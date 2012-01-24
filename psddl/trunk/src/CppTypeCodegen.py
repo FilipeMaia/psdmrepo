@@ -43,6 +43,7 @@ from psddl.Attribute import Attribute
 from psddl.ExprVal import ExprVal
 from psddl.Method import Method
 from psddl.Type import Type
+from psddl.Template import Template as T
 
 #----------------------------------
 # Local non-exported definitions --
@@ -106,33 +107,33 @@ class CppTypeCodegen ( object ) :
         logging.debug("CppTypeCodegen.codegen: type=%s", repr(self._type))
 
         # class-level comment
-        print >>self._inc, "\n/** @class %s\n\n  %s\n*/\n" % (self._type.name, self._type.comment)
+        print >>self._inc, T("\n/** @class $name\n\n  $comment\n*/\n")[self._type]
 
         # declare config classes if needed
         for cfg in self._type.xtcConfig:
-            print >>self._inc, "class %s;" % cfg.name
+            print >>self._inc, T("class $name;")[cfg]
 
         # for non-abstract types C++ may need pack pragma
         needPragmaPack = not self._abs and self._type.pack
         if needPragmaPack : 
-            print >>self._inc, "#pragma pack(push,%s)" % self._type.pack
+            print >>self._inc, T("#pragma pack(push,$pack)")[self._type]
 
         # base class
         base = ""
-        if self._type.base : base = ": public %s" % self._type.base.name
+        if self._type.base : base = T(": public $name")[self._type.base]
 
         # start class declaration
-        print >>self._inc, "\nclass %s%s {" % (self._type.name, base)
+        print >>self._inc, T("\nclass $name$base {")(name = self._type.name, base = base)
         access = "private"
 
         # enums for version and typeId
         access = self._access("public", access)
         if self._type.type_id is not None: 
             doc = '/**< XTC type ID value (from Pds::TypeId class) */'
-            print >>self._inc, "  enum { TypeId = Pds::TypeId::%s %s };" % (self._type.type_id, doc)
+            print >>self._inc, T("  enum { TypeId = Pds::TypeId::$type_id $doc };")(type_id=self._type.type_id, doc=doc)
         if self._type.version is not None: 
             doc = '/**< XTC type version number */'
-            print >>self._inc, "  enum { Version = %s %s };" % (self._type.version, doc)
+            print >>self._inc, T("  enum { Version = $version $doc };")(version=self._type.version, doc=doc)
 
         # enums for constants
         access = self._access("public", access)
@@ -153,8 +154,8 @@ class CppTypeCodegen ( object ) :
         if self._abs:
             # need virtual destructor
             access = self._access("public", access)
-            print >>self._inc, "  virtual ~%s();" % self._type.name
-            print >>self._cpp, "\n%s::~%s() {}\n" % (self._type.name, self._type.name)
+            print >>self._inc, T("  virtual ~$name();")[self._type]
+            print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
@@ -187,19 +188,19 @@ class CppTypeCodegen ( object ) :
     def _genConst(self, const):
         
         doc = ""
-        if const.comment: doc = "/**< %s */ " %  const.comment
-        print >>self._inc, "  enum { %s = %s %s};" % (const.name, const.value, doc)
+        if const.comment: doc = T("/**< $comment */ ")[const]
+        print >>self._inc, T("  enum { $name = $value $doc};")(name=const.name, value=const.value, doc=doc)
 
     def _genEnum(self, enum):
         
-        if enum.comment: print >>self._inc, "\n  /** %s */" % (enum.comment)
-        print >>self._inc, "  enum %s {" % (enum.name or "",)
+        if enum.comment: print >>self._inc, T("\n  /** $comment */")[enum]
+        print >>self._inc, T("  enum $name {")(name = enum.name or "")
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
             doc = ""
-            if const.comment: doc = ' /**< %s */' % const.comment
-            print >>self._inc, "    %s%s,%s" % (const.name, val, doc)
+            if const.comment: doc = T(' /**< $comment */')[const]
+            print >>self._inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self._inc, "  };"
 
     def _genAttrDecl(self, attr):
@@ -208,20 +209,20 @@ class CppTypeCodegen ( object ) :
         logging.debug("_genAttrDecl: attr: %s", attr)
         
         doc = ""
-        if attr.comment : doc = "\t/**< %s */" % attr.comment.strip()
+        if attr.comment : doc = T("\t/**< $comment */")(comment = attr.comment.strip())
         
         if not attr.shape :
             if attr.isfixed():
-                decl = "  %s\t%s;%s" % (_typename(attr.type), attr.name, doc)
+                decl = T("  $type\t$name;$doc")(type=_typename(attr.type), name=attr.name, doc=doc)
             else:
-                decl = "  //%s\t%s;" % (_typename(attr.type), attr.name)
+                decl = T("  //$type\t$name;")(type=_typename(attr.type), name=attr.name)
         else:
             if attr.isfixed():
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
-                decl = "  %s\t%s%s;%s" % (_typename(attr.type), attr.name, dim, doc)
+                decl = T("  $type\t$name$shape;$doc")(type=_typename(attr.type), name=attr.name, shape=dim, doc=doc)
             else :
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
-                decl = "  //%s\t%s%s;" % (_typename(attr.type), attr.name, dim)
+                decl = T("  //$type\t$name$shape;")(type=_typename(attr.type), name=attr.name, shape=dim)
         print >>self._inc, decl
 
 
@@ -346,12 +347,12 @@ class CppTypeCodegen ( object ) :
 
         if attr.isfixed():
 
-            return "return " + attr.name + ";"
+            return T("return $name;")[attr]
         
         else:
             
-            body = "ptrdiff_t offset=%s;" % str(attr.offset)
-            body += "\n  return *(const %s*)(((const char*)this)+offset);" % _typename(attr.type)
+            body = T("ptrdiff_t offset=$offset;")[attr]
+            body += T("\n  return *(const $type*)(((const char*)this)+offset);")(type=_typename(attr.type))
             return body
 
     def _bodyCharArrray(self, attr):
@@ -359,15 +360,14 @@ class CppTypeCodegen ( object ) :
 
         if attr.isfixed():
 
-            return "return " + attr.name + _dimexpr(attr.shape.dims[:-1]) + ";"
+            return T("return $name$dimexpr;")(name=attr.name, dimexpr=_dimexpr(attr.shape.dims[:-1]))
         
         else:
             
-            dims = _dims(attr.shape.dims[1:])
-            body = "typedef char atype" + dims + ';'
-            body += "\n  ptrdiff_t offset=%s;" % str(attr.offset)
+            body = T("typedef char atype$dims;")(dims=_dims(attr.shape.dims[1:]))
+            body += T("\n  ptrdiff_t offset=$offset;")[attr]
             body += "\n  const atype* pchar = (const atype*)(((const char*)this)+offset);"
-            body += "\n  return pchar" + _dimexpr(attr.shape.dims[:-1]) + ';'
+            body += T("\n  return pchar$dimexpr;")(dimexpr=_dimexpr(attr.shape.dims[:-1]))
             return body
 
     def _bodyNDArrray(self, attr):
@@ -377,14 +377,13 @@ class CppTypeCodegen ( object ) :
         if attr.isfixed():
 
             idx0 = "[0]" * len(attr.shape.dims)
-            return "return make_ndarray(&%s%s, %s);" % (attr.name, idx0, shape)
+            return T("return make_ndarray(&$name$idx, $shape);")(name=attr.name, idx=idx0, shape=shape)
 
         else:
             
-            typename = _typename(attr.type)
-            body = "ptrdiff_t offset=%s;" % str(attr.offset)
-            body += "\n  %s* data = (%s*)(((const char*)this)+offset);" % (typename, typename)
-            body += "\n  return make_ndarray(data, %s);" % shape
+            body = T("ptrdiff_t offset=$offset;")[attr]
+            body += T("\n  $type* data = ($type*)(((const char*)this)+offset);")(type=_typename(attr.type))
+            body += T("\n  return make_ndarray(data, $shape);")(shape=shape)
             return body
 
     def _bodyAnyArrray(self, attr):
@@ -393,7 +392,7 @@ class CppTypeCodegen ( object ) :
         shape = ', '.join([str(s or 0) for s in attr.shape.dims])
         if attr.isfixed():
 
-            return "return " + attr.name + _dimexpr(attr.shape.dims) + ";"
+            return T("return $name$dimexpr;")(name=attr.name, dimexpr=_dimexpr(attr.shape.dims))
 
         elif attr.type.variable:
             
@@ -403,11 +402,11 @@ class CppTypeCodegen ( object ) :
                 sizeofCfg = '{xtc-config}'
                 
             typename = _typename(attr.type)
-            body = "const char* memptr = ((const char*)this)+%s;" % str(attr.offset)
+            body = T("const char* memptr = ((const char*)this)+$offset;")[attr]
             body += "\n  for (uint32_t i=0; i != i0; ++ i) {"
-            body += "\n    memptr += ((const %s*)memptr)->_sizeof(%s);" % (typename, sizeofCfg)
+            body += T("\n    memptr += ((const $typename*)memptr)->_sizeof($sizeofCfg);")(locals())
             body += "\n  }"
-            body += "\n  return *(const %s*)(memptr);" % (typename)
+            body += T("\n  return *(const $typename*)(memptr);")(locals())
             return body
 
         else:
@@ -422,10 +421,10 @@ class CppTypeCodegen ( object ) :
                 sizeofCfg = '{xtc-config}'
 
             typename = _typename(attr.type)
-            body = "ptrdiff_t offset=%s;" % str(attr.offset)
-            body += "\n  const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename, typename)
-            body += "\n  size_t memsize = memptr->_sizeof(%s);" % (sizeofCfg,)
-            body += "\n  return *(const %s*)((const char*)memptr + (%s)*memsize);" % (typename, idxexpr)
+            body = T("ptrdiff_t offset=$offset;")[attr]
+            body += T("\n  const $typename* memptr = (const $typename*)(((const char*)this)+offset);")(locals())
+            body += T("\n  size_t memsize = memptr->_sizeof($sizeofCfg);")(locals())
+            body += T("\n  return *(const $typename*)((const char*)memptr + ($idxexpr)*memsize);")(locals())
             return body
 
 
@@ -433,7 +432,7 @@ class CppTypeCodegen ( object ) :
         """ Generate method, both declaration and definition, given the expression that it returns"""
 
         body = expr
-        if body and rettype != 'void': body = "return %s;" % (expr,)
+        if body and rettype != 'void': body = T("return $expr;")(locals())
         self._genMethodBody(methname, rettype, body, args=args, inline=inline, static=static, doc=doc)
         
     def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
@@ -450,29 +449,29 @@ class CppTypeCodegen ( object ) :
             const = "const"
         
 
-        if doc: print >>self._inc, '  /** %s */' % doc
+        if doc: print >>self._inc, T('  /** $doc */')(locals())
 
         if self._abs and not static:
             
             # abstract method declaration, body is not needed
-            print >>self._inc, "  virtual %s %s(%s) const = 0;" % (rettype, methname, argsspec)
+            print >>self._inc, T("  virtual $rettype $methname($argsspec) const = 0;")(locals())
 
         elif not body:
 
             # declaration only, implementation provided somewhere else
-            print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
+            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
 
         elif inline:
             
             # inline method
-            print >>self._inc, "  %s%s %s(%s) %s { %s }" % (static, rettype, methname, argsspec, const, body)
+            print >>self._inc, T("  $static$rettype $methname($argsspec) $const { $body }")(locals())
         
         else:
             
             # out-of-line method
-            print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
-            print >>self._cpp, "%s\n%s::%s(%s) %s {\n  %s\n}" % \
-                    (rettype, self._type.name, methname, argsspec, const, body)
+            classname = self._type.name
+            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
+            print >>self._cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
 
 
 
@@ -546,7 +545,7 @@ class CppTypeCodegen ( object ) :
                 init = ctor.attr_init[attr.name]
             else:
                 init = ""
-            if init: initlist.append("%s(%s)" % (attr.name, init))
+            if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
 
         # do we need generate definition too?
         if 'c++-definition' in ctor.tags:
@@ -560,36 +559,36 @@ class CppTypeCodegen ( object ) :
         if not genDef:
             
             # simply a declaration
-            print >>self._inc, "  %s(%s);" % (self._type.name, arglist)
+            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
 
         elif 'inline' in ctor.tags:
             
             # inline the definition
-            print >>self._inc, "  %s(%s)" % (self._type.name, arglist)
-            if initlist: print >>self._inc, "    : %s" % (', '.join(initlist))
+            print >>self._inc, T("  $name($args)")(name=self._type.name, args=arglist)
+            if initlist: print >>self._inc, "    :", ', '.join(initlist)
             print >>self._inc, "  {"
             for attr in self._type.attributes():
                 arg = attr2arg.get(attr,"")
                 if attr.shape and arg:
                     size = attr.shape.size()
                     first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, "    std::copy(%s, %s+(%s), %s%s);" % (arg, arg, size, attr.name, first)
+                    print >>self._inc, T("    std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
             print >>self._inc, "  }"
 
         else:
             
             # out-line the definition
-            print >>self._inc, "  %s(%s);" % (self._type.name, arglist)
+            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
 
-            print >>self._cpp, "%s::%s(%s)" % (self._type.name, self._type.name, arglist)
-            if initlist: print >>self._cpp, "    : %s" % (', '.join(initlist))
+            print >>self._cpp, T("$name::$name($args)")(name=self._type.name, args=arglist)
+            if initlist: print >>self._cpp, "    :", ', '.join(initlist)
             print >>self._cpp, "{"
             for attr in self._type.attributes():
                 arg = attr2arg.get(attr,"")
                 if attr.shape and arg:
                     size = attr.shape.size()
                     first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, "  std::copy(%s, %s+(%s), %s%s);" % (arg, arg, size, attr.name, first)
+                    print >>self._inc, T("  std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
             print >>self._cpp, "}"
 
 
@@ -607,9 +606,9 @@ class CppTypeCodegen ( object ) :
         shape = [str(s or -1) for s in attr.shape.dims]
 
         body = "std::vector<int> shape;" 
-        body += "\n  shape.reserve(%d);" % len(shape)
+        body += T("\n  shape.reserve($size);")(size=len(shape))
         for s in shape:
-            body += "\n  shape.push_back(%s);" % s
+            body += T("\n  shape.push_back($dim);")(dim=s)
         body += "\n  return shape;"
 
         # guess if we need to pass cfg object to method

@@ -44,6 +44,7 @@ import types
 from psddl.CppTypeCodegen import CppTypeCodegen
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.Template import Template as T
 
 #----------------------------------
 # Local non-exported definitions --
@@ -115,8 +116,8 @@ class DdlPsanaInterfaces ( object ) :
                 print >>self.inc, "#include \"%s\"" % header
 
         if self.top_pkg : 
-            print >>self.inc, "namespace %s {" % self.top_pkg
-            print >>self.cpp, "namespace %s {" % self.top_pkg
+            print >>self.inc, T("namespace $top_pkg {")[self]
+            print >>self.cpp, T("namespace $top_pkg {")[self]
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -125,8 +126,8 @@ class DdlPsanaInterfaces ( object ) :
                 self._parsePackage(pkg)
 
         if self.top_pkg : 
-            print >>self.inc, "} // namespace %s" % self.top_pkg
-            print >>self.cpp, "} // namespace %s" % self.top_pkg
+            print >>self.inc, T("} // namespace $top_pkg")[self]
+            print >>self.cpp, T("} // namespace $top_pkg")[self]
 
         # close include guard
         print >>self.inc, "#endif //", self.guard
@@ -139,8 +140,8 @@ class DdlPsanaInterfaces ( object ) :
     def _parsePackage(self, pkg):
 
         # open namespaces
-        print >>self.inc, "namespace %s {" % pkg.name
-        print >>self.cpp, "namespace %s {" % pkg.name
+        print >>self.inc, T("namespace $name {")[pkg]
+        print >>self.cpp, T("namespace $name {")[pkg]
 
         # enums for constants
         for const in pkg.constants() :
@@ -164,8 +165,8 @@ class DdlPsanaInterfaces ( object ) :
                 self._parseType(type = ns)
 
         # close namespaces
-        print >>self.inc, "} // namespace %s" % pkg.name
-        print >>self.cpp, "} // namespace %s" % pkg.name
+        print >>self.inc, T("} // namespace $name")[pkg]
+        print >>self.cpp, T("} // namespace $name")[pkg]
 
     def _parseType(self, type):
 
@@ -182,19 +183,18 @@ class DdlPsanaInterfaces ( object ) :
 
     def _genConst(self, const):
         
-        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
-                (const.name, const.value, const.comment)
+        print >>self.inc, T("  enum {\n    $name = $value /**< $comment */\n  };")[const]
 
     def _genEnum(self, enum):
         
-        if enum.comment: print >>self.inc, "\n  /** %s */" % (enum.comment)
-        print >>self.inc, "  enum %s {" % (enum.name or "",)
+        if enum.comment: print >>self.inc, T("\n  /** $comment */")[enum]
+        print >>self.inc, T("  enum $name {")(name = enum.name or "")
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
             doc = ""
-            if const.comment: doc = ' /**< %s */' % const.comment
-            print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
+            if const.comment: doc = T(' /**< $comment */')[const]
+            print >>self.inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self.inc, "  };"
 
 

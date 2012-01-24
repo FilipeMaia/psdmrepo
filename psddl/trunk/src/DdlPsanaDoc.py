@@ -44,6 +44,7 @@ import cgi
 from psddl.Constant import Constant
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.Template import Template as T
 
 #----------------------------------
 # Local non-exported definitions --
@@ -123,7 +124,12 @@ def _typedecl(type):
     return typename
 
 def _esc(s):
-    return cgi.escape(s)
+    if type(s) == type({}):
+        return dict([(k, _esc(v)) for k, v in s.iteritems()])
+    elif type(s) == type(""):
+        return cgi.escape(s)
+    else:
+        return s
 
 #------------------------
 # Exported definitions --
@@ -172,7 +178,9 @@ class DdlPsanaDoc ( object ) :
         if packages:
             print >>out, '<h2>Packages/namespaces</h2><ul>'
             for pkg in packages :
-                print >>out, '<li><a href="%s">%s</a></li>' % (_esc(self._pkgFileName(pkg)), _esc(pkg.fullName('C++',self.top_pkg)))
+                href = _esc(self._pkgFileName(pkg))
+                name = _esc(pkg.fullName('C++',self.top_pkg))
+                print >>out, T('<li><a href="$href">$name</a></li>')(locals())
             print >>out, '</ul>'
 
     def printTypes(self, ns, out):
@@ -181,7 +189,7 @@ class DdlPsanaDoc ( object ) :
         if types:
             print >>out, '<h2>Types/classes</h2><ul>'
             for type in types :
-                print >>out, '<li>%s</li>' % self._typeRef(type)
+                print >>out, T('<li>$ref</li>')(ref=self._typeRef(type))
             print >>out, '</ul>'
 
     def printConstants(self, ns, out):
@@ -201,28 +209,25 @@ class DdlPsanaDoc ( object ) :
         if constants:
             print >>out, '<h2>Constants</h2>'
             for const in constants:
-                print >>out, '<div class="descr"><div class="def">'
-                print >>out, '%s = %s' % (_esc(const.name), _esc(const.value))
-                print >>out, '</div>'
-                print >>out, '%s' % _esc(const.comment)
-                print >>out, '</div>'
+                print >>out, T('<div class="descr"><div class="def">$name = $value</div>$comment</div>')\
+                        (_esc(const.__dict__))
 
 
     def printEnum(self, enum, out):
         
         
-        print >>out, '<div class="descr"><div class="def" id="enum_%s">' % enum.name
-        print >>out, 'Enumeration <font class="enumname">%s</font>' % _esc(enum.fullName('C++',self.top_pkg))
+        print >>out, T('<div class="descr"><div class="def" id="enum_$name">')[enum]
+        print >>out, T('Enumeration <font class="enumname">$name</font>')(name=_esc(enum.fullName('C++',self.top_pkg)))
         print >>out, '</div>'
-        print >>out, "<p>%s</p>" % _esc(enum.comment)
+        print >>out, T("<p>$comment</p>")(_esc(enum.__dict__))
         print >>out, "<p>Enumerators:<table>"
         for const in enum.constants() :
             print >>out, '<tr>'
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>out, '<td class="const">%s</td>' % _esc(const.name)
-            print >>out, '<td class="const">%s</td>' % _esc(val)
-            print >>out, '<td>%s</td>' % _esc(const.comment)
+            print >>out, T('<td class="const">$name</td>')(_esc(const.__dict__))
+            print >>out, T('<td class="const">$value</td>')(value=_esc(val))
+            print >>out, T('<td>$comment</td>')(_esc(const.__dict__))
             print >>out, '</tr>'
         print >>out, "</table></p>"
         print >>out, '</div>'
@@ -265,8 +270,8 @@ class DdlPsanaDoc ( object ) :
 
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
-        self._htmlHeader(out, "Package %s Reference" % _esc(pkgname))
-        print >>out, '<h1>Package %s Reference</h1>' % _esc(pkgname)
+        self._htmlHeader(out, T("Package $name Reference")(name=_esc(pkgname)))
+        print >>out, T('<h1>Package $name Reference</h1>')(name=_esc(pkgname))
 
         print >>out, _esc(pkg.comment)
 
@@ -295,17 +300,19 @@ class DdlPsanaDoc ( object ) :
 
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
-        self._htmlHeader(out, "Class %s Reference" % _esc(typename))
-        print >>out, '<h1>Class %s Reference</h1>' % _esc(typename)
+        self._htmlHeader(out, T("Class $name Reference")(name=_esc(typename)))
+        print >>out, T('<h1>Class $name Reference</h1>')(name=_esc(typename))
 
         if type.location:
             include = os.path.basename(type.location)
             include = os.path.splitext(include)[0] + '.h'
-            repourl = "https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/%s/trunk/include/%s" % (self.psana_inc, include)
-            print >>out, '<p>Include: <span class="code">#include "<a href="%s">%s/%s</a>"</span></p>' % (repourl, _esc(self.psana_inc), _esc(include))
+            repourl = T("https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/$package/trunk/include/$header")\
+                    (package=self.psana_inc, header=include)
+            print >>out, T('<p>Include: <span class="code">#include "<a href="$href">$package/$header</a>"</span></p>')\
+                    (href=repourl, package=_esc(self.psana_inc), header=_esc(include))
 
         if type.base:
-            print >>out, "<p>Base class: %s</p>" % self._typeRef(type.base)
+            print >>out, T("<p>Base class: $base</p>")(base=self._typeRef(type.base))
 
         print >>out, _esc(type.comment)
             
@@ -346,12 +353,8 @@ class DdlPsanaDoc ( object ) :
             print >>out, '<h2>Member Functions Reference</h2>'
             
             for meth in mlist:
-                print >>out, '<div class="descr">'
-                print >>out, '<div class="def" id="meth_%s">' % meth[0]
-                print >>out, self._methDecl2(*meth)
-                print >>out, '</div>'
-                print >>out, _esc(meth[3])
-                print >>out, '</div>'
+                print >>out, T('<div class="descr"><div class="def" id="meth_$name">$decl</div>$descr</div>')\
+                        (name=meth[0], decl=self._methDecl2(*meth), descr=_esc(meth[3]))
         
 
         self._htmlFooter(out)
@@ -359,8 +362,8 @@ class DdlPsanaDoc ( object ) :
 
     def _methDecl(self, name, rettype, args, descr):
 
-        return '<tr><td class="methrettype">%s</td><td class="methdecl">%s(%s)</td></tr>' % \
-            (_esc(rettype), self._methRef(_esc(name)), _esc(args))
+        return T('<tr><td class="methrettype">$type</td><td class="methdecl">$name($args)</td></tr>')\
+            (type=_esc(rettype), name=self._methRef(_esc(name)), args=_esc(args))
 
     def _methShapeDescr(self, attr):
 
@@ -372,7 +375,7 @@ class DdlPsanaDoc ( object ) :
                 _esc(attr.name)
 
     def _methDecl2(self, name, rettype, args, descr):
-        return '%s %s(%s)' % (_esc(rettype), _esc(name), _esc(args))
+        return T('$type $name($args)')(type=_esc(rettype), name=_esc(name), args=_esc(args))
 
     def _methReturnType(self, meth):
 
@@ -392,7 +395,7 @@ class DdlPsanaDoc ( object ) :
             elif meth.attribute.type.value_type :
                 
                 # return ndarray
-                typename = "ndarray<%s, %d>" % (_typename(meth.attribute.type), len(meth.attribute.shape.dims))
+                typename = T("ndarray<$type, $rank>")(type=_typename(meth.attribute.type), rank=len(meth.attribute.shape.dims))
 
             else:
 
@@ -407,7 +410,7 @@ class DdlPsanaDoc ( object ) :
 
             typename = _typedecl(meth.type)
             if meth.rank > 0:
-                typename = "ndarray<%s, %d>" % (typename, meth.rank)
+                typename = T("ndarray<$type, $rank>")(type=typename, rank=meth.rank)
             
         return typename
 
@@ -433,8 +436,8 @@ class DdlPsanaDoc ( object ) :
         
         print >>f, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
         print >>f, '<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">'
-        print >>f, '<title>%s</title>' % title
-        print >>f, '<link href="%s" rel="stylesheet" type="text/css">' % _css_file
+        print >>f, T('<title>$title</title>')(locals())
+        print >>f, T('<link href="$href" rel="stylesheet" type="text/css">')(href=_css_file)
         print >>f, '</head><body>'
 
     def _htmlFooter(self, f):
@@ -453,15 +456,19 @@ class DdlPsanaDoc ( object ) :
 
     def _pkgRef(self, pkg):
 
-        return '<a href="%s">%s</a>' % (self._pkgFileName(pkg), _esc(pkg.fullName('C++',self.top_pkg)))
+        return self._href(self._pkgFileName(pkg), _esc(pkg.fullName('C++',self.top_pkg)))
 
     def _typeRef(self, type):
 
-        return '<a href="%s">%s</a>' % (self._typeFileName(type), _esc(type.fullName('C++',self.top_pkg)))
+        return self._href(self._typeFileName(type), _esc(type.fullName('C++',self.top_pkg)))
 
     def _methRef(self, methname):
 
-        return '<a href="#meth_%s">%s</a>' % (methname, _esc(methname))
+        return self._href('#meth_'+methname, _esc(methname))
+
+    def _href(self, href, name):
+
+        return T('<a href="$href">$name</a>')(locals())
 
 
 

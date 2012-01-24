@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2012-01-12 Andy Salnikov
+- use templates ($name substitution) instead of formatting (%s) for 
+  code generation in many places.
+- at some point it may be beneficial to switch to more advanced
+  templating system than to keep all stuff in Python code.
+
 Tag: V00-01-02
 2012-01-12 Andy Salnikov
 - extending method generation capabilities

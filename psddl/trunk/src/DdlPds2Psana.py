@@ -45,6 +45,7 @@ from psddl.Attribute import Attribute
 from psddl.Enum import Enum
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.Template import Template as T
 
 #----------------------------------
 # Local non-exported definitions --
@@ -118,15 +119,15 @@ class DdlPds2Psana ( object ) :
         print >>self.inc, "#include <boost/shared_ptr.hpp>"
 
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
-        print >>self.cpp, "#include \"%s\"\n" % inc
+        print >>self.cpp, T("#include \"$inc\"\n")(locals())
         print >>self.cpp, "#include <cstddef>\n"
         print >>self.cpp, "#include <stdexcept>\n"
 
         # headers for psana and pdsdata includes
         inc = os.path.join(self.psana_inc, os.path.basename(self.incname))
-        print >>self.inc, "#include \"%s\"" % inc
+        print >>self.inc, T("#include \"$inc\"")(locals())
         inc = os.path.join(self.pdsdata_inc, os.path.basename(self.incname))
-        print >>self.inc, "#include \"%s\"" % inc
+        print >>self.inc, T("#include \"$inc\"")(locals())
 
         # headers for other included packages
         for use in model.use:
@@ -137,11 +138,11 @@ class DdlPds2Psana ( object ) :
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
-                print >>self.inc, "#include \"%s\"" % header
+                print >>self.inc, T("#include \"$header\"")(locals())
 
         if self.top_pkg : 
-            print >>self.inc, "namespace %s {" % self.top_pkg
-            print >>self.cpp, "namespace %s {" % self.top_pkg
+            print >>self.inc, T("namespace $top_pkg {")[self]
+            print >>self.cpp, T("namespace $top_pkg {")[self]
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -150,8 +151,8 @@ class DdlPds2Psana ( object ) :
                 self._parsePackage(pkg)
 
         if self.top_pkg : 
-            print >>self.inc, "} // namespace %s" % self.top_pkg
-            print >>self.cpp, "} // namespace %s" % self.top_pkg
+            print >>self.inc, T("} // namespace $top_pkg")[self]
+            print >>self.cpp, T("} // namespace $top_pkg")[self]
 
         # close include guard
         print >>self.inc, "#endif //", self.guard
@@ -164,8 +165,8 @@ class DdlPds2Psana ( object ) :
     def _parsePackage(self, pkg):
 
         # open namespaces
-        print >>self.inc, "namespace %s {" % pkg.name
-        print >>self.cpp, "namespace %s {" % pkg.name
+        print >>self.inc, T("namespace $name {")[pkg]
+        print >>self.cpp, T("namespace $name {")[pkg]
 
         # regular enums
         for enum in pkg.enums() :
@@ -184,8 +185,8 @@ class DdlPds2Psana ( object ) :
                 self._parseType(type = ns)
 
         # close namespaces
-        print >>self.inc, "} // namespace %s" % pkg.name
-        print >>self.cpp, "} // namespace %s" % pkg.name
+        print >>self.inc, T("} // namespace $name")[pkg]
+        print >>self.cpp, T("} // namespace $name")[pkg]
 
     def _genEnum(self, enum):
 
@@ -193,11 +194,10 @@ class DdlPds2Psana ( object ) :
 
         if not enum.name: return
 
-        pdstypename = enum.fullName('C++', self.pdsdata_ns)
-        psanatypename = enum.fullName('C++', self.psana_ns)
+        pdstype = enum.fullName('C++', self.pdsdata_ns)
+        psanatype = enum.fullName('C++', self.psana_ns)
         
-        print >>self.cpp, "%s pds_to_psana(%s e)\n{\n  return %s(e);\n}\n" % \
-            (psanatypename, pdstypename, psanatypename)
+        print >>self.cpp, T("$psanatype pds_to_psana($pdstype e)\n{\n  return $psanatype(e);\n}\n")(locals())
 
 
     def _parseType(self, type):
@@ -286,19 +286,19 @@ class DdlPds2Psana ( object ) :
                     expr = "pds."+dest.accessor.name+"().data()"
                 
             if not atype.basic and not atype.external and not isinstance(atype, Enum):
-                expr = "pds_to_psana(%s)" % expr
+                expr = T("pds_to_psana($expr)")(expr=expr)
             ctor_args.append(expr)
 
         ctor_args = ', '.join(ctor_args)
 
 
-        print >>self.inc, "%s::%s pds_to_psana(%s::%s pds);\n" % \
-            (self.psana_ns, typename, self.pdsdata_ns, typename)
+        print >>self.inc, T("$psana_ns::$typename pds_to_psana($pdsdata_ns::$typename pds);\n")\
+            (self.__dict__, typename=typename)
 
-        print >>self.cpp, "%s::%s pds_to_psana(%s::%s pds)\n{" % \
-            (self.psana_ns, typename, self.pdsdata_ns, typename)
-        print >>self.cpp, "  return %s::%s(%s);" % \
-            (self.psana_ns, typename, ctor_args)
+        print >>self.cpp, T("$psana_ns::$typename pds_to_psana($pdsdata_ns::$typename pds)\n{")\
+            (self.__dict__, typename=typename)
+        print >>self.cpp, T("  return $psana_ns::$typename($ctor_args);")\
+            (locals(), psana_ns=self.psana_ns)
         print >>self.cpp, "}\n"
         
 
@@ -315,17 +315,17 @@ class DdlPds2Psana ( object ) :
         pdstypename = type.fullName('C++', self.pdsdata_ns)
         psanatypename = type.fullName('C++', self.psana_ns)
 
-        print >>self.inc, "\nclass %s : public %s {\npublic:" % (type.name, psanatypename)
+        print >>self.inc, T("\nclass $name : public $psanatype {\npublic:")(name=type.name, psanatype=psanatypename)
 
-        print >>self.inc, "  typedef %s XtcType;" % (pdstypename, )
-        print >>self.inc, "  typedef %s PsanaType;" % (psanatypename)
+        print >>self.inc, T("  typedef $pdstypename XtcType;")(locals())
+        print >>self.inc, T("  typedef $psanatypename PsanaType;")(locals())
         
         configs = type.xtcConfig or [None]
         for cfgnum, cfg in enumerate(configs):
             self._genCtor(type, cfg, cfgnum)
         
-        print >>self.inc, "  virtual ~%s();" % type.name
-        print >>self.cpp, "%s::~%s()\n{\n}\n" % (type.name, type.name)
+        print >>self.inc, T("  virtual ~$name();")[type]
+        print >>self.cpp, T("$name::~$name()\n{\n}\n")[type]
 
         # declarations for public methods 
         for t in _types(type):
@@ -346,8 +346,8 @@ class DdlPds2Psana ( object ) :
         # declaration for config pointers
         configs = type.xtcConfig or []
         for cfgnum, cfg in enumerate(configs):
-            print >>self.inc, "  boost::shared_ptr<const %s> m_cfgPtr%i;" % \
-                (cfg.fullName('C++', self.pdsdata_ns), cfgnum)
+            print >>self.inc, T("  boost::shared_ptr<const $type> m_cfgPtr$cfgnum;")\
+                (type=cfg.fullName('C++', self.pdsdata_ns), cfgnum=cfgnum)
         
         # declarations for data members
         for attr in type.attributes() :
@@ -382,7 +382,7 @@ class DdlPds2Psana ( object ) :
                         rettype = "const char*"
                         args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
                     else:
-                        rettype = "ndarray<%s, %d>" % (rettype, len(attr.shape.dims))
+                        rettype = T("ndarray<$type, $rank>")(type=rettype, rank=len(attr.shape.dims))
                 self._genFwdMeth(meth.name, rettype, type, cfgNeeded, args=args)
             
             else:
@@ -392,28 +392,28 @@ class DdlPds2Psana ( object ) :
                 if not attr.shape:
                     
                     # attribute is a regular non-array object
-                    print >>self.inc, "  virtual const %s& %s() const;" % \
-                            (psana_type, meth.name)
-                    print >>self.cpp, "\nconst %s& %s::%s() const { return %s; }" % \
-                            (psana_type, type.name, meth.name, attr.name)
+                    print >>self.inc, T("  virtual const $type& $name() const;")(type=psana_type, name=meth.name)
+                    print >>self.cpp, T("\nconst $type& $classname::$name() const { return $attr; }")\
+                            (type=psana_type, classname=type.name, name=meth.name, attr=attr.name)
                         
                 elif attr.type.value_type:
                     
                     # attribute is an array accessed through ndarray
-                    ndarray = "ndarray<%s, %d>" % (psana_type, len(attr.shape.dims))
-                    print >>self.inc, "  virtual %s %s() const;" % (ndarray, meth.name)
-                    expr = "%s(&%s_ndarray_storage_[0], %s_ndarray_shape_)" % (ndarray, attr.name, attr.name)
-                    print >>self.cpp, "\n%s %s::%s() const { return %s; }" % (ndarray, type.name, meth.name, expr)
+                    ndarray = T("ndarray<$type, $rank>")(type=psana_type, rank=len(attr.shape.dims))
+                    print >>self.inc, T("  virtual $type $name() const;")(type=ndarray, name=meth.name)
+                    expr = T("$type(&${name}_ndarray_storage_[0], ${name}_ndarray_shape_)")(type=ndarray, name=attr.name)
+                    print >>self.cpp, T("\n$type $classname::$name() const { return $expr; }")\
+                            (type=ndarray, classname=type.name, name=meth.name, expr=expr)
                         
                 else:
     
                     # attribute is an array object, return pointer for basic types,
                     # or reference to elements for composite types
                     expr = attr.name + _dimexpr(attr.shape)
-                    print >>self.inc, "  virtual const %s& %s(%s) const;" % \
-                            (psana_type, meth.name, _dimargs(attr.shape))
-                    print >>self.cpp, "\nconst %s& %s::%s(%s) const { return %s; }" % \
-                            (psana_type, type.name, meth.name, _dimargs(attr.shape), expr)
+                    print >>self.inc, T("  virtual const $type& $meth($args) const;")\
+                            (type=psana_type, meth=meth.name, args=_dimargs(attr.shape))
+                    print >>self.cpp, T("\nconst $type& $classname::$meth($args) const { return $expr; }")\
+                            (type=psana_type, classname=type.name, meth=meth.name, args=_dimargs(attr.shape), expr=expr)
 
         else:
 
@@ -429,7 +429,7 @@ class DdlPds2Psana ( object ) :
                 if not expr : expr = meth.expr.get("Any")
                 if expr:
                     body = expr
-                    if type: body = "return %s;" % expr
+                    if type: body = T("return $expr;")(locals())
             cfgNeeded = False
             if body:
                 cfgNeeded = body.find('{xtc-config}') >= 0
@@ -442,7 +442,7 @@ class DdlPds2Psana ( object ) :
             elif rettype.basic and not isinstance(rettype, Enum):
                 rettype = rettype.fullName('C++')
                 if meth.rank > 0:
-                    rettype = "ndarray<%s, %d>" % (rettype, meth.rank)
+                    rettype = T("ndarray<$type, $rank>")(type=rettype, rank=meth.rank)
             else:
                 cvt = True
                 rettype = rettype.fullName('C++', self.psana_ns)
@@ -458,24 +458,24 @@ class DdlPds2Psana ( object ) :
         passargs = [aname for aname, atype in args]
         passargs = ', '.join(passargs)
         
-        print >>self.inc, "  virtual %s %s(%s) const;" % (typedecl, name, argdecl)
+        print >>self.inc, T("  virtual $type $meth($args) const;")(type=typedecl, meth=name, args=argdecl)
         cfg = ''
         if cfgNeeded :
-            print >>self.cpp, "\n%s %s::%s(%s) const {" % (typedecl, type.name, name, argdecl)
+            print >>self.cpp, T("\n$type $Class::$meth($args) const {")(type=typedecl, Class=type.name, meth=name, args=argdecl)
             for i in range(len(type.xtcConfig)):
                 if cvt:
-                    print >>self.cpp, "  if (m_cfgPtr%i.get()) return pds_to_psana(m_xtcObj->%s(*m_cfgPtr%i));" % (i, name, i)
+                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$i));")(locals())
                 else:
-                    print >>self.cpp, "  if (m_cfgPtr%i.get()) return m_xtcObj->%s(*m_cfgPtr%i);" % (i, name, i)
-            print >>self.cpp, "  throw std::runtime_error(\"%s::%s: config object pointer is zero\");" % (type.name, name)    
+                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return m_xtcObj->$name(*m_cfgPtr$i);")(locals())
+            print >>self.cpp, T("  throw std::runtime_error(\"$Class::$meth: config object pointer is zero\");")(Class=type.name, meth=name)
             print >>self.cpp, "}\n"
         else:
             if cvt:
-                print >>self.cpp, "\n%s %s::%s(%s) const { return pds_to_psana(m_xtcObj->%s(%s)); }" % \
-                        (typedecl, type.name, name, argdecl, name, passargs)
+                print >>self.cpp, T("\n$type $Class::$meth($args) const { return pds_to_psana(m_xtcObj->$meth($passargs)); }")\
+                        (type=typedecl, Class=type.name, meth=name, args=argdecl, passargs=passargs)
             else:
-                print >>self.cpp, "\n%s %s::%s(%s) const { return m_xtcObj->%s(%s); }" % \
-                        (typedecl, type.name, name, argdecl, name, passargs)
+                print >>self.cpp, T("\n$type $Class::$meth($args) const { return m_xtcObj->$meth($passargs); }")\
+                        (type=typedecl, Class=type.name, meth=name, args=argdecl, passargs=passargs)
 
     def _genAttrDecl(self, attr):
         
@@ -490,20 +490,20 @@ class DdlPds2Psana ( object ) :
 
         if not attr.shape:
             
-            print >>self.inc, "  %s %s;" % (psana_type, attr.name)
+            print >>self.inc, T("  $type $attr;")(type=psana_type, attr=attr.name)
 
         elif attr.type.value_type:
             
             # for value types we return ndarray which needs contiguous memory
-            print >>self.inc, "  std::vector<%s> %s_ndarray_storage_;" % (psana_type, attr.name)
-            print >>self.inc, "  unsigned %s_ndarray_shape_[%d];" % (attr.name, len(attr.shape.dims))
+            print >>self.inc, T("  std::vector<$type> ${attr}_ndarray_storage_;")(type=psana_type, attr=attr.name)
+            print >>self.inc, T("  unsigned ${attr}_ndarray_shape_[$rank];")(attr=attr.name, rank=len(attr.shape.dims))
 
         else :
 
             atype = psana_type     
             for d in attr.shape.dims:
                 atype = "std::vector< %s >" % atype
-            print >>self.inc, "  %s %s;" % (atype, attr.name)
+            print >>self.inc, T("  $type $attr;")(type=atype, attr=attr.name)
 
 
     def _genCtor(self, type, cfg, cfgnum):
@@ -513,21 +513,21 @@ class DdlPds2Psana ( object ) :
         args = "const boost::shared_ptr<const XtcType>& xtcPtr"
         if cfg :
             cfgName = cfg.fullName('C++', self.pdsdata_ns)
-            args += ", const boost::shared_ptr<const %s>& cfgPtr" % cfgName
+            args += T(", const boost::shared_ptr<const $type>& cfgPtr")(type=cfgName)
         if type.size.value is None:
             # special case when the data size have to be guessed from XTC size
             args += ", size_t xtcSize"
             
-        print >>self.inc, "  %s(%s);" % (type.name, args)
+        print >>self.inc, T("  $Class($args);")(Class=type.name, args=args)
         
         if type.size.value is not None:
             
             # if size is None manual implementation of the constructor will be provided
             
-            print >>self.cpp, "%s::%s(%s)" % (type.name, type.name, args)
-            print >>self.cpp, "  : %s()" % (type.fullName('C++', self.psana_ns))
+            print >>self.cpp, T("$Class::$Class($args)")(Class=type.name, args=args)
+            print >>self.cpp, T("  : $base()")(base=type.fullName('C++', self.psana_ns))
             print >>self.cpp, "  , m_xtcObj(xtcPtr)"
-            if cfg : print >>self.cpp, "  , m_cfgPtr%i(cfgPtr)" % cfgnum
+            if cfg : print >>self.cpp, T("  , m_cfgPtr$i(cfgPtr)")(i=cfgnum)
             
             # member initialization
             for attr in type.attributes() :
@@ -552,21 +552,21 @@ class DdlPds2Psana ( object ) :
 
         # how to get access to member
         if attr.access == 'public' :
-            expr = "xtcPtr->%s" % attr.name
+            expr = T("xtcPtr->$name")[attr]
         elif attr.accessor is not None:
-            expr = "xtcPtr->%s()" % attr.accessor.name
+            expr = T("xtcPtr->$name()")[attr.accessor]
 
         # may need to mangle name
         name = attr.name
 
         if attr.type.external:
-            print >>self.cpp, "  , %s(%s)" % (name, expr)
+            print >>self.cpp, T("  , $name($expr)")(locals())
         elif attr.type.value_type:
             ns = attr.type._parent.fullName('C++', self.top_pkg)
-            print >>self.cpp, "  , %s(%s::pds_to_psana(%s))" % (name, ns, expr)
+            print >>self.cpp, T("  , $name($ns::pds_to_psana($expr))")(locals())
         else :
             xtc_type = attr.type.fullName('C++', self.pdsdata_ns)
-            print >>self.cpp, "  , %s(boost::shared_ptr<const %s>(xtcPtr, &%s))" % (name, xtc_type, expr)
+            print >>self.cpp, T("  , $name(boost::shared_ptr<const $xtc_type>(xtcPtr, &$expr))")(locals())
 
 
     def _genAttrInitArray(self, attr):
@@ -602,37 +602,37 @@ class DdlPds2Psana ( object ) :
         cfg = ''
         for d in attr.shape.dims:
             if '{xtc-config}' in str(d) : cfg = "*cfgPtr"
-        print >>self.cpp, "    const std::vector<int>& dims = xtcPtr->%s(%s);" % (attr.shape_method, cfg)
+        print >>self.cpp, T("    const std::vector<int>& dims = xtcPtr->$meth($cfg);")(meth=attr.shape_method, cfg=cfg)
 
         for r in range(ndims):
             idx = 'i%d'%r
             offset = "  "*(r+1)
-            print >>self.cpp, offset+"  %s%s.reserve(dims[%d]);" % (name, subscr(r), r)
-            print >>self.cpp, offset+"  for (int %s=0; %s != dims[%d]; ++%s) {" % (idx, idx, r, idx) 
+            print >>self.cpp, offset+T("  $name$subscr.reserve(dims[$dim]);")(name=name, subscr=subscr(r), dim=r)
+            print >>self.cpp, offset+T("  for (int $i=0; $i != dims[$dim]; ++$i) {")(i=idx, dim=r) 
             if r != ndims-1:
-                print >>self.cpp, offset+"    %s%s.resize(dims[%d]);" % (name, subscr(r), r)
+                print >>self.cpp, offset+T("    $name$subscr.resize(dims[$dim]);")(name=name, subscr=subscr(r), dim=r)
             else:
                 # how to get access to member
                 if attr.access == 'public' :
-                    expr = "xtcPtr->%s%s" % (attr.name, subscr(r+1))
+                    expr = T("xtcPtr->$attr$subscr")(attr=attr.name, subscr=subscr(r+1))
                 elif attr.accessor is not None:
                     if cfgNeeded:
-                        expr = "xtcPtr->%s(*cfgPtr, %s)" % (attr.accessor.name, subscr_comma(r+1))
+                        expr = T("xtcPtr->$meth(*cfgPtr, $subscr)")(meth=attr.accessor.name, subscr=subscr_comma(r+1))
                     else:
-                        expr = "xtcPtr->%s(%s)" % (attr.accessor.name, subscr_comma(r+1))
+                        expr = T("xtcPtr->$meth($subscr)")(meth=attr.accessor.name, subscr=subscr_comma(r+1))
                 if attr.type.external:
                     pass
                 elif attr.type.value_type:
                     ns = attr.type._parent.fullName('C++', self.top_pkg)
-                    expr = "%s::pds_to_psana(%s)" % (ns, expr)
+                    expr = T("$ns::pds_to_psana($expr)")(locals())
                 else:
                     attrXtcType = attr.type.fullName('C++', self.pdsdata_ns)
-                    print >>self.cpp, offset+"    const %s& d = %s;" % (attrXtcType, expr)
-                    print >>self.cpp, offset+"    boost::shared_ptr<const %s> dPtr(m_xtcObj, &d);" % attrXtcType
+                    print >>self.cpp, offset+T("    const $type& d = $expr;")(type=attrXtcType, expr=expr)
+                    print >>self.cpp, offset+T("    boost::shared_ptr<const $type> dPtr(m_xtcObj, &d);")(type=attrXtcType)
                     expr = "dPtr"
                     if attr.type.xtcConfig: expr += ", cfgPtr"
-                    expr = "%s(%s)" % (attr.type.fullName('C++', self.top_pkg), expr)
-                print >>self.cpp, offset+"    %s%s.push_back(%s);" % (name, subscr(r), expr)
+                    expr = T("$type($expr)")(type=attr.type.fullName('C++', self.top_pkg), expr=expr)
+                print >>self.cpp, offset+T("    $name$subscr.push_back($expr);")(name=name, subscr=subscr(r), expr=expr)
 
         for r in range(ndims):
             offset = "  "*(ndims-r)
@@ -663,18 +663,18 @@ class DdlPds2Psana ( object ) :
             elem_expr = '*it'
         else:
             ns = attr.type._parent.fullName('C++', self.top_pkg)
-            elem_expr = '%s::pds_to_psana(*it)' % ns
+            elem_expr = T('$ns::pds_to_psana(*it)')(locals())
             
         # ndarray initialization
         print >>self.cpp, "  {"
-        print >>self.cpp, "    typedef ndarray<%s, %d> XtcNDArray;" % (pdstypename, ndims)
-        print >>self.cpp, "    const XtcNDArray& xtc_ndarr = xtcPtr->%s(%s);" % (attr.accessor.name, cfg)
-        print >>self.cpp, "    %s_ndarray_storage_.reserve(xtc_ndarr.size());" % (name,)
+        print >>self.cpp, T("    typedef ndarray<$type, $rank> XtcNDArray;")(type=pdstypename, rank=ndims)
+        print >>self.cpp, T("    const XtcNDArray& xtc_ndarr = xtcPtr->$meth($cfg);")(meth=attr.accessor.name, cfg=cfg)
+        print >>self.cpp, T("    ${name}_ndarray_storage_.reserve(xtc_ndarr.size());")(locals())
         print >>self.cpp, "    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
-        print >>self.cpp, "      %s_ndarray_storage_.push_back(%s);" % (name, elem_expr)
+        print >>self.cpp, T("      ${name}_ndarray_storage_.push_back($elem_expr);")(locals())
         print >>self.cpp, "    }"
         print >>self.cpp, "    const unsigned* shape = xtc_ndarr.shape();"
-        print >>self.cpp, "    std::copy(shape, shape+%d, %s_ndarray_shape_);" % (ndims, name)
+        print >>self.cpp, T("    std::copy(shape, shape+$ndims, ${name}_ndarray_shape_);")(locals())
         print >>self.cpp, "  }" 
 
 
@@ -702,14 +702,14 @@ class DdlPds2Psana ( object ) :
 
             shape = attr.shape.dims
 
-            print >>self.inc, "  virtual std::vector<int> %s() const;" % (attr.shape_method)
+            print >>self.inc, T("  virtual std::vector<int> $meth() const;")(meth=attr.shape_method)
             
-            print >>self.cpp, "std::vector<int> %s::%s() const\n{" % (type.name, attr.shape_method)
+            print >>self.cpp, T("std::vector<int> $Class::$meth() const\n{")(Class=type.name, meth=attr.shape_method)
             print >>self.cpp, "  std::vector<int> shape;" 
-            print >>self.cpp, "  shape.reserve(%d);" % len(shape)
+            print >>self.cpp, T("  shape.reserve($rank);")(rank=len(shape))
             v = name
             for s in shape:
-                print >>self.cpp, "  shape.push_back(%s.size());" % v
+                print >>self.cpp, T("  shape.push_back($attr.size());")(attr=v)
                 v += '[0]'
             print >>self.cpp, "  return shape;\n}\n"
 
