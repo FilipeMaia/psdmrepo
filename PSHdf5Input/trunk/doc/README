@@ -1,0 +1,16 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSHdf5Input
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+This package provides implementation of the input module for psana which
+reads data from HDF5 files.
+ 
