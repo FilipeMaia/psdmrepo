@@ -1,0 +1,17 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSHdf5Input
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: andy-20120125
+2012-01-25 Andy Salnikov
+- first commit to repository, event loop is implemented, but data conversion
+  is still needs to be done
