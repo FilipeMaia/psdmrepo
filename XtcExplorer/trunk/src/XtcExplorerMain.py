@@ -402,6 +402,15 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             if os.path.isfile(filename) :
                 self.filenames.append(filename)
 
+                # update the select buttons for Instrument and Experiment
+                parts = filename.split('/')
+                self.instrument = parts[4]
+                self.experiment = parts[5]
+                self.runnumber = parts[7].split('-')[1].strip('r')
+                self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
+                self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
+                self.lineEditRun.setText(self.runnumber)
+
                 # add the last file opened to the line dialog
                 self.lineedit.setText( str(filename) )
                 self.update_currentfiles()

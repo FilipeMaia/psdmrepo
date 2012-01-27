@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pypdsdata import xtc
+from pypdsdata.xtc import TypeId
 
 #-----------------------------
 # Imports for local modules --
@@ -140,6 +140,10 @@ class  pyana_image ( object ) :
             self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
             print "Using plot_vrange = %.2f,%.2f"%(self.plot_vmin,self.plot_vmax)
 
+        self.show_projections = 0
+        if show_projections is not None:
+            self.show_projections = int(show_projections)
+
         # to keep track
         self.n_shots = None
         self.n_saved = 0
@@ -170,23 +174,25 @@ class  pyana_image ( object ) :
         self.calib_path = calib_path
         
         self.cspad = {}
-        
-        self.configtypes = { 'Cspad2x2'  : xtc.TypeId.Type.Id_CspadConfig ,
-                             'Cspad'     : xtc.TypeId.Type.Id_CspadConfig ,
-                             'Opal1000'  : xtc.TypeId.Type.Id_Opal1kConfig,
-                             'TM6740'    : xtc.TypeId.Type.Id_TM6740Config,
-                             'pnCCD'     : xtc.TypeId.Type.Id_pnCCDconfig,
-                             'Princeton' : xtc.TypeId.Type.Id_PrincetonConfig,
-                             'Fccd'      : xtc.TypeId.Type.Id_FccdConfig,
-                             'PIM'       : xtc.TypeId.Type.Id_PimImageConfig
+
+        self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_CspadConfig ,
+                             'Cspad'     : TypeId.Type.Id_CspadConfig ,
+                             'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
+                             'TM6740'    : TypeId.Type.Id_TM6740Config,
+                             'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
+                             'Princeton' : TypeId.Type.Id_PrincetonConfig,
+                             'Fccd'      : TypeId.Type.Id_FccdConfig,
+                             'PIM'       : TypeId.Type.Id_PimImageConfig,
+                             'Timepix'   : TypeId.Type.Id_TimepixConfig
                              }
 
-        self.datatypes = {'Cspad2x2'      : xtc.TypeId.Type.Id_Cspad2x2Element, 
-                          'Cspad'         : xtc.TypeId.Type.Id_CspadElement,
-                          'TM6740'        : xtc.TypeId.Type.Id_Frame,
-                          'Opal1000'      : xtc.TypeId.Type.Id_Frame,
-                          'pnCCD'         : xtc.TypeId.Type.Id_pnCCDframe,
-                          'Princeton'     : xtc.TypeId.Type.Id_PrincetonFrame
+        self.datatypes = {'Cspad2x2'      : TypeId.Type.Id_Cspad2x2Element, 
+                          'Cspad'         : TypeId.Type.Id_CspadElement,
+                          'TM6740'        : TypeId.Type.Id_Frame,
+                          'Opal1000'      : TypeId.Type.Id_Frame,
+                          'pnCCD'         : TypeId.Type.Id_pnCCDframe,
+                          'Princeton'     : TypeId.Type.Id_PrincetonFrame,
+                          'Timepix'       : TypeId.Type.Id_TimepixData
                           }
 
     def beginjob ( self, evt, env ) : 
@@ -206,6 +212,10 @@ class  pyana_image ( object ) :
             if not config:
                 print '*** %s config object is missing ***'%addr
                 return
+
+            
+            #print "Config object has: "
+            #print dir(config)
 
             if addr.find('Cspad')>=0:
                 quads = range(4)
@@ -377,7 +387,7 @@ class  pyana_image ( object ) :
             
             for (name,title,image) in event_display_images:
                 self.plotter.add_frame(name,addr,(image,))
-                self.plotter.frames[name].showProj=1
+                self.plotter.frames[name].showProj=self.show_projections
                 
             self.plotter.title = "Cameras shot#%d"%self.n_shots
             newmode = self.plotter.plot_all_frames(fignum=self.mpl_num,ordered=True)
@@ -454,7 +464,7 @@ class  pyana_image ( object ) :
             self.plotter.draw_figurelist(self.mpl_num+nsrc,
                                          event_display_images,
                                          title="Endjob:  %s"%addr,
-                                         showProj=1)
+                                         showProj=self.show_projections)
         
             plt.draw()
         

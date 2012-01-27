@@ -12,8 +12,16 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 	
+2012-Jan-26 ofte  Tag V00-01-18        rev 2829
+	- Added the Timepix to list of camera sources. 
+          Todo: add histogram/spectrum of the image (request from XCS)
+	- Loading xtcfiles from command line now also updates the file selection buttons
+	  which should make it easier to e.g. switch to a different run in the same experiment. 
+	- changed the get fram method for pyana_image_beta to be the same as pyana_image 
+	  (use the generic evt.get() and a dicionary looking up the data types for each device)
+	
 2012-Jan-19 ofte  Tag V00-01-17        rev 2809
-         - finished the CsPad map of full image. And commented it out, because 
+         - finished the CsPad pixel map of full image. And commented it out, because 
 	 there isn't really much you can do with it, but it can be used if requested. 
 	 Plan to move this to a separate pyana/cspad utilities library. 
 

@@ -28,10 +28,9 @@ import numpy as np
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pypdsdata import xtc
+from pypdsdata.xtc import TypeId
 from cspad import CsPad
 
-from utilities import Plotter
 from utilities import Threshold
 from utilities import PyanaOptions
 from utilities import ImageData
@@ -111,14 +110,6 @@ class  pyana_image_beta ( object ) :
             self.threshold.area[2] = float(yrange[0])
             self.threshold.area[3] = float(yrange[1])
 
-            
-
-#        # Set up the plotter's frame by hand, since
-#        # we need to also tell it about thresholds, and vlimits
-#        self.plotter.add_frame(self.source)
-#        self.plotter.frame[self.source].threshold = self.threshold
-#        self.plotter.frame[self.source].vmin = self.plot_vmin
-#        self.plotter.frame[self.source].vmax = self.plot_vmax
 
         # ----
         # initializations of other class variables
@@ -146,16 +137,26 @@ class  pyana_image_beta ( object ) :
                                    'projY'    : self.book_projY_plot,
                                    'projR'    : self.book_projR_plot }
         
-        # Dictionary mapping the source to the right get function
-        self.funcdict_getimage = { 'Cspad' :     self.get_cspad_image,
-                                   'Cspad2x2':   self.get_cspad2x2_image,
-                                   'Princeton' : self.get_princeton_image,
-                                   'pnCCD' :     self.get_pnccd_image,
-                                   'Fccd' :      self.get_fccd_image, 
-                                   'TM6740' :    self.get_other_image,
-                                   'Opal1000' :  self.get_other_image,
-                                   'AnyOther' :  self.get_other_image }
-        
+        self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_CspadConfig ,
+                             'Cspad'     : TypeId.Type.Id_CspadConfig ,
+                             'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
+                             'TM6740'    : TypeId.Type.Id_TM6740Config,
+                             'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
+                             'Princeton' : TypeId.Type.Id_PrincetonConfig,
+                             'Fccd'      : TypeId.Type.Id_FccdConfig,
+                             'PIM'       : TypeId.Type.Id_PimImageConfig,
+                             'Timepix'   : TypeId.Type.Id_TimepixConfig
+                             }
+
+        self.datatypes = {'Cspad2x2'      : TypeId.Type.Id_Cspad2x2Element, 
+                          'Cspad'         : TypeId.Type.Id_CspadElement,
+                          'TM6740'        : TypeId.Type.Id_Frame,
+                          'Opal1000'      : TypeId.Type.Id_Frame,
+                          'pnCCD'         : TypeId.Type.Id_pnCCDframe,
+                          'Princeton'     : TypeId.Type.Id_PrincetonFrame,
+                          'Timepix'       : TypeId.Type.Id_TimepixData
+                          }
+
         
         # accumulate image data 
         self.sum_good_images = None
@@ -188,14 +189,16 @@ class  pyana_image_beta ( object ) :
 
         self.mydata = ImageData(self.source)
 
-        if self.source.find("Cspad")>0 :
-            config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.source)
-            if not config:
-                print '*** cspad config object is missing ***'
-                return
-        
-            quads = range(4)
+        # pick out the device name from the address
+        device = self.source.split('|')[1].split('-')[0]
+        config = env.getConfig( self.configtypes[device], self.source )
+        if not config:
+            print '*** %s config object is missing ***'%self.source
+            return
 
+            
+        if self.source.find("Cspad")>0 :
+            quads = range(4)
             print 
             print "Cspad configuration"
             print "  N quadrants   : %d" % config.numQuads()
@@ -248,9 +251,46 @@ class  pyana_image_beta ( object ) :
         #################################
         ## Get data from XTC file      ##
         #################################
+        the_image = None
 
-        # call the relevant function to get the image (faster than if-else clauses)
-        the_image = self.funcdict_getimage[self.image_type]([evt, env])
+        # pick out the device name from the address
+        device = self.source.split('|')[1].split('-')[0]
+        frame = evt.get( self.datatypes[device], self.source )
+
+        if self.source.find("Cspad2x2")>0 :
+            # in this case 'frame' is the MiniElement
+            # call cspad library to assemble the image
+            the_image = self.cspad[self.source].get_mini_image(frame)
+
+        elif self.source.find("Cspad")>0 :
+            # in this case we need the specialized getter: 
+            quads = evt.getCsPadQuads(self.source, env)
+            # then call cspad library to assemble the image
+            the_image = self.cspad[self.source].get_detector_image(quads)
+
+        else:
+            # all other cameras have simple arrays. 
+            the_image = frame.data()
+            
+        if the_image is None:
+            print "No frame image from ", self.source, " in shot#", self.n_shots
+            return
+
+        # image is a numpy array (pixels)
+        if self.source.find("Fccd")>0:
+            # convert to 16-bit integer
+            the_image.dtype = np.uint16
+                
+
+        # check that it has dimensions as expected from a camera image
+        dim = np.shape( the_image )
+        if len( dim )!= 2 :
+            print "Unexpected dimensions of image array from %s: %s" % (self.source,dim)
+
+                                
+        ## call the relevant function to get the image (faster than if-else clauses)
+        #the_image = self.funcdict_getimage[self.image_type]([evt, env])
+
         if the_image is None:
             #print "No image from ", self.image_type
             return
@@ -484,87 +524,3 @@ class  pyana_image_beta ( object ) :
         self.mydata.projTheta = mean_intensity
         self.mydata.binsTheta =self.tbins
 
-
-    def get_cspad2x2_image(self, arg):
-        """small Cspad2x2
-        """
-        evt = arg[0]
-        env = arg[1]
-
-        if self.cspad is None:
-            print "get_cspad_image is returning in event ", self.n_shots
-            return
-
-        image = None
-        quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.source)
-        if quads is not None: 
-            image = self.cspad.get_mini_image(quads)
-        else: 
-            print '*** cspad information is missing ***'
-            return
-
-        return image
-
-    def get_cspad_image(self, arg):
-        """ full Cspad
-        """
-        evt = arg[0]
-        env = arg[1]
-
-        if self.cspad is None:
-            print "get_cspad_image is returning in event ", self.n_shots
-            return
-
-        print "Trying to get Full CsPad from ", self.source
-        quads = evt.getCsPadQuads(self.source, env)
-        image = None
-        if quads is not None:         
-            image = self.cspad.get_detector_image(quads)
-        else :
-            print '*** cspad information is missing ***'
-            print self.source
-            return
-        
-        return image
-
-
-    def get_princeton_image(self, arg):
-        evt = arg[0]
-        env = arg[1]
-        try: 
-            frame = evt.getPrincetonValue(self.source, env)
-            return frame.data()
-        except: 
-            # Princeton cameras are so slow that these are often lacking from the event
-            #print "No frame from ", self.source, " in shot#", self.n_shots
-            return
-        
-    def get_pnccd_image(self,arg):
-        evt = arg[0]
-        env = arg[1]
-        try: 
-            frame = evt.getPnCcdValue(self.source, env)
-            return frame.data()
-        except: 
-            print "No frame from ", self.source, " in shot#", self.n_shots
-
-    def get_fccd_image(self,arg):
-        evt = arg[0]
-        try: 
-            frame = evt.getFrameValue(self.source)
-            image = frame.data()
-            # convert to 16-bit integer
-            image.dtype = np.uint16
-            return image
-        except: 
-            print "No frame from ", self.source, " in shot#", self.n_shots
-            return 
-            
-    def get_other_image(self, arg):
-        evt = arg[0]
-        try: 
-            frame = evt.getFrameValue(self.source)
-            return frame.data()
-        except: 
-            print "No frame from ", self.source, " in shot#", self.n_shots
-            return 

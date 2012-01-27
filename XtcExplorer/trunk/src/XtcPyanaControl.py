@@ -962,13 +962,14 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
-        # --- --- --- TM6740 --- --- ---
+        # --- --- --- All images --- --- ---
         if ( str(box.text()).find("TM6740")>=0 
              or str(box.text()).find("Opal1000")>=0 
              or str(box.text()).find("Fccd")>=0 
              or str(box.text()).find("Princeton")>=0
              or str(box.text()).find("pnCCD")>=0 
-             or str(box.text()).find("Cspad")>=0 ):
+             or str(box.text()).find("Cspad")>=0
+             or str(box.text()).find("Timepix")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
@@ -985,9 +986,9 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\ninputdark = ")
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\nshow_projections = 0 ; 0: no projection, 1:project average, 2: project max values")
+            options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
             options_for_mod[index].append("\noutputfile = ")
-            options_for_mod[index].append("\nmax_save = 0   ; maximum number of event images to save" )
+            options_for_mod[index].append("\nmax_save = 0   ; max event images to save" )
             options_for_mod[index].append("\nn_hdf5 = ") 
             return
 
