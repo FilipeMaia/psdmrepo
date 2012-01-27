@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2012-01-27 Andy Salnikov
+- Source::parse now can understand old detector names
+
 Tag: V00-04-00
 2011-10-28 Andy Salnikov
 - method Event::keys() now takes options source argument to limit 

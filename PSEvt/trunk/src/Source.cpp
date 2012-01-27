@@ -20,6 +20,7 @@
 //-----------------
 #include <vector>
 #include <cassert>
+#include <map>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -42,6 +43,12 @@ namespace {
   // Parse spec tring and return Src or throw
   Pds::Src parse(std::string spec);
   
+  std::map<std::string, Pds::DetInfo::Detector> initName2Det();
+  const std::map<std::string, Pds::DetInfo::Detector> name2det = initName2Det();
+
+  std::map<std::string, Pds::DetInfo::Device> initName2Dev();
+  const std::map<std::string, Pds::DetInfo::Device> name2dev = initName2Dev();
+
 }
 
 //		----------------------------------------
@@ -297,20 +304,16 @@ bool parseDetInfo(const std::string& spec, Pds::Src *src, char sep1, char sep2)
   Pds::DetInfo::Detector det = Pds::DetInfo::Detector(255);
   Pds::DetInfo::Device dev = Pds::DetInfo::Device(255);
   if (not detPair.first.empty()) {
-    for(int i = 0; i < Pds::DetInfo::NumDetector; ++ i) {
-      if (detPair.first == Pds::DetInfo::name(Pds::DetInfo::Detector(i))) {
-        det = Pds::DetInfo::Detector(i);
-        break;
-      }
+    std::map<std::string, Pds::DetInfo::Detector>::const_iterator it = ::name2det.find(detPair.first);
+    if (it != ::name2det.end()) {
+      det = it->second;
     }
     if (det == 255) return false;
   }
   if (not devPair.first.empty()) {
-    for(int i = 0; i < Pds::DetInfo::NumDevice; ++ i) {
-      if (devPair.first == Pds::DetInfo::name(Pds::DetInfo::Device(i))) {
-        dev = Pds::DetInfo::Device(i);
-        break;
-      }
+    std::map<std::string, Pds::DetInfo::Device>::const_iterator it = ::name2dev.find(devPair.first);
+    if (it != ::name2dev.end()) {
+      dev = it->second;
     }
     if (dev == 255) return false;
   }
@@ -416,5 +419,51 @@ parse(std::string spec)
     
   }
 }
+
+std::map<std::string, Pds::DetInfo::Detector>
+initName2Det()
+{
+  std::map<std::string, Pds::DetInfo::Detector> name2det;
   
+  // add all current names
+  for(int i = 0; i < Pds::DetInfo::NumDetector; ++ i) {
+    name2det[Pds::DetInfo::name(Pds::DetInfo::Detector(i))] = Pds::DetInfo::Detector(i);
+  }
+
+  // add some names which existed in the past
+  name2det["AmoIms"] = Pds::DetInfo::AmoIms;
+  name2det["amoIMS"] = Pds::DetInfo::AmoIms;
+  name2det["AmoPem"] = Pds::DetInfo::AmoGasdet;
+  name2det["amoGD"] = Pds::DetInfo::AmoGasdet;
+  name2det["AmoETof"] = Pds::DetInfo::AmoETof;
+  name2det["amoETOF"] = Pds::DetInfo::AmoETof;
+  name2det["AmoITof"] = Pds::DetInfo::AmoITof;
+  name2det["amoITOF"] = Pds::DetInfo::AmoITof;
+  name2det["AmoMbs"] = Pds::DetInfo::AmoMbes;
+  name2det["amoMBES"] = Pds::DetInfo::AmoMbes;
+  name2det["AmoIis"] = Pds::DetInfo::AmoVmi;
+  name2det["amoVMI"] = Pds::DetInfo::AmoVmi;
+  name2det["AmoBps"] = Pds::DetInfo::AmoBps;
+  name2det["amoBPS"] = Pds::DetInfo::AmoBps;
+  name2det["epicsArch"] = Pds::DetInfo::EpicsArch;
+
+  return name2det;
+}
+
+std::map<std::string, Pds::DetInfo::Device>
+initName2Dev()
+{
+  std::map<std::string, Pds::DetInfo::Device> name2dev;
+
+  // add all current names
+  for(int i = 0; i < Pds::DetInfo::NumDevice; ++ i) {
+    name2dev[Pds::DetInfo::name(Pds::DetInfo::Device(i))] = Pds::DetInfo::Device(i);
+  }
+
+  // add some names which existed in the past
+  // ... nothing ...
+
+  return name2dev;
+}
+
 }
