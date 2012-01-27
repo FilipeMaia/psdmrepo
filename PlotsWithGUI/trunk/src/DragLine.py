@@ -38,7 +38,7 @@ class DragLine( Drag, lines.Line2D ) :
         if event.inaxes != self.axes: return
 
         clickxy = event.xdata, event.ydata
-        #print 'clickxy =',clickxy 
+        #print 'clickxy =',clickxy
 
         if self.isInitialized :
             contains, attrd = self.contains(event)
@@ -93,7 +93,6 @@ class DragLine( Drag, lines.Line2D ) :
         self.press = None
         self.on_release_graphic_manipulations()
 
-
 #-----------------------------
 # Test
 #-----------------------------
@@ -110,6 +109,7 @@ def get_array2d_for_test() :
 def main():
 
     fig = plt.figure()
+    fig.my_mode = None
     ax = fig.add_subplot(111)
 
     axisImage = ax.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
@@ -140,6 +140,7 @@ def main():
     dl.connect()
     dls.append(dl)
         
+    plt.get_current_fig_manager().window.move(50, 10)    
     plt.show()
 
 #-----------------------------

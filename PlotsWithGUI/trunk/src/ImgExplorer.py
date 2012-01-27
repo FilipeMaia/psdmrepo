@@ -46,42 +46,47 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 import ImgFigureManager     as imgfm
-import MyNavigationToolbar  as mytb
 import ImgWidget            as imgwidg
 import ImgGUI               as imggui
+import ImgControl           as ic
+#import MyNavigationToolbar  as mytb
 
 #---------------------
 #  Class definition --
 #---------------------
 
 #class ImgExplorer (QtGui.QMainWindow) :
-class ImgExplorer (QtGui.QWidget) :
+class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
     """Plots for any 'image' record in the EventeDisplay project."""
 
 
     def __init__(self, parent=None, arr=None):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
+        ic.ImgControl.__init__(self)
+
+        #self.icp.control = self # is set in ImgControl
+
         self.setGeometry(10, 10, 880, 1000) 
         self.setWindowTitle('GUI with plot')
         self.setFrame()
 
         #self.fig = Figure((5, 10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
         #self.fig = plt.figure(num=None, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-        self.fig       = imgfm.ifm.get_figure(figsize=(10,10), type='maxspace')
-        self.widgimage = imgwidg.ImgWidget(parent, self.fig, arr)
-        self.widimggui = imggui.ImgGUI(None)
+        self.fig  = imgfm.ifm.get_figure(figsize=(10,10), type='maxspace', icp=self.icp)
+        self.wimg = imgwidg.ImgWidget(self.icp, self.fig, arr)
+        self.wgui = imggui.ImgGUI(self.icp)
 
         # Create the navigation toolbar, tied to the canvas
-        self.mpl_toolbar = mytb.MyNavigationToolbar(self.widgimage.getCanvas(), self)
+        #self.mpl_toolbar = mytb.MyNavigationToolbar(self.wimg.getCanvas(), self)
  
         #---------------------
 
-        vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
-        #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
-        vbox.addWidget(self.mpl_toolbar)                # <=== Add toolbar
-        vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas (saves useful space)
-        vbox.addWidget(self.widimggui)                  # <=== Add gui         
+        vbox = QtGui.QVBoxLayout()                 # <=== Begin to combine layout 
+        #vbox.addWidget(self.wimg)                 # <=== Add figure as QWidget
+        vbox.addWidget(self.wimg.getCanvas())      # <=== Add figure as FigureCanvas (saves useful space)
+        #vbox.addWidget(self.mpl_toolbar)           # <=== Add toolbar
+        vbox.addWidget(self.wgui)                  # <=== Add gui         
         self.setLayout(vbox)
 
         #---------------------
@@ -92,7 +97,7 @@ class ImgExplorer (QtGui.QWidget) :
 
 
     def set_image_array(self,arr):
-        self.widgimage.set_image_array(arr)
+        self.wimg.set_image_array(arr)
 
 
     def setFrame(self):
@@ -104,29 +109,52 @@ class ImgExplorer (QtGui.QWidget) :
         #self.frame.setVisible(False)
 
 
+    def getPosition(self):
+        self.position = (self.pos().x(), self.pos().y())
+        print 'self.position=', self.position #WORKS
+        return self.position
+
+
+    def getSize(self):
+        self.width = self.size().width()        
+        self.height= self.size().height()
+        print 'self.size=', self.width, self.height # WORKS
+        return (self.width, self.height)
+
+
+    def moveEvent(self, e):
+        #print 'moveEvent' 
+        #self.getPosition()
+        pass
+
+
     def resizeEvent(self, e):
         #print 'resizeEvent' 
+        #self.getSize()
         self.frame.setGeometry(self.rect())
-        pass
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         print 'Close application'
-        #self.widgimage  .close()
+        self.signal_quit()
+        #self.wimg  .close()
+
+#-----------------------------
+# For test
+    def get_array2d_for_test(self) :
+        print 'ImgExplorer.get_array2d_for_test() - generate the new image array'
+        mu, sigma = 200, 25
+        #arr = np.arange(2400)
+        arr = mu + sigma*np.random.standard_normal(size=250000)
+        arr.shape = (500,500)
+        #arr = mu + sigma*np.random.standard_normal(size=25)
+        #arr.shape = (5,5)
+        return arr
+
 
 #-----------------------------
 # Test
 #-----------------------------
-
-def get_array2d_for_test() :
-    mu, sigma = 200, 25
-    #arr = np.arange(2400)
-    arr = mu + sigma*np.random.standard_normal(size=250000)
-    arr.shape = (500,500)
-    #arr = mu + sigma*np.random.standard_normal(size=25)
-    #arr.shape = (5,5)
-    return arr
-
 
 def main():
 
@@ -135,7 +163,7 @@ def main():
     #w  = ImgExplorer(None, arr)
     w  = ImgExplorer(None)
     w.move(QtCore.QPoint(10,10))
-    w.set_image_array( get_array2d_for_test() )
+    w.set_image_array( w.get_array2d_for_test() )
     w.show()
 
     app.exec_()

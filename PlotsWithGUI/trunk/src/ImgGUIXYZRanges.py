@@ -45,7 +45,7 @@ class ImgGUIXYZRanges (QtGui.QWidget) :
     def __init__(self, parent=None ):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI for XYZ Ranges')
-        #self.setFrame()
+        self.setFrame()
 
         self.styleSheetGrey  = "background-color: rgb(170, 170, 170); color: rgb(0, 0, 0)"
         self.styleSheetWhite = "background-color: rgb(240, 240, 240); color: rgb(0, 0, 0)"

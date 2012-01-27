@@ -36,8 +36,9 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ImgConfigParameters as icp
+#import ImgConfigParameters as icp
 import ImgGUISpectrum as igspec
+import ImgGUIPlayer   as igplr
 
 #---------------------
 #  Class definition --
@@ -48,10 +49,13 @@ class ImgGUI ( QtGui.QWidget ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ (self, parent=None) :
+    def __init__ (self, icp=None) :
         """Constructor"""
 
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent=None)
+
+        self.icp      = icp
+        self.icp.wgui = self
 
         self.setGeometry(200, 500, 500, 250)
         self.setWindowTitle('Image GUI')
@@ -67,7 +71,9 @@ class ImgGUI ( QtGui.QWidget ) :
         self.minHeight = 100
         self.maxHeight = 250
 
-        self.guiWin = igspec.ImgGUISpectrum() # QtGui.QTextEdit('First')
+        self.guiPlayer = igplr.ImgGUIPlayer(self.icp)
+
+        self.guiWin = igspec.ImgGUISpectrum(self.icp) # QtGui.QTextEdit('First')
         self.guiWin.setMinimumHeight(self.minHeight)
         self.guiWin.setMaximumHeight(self.maxHeight)
 
@@ -78,6 +84,7 @@ class ImgGUI ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiWin)
 
         self.vboxGlobal = QtGui.QVBoxLayout()
+        self.vboxGlobal.addWidget(self.guiPlayer)
         self.vboxGlobal.addLayout(self.hboxT)
         self.vboxGlobal.addLayout(self.hboxD)
         self.vboxGlobal.addLayout(self.hboxB)
@@ -86,7 +93,7 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.showToolTips()
 
-        icp.imgconfpars.ImgGUIIsOpen = True
+        #icp.imgconfpars.ImgGUIIsOpen = True
 
 
     #-------------------
@@ -117,7 +124,7 @@ class ImgGUI ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         print 'closeEvent for ImgGUI'
-        icp.imgconfpars.ImgGUIIsOpen = False
+        #icp.imgconfpars.ImgGUIIsOpen = False
 
 
     def processQuit(self):
@@ -177,7 +184,7 @@ class ImgGUI ( QtGui.QWidget ) :
             pass
 
         if indTab == self.indTabEmpt : return
-        if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum() #QtGui.QTextEdit('Spectrum')
+        if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum(self.icp) #QtGui.QTextEdit('Spectrum')
         if indTab == self.indTabProX : self.guiWin = QtGui.QTextEdit('Projection X')
         if indTab == self.indTabProY : self.guiWin = QtGui.QTextEdit('Projection Y')
         if indTab == self.indTabProR : self.guiWin = QtGui.QTextEdit('Projection R')
@@ -237,29 +244,48 @@ class ImgGUI ( QtGui.QWidget ) :
         self.tabBarTop.setCurrentIndex(self.indTabEmpt)
 
 
+    def get_control(self) :
+        return self.icp.control
+
 
     def keyPressEvent(self, event):
-        print 'event.key() = %s' % (event.key())
+        #print 'ImgGUI : event.key() = %s' % (event.key())
         if event.key() == QtCore.Qt.Key_Escape:
-            self.IsOn = False    
-            self.close()
+            pass
 
-        if event.key() == QtCore.Qt.Key_B:
-            print 'event.key() = %s' % (QtCore.Qt.Key_B)
+        if event.key() == QtCore.Qt.Key_S:
+            #print 'ImgGUI : S is pressed' 
+            self.get_control().signal_save()
+
+        if event.key() == QtCore.Qt.Key_Q:
+            #print 'ImgGUI : Q is pressed' 
+            self.get_control().signal_quit()
+
+        if event.key() == QtCore.Qt.Key_P:
+            #print 'ImgGUI : Q is pressed' 
+            self.get_control().signal_print()
 
         if event.key() == QtCore.Qt.Key_Return:
-            print 'event.key() = Return'
+            #print 'event.key() = Return'
+            pass
 
         if event.key() == QtCore.Qt.Key_Home:
-            print 'event.key() = Home'
+            #print 'event.key() = Home'
+            pass
 
 
 #-----------------------------
 #  Test
 #
 if __name__ == "__main__" :
+
+    import ImgConfigParameters as gicp
+    icp = gicp.giconfpars.addImgConfigPars( None )
+
     app = QtGui.QApplication(sys.argv)
-    ex  = ImgGUI()
-    ex.show()
+    w  = ImgGUI(icp)
+    w.move(QtCore.QPoint(50,50))
+    w.show()
     app.exec_()
+
 #-----------------------------

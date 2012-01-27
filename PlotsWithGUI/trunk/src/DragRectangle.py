@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #----------------------------------
 
+import sys
+
 import numpy as np
 #import copy
 import matplotlib.pyplot  as plt
@@ -19,14 +21,39 @@ class DragRectangle( Drag, patches.Rectangle ) :
             xy0=(0,0)
             patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
             self.isInitialized = False
+            print "DragRectangle initialization w/o parameters."
+
+        #elif width == 1 : # Initialization at the mouse click, assume that the xy is defined
+        #    patches.Rectangle.__init__(self, xy, width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
+        #    self.isInitialized = False
+        #    print "DragRectangle initialization w/o parameters."
+
         else :
             patches.Rectangle.__init__(self, xy,  width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
             self.isInitialized = True
 
-
         self.set_picker(picker)
         self.myPicker = picker
         self.press    = None
+
+
+    def get_list_of_rect_pars(self) :
+        x0 = int( self.get_x() )
+        y0 = int( self.get_y() )
+        w0 = int( self.get_width () )
+        h0 = int( self.get_height() )
+        x  = min(x0,x0+w0)
+        y  = min(y0,y0+h0)
+        h  = abs(h0)
+        w  = abs(w0)
+        s  =      self.isSelected
+        t  =      self.myType
+        return (x,y,w,h,s,t)
+
+
+    def print_pars(self) :
+        x,y,w,h,s,t = self.get_list_of_rect_pars()
+        print 'x,y,w,h,s,t =', x,y,w,h,s,t
 
 
     def my_contains(self, event):
@@ -95,6 +122,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.press = xy0, w0, h0, clickxy, vertindex
 
             if event.button is 2 : # for middle mouse button
+                print 'Remove the rect now...'
                 self.remove_from_axes()
 
         else : # if the object position is not defined yet:
@@ -146,6 +174,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.set_height(dy)
             self.set_xy(xy0)
 
+
         self.on_motion_graphic_manipulations()
 
 
@@ -155,7 +184,80 @@ class DragRectangle( Drag, patches.Rectangle ) :
         self.on_release_graphic_manipulations()
 
 #-----------------------------
+#-----------------------------
+#-----------------------------
 # Test
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
+class TestDragRectangle : 
+
+    def __init__(self, fig, axes) :
+
+        self.fig          = fig
+        self.axes         = axes
+        self.fig.my_mode  = None # This is used to transmit signals
+        self.list_of_objs = []
+
+        self.fig.canvas.mpl_connect('key_press_event',    self.on_key_press)
+        self.fig.canvas.mpl_connect('button_press_event', self.on_mouse_press)
+        self.print_mode_keys()
+
+
+    def set_list_of_objs(self, list_of_objs) :
+        self.list_of_objs = list_of_objs
+
+        
+    def print_mode_keys(self) :
+        """Prints the hint for mode selection using keyboard
+        """
+        print '\n\nUse keyboard to select the mode: \nA=ADD, \nM=MARK, \nD=DELETE, \nR=DELETE, \nN=NONE, \nW=PRINT list of objects'
+
+
+    def on_key_press(self, event) :
+        """Responds on keyboard signals and switch the fig.my_mode
+           It also prints the list of objects for key W.
+        """
+        if   event.key == 'a': self.fig.my_mode  = 'Add'
+        elif event.key == 'n': self.fig.my_mode  = 'None'
+        elif event.key == 'd': self.fig.my_mode  = 'Remove'
+        elif event.key == 'r': self.fig.my_mode  = 'Remove'
+        elif event.key == 'm': self.fig.my_mode  = 'Select'
+        elif event.key == 'w': self.print_list_of_objs()
+        else                 : self.print_mode_keys()
+        print '\nCurrent mode is :', self.fig.my_mode
+
+
+    def on_mouse_press(self, event) :
+        """Responds on mouse signals and do the object initialization for the mode Add
+        """
+        xy = event.xdata, event.ydata
+        print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
+        if self.fig.my_mode  == 'Add' :
+            print 'mode=', self.fig.my_mode
+            obj = DragRectangle(xy) # Creates the DragRectangle object with 1st vertex in xy
+            add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
+            obj.on_press(event)                                     # <<<==========================
+
+    
+    def print_list_of_objs(self) :
+        """Prints the list of objects with its parameters.
+        """
+        print 'Print list of', len(self.list_of_objs), 'objects'
+        for obj in self.list_of_objs :
+            print 'ind=', self.list_of_objs.index(obj),':',
+            obj.print_pars()
+
+#-----------------------------
+
+def add_obj_to_axes(obj, axes, list_of_objs) :
+    """Add object to axes and append the list of objects
+    """
+    obj.add_to_axes(axes)                        # 1. Add it to figure axes
+    obj.connect()                                # 2. Connect object with signals
+    list_of_objs.append(obj)                     # 3. Append the list of objects 
+
 #-----------------------------
 
 def get_array2d_for_test() :
@@ -165,48 +267,89 @@ def get_array2d_for_test() :
     arr.shape = (90,150)
     return arr
 
-#-----------------------------
 
-def main():
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    axesImage = ax.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
-    #axisImage.set_clim(zmin,zmax)
-    mycolbar = fig.colorbar(axesImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+def generate_list_of_objects_for_axes(axes, axesImage) :
+    """Produce the list of random objects (Rectangles) for test purpose.
+    1. Generates initial list of random objects
+    2. Add them to the figure axes
+    3. Connect with signals.
+    4. Returns the list of created objects.
+    """
     xmin,xmax,ymin,ymax =  axesImage.get_extent() 
     #print 'xmin,xmax,ymin,ymax = ', xmin,xmax,ymin,ymax
-
     nobj = 10
     x = xmin+(xmax-xmin)*np.random.rand(nobj)
     y = ymax+(ymin-ymax)*np.random.rand(nobj)
     w = (xmax-xmin)/3*np.random.rand(nobj)
     h = (ymin-ymax)/3*np.random.rand(nobj)
-    #print ' x=',x
-    #print ' y=',y
-    #print ' w=',w
-    #print ' h=',h
+    #print ' x=',x, ' y=',y, ' w=',w, ' h=',h
 
     obj_list = []
 
     # Add objects with initialization through the parameters
     for indobj in range(nobj) :
-        obj = DragRectangle((x[indobj],y[indobj]), w[indobj], h[indobj])
-        #ax.add_artist(obj) 
-        obj.add_to_axes(ax)
-        obj.connect()
-        obj_list.append(obj)
+        obj = DragRectangle((x[indobj],y[indobj]), w[indobj], h[indobj], color='g')
+        add_obj_to_axes(obj, axes, obj_list)      # <<<==========================
 
-    # Add one more object with mouse initialization
-    obj = DragRectangle() # W/O parameters !
-    obj.add_to_axes(ax)
-    obj.connect()
-    obj_list.append(obj)
-        
+    return obj_list
+
+#-----------------------------
+
+def generate_test_image() :
+
+    fig = plt.figure()
+    fig.my_mode = None # This is used to transmit signals
+    axes = fig.add_subplot(111)
+
+    axesImage = axes.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
+    #axesImage.set_clim(zmin,zmax)
+    mycolbar = fig.colorbar(axesImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+
+    return fig, axes, axesImage
+
+#-----------------------------
+
+def main_full_test():
+    """Full test of the class DragRectangle, using the class TestDragRectangle
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. use the class TestDragRectangle to switch between modes for full test of the class DragRectangle
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
+
+    t = TestDragRectangle(fig, axes)
+    t .set_list_of_objs(list_of_objs)
+
+    plt.get_current_fig_manager().window.move(50, 10)
     plt.show()
 
 #-----------------------------
+
+def main_simple_test():
+    """Simple test of the class DragRectangle.
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. add one more object with initialization at 1st click-and-drag of mouse-left button
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
+
+    #Add one more object
+    obj = DragRectangle() # call W/O parameters => object will be initialized at first mouse click
+    add_obj_to_axes(obj, axes, list_of_objs)
+
+    plt.get_current_fig_manager().window.move(50, 10)
+    plt.show()
+
+#-----------------------------
+
 if __name__ == "__main__" :
-    main()
+
+    #main_simple_test()
+    main_full_test()
+    sys.exit ('End of test')
+
 #-----------------------------

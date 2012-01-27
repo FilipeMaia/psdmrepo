@@ -106,6 +106,7 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
         self.press = None
         self.on_release_graphic_manipulations()
 
+
 #-----------------------------
 # Test
 #-----------------------------
@@ -122,6 +123,7 @@ def get_array2d_for_test() :
 def main():
 
     fig = plt.figure()
+    fig.my_mode = None
     ax = fig.add_subplot(111)
 
     axesImage = ax.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
@@ -138,7 +140,7 @@ def main():
     obj_list = []
     # Add objects with initialization through the parameters
     for indobj in range(nobj) :
-        obj = DragCircle((x[indobj], y[indobj]), radius=r[indobj])
+        obj = DragCircle((x[indobj], y[indobj]), radius=r[indobj], color='g')
         #ax.add_artist(obj) 
         obj.add_to_axes(ax)
         obj.connect()
@@ -149,7 +151,8 @@ def main():
     obj.add_to_axes(ax)
     obj.connect()
     obj_list.append(obj)
-        
+
+    plt.get_current_fig_manager().window.move(50, 10)    
     plt.show()
 
 #-----------------------------

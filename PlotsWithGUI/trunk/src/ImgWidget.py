@@ -42,20 +42,29 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from   matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
+import ImgDrawOnTop   as idont
+import ImgDrawOutside as idout
+
 from PyQt4 import QtGui, QtCore
-import ImgConfigParameters as icp
+#import ImgConfigParameters as icp
 #---------------------
 #  Class definition --
 #---------------------
 
-class ImgWidget (QtGui.QWidget) :
+class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
     """Plots for any 'image' record in the EventeDisplay project."""
 
-    def __init__(self, parent=None, fig=None, arr=None):
-        QtGui.QWidget.__init__(self, parent)
+    def __init__(self, icp=None, fig=None, arr=None):
+        QtGui.QWidget.__init__(self, parent=None)
+        idont.ImgDrawOnTop  .__init__(self, icp)
+        idout.ImgDrawOutside.__init__(self, icp)
+        
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
-        self.arr = arr        
-        self.fig = fig
+        self.arr         = arr        
+        self.fig         = fig
+        self.icp         = icp
+        self.icp.wimg    = self
+
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
@@ -63,9 +72,8 @@ class ImgWidget (QtGui.QWidget) :
         vbox.addWidget(self.canvas)        # Wrap figure canvas in widget 
         self.setLayout(vbox)
         #-----------------------------------
-        self.initParameters()
 
-        icp.imgconfpars.widg_img = self
+        self.initParameters()
 
 
     def initParameters(self):
@@ -77,18 +85,22 @@ class ImgWidget (QtGui.QWidget) :
         self.fig.myYmax = None
         self.fig.myZmin = None
         self.fig.myZmax = None
+
         self.fig.myZoomIsOn = False
-
         self.selectRectIsOn = False
-        self.mouse1BottonIsPrresed = False
-        self.mouse2BottonIsPrresed = False
-        self.mouse3BottonIsPrresed = False
 
-        self.xpress = 0
-        self.ypress = 0
+        self.mouseLeftIsPrresed = False
+        self.mouseMidlIsPrresed = False
+        self.mouseRighIsPrresed = False
+
+        self.xpress    = 0
+        self.ypress    = 0
         self.xpressabs = 0
         self.ypressabs = 0
 
+        # Initialization of signals for draw_on_top() and draw_outside()
+        # This can not be done in ImgControl.__init__ because the figure is initialized later...
+        self.get_control().set_signal_info()
 
 
     def setFrame(self):
@@ -97,11 +109,19 @@ class ImgWidget (QtGui.QWidget) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False) # False = SET THE FRAME INVISIBLE !!
 
 
     def getCanvas(self):
         return self.canvas
+
+
+    def get_canvas(self):
+        return self.canvas
+
+
+    def get_control(self):
+        return self.icp.control
 
 
     def resizeEvent(self, e):
@@ -147,7 +167,9 @@ class ImgWidget (QtGui.QWidget) :
         #self.fig.myaxesSIm = self.fig.add_subplot(gs[0:18,:])
         #self.fig.myaxesSIm = self.fig.add_subplot(gs[:,:])
         self.fig.myaxesSIm = self.fig.add_subplot(111)
-        #self.fig.myaxesI.grid(self.cbox_grid.isChecked())
+
+        self.grid_onoff(self.icp.gridIsOn)
+
         self.fig.myaxesImg = self.fig.myaxesSIm.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
         self.fig.myaxesImg.set_clim(zmin,zmax)
 
@@ -158,35 +180,32 @@ class ImgWidget (QtGui.QWidget) :
         #self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation=1)#, ticks=coltickslocs) 
         #self.fig.mycolbar.set_clim(zmin,zmax)
 
-        self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
-        self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        self.connectImgWithMouse()
 
-        #plt.draw()
+        self.draw_on_top()
+        self.draw_outside()
         self.canvas.draw()
-        #self.img_bkgd = self.canvas.copy_from_bbox(self.fig.myaxesSIm.bbox)
-        #self.img_bbox = self.fig.myaxesSIm.bbox
-        #l, b, r, t = self.fig.myaxesSIm.bbox.extents        
-        print 'self.fig.myaxesSIm.bbox.extents (l, b, r, t) =', self.fig.myaxesSIm.bbox.extents    
-        #print 'End of on_draw'
 
 
-    def resetImage( self ) :
-        self.selectRectIsOn = False
-
-        img_bbox = self.fig.myaxesSIm.bbox
-        self.canvas.restore_region(self.img_bkgd)#, bbox=img_bbox)
-        self.canvas.blit(img_bbox)
-        print 'img_bbox.extents (l, b, r, t) =', img_bbox.extents    
-        #print 'bbox.width, bbox.height =', img_bbox.width, img_bbox.height
-        #self.on_draw()
+    def grid_onoff(self, status=False):
+        print 'Set grid status =', status
+        self.fig.myaxesSIm.grid(status)        
+        self.canvas.draw()
 
 
-    def selectRectangularRegion(self) :
-        self.selectRectIsOn = True
-        self.img_bkgd = self.canvas.copy_from_bbox(self.fig.myaxesSIm.bbox)
+    def connectImgWithMouse(self):
+        'connect to all the events we need'        
+        self.cidpress   = self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
+        self.cidrelease = self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
+        self.cidmotion  = self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
 
 
+    def disconnectImgFromMouse(self):
+        'disconnect all the stored connection ids'
+        self.canvas.mpl_disconnect(self.cidpress) 
+        self.canvas.mpl_disconnect(self.cidrelease) 
+        self.canvas.mpl_disconnect(self.cidmotion)
+ 
 
     def processMouseMotion(self, event) :
         fig = self.fig
@@ -195,17 +214,11 @@ class ImgWidget (QtGui.QWidget) :
             #print 'event.xdata, event.ydata =', event.xdata, event.ydata
             #print 'event.x, event.y =', event.x, event.y
 
-            if self.selectRectIsOn and self.mouse1BottonIsPrresed :            
-                height = self.canvas.figure.bbox.height
-                x0 = self.xpressabs
-                x1 = event.x
-                y0 = height - self.ypressabs
-                y1 = height - event.y
-                w  = x1 - x0
-                h  = y1 - y0
-                rect = [x0, y0, w, h]
-                self.fig.canvas.drawRectangle( rect )              
-            
+            #if self.selectRectIsOn and self.mouseLBottonIsPrresed :            
+
+                #self.addRectangle(event) ### ?????????????????????
+            pass
+
 
     def processDraw(self) :
         #fig = event.canvas.figure
@@ -214,43 +227,63 @@ class ImgWidget (QtGui.QWidget) :
 
 
     def processMouseButtonPress(self, event) :
-        print 'MouseButtonPress'
+        print 'ImgWidget: MouseButtonPress'
         self.fig = event.canvas.figure
+        if event.button is 1 : self.mouseLeftIsPrresed = True
+        if event.button is 2 : self.mouseMidlIsPrresed = True
+        if event.button is 3 : self.mouseRighIsPrresed = True
 
         if event.inaxes == self.fig.mycolbar.ax : self.mousePressOnColorBar (event)
         if event.inaxes == self.fig.myaxesSIm   : self.mousePressOnImage    (event)
 
 
+    def processMouseButtonRelease(self, event) :
+        print 'ImgWidget: MouseButtonRelease'
+        self.fig = event.canvas.figure
+        self.mouseLeftIsPrresed = False
+        self.mouseMidlIsPrresed = False
+        self.mouseRighIsPrresed = False
+                
+        if event.inaxes == self.fig.mycolbar.ax : pass # self.mouseReleaseOnColorBar (event)
+        if event.inaxes == self.fig.myaxesSIm   : self.mouseReleaseOnImage  (event)
+
 
     def mousePressOnImage(self, event) :
-        fig = self.fig
-        if event.button is 1 : self.mouse1BottonIsPrresed = True
-        if event.button is 2 : self.mouse2BottonIsPrresed = True
-        if event.button is 3 : self.mouse3BottonIsPrresed = True
+        print 'ImgWidget: mousePressOnImage'
 
-        if event.inaxes == fig.myaxesSIm :
-            print 'PressOnImage'
-           #print 'event.xdata, event.ydata =', event.xdata, event.ydata
-            self.xpress    = event.xdata
-            self.ypress    = event.ydata
-            self.xpressabs = event.x
-            self.ypressabs = event.y
+        self.xpress    = event.xdata
+        self.ypress    = event.ydata
+        self.xpressabs = event.x
+        self.ypressabs = event.y
 
+        self.get_control().signal_mouse_on_image_press(event) # send signal in control module
+
+
+    def mouseReleaseOnImage(self, event) :
+        print 'ImgWidget: mouseReleaseOnImage'
+
+        self.xrelease = event.xdata
+        self.yrelease = event.ydata
+
+        self.get_control().signal_mouse_on_image_release(event) # send signal in control module
+        #self.zoomImageOnRelease(event) 
 
 
     def mousePressOnColorBar(self, event) :
-        print 'PressOnColorBar'
+        print 'ImgWidget: mousePressOnColorBar'
+
         lims = self.fig.myaxesImg.get_clim()
         colmin = lims[0]
         colmax = lims[1]
         range = colmax - colmin
-        value = colmin + event.xdata * range
+        if self.fig.mycolbar.orientation == 'vertical' : value = colmin + event.ydata * range
+        else                                           : value = colmin + event.xdata * range         
         self.setColorLimits(event, colmin, colmax, value)
 
 
     def setColorLimits(self, event, colmin, colmax, value) :
 
-        print colmin, colmax, value
+        print 'ImgWidget: setColorLimits(...) colmin, colmax, value =', colmin, colmax, value
 
         # left button
         if event.button is 1 :
@@ -277,60 +310,6 @@ class ImgWidget (QtGui.QWidget) :
         self.processDraw()
 
 
-    def processMouseButtonRelease(self, event) :
-        print 'MouseButtonRelease'
-
-        fig         = event.canvas.figure # or plt.gcf()
-        #figNum      = fig.number 
-        self.fig    = fig
-        axes        = event.inaxes # fig.gca() 
-
-        self.mouse1BottonIsPrresed = False
-        self.mouse2BottonIsPrresed = False
-        self.mouse3BottonIsPrresed = False
-                
-        if event.inaxes == fig.myaxesSIm and event.button == 1 : # Left button
-
-            self.xrelease = event.xdata
-            self.yrelease = event.ydata
-
-            if self.selectRectIsOn == True :
-
-                fig.myXmin = int(min(self.xpress, self.xrelease))
-                fig.myXmax = int(max(self.xpress, self.xrelease))  
-                fig.myYmin = int(min(self.ypress, self.yrelease))
-                fig.myYmax = int(max(self.ypress, self.yrelease))
-                print ' Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
-                self.drawRectangle( fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax )
-
-            if fig.myZoomIsOn :
-                self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
-
-        if event.button == 2 : #or event.button == 3 : # middle or right button
-            fig.myXmin = None
-            fig.myXmax = None
-            fig.myYmin = None
-            fig.myYmax = None
-            fig.myZmin = None
-            fig.myZmax = None
-            self.on_draw()
-
-            #plt.draw() # redraw the current figure
-            #fig.myZoomIsOn = False
-
-        #self.setEditFieldValues()
-
-
-    def drawRectangle( self, Xmin, Xmax, Ymin, Ymax):
-        xy = Xmin, Ymin
-        w  = Xmax - Xmin
-        h  = Ymax - Ymin
-
-        rec = plt.Rectangle(xy, width=w, height=h, edgecolor='r', linewidth=2, fill=False)
-        plt.gca().add_patch(rec)
-        plt.draw()
-
-
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         print 'Close application'
            
@@ -345,11 +324,41 @@ class ImgWidget (QtGui.QWidget) :
         else             : return int(value)
 
 
+#---------------------
+# CURRENTLY IS NOT USED
+    def zoomImageOnRelease(self, event) :
+        fig  = self.fig = event.canvas.figure # or plt.gcf()
+        #axes = event.inaxes        # fig.gca() 
+
+        if event.button == 1 : # Left button
+
+            if self.selectRectIsOn == True : # THIS SHOULD BE SET FROM EXTERNAL MENU
+
+                fig.myXmin = int(min(self.xpress, self.xrelease))
+                fig.myXmax = int(max(self.xpress, self.xrelease))  
+                fig.myYmin = int(min(self.ypress, self.yrelease))
+                fig.myYmax = int(max(self.ypress, self.yrelease))
+                print ' Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
+                self.drawRectangle( fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax )
+
+            if fig.myZoomIsOn :              # THIS SHOULD BE SET FROM EXTERNAL MENU
+                self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
+
+        if event.button == 2 : #or event.button == 3 : # middle or right button
+            fig.myXmin = None
+            fig.myXmax = None
+            fig.myYmin = None
+            fig.myYmax = None
+            fig.myZmin = None
+            fig.myZmax = None
+            self.on_draw()
+
 #-----------------------------
 # Test
 #-----------------------------
 
 def get_array2d_for_test() :
+    print 'ImgWidget: get_array2d_for_test()'
     mu, sigma = 200, 25
     arr = mu + sigma*np.random.standard_normal(size=2400)
     #arr = np.arange(2400)
@@ -360,13 +369,18 @@ def get_array2d_for_test() :
 
 def main():
 
+# IN ORDER TO RUN NEEDS IN matplotlib.use('Qt4Agg') UNCOMMENTED ON THE TOP !!!!
+
+    import ImgConfigParameters as gicp
+    icp = gicp.giconfpars.addImgConfigPars( None )
+
     app = QtGui.QApplication(sys.argv)
 
     #fig = Figure(          figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
     fig = plt.figure(num=1, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
 
     #w = ImgWidget(None, fig, arr)
-    w = ImgWidget(None, fig)
+    w = ImgWidget(icp, fig)
     w.move(QtCore.QPoint(50,50))
     w.set_image_array( get_array2d_for_test() )
     w.show()    
