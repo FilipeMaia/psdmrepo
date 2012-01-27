@@ -63,6 +63,8 @@ XtcInputModule::XtcInputModule (const std::string& name)
   , m_l1Count(0)
   , m_simulateEOR(0)
 {
+  std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
+
   // get number of events to process/skip from psana configuration
   ConfigSvc::ConfigSvc cfg;
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
@@ -186,7 +188,7 @@ XtcInputModule::event(Event& evt, Env& env)
     MsgLog(name(), debug, name() << ": found new datagram, transition = "
           << Pds::TransitionId::name(trans));
 
-    switch( seq.service()) {
+    switch (trans) {
     
     case Pds::TransitionId::Configure:
       if (not (clock == m_transitions[trans])) {

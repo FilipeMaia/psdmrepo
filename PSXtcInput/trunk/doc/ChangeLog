@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2012-01-27 Andy Salnikov
+- Pds::ClockTime array in XtcInputModule class was default-initialized 
+  which left ClockTime members uninitialized
+
 Tag: V00-01-00
 2011-10-04 Andy Salnikov
 - implemented event skipping and max event number
