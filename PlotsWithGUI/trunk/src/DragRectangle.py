@@ -23,18 +23,13 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.isInitialized = False
             print "DragRectangle initialization w/o parameters."
 
-        #elif width == 1 : # Initialization at the mouse click, assume that the xy is defined
-        #    patches.Rectangle.__init__(self, xy, width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
-        #    self.isInitialized = False
-        #    print "DragRectangle initialization w/o parameters."
-
         else :
             patches.Rectangle.__init__(self, xy,  width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
             self.isInitialized = True
 
         self.set_picker(picker)
         self.myPicker = picker
-        self.press    = None
+        self.press    = None # Is ised to transmit local information between press and release button
 
 
     def get_list_of_rect_pars(self) :
@@ -121,9 +116,9 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
             self.press = xy0, w0, h0, clickxy, vertindex
 
-            if event.button is 2 : # for middle mouse button
-                print 'Remove the rect now...'
-                self.remove_from_axes()
+            #if event.button is 2 : # for middle mouse button
+            #    print 'Remove the rect now...'
+            #    self.remove_from_axes()
 
         else : # if the object position is not defined yet:
             vertindex = 0
@@ -200,8 +195,9 @@ class TestDragRectangle :
         self.fig.my_mode  = None # This is used to transmit signals
         self.list_of_objs = []
 
-        self.fig.canvas.mpl_connect('key_press_event',    self.on_key_press)
-        self.fig.canvas.mpl_connect('button_press_event', self.on_mouse_press)
+        self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)
+        self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)
+        self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)
         self.print_mode_keys()
 
 
@@ -235,10 +231,16 @@ class TestDragRectangle :
         xy = event.xdata, event.ydata
         print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
         if self.fig.my_mode  == 'Add' :
+            if event.button != 1 : return # if other than Left mouse button
             print 'mode=', self.fig.my_mode
             obj = DragRectangle(xy) # Creates the DragRectangle object with 1st vertex in xy
             add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
             obj.on_press(event)                                     # <<<==========================
+
+
+    def on_mouse_release(self, event) :
+        print """Responds on mouse signals and do necessary actions after release button"""
+
 
     
     def print_list_of_objs(self) :
@@ -250,23 +252,14 @@ class TestDragRectangle :
             obj.print_pars()
 
 #-----------------------------
-
-def add_obj_to_axes(obj, axes, list_of_objs) :
-    """Add object to axes and append the list of objects
-    """
-    obj.add_to_axes(axes)                        # 1. Add it to figure axes
-    obj.connect()                                # 2. Connect object with signals
-    list_of_objs.append(obj)                     # 3. Append the list of objects 
-
 #-----------------------------
-
-def get_array2d_for_test() :
-    mu, sigma = 200, 25
-    arr = mu + sigma*np.random.standard_normal(size=13500)
-    #arr = np.arange(2400)
-    arr.shape = (90,150)
-    return arr
-
+# ===>>> Moved to Drag.py
+#-----------------------------
+# def add_obj_to_axes(obj, axes, list_of_objs) :
+# def get_array2d_for_test() :
+# def generate_test_image() :
+#-----------------------------
+#-----------------------------
 
 def generate_list_of_objects_for_axes(axes, axesImage) :
     """Produce the list of random objects (Rectangles) for test purpose.
@@ -292,20 +285,6 @@ def generate_list_of_objects_for_axes(axes, axesImage) :
         add_obj_to_axes(obj, axes, obj_list)      # <<<==========================
 
     return obj_list
-
-#-----------------------------
-
-def generate_test_image() :
-
-    fig = plt.figure()
-    fig.my_mode = None # This is used to transmit signals
-    axes = fig.add_subplot(111)
-
-    axesImage = axes.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
-    #axesImage.set_clim(zmin,zmax)
-    mycolbar = fig.colorbar(axesImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
-
-    return fig, axes, axesImage
 
 #-----------------------------
 

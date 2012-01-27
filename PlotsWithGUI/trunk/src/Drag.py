@@ -3,7 +3,6 @@
 
 #import numpy as np
 #import copy
-#import matplotlib.pyplot  as plt
 import matplotlib.patches as patches
 import math # cos(x), sin(x), radians(x), degrees()
 #import copy
@@ -53,12 +52,13 @@ class Drag :
         return self.isInitialized
 
 
-    def remove_from_axes(self) :
-        #self.axes.patches.remove(self)
-        #self.remove()
-        #self.figure.canvas.draw()
-        pass
-        self.remove_object_from_img()
+    #def remove_from_axes(self) :
+        ##self.axes.patches.remove(self)
+        ##self.remove()
+        ##self.figure.canvas.draw()
+        #pass
+        #self.remove_object_from_img()
+
 
     def connect(self):
         'connect to all the events we need'
@@ -91,13 +91,18 @@ class Drag :
             self.isRemoved = True
         else :
             self.isRemoved = False
-        print 'Drag:on_press_remove(), self.get_mode() =', self.get_mode(), ' isRemoved =', self.isRemoved
+        print 'Drag: on_press_remove(), self.get_mode() =', self.get_mode(), ' isRemoved =', self.isRemoved
 
 
     def on_release_remove(self) :
         if self.isRemoved :
-            #print 'on_release_remove fig_number =', self.fig_outside.number
-            imgfm.ifm.close_fig(self.fig_outside.number)
+            print 'Drag: on_release_remove()' # ,' fig_number =', self.fig_outside.number
+            #
+            # NEEDS IN CALBACK SIGNAL FOR REMOVE ACTION IN ORDER TO :
+            # 1. REMOVE OBJECT FROM EXTERNAL LIST
+            # 2. REMOVE ASSOCIATED OBJECTS 
+            # imgfm.ifm.close_fig(self.fig_outside.number)
+
             self.disconnect()
 
 
@@ -222,6 +227,12 @@ class Drag :
 
     def remove_object_from_img(self) :
         print 'Drag : remove_object_from_img() : self.myIndex ='  #, self.myIndex 
+        self.on_press_graphic_manipulations()
+        self.on_release_graphic_manipulations()
+
+
+    def remove_object_from_img_v1(self) :
+        print 'Drag : remove_object_from_img() : self.myIndex ='  #, self.myIndex 
         self.isRemoved = True
 
         #self.on_press_graphic_manipulations()
@@ -241,10 +252,67 @@ class Drag :
         #self.on_release_graphic_manipulations()
         self.disconnect()
         self.isInitialized = True
-        self.isRemoved     = False
-
+        self.isRemoved     = False # ?????????????????
 
 #-----------------------------
+#-----------------------------
+# Global methods
+#-----------------------------
+#-----------------------------
+
+def add_obj_to_axes(obj, axes, list_of_objs) :
+    """Add object to axes and append the list of objects
+    """
+    obj.add_to_axes(axes)                        # 1. Add it to figure axes
+    obj.connect()                                # 2. Connect object with signals
+    list_of_objs.append(obj)                     # 3. Append the list of objects 
+
+#-----------------------------
+# Global methods for test
+#-----------------------------
+
+import numpy as np
+
+def get_array2d_for_test() :
+    mu, sigma = 200, 25
+    arr = mu + sigma*np.random.standard_normal(size=13500)
+    #arr = np.arange(2400)
+    arr.shape = (90,150)
+    return arr
+
+
+import matplotlib.pyplot as plt
+
+def generate_test_image() :
+    """Produce the figure with 2-d image for the test purpose.
+       returns the necessary for test parameters: 
+    """
+    fig = plt.figure()
+    fig.my_mode = None # This is used to transmit signals
+    axes = fig.add_subplot(111)
+
+    axesImage = axes.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
+    #axesImage.set_clim(zmin,zmax)
+    mycolbar = fig.colorbar(axesImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+
+    return fig, axes, axesImage
+
+#-----------------------------
+
+def main_test_global():
+    """Test of the global methods only
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    plt.get_current_fig_manager().window.move(50, 10)
+    plt.show()
+
+#-----------------------------
+import sys
+
 if __name__ == "__main__" :
-    sys.exit ('This module does not have main()')
+
+    main_test_global()
+    sys.exit ('End of test')
+
 #-----------------------------

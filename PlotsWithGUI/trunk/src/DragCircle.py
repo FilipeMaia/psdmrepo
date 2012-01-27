@@ -64,7 +64,8 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
             self.press = xy0, clickxy, vertindex, r0
 
             if event.button is 2 : # for middle mouse button
-                self.remove_from_axes()
+            #    self.remove_from_axes()
+                self.remove_object_from_img()
 
         else : # if the object position is not defined yet:
             vertindex = 0
