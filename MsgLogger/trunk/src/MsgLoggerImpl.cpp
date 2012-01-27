@@ -36,6 +36,7 @@ extern "C" {
 #include <sstream>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -78,9 +79,15 @@ namespace {
   // read config stuff
   void readConfig() ;
 
+  // mutex used to serialize creation of the loggers
+  static boost::mutex newLoggerMutex ;
+
 }
 
 namespace MsgLogger {
+
+
+
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -183,6 +190,8 @@ MsgLoggerImpl::getLogger( const std::string& name )
   if ( implementations.destroyed ) {
     return 0 ;
   }
+
+  boost::lock_guard<boost::mutex> lock(::newLoggerMutex);
 
   // on the first call read configuration
   if ( implementations.map.empty() ) {

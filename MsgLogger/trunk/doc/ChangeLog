@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2012-01-27 Andy Salnikov
+- MsgLoggerImpl::getLogger() is now thread safe
+
 Tag: V00-01-03
 2011-12-09 Andy Salnikov
 - doxygenated whole thing
