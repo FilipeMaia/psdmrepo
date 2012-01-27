@@ -15,6 +15,7 @@
 //-----------------
 #include <list>
 #include <vector>
+#include <queue>
 #include <iosfwd>
 #include <boost/utility.hpp>
 
@@ -101,6 +102,7 @@ private:
   MergeMode m_mode ;
   int32_t m_l1OffsetSec ;
   int32_t m_l1OffsetNsec ;
+  std::queue<Dgram> m_outputQueue;
 
 };
 
