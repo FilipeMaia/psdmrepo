@@ -1,0 +1,87 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSXtcInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-01
+2012-01-27 Andy Salnikov
+- Pds::ClockTime array in XtcInputModule class was default-initialized 
+  which left ClockTime members uninitialized
+
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- implemented event skipping and max event number
+
+Tag: V00-00-13
+2011-10-04 Andy Salnikov
+- XtcInputModule now adds EventId and datagram objects to the event in
+  beginRun and beginCalibCyle, run number can be extracted in beginRun()
+
+Tag: V00-00-12
+2011-06-17 Andy Salnikov
+- changed default datagram size to 32MB
+
+Tag: V00-00-11
+2011-05-06 Andy Salnikov
+- improve doxygenated comments
+
+Tag: V00-00-10
+2011-03-31 Andy Salnikov
+- XtcInputModule: added some debugging info
+
+Tag: V00-00-09
+2011-03-29 Andy Salnikov
+- XtcInputModule sets correct run number in the Event ID
+
+Tag: V00-00-08
+2011-03-28 Andy Salnikov
+- Unconfigure transition does not stop job, multiple configures
+  possible (warning will be printed if more than one).
+
+Tag: V00-00-07
+2011-03-28 Andy Salnikov
+- XtcInputModule now fills epicsstore with EPICS data
+
+Tag: V00-00-06
+2011-03-22 Andy Salnikov
+- implemented merging of the control transitions
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added implementation of the event ID class
+
+Tag: V00-00-04
+2011-01-31 Andy Salnikov
+- renamed this package to PSXtcInput
+- use ErrSvc::Issue for exceptions' base class
+
+Tag: V00-00-03
+2011-01-27 Andy Salnikov
+- fix properties on files
+
+Tag: V00-00-02
+2011-01-27 Andy Salnikov
+- added exception classes
+- started implementation of the event filling part
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- retag with standard tag, good for nightly
+
+Tag: andy-20110126-02
+2011-01-26 Andy Salnikov
+- moved common classes to new package XtcInput
+
+Tag: andy-20110126-01
+2011-01-26 Andy Salnikov
+- copied few classes from translator
+- added XtcInputModule class
+- common classes will probably be moved to XtcInput package
