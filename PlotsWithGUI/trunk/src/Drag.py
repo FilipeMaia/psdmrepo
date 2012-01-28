@@ -91,12 +91,12 @@ class Drag :
             self.isRemoved = True
         else :
             self.isRemoved = False
-        print 'Drag: on_press_remove(), self.get_mode() =', self.get_mode(), ' isRemoved =', self.isRemoved
+        #print 'Drag: on_press_remove(), self.get_mode() =', self.get_mode(), ' isRemoved =', self.isRemoved
 
 
     def on_release_remove(self) :
         if self.isRemoved :
-            print 'Drag: on_release_remove()' # ,' fig_number =', self.fig_outside.number
+            #print 'Drag: on_release_remove()' # ,' fig_number =', self.fig_outside.number
             #
             # NEEDS IN CALBACK SIGNAL FOR REMOVE ACTION IN ORDER TO :
             # 1. REMOVE OBJECT FROM EXTERNAL LIST
@@ -159,7 +159,7 @@ class Drag :
 
     def select_deselect_obj(self) :
 
-        print 'select_deselect_obj() : self.isRemoved = ', self.isRemoved
+        #print 'select_deselect_obj() : self.isRemoved = ', self.isRemoved
 
         if self.press == None     : return
         if not self.isInitialized : return
@@ -220,39 +220,17 @@ class Drag :
         self.isInitialized = True
         self.on_release_remove()
         #self.figure.canvas.draw()
-        print 'on_relese in Drag object'
 
 #-----------------------------
 # is called by ImgFigureManager -> ImgDrawOnTop.py -> in order to remove object from main image
 
     def remove_object_from_img(self) :
-        print 'Drag : remove_object_from_img() : self.myIndex ='  #, self.myIndex 
-        self.on_press_graphic_manipulations()
-        self.on_release_graphic_manipulations()
-
-
-    def remove_object_from_img_v1(self) :
-        print 'Drag : remove_object_from_img() : self.myIndex ='  #, self.myIndex 
-        self.isRemoved = True
-
-        #self.on_press_graphic_manipulations()
-
-        self.save_obj_properties()              # Save original line properties
+        #print 'Drag : remove_object_from_img() : ', self.print_pars()
         self.set_linewidth(0)                   # Makes the line invisible
         #self.set_linestyle('')                 # Draw nothing - makes the line invisible
-        self.figure.canvas.draw()               # Draw canvas and save the background 
-        self.save_current_background()          # Added for blit
-        #self.on_press_remove()                  # In case of remove mode
-        #self.set_dragged_obj_properties()       # Set the line properties during dragging 
-        #self.redraw_obj()
-        self.redraw_blit()
-        #self.select_deselect_obj()
-
-        self.press = None
-        #self.on_release_graphic_manipulations()
+        self.figure.canvas.draw()               # Draw canvas with all current objects on it
         self.disconnect()
-        self.isInitialized = True
-        self.isRemoved     = False # ?????????????????
+        self.isRemoved = True
 
 #-----------------------------
 #-----------------------------

@@ -90,8 +90,13 @@ class DragLine( Drag, lines.Line2D ) :
 
     def on_release(self, event):
         'on release we reset the press data'
-        self.press = None
         self.on_release_graphic_manipulations()
+
+        if self.press is None: return
+        if event.button is 2 : # for middle mouse button
+            self.remove_object_from_img() # Remove object from image for test
+
+        self.press = None
 
 #-----------------------------
 # Test

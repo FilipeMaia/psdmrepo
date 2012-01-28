@@ -29,7 +29,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
         self.set_picker(picker)
         self.myPicker = picker
-        self.press    = None # Is ised to transmit local information between press and release button
+        self.press    = None # Is used to transmit local information between press and release button
 
 
     def get_list_of_rect_pars(self) :
@@ -48,7 +48,8 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
     def print_pars(self) :
         x,y,w,h,s,t = self.get_list_of_rect_pars()
-        print 'x,y,w,h,s,t =', x,y,w,h,s,t
+        r = self.isRemoved
+        print 'x,y,w,h,s,t,r =', x,y,w,h,s,t,r
 
 
     def my_contains(self, event):
@@ -175,8 +176,14 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
     def on_release(self, event):
         'on release we reset the press data'
-        self.press = None
         self.on_release_graphic_manipulations()
+
+        if self.press is None: return
+        if event.button is 2 : # for middle mouse button
+            self.remove_object_from_img() # Remove object from image for test
+
+        self.press = None
+
 
 #-----------------------------
 #-----------------------------
@@ -194,10 +201,12 @@ class TestDragRectangle :
         self.axes         = axes
         self.fig.my_mode  = None # This is used to transmit signals
         self.list_of_objs = []
+        self.needInUpdate = False
 
         self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)
         self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)
         self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)
+        self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)
         self.print_mode_keys()
 
 
@@ -208,7 +217,7 @@ class TestDragRectangle :
     def print_mode_keys(self) :
         """Prints the hint for mode selection using keyboard
         """
-        print '\n\nUse keyboard to select the mode: \nA=ADD, \nM=MARK, \nD=DELETE, \nR=DELETE, \nN=NONE, \nW=PRINT list of objects'
+        print '\n\nUse keyboard to select the mode: \nA=ADD, \nM=MARK, \nD=REMOVE SELECTED, \nR=REMOVE, \nN=NONE, \nW=PRINT list'
 
 
     def on_key_press(self, event) :
@@ -217,32 +226,69 @@ class TestDragRectangle :
         """
         if   event.key == 'a': self.fig.my_mode  = 'Add'
         elif event.key == 'n': self.fig.my_mode  = 'None'
-        elif event.key == 'd': self.fig.my_mode  = 'Remove'
         elif event.key == 'r': self.fig.my_mode  = 'Remove'
         elif event.key == 'm': self.fig.my_mode  = 'Select'
         elif event.key == 'w': self.print_list_of_objs()
+        elif event.key == 'd': self.test_remove_selected_objs_from_img_by_call()
         else                 : self.print_mode_keys()
-        print '\nCurrent mode is :', self.fig.my_mode
+        print '\nCurrent mode:', self.fig.my_mode
 
 
     def on_mouse_press(self, event) :
         """Responds on mouse signals and do the object initialization for the mode Add
         """
         xy = event.xdata, event.ydata
-        print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
+        #print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
         if self.fig.my_mode  == 'Add' :
             if event.button != 1 : return # if other than Left mouse button
-            print 'mode=', self.fig.my_mode
+            #print 'mode=', self.fig.my_mode
             obj = DragRectangle(xy) # Creates the DragRectangle object with 1st vertex in xy
             add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
             obj.on_press(event)                                     # <<<==========================
 
 
     def on_mouse_release(self, event) :
-        print """Responds on mouse signals and do necessary actions after release button"""
+        self.needInUpdate = True # Works in on_mouse_motion(...)
 
+    def on_mouse_motion(self, event) :
+        """HAVE TO USE IT, because I need to update the list after the button release loop over all objects...
+        """
+        #print 'mouse is moved.. do something...', event.xdata, event.ydata
+        if self.needInUpdate :
+            self.update_list_of_objs()
+            self.needInUpdate = False
 
     
+    def update_list_of_objs(self) :
+        print 'update_list_of_objs()'
+        for obj in self.list_of_objs :
+            if obj.isRemoved :
+
+                #====================== REMOVE OBJECT BY CLICK ON MOUSE ===============================
+                # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK ON MOUSE
+                print 'Object ', self.list_of_objs.index(obj), 'is removing from the list. ACT HERE !!!'
+                self.list_of_objs.remove(obj)
+                #======================================================================================
+
+
+    def test_remove_selected_objs_from_img_by_call(self) :
+        """Loop over list of objects and remove selected from the image USING CALL from code.
+        """
+        print 'test_remove_selected_objs_from_img_by_call()'
+        for obj in self.list_of_objs :
+            if obj.isSelected :
+                print 'Object', self.list_of_objs.index(obj), 'is selected and will be removed in this test'
+
+                #====================== REMOVE OBJECT BY PROGRAM CALL =================================
+                # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER PROGRAM CALL
+                print 'Object ', self.list_of_objs.index(obj), 'is removing from the list. ACT HERE !!!'
+                obj.remove_object_from_img()  # <<<========= PROGRAM CALL TO REMOVE THE OBJECT FROM IMG
+                self.list_of_objs.remove(obj) # <<<========= REMOVE OBJECT FROM THE LIST
+                #======================================================================================
+
+        self.needInUpdate = False
+
+
     def print_list_of_objs(self) :
         """Prints the list of objects with its parameters.
         """

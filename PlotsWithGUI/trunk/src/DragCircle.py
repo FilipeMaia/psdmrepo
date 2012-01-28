@@ -63,10 +63,6 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
             vertindex = 1
             self.press = xy0, clickxy, vertindex, r0
 
-            if event.button is 2 : # for middle mouse button
-            #    self.remove_from_axes()
-                self.remove_object_from_img()
-
         else : # if the object position is not defined yet:
             vertindex = 0
             r0  = 0
@@ -104,9 +100,13 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
 
     def on_release(self, event):
     #    'on release we reset the press data'
-        self.press = None
         self.on_release_graphic_manipulations()
 
+        if self.press is None: return
+        if event.button is 2 : # for middle mouse button
+            self.remove_object_from_img() # Remove object from image for test
+
+        self.press = None
 
 #-----------------------------
 # Test
