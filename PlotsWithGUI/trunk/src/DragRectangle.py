@@ -199,14 +199,14 @@ class TestDragRectangle :
 
         self.fig          = fig
         self.axes         = axes
-        self.fig.my_mode  = None # This is used to transmit signals
+        self.fig.my_mode  = None  # Mode for interaction between fig and obj
         self.list_of_objs = []
-        self.needInUpdate = False
+        self.needInUpdate = False # local flag for remove
 
-        self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)
-        self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)
-        self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)
-        self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)
+        self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)      # for test only
+        self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)    # for Add mode
+        self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)  # for Remove
+        self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)   # For Remove (at the end)
         self.print_mode_keys()
 
 
@@ -231,7 +231,7 @@ class TestDragRectangle :
         elif event.key == 'w': self.print_list_of_objs()
         elif event.key == 'd': self.test_remove_selected_objs_from_img_by_call()
         else                 : self.print_mode_keys()
-        print '\nCurrent mode:', self.fig.my_mode
+        print '\nCurrent mode:a', self.fig.my_mode
 
 
     def on_mouse_press(self, event) :
