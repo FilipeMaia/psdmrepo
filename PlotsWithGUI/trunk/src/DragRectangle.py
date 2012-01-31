@@ -117,9 +117,10 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
             self.press = xy0, w0, h0, clickxy, vertindex
 
-            #if event.button is 2 : # for middle mouse button
-            #    print 'Remove the rect now...'
-            #    self.remove_from_axes()
+            #----Remove object at click on middle mouse botton
+            if event.button is 2 : # for middle mouse button
+                self.remove_object_from_img() # Remove object from image
+                return
 
         else : # if the object position is not defined yet:
             vertindex = 0
@@ -170,20 +171,14 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.set_height(dy)
             self.set_xy(xy0)
 
-
         self.on_motion_graphic_manipulations()
 
 
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-
-        if self.press is None: return
-        if event.button is 2 : # for middle mouse button
-            self.remove_object_from_img() # Remove object from image for test
-
+        
         self.press = None
-
 
 #-----------------------------
 #-----------------------------
@@ -205,12 +200,13 @@ class TestDragRectangle(TestDragObject) :
     def on_mouse_press(self, event) :
         """Responds on mouse signals and do the object initialization for the mode Add
         """
-        xy = event.xdata, event.ydata
+        #xy = event.xdata, event.ydata
         #print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
         if self.fig.my_mode  == 'Add' :
             if event.button != 1 : return # if other than Left mouse button
             #print 'mode=', self.fig.my_mode
-            obj = DragRectangle(xy) # Creates the DragRectangle object with 1st vertex in xy
+            #obj = DragRectangle(xy) # Creates the DragRectangle object with 1st vertex in xy
+            obj = DragRectangle() # Creates the DragRectangle object with 1st vertex in xy
             add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
             obj.on_press(event)                                     # <<<==========================
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #----------------------------------
+import sys
 
 import numpy as np
 import copy
@@ -25,12 +26,27 @@ class DragLine( Drag, lines.Line2D ) :
 
         self.set_pickradius(picker)
         self.press    = None
+        self.myPicker = picker
 
 
     #def set_dragged_obj_properties(self):
     #    self.set_color    ('k')
     #    self.set_linewidth(1)
     #    self.set_linestyle('--') #'--', ':'
+
+    def get_list_of_line_pars(self) :
+        x = self.get_xdata()
+        y = self.get_ydata()
+        s = self.isSelected
+        r = self.isRemoved
+        t = self.myType
+        return (x,y,s,t,r)
+
+
+    def print_pars(self) :
+        x,y,s,t,r = self.get_list_of_line_pars()
+        r = self.isRemoved
+        print 'x,y,s,t,r =', x,y,s,t,r
 
 
     def on_press(self, event):
@@ -42,6 +58,7 @@ class DragLine( Drag, lines.Line2D ) :
 
         if self.isInitialized :
             contains, attrd = self.contains(event)
+            #contains = self.contains(event)
             if not contains: return
 
             xy0 = self.get_xydata()
@@ -51,6 +68,11 @@ class DragLine( Drag, lines.Line2D ) :
             else :
                 vertindex = 1
             self.press = xy0, clickxy, vertindex
+
+            #----Remove object at click on middle mouse botton
+            if event.button is 2 : # for middle mouse button
+                self.remove_object_from_img() # Remove object from image
+                return
 
         else : # if the line position is not defined yet:
             vertindex = 1
@@ -91,64 +113,118 @@ class DragLine( Drag, lines.Line2D ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-
-        if self.press is None: return
-        if event.button is 2 : # for middle mouse button
-            self.remove_object_from_img() # Remove object from image for test
-
         self.press = None
 
+
+#-----------------------------
+#-----------------------------
 #-----------------------------
 # Test
 #-----------------------------
+#-----------------------------
+#-----------------------------
 
-def get_array2d_for_test() :
-    mu, sigma = 200, 25
-    arr = mu + sigma*np.random.standard_normal(size=2400)
-    #arr = np.arange(2400)
-    arr.shape = (40,60)
-    return arr
+from TestDragObject import *
+
+class TestDragLine(TestDragObject) : 
+
+    def __init__(self, fig, axes) :
+        TestDragObject.__init__(self, fig, axes)
+
+
+    # THE ONLY OBJECT-SPECIFIC METHOD, IN ADDITION TO class TestDragObject
+    def on_mouse_press(self, event) :
+        """Responds on mouse signals and do the object initialization for the mode Add
+        """
+        #x = (event.xdata, event.xdata+1)
+        #y = (event.ydata, event.ydata+1)
+        #print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
+        if self.fig.my_mode  == 'Add' :
+            if event.button != 1 : return # if other than Left mouse button
+            #print 'mode=', self.fig.my_mode
+            obj = DragLine() # Creates the DragRectangle object with 1st vertex in xy
+            add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
+            obj.on_press(event)                                     # <<<==========================
+
+
+#-----------------------------
+#-----------------------------
+# ===>>> Moved to Drag.py
+#-----------------------------
+# def add_obj_to_axes(obj, axes, list_of_objs) :
+# def get_array2d_for_test() :
+# def generate_test_image() :
+#-----------------------------
+#-----------------------------
+
+def generate_list_of_objects_for_axes(axes, axesImage) :
+    """Produce the list of random objects (Rectangles) for test purpose.
+    1. Generates initial list of random objects
+    2. Add them to the figure axes
+    3. Connect with signals.
+    4. Returns the list of created objects.
+    """
+    xmin,xmax,ymin,ymax =  axesImage.get_extent() 
+    #print 'xmin,xmax,ymin,ymax = ', xmin,xmax,ymin,ymax
+
+    nobj = 10
+    x = (xmin,xmax)
+    y = ymin+(ymax-ymin)*np.random.rand(nobj,2)
+
+    obj_list = []
+
+    # Add objects with initialization through the parameters
+    for indobj in range(nobj) :
+        obj = DragLine(x, y[indobj], linewidth=2, color='g', picker=5, linestyle='-')
+        add_obj_to_axes(obj, axes, obj_list)      # <<<==========================
+
+    return obj_list
 
 #-----------------------------
 
-def main():
+def main_full_test():
+    """Full test of the class DragRectangle, using the class TestDragRectangle
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. use the class TestDragRectangle to switch between modes for full test of the class DragRectangle
+    """
+    fig, axes, axesImage = generate_test_image()
 
-    fig = plt.figure()
-    fig.my_mode = None
-    ax = fig.add_subplot(111)
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
 
-    axisImage = ax.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
-    #axisImage.set_clim(zmin,zmax)
-    mycolbar = fig.colorbar(axisImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+    t = TestDragLine(fig, axes)
+    t .set_list_of_objs(list_of_objs)
 
-    xmin,xmax,ymin,ymax =  axisImage.get_extent() 
-    #print 'xmin,xmax,ymin,ymax = ', xmin,xmax,ymin,ymax
-
-    nlines = 10
-    x = (xmin,xmax)
-    y = ymin+(ymax-ymin)*np.random.rand(nlines,2)
-
-    dls = []
-    # Add lines with initialization through the parameters
-    for indline in range(nlines) :
-        dl = DragLine(x, y[indline], linewidth=2, color='g', picker=5, linestyle='-')
-        #ax.add_line(dl) 
-        #ax.add_artist(dl) 
-        dl.add_to_axes(ax)
-        dl.connect()
-        dls.append(dl)
-
-    # Add line with mouse initialization
-
-    dl = DragLine() # W/O parameters !
-    dl.add_to_axes(ax)
-    dl.connect()
-    dls.append(dl)
-        
-    plt.get_current_fig_manager().window.move(50, 10)    
+    plt.get_current_fig_manager().window.move(50, 10)
     plt.show()
 
 #-----------------------------
-if __name__ == "__main__" :
-    main()
+
+def main_simple_test():
+    """Simple test of the class DragRectangle.
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. add one more object with initialization at 1st click-and-drag of mouse-left button
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
+
+    #Add one more object
+    obj = DragLine() # call W/O parameters => object will be initialized at first mouse click
+    add_obj_to_axes(obj, axes, list_of_objs)
+
+    plt.get_current_fig_manager().window.move(50, 10)
+    plt.show()
+
 #-----------------------------
+
+if __name__ == "__main__" :
+
+    #main_simple_test()
+    main_full_test()
+    sys.exit ('End of test')
+
+#-----------------------------
+
+

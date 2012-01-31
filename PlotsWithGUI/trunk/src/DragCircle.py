@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #----------------------------------
+import sys
 
 import numpy as np
 #import copy
@@ -44,6 +45,20 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
     #    else :
     #        return False
 
+    def get_list_of_circ_pars(self) :
+        x,y = self.center
+        xy0 = (int(x), int(y))
+        r0  = int( self.get_radius() )
+        s   =      self.isSelected
+        t   =      self.myType
+        r   = self.isRemoved
+        return (xy0,r0,s,t,r)
+
+
+    def print_pars(self) :
+        xy0,r0,s,t,r = self.get_list_of_circ_pars()
+        print 'xy0,r0,s,t,r =', xy0,r0,s,t,r
+
 
     def on_press(self, event):
         'on button press we will see if the mouse is over us and store some data'
@@ -62,6 +77,11 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
 
             vertindex = 1
             self.press = xy0, clickxy, vertindex, r0
+
+            #----Remove object at click on middle mouse botton
+            if event.button is 2 : # for middle mouse button
+                self.remove_object_from_img() # Remove object from image
+                return
 
         else : # if the object position is not defined yet:
             vertindex = 0
@@ -101,35 +121,57 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
     def on_release(self, event):
     #    'on release we reset the press data'
         self.on_release_graphic_manipulations()
-
-        if self.press is None: return
-        if event.button is 2 : # for middle mouse button
-            self.remove_object_from_img() # Remove object from image for test
-
         self.press = None
 
+
+#-----------------------------
+#-----------------------------
 #-----------------------------
 # Test
 #-----------------------------
-
-def get_array2d_for_test() :
-    mu, sigma = 200, 25
-    arr = mu + sigma*np.random.standard_normal(size=13500)
-    #arr = np.arange(2400)
-    arr.shape = (90,150)
-    return arr
-
+#-----------------------------
 #-----------------------------
 
-def main():
+from TestDragObject import *
 
-    fig = plt.figure()
-    fig.my_mode = None
-    ax = fig.add_subplot(111)
+class TestDragCircle(TestDragObject) : 
 
-    axesImage = ax.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
-    #axisImage.set_clim(zmin,zmax)
-    mycolbar = fig.colorbar(axesImage, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+    def __init__(self, fig, axes) :
+        TestDragObject.__init__(self, fig, axes)
+
+
+    # THE ONLY OBJECT-SPECIFIC METHOD, IN ADDITION TO class TestDragObject
+    def on_mouse_press(self, event) :
+        """Responds on mouse signals and do the object initialization for the mode Add
+        """
+        #xy = event.xdata, event.ydata
+        #print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
+        if self.fig.my_mode  == 'Add' :
+            if event.button != 1 : return # if other than Left mouse button
+            #print 'mode=', self.fig.my_mode
+            obj = DragCircle() # Creates the DragRectangle object with 1st vertex in xy
+            #obj = DragCircle(xy) # Creates the DragRectangle object with 1st vertex in xy
+            add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
+            obj.on_press(event)                                     # <<<==========================
+
+
+#-----------------------------
+#-----------------------------
+# ===>>> Moved to Drag.py
+#-----------------------------
+# def add_obj_to_axes(obj, axes, list_of_objs) :
+# def get_array2d_for_test() :
+# def generate_test_image() :
+#-----------------------------
+#-----------------------------
+
+def generate_list_of_objects_for_axes(axes, axesImage) :
+    """Produce the list of random objects (Circle) for test purpose.
+    1. Generates initial list of random objects
+    2. Add them to the figure axes
+    3. Connect with signals.
+    4. Returns the list of created objects.
+    """
     xmin,xmax,ymin,ymax =  axesImage.get_extent() 
     #print 'xmin,xmax,ymin,ymax = ', xmin,xmax,ymin,ymax
 
@@ -142,21 +184,53 @@ def main():
     # Add objects with initialization through the parameters
     for indobj in range(nobj) :
         obj = DragCircle((x[indobj], y[indobj]), radius=r[indobj], color='g')
-        #ax.add_artist(obj) 
-        obj.add_to_axes(ax)
-        obj.connect()
-        obj_list.append(obj)
+        add_obj_to_axes(obj, axes, obj_list)      # <<<==========================
 
-    # Add one more object with mouse initialization
-    obj = DragCircle() # W/O parameters !
-    obj.add_to_axes(ax)
-    obj.connect()
-    obj_list.append(obj)
+    return obj_list
 
-    plt.get_current_fig_manager().window.move(50, 10)    
+#-----------------------------
+
+def main_full_test():
+    """Full test of the class DragRectangle, using the class TestDragRectangle
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. use the class TestDragRectangle to switch between modes for full test of the class DragRectangle
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
+
+    t = TestDragCircle(fig, axes)
+    t .set_list_of_objs(list_of_objs)
+
+    plt.get_current_fig_manager().window.move(50, 10)
     plt.show()
 
 #-----------------------------
+
+def main_simple_test():
+    """Simple test of the class DragRectangle.
+       1. make a 2-d plot
+       2. make a list of random objects and add them to the plot
+       3. add one more object with initialization at 1st click-and-drag of mouse-left button
+    """
+    fig, axes, axesImage = generate_test_image()
+
+    list_of_objs = generate_list_of_objects_for_axes(axes, axesImage)
+
+    #Add one more object
+    obj = DragCircle() # call W/O parameters => object will be initialized at first mouse click
+    add_obj_to_axes(obj, axes, list_of_objs)
+
+    plt.get_current_fig_manager().window.move(50, 10)
+    plt.show()
+
+#-----------------------------
+
 if __name__ == "__main__" :
-    main()
+
+    #main_simple_test()
+    main_full_test()
+    sys.exit ('End of test')
+
 #-----------------------------

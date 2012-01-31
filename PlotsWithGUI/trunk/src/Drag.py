@@ -86,26 +86,6 @@ class Drag :
         return max(dx,dy)
 
 
-    def on_press_remove(self) :
-        if self.get_mode() == self.modeRemove :
-            self.isRemoved = True
-        else :
-            self.isRemoved = False
-        #print 'Drag: on_press_remove(), self.get_mode() =', self.get_mode(), ' isRemoved =', self.isRemoved
-
-
-    def on_release_remove(self) :
-        if self.isRemoved :
-            #print 'Drag: on_release_remove()' # ,' fig_number =', self.fig_outside.number
-            #
-            # NEEDS IN CALBACK SIGNAL FOR REMOVE ACTION IN ORDER TO :
-            # 1. REMOVE OBJECT FROM EXTERNAL LIST
-            # 2. REMOVE ASSOCIATED OBJECTS 
-            # imgfm.ifm.close_fig(self.fig_outside.number)
-
-            self.disconnect()
-
-
     def save_obj_properties(self) :
         #print 'save_line_properties',
         #self.myColor = self.get_color()
@@ -121,24 +101,14 @@ class Drag :
         self.set_color    (self.myColor)
         self.set_linewidth(self.myWidth)
         self.set_linestyle(self.myStyle)
-        if self.isRemoved : self.set_linewidth(0)
 
 
     def set_dragged_obj_properties(self) :
         self.set_color    ('k')
         self.set_linewidth(1)
         self.set_linestyle('dashed')
-        if self.isRemoved : self.set_linewidth(0)
 
 
-    def redraw_artist(self) :
-        self.axes.draw_artist(self)
-
-
-    def redraw_blit(self):
-        self.figure.canvas.blit(self.axes.bbox) # blit canvas before any motion
-
-        
     def redraw_obj(self) :
         self.axes.draw_artist(self)        
         self.figure.canvas.blit(self.axes.bbox) # blit canvas before any motion
@@ -194,43 +164,67 @@ class Drag :
 
 
     def on_press_graphic_manipulations(self) :
+        """on press we do:
+        1. check if object needs to be removed and remove it if the mode is Remove
+        2. make the object invisible and re-draw canwas (w/o this object)
+        3. save this as a canva background
+        4. set the attributes for draged object
+        5. redraw object with dragged attributes
+        6. check if the object needs to be selected
+        """
+
+        if self.is_on_press_remove() : return   # In case of remove mode
         self.save_obj_properties()              # Save original line properties
         self.set_linewidth(0)                   # Makes the line invisible
-        #self.set_linestyle('')                 # Draw nothing - makes the line invisible
+        #self.set_linestyle('')                 # Draw nothing - makes the line invisible (Does not work for Circlr)
         self.figure.canvas.draw()               # Draw canvas and save the background 
         self.save_current_background()          # Added for blit
-        self.on_press_remove()                  # In case of remove mode
         self.set_dragged_obj_properties()       # Set the line properties during dragging 
         self.redraw_obj()
-        self.select_deselect_obj()
+        self.select_deselect_obj()              # Set/reset the isSelected flag 
 
 
     def on_motion_graphic_manipulations(self) :
-        #self.figure.canvas.draw()                         # Regular case
-        if self.isRemoved : return
+        """on motion we redraw the background and object in its current position
+        """
         self.restore_background()
         self.redraw_obj()
 
 
     def on_release_graphic_manipulations(self) :
-        """on release we reset the press data"""
+        """on release we reset the press data
+        """
         self.restore_obj_properties()
         self.set_select_deselect_color()
         self.redraw_obj()
         self.isInitialized = True
-        self.on_release_remove()
-        #self.figure.canvas.draw()
 
 #-----------------------------
-# is called by ImgFigureManager -> ImgDrawOnTop.py -> in order to remove object from main image
+
+    def is_on_press_remove(self) :
+        """Remove the object for remove mode
+        """
+        if self.get_mode() == self.modeRemove :
+            self.remove_object_from_img()
+            return True
+        else :
+            return False
+
+#-----------------------------
+# Is called by
+# 1. on_press_graphic_manipulations()
+# 2. ImgFigureManager -> ImgDrawOnTop.py -> in order to remove object from main image
 
     def remove_object_from_img(self) :
+        """ Remove object from figure canvas, axes, disconnect from signals, mark for removal 
+        """
         #print 'Drag : remove_object_from_img() : ', self.print_pars()
         self.set_linewidth(0)                   # Makes the line invisible
         #self.set_linestyle('')                 # Draw nothing - makes the line invisible
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
-        self.disconnect()
-        self.isRemoved = True
+        self.disconnect()                       # Disconnect object from canvas signals
+        self.remove()                           # Removes artist from axes
+        self.isRemoved = True                   # Set flag that the object is removed
 
 #-----------------------------
 #-----------------------------
