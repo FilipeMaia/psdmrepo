@@ -57,7 +57,7 @@ class TestDragObject :
 
 
     def send_signal_and_remove_object_from_list(self, obj, remove_type) :
-        print 'Object is removing from the list. ACT HERE !!!'
+        print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
         obj.print_pars()
         #====================== REMOVE OBJECT =================================================
         # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK OR PROGRAM CALL

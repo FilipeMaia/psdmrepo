@@ -219,11 +219,11 @@ class Drag :
         """ Remove object from figure canvas, axes, disconnect from signals, mark for removal 
         """
         #print 'Drag : remove_object_from_img() : ', self.print_pars()
-        self.set_linewidth(0)                   # Makes the line invisible
         #self.set_linestyle('')                 # Draw nothing - makes the line invisible
+        #self.set_linewidth(0)                   # Makes the line invisible
+        self.remove()                           # Removes artist from axes
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
         self.disconnect()                       # Disconnect object from canvas signals
-        self.remove()                           # Removes artist from axes
         self.isRemoved = True                   # Set flag that the object is removed
 
 #-----------------------------
