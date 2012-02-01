@@ -111,21 +111,20 @@ class ImgFigureManager :
         fig    = event.canvas.figure # plt.gcf() does not work, because closed canva may be non active
         figNum = fig.number
 
-        #if fig.my_icp.modeCurrent != fig.my_icp.modeRemove : return
-        #fig.my_icp.modeCurrent = fig.my_icp.modeNormal
-
         if figNum in self.list_of_open_figs : 
 
             if  fig.my_object != None : # if the object, associated with figure is not yet removed.
-                fig.my_icp.idrawontop.remove_object(fig.my_object)
+
+                fig.my_icp.control.signal_outside_fig_will_be_closed(fig)
 
             self.list_of_open_figs.remove(figNum)
 
 
-#    def get_figure_number(self) :
-#        return self.fig.number
-
+#-----------------------------
+#-----------------------------
 ifm = ImgFigureManager()
+#-----------------------------
+#-----------------------------
 
 #-----------------------------
 # Test
@@ -179,7 +178,8 @@ def main() :
     fig1  = ifm.get_figure(figsize=(7,5), type='test')
     plt.get_current_fig_manager().window.move(10,10)
     axes1 = fig1.add_subplot(111)
-    axes1.imshow( get_array2d_for_test(), interpolation='nearest', origin='bottom', aspect='auto') #, cmap=matplotlib.cm.gray, extent=self.range
+    axes1.imshow( get_array2d_for_test(), interpolation='nearest', origin='bottom', aspect='auto')
+                  #, cmap=matplotlib.cm.gray, extent=self.range
     print 'figure number =', fig1.number
 
     set_colormap('spectral')
@@ -187,7 +187,8 @@ def main() :
     fig2  = ifm.get_figure(figsize=(7,5), type='test')
     plt.get_current_fig_manager().window.move(100,100)
     axes2 = fig2.add_subplot(111)
-    axes2.imshow( get_array2d_for_test(), interpolation='nearest', origin='bottom', aspect='auto') #, cmap=matplotlib.cm.gray, extent=self.range
+    axes2.imshow( get_array2d_for_test(), interpolation='nearest', origin='bottom', aspect='auto')
+                  #, cmap=matplotlib.cm.gray, extent=self.range
     print 'figure number =', fig2.number
 
     ifm.print_list_of_open_figs()

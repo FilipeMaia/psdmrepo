@@ -152,4 +152,16 @@ class ImgControl :
 # Signals from ImgDrawOutside
 
 
+
+#---------------------------------------
+# Signals from ImgFigureManager
+    def signal_outside_fig_will_be_closed(self, fig) :
+        """This method will be called for any request to close figure
+        """
+        print 'ImgControl : signal_outside_fig_will_be_closed(...), fig.number =', fig.number, ' for object:' 
+        fig.my_object.print_pars()
+
+        if self.icp.modeCurrent != self.icp.modeSelect :
+            self.get_idrawontop().remove_object(fig.my_object)
+    
 #---------------------------------------
