@@ -44,7 +44,9 @@ class TestDragObject :
 
     def on_mouse_release(self, event) :
         #print 'on_mouse_release - test of order'
+        #=========================
         self.update_list_of_objs()
+        #=========================
 
 
 #    def on_mouse_motion(self, event) :
@@ -56,14 +58,14 @@ class TestDragObject :
 #            self.needInUpdate = False
 
 
-    def send_signal_and_remove_object_from_list(self, obj, remove_type) :
+    def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
         print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
         obj.print_pars()
         #====================== REMOVE OBJECT =================================================
         # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK OR PROGRAM CALL
         # SIGNAL ABOUT REMOVAL SHOULD BE SENT FROM HERE
-        if remove_type == 'Call' : obj.remove_object_from_img()  # <<<========= PROGRAM CALL TO REMOVE THE OBJECT FROM IMG
-        self.list_of_objs.remove(obj)                            # <<<========= REMOVE OBJECT FROM THE LIST
+        if remove_type == 'Call' : obj.remove_object_from_img() # <<<========= PROGRAM CALL TO REMOVE THE OBJECT FROM IMG
+        list_of_objs.remove(obj)                                # <<<========= REMOVE OBJECT FROM THE LIST
         #======================================================================================
 
     
@@ -74,7 +76,7 @@ class TestDragObject :
             if obj.isRemoved :
                 #print 'Object ', initial_list_of_objs.index(obj), 'is removing from the list. ACT HERE !!!'
                 #====================== REMOVE OBJECT BY CLICK ON MOUSE ===============================
-                self.send_signal_and_remove_object_from_list(obj, 'Click')
+                self.send_signal_and_remove_object_from_list(obj, self.list_of_objs, 'Click')
                 #======================================================================================
 
 
@@ -88,7 +90,7 @@ class TestDragObject :
             if obj.isSelected :
                 #print 'Object', initial_list_of_objs.index(obj), 'is selected and will be removed in this test'
                 #====================== REMOVE OBJECT BY PROGRAM CALL =================================
-                self.send_signal_and_remove_object_from_list(obj, 'Call')
+                self.send_signal_and_remove_object_from_list(obj, self.list_of_objs, 'Call')
                 #======================================================================================
 
 

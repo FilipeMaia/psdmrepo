@@ -59,19 +59,26 @@ class ImgControl :
     def get_idrawout( self ) :
         return self.icp.idrawout
 
+
+    def get_idrawontop( self ) :
+        return self.icp.idrawontop
+
+
 #---------------------------------------
 # Signals from ImgGUISpectrum.py
     def signal_to_control( self, form, mode ) :
-        self.icp.modeCurrent = mode
-        self.icp.formCurrent = form
+        self.icp.modeCurrent = mode  # None, Add, Select, Remove, etc
+        self.icp.formCurrent = form  # None, Line, Rect, Circle, etc. 
+        #self.icp.typeCurrent        # None, Spectrum, Profile, ProjX, Zoom, etc.; Is already set.
         self.set_signal_info()
 
-        if form == self.icp.formRect :
-            if mode == self.icp.modeAdd:     self.get_wimg().    add_rect( self.icp.typeCurrent )
-            if mode == self.icp.modeSelect:  self.get_wimg(). select_rect()
-            if mode == self.icp.modeOverlay: self.get_wimg().overlay_rect()
-            if mode == self.icp.modeNone:    self.get_wimg().   none_rect()
-            if mode == self.icp.modeRemove:  self.get_wimg(). remove_rect()
+        # HERE WE NEED TO SET MODE ONLY
+        #if form == self.icp.formRect :
+        #    if mode == self.icp.modeAdd:     self.get_wimg().    add_rect( self.icp.typeCurrent )
+        #    if mode == self.icp.modeSelect:  self.get_wimg(). select_rect()
+        #    if mode == self.icp.modeOverlay: self.get_wimg().overlay_rect()
+        #    if mode == self.icp.modeNone:    self.get_wimg().   none_rect()
+        #    if mode == self.icp.modeRemove:  self.get_wimg(). remove_rect()
 
     def set_signal_info( self, mode=None ) :
         if mode != None : self.icp.modeCurrent = mode
@@ -121,14 +128,24 @@ class ImgControl :
 #---------------------------------------
 # Signals from ImgWidget which require immediate actions
 
-    def signal_mouse_on_image_release( self, event ) :
-        #print 'signal_mouse_release'
-        self.get_idrawout().draw_outside()
-        pass
 
     def signal_mouse_on_image_press( self, event ) :
+        """Signal receiver from ImgWidget"""
         #print 'signal_mouse_press'
-        pass
+        self.get_idrawontop().on_mouse_press(event) 
+
+
+    def signal_mouse_on_image_release( self, event ) :
+        """Signal receiver from ImgWidget"""
+        #print 'signal_mouse_release'
+        self.get_idrawontop().on_mouse_release(event) 
+        self.get_idrawout().draw_outside()
 
 #---------------------------------------
+# Signals from ImgDrawOnTop
 
+    def signal_obj_will_be_removed(self, obj) :
+        print 'ImgControl : signal_obj_will_be_removed(...)'
+        obj.print_pars()
+
+#---------------------------------------

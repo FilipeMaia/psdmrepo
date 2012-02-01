@@ -63,31 +63,66 @@ class ImgDrawOnTop :
         return self.icp.wimg
 
 
+    def get_fig(self) :
+        return self.icp.wimg.fig
+
+
+    def get_axes(self) :
+        return self.icp.wimg.fig.myaxesSIm
+
+
     def get_idrawout( self ) :
         return self.icp.idrawout
 
 
+    def on_mouse_press(self, event) : # is called from ImgControl
+        print 'ImgDrawOnTop : on_mouse_press(...), mode=', self.get_fig().my_mode
+        #if self.get_fig().my_mode  == 'Add' :
+        if self.icp.modeCurrent == self.icp.modeAdd :
+            if event.button != 1 : return     # if other than Left mouse button
+
+            if self.icp.formCurrent == self.icp.formRect :
+                obj = dragr.DragRectangle()
+
+            dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
+            obj.on_press(event)               # Initialize object by the mouse drag
+
+            obj.myType  = self.icp.typeCurrent              # set attribute
+            obj.myIndex = self.icp.list_of_rects.index(obj) # index in the list
+
+
+    def on_mouse_release(self, event) : # is called from ImgControl
+        """ImgDrawOnTop : on_mouse_release(...) is called from ImgControl
+        """
+        self.update_list_of_objs()
+
+
     def add_rect(self, type=None, selected=False, xy=None, width=1, height=1):
-        self.update_list_of_rects()
+        print 'ImgDrawOnTop : add_rect(...) from program call'
         obj = dragr.DragRectangle(xy=xy, width=width, height=height, color='r') 
-        obj.add_to_axes(self.get_wimg().fig.myaxesSIm)
-        obj.connect()
+        dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
         obj.myType     = type
         obj.isSelected = selected
-        obj.set_select_deselect_color()
-        self.icp.list_of_rects.append(obj)
         obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
         print 'obj.myIndex=', obj.myIndex
-        #self.get_idrawout().draw_spectrum_for_rect(obj)
 
+
+
+
+
+#???????????????????????????????????????????
 
     def redraw_rect(self, obj):
-        obj.disconnect() # presumably from old canvas
-        obj.add_to_axes(self.get_wimg().fig.myaxesSIm)
-        obj.connect()
-        obj.set_select_deselect_color()
+        obj.disconnect() # disconnect object from canvas signals
+        #obj.remove()     # remove object from axes
+        if obj in self.icp.list_of_rects :
+            self.icp.list_of_rects.remove(obj)
+        #obj.add_to_axes(self.get_fig().myaxesSIm)
+        #obj.connect()
+        #obj.set_select_deselect_color()
+        dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
         obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
-        print 'obj.myIndex=', obj.myIndex
+        print 'B) obj.myIndex=', obj.myIndex
 
 
     def none_rect(self):
@@ -103,32 +138,41 @@ class ImgDrawOnTop :
 
 
     def remove_rect(self):
-        #rect_for_remove = self.find_rect_for_remove()
-        #if rect_for_remove == None : return
-        #self.get_idrawout().close_figure_for_rect(rect_for_remove)        
+        pass
+
+
+    def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
+        print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
+        obj.print_pars()
+        #====================== REMOVE OBJECT =================================================
+        # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK OR PROGRAM CALL
+        # SIGNAL ABOUT REMOVAL SHOULD BE SENT FROM HERE
+        if remove_type == 'Call' : obj.remove_object_from_img() # <<<========= PROGRAM CALL TO REMOVE THE OBJECT FROM IMG
+        self.get_control().signal_obj_will_be_removed(obj)      # <<<========= SIGNAL FOR ImgControl
+        list_of_objs.remove(obj)                                # <<<========= REMOVE OBJECT FROM THE LIST
+        #======================================================================================
+
+
+    def update_list_of_objs(self):
         self.update_list_of_rects()
-        # Rect for removal IS NOT SELECTED YET...
-
-
-    def find_rect_for_remove(self):
-        for self.obj in self.icp.list_of_rects :
-            if self.obj.isRemoved :
-                return self.obj
-        return None
+        #self.update_list_of_lines()
+        #self.update_list_of_circles()
 
 
     def update_list_of_rects(self):
-        for obj in self.icp.list_of_rects :
+        initial_list_of_objs = list(self.icp.list_of_rects) # COPY list
+        for obj in initial_list_of_objs :
             #print 'update_list_of_rects: obj.isRemoved=', obj.isRemoved
             if obj.isRemoved :
-                self.icp.list_of_rects.remove(obj)
-        #print 'len(self.icp.list_of_rects)=', len(self.icp.list_of_rects)
+                #self.icp.list_of_rects.remove(obj)
+                self.send_signal_and_remove_object_from_list(obj, self.icp.list_of_rects, 'Click')
 
 
     def draw_rects(self):
 
         if self.rectsFromInputAreCreated :
-            for obj in self.icp.list_of_rects :
+            initial_list_of_rects = list(self.icp.list_of_rects)
+            for obj in initial_list_of_rects :
                 self.redraw_rect(obj)
         else:
             for rectPars in self.icp.listOfRectInputParameters :

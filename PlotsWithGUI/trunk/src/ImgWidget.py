@@ -135,6 +135,12 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
         self.on_draw(self.fig.myXmin, self.fig.myXmax, self.fig.myYmin, self.fig.myYmax, self.fig.myZmin, self.fig.myZmax)
 
 
+    def processDraw(self) :
+        #fig = event.canvas.figure
+        fig = self.fig
+        self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
+
+
     def on_draw(self, xmin=None, xmax=None, ymin=None, ymax=None, zmin=None, zmax=None):
         """Redraws the figure"""
 
@@ -195,9 +201,9 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
 
     def connectImgWithMouse(self):
         'connect to all the events we need'        
-        self.cidpress   = self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
-        self.cidrelease = self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        self.cidmotion  = self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        self.cidpress   = self.canvas.mpl_connect('button_press_event',   self.onMouseButtonPress) 
+        self.cidrelease = self.canvas.mpl_connect('button_release_event', self.onMouseButtonRelease) 
+        self.cidmotion  = self.canvas.mpl_connect('motion_notify_event',  self.onMouseMotion)
 
 
     def disconnectImgFromMouse(self):
@@ -207,7 +213,7 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
         self.canvas.mpl_disconnect(self.cidmotion)
  
 
-    def processMouseMotion(self, event) :
+    def onMouseMotion(self, event) :
         fig = self.fig
         if event.inaxes == fig.myaxesSIm :
             #print 'processMouseMotion',
@@ -220,14 +226,8 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
             pass
 
 
-    def processDraw(self) :
-        #fig = event.canvas.figure
-        fig = self.fig
-        self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
-
-
-    def processMouseButtonPress(self, event) :
-        print 'ImgWidget: MouseButtonPress'
+    def onMouseButtonPress(self, event) :
+        print 'ImgWidget: onMouseButtonPress'
         self.fig = event.canvas.figure
         if event.button is 1 : self.mouseLeftIsPrresed = True
         if event.button is 2 : self.mouseMidlIsPrresed = True
@@ -237,8 +237,8 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
         if event.inaxes == self.fig.myaxesSIm   : self.mousePressOnImage    (event)
 
 
-    def processMouseButtonRelease(self, event) :
-        print 'ImgWidget: MouseButtonRelease'
+    def onMouseButtonRelease(self, event) :
+        print 'ImgWidget: onMouseButtonRelease'
         self.fig = event.canvas.figure
         self.mouseLeftIsPrresed = False
         self.mouseMidlIsPrresed = False
@@ -251,22 +251,20 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
     def mousePressOnImage(self, event) :
         print 'ImgWidget: mousePressOnImage'
 
-        self.xpress    = event.xdata
-        self.ypress    = event.ydata
-        self.xpressabs = event.x
-        self.ypressabs = event.y
-
-        self.get_control().signal_mouse_on_image_press(event) # send signal in control module
+        self.xpress    = event.xdata                            # Stuff for zoom
+        self.ypress    = event.ydata                            # Stuff for zoom
+        self.xpressabs = event.x                                # Stuff for zoom
+        self.ypressabs = event.y                                # Stuff for zoom
+        self.get_control().signal_mouse_on_image_press(event)   # Send signal in control module
 
 
     def mouseReleaseOnImage(self, event) :
         print 'ImgWidget: mouseReleaseOnImage'
 
-        self.xrelease = event.xdata
-        self.yrelease = event.ydata
-
-        self.get_control().signal_mouse_on_image_release(event) # send signal in control module
-        #self.zoomImageOnRelease(event) 
+        self.xrelease = event.xdata                             # Stuff for zoom
+        self.yrelease = event.ydata                             # Stuff for zoom
+        #self.zoomImageOnRelease(event)                         # Stuff for zoom
+        self.get_control().signal_mouse_on_image_release(event) # Send signal in control module
 
 
     def mousePressOnColorBar(self, event) :
