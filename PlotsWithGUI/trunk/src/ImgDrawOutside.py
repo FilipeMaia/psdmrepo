@@ -115,6 +115,13 @@ class ImgDrawOutside :
         self.draw_spectra()
 
 #-----------------------------
+# New
+
+    def remove_spectra(self, obj) :
+        number = obj.get_fig_outside().number
+        imgfm.ifm.close_fig(number)
+
+#-----------------------------
 # Test
 #
 

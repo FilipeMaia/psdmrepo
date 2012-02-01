@@ -66,6 +66,7 @@ class ImgControl :
 
 #---------------------------------------
 # Signals from ImgGUISpectrum.py
+
     def signal_to_control( self, form, mode ) :
         self.icp.modeCurrent = mode  # None, Add, Select, Remove, etc
         self.icp.formCurrent = form  # None, Line, Rect, Circle, etc. 
@@ -87,8 +88,6 @@ class ImgControl :
 
     def print_signal_info( self ) :
         print 'Current signals: type, form, mode :', self.icp.typeCurrent, self.icp.formCurrent, self.icp.modeCurrent
-
-#---------------------------------------
 
     def signal_draw( self ) :
         print 'signal_draw, type=', self.icp.typeCurrent
@@ -128,7 +127,6 @@ class ImgControl :
 #---------------------------------------
 # Signals from ImgWidget which require immediate actions
 
-
     def signal_mouse_on_image_press( self, event ) :
         """Signal receiver from ImgWidget"""
         #print 'signal_mouse_press'
@@ -147,5 +145,11 @@ class ImgControl :
     def signal_obj_will_be_removed(self, obj) :
         print 'ImgControl : signal_obj_will_be_removed(...)'
         obj.print_pars()
+
+        self.get_idrawout().remove_spectra(obj)
+
+#---------------------------------------
+# Signals from ImgDrawOutside
+
 
 #---------------------------------------
