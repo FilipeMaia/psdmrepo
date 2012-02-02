@@ -38,6 +38,7 @@ from PyQt4 import QtGui, QtCore
 from XtcScanner import XtcScanner
 
 from XtcPyanaControl import XtcPyanaControl
+import AppUtils.AppDataPath as apputils
 
 import matplotlib
 #from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -91,8 +92,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
+        self.lclsLogo =  apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
         self.setWindowTitle("LCLS Xtc Explorer")
-        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path() ))
 
         self.directory = "/reg/d/psdm/"
         self.instrument = instrument
@@ -114,7 +116,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
         # Icon
         self.pic = QtGui.QLabel(self)
-        self.pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.pic.setPixmap( QtGui.QPixmap(self.lclsLogo.path()))
 
         # menu
         self.help_menu = QtGui.QMenu('&Help', self)

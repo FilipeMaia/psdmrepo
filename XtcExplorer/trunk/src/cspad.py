@@ -4,6 +4,8 @@ import scipy.ndimage.interpolation as interpol
 from utilities import Plotter
 import matplotlib.pyplot as plt
 np.set_printoptions(precision=3,suppress=True)
+import AppUtils.AppDataPath as apputils
+
 
 class CsPad( object ):
     """CsPad class for creating CsPad image for an event within pyana
@@ -48,8 +50,9 @@ class CsPad( object ):
         path/file can be given by arguments
         """
         if path is None: # use a local copy
-            path = 'data/XtcExplorer/calib/CSPad'
-            print "Reading CsPad tile alignment from local calibration directory"
+            calibdir = apputils.AppDataPath('XtcExplorer/calib/CSPad')
+            path = calibdir.path()
+            print "Reading CsPad tile alignment from local calibration directory:", path
         else :
             print "Reading CsPad tile alignment from ", path
             
