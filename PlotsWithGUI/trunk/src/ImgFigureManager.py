@@ -36,6 +36,9 @@ import matplotlib
 #matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 import matplotlib.pyplot as plt
 
+
+#from PyQt4 import QtGui, QtCore
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -70,7 +73,11 @@ class ImgFigureManager :
         elif type == 'test' :
             return fig
 
-        fig.canvas.mpl_connect('close_event', self.processCloseEvent)
+        fig.canvas.mpl_connect('close_event',        self.onCloseEvent)
+        fig.canvas.mpl_connect('button_press_event', self.onButtonPressEvent)
+
+        #qtwidget = QtGui.QWidget(plt.get_current_fig_manager().window)
+        #qtwidget.connect(qtwidget, QtCore.SIGNAL('clicked()'), self.onButtonPressEvent)
 
         self.set_fig_window_position(fig)
 
@@ -100,13 +107,13 @@ class ImgFigureManager :
         if num==None :
             plt.close('all') # closes all the figure windows
         else :
-            plt.close( num ) # sends signal 'close_event' will auto-call the processCloseEvent(...)
+            plt.close( num ) # sends signal 'close_event' will auto-call the onCloseEvent(...)
 
 
     # This is always automatically envoked when figure is closing
-    def processCloseEvent( self, event ):
+    def onCloseEvent( self, event ):
         """Figure will be closed automatically, but it is necesary to remove its number from the list..."""
-        print 'ImgFigureManager : processCloseEvent() close event, fig number =', event.canvas.figure.number
+        print 'ImgFigureManager : onCloseEvent() close event, fig number =', event.canvas.figure.number
 
         fig    = event.canvas.figure # plt.gcf() does not work, because closed canva may be non active
         figNum = fig.number
@@ -118,6 +125,13 @@ class ImgFigureManager :
                 fig.my_icp.control.signal_outside_fig_will_be_closed(fig)
 
             self.list_of_open_figs.remove(figNum)
+
+
+    def onButtonPressEvent( self, event ):
+        """Figure is picked"""
+        #print 'ImgFigureManager : onButtonPressEvent(), fig number =', event.canvas.figure.number
+        fig    = event.canvas.figure
+        fig.my_icp.control.signal_figure_is_selected(fig)
 
 
 #-----------------------------

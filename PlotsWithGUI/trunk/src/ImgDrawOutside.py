@@ -77,7 +77,7 @@ class ImgDrawOutside :
 
         else :
 
-            if not rect.needs_in_redraw() : return
+            if not rect.needsInRedraw : return
 
             fig_outside = rect.get_fig_outside()
             #fig_outside = plt.figure(num=fig_outside.number,figsize=(4,3))
@@ -85,9 +85,9 @@ class ImgDrawOutside :
             fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
 
 
-        if s : # rect is selected
+        if s : # rect is selected -> redraw its outside figure
             number = rect.get_fig_outside().number
-            imgfm.ifm.close_fig(number)
+            self.get_control().signal_and_close_fig(number)
             fig_outside = imgfm.ifm.get_figure(num=number, figsize=(5,4), type='type1', icp=self.icp)
             rect.set_fig_outside(fig_outside)
             fig_outside.rect_index = rect.myIndex 
@@ -101,7 +101,7 @@ class ImgDrawOutside :
 
         fig_outside.canvas.draw()
 
-        rect.set_needs_in_redraw(False)
+        rect.needsInRedraw = False
         #plt.ioff()
 
 
@@ -119,7 +119,7 @@ class ImgDrawOutside :
 
     def remove_spectra(self, obj) :
         number = obj.get_fig_outside().number
-        imgfm.ifm.close_fig(number)
+        self.get_control().signal_and_close_fig(number)
 
 #-----------------------------
 # Test

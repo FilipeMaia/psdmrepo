@@ -125,6 +125,11 @@ class ImgDrawOnTop :
         print 'B) obj.myIndex=', obj.myIndex
 
 
+    def set_all_objs_need_in_redraw(self, list_of_obj):
+        for obj in list_of_obj :
+            obj.needsInRedraw = True
+
+
     def none_rect(self):
         pass # self.update_list_of_rects()
 

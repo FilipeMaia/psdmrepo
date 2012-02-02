@@ -59,10 +59,8 @@ class ImgControl :
     def get_idrawout( self ) :
         return self.icp.idrawout
 
-
     def get_idrawontop( self ) :
         return self.icp.idrawontop
-
 
 #---------------------------------------
 # Signals from ImgGUISpectrum.py
@@ -106,6 +104,8 @@ class ImgControl :
 
     def reset_event_for_test( self ) :
         self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
+        self.get_idrawontop().set_all_objs_need_in_redraw(self.icp.list_of_rects)
+        self.get_idrawout().draw_outside()
 
     def signal_grid_onoff(self):
         #self.icp.gridIsOn = self.cbox_onoff.isChecked()
@@ -151,7 +151,9 @@ class ImgControl :
 #---------------------------------------
 # Signals from ImgDrawOutside
 
-
+    def signal_and_close_fig(self, number) :
+        print 'ImgControl : signal_and_close_fig(...), figure number =', number
+        imgfm.ifm.close_fig(number)
 
 #---------------------------------------
 # Signals from ImgFigureManager
@@ -163,5 +165,19 @@ class ImgControl :
 
         if self.icp.modeCurrent != self.icp.modeSelect :
             self.get_idrawontop().remove_object(fig.my_object)
-    
+
+
+    def signal_figure_is_selected(self, fig) :
+        """This method will be called when mouse click on figure.
+           CLICK SHOULD BE INSIDE THE CANVAS REGION...
+           DOES NOT WORK AT CLICK ON FRAME ....
+        """
+        print 'ImgControl : signal_figure_is_selected(...), fig number =', fig.number, ' for object:'
+        obj = fig.my_object
+
+        if obj != None :
+            obj.print_pars()
+           #self.get_idrawontop().select_deselect_object_by_call()   
+            obj.select_deselect_object_by_call(color='w')   
+
 #---------------------------------------

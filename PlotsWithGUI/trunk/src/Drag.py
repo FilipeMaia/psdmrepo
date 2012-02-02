@@ -17,18 +17,17 @@ class Drag :
         """        
         self.isInitialized = False
 
-        self.myColor     = color
-        self.myWidth     = linewidth
-        self.myStyle     = linestyle
-        self.isSelected  = False
-        self.isRemoved   = False
-        self.fig_outside = None
-        self.set_needs_in_redraw(False)         
+        self.myColor       = color
+        self.myWidth       = linewidth
+        self.myStyle       = linestyle
+        self.isSelected    = False
+        self.isRemoved     = False
+        self.fig_outside   = None
+        self.needsInRedraw = False
+        self.modeRemove    = 'Remove' # Should be the same as icp.modeRemove
+        self.modeSelect    = 'Select'
 
-        self.modeRemove  = 'Remove' # Should be the same as icp.modeRemove
-        self.modeSelect  = 'Select'
-
-        self.myType      = None #?????????????
+        self.myType        = None #?????????????
 
 
     def add_to_axes(self, axes) :
@@ -128,15 +127,17 @@ class Drag :
 
 
     def select_deselect_obj(self) :
-
         #print 'select_deselect_obj() : self.isRemoved = ', self.isRemoved
 
-        if self.press == None     : return
-        if not self.isInitialized : return
+        if self.press == None                 : return
+        if not self.isInitialized             : return
+        self.needsInRedraw = True
 
-        self.set_needs_in_redraw(True)  
+        if self.get_mode() != self.modeSelect : return
+        self.swap_select_deselect_status()
 
-        if self.get_mode() != self.modeSelect   : return
+        
+    def swap_select_deselect_status(self) :
 
         if  self.isSelected == False :
             self.isSelected =  True
@@ -146,21 +147,10 @@ class Drag :
             print 'object IS DESELECTED'
 
 
-    def needs_in_redraw(self) :
-        if self.needsInRedraw : return True
-        else                  : return False
+    def set_select_deselect_color(self, color='w') :
 
-
-    def set_needs_in_redraw(self, status=True) :
-        self.needsInRedraw = status
-
-
-    def set_select_deselect_color(self) :
-        #if self.get_mode() != self.modeSelect : return
-        if self.isSelected :
-            self.set_color('w')
-        else :
-            self.set_color(self.myColor)
+        if self.isSelected : self.set_color(color)
+        else               : self.set_color(self.myColor)
 
 
     def on_press_graphic_manipulations(self) :
@@ -225,6 +215,14 @@ class Drag :
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
         self.disconnect()                       # Disconnect object from canvas signals
         self.isRemoved = True                   # Set flag that the object is removed
+
+#-----------------------------
+
+    def select_deselect_object_by_call(self, color='w') :
+
+        self.swap_select_deselect_status()
+        self.set_select_deselect_color(color)
+        self.figure.canvas.draw()               # Draw canvas with all current objects on it
 
 #-----------------------------
 #-----------------------------
