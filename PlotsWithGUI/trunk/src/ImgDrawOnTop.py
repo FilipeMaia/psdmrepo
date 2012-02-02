@@ -127,7 +127,7 @@ class ImgDrawOnTop :
 
     def set_all_objs_need_in_redraw(self, list_of_obj):
         for obj in list_of_obj :
-            obj.needsInRedraw = True
+            obj.isChanged = True
 
 
     def none_rect(self):
@@ -201,7 +201,7 @@ class ImgDrawOnTop :
         if obj in self.icp.list_of_rects :
             obj.remove_object_from_img()
             self.icp.list_of_rects.remove(obj) 
-            self.icp.control.set_signal_info(mode=self.icp.modeNone)
+            #self.icp.control.set_signal_info(mode=self.icp.modeNone)
 
 #-----------------------------
 # Test

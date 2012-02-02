@@ -66,29 +66,31 @@ class ImgDrawOutside :
 
         plt.ion()
 
-        if rect.get_fig_outside() == None : # if figure is not open yet
+        fig_outside = rect.get_fig_outside()                    # Get figure from the object
+
+        if fig_outside == None : # if figure is not open yet
         
             fig_outside = imgfm.ifm.get_figure(figsize=(5,4), type='type1', icp=self.icp) # type='maxspace'
-            rect.set_fig_outside(fig_outside)
+            rect.set_fig_outside(fig_outside)                   # Preserve figure in the object
             fig_outside.rect_index = rect.myIndex 
             fig_outside.my_object  = rect
-            fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
+            fig_outside.canvas.set_window_title('Spectrum for rect %d' % rect.myIndex  )
             print 'fig_outside.number=',fig_outside.number
 
         else :
 
-            if not rect.needsInRedraw : return
-
-            fig_outside = rect.get_fig_outside()
-            #fig_outside = plt.figure(num=fig_outside.number,figsize=(4,3))
+            if not rect.isChanged : return
             fig_outside.clear()
             fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
 
 
-        if s : # rect is selected -> redraw its outside figure
-            number = rect.get_fig_outside().number
-            self.get_control().signal_and_close_fig(number)
+        #if s and self.icp.modeCurrent == self.icp.modeSelect :   # Redraw 
+        if s :   # Redraw 
+            number = rect.get_fig_outside().number               # Preserve the figure number
+            pos = imgfm.ifm.get_fig_window_position(fig_outside) # Preserve the figure position
+            self.get_control().signal_and_close_fig(number)      # Close figure
             fig_outside = imgfm.ifm.get_figure(num=number, figsize=(5,4), type='type1', icp=self.icp)
+            imgfm.ifm.set_fig_window_position(fig_outside, pos)  # Restore the figure position
             rect.set_fig_outside(fig_outside)
             fig_outside.rect_index = rect.myIndex 
             fig_outside.my_object  = rect
@@ -101,7 +103,7 @@ class ImgDrawOutside :
 
         fig_outside.canvas.draw()
 
-        rect.needsInRedraw = False
+        rect.isChanged = False
         #plt.ioff()
 
 
@@ -115,7 +117,6 @@ class ImgDrawOutside :
         self.draw_spectra()
 
 #-----------------------------
-# New
 
     def remove_spectra(self, obj) :
         number = obj.get_fig_outside().number

@@ -23,8 +23,8 @@ class Drag :
         self.isSelected    = False
         self.isRemoved     = False
         self.fig_outside   = None
-        self.needsInRedraw = False
-        self.modeRemove    = 'Remove' # Should be the same as icp.modeRemove
+        self.isChanged     = False
+        self.modeRemove    = 'Remove'  # Should be the same as icp.modeRemove
         self.modeSelect    = 'Select'
 
         self.myType        = None #?????????????
@@ -129,9 +129,9 @@ class Drag :
     def select_deselect_obj(self) :
         #print 'select_deselect_obj() : self.isRemoved = ', self.isRemoved
 
-        if self.press == None                 : return
         if not self.isInitialized             : return
-        self.needsInRedraw = True
+        if self.press == None                 : return
+        self.isChanged = True
 
         if self.get_mode() != self.modeSelect : return
         self.swap_select_deselect_status()
@@ -206,11 +206,10 @@ class Drag :
 # 2. ImgFigureManager -> ImgDrawOnTop.py -> in order to remove object from main image
 
     def remove_object_from_img(self) :
-        """ Remove object from figure canvas, axes, disconnect from signals, mark for removal 
+        """Remove object from figure canvas, axes, disconnect from signals, mark for removal 
         """
         #print 'Drag : remove_object_from_img() : ', self.print_pars()
         #self.set_linestyle('')                 # Draw nothing - makes the line invisible
-        #self.set_linewidth(0)                   # Makes the line invisible
         self.remove()                           # Removes artist from axes
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
         self.disconnect()                       # Disconnect object from canvas signals
@@ -219,9 +218,10 @@ class Drag :
 #-----------------------------
 
     def select_deselect_object_by_call(self, color='w') :
-
-        self.swap_select_deselect_status()
-        self.set_select_deselect_color(color)
+        """Select/deselect object and change its color on canvas
+        """
+        self.swap_select_deselect_status()      # Swap the isSelected between True and False
+        self.set_select_deselect_color(color)   # Set the object color depending on isSelected
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
 
 #-----------------------------
@@ -233,9 +233,9 @@ class Drag :
 def add_obj_to_axes(obj, axes, list_of_objs) :
     """Add object to axes and append the list of objects
     """
-    obj.add_to_axes(axes)                        # 1. Add it to figure axes
-    obj.connect()                                # 2. Connect object with signals
-    list_of_objs.append(obj)                     # 3. Append the list of objects 
+    obj.add_to_axes(axes)                        # Add it to figure axes
+    obj.connect()                                # Connect object with signals
+    list_of_objs.append(obj)                     # Append the list of objects 
 
 #-----------------------------
 # Global methods for test

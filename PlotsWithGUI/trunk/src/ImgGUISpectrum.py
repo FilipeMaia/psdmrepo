@@ -56,7 +56,7 @@ class ImgGUISpectrum (QtGui.QWidget) :
         self.but_remove = QtGui.QPushButton("Remove")
         self.but_select = QtGui.QPushButton("Select")
         self.but_overlay= QtGui.QPushButton("Overlay")
-        self.but_normal = QtGui.QPushButton("Normal")
+        self.but_normal = QtGui.QPushButton("Move")
         self.but_draw   = QtGui.QPushButton("Draw")
         self.cbox_grid  = QtGui.QCheckBox("Show &Grid")
         self.cbox_grid   .setChecked(self.icp.gridIsOn)

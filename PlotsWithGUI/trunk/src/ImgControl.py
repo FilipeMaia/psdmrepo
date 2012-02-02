@@ -157,14 +157,23 @@ class ImgControl :
 
 #---------------------------------------
 # Signals from ImgFigureManager
-    def signal_outside_fig_will_be_closed(self, fig) :
-        """This method will be called for any request to close figure
+    def signal_outside_fig_is_closing_by_call(self, fig) :
+        """This method will be called for the program request to close figure
         """
-        print 'ImgControl : signal_outside_fig_will_be_closed(...), fig.number =', fig.number, ' for object:' 
-        fig.my_object.print_pars()
+        print 'ImgControl : signal_outside_fig_is_closing_by_call(...), fig.number =', fig.number 
+        #fig.my_object.print_pars()
+        if self.icp.modeCurrent == self.icp.modeSelect : return
+        if self.icp.modeCurrent != self.icp.modeRemove : return 
+        #and fig.my_object.isSelected : return
+        self.get_idrawontop().remove_object(fig.my_object) # Remove object from the main plot
 
-        if self.icp.modeCurrent != self.icp.modeSelect :
-            self.get_idrawontop().remove_object(fig.my_object)
+
+    def signal_outside_fig_is_closing_by_click(self, fig) :
+        """This method will be called for the click on X
+        """
+        print 'ImgControl : signal_outside_fig_is_closing_by_click(...), fig.number =', fig.number
+        #fig.my_object.print_pars()
+        self.get_idrawontop().remove_object(fig.my_object) # Remove object from the main plot
 
 
     def signal_figure_is_selected(self, fig) :
