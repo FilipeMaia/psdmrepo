@@ -363,8 +363,8 @@ class  pyana_bld ( object ) :
                 # numpy arrays
                 ftime1 = np.float_(self.PC_ftime1)
                 ftime2 = np.float_(self.PC_ftime2)
-                fchrg1 = np.float_(self.PC_ftime1)
-                fchrg2 = np.float_(self.PC_ftime2)
+                fchrg1 = np.float_(self.PC_fchrg1)
+                fchrg2 = np.float_(self.PC_fchrg2)
 
                 # store for later (ipython)
                 self.data["PhaseCavity"].time = np.vstack( (ftime1, ftime2)).T
