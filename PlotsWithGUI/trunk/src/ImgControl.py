@@ -66,7 +66,7 @@ class ImgControl :
 # Signals from ImgGUISpectrum.py
 
     def signal_to_control( self, form, mode ) :
-        self.icp.modeCurrent = mode  # None, Add, Select, Remove, etc
+        self.icp.modeCurrent = mode  # None, Add, Move, Select, Remove, etc
         self.icp.formCurrent = form  # None, Line, Rect, Circle, etc. 
         #self.icp.typeCurrent        # None, Spectrum, Profile, ProjX, Zoom, etc.; Is already set.
         self.set_signal_info()

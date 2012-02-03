@@ -80,7 +80,7 @@ class ImgFigureManager :
         # Attempt to find responce at click on figure window frame.
         #qtwidget = fig.canvas.manager.window
         #qtwidget = QtGui.QWidget(plt.get_current_fig_manager().window)
-        #qtwidget.connect(qtwidget, QtCore.SIGNAL('clicked()'), self.onButtonPressEvent)
+        #qtwidget.connect(qtwidget, QtCore.SIGNAL('focusInEvent()'), self.onTestEvent)
 
         self.set_fig_window_default_position(fig)
         return fig
@@ -158,6 +158,9 @@ class ImgFigureManager :
         fig    = event.canvas.figure
         fig.my_icp.control.signal_figure_is_selected(fig)
 
+
+    def onTestEvent( self, event ):
+        print 'ImgFigureManager : onTestEvent(), fig number =', event.canvas.figure.number
 
 #-----------------------------
 #-----------------------------

@@ -90,12 +90,13 @@ class ImgConfigParameters :
         #----
         #Mode is set in the ImgControl in the signal methods
         self.modeNone      = 'None'
+        self.modeMove      = 'Move'
         self.modeAdd       = 'Add'
         self.modeSelect    = 'Select'
         self.modeOverlay   = 'Overlay'
         self.modeRemove    = 'Remove'
 
-        self.modeCurrent   = self.modeNone
+        self.modeCurrent   = self.modeMove
 
         #----
         #Form is set in the ImgControl in the signal methods

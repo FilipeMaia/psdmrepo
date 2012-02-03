@@ -84,17 +84,20 @@ class ImgDrawOutside :
             fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
 
 
-        #if s and self.icp.modeCurrent == self.icp.modeSelect :   # Redraw 
-        if s :   # Redraw 
-            number = rect.get_fig_outside().number               # Preserve the figure number
-            pos = imgfm.ifm.get_fig_window_position(fig_outside) # Preserve the figure position
-            self.get_control().signal_and_close_fig(number)      # Close figure
-            fig_outside = imgfm.ifm.get_figure(num=number, figsize=(5,4), type='type1', icp=self.icp)
-            imgfm.ifm.set_fig_window_position(fig_outside, pos)  # Restore the figure position
-            rect.set_fig_outside(fig_outside)
-            fig_outside.rect_index = rect.myIndex 
-            fig_outside.my_object  = rect
-            fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
+        if s :   # Re-draw the figure window on top
+
+            fig_outside.canvas.manager.window.activateWindow() # Makes window active
+            fig_outside.canvas.manager.window.raise_()         # Move window on top
+
+            #number = rect.get_fig_outside().number               # Preserve the figure number
+            #pos = imgfm.ifm.get_fig_window_position(fig_outside) # Preserve the figure position
+            #self.get_control().signal_and_close_fig(number)      # Close figure
+            #fig_outside = imgfm.ifm.get_figure(num=number, figsize=(5,4), type='type1', icp=self.icp)
+            #imgfm.ifm.set_fig_window_position(fig_outside, pos)  # Restore the figure position
+            #rect.set_fig_outside(fig_outside)
+            #fig_outside.rect_index = rect.myIndex 
+            #fig_outside.my_object  = rect
+            #fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
 
         arrwin =  self.arr[y:y+h,x:x+w]
 
