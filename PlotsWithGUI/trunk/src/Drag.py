@@ -237,6 +237,28 @@ def add_obj_to_axes(obj, axes, list_of_objs) :
     obj.connect()                                # Connect object with signals
     list_of_objs.append(obj)                     # Append the list of objects 
 
+
+def remove_object_from_img_and_list(obj, list):
+    print 'ImgDrawOnTop : remove_object'
+    if obj in list :
+        obj.remove_object_from_img()
+        list.remove(obj) 
+
+
+def set_list_need_in_redraw(list_of_obj):
+    for obj in list_of_obj :
+        obj.isChanged = True
+
+
+def redraw_obj_update_list(obj, axes, list_of_objs):
+    obj.disconnect() # disconnect object from canvas signals
+    #obj.remove()     # remove object from axes
+    if obj in list_of_objs : list_of_objs.remove(obj)
+    add_obj_to_axes(obj, axes, list_of_objs)
+    obj.myIndex=list_of_objs.index(obj) # index in the list
+    print 'Drag : redraw_obj_update_list(...),  obj.myIndex=', obj.myIndex, '(last added to the list)'
+
+
 #-----------------------------
 # Global methods for test
 #-----------------------------

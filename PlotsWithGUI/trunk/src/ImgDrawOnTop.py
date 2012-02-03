@@ -29,6 +29,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 
+import Drag                as drag
 import DragCircle          as dragc
 import DragRectangle       as dragr
 #import ImgConfigParameters as icp
@@ -45,7 +46,7 @@ class ImgDrawOnTop :
         self.icp               = icp
         self.icp.idrawontop    = self
 
-        self.rectsFromInputAreCreated = False
+        self.rectsFromInputAreCreated = False                             # <===== DEPENDS ON SHAPE
 
         #self.icp.list_of_rects = [] # moved to icp
         print 'ImgDrawOnTop : init' 
@@ -84,7 +85,7 @@ class ImgDrawOnTop :
             if self.icp.formCurrent == self.icp.formRect :
                 obj = dragr.DragRectangle()
 
-            dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
+            drag.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)  # <===== DEPENDS ON SHAPE
             obj.on_press(event)               # Initialize object by the mouse drag
 
             obj.myType  = self.icp.typeCurrent              # set attribute
@@ -97,53 +98,28 @@ class ImgDrawOnTop :
         self.update_list_of_objs()
 
 
-    def add_rect(self, type=None, selected=False, xy=None, width=1, height=1):
+    def update_list_of_objs(self):
+        self.update_list_of_rects()                                             # <===== DEPENDS ON SHAPE
+        #self.update_list_of_lines()
+        #self.update_list_of_circles()
+
+
+
+
+    def add_rect(self, type=None, selected=False, xy=None, width=1, height=1):  # <===== DEPENDS ON SHAPE ?
         print 'ImgDrawOnTop : add_rect(...) from program call'
         obj = dragr.DragRectangle(xy=xy, width=width, height=height, color='r') 
-        dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
+        drag.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
         obj.myType     = type
         obj.isSelected = selected
         obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
         print 'obj.myIndex=', obj.myIndex
 
 
+    def set_all_objs_need_in_redraw(self):
 
-
-
-#???????????????????????????????????????????
-
-    def redraw_rect(self, obj):
-        obj.disconnect() # disconnect object from canvas signals
-        #obj.remove()     # remove object from axes
-        if obj in self.icp.list_of_rects :
-            self.icp.list_of_rects.remove(obj)
-        #obj.add_to_axes(self.get_fig().myaxesSIm)
-        #obj.connect()
-        #obj.set_select_deselect_color()
-        dragr.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
-        obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
-        print 'B) obj.myIndex=', obj.myIndex
-
-
-    def set_all_objs_need_in_redraw(self, list_of_obj):
-        for obj in list_of_obj :
-            obj.isChanged = True
-
-
-    def none_rect(self):
-        pass # self.update_list_of_rects()
-
-
-    def overlay_rect(self):
-        pass
-
-
-    def select_rect(self):
-        pass
-
-
-    def remove_rect(self):
-        pass
+        if self.icp.typeCurrent == self.icp.typeSpectrum :
+            drag.set_list_need_in_redraw(self.icp.list_of_rects)                 # <===== DEPENDS ON SHAPE
 
 
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
@@ -158,11 +134,6 @@ class ImgDrawOnTop :
         #======================================================================================
 
 
-    def update_list_of_objs(self):
-        self.update_list_of_rects()
-        #self.update_list_of_lines()
-        #self.update_list_of_circles()
-
 
     def update_list_of_rects(self):
         initial_list_of_objs = list(self.icp.list_of_rects) # COPY list
@@ -173,12 +144,12 @@ class ImgDrawOnTop :
                 self.send_signal_and_remove_object_from_list(obj, self.icp.list_of_rects, 'Click')
 
 
-    def draw_rects(self):
+    def draw_rects(self):                                                                 # <===== DEPENDS ON SHAPE
 
         if self.rectsFromInputAreCreated :
             initial_list_of_rects = list(self.icp.list_of_rects)
             for obj in initial_list_of_rects :
-                self.redraw_rect(obj)
+                drag.redraw_obj_update_list(obj, self.get_axes(), self.icp.list_of_rects)
         else:
             for rectPars in self.icp.listOfRectInputParameters :
                 #print rectPars
@@ -194,14 +165,11 @@ class ImgDrawOnTop :
         self.draw_rects()
 
 #-----------------------------
-# is called from ImgFigureManager.
+# is called from ImgFigureManager -> ImgControl ->
 
     def remove_object(self, obj):
-        print 'ImgDrawOnTop : remove_object'
-        if obj in self.icp.list_of_rects :
-            obj.remove_object_from_img()
-            self.icp.list_of_rects.remove(obj) 
-            #self.icp.control.set_signal_info(mode=self.icp.modeNone)
+        drag.remove_object_from_img_and_list(obj, self.icp.list_of_rects)       # <===== DEPENDS ON SHAPE 
+
 
 #-----------------------------
 # Test

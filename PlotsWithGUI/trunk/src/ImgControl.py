@@ -71,14 +71,6 @@ class ImgControl :
         #self.icp.typeCurrent        # None, Spectrum, Profile, ProjX, Zoom, etc.; Is already set.
         self.set_signal_info()
 
-        # HERE WE NEED TO SET MODE ONLY
-        #if form == self.icp.formRect :
-        #    if mode == self.icp.modeAdd:     self.get_wimg().    add_rect( self.icp.typeCurrent )
-        #    if mode == self.icp.modeSelect:  self.get_wimg(). select_rect()
-        #    if mode == self.icp.modeOverlay: self.get_wimg().overlay_rect()
-        #    if mode == self.icp.modeNone:    self.get_wimg().   none_rect()
-        #    if mode == self.icp.modeRemove:  self.get_wimg(). remove_rect()
-
     def set_signal_info( self, mode=None ) :
         if mode != None : self.icp.modeCurrent = mode
         self.get_wimg().fig.my_mode = self.icp.modeCurrent # Is used in Drag.py
@@ -104,7 +96,7 @@ class ImgControl :
 
     def reset_event_for_test( self ) :
         self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
-        self.get_idrawontop().set_all_objs_need_in_redraw(self.icp.list_of_rects)
+        self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_idrawout().draw_outside()
 
     def signal_grid_onoff(self):

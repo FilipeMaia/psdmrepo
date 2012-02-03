@@ -77,23 +77,20 @@ class ImgFigureManager :
         fig.canvas.mpl_connect('close_event',        self.onCloseEvent)       # In order to close window by click on X
         fig.canvas.mpl_connect('button_press_event', self.onButtonPressEvent) # In order to "actiwate" the window and assoc. obj.
 
+        # Attempt to find responce at click on figure window frame.
         #qtwidget = fig.canvas.manager.window
         #qtwidget = QtGui.QWidget(plt.get_current_fig_manager().window)
-        #qtwidget.connect(qtwidget, QtCore.SIGNAL('mousePressEvent()'), self.onButtonPressEvent)
         #qtwidget.connect(qtwidget, QtCore.SIGNAL('clicked()'), self.onButtonPressEvent)
-        #fig.canvas.connect(qtwidget, QtCore.SIGNAL('clicked()'), self.onWindowPressEvent)
-        #qtwidget.clicked.connect(self.onWindowPressEvent)
 
         self.set_fig_window_default_position(fig)
         return fig
 
 
     def set_fig_window_default_position(self,fig) : 
-        wmain_pos  = fig.my_icp.control.getPosition()
+        wmain_pos  = fig.my_icp.control.getPosition() # Get position of the main window
+        fig_window = fig.canvas.manager.window        # Get the QMainWindow object for fig
         #fig_window = plt.get_current_fig_manager().window
-        fig_window = fig.canvas.manager.window
         #wmain_size = fig.my_icp.control.getSize()
-        #fig_window.move(wmain_pos[0]+wmain_size[0]+50*(fig.number-2), wmain_pos[1]+20*(fig.number-2))
         fig_window.move(900+50*(fig.number-2), 10+20*(fig.number-2))
 
 
@@ -115,6 +112,8 @@ class ImgFigureManager :
 
 
     def get_figure_by_number( self, num ) :
+        """Search and return the fig object from the list by its number.
+        """
         for fig in self.list_of_open_figs : 
             if fig.number == num : return fig
         return None
@@ -122,7 +121,8 @@ class ImgFigureManager :
 
     # This is a colse figure request from program
     def close_fig( self, num=None ) :
-        """Close fig and its window."""
+        """Close fig and its window.
+        """
         print 'ImgFigureManager : close_fig() program call to close fig number =', num
 
         if num==None :
@@ -135,7 +135,8 @@ class ImgFigureManager :
 
     # This is always automatically envoked when figure is closing
     def onCloseEvent( self, event ):
-        """Figure will be closed automatically, but it is necesary to remove its number from the list..."""
+        """Figure will be closed automatically, but it is necesary to remove its number from the list...
+        """
         print 'ImgFigureManager : onCloseEvent() close event, fig number =', event.canvas.figure.number
 
         fig = event.canvas.figure # plt.gcf() does not work, because closed canva may be non active
@@ -153,15 +154,10 @@ class ImgFigureManager :
 
     def onButtonPressEvent( self, event ):
         """Figure is picked"""
-        #print 'ImgFigureManager : onButtonPressEvent(), fig number =', event.canvas.figure.number
+        print 'ImgFigureManager : onButtonPressEvent(), fig number =', event.canvas.figure.number
         fig    = event.canvas.figure
         fig.my_icp.control.signal_figure_is_selected(fig)
 
-
-
-    def onWindowPressEvent( self, event ):
-        """Figure is picked"""
-        print 'ImgFigureManager : onWindowPressEvent(), fig number =', event.canvas.figure.number
 
 #-----------------------------
 #-----------------------------
