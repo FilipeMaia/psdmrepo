@@ -65,6 +65,10 @@ class ImgControl :
 #---------------------------------------
 # Signals from ImgGUISpectrum.py
 
+
+#---------------------------------------
+# Signals from ImgGUIMode.py
+
     def signal_to_control( self, form, mode ) :
         self.icp.modeCurrent = mode  # None, Add, Move, Select, Remove, etc
         self.icp.formCurrent = form  # None, Line, Rect, Circle, etc. 
@@ -82,6 +86,13 @@ class ImgControl :
     def signal_draw( self ) :
         print 'signal_draw, type=', self.icp.typeCurrent
 
+    def signal_grid_onoff(self):
+        #self.icp.gridIsOn = self.cbox_onoff.isChecked()
+        self.get_wimg().grid_onoff(self.icp.gridIsOn)
+
+    def signal_log_onoff(self):
+        print 'ImgControl : signal_log_onoff(...), log=', self.icp.logIsOn
+
 #---------------------------------------
 # Signals from ImgGUIPlayer.py
 
@@ -98,10 +109,6 @@ class ImgControl :
         self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
         self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_idrawout().draw_outside()
-
-    def signal_grid_onoff(self):
-        #self.icp.gridIsOn = self.cbox_onoff.isChecked()
-        self.get_wimg().grid_onoff(self.icp.gridIsOn)
 
     def signal_save( self ) :
         print 'signal_save'
@@ -138,7 +145,7 @@ class ImgControl :
         print 'ImgControl : signal_obj_will_be_removed(...)'
         obj.print_pars()
 
-        self.get_idrawout().remove_spectra(obj)
+        self.get_idrawout().remove_outside_plot_for_obj(obj)
 
 #---------------------------------------
 # Signals from ImgDrawOutside

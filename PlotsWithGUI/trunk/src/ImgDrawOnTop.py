@@ -32,7 +32,7 @@ import os
 import Drag                as drag
 import DragCircle          as dragc
 import DragRectangle       as dragr
-#import ImgConfigParameters as icp
+import DragLine            as dragl
 
 #---------------------
 #  Class definition --
@@ -47,6 +47,8 @@ class ImgDrawOnTop :
         self.icp.idrawontop    = self
 
         self.rectsFromInputAreCreated = False                             # <===== DEPENDS ON SHAPE
+        self.circsFromInputAreCreated = False                             # <===== DEPENDS ON SHAPE
+        self.linesFromInputAreCreated = False                             # <===== DEPENDS ON SHAPE
 
         #self.icp.list_of_rects = [] # moved to icp
         print 'ImgDrawOnTop : init' 
@@ -95,31 +97,26 @@ class ImgDrawOnTop :
     def on_mouse_release(self, event) : # is called from ImgControl
         """ImgDrawOnTop : on_mouse_release(...) is called from ImgControl
         """
-        self.update_list_of_objs()
+        self.update_list_of_all_objs()
 
 
-    def update_list_of_objs(self):
-        self.update_list_of_rects()                                             # <===== DEPENDS ON SHAPE
-        #self.update_list_of_lines()
-        #self.update_list_of_circles()
+    def update_list_of_all_objs(self):
+        self.update_list_of_objs( self.icp.list_of_rects )                      # <===== DEPENDS ON SHAPE
+        #self.update_list_of_objs( self.icp.list_of_lines )                      # <===== DEPENDS ON SHAPE
+        #self.update_list_of_objs( self.icp.list_of_circs )                      # <===== DEPENDS ON SHAPE
 
 
-
-
-    def add_rect(self, type=None, selected=False, xy=None, width=1, height=1):  # <===== DEPENDS ON SHAPE ?
-        print 'ImgDrawOnTop : add_rect(...) from program call'
-        obj = dragr.DragRectangle(xy=xy, width=width, height=height, color='r') 
-        drag.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
-        obj.myType     = type
-        obj.isSelected = selected
-        obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
-        print 'obj.myIndex=', obj.myIndex
+    def update_list_of_objs(self, list_of_objs):
+        initial_list_of_objs = list(list_of_objs) # COPY list
+        for obj in initial_list_of_objs :
+            if obj.isRemoved :
+                self.send_signal_and_remove_object_from_list(obj, list_of_objs, 'Click')
 
 
     def set_all_objs_need_in_redraw(self):
-
         if self.icp.typeCurrent == self.icp.typeSpectrum :
             drag.set_list_need_in_redraw(self.icp.list_of_rects)                 # <===== DEPENDS ON SHAPE
+
 
 
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
@@ -134,14 +131,14 @@ class ImgDrawOnTop :
         #======================================================================================
 
 
-
-    def update_list_of_rects(self):
-        initial_list_of_objs = list(self.icp.list_of_rects) # COPY list
-        for obj in initial_list_of_objs :
-            #print 'update_list_of_rects: obj.isRemoved=', obj.isRemoved
-            if obj.isRemoved :
-                #self.icp.list_of_rects.remove(obj)
-                self.send_signal_and_remove_object_from_list(obj, self.icp.list_of_rects, 'Click')
+    def add_rect(self, type=None, selected=False, xy=None, width=1, height=1):  # <===== DEPENDS ON SHAPE ?
+        print 'ImgDrawOnTop : add_rect(...) from program call'
+        obj = dragr.DragRectangle(xy=xy, width=width, height=height, color='r') 
+        drag.add_obj_to_axes(obj, self.get_axes(), self.icp.list_of_rects)
+        obj.myType     = type
+        obj.isSelected = selected
+        obj.myIndex=self.icp.list_of_rects.index(obj) # index in the list
+        print 'obj.myIndex=', obj.myIndex
 
 
     def draw_rects(self):                                                                 # <===== DEPENDS ON SHAPE
@@ -169,7 +166,6 @@ class ImgDrawOnTop :
 
     def remove_object(self, obj):
         drag.remove_object_from_img_and_list(obj, self.icp.list_of_rects)       # <===== DEPENDS ON SHAPE 
-
 
 #-----------------------------
 # Test

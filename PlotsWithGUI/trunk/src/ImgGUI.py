@@ -36,9 +36,10 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#import ImgConfigParameters as icp
-import ImgGUISpectrum as igspec
+
 import ImgGUIPlayer   as igplr
+import ImgGUISpectrum as igspec
+import ImgGUIProfile  as igprof
 
 #---------------------
 #  Class definition --
@@ -151,23 +152,22 @@ class ImgGUI ( QtGui.QWidget ) :
         #self.tabBar.setMovable(True) 
 
         self.indTabSpec = self.tabBarTop.addTab( 'Spectrum' )
+        self.indTabProf = self.tabBarTop.addTab( 'Profile' )
         self.indTabProX = self.tabBarTop.addTab( 'Proj.X' )
         self.indTabProY = self.tabBarTop.addTab( 'Proj.Y' )
         self.indTabProR = self.tabBarTop.addTab( 'Proj.R' )
         self.indTabProP = self.tabBarTop.addTab( 'Proj.P' )
-        self.indTabEmpt = self.tabBarTop.addTab( 5*' ' )
-        self.tabBarTop.setTabEnabled(self.indTabEmpt,False)
+        self.indTabEmpT = self.tabBarTop.addTab( 5*' ' )
+        self.tabBarTop.setTabEnabled(self.indTabEmpT,False)
 
         self.tabBarTop.setTabTextColor(self.indTabSpec,QtGui.QColor('red'))
+        self.tabBarTop.setTabTextColor(self.indTabProf,QtGui.QColor('magenta'))
         self.tabBarTop.setTabTextColor(self.indTabProX,QtGui.QColor('blue'))
         self.tabBarTop.setTabTextColor(self.indTabProY,QtGui.QColor('green'))
         self.tabBarTop.setTabTextColor(self.indTabProR,QtGui.QColor('magenta'))
         self.tabBarTop.setTabTextColor(self.indTabProP,QtGui.QColor('red'))
         self.tabBarTop.setShape(QtGui.QTabBar.RoundedNorth)
- 
-        #self.tabBarTop.setShape(QtGui.QTabBar.RoundedWest)
             
-        #self.hboxT = QtGui.QHBoxLayout() # it is already defined and added in layout
         self.hboxT.addWidget(self.tabBarTop) 
         self.connect(self.tabBarTop, QtCore.SIGNAL('currentChanged(int)'), self.processTabBarTop)
 
@@ -183,8 +183,9 @@ class ImgGUI ( QtGui.QWidget ) :
         except AttributeError :
             pass
 
-        if indTab == self.indTabEmpt : return
+        if indTab == self.indTabEmpT : return
         if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum(self.icp) #QtGui.QTextEdit('Spectrum')
+        if indTab == self.indTabProf : self.guiWin = igprof.ImgGUIProfile (self.icp)
         if indTab == self.indTabProX : self.guiWin = QtGui.QTextEdit('Projection X')
         if indTab == self.indTabProY : self.guiWin = QtGui.QTextEdit('Projection Y')
         if indTab == self.indTabProR : self.guiWin = QtGui.QTextEdit('Projection R')
@@ -216,7 +217,6 @@ class ImgGUI ( QtGui.QWidget ) :
         self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
             
-        #self.hboxT = QtGui.QHBoxLayout() # it is already defined and added in layout
         self.hboxB.addWidget(self.tabBarBot) 
         self.connect(self.tabBarBot, QtCore.SIGNAL('currentChanged(int)'), self.processTabBarBot)
 
@@ -241,7 +241,7 @@ class ImgGUI ( QtGui.QWidget ) :
         self.guiWin.setMaximumHeight(self.maxHeight)
         self.hboxD.addWidget(self.guiWin)
 
-        self.tabBarTop.setCurrentIndex(self.indTabEmpt)
+        self.tabBarTop.setCurrentIndex(self.indTabEmpT)
 
 
     def get_control(self) :

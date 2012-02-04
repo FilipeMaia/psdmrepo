@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module ImgGUISpectrum...
+#  Module ImgGUIProfile...
 #
 #------------------------------------------------------------------------
 
-"""GUI for Spectrum.
+"""GUI for Profile.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -36,15 +36,15 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class ImgGUISpectrum (QtGui.QWidget) :
-    """GUI for Spectrum"""
+class ImgGUIProfile (QtGui.QWidget) :
+    """GUI for Profile"""
 
     def __init__(self, icp=None):
         QtGui.QWidget.__init__(self)
 
         self.icp = icp # Image control parameters
-        self.icp.typeCurrent = self.icp.typeSpectrum     
-        self.icp.formCurrent = self.icp.formRect     
+        self.icp.typeCurrent = self.icp.typeProfile     
+        self.icp.formCurrent = self.icp.formLine     
 
         self.setWindowTitle('GUI for Spectrum')
         self.setFrame()
@@ -53,28 +53,28 @@ class ImgGUISpectrum (QtGui.QWidget) :
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
         self.gui_mode   = igm.ImgGUIMode(self.icp)
-        self.but_overlay= QtGui.QPushButton("Overlay")
-        self.but_draw   = QtGui.QPushButton("Draw")
+        #self.but_overlay= QtGui.QPushButton("Overlay")
+        #self.but_draw   = QtGui.QPushButton("Draw")
 
         width = 60
 
-        self.but_overlay.setMaximumWidth(width)
-        self.but_draw   .setMaximumWidth(width)
+        #self.but_overlay.setMaximumWidth(width)
+        #self.but_draw   .setMaximumWidth(width)
  
         #self.widg_xyz   = igxyz.ImgGUIXYZRanges()
         #self.widg_xyz.setXYZRanges(0,10,20,30,40,50)
         
-        self.connect(self.but_overlay,QtCore.SIGNAL('clicked()'), self.processOverlay)
-        self.connect(self.but_draw,   QtCore.SIGNAL('clicked()'), self.processDraw)
+        #self.connect(self.but_overlay,QtCore.SIGNAL('clicked()'), self.processOverlay)
+        #self.connect(self.but_draw,   QtCore.SIGNAL('clicked()'), self.processDraw)
 
         # Layout with box sizers
         # 
         grid = QtGui.QGridLayout()
         row = 1
         grid.addWidget(self.gui_mode    , row, 0, 1, 7)
-        row = 2
-        grid.addWidget(self.but_draw    , row, 0)
-        grid.addWidget(self.but_overlay , row, 3)
+        #row = 2
+        #grid.addWidget(self.but_draw    , row, 0)
+        #grid.addWidget(self.but_overlay , row, 3)
 
         vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
         vbox.addLayout(grid)
@@ -82,14 +82,15 @@ class ImgGUISpectrum (QtGui.QWidget) :
 
         self.showToolTips()
 
+
     def get_control(self) :
         return self.icp.control
 
 
     def showToolTips(self):
         # Tips for buttons and fields:
-        self.but_draw  .setToolTip('Draw spectrum for selected region')
-
+        #self.but_draw  .setToolTip('Draw spectrum for selected region')
+        pass
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -131,7 +132,7 @@ def main():
     icp = gicp.giconfpars.addImgConfigPars( None )
 
     app = QtGui.QApplication(sys.argv)
-    w = ImgGUISpectrum(icp)
+    w = ImgGUIProfile(icp)
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()

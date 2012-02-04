@@ -49,6 +49,8 @@ class ImgConfigParameters :
         self.wgui       = None
         self.idrawontop = None
         self.idrawout   = None
+        self.idrawspec  = None
+        self.idrawprof  = None
 
         self.setRunTimeParametersInit()
         self.setDefaultParameters()
@@ -113,8 +115,11 @@ class ImgConfigParameters :
         #----
         #For main image
         self.gridIsOn      = False
+        self.logIsOn       = False
 
         self.list_of_rects  = []
+        self.list_of_lines  = []
+        #self.list_of_circs  = []
 
 #---------------------------------------
 
