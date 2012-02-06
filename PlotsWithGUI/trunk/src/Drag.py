@@ -239,7 +239,7 @@ def add_obj_to_axes(obj, axes, list_of_objs) :
 
 
 def remove_object_from_img_and_list(obj, list):
-    print 'ImgDrawOnTop : remove_object'
+    #print 'Draw : remove_object'
     if obj in list :
         obj.remove_object_from_img()
         list.remove(obj) 
@@ -256,7 +256,14 @@ def redraw_obj_update_list(obj, axes, list_of_objs):
     if obj in list_of_objs : list_of_objs.remove(obj)
     add_obj_to_axes(obj, axes, list_of_objs)
     obj.myIndex=list_of_objs.index(obj) # index in the list
-    print 'Drag : redraw_obj_update_list(...),  obj.myIndex=', obj.myIndex, '(last added to the list)'
+    #print 'Drag : redraw_obj_update_list(...),  obj.myIndex=', obj.myIndex, '(last added to the list)'
+
+
+def redraw_objs_from_list(axes, list_of_objs) :   
+    initial_list_of_objs = list(list_of_objs)
+    for obj in initial_list_of_objs :
+        redraw_obj_update_list(obj, axes, list_of_objs)
+        #drag.redraw_obj_update_list(obj, axes, list_of_objs)
 
 
 #-----------------------------

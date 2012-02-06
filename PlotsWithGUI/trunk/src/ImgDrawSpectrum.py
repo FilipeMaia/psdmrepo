@@ -51,8 +51,8 @@ class ImgDrawSpectrum :
 
 
     def draw_spectrum_for_rect(self,rect) :
-        x,y,w,h,s,t = rect.get_list_of_rect_pars() 
-        print 'draw_spectrum_for_rect : x,y,w,h,s,t =', x,y,w,h,s,t
+        x,y,w,h,lw,col,s,t = rect.get_list_of_rect_pars() 
+        print 'draw_spectrum_for_rect : x,y,w,h,lw,col,s,t =', x,y,w,h,lw,col,s,t
 
         plt.ion()
 

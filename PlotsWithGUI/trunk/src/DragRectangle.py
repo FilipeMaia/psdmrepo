@@ -37,19 +37,21 @@ class DragRectangle( Drag, patches.Rectangle ) :
         y0 = int( self.get_y() )
         w0 = int( self.get_width () )
         h0 = int( self.get_height() )
+        lw = int( self.get_linewidth() ) 
+        col=      self.get_edgecolor() 
         x  = min(x0,x0+w0)
         y  = min(y0,y0+h0)
         h  = abs(h0)
         w  = abs(w0)
         s  =      self.isSelected
         t  =      self.myType
-        return (x,y,w,h,s,t)
+        return (x,y,w,h,lw,col,s,t)
 
 
     def print_pars(self) :
-        x,y,w,h,s,t = self.get_list_of_rect_pars()
+        x,y,w,h,lw,col,s,t = self.get_list_of_rect_pars()
         r = self.isRemoved
-        print 'x,y,w,h,s,t,r =', x,y,w,h,s,t,r
+        print 'x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
 
 
     def my_contains(self, event):

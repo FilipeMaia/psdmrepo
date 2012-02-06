@@ -119,7 +119,7 @@ class ImgConfigParameters :
 
         self.list_of_rects  = []
         self.list_of_lines  = []
-        #self.list_of_circs  = []
+        self.list_of_circs  = []
 
 #---------------------------------------
 
@@ -144,14 +144,17 @@ class ImgConfigParameters :
         print 'File name :', self.icpfname 
         print 'Image No. :', self.number 
 
-        self.idrawontop.update_list_of_rects()
+
+        self.idrawontop.update_list_of_all_objs()
+        #self.idrawontop.update_list_of_objs( self.list_of_rects ) 
+
         Nrects = len(self.list_of_rects)
         if Nrects > 0 :
             print 'Number of rects =', Nrects
-            for rect in self.list_of_rects :
-                (x,y,w,h,s,t) = rect.get_list_of_rect_pars()
-                i = self.list_of_rects.index(rect)
-                print 'Rect in list: i,t,s,x,y,w,h = %3d %s %6s %4d %4d %4d %4d' % (i, t, s, x, y, w, h)
+            for obj in self.list_of_rects :
+                (x,y,w,h,lw,col,s,t) = obj.get_list_of_rect_pars()
+                i = self.list_of_rects.index(obj)
+                print 'Rect in list: i,t,s,x,y,w,h,lw,col = %3d %s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, x, y, w, h, lw, col)
 
 #---------------------------------------
 
@@ -163,22 +166,24 @@ class ImgConfigParameters :
         f.write('FILE_NAME'            + space + self.fname       + '\n')
         f.write('IMG_NUMBER'           + space + str(self.number) + '\n')
 
-        self.idrawontop.update_list_of_rects()
+        self.idrawontop.update_list_of_all_objs()
 
         Nrects = len(self.list_of_rects)
         if Nrects > 0 :
             f.write('\n\nNUMBER_OF_RECTS'  + space + str(Nrects) + '\n')
             for rect in self.list_of_rects :
-                (x,y,w,h,s,t) = rect.get_list_of_rect_pars()
+                (x,y,w,h,lw,col,s,t) = rect.get_list_of_rect_pars()
                 i = self.list_of_rects.index(rect)
                 f.write('\n')
-                f.write(space + 'RECT_I'           + space + str(i) + '\n') # Index
-                f.write(space + 'RECT_T'           + space +     t  + '\n') # Type
-                f.write(space + 'RECT_S'           + space + str(s) + '\n') # isSelected
-                f.write(space + 'RECT_X'           + space + str(x) + '\n')
-                f.write(space + 'RECT_Y'           + space + str(y) + '\n')
-                f.write(space + 'RECT_W'           + space + str(w) + '\n')
-                f.write(space + 'RECT_H'           + space + str(h) + '\n')
+                f.write(space + 'RECT_I'           + space + str(i)   + '\n') # Index
+                f.write(space + 'RECT_T'           + space +     t    + '\n') # Type
+                f.write(space + 'RECT_S'           + space + str(s)   + '\n') # isSelected
+                f.write(space + 'RECT_X'           + space + str(x)   + '\n')
+                f.write(space + 'RECT_Y'           + space + str(y)   + '\n')
+                f.write(space + 'RECT_W'           + space + str(w)   + '\n')
+                f.write(space + 'RECT_H'           + space + str(h)   + '\n')
+                f.write(space + 'RECT_LW'          + space + str(lw)  + '\n')
+                f.write(space + 'RECT_COL'         + space + str(col) + '\n')
 
                 #print 'rect in list: x,y,w,h, isSelected, type =', x, y, w, h, s, t
 
@@ -205,13 +210,15 @@ class ImgConfigParameters :
                 elif key == 'NUMBER_OF_RECTS'  : self.Nrects = int(val)
                 elif key == 'RECT_I'           :
                     self.ind    = int(val)
-                    self.listOfRectInputParameters.append( [self.typeNone, False, 100, 200, 300, 400] )
+                    self.listOfRectInputParameters.append( [self.typeNone, False, 100, 200, 300, 400, 2, 'r'] )
                 elif key == 'RECT_T'           : self.listOfRectInputParameters[self.ind][0] = val 
                 elif key == 'RECT_S'           : self.listOfRectInputParameters[self.ind][1] = dicBool[val.lower()]
                 elif key == 'RECT_X'           : self.listOfRectInputParameters[self.ind][2] = int(val) 
                 elif key == 'RECT_Y'           : self.listOfRectInputParameters[self.ind][3] = int(val) 
                 elif key == 'RECT_W'           : self.listOfRectInputParameters[self.ind][4] = int(val) 
                 elif key == 'RECT_H'           : self.listOfRectInputParameters[self.ind][5] = int(val) 
+                elif key == 'RECT_LW'          : self.listOfRectInputParameters[self.ind][6] = int(val)
+                elif key == 'RECT_COL'         : self.listOfRectInputParameters[self.ind][7] = val 
 
             f.close()
 
