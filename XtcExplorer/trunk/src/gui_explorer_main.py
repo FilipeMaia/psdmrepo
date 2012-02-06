@@ -47,6 +47,8 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 
+import AppUtils.AppDataPath as apputils
+
 import webbrowser
 #----------------------------------
 # Local non-exported definitions --
@@ -572,9 +574,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
     def about(self):
         progname = os.path.basename(sys.argv[0])
-        progversion = "pre-0.1.16"
+        progversion = __version__.strip("$")
         QtGui.QMessageBox.about(self, "About %s" % os.path.basename(sys.argv[0]),
-u"""%(prog)s version %(version)s
+u"""%(prog)s ........ %(version)s
 GUI interface to analysis of xtc files.
 
 This software was developed for the LCLS project at 

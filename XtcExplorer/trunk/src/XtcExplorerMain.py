@@ -24,9 +24,9 @@ part of it, please give an appropriate acknowledgment.
 
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision: 0 $"
+__version__ = "$Revision$"
 # $Source$
 
 #-----------------------------
@@ -575,9 +575,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
     def about(self):
         progname = os.path.basename(sys.argv[0])
-        progversion = "pre-0.1.16"
+        progversion = __version__.strip("$")
         QtGui.QMessageBox.about(self, "About %s" % os.path.basename(sys.argv[0]),
-u"""%(prog)s version %(version)s
+u"""%(prog)s ........ %(version)s
 GUI interface to analysis of xtc files.
 
 This software was developed for the LCLS project at 

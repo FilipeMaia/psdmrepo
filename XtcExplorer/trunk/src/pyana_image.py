@@ -386,7 +386,7 @@ class  pyana_image ( object ) :
             evt.put(True, 'show_event')
             
             for (name,title,image) in event_display_images:
-                self.plotter.add_frame(name,addr,(image,))
+                self.plotter.add_frame(name,title,(image,))
                 self.plotter.frames[name].showProj=self.show_projections
                 
             self.plotter.title = "Cameras shot#%d"%self.n_shots

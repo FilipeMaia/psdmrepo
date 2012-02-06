@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Feb-06 ofte                      rev 2858
+	- Fixed a bug in pyana_images title. 
+	- Automatic update of revision number in the 'about' gui (hope it works)
 	
 2012-Jan-26 ofte  Tag V00-01-19        rev 2850
         - I think I've solved the CSPad calib path issue by using AppUtils.AppDataPath 
