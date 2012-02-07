@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2012-02-06 Andy Salnikov
+- rename  dump_cspad_mini to dump_cspad2x2
+- add cspad2x2.ConfigV1 dump to dump_cspad2x2
+
 2012-01-17 Ingrid Ofte
 - added two modules used for xpp tutorial: 
 	pyana_examples/src/xppt_image_analysis.py and 

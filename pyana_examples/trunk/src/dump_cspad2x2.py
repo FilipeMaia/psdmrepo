@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Pyana user analysis module dump_cspad_mini...
+#  Pyana user analysis module dump_cspad2x2...
 #
 #------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ from pypdsdata import xtc
 #---------------------
 #  Class definition --
 #---------------------
-class dump_cspad_mini (object) :
+class dump_cspad2x2 (object) :
     """Class whose instance will be used as a user analysis module. """
 
     #--------------------
@@ -72,7 +72,50 @@ class dump_cspad_mini (object) :
 
     def beginjob( self, evt, env ) :
  
-       logging.info( "dump_cspad_mini.beginjob() called" )
+        config = env.getConfig(xtc.TypeId.Type.Id_Cspad2x2Config, self.m_src)
+        if not config:
+            return
+        
+        print "dump_cspad2x2: %s: %s" % (config.__class__.__name__, self.m_src)
+        print "  tdi =", config.tdi()
+        prot = config.protectionThreshold()
+        print "  protectionThreshold: adcThreshold =", prot.adcThreshold, "pixelCountThreshold =", prot.pixelCountThreshold 
+        print "  protectionEnable =", config.protectionEnable()
+        print "  inactiveRunMode =", config.inactiveRunMode()
+        print "  activeRunMode =", config.activeRunMode()
+        print "  payloadSize =", config.payloadSize()
+        print "  badAsicMask =", config.badAsicMask()
+        print "  asicMask =", config.asicMask()
+        print "  roiMask =", config.roiMask()
+        print "  numAsicsRead =", config.numAsicsRead()
+        print "  numAsicsStored =", config.numAsicsStored()
+        print "  concentratorVersion =", config.concentratorVersion()
+        quad = config.quad()
+        print "  quad:"
+        print "    shiftSelect =", quad.shiftSelect()
+        print "    edgeSelect =", quad.edgeSelect()
+        print "    readClkSet =", quad.readClkSet()
+        print "    readClkHold =", quad.readClkHold()
+        print "    dataMode =", quad.dataMode()
+        print "    prstSel =", quad.prstSel()
+        print "    acqDelay =", quad.acqDelay()
+        print "    intTime =", quad.intTime()
+        print "    digDelay =", quad.digDelay()
+        print "    ampIdle =", quad.ampIdle()
+        print "    injTotal =", quad.injTotal()
+        print "    rowColShiftPer =", quad.rowColShiftPer()
+        print "    ampReset =", quad.ampReset()
+        print "    digCount =", quad.digCount()
+        print "    digPeriod =", quad.digPeriod()
+        print "    PeltierEnable =", quad.PeltierEnable()
+        print "    kpConstant =", quad.kpConstant()
+        print "    kiConstant =", quad.kiConstant()
+        print "    kdConstant =", quad.kdConstant()
+        print "    humidThold =", quad.humidThold()
+        print "    setPoint =", quad.setPoint()
+        print "    ro =", quad.ro()
+        print "    dp =", quad.dp()
+        print "    gm =", quad.gm()
 
 
     def event( self, evt, env ) :
@@ -83,6 +126,7 @@ class dump_cspad_mini (object) :
             return
 
         # dump information about quadrants
+        print "dump_cspad2x2: %s: %s" % (elem.__class__.__name__, self.m_src)
         print "    quadrant: %d" % elem.quad()
         print "    virtual_channel: %s" % elem.virtual_channel()
         print "    lane: %s" % elem.lane()
@@ -98,8 +142,8 @@ class dump_cspad_mini (object) :
         # image data as 3-dimentional array
         data = elem.data()
         print "    Data shape: %s" % str(data.shape)
-        print data
+        print "    Data:", data
 
     def endjob( self, env ) :
 
-        logging.info( "dump_cspad_mini.endjob() called" )
+        logging.info( "dump_cspad2x2.endjob() called" )
