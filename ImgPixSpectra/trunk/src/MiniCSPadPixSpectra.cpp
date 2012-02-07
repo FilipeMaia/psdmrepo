@@ -28,7 +28,7 @@
 // header from psddl_psana package
 // #include "psddl_psana/acqiris.ddl.h"
 
-#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 #include "PSEvt/EventId.h"
 #include "CSPadPixCoords/Image2D.h"
 
@@ -122,10 +122,10 @@ MiniCSPadPixSpectra::event(Event& evt, Env& env)
      or (m_count<500 and m_count%100  == 0) 
      or                  m_count%1000 == 0  ) WithMsgLog(name(), info, log) { log << "event=" << m_count; }
   
-  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src, m_key, &m_actualSrc);
+  shared_ptr<Psana::CsPad2x2::ElementV1> mini1 = evt.get(m_src, m_key, &m_actualSrc);
   if (mini1.get()) {
 
-      const Psana::CsPad::MiniElementV1& el = *mini1;
+      const Psana::CsPad2x2::ElementV1& el = *mini1;
       
       //const int16_t* data = el.data(); // depricated
       const ndarray<int16_t,3>& data_nda = el.data();
@@ -140,7 +140,7 @@ MiniCSPadPixSpectra::event(Event& evt, Env& env)
       }
 
       //WithMsgLog(name(), info, log) { 
-      //  log << "CsPad::MiniElementV1  dshape.size() = " << dshape.size() << "  shape = "; 
+      //  log << "CsPad2x2::ElementV1  dshape.size() = " << dshape.size() << "  shape = ";
       //for(uint i=0; i<dshape.size(); i++) log << dshape[i] << ", "; 
       //log << "    npix_mini1 = " << npix_mini1 << "\n";
       //
