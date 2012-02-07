@@ -41,8 +41,5 @@ ElementV2::~ElementV2() {}
 
 DataV2::~DataV2() {}
 
-
-MiniElementV1::~MiniElementV1() {}
-
 } // namespace CsPad
 } // namespace Psana
