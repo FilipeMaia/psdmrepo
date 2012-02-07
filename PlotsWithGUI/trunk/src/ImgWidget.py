@@ -183,7 +183,7 @@ class ImgWidget (QtGui.QWidget, idont.ImgDrawOnTop, idout.ImgDrawOutside) :
         self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, pad=0.004, fraction=0.1, aspect=40)
 
         #self.fig.myaxesSCB = self.fig.add_subplot(gs[19,:])
-        #self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation=1)#, ticks=coltickslocs) 
+        #self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation='vertical')#, ticks=coltickslocs) 
         #self.fig.mycolbar.set_clim(zmin,zmax)
 
         self.connectImgWithMouse()

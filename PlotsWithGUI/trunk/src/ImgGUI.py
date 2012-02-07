@@ -37,9 +37,11 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
+import ImgGUIMode     as igm
 import ImgGUIPlayer   as igplr
 import ImgGUISpectrum as igspec
 import ImgGUIProfile  as igprof
+import ImgGUIZoom     as igzoom
 
 #---------------------
 #  Class definition --
@@ -72,7 +74,8 @@ class ImgGUI ( QtGui.QWidget ) :
         self.minHeight = 100
         self.maxHeight = 250
 
-        self.guiPlayer = igplr.ImgGUIPlayer(self.icp)
+        self.gui_player = igplr.ImgGUIPlayer(self.icp)
+        self.gui_mode   = igm.ImgGUIMode(self.icp)
 
         self.guiWin = igspec.ImgGUISpectrum(self.icp) # QtGui.QTextEdit('First')
         self.guiWin.setMinimumHeight(self.minHeight)
@@ -85,7 +88,8 @@ class ImgGUI ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiWin)
 
         self.vboxGlobal = QtGui.QVBoxLayout()
-        self.vboxGlobal.addWidget(self.guiPlayer)
+        self.vboxGlobal.addWidget(self.gui_player)
+        self.vboxGlobal.addWidget(self.gui_mode)
         self.vboxGlobal.addLayout(self.hboxT)
         self.vboxGlobal.addLayout(self.hboxD)
         self.vboxGlobal.addLayout(self.hboxB)
@@ -95,7 +99,7 @@ class ImgGUI ( QtGui.QWidget ) :
         self.showToolTips()
 
         #icp.imgconfpars.ImgGUIIsOpen = True
-
+        self.gui_mode.setStatus()
 
     #-------------------
     # Private methods --
@@ -196,6 +200,7 @@ class ImgGUI ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiWin)
 
         self.tabBarBot.setCurrentIndex(self.indTabEmpB)
+        self.gui_mode.setStatus()
 
 
     def makeTabBarBot(self,mode=None) :
@@ -204,14 +209,14 @@ class ImgGUI ( QtGui.QWidget ) :
         self.tabBarBot = QtGui.QTabBar()
         #self.tabBarBot.setMovable(True) 
 
-        self.indTabZmCp = self.tabBarBot.addTab( 'Zoom-copy' )
+        self.indTabZoom = self.tabBarBot.addTab( 'Zoom' )
         self.indTabCent = self.tabBarBot.addTab( 'Center' )
         self.indTabLine = self.tabBarBot.addTab( 'Line' )
         self.indTabCirc = self.tabBarBot.addTab( 'Circ' )
         self.indTabEmpB = self.tabBarBot.addTab( 5*' ' )
         self.tabBarBot.setTabEnabled(self.indTabEmpB,False)
 
-        self.tabBarBot.setTabTextColor(self.indTabZmCp,QtGui.QColor('magenta'))
+        self.tabBarBot.setTabTextColor(self.indTabZoom,QtGui.QColor('magenta'))
         self.tabBarBot.setTabTextColor(self.indTabCent,QtGui.QColor('green'))
         self.tabBarBot.setTabTextColor(self.indTabLine,QtGui.QColor('red'))
         self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
@@ -231,8 +236,9 @@ class ImgGUI ( QtGui.QWidget ) :
             self.guiWin.close()
         except AttributeError :
             pass
+
         if indTab == self.indTabEmpB : return
-        if indTab == self.indTabZmCp : self.guiWin = QtGui.QTextEdit('Zoomed copy of image')
+        if indTab == self.indTabZoom : self.guiWin = igzoom.ImgGUIZoom (self.icp)
         if indTab == self.indTabCent : self.guiWin = QtGui.QTextEdit('Set center')
         if indTab == self.indTabLine : self.guiWin = QtGui.QTextEdit('Profile along Line')
         if indTab == self.indTabCirc : self.guiWin = QtGui.QTextEdit('Profile along Circ')
@@ -242,6 +248,7 @@ class ImgGUI ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiWin)
 
         self.tabBarTop.setCurrentIndex(self.indTabEmpT)
+        self.gui_mode.setStatus()
 
 
     def get_control(self) :

@@ -143,8 +143,9 @@ class ImgDrawProfile :
 
         self.arr = arr
 
-        for obj in self.icp.list_of_lines :                                           # <====== DEPENDS ON FORM
-            if obj.myType == self.icp.typeCurrent : self.draw_profile_for_line(obj)   # <====== DEPENDS ON FORM
+        for obj in self.icp.list_of_lines :                     # <====== DEPENDS ON FORM
+            if obj.myType == self.icp.typeProfile :             # <====== DEPENDS ON FORM
+                self.draw_profile_for_line(obj)                 # <====== DEPENDS ON FORM
 
 #-----------------------------
 # Test

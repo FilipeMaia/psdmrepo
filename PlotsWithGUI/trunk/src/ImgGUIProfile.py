@@ -29,7 +29,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 
-import ImgGUIMode as igm
+#import ImgGUIMode as igm
 from PyQt4 import QtGui, QtCore
 
 #---------------------
@@ -52,7 +52,8 @@ class ImgGUIProfile (QtGui.QWidget) :
         self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
-        self.gui_mode   = igm.ImgGUIMode(self.icp)
+        self.txt_msg    = QtGui.QTextEdit('Profile: use Add, Move, Select or Remove mode and click and drag mouse on image.')
+        #self.gui_mode   = igm.ImgGUIMode(self.icp)
         #self.but_overlay= QtGui.QPushButton("Overlay")
         #self.but_draw   = QtGui.QPushButton("Draw")
 
@@ -71,7 +72,7 @@ class ImgGUIProfile (QtGui.QWidget) :
         # 
         grid = QtGui.QGridLayout()
         row = 1
-        grid.addWidget(self.gui_mode    , row, 0, 1, 7)
+        grid.addWidget(self.txt_msg, row, 0, 1, 7)
         #row = 2
         #grid.addWidget(self.but_draw    , row, 0)
         #grid.addWidget(self.but_overlay , row, 3)
