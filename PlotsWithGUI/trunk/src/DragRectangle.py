@@ -43,14 +43,14 @@ class DragRectangle( Drag, patches.Rectangle ) :
         y  = min(y0,y0+h0)
         h  = abs(h0)
         w  = abs(w0)
-        s  =      self.isSelected
-        t  =      self.myType
-        return (x,y,w,h,lw,col,s,t)
+        s  = self.isSelected
+        t  = self.myType
+        r  = self.isRemoved
+        return (x,y,w,h,lw,col,s,t,r)
 
 
     def print_pars(self) :
-        x,y,w,h,lw,col,s,t = self.get_list_of_rect_pars()
-        r = self.isRemoved
+        x,y,w,h,lw,col,s,t,r = self.get_list_of_rect_pars()
         print 'x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
 
 

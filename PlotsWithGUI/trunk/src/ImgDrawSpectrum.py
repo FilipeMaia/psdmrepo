@@ -50,28 +50,28 @@ class ImgDrawSpectrum :
         return self.icp.control
 
 
-    def draw_spectrum_for_rect(self,rect) :
-        x,y,w,h,lw,col,s,t = rect.get_list_of_rect_pars() 
-        print 'draw_spectrum_for_rect : x,y,w,h,lw,col,s,t =', x,y,w,h,lw,col,s,t
+    def draw_spectrum_for_rect(self,obj) :
+        x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
+        print 'draw_spectrum_for_rect : x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
 
         plt.ion()
 
-        fig_outside = rect.get_fig_outside()                    # Get figure from the object
+        fig_outside = obj.get_fig_outside()                    # Get figure from the object
 
         if fig_outside == None : # if figure is not open yet
         
             fig_outside = imgfm.ifm.get_figure(figsize=(5,4), type='type1', icp=self.icp) # type='maxspace'
-            rect.set_fig_outside(fig_outside)                   # Preserve figure in the object
-            fig_outside.rect_index = rect.myIndex 
-            fig_outside.my_object  = rect
-            fig_outside.canvas.set_window_title('Spectrum for rect %d' % rect.myIndex  )
+            obj.set_fig_outside(fig_outside)                   # Preserve figure in the object
+            fig_outside.obj_index = obj.myIndex 
+            fig_outside.my_object = obj
+            fig_outside.canvas.set_window_title('Spectrum for rect %d' % obj.myIndex  )
             print 'fig_outside.number=',fig_outside.number
 
         else :
 
-            if not rect.isChanged : return
+            if not obj.isChanged : return
             fig_outside.clear()
-            fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.rect_index )
+            fig_outside.canvas.set_window_title('Spectrum for rect %d' % fig_outside.obj_index )
 
 
         if s :   # Re-draw the figure window on top
@@ -96,13 +96,13 @@ class ImgDrawSpectrum :
 
         fig_outside.canvas.draw()
 
-        rect.isChanged = False
+        obj.isChanged = False
         #plt.ioff()
 
 #-----------------------------
 
     def draw_outside_plots_for_list_of_objs(self, arr) :
-        print 'draw_outside_plots_for_list_of_objs(...)'
+        print 'ImgDrawSpectrum : draw_outside_plots_for_list_of_objs(...)'
 
         self.arr = arr
 

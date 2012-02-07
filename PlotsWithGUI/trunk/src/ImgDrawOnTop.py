@@ -114,7 +114,6 @@ class ImgDrawOnTop :
         drag.set_list_need_in_redraw(self.icp.list_of_circs)                 # <===== DEPENDS ON SHAPE
 
 
-
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
         print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
         obj.print_pars()
@@ -159,9 +158,9 @@ class ImgDrawOnTop :
             for objPars in self.icp.listOfRectInputParameters :
                 #print objPars
                 t,s,x,y,w,h,lw,col = objPars
-                if t == self.icp.typeCurrent :
-                    obj = dragr.DragRectangle(xy=(x,y), width=w, height=h, color='r')
-                    self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
+                #if t == self.icp.typeCurrent :
+                obj = dragr.DragRectangle(xy=(x,y), width=w, height=h, color='r')
+                self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)
 
@@ -174,16 +173,14 @@ class ImgDrawOnTop :
 
         if not self.linesFromInputAreCreated :
             self.linesFromInputAreCreated = True
-#            for objPars in self.icp.listOfLineInputParameters :
-#                #print objPars
-#                t,s,x1,x2,y1,y2,w,h = objPars
-#                if t == self.icp.typeCurrent :
-#                    obj = DragLine((x1,x2), (y1,y2), linewidth=2, color='r')
-#                    self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
+            for objPars in self.icp.listOfLineInputParameters :
+                #print objPars
+                t,s,x1,x2,y1,y2,lw,col = objPars
+                #if t == self.icp.typeCurrent :
+                obj = dragl.DragLine((x1,x2), (y1,y2), linewidth=2, color='r')
+                self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)
-
-
 
 
     def draw_circs(self) :                                      # <===== DEPENDS ON SHAPE INSIDE
@@ -194,15 +191,14 @@ class ImgDrawOnTop :
 
         if not self.circsFromInputAreCreated :
             self.circsFromInputAreCreated = True
-#            for objPars in self.icp.listOfCircleInputParameters :
-#                #print objPars
-#                t,s,x0,y0,r = objPars
-#                if t == self.icp.typeCurrent :
-#                    obj = DragCircle((x0, y0), radius=r, color='r')
-#                    self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
+            for objPars in self.icp.listOfCircInputParameters :
+                #print objPars
+                t,s,x0,y0,r,lw,col = objPars
+                #if t == self.icp.typeCurrent :
+                obj = dragc.DragCircle((x0, y0), radius=r, color='r')
+                self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)
-
 
 
     def draw_on_top(self):

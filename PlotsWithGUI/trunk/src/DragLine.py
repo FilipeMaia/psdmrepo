@@ -35,18 +35,21 @@ class DragLine( Drag, lines.Line2D ) :
     #    self.set_linestyle('--') #'--', ':'
 
     def get_list_of_line_pars(self) :
-        x = self.get_xdata()
-        y = self.get_ydata()
-        s = self.isSelected
-        r = self.isRemoved
-        t = self.myType
-        return (x,y,s,t,r)
+        x1  = int( self.get_xdata()[0] )
+        x2  = int( self.get_xdata()[1] )
+        y1  = int( self.get_ydata()[0] )
+        y2  = int( self.get_ydata()[1] )
+        lw  = int( self.get_linewidth() ) 
+        col =      self.get_color() 
+        s   = self.isSelected
+        t   = self.myType
+        r   = self.isRemoved
+        return (x1,x2,y1,y2,lw,col,s,t,r)
 
 
     def print_pars(self) :
-        x,y,s,t,r = self.get_list_of_line_pars()
-        r = self.isRemoved
-        print 'x,y,s,t,r =', x,y,s,t,r
+        x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_line_pars()
+        print 'x1,x2,y1,y2,lw,col,s,t,r =', x1,x2,y1,y2,lw,col,s,t,r
 
 
     def on_press(self, event):

@@ -46,18 +46,20 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
     #        return False
 
     def get_list_of_circ_pars(self) :
-        x,y = self.center
-        xy0 = (int(x), int(y))
+        xc,yc = self.center
+        x,y = (int(xc), int(yc))
         r0  = int( self.get_radius() )
+        lw  = int( self.get_linewidth() ) 
+        col =      self.get_edgecolor() 
         s   =      self.isSelected
         t   =      self.myType
-        r   = self.isRemoved
-        return (xy0,r0,s,t,r)
+        r   =      self.isRemoved
+        return (x,y,r0,lw,col,s,t,r)
 
 
     def print_pars(self) :
-        xy0,r0,s,t,r = self.get_list_of_circ_pars()
-        print 'xy0,r0,s,t,r =', xy0,r0,s,t,r
+        x,y,r0,lw,col,s,t,r = self.get_list_of_circ_pars()
+        print 'x,y,r0,lw,col,s,t,r =', x,y,r0,lw,col,s,t,r
 
 
     def on_press(self, event):

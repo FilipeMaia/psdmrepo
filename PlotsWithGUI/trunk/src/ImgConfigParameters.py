@@ -148,13 +148,35 @@ class ImgConfigParameters :
         self.idrawontop.update_list_of_all_objs()
         #self.idrawontop.update_list_of_objs( self.list_of_rects ) 
 
-        Nrects = len(self.list_of_rects)
-        if Nrects > 0 :
-            print 'Number of rects =', Nrects
-            for obj in self.list_of_rects :
-                (x,y,w,h,lw,col,s,t) = obj.get_list_of_rect_pars()
-                i = self.list_of_rects.index(obj)
-                print 'Rect in list: i,t,s,x,y,w,h,lw,col = %3d %s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, x, y, w, h, lw, col)
+        list_of_objs = self.list_of_rects
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            print 'Number of rects =', Nobjs
+            for obj in list_of_objs :
+                (x,y,w,h,lw,col,s,t,r) = obj.get_list_of_rect_pars()
+                i = list_of_objs.index(obj)
+                print 'Rect in list: i,t,s,r,x,y,w,h,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, r, x, y, w, h, lw, col)
+
+
+        list_of_objs = self.list_of_lines
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            print 'Number of lines =', Nobjs
+            for obj in list_of_objs :
+                (x1,x2,y1,y2,lw,col,s,t,r) = obj.get_list_of_line_pars()
+                i = list_of_objs.index(obj)
+                print 'Line in list: i,t,s,r,x1,x2,y1,y2,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, r, x1, x2, y1, y2, lw, col)
+
+
+        list_of_objs = self.list_of_circs
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            print 'Number of circs =', Nobjs
+            for obj in list_of_objs :
+                (x,y,r0,lw,col,s,t,r) = obj.get_list_of_rect_pars()
+                i = list_of_objs.index(obj)
+                print 'Circ in list: i,t,s,r,x,y,r,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %s' % (i, t, s, r, x, y, r0, lw, col)
+
 
 #---------------------------------------
 
@@ -168,12 +190,13 @@ class ImgConfigParameters :
 
         self.idrawontop.update_list_of_all_objs()
 
-        Nrects = len(self.list_of_rects)
-        if Nrects > 0 :
-            f.write('\n\nNUMBER_OF_RECTS'  + space + str(Nrects) + '\n')
-            for rect in self.list_of_rects :
-                (x,y,w,h,lw,col,s,t) = rect.get_list_of_rect_pars()
-                i = self.list_of_rects.index(rect)
+        list_of_objs = self.list_of_rects
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            f.write('\n\nNUMBER_OF_RECTS'  + space + str(Nobjs) + '\n')
+            for obj in list_of_objs :
+                (x,y,w,h,lw,col,s,t,r) = obj.get_list_of_rect_pars()
+                i = list_of_objs.index(obj)
                 f.write('\n')
                 f.write(space + 'RECT_I'           + space + str(i)   + '\n') # Index
                 f.write(space + 'RECT_T'           + space +     t    + '\n') # Type
@@ -182,10 +205,45 @@ class ImgConfigParameters :
                 f.write(space + 'RECT_Y'           + space + str(y)   + '\n')
                 f.write(space + 'RECT_W'           + space + str(w)   + '\n')
                 f.write(space + 'RECT_H'           + space + str(h)   + '\n')
-                f.write(space + 'RECT_LW'          + space + str(lw)  + '\n')
-                f.write(space + 'RECT_COL'         + space + str(col) + '\n')
+                f.write(space + 'RECT_L'           + space + str(lw)  + '\n')
+                f.write(space + 'RECT_C'           + space + str(col) + '\n')
 
-                #print 'rect in list: x,y,w,h, isSelected, type =', x, y, w, h, s, t
+
+        list_of_objs = self.list_of_lines
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            f.write('\n\nNUMBER_OF_LINES'  + space + str(Nobjs) + '\n')
+            for obj in list_of_objs :
+                (x1,x2,y1,y2,lw,col,s,t,r) = obj.get_list_of_line_pars()
+                i = list_of_objs.index(obj)
+                f.write('\n')
+                f.write(space + 'LINE_I'           + space + str(i)   + '\n') # Index
+                f.write(space + 'LINE_T'           + space +     t    + '\n') # Type
+                f.write(space + 'LINE_S'           + space + str(s)   + '\n') # isSelected
+                f.write(space + 'LINE_X1'          + space + str(x1)  + '\n')
+                f.write(space + 'LINE_X2'          + space + str(x2)  + '\n')
+                f.write(space + 'LINE_Y1'          + space + str(y1)  + '\n')
+                f.write(space + 'LINE_Y2'          + space + str(y2)  + '\n')
+                f.write(space + 'LINE_L'           + space + str(lw)  + '\n')
+                f.write(space + 'LINE_C'           + space + str(col) + '\n')
+
+
+        list_of_objs = self.list_of_circs
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            f.write('\n\nNUMBER_OF_CIRCS'  + space + str(Nobjs) + '\n')
+            for obj in list_of_objs :
+                (x,y,r,lw,col,s,t,r) = obj.get_list_of_circ_pars()
+                i = list_of_objs.index(obj)
+                f.write('\n')
+                f.write(space + 'CIRC_I'           + space + str(i)   + '\n') # Index
+                f.write(space + 'CIRC_T'           + space +     t    + '\n') # Type
+                f.write(space + 'CIRC_S'           + space + str(s)   + '\n') # isSelected
+                f.write(space + 'CIRC_X'           + space + str(x)   + '\n')
+                f.write(space + 'CIRC_Y'           + space + str(y)   + '\n')
+                f.write(space + 'CIRC_R'           + space + str(r)   + '\n')
+                f.write(space + 'CIRC_L'           + space + str(lw)  + '\n')
+                f.write(space + 'CIRC_C'           + space + str(col) + '\n')
 
         f.close() 
 
@@ -197,6 +255,8 @@ class ImgConfigParameters :
         dicBool = {'false':False, 'true':True}
 
         self.listOfRectInputParameters = []
+        self.listOfLineInputParameters = []
+        self.listOfCircInputParameters = []
 
         if os.path.exists(self.fname) :
             f=open(self.fname,'r')
@@ -206,6 +266,7 @@ class ImgConfigParameters :
                 val = line.split()[1]
                 if   key == 'FILE_NAME'        : val # self.dirName,self.fileName = os.path.split(val)
                 elif key == 'IMG_NUMBER'       : self.number = int(val)
+
 
                 elif key == 'NUMBER_OF_RECTS'  : self.Nrects = int(val)
                 elif key == 'RECT_I'           :
@@ -217,8 +278,35 @@ class ImgConfigParameters :
                 elif key == 'RECT_Y'           : self.listOfRectInputParameters[self.ind][3] = int(val) 
                 elif key == 'RECT_W'           : self.listOfRectInputParameters[self.ind][4] = int(val) 
                 elif key == 'RECT_H'           : self.listOfRectInputParameters[self.ind][5] = int(val) 
-                elif key == 'RECT_LW'          : self.listOfRectInputParameters[self.ind][6] = int(val)
-                elif key == 'RECT_COL'         : self.listOfRectInputParameters[self.ind][7] = val 
+                elif key == 'RECT_L'           : self.listOfRectInputParameters[self.ind][6] = int(val)
+                elif key == 'RECT_C'           : self.listOfRectInputParameters[self.ind][7] = val 
+
+
+                elif key == 'NUMBER_OF_LINES'  : self.Nlines = int(val)
+                elif key == 'LINE_I'           :
+                    self.ind    = int(val)
+                    self.listOfLineInputParameters.append( [self.typeNone, False, 100, 200, 300, 400, 2, 'r'] )
+                elif key == 'LINE_T'           : self.listOfLineInputParameters[self.ind][0] = val 
+                elif key == 'LINE_S'           : self.listOfLineInputParameters[self.ind][1] = dicBool[val.lower()]
+                elif key == 'LINE_X1'          : self.listOfLineInputParameters[self.ind][2] = int(val) 
+                elif key == 'LINE_X2'          : self.listOfLineInputParameters[self.ind][3] = int(val) 
+                elif key == 'LINE_Y1'          : self.listOfLineInputParameters[self.ind][4] = int(val) 
+                elif key == 'LINE_Y2'          : self.listOfLineInputParameters[self.ind][5] = int(val) 
+                elif key == 'LINE_L'           : self.listOfLineInputParameters[self.ind][6] = int(val)
+                elif key == 'LINE_C'           : self.listOfLineInputParameters[self.ind][7] = val 
+
+
+                elif key == 'NUMBER_OF_CIRCS'  : self.Nlines = int(val)
+                elif key == 'CIRC_I'           :
+                    self.ind    = int(val)
+                    self.listOfCircInputParameters.append( [self.typeNone, False, 100, 200, 300, 2, 'r'] )
+                elif key == 'CIRC_T'           : self.listOfCircInputParameters[self.ind][0] = val 
+                elif key == 'CIRC_S'           : self.listOfCircInputParameters[self.ind][1] = dicBool[val.lower()]
+                elif key == 'CIRC_X'           : self.listOfCircInputParameters[self.ind][2] = int(val) 
+                elif key == 'CIRC_Y'           : self.listOfCircInputParameters[self.ind][3] = int(val) 
+                elif key == 'CIRC_R'           : self.listOfCircInputParameters[self.ind][4] = int(val) 
+                elif key == 'CIRC_L'           : self.listOfCircInputParameters[self.ind][5] = int(val)
+                elif key == 'CIRC_C'           : self.listOfCircInputParameters[self.ind][6] = val 
 
             f.close()
 
