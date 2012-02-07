@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2012-02-06 Andy Salnikov
+- added cspad2x2 package
+- moved cspad.MiniElementV1 to cspad2x2.ElementV1
+- added cspad2x2.ConfigV1
+
 Tag: V00-01-01
 2012-01-12 Andy Salnikov
 - adding timepix package
