@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_CSPADMINIELEMENTV1CVT_H
-#define O2OTRANSLATOR_CSPADMINIELEMENTV1CVT_H
+#ifndef O2OTRANSLATOR_CSPAD2X2ELEMENTV1CVT_H
+#define O2OTRANSLATOR_CSPAD2X2ELEMENTV1CVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniElementV1Cvt.
+//	Class CsPad2x2ElementV1Cvt.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/CsPadMiniElementV1.h"
+#include "H5DataTypes/CsPad2x2ElementV1.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/CvtDataContainer.h"
@@ -52,19 +52,19 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class CsPadMiniElementV1Cvt : public EvtDataTypeCvt<Pds::CsPad::MiniElementV1> {
+class CsPad2x2ElementV1Cvt : public EvtDataTypeCvt<Pds::CsPad2x2::ElementV1> {
 public:
 
-  typedef Pds::CsPad::MiniElementV1 XtcType ;
+  typedef Pds::CsPad2x2::ElementV1 XtcType ;
 
   // constructor
-  CsPadMiniElementV1Cvt ( const std::string& typeGroupName,
+  CsPad2x2ElementV1Cvt ( const std::string& typeGroupName,
                       const CalibObjectStore& calibStore,
                       hsize_t chunk_size,
                       int deflate ) ;
 
   // Destructor
-  virtual ~CsPadMiniElementV1Cvt () ;
+  virtual ~CsPad2x2ElementV1Cvt () ;
 
 protected:
 
@@ -81,7 +81,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPadMiniElementV1> > ElementCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> > ElementCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CommonModeDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
@@ -96,10 +96,10 @@ private:
   XtcClockTimeCont* m_timeCont ;
 
   // Copy constructor and assignment are disabled by default
-  CsPadMiniElementV1Cvt ( const CsPadMiniElementV1Cvt& ) ;
-  CsPadMiniElementV1Cvt& operator = ( const CsPadMiniElementV1Cvt& ) ;
+  CsPad2x2ElementV1Cvt ( const CsPad2x2ElementV1Cvt& ) ;
+  CsPad2x2ElementV1Cvt& operator = ( const CsPad2x2ElementV1Cvt& ) ;
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_CSPADMINIELEMENTV1CVT_H
+#endif // O2OTRANSLATOR_CSPAD2X2ELEMENTV1CVT_H

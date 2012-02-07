@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniElementV1Cvt...
+//	Class CsPad2x2ElementV1Cvt...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/CsPadMiniElementV1Cvt.h"
+#include "O2OTranslator/CsPad2x2ElementV1Cvt.h"
 
 //-----------------
 // C/C++ Headers --
@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------
 
 namespace {
-  const char logger[] = "CsPadMiniElementV1Cvt" ;
+  const char logger[] = "CsPad2x2ElementV1Cvt" ;
   
   // slow bit count
   unsigned bitCount(uint32_t mask, unsigned maxBits) {
@@ -58,11 +58,11 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniElementV1Cvt::CsPadMiniElementV1Cvt ( const std::string& typeGroupName,
+CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const std::string& typeGroupName,
                                                const CalibObjectStore& calibStore,
                                                hsize_t chunk_size,
                                                int deflate )
-  : EvtDataTypeCvt<Pds::CsPad::MiniElementV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::CsPad2x2::ElementV1>(typeGroupName)
   , m_calibStore(calibStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
@@ -76,7 +76,7 @@ CsPadMiniElementV1Cvt::CsPadMiniElementV1Cvt ( const std::string& typeGroupName,
 //--------------
 // Destructor --
 //--------------
-CsPadMiniElementV1Cvt::~CsPadMiniElementV1Cvt ()
+CsPad2x2ElementV1Cvt::~CsPad2x2ElementV1Cvt ()
 {
   delete m_elementCont ;
   delete m_pixelDataCont ;
@@ -86,7 +86,7 @@ CsPadMiniElementV1Cvt::~CsPadMiniElementV1Cvt ()
 
 // typed conversion method
 void
-CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
+CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                               const XtcType& data,
                                               size_t size,
                                               const Pds::TypeId& typeId,
@@ -108,7 +108,7 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_elementCont ) {
 
     // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::CsPadMiniElementV1> elContFactory( "element", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> elContFactory( "element", m_chunk_size, m_deflate, true ) ;
     m_elementCont = new ElementCont ( elContFactory ) ;
 
     // create container for frame data
@@ -136,7 +136,7 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   float commonMode[nSect];
 
   // move the data
-  H5DataTypes::CsPadMiniElementV1 elem(data);
+  H5DataTypes::CsPad2x2ElementV1 elem(data);
 
   // loop over sections
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
@@ -206,12 +206,12 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   }
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::CsPadMiniElementV1::stored_type();
+  hdf5pp::Type type = H5DataTypes::CsPad2x2ElementV1::stored_type();
   m_elementCont->container(group,type)->append ( elem, type ) ;
-  type = H5DataTypes::CsPadMiniElementV1::stored_data_type() ;
+  type = H5DataTypes::CsPad2x2ElementV1::stored_data_type() ;
   m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
   if (m_cmodeDataCont) {
-    type = H5DataTypes::CsPadMiniElementV1::cmode_data_type() ;
+    type = H5DataTypes::CsPad2x2ElementV1::cmode_data_type() ;
     m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
   }
   m_timeCont->container(group)->append ( time ) ;
@@ -219,7 +219,7 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
 /// method called when the driver closes a group in the file
 void
-CsPadMiniElementV1Cvt::closeSubgroup( hdf5pp::Group group )
+CsPad2x2ElementV1Cvt::closeSubgroup( hdf5pp::Group group )
 {
   if ( m_elementCont ) m_elementCont->closeGroup( group ) ;
   if ( m_pixelDataCont ) m_pixelDataCont->closeGroup( group ) ;

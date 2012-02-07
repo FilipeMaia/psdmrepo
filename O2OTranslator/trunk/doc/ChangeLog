@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-16-00
+2012-02-06 Andy Salnikov
+- upgrading to pdsdata V03-02-11
+- renamed CsPadMiniElementV1Cvt to CsPad2x2ElementV1Cvt
+- use CsPad2x2::ElementV1 instead of CsPad::MiniElementV1 (also
+  changed group name).
+- added conversion for CsPad2x2::ConfigV1
+
 Tag: V00-15-02
 2012-01-12 Andy Salnikov
 - adding translation for new Timepix classes
