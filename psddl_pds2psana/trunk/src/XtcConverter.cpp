@@ -32,6 +32,7 @@
 #include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/control.ddl.h"
 #include "psddl_pds2psana/cspad.ddl.h"
+#include "psddl_pds2psana/cspad2x2.ddl.h"
 #include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/encoder.ddl.h"
 #include "psddl_pds2psana/epics.ddl.h"
@@ -346,7 +347,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_XampsElement:
     break;
   case Pds::TypeId::Id_Cspad2x2Element:
-    if (version == 1) ::storeDataProxy<CsPad::MiniElementV1>(xtc, evt);
+    if (version == 1) ::storeDataProxy<CsPad2x2::ElementV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_SharedPim:
     if (version == 1) ::storeDataProxy<Bld::BldDataPimV1>(xtc, evt);
@@ -504,6 +505,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_SharedPim:
     break;
   case Pds::TypeId::Id_Cspad2x2Config:
+    if (version == 1) ::storeCfgObject<CsPad2x2::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_FexampConfig:
     break;

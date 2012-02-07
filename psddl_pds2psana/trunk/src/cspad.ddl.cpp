@@ -502,40 +502,5 @@ std::vector<int> DataV2::quads_shape() const
   return shape;
 }
 
-MiniElementV1::MiniElementV1(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::CsPad::MiniElementV1()
-  , m_xtcObj(xtcPtr)
-{
-}
-MiniElementV1::~MiniElementV1()
-{
-}
-
-
-uint32_t MiniElementV1::virtual_channel() const { return m_xtcObj->virtual_channel(); }
-
-uint32_t MiniElementV1::lane() const { return m_xtcObj->lane(); }
-
-uint32_t MiniElementV1::tid() const { return m_xtcObj->tid(); }
-
-uint32_t MiniElementV1::acq_count() const { return m_xtcObj->acq_count(); }
-
-uint32_t MiniElementV1::op_code() const { return m_xtcObj->op_code(); }
-
-uint32_t MiniElementV1::quad() const { return m_xtcObj->quad(); }
-
-uint32_t MiniElementV1::seq_count() const { return m_xtcObj->seq_count(); }
-
-uint32_t MiniElementV1::ticks() const { return m_xtcObj->ticks(); }
-
-uint32_t MiniElementV1::fiducials() const { return m_xtcObj->fiducials(); }
-
-ndarray<uint16_t, 1> MiniElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
-
-uint32_t MiniElementV1::frame_type() const { return m_xtcObj->frame_type(); }
-
-ndarray<int16_t, 3> MiniElementV1::data() const { return m_xtcObj->data(); }
-
-float MiniElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
 } // namespace CsPad
 } // namespace psddl_pds2psana

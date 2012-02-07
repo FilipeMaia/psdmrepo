@@ -282,31 +282,6 @@ private:
   std::vector< psddl_pds2psana::CsPad::ElementV2 > _quads;
 };
 
-
-class MiniElementV1 : public Psana::CsPad::MiniElementV1 {
-public:
-  typedef PsddlPds::CsPad::MiniElementV1 XtcType;
-  typedef Psana::CsPad::MiniElementV1 PsanaType;
-  MiniElementV1(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~MiniElementV1();
-  virtual uint32_t virtual_channel() const;
-  virtual uint32_t lane() const;
-  virtual uint32_t tid() const;
-  virtual uint32_t acq_count() const;
-  virtual uint32_t op_code() const;
-  virtual uint32_t quad() const;
-  virtual uint32_t seq_count() const;
-  virtual uint32_t ticks() const;
-  virtual uint32_t fiducials() const;
-  virtual ndarray<uint16_t, 1> sb_temp() const;
-  virtual uint32_t frame_type() const;
-  virtual ndarray<int16_t, 3> data() const;
-  virtual float common_mode(uint32_t section) const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
-
 } // namespace CsPad
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_CSPAD_DDL_H
