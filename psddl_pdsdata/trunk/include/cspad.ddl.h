@@ -489,49 +489,6 @@ public:
 private:
   //CsPad::ElementV2	_quads[cfg.numQuads()];
 };
-
-/** @class MiniElementV1
-
-  CsPad data from single 2x2 element.
-*/
-
-
-class MiniElementV1 {
-public:
-  enum { TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */ };
-  enum { Version = 1 /**< XTC type version number */ };
-  enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
-  /** Virtual channel number. */
-  uint32_t virtual_channel() const { return uint32_t(this->_word0 & 0x3); }
-  /** Lane number. */
-  uint32_t lane() const { return uint32_t((this->_word0>>6) & 0x3); }
-  uint32_t tid() const { return uint32_t((this->_word0>>8) & 0xffffff); }
-  uint32_t acq_count() const { return uint32_t(this->_word1 & 0xffff); }
-  uint32_t op_code() const { return uint32_t((this->_word1>>16) & 0xff); }
-  /** Quadrant number. */
-  uint32_t quad() const { return uint32_t((this->_word1>>24) & 0x3); }
-  uint32_t seq_count() const { return _seq_count; }
-  uint32_t ticks() const { return _ticks; }
-  uint32_t fiducials() const { return _fiducials; }
-  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
-  uint32_t frame_type() const { return _frame_type; }
-  ndarray<int16_t, 3> data() const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
-  return make_ndarray(data, ColumnsPerASIC,  MaxRowsPerASIC*2,  2); }
-  /** Common mode value for a given section, section number can be 0 or 1.
-                Will return 0 for data read from XTC, may be non-zero after calibration. */
-  float common_mode(uint32_t section) const;
-  static uint32_t _sizeof()  { return ((20+(2*(Nsbtemp)))+4)+(2*(ColumnsPerASIC)*( MaxRowsPerASIC*2)*( 2)); }
-private:
-  uint32_t	_word0;
-  uint32_t	_word1;
-  uint32_t	_seq_count;
-  uint32_t	_ticks;
-  uint32_t	_fiducials;
-  uint16_t	_sbtemp[Nsbtemp];
-  uint32_t	_frame_type;
-  //int16_t	_data[ColumnsPerASIC][ MaxRowsPerASIC*2][ 2];
-};
 } // namespace CsPad
 } // namespace PsddlPds
 #endif // PSDDLPDS_CSPAD_DDL_H

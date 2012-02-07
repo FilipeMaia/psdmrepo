@@ -137,9 +137,5 @@ DataV2::quads_shape(const CsPad::ConfigV3& cfg) const {
   shape.push_back(cfg.numQuads());
   return shape;
 }
-float
-MiniElementV1::common_mode(uint32_t section) const {
-  return 0;
-}
 } // namespace CsPad
 } // namespace PsddlPds
