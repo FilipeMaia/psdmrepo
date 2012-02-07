@@ -1,12 +1,12 @@
-#ifndef PSANA_EXAMPLES_DUMPCSPAD_H
-#define PSANA_EXAMPLES_DUMPCSPAD_H
+#ifndef PSANA_EXAMPLES_DUMPCSPAD2X2_H
+#define PSANA_EXAMPLES_DUMPCSPAD2X2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DumpCsPad.
+//	Class DumpCsPad2x2.
 //
 //------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@ namespace psana_examples {
  *  @author Andrei Salnikov
  */
 
-class DumpCsPad : public Module {
+class DumpCsPad2x2 : public Module {
 public:
 
   // Default constructor
-  DumpCsPad (const std::string& name) ;
+  DumpCsPad2x2 (const std::string& name) ;
 
   // Destructor
-  virtual ~DumpCsPad () ;
+  virtual ~DumpCsPad2x2 () ;
 
   /// Method which is called at the beginning of the calibration cycle
   virtual void beginCalibCycle(Event& evt, Env& env);
@@ -73,4 +73,4 @@ private:
 
 } // namespace psana_examples
 
-#endif // PSANA_EXAMPLES_DUMPCSPAD_H
+#endif // PSANA_EXAMPLES_DUMPCSPAD2X2_H

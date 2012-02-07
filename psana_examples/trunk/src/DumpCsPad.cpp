@@ -51,7 +51,6 @@ DumpCsPad::DumpCsPad (const std::string& name)
 {
   m_key = configStr("inputKey", "");
   m_src = configStr("source", "DetInfo(:Cspad)");
-  m_src2x2 = configStr("source2x2", "DetInfo(:Cspad2x2)");
 }
 
 //--------------
@@ -260,48 +259,6 @@ DumpCsPad::event(Event& evt, Env& env)
         str << "\n    ]";
       }
 
-    }
-  }
-
-  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src2x2, m_key);
-  if (mini1.get()) {
-
-    WithMsgLog(name(), info, str) {
-      str << "CsPad::MiniElementV1:";
-      str << "\n  virtual_channel = " << mini1->virtual_channel() ;
-      str << "\n  lane = " << mini1->lane() ;
-      str << "\n  tid = " << mini1->tid() ;
-      str << "\n  acq_count = " << mini1->acq_count() ;
-      str << "\n  op_code = " << mini1->op_code() ;
-      str << "\n  quad = " << mini1->quad() ;
-      str << "\n  seq_count = " << mini1->seq_count() ;
-      str << "\n  ticks = " << mini1->ticks() ;
-      str << "\n  fiducials = " << mini1->fiducials() ;
-      str << "\n  frame_type = " << mini1->frame_type() ;
-
-      str << "\n    sb_temp = [ ";
-      const ndarray<uint16_t, 1>& sb_temp = mini1->sb_temp();
-      std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
-      str << "]";
-
-      const ndarray<int16_t, 3>& data = mini1->data();
-      str << "\n    data_shape = [ ";
-      std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
-      str << "]";
-
-      str << "\n    common_mode = [ ";
-      for (unsigned i = 0; i != data.shape()[2]; ++ i) {
-          str << mini1->common_mode(i) << ' ';
-      }
-      str << "]";
-
-      str << "\n    data = [";
-      for (unsigned s = 0; s != data.shape()[2]; ++ s) {
-        str << "\n        [ ";
-        for (unsigned i = 0; i < 10; ++ i) str << data[0][i][s] << ' ';
-        str << "... ]";
-      }
-      str << "\n    ]";
     }
   }
 
