@@ -19,8 +19,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-lusi_xtc_ver = "3.2.4"
-PREFIX = pjoin(env['SIT_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver)
+pdsdata_ver = "3.2.11"
+PREFIX = pjoin(env['SIT_ROOT'],"sw/external/pdsdata",pdsdata_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
 INCDIR = "pdsdata"
