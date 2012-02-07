@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_CSPAD_MINIELEMENTV1_H
-#define PYPDSDATA_CSPAD_MINIELEMENTV1_H
+#ifndef PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H
+#define PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class MiniElementV1.
+//	Class CsPadProtectionSystemThreshold.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad/MiniElementV1.hh"
+#include "pdsdata/cspad2x2/ConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -33,7 +33,7 @@
 //              ---------------------
 
 namespace pypdsdata {
-namespace CsPad {
+namespace CsPad2x2 {
 
 /**
  *  This software was developed for the LCLS project.  If you use all or 
@@ -46,17 +46,17 @@ namespace CsPad {
  *  @author Andrei Salnikov
  */
 
-class MiniElementV1 : public PdsDataType<MiniElementV1, Pds::CsPad::MiniElementV1> {
+class CsPadProtectionSystemThreshold : public PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad2x2::ProtectionSystemThreshold> {
 public:
 
-  typedef PdsDataType<MiniElementV1, Pds::CsPad::MiniElementV1> BaseType;
+  typedef PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad2x2::ProtectionSystemThreshold> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
 };
 
-} // namespace CsPad
+} // namespace CsPad2x2
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_CSPAD_MINIELEMENTV1_H
+#endif // PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H

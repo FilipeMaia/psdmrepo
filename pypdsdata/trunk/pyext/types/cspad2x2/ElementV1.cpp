@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class MiniElementV1...
+//	Class ElementV1...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "MiniElementV1.h"
+#include "ElementV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -22,8 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ConfigV2.h"
-#include "ConfigV3.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../../pdsdata_numpy.h"
@@ -35,18 +33,19 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, virtual_channel)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, lane)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, tid)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, acq_count)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, op_code)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, quad)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, seq_count)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, ticks)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, fiducials)
-  FUN0_WRAPPER(pypdsdata::CsPad::MiniElementV1, frame_type)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, virtual_channel)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, lane)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, tid)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, acq_count)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, op_code)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, quad)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, seq_count)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, ticks)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, fiducials)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, frame_type)
   PyObject* sb_temp( PyObject* self, PyObject* args );
   PyObject* data( PyObject* self, PyObject* );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"virtual_channel", virtual_channel, METH_NOARGS,  "" },
@@ -64,7 +63,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::CsPad::MiniElementV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::CsPad2x2::ElementV1 class.";
 }
 
 //              ----------------------------------------
@@ -72,22 +71,24 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::CsPad::MiniElementV1::initType( PyObject* module )
+pypdsdata::CsPad2x2::ElementV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // add an enum analog to this class 
   type->tp_dict = PyDict_New();
-  PyObject* val = PyInt_FromLong(Pds::CsPad::ColumnsPerASIC);
+  PyObject* val = PyInt_FromLong(Pds::CsPad2x2::ColumnsPerASIC);
   PyDict_SetItemString( type->tp_dict, "ColumnsPerASIC", val );
   Py_CLEAR(val);
-  val = PyInt_FromLong(Pds::CsPad::MaxRowsPerASIC);
+  val = PyInt_FromLong(Pds::CsPad2x2::MaxRowsPerASIC);
   PyDict_SetItemString( type->tp_dict, "MaxRowsPerASIC", val );
   Py_CLEAR(val);
 
-  BaseType::initType( "MiniElementV1", module );
+  BaseType::initType( "ElementV1", module );
 }
 
 namespace {
@@ -95,15 +96,15 @@ namespace {
 PyObject*
 sb_temp( PyObject* self, PyObject* args )
 {
-  const Pds::CsPad::MiniElementV1* obj = pypdsdata::CsPad::MiniElementV1::pdsObject( self );
+  const Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   unsigned index ;
-  if ( not PyArg_ParseTuple( args, "I:MiniElementV1.sb_temp", &index ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "I:ElementV1.sb_temp", &index ) ) return 0;
 
   if ( index >= 4 ) {
-    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in MiniElementV1.sb_temp()");
+    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in ElementV1.sb_temp()");
     return 0;
   }
   
@@ -114,7 +115,7 @@ sb_temp( PyObject* self, PyObject* args )
 PyObject*
 data( PyObject* self, PyObject* )
 {
-  Pds::CsPad::MiniElementV1* obj = pypdsdata::CsPad::MiniElementV1::pdsObject( self );
+  Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject( self );
   if ( not obj ) return 0;
 
   // NumPy type number
@@ -125,7 +126,7 @@ data( PyObject* self, PyObject* )
 
   // dimensions
   const unsigned nSect = 2;
-  npy_intp dims[3] = { Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2, nSect };
+  npy_intp dims[3] = { Pds::CsPad2x2::ColumnsPerASIC, Pds::CsPad2x2::MaxRowsPerASIC*2, nSect };
 
   // start of pixel data
   uint16_t* qdata = &obj->pair[0][0].s0;
@@ -141,5 +142,26 @@ data( PyObject* self, PyObject* )
   return array;
 }
 
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "CsPad2x2.ElementV1(quad=" << obj->quad()
+      << ", virtual_channel=" << obj->virtual_channel()
+      << ", lane=" << obj->lane()
+      << ", tid=" << obj->tid()
+      << ", acq_count=" << obj->acq_count()
+      << ", op_code=" << obj->op_code()
+      << ", seq_count=" << obj->seq_count()
+      << ", ticks=" << obj->ticks()
+      << ", fiducials=" << obj->fiducials()
+      << ", frame_type=" << obj->frame_type()
+      << ")";
+
+  return PyString_FromString( str.str().c_str() );
+}
 
 }

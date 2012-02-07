@@ -1,4 +1,9 @@
 
+Tag: V00-00-46
+2012-02-06 Andy Salnikov
+- upgrade to pdsdata V03-02-04
+  - implement cspad2x2 package
+
 Tag: V00-00-45
 2012-01-19 Andy Salnikov
 - upgrade to pdsdata V03-02-04
