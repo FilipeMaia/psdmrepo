@@ -37,10 +37,10 @@ namespace cspad_mod {
 //----------------
 // Constructors --
 //----------------
-MiniElementV1::MiniElementV1 (const Psana::CsPad::MiniElementV1& elem,
+MiniElementV1::MiniElementV1 (const Psana::CsPad2x2::ElementV1& elem,
     const int16_t* data,
     const float* common_mode)
-  : Psana::CsPad::MiniElementV1()
+  : Psana::CsPad2x2::ElementV1()
   , m_virtual_channel(elem.virtual_channel())
   , m_lane(elem.lane())
   , m_tid(elem.tid())

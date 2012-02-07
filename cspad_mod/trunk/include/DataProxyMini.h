@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 #include "PSEnv/EnvObjectStore.h"
 #include "PSEvt/EventKey.h"
 
@@ -51,7 +51,7 @@ namespace cspad_mod {
  *  @author Andy Salnikov
  */
 
-class DataProxyMini : public PSEvt::Proxy<Psana::CsPad::MiniElementV1> {
+class DataProxyMini : public PSEvt::Proxy<Psana::CsPad2x2::ElementV1> {
 public:
 
   // Default constructor
@@ -68,7 +68,7 @@ public:
    *  @param[in] key     String key, additional key supplied by user.
    *  @return Shared pointer of the correct type.
    */
-  virtual boost::shared_ptr<Psana::CsPad::MiniElementV1>
+  virtual boost::shared_ptr<Psana::CsPad2x2::ElementV1>
   getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
 
 protected:
@@ -78,7 +78,7 @@ private:
   // Data members
   PSEvt::EventKey m_key;
   PSEnv::EnvObjectStore& m_calibStore;
-  boost::shared_ptr<Psana::CsPad::MiniElementV1> m_data;
+  boost::shared_ptr<Psana::CsPad2x2::ElementV1> m_data;
 
 };
 

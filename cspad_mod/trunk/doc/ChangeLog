@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-02-06 Andy Salnikov
+- cspad.MiniElementV1 was renamed to cspad2x2.ElementV1, updating client code.
+
 Tag: V00-02-01
 2011-12-14 Andy Salnikov
 - applying patch V00-01-03 to the trunk

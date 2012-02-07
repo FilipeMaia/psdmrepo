@@ -28,6 +28,7 @@
 #include "pdscalibdata/CsPadFilterV1.h"
 #include "PSCalib/CalibFileFinder.h"
 #include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -200,25 +201,25 @@ CsPadFilter::event(Event& evt, Env& env)
   }
 
 
-  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src, m_key, &actualSrc);
+  shared_ptr<Psana::CsPad2x2::ElementV1> mini1 = evt.get(m_src, m_key, &actualSrc);
   if (mini1.get()) {
 
     // get calibration object
     boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter = env.calibStore().get(actualSrc);
     if (filter.get()) {
 
-      const Psana::CsPad::MiniElementV1& el = *mini1;
+      const Psana::CsPad2x2::ElementV1& el = *mini1;
 
       // call filter
       bool stat = filter->filter(el.data());
       if (stat) {
         // at least some data is good, do not skip and stop here
-        MsgLog(name(), debug, name() << ": Good data found in CsPad::MiniElementV1 quadrant=" << el.quad());
+        MsgLog(name(), debug, name() << ": Good data found in CsPad2x2::ElementV1 quadrant=" << el.quad());
         return;
       }
 
       // no good data found, skip it
-      MsgLog(name(), debug, name() << ": No good data were found in CsPad::MiniElementV1");
+      MsgLog(name(), debug, name() << ": No good data were found in CsPad2x2::ElementV1");
       skip();
       return;
 

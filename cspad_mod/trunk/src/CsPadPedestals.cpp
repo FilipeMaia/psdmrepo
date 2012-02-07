@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -140,7 +141,7 @@ CsPadPedestals::event(Event& evt, Env& env)
     
     // we should expect 2x2 data 
     
-    shared_ptr<Psana::CsPad::MiniElementV1> data1 = evt.get(m_src);
+    shared_ptr<Psana::CsPad2x2::ElementV1> data1 = evt.get(m_src);
     if (data1.get()) {
   
       ++ m_count;

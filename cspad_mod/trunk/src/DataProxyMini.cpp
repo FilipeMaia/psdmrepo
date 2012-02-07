@@ -49,7 +49,7 @@ namespace cspad_mod {
 // Constructors --
 //----------------
 DataProxyMini::DataProxyMini (const PSEvt::EventKey& key, PSEnv::EnvObjectStore& calibStore)
-  : PSEvt::Proxy<Psana::CsPad::MiniElementV1>()
+  : PSEvt::Proxy<Psana::CsPad2x2::ElementV1>()
   , m_key(key)
   , m_calibStore(calibStore)
   , m_data()
@@ -63,7 +63,7 @@ DataProxyMini::~DataProxyMini ()
 {
 }
 
-boost::shared_ptr<Psana::CsPad::MiniElementV1>
+boost::shared_ptr<Psana::CsPad2x2::ElementV1>
 DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
   if (m_data.get()) return m_data;
@@ -71,7 +71,7 @@ DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, con
   // get the original object
   boost::shared_ptr<void> vptr = dict->get(m_key.typeinfo(), PSEvt::Source(m_key.src()), m_key.key(), 0);
   if (not vptr.get()) return m_data;
-  boost::shared_ptr<Psana::CsPad::MiniElementV1> obj = boost::static_pointer_cast<Psana::CsPad::MiniElementV1>(vptr);
+  boost::shared_ptr<Psana::CsPad2x2::ElementV1> obj = boost::static_pointer_cast<Psana::CsPad2x2::ElementV1>(vptr);
 
   // get calibration data
   boost::shared_ptr<pdscalibdata::CsPadMiniPedestalsV1> pedestals = m_calibStore.get(m_key.src());

@@ -24,7 +24,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

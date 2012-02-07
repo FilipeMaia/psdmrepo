@@ -32,7 +32,8 @@
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "PSCalib/CalibFileFinder.h"
-#include "psddl_psana/acqiris.ddl.h"
+#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -153,8 +154,8 @@ CsPadCalib::event(Event& evt, Env& env)
 
       addProxyV2(key, evt, env);
 
-    } else if (*key.typeinfo() == typeid(Psana::CsPad::MiniElementV1)) {
-      MsgLog(name(), debug, name() << ": found Psana::CsPad::MiniElementV1 " << key);
+    } else if (*key.typeinfo() == typeid(Psana::CsPad2x2::ElementV1)) {
+      MsgLog(name(), debug, name() << ": found Psana::CsPad2x2::ElementV1 " << key);
 
       addProxyMini(key, evt, env);
 
@@ -208,7 +209,7 @@ CsPadCalib::addProxyMini(const PSEvt::EventKey& key, Event& evt, Env& env)
   // need an access to calib store
   PSEnv::EnvObjectStore& calibStore = env.calibStore();
 
-  boost::shared_ptr< PSEvt::Proxy<Psana::CsPad::MiniElementV1> > proxy(new DataProxyMini(key, calibStore));
+  boost::shared_ptr< PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > proxy(new DataProxyMini(key, calibStore));
   evt.putProxy(proxy, key.src(), m_outkey);
 }
 

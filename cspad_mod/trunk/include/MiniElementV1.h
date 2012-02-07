@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -38,7 +38,7 @@ namespace cspad_mod {
 /**
  *  @ingroup cspad_mod
  *
- *  @brief Implementation of Psana::CsPad::MiniElementV1 interface for
+ *  @brief Implementation of Psana::CsPad2x2::ElementV1 interface for
  *  calibrated data.
  *
  *  This software was developed for the LCLS project.  If you use all or 
@@ -51,11 +51,11 @@ namespace cspad_mod {
  *  @author Andy Salnikov
  */
 
-class MiniElementV1 : public Psana::CsPad::MiniElementV1 {
+class MiniElementV1 : public Psana::CsPad2x2::ElementV1 {
 public:
 
   enum {
-    Nsbtemp = Psana::CsPad::MiniElementV1::Nsbtemp /**< Number of the elements in _sbtemp array. */
+    Nsbtemp = Psana::CsPad2x2::ElementV1::Nsbtemp /**< Number of the elements in _sbtemp array. */
   };
 
   /**
@@ -63,7 +63,7 @@ public:
    *  Data array must be allocated with new[] and will be deallocated in destructor.
    *  Common_mode array is copied, caller keeps ownership.
    */
-  MiniElementV1 (const Psana::CsPad::MiniElementV1& elem,
+  MiniElementV1 (const Psana::CsPad2x2::ElementV1& elem,
       const int16_t* data,
       const float* common_mode) ;
 
