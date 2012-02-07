@@ -60,7 +60,7 @@ class ImgDrawZoom :
 
         if fig_outside == None : # if figure is not open yet
         
-            fig_outside = imgfm.ifm.get_figure(figsize=(5,4), type='type1', icp=self.icp) # type='maxspace'
+            fig_outside = imgfm.ifm.get_figure(figsize=(7,7), type='type1', icp=self.icp) # type='maxspace','type1'
             obj.set_fig_outside(fig_outside)                   # Preserve figure in the object
             fig_outside.obj_index = obj.myIndex 
             fig_outside.my_object = obj
