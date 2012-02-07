@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_CSPADMINIELEMENTV1_H
-#define H5DATATYPES_CSPADMINIELEMENTV1_H
+#ifndef H5DATATYPES_CSPAD2X2ELEMENTV1_H
+#define H5DATATYPES_CSPAD2X2ELEMENTV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniElementV1.
+//	Class CsPad2x2ElementV1.
 //
 //------------------------------------------------------------------------
 
@@ -21,9 +21,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/CsPadElementHeader.h"
+#include "H5DataTypes/CsPad2x2ElementHeader.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/cspad/MiniElementV1.hh"
+#include "pdsdata/cspad2x2/ElementV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,15 +36,15 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::CsPad::MiniElementV1
+// Helper type for Pds::CsPad2x2::ElementV1
 //
-class CsPadMiniElementV1  {
+class CsPad2x2ElementV1  {
 public:
 
-  typedef Pds::CsPad::MiniElementV1 XtcType ;
+  typedef Pds::CsPad2x2::ElementV1 XtcType ;
 
-  CsPadMiniElementV1 () {}
-  CsPadMiniElementV1 ( const XtcType& data ) ;
+  CsPad2x2ElementV1 () {}
+  CsPad2x2ElementV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -54,10 +54,10 @@ public:
 
 private:
 
-  CsPadElementHeader m_data ;
+  CsPad2x2ElementHeader m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADMINIELEMENTV1_H
+#endif // H5DATATYPES_CSPAD2X2ELEMENTV1_H
