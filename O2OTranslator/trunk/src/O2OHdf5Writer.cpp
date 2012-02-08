@@ -542,7 +542,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  // very special converter for CsPad::MiniElementV1, it needs calibrations
+  // very special converter for CsPad2x2::ElementV1, it needs calibrations
   converter.reset( new CsPad2x2ElementV1Cvt (
       "CsPad2x2::ElementV1", m_calibStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Cspad2x2Element, 1).value() ;

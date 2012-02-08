@@ -28,8 +28,8 @@
 #include "O2OTranslator/O2OExceptions.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadFilterV1.h"
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -95,10 +95,10 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 {
   // get calibrarion data
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
-  boost::shared_ptr<pdscalibdata::CsPadMiniPedestalsV1> pedestals =
-    m_calibStore.get<pdscalibdata::CsPadMiniPedestalsV1>(address);
-  boost::shared_ptr<pdscalibdata::CsPadMiniPixelStatusV1> pixStatusCalib =
-    m_calibStore.get<pdscalibdata::CsPadMiniPixelStatusV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPad2x2PedestalsV1> pedestals =
+    m_calibStore.get<pdscalibdata::CsPad2x2PedestalsV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPad2x2PixelStatusV1> pixStatusCalib =
+    m_calibStore.get<pdscalibdata::CsPad2x2PixelStatusV1>(address);
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
   boost::shared_ptr<pdscalibdata::CsPadFilterV1> filterCalib =

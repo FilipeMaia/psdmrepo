@@ -87,7 +87,7 @@ CsPadCalibV1Cvt::convert ( const void* data,
     // We only accept data from Cspad devices here
     const Pds::Src& pdssrc = src.top();
     if (pdssrc.level() != Pds::Level::Source) {
-      MsgLog(logger, warning, "CsPadMiniCalibV1Cvt::convert called with non-Source level: " << Pds::Level::name(pdssrc.level()));
+      MsgLog(logger, warning, "CsPadCalibV1Cvt::convert called with non-Source level: " << Pds::Level::name(pdssrc.level()));
       return;
     }
     const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(pdssrc);
