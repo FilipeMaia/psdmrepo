@@ -1,12 +1,12 @@
-#ifndef CSPAD_MOD_MINIELEMENTV1_H
-#define CSPAD_MOD_MINIELEMENTV1_H
+#ifndef CSPAD_MOD_CSPAD2X2ELEMENTV1_H
+#define CSPAD_MOD_CSPAD2X2ELEMENTV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class MiniElementV1.
+//	Class CsPad2x2ElementV1.
 //
 //------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ namespace cspad_mod {
  *  @author Andy Salnikov
  */
 
-class MiniElementV1 : public Psana::CsPad2x2::ElementV1 {
+class CsPad2x2ElementV1 : public Psana::CsPad2x2::ElementV1 {
 public:
 
   enum {
@@ -63,12 +63,12 @@ public:
    *  Data array must be allocated with new[] and will be deallocated in destructor.
    *  Common_mode array is copied, caller keeps ownership.
    */
-  MiniElementV1 (const Psana::CsPad2x2::ElementV1& elem,
+  CsPad2x2ElementV1 (const Psana::CsPad2x2::ElementV1& elem,
       const int16_t* data,
       const float* common_mode) ;
 
   // Destructor
-  virtual ~MiniElementV1 () ;
+  virtual ~CsPad2x2ElementV1 () ;
 
   /** Virtual channel number. */
   virtual uint32_t virtual_channel() const { return m_virtual_channel; }
@@ -107,11 +107,11 @@ private:
   unsigned m_data_shape[3];
 
   // Copy constructor and assignment are disabled by default
-  MiniElementV1 ( const MiniElementV1& ) ;
-  MiniElementV1& operator = ( const MiniElementV1& ) ;
+  CsPad2x2ElementV1 ( const CsPad2x2ElementV1& ) ;
+  CsPad2x2ElementV1& operator = ( const CsPad2x2ElementV1& ) ;
 
 };
 
 } // namespace cspad_mod
 
-#endif // CSPAD_MOD_MINIELEMENTV1_H
+#endif // CSPAD_MOD_CSPAD2X2ELEMENTV1_H

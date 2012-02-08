@@ -24,7 +24,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PSCalib/CalibFileFinder.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -63,12 +62,10 @@ public:
    *   Make new proxy instance
    *
    *   @param[in] calibDir   Experiment calibration directory
-   *   @param[in] calibClass Class of calibration object such as "CsPad::CalibV1"
    *   @param[in] calibType  Type of object such as "pedestals" or "common_mode"
    *   @param[in] run        Run number
    */
-  CalibDataProxy (const std::string& calibDir, const std::string& calibClass,
-      const std::string& calibType, int run);
+  CalibDataProxy (const std::string& calibDir, const std::string& calibType, int run);
 
   virtual ~CalibDataProxy ();
 
@@ -106,7 +103,7 @@ private:
   typedef std::map<_Src, boost::shared_ptr<T> > Src2Data;
 
   // Data members
-  PSCalib::CalibFileFinder m_finder;
+  const std::string m_calibDir;
   const std::string m_calibType;
   int m_run;
   Src2Data m_data;

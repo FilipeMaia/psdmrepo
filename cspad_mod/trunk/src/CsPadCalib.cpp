@@ -23,12 +23,12 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "cspad_mod/CalibDataProxy.h"
-#include "cspad_mod/DataProxyMini.h"
+#include "cspad_mod/DataProxy2x2.h"
 #include "cspad_mod/DataProxyT.h"
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "PSCalib/CalibFileFinder.h"
@@ -98,28 +98,28 @@ CsPadCalib::beginRun(Event& evt, Env& env)
   PSEnv::EnvObjectStore& calibStore = env.calibStore();
 
   if (m_doPedestals) {
-    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadMiniPedestalsV1> > proxy1(
-        new CalibDataProxy<pdscalibdata::CsPadMiniPedestalsV1>(env.calibDir(), "CsPad::CalibV1", "pedestals", run));
+    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPad2x2PedestalsV1> > proxy1(
+        new CalibDataProxy<pdscalibdata::CsPad2x2PedestalsV1>(env.calibDir(), "pedestals", run));
     calibStore.putProxy(proxy1, PSEvt::EventKey::anySource());
 
     boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadPedestalsV1> > proxy2(
-        new CalibDataProxy<pdscalibdata::CsPadPedestalsV1>(env.calibDir(), "CsPad::CalibV1", "pedestals", run));
+        new CalibDataProxy<pdscalibdata::CsPadPedestalsV1>(env.calibDir(), "pedestals", run));
     calibStore.putProxy(proxy2, PSEvt::EventKey::anySource());
   }
 
   if (m_doPixelStatus) {
-    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadMiniPixelStatusV1> > proxy1(
-        new CalibDataProxy<pdscalibdata::CsPadMiniPixelStatusV1>(env.calibDir(), "CsPad::CalibV1", "pixel_status", run));
+    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPad2x2PixelStatusV1> > proxy1(
+        new CalibDataProxy<pdscalibdata::CsPad2x2PixelStatusV1>(env.calibDir(), "pixel_status", run));
     calibStore.putProxy(proxy1, PSEvt::EventKey::anySource());
 
     boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadPixelStatusV1> > proxy2(
-        new CalibDataProxy<pdscalibdata::CsPadPixelStatusV1>(env.calibDir(), "CsPad::CalibV1", "pixel_status", run));
+        new CalibDataProxy<pdscalibdata::CsPadPixelStatusV1>(env.calibDir(), "pixel_status", run));
     calibStore.putProxy(proxy2, PSEvt::EventKey::anySource());
   }
 
   if (m_doCommonMode) {
     boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadCommonModeSubV1> > proxy(
-        new CalibDataProxy<pdscalibdata::CsPadCommonModeSubV1>(env.calibDir(), "CsPad::CalibV1", "common_mode", run));
+        new CalibDataProxy<pdscalibdata::CsPadCommonModeSubV1>(env.calibDir(), "common_mode", run));
     calibStore.putProxy(proxy, PSEvt::EventKey::anySource());
   }
 
@@ -157,7 +157,7 @@ CsPadCalib::event(Event& evt, Env& env)
     } else if (*key.typeinfo() == typeid(Psana::CsPad2x2::ElementV1)) {
       MsgLog(name(), debug, name() << ": found Psana::CsPad2x2::ElementV1 " << key);
 
-      addProxyMini(key, evt, env);
+      addProxy2x2(key, evt, env);
 
     }
 
@@ -204,12 +204,12 @@ CsPadCalib::addProxyV2(const PSEvt::EventKey& key, Event& evt, Env& env)
 }
 
 void
-CsPadCalib::addProxyMini(const PSEvt::EventKey& key, Event& evt, Env& env)
+CsPadCalib::addProxy2x2(const PSEvt::EventKey& key, Event& evt, Env& env)
 {
   // need an access to calib store
   PSEnv::EnvObjectStore& calibStore = env.calibStore();
 
-  boost::shared_ptr< PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > proxy(new DataProxyMini(key, calibStore));
+  boost::shared_ptr< PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > proxy(new DataProxy2x2(key, calibStore));
   evt.putProxy(proxy, key.src(), m_outkey);
 }
 

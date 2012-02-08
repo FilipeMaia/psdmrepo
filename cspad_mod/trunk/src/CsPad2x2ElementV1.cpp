@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class MiniElementV1...
+//	Class CsPad2x2ElementV1...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "cspad_mod/MiniElementV1.h"
+#include "cspad_mod/CsPad2x2ElementV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -37,7 +37,7 @@ namespace cspad_mod {
 //----------------
 // Constructors --
 //----------------
-MiniElementV1::MiniElementV1 (const Psana::CsPad2x2::ElementV1& elem,
+CsPad2x2ElementV1::CsPad2x2ElementV1 (const Psana::CsPad2x2::ElementV1& elem,
     const int16_t* data,
     const float* common_mode)
   : Psana::CsPad2x2::ElementV1()
@@ -70,7 +70,7 @@ MiniElementV1::MiniElementV1 (const Psana::CsPad2x2::ElementV1& elem,
 //--------------
 // Destructor --
 //--------------
-MiniElementV1::~MiniElementV1 ()
+CsPad2x2ElementV1::~CsPad2x2ElementV1 ()
 {
   delete [] m_data;
 }

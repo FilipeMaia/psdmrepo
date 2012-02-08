@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2012-02-08 Andy Salnikov
+- 2x2 calibrations now live in separate directory, fix calibration
+  classes to look there
+- renamed Mini classes to 2x2
+
 Tag: V00-03-00
 2012-02-06 Andy Salnikov
 - cspad.MiniElementV1 was renamed to cspad2x2.ElementV1, updating client code.

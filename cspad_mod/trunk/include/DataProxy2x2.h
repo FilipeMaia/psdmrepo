@@ -1,12 +1,12 @@
-#ifndef CSPAD_MOD_DATAPROXYMINI_H
-#define CSPAD_MOD_DATAPROXYMINI_H
+#ifndef CSPAD_MOD_DATAPROXY2X2_H
+#define CSPAD_MOD_DATAPROXY2X2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DataProxyMini.
+//	Class DataProxy2x2.
 //
 //------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ namespace cspad_mod {
 /**
  *  @ingroup cspad_mod
  *
- *  @brief Proxy for MiniElement which performs calibration.
+ *  @brief Proxy for 2x2 Element which performs calibration.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -51,14 +51,14 @@ namespace cspad_mod {
  *  @author Andy Salnikov
  */
 
-class DataProxyMini : public PSEvt::Proxy<Psana::CsPad2x2::ElementV1> {
+class DataProxy2x2 : public PSEvt::Proxy<Psana::CsPad2x2::ElementV1> {
 public:
 
   // Default constructor
-  DataProxyMini (const PSEvt::EventKey& key, PSEnv::EnvObjectStore& calibStore) ;
+  DataProxy2x2 (const PSEvt::EventKey& key, PSEnv::EnvObjectStore& calibStore) ;
 
   // Destructor
-  virtual ~DataProxyMini () ;
+  virtual ~DataProxy2x2 () ;
 
   /**
    *  @brief Get the correctly-typed object from the proxy.
@@ -84,4 +84,4 @@ private:
 
 } // namespace cspad_mod
 
-#endif // CSPAD_MOD_DATAPROXYMINI_H
+#endif // CSPAD_MOD_DATAPROXY2X2_H

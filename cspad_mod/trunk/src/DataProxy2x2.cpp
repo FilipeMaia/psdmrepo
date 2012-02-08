@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class DataProxyMini...
+//	Class DataProxy2x2...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "cspad_mod/DataProxyMini.h"
+#include "cspad_mod/DataProxy2x2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "cspad_mod/MiniElementV1.h"
+#include "cspad_mod/CsPad2x2ElementV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -34,7 +34,7 @@
 
 namespace {
 
-  const char logger[] = "DataProxyMini";
+  const char logger[] = "DataProxy2x2";
 
 }
 
@@ -48,7 +48,7 @@ namespace cspad_mod {
 //----------------
 // Constructors --
 //----------------
-DataProxyMini::DataProxyMini (const PSEvt::EventKey& key, PSEnv::EnvObjectStore& calibStore)
+DataProxy2x2::DataProxy2x2 (const PSEvt::EventKey& key, PSEnv::EnvObjectStore& calibStore)
   : PSEvt::Proxy<Psana::CsPad2x2::ElementV1>()
   , m_key(key)
   , m_calibStore(calibStore)
@@ -59,12 +59,12 @@ DataProxyMini::DataProxyMini (const PSEvt::EventKey& key, PSEnv::EnvObjectStore&
 //--------------
 // Destructor --
 //--------------
-DataProxyMini::~DataProxyMini ()
+DataProxy2x2::~DataProxy2x2 ()
 {
 }
 
 boost::shared_ptr<Psana::CsPad2x2::ElementV1>
-DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
   if (m_data.get()) return m_data;
 
@@ -74,8 +74,8 @@ DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, con
   boost::shared_ptr<Psana::CsPad2x2::ElementV1> obj = boost::static_pointer_cast<Psana::CsPad2x2::ElementV1>(vptr);
 
   // get calibration data
-  boost::shared_ptr<pdscalibdata::CsPadMiniPedestalsV1> pedestals = m_calibStore.get(m_key.src());
-  boost::shared_ptr<pdscalibdata::CsPadMiniPixelStatusV1> pixStatusCalib = m_calibStore.get(m_key.src());
+  boost::shared_ptr<pdscalibdata::CsPad2x2PedestalsV1> pedestals = m_calibStore.get(m_key.src());
+  boost::shared_ptr<pdscalibdata::CsPad2x2PixelStatusV1> pixStatusCalib = m_calibStore.get(m_key.src());
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib = m_calibStore.get(m_key.src());
 
   // get few constants
@@ -145,7 +145,7 @@ DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, con
   }
 
   // make new object
-  m_data.reset(new MiniElementV1(*obj, pixelData, commonMode));
+  m_data.reset(new CsPad2x2ElementV1(*obj, pixelData, commonMode));
 
   return m_data;
 }

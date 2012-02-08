@@ -96,7 +96,7 @@ CsPadFilter::beginRun(Event& evt, Env& env)
   
     // add proxy to calib store
     boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadFilterV1> > proxy(
-        new CalibDataProxy<pdscalibdata::CsPadFilterV1>(env.calibDir(), "CsPad::CalibV1", "filter", run));
+        new CalibDataProxy<pdscalibdata::CsPadFilterV1>(env.calibDir(), "filter", run));
     env.calibStore().putProxy(proxy, PSEvt::EventKey::anySource());
 
   } else {
