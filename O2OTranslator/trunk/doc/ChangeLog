@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-02-08 Andy Salnikov
+- updated ChangeLog
+
+Tag: V00-17-01
+2012-02-08 Andy Salnikov
+- small fix, not everything was changed to 2x2 in last commit
+
 Tag: V00-17-00
 2012-02-08 Andy Salnikov
 - renamed CsPadMiniCalibV1Cvt to CsPad2x2CalibV1Cvt
