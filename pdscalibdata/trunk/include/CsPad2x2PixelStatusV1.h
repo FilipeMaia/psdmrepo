@@ -41,7 +41,7 @@ namespace pdscalibdata {
 /**
  *  @ingroup pdscalibdata
  *
- *  @brief Pixel status data for CsPad::MiniElementV1.
+ *  @brief Pixel status data for CsPad2x2::ElementV1.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
