@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPixelStatusV1...
+//	Class CsPad2x2PixelStatusV1...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -40,13 +40,13 @@ namespace pdscalibdata {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 ()
+CsPad2x2PixelStatusV1::CsPad2x2PixelStatusV1 ()
 {
   // fill all status codes with zeros
   std::fill_n(m_status, int(Size), status_t(0));
 }
 
-CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const std::string& fname)
+CsPad2x2PixelStatusV1::CsPad2x2PixelStatusV1 (const std::string& fname)
 {
   // open file
   std::ifstream in(fname.c_str());
@@ -84,7 +84,7 @@ CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const std::string& fname)
 //--------------
 // Destructor --
 //--------------
-CsPadMiniPixelStatusV1::~CsPadMiniPixelStatusV1 ()
+CsPad2x2PixelStatusV1::~CsPad2x2PixelStatusV1 ()
 {
 }
 

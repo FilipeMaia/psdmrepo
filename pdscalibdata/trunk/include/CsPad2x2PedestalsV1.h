@@ -1,12 +1,12 @@
-#ifndef PDSCALIBDATA_CSPADMINIPIXELSTATUSV1_H
-#define PDSCALIBDATA_CSPADMINIPIXELSTATUSV1_H
+#ifndef PDSCALIBDATA_CSPAD2X2PEDESTALSV1_H
+#define PDSCALIBDATA_CSPAD2X2PEDESTALSV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPixelStatusV1.
+//	Class CsPad2x2PedestalsV1.
 //
 //------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "ndarray/ndarray.h"
-#include "pdsdata/cspad/Detector.hh"
+#include "pdsdata/cspad2x2/Detector.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -41,7 +41,7 @@ namespace pdscalibdata {
 /**
  *  @ingroup pdscalibdata
  *
- *  @brief Pixel status data for CsPad::MiniElementV1.
+ *  @brief Pedestals data for CsPad::MiniElementV1.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -51,39 +51,28 @@ namespace pdscalibdata {
  *  @author Andy Salnikov
  */
 
-class CsPadMiniPixelStatusV1 : boost::noncopyable {
+class CsPad2x2PedestalsV1 : boost::noncopyable {
 public:
 
   enum { Sections = 2 };
-  enum { Columns = Pds::CsPad::ColumnsPerASIC };
-  enum { Rows = Pds::CsPad::MaxRowsPerASIC*2 };
+  enum { Columns = Pds::CsPad2x2::ColumnsPerASIC };
+  enum { Rows = Pds::CsPad2x2::MaxRowsPerASIC*2 };
   enum { Size = Sections*Columns*Rows };
 
-  // NOTE: Using the same codes as in CspadCorrector
-  enum PixelStatus {
-    VeryHot=1,
-    Hot=2,
-    Cold=4
-  };
+  typedef float pedestal_t;
 
-  typedef uint16_t status_t;
+  // Default constructor
+  CsPad2x2PedestalsV1 () ;
 
-  /// Default constructor, all pixel codes set to 0
-  CsPadMiniPixelStatusV1 () ;
-
-  /**
-   *  Read all codes from file.
-   *
-   *  @throw std::exception
-   */
-  CsPadMiniPixelStatusV1 (const std::string& fname) ;
+  // read pedestals from file
+  CsPad2x2PedestalsV1 (const std::string& fname) ;
 
   // Destructor
-  ~CsPadMiniPixelStatusV1 () ;
+  ~CsPad2x2PedestalsV1 () ;
 
-  // access status data
-  ndarray<status_t, 3> status() const {
-    return make_ndarray(m_status, Columns, Rows, Sections);
+  // access pedestal data
+  ndarray<pedestal_t, 3> pedestals() const {
+    return make_ndarray(m_pedestals, Columns, Rows, Sections);
   }
 
 protected:
@@ -91,10 +80,10 @@ protected:
 private:
 
   // Data members
-  status_t m_status[Size];
+  pedestal_t m_pedestals[Size];
 
 };
 
 } // namespace pdscalibdata
 
-#endif // PDSCALIBDATA_CSPADMINIPIXELSTATUSV1_H
+#endif // PDSCALIBDATA_CSPAD2X2PEDESTALSV1_H

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPedestalsV1...
+//	Class CsPad2x2PedestalsV1...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -40,13 +40,13 @@ namespace pdscalibdata {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 ()
+CsPad2x2PedestalsV1::CsPad2x2PedestalsV1 ()
 {
   // fill all pedestals with zeros
   std::fill_n(m_pedestals, int(Size), pedestal_t(0));
 }
 
-CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 (const std::string& fname)
+CsPad2x2PedestalsV1::CsPad2x2PedestalsV1 (const std::string& fname)
 {
   // open file
   std::ifstream in(fname.c_str());
@@ -84,7 +84,7 @@ CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 (const std::string& fname)
 //--------------
 // Destructor --
 //--------------
-CsPadMiniPedestalsV1::~CsPadMiniPedestalsV1 ()
+CsPad2x2PedestalsV1::~CsPad2x2PedestalsV1 ()
 {
 }
 
