@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-17-00
+2012-02-08 Andy Salnikov
+- renamed CsPadMiniCalibV1Cvt to CsPad2x2CalibV1Cvt
+- 2x2 calibration now come from 'CsPad2x2::CalibV1' directory and
+  stored in HDF5 file in a group with the same name
+- 2x2 calibrations are read when either CsPad2x2::ConfigV1 or
+  CsPad::ConfigV3 are present in XTC file
+
 Tag: V00-16-00
 2012-02-06 Andy Salnikov
 - upgrading to pdsdata V03-02-11

@@ -86,7 +86,7 @@
 #include "O2OTranslator/CsPadElementV1Cvt.h"
 #include "O2OTranslator/CsPadElementV2Cvt.h"
 #include "O2OTranslator/CsPadCalibV1Cvt.h"
-#include "O2OTranslator/CsPadMiniCalibV1Cvt.h"
+#include "O2OTranslator/CsPad2x2CalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2ElementV1Cvt.h"
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
@@ -383,11 +383,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter object for CsPad calibration data
-  converter.reset( new CsPadMiniCalibV1Cvt ( "CsPad::CalibV1", m_metadata, m_calibStore ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 1).value() ;
+  converter.reset( new CsPad2x2CalibV1Cvt ( "CsPad2x2::CalibV1", m_metadata, m_calibStore ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Cspad2x2Config, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  // some cspad2x2 data was produced without Cspad2x2Config object but
+  // with CspadConfig/3 instead
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 

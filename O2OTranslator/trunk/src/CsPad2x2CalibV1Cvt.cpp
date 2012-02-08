@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniCalibV1Cvt...
+//	Class CsPad2x2CalibV1Cvt...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/CsPadMiniCalibV1Cvt.h"
+#include "O2OTranslator/CsPad2x2CalibV1Cvt.h"
 
 //-----------------
 // C/C++ Headers --
@@ -24,15 +24,15 @@
 //-------------------------------
 #include "H5DataTypes/CsPadCommonModeSubV1.h"
 #include "H5DataTypes/CsPadFilterV1.h"
-#include "H5DataTypes/CsPadMiniPedestalsV1.h"
-#include "H5DataTypes/CsPadMiniPixelStatusV1.h"
+#include "H5DataTypes/CsPad2x2PedestalsV1.h"
+#include "H5DataTypes/CsPad2x2PixelStatusV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadFilterV1.h"
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 #include "PSCalib/CalibFileFinder.h"
 
 //-----------------------------------------------------------------------
@@ -41,7 +41,7 @@
 
 namespace {
 
-  const char logger[] = "CsPadMiniCalibV1Cvt";
+  const char logger[] = "CsPad2x2CalibV1Cvt";
   
 }
 
@@ -54,7 +54,7 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniCalibV1Cvt::CsPadMiniCalibV1Cvt (const std::string& typeGroupName,
+CsPad2x2CalibV1Cvt::CsPad2x2CalibV1Cvt (const std::string& typeGroupName,
                                   const O2OMetaData& metadata,
                                   CalibObjectStore& calibStore)
   : DataTypeCvtI()
@@ -68,13 +68,13 @@ CsPadMiniCalibV1Cvt::CsPadMiniCalibV1Cvt (const std::string& typeGroupName,
 //--------------
 // Destructor --
 //--------------
-CsPadMiniCalibV1Cvt::~CsPadMiniCalibV1Cvt ()
+CsPad2x2CalibV1Cvt::~CsPad2x2CalibV1Cvt ()
 {
 }
 
 /// main method of this class
 void 
-CsPadMiniCalibV1Cvt::convert ( const void* data,
+CsPad2x2CalibV1Cvt::convert ( const void* data,
                                size_t size,
                                const Pds::TypeId& typeId,
                                const O2OXtcSrc& src,
@@ -87,7 +87,7 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
     // We only accept data from Cspad2x2 devices here
     const Pds::Src& pdssrc = src.top();
     if (pdssrc.level() != Pds::Level::Source) {
-      MsgLog(logger, warning, "CsPadMiniCalibV1Cvt::convert called with non-Source level: " << Pds::Level::name(pdssrc.level()));
+      MsgLog(logger, warning, "CsPad2x2CalibV1Cvt::convert called with non-Source level: " << Pds::Level::name(pdssrc.level()));
       return;
     }
     const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(pdssrc);
@@ -111,16 +111,16 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
   if ( pedFileName.empty() and pixFileName.empty() and cmodeFileName.empty()) return;
 
   // read everything
-  boost::shared_ptr<pdscalibdata::CsPadMiniPedestalsV1> peds;
-  boost::shared_ptr<pdscalibdata::CsPadMiniPixelStatusV1> pixStat;
+  boost::shared_ptr<pdscalibdata::CsPad2x2PedestalsV1> peds;
+  boost::shared_ptr<pdscalibdata::CsPad2x2PixelStatusV1> pixStat;
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cmode;
   boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter;
   if (not pedFileName.empty()) {
-    peds.reset(new pdscalibdata::CsPadMiniPedestalsV1(pedFileName));
+    peds.reset(new pdscalibdata::CsPad2x2PedestalsV1(pedFileName));
     MsgLog(logger, info, "Read CsPad pedestals from " << pedFileName);
   }
   if (not pixFileName.empty()) {
-    pixStat.reset(new pdscalibdata::CsPadMiniPixelStatusV1(pixFileName));
+    pixStat.reset(new pdscalibdata::CsPad2x2PixelStatusV1(pixFileName));
     MsgLog(logger, info, "Read CsPad pixel status from " << pixFileName);
   }
   if (not cmodeFileName.empty()) {
@@ -148,10 +148,10 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
 
   // store it in a file
   if (peds.get()) {
-    H5DataTypes::CsPadMiniPedestalsV1::store(*peds, grp, pedFileName);
+    H5DataTypes::CsPad2x2PedestalsV1::store(*peds, grp, pedFileName);
   }
   if (pixStat.get()) {
-    H5DataTypes::CsPadMiniPixelStatusV1::store(*pixStat, grp, pixFileName);
+    H5DataTypes::CsPad2x2PixelStatusV1::store(*pixStat, grp, pixFileName);
   }
   if (cmode.get()) {
     H5DataTypes::CsPadCommonModeSubV1::store(*cmode, grp, cmodeFileName);
@@ -170,14 +170,14 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
 
 /// method called when the driver makes a new group in the file
 void 
-CsPadMiniCalibV1Cvt::openGroup( hdf5pp::Group group )
+CsPad2x2CalibV1Cvt::openGroup( hdf5pp::Group group )
 {
   m_groups.push ( group ) ;
 }
 
 /// method called when the driver closes a group in the file
 void 
-CsPadMiniCalibV1Cvt::closeGroup( hdf5pp::Group group )
+CsPad2x2CalibV1Cvt::closeGroup( hdf5pp::Group group )
 {
   if ( m_groups.empty() ) return ;
   while ( m_groups.top() != group ) m_groups.pop() ;
