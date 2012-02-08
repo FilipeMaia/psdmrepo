@@ -28,9 +28,13 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 #import os
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot   as plt
-import ImgFigureManager    as imgfm
+import numpy as np
+
+import matplotlib.gridspec     as gridspec
+import matplotlib.pyplot       as plt
+import matplotlib.ticker       as mtick
+import ImgFigureManager        as imgfm
+import FastArrayTransformation as fat
 
 #---------------------
 #  Class definition --
@@ -93,23 +97,79 @@ class ImgDrawZoom :
 
         x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
         
-        arrwin =  arr[y:y+h,x:x+w]
-        range  = [x, x+w, y+h, y]
-        
+        arrwin  =  arr[y:y+h,x:x+w]
+        xyrange = [x, x+w, y+h, y]
+
+        nx_slices = 3
+        ny_slices = 4
+      
         #axsb = fig.add_subplot(111)
         gs   = gridspec.GridSpec(20, 20)
 
+    #                            [  Y   ,   X ]
+        axsa = fig.add_subplot(gs[ 1:14,  0:12])
+        axsb = fig.add_subplot(gs[ 1:14, 12:19])
+        axsc = fig.add_subplot(gs[14:  ,  0:12])
+        axsd = fig.add_subplot(gs[15:  , 13:19])
+        axCB = fig.add_subplot(gs[    0,  0:12])
+
+        #------------------
         # Panel A
-        axsa = fig.add_subplot(gs[ 1:16, 0:14])
-        axim = axsa.imshow(arrwin, interpolation='nearest', origin='bottom', aspect='auto', extent=range)
+        axim = axsa.imshow(arrwin, interpolation='nearest', origin='bottom', aspect='auto', extent=xyrange)
+        axsa.xaxis.set_major_formatter(mtick.NullFormatter()) 
 
-        axcb = fig.add_subplot(gs[    0, 0:14])
-        colb = fig.colorbar(axim, cax=axcb, orientation='horizontal') # pad=0.004, fraction=0.1, aspect=40) 
-        axcb.xaxis.set_ticks_position('top')
+        #------------------
+        # Panel CB
+        colb = fig.colorbar(axim, cax=axCB, orientation='horizontal') # pad=0.004, fraction=0.1, aspect=40) 
+        axCB.xaxis.set_ticks_position('top')
 
+        #------------------
+        # Panel B
+        xrange  = (x,x+w,ny_slices)
+        yrange  = (y,y+h,h)
+        arr2dy  = fat.rebinArray(arr, xrange, yrange) 
+        #axprojy = axsb.imshow(arr2dy, interpolation='nearest', origin='bottom', aspect='auto', extent=xyrange)
+
+        for slice in range(ny_slices) :
+            arr1slice = arr2dy[...,slice]
+            yarr = np.linspace(y+h, y, num=h, endpoint=True)
+            if arr1slice.sum() == 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
+
+            axsb.hist(yarr, bins=h, weights=arr1slice, histtype='step', orientation='horizontal')
+
+        axsb.set_ylim(y+h, y)
+        axsb.xaxis.set_ticks_position('top')
+        axsb.yaxis.set_ticks_position('right')
+
+        # Rotate axis labels
+        for label in axsb.get_xticklabels() :
+            label.set_rotation(60)
+            label.set_horizontalalignment('center') # 'right'
+
+        #------------------
+        # Panel C
+        xrange  = (x,x+w,w)
+        yrange  = (y,y+h,nx_slices)
+        arr2dx  = fat.rebinArray(arr, xrange, yrange) 
+        #axprojx = axsc.imshow(arr2dx, interpolation='nearest', origin='bottom', aspect='auto', extent=xyrange)
+
+        for slice in range(nx_slices) :
+            arr1slice = arr2dx[slice,...]
+            xarr = np.linspace(x, x+w, num=w, endpoint=True)
+            if arr1slice.sum() == 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
+
+            axsc.hist(xarr, bins=w, weights=arr1slice, histtype='step')
+
+        axsc.set_xlim(x, x+w)
+
+        #------------------
         # Panel D
-        axsd = fig.add_subplot(gs[17:,15:])
         axsd.hist(arrwin.flatten(), bins=100)#, range=range)
+        axsd.yaxis.set_ticks_position('right')
 
 
 #-----------------------------
