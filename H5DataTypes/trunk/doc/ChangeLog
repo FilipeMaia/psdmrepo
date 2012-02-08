@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-49
+2012-02-08 Andy Salnikov
+- renamed CsPadMini classes to CsPad2x2
+
 Tag: V00-00-48
 2012-02-06 Andy Salnikov
 - upgrading to pdsdata V03-02-11

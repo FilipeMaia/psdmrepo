@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_CSPADMINIPEDESTALSV1_H
-#define H5DATATYPES_CSPADMINIPEDESTALSV1_H
+#ifndef H5DATATYPES_CSPAD2X2PEDESTALSV1_H
+#define H5DATATYPES_CSPAD2X2PEDESTALSV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPedestalsV1.
+//	Class CsPad2x2PedestalsV1.
 //
 //------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdscalibdata/CsPadMiniPedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PedestalsV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,21 +37,21 @@
 namespace H5DataTypes {
 
 //
-// Helper type for pdscalibdata::CsPadMiniPedestalsV1
+// Helper type for pdscalibdata::CsPad2x2PedestalsV1
 //
-class CsPadMiniPedestalsV1  {
+class CsPad2x2PedestalsV1  {
 public:
 
-  typedef pdscalibdata::CsPadMiniPedestalsV1 DataType ;
+  typedef pdscalibdata::CsPad2x2PedestalsV1 DataType ;
 
   // Default constructor
-  CsPadMiniPedestalsV1 () ;
+  CsPad2x2PedestalsV1 () ;
 
   // Construct from transient object
-  CsPadMiniPedestalsV1 (const DataType& data) ;
+  CsPad2x2PedestalsV1 (const DataType& data) ;
 
   // Destructor
-  ~CsPadMiniPedestalsV1 () ;
+  ~CsPad2x2PedestalsV1 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -71,4 +71,4 @@ private:
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADMINIPEDESTALSV1_H
+#endif // H5DATATYPES_CSPAD2X2PEDESTALSV1_H

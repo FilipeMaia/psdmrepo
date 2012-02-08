@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPixelStatusV1...
+//	Class CsPad2x2PixelStatusV1...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/CsPadMiniPixelStatusV1.h"
+#include "H5DataTypes/CsPad2x2PixelStatusV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -52,14 +52,14 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 ()
+CsPad2x2PixelStatusV1::CsPad2x2PixelStatusV1 ()
 {
   // fill all codes with zeros
-  pdscalibdata::CsPadMiniPixelStatusV1::status_t zero=0;
+  pdscalibdata::CsPad2x2PixelStatusV1::status_t zero=0;
   std::fill_n(&status[0][0][0], int(DataType::Size), zero);
 }
 
-CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const DataType& data)
+CsPad2x2PixelStatusV1::CsPad2x2PixelStatusV1 (const DataType& data)
 {
   const ndarray<DataType::status_t, 3>& sdata = data.status();
 
@@ -77,19 +77,19 @@ CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const DataType& data)
 //--------------
 // Destructor --
 //--------------
-CsPadMiniPixelStatusV1::~CsPadMiniPixelStatusV1 ()
+CsPad2x2PixelStatusV1::~CsPad2x2PixelStatusV1 ()
 {
 }
 
 
 hdf5pp::Type
-CsPadMiniPixelStatusV1::stored_type()
+CsPad2x2PixelStatusV1::stored_type()
 {
   return native_type() ;
 }
 
 hdf5pp::Type
-CsPadMiniPixelStatusV1::native_type()
+CsPad2x2PixelStatusV1::native_type()
 {
   hsize_t dims[4] = { DataType::Columns,
                       DataType::Rows,
@@ -100,10 +100,10 @@ CsPadMiniPixelStatusV1::native_type()
 }
 
 void
-CsPadMiniPixelStatusV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
+CsPad2x2PixelStatusV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
-  CsPadMiniPixelStatusV1 obj(data);
-  hdf5pp::DataSet<CsPadMiniPixelStatusV1> ds = storeDataObject ( obj, "pixel_status", grp ) ;
+  CsPad2x2PixelStatusV1 obj(data);
+  hdf5pp::DataSet<CsPad2x2PixelStatusV1> ds = storeDataObject ( obj, "pixel_status", grp ) ;
 
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());

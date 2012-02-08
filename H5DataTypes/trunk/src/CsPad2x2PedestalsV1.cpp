@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPedestalsV1...
+//	Class CsPad2x2PedestalsV1...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/CsPadMiniPedestalsV1.h"
+#include "H5DataTypes/CsPad2x2PedestalsV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -52,13 +52,13 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 ()
+CsPad2x2PedestalsV1::CsPad2x2PedestalsV1 ()
 {
   // fill all pedestals with zeros
   std::fill_n(&pedestals[0][0][0], int(DataType::Size), 0.0f);
 }
 
-CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 (const DataType& data)
+CsPad2x2PedestalsV1::CsPad2x2PedestalsV1 (const DataType& data)
 {
   const ndarray<DataType::pedestal_t, 3>& pdata = data.pedestals();
 
@@ -76,19 +76,19 @@ CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 (const DataType& data)
 //--------------
 // Destructor --
 //--------------
-CsPadMiniPedestalsV1::~CsPadMiniPedestalsV1 ()
+CsPad2x2PedestalsV1::~CsPad2x2PedestalsV1 ()
 {
 }
 
 
 hdf5pp::Type
-CsPadMiniPedestalsV1::stored_type()
+CsPad2x2PedestalsV1::stored_type()
 {
   return native_type() ;
 }
 
 hdf5pp::Type
-CsPadMiniPedestalsV1::native_type()
+CsPad2x2PedestalsV1::native_type()
 {
   hsize_t dims[4] = { DataType::Columns,
                       DataType::Rows,
@@ -99,10 +99,10 @@ CsPadMiniPedestalsV1::native_type()
 }
 
 void
-CsPadMiniPedestalsV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
+CsPad2x2PedestalsV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
-  CsPadMiniPedestalsV1 obj(data);
-  hdf5pp::DataSet<CsPadMiniPedestalsV1> ds = storeDataObject ( obj, "pedestals", grp ) ;
+  CsPad2x2PedestalsV1 obj(data);
+  hdf5pp::DataSet<CsPad2x2PedestalsV1> ds = storeDataObject ( obj, "pedestals", grp ) ;
 
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());

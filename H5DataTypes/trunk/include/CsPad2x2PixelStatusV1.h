@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_CSPADMINIPIXELSTATUSV1_H
-#define H5DATATYPES_CSPADMINIPIXELSTATUSV1_H
+#ifndef H5DATATYPES_CSPAD2X2PIXELSTATUSV1_H
+#define H5DATATYPES_CSPAD2X2PIXELSTATUSV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadMiniPixelStatusV1.
+//	Class CsPad2x2PixelStatusV1.
 //
 //------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
+#include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,21 +37,21 @@
 namespace H5DataTypes {
 
 //
-// Helper type for pdscalibdata::CsPadMiniPixelStatusV1
+// Helper type for pdscalibdata::CsPad2x2PixelStatusV1
 //
-class CsPadMiniPixelStatusV1  {
+class CsPad2x2PixelStatusV1  {
 public:
 
-  typedef pdscalibdata::CsPadMiniPixelStatusV1 DataType ;
+  typedef pdscalibdata::CsPad2x2PixelStatusV1 DataType ;
 
   // Default constructor
-  CsPadMiniPixelStatusV1 () ;
+  CsPad2x2PixelStatusV1 () ;
 
   // Construct from transient object
-  CsPadMiniPixelStatusV1 (const DataType& data) ;
+  CsPad2x2PixelStatusV1 (const DataType& data) ;
 
   // Destructor
-  ~CsPadMiniPixelStatusV1 () ;
+  ~CsPad2x2PixelStatusV1 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -71,4 +71,4 @@ private:
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADMINIPIXELSTATUSV1_H
+#endif // H5DATATYPES_CSPAD2X2PIXELSTATUSV1_H
