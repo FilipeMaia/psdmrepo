@@ -167,6 +167,6 @@ html_theme = 'nature'
 EOD
 
 # run sphinx
-sphinx-build $warn -b html "$tmpdir" "$output"
+sphinx-build $warn -b dirhtml "$tmpdir" "$output"
 
 rm -rf "$tmpdir"

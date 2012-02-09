@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2012-02-09 Andy Salnikov
+- filter non-existing packages in doxy-driver, makes it easier to 
+  run in test release
+- use dirhtml generator for sphinx, makes nicer URLs
+
 Tag: V00-00-08
 2012-02-09 Andy Salnikov
 - add script pydoc-driver which runs sphinx on Python packages

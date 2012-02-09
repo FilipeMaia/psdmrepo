@@ -54,6 +54,17 @@ else
   esac
 fi
 
+# filter non-existing packages
+allpackages="$packages"
+packages=
+for pkg in $allpackages; do
+  if [ -d $pkg ] ; then
+    packages="$packages $pkg"
+  else
+    echo "Package $pkg does not exist, skipping."
+  fi
+done
+
 # try to make directory
 mkdir -p "$output" 2>/dev/null
 
