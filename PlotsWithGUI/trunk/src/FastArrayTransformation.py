@@ -168,7 +168,7 @@ def rebinArray(arr2d, XRange, YRange) :
 #---------------------------------- 
 #----------------------------------
 
-def ringIntensity(r,r0,sigma) :
+def gaussian(r,r0,sigma) :
     factor = 1/ (math.sqrt(2) * sigma)
     rr = factor*(r-r0)
     return np.exp(-rr*rr)
@@ -197,9 +197,9 @@ def getCartesianArray3Rings() :
     R = np.sqrt(X*X+Y*Y)
     #print 'R=\n',R
 
-    A = a1 * ringIntensity(R, r1, s1)
-    A+= a2 * ringIntensity(R, r2, s2)
-    A+= a3 * ringIntensity(R, r3, s3)
+    A = a1 * gaussian(R, r1, s1)
+    A+= a2 * gaussian(R, r2, s2)
+    A+= a3 * gaussian(R, r3, s3)
     #print 'A=\n',A
 
     return A
@@ -226,7 +226,7 @@ def getCartesianArray1Ring() :
     R = np.sqrt((X-xc)*(X-xc)+(Y-yc)*(Y-yc))
     #print 'R=\n',R
 
-    A = a1 * X * Y * ringIntensity(R, r1, s1)
+    A = a1 * X * Y * gaussian(R, r1, s1)
     #print 'A=\n',A
 
     return A

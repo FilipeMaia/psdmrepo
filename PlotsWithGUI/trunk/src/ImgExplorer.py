@@ -151,10 +151,29 @@ class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
         #arr.shape = (5,5)
         return arr
 
+    def get_array2d_with_ring_for_test(self) :
+
+        a1, r1, s1 = 200, 160, 10 # amplitude, radius, and sigma of the ring
+
+        arr = self.get_array2d_for_test()
+        npx, npy = arr.shape
+        x0,  y0  = npx/2, npy/2
+        x = np.arange(0,npx,1,dtype = np.float32) # np.linspace(0,200,201)
+        y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
+        X, Y = np.meshgrid(x-x0, y-y0)        
+        R = np.sqrt(X*X+Y*Y)
+        arr += a1 * gaussian(R, r1, s1)
+        return arr
 
 #-----------------------------
 # Test
 #-----------------------------
+import math
+def gaussian(r,r0,sigma) :
+    factor = 1/ (math.sqrt(2) * sigma)
+    rr = factor*(r-r0)
+    return np.exp(-rr*rr)
+
 
 def main():
 
@@ -163,7 +182,8 @@ def main():
     #w  = ImgExplorer(None, arr)
     w  = ImgExplorer(None)
     w.move(QtCore.QPoint(10,10))
-    w.set_image_array( w.get_array2d_for_test() )
+    w.set_image_array( w.get_array2d_with_ring_for_test() )
+    #w.set_image_array( w.get_array2d_for_test() )
     w.show()
 
     app.exec_()

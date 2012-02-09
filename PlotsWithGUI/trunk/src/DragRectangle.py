@@ -28,10 +28,12 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.isInitialized = True
 
         self.set_picker(picker)
-        self.myPicker = picker
-        self.press    = None # Is used to transmit local information between press and release button
+        self.myPicker  = picker
+        self.press     = None # Is used to transmit local information between press and release button
+        self.nx_slices = 1
+        self.ny_slices = 1
 
-
+        
     def get_list_of_rect_pars(self) :
         x0 = int( self.get_x() )
         y0 = int( self.get_y() )
@@ -47,6 +49,10 @@ class DragRectangle( Drag, patches.Rectangle ) :
         t  = self.myType
         r  = self.isRemoved
         return (x,y,w,h,lw,col,s,t,r)
+
+
+    def get_number_of_slices_for_rect(self) :
+        return self.nx_slices, self.ny_slices
 
 
     def print_pars(self) :

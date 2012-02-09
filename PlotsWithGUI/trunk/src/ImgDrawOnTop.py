@@ -136,6 +136,8 @@ class ImgDrawOnTop :
         obj.myType     = self.icp.typeCurrent                               # set attribute
         obj.myIndex    = list_of_objs.index(obj)                            # set attribute
         obj.isSelected = False                                              # set attribute
+        obj.nx_slices  = self.icp.nx_slices                                 # set attribute
+        obj.ny_slices  = self.icp.ny_slices                                 # set attribute
 
 
     def add_obj_on_call(self, obj, axes, list_of_objs, type=None, selected=False) :  
@@ -157,9 +159,11 @@ class ImgDrawOnTop :
             self.rectsFromInputAreCreated = True
             for objPars in self.icp.listOfRectInputParameters :
                 #print objPars
-                t,s,x,y,w,h,lw,col = objPars
+                t,s,x,y,w,h,lw,col,nx,ny = objPars
                 #if t == self.icp.typeCurrent :
                 obj = dragr.DragRectangle(xy=(x,y), width=w, height=h, color='r')
+                obj.nx_slices = nx
+                obj.ny_slices = ny
                 self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)

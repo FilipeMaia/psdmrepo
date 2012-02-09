@@ -81,10 +81,8 @@ class ImgConfigParameters :
         self.typeNone      = 'None'
         self.typeSpectrum  = 'Spectrum'
         self.typeProfile   = 'Profile'
-        self.typeProjX     = 'ProjX'
-        self.typeProjY     = 'ProjY'
-        self.typeProjR     = 'ProjR'
-        self.typeProjP     = 'ProjP'
+        self.typeProjXY    = 'ProjXY'
+        self.typeProjRP    = 'ProjRP'
         self.typeZoom      = 'Zoom'
 
         self.typeCurrent   = self.typeNone
@@ -121,6 +119,14 @@ class ImgConfigParameters :
         self.list_of_lines  = []
         self.list_of_circs  = []
 
+        self.x_center       = 100
+        self.y_center       = 100
+
+        #----
+        #For ProjXY image
+        self.nx_slices      = 3
+        self.ny_slices      = 5
+
 #---------------------------------------
 
     def getValIntOrNone( self, val ) :
@@ -154,8 +160,9 @@ class ImgConfigParameters :
             print 'Number of rects =', Nobjs
             for obj in list_of_objs :
                 (x,y,w,h,lw,col,s,t,r) = obj.get_list_of_rect_pars()
+                nx, ny                 = obj.get_number_of_slices_for_rect()
                 i = list_of_objs.index(obj)
-                print 'Rect in list: i,t,s,r,x,y,w,h,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, r, x, y, w, h, lw, col)
+                print 'Rect in list: i,t,s,r,x,y,w,h,lw,col,nx,ny = %3d %s %6s %6s %4d %4d %4d %4d %4d %s %4d %4d ' % (i, t, s, r, x, y, w, h, lw, col, nx, ny)
 
 
         list_of_objs = self.list_of_lines
@@ -196,6 +203,8 @@ class ImgConfigParameters :
             f.write('\n\nNUMBER_OF_RECTS'  + space + str(Nobjs) + '\n')
             for obj in list_of_objs :
                 (x,y,w,h,lw,col,s,t,r) = obj.get_list_of_rect_pars()
+                nx, ny                 = obj.get_number_of_slices_for_rect()
+
                 i = list_of_objs.index(obj)
                 f.write('\n')
                 f.write(space + 'RECT_I'           + space + str(i)   + '\n') # Index
@@ -207,6 +216,8 @@ class ImgConfigParameters :
                 f.write(space + 'RECT_H'           + space + str(h)   + '\n')
                 f.write(space + 'RECT_L'           + space + str(lw)  + '\n')
                 f.write(space + 'RECT_C'           + space + str(col) + '\n')
+                f.write(space + 'RECT_NX'          + space + str(nx)  + '\n')
+                f.write(space + 'RECT_NY'          + space + str(ny)  + '\n')
 
 
         list_of_objs = self.list_of_lines
@@ -271,7 +282,7 @@ class ImgConfigParameters :
                 elif key == 'NUMBER_OF_RECTS'  : self.Nrects = int(val)
                 elif key == 'RECT_I'           :
                     self.ind    = int(val)
-                    self.listOfRectInputParameters.append( [self.typeNone, False, 100, 200, 300, 400, 2, 'r'] )
+                    self.listOfRectInputParameters.append( [self.typeNone, False, 100, 200, 300, 400, 2, 'r', 1, 1] )
                 elif key == 'RECT_T'           : self.listOfRectInputParameters[self.ind][0] = val 
                 elif key == 'RECT_S'           : self.listOfRectInputParameters[self.ind][1] = dicBool[val.lower()]
                 elif key == 'RECT_X'           : self.listOfRectInputParameters[self.ind][2] = int(val) 
@@ -280,6 +291,8 @@ class ImgConfigParameters :
                 elif key == 'RECT_H'           : self.listOfRectInputParameters[self.ind][5] = int(val) 
                 elif key == 'RECT_L'           : self.listOfRectInputParameters[self.ind][6] = int(val)
                 elif key == 'RECT_C'           : self.listOfRectInputParameters[self.ind][7] = val 
+                elif key == 'RECT_NX'          : self.listOfRectInputParameters[self.ind][8] = int(val) 
+                elif key == 'RECT_NY'          : self.listOfRectInputParameters[self.ind][9] = int(val) 
 
 
                 elif key == 'NUMBER_OF_LINES'  : self.Nlines = int(val)

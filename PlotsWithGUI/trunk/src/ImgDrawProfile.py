@@ -106,23 +106,30 @@ class ImgDrawProfile :
         print 'xmin, xmax, ymin, ymax = ', xmin, xmax, ymin, ymax
 
         profile = []
+        tit_add = ''
         if xmax-xmin > ymax-ymin :
             print 'Plot profile for X bins'
-            k = float(ymax-ymin)/float(xmax-xmin)
+            tit_add = 'X-binning'
+            if x1 == xmin: ysta, yend = y1, y2
+            else         : ysta, yend = y2, y1
+            k = float(yend-ysta)/float(xmax-xmin)
             arrX = np.arange(xmin,xmax,dtype=np.int16)
 
             for x in arrX :
-                y = int( k*(x-xmin) + ymin )
+                y = int( k*(x-xmin) + ysta )
                 profile.append(arr2d[y,x])
                 #print 'x,y=',x,y,'   profile=',arr2d[y,x]
  
         else :
             print 'Plot profile for Y bins'
-            k = float(xmax-xmin)/float(ymax-ymin)
+            tit_add = 'Y-binning'
+            if y1 == ymin: xsta, xend = x1, x2
+            else         : xsta, xend = x2, x1
+            k = float(xend-xsta)/float(ymax-ymin)
             arrX = np.arange(ymin,ymax,dtype=np.int16)
 
             for y in arrX :
-                x = int( k*(y-ymin) + xmin )
+                x = int( k*(y-ymin) + xsta )
                 profile.append(arr2d[y,x])
                 #print 'x,y=',x,y,'   profile=',arr2d[y,x]
 
@@ -132,7 +139,7 @@ class ImgDrawProfile :
         axsb.hist(arrX, bins=arrX.shape[0], weights=arrY, histtype='step')
         #plt.ylim(0,4000)
         axsb.grid()
-        fig.canvas.set_window_title('Profile along the line '+str(obj.myIndex))
+        fig.canvas.set_window_title('Profile along the line '+str(obj.myIndex) + ' : ' + tit_add )
         #plt.savefig('plot-profile-along-line-' + str(obj.myIndex) + '-' + imp.impars.plot_fname_suffix + '.png')
 
 

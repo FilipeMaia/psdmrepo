@@ -42,6 +42,7 @@ import ImgGUIPlayer   as igplr
 import ImgGUISpectrum as igspec
 import ImgGUIProfile  as igprof
 import ImgGUIZoom     as igzoom
+import ImgGUIProjXY   as igprxy
 
 #---------------------
 #  Class definition --
@@ -157,19 +158,15 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.indTabSpec = self.tabBarTop.addTab( 'Spectrum' )
         self.indTabProf = self.tabBarTop.addTab( 'Profile' )
-        self.indTabProX = self.tabBarTop.addTab( 'Proj.X' )
-        self.indTabProY = self.tabBarTop.addTab( 'Proj.Y' )
-        self.indTabProR = self.tabBarTop.addTab( 'Proj.R' )
-        self.indTabProP = self.tabBarTop.addTab( 'Proj.P' )
+        self.indTabPrXY = self.tabBarTop.addTab( 'Proj. X-Y' )
+        self.indTabPrRP = self.tabBarTop.addTab( 'Proj. R-Phi' )
         self.indTabEmpT = self.tabBarTop.addTab( 5*' ' )
         self.tabBarTop.setTabEnabled(self.indTabEmpT,False)
 
         self.tabBarTop.setTabTextColor(self.indTabSpec,QtGui.QColor('red'))
         self.tabBarTop.setTabTextColor(self.indTabProf,QtGui.QColor('magenta'))
-        self.tabBarTop.setTabTextColor(self.indTabProX,QtGui.QColor('blue'))
-        self.tabBarTop.setTabTextColor(self.indTabProY,QtGui.QColor('green'))
-        self.tabBarTop.setTabTextColor(self.indTabProR,QtGui.QColor('magenta'))
-        self.tabBarTop.setTabTextColor(self.indTabProP,QtGui.QColor('red'))
+        self.tabBarTop.setTabTextColor(self.indTabPrXY,QtGui.QColor('blue'))
+        self.tabBarTop.setTabTextColor(self.indTabPrRP,QtGui.QColor('red'))
         self.tabBarTop.setShape(QtGui.QTabBar.RoundedNorth)
             
         self.hboxT.addWidget(self.tabBarTop) 
@@ -190,10 +187,8 @@ class ImgGUI ( QtGui.QWidget ) :
         if indTab == self.indTabEmpT : return
         if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum(self.icp) #QtGui.QTextEdit('Spectrum')
         if indTab == self.indTabProf : self.guiWin = igprof.ImgGUIProfile (self.icp)
-        if indTab == self.indTabProX : self.guiWin = QtGui.QTextEdit('Projection X')
-        if indTab == self.indTabProY : self.guiWin = QtGui.QTextEdit('Projection Y')
-        if indTab == self.indTabProR : self.guiWin = QtGui.QTextEdit('Projection R')
-        if indTab == self.indTabProP : self.guiWin = QtGui.QTextEdit('Projection P')
+        if indTab == self.indTabPrXY : self.guiWin = igprxy.ImgGUIProjXY  (self.icp)
+        if indTab == self.indTabPrRP : self.guiWin = QtGui.QTextEdit('Projections R-Phi')
 
         self.guiWin.setMinimumHeight(self.minHeight)
         self.guiWin.setMaximumHeight(self.maxHeight)
