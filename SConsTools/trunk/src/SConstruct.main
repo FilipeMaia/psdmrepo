@@ -162,6 +162,8 @@ if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
 if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
+if 'pyana' in packages:
+    docTargets.append(env.Command('doc/pyana-ref/html/index.html', env.Dir('pyana'), "pydoc-driver -p pyana doc/pyana-ref/html pyana _pdsdata pypdsdata"))
 env.Alias ( 'doc', docTargets )
 
 #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
