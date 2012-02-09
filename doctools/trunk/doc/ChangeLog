@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2012-02-09 Andy Salnikov
+- add script pydoc-driver which runs sphinx on Python packages
+- add Python module doxy_kw_subs.py which is extension module for 
+  sphinx replacing Doxygen tags
+
 Tag: V00-00-07
 2012-01-19 Andy Salnikov
 - added ImgPixSpectra for psana-modules mode
