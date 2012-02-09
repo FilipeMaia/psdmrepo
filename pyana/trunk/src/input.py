@@ -14,7 +14,17 @@ _log = logging.getLogger("pyana.input")
 
 
 def dgramGen(names):
-    """ Datagram generator """
+    """dgramGen(names) -> datagram
+    
+    This is the generator method which takes the list of XTC file names
+    and produces a sequence of XTC datagrams. As a generated it should be 
+    called repeatedly for each new datagram. Generation stops when there is 
+    no more datagrams left in the input files.
+    
+    This method uses pypdsdata.io.XtcMergeIterator class to correctly
+    merge multiple XTC streams and chunks into a single stream of 
+    time-ordered histrograms.
+    """
 
     # group files by run number
     runfiles = {}
@@ -44,6 +54,10 @@ def dgramGen(names):
 
 
 class _DgramReaderThread ( threading.Thread ):
+    """
+    Class for thread which reads datagrams using dgramGen() generator
+    and fills the queue with the datagrams
+    """
     
     def __init__(self, queue, names):
         
@@ -61,8 +75,15 @@ class _DgramReaderThread ( threading.Thread ):
             
 
 def threadedDgramGen( names, queueSize = 10 ):
-
-    """ datagram generator which does reading in a separate thread """
+    """threadedDgramGen(names, queueSize = 10) -> datagram
+    
+    This is the generator method which takes the list of XTC file names
+    and produces a sequence of XTC datagrams very much like dgramGen(). 
+    Unlike in dgramGen() actual reading of the datagfram happens in a 
+    separate thread which should reduce waiting time for the consumer
+    of the datagrams. Parameter ``queueSize`` controls maximum depth of
+    the datagram queue, for optimal performance it should not be very large.
+    """
 
     queue = Queue.Queue(queueSize)
     thread = _DgramReaderThread(queue, names)

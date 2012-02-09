@@ -4,6 +4,11 @@
 # Copyright (c) 2010 SLAC National Accelerator Laboratory
 # 
 
+"""
+This module is a collection of classes and methods to deal with the event data and everything related to it.
+"""
+
+
 import logging
 import numpy
 import os
@@ -75,11 +80,21 @@ def _addr( address ):
     
     return dict(detector=det, detId=detId, device=dev, devId=devId)
 
-#
-# Class encapsulating event data 
-#
 class Event(object):
     
+    """Class encapsulating event data. Instance of this class contains all 
+    data belonging to currently processed event.
+
+    Clients typically use generic get() method or one of the specific
+    getXYZ() methods to get access to event data. TYpically event object
+    contains all the data that are read from XTC file (some data from XTC 
+    is stored in environment). Additionally users can add their own objects
+    to event using put() method which allows sharing of the user data  
+    between several modules.
+    
+    Event has few additional methods which provide generic information
+    about event, such as event time, run number, damage mask, etc. 
+    """
     
     def __init__( self, dg, run = -1, env = None ):
         
@@ -98,44 +113,90 @@ class Event(object):
             }
 
     def run(self) :
+        """ self.run() -> int
+        
+        Returns run number as integer value. Run number is extracted from the file names being processed. 
+        When the file name cannot be determined or has unknown format the above method will return negative number.
+        """
         return self.m_run
 
     def seq(self) :
+        """ self.seq() -> Sequence
+        
+        Returns _pdsdata.xtc.Sequence object corresponding to current event.
+        """
         return self.m_dg.seq
 
     def env(self) :
+        """ self.env() -> Env
+        
+        Returns environment object. User code does not typically need to use this method as user code 
+        receives environment object via method arguments.
+        """
         return self.m_dg.env
 
     def damage(self) :
+        """ self.damage() -> int
+        
+        Returns object of type _pdsdata.xtc.Damage representing damage mask. The damage mask is returned for 
+        the top-level XTC, individual sub-objects may contain different damage masks.
+        """
         return self.m_dg.xtc.damage
 
     def getTime(self) :
-         return self.m_dg.seq.clock()
-
-    def findXtc(self, **kw):
-        """ Returns the list of Xtc objects matching the criteria.
-        Accepts keyword parameters same as _filter() """
-
-        return list( Event._filter(self.m_dg.xtc, **kw) )
+        """ self.getTime() -> ClockTime
+        
+        Returns _pdsdata.xtc.ClockTime object, equivalent to dg.seq.clock().
+        """
+        return self.m_dg.seq.clock()
 
     def find(self, **kw):
-        """ Returns the list of payload objects matching the criteria.
-        Accepts keyword parameters same as _filter() """
+        """self.find(**kw) -> list of object
+        
+        Returns possibly empty list of data objects contained in the event. This method accepts a number of arguments, 
+        but all arguments are optional. If no arguments are given then a list of all data objects is returned. 
+        If some arguments are given then only those objects that satisfy a particular criteria are returned. 
+        
+        The list of possible keyword arguments: 
+        ``typeId`` - accepts enum xtc.TypeId.Type, only return objects which have that TypeId;
+        ``version`` - accepts number, only return objects whose type version number is equal to number;
+        ``level`` - accepts one of xtc.Level values, only returns objects originated at that level;
+        ``detector`` - accepts enum xtc.DetInfo.Detector values, only returns objects produced by this detector;
+        ``detId`` - accepts number, only returns objects produced by this detector ID;
+        ``device`` - accepts enum xtc.DetInfo.Device values, only returns objects produced by this device;
+        ``devId`` - accepts number, only returns objects produced by this device ID;
+        ``address`` - xtc.DetInfo object or an address string.
+    
+        The parameters ``address`` and any of the ``detector``, ``detId``, ``device``, ``devId`` are incompatible, 
+        specify only one or another.
+        """
 
         objects = [x.payload() for x in Event._filter(self.m_dg.xtc,**kw)]
         return filter(None, objects)
 
+    def findXtc(self, **kw):
+        """self.findXtc(**kw) -> list of XTCs
+        
+        Returns the list (possibly empty) of Xtc objects matching the criteria.
+        Accepts keyword parameters same as find() """
+
+        return list( Event._filter(self.m_dg.xtc, **kw) )
+
     def findFirstXtc(self, **kw):
-        """ Returns the first Xtc object matching the criteria.
-        Accepts keyword parameters same as _filter() """
+        """self.findFirstXtc(**kw) -> XTC object
+        
+        Returns the first Xtc object matching the criteria or None.
+        Accepts keyword parameters same as find()."""
         
         for x in Event._filter(self.m_dg.xtc, **kw):
             return x
         return None
 
     def findFirst(self, **kw):
-        """ Returns first data object (XTC's payload) matching the criteria.
-        Accepts keyword parameters same as _filter() """
+        """self.findFirst(**kw) -> object
+        
+        Returns first data object (XTC's payload) matching the criteria or None.
+        Accepts keyword parameters same as find()."""
         
         for x in Event._filter(self.m_dg.xtc, **kw):
             obj = x.payload()
@@ -143,8 +204,10 @@ class Event(object):
         return None
 
     def get(self, key, address=None):
-        """Generic get method, retrieves detector data or user data. 
-        If first argument (key) is an integer then it is assumed to be 
+        """self.get(key, address=None) -> object
+        
+        Generic get method, retrieves detector data or user data. 
+        If first argument (``key``) is an integer then it is assumed to be 
         TypeId value (such as xtc.TypeId.Type.Id_AcqWaveform), second
         argument in this case is an address string or DetInfo object.
         Otherwise the first argument is assumed to be a key (usually a 
@@ -248,11 +311,18 @@ class Event(object):
         return quads
 
     def getAcqValue(self, address, channel, env):
-        """ returns Acquiris data for specific detector and channel, 
-        address is the DetInfo object or address string. 
-        This methods requires environment object to get access to 
-        Acqiris configuration object. Returned object is an iterator
-        which returns tuples - timestamp and voltage value"""
+        """self.getAcqValue(address, channel, env) -> object
+        
+        Returns Acqiris data object of type pypdsdata.acqiris.DataDescV* for specific device and channel. 
+        If address given is not very specific then the first matching object is returned.
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string;
+        ``channel`` - channel number from 0 to max number of channels;
+        ``env`` - environment object containing Acqiris configuration object.
+
+        Channel number is an integer number, total number of channels can be extracted from the Acqiris configuration object.
+        """
 
         _log.debug("Event.getAcqValue: address=%s channel=%s", address, channel)
 
@@ -279,35 +349,83 @@ class Event(object):
         return acqiris.DataDescV1( obj, hcfg, vcfg )
     
     def getEBeam(self):
-        """Returns bld.BldDataEBeam or bld.BldDataEBeamV0 object whichever is present"""
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_EBeam )
+        """self.getEBeam() -> object
+        
+        Returns data object of type pypdsdata.bld.BldDataEBeamV* whichever is present in the event.
+        This method is equivalent to ``self.get(xtc.TypeId.Type.Id_EBeam)``.
+        """
+        return self.findFirst(typeId=xtc.TypeId.Type.Id_EBeam )
 
     def getEvrData(self, address):
-        """Returns EvrData for specific address"""
+        """self.getEvrData(address) -> object
+        
+        Returns data object of type pypdsdata.evr.DataV* for given address.
+        Parameters: ``address`` xtc.DetInfo object or an address string.
+
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_EvrData, address)``.
+        """
         return self.findFirst( typeId=xtc.TypeId.Type.Id_EvrData, address=address )
 
     def getFeeGasDet(self):
-        """Returns list of 4 floating numbers"""
+        """self.getFeeGasDet() -> list of floats
+        
+        Returns the list of 4 floating numbers [f_11_ENRC, f_12_ENRC, f_21_ENRC, f_22_ENRC] 
+        obtained from bld.BldDataFEEGasDetEnergy object.
+        """
         obj = self.findFirst( typeId=xtc.TypeId.Type.Id_FEEGasDetEnergy )
         if obj :
             return [obj.f_11_ENRC, obj.f_12_ENRC, obj.f_21_ENRC, obj.f_22_ENRC]
 
     def getFrameValue(self, address):
-        """Returns Frame data for specific address"""
+        """self.getFrameValue(address) -> object
+        
+        Returns frame data object of type pypdsdata.camera.FrameV* for specific device. If address given is 
+        not very specific then the first matching object is returned.
+
+        Parameters:
+        ``address`` - xtc.DetInfo object or an address string.
+
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_Frame, address)``.
+        """
         return self.findFirst( typeId=xtc.TypeId.Type.Id_Frame, address=address )
 
     def getIpimbValue(self, address):
-        """Returns Ipimb data for specific address"""
+        """self.getIpimbValue(address) -> object
+        
+        Returns frame data object of type pypdsdata.ipimb.DataV* for specific device. If address given 
+        is not very specific then the first matching object is returned.
+
+        Parameters:
+        ``address`` - xtc.DetInfo object or an address string.
+
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_IpimbData, address)``.
+        """
         return self.findFirst( typeId=xtc.TypeId.Type.Id_IpimbData, address=address )
 
     getOpal1kValue = getFrameValue
+    """This methods is an alias for getFrameValue()."""
 
     def getPhaseCavity(self):
-        """Returns bld.BldDataPhaseCavity object"""
+        """self.getPhaseCavity() -> object
+        
+        Returns data object of type pypdsdata.bld.BldDataPhaseCavity.
+        
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_PhaseCavity, address)``.
+        """
         return self.findFirst( typeId=xtc.TypeId.Type.Id_PhaseCavity )
 
     def getPnCcdValue(self, address, env):
-        """ returns PnCCDFrameV1 for specific address"""
+        """self.getPnCcdValue(address, env) -> object
+        
+        Returns pnCCD data object of type pypdsdata.pnccd.FrameV* for specific device. 
+        If address given is not very specific then the first matching object is returned.
+
+        Parameters:
+        ``address`` - xtc.DetInfo object or an address string;
+        ``env`` - environment object containing pnCCD configuration object.
+        
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_pnCCDframe, address)``.
+        """
         
         _log.debug("Event.getPnCcdValue: address=%s", address)
 
@@ -317,8 +435,17 @@ class Event(object):
         return self._wrapPnCcdData(xtcObj.payload(), xtcObj.contains.id(), xtcObj.contains.version(), xtcObj.src)
 
     def getPrincetonValue(self, address, env):
-        """ returns Acquiris data for specific detector and channel, 
-        address is the DetInfo object or address string."""
+        """self.getPrincetonValue(address, env) -> object
+        
+        Returns Princeton frame object of type pypdsdata.princeton.Frame* for specific device. 
+        If address given is not very specific then the first matching object is returned.
+
+        Parameters:
+        ``address`` - xtc.DetInfo object or an address string;
+        ``env`` - environment object containing Acqiris configuration object.
+                
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_PrincetonFrame, address)``.
+        """
 
         _log.debug("Event.getPrincetonValue: address=%s", address)
 
@@ -328,7 +455,17 @@ class Event(object):
         return self._wrapPrincetonData(xtcObj.payload(), xtcObj.contains.id(), xtcObj.contains.version(), xtcObj.src)
 
     def getCsPadQuads(self, address, env):
-        """ returns CsPadElement for specific address"""
+        """self.getCsPadQuads(address, env) -> list
+        
+        Returns list of objects of type pypdsdata.cspad.ElementV* for specific device address. 
+        If address given is not very specific then the first matching object is returned.
+
+        Parameters:
+        ``address`` - xtc.DetInfo object or an address string;
+        ``env`` - environment object containing CsPad configuration object.
+
+        The size of the list is determined by the CsPad configuration (``numQuads()`` method of the configuration object).
+        """
         
         _log.debug("Event.getCsPadElements: address=%s", address)
 
@@ -339,8 +476,13 @@ class Event(object):
 
 
     def put(self, data, key):
-        """ Add user data to the event, key identifies the data. 
-        Key is usually a string but can have any type except integer type."""
+        """self.put(data : object, key : object)
+        
+        Add user data to the event, key identifies the data. User data can be any kind 
+        of Python object. Key is usually a string but can have any type except integer type.
+        Use the same key as the first argument of ``get()`` method to retrieve stored object.
+        This mechanism allows sharing of data between different modules.
+        """
         
         self.m_userData[key] = data
 
@@ -437,6 +579,10 @@ class Event(object):
 # class that tracks values of all Epics channels
 #
 class EpicsStore(object):
+    """
+    Instance of this class contains current status of all EPICS channels. 
+    It is updated from event data on every new event.
+    """
     
     def __init__ (self):
         
@@ -444,6 +590,10 @@ class EpicsStore(object):
         self.m_name2epics = {}
         
     def update(self, evt):
+        """ self.update(evt)
+        
+        This method updates environment EPICS data from event object. 
+        """
         
         epicsData = evt.findXtc(typeId=xtc.TypeId.Type.Id_Epics)
         for extc in epicsData :
@@ -463,12 +613,21 @@ class EpicsStore(object):
             self.m_name2epics[name] = e
 
     def value(self, name):
+        """ self.value(name) -> EPICS object
+        
+        Parameters: ``name`` - name of the EPICS channel.
+        
+        This is the primary method to access EPICS information in pyana jobs.
+        Returns current value of the EPICS channel with the given name. The type of returned data 
+        is either epics.EpicsPvCtrl or epics.EpicsPvTime.
+        """
         return self.m_name2epics.get(name, None)
 
-#
-# Environment
-#
 class Env(object):
+    """
+    Class encapsulating all environment data such as configuration objects,
+    job options, histogram manager, etc.
+    """
     
     def __init__ (self, jobName="pyana", hmgr=None, subproc=-1 ):
         """If subproc is negative it means main process, non-negative
@@ -487,19 +646,35 @@ class Env(object):
         self.m_files = {}
 
     def jobName(self):
+        """ self.jobName() -> string
+        
+        Returns job name.
+        """
         return self.m_jobName
     
     def subprocess(self):
+        """ self.subprocess() -> int
+        
+        Returns sub-process number. In case of multi-processing job it will be a non-negative number 
+        ranging from 0 to a total number of sub-processes. In case of single-process job it will return -1.
+        """
         return self.m_subproc
     
     def jobNameSub(self):
+        """ self.jobNameSub() -> string
+        
+        Returns combination of job name and subprocess index as a string 
+        which is unique for all subprocesses in a job.
+        """
         if self.m_subproc < 0 :
             return self.m_jobName
         else :
             return "%s-%d" % (self.m_jobName, self.m_subproc)
     
     def hmgr(self):
-        "Returns histogram manager object"
+        """ self.hmgr() -> pyana.histo.HistoMgr
+        
+        Returns histogram manager object."""
         
         if not self.m_hmgr:
             if self.m_subproc < 0 :
@@ -512,6 +687,19 @@ class Env(object):
         return self.m_hmgr
 
     def mkfile(self, filename, mode='w', bufsize=-1):
+        """self.mkfile(filename, mode='w', bufsize=-1) -> file
+        
+        Opens file for writing output data. This is pyana's alternative for Python open() function 
+        which supports multi-processing. If user needs the data in this file to be merged with the 
+        files produced by other processes then mkfile() has to be used in place of open(). This method 
+        takes same parameters as regular open() call.
+        
+        In case of single-process job this method is equivalent to a regular Python open() method. 
+        In case of multi-processing when this method is called from a sub-process then the file is 
+        created somewhere in a temporary location (with unique name). At the end of the job files 
+        from all sub-processes are merged into one file with name filename and the temporary 
+        files are deleted. Merging is performed by concatenation, merge order is unspecified. 
+        """
 
         if self.m_subproc < 0 :
             # in regular job just open the file
@@ -523,20 +711,41 @@ class Env(object):
             return os.fdopen(fd, mode, bufsize)
 
     def epicsStore(self):
+        """ self.epicsStore() -> EpicsStore
+        
+        This is the primary method for user code to access EPICS data. 
+        It returns event.EpicsStore object which can be used to retrieve the state of the 
+        individual EPICS channels.
+        """
+        
         return self.m_epics
     
     def update(self, evt):
-        """ Update environment with some info from event """
+        """ self.update(evt)
+        
+        Parameters: ``evt`` - event object of type event.Event.
+        
+        This method updates environment contents with selected data from event object. 
+        This is equivalent to calling env.updateEpics() and env.updateConfig().
+        
+        This method is not supposed to be called from user code, pyana takes care of all updates itself.
+        """
         self.updateConfig(evt)
         self.updateEpics(evt)
 
     def updateEpics(self, evt):
-        """ Update environment with epics info from event """        
+        """ self.updateEpics(evt)
+        
+        This method updates environment EPICS data from event object. 
+        """        
         # epics
         self.m_epics.update( evt )
 
     def updateConfig(self, evt):
-        """ Update environment with config info from event """
+        """ self.updateConfig(evt)
+        
+        This method copies configuration objects from event object into environment.
+        """
         
         # store config objects 
         if evt.seq().service() in [xtc.TransitionId.Configure, xtc.TransitionId.BeginCalibCycle] :
@@ -554,32 +763,101 @@ class Env(object):
                             _log.error('Failed to extract config object of type %s: %s', xtc.contains, e )
                     
     def getConfig(self, typeId, address=None):
-        """Generic getConfig method"""
+        """ self.getConfig(typeId, address=None) -> config object
+        
+        Parameters: 
+        ``typeId`` - one of the enum xtc.TypeId.Type values; 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        This is a generic method for finding a configuration object of given type. 
+        If address is not given or is not very specific then the first matching object is returned.
+        """
         _log.debug("Env.getConfig: %s %s", typeId, address)
         return self._getConfig(typeId=typeId, address=address)
 
     def getAcqConfig(self, address=None):
+        """ self.getAcqConfig(address=None) -> config object
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        Returns Acqiris configuration object for a given device address. If more than one object 
+        is matched by the parameters then first arbitrary object is returned. 
+        None is returned if no object is found.
+        This method is equivalent to ``getConfig(xtc.TypeId.Type.Id_AcqConfig, address)``.
+        """
         _log.debug("Env.getAcqConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_AcqConfig, address=address)
 
     def getGsc16aiConfig(self, address=None):
+        """ self.getGsc16aiConfig(address=None) -> config object
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        Returns Gsc16ai configuration object for a given device address. If more than one object 
+        is matched by the parameters then first arbitrary object is returned. 
+        None is returned if no object is found.
+        This method is equivalent to ``getConfig(xtc.TypeId.Type.Id_Gsc16aiConfig, address)``.
+        """
         _log.debug("Env.getGsc16aiConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_Gsc16aiConfig, address=address)
 
     def getOpal1kConfig(self, address=None):
+        """ self.getOpal1kConfig(address=None) -> config object
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        Returns Opal1k configuration object for a given device address. If more than one object 
+        is matched by the parameters then first arbitrary object is returned. 
+        None is returned if no object is found.
+        This method is equivalent to ``getConfig(xtc.TypeId.Type.Id_Opal1kConfig, address)``.
+        """
         _log.debug("Env.getOpal1kConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_Opal1kConfig, address=address)
 
     def getPnCCDConfig(self, address=None):
+        """ self.getPnCCDConfig(address=None) -> config object
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        Returns PnCCD configuration object for a given device address. If more than one object 
+        is matched by the parameters then first arbitrary object is returned. 
+        None is returned if no object is found.
+        This method is equivalent to ``getConfig(xtc.TypeId.Type.Id_pnCCDconfig, address)``.
+        """
         _log.debug("Env.getPnCCDConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_pnCCDconfig, address=address)
 
     def getPrincetonConfig(self, address=None):
+        """ self.getPrincetonConfig(address=None) -> config object
+        
+        Parameters: 
+        ``address`` - xtc.DetInfo object or an address string; 
+        return type - configuration object or None.
+    
+        Returns Princeton configuration object for a given device address. If more than one object 
+        is matched by the parameters then first arbitrary object is returned. 
+        None is returned if no object is found.
+        This method is equivalent to ``getConfig(xtc.TypeId.Type.Id_PrincetonConfig, address)``.
+        """
         _log.debug("Env.getPrincetonConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_PrincetonConfig, address=address)
 
     def result(self):
-        """returns complete result of processing from a subprocess"""
+        """ self.result() -> dict
+        
+        Returns complete result of processing from a subprocess. This method
+        is used by framework to collect result data from sub-processes, user code
+        should never call this method.
+        """
         if self.m_subproc >= 0 :
 
             # send back all histogram and all file names
@@ -590,16 +868,29 @@ class Env(object):
                           histos = histos )
 
     def finish(self):
+        """ self.finish()
+        
+        Finish job. This method is used by framework to finalize data collection, user code
+        should never call this method.
+        """
         if self.m_hmgr : self.m_hmgr.close()
 
     # ==================
     #  internal methods
     # ==================
     def _storeConfig(self, typeId, detInfo, cfgObj ):
+        """ self._storeConfig(typeId, detInfo, cfgObj)
+
+        Store one configuration object.
+        """
         _log.debug("Env._storeConfig: typeId=%s detinfo=%s", typeId, detInfo)
         self.m_config.setdefault(typeId, {})[detInfo] = cfgObj        
         
     def _getConfig(self, typeId=None, detector=None, detId=None, device=None, devId=None, address=None):
+        """ self._getConfig(typeId=None, detector=None, detId=None, device=None, devId=None, address=None) -> config object
+
+        Find and return configuration object.
+        """
         
         if address is not None :
             addrdict = _addr(address)
