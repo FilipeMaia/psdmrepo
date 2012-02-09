@@ -65,21 +65,22 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"quads",               quads,               METH_NOARGS, "" },
-    {"numQuads",            numQuads,            METH_NOARGS, "" },
-    {"tdi",                 tdi,                 METH_NOARGS, "" },
-    {"quadMask",            quadMask,            METH_NOARGS, "" },
-    {"runDelay",            runDelay,            METH_NOARGS, "" },
-    {"eventCode",           eventCode,           METH_NOARGS, "" },
-    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "" },
-    {"activeRunMode",       activeRunMode,       METH_NOARGS, "" },
-    {"payloadSize",         payloadSize,         METH_NOARGS, "" },
-    {"badAsicMask0",        badAsicMask0,        METH_NOARGS, "" },
-    {"badAsicMask1",        badAsicMask1,        METH_NOARGS, "" },
-    {"asicMask",            asicMask,            METH_NOARGS, "" },
-    {"numAsicsRead",        numAsicsRead,        METH_NOARGS, "" },
-    {"concentratorVersion", concentratorVersion, METH_NOARGS, "" },
-    {"sections",            sections,            METH_VARARGS, "list of sections read for a given quadrant number" },
+    {"quads",               quads,               METH_NOARGS, "self.quads() -> list\n\nReturns list of ConfigV1QuadReg objects" },
+    {"numQuads",            numQuads,            METH_NOARGS, "self.numQuads() -> int\n\nReturns number of quadrants" },
+    {"tdi",                 tdi,                 METH_NOARGS, "self.tdi() -> int\n\nReturns test data index" },
+    {"quadMask",            quadMask,            METH_NOARGS, "self.quadMask() -> int\n\nReturns quadrant bit mask" },
+    {"runDelay",            runDelay,            METH_NOARGS, "self.runDelay() -> int\n\nReturns integer number" },
+    {"eventCode",           eventCode,           METH_NOARGS, "self.eventCode() -> int\n\nReturns event code" },
+    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "self.inactiveRunMode() -> RunModes enum\n\nReturns RunModes enum" },
+    {"activeRunMode",       activeRunMode,       METH_NOARGS, "self.activeRunMode() -> RunModes enum\n\nReturns RunModes enum" },
+    {"payloadSize",         payloadSize,         METH_NOARGS, "self.payloadSize() -> int\n\nReturns size of data" },
+    {"badAsicMask0",        badAsicMask0,        METH_NOARGS, "self.badAsicMask0() -> int\n\nRetuns bit mask" },
+    {"badAsicMask1",        badAsicMask1,        METH_NOARGS, "self.badAsicMask1() -> int\n\nRetuns bit mask" },
+    {"asicMask",            asicMask,            METH_NOARGS, "self.asicMask() -> int\n\nRetuns bit mask" },
+    {"numAsicsRead",        numAsicsRead,        METH_NOARGS, "self.numAsicsRead() -> int\n\nRetuns number of ASICs in readout" },
+    {"concentratorVersion", concentratorVersion, METH_NOARGS, "self.concentratorVersion() -> int\n\nReturns concentrator version" },
+    {"sections",            sections,            METH_VARARGS,
+        "self.sections(q: int) -> list of int\n\nlist of section indices read for a given quadrant number" },
     {0, 0, 0, 0}
    };
 

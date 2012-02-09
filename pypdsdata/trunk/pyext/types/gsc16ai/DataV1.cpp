@@ -39,8 +39,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "timestamps",    timestamps,    METH_NOARGS, "" },
-    { "channelValues", channelValues, METH_VARARGS, "" },
+    { "timestamps",    timestamps,    METH_NOARGS,  "self.timestamps() -> ndarray\n\nReturns array of integers" },
+    { "channelValues", channelValues, METH_VARARGS, "self.channelValues(cfg: ConfigV1) -> ndarray\n\nReturns array of integers" },
     {0, 0, 0, 0}
    };
 

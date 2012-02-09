@@ -48,8 +48,8 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Marker, type, typeEnum)
 
   PyMethodDef methods[] = {
-    {"source",   source, METH_NOARGS,  "Returns TdcDataV1.Source enum value" },
-    {"type",     type,   METH_NOARGS,  "Returns Type enum value" },
+    {"source",   source, METH_NOARGS,  "self.source() -> Source enum\n\nReturns TdcDataV1.Source enum value" },
+    {"type",     type,   METH_NOARGS,  "self.type() -> Type enum\n\nReturns Type enum value" },
     {0, 0, 0, 0}
    };
 

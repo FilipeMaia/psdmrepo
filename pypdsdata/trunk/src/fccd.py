@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.fccd.
+"""Wrapper module for _pdsdata.fccd. This module imports all _pdsdata.fccd 
+classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 

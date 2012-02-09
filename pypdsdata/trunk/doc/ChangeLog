@@ -1,4 +1,9 @@
 
+Tag: V00-00-47
+2012-02-09 Andy Salnikov
+- add src/cspad2x2.py, src/timepix.py
+- Lots of changes to docstrings everywhere
+
 Tag: V00-00-46
 2012-02-06 Andy Salnikov
 - upgrade to pdsdata V03-02-04

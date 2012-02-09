@@ -34,6 +34,11 @@
 namespace {
 
   // methods
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, width)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, height)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, depth)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, depth_bytes)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, data_size)
   FUN0_WRAPPER(pypdsdata::Timepix::DataV1, timestamp)
   FUN0_WRAPPER(pypdsdata::Timepix::DataV1, frameCounter)
   FUN0_WRAPPER(pypdsdata::Timepix::DataV1, lostRows)
@@ -41,10 +46,15 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "timestamp",      timestamp,      METH_NOARGS,  "" },
-    { "frameCounter",   frameCounter,   METH_NOARGS,  "" },
-    { "lostRows",       lostRows,       METH_NOARGS,  "" },
-    { "data",           data,           METH_NOARGS,  "" },
+    { "width",          width,          METH_NOARGS,  "self.width() -> int\n\nReturns image width" },
+    { "height",         height,         METH_NOARGS,  "self.height() -> int\n\nReturns image height" },
+    { "depth",          depth,          METH_NOARGS,  "self.depth() -> int\n\nReturns number of bits per pixel" },
+    { "depth_bytes",    depth_bytes,    METH_NOARGS,  "self.depth_bytes() -> int\n\nReturns number of bytes per pixel" },
+    { "data_size",      data_size,      METH_NOARGS,  "self.data_size() -> int\n\nReturns size of image data" },
+    { "timestamp",      timestamp,      METH_NOARGS,  "self.timestamp() -> int\n\nReturns integer number" },
+    { "frameCounter",   frameCounter,   METH_NOARGS,  "self.frameCounter() -> int\n\nReturns integer number" },
+    { "lostRows",       lostRows,       METH_NOARGS,  "self.lostRows() -> int\n\nReturns integer number" },
+    { "data",           data,           METH_NOARGS,  "self.data() -> numpy.ndarray\n\nReturns 2-dim array of integers" },
     {0, 0, 0, 0}
    };
 

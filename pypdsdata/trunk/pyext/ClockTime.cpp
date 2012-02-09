@@ -43,8 +43,8 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::ClockTime, nanoseconds);
 
   PyMethodDef methods[] = {
-    { "seconds",     seconds,     METH_NOARGS, "Returns the number of seconds" },
-    { "nanoseconds", nanoseconds, METH_NOARGS, "Returns the number of nanoseconds" },
+    { "seconds",     seconds,     METH_NOARGS, "self.seconds() -> int\n\nReturns the number of seconds" },
+    { "nanoseconds", nanoseconds, METH_NOARGS, "self.nanoseconds() -> int\n\nReturns the number of nanoseconds" },
     {0, 0, 0, 0}
    };
 

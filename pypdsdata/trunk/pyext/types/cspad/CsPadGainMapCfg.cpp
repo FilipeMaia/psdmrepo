@@ -37,12 +37,12 @@ namespace {
   PyObject* gainMap( PyObject* self, void* );
 
   PyMethodDef methods[] = {
-    {"map",     map,      METH_NOARGS, "Returns gain map as an array." },
+    {"map",     map,      METH_NOARGS, "self.map() -> numpy.ndarray\n\nReturns gain map as an array [ColumnsPerASIC][MaxRowsPerASIC]." },
     {0, 0, 0, 0}
    };
 
   PyGetSetDef getset[] = {
-    {"gainMap",         gainMap,         0, "", 0},
+    {"gainMap",         gainMap,         0, "Array [ColumnsPerASIC][MaxRowsPerASIC] of integers", 0},
     {0, 0, 0, 0, 0}
   };
 

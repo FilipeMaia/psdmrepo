@@ -45,13 +45,13 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "neventcodes",neventcodes, METH_NOARGS, "event codes appended to this structure" },
-    { "eventcode",  eventcode,   METH_VARARGS, "event codes appended to this structure" },
-    { "npulses",    npulses,     METH_NOARGS, "pulse configurations appended to this structure" },
-    { "pulse",      pulse,       METH_VARARGS, "pulse configurations appended to this structure" },
-    { "noutputs",   noutputs,    METH_NOARGS, "output configurations appended to this structure" },
-    { "output_map", output_map,  METH_VARARGS, "output configurations appended to this structure" },
-    { "size",       size,        METH_NOARGS, "size including appended PulseConfig's and OutputMap's" },
+    { "neventcodes",neventcodes, METH_NOARGS,  "self.neventcodes() -> int\n\nReturns number of event codes" },
+    { "eventcode",  eventcode,   METH_VARARGS, "self.eventcode(i: int) -> EventCodeV3\n\nReturns event code (EventCodeV3 object)" },
+    { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
+    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfigV3\n\nReturns pulse configuration" },
+    { "noutputs",   noutputs,    METH_NOARGS,  "self.noutputs() -> int\n\nReturns number of output configurations" },
+    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration" },
+    { "size",       size,        METH_NOARGS,  "self.size() -> int\n\nRetuns structure size" },
     {0, 0, 0, 0}
    };
 

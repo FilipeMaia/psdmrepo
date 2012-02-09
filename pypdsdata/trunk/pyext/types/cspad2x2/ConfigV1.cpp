@@ -50,6 +50,7 @@ namespace {
   // methods
   PyObject* quad( PyObject* self, PyObject* );
   PyObject* protectionThreshold( PyObject* self, PyObject*);
+  PyObject* sections( PyObject* self, PyObject* args);
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1, tdi)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1, protectionEnable)
   ENUM_FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1, inactiveRunMode, runModesEnum)
@@ -64,19 +65,21 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"quad",                quad,                METH_NOARGS, "" },
-    {"tdi",                 tdi,                 METH_NOARGS, "" },
-    {"protectionThreshold", protectionThreshold, METH_NOARGS, "" },
-    {"protectionEnable",    protectionEnable,    METH_NOARGS, "" },
-    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "" },
-    {"activeRunMode",       activeRunMode,       METH_NOARGS, "" },
-    {"payloadSize",         payloadSize,         METH_NOARGS, "" },
-    {"badAsicMask",         badAsicMask,         METH_NOARGS, "" },
-    {"asicMask",            asicMask,            METH_NOARGS, "" },
-    {"roiMask",             roiMask,             METH_VARARGS, "" },
-    {"numAsicsRead",        numAsicsRead,        METH_NOARGS, "" },
-    {"numAsicsStored",      numAsicsStored,      METH_VARARGS, "" },
-    {"concentratorVersion", concentratorVersion, METH_NOARGS, "" },
+    {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV1QuadReg\n\nReturns ConfigV1QuadReg object" },
+    {"tdi",                 tdi,                 METH_NOARGS, "self.tdi() -> int\n\nReturns test data index" },
+    {"protectionThreshold", protectionThreshold, METH_NOARGS,
+        "self.protectionThresholds() -> CsPadProtectionSystemThreshold\n\nReturns CsPadProtectionSystemThreshold object" },
+    {"protectionEnable",    protectionEnable,    METH_NOARGS, "self.protectionEnable() -> int\n\nReturns integer number" },
+    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "self.inactiveRunMode() -> RunModes enum\n\nReturns RunModes enum" },
+    {"activeRunMode",       activeRunMode,       METH_NOARGS, "self.activeRunMode() -> RunModes enum\n\nReturns RunModes enum" },
+    {"payloadSize",         payloadSize,         METH_NOARGS, "self.payloadSize() -> int\n\nReturns size of data" },
+    {"badAsicMask",         badAsicMask,         METH_NOARGS, "self.badAsicMask() -> int\n\nRetuns bit mask" },
+    {"asicMask",            asicMask,            METH_NOARGS, "self.asicMask() -> int\n\nRetuns bit mask" },
+    {"roiMask",             roiMask,             METH_NOARGS, "self.roiMask() -> int\n\nRetuns sections bit mask" },
+    {"numAsicsRead",        numAsicsRead,        METH_NOARGS, "self.numAsicsRead() -> int\n\nRetuns number of ASICs in readout" },
+    {"numAsicsStored",      numAsicsStored,      METH_NOARGS, "self.numAsicsStored() -> int\n\nRetuns number of ASICs stored" },
+    {"concentratorVersion", concentratorVersion, METH_NOARGS, "self.concentratorVersion() -> int\n\nReturns concentrator version" },
+    {"sections",            sections,            METH_NOARGS, "self.sections() -> list of int\n\nlist of section indices" },
     {0, 0, 0, 0}
    };
 
@@ -126,6 +129,27 @@ protectionThreshold( PyObject* self, PyObject* )
 
   return pypdsdata::CsPad2x2::CsPadProtectionSystemThreshold::PyObject_FromPds(
       obj->protectionThreshold(), self, sizeof(Pds::CsPad2x2::ProtectionSystemThreshold) );
+}
+
+PyObject*
+sections( PyObject* self, PyObject* args )
+{
+  const Pds::CsPad2x2::ConfigV1* obj = pypdsdata::CsPad2x2::ConfigV1::pdsObject( self );
+  if ( not obj ) return 0;
+
+  unsigned mask = obj->roiMask();
+  unsigned count = 0;
+  for ( unsigned i = 0 ; i < sizeof(mask)*8 ; ++ i ) {
+    if (mask & (1<<i)) ++ count;
+  }
+  PyObject* list = PyList_New( count );
+  unsigned ic = 0 ;
+  for ( unsigned i = 0 ; i < sizeof(mask)*8 ; ++ i ) {
+    if (mask & (1<<i)) {
+      PyList_SET_ITEM( list, ic++, pypdsdata::TypeLib::toPython(i) );
+    }
+  }
+  return list;
 }
 
 PyObject*

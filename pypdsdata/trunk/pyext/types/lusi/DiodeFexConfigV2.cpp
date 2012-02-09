@@ -40,8 +40,8 @@ namespace {
   PyObject* DiodeFexConfigV2_scale( PyObject* self, void* );
 
   PyGetSetDef getset[] = {
-    {"base",       DiodeFexConfigV2_base,   0, "", 0},
-    {"scale",      DiodeFexConfigV2_scale,  0, "", 0},
+    {"base",       DiodeFexConfigV2_base,   0, "List of NRANGES floating numbers", 0},
+    {"scale",      DiodeFexConfigV2_scale,  0, "List of NRANGES floating numbers", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -60,6 +60,12 @@ pypdsdata::Lusi::DiodeFexConfigV2::initType( PyObject* module )
   type->tp_getset = ::getset;
   type->tp_str = _repr;
   type->tp_repr = _repr;
+
+  // define class attributes for enums
+  type->tp_dict = PyDict_New();
+  PyObject* val = PyInt_FromLong(Pds::Lusi::DiodeFexConfigV2::NRANGES);
+  PyDict_SetItemString( type->tp_dict, "NRANGES", val );
+  Py_XDECREF(val);
 
   BaseType::initType( "DiodeFexConfigV2", module );
 }

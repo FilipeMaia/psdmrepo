@@ -38,8 +38,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"numLinks",           numLinks,           METH_NOARGS,  "Returns number of links." },
-    {"payloadSizePerLink", payloadSizePerLink, METH_NOARGS,  "Returns data size per link." },
+    {"numLinks",           numLinks,           METH_NOARGS,  "self.numLinks() -> int\n\nReturns number of links." },
+    {"payloadSizePerLink", payloadSizePerLink, METH_NOARGS,  "self.payloadSizePerLink() -> int\n\nReturns data size per link." },
     {0, 0, 0, 0}
    };
 

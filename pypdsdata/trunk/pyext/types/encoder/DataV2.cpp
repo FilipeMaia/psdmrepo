@@ -38,8 +38,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"_33mhz_timestamp", _33mhz_timestamp,  0, "", 0},
-    {"_encoder_count",   _encoder_count,    0, "", 0},
+    {"_33mhz_timestamp", _33mhz_timestamp,  0, "Integer number", 0},
+    {"_encoder_count",   _encoder_count,    0, "List of 3 integer numbers", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -47,7 +47,7 @@ namespace {
   PyObject* value( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"value",                 value,                  METH_VARARGS,  "" },
+    {"value",     value,       METH_VARARGS,  "self.value(chan: int) -> int\n\nReturns value for given channel number (0..2)" },
     {0, 0, 0, 0}
    };
 

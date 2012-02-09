@@ -46,14 +46,16 @@ namespace {
   PyObject* FrameV1_pixel( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"width",       width,         METH_NOARGS,  "Returns number of pixels in a row." },
-    {"height",      height,        METH_NOARGS,  "Returns number of pixels in a column." },
-    {"depth",       depth,         METH_NOARGS,  "Returns number of bits per pixel." },
-    {"depth_bytes", depth_bytes,   METH_NOARGS,  "Returns number of bytes per pixel." },
-    {"offset",      offset,        METH_NOARGS,  "Returns fixed offset/pedestal value of pixel data." },
-    {"data_size",   data_size,     METH_NOARGS,  "Returns size of pixel data." },
-    {"data",        FrameV1_data,  METH_VARARGS, "Returns pixel data as NumPy array, if optional argument is True then array is writable." },
-    {"pixel",       FrameV1_pixel, METH_VARARGS, "Returns individual pixel datum given coordinates (x, y)." },
+    {"width",       width,         METH_NOARGS,  "self.width() -> int\n\nReturns number of pixels in a row." },
+    {"height",      height,        METH_NOARGS,  "self.height() -> int\n\nReturns number of pixels in a column." },
+    {"depth",       depth,         METH_NOARGS,  "self.depth() -> int\n\nReturns number of bits per pixel." },
+    {"depth_bytes", depth_bytes,   METH_NOARGS,  "self.depth_bytes() -> int\n\nReturns number of bytes per pixel." },
+    {"offset",      offset,        METH_NOARGS,  "self.offset() -> int\n\nReturns fixed offset/pedestal value of pixel data." },
+    {"data_size",   data_size,     METH_NOARGS,  "self.data_size() -> int\n\nReturns size of pixel data." },
+    {"data",        FrameV1_data,  METH_VARARGS,
+        "self.data(writable = False) -> numpy.ndarray\n\nReturns pixel data as NumPy array, if optional argument is True then array is writable." },
+    {"pixel",       FrameV1_pixel, METH_VARARGS,
+        "self.pixel(x: int, y: int) -> int\n\nReturns individual pixel datum given coordinates (x, y)." },
     {0, 0, 0, 0}
    };
 

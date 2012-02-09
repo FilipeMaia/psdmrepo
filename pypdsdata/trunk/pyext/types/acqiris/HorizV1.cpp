@@ -39,10 +39,10 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::HorizV1, nbrSegments)
 
   PyMethodDef methods[] = {
-    {"sampInterval", sampInterval, METH_NOARGS,  "Returns floating number" },
-    {"delayTime",    delayTime,    METH_NOARGS,  "Returns floating number" },
-    {"nbrSamples",   nbrSamples,   METH_NOARGS,  "Returns number of samples" },
-    {"nbrSegments",  nbrSegments,  METH_NOARGS,  "Returns number of segments" },
+    {"sampInterval", sampInterval, METH_NOARGS,  "self.sampInterval() -> float\n\nReturns floating number" },
+    {"delayTime",    delayTime,    METH_NOARGS,  "self.delayTime() -> float\n\nReturns floating number" },
+    {"nbrSamples",   nbrSamples,   METH_NOARGS,  "self.nbrSamples() -> int\n\nReturns number of samples" },
+    {"nbrSegments",  nbrSegments,  METH_NOARGS,  "self.nbrSegments() -> int\n\nReturns number of segments" },
     {0, 0, 0, 0}
    };
 

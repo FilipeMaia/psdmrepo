@@ -48,15 +48,15 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"uses_duration", uses_duration,  METH_NOARGS,  "Returns boolean value." },
-    {"uses_events",   uses_events,    METH_NOARGS,  "Returns boolean value." },
-    {"duration",      duration,       METH_NOARGS,  "Returns ClockTime value." },
-    {"events",        events,         METH_NOARGS,  "Returns number of events." },
-    {"npvControls",   npvControls,    METH_NOARGS,  "Returns number of PVControls." },
-    {"npvMonitors",   npvMonitors,    METH_NOARGS,  "Returns number of PVMonitors." },
-    {"size",          size,           METH_NOARGS,  "Returns total data size." },
-    {"pvControl",     pvControl,      METH_VARARGS, "Returns PVControl for a given index." },
-    {"pvMonitor",     pvMonitor,      METH_VARARGS, "Returns PVMonitor for a given index." },
+    {"uses_duration", uses_duration,  METH_NOARGS,  "self.uses_duration() -> bool\n\nReturns boolean value." },
+    {"uses_events",   uses_events,    METH_NOARGS,  "self.uses_events() -> bool\n\nReturns boolean value." },
+    {"duration",      duration,       METH_NOARGS,  "self.duration() -> xtc.Clocktime\n\nReturns ClockTime value." },
+    {"events",        events,         METH_NOARGS,  "self.events() -> int\n\nReturns number of events." },
+    {"npvControls",   npvControls,    METH_NOARGS,  "self.npvControls() -> int\n\nReturns number of PVControls." },
+    {"npvMonitors",   npvMonitors,    METH_NOARGS,  "self.npvMonitors() -> int\n\nReturns number of PVMonitors." },
+    {"size",          size,           METH_NOARGS,  "self.size() -> int\n\nReturns total data size." },
+    {"pvControl",     pvControl,      METH_VARARGS, "self.pvControl(idx: int) -> control.PVControl\n\nReturns PVControl for a given index." },
+    {"pvMonitor",     pvMonitor,      METH_VARARGS, "self.pvMonitor(idx: int) -> control.PVMonitor\n\nReturns PVMonitor for a given index." },
     {0, 0, 0, 0}
    };
 

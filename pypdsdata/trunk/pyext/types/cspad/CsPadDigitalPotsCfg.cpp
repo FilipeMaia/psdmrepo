@@ -36,12 +36,12 @@ namespace {
   PyObject* pots( PyObject* self, void* );
 
   PyMethodDef methods[] = {
-    {"value",     value,      METH_VARARGS, "Returns pot value for a given index." },
+    {"value",     value,      METH_VARARGS, "self.value(i: int) -> int\n\nReturns pot value for a given index." },
     {0, 0, 0, 0}
    };
 
   PyGetSetDef getset[] = {
-    {"pots",         pots,         0, "", 0},
+    {"pots",         pots,         0, "List of PotsPerQuad integers", 0},
     {0, 0, 0, 0, 0}
   };
 

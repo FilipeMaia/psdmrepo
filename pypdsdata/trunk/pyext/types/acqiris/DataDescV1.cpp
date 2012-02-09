@@ -51,12 +51,15 @@ namespace {
   PyObject* nextChannel( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"nbrSamplesInSeg",  nbrSamplesInSeg,   METH_NOARGS,  "Returns integer number" },
-    {"nbrSegments",      nbrSegments,       METH_NOARGS,  "Returns integer number" },
-    {"indexFirstPoint",  indexFirstPoint,   METH_NOARGS,  "Returns integer number" },
-    {"timestamp",        timestamp,         METH_VARARGS, "Returns TimestampV1 object for a given segment" },
-    {"waveform",         waveform,          METH_VARARGS, "Returns waveform array given a HorizV1 object" },
-    {"nextChannel",      nextChannel,       METH_VARARGS, "Returns DataDescV1 for next channel (arg is HorizV1 object)" },
+    {"nbrSamplesInSeg",  nbrSamplesInSeg,   METH_NOARGS,  "self.nbrSamplesInSeg() -> int\n\nReturns integer number" },
+    {"nbrSegments",      nbrSegments,       METH_NOARGS,  "self.nbrSegments() -> int\n\nReturns integer number" },
+    {"indexFirstPoint",  indexFirstPoint,   METH_NOARGS,  "self.indexFirstPoint() -> int\n\nReturns integer number" },
+    {"timestamp",        timestamp,         METH_VARARGS,
+        "self.timestamp(seg: int) -> TimestampV1\n\nReturns TimestampV1 object for a given segment" },
+    {"waveform",         waveform,          METH_VARARGS,
+        "self.waveform(hcfg: HorizV1) -> numpy.ndarray\n\nReturns waveform array given a HorizV1 object" },
+    {"nextChannel",      nextChannel,       METH_VARARGS,
+        "self.nextChannel(hcfg: HorizV1) -> DataDescV1\n\nReturns DataDescV1 for next channel (arg is HorizV1 object)" },
     {0, 0, 0, 0}
    };
 

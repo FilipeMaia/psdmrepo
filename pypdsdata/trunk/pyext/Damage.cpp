@@ -66,10 +66,10 @@ namespace {
   PyObject* Damage_hasDamage( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    { "value",     value,            METH_NOARGS,  "Returns complete damage mask" },
-    { "bits",      bits,             METH_NOARGS,  "Returns damage mask excluding user bits" },
-    { "userBits",  userBits,         METH_NOARGS,  "Returns user bits of the damage mask" },
-    { "hasDamage", Damage_hasDamage, METH_VARARGS, "Returns True if the damage bit is set, accepts values like Damage.OutOfOrder" },
+    { "value",     value,            METH_NOARGS,  "self.value() -> int\n\nReturns complete damage mask" },
+    { "bits",      bits,             METH_NOARGS,  "self.bits() -> int\n\nReturns damage mask excluding user bits" },
+    { "userBits",  userBits,         METH_NOARGS,  "self.userBits() -> int\n\nReturns user bits of the damage mask" },
+    { "hasDamage", Damage_hasDamage, METH_VARARGS, "self.hasDamage(value: Value) -> bool\n\nReturns True if the damage bit is set, accepts values like Damage.OutOfOrder" },
     {0, 0, 0, 0}
    };
 

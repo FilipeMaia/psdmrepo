@@ -56,11 +56,11 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMap, map)
 
   PyMethodDef methods[] = {
-    { "source",    source,     METH_NOARGS, "source (generated pulse) of output generation" },
-    { "source_id", source_id,  METH_NOARGS, "source (generated pulse) of output generation" },
-    { "conn",      conn,       METH_NOARGS, "connector for output destination" },
-    { "conn_id",   conn_id,    METH_NOARGS, "connector for output destination" },
-    { "map",       map,        METH_NOARGS, "encoded source value" },
+    { "source",    source,     METH_NOARGS, "self.source() -> Source enum\n\nReturns source (generated pulse) of output generation" },
+    { "source_id", source_id,  METH_NOARGS, "self.source_id() -> int\n\nReturns source (generated pulse) of output generation" },
+    { "conn",      conn,       METH_NOARGS, "self.conn() -> Conn enum\n\nReturns connector for output destination" },
+    { "conn_id",   conn_id,    METH_NOARGS, "self.conn_id() -> int\n\nReturns connector for output destination" },
+    { "map",       map,        METH_NOARGS, "self.map() -> int\n\nReturns encoded source value" },
     {0, 0, 0, 0}
    };
 

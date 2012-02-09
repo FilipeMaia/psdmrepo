@@ -65,15 +65,24 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"forwarding",       forwarding,       METH_NOARGS,  "Returns forwarding policy for frame data." },
-    {"forward_prescale", forward_prescale, METH_NOARGS,  "Returns prescale of events with forwarded frames." },
-    {"processing",       processing,       METH_NOARGS,  "Returns algorithm to apply to frames to produce processed output." },
-    {"roiBegin",         roiBegin,         METH_NOARGS,  "Returns coordinates of start of rectangular region of interest (inclusive)." },
-    {"roiEnd",           roiEnd,           METH_NOARGS,  "Returns coordinates of finish of rectangular region of interest (exclusive)." },
-    {"threshold",        threshold,        METH_NOARGS,  "Returns pixel data threshold value to apply in processing." },
-    {"number_of_masked_pixels", number_of_masked_pixels, METH_NOARGS, "Returns count of masked pixels to exclude from processing." },
-    {"masked_pixel_coordinates", masked_pixel_coordinates, METH_NOARGS, "Returns list of masked pixel coordinates." },
-    {"size",             size,             METH_NOARGS, "Returns size of this structure (including appended masked pixel coordinates)." },
+    {"forwarding",       forwarding,       METH_NOARGS,
+        "self.forwarding() -> Forwarding enum\n\nReturns forwarding policy for frame data." },
+    {"forward_prescale", forward_prescale, METH_NOARGS,
+        "self.forward_prescale() -> int\n\nReturns prescale of events with forwarded frames." },
+    {"processing",       processing,       METH_NOARGS,
+        "self.processing() -> Processing enum\n\nReturns algorithm to apply to frames to produce processed output." },
+    {"roiBegin",         roiBegin,         METH_NOARGS,
+        "self.roiBegin() -> camera.FrameCoord\n\nReturns coordinates of start of rectangular region of interest (inclusive)." },
+    {"roiEnd",           roiEnd,           METH_NOARGS,
+        "self.roiEnd() -> camera.FrameCoord\n\nReturns coordinates of finish of rectangular region of interest (exclusive)." },
+    {"threshold",        threshold,        METH_NOARGS,
+        "self.threshold() -> int\n\nReturns pixel data threshold value to apply in processing." },
+    {"number_of_masked_pixels", number_of_masked_pixels, METH_NOARGS,
+        "self.number_of_masked_pixels() -> int\n\nReturns count of masked pixels to exclude from processing." },
+    {"masked_pixel_coordinates", masked_pixel_coordinates, METH_NOARGS,
+        "self.masked_pixel_coordinates() -> list of camera.FrameCoord\n\nReturns list of masked pixel coordinates." },
+    {"size",             size,             METH_NOARGS,
+        "self.size() -> int\n\nReturns size of this structure (including appended masked pixel coordinates)." },
     {0, 0, 0, 0}
    };
 

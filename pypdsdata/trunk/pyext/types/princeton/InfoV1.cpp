@@ -37,7 +37,7 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "temperature",    temperature,    METH_NOARGS, "" },
+    { "temperature",    temperature,    METH_NOARGS, "self.temperature() -> float\n\nReturns temperature value" },
     {0, 0, 0, 0}
    };
 

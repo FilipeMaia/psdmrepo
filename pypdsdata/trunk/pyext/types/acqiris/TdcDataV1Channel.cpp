@@ -41,10 +41,10 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Channel, time)
 
   PyMethodDef methods[] = {
-    {"source",   source,   METH_NOARGS,  "Returns TdcDataV1.Source enum value" },
-    {"overflow", overflow, METH_NOARGS,  "Returns boolean value" },
-    {"ticks",    ticks,    METH_NOARGS,  "Returns integer number" },
-    {"time",     time,     METH_NOARGS,  "Returns floating number" },
+    {"source",   source,   METH_NOARGS,  "self.source() -> Source enum\n\nReturns TdcDataV1.Source enum value" },
+    {"overflow", overflow, METH_NOARGS,  "self.overflow() -> bool\n\nReturns boolean value" },
+    {"ticks",    ticks,    METH_NOARGS,  "self.ticks() -> int\n\nReturns integer number" },
+    {"time",     time,     METH_NOARGS,  "self.time() -> float\n\nReturns floating number" },
     {0, 0, 0, 0}
    };
 

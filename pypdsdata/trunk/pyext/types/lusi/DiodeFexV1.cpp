@@ -38,7 +38,7 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Lusi::DiodeFexV1, value)
 
   PyGetSetDef getset[] = {
-    {"value",       value,   0, "", 0},
+    {"value",       value,   0, "Floating point number", 0},
     {0, 0, 0, 0, 0}
   };
 

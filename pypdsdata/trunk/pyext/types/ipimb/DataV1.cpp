@@ -48,19 +48,19 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "triggerCounter", triggerCounter, METH_NOARGS, "" },
-    { "config0",        config0,        METH_NOARGS, "" },
-    { "config1",        config1,        METH_NOARGS, "" },
-    { "config2",        config2,        METH_NOARGS, "" },
-    { "channel0",       channel0,       METH_NOARGS, "" },
-    { "channel1",       channel1,       METH_NOARGS, "" },
-    { "channel2",       channel2,       METH_NOARGS, "" },
-    { "channel3",       channel3,       METH_NOARGS, "" },
-    { "channel0Volts",  channel0Volts,  METH_NOARGS, "" },
-    { "channel1Volts",  channel1Volts,  METH_NOARGS, "" },
-    { "channel2Volts",  channel2Volts,  METH_NOARGS, "" },
-    { "channel3Volts",  channel3Volts,  METH_NOARGS, "" },
-    { "checksum",       checksum,       METH_NOARGS, "" },
+    { "triggerCounter", triggerCounter, METH_NOARGS, "self.triggerCounter() -> int\n\nReturns integer number" },
+    { "config0",        config0,        METH_NOARGS, "self.config0() -> int\n\nReturns integer number" },
+    { "config1",        config1,        METH_NOARGS, "self.config1() -> int\n\nReturns integer number" },
+    { "config2",        config2,        METH_NOARGS, "self.config2() -> int\n\nReturns integer number" },
+    { "channel0",       channel0,       METH_NOARGS, "self.channel0() -> int\n\nReturns integer number" },
+    { "channel1",       channel1,       METH_NOARGS, "self.channel1() -> int\n\nReturns integer number" },
+    { "channel2",       channel2,       METH_NOARGS, "self.channel2() -> int\n\nReturns integer number" },
+    { "channel3",       channel3,       METH_NOARGS, "self.channel3() -> int\n\nReturns integer number" },
+    { "channel0Volts",  channel0Volts,  METH_NOARGS, "self.channel0Volts() -> float\n\nReturns floating number" },
+    { "channel1Volts",  channel1Volts,  METH_NOARGS, "self.channel1Volts() -> float\n\nReturns floating number" },
+    { "channel2Volts",  channel2Volts,  METH_NOARGS, "self.channel2Volts() -> float\n\nReturns floating number" },
+    { "channel3Volts",  channel3Volts,  METH_NOARGS, "self.channel3Volts() -> float\n\nReturns floating number" },
+    { "checksum",       checksum,       METH_NOARGS, "self.checksum() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

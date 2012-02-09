@@ -39,12 +39,12 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::EventCodeV3, maskClear)
 
   PyMethodDef methods[] = {
-    { "code",          code,         METH_NOARGS, "" },
-    { "isReadout",     isReadout,    METH_NOARGS, "" },
-    { "isTerminator",  isTerminator, METH_NOARGS, "" },
-    { "maskTrigger",   maskTrigger,  METH_NOARGS, "" },
-    { "maskSet",       maskSet,      METH_NOARGS, "" },
-    { "maskClear",     maskClear,    METH_NOARGS, "" },
+    { "code",          code,         METH_NOARGS, "self.code() -> int\n\nReturns integer number" },
+    { "isReadout",     isReadout,    METH_NOARGS, "self.isReadout() -> bool\n\nReturns boolean" },
+    { "isTerminator",  isTerminator, METH_NOARGS, "self.isTerminator() -> bool\n\nReturns boolean" },
+    { "maskTrigger",   maskTrigger,  METH_NOARGS, "self.maskTrigger() -> int\n\nReturns integer number" },
+    { "maskSet",       maskSet,      METH_NOARGS, "self.maskSet() -> int\n\nReturns integer number" },
+    { "maskClear",     maskClear,    METH_NOARGS, "self.maskClear() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

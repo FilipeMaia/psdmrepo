@@ -55,12 +55,12 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "width",         width,         METH_NOARGS, "" },
-    { "height",        height,        METH_NOARGS, "" },
-    { "trimmedWidth",  trimmedWidth,  METH_NOARGS, "" },
-    { "trimmedHeight", trimmedHeight, METH_NOARGS, "" },
-    { "outputMode",    outputMode,    METH_NOARGS, "" },
-    { "size",          size,          METH_NOARGS, "" },
+    { "width",         width,         METH_NOARGS, "self.width() -> int\n\nReturns image width" },
+    { "height",        height,        METH_NOARGS, "self.height() -> int\n\nReturns image height" },
+    { "trimmedWidth",  trimmedWidth,  METH_NOARGS, "self.trimmedWidth() -> int\n\nReturns trimmed image width" },
+    { "trimmedHeight", trimmedHeight, METH_NOARGS, "self.trimmedHeight() -> int\n\nReturns trimmed image height" },
+    { "outputMode",    outputMode,    METH_NOARGS, "self.outputMode() -> int\n\nReturns integer number" },
+    { "size",          size,          METH_NOARGS, "self.size() -> int\n\nReturns size of this config object" },
     {0, 0, 0, 0}
    };
 

@@ -61,7 +61,7 @@ EpicsModule::getModule()
   if ( s_module ) return s_module;
 
   // create the module
-  PyObject* module = Py_InitModule3( "_pdsdata.epics", methods, "The Python module for pdsdata/epics" );
+  PyObject* module = Py_InitModule3( "_pdsdata.epics", methods, "The Python wrapper module for pdsdata/epics" );
 
   // define constants
   PyModule_AddIntConstant( module, "DBR_STRING", DBR_STRING );

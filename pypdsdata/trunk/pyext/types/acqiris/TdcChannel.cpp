@@ -67,10 +67,10 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::TdcChannel, level)
 
   PyMethodDef methods[] = {
-    {"channel",   channel,  METH_NOARGS,  "Returns Channel enum value" },
-    {"mode",      mode,     METH_NOARGS,  "Returns Mode enum value" },
-    {"slope",     slope,    METH_NOARGS,  "Returns Slope enum value" },
-    {"level",     level,    METH_NOARGS,  "Returns floating number" },
+    {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns Channel enum value" },
+    {"mode",      mode,     METH_NOARGS,  "self.mode() -> Mode enum\n\nReturns Mode enum value" },
+    {"slope",     slope,    METH_NOARGS,  "self.slope() -> Slope enum\n\nReturns Slope enum value" },
+    {"level",     level,    METH_NOARGS,  "self.level() -> float\n\nReturns floating number" },
     {0, 0, 0, 0}
    };
 

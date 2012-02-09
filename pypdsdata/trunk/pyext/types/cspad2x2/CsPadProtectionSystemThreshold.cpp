@@ -37,8 +37,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"adcThreshold",        adcThreshold,        0, "", 0},
-    {"pixelCountThreshold", pixelCountThreshold, 0, "", 0},
+    {"adcThreshold",        adcThreshold,        0, "Integer number", 0},
+    {"pixelCountThreshold", pixelCountThreshold, 0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 

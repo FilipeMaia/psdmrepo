@@ -48,19 +48,19 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "triggerCounter",      triggerCounter,      METH_NOARGS, "" },
-    { "serialID",            serialID,            METH_NOARGS, "" },
-    { "chargeAmpRange",      chargeAmpRange,      METH_NOARGS, "" },
-    { "calibrationRange",    calibrationRange,    METH_NOARGS, "" },
-    { "resetLength",         resetLength,         METH_NOARGS, "" },
-    { "resetDelay",          resetDelay,          METH_NOARGS, "" },
-    { "chargeAmpRefVoltage", chargeAmpRefVoltage, METH_NOARGS, "" },
-    { "calibrationVoltage",  calibrationVoltage,  METH_NOARGS, "" },
-    { "diodeBias",           diodeBias,           METH_NOARGS, "" },
-    { "status",              status,              METH_NOARGS, "" },
-    { "errors",              errors,              METH_NOARGS, "" },
-    { "calStrobeLength",     calStrobeLength,     METH_NOARGS, "" },
-    { "trigDelay",           trigDelay,           METH_NOARGS, "" },
+    { "triggerCounter",      triggerCounter,      METH_NOARGS, "self.triggerCounter() -> int\n\nReturns integer number" },
+    { "serialID",            serialID,            METH_NOARGS, "self.serialID() -> int\n\nReturns integer number" },
+    { "chargeAmpRange",      chargeAmpRange,      METH_NOARGS, "self.chargeAmpRange() -> int\n\nReturns integer number" },
+    { "calibrationRange",    calibrationRange,    METH_NOARGS, "self.calibrationRange() -> int\n\nReturns integer number" },
+    { "resetLength",         resetLength,         METH_NOARGS, "self.resetLength() -> int\n\nReturns integer number" },
+    { "resetDelay",          resetDelay,          METH_NOARGS, "self.resetDelay() -> int\n\nReturns integer number" },
+    { "chargeAmpRefVoltage", chargeAmpRefVoltage, METH_NOARGS, "self.chargeAmpRefVoltage() -> float\n\nReturns floating number" },
+    { "calibrationVoltage",  calibrationVoltage,  METH_NOARGS, "self.calibrationVoltage() -> float\n\nReturns floating number" },
+    { "diodeBias",           diodeBias,           METH_NOARGS, "self.diodeBias() -> float\n\nReturns floating number" },
+    { "status",              status,              METH_NOARGS, "self.status() -> int\n\nReturns integer number" },
+    { "errors",              errors,              METH_NOARGS, "self.errors() -> int\n\nReturns integer number" },
+    { "calStrobeLength",     calStrobeLength,     METH_NOARGS, "self.calStrobeLength() -> int\n\nReturns integer number" },
+    { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

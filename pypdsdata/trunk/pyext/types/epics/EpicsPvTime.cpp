@@ -48,13 +48,13 @@ namespace {
   PyObject* EpicsPvTime_getnewargs( PyObject* self, PyObject* );
 
   PyGetSetDef getset[] = {
-    {"iPvId",        iPvId,                0, "Pv Id", 0},
-    {"iDbrType",     iDbrType,             0, "Epics Data Type", 0},
-    {"iNumElements", iNumElements,         0, "Size of Pv Array", 0},
-    {"status",       EpicsPvTime_status,   0, "Status value", 0},
-    {"severity",     EpicsPvTime_severity, 0, "Severity value", 0},
+    {"iPvId",        iPvId,                0, "Integer number, Pv Id", 0},
+    {"iDbrType",     iDbrType,             0, "Integer number, Epics Data Type", 0},
+    {"iNumElements", iNumElements,         0, "Integer number, Size of Pv Array", 0},
+    {"status",       EpicsPvTime_status,   0, "Integer number, Status value", 0},
+    {"severity",     EpicsPvTime_severity, 0, "Integer number, Severity value", 0},
     {"stamp",        EpicsPvTime_stamp,    0, "EPICS timestamp value of type epicsTimeStamp", 0},
-    {"value",        EpicsPvTime_value,    0, "PV value, always a single value, for arrays it is first element", 0},
+    {"value",        EpicsPvTime_value,    0, "PV value (number or string), always a single value, for arrays it is first element", 0},
     {"values",       EpicsPvTime_values,   0, "List of PV values of size [iNumElements]", 0},
     {0, 0, 0, 0, 0}
   };

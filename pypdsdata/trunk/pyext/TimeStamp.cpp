@@ -45,10 +45,10 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::TimeStamp, vector);
 
   PyMethodDef methods[] = {
-    { "ticks",    ticks,    METH_NOARGS, "Returns the ticks value" },
-    { "fiducials", fiducials, METH_NOARGS, "Returns the fiducials value" },
-    { "control",  control,  METH_NOARGS, "Returns the control value" },
-    { "vector",   ticks,    METH_NOARGS, "Returns the vector value" },
+    { "ticks",    ticks,    METH_NOARGS, "self.ticks() -> int\n\nReturns the ticks value" },
+    { "fiducials", fiducials, METH_NOARGS, "self.fiducials() -> int\n\nReturns the fiducials value" },
+    { "control",  control,  METH_NOARGS, "self.control() -> int\n\nReturns the control value" },
+    { "vector",   ticks,    METH_NOARGS, "self.vector() -> int\n\nReturns the vector value" },
     {0, 0, 0, 0}
    };
 

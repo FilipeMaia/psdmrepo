@@ -39,10 +39,10 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"fFitTime1", fFitTime1, 0, "PV name: UND:R02:IOC:16:BAT:FitTime1, in pico-seconds", 0},
-    {"fFitTime2", fFitTime2, 0, "PV name: UND:R02:IOC:16:BAT:FitTime2,in pico-seconds", 0},
-    {"fCharge1",  fCharge1,  0, "PV name: UND:R02:IOC:16:BAT:Charge1,in pico-seconds", 0},
-    {"fCharge2",  fCharge2,  0, "PV name: UND:R02:IOC:16:BAT:Charge2,in pico-seconds", 0},
+    {"fFitTime1", fFitTime1, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime1, in pico-seconds", 0},
+    {"fFitTime2", fFitTime2, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime2, in pico-seconds", 0},
+    {"fCharge1",  fCharge1,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge1, in pico-columbs", 0},
+    {"fCharge2",  fCharge2,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge2, in pico-columbs", 0},
     {0, 0, 0, 0, 0}
   };
 

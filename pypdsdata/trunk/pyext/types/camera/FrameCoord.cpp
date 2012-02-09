@@ -41,11 +41,11 @@ namespace {
     {"x",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
        0, "column index" },
     {"column", T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
-       0, "column index" },
+       0, "column index, same value as 'x'" },
     {"y",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
       0, "row index" },
     {"row",    T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
-      0, "row index" },
+      0, "row index, same value as 'y'" },
     {0, 0, 0, 0, 0}
   };
 

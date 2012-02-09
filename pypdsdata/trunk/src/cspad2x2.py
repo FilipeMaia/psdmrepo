@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module control...
+#  Module cspad2x2...
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.control. This module imports all _pdsdata.control 
+"""Wrapper module for _pdsdata.cspad2x2. This module imports all _pdsdata.cspad2x2 
 classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
@@ -45,4 +45,4 @@ __version__ = "$Revision$"
 # Exported definitions --
 #------------------------
 
-from _pdsdata.control import *
+from _pdsdata.cspad2x2 import *

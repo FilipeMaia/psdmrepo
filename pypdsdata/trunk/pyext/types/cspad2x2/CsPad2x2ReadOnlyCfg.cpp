@@ -37,8 +37,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"shiftTest",       shiftTest,       0, "", 0},
-    {"version",         version,         0, "", 0},
+    {"shiftTest",       shiftTest,       0, "Integer number", 0},
+    {"version",         version,         0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 

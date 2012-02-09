@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.cspad.
+"""Wrapper module for _pdsdata.cspad, provides wrapper for ElementV*
+classes. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 
@@ -53,6 +52,10 @@ from _pdsdata.cspad import ElementV2 as _ElementV2
 
 # extend FrameV1
 class ElementV1(object) :
+    """
+    This is a wrapper for _pdsdata.cspad.ElementV1 which removes the need to pass 
+    configuration objects to several methods.
+    """
 
     # class constants imported without change
     ColumnsPerASIC = _ElementV1.ColumnsPerASIC
@@ -77,44 +80,96 @@ class ElementV1(object) :
         self.__data = quad.data(cfg)
 
     def virtual_channel(self):
+        """self.virtual_channel() -> int
+        
+        Returns integer number.
+        """
         return self.__virtual_channel
 
     def lane(self):
+        """self.lane() -> int
+        
+        Returns integer number.
+        """
         return self.__lane
 
     def tid(self):
+        """self.tid() -> int
+        
+        Returns integer number.
+        """
         return self.__tid
 
     def acq_count(self):
+        """self.acq_count() -> int
+        
+        Returns integer number.
+        """
         return self.__acq_count
 
     def op_code(self):
+        """self.op_code() -> int
+        
+        Returns integer number.
+        """
         return self.__op_code
 
     def quad(self):
+        """self.quad() -> int
+        
+        Returns quadrant number.
+        """
         return self.__quad
 
     def seq_count(self):
+        """self.seq_count() -> int
+        
+        Returns sequence counter.
+        """
         return self.__seq_count
 
     def ticks(self):
+        """self.ticks() -> int
+        
+        Returns integer number.
+        """
         return self.__ticks
 
     def fiducials(self):
+        """self.fiducials() -> int
+        
+        Returns integer number.
+        """
         return self.__fiducials
 
     def frame_type(self):
+        """self.frame_type() -> int
+        
+        Returns integer number.
+        """
         return self.__frame_type
 
     def sb_temp(self, i):
+        """self.sb_temp(i: int) -> int
+        
+        Retuns integer number, index i in the range (0..3).
+        """
         return self.__sb_temp[i]
 
     def data(self):
+        """self.data() -> numpy.ndarray
+        
+        Returns data array for this quadrant.
+        """
         return self.__data
 
 
 # extend FrameV1
 class ElementV2(object) :
+    """
+    This is a wrapper for _pdsdata.cspad.ElementV2 which removes the need to pass 
+    configuration objects to several methods.
+    """
 
     # class constants imported without change
     ColumnsPerASIC = _ElementV2.ColumnsPerASIC
@@ -139,39 +194,87 @@ class ElementV2(object) :
         self.__data = quad.data(cfg)
 
     def virtual_channel(self):
+        """self.virtual_channel() -> int
+        
+        Returns integer number.
+        """
         return self.__virtual_channel
 
     def lane(self):
+        """self.lane() -> int
+        
+        Returns integer number.
+        """
         return self.__lane
 
     def tid(self):
+        """self.tid() -> int
+        
+        Returns integer number.
+        """
         return self.__tid
 
     def acq_count(self):
+        """self.acq_count() -> int
+        
+        Returns integer number.
+        """
         return self.__acq_count
 
     def op_code(self):
+        """self.op_code() -> int
+        
+        Returns integer number.
+        """
         return self.__op_code
 
     def quad(self):
+        """self.quad() -> int
+        
+        Returns quadrant number.
+        """
         return self.__quad
 
     def seq_count(self):
+        """self.seq_count() -> int
+        
+        Returns sequence counter.
+        """
         return self.__seq_count
 
     def ticks(self):
+        """self.ticks() -> int
+        
+        Returns integer number.
+        """
         return self.__ticks
 
     def fiducials(self):
+        """self.fiducials() -> int
+        
+        Returns integer number.
+        """
         return self.__fiducials
 
     def frame_type(self):
+        """self.frame_type() -> int
+        
+        Returns integer number.
+        """
         return self.__frame_type
 
     def sb_temp(self, i):
+        """self.sb_temp(i: int) -> int
+        
+        Retuns integer number, index i in the range (0..3).
+        """
         return self.__sb_temp[i]
 
     def data(self):
+        """self.data() -> numpy.ndarray
+        
+        Returns data array for this quadrant.
+        """
         return self.__data
 
 

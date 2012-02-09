@@ -47,11 +47,11 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::ProcInfo, ipAddr);
 
   PyMethodDef methods[] = {
-    { "level",      ProcInfo_level, METH_NOARGS, "Returns source level object (Level class)" },
-    { "log",        log,            METH_NOARGS, "Returns logical address of data source" },
-    { "phy",        phy,            METH_NOARGS, "Returns physical address of data source" },
-    { "processId",  processId,      METH_NOARGS, "Returns process ID" },
-    { "ipAddr",     ipAddr,         METH_NOARGS, "Returns host IP address" },
+    { "level",      ProcInfo_level, METH_NOARGS, "self.level() -> Level\n\nReturns source level object (Level class)" },
+    { "log",        log,            METH_NOARGS, "self.log() -> int\n\nReturns logical address of data source" },
+    { "phy",        phy,            METH_NOARGS, "self.phy() -> int\n\nReturns physical address of data source" },
+    { "processId",  processId,      METH_NOARGS, "self.processId() -> int\n\nReturns process ID" },
+    { "ipAddr",     ipAddr,         METH_NOARGS, "self.ipAddr() -> int\n\nReturns host IP address" },
     {0, 0, 0, 0}
    };
 

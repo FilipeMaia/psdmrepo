@@ -62,9 +62,9 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcAuxIO, term, termEnum)
 
   PyMethodDef methods[] = {
-    {"channel",   channel,  METH_NOARGS,  "Returns Channel enum value" },
-    {"mode",      mode,     METH_NOARGS,  "Returns Mode enum value" },
-    {"term",      term,     METH_NOARGS,  "Returns Termination enum value" },
+    {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns Channel enum value" },
+    {"mode",      mode,     METH_NOARGS,  "self.mode() -> Mode enum\n\nReturns Mode enum value" },
+    {"term",      term,     METH_NOARGS,  "self.term() -> Termination enum\n\nReturns Termination enum value" },
     {0, 0, 0, 0}
    };
 

@@ -39,9 +39,9 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "numFifoEvents", numFifoEvents, METH_NOARGS,  "number of FIFOEvent objects" },
-    { "fifoEvent",     fifoEvent,     METH_VARARGS, "" },
-    { "size",          size,          METH_NOARGS,  "full size of the object" },
+    { "numFifoEvents", numFifoEvents, METH_NOARGS,  "self.numFifoEvents() -> int\n\nReturns number of DataV3_FIFOEvent objects" },
+    { "fifoEvent",     fifoEvent,     METH_VARARGS, "self.fifoEvent(i: int) -> DataV3_FIFOEvent\n\nReturns DataV3_FIFOEvent object" },
+    { "size",          size,          METH_NOARGS,  "self.size() ->int\n\nReturns full size of the data object" },
     {0, 0, 0, 0}
    };
 

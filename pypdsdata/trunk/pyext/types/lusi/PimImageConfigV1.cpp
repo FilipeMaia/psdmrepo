@@ -39,8 +39,8 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, yscale)
 
   PyGetSetDef getset[] = {
-    {"xscale",       xscale,   0, "", 0},
-    {"yscale",       yscale,   0, "", 0},
+    {"xscale",       xscale,   0, "Floating point number", 0},
+    {"yscale",       yscale,   0, "Floating point number", 0},
     {0, 0, 0, 0, 0}
   };
 

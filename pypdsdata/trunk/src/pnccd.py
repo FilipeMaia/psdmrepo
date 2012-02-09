@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.pnccd.
+"""Wrapper module for _pdsdata.pnccd, provides wrapper for FrameV1
+class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 
@@ -51,6 +50,10 @@ from _pdsdata.pnccd import *
 
 # extend FrameV1
 class FrameV1(object) :
+    """
+    This is a wrapper for _pdsdata.pnccd.FrameV1 which makes a larger frame
+    image out of four smaller frames. 
+    """
 
     def __init__ (self, frames, cfg):
         """ Constructor takes list of _pdsdata.pnccd.FrameV1 and 
@@ -89,21 +92,45 @@ class FrameV1(object) :
         self.__data[ny:2*ny, nx:2*nx] = data[2][::-1,::-1]
         
     def specialWord(self) :
+        """self.specialWord() -> int
+        
+        Returns integer number.
+        """
         return self.__specialWord
     
     def frameNumber(self) :
+        """self.frameNumber() -> int
+        
+        Returns integer number.
+        """
         return self.__frameNumber
     
     def timeStampHi(self) :
+        """self.timeStampHi() -> int
+        
+        Returns integer number.
+        """
         return self.__timeStampHi
     
     def timeStampLo(self) :
+        """self.timeStampLo() -> int
+        
+        Returns integer number.
+        """
         return self.__timeStampLo
     
     def data(self) :
+        """self.data() -> numpy.ndarray
+        
+        Returns frame data as NumPy 2-dimensional array of integers of size 1024x1024
+        """
         return self.__data
     
     def sizeofData(self) :
+        """self.sizeofData() -> int
+        
+        Returns size of data in a frame (in pixels)
+        """
         return self.__data.size
 
     

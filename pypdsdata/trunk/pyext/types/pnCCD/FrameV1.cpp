@@ -48,13 +48,14 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"specialWord", specialWord, METH_NOARGS,  "" },
-    {"frameNumber", frameNumber, METH_NOARGS,  "" },
-    {"timeStampHi", timeStampHi, METH_NOARGS,  "" },
-    {"timeStampLo", timeStampLo, METH_NOARGS,  "" },
-    {"next",        next,        METH_VARARGS, "" },
-    {"data",        data,        METH_VARARGS, "" },
-    {"sizeofData",  sizeofData,  METH_VARARGS, "" },
+    {"specialWord", specialWord, METH_NOARGS,  "self.specialWord() -> int\n\nReturns integer number" },
+    {"frameNumber", frameNumber, METH_NOARGS,  "self.frameNumber() -> int\n\nReturns integer number" },
+    {"timeStampHi", timeStampHi, METH_NOARGS,  "self.timeStampHi() -> int\n\nReturns integer number" },
+    {"timeStampLo", timeStampLo, METH_NOARGS,  "self.timeStampLo() -> int\n\nReturns integer number" },
+    {"next",        next,        METH_VARARGS, "self.next(cfg: ConfigV*) -> FrameV1\n\nReturns frame object for the next link" },
+    {"data",        data,        METH_VARARGS, 
+        "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns frame data as NumPy 2-dimensional array of integers of size 512x512" },
+    {"sizeofData",  sizeofData,  METH_VARARGS, "self.sizeofData(cfg: ConfigV*) -> int\n\nReturns size of data in a frame (in pixels)" },
     {0, 0, 0, 0}
    };
 

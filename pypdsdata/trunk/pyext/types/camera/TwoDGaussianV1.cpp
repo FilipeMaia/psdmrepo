@@ -42,12 +42,12 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"integral",         integral,         METH_NOARGS,  "Returns integral statistics as integer number." },
-    {"xmean",            xmean,            METH_NOARGS,  "Returns mean X value." },
-    {"ymean",            ymean,            METH_NOARGS,  "Returns mean Y value." },
-    {"major_axis_width", major_axis_width, METH_NOARGS,  "Returns width of major axis." },
-    {"minor_axis_width", minor_axis_width, METH_NOARGS,  "Returns width of minor axis." },
-    {"major_axis_tilt",  major_axis_tilt,  METH_NOARGS,  "Returns tilt of major axis." },
+    {"integral",         integral,         METH_NOARGS,  "self.integral() -> int\n\nReturns integral statistics as integer number." },
+    {"xmean",            xmean,            METH_NOARGS,  "self.xmean() -> float\n\nReturns mean X value." },
+    {"ymean",            ymean,            METH_NOARGS,  "self.ymean() -> float\n\nReturns mean Y value." },
+    {"major_axis_width", major_axis_width, METH_NOARGS,  "self.major_axis_width() -> float\n\nReturns width of major axis." },
+    {"minor_axis_width", minor_axis_width, METH_NOARGS,  "self.minor_axis_width() -> float\n\nReturns width of minor axis." },
+    {"major_axis_tilt",  major_axis_tilt,  METH_NOARGS,  "self.major_axis_tilt() -> float\n\nReturns tilt of major axis." },
     {0, 0, 0, 0}
    };
 

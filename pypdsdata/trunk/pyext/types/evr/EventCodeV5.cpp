@@ -44,17 +44,17 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::EventCodeV5, maskClear)
 
   PyMethodDef methods[] = {
-    { "code",          code,         METH_NOARGS, "" },
-    { "desc",          desc,         METH_NOARGS, "" },
-    { "isReadout",     isReadout,    METH_NOARGS, "" },
-    { "isCommand",     isCommand,    METH_NOARGS, "" },
-    { "isLatch",       isLatch,      METH_NOARGS, "" },
-    { "reportDelay",   reportDelay,  METH_NOARGS, "" },
-    { "reportWidth",   reportWidth,  METH_NOARGS, "" },
-    { "releaseCode",   releaseCode,  METH_NOARGS, "" },
-    { "maskTrigger",   maskTrigger,  METH_NOARGS, "" },
-    { "maskSet",       maskSet,      METH_NOARGS, "" },
-    { "maskClear",     maskClear,    METH_NOARGS, "" },
+    { "code",          code,         METH_NOARGS, "self.code() -> int\n\nReturns integer number" },
+    { "desc",          desc,         METH_NOARGS, "self.desc() -> string\n\nReturns string" },
+    { "isReadout",     isReadout,    METH_NOARGS, "self.isReadout() -> bool\n\nReturns boolean" },
+    { "isCommand",     isCommand,    METH_NOARGS, "self.isCommand() -> bool\n\nReturns boolean" },
+    { "isLatch",       isLatch,      METH_NOARGS, "self.isLatch() -> bool\n\nReturns boolean" },
+    { "reportDelay",   reportDelay,  METH_NOARGS, "self.reportDelay() -> int\n\nReturns integer number" },
+    { "reportWidth",   reportWidth,  METH_NOARGS, "self.reportWidth() -> int\n\nReturns integer number" },
+    { "releaseCode",   releaseCode,  METH_NOARGS, "self.releaseCode() -> int\n\nReturns integer number" },
+    { "maskTrigger",   maskTrigger,  METH_NOARGS, "self.maskTrigger() -> int\n\nReturns integer number" },
+    { "maskSet",       maskSet,      METH_NOARGS, "self.maskSet() -> int\n\nReturns integer number" },
+    { "maskClear",     maskClear,    METH_NOARGS, "self.maskClear() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

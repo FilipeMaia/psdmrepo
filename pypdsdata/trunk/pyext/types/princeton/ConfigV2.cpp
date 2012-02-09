@@ -49,20 +49,20 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "width",                  width,                  METH_NOARGS, "" },
-    { "height",                 height,                 METH_NOARGS, "" },
-    { "orgX",                   orgX,                   METH_NOARGS, "" },
-    { "orgY",                   orgY,                   METH_NOARGS, "" },
-    { "binX",                   binX,                   METH_NOARGS, "" },
-    { "binY",                   binY,                   METH_NOARGS, "" },
-    { "exposureTime",           exposureTime,           METH_NOARGS, "" },
-    { "coolingTemp",            coolingTemp,            METH_NOARGS, "" },
-    { "gainIndex",              gainIndex,              METH_NOARGS, "" },
-    { "readoutSpeedIndex",      readoutSpeedIndex,      METH_NOARGS, "" },
-    { "readoutEventCode",       readoutEventCode,       METH_NOARGS, "" },
-    { "delayMode",              delayMode,              METH_NOARGS, "" },
-    { "size",                   size,                   METH_NOARGS, "" },
-    { "frameSize",              frameSize,              METH_NOARGS, "" },
+    { "width",             width,             METH_NOARGS, "self.width() -> int\n\nReturns frame width" },
+    { "height",            height,            METH_NOARGS, "self.height() -> int\n\nReturns fram height" },
+    { "orgX",              orgX,              METH_NOARGS, "self.orgX() -> int\n\nReturns origin in X" },
+    { "orgY",              orgY,              METH_NOARGS, "self.orgY() -> int\n\nReturns origin in Y" },
+    { "binX",              binX,              METH_NOARGS, "self.binX() -> int\n\nReturns binning in X" },
+    { "binY",              binY,              METH_NOARGS, "self.binY() -> int\n\nReturns binning in Y" },
+    { "exposureTime",      exposureTime,      METH_NOARGS, "self.exposureTime() -> float\n\nReturns exposure time" },
+    { "coolingTemp",       coolingTemp,       METH_NOARGS, "self.coolingTemp() -> float\n\nReturns integer number" },
+    { "gainIndex",         gainIndex,         METH_NOARGS, "self.gainIndex() -> int\n\nReturns integer number" },
+    { "readoutSpeedIndex", readoutSpeedIndex, METH_NOARGS, "self.readoutSpeedIndex() -> int\n\nReturns integer number" },
+    { "readoutEventCode",  readoutEventCode,  METH_NOARGS, "self.readoutEventCode() -> int\n\nReturns integer number" },
+    { "delayMode",         delayMode,         METH_NOARGS, "self.delayMode() -> int\n\nReturns integer number" },
+    { "size",              size,              METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
+    { "frameSize",         frameSize,         METH_NOARGS, "self.height() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
     {0, 0, 0, 0}
    };
 

@@ -35,9 +35,9 @@ namespace {
   MEMBER_WRAPPER_EMBEDDED(pypdsdata::EvrData::DataV3_FIFOEvent, EventCode)
 
   PyGetSetDef getset[] = {
-    {"TimestampHigh",  TimestampHigh,     0, "", 0},
-    {"TimestampLow",   TimestampLow,      0, "", 0},
-    {"EventCode",      EventCode,         0, "", 0},
+    {"TimestampHigh",  TimestampHigh,     0, "Integer number", 0},
+    {"TimestampLow",   TimestampLow,      0, "Integer number", 0},
+    {"EventCode",      EventCode,         0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 

@@ -41,11 +41,11 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"name",       name,       METH_NOARGS,  "Returns name of the monitoring channel" },
-    {"array",      array,      METH_NOARGS,  "Returns true for array" },
-    {"index",      index,      METH_NOARGS,  "Returns index in the array" },
-    {"loValue",    loValue,    METH_NOARGS,  "Returns low value" },
-    {"hiValue",    hiValue,    METH_NOARGS,  "Returns high value" },
+    {"name",       name,       METH_NOARGS,  "self.name() -> string\n\nReturns name of the monitoring channel" },
+    {"array",      array,      METH_NOARGS,  "self.array() -> bool\n\nReturns true for array" },
+    {"index",      index,      METH_NOARGS,  "self.index() -> int\n\nReturns index in the array" },
+    {"loValue",    loValue,    METH_NOARGS,  "self.loValue() -> float\n\nReturns low value" },
+    {"hiValue",    hiValue,    METH_NOARGS,  "self.hiValue() -> float\n\nReturns high value" },
     {0, 0, 0, 0}
    };
 

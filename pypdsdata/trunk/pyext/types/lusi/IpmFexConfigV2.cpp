@@ -41,9 +41,9 @@ namespace {
   PyObject* IpmFexConfigV2_diode( PyObject* self, void* );
 
   PyGetSetDef getset[] = {
-    {"xscale",   xscale,                0, "", 0},
-    {"yscale",   yscale,                0, "", 0},
-    {"diode",    IpmFexConfigV2_diode,  0, "", 0},
+    {"xscale",   xscale,                0, "Floating point number", 0},
+    {"yscale",   yscale,                0, "Floating point number", 0},
+    {"diode",    IpmFexConfigV2_diode,  0, "List of NCHANNELS DiodeFexConfigV2 objects", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -62,6 +62,12 @@ pypdsdata::Lusi::IpmFexConfigV2::initType( PyObject* module )
   type->tp_getset = ::getset;
   type->tp_str = _repr;
   type->tp_repr = _repr;
+
+  // define class attributes for enums
+  type->tp_dict = PyDict_New();
+  PyObject* val = PyInt_FromLong(Pds::Lusi::IpmFexConfigV2::NCHANNELS);
+  PyDict_SetItemString( type->tp_dict, "NCHANNELS", val );
+  Py_XDECREF(val);
 
   BaseType::initType( "IpmFexConfigV2", module );
 }

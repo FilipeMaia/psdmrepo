@@ -43,14 +43,14 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"uDamageMask",    uDamageMask,    0, "", 0},
-    {"fEbeamCharge",   fEbeamCharge,   0, "in nC", 0},
-    {"fEbeamL3Energy", fEbeamL3Energy, 0, "in MeV", 0},
-    {"fEbeamLTUPosX",  fEbeamLTUPosX,  0, "in mm", 0},
-    {"fEbeamLTUPosY",  fEbeamLTUPosY,  0, "in mm", 0},
-    {"fEbeamLTUAngX",  fEbeamLTUAngX,  0, "in mrad", 0},
-    {"fEbeamLTUAngY",  fEbeamLTUAngY,  0, "in mrad", 0},
-    {"fEbeamPkCurrBC2", fEbeamPkCurrBC2, 0, "in Amps", 0},
+    {"uDamageMask",    uDamageMask,    0, "integer number", 0},
+    {"fEbeamCharge",   fEbeamCharge,   0, "floating number, in nC", 0},
+    {"fEbeamL3Energy", fEbeamL3Energy, 0, "floating number, in MeV", 0},
+    {"fEbeamLTUPosX",  fEbeamLTUPosX,  0, "floating number, in mm", 0},
+    {"fEbeamLTUPosY",  fEbeamLTUPosY,  0, "floating number, in mm", 0},
+    {"fEbeamLTUAngX",  fEbeamLTUAngX,  0, "floating number, in mrad", 0},
+    {"fEbeamLTUAngY",  fEbeamLTUAngY,  0, "floating number, in mrad", 0},
+    {"fEbeamPkCurrBC2", fEbeamPkCurrBC2, 0, "floating number, in Amps", 0},
     {0, 0, 0, 0, 0}
   };
 

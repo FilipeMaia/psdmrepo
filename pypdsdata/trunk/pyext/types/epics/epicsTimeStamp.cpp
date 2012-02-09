@@ -39,9 +39,9 @@ namespace {
 
   PyMemberDef members[] = {
     {"secPastEpoch", T_UINT, offsetof(pypdsdata::Epics::epicsTimeStamp,m_obj.secPastEpoch),
-       0, "seconds since 0000 Jan 1, 1990" },
+       0, "integer number, seconds since 00:00 Jan 1, 1990" },
     {"nsec",         T_UINT, offsetof(pypdsdata::Epics::epicsTimeStamp,m_obj.nsec),
-      0, "nanoseconds within second" },
+      0, "integer number, nanoseconds within second" },
     {0, 0, 0, 0, 0}
   };
 

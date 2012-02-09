@@ -48,17 +48,17 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"numLinks",                numLinks,               METH_NOARGS,  "Returns number of links." },
-    {"payloadSizePerLink",      payloadSizePerLink,     METH_NOARGS,  "Returns data size per link in bytes." },
-    {"numChannels",             numChannels,            METH_NOARGS,  "" },
-    {"numRows",                 numRows,                METH_NOARGS,  "" },
-    {"numSubmoduleChannels",    numSubmoduleChannels,   METH_NOARGS,  "" },
-    {"numSubmoduleRows",        numSubmoduleRows,       METH_NOARGS,  "" },
-    {"numSubmodules",           numSubmodules,          METH_NOARGS,  "" },
-    {"camexMagic",              camexMagic,             METH_NOARGS,  "" },
-    {"info",                    info,                   METH_NOARGS,  "" },
-    {"timingFName",             timingFName,            METH_NOARGS,  "" },
-    {"size",                    size,                   METH_NOARGS,  "" },
+    {"numLinks",                numLinks,               METH_NOARGS,  "self.numLinks() -> int\n\nReturns number of links." },
+    {"payloadSizePerLink",      payloadSizePerLink,     METH_NOARGS,  "self.payloadSizePerLink() -> int\n\nReturns data size per link in bytes." },
+    {"numChannels",             numChannels,            METH_NOARGS,  "self.numChannels() -> int\n\nReturns integer number" },
+    {"numRows",                 numRows,                METH_NOARGS,  "self.numRows() -> int\n\nReturns integer number" },
+    {"numSubmoduleChannels",    numSubmoduleChannels,   METH_NOARGS,  "self.numSubmoduleChannels() -> int\n\nReturns integer number" },
+    {"numSubmoduleRows",        numSubmoduleRows,       METH_NOARGS,  "self.numSubmoduleRows() -> int\n\nReturns integer number" },
+    {"numSubmodules",           numSubmodules,          METH_NOARGS,  "self.numSubmodules() -> int\n\nReturns integer number" },
+    {"camexMagic",              camexMagic,             METH_NOARGS,  "self.camexMagic() -> int\n\nReturns integer number" },
+    {"info",                    info,                   METH_NOARGS,  "self.info() -> string\n\nReturns informational string" },
+    {"timingFName",             timingFName,            METH_NOARGS,  "self.timingFName() -> string\n\nReturns timing file name" },
+    {"size",                    size,                   METH_NOARGS,  "self.size() -> int\n\nReturns total size of the object" },
     {0, 0, 0, 0}
    };
 

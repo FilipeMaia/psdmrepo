@@ -43,17 +43,17 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::PulseConfig, width)
 
   PyMethodDef methods[] = {
-    { "pulse",              pulse,              METH_NOARGS, "internal pulse generation channel" },
-    { "trigger",            trigger,            METH_NOARGS, "id of generated pulse for each mode (edge/level)" },
-    { "set",                set,                METH_NOARGS, "id of generated pulse for each mode (edge/level)" },
-    { "clear",              clear,              METH_NOARGS, "id of generated pulse for each mode (edge/level)" },
-    { "polarity",           polarity,           METH_NOARGS, "bool: positive(negative) level" },
-    { "map_set_enable",     map_set_enable,     METH_NOARGS, "bool: enable pulse generation masks" },
-    { "map_reset_enable",   map_reset_enable,   METH_NOARGS, "bool: enable pulse generation masks" },
-    { "map_trigger_enable", map_trigger_enable, METH_NOARGS, "bool: enable pulse generation masks" },
-    { "prescale",           prescale,           METH_NOARGS, "pulse event prescale" },
-    { "delay",              delay,              METH_NOARGS, "delay in 119MHz clks" },
-    { "width",              width,              METH_NOARGS, "width in 119MHz clks" },
+    { "pulse",              pulse,              METH_NOARGS, "self.pulse() -> int\n\nReturns internal pulse generation channel" },
+    { "trigger",            trigger,            METH_NOARGS, "self.trigger() -> int\n\nReturns id of generated pulse for each mode (edge/level)" },
+    { "set",                set,                METH_NOARGS, "self.set() -> int\n\nReturns id of generated pulse for each mode (edge/level)" },
+    { "clear",              clear,              METH_NOARGS, "self.clear() -> int\n\nReturns id of generated pulse for each mode (edge/level)" },
+    { "polarity",           polarity,           METH_NOARGS, "self.polarity() -> bool\n\nReturns boolean" },
+    { "map_set_enable",     map_set_enable,     METH_NOARGS, "self.map_set_enable() -> int\n\nReturns boolean" },
+    { "map_reset_enable",   map_reset_enable,   METH_NOARGS, "self.map_reset_enable() -> int\n\nReturns boolean" },
+    { "map_trigger_enable", map_trigger_enable, METH_NOARGS, "self.map_trigger_enable() -> int\n\nReturns boolean" },
+    { "prescale",           prescale,           METH_NOARGS, "self.prescale() -> int\n\nReturns pulse event prescale" },
+    { "delay",              delay,              METH_NOARGS, "self.delay() -> int\n\nReturns delay in 119MHz clks" },
+    { "width",              width,              METH_NOARGS, "self.width() -> int\n\nReturns width in 119MHz clks" },
     {0, 0, 0, 0}
    };
 

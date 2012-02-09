@@ -103,9 +103,9 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, version);
 
   PyMethodDef methods[] = {
-    { "value",    value,   METH_NOARGS, "Returns the whole type ID number including version" },
-    { "id",       id,      METH_NOARGS, "Returns the type ID number without version" },
-    { "version",  version, METH_NOARGS, "Returns the type ID version number" },
+    { "value",    value,   METH_NOARGS, "self.value() -> int\n\nReturns the whole type ID number including version" },
+    { "id",       id,      METH_NOARGS, "self.id() -> Type\n\nReturns the type ID number without version" },
+    { "version",  version, METH_NOARGS, "self.version() -> int\n\nReturns the type ID version number" },
     {0, 0, 0, 0}
    };
 

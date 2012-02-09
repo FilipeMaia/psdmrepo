@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.ipimb.
+"""Wrapper module for _pdsdata.ipimb. This module imports all _pdsdata.ipimb 
+classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 

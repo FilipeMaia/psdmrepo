@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -37,11 +38,11 @@ namespace {
   PyObject initHeader = { PyObject_HEAD_INIT(0) };
 
   char docString[] =
-    "Python class which emulates C++ enum type. It defines class\n"
-    "attributes whose values are integer numbers, so that you can\n"
-    "use EnumType.EnumValue notation to access the values. Instances\n"
-    "of this class are integer numbers which when converted to string\n"
-    "give the name of the corresponding class attribute.";
+    "Python class which emulates C++ enumeration. It defines class attributes\n"
+    "whose values are integer numbers, so that you can use EnumType.EnumValue\n"
+    "notation to access the values. Instances of this class are integer numbers\n"
+    "which when converted to string give the name of the corresponding class\n"
+    "attribute, e.g. str(Enum.SomeConst) => \"SomeConst\".\n";
 
   // standard Python stuff
   void Enum_dealloc( PyObject* self );
@@ -71,7 +72,7 @@ pypdsdata::EnumType::EnumType ( const char* name, Enum* enums )
   m_type.tp_repr = Enum_str_repr;
   m_type.tp_str = Enum_str_repr;
   m_type.tp_flags = Py_TPFLAGS_DEFAULT;
-  m_type.tp_doc = ::docString ;
+  m_type.tp_doc = 0;
   m_type.tp_base = &PyInt_Type ;
   m_type.tp_init = Enum_init ;
   m_type.tp_alloc = PyType_GenericAlloc ;
@@ -91,23 +92,36 @@ pypdsdata::EnumType::EnumType ( const char* name, Enum* enums )
   type += '.';
 
   // define class attributes as enum values
-  for ( ; enums->name ; ++ enums ) {
+  for (Enum* eiter = enums; eiter->name ; ++ eiter) {
 
     // build the object
     EnumObject* value = PyObject_New(EnumObject, &m_type);
-    std::string name = type + enums->name;
-    value->ob_ival = enums->value;
+    std::string name = type + eiter->name;
+    value->ob_ival = eiter->value;
     value->en_name = PyString_FromString( name.c_str() );
 
     // store it in the class attribute
-    PyObject* key = PyString_FromString(enums->name) ;
+    PyObject* key = PyString_FromString(eiter->name) ;
     PyDict_SetItem( m_type.tp_dict, key, (PyObject*)value );
     Py_DECREF(key);
 
     // and in the map
-    m_int2enum[enums->value] = (PyObject*)value;
+    m_int2enum[eiter->value] = (PyObject*)value;
   }
 
+  // generate doc string
+  std::ostringstream doc;
+  doc << ::docString << "\nThis class defines following constants: ";
+  for (Enum* eiter = enums; eiter->name ; ++ eiter) {
+    if (eiter != enums) doc << ", ";
+    doc << "    " << eiter->name << " = " << eiter->value;
+  }
+  const std::string& docstr = doc.str();
+  char* buf = new char[docstr.size()+1];
+  std::copy(docstr.begin(), docstr.end(), buf);
+  buf[docstr.size()] = '\0';
+  // TODO: memory leak
+  m_type.tp_doc = buf;
 }
 
 //--------------

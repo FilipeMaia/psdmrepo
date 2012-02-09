@@ -43,10 +43,10 @@ namespace {
   PyObject* IpmFexV1_channel( PyObject* self, void* );
 
   PyGetSetDef getset[] = {
-    {"sum",     sum,               0, "", 0},
-    {"xpos",    xpos,              0, "", 0},
-    {"ypos",    ypos,              0, "", 0},
-    {"channel", IpmFexV1_channel,  0, "", 0},
+    {"sum",     sum,               0, "Floating point number", 0},
+    {"xpos",    xpos,              0, "Floating point number", 0},
+    {"ypos",    ypos,              0, "Floating point number", 0},
+    {"channel", IpmFexV1_channel,  0, "List of 4 floating numbers", 0},
     {0, 0, 0, 0, 0}
   };
 

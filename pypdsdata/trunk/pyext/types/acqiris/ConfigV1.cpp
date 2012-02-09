@@ -45,13 +45,13 @@ namespace {
   PyObject* vert( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"nbrConvertersPerChannel", nbrConvertersPerChannel, METH_NOARGS,  "Returns integer number" },
-    {"channelMask",  channelMask,  METH_NOARGS,  "Returns integer number" },
-    {"nbrChannels",  nbrChannels,  METH_NOARGS,  "Returns integer number" },
-    {"nbrBanks",     nbrBanks,     METH_NOARGS,  "Returns integer number" },
-    {"horiz",        horiz,        METH_NOARGS,  "Returns HorizV1 object" },
-    {"trig",         trig,         METH_NOARGS,  "Returns TrigV1 object" },
-    {"vert",         vert,         METH_VARARGS, "Returns VertV1 object for a given channel number" },
+    {"nbrConvertersPerChannel", nbrConvertersPerChannel, METH_NOARGS,  "self.nbrConvertersPerChannel() -> int\n\nReturns integer number" },
+    {"channelMask",  channelMask,  METH_NOARGS,  "self.channelMask() -> int\n\nReturns integer number" },
+    {"nbrChannels",  nbrChannels,  METH_NOARGS,  "self.nbrChannels() -> int\n\nReturns integer number" },
+    {"nbrBanks",     nbrBanks,     METH_NOARGS,  "self.nbrBanks() -> int\n\nReturns integer number" },
+    {"horiz",        horiz,        METH_NOARGS,  "self.horiz() -> HorizV1\n\nReturns HorizV1 object" },
+    {"trig",         trig,         METH_NOARGS,  "self.trig() -> TrigV1\n\nReturns TrigV1 object" },
+    {"vert",         vert,         METH_VARARGS, "self.vert(channel: int) -> VertV1\n\nReturns VertV1 object for a given channel number" },
     {0, 0, 0, 0}
    };
 

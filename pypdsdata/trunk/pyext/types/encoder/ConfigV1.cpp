@@ -62,12 +62,12 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"_chan_num",         _chan_num,         0, "", 0},
-    {"_count_mode",      _count_mode,       0, "", 0},
-    {"_quadrature_mode", _quadrature_mode,  0, "", 0},
-    {"_input_num",       _input_num,        0, "", 0},
-    {"_input_rising",    _input_rising,     0, "", 0},
-    {"_ticks_per_sec",   _ticks_per_sec,    0, "", 0},
+    {"_chan_num",         _chan_num,        0, "Integer number", 0},
+    {"_count_mode",      _count_mode,       0, "Integer number", 0},
+    {"_quadrature_mode", _quadrature_mode,  0, "Integer number", 0},
+    {"_input_num",       _input_num,        0, "Integer number", 0},
+    {"_input_rising",    _input_rising,     0, "Integer number", 0},
+    {"_ticks_per_sec",   _ticks_per_sec,    0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 

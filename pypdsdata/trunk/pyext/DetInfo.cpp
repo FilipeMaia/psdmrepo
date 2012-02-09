@@ -152,14 +152,14 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::DetInfo, devId);
 
   PyMethodDef methods[] = {
-    { "level",     DetInfo_level, METH_NOARGS, "Returns source level object (Level class)" },
-    { "log",       log,           METH_NOARGS, "Returns logical address of data source" },
-    { "phy",       phy,           METH_NOARGS, "Returns physical address of data source" },
-    { "processId", processId,     METH_NOARGS, "Returns process ID" },
-    { "detector",  detector,      METH_NOARGS, "Returns detector type, one of Detector.AmoIms, Detector.AmoGasdet, etc." },
-    { "device",    device,        METH_NOARGS, "Returns device type, one of Device.Evr, Device.Acqiris, etc." },
-    { "detId",     detId,         METH_NOARGS, "Returns detector ID" },
-    { "devId",     devId,         METH_NOARGS, "Returns device ID" },
+    { "level",     DetInfo_level, METH_NOARGS, "self.level() -> Level\n\nReturns source level object (Level class)" },
+    { "log",       log,           METH_NOARGS, "self.log() -> int\n\nReturns logical address of data source" },
+    { "phy",       phy,           METH_NOARGS, "self.phy() -> int\n\nReturns physical address of data source" },
+    { "processId", processId,     METH_NOARGS, "self.processId() -> int\n\nReturns process ID" },
+    { "detector",  detector,      METH_NOARGS, "self.detector() -> Detector\n\nReturns detector type, one of Detector.AmoIms, Detector.AmoGasdet, etc." },
+    { "device",    device,        METH_NOARGS, "self.device() -> Device\n\nReturns device type, one of Device.Evr, Device.Acqiris, etc." },
+    { "detId",     detId,         METH_NOARGS, "self.detId() -> int\n\nReturns detector ID" },
+    { "devId",     devId,         METH_NOARGS, "self.devId() -> int\n\nReturns device ID" },
     {0, 0, 0, 0}
    };
 

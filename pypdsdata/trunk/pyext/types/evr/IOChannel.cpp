@@ -40,9 +40,9 @@ namespace {
   PyObject* info( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    { "name",    name,   METH_NOARGS, "" },
-    { "ninfo",   ninfo,  METH_NOARGS, "" },
-    { "info",    info,   METH_VARARGS, "" },
+    { "name",    name,   METH_NOARGS,  "self.name() -> string\n\nReturns string" },
+    { "ninfo",   ninfo,  METH_NOARGS,  "self.ninfo() -> int\n\nReturns number of DetInfo objects" },
+    { "info",    info,   METH_VARARGS, "self.info(i: int) -> xtc.DetInfo\n\nReturns DetInfo object" },
     {0, 0, 0, 0}
    };
 

@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.acqiris, provides additional functionality.
+"""Wrapper module for _pdsdata.acqiris, provides wrapper for DataDescV1
+class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 
@@ -51,29 +50,46 @@ from _pdsdata.acqiris import *
 
 # extend DataDescV1
 class DataDescV1(object) :
+    """
+    This is a wrapper for _pdsdata.acqiris.DataDescV1 which removes the need
+    to pass configuration objects to several methods.
+    """
     
     def __init__(self, ddesc, hcfg, vcfg ):
         """ Constructor takes _pdsdata.acqiris.DataDescV1,
-        _pdsdata.acqiris.HorizV1 and _pdsdata.acqiris.VertV1 objects """
+        _pdsdata.acqiris.HorizV1 and _pdsdata.acqiris.VertV1 objects
+        """
         
         self.__ddesc = ddesc
         self.__hcfg = hcfg
         self.__vcfg = vcfg
     
     def nbrSamplesInSeg(self) :
-        "Returns number of samples per segment"
+        """self.nbrSamplesInSeg() -> int
+        
+        Returns number of samples per segment
+        """
         return self.__ddesc.nbrSamplesInSeg()
     
     def nbrSegments(self) :
-        "Returns number of segments"
+        """self.nbrSegments() -> int
+        
+        Returns number of segments
+        """
         return self.__ddesc.nbrSegments()
     
     def timestamp(self, segment) :
-        "Returns TimestampV1 object for a given segment"
+        """self.timestamp(seg: int) -> TimestampV1
+        
+        Returns TimestampV1 object for a given segment
+        """
         return self.__ddesc.timestamp(segment)
  
     def waveform(self) :
-        "Returns waveform array"
+        """self.waveform() -> numpy.ndarray
+        
+        Returns waveform array
+        """
         wf = self.__ddesc.waveform( self.__hcfg )
         slope = self.__vcfg.slope()
         offset = self.__vcfg.offset()
@@ -81,7 +97,10 @@ class DataDescV1(object) :
         return wf
 
     def timestamps(self) :
-        "Returns array of timestamps"
+        """self.timestamps() -> numpy.ndarray
+        
+        Returns array of timestamps
+        """
         sampInterval = self.__hcfg.sampInterval()
         nbrSamples = self.__hcfg.nbrSamples()
         return numpy.arange( 0, nbrSamples*sampInterval, sampInterval, dtype=float )

@@ -7,12 +7,11 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.opal1k.
+"""Wrapper module for _pdsdata.opal1k. This module imports all _pdsdata.opal1k 
+classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 

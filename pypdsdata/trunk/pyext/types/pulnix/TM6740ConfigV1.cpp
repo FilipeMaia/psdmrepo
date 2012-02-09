@@ -81,17 +81,22 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"vref",                   vref,                    METH_NOARGS,  "" },
-    {"gain_a",                 gain_a,                  METH_NOARGS,  "" },
-    {"gain_b",                 gain_b,                  METH_NOARGS,  "" },
-    {"gain_balance",           gain_balance,            METH_NOARGS,  "" },
-    {"shutter_width",          shutter_width,           METH_NOARGS,  "Return shutter width in microseconds." },
-    {"output_resolution",      output_resolution,       METH_NOARGS,  "Returns bit-depth of pixel counts (one of Depth.Eight_bit, Depth.Ten_bit)." },
-    {"output_resolution_bits", output_resolution_bits,  METH_NOARGS,  "Returns bit-depth of pixel counts (in actual bits)." },
-    {"horizontal_binning",     horizontal_binning,      METH_NOARGS,  "Returns horizontal re-binning of output (consecutive columns summed), one of Binning.x1, Binning.x2, etc." },
-    {"vertical_binning",       vertical_binning,        METH_NOARGS,  "Returns vertical re-binning of output (consecutive rows summed), one of Binning.x1, Binning.x2, etc." },
-    {"lookuptable_mode",       lookuptable_mode,        METH_NOARGS,  "one of LookupTable.Gamma, LookupTable.Linear" },
-
+    {"vref",                   vref,                    METH_NOARGS,  "self.vref() -> int\n\nReturns integer number" },
+    {"gain_a",                 gain_a,                  METH_NOARGS,  "self.gain_a() -> int\n\nReturns integer number" },
+    {"gain_b",                 gain_b,                  METH_NOARGS,  "self.gain_b() -> int\n\nReturns integer number" },
+    {"gain_balance",           gain_balance,            METH_NOARGS,  "self.gain_balance() -> bool\n\nReturns boolean value" },
+    {"shutter_width",          shutter_width,           METH_NOARGS,  
+        "self.shutter_width() -> int\n\nReturn shutter width in microseconds." },
+    {"output_resolution",      output_resolution,       METH_NOARGS,  
+        "self.output_resolution() -> Depth enum\n\nReturns bit-depth of pixel counts (one of Depth.Eight_bit, Depth.Ten_bit)." },
+    {"output_resolution_bits", output_resolution_bits,  METH_NOARGS,  
+        "self.output_resolution_bits() -> int\n\nReturns bit-depth of pixel counts (in actual bits)." },
+    {"horizontal_binning",     horizontal_binning,      METH_NOARGS,  
+        "self.horizontal_binning() -> Binning enum\n\nReturns horizontal re-binning of output (consecutive columns summed), one of Binning.x1, Binning.x2, etc." },
+    {"vertical_binning",       vertical_binning,        METH_NOARGS,  
+        "self.vertical_binning() -> Binning enum\n\nReturns vertical re-binning of output (consecutive rows summed), one of Binning.x1, Binning.x2, etc." },
+    {"lookuptable_mode",       lookuptable_mode,        METH_NOARGS,  
+        "self.lookuptable_mode() -> LookupTable enum\n\nReturns one of LookupTable.Gamma, LookupTable.Linear" },
     {0, 0, 0, 0}
    };
 

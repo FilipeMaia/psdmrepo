@@ -41,9 +41,9 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "shotIdStart",    shotIdStart,    METH_NOARGS, "" },
-    { "readoutTime",    readoutTime,    METH_NOARGS, "" },
-    { "data",           data,           METH_VARARGS, "" },
+    { "shotIdStart",    shotIdStart,    METH_NOARGS, "self.shotIdStart() -> int\n\nReturns integer number" },
+    { "readoutTime",    readoutTime,    METH_NOARGS, "self.readoutTime() -> float\n\nReturns floating number" },
+    { "data",           data,           METH_VARARGS, "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns 2-dim array of integer numbers" },
     {0, 0, 0, 0}
    };
 

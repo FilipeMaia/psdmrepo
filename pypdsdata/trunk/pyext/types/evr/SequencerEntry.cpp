@@ -36,8 +36,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "eventcode",       eventcode,       METH_NOARGS, "" },
-    { "delay",           delay,           METH_NOARGS, "" },
+    { "eventcode",       eventcode,       METH_NOARGS, "self.eventcode() -> int\n\nReturns integer number" },
+    { "delay",           delay,           METH_NOARGS, "self.delay() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

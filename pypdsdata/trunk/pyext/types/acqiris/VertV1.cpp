@@ -62,11 +62,11 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, slope)
 
   PyMethodDef methods[] = {
-    {"fullScale",    fullScale,   METH_NOARGS,  "Returns floating number" },
-    {"offset",       offset,      METH_NOARGS,  "Returns floating number" },
-    {"coupling",     coupling,    METH_NOARGS,  "Returns integer number, one of Coupling.GND, Coupling.DC, Coupling.AC, etc." },
-    {"bandwidth",    bandwidth,   METH_NOARGS,  "Returns integer number, one of Bandwidth.None_, Bandwidth.MHz25, Bandwidth.MHz700, etc." },
-    {"slope",        slope,       METH_NOARGS,  "Returns floating number" },
+    {"fullScale",    fullScale,   METH_NOARGS,  "self.fullScale() -> float\n\nReturns floating number" },
+    {"offset",       offset,      METH_NOARGS,  "self.offset() -> float\n\nReturns floating number" },
+    {"coupling",     coupling,    METH_NOARGS,  "self.coupling() -> Coupling enum\n\nReturns enum value one of Coupling.GND, Coupling.DC, Coupling.AC, etc." },
+    {"bandwidth",    bandwidth,   METH_NOARGS,  "self.bandwidth() -> Bandwidth enum\n\nReturns enum value one of Bandwidth.None_, Bandwidth.MHz25, Bandwidth.MHz700, etc." },
+    {"slope",        slope,       METH_NOARGS,  "self.slope() -> float\n\nReturns floating number" },
     {0, 0, 0, 0}
    };
 

@@ -41,9 +41,9 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"camConfig",    camConfig,  0, "", 0},
-    {"pimConfig",    pimConfig,  0, "", 0},
-    {"frame",        frame,      0, "", 0},
+    {"camConfig",    camConfig,  0, "attribute of type pulnix.TM6740ConfigV2", 0},
+    {"pimConfig",    pimConfig,  0, "attribute of type lusi.PimImageConfigV1", 0},
+    {"frame",        frame,      0, "attribute of type camera.FrameV1", 0},
     {0, 0, 0, 0, 0}
   };
 

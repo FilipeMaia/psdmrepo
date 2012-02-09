@@ -40,9 +40,9 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Common, nhits)
 
   PyMethodDef methods[] = {
-    {"source",   source,   METH_NOARGS,  "Returns TdcDataV1.Source enum value" },
-    {"overflow", overflow, METH_NOARGS,  "Returns boolean value" },
-    {"nhits",    nhits,    METH_NOARGS,  "Returns integer number" },
+    {"source",   source,   METH_NOARGS,  "self.source() -> Source enum\n\nReturns TdcDataV1.Source enum value" },
+    {"overflow", overflow, METH_NOARGS,  "self.overflow() -> bool\n\nReturns boolean value" },
+    {"nhits",    nhits,    METH_NOARGS,  "self.nhits() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

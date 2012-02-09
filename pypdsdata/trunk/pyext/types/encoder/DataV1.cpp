@@ -38,8 +38,8 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"_33mhz_timestamp", _33mhz_timestamp,  0, "", 0},
-    {"_encoder_count",   _encoder_count,    0, "", 0},
+    {"_33mhz_timestamp", _33mhz_timestamp,  0, "Integer number", 0},
+    {"_encoder_count",   _encoder_count,    0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -47,7 +47,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Encoder::DataV1, value)
 
   PyMethodDef methods[] = {
-    {"value",                 value,                  METH_NOARGS,  "" },
+    {"value",       value,    METH_NOARGS,  "self.value() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

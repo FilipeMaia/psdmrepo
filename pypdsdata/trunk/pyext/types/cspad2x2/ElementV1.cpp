@@ -48,18 +48,18 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"virtual_channel", virtual_channel, METH_NOARGS,  "" },
-    {"lane",            lane,           METH_NOARGS,  "" },
-    {"tid",             tid,            METH_NOARGS,  "" },
-    {"acq_count",       acq_count,      METH_NOARGS,  "" },
-    {"op_code",         op_code,        METH_NOARGS,  "" },
-    {"quad",            quad,           METH_NOARGS,  "" },
-    {"seq_count",       seq_count,      METH_NOARGS,  "" },
-    {"ticks",           ticks,          METH_NOARGS,  "" },
-    {"fiducials",       fiducials,      METH_NOARGS,  "" },
-    {"frame_type",      frame_type,     METH_NOARGS,  "" },
-    {"sb_temp",         sb_temp,        METH_VARARGS,  "" },
-    {"data",            data,           METH_NOARGS,  "" },
+    {"virtual_channel", virtual_channel, METH_NOARGS,  "self.virtual_channel() -> int\n\nReturns integer number" },
+    {"lane",            lane,           METH_NOARGS,  "self.lane() -> int\n\nReturns integer number" },
+    {"tid",             tid,            METH_NOARGS,  "self.tid() -> int\n\nReturns integer number" },
+    {"acq_count",       acq_count,      METH_NOARGS,  "self.acq_count() -> int\n\nReturns integer number" },
+    {"op_code",         op_code,        METH_NOARGS,  "self.op_code() -> int\n\nReturns integer number" },
+    {"quad",            quad,           METH_NOARGS,  "self.quad() -> int\n\nReturns quadrant number" },
+    {"seq_count",       seq_count,      METH_NOARGS,  "self.seq_count() -> int\n\nReturns sequence counter" },
+    {"ticks",           ticks,          METH_NOARGS,  "self.ticks() -> int\n\nReturns integer number" },
+    {"fiducials",       fiducials,      METH_NOARGS,  "self.fiducials() -> int\n\nReturns integer number" },
+    {"frame_type",      frame_type,     METH_NOARGS,  "self.frame_type() -> int\n\nReturns integer number" },
+    {"sb_temp",         sb_temp,        METH_VARARGS, "self.sb_temp(i: int) -> int\n\nRetuns integer number, index i in the range (0..3)" },
+    {"data",            data,           METH_NOARGS,  "self.data() -> numpy.ndarray\n\nReturns data array" },
     {0, 0, 0, 0}
    };
 

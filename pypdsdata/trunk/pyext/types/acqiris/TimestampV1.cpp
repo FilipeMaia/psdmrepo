@@ -37,8 +37,8 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::TimestampV1, value)
 
   PyMethodDef methods[] = {
-    {"pos",     pos,    METH_NOARGS,  "Returns floating number" },
-    {"value",   value,  METH_NOARGS,  "Returns integer number" },
+    {"pos",     pos,    METH_NOARGS,  "self.pos() -> float\n\nReturns floating number" },
+    {"value",   value,  METH_NOARGS,  "self.value() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 

@@ -37,11 +37,11 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::PulseConfigV3, width)
 
   PyMethodDef methods[] = {
-    { "pulseId",            pulseId,            METH_NOARGS, "" },
-    { "polarity",           polarity,           METH_NOARGS, "0 -> positive polarity , 1 -> negative polarity" },
-    { "prescale",           prescale,           METH_NOARGS, "Clock divider" },
-    { "delay",              delay,              METH_NOARGS, "Delay in 119MHz clks" },
-    { "width",              width,              METH_NOARGS, "Width in 119MHz clks" },
+    { "pulseId",            pulseId,            METH_NOARGS, "self.pulseId() -> int\n\nReturns integer number" },
+    { "polarity",           polarity,           METH_NOARGS, "self.polarity() -> int\n\nReturns 0 for positive polarity , 1 for negative polarity" },
+    { "prescale",           prescale,           METH_NOARGS, "self.prescale() -> int\n\nReturns clock divider" },
+    { "delay",              delay,              METH_NOARGS, "self.delay() -> int\n\nReturns delay in 119MHz clks" },
+    { "width",              width,              METH_NOARGS, "self.width() -> int\n\nReturns width in 119MHz clks" },
     {0, 0, 0, 0}
    };
 
