@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2012-02-09 Andy Salnikov
+- add quiet option to pydoc-driver
+
 Tag: V00-01-10
 2012-02-09 Andy Salnikov
 - doc target now also runs sphinx on pyana modules and friends
