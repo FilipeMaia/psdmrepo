@@ -33,6 +33,7 @@ import sys
 import logging
 import ConfigParser 
 from optparse import OptionParser, make_option
+import gc
 
 #---------------------------------
 #  Imports of base class module --
@@ -61,11 +62,13 @@ _options = {
     'verbose'    : ( 'verbose',    int ),
     'file-list'  : ( 'file_list',  _unity),
     'num-events' : ( 'num_events', int),
-    'skip-events' : ( 'skip_events', int),
+    'skip-events': ( 'skip_events',int),
     'modules'    : ( 'module',     lambda x : x.split()),
     'job-name'   : ( 'job_name',   _unity),
     'num-cpu'    : ( 'num_cpu',    int),
     'dg-ref'     : ( 'dg_ref',     _str2bool),
+    'gc-threshod': ( 'gc_threshod', int),
+    'gc-debug'   : ( 'gc_debug',   _str2bool),
 }
 
 
@@ -80,6 +83,8 @@ _cmdoptions = [
     make_option( '-m', "--module", metavar="NAME", action="append", help="user module name, multiple modules allowed" ),
     make_option( '-p', "--num-cpu", metavar="NUMBER", type="int", help="number grater than 1 enables multi-processing" ),
     make_option( '-r', "--dg-ref", action="store_true",help="pass datagrams by-reference to children processes" ),
+    make_option( '-g', "--gc-threshod", metavar="NUMBER", type="int", help="threshold in MB for running garbage collector, use 0 to disable; def: 10" ),
+    make_option( '-G', "--gc-debug", action="store_true",help="debug garbage collection" ),
 ]
 
 #------------------------
@@ -138,6 +143,9 @@ class config ( object ) :
         level = log_levels.get ( self.getJobConfig('verbose', 0), logging.DEBUG )
         logging.getLogger().setLevel(level)
 
+        # set GC debug
+        if self.getJobConfig('gc-debug', False):
+            gc.set_debug(gc.DEBUG_STATS)
 
     #-------------------
     #  Public methods --

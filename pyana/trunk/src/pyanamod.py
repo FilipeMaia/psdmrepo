@@ -55,18 +55,28 @@ from pyana.merger import merger
 # Local non-exported definitions --
 #----------------------------------
 
+def _vmsize():
+    fname = '/proc/%d/stat' % os.getpid() 
+    return int(file(fname).read().split()[22])
+
 def _rusage(msg, ru1, ru2):
     
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
 
-def _proc(jobname, id, pipes, userObjects, dg_ref):
+def _proc(jobname, id, pipes, userObjects, jobConfig):
     """ method which is running in child process when we do multi-processing """
 
     for i in range(len(pipes)):
         pipes[i][0].close()
         if i != id : pipes[i][1].close()
     pipe = pipes[id][1]
+
+    # gc options
+    gc_threshod = jobConfig.getJobConfig("gc-threshod", 10)
+    gc_debug = jobConfig.getJobConfig("gc-debug", False)
+
+    dg_ref = jobConfig.getJobConfig('dg-ref', False)
 
     ru1 = getrusage(RUSAGE_SELF)
     
@@ -78,6 +88,7 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
     dispatch = evt_dispatch(userObjects)
     proto = mp_proto(pipe, dg_ref, 'prot-%d' % id)
     nevent = 0
+    vmsize = _vmsize()
 
     # event loop
     for req in proto.getRequest():
@@ -122,9 +133,15 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
             # stop here
             break
 
-        # explicitly run garbage collector once per iteration
-        # to collect cycles.
-        gc.collect()
+        # explicitly run garbage collector if memory grows too much
+        if gc_debug: logging.info("VM size: %d", _vmsize())
+        if gc_threshod > 0:
+            newvmsize = _vmsize()
+            if newvmsize - vmsize > gc_threshod*1048576:
+                logging.debug("running garbage collector, virtual size: %d", newvmsize)
+                gc.collect()
+                vmsize = _vmsize()
+                logging.debug("virtual size after GC: %d", vmsize)
             
     # done with the environment
     env.finish()
@@ -142,6 +159,10 @@ def _pyana ( argv ) :
 
     # get all options from command line and config file
     jobConfig = config( argv[1:] )
+
+    # gc options
+    gc_threshod = jobConfig.getJobConfig("gc-threshod", 10)
+    gc_debug = jobConfig.getJobConfig("gc-debug", False)
 
     # get file names
     names = jobConfig.files()
@@ -180,7 +201,7 @@ def _pyana ( argv ) :
     logging.info("dg-ref: %s", dg_ref)
 
     conns = [ mp.Pipe() for i in range(nsub)]
-    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, dg_ref)) for i in range(nsub)]
+    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, jobConfig)) for i in range(nsub)]
     for p in procs : p.start()
     for conn in conns : conn[1].close()
     pipes = [mp_proto(conn[0], dg_ref, 'prot-main') for conn in conns]
@@ -198,13 +219,20 @@ def _pyana ( argv ) :
         ndamage = 0
         damagemask = 0
         next = 0
-    
+        vmsize = _vmsize()
+
         # read datagrams one by one
         for dgtup in dgramGen( names ) :
 
-            # explicitly run garbage collector once per iteration
-            # to collect cycles.
-            gc.collect()
+            # explicitly run garbage collector if memory grows too much
+            if gc_debug: logging.info("VM size: %d", _vmsize())
+            if gc_threshod > 0:
+                newvmsize = _vmsize()
+                if newvmsize - vmsize > gc_threshod*1048576:
+                    logging.debug("running garbage collector, virtual size: %d", newvmsize)
+                    gc.collect()
+                    vmsize = _vmsize()
+                    logging.debug("virtual size after GC: %d", vmsize)
     
             if num_events is not None and nevent >= num_events+skip_events :
                 logging.info("event limit reached (%d), terminating", nevent)
