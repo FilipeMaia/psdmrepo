@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-37
+2012-02-11 Andy Salnikov
+- adding protection for zero-size EPICS channel data in the event
+- print a warning in case zero-size EPICS channel data is detected,
+  not much else can be done to correct the problem, and masking it 
+  completely does not look like a right thing to do
+
 Tag: V00-00-36
 2012-02-10 Andy Salnikov
 - gc.collect() on every event takes too much CPU, implementing better 

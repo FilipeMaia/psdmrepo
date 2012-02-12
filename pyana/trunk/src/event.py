@@ -600,17 +600,28 @@ class EpicsStore(object):
             
             src = extc.src
             e = extc.payload()
-            
-            id = (src.log(), src.phy(), e.iPvId)
-            
-            if epics.dbr_type_is_CTRL(e.iDbrType) :
-                # store mapping from name to ID
-                name = e.sPvName
-                self.m_id2name[id] = name
-            else:
-                name = self.m_id2name.get(id, None)
+            if e is None:
                 
-            self.m_name2epics[name] = e
+                guessId = (src.log(), src.phy(), lastPvId+1)
+                guessName = self.m_id2name.get(id, None)
+                if guessName:
+                    _log.warning("Zero-size EPICS data found in the event, expected name is %s", guessName)
+                else:
+                    _log.warning("Zero-size EPICS data found in the event")
+                
+            else:
+
+                lastPvId = e.iPvId
+                id = (src.log(), src.phy(), e.iPvId)
+                
+                if epics.dbr_type_is_CTRL(e.iDbrType) :
+                    # store mapping from name to ID
+                    name = e.sPvName
+                    self.m_id2name[id] = name
+                else:
+                    name = self.m_id2name.get(id, None)
+                    
+                self.m_name2epics[name] = e
 
     def value(self, name):
         """ self.value(name) -> EPICS object
