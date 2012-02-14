@@ -45,7 +45,7 @@ class ImgDrawProjRP :
 
     def __init__(self, icp=None):
         self.icp           = icp
-        self.icp.idrawspec = self
+        self.icp.idrawprrp = self
         self.arr           = None
 
         #self.icp.list_of_rects = [] # moved to icp
@@ -54,9 +54,9 @@ class ImgDrawProjRP :
         return self.icp.control
 
 
-    def draw_prxy_for_rect(self,obj) :
-        x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
-        print 'draw_zoom_for_rect : x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
+    def draw_prrp_for_wedge(self,obj) :
+        (x,y,r,w,t1,t2,lw,col,s,t,rem) = obj.get_list_of_wedge_pars()
+        #obj.print_pars()
 
         plt.ion()
 
@@ -68,21 +68,21 @@ class ImgDrawProjRP :
             obj.set_fig_outside(fig_outside)                   # Preserve figure in the object
             fig_outside.obj_index = obj.myIndex 
             fig_outside.my_object = obj
-            fig_outside.canvas.set_window_title('Projections X and Y for rect %d' % obj.myIndex  )
+            fig_outside.canvas.set_window_title('Projections R and P for wedge %d' % obj.myIndex  )
             print 'fig_outside.number=',fig_outside.number
 
         else :
 
             if not obj.isChanged : return
             fig_outside.clear()
-            fig_outside.canvas.set_window_title('Projections X and Y for rect %d' % fig_outside.obj_index )
+            fig_outside.canvas.set_window_title('Projections R and P for wedge %d' % fig_outside.obj_index )
 
         if s :   # Re-draw the figure window on top
 
             fig_outside.canvas.manager.window.activateWindow() # Makes window active
             fig_outside.canvas.manager.window.raise_()         # Move window on top
 
-        self.drawImgAndProjsInRect(fig_outside, self.arr, obj)
+        #self.drawImgAndProjsInRect(fig_outside, self.arr, obj)
 
         fig_outside.canvas.draw()
 
@@ -178,9 +178,9 @@ class ImgDrawProjRP :
 
         self.arr = arr
 
-        for obj in self.icp.list_of_rects :                  # <====== DEPENDS ON FORM
-            if obj.myType == self.icp.typeProjXY :           # <====== DEPENDS ON FORM
-                self.draw_prxy_for_rect(obj)                 # <====== DEPENDS ON FORM
+        for obj in self.icp.list_of_wedgs :                  # <====== DEPENDS ON FORM
+            if obj.myType == self.icp.typeProjRP :           # <====== DEPENDS ON FORM
+                self.draw_prrp_for_wedge(obj)                # <====== DEPENDS ON FORM
 
 #-----------------------------
 # Test

@@ -33,6 +33,7 @@ import ImgDrawSpectrum  as sp                                   # <======= Depen
 import ImgDrawProfile   as pr                                   # <======= Depends on form etc.
 import ImgDrawZoom      as zo                                   # <======= Depends on form etc.
 import ImgDrawProjXY    as xy                                   # <======= Depends on form etc.
+import ImgDrawProjRP    as rp                                   # <======= Depends on form etc.
 
 #---------------------
 #  Class definition --
@@ -48,6 +49,7 @@ class ImgDrawOutside :
         self.prof = pr.ImgDrawProfile (icp)                     # <======= Depends on form etc.
         self.zoom = zo.ImgDrawZoom    (icp)                     # <======= Depends on form etc.
         self.prxy = xy.ImgDrawProjXY  (icp)                     # <======= Depends on form etc.
+        self.prrp = rp.ImgDrawProjRP  (icp)                     # <======= Depends on form etc.
 
 
     def get_control(self) :
@@ -60,6 +62,7 @@ class ImgDrawOutside :
         self.prof.draw_outside_plots_for_list_of_objs(self.arr) # <======= Depends on form etc.
         self.zoom.draw_outside_plots_for_list_of_objs(self.arr) # <======= Depends on form etc.
         self.prxy.draw_outside_plots_for_list_of_objs(self.arr) # <======= Depends on form etc.
+        self.prrp.draw_outside_plots_for_list_of_objs(self.arr) # <======= Depends on form etc.
 
     def remove_outside_plot_for_obj(self, obj) :
 

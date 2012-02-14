@@ -50,7 +50,10 @@ class ImgConfigParameters :
         self.idrawontop = None
         self.idrawout   = None
         self.idrawspec  = None
+        self.idrawzoom  = None
         self.idrawprof  = None
+        self.idrawprxy  = None
+        self.idrawprrp  = None
 
         self.setRunTimeParametersInit()
         self.setDefaultParameters()

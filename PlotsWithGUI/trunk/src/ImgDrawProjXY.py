@@ -45,7 +45,7 @@ class ImgDrawProjXY :
 
     def __init__(self, icp=None):
         self.icp           = icp
-        self.icp.idrawspec = self
+        self.icp.idrawprxy = self
         self.arr           = None
 
         #self.icp.list_of_rects = [] # moved to icp

@@ -45,7 +45,7 @@ class ImgDrawZoom :
 
     def __init__(self, icp=None):
         self.icp           = icp
-        self.icp.idrawspec = self
+        self.icp.idrawzoom = self
         self.arr           = None
 
         #self.icp.list_of_rects = [] # moved to icp
