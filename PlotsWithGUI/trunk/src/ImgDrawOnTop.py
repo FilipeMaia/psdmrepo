@@ -90,8 +90,8 @@ class ImgDrawOnTop :
             self.add_obj_on_click(event, dragr.DragRectangle, self.icp.formRect,   self.get_axes(), self.icp.list_of_rects) # <===== DEPENDS ON SHAPE
             self.add_obj_on_click(event, dragl.DragLine,      self.icp.formLine,   self.get_axes(), self.icp.list_of_lines) # <===== DEPENDS ON SHAPE
             self.add_obj_on_click(event, dragc.DragCircle,    self.icp.formCircle, self.get_axes(), self.icp.list_of_circs) # <===== DEPENDS ON SHAPE
-            self.add_obj_on_click(event, dragw.DragWedge,     self.icp.formWedge,  self.get_axes(), self.icp.list_of_wedgs) # <===== DEPENDS ON SHAPE
             self.add_obj_on_click(event, drags.DragCenter,    self.icp.formCenter, self.get_axes(), self.icp.list_of_cents) # <===== DEPENDS ON SHAPE
+            self.add_obj_on_click(event, dragw.DragWedge,     self.icp.formWedge,  self.get_axes(), self.icp.list_of_wedgs) # <===== DEPENDS ON SHAPE
 
 
     def on_mouse_release(self, event) : # is called from ImgControl
@@ -172,20 +172,32 @@ class ImgDrawOnTop :
         """Creates a new object on mouse click
         """
         if self.icp.formCurrent != form : return                            # check that the form is correct 
-        obj = DragObject()                                                  # create default object
+
+        center = (self.icp.x_center, self.icp.y_center)                     #FOR OBJECTS WHICH NEED IN CENTER
+        if form == self.icp.formWedge :
+
+            print 'Initialize Wedge for center=', center
+
+            obj = DragObject(xy=center)                                     # create semi-default object
+            
+        else :
+            obj = DragObject()                                              # create default object
+
         drag.add_obj_to_axes(obj, axes, list_of_objs)                       # add object to axes and in the list
         obj.on_press(event)                                                 # Initialize object by the mouse drag
         obj.myType     = self.icp.typeCurrent                               # set attribute
         obj.myIndex    = list_of_objs.index(obj)                            # set attribute
         obj.isSelected = False                                              # set attribute        
         
+        if  obj.myType == self.icp.typeProjRP  :
+            obj.n_rings    = self.icp.n_rings                                   # set attribute
+            obj.n_sects    = self.icp.n_sects                                   # set attribute
+
         if  obj.myType == self.icp.typeProjXY  :
             obj.nx_slices  = self.icp.nx_slices                                 # set attribute
             obj.ny_slices  = self.icp.ny_slices                                 # set attribute
 
-        if  obj.myType == self.icp.typeProjRP  :
-            obj.n_rings    = self.icp.n_rings                                   # set attribute
-            obj.n_sects    = self.icp.n_sects                                   # set attribute
+
 
 
     def add_obj_on_call(self, obj, axes, list_of_objs, type=None, selected=False) :  

@@ -106,7 +106,8 @@ class ImgControl :
         self.reset_event_for_test()
 
     def reset_event_for_test( self ) :
-        self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
+        #self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
+        self.set_image_array( self.get_array2d_with_ring_for_test() )  # on_draw() is called automatically
         self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_idrawout().draw_outside()
 

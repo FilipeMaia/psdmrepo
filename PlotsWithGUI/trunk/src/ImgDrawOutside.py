@@ -62,8 +62,16 @@ class ImgDrawOutside :
         self.prxy.draw_outside_plots_for_list_of_objs(self.arr) # <======= Depends on form etc.
 
     def remove_outside_plot_for_obj(self, obj) :
-        number = obj.get_fig_outside().number
-        self.get_control().signal_and_close_fig(number)
+
+        try :
+            number = obj.get_fig_outside().number
+            self.get_control().signal_and_close_fig(number)
+        except :
+            print 'ImgDrawOutside : remove_outside_plot_for_obj() : WARNING! try to remove non-existent figure...'
+
+        
+
+
 
 #-----------------------------
 # Test

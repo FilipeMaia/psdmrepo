@@ -57,16 +57,31 @@ class ImgGUICenter (QtGui.QWidget) :
         #self.but_overlay= QtGui.QPushButton("Overlay")
         #self.but_draw   = QtGui.QPushButton("Draw")
         self.but_reset    = QtGui.QPushButton('Reset')
+        self.but_left     = QtGui.QPushButton(u'\u25C0') # left-head triangle "Previous"
+        self.but_right    = QtGui.QPushButton(u'\u25B6') # right-head triangle "Next"
+        self.but_up       = QtGui.QPushButton(u'\u25B2') # up-head triangle "Previous"
+        self.but_down     = QtGui.QPushButton(u'\u25BC') # right-head triangle "Next"
+ 
+
         self.tit_center   = QtGui.QLabel('Center coordinates:')
+        self.tit_move     = QtGui.QLabel('Move center:')
         self.edi_x_center = QtGui.QLineEdit(str(self.icp.x_center))
         self.edi_y_center = QtGui.QLineEdit(str(self.icp.y_center))
+        self.edi_d_center = QtGui.QLineEdit(str(self.icp.d_center))
 
         width     = 60
         width_edi = 40
+        width_arr = 40
 
         self.but_reset   .setMaximumWidth(width)
+        self.but_left    .setMaximumWidth(width_arr)    
+        self.but_right   .setMaximumWidth(width_arr)    
+        self.but_up      .setMaximumWidth(width_arr)    
+        self.but_down    .setMaximumWidth(width_arr)    
+
         self.edi_x_center.setMaximumWidth(width_edi)
         self.edi_y_center.setMaximumWidth(width_edi)
+        self.edi_d_center.setMaximumWidth(width_edi)
         #self.edi_x_center.setValidator(QtGui.QIntValidator(1,1000,self))
         #self.edi_x_center.setValidator(QtGui.QIntValidator(1,1000,self))
  
@@ -80,8 +95,14 @@ class ImgGUICenter (QtGui.QWidget) :
         #self.connect(self.but_draw,   QtCore.SIGNAL('clicked()'), self.processDraw)
 
         self.connect(self.but_reset,    QtCore.SIGNAL('clicked()'),          self.onReset )
+        self.connect(self.but_left ,    QtCore.SIGNAL('clicked()'),          self.onArrowLeft )
+        self.connect(self.but_right,    QtCore.SIGNAL('clicked()'),          self.onArrowRight )
+        self.connect(self.but_up   ,    QtCore.SIGNAL('clicked()'),          self.onArrowUp )
+        self.connect(self.but_down ,    QtCore.SIGNAL('clicked()'),          self.onArrowDown )
         self.connect(self.edi_x_center, QtCore.SIGNAL('editingFinished ()'), self.onEditXCenter )
         self.connect(self.edi_y_center, QtCore.SIGNAL('editingFinished ()'), self.onEditYCenter )
+        self.connect(self.edi_d_center, QtCore.SIGNAL('editingFinished ()'), self.onEditDCenter )
+
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_center)
@@ -89,6 +110,12 @@ class ImgGUICenter (QtGui.QWidget) :
         self.hboxB.addWidget(self.edi_y_center)
         self.hboxB.addWidget(self.but_reset)
         self.hboxB.addStretch(1)
+        self.hboxB.addWidget(self.tit_move)
+        self.hboxB.addWidget(self.but_left)
+        self.hboxB.addWidget(self.but_right)
+        self.hboxB.addWidget(self.edi_d_center)
+        self.hboxB.addWidget(self.but_up)
+        self.hboxB.addWidget(self.but_down)
 
         # Layout with box sizers
         # 
@@ -144,6 +171,11 @@ class ImgGUICenter (QtGui.QWidget) :
         self.get_control().signal_center_is_reset_in_gui()
 
 
+    def onEditDCenter(self):
+        print 'onEditDCenter'
+        self.icp.d_center = int(self.edi_d_center.displayText())
+
+
     def onReset(self):
         self.icp.x_center=250
         self.icp.y_center=250
@@ -155,6 +187,36 @@ class ImgGUICenter (QtGui.QWidget) :
         self.edi_y_center.setText(str(self.icp.y_center))
         self.get_control().signal_center_is_reset_in_gui()
 
+
+    def onArrowLeft(self) :
+        self.icp.x_center -= self.icp.d_center
+        self.edi_x_center.setText(str(self.icp.x_center))
+        self.get_control().signal_center_is_reset_in_gui()
+        
+
+    def onArrowRight(self) :
+        self.icp.x_center += self.icp.d_center
+        self.edi_x_center.setText(str(self.icp.x_center))
+        self.get_control().signal_center_is_reset_in_gui()
+
+        
+    def onArrowLeft(self) :
+        self.icp.x_center -= self.icp.d_center
+        self.edi_x_center.setText(str(self.icp.x_center))
+        self.get_control().signal_center_is_reset_in_gui()
+        
+
+    def onArrowUp(self) :
+        self.icp.y_center -= self.icp.d_center # SIGN - IS DUE TO THE DOWN DIRECTION OF POSITIVE Y
+        self.edi_y_center.setText(str(self.icp.y_center))
+        self.get_control().signal_center_is_reset_in_gui()
+        
+
+    def onArrowDown(self) :
+        self.icp.y_center += self.icp.d_center # SIGN + IS DUE TO THE DOWN DIRECTION OF POSITIVE Y
+        self.edi_y_center.setText(str(self.icp.y_center))
+        self.get_control().signal_center_is_reset_in_gui()
+        
 
     def processOverlay(self):
         self.get_control().signal_to_control( self.icp.formRect, self.icp.modeOverlay )

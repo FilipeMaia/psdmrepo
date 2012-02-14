@@ -127,6 +127,7 @@ class ImgConfigParameters :
         #For Center
         self.x_center       = 250
         self.y_center       = 250
+        self.d_center       = 1
 
         #----
         #For ProjXY image

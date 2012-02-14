@@ -17,20 +17,28 @@ from Drag import *
 
 class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
-    def __init__(self, xy=None, radius=10, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=5) :
+    def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=5) :
         """Draw a wedge centered at x, y center with radius r that sweeps theta1 to theta2 (in degrees) in positive angle direction.
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
         Drag.__init__(self, linewidth, color, linestyle)
 
-        if  xy == None : # Default initialization
-            xc,yc=(10,10)
+        if  xy == None :      # Default initialization
+            self.center = (xc,yc) = (10,10)
+            r0=10
             self.isInitialized = False
+
+        elif radius == None : # Semi-default initialization
+            self.center = (xc,yc) = xy
+            r0=10
+            self.isInitialized = False
+
         else :
-            xc,yc=xy
+            self.center = (xc,yc) = xy
+            r0=radius
             self.isInitialized = True
 
-        self.set_wedge_pars(xy, radius, width, theta1, theta2)
-        xarr, yarr = self.get_xy_arrays_for_wedge(xc,yc,radius,width,theta1,theta2)
+        self.set_wedge_pars(self.center, r0, width, theta1, theta2)
+        xarr, yarr = self.get_xy_arrays_for_wedge(xc,yc,r0,width,theta1,theta2)
         lines.Line2D.__init__(self, xarr, yarr, linewidth=linewidth, color=color, picker=picker)
 
         self.set_picker(picker)
@@ -165,7 +173,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def get_list_of_wedge_pars(self) :
-        x,y = self.center
+        x,y =      self.center
         r   =      self.radius
         w   =      self.width
         t1  =      self.theta1
@@ -319,7 +327,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         else : # if the object position is not defined yet:
 
             vertindex = 2
-            x0,y0 = xy0 = self.center = (40,60)
+            x0,y0 = xy0 = self.center #= (40,60)
             click_r = self.distance( clickxy, xy0 )
             click_theta = math.degrees( math.atan2(click_y-y0, click_x-x0) ) # Click angle in the range [-180,180]
             self.theta2 = self.theta1 = click_theta
