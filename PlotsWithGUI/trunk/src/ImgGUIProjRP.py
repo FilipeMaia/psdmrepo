@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module ImgGUIProjXY...
+#  Module ImgGUIProjRP...
 #
 #------------------------------------------------------------------------
 
-"""GUI for ProjXY.
+"""GUI for ProjRP.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -36,17 +36,17 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class ImgGUIProjXY (QtGui.QWidget) :
-    """GUI for ProjXY"""
+class ImgGUIProjRP (QtGui.QWidget) :
+    """GUI for ProjRP"""
 
     def __init__(self, icp=None):
         QtGui.QWidget.__init__(self)
 
         self.icp = icp # Image control parameters
-        self.icp.typeCurrent = self.icp.typeProjXY     # <=================== DEPENDS ON TYPE
-        self.icp.formCurrent = self.icp.formRect       # <=================== DEPENDS ON FORM   
+        self.icp.typeCurrent = self.icp.typeProjRP     # <=================== DEPENDS ON TYPE
+        self.icp.formCurrent = self.icp.formWedge      # <=================== DEPENDS ON FORM   
 
-        self.setWindowTitle('GUI for ProjXY')
+        self.setWindowTitle('GUI for ProjRP')
         self.setFrame()
 
         self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
@@ -54,39 +54,39 @@ class ImgGUIProjXY (QtGui.QWidget) :
 
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
 
-        self.txt_msg      = QtGui.QTextEdit('Projections X and Y: use Add, Move, Select or Remove mode and click-and-drag mouse on image.' + \
-                                            'The number of slices for X and Y projections can be selected.')
+        self.txt_msg      = QtGui.QTextEdit('Projections R and Phi: use Add, Move, Select or Remove mode and click-and-drag mouse on image.' + \
+                                            'The number of R-rings and Phi-sectors for projections can be selected.')
         self.but_reset    = QtGui.QPushButton('Reset')
-        self.tit_nslices  = QtGui.QLabel('N slices X,Y:')
-        self.edi_nxslices = QtGui.QLineEdit(str(self.icp.nx_slices))
-        self.edi_nyslices = QtGui.QLineEdit(str(self.icp.ny_slices))
+        self.tit_nslices  = QtGui.QLabel('Number of r-rings, phi-sectors:')
+        self.edi_nrings   = QtGui.QLineEdit(str(self.icp.n_rings))
+        self.edi_nsects   = QtGui.QLineEdit(str(self.icp.n_sects))
   
         width     = 60
         width_edi = 40
 
         self.but_reset   .setMaximumWidth(width)
-        self.edi_nxslices.setMaximumWidth(width_edi)
-        self.edi_nyslices.setMaximumWidth(width_edi)
-        self.edi_nxslices.setValidator(QtGui.QIntValidator(1,1000,self))
-        self.edi_nyslices.setValidator(QtGui.QIntValidator(1,1000,self))
+        self.edi_nrings.setMaximumWidth(width_edi)
+        self.edi_nsects.setMaximumWidth(width_edi)
+        self.edi_nrings.setValidator(QtGui.QIntValidator(1,1000,self))
+        self.edi_nsects.setValidator(QtGui.QIntValidator(1,1000,self))
  
         self.connect(self.but_reset,    QtCore.SIGNAL('clicked()'),          self.onReset )
-        self.connect(self.edi_nxslices, QtCore.SIGNAL('editingFinished ()'), self.onEditNXSlices )
-        self.connect(self.edi_nyslices, QtCore.SIGNAL('editingFinished ()'), self.onEditNYSlices )
+        self.connect(self.edi_nrings, QtCore.SIGNAL('editingFinished ()'), self.onEditNRings )
+        self.connect(self.edi_nsects, QtCore.SIGNAL('editingFinished ()'), self.onEditNSects )
  
         # Layout with box sizers
         # 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_nslices)
-        self.hboxB.addWidget(self.edi_nxslices)
-        self.hboxB.addWidget(self.edi_nyslices)
+        self.hboxB.addWidget(self.edi_nrings)
+        self.hboxB.addWidget(self.edi_nsects)
         self.hboxB.addWidget(self.but_reset)
         self.hboxB.addStretch(1)
         
-        grid = QtGui.QGridLayout()
-        row = 0
-        grid.addWidget(self.txt_msg,       row, 0)
-        row = 1
+        #grid = QtGui.QGridLayout()
+        #row = 0
+        #grid.addWidget(self.txt_msg,       row, 0)
+        #row = 1
         #grid.addWidget(self.tit_nslices,  row, 0)
         #grid.addWidget(self.edi_nxslices, row, 1)
         #grid.addWidget(self.edi_nyslices, row, 2)
@@ -107,8 +107,9 @@ class ImgGUIProjXY (QtGui.QWidget) :
 
     def showToolTips(self):
         # Tips for buttons and fields:
-        self.but_reset.setToolTip('Reset the number of slices in X and Y to the default values.')
+        self.but_reset.setToolTip('Reset the number of R-rings and Phi-sectors to the default values.')
         pass
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -124,25 +125,21 @@ class ImgGUIProjXY (QtGui.QWidget) :
         self.frame.setGeometry(self.rect())
 
 
-    def processOverlay(self):
-        self.get_control().signal_to_control( self.icp.formRect, self.icp.modeOverlay )
+    def onEditNRings(self):
+        print 'onEditNRings'
+        self.icp.n_rings = int(self.edi_nrings.displayText())
 
 
-    def onEditNXSlices(self):
-        print 'onEditNXSlices'
-        self.icp.nx_slices = int(self.edi_nxslices.displayText())
-
-
-    def onEditNYSlices(self):
-        print 'onEditNYSlices'
-        self.icp.ny_slices = int(self.edi_nyslices.displayText())
+    def onEditNSects(self):
+        print 'onEditNSects'
+        self.icp.n_sects = int(self.edi_nsects.displayText())
 
 
     def onReset(self):
-        self.icp.nx_slices=1
-        self.icp.ny_slices=1
-        self.edi_nxslices.setText(str(self.icp.nx_slices))
-        self.edi_nyslices.setText(str(self.icp.ny_slices))
+        self.icp.n_rings=1
+        self.icp.n_sects=1
+        self.edi_nrings.setText(str(self.icp.n_rings))
+        self.edi_nsects.setText(str(self.icp.n_sects))
 
         
     def processDraw(self):
@@ -167,7 +164,7 @@ def main():
     icp = gicp.giconfpars.addImgConfigPars( None )
 
     app = QtGui.QApplication(sys.argv)
-    w = ImgGUIProjXY(icp)
+    w = ImgGUIProjRP(icp)
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()

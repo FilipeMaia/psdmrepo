@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module ImgGUIProjXY...
+#  Module ImgGUICenter...
 #
 #------------------------------------------------------------------------
 
-"""GUI for ProjXY.
+"""GUI for Center.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -36,61 +36,68 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class ImgGUIProjXY (QtGui.QWidget) :
-    """GUI for ProjXY"""
+class ImgGUICenter (QtGui.QWidget) :
+    """GUI for Center"""
 
     def __init__(self, icp=None):
         QtGui.QWidget.__init__(self)
 
         self.icp = icp # Image control parameters
-        self.icp.typeCurrent = self.icp.typeProjXY     # <=================== DEPENDS ON TYPE
-        self.icp.formCurrent = self.icp.formRect       # <=================== DEPENDS ON FORM   
+        self.icp.typeCurrent = self.icp.typeCenter     
+        self.icp.formCurrent = self.icp.formCenter     
 
-        self.setWindowTitle('GUI for ProjXY')
+        self.setWindowTitle('GUI for Center')
         self.setFrame()
 
         self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
+        self.txt_msg      = QtGui.QTextEdit('Center: use Add, Move, Select or Remove mode and click and drag mouse on image.')
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
-
-        self.txt_msg      = QtGui.QTextEdit('Projections X and Y: use Add, Move, Select or Remove mode and click-and-drag mouse on image.' + \
-                                            'The number of slices for X and Y projections can be selected.')
+        #self.but_overlay= QtGui.QPushButton("Overlay")
+        #self.but_draw   = QtGui.QPushButton("Draw")
         self.but_reset    = QtGui.QPushButton('Reset')
-        self.tit_nslices  = QtGui.QLabel('N slices X,Y:')
-        self.edi_nxslices = QtGui.QLineEdit(str(self.icp.nx_slices))
-        self.edi_nyslices = QtGui.QLineEdit(str(self.icp.ny_slices))
-  
+        self.tit_center   = QtGui.QLabel('Center coordinates:')
+        self.edi_x_center = QtGui.QLineEdit(str(self.icp.x_center))
+        self.edi_y_center = QtGui.QLineEdit(str(self.icp.y_center))
+
         width     = 60
         width_edi = 40
 
         self.but_reset   .setMaximumWidth(width)
-        self.edi_nxslices.setMaximumWidth(width_edi)
-        self.edi_nyslices.setMaximumWidth(width_edi)
-        self.edi_nxslices.setValidator(QtGui.QIntValidator(1,1000,self))
-        self.edi_nyslices.setValidator(QtGui.QIntValidator(1,1000,self))
+        self.edi_x_center.setMaximumWidth(width_edi)
+        self.edi_y_center.setMaximumWidth(width_edi)
+        #self.edi_x_center.setValidator(QtGui.QIntValidator(1,1000,self))
+        #self.edi_x_center.setValidator(QtGui.QIntValidator(1,1000,self))
  
+        #self.but_overlay.setMaximumWidth(width)
+        #self.but_draw   .setMaximumWidth(width)
+ 
+        #self.widg_xyz   = igxyz.ImgGUIXYZRanges()
+        #self.widg_xyz.setXYZRanges(0,10,20,30,40,50)
+        
+        #self.connect(self.but_overlay,QtCore.SIGNAL('clicked()'), self.processOverlay)
+        #self.connect(self.but_draw,   QtCore.SIGNAL('clicked()'), self.processDraw)
+
         self.connect(self.but_reset,    QtCore.SIGNAL('clicked()'),          self.onReset )
-        self.connect(self.edi_nxslices, QtCore.SIGNAL('editingFinished ()'), self.onEditNXSlices )
-        self.connect(self.edi_nyslices, QtCore.SIGNAL('editingFinished ()'), self.onEditNYSlices )
- 
-        # Layout with box sizers
-        # 
+        self.connect(self.edi_x_center, QtCore.SIGNAL('editingFinished ()'), self.onEditXCenter )
+        self.connect(self.edi_y_center, QtCore.SIGNAL('editingFinished ()'), self.onEditYCenter )
+
         self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.tit_nslices)
-        self.hboxB.addWidget(self.edi_nxslices)
-        self.hboxB.addWidget(self.edi_nyslices)
+        self.hboxB.addWidget(self.tit_center)
+        self.hboxB.addWidget(self.edi_x_center)
+        self.hboxB.addWidget(self.edi_y_center)
         self.hboxB.addWidget(self.but_reset)
         self.hboxB.addStretch(1)
-        
-        grid = QtGui.QGridLayout()
-        row = 0
-        grid.addWidget(self.txt_msg,       row, 0)
-        row = 1
-        #grid.addWidget(self.tit_nslices,  row, 0)
-        #grid.addWidget(self.edi_nxslices, row, 1)
-        #grid.addWidget(self.edi_nyslices, row, 2)
-        #grid.addWidget(self.but_reset,    row, 3)
+
+        # Layout with box sizers
+        # 
+        #grid = QtGui.QGridLayout()
+        #row = 1
+        #grid.addWidget(self.txt_msg, row, 0, 1, 7)
+        #row = 2
+        #grid.addWidget(self.but_draw    , row, 0)
+        #grid.addWidget(self.but_overlay , row, 3)
 
         vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
         #vbox.addLayout(grid)
@@ -107,8 +114,9 @@ class ImgGUIProjXY (QtGui.QWidget) :
 
     def showToolTips(self):
         # Tips for buttons and fields:
-        self.but_reset.setToolTip('Reset the number of slices in X and Y to the default values.')
+        #self.but_draw  .setToolTip('Draw spectrum for selected region')
         pass
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -124,27 +132,34 @@ class ImgGUIProjXY (QtGui.QWidget) :
         self.frame.setGeometry(self.rect())
 
 
+    def onEditXCenter(self):
+        print 'onEditXCenter'
+        self.icp.x_center = int(self.edi_x_center.displayText())
+        self.get_control().signal_center_is_reset_in_gui()
+
+
+    def onEditYCenter(self):
+        print 'onEditYCenter'
+        self.icp.y_center = int(self.edi_y_center.displayText())
+        self.get_control().signal_center_is_reset_in_gui()
+
+
+    def onReset(self):
+        self.icp.x_center=250
+        self.icp.y_center=250
+        self.setEditCenter()
+
+
+    def setEditCenter(self) :
+        self.edi_x_center.setText(str(self.icp.x_center))
+        self.edi_y_center.setText(str(self.icp.y_center))
+        self.get_control().signal_center_is_reset_in_gui()
+
+
     def processOverlay(self):
         self.get_control().signal_to_control( self.icp.formRect, self.icp.modeOverlay )
 
 
-    def onEditNXSlices(self):
-        print 'onEditNXSlices'
-        self.icp.nx_slices = int(self.edi_nxslices.displayText())
-
-
-    def onEditNYSlices(self):
-        print 'onEditNYSlices'
-        self.icp.ny_slices = int(self.edi_nyslices.displayText())
-
-
-    def onReset(self):
-        self.icp.nx_slices=1
-        self.icp.ny_slices=1
-        self.edi_nxslices.setText(str(self.icp.nx_slices))
-        self.edi_nyslices.setText(str(self.icp.ny_slices))
-
-        
     def processDraw(self):
         self.get_control().signal_draw()
 
@@ -167,7 +182,7 @@ def main():
     icp = gicp.giconfpars.addImgConfigPars( None )
 
     app = QtGui.QApplication(sys.argv)
-    w = ImgGUIProjXY(icp)
+    w = ImgGUICenter(icp)
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()

@@ -144,9 +144,25 @@ class ImgControl :
     def signal_obj_will_be_removed(self, obj) :
         print 'ImgControl : signal_obj_will_be_removed(...)'
         obj.print_pars()
-
         self.get_idrawout().remove_outside_plot_for_obj(obj)
 
+
+    def signal_center_is_reset_on_click(self) :
+        print 'ImgControl : signal_center_is_reset_on_click(). New center x,y =', self.icp.x_center, self.icp.y_center
+        # self.get_idrawontop().draw_wedgs() # DOES NOT WORK
+        self.get_wgui().setTabBarCenter()
+        self.get_idrawontop().update_list_of_objs( self.icp.list_of_wedgs )
+        self.get_wimg().on_draw()
+
+
+#---------------------------------------
+# Signals from ImgGUICenter.py
+    def signal_center_is_reset_in_gui(self) :
+        print 'ImgControl : signal_center_is_reset_in_gui(). New center x,y =', self.icp.x_center, self.icp.y_center
+        self.get_idrawontop().set_center_position_from_icp()
+        self.get_idrawontop().update_list_of_objs( self.icp.list_of_wedgs )
+        self.get_wimg().on_draw()
+        
 #---------------------------------------
 # Signals from ImgDrawOutside
 

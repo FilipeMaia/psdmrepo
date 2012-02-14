@@ -17,12 +17,12 @@ from Drag import *
 
 class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
-    def __init__(self, xy=None, radius=10, theta1=0, theta2=70, width=15, linewidth=2, linestyle='solid', color='b', picker=5) :
+    def __init__(self, xy=None, radius=10, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=5) :
         """Draw a wedge centered at x, y center with radius r that sweeps theta1 to theta2 (in degrees) in positive angle direction.
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
         Drag.__init__(self, linewidth, color, linestyle)
 
-        if  xy == None : # Default line initialization
+        if  xy == None : # Default initialization
             xc,yc=(10,10)
             self.isInitialized = False
         else :
@@ -36,6 +36,62 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         self.set_picker(picker)
         self.myPicker = picker
         self.press    = None
+        self.theta1_offset = self.get_theta_offset(theta1)
+        self.theta2_offset = self.get_theta_offset(theta2)
+        self.n_rings = 1
+        self.n_sects = 1
+
+        #self.print_test_theta_sheet_number()
+
+
+    def get_theta_offset(self, theta) :
+        return 360 * self.get_theta_sheet_number(theta)
+
+
+    def get_theta_sheet_number(self, theta) :
+        """Sheet number of the angular range [-180,180]
+        [-540,-180] : sheet =-1
+        [-180, 180] : sheet = 0
+        [ 180, 540] : sheet = 1 ...
+        """
+        n_sheet = int( int(theta + 180) / 360 )
+        #print 'theta, n_sheet=', theta, n_sheet
+        return n_sheet
+        
+
+    def print_test_theta_sheet_number(self) :
+        for t in range(-900,901,30) :
+            print 'theta=',t,'   sheet=', self.get_theta_sheet_number(t),'   offset=', self.get_theta_offset(t)
+
+
+    def bring_theta_in_range(self, theta, range=(-180, 180) ) :
+        """Recursive method which brings the input theta in the specified range.
+           The default range value corresponds to the range of math.atan2(y,x) : [-pi, pi]
+        """
+        theta_min, theta_max = range
+        theta_corr = theta
+        if   theta <  theta_min : theta_corr += 360            
+        elif theta >= theta_max : theta_corr -= 360
+        else : return theta
+        return self.bring_theta_in_range(theta_corr)
+
+
+    def set_standard_wedge_parameters(self) :
+        """Reset the wedge parameters to standard: width > 0, t2>t1 
+        """
+        if self.width < 0 :            
+            self.width  = -self.width 
+            self.radius += self.width 
+ 
+        if self.theta2 < self.theta1 : # Swap t1 and t2 to get t1<t2
+            t = self.theta2
+            self.theta2 = self.theta1
+            self.theta1 = t
+
+        # Bring theta1 to 0 sheet
+        theta_offset = self.get_theta_offset(self.theta1)
+        self.theta1 -= theta_offset 
+        self.theta2 -= theta_offset
 
 
     def set_wedge_pars(self, xy, radius, width, theta1, theta2) :
@@ -52,7 +108,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         self.set_xy_arrays_for_wedge()
 
 
-    def set_center(self, radius) :
+    def set_radius(self, radius) :
         self.radius = radius
         self.set_xy_arrays_for_wedge()
 
@@ -73,7 +129,8 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def set_xy_arrays_for_wedge(self) :
-        xc,yc,radius,width,theta1,theta2 = self.center[0],self.center[1],self.radius,self.width,self.theta1,self.theta2
+        xc,yc = self.center
+        radius,width,theta1,theta2 = self.radius, self.width, self.theta1, self.theta2
         xarr, yarr = self.get_xy_arrays_for_wedge(xc,yc,radius,width,theta1,theta2)
 
         self.set_xdata(xarr)
@@ -103,13 +160,17 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         return xarr, yarr #.flatten(), yarr.flatten()
 
 
+    def get_number_of_slices_for_wedge(self) :
+        return self.n_rings, self.n_sects
+
+
     def get_list_of_wedge_pars(self) :
         x,y = self.center
         r   =      self.radius
         w   =      self.width
         t1  =      self.theta1
         t2  =      self.theta2
-        lw  = int( self.get_linewidth() ) 
+        lw  =      self.get_linewidth()
         col =      self.get_color() 
         s   =      self.isSelected
         t   =      self.myType
@@ -122,67 +183,56 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         print 'x,y,r,w,t1,t2,lw,col,s,t,rem =', x,y,r,w,t1,t2,lw,col,s,t,rem
 
 
-    def bring_theta_in_range(self, theta, range=(-180, 180) ) :
-        """Recursive method which brings the input theta in the specified range.
-           The default range value corresponds to the range of math.atan2(y,x) : [-pi, pi]
-        """
-        theta_min, theta_max = range
-        theta_corr = theta
-        if   theta <  theta_min : theta_corr += 360            
-        elif theta >= theta_max : theta_corr -= 360
-        else : return theta
-        return self.bring_theta_in_range(theta_corr)
-
-
-    def my_contains(self, click_r, click_theta, theta1, theta2, dt):
+    def my_contains(self, click_r, click_theta, theta1, theta2, dtpick):
         x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_wedge_pars()
-        psize = self.myPicker
+        drpick = self.myPicker
 
-        #dt = math.degrees( psize / r ) # picker size (degree) in angular direction
+        #dt = math.degrees( drpick / r ) # picker size (degree) in angular direction
         #click_r = self.distance( clickxy, (x,y) )
         #click_theta = math.degrees( math.atan2(click_y-y, click_x-x) ) # Click angle in the range [-180,180]
-        #theta1 = self.bring_theta_in_range(t1)
-        #theta2 = self.bring_theta_in_range(t2)
+        t1_in_range = self.bring_theta_in_range(t1)
+        t2_in_range = self.bring_theta_in_range(t2)
 
         # Check for RADIAL direction
-        if click_r < (r + psize) and click_r > (r - w - psize) : 
+        if click_r < (r + drpick) and click_r > (r - w - drpick) : 
             self.inWideRing = True
         else :
             self.inWideRing = False
             
-        if click_r < (r - psize) and click_r > (r - w + psize) : 
+        if click_r < (r - drpick) and click_r > (r - w + drpick) : 
             self.inNarrowRing = True
         else :
             self.inNarrowRing = False
 
-        # Check for ANGULAR direction
+        # Check for entire ring with 2 cuts
         if abs(t2-t1) > 360 :
             self.isRing = True
-            if self.inWideRing and not self.inNarrowRing : return True
-            else                                         : return False
-        else :
-            self.isRing = False
+            if self.inWideRing :
+                if not self.inNarrowRing                     : return True
+                elif abs(click_theta - t1_in_range) < dtpick : return True
+                elif abs(click_theta - t2_in_range) < dtpick : return True
+                else                                         : return False
 
         if theta2 > theta1 : # normal, positive direction of the arc
 
-            if click_theta > theta1 - dt and click_theta < theta2 + dt :
+            if click_theta > theta1 - dtpick and click_theta < theta2 + dtpick :
                 self.inWideSector = True
             else :
                 self.inWideSector = False
                 
-            if click_theta > theta1 + dt and click_theta < theta2 - dt :
+            if click_theta > theta1 + dtpick and click_theta < theta2 - dtpick :
                 self.inNarrowSector = True
             else :
                 self.inNarrowSector = False
                 
         else :   # opposite, negative direction of the arc 
 
-            if click_theta > theta1 - dt or click_theta < theta2 + dt :
+            if click_theta > theta1 - dtpick or click_theta < theta2 + dtpick :
                 self.inWideSector = True
             else :
                 self.inWideSector = False
                 
-            if click_theta > theta1 + dt or click_theta < theta2 - dt :
+            if click_theta > theta1 + dtpick or click_theta < theta2 - dtpick :
                 self.inNarrowSector = True
             else :
                 self.inNarrowSector = False
@@ -202,19 +252,19 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         if self.isInitialized :
 
             x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_wedge_pars()
-            psize = self.myPicker
-            dt = math.degrees( psize / r ) # picker size (degree) in angular direction
-            
             click_r = self.distance( clickxy, (x,y) )
             click_theta = math.degrees( math.atan2(click_y-y, click_x-x) ) # Click angle in the range [-180,180]
+            drpick = self.myPicker
+            dtpick = math.degrees( drpick / r ) # picker size (degree) in angular direction
+            
             theta1 = self.bring_theta_in_range(t1)
             theta2 = self.bring_theta_in_range(t2)
-            
-            print 'x,y,r,w,t1,t2,dt,click_theta,_r = ', x,y,r,w,t1,t2,dt, click_theta, click_r
 
-            if not self.my_contains(click_r, click_theta, theta1, theta2, dt) : return
             #if not self.contains(event) : return
+            if not self.my_contains(click_r, click_theta, theta1, theta2, dtpick) : return
 
+            self.print_pars()
+            #print 'x,y,r,w,t1,t2,dtpick,click_theta,_r = ', x,y,r,w,t1,t2,dtpick, click_theta, click_r
             #self.set_center(clickxy) 
 
             r0   = self.radius
@@ -226,10 +276,10 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
             clkAtTheta1 = False
             clkAtTheta2 = False
 
-            if abs(click_r - r0)      < psize : clkAtRmax = True                
-            if abs(click_r - (r0-w0)) < psize : clkAtRmin = True
-            if click_theta > theta1-dt and click_theta < theta1+dt : clkAtTheta1 = True
-            if click_theta > theta2-dt and click_theta < theta2+dt : clkAtTheta2 = True
+            if abs(click_r - r0)      < drpick : clkAtRmax = True                
+            if abs(click_r - (r0-w0)) < drpick : clkAtRmin = True
+            if click_theta > theta1-dtpick and click_theta < theta1+dtpick : clkAtTheta1 = True
+            if click_theta > theta2-dtpick and click_theta < theta2+dtpick : clkAtTheta2 = True
 
 # Numeration in vertindex the vertices and sides of the wedge
 #
@@ -257,9 +307,9 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
             elif clkAtTheta1   : vertindex = 5 
             elif clkAtTheta2   : vertindex = 6 
 
-            print 'vertindex= ',vertindex
+            #print 'vertindex= ',vertindex
 
-            self.press = xy0, clickxy, click_r, click_theta, r0, w0, theta1, theta2, vertindex
+            self.press = xy0, clickxy, click_r, click_theta, r0, w0, self.theta1, self.theta2, vertindex
 
             #----Remove object at click on middle mouse botton
             if event.button is 2 : # for middle mouse button
@@ -268,19 +318,18 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
         else : # if the object position is not defined yet:
 
-            vertindex = 1
+            vertindex = 2
             x0,y0 = xy0 = self.center = (40,60)
             click_r = self.distance( clickxy, xy0 )
             click_theta = math.degrees( math.atan2(click_y-y0, click_x-x0) ) # Click angle in the range [-180,180]
-            theta1 = click_theta
-            theta2 = theta1 + 1 
-
+            self.theta2 = self.theta1 = click_theta
             self.center = xy0
             self.radius = click_r
-            self.theta1 = click_theta
 
-            self.press  = xy0, clickxy, click_r, click_theta, self.radius, self.width, theta1, theta2, vertindex
+            self.press  = xy0, clickxy, click_r, click_theta, self.radius, self.width, self.theta1, self.theta2, vertindex
 
+        self.dt_offset = 0
+        self.dt_old    = 0
         self.on_press_graphic_manipulations()
 
 
@@ -299,51 +348,51 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         current_r = self.distance( current_xy, xy0 )
         current_t = math.degrees( math.atan2(current_y-y0, current_x-x0) ) # Click angle in the range [-180,180]
 
-        dx = current_x - click_x
-        dy = current_y - click_y
+        #dx = current_x - click_x
+        #dy = current_y - click_y
         dr = current_r - click_r
         dt = current_t - click_t
 
-        if self.isInitialized : # for left mouse button
 
-            if   vertindex == 0 : #side
-                print 'WORNING, NON-POSSIBLE vertindex =', vertindex
+        # Jump ovet the sheet cut
+        if dt - self.dt_old >  180 : self.dt_offset -= 360
+        if dt - self.dt_old < -180 : self.dt_offset += 360
+        self.dt_old = dt        
+        dt += self.dt_offset
 
-            elif vertindex == 1 :
-                self.theta1 = theta1 + dt
-                self.radius = radius + dr
-                self.width  = width  + dr
+        if   vertindex == 0 : #side
+            print 'WORNING, NON-POSSIBLE vertindex =', vertindex
 
-            elif vertindex == 2 :
-                self.theta2 = theta2 + dt
-                self.radius = radius + dr
-                self.width  = width  + dr
+        elif vertindex == 1 :
+            self.theta1 = theta1 + dt
+            self.radius = radius + dr
+            self.width  = width  + dr
 
-            elif vertindex == 3 :
-                self.theta1 = theta1 + dt
-                self.width  = width  - dr
+        elif vertindex == 2 :
+            self.theta2 = theta2 + dt
+            self.radius = radius + dr
+            self.width  = width  + dr
 
-            elif vertindex == 4 :
-                self.theta2 = theta2 + dt
-                self.width  = width  - dr
+        elif vertindex == 3 :
+            self.theta1 = theta1 + dt
+            self.width  = width  - dr
 
-            elif vertindex == 5 :
-                self.theta1 = theta1 + dt
+        elif vertindex == 4 :
+            self.theta2 = theta2 + dt
+            self.width  = width  - dr
 
-            elif vertindex == 6 :
-                self.theta2 = theta2 + dt
+        elif vertindex == 5 :
+            self.theta1 = theta1 + dt
 
-            elif vertindex == 7 :
-                self.radius = radius + dr
-                self.width  = width  + dr
+        elif vertindex == 6 :
+            self.theta2 = theta2 + dt
 
-            elif vertindex == 8 :
-                self.width  = width  - dr
+        elif vertindex == 7 :
+            self.radius = radius + dr
+            self.width  = width  + dr
 
-        else :
-            print 'current_r, current_theta =', current_r, current_theta
-            self.width  = click_r - current_r
-            self.theta2 = current_t
+        elif vertindex == 8 :
+            self.width  = width  - dr
 
         self.set_xy_arrays_for_wedge()
 
@@ -352,7 +401,10 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
     def on_release(self, event):
     #    'on release we reset the press data'
+        self.set_standard_wedge_parameters()
         self.on_release_graphic_manipulations()
+
+        if self.press != None : self.print_pars()
         self.press = None
 
 

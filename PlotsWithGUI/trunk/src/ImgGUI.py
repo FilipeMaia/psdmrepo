@@ -43,6 +43,9 @@ import ImgGUISpectrum as igspec
 import ImgGUIProfile  as igprof
 import ImgGUIZoom     as igzoom
 import ImgGUIProjXY   as igprxy
+import ImgGUIProjRP   as igprrp
+import ImgGUICenter   as igcent
+
 
 #---------------------
 #  Class definition --
@@ -188,7 +191,8 @@ class ImgGUI ( QtGui.QWidget ) :
         if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum(self.icp) #QtGui.QTextEdit('Spectrum')
         if indTab == self.indTabProf : self.guiWin = igprof.ImgGUIProfile (self.icp)
         if indTab == self.indTabPrXY : self.guiWin = igprxy.ImgGUIProjXY  (self.icp)
-        if indTab == self.indTabPrRP : self.guiWin = QtGui.QTextEdit('Projections R-Phi')
+        if indTab == self.indTabPrRP : self.guiWin = igprrp.ImgGUIProjRP  (self.icp)
+        #if indTab == self.indTabPrRP : self.guiWin = QtGui.QTextEdit('Projections R-Phi')
 
         self.guiWin.setMinimumHeight(self.minHeight)
         self.guiWin.setMaximumHeight(self.maxHeight)
@@ -206,15 +210,15 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.indTabZoom = self.tabBarBot.addTab( 'Zoom' )
         self.indTabCent = self.tabBarBot.addTab( 'Center' )
-        self.indTabLine = self.tabBarBot.addTab( 'Line' )
-        self.indTabCirc = self.tabBarBot.addTab( 'Circ' )
+        #self.indTabLine = self.tabBarBot.addTab( 'Line' )
+        #self.indTabCirc = self.tabBarBot.addTab( 'Circ' )
         self.indTabEmpB = self.tabBarBot.addTab( 5*' ' )
         self.tabBarBot.setTabEnabled(self.indTabEmpB,False)
 
         self.tabBarBot.setTabTextColor(self.indTabZoom,QtGui.QColor('magenta'))
         self.tabBarBot.setTabTextColor(self.indTabCent,QtGui.QColor('green'))
-        self.tabBarBot.setTabTextColor(self.indTabLine,QtGui.QColor('red'))
-        self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
+        #self.tabBarBot.setTabTextColor(self.indTabLine,QtGui.QColor('red'))
+        #self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
             
         self.hboxB.addWidget(self.tabBarBot) 
@@ -233,10 +237,11 @@ class ImgGUI ( QtGui.QWidget ) :
             pass
 
         if indTab == self.indTabEmpB : return
-        if indTab == self.indTabZoom : self.guiWin = igzoom.ImgGUIZoom (self.icp)
-        if indTab == self.indTabCent : self.guiWin = QtGui.QTextEdit('Set center')
-        if indTab == self.indTabLine : self.guiWin = QtGui.QTextEdit('Profile along Line')
-        if indTab == self.indTabCirc : self.guiWin = QtGui.QTextEdit('Profile along Circ')
+        if indTab == self.indTabZoom : self.guiWin = igzoom.ImgGUIZoom   (self.icp)
+        if indTab == self.indTabCent : self.guiWin = igcent.ImgGUICenter (self.icp)
+        #if indTab == self.indTabCent : self.guiWin = QtGui.QTextEdit('Set center')
+        #if indTab == self.indTabLine : self.guiWin = QtGui.QTextEdit('Profile along Line')
+        #if indTab == self.indTabCirc : self.guiWin = QtGui.QTextEdit('Profile along Circ')
 
         self.guiWin.setMinimumHeight(self.minHeight)
         self.guiWin.setMaximumHeight(self.maxHeight)
@@ -244,6 +249,12 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.tabBarTop.setCurrentIndex(self.indTabEmpT)
         self.gui_mode.setStatus()
+
+
+    def setTabBarCenter(self) :
+        self.tabBarBot.setCurrentIndex(self.indTabEmpB)
+        self.tabBarBot.setCurrentIndex(self.indTabCent)
+        #self.processTabBarBot()
 
 
     def get_control(self) :

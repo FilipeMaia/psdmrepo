@@ -84,6 +84,7 @@ class ImgConfigParameters :
         self.typeProjXY    = 'ProjXY'
         self.typeProjRP    = 'ProjRP'
         self.typeZoom      = 'Zoom'
+        self.typeCenter    = 'Center'
 
         self.typeCurrent   = self.typeNone
 
@@ -104,9 +105,10 @@ class ImgConfigParameters :
         self.formRect     = 'Rect'
         self.formLine     = 'Line'
         self.formCircle   = 'Circle'
+        self.formWedge    = 'Wedge'
+        self.formCenter   = 'Center'
         self.formSector   = 'Sector'
         self.formArc      = 'Arc'
-        self.formCenter   = 'Center'
 
         self.formCurrent  = self.formNone
 
@@ -118,14 +120,24 @@ class ImgConfigParameters :
         self.list_of_rects  = []
         self.list_of_lines  = []
         self.list_of_circs  = []
+        self.list_of_wedgs  = []
+        self.list_of_cents  = []
 
-        self.x_center       = 100
-        self.y_center       = 100
+        #----
+        #For Center
+        self.x_center       = 250
+        self.y_center       = 250
 
         #----
         #For ProjXY image
         self.nx_slices      = 3
         self.ny_slices      = 5
+
+        #----
+        #For ProjRP image
+        self.n_rings        = 3
+        self.n_sects        = 5
+
 
 #---------------------------------------
 
@@ -183,6 +195,27 @@ class ImgConfigParameters :
                 (x,y,r0,lw,col,s,t,r) = obj.get_list_of_rect_pars()
                 i = list_of_objs.index(obj)
                 print 'Circ in list: i,t,s,r,x,y,r,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %s' % (i, t, s, r, x, y, r0, lw, col)
+
+
+        list_of_objs = self.list_of_wedgs
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            print 'Number of wedges =', Nobjs
+            for obj in list_of_objs :
+                (x,y,r,w,t1,t2,lw,col,s,t,rem) = obj.get_list_of_wedge_pars()
+                nr, np                 = obj.get_number_of_slices_for_wedge()
+                i = list_of_objs.index(obj)
+                print 'Rect in list: i,t,s,rem,x,y,r,w,t1,t2,lw,col,nr,np = %3d %s %6s %6s %4d %4d %4d %4d %4d %4d %4d %s %4d %4d ' % (i, t, s, rem, x, y, r, w, t1, t2, lw, col, nr, np)
+
+
+        list_of_objs = self.list_of_cents
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            print 'Number of centers =', Nobjs
+            for obj in list_of_objs :
+                (xc,yc,xerr,yerr,lw,col,s,t,r) = obj.get_list_of_center_pars()
+                i = list_of_objs.index(obj)
+                print 'Center in list: i,t,s,r,xc,yc,xe,ye,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, r, xc, yc, xerr, yerr, lw, col)
 
 
 #---------------------------------------
@@ -256,6 +289,50 @@ class ImgConfigParameters :
                 f.write(space + 'CIRC_L'           + space + str(lw)  + '\n')
                 f.write(space + 'CIRC_C'           + space + str(col) + '\n')
 
+
+        list_of_objs = self.list_of_wedgs
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            f.write('\n\nNUMBER_OF_WEDGS'  + space + str(Nobjs) + '\n')
+            for obj in list_of_objs :
+                (x,y,r,w,t1,t2,lw,col,s,t,rem) = obj.get_list_of_wedge_pars()
+                nr, np                 = obj.get_number_of_slices_for_wedge()
+
+                i = list_of_objs.index(obj)
+                f.write('\n')
+                f.write(space + 'WEDG_I'           + space + str(i)   + '\n') # Index
+                f.write(space + 'WEDG_T'           + space +     t    + '\n') # Type
+                f.write(space + 'WEDG_S'           + space + str(s)   + '\n') # isSelected
+                f.write(space + 'WEDG_X'           + space + str(x)   + '\n')
+                f.write(space + 'WEDG_Y'           + space + str(y)   + '\n')
+                f.write(space + 'WEDG_R'           + space + str(r)   + '\n')
+                f.write(space + 'WEDG_W'           + space + str(w)   + '\n')
+                f.write(space + 'WEDG_T1'          + space + str(t1)  + '\n')
+                f.write(space + 'WEDG_T2'          + space + str(t2)  + '\n')
+                f.write(space + 'WEDG_L'           + space + str(lw)  + '\n')
+                f.write(space + 'WEDG_C'           + space + str(col) + '\n')
+                f.write(space + 'WEDG_NR'          + space + str(nr)  + '\n')
+                f.write(space + 'WEDG_NP'          + space + str(np)  + '\n')
+
+  
+        list_of_objs = self.list_of_cents
+        Nobjs = len(list_of_objs)
+        if Nobjs > 0 :
+            f.write('\n\nNUMBER_OF_CENTS'  + space + str(Nobjs) + '\n')
+            for obj in list_of_objs :
+                (xc,yc,xerr,yerr,lw,col,s,t,r) = obj.get_list_of_center_pars()
+                i = list_of_objs.index(obj)
+                f.write('\n')
+                f.write(space + 'CENT_I'           + space + str(i)   + '\n') # Index
+                f.write(space + 'CENT_T'           + space +     t    + '\n') # Type
+                f.write(space + 'CENT_S'           + space + str(s)   + '\n') # isSelected
+                f.write(space + 'CENT_X'           + space + str(xc)  + '\n')
+                f.write(space + 'CENT_Y'           + space + str(yc)  + '\n')
+                f.write(space + 'CENT_XE'          + space + str(xerr)+ '\n')
+                f.write(space + 'CENT_YE'          + space + str(yerr)+ '\n')
+                f.write(space + 'CENT_L'           + space + str(lw)  + '\n')
+                f.write(space + 'CENT_C'           + space + str(col) + '\n')
+
         f.close() 
 
 #---------------------------------------
@@ -268,6 +345,8 @@ class ImgConfigParameters :
         self.listOfRectInputParameters = []
         self.listOfLineInputParameters = []
         self.listOfCircInputParameters = []
+        self.listOfWedgInputParameters = []
+        self.listOfCentInputParameters = []
 
         if os.path.exists(self.fname) :
             f=open(self.fname,'r')
@@ -320,6 +399,39 @@ class ImgConfigParameters :
                 elif key == 'CIRC_R'           : self.listOfCircInputParameters[self.ind][4] = int(val) 
                 elif key == 'CIRC_L'           : self.listOfCircInputParameters[self.ind][5] = int(val)
                 elif key == 'CIRC_C'           : self.listOfCircInputParameters[self.ind][6] = val 
+
+
+                elif key == 'NUMBER_OF_WEDGS'  : self.Nwedgs = int(val)
+                elif key == 'WEDG_I'           :
+                    self.ind    = int(val)
+                    self.listOfWedgInputParameters.append( [self.typeNone, False, 100, 200, 300, 50, 0, 30, 2, 'r', 1, 1] )
+                elif key == 'WEDG_T'           : self.listOfWedgInputParameters[self.ind][ 0] = val 
+                elif key == 'WEDG_S'           : self.listOfWedgInputParameters[self.ind][ 1] = dicBool[val.lower()]
+                elif key == 'WEDG_X'           : self.listOfWedgInputParameters[self.ind][ 2] = int(val) 
+                elif key == 'WEDG_Y'           : self.listOfWedgInputParameters[self.ind][ 3] = int(val) 
+                elif key == 'WEDG_R'           : self.listOfWedgInputParameters[self.ind][ 4] = float(val) 
+                elif key == 'WEDG_W'           : self.listOfWedgInputParameters[self.ind][ 5] = float(val) 
+                elif key == 'WEDG_T1'          : self.listOfWedgInputParameters[self.ind][ 6] = float(val) 
+                elif key == 'WEDG_T2'          : self.listOfWedgInputParameters[self.ind][ 7] = float(val) 
+                elif key == 'WEDG_L'           : self.listOfWedgInputParameters[self.ind][ 8] = int(val)
+                elif key == 'WEDG_C'           : self.listOfWedgInputParameters[self.ind][ 9] = val 
+                elif key == 'WEDG_NR'          : self.listOfWedgInputParameters[self.ind][10] = int(val) 
+                elif key == 'WEDG_NP'          : self.listOfWedgInputParameters[self.ind][11] = int(val) 
+
+
+                elif key == 'NUMBER_OF_CENTS'  : self.Ncents = int(val)
+                elif key == 'CENT_I'           :
+                    self.ind    = int(val)
+                    self.listOfCentInputParameters.append( [self.typeNone, False, 100, 200, 10, 20, 2, 'r'] )
+                elif key == 'CENT_T'           : self.listOfCentInputParameters[self.ind][0] = val 
+                elif key == 'CENT_S'           : self.listOfCentInputParameters[self.ind][1] = dicBool[val.lower()]
+                elif key == 'CENT_X'           : self.listOfCentInputParameters[self.ind][2] = int(val) 
+                elif key == 'CENT_Y'           : self.listOfCentInputParameters[self.ind][3] = int(val) 
+                elif key == 'CENT_XE'          : self.listOfCentInputParameters[self.ind][4] = int(val) 
+                elif key == 'CENT_YE'          : self.listOfCentInputParameters[self.ind][5] = int(val) 
+                elif key == 'CENT_L'           : self.listOfCentInputParameters[self.ind][6] = int(val)
+                elif key == 'CENT_C'           : self.listOfCentInputParameters[self.ind][7] = val 
+
 
             f.close()
 

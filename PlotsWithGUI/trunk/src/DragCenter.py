@@ -38,10 +38,16 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
     def get_xy_arrays_for_center_sign(self,xc,yc,xerr,yerr) :      
         """Return arrays of X and Y polyline coordinates which define the shape of the center sign"""
-        gap  = 3
-        xarr = (xc, xc+xerr, xc-xerr, xc-gap, xc     , xc     )
-        yarr = (yc, yc     , yc     , yc+gap, yc+yerr, yc-yerr)
+        gapx, gapy = 0.1*xerr, 0.1*yerr
+        xarr = (xc, xc+xerr, xc-xerr, xc-gapx, xc     , xc     )
+        yarr = (yc, yc     , yc     , yc+gapy, yc+yerr, yc-yerr)
         return xarr, yarr
+
+
+    def reset_center_position(self,x,y) :
+        """Reset the center position keeping all other properties"""
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_center_pars()
+        self.set_xy_arrays_for_center_sign(x,y,xerr,yerr)        
 
 
     def set_xy_arrays_for_center_sign(self,xc,yc,xerr,yerr) :      
