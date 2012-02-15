@@ -7,6 +7,7 @@
 import logging
 
 from pypdsdata import xtc
+import pyana
 
 _log = logging.getLogger("pyana.userana")
 
@@ -52,6 +53,8 @@ def mod_import(name, config):
         if not hasattr(userana, method) :
             _log.error("User analysis class %s does not define method %s", classname, method )
             return None
+
+    setattr(userana, "__modname__", name)
 
     # looks OK so far
     return userana
@@ -120,7 +123,17 @@ class evt_dispatch(object) :
             self.calibbegun = False
             
         elif svc == xtc.TransitionId.L1Accept :
-            for userana in self.userObjects : userana.event( evt, env )
+            
+            for userana in self.userObjects :
+                code = userana.event( evt, env )
+                if code == pyana.Skip:
+                    # skip the rest of the modules 
+                    _log.debug("User module %s requested event skip", userana.__modname__)
+                    break
+                if code in [pyana.Stop, pyana.Terminate]:
+                    # return it to caller 
+                    return code
+                
 
     def finish(self, evt, env):
         

@@ -44,6 +44,7 @@ import gc
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
+import pyana as pyana_
 from pyana import event
 from pyana.input import dgramGen, threadedDgramGen
 from pyana.userana import mod_import, evt_dispatch
@@ -112,8 +113,10 @@ def _proc(jobname, id, pipes, userObjects, jobConfig):
             env.m_epics.m_name2epics = epics_data
     
             # process all data
-            dispatch.dispatch(evt, env)
-    
+            code = dispatch.dispatch(evt, env)
+            if code is not None:
+                logging.warning("event loop termination is not supported in multi-process mode")
+
             if evt.seq().service() == xtc.TransitionId.L1Accept : nevent += 1
 
         elif req[0] == OP_FINISH :
@@ -278,7 +281,15 @@ def _pyana ( argv ) :
             else :
                 
                 # process all data
-                dispatch.dispatch(evt, env)
+                code = dispatch.dispatch(evt, env)
+                if code == pyana_.Terminate:
+                    # stop right here, return some strange error code
+                    logging.warning("terminating by user request")
+                    return 12
+                if code == pyana_.Stop:
+                    # stop event loop
+                    logging.info("event loop stopped by user request")
+                    break
                     
                 
         # finish
