@@ -239,7 +239,7 @@ HERE;
 
 	$logbook->commit();
 
-} catch( LogBookException  $e ) { print $e->toHtml(); }
-  catch( LusiTimeException $e ) { print $e->toHtml(); }
+} catch( LogBookException  $e ) { report_error_and_exit( $e->toHtml()); }
+  catch( LusiTimeException $e ) { report_error_and_exit( $e->toHtml()); }
 
 ?>

@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-07
+2012-02-14
+- added an application (app/LogBookPost.py) for posting e-log entries from
+the command line
+- extended run parameters to show a list of detectors activated during a run
+
 Tag: V00-02-06
 2011-11-17
 - migrated to the NetBeans IDE

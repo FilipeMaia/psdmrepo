@@ -59,7 +59,7 @@ class LogBookRun {
     public function values ( $condition='', $return_dict=false ) {
 
         $list = array();
-        $run_id = $this->attr['id'];
+        $run_id = $this->id();
 
         /* Get descriptions of run parameters for the experiment. We need to know
          * type names of the parameters to scedule a request to the corresponding
@@ -181,7 +181,7 @@ class LogBookRun {
         /* Check if its value is already set, and if so - if we're allowed
          * to update it.
          */
-        $run_id = $this->attr['id'];
+        $run_id = $this->id();
 
         $result = $this->connection->query (
             "SELECT COUNT(*) AS \"count\" FROM {$this->connection->database}.run_val p WHERE p.run_id=".$run_id.
@@ -236,6 +236,56 @@ class LogBookRun {
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
+
+    /*
+     * ======================
+     *   PER-RUN ATTRIBUTES
+     * ======================
+     */
+    public function attr_classes() {
+        $result = $this->connection->query("SELECT DISTINCT class FROM {$this->connection->database}.run_attr WHERE run_id={$this->id()} ORDER BY class");
+        $list = array();
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            array_push($list, $attr['class']);
+        }
+        return $list;
+    }
+    public function attributes($class_name) {
+        $class_name_sql = is_null($class_name) ? '' : $this->connection->escape_string($class_name);
+        if($class_name_sql == '')
+            throw new LogBookException (
+                __METHOD__,
+                "no attribute class name provided");
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.run_attr WHERE run_id={$this->id()}  AND class='{$class_name_sql}' ORDER BY name");
+        $list = array();
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            array_push(
+                $list,
+                new LogBookRunAttr (
+                    $this->connection,
+                    $this,
+                    $attr,
+                    $this->attr_val($attr['id'],$attr['type'])));
+        }
+        return $list;
+    }
+    private function attr_val($attr_id, $attr_type) {
+        $result = $this->connection->query("SELECT val FROM {$this->connection->database}.run_attr_{$attr_type} WHERE attr_id={$attr_id}");
+        $nrows = mysql_numrows( $result );
+        if( $nrows != 1 )
+            throw new LogBookException (
+                __METHOD__,
+                "no attribute value found for attr_id: {$attr_id} and type: {$attr_type}; the database may be corrupt");
+        $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+        return $attr['val'];
+    }
+
+    /* =================
+     *   MANAGING RUNS
+     * =================
+     */
 
     /* Close the open-ended run
      */

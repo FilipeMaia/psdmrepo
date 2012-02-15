@@ -586,6 +586,12 @@ $sections = array(
     )
 );
 
+/* A dictionary of known per-run attribute sections
+ */
+$attribute_sections = array (
+    'DAQ_Detectors' => '&nbsp;D A Q&nbsp;&nbsp;D e t e c t o r s'
+);
+
 /* Proceed with the operation
  */
 try {
@@ -620,7 +626,7 @@ try {
     $value_color = 'maroon';
     $label_color = '#b0b0b0';
 
-    $num_cols = 780;
+    $num_cols = 775;
 
     $con = new RegDBHtml( 0, 0, $num_cols );
 
@@ -672,7 +678,23 @@ try {
     	$row += 20;
     }
     $row += 15;
-    
+
+    /* Display per-run attributes in a separate section
+     */
+    foreach( $run->attr_classes() as $class_name ) {
+        $title = array_key_exists($class_name, $attribute_sections) ? $attribute_sections[$class_name] : $class_name;
+        $con->label_1(0, $row, $title, $num_cols );
+        $row += 30;
+
+        foreach( $run->attributes($class_name) as $attr ) {
+            $con->value( 10, $row, '<i>'.substr( $attr->description(), 0, 32).'</i>' )
+                ->value(300, $row, $attr->name(), $value_color )
+                ->label(500, $row, substr( $attr->val(), 0, 32), true, $label_color );
+        	$row += 20;
+        }
+        $row += 15;
+    }
+
     echo $con->html();
 
     $logbook->commit();
