@@ -1,13 +1,19 @@
 <?php
 
-require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'authdb/authdb.inc.php' );
+require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
+
+use DataPortal\NeoCaptar;
+use DataPortal\NeoCaptarUtils;
+use DataPortal\NeoCaptarException;
 
 use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
-use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 $document_title = 'PCDS Cable Management:';
 $document_subtitle = 'Neo-CAPTAR';
@@ -19,6 +25,8 @@ try {
 	$authdb = AuthDB::instance();
 	$authdb->begin();
 
+    $neocaptar = NeoCaptar::instance();
+	$neocaptar->begin();
 ?>
 
 
@@ -77,9 +85,9 @@ body {
 }
 #p-context-header {
   width: 100%;
-  height: 36px;
+  height: 35px;
   background-color: #E0E0E0;
-  border-bottom: 1px solid #0b0b0b;
+  border-bottom: 2px solid #a0a0a0;
 }
 #p-title,
 #p-subtitle {
@@ -172,7 +180,7 @@ a:hover, a.link:hover {
 div.m-item {
 
   margin-left: 3px;
-  margin-top: 3px;
+  margin-top: 5px;
 
   padding: 5px;
   padding-left: 10px;
@@ -182,8 +190,7 @@ div.m-item {
 
   color: #0071BC;
 
-  border-top: 2px solid #c0c0c0;
-  border-right: 2px solid #c0c0c0;
+  border-right: 2px solid #a0a0a0;
 
   border-radius: 5px;
   border-bottom-left-radius: 0;
@@ -248,12 +255,47 @@ div.v-item:hover {
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 75%;
 }
-.application-workarea-instructions {
-  padding-bottom: 20px;
-  width: 720px;
+.section1,
+.section2,
+.section3 {
+  margin: 0.25em 0 0.25em 0;
+  padding: 0.25em;
+  padding-left: 0.5em;
+
+  background-color: #DEF0CD;
+  border: 2px solid #a0a0a0;
+
+  border-left:0;
+  border-top:0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+
+  font-family: "Times", serif;
+  font-size: 36px;
+  font-weight: bold;
+  text-align:left;
+}
+.section2 {
+  font-size: 28px;
+}
+.section3 {
+  font-size: 18px;
 }
 .hidden  { display: none; }
 .visible { display: block; }
+
+#popupdialogs {
+  display: none;
+}
+
+#infodialogs {
+  display: none;
+  padding: 20px;
+}
+#editdialogs {
+  display: none;
+  padding: 20px;
+}
 
 </style>
 
@@ -484,11 +526,71 @@ function report_error( msg, on_cancel ) {
 	});
 }
 
+function report_info( title, msg ) {
+	$('#infodialogs').html(msg);
+	$('#infodialogs').dialog({
+		resizable: true,
+		modal: true,
+/*
+        buttons: {
+			Cancel: function() {
+				$(this).dialog('close');
+			}
+		},
+*/
+		title: title
+	});
+}
+
+function report_action( title, msg ) {
+	return $('#infodialogs').
+        html(msg).
+        dialog({
+    		resizable: true,
+        	modal: true,
+            buttons: {
+                Cancel: function() {
+                    $(this).dialog('close');
+                }
+            },
+            title: title
+        });
+}
+
+function edit_dialog( title, msg, on_save, on_cancel ) {
+	$('#editdialogs').html(msg);
+	$('#editdialogs').dialog({
+		resizable: true,
+		modal: true,
+		buttons: {
+			Save: function() {
+				$(this).dialog('close');
+				if( on_save != null ) on_save();
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+				if( on_cancel != null ) on_cancel();
+			}
+		},
+		title: title
+	});
+}
 
 /* ------------------------------------------------------
  *             APPLICATION INITIALIZATION
  * ------------------------------------------------------
  */
+var global_current_user = {
+    uid:                '<?php echo $authdb->authName(); ?>',
+    is_administrator:    <?php echo $neocaptar->is_administrator()?'1':'0'; ?>,
+    can_manage_projects: <?php echo $neocaptar->can_manage_projects()?'1':'0'; ?>
+};
+var global_users = [];
+<?php
+    foreach( $neocaptar->users() as $user ) {
+        echo "global_users.push('{$user->uid()}');\n";
+    }
+?>
 var applications = {
 	'p-appl-projects'   : projects,
 	'p-appl-dictionary' : dict,
@@ -591,6 +693,10 @@ $(function() {
 
 	$('#p-search-text').keyup(function(e) { if(($(this).val() != '') && (e.keyCode == 13)) global_simple_search(); });
 
+    // Make sure the dictionaries are loaded
+    //
+    dict.init();
+
 	// Finally, activate the selected application.
 	//
 	for(var id in applications) {
@@ -605,48 +711,63 @@ $(function() {
 	}
 });
 
-
-/* ----------------------------------------------------
- *             CROSS_APPLICATION DATA
- * ------------------------------------------------------
- */
-
-// TODO: These structures have to be re-populated from the database
-// at the first use and after any modifications made to cables from within
-// the current application.
-//
-
-var global_routing = [
-    'HV:TDFEHF02'
-];
-
-var global_instr = [ '0', '5', '7' ];
-
 /* ------------------------------------------------------
  *             CROSS_APPLICATION EVENT HANDLERS
  * ------------------------------------------------------
  */
 function global_switch_context(application_name, context_name) {
-	var that = this;
-	this.application_name = application_name;
-	this.context_name = context_name;
-	this.execute = function() {
-		for(var id in applications) {
-			var application = applications[id];
-			if(application.name == that.application_name) {
-				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-				v_item_selected($('#v-menu > #'+that.application_name).children('.v-item#'+that.context_name));
-				application.select(that.context_name);
-				break;
-			}
+	for(var id in applications) {
+		var application = applications[id];
+		if(application.name == application_name) {
+			$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
+			v_item_selected($('#v-menu > #'+application_name).children('.v-item#'+context_name));
+            if( context_name != null) application.select(context_name);
+            else application.select_default();
+			return application;
 		}
-	};
-	return this;
+	}
+    return null;
 }
-function global_simple_search() {
-	var cxt = new global_switch_context('search', 'cables');
-	cxt.execute();
-	application.simple_search($('#p-search-text').val());
+function global_simple_search                     ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
+function global_search_cable_by_cablenumber       (cablenumber) { global_switch_context('search',  'cables').search_cable_by_cablenumber       (cablenumber); }
+function global_search_cables_by_prefix           (prefix)      { global_switch_context('search',  'cables').search_cables_by_prefix           (prefix); }
+function global_search_cables_by_jobnumber        (jobnumber)   { global_switch_context('search',  'cables').search_cables_by_jobnumber        (jobnumber); }
+function global_search_cables_by_jobnumber_prefix (prefix)      { global_switch_context('search',  'cables').search_cables_by_jobnumber_prefix (prefix); }
+function global_search_cables_by_dict_cable_id    (id)          { global_switch_context('search',  'cables').search_cables_by_dict_cable_id    (id); }
+function global_search_cables_by_dict_connector_id(id)          { global_switch_context('search',  'cables').search_cables_by_dict_connector_id(id); }
+function global_search_cables_by_dict_pinlist_id  (id)          { global_switch_context('search',  'cables').search_cables_by_dict_pinlist_id  (id); }
+function global_search_cables_by_dict_location_id (id)          { global_switch_context('search',  'cables').search_cables_by_dict_location_id (id); }
+function global_search_cables_by_dict_rack_id     (id)          { global_switch_context('search',  'cables').search_cables_by_dict_rack_id     (id); }
+function global_search_cables_by_dict_routing_id  (id)          { global_switch_context('search',  'cables').search_cables_by_dict_routing_id  (id); }
+function global_search_cables_by_dict_instr_id    (id)          { global_switch_context('search',  'cables').search_cables_by_dict_instr_id    (id); }
+function global_search_project_by_id              (id)          { global_switch_context('projects','search').search_project_by_id              (id); }
+function global_search_projects_by_owner          (uid)         { global_switch_context('projects','search').search_projects_by_owner          (uid); }
+
+function global_export_cables(search_params,outformat) {
+    search_params.format = outformat;
+    var html = '<img src="../logbook/images/ajaxloader.gif" />';
+    var dialog = report_action('Generating Document: '+outformat,html);
+    var jqXHR = $.get(
+        '../portal/neocaptar_cable_search.php', search_params,
+        function(data) {
+            if( data.status != 'success' ) {
+                report_error( data.message );
+                dialog.dialog('close');
+                return;
+            }
+            var html = 'Document is ready to be downloaded from this location: <a class="link" href="'+data.url+'" target="_blank" >'+data.name+'</a>';
+            dialog.html(html);
+        },
+        'JSON'
+    ).error(
+        function () {
+            report_error('failed because of: '+jqXHR.statusText);
+            dialog.dialog('close');
+        }
+    ).complete(
+        function () {
+        }
+    );
 }
 
 </script>
@@ -740,6 +861,11 @@ function global_simple_search() {
         <div style="float:left;" >Routings</div>
         <div style="clear:both;"></div>
       </div>
+      <div class="v-item" id="instrs">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Instructions</div>
+        <div style="clear:both;"></div>
+      </div>
     </div>
 
     <div id="search" class="hidden">
@@ -756,14 +882,14 @@ function global_simple_search() {
         <div style="float:left;" >Cable Numbers</div>
         <div style="clear:both;"></div>
       </div>
-      <div class="v-item" id="jobs">
+      <div class="v-item" id="jobnumbers">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-        <div style="float:left;" >Job assignments</div>
+        <div style="float:left;" >Job Numbers</div>
         <div style="clear:both;"></div>
       </div>
       <div class="v-item" id="access">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-        <div style="float:left;" >Access Rights</div>
+        <div style="float:left;" >Access Control</div>
         <div style="clear:both;"></div>
       </div>
     </div>
@@ -792,48 +918,24 @@ function global_simple_search() {
             -- the selected projects.
             -->
           <tr>
-            <td><b>Project status:</b></td>
-            <td><select name="sort" style="padding:1px;">
-                  <option>any</option>
-                  <option>in-progress</option>
-                  <option>submitted</option>
-                </select></td>
+            <td><b>Project title:</b></td>
+            <td><input type="text" size=6 name="title" title="put in a text to match then press RETURN to search" /></td>
             <td></td>
             <td><b>Owner:</b></td>
-            <td><select name="sort" style="padding:1px;">
-                  <option>any</option>
-                  <option>gapon</option>
-                  <option>perazzo</option>
+            <td><select name="owner" style="padding:1px;">
+<?php
+    print "<option></option>";
+    foreach( $neocaptar->known_project_owners() as $owner)
+        print "<option>{$owner}</option>";
+?>
                 </select></td>
             <td><b>Created: </b></td>
-            <td><input type="text" size=6 id="projects-search-after" title="specify the start time if applies" />
+            <td><input type="text" size=6 name="begin" title="specify the begin time if applies" />
                 <b>&mdash;</b>
-                <input type="text" size=6 id="projects-search-before" title="specify the end time if applies" /></td>
+                <input type="text" size=6 name="end" title="specify the end time if applies" /></td>
             <td><div style="width:20px;"></div></td>
-             
-            <!-- Search commands -->
-            <td><button id="projects-search-search" title="refresh the projects list">Search</button></td>
-            <td><button id="projects-search-reset"  title="reset the serach form to the default state">Reset Form</button></td>
-          </tr>
-
-          <!-- Controls to change various display and presentation options (sorting, etc.)
-            -- for the projects dynamically loaded from a Web service.
-            -->
-          <tr>
-            <td><b>Sort by:</b></td>
-            <td><select name="sort" style="padding:1px;">
-                  <option>created</option>
-                  <option>owner</option>
-                  <option>title</option>
-                  <option>cable</option>
-                  <option>status</option>
-                  <option>changed</option>
-                  <option>due</option>
-                </select></td>
-            <td></td>
-            <td><b>Order:</b></td>
-            <td><input type="checkbox" name="reverse" ></input>reverse</td>
-            </td>
+            <td><button name="search" title="refresh the projects list">Search</button></td>
+            <td><button name="reset"  title="reset the search form to the default state">Reset Form</button></td>
           </tr>
         </tbody></table>
       </div>
@@ -845,264 +947,176 @@ function global_simple_search() {
 
         <!-- Table header -->
         <div id="projects-search-header">
-          <div style="float:left; margin-left:20px; width:150px;"><span class="proj-table-hdr">Created</span></div>
+          <div style="float:left; margin-left:20px; width:100px;"><span class="proj-table-hdr">Created</span></div>
           <div style="float:left;                   width: 70px;"><span class="proj-table-hdr">Owner</span></div>
           <div style="float:left;                   width:300px;"><span class="proj-table-hdr">Title</span></div>
-          <div style="float:left;                   width:120px;"><span class="proj-table-hdr">Due by</span></div>
-          <div style="float:left;                   width: 70px;"><span class="proj-table-hdr"># Cables:</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Pln</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Rgs</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Lbl</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Fbr</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Rdy</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Ins</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Cms</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Dmg</span></div>
-          <div style="float:left;                   width: 35px;"><span class="proj-table-hdr">Rtr</span></div>
-          <div style="float:left;                   width:100px;"><span class="proj-table-hdr">Status</span></div>
-          <div style="float:left;                   width:120px;"><span class="proj-table-hdr">Last changed</span></div>
+          <div style="float:left; margin-right: 9px; border-right:1px solid #000000; width: 60px;"><span class="proj-table-hdr">Cables</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Pln</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Reg</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Lbl</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Fbr</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Rdy</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Ins</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Com</span></div>
+          <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Dmg</span></div>
+          <div style="float:left;margin-right: 19px; border-right:1px solid #000000; width: 60px;"><span class="proj-table-hdr">Rtr</span></div>
+          <div style="float:left;                   width:100px;"><span class="proj-table-hdr">Deadline</span></div>
+          <div style="float:left;                   width:160px;"><span class="proj-table-hdr">Modified</span></div>
           <div style="clear:both;"></div>
         </div>
 
         <!-- Table body is loaded dynamically by the application -->
-        <div id="projects-search-list"></div>
+        <div id="projects-search-list"><div style="color:maroon; margin-top:10px;">Use the search form to find projects...</div></div>
 
       </div>
 
     </div>
 
     <div id="projects-create" class="application-workarea hidden">
+<?php
+    if( $neocaptar->can_manage_projects())
+        print <<<HERE
       <div style="margin-bottom:20px; border-bottom:1px dashed #c0c0c0;">
         <div style="float:left;">
           <form id="projects-create-form">
             <table style="font-size:95%;"><tbody>
               <tr>
-                <td><b>Owner:<?=$required_field_html?></b></td>  <td><select            name="owner" class="projects-create-form-element">
-                                                                        <option>gapon</option>
-                                                                        <option>perazzo</option>
-                                                                      </select></td>
-                <td><b>Title:<?=$required_field_html?></b></td><td><input type="text" name="name" size="50" class="projects-create-form-element" value="" /></td>
+                <td><b>Owner:{$required_field_html}</b></td><td><input type="text" name="owner" size="5"  class="projects-create-form-element" style="padding:2px;" value="{$authdb->authName()}" /></td>
               </tr>
               <tr>
-                <td><b>Descr: </b></td>
-                <td colspan="4"><textarea cols=54 rows=4 name="descr" class="projects-create-form-element" style="padding:4px;" title="Here be the project description"></textarea></td>
+                <td><b>Title:{$required_field_html}</b></td><td><input type="text" name="title"  size="50" class="projects-create-form-element" style="padding:2px;" value="" /></td>
               </tr>
               <tr>
-                <td><b>Due by:</b></td><td><input type="text" name="due" size="6" class="projects-create-form-element" value="" /></td>
+                <td><b>Descr: </b></td><td colspan="4"><textarea cols=54 rows=4 name="description" class="projects-create-form-element" style="padding:4px;" title="Here be the project description"></textarea></td>
+              </tr>
+              <tr>
+                <td><b>Due by:{$required_field_html}</b></td><td><input type="text" name="due_time" size="6" class="projects-create-form-element" value="" /></td>
               </tr>
             </tbody></table>
           </form>
         </div>
         <div style="float:left; padding:5px;">
-          <button id="projects-create-save">Save</button>
-          <button id="projects-create-reset">Reset Form</button>
+          <div>
+            <button id="projects-create-save">Create</button>
+            <button id="projects-create-reset">Reset Form</button>
+          </div>
+          <div style="margin-top:5px;" id="projects-create-info" >&nbsp;</div>
         </div>
         <div style="clear:both;"></div>
       </div>
-      <?=$required_field_html?> required feild
+      {$required_field_html} required feild
+HERE;
+      else {
+          $admin_access_href = "javascript:global_switch_context('admin','access')";
+        print <<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We're sorry! Your SLAC UNIX account <b>{$authdb->authName()}</b> has no sufficient permissions for this operation.
+  Normally we assign this task to authorized <a href="{$admin_access_href}">project managers</a>.
+  Please contact administrators of this application if you think you need to create/manage projects.
+  A list of administrators can be found in the <a href="{$admin_access_href}">Access Control</a> section of the <a href="{$admin_access_href}">Admin</a> tab of this application.
+</div>
+HERE;
+      }
+?>
     </div>
 
-
     <div id="dictionary-types" class="application-workarea hidden">
-      <div class="application-workarea-instructions" style="float:left; " >
-        <table><tbody>
-          <tr>
-            <td nowrap="nowrap" valign="top" class="table_cell table_cell_left table_cell_bottom ">USAGE NOTES:</td>
-            <td class="table_cell table_cell_right table_cell_bottom table_cell_top ">
-              This pages displays a dictionary of cable types, related connectors and pin lists.
-              Authorized users are also allowed to modify the contents of the dictionary.
-              More specific instructions will be added here later...
-            </td>
-          </tr>
-        </tbody></table>
-      </div>
-      <div style="float:left; margin-left:40px; " ><button id="dictionary-types-reload" title="reload the dictionary from the database">Reload</button></div>
-      <div style="clear:both; "></div>
-      <div id="dictionary-types-info" >&nbsp;</div>
-
-      <div class="dict-section dict-section-first" style="float:left;">
-        <div class="dict-header" >
-          <div style="float:left; width:40px;  ">&nbsp;</div>
-          <div style="float:left; width:120px; ">Cable Type</div>
-          <div style="float:left; width:120px; ">Created</div>
-          <div style="float:left; width:80px;  ">By</div>
-          <div style="float:left; width:60px;  "># Refs</div>
-          <div style="clear:both;              "></div>
-        </div>
-        <div class="dict-body" id="dictionary-types-cables"></div>
-        <div class="dict-input">
-          <div style="float:left; width:40px; padding-top: 4px; "><b>add</b> &rarr;</div>
+      <div><button id="dictionary-types-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="float:left;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top: 4px; ">Add new cable type:</div>
           <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; ">(8 chars)</div>
           <div style="clear:both; "></div>
         </div>
+        <div id="dictionary-types-cables"></div>
       </div>
-
-      <div class="dict-section" style="float:left;">
-        <div class="dict-header">
-          <div style="float:left; width:40px;  ">&nbsp;</div>
-          <div style="float:left; width:120px; ">Connector</div>
-          <div style="float:left; width:120px; ">Created</div>
-          <div style="float:left; width:80px;  ">By</div>
-          <div style="float:left; width:60px;  "># Refs</div>
-          <div style="clear:both;              "></div>
-        </div>
-        <div class="dict-body" id="dictionary-types-connectors"></div>
-        <div class="dict-input">
-          <div style="float:left; width:40px; padding-top: 4px; "><b>add</b> &rarr;</div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top:4px; ">Add new connector type:</div>
           <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type, press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; ">(7 chars)</div>
           <div style="clear:both; "></div>
         </div>
+        <div id="dictionary-types-connectors"></div>
       </div>
-
-      <div class="dict-section" style="float:left;">
-        <div class="dict-header">
-          <div style="float:left; ">&nbsp;</div>
-          <div style="float:left; width:120px; ">Pin List</div>
-          <div style="float:left; width:120px; ">Created</div>
-          <div style="float:left; width:80px;  ">By</div>
-          <div style="float:left; width:60px;  "># Refs</div>
-          <div style="clear:both;              "></div>
-        </div>
-        <div class="dict-body" id="dictionary-types-pinlists"></div>
-        <div class="dict-input">
-          <div style="float:left; width:40px; padding-top: 4px; "><b>add</b> &rarr;</div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top:4px; ">Add pin list:</div>
           <div style="float:left; "><input type="text" size="12" name="pinlist2add" title="fill in new pin list type, press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; ">(16 chars)</div>
           <div style="clear:both; "></div>
         </div>
+        <div id="dictionary-types-pinlists"></div>
       </div>
-
       <div style="clear:both;"></div>
-
     </div>
 
     <div id="dictionary-locations" class="application-workarea hidden">
-
-      <div class="application-workarea-instructions" style="float:left; " >
-        <table><tbody>
-          <tr>
-            <td nowrap="nowrap" valign="top" class="table_cell table_cell_left table_cell_bottom ">USAGE NOTES:</td>
-            <td class="table_cell table_cell_right table_cell_bottom table_cell_top ">
-              This pages displays a dictionary of locations and racks.
-              Authorized users are also allowed to modify the contents of the dictionary.
-              More specific instructions will be added here later...
-            </td>
-          </tr>
-        </tbody></table>
-      </div>
-      <div style="float:left; margin-left:40px; " ><button id="dictionary-locations-reload" title="reload the dictionary from the database">Reload</button></div>
-      <div style="clear:both; "></div>
-      <div id="dictionary-locations-info" >&nbsp;</div>
-
-      <div class="dict-section dict-section-first" style="float:left;">
-        <div class="dict-header" >
-          <div style="float:left; width:40px;  ">&nbsp;</div>
-          <div style="float:left; width:120px; ">Location</div>
-          <div style="float:left; width:120px; ">Created</div>
-          <div style="float:left; width:80px;  ">By</div>
-          <div style="float:left; width:60px;  "># Refs</div>
-          <div style="clear:both;              "></div>
-        </div>
-        <div class="dict-body" id="dictionary-locations-locations"></div>
-        <div class="dict-input">
-          <div style="float:left; width:40px; padding-top: 4px; "><b>add</b> &rarr;</div>
+      <div><button id="dictionary-locations-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="float:left;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top: 4px; ">Add new location:</div>
           <div style="float:left; "><input type="text" size="12" name="location2add" title="fill in new location name, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; ">(6 chars)</div>
           <div style="clear:both; "></div>
         </div>
+        <div id="dictionary-locations-locations"></div>
       </div>
-
-      <div class="dict-section" style="float:left;">
-        <div class="dict-header">
-          <div style="float:left; width:40px;  ">&nbsp;</div>
-          <div style="float:left; width:120px; ">Rack</div>
-          <div style="float:left; width:120px; ">Created</div>
-          <div style="float:left; width:80px;  ">By</div>
-          <div style="float:left; width:60px;  "># Refs</div>
-          <div style="clear:both;              "></div>
-        </div>
-        <div class="dict-body" id="dictionary-locations-racks"></div>
-        <div class="dict-input">
-          <div style="float:left; width:40px; padding-top: 4px; "><b>add</b> &rarr;</div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top:4px; ">Add new rack:</div>
           <div style="float:left; "><input type="text" size="12" name="rack2add" title="fill in new rack name, press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; ">(6 chars)</div>
           <div style="clear:both; "></div>
         </div>
+        <div id="dictionary-locations-racks"></div>
       </div>
-
-      <div style="clear:both;"></div>
-
+      <div style="clear:both; "></div>
     </div>
 
-    <div id="dictionary-routings"  class="application-workarea hidden">Cable routings</div>
+    <div id="dictionary-routings" class="application-workarea hidden">
+      <div><button id="dictionary-routings-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="margin-top:20px; margin-bottom:10px;">
+        <div style="float:left; padding-top:4px; ">Add new routing:</div>
+        <div style="float:left; "><input type="text" size="12" name="routing2add" title="fill in new routing name, press RETURN to save" /></div>
+        <div style="float:left; padding-top:4px; "></div>
+        <div style="clear:both; "></div>
+      </div>
+      <div id="dictionary-routings-routings"></div>
+    </div>
 
 
-    <!-- The DEMO version of an area for searching cables and displaying
-      -- results. This form will be reimplemented to be more dynamic.
-      -- In particular, the following options need to be obtained/loaded
-      -- from a database:
-      --
-      --   o a list of projects 
-      --   o a list of known systems
-      --
-      -- It's also possible to have an auto-complete dialog for values
-      -- which have already been used before. This should accelerate
-      -- the use of the search form.
-      -->
+    <div id="dictionary-instrs" class="application-workarea hidden">
+      <div><button id="dictionary-instrs-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="margin-top:20px; margin-bottom:10px;">
+        <div style="float:left; padding-top: 4px; ">Add new instruction:</div>
+        <div style="float:left; "><input type="text" size="1" name="instr2add" title="fill in new instr name, press RETURN to save" /></div>
+        <div style="float:left; padding-top: 4px; "> (1 digit)</div>
+        <div style="clear:both; "></div>
+      </div>
+      <div id="dictionary-instrs-instrs"></div>
+    </div>
 
     <div id="search-cables" class="application-workarea hidden">
-      <div style="border-bottom:1px dashed #c0c0c0; margin-bottom:10px;">
+      <div style="border-bottom: 1px solid #000000;">
         <div style="float:left;">
           <form id="search-cables-form">
             <table style="font-size:95%;"><tbody>
-              <tr>
-                <td><b>Project:</b></td>
-                <td>
-                  <select name="project">
-                    <option></option>
-                    <option>no project</option>
-                    <option>LAN for CXI</option>
-                    <option>InfiniBand Network for FEH</option>
-                  </select>
-                </td>
-                <td><b>System:</b></td>
-                <td><input type="text" name="system" value=""></input></td>
-                <td><b>Source (loc):</b></td>
-                <td>
-                  <select name="source_loc">
-                    <option></option>
-                    <option>AMO</option>
-                    <option>CXI</option>
-                    <option>B999</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td><b>Cable #:</b></td>
-                <td><input type="text" name="cable_number" value=""></input></td>
-                <td><b>Function:</b></td>
-                <td><input type="text" name="function" value=""></input></td>
-                <td><b>Dest (loc):</b></td>
-                <td>
-                  <select name="destination_loc">
-                    <option></option>
-                    <option>AMO</option>
-                    <option>CXI</option>
-                    <option>B999</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td><b>Job #:</b></td>
-                <td><input type="text" name="job_number" value=""></input></td>
-                <td><b>Type:</b></td>
-                <td>
-                  <select name="type">
-                    <option></option>
-                    <option>1PR18OTN</option>
-                    <option>CAT6STLN</option>
-                    <option>CNT195</option>
-                    <option>CAT6UTLN</option>
-                  </select>
-                </td>
-              </tr>
+              <tr><td><b>Cable #</b>    </td><td><input type="text" name="cable"           size="6"  value="" title="full or partial cable number"        ></input></td>
+                  <td><b>Cable Type</b> </td><td><input type="text" name="cable_type"      size="6"  value="" title="full or partial cable type"          ></input></td>
+                  <td><b>Device</b>     </td><td><input type="text" name="device"          size="12" value="" title="full or partial device name"         ></input></td>
+                  <td><b>Origin Loc.</b></td><td><input type="text" name="origin_loc"      size="3"  value="" title="full or partial origin location"     ></input></td></tr>
+              <tr><td><b>Job #</b>      </td><td><input type="text" name="job"             size="6"  value="" title="full or partial job number"          ></input></td>
+                  <td><b>Routing</b>    </td><td><input type="text" name="routing"         size="6"  value="" title="full or partial routing"             ></input></td>
+                  <td><b>Function</b>   </td><td><input type="text" name="func"            size="12" value="" title="full or partial function name"       ></input></td>
+                  <td><b>Dest. Loc.</b> </td><td><input type="text" name="destination_loc" size="3"  value="" title="full or partial destination location"></input></td></tr>
             </tbody></table>
           </form>
         </div>
@@ -1112,73 +1126,81 @@ function global_simple_search() {
         </div>
         <div style="clear:both;"></div>
       </div>
-      <div style="border-bottom:1px dashed #c0c0c0; margin-bottom:15px;">
-      <form id="search-cables-display-form">
-        <div style="float:left;">
-          <table style="font-size:95%;"><tbody>
-            <tr>
-              <td valign="top"><b>Sort by:</b></td>
-              <td>
-                <select name="sort">
-                  <option>project</option>
-                  <option>job #</option>
-                  <option>cable #</option>
-                  <option>system</option>
-                  <option>function</option>
-                  <option>source</option>
-                  <option>destination</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td><input type="checkbox" name="reverse" ></input>reverse</td>
-              </td>
-            </tr>
-          </tbody></table>
+      <div style="padding:10px">
+        <div style="padding-bottom:10px;">
+          <div style="float:left;  padding-top:5px; padding-bottom:10px;">
+            <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="img/EXCEL_icon.gif" /></button>
+          </div>
+          <div style="float:right;" id="search-cables-info">&nbsp;</div>
+          <div style="clear:both;"></div>
+          <div id="search-cables-display">
+            <input type="checkbox" name="project" checked="checked"></input>project
+            <input type="checkbox" name="job"     checked="checked"></input>job #
+            <input type="checkbox" name="cable"   checked="checked"></input>cable #
+            <input type="checkbox" name="device"  checked="checked"></input>device
+            <input type="checkbox" name="func"    checked="checked"></input>function
+            <input type="checkbox" name="length"  checked="checked"></input>length
+            <input type="checkbox" name="routing" checked="checked"></input>routing
+            <input type="checkbox" name="sd"      checked="checked"></input>source & destination
+          </div>
         </div>
-        <div style="float:left; margin-left:20px; padding-left:10px; /*border-left:1px dashed #c0c0c0;*/">
-          <table style="font-size:95%;"><tbody>
-            <tr>
-              <td valign="top"><b>Display:</b></td>
-              <td><input type="checkbox" name="project"                      ></input>project</td>
-              <td><input type="checkbox" name="job"                          ></input>job #</td>
-              <td><input type="checkbox" name="system"      checked="checked"></input>system</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td><input type="checkbox" name="function"    checked="checked"></input>function</td>
-              <td><input type="checkbox" name="source"      checked="checked"></input>source</td>
-              <td><input type="checkbox" name="destination" checked="checked"></input>destination</td>
-            </tr>
-          </tbody></table>
-        </div>
-        <div style="float:left; margin-left:20px; padding-left:10px; /*border-left:1px dashed #c0c0c0;*/">
-          <table style="font-size:95%;"><tbody>
-            <tr>
-              <td valign="top"><b>Export to:</b></td>
-              <td></td>
-              <td><a class="link" href="" target="_blank" title="Microsoft Excel 2008 File"><img src="img/EXCEL_icon.gif" /></a></td>
-              <td><a class="link" href="" target="_blank" title="Text File to be embeded into Confluence Wiki"><img src="img/WIKI_icon.png"/></a></td>
-              <td><a class="link" href="" target="_blank" title="Plain Text File"><img src="img/TEXT_icon.png" /></a></td>
-            </tr>
-          </tbody></table>
-        </div>
-        <div id="search-cables-info" style="float:right;">&nbsp;</div>
-        <div style="clear:both;"></div>
-      </form>
+        <div id="search-cables-result"></div>
       </div>
-      <div id="search-cables-result"></div>
     </div>
 
-    <div id="admin-cablenumbers" class="application-workarea hidden">View/manage cable numbers allocation</div>
-    <div id="admin-jobs"         class="application-workarea hidden">Manage job number assignments to authorized personell</div>
-    <div id="admin-access"       class="application-workarea hidden">View/manage access privileges to the application.<br/>
-                                                                     Add/remove user accounts allowed to modify the database contents.<br/>
-                                                                     This page is supposed to be available only to the administrators of this service.</div>
+    <div id="admin-cablenumbers" class="application-workarea hidden">
+      <div style="float:left;" ><button id="admin-cablenumbers-reload" title="reload from the database">Reload</button></div>
+      <div style="clear:both; "></div>
+      <div style="margin-top:30px;">
+        <div class="section3">Ranges</div>
+        <div id="admin-cablenumbers-cablenumbers"></div>
+      </div>
+    </div>
+
+    <div id="admin-jobnumbers" class="application-workarea hidden">
+      <div style="float:left;" ><button id="admin-jobnumbers-reload" title="reload from the database">Reload</button></div>
+      <div style="clear:both; "></div>
+      <div style="margin-top:30px;">
+        <div class="section3">Ranges</div>
+        <div id="admin-jobnumbers-jobnumbers"></div>
+      </div>
+      <div style="margin-top:30px;">
+        <div class="section3">Allocated Numbers</div>
+        <div id="admin-jobnumbers-allocations"></div>
+      </div>
+    </div>
+
+    <div id="admin-access" class="application-workarea hidden">
+      <div style="float:left;" ><button id="admin-access-reload" title="reload from the database">Reload</button></div>
+      <div style="clear:both; "></div>
+      <div style="margin-top:30px;">
+        <div class="section3">Administrators</div>
+        <div style="padding-left:20px; padding-top:20px;">
+          <div style="float:left; padding-top: 4px; ">Add new administrator:</div>
+          <div style="float:left; "><input type="text" size="12" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; ">(valid UNIX account)</div>
+          <div style="clear:both; "></div>
+        </div>
+        <div id="admin-access-administrators"></div>
+      </div>
+      <div style="margin-top:30px;">
+        <div class="section3">Project Managers</div>
+        <div style="padding-left:20px; padding-top:20px;">
+          <div style="float:left; padding-top: 4px; ">Add new project manager:</div>
+          <div style="float:left; "><input type="text" size="12" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; ">(valid UNIX account)</div>
+          <div style="clear:both; "></div>
+        </div>
+        <div id="admin-access-projmanagers"></div>
+      </div>
+    </div>
+
   </div>
 
-  <div id="popupdialogs" style="display:none;"></div>
+  <div id="popupdialogs" ></div>
+  <div id="infodialogs"  ></div>
+  <div id="editdialogs"  ></div>
+
 </div>
 
 </body>
@@ -1190,8 +1212,10 @@ function global_simple_search() {
 <?php
 
 	$authdb->commit();
+	$neocaptar->commit();
 
-} catch( LusiTimeException $e ) { print $e->toHtml(); }
-  catch( AuthDBException   $e ) { print $e->toHtml(); }
+} catch( AuthDBException    $e ) { print $e->toHtml(); }
+  catch( LusiTimeException  $e ) { print $e->toHtml(); }
+  catch( NeoCaptarException $e ) { print $e->toHtml(); }
 
 ?>

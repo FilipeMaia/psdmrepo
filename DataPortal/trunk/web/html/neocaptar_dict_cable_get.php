@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This service will return a dictionary of known cable types,
+ * connectors and pinlists.
+ */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
@@ -11,31 +15,12 @@ use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
 use DataPortal\NeoCaptar;
+use DataPortal\NeoCaptarUtils;
 use DataPortal\NeoCaptarException;
-
-/**
- * This service will return a dictionary of known cable types,
- * connectors and pinlists.
- */
 
 header( 'Content-type: application/json' );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
-/* Package the error message into a JSON object and return the one back
- * to a caller. The script's execution will end at this point.
- */
-function report_error( $msg ) {
-	$status_encoded = json_encode( "error" );
-    $msg_encoded = json_encode( $msg );
-   	print <<< HERE
-{
-  "status": {$status_encoded},
-  "message": {$msg_encoded}
-}
-HERE;
-    exit;
-}
 
 try {
 	$authdb = AuthDB::instance();
@@ -73,17 +58,13 @@ try {
 		);
 	}
 
-	print
-   		'{ "status": '.json_encode("success").
-   		', "updated": '.json_encode( LusiTime::now()->toStringShort()).
-   		', "cable": '.json_encode( $cables ).
-   		'}';
-
 	$authdb->commit();
 	$neocaptar->commit();
 
-} catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { report_error( $e->toHtml()); }
-  catch( NeoCaptarException  $e ) { report_error( $e->toHtml()); }
+    NeoCaptarUtils::report_success( array( 'cable' => $cables ));
+
+} catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( NeoCaptarException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   
 ?>

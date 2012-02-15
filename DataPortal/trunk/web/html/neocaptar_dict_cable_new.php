@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This service will return a dictionary of known cable types,
+ * connectors and pinlists.
+ */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
@@ -11,46 +15,18 @@ use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
 use DataPortal\NeoCaptar;
+use DataPortal\NeoCaptarUtils;
 use DataPortal\NeoCaptarException;
-
-/**
- * This service will return a dictionary of known cable types,
- * connectors and pinlists.
- */
 
 header( 'Content-type: application/json' );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-/* Package the error message into a JSON object and return the one back
- * to a caller. The script's execution will end at this point.
- */
-function report_error( $msg ) {
-	$status_encoded = json_encode( "error" );
-    $msg_encoded = json_encode( $msg );
-   	print <<< HERE
-{
-  "status": {$status_encoded},
-  "message": {$msg_encoded}
-}
-HERE;
-    exit;
-}
-
-if( !isset( $_GET['cable' ] )) report_error('missing cable name');
-$cable_name = trim( $_GET['cable'] );
-if( $cable_name == '' ) report_error('empty cable name');
-
-if( isset( $_GET['connector'] )) {
-	$connector_name = trim( $_GET['connector'] );
-	if( $connector_name == '' ) report_error('empty connector name');
-	if( isset( $_GET['pinlist'] )) {
-		$pinlist_name = trim( $_GET['pinlist'] );
-		if( $pinlist_name == '' ) report_error('empty pinlist name');
-	}
-}
-
 try {
+
+    $cable_name     = NeoCaptarUtils::get_param_GET('cable');
+    $connector_name = NeoCaptarUtils::get_param_GET('connector',false);
+    $pinlist_name   = is_null($connector_name) ? null : NeoCaptarUtils::get_param_GET('pinlist',false);
 
 	$created_time = LusiTime::now();
 
@@ -78,13 +54,13 @@ try {
 			$neocaptar->commit();
 			$neocaptar->begin();
 			$cable = $neocaptar->find_dict_cable_by_name( $cable_name );
-			if( is_null( $cable )) report_error('failed to find or create the specified cable type');
+			if( is_null( $cable )) NeoCaptarUtils::report_error('failed to find or create the specified cable type');
 		}
 	}
 
 	// Same approach for connectors and pinlists
 	//
-	if( isset( $connector_name )) {
+	if( !is_null( $connector_name )) {
 		$connector = $cable->find_connector_by_name( $connector_name );
 		if( is_null( $connector )) {
 			$connector = $cable->add_connector( $connector_name, $created_time, $created_uid  );
@@ -92,11 +68,11 @@ try {
 				$neocaptar->commit();
 				$neocaptar->begin();
 				$connector = $cable->find_connector_by_name( $connector_name );
-				if( is_null( $connector )) report_error('failed to find or create the specified connector type');
+				if( is_null( $connector )) NeoCaptarUtils::report_error('failed to find or create the specified connector type');
 			}
 		}
 
-		if( isset( $pinlist_name )) {
+		if( !is_null( $pinlist_name )) {
 			$pinlist = $connector->find_pinlist_by_name( $pinlist_name );
 			if( is_null( $pinlist )) {
 				$pinlist = $connector->add_pinlist( $pinlist_name, $created_time, $created_uid  );
@@ -104,7 +80,7 @@ try {
 					$neocaptar->commit();
 					$neocaptar->begin();
 					$pinlist = $connector->find_pinlist_by_name( $pinlist_name );
-					if( is_null( $pinlist )) report_error('failed to find or create the specified pinlist type');
+					if( is_null( $pinlist )) NeoCaptarUtils::report_error('failed to find or create the specified pinlist type');
 				}
 			}
 		}
@@ -136,16 +112,14 @@ try {
 			'connector'    => $connectors
 		)
 	);
-	print
-   		'{ "status": '.json_encode("success").
-   		', "updated": '.json_encode( LusiTime::now()->toStringShort()).
-   		', "cable": '.json_encode( $cables ).
-   		'}';
 
+	$authdb->commit();
 	$neocaptar->commit();
 
-} catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { report_error( $e->toHtml()); }
-  catch( NeoCaptarException  $e ) { report_error( $e->toHtml()); }
+    NeoCaptarUtils::report_success( array( 'cable' => $cables ));
+
+} catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( NeoCaptarException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   
 ?>

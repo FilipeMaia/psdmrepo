@@ -1,9 +1,8 @@
 <?php
 
 /**
- * This service will return a dictionary of known locations and racks.
+ * This service will return an access control lists.
  */
-
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
@@ -22,7 +21,6 @@ header( 'Content-type: application/json' );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-
 try {
 	$authdb = AuthDB::instance();
 	$authdb->begin();
@@ -30,30 +28,17 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$locations = array();
-	foreach( $neocaptar->dict_locations() as $location ) {
-
-		$racks = array();
-		foreach( $location->racks() as $rack ) {
-
-			$racks[$rack->name()] = array(
-				'id'           => $rack->id(),
-				'created_time' => $rack->created_time()->toStringShort(),
-				'created_uid'  => $rack->created_uid()
-			);
-		}
-		$locations[$location->name()] = array(
-			'id'           => $location->id(),
-			'created_time' => $location->created_time()->toStringShort(),
-			'created_uid'  => $location->created_uid(),
-			'rack'         => $racks
-		);
-	}
+    $access2array = array(
+        'administrator' => array(),
+        'projmanager' => array()
+    );
+    foreach( $neocaptar->users() as $u )
+        array_push($access2array[$u->role()], NeoCaptarUtils::user2array($u));
 
 	$authdb->commit();
 	$neocaptar->commit();
 
-    NeoCaptarUtils::report_success(array('location' => $locations));
+    NeoCaptarUtils::report_success( array( 'access' => $access2array ));
 
 } catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }

@@ -1,55 +1,34 @@
 <?php
 
+/**
+ * This service will return a dictionary of known locations and racks.
+ */
 require_once( 'authdb/authdb.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
-
 use DataPortal\NeoCaptar;
+use DataPortal\NeoCaptarUtils;
 use DataPortal\NeoCaptarException;
 
-/**
- * This service will return a dictionary of known locations and racks.
- */
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
 
 header( 'Content-type: application/json' );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-/* Package the error message into a JSON object and return the one back
- * to a caller. The script's execution will end at this point.
- */
-function report_error( $msg ) {
-	$status_encoded = json_encode( "error" );
-    $msg_encoded = json_encode( $msg );
-   	print <<< HERE
-{
-  "status": {$status_encoded},
-  "message": {$msg_encoded}
-}
-HERE;
-    exit;
-}
-
-if( !isset( $_GET['location' ] )) report_error('missing location name');
-$location_name = trim( $_GET['location'] );
-if( $location_name == '' ) report_error('empty location name');
-
-if( isset( $_GET['rack'] )) {
-	$rack_name = trim( $_GET['rack'] );
-	if( $rack_name == '' ) report_error('empty rack name');
-}
-
 try {
+
+    $location_name = NeoCaptarUtils::get_param_GET('location');
+    $rack_name     = NeoCaptarUtils::get_param_GET('rack',false);  // not required
 
 	$created_time = LusiTime::now();
 
-	// Check for proper authorization andf get the current UID
+	// Check for proper authorization and get the current UID
 	//
 	$authdb = AuthDB::instance();
 	$authdb->begin();
@@ -73,13 +52,13 @@ try {
 			$neocaptar->commit();
 			$neocaptar->begin();
 			$location = $neocaptar->find_dict_location_by_name( $location_name );
-			if( is_null( $location )) report_error('failed to find or create the specified location');
+			if( is_null( $location )) NeoCaptarUtils::report_error('failed to find or create the specified location');
 		}
 	}
 
 	// Same approach for racks
 	//
-	if( isset( $rack_name )) {
+	if( !is_null( $rack_name )) {
 		$rack = $location->find_rack_by_name( $rack_name );
 		if( is_null( $rack )) {
 			$rack = $location->add_rack( $rack_name, $created_time, $created_uid  );
@@ -87,7 +66,7 @@ try {
 				$neocaptar->commit();
 				$neocaptar->begin();
 				$rack = $location->find_rack_by_name( $rack_name );
-				if( is_null( $rack )) report_error('failed to find or create the specified rack');
+				if( is_null( $rack )) NeoCaptarUtils::report_error('failed to find or create the specified rack');
 			}
 		}
 	}
@@ -109,16 +88,13 @@ try {
 			'rack'    => $racks
 		)
 	);
-	print
-   		'{ "status": '.json_encode("success").
-   		', "updated": '.json_encode( LusiTime::now()->toStringShort()).
-   		', "location": '.json_encode( $locations ).
-   		'}';
 
 	$neocaptar->commit();
 
-} catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { report_error( $e->toHtml()); }
-  catch( NeoCaptarException  $e ) { report_error( $e->toHtml()); }
+    NeoCaptarUtils::report_success(array('location' => $locations));
+
+} catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
+  catch( NeoCaptarException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   
 ?>

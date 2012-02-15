@@ -1135,7 +1135,7 @@ span.toggler {
 div.m-item {
 
   margin-left: 3px;
-  margin-top: 3px;
+  margin-top: 5px;
 
   padding: 5px;
   padding-left: 10px;
@@ -1145,9 +1145,7 @@ div.m-item {
 
   color: #0071BC;
 
-  border-top: 2px solid #c0c0c0;
-  /*border-bottom: 1px solid #c0c0c0;*/
-  border-right: 2px solid #c0c0c0;
+  border-right: 2px solid #a0a0a0;
 
   border-radius: 5px;
   border-bottom-left-radius: 0;

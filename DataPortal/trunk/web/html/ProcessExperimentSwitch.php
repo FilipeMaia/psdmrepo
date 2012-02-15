@@ -234,7 +234,7 @@ HERE;
     	fwrite( $handle, $body );
     	fclose( $handle );
 
-    	$subject = "[ {$instrument_experiment_names} ]  experiment activated for DAQ & OFFLINE data processing";
+    	$subject = "[ {$instrument_experiment_names} ]  experiment activated for DAQ";
 
 	    foreach( $notify as $n ) {
     		$address = $n['email'];
