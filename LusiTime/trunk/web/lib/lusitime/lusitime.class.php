@@ -136,6 +136,11 @@ class LusiTime {
      */
     public function toStringHMS() {
         return date("H:i:s", $this->sec); }
+
+    /* Produce a string in the following format: DD_HH:MM
+     */
+    public function toStringDHM() {
+        return date("d_H:i", $this->sec); }
         
     /* Return 4-digit year number of the timestamp.
      */

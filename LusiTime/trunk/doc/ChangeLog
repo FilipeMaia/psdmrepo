@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-00-22
+2012-02-14 Igor Gaponenko
+- extended LusitIme with one convenience method
+
 Tag: V00-00-21
 2011-10-24 Andy Salnikov
 - removed include Lusi.h
