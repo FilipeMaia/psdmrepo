@@ -68,56 +68,61 @@ def polar2cart(r, theta) :
 #----------------------------------    
 
 def coordinateToIndexOpenEnd(V,VRange) :
-    Vmin = VRange[0]
-    Vmax = VRange[1]
-    Nbins= VRange[2]
+    Vmin, Vmax, Nbins = VRange
     factor = float(Nbins-1) / float(Vmax-Vmin) #* (1-1e-9) # In order to get open endpoint [Vmin,Vmax)
     return np.int32( factor * (V-Vmin) )
 
 #----------------------------------    
 
 def coordinateToIndex(V,VRange) :
-    Vmin = VRange[0]
-    Vmax = VRange[1]
-    Nbins= VRange[2]
+    Vmin, Vmax, Nbins = VRange
     factor = float(Nbins) / float(Vmax-Vmin)
     return np.int32( factor * (V-Vmin) )
 
 #----------------------------------    
 
 def coordinateToIndexProtected(V,VRange) :
-    Vmin = VRange[0]
-    Vmax = VRange[1]
-    Nbins= VRange[2]
+    Vmin, Vmax, Nbins = VRange
     factor = float(Nbins) / float(Vmax-Vmin)
     indarr = np.int32( factor * (V-Vmin) )
     return np.select([V<Vmin], [-1000], default=indarr)
  
 #----------------------------------    
 
-def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
-    """Input Cartesian array elements are summed together in 2D polar array bins"""
+def transformCartToPolarArray(arr, RRange, ThetaRange, Origin) :
+    """Input Cartesian array elements are summed together in 2D polar array bins
 
-    dimY,dimX = arr.shape 
-    x = np.arange(dimX) - origin[0]
-    y = np.arange(dimY) - origin[1]
+    This transformation works fine when the ThetaRange is inside a single sheet [-180,180] degree.
+    """
 
-    X, Y       = np.meshgrid(x, y)
-    R, Theta   = cart2polar (X, Y)
+    arrShape = arr.shape 
+    print 'arrShape=\n', arrShape
+
+    dimY,dimX = arr.shape
+    xc,yc = Origin
+    x = np.arange(dimX) - xc
+    y = np.arange(dimY) - yc
+
+    X, Y       = np.meshgrid(x,y)
+    R, Theta   = cart2polar (X,Y)
 
     iR         = coordinateToIndexProtected(R,RRange)        
     iTheta     = coordinateToIndexProtected(Theta,ThetaRange)
-    arrMasked = np.select([iTheta<0,iR<0], [0,0], default=arr)
-    #arrMasked  = arr * maskT * maskR
 
-    #i1D        = iR + iTheta * RRange[2] #THIS IS WRONG
-    i1D        = iTheta + iR * ThetaRange[2]
+    #arrZeroes = np.zeros(shape,dtype=float)
+    arrMasked = np.select([iTheta<0, iTheta>=ThetaRange[2], iR<0, iR>=RRange[2]], [0,0,0,0], default=arr)
+
     i1DInPolar = np.arange(ThetaRange[2] * RRange[2], dtype=np.int32)
 
+    i1D      = iTheta + iR * ThetaRange[2]
     arrPolar = np.array( sp.ndimage.sum(arrMasked, i1D, index=i1DInPolar) )
-    #arrPolar.shape = (ThetaRange[2], RRange[2]) 
     arrPolar.shape = (RRange[2], ThetaRange[2])
     return arrPolar
+
+    #i1D      = iR + iTheta * RRange[2]
+    #arrPolar = np.array( sp.ndimage.sum(arrMasked, i1D, index=i1DInPolar) )
+    #arrPolar.shape = (ThetaRange[2], RRange[2]) 
+    #return arrPolar.T
 
 #----------------------------------    
 
@@ -323,8 +328,8 @@ def drawOrShow(showTimeSec=None) :
 
 def drawImage(arr2d, title, Range=None) :
     """Draws the image and color bar for a single 2D array."""
-    axes = plt.imshow(arr2d, origin='lower', interpolation='nearest',extent=Range) # origin='lower', origin='upper'
-    colb = plt.colorbar(axes, pad=0.06, fraction=0.10, shrink = 0.7, aspect = 20, orientation=1) #, ticks=coltickslocs
+    axes = plt.imshow(arr2d, origin='upper', interpolation='nearest',extent=Range, aspect='auto') # origin='lower', origin='upper',origin='lower', 
+    colb = plt.colorbar(axes, pad=0.01, fraction=0.10, aspect = 20, orientation='vertical') #, ticks=coltickslocs, shrink = 0.7
     plt.title(title, color='r', fontsize=20)
     #plt.clim(imageAmin,imageAmax)
     
@@ -372,9 +377,10 @@ def mainTest1Ring() :
     
     origin = (50,40)
     RRange = (0,50,10)
-    PRange = (-90,90,90)
+    PRange = (-90,180,90)
+    #PRange = (0,180,90)
     #PRange = (-180,180,18)
-    RPRange= (RRange[0], RRange[1], PRange[0], PRange[1])
+    RPRange= (PRange[0], PRange[1], RRange[0], RRange[1])
 
     polar_arr = transformCartToPolarArray(arr, RRange, PRange, origin)
     draw2DImage(polar_arr, showTimeSec=0, Range=RPRange)
@@ -396,8 +402,8 @@ def mainTest1Ring() :
 
 if __name__ == "__main__" :
 
-    #mainTest1Ring()
-    mainTest3Rings()
+    mainTest1Ring()
+    #mainTest3Rings()
 
 #----------------------------------
 #----------------------------------

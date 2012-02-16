@@ -143,7 +143,7 @@ class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
 # For test
     def get_array2d_for_test(self) :
         print 'ImgExplorer.get_array2d_for_test() - generate the new image array'
-        mu, sigma = 200, 25
+        mu, sigma = 20, 3
         #arr = np.arange(2400)
         arr = mu + sigma*np.random.standard_normal(size=250000)
         arr.shape = (500,500)
@@ -151,18 +151,28 @@ class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
         #arr.shape = (5,5)
         return arr
 
+    def get_array2d_of_zeros(self) :
+        print 'ImgExplorer.get_array2d_of_zeros() - generate the new image array'
+        shape = (500,500)
+        arr = np.zeros(shape,dtype=float)
+        return arr
+
     def get_array2d_with_ring_for_test(self) :
 
         a1, r1, s1 = 200, 160, 10 # amplitude, radius, and sigma of the ring
 
         arr = self.get_array2d_for_test()
+        #arr = self.get_array2d_of_zeros()
         npx, npy = arr.shape
         x0,  y0  = npx/2, npy/2
         x = np.arange(0,npx,1,dtype = np.float32) # np.linspace(0,200,201)
         y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
         X, Y = np.meshgrid(x-x0, y-y0)        
         R = np.sqrt(X*X+Y*Y)
-        arr += a1 * gaussian(R, r1, s1)
+        T = np.arctan2(Y,X)
+        amp  = np.sin(9*T) * np.sin(T)
+        arr += a1 * amp * amp * gaussian(R, r1, s1)
+
         return arr
 
 #-----------------------------

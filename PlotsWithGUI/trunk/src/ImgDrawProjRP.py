@@ -82,7 +82,7 @@ class ImgDrawProjRP :
             fig_outside.canvas.manager.window.activateWindow() # Makes window active
             fig_outside.canvas.manager.window.raise_()         # Move window on top
 
-        #self.drawImgAndProjsInRect(fig_outside, self.arr, obj)
+        self.drawImgAndProjsInWedge(fig_outside, self.arr, obj)
 
         fig_outside.canvas.draw()
 
@@ -93,14 +93,34 @@ class ImgDrawProjRP :
 #-----------------------------
 
 
-    def drawImgAndProjsInRect(self, fig, arr, obj) :
+    def drawImgAndProjsInWedge(self, fig, arr, obj) :
 
-        x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
+        #x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
+        #nx_slices, ny_slices = obj.get_number_of_slices_for_rect()
+        (x0,y0,r0,w0,t1,t2,lw,col,s,t,rem) = obj.get_list_of_wedge_pars()
+        n_rings, n_sects = obj.get_number_of_slices_for_wedge()
 
-        nx_slices, ny_slices = obj.get_number_of_slices_for_rect()
+        # Transform cartesian array tp polar
 
-        arrwin  =  arr[y:y+h,x:x+w]
-        xyrange = [x, x+w, y+h, y]
+        y = int(r0-w0)
+        h = int(w0)
+        x = int(t1)
+        w = int(t2-t1)
+
+        Origin     = (x0,y0)
+        RRange     = (y,y+h,h)
+        ThetaRange = (x,x+w,w)
+
+        nx_slices = 3
+        ny_slices = 3
+
+        print ' Origin    =', Origin    
+        print ' RRange    =', RRange    
+        print ' ThetaRange=', ThetaRange
+
+        arrwin = fat.transformCartToPolarArray(arr, RRange, ThetaRange, Origin)
+
+        xyrange = [x, x+w, y, y+h]
       
         #axsb = fig.add_subplot(111)
         gs   = gridspec.GridSpec(20, 20)
@@ -114,19 +134,21 @@ class ImgDrawProjRP :
 
         #------------------
         # Panel A
-        axim = axsa.imshow(arrwin, interpolation='nearest', aspect='auto', extent=xyrange) #, origin='bottom'
+        axim = axsa.imshow(arrwin, interpolation='nearest', aspect='auto', extent=xyrange, origin='bottom')
         axsa.xaxis.set_major_formatter(mtick.NullFormatter()) 
 
         #------------------
         # Panel CB
         colb = fig.colorbar(axim, cax=axCB, orientation='horizontal') # pad=0.004, fraction=0.1, aspect=40) 
         axCB.xaxis.set_ticks_position('top')
+        self.rotate_lables_for_xaxis(axCB, angle=50, alignment='left')
 
         #------------------
         # Panel B
-        xrange  = (x,x+w,ny_slices)
-        yrange  = (y,y+h,h)
-        arr2dy  = fat.rebinArray(arr, xrange, yrange) 
+
+        xrange  = (0,w,ny_slices)
+        yrange  = (0,h,h)
+        arr2dy  = fat.rebinArray(arrwin, xrange, yrange) 
         #axprojy = axsb.imshow(arr2dy, interpolation='nearest', origin='bottom', aspect='auto', extent=xyrange)
 
         for slice in range(ny_slices) :
@@ -138,20 +160,17 @@ class ImgDrawProjRP :
 
             axsb.hist(yarr, bins=h, weights=arr1slice, histtype='step', orientation='horizontal')
 
-        axsb.set_ylim(y+h, y)
+        axsb.set_ylim(y, y+h)
         axsb.xaxis.set_ticks_position('top')
         axsb.yaxis.set_ticks_position('right')
 
-        # Rotate axis labels
-        for label in axsb.get_xticklabels() :
-            label.set_rotation(60)
-            label.set_horizontalalignment('center') # 'right'
+        self.rotate_lables_for_xaxis(axsb, angle=50, alignment='left')
 
         #------------------
         # Panel C
-        xrange  = (x,x+w,w)
-        yrange  = (y,y+h,nx_slices)
-        arr2dx  = fat.rebinArray(arr, xrange, yrange) 
+        xrange  = (0,w,w)
+        yrange  = (0,h,nx_slices)
+        arr2dx  = fat.rebinArray(arrwin, xrange, yrange) 
         #axprojx = axsc.imshow(arr2dx, interpolation='nearest', origin='bottom', aspect='auto', extent=xyrange)
 
         for slice in range(nx_slices) :
@@ -169,7 +188,16 @@ class ImgDrawProjRP :
         # Panel D
         axsd.hist(arrwin.flatten(), bins=100)#, range=range)
         axsd.yaxis.set_ticks_position('right')
+        self.rotate_lables_for_xaxis(axsd, angle=50, alignment='right')
 
+#-----------------------------
+
+    def rotate_lables_for_xaxis(self, axes, angle=50, alignment='center') : # 'right'
+        """Rotate axis labels
+        """
+        for label in axes.get_xticklabels() :
+            label.set_rotation(angle)
+            label.set_horizontalalignment(alignment)
 
 #-----------------------------
 
