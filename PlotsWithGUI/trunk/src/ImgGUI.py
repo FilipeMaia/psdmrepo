@@ -92,11 +92,11 @@ class ImgGUI ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiWin)
 
         self.vboxGlobal = QtGui.QVBoxLayout()
-        self.vboxGlobal.addWidget(self.gui_player)
-        self.vboxGlobal.addWidget(self.gui_mode)
         self.vboxGlobal.addLayout(self.hboxT)
         self.vboxGlobal.addLayout(self.hboxD)
         self.vboxGlobal.addLayout(self.hboxB)
+        self.vboxGlobal.addWidget(self.gui_mode)
+        self.vboxGlobal.addWidget(self.gui_player)
 
         self.setLayout(self.vboxGlobal)
 

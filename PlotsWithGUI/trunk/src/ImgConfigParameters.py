@@ -142,6 +142,11 @@ class ImgConfigParameters :
         self.n_rings        = 3
         self.n_sects        = 5
 
+        #----
+        #For ImgDrawOnTop
+        self.lwAdd          = 1   # on top object linewidth for mode Add
+        self.colAdd         = 'g' # on top object color for mode Add
+
 
 #---------------------------------------
 

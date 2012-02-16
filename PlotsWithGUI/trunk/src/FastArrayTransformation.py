@@ -36,11 +36,9 @@ import numpy as np
 import scipy as sp
 import scipy.ndimage
 
-
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-
 
 import matplotlib
 #matplotlib.use('Agg')
@@ -51,16 +49,19 @@ import matplotlib.pyplot as plt
 #------------------------
 # Exported definitions --
 #------------------------
-
 #----------------------------------    
 
 def cart2polar(x, y) :
+    """For numpy arryys x and y returns the numpy arrays of r and theta 
+    """
     r = np.sqrt(x*x + y*y)
     theta  = np.rad2deg(np.arctan2(y, x)) #[-180,180]
     #theta0 = np.select([theta<0, theta>=0],[theta+360,theta]) #[0,360]
     return r, theta
 
 def polar2cart(r, theta) :
+    """For numpy arryys r and theta returns the numpy arrays of x and y 
+    """
     x = r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y

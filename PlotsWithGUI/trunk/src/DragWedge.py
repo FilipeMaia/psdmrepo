@@ -53,11 +53,13 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def get_theta_offset(self, theta) :
+        """For angle theta in degrees returns its offset w.r.t. the 0-sheet [-180,180)
+        """
         return 360 * self.get_theta_sheet_number(theta)
 
 
     def get_theta_sheet_number(self, theta) :
-        """Sheet number of the angular range [-180,180)
+        """Returns the sheet number of the angle theta in degree
         [-540,-180) : sheet =-1
         [-180, 180) : sheet = 0
         [ 180, 540) : sheet = 1 ...

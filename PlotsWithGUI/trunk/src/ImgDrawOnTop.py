@@ -143,7 +143,7 @@ class ImgDrawOnTop :
     def set_center_position_from_icp(self) :
         obj = self.icp.list_of_cents[0]
         obj.reset_center_position(self.icp.x_center, self.icp.y_center)
-
+        #drag.set_list_need_in_redraw(self.icp.list_of_wedgs)                 # <===== DEPENDS ON SHAPE
 
 
 
@@ -173,15 +173,18 @@ class ImgDrawOnTop :
         """
         if self.icp.formCurrent != form : return                            # check that the form is correct 
 
+        lw  = self.icp.lwAdd
+        col = self.icp.colAdd
+
         center = (self.icp.x_center, self.icp.y_center)                     #FOR OBJECTS WHICH NEED IN CENTER
         if form == self.icp.formWedge :
 
             print 'Initialize Wedge for center=', center
 
-            obj = DragObject(xy=center)                                     # create semi-default object
+            obj = DragObject(xy=center, linewidth=lw, color=col)            # create semi-default object
             
         else :
-            obj = DragObject()                                              # create default object
+            obj = DragObject(linewidth=lw, color=col)                       # create default object
 
         drag.add_obj_to_axes(obj, axes, list_of_objs)                       # add object to axes and in the list
         obj.on_press(event)                                                 # Initialize object by the mouse drag
@@ -222,7 +225,7 @@ class ImgDrawOnTop :
                 #print objPars
                 t,s,x,y,w,h,lw,col,nx,ny = objPars
                 #if t == self.icp.typeCurrent :
-                obj = dragr.DragRectangle(xy=(x,y), width=w, height=h, color='r')
+                obj = dragr.DragRectangle(xy=(x,y), width=w, height=h, linewidth=lw, color=col)
                 obj.nx_slices = nx
                 obj.ny_slices = ny
                 self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
@@ -243,7 +246,7 @@ class ImgDrawOnTop :
                 #print objPars
                 t,s,x1,x2,y1,y2,lw,col = objPars
                 #if t == self.icp.typeCurrent :
-                obj = dragl.DragLine((x1,x2), (y1,y2), linewidth=2, color='r')
+                obj = dragl.DragLine((x1,x2), (y1,y2), linewidth=lw, color=col)
                 self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)
@@ -262,7 +265,7 @@ class ImgDrawOnTop :
                 #print objPars
                 t,s,x0,y0,r,lw,col = objPars
                 #if t == self.icp.typeCurrent :
-                obj = dragc.DragCircle((x0, y0), radius=r, color='r')
+                obj = dragc.DragCircle((x0, y0), radius=r, linewidth=lw, color=col)
                 self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)
@@ -281,7 +284,7 @@ class ImgDrawOnTop :
                 #print objPars
                 t,s,x,y,r,w,t1,t2,lw,col,nr,np = objPars
                 #if t == self.icp.typeCurrent :
-                obj = dragw.DragWedge(xy=(x,y), radius=r, width=w, theta1=t1, theta2=t2, color='r')
+                obj = dragw.DragWedge(xy=(x,y), radius=r, width=w, theta1=t1, theta2=t2, linewidth=lw, color=col)
                 obj.n_rings = nr
                 obj.n_sects = np
                 obj.set_center((self.icp.x_center, self.icp.y_center))
@@ -303,7 +306,7 @@ class ImgDrawOnTop :
                 #print objPars
                 t,s,xc,yc,xe,ye,lw,col = objPars
                 #if t == self.icp.typeCurrent :
-                obj = drags.DragCenter(xc, yc, xe, ye, linewidth=2, color='g')
+                obj = drags.DragCenter(xc, yc, xe, ye, linewidth=lw, color=col)
                 self.add_obj_on_call(obj, axes, list_of_objs, type=t, selected=s)
         else:
             drag.redraw_objs_from_list(axes, list_of_objs)

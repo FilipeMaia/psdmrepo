@@ -153,8 +153,8 @@ class ImgControl :
         # self.get_idrawontop().draw_wedgs() # DOES NOT WORK
         self.get_wgui().setTabBarCenter()
         self.get_idrawontop().update_list_of_objs( self.icp.list_of_wedgs )
+        self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_wimg().on_draw()
-
 
 #---------------------------------------
 # Signals from ImgGUICenter.py
@@ -162,6 +162,7 @@ class ImgControl :
         print 'ImgControl : signal_center_is_reset_in_gui(). New center x,y =', self.icp.x_center, self.icp.y_center
         self.get_idrawontop().set_center_position_from_icp()
         self.get_idrawontop().update_list_of_objs( self.icp.list_of_wedgs )
+        self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_wimg().on_draw()
         
 #---------------------------------------

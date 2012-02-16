@@ -97,6 +97,7 @@ class ImgDrawProjRP :
 
         #x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
         #nx_slices, ny_slices = obj.get_number_of_slices_for_rect()
+        obj.set_standard_wedge_parameters()
         (x0,y0,r0,w0,t1,t2,lw,col,s,t,rem) = obj.get_list_of_wedge_pars()
         n_rings, n_sects = obj.get_number_of_slices_for_wedge()
 
@@ -189,7 +190,7 @@ class ImgDrawProjRP :
 #-----------------------------
 
     def rotate_lables_for_xaxis(self, axes, angle=50, alignment='center') : # 'right'
-        """Rotate axis labels
+        """Rotate axis labels by anble in degree
         """
         for label in axes.get_xticklabels() :
             label.set_rotation(angle)
@@ -205,7 +206,6 @@ class ImgDrawProjRP :
         print ' ThetaRange=', ThetaRange
 
         Tmin, Tmax, NTBins = ThetaRange
-        Rmin, Rmax, NRBins = RRange
 
         # Bring Tmin to the 0-sheet, if necessary
         theta_offset = self.get_theta_offset(Tmin)
@@ -216,7 +216,8 @@ class ImgDrawProjRP :
         sheetTmax = self.get_theta_sheet_number(Tmax)
 
         if sheetTmax == 0 : # both Tmin and Tmax on 0 sheet
-            self.arrRPhi = fat.transformCartToPolarArray(arr, RRange, ThetaRange, Origin)
+            ThetaRangeWhole = (Tmin, Tmax, Tmax-Tmin)
+            self.arrRPhi = fat.transformCartToPolarArray(arr, RRange, ThetaRangeWhole, Origin)
 
         else :              # Tmin and Tmax on different sheets
             TRangeSheetFirst = (Tmin, 180, 180-Tmin)
@@ -240,14 +241,15 @@ class ImgDrawProjRP :
 
 #-----------------------------
 
-
     def get_theta_offset(self, theta) :
+        """For angle theta in degrees returns its offset w.r.t. the 0-sheet [-180,180)
+        """
         return 360 * self.get_theta_sheet_number(theta)
 
 #-----------------------------
 
     def get_theta_sheet_number(self, theta) :
-        """Sheet number of the angular range [-180,180)
+        """Returns the sheet number of the angle theta in degree
         [-540,-180) : sheet =-1
         [-180, 180) : sheet = 0
         [ 180, 540) : sheet = 1 ...

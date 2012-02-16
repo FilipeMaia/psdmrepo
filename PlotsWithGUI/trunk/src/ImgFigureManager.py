@@ -126,11 +126,15 @@ class ImgFigureManager :
         print 'ImgFigureManager : close_fig() program call to close fig number =', num
 
         if num==None :
-            plt.close('all') # closes all the figure windows
+            try :
+                plt.close('all') # closes all the figure windows
+            except RuntimeError:    
+                print 'WARNING: exception in close("all")...'
+
         else :
             fig = self.get_figure_by_number(num)
             fig.my_close_mode = 'Call'
-            plt.close( num ) # sends signal 'close_event' will auto-call the onCloseEvent(...)
+            plt.close( fig ) # sends signal 'close_event' will auto-call the onCloseEvent(...)
 
 
     # This is always automatically envoked when figure is closing
