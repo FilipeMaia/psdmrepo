@@ -227,6 +227,20 @@ class ImgConfigParameters :
                 print 'Center in list: i,t,s,r,xc,yc,xe,ye,lw,col = %3d %s %6s %6s %4d %4d %4d %4d %4d %s' % (i, t, s, r, xc, yc, xerr, yerr, lw, col)
 
 
+
+        print 'CENT_X_CENTER',   self.x_center
+        print 'CENT_Y_CENTER',   self.y_center
+        print 'CENT_D_CENTER',   self.d_center
+
+        print 'PRXY_NX_SLICES',  self.nx_slices
+        print 'PRXY_NX_SLICES',  self.ny_slices
+
+        print 'PRRP_N_RINGS',    self.n_rings
+        print 'PRRP_N_SECTS',    self.n_sects
+
+        print 'SETS_LINE_WIDTH', self.lwAdd
+        print 'SETS_COLOR',      self.colAdd   
+
 #---------------------------------------
 
     def saveImgConfigPars ( self, fname=None ) :
@@ -236,6 +250,22 @@ class ImgConfigParameters :
         f=open(self.fname,'w')
         f.write('FILE_NAME'            + space + self.fname       + '\n')
         f.write('IMG_NUMBER'           + space + str(self.number) + '\n')
+
+
+        f.write('CENT_X_CENTER'        + space + str(self.x_center ) + '\n')
+        f.write('CENT_Y_CENTER'        + space + str(self.y_center ) + '\n')
+        f.write('CENT_D_CENTER'        + space + str(self.d_center ) + '\n')
+                                                                   
+        f.write('PRXY_NX_SLICES'       + space + str(self.nx_slices) + '\n')
+        f.write('PRXY_NX_SLICES'       + space + str(self.ny_slices) + '\n')
+                                                                   
+        f.write('PRRP_N_RINGS'         + space + str(self.n_rings  ) + '\n')
+        f.write('PRRP_N_SECTS'         + space + str(self.n_sects  ) + '\n')
+                                                                   
+        f.write('SETS_LINE_WIDTH'      + space + str(self.lwAdd    ) + '\n')
+        f.write('SETS_COLOR'           + space + str(self.colAdd   ) + '\n')
+
+
 
         self.idrawontop.update_list_of_all_objs()
 
@@ -366,6 +396,19 @@ class ImgConfigParameters :
                 if   key == 'FILE_NAME'        : val # self.dirName,self.fileName = os.path.split(val)
                 elif key == 'IMG_NUMBER'       : self.number = int(val)
 
+                elif key == 'CENT_X_CENTER'    : self.x_center   = float(val)
+                elif key == 'CENT_Y_CENTER'    : self.y_center   = float(val)
+                elif key == 'CENT_D_CENTER'    : self.d_center   = float(val)
+                                                                
+                elif key == 'PRXY_NX_SLICES'   : self.nx_slices  = int(val)
+                elif key == 'PRXY_NX_SLICES'   : self.ny_slices  = int(val)
+                                                                
+                elif key == 'PRRP_N_RINGS'     : self.n_rings    = int(val)
+                elif key == 'PRRP_N_SECTS'     : self.n_sects    = int(val)
+                                                                
+                elif key == 'SETS_LINE_WIDTH'  : self.lwAdd      = int(val)
+                elif key == 'SETS_COLOR'       : self.colAdd     = str(val)
+
 
                 elif key == 'NUMBER_OF_RECTS'  : self.Nrects = int(val)
                 elif key == 'RECT_I'           :
@@ -416,8 +459,8 @@ class ImgConfigParameters :
                     self.listOfWedgInputParameters.append( [self.typeNone, False, 100, 200, 300, 50, 0, 30, 2, 'r', 1, 1] )
                 elif key == 'WEDG_T'           : self.listOfWedgInputParameters[self.ind][ 0] = val 
                 elif key == 'WEDG_S'           : self.listOfWedgInputParameters[self.ind][ 1] = dicBool[val.lower()]
-                elif key == 'WEDG_X'           : self.listOfWedgInputParameters[self.ind][ 2] = int(val) 
-                elif key == 'WEDG_Y'           : self.listOfWedgInputParameters[self.ind][ 3] = int(val) 
+                elif key == 'WEDG_X'           : self.listOfWedgInputParameters[self.ind][ 2] = float(val) 
+                elif key == 'WEDG_Y'           : self.listOfWedgInputParameters[self.ind][ 3] = float(val) 
                 elif key == 'WEDG_R'           : self.listOfWedgInputParameters[self.ind][ 4] = float(val) 
                 elif key == 'WEDG_W'           : self.listOfWedgInputParameters[self.ind][ 5] = float(val) 
                 elif key == 'WEDG_T1'          : self.listOfWedgInputParameters[self.ind][ 6] = float(val) 

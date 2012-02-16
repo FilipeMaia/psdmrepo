@@ -45,6 +45,7 @@ import ImgGUIZoom     as igzoom
 import ImgGUIProjXY   as igprxy
 import ImgGUIProjRP   as igprrp
 import ImgGUICenter   as igcent
+import ImgGUISettings as igsets
 
 
 #---------------------
@@ -210,6 +211,7 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.indTabZoom = self.tabBarBot.addTab( 'Zoom' )
         self.indTabCent = self.tabBarBot.addTab( 'Center' )
+        self.indTabSets = self.tabBarBot.addTab( 'Settings' )
         #self.indTabLine = self.tabBarBot.addTab( 'Line' )
         #self.indTabCirc = self.tabBarBot.addTab( 'Circ' )
         self.indTabEmpB = self.tabBarBot.addTab( 5*' ' )
@@ -217,6 +219,7 @@ class ImgGUI ( QtGui.QWidget ) :
 
         self.tabBarBot.setTabTextColor(self.indTabZoom,QtGui.QColor('magenta'))
         self.tabBarBot.setTabTextColor(self.indTabCent,QtGui.QColor('green'))
+        self.tabBarBot.setTabTextColor(self.indTabSets,QtGui.QColor('red'))
         #self.tabBarBot.setTabTextColor(self.indTabLine,QtGui.QColor('red'))
         #self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
@@ -237,8 +240,9 @@ class ImgGUI ( QtGui.QWidget ) :
             pass
 
         if indTab == self.indTabEmpB : return
-        if indTab == self.indTabZoom : self.guiWin = igzoom.ImgGUIZoom   (self.icp)
-        if indTab == self.indTabCent : self.guiWin = igcent.ImgGUICenter (self.icp)
+        if indTab == self.indTabZoom : self.guiWin = igzoom.ImgGUIZoom    (self.icp)
+        if indTab == self.indTabCent : self.guiWin = igcent.ImgGUICenter  (self.icp)
+        if indTab == self.indTabSets : self.guiWin = igsets.ImgGUISettings(self.icp)
         #if indTab == self.indTabCent : self.guiWin = QtGui.QTextEdit('Set center')
         #if indTab == self.indTabLine : self.guiWin = QtGui.QTextEdit('Profile along Line')
         #if indTab == self.indTabCirc : self.guiWin = QtGui.QTextEdit('Profile along Circ')
