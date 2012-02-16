@@ -57,10 +57,10 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def get_theta_sheet_number(self, theta) :
-        """Sheet number of the angular range [-180,180]
-        [-540,-180] : sheet =-1
-        [-180, 180] : sheet = 0
-        [ 180, 540] : sheet = 1 ...
+        """Sheet number of the angular range [-180,180)
+        [-540,-180) : sheet =-1
+        [-180, 180) : sheet = 0
+        [ 180, 540) : sheet = 1 ...
         """
         n_sheet = int( int(theta + 180) / 360 )
         #print 'theta, n_sheet=', theta, n_sheet

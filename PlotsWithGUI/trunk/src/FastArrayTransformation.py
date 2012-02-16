@@ -104,10 +104,10 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, Origin) :
     y = np.arange(dimY) - yc
 
     X, Y       = np.meshgrid(x,y)
-    R, Theta   = cart2polar (X,Y)
+    R, Theta   = cart2polar (X,Y) 
 
     iR         = coordinateToIndexProtected(R,RRange)        
-    iTheta     = coordinateToIndexProtected(Theta,ThetaRange)
+    iTheta     = coordinateToIndexProtected(Theta,ThetaRange) #Theta is in the range [-180,180] 0-sheet
 
     #arrZeroes = np.zeros(shape,dtype=float)
     arrMasked = np.select([iTheta<0, iTheta>=ThetaRange[2], iR<0, iR>=RRange[2]], [0,0,0,0], default=arr)

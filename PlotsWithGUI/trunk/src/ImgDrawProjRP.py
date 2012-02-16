@@ -111,14 +111,10 @@ class ImgDrawProjRP :
         RRange     = (y,y+h,h)
         ThetaRange = (x,x+w,w)
 
-        nx_slices = 3
-        ny_slices = 3
+        nx_slices = n_rings
+        ny_slices = n_sects
 
-        print ' Origin    =', Origin    
-        print ' RRange    =', RRange    
-        print ' ThetaRange=', ThetaRange
-
-        arrwin = fat.transformCartToPolarArray(arr, RRange, ThetaRange, Origin)
+        arrwin = self.getMultiSheetPolarArray(arr, RRange, ThetaRange, Origin)
 
         xyrange = [x, x+w, y, y+h]
       
@@ -198,6 +194,67 @@ class ImgDrawProjRP :
         for label in axes.get_xticklabels() :
             label.set_rotation(angle)
             label.set_horizontalalignment(alignment)
+
+#-----------------------------
+
+    def getMultiSheetPolarArray(self, arr, RRange, ThetaRange, Origin) :
+        """Split the theta range for necessary number of sheets, and hstack the entire array
+        """
+        print ' Origin    =', Origin    
+        print ' RRange    =', RRange    
+        print ' ThetaRange=', ThetaRange
+
+        Tmin, Tmax, NTBins = ThetaRange
+        Rmin, Rmax, NRBins = RRange
+
+        # Bring Tmin to the 0-sheet, if necessary
+        theta_offset = self.get_theta_offset(Tmin)
+        Tmin -= theta_offset
+        Tmax -= theta_offset
+
+        sheetTmin = self.get_theta_sheet_number(Tmin)
+        sheetTmax = self.get_theta_sheet_number(Tmax)
+
+        if sheetTmax == 0 : # both Tmin and Tmax on 0 sheet
+            self.arrRPhi = fat.transformCartToPolarArray(arr, RRange, ThetaRange, Origin)
+
+        else :              # Tmin and Tmax on different sheets
+            TRangeSheetFirst = (Tmin, 180, 180-Tmin)
+            self.arrRPhiFirst = fat.transformCartToPolarArray(arr, RRange, TRangeSheetFirst, Origin)
+
+            TmaxOnZeroSheet = Tmax - self.get_theta_offset(Tmax)
+            TRangeSheetLast = (-180, TmaxOnZeroSheet, TmaxOnZeroSheet+180)
+            self.arrRPhiLast = fat.transformCartToPolarArray(arr, RRange, TRangeSheetLast, Origin)
+
+            if sheetTmax-sheetTmin > 1 : # Check if the entire ring needs to be inserted
+                print 'WARNING: WEDGE HAS MORE THAN ONE LOOP IN THETA... DO YOU REALLY NEED IT?'
+                TRangeRing = (-180, 180, 360)
+                self.arrRPhiRing = fat.transformCartToPolarArray(arr, RRange, TRangeRing, Origin)
+
+            self.arrRPhi = self.arrRPhiFirst
+            for sheet in range(sheetTmax-sheetTmin-1) : # Loop over sheets and add entire theta-rings
+                self.arrRPhi = np.hstack([self.arrRPhi,self.arrRPhiRing])
+
+            self.arrRPhi = np.hstack([self.arrRPhi,self.arrRPhiLast])
+        return self.arrRPhi
+
+#-----------------------------
+
+
+    def get_theta_offset(self, theta) :
+        return 360 * self.get_theta_sheet_number(theta)
+
+#-----------------------------
+
+    def get_theta_sheet_number(self, theta) :
+        """Sheet number of the angular range [-180,180)
+        [-540,-180) : sheet =-1
+        [-180, 180) : sheet = 0
+        [ 180, 540) : sheet = 1 ...
+        """
+        n_sheet = int( int(theta + 180) / 360 )
+        #print 'theta, n_sheet=', theta, n_sheet
+        return n_sheet
 
 #-----------------------------
 
