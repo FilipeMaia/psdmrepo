@@ -13,6 +13,8 @@ reverse time order.
 
 Tag: V00-00-50
 2012-02-17 Andy Salnikov
+- upgrading to pdsdata V03-02-12
+- added TimepixDataV2
 
 Tag: V00-00-49
 2012-02-08 Andy Salnikov
