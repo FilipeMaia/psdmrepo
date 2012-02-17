@@ -165,20 +165,62 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  enum { TIMEPIX_HEIGHT = 512 };
-  enum { TIMEPIX_WIDTH = 512 };
-  enum { TIMEPIX_DEPTH = 14 };
-  enum { TIMEPIX_DEPTH_BYTES = 2 };
+  enum { Height = 512 };
+  enum { Width = 512 };
+  enum { Depth = 14 };
+  enum { DepthBytes = 2 };
+  enum { MaxPixelValue = 11810 };
   uint32_t timestamp() const { return _timestamp; }
   uint16_t frameCounter() const { return _frameCounter; }
   uint16_t lostRows() const { return _lostRows; }
-  ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], TIMEPIX_HEIGHT, TIMEPIX_WIDTH); }
-  static uint32_t _sizeof()  { return 8+(2*(TIMEPIX_HEIGHT)*(TIMEPIX_WIDTH)); }
+  ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], Height, Width); }
+  uint32_t width() const { return Width; }
+  uint32_t height() const { return Height; }
+  uint32_t depth() const { return Depth; }
+  uint32_t depth_bytes() const { return DepthBytes; }
+  static uint32_t _sizeof()  { return 8+(2*(Height)*(Width)); }
 private:
   uint32_t	_timestamp;
   uint16_t	_frameCounter;
   uint16_t	_lostRows;
-  uint16_t	_data[TIMEPIX_HEIGHT][TIMEPIX_WIDTH];
+  uint16_t	_data[Height][Width];
+};
+
+/** @class DataV2
+
+  
+*/
+
+
+class DataV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  enum { Depth = 14 };
+  enum { MaxPixelValue = 11810 };
+  /** Pixels per row */
+  uint16_t width() const { return _width; }
+  /** Pixels per column */
+  uint16_t height() const { return _height; }
+  /** hardware timestamp */
+  uint32_t timestamp() const { return _timestamp; }
+  /** hardware frame counter */
+  uint16_t frameCounter() const { return _frameCounter; }
+  /** lost row count */
+  uint16_t lostRows() const { return _lostRows; }
+  ndarray<uint16_t, 2> data() const { ptrdiff_t offset=12;
+  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_height, this->_width); }
+  uint32_t depth() const { return Depth; }
+  uint32_t depth_bytes() const { return (Depth+7)/8; }
+  uint32_t _sizeof() const { return 12+(2*(this->_height)*(this->_width)); }
+private:
+  uint16_t	_width;	/**< Pixels per row */
+  uint16_t	_height;	/**< Pixels per column */
+  uint32_t	_timestamp;	/**< hardware timestamp */
+  uint16_t	_frameCounter;	/**< hardware frame counter */
+  uint16_t	_lostRows;	/**< lost row count */
+  //uint16_t	_data[this->_height][this->_width];
 };
 } // namespace Timepix
 } // namespace PsddlPds
