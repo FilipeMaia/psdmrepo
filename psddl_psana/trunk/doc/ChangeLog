@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2012-02-17 Andy Salnikov
+- upgrading to pdsdata V03-02-12
+- regenerate whole thing from psddldata V00-02-01
+
 Tag: V00-02-01
 2012-02-06 Andy Salnikov
 - adding forgotten cspad2x2.ddl.* files

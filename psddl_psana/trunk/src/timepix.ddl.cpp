@@ -11,5 +11,8 @@ ConfigV1::~ConfigV1() {}
 
 DataV1::~DataV1() {}
 
+
+DataV2::~DataV2() {}
+
 } // namespace Timepix
 } // namespace Psana

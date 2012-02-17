@@ -19,6 +19,11 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_IpimbConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  enum CapacitorValue {
+    c_1pF,
+    c_100pF,
+    c_10nF,
+  };
   virtual ~ConfigV1();
   virtual uint64_t triggerCounter() const = 0;
   virtual uint64_t serialID() const = 0;
@@ -33,6 +38,8 @@ public:
   virtual uint16_t errors() const = 0;
   virtual uint16_t calStrobeLength() const = 0;
   virtual uint32_t trigDelay() const = 0;
+  /** nReturns CapacitorValue enum for given channel number (0..3). */
+  virtual Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const = 0;
 };
 
 /** @class ConfigV2
@@ -45,6 +52,16 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_IpimbConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  enum CapacitorValue {
+    c_1pF,
+    c_4p7pF,
+    c_24pF,
+    c_120pF,
+    c_620pF,
+    c_3p3nF,
+    c_10nF,
+    expert,
+  };
   virtual ~ConfigV2();
   virtual uint64_t triggerCounter() const = 0;
   virtual uint64_t serialID() const = 0;
@@ -61,6 +78,8 @@ public:
   virtual uint32_t trigDelay() const = 0;
   virtual uint32_t trigPsDelay() const = 0;
   virtual uint32_t adcDelay() const = 0;
+  /** nReturns CapacitorValue enum for given channel number (0..3). */
+  virtual Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const = 0;
 };
 
 /** @class DataV1

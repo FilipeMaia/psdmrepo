@@ -101,15 +101,48 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  enum { TIMEPIX_HEIGHT = 512 };
-  enum { TIMEPIX_WIDTH = 512 };
-  enum { TIMEPIX_DEPTH = 14 };
-  enum { TIMEPIX_DEPTH_BYTES = 2 };
+  enum { Height = 512 };
+  enum { Width = 512 };
+  enum { Depth = 14 };
+  enum { DepthBytes = 2 };
+  enum { MaxPixelValue = 11810 };
   virtual ~DataV1();
   virtual uint32_t timestamp() const = 0;
   virtual uint16_t frameCounter() const = 0;
   virtual uint16_t lostRows() const = 0;
   virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual uint32_t width() const = 0;
+  virtual uint32_t height() const = 0;
+  virtual uint32_t depth() const = 0;
+  virtual uint32_t depth_bytes() const = 0;
+};
+
+/** @class DataV2
+
+  
+*/
+
+
+class DataV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  enum { Depth = 14 };
+  enum { MaxPixelValue = 11810 };
+  virtual ~DataV2();
+  /** Pixels per row */
+  virtual uint16_t width() const = 0;
+  /** Pixels per column */
+  virtual uint16_t height() const = 0;
+  /** hardware timestamp */
+  virtual uint32_t timestamp() const = 0;
+  /** hardware frame counter */
+  virtual uint16_t frameCounter() const = 0;
+  /** lost row count */
+  virtual uint16_t lostRows() const = 0;
+  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual uint32_t depth() const = 0;
+  virtual uint32_t depth_bytes() const = 0;
 };
 } // namespace Timepix
 } // namespace Psana
