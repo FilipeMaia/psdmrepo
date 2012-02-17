@@ -103,6 +103,7 @@
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/DataV1.h"
+#include "types/timepix/DataV2.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -375,6 +376,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_TimepixData :
     if ( not obj ) obj = xtc2obj<Timepix::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Timepix::DataV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

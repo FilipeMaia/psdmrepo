@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class Timepix_TM6740DataV1...
+//	Class Timepix_TM6740DataV2...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "DataV1.h"
+#include "DataV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -34,31 +34,31 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, width)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, height)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, depth)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, depth_bytes)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, data_size)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, timestamp)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, frameCounter)
-  FUN0_WRAPPER(pypdsdata::Timepix::DataV1, lostRows)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, timestamp)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, frameCounter)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, lostRows)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, width)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, height)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, depth)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, depth_bytes)
+  FUN0_WRAPPER(pypdsdata::Timepix::DataV2, data_size)
   PyObject* data( PyObject* self, PyObject* );
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
+    { "timestamp",      timestamp,      METH_NOARGS,  "self.timestamp() -> int\n\nReturns integer number" },
+    { "frameCounter",   frameCounter,   METH_NOARGS,  "self.frameCounter() -> int\n\nReturns integer number" },
+    { "lostRows",       lostRows,       METH_NOARGS,  "self.lostRows() -> int\n\nReturns integer number" },
     { "width",          width,          METH_NOARGS,  "self.width() -> int\n\nReturns image width" },
     { "height",         height,         METH_NOARGS,  "self.height() -> int\n\nReturns image height" },
     { "depth",          depth,          METH_NOARGS,  "self.depth() -> int\n\nReturns number of bits per pixel" },
     { "depth_bytes",    depth_bytes,    METH_NOARGS,  "self.depth_bytes() -> int\n\nReturns number of bytes per pixel" },
     { "data_size",      data_size,      METH_NOARGS,  "self.data_size() -> int\n\nReturns size of image data" },
-    { "timestamp",      timestamp,      METH_NOARGS,  "self.timestamp() -> int\n\nReturns integer number" },
-    { "frameCounter",   frameCounter,   METH_NOARGS,  "self.frameCounter() -> int\n\nReturns integer number" },
-    { "lostRows",       lostRows,       METH_NOARGS,  "self.lostRows() -> int\n\nReturns integer number" },
     { "data",           data,           METH_NOARGS,  "self.data() -> numpy.ndarray\n\nReturns 2-dim array of integers" },
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Timepix::DataV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Timepix::DataV2 class.";
 }
 
 //              ----------------------------------------
@@ -66,7 +66,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::Timepix::DataV1::initType( PyObject* module )
+pypdsdata::Timepix::DataV2::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -77,29 +77,14 @@ pypdsdata::Timepix::DataV1::initType( PyObject* module )
   // define class attributes for enums/constants
   type->tp_dict = PyDict_New();
   PyObject* val = 0;
-  val = PyInt_FromLong(Pds::Timepix::DataV1::Height);
-  PyDict_SetItemString( type->tp_dict, "Height", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::Width);
-  PyDict_SetItemString( type->tp_dict, "Width", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::Depth);
+  val = PyInt_FromLong(Pds::Timepix::DataV2::Depth);
   PyDict_SetItemString( type->tp_dict, "Depth", val );
   Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::DepthBytes);
-  PyDict_SetItemString( type->tp_dict, "DepthBytes", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::RawDataBytes);
-  PyDict_SetItemString( type->tp_dict, "RawDataBytes", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::DecodedDataBytes);
-  PyDict_SetItemString( type->tp_dict, "DecodedDataBytes", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::MaxPixelValue);
+  val = PyInt_FromLong(Pds::Timepix::DataV2::MaxPixelValue);
   PyDict_SetItemString( type->tp_dict, "MaxPixelValue", val );
   Py_XDECREF(val);
 
-  BaseType::initType( "DataV1", module );
+  BaseType::initType( "DataV2", module );
 }
 
 namespace {
@@ -107,14 +92,26 @@ namespace {
 PyObject*
 data( PyObject* self, PyObject* args )
 {
-  Pds::Timepix::DataV1* obj = pypdsdata::Timepix::DataV1::pdsObject(self);
+  Pds::Timepix::DataV2* obj = pypdsdata::Timepix::DataV2::pdsObject(self);
   if(not obj) return 0;
   
   // dimensions
   npy_intp dims[2] = { obj->height(), obj->width() };
 
   // NumPy type number
-  int typenum = NPY_USHORT ;
+  int typenum = 0 ;
+  switch ( obj->depth_bytes() ) {
+  case 1:
+    typenum = NPY_UBYTE;
+    break;
+  case 2:
+    typenum = NPY_USHORT;
+    break;
+  case 4:
+    typenum = NPY_UINT;
+    break;
+  }
+
   int flags = NPY_C_CONTIGUOUS ;
 
   // make array
@@ -131,11 +128,11 @@ data( PyObject* self, PyObject* args )
 PyObject*
 _repr( PyObject *self )
 {
-  Pds::Timepix::DataV1* obj = pypdsdata::Timepix::DataV1::pdsObject(self);
+  Pds::Timepix::DataV2* obj = pypdsdata::Timepix::DataV2::pdsObject(self);
   if(not obj) return 0;
 
   std::ostringstream str;
-  str << "Timepix.DataV1(timestamp=" << obj->timestamp()
+  str << "Timepix.DataV2(timestamp=" << obj->timestamp()
       << ", frameCounter=" << obj->frameCounter()
       << ", lostRows=" << obj->lostRows()
       << ", width=" << obj->width()

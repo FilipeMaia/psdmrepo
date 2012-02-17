@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "../../EnumType.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 
@@ -30,6 +31,19 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 namespace {
+
+  pypdsdata::EnumType::Enum capacitorValueEnumValues[] = {
+      { "c_1pF",         Pds::Ipimb::ConfigV2::c_1pF },
+      { "c_4p7pF",       Pds::Ipimb::ConfigV2::c_4p7pF },
+      { "c_24pF",        Pds::Ipimb::ConfigV2::c_24pF },
+      { "c_120pF",       Pds::Ipimb::ConfigV2::c_120pF },
+      { "c_620pF",       Pds::Ipimb::ConfigV2::c_620pF },
+      { "c_3p3nF",       Pds::Ipimb::ConfigV2::c_3p3nF },
+      { "c_10nF",        Pds::Ipimb::ConfigV2::c_10nF },
+      { "expert",        Pds::Ipimb::ConfigV2::expert },
+      { 0, 0 }
+  };
+  pypdsdata::EnumType capacitorValueEnum ( "CapacitorValue", capacitorValueEnumValues );
 
   // type-specific methods
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, triggerCounter)
@@ -47,6 +61,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigPsDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, adcDelay)
+  PyObject* diodeGain(PyObject* self, PyObject* args);
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
@@ -65,6 +80,8 @@ namespace {
     { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
     { "trigPsDelay",         trigPsDelay,         METH_NOARGS, "self.trigPsDelay() -> int\n\nReturns integer number" },
     { "adcDelay",            adcDelay,            METH_NOARGS, "self.adcDelay() -> int\n\nReturns integer number" },
+    { "diodeGain",           diodeGain,           METH_VARARGS, 
+        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns CapacitorValue enum for given channel number (0..3)" },
     {0, 0, 0, 0}
    };
 
@@ -85,15 +102,37 @@ pypdsdata::Ipimb::ConfigV2::initType( PyObject* module )
   type->tp_str = _repr;
   type->tp_repr = _repr;
 
+  // define class attributes for enums
+  type->tp_dict = PyDict_New();
+  PyDict_SetItemString( type->tp_dict, "CapacitorValue", capacitorValueEnum.type() );
+
   BaseType::initType( "ConfigV2", module );
 }
 
 namespace {
+
+PyObject*
+diodeGain( PyObject* self, PyObject* args )
+{
+  const Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
+  if ( not obj ) return 0;
+
+  // parse args
+  unsigned index ;
+  if ( not PyArg_ParseTuple( args, "I:Ipimb_ConfigV2_diodeGain", &index ) ) return 0;
+
+  if ( index >= 4 ) {
+    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in Ipimb.ConfigV2.diodeGain()");
+    return 0;
+  }
   
+  return capacitorValueEnum.Enum_FromLong((obj->chargeAmpRange() >> (4*index)) & 0xf);
+}
+
 PyObject*
 _repr( PyObject *self )
 {
-  Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
+  const Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
   if(not obj) return 0;
 
   std::ostringstream str;

@@ -150,6 +150,7 @@
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/DataV1.h"
+#include "types/timepix/DataV2.h"
 
 #define PDSDATA_IMPORT_ARRAY
 #import "pdsdata_numpy.h"
@@ -370,6 +371,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.timepix", 0, "The Python wrapper module for pdsdata/timepix" );
   pypdsdata::Timepix::ConfigV1::initType( module );
   pypdsdata::Timepix::DataV1::initType( module );
+  pypdsdata::Timepix::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "timepix", module );
 

@@ -1,4 +1,11 @@
 
+Tag: V00-00-48
+2012-02-09 Andy Salnikov
+- upgrade to pdsdata V03-02-12
+  - new class timepix.DataV2
+- added diodeGain(int) method (does not exist in pdsdata)
+  and gain enums to ipimb.ConfigV{1,2} classes
+
 Tag: V00-00-47
 2012-02-09 Andy Salnikov
 - add src/cspad2x2.py, src/timepix.py
@@ -6,7 +13,7 @@ Tag: V00-00-47
 
 Tag: V00-00-46
 2012-02-06 Andy Salnikov
-- upgrade to pdsdata V03-02-04
+- upgrade to pdsdata V03-02-11
   - implement cspad2x2 package
 
 Tag: V00-00-45
