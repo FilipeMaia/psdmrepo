@@ -224,8 +224,11 @@ class  pyana_image ( object ) :
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
 
         ## load dark image from file
-        #try:
-        #    self.dark_image = 
+        try:
+            self.dark_image = np.load(self.darkfile)
+        except:
+            print "No dark image in file ", self.darkfile
+            
 
     # process event/shot data
     def event ( self, evt, env ) :
@@ -286,6 +289,13 @@ class  pyana_image ( object ) :
             dim = np.shape( image )
             if len( dim )!= 2 :
                 print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
+
+
+            # ---------------------------------------------------------------------------------------
+            # Subtract dark image
+            if self.dark_image is not None :
+                image -= self.dark_image
+            
 
                                 
             # ---------------------------------------------------------------------------------------
@@ -450,11 +460,6 @@ class  pyana_image ( object ) :
                 
                 rejected_image = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
                 event_display_images.append( (name, title, rejected_image ) )
-            
-            #if self.dark_image is not None :
-            #    name = "dark"
-            #    title = "Dark image from input file"
-            #    event_display_images.append( (name, title, self.dark_image ) )
             
             if len(event_display_images) == 0:
                 print "That shouldn't be possible"
