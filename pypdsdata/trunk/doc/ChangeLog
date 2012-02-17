@@ -1,6 +1,6 @@
 
-Tag: V00-00-48
-2012-02-09 Andy Salnikov
+Tag: V00-00-49
+2012-02-17 Andy Salnikov
 - upgrade to pdsdata V03-02-12
   - new class timepix.DataV2
 - added diodeGain(int) method (does not exist in pdsdata)
