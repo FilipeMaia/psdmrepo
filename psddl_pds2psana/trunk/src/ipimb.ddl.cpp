@@ -9,6 +9,11 @@
 
 namespace psddl_pds2psana {
 namespace Ipimb {
+Psana::Ipimb::ConfigV1::CapacitorValue pds_to_psana(PsddlPds::Ipimb::ConfigV1::CapacitorValue e)
+{
+  return Psana::Ipimb::ConfigV1::CapacitorValue(e);
+}
+
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Ipimb::ConfigV1()
   , m_xtcObj(xtcPtr)
@@ -44,6 +49,13 @@ uint16_t ConfigV1::errors() const { return m_xtcObj->errors(); }
 uint16_t ConfigV1::calStrobeLength() const { return m_xtcObj->calStrobeLength(); }
 
 uint32_t ConfigV1::trigDelay() const { return m_xtcObj->trigDelay(); }
+
+Psana::Ipimb::ConfigV1::CapacitorValue ConfigV1::diodeGain(uint32_t ch) const { return pds_to_psana(m_xtcObj->diodeGain(ch)); }
+Psana::Ipimb::ConfigV2::CapacitorValue pds_to_psana(PsddlPds::Ipimb::ConfigV2::CapacitorValue e)
+{
+  return Psana::Ipimb::ConfigV2::CapacitorValue(e);
+}
+
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Ipimb::ConfigV2()
   , m_xtcObj(xtcPtr)
@@ -83,6 +95,8 @@ uint32_t ConfigV2::trigDelay() const { return m_xtcObj->trigDelay(); }
 uint32_t ConfigV2::trigPsDelay() const { return m_xtcObj->trigPsDelay(); }
 
 uint32_t ConfigV2::adcDelay() const { return m_xtcObj->adcDelay(); }
+
+Psana::Ipimb::ConfigV2::CapacitorValue ConfigV2::diodeGain(uint32_t ch) const { return pds_to_psana(m_xtcObj->diodeGain(ch)); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Ipimb::DataV1()
   , m_xtcObj(xtcPtr)

@@ -29,6 +29,7 @@ public:
   virtual uint16_t errors() const;
   virtual uint16_t calStrobeLength() const;
   virtual uint32_t trigDelay() const;
+  virtual Psana::Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -56,6 +57,7 @@ public:
   virtual uint32_t trigDelay() const;
   virtual uint32_t trigPsDelay() const;
   virtual uint32_t adcDelay() const;
+  virtual Psana::Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

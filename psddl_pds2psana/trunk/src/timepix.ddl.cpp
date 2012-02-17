@@ -163,5 +163,38 @@ uint16_t DataV1::frameCounter() const { return m_xtcObj->frameCounter(); }
 uint16_t DataV1::lostRows() const { return m_xtcObj->lostRows(); }
 
 ndarray<uint16_t, 2> DataV1::data() const { return m_xtcObj->data(); }
+
+uint32_t DataV1::width() const { return m_xtcObj->width(); }
+
+uint32_t DataV1::height() const { return m_xtcObj->height(); }
+
+uint32_t DataV1::depth() const { return m_xtcObj->depth(); }
+
+uint32_t DataV1::depth_bytes() const { return m_xtcObj->depth_bytes(); }
+DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Timepix::DataV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+DataV2::~DataV2()
+{
+}
+
+
+uint16_t DataV2::width() const { return m_xtcObj->width(); }
+
+uint16_t DataV2::height() const { return m_xtcObj->height(); }
+
+uint32_t DataV2::timestamp() const { return m_xtcObj->timestamp(); }
+
+uint16_t DataV2::frameCounter() const { return m_xtcObj->frameCounter(); }
+
+uint16_t DataV2::lostRows() const { return m_xtcObj->lostRows(); }
+
+ndarray<uint16_t, 2> DataV2::data() const { return m_xtcObj->data(); }
+
+uint32_t DataV2::depth() const { return m_xtcObj->depth(); }
+
+uint32_t DataV2::depth_bytes() const { return m_xtcObj->depth_bytes(); }
 } // namespace Timepix
 } // namespace psddl_pds2psana

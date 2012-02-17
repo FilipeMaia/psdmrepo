@@ -91,6 +91,30 @@ public:
   virtual uint16_t frameCounter() const;
   virtual uint16_t lostRows() const;
   virtual ndarray<uint16_t, 2> data() const;
+  virtual uint32_t width() const;
+  virtual uint32_t height() const;
+  virtual uint32_t depth() const;
+  virtual uint32_t depth_bytes() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+class DataV2 : public Psana::Timepix::DataV2 {
+public:
+  typedef PsddlPds::Timepix::DataV2 XtcType;
+  typedef Psana::Timepix::DataV2 PsanaType;
+  DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~DataV2();
+  virtual uint16_t width() const;
+  virtual uint16_t height() const;
+  virtual uint32_t timestamp() const;
+  virtual uint16_t frameCounter() const;
+  virtual uint16_t lostRows() const;
+  virtual ndarray<uint16_t, 2> data() const;
+  virtual uint32_t depth() const;
+  virtual uint32_t depth_bytes() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
