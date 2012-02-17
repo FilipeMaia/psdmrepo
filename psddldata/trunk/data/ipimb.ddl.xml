@@ -23,6 +23,12 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_IpimbConfig" pack="4">
 		
+		    <enum name="CapacitorValue">
+	            <enum-const name="c_1pF" />
+	            <enum-const name="c_100pF" />
+	            <enum-const name="c_10nF" />
+        	</enum>		
+
             <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
             </attribute>
 
@@ -65,12 +71,31 @@
             <attribute name="_trigDelay" type="uint32_t" accessor="trigDelay">
             </attribute>
 
+            <method name="diodeGain" type="CapacitorValue">
+                nReturns CapacitorValue enum for given channel number (0..3).
+                <tag name="inline"/>
+                <arg name="ch" type="uint32_t"/>
+                <expr lang="C++" value="CapacitorValue((_chargeAmpRange &gt;&gt; (ch*2)) &amp; 0x3)" />
+            </method>
+
         </pstype>
         
         <!-- ========================================================================= -->
 	
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_IpimbConfig" pack="4">
+		
+		
+		    <enum name="CapacitorValue">
+	            <enum-const name="c_1pF" />
+	            <enum-const name="c_4p7pF" />
+	            <enum-const name="c_24pF" />
+	            <enum-const name="c_120pF" />
+	            <enum-const name="c_620pF" />
+	            <enum-const name="c_3p3nF" />
+	            <enum-const name="c_10nF" />
+	            <enum-const name="expert" />
+        	</enum>		
 		
             <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
             </attribute>
@@ -119,6 +144,13 @@
 
             <attribute name="_adcDelay" type="uint32_t" accessor="adcDelay">
             </attribute>
+
+            <method name="diodeGain" type="CapacitorValue">
+                nReturns CapacitorValue enum for given channel number (0..3).
+                <tag name="inline"/>
+                <arg name="ch" type="uint32_t"/>
+                <expr lang="C++" value="CapacitorValue((_chargeAmpRange &gt;&gt; (ch*4)) &amp; 0xf)" />
+            </method>
 
         </pstype>
         

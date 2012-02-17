@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-02-17 Andy Salnikov
+- upgrade to pdsdata V03-02-12
+  - new class timepix.DataV2
+- added diodeGain(int) method (does not exist in pdsdata)
+  and gain enums to ipimb.ConfigV{1,2} classes
+
 Tag: V00-02-00
 2012-02-06 Andy Salnikov
 - added cspad2x2 package

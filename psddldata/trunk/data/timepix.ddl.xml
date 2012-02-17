@@ -161,10 +161,11 @@
 		
         <pstype name="DataV1" version="1" type_id="Id_TimepixData">
 
-            <const name="TIMEPIX_HEIGHT" value="512"/>
-            <const name="TIMEPIX_WIDTH" value="512"/>
-            <const name="TIMEPIX_DEPTH" value="14"/>
-            <const name="TIMEPIX_DEPTH_BYTES" value="2"/>
+            <const name="Height" value="512"/>
+            <const name="Width" value="512"/>
+            <const name="Depth" value="14"/>
+            <const name="DepthBytes" value="2"/>
+            <const name="MaxPixelValue" value="11810"/>
         
             <attribute name="_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
@@ -175,8 +176,70 @@
             <attribute name="_lostRows" type="uint16_t" accessor="lostRows">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" shape="TIMEPIX_HEIGHT,TIMEPIX_WIDTH" accessor="data">
+            <attribute name="_data" type="uint16_t" shape="Height,Width" accessor="data">
             </attribute>
+            
+            <method name="width" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="Width" />
+            </method>
+
+            <method name="height" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="Height" />
+            </method>
+
+            <method name="depth" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="Depth" />
+            </method>
+
+            <method name="depth_bytes" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="DepthBytes" />
+            </method>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+        <pstype name="DataV2" version="2" type_id="Id_TimepixData">
+
+            <const name="Depth" value="14"/>
+            <const name="MaxPixelValue" value="11810"/>
+        
+            <attribute name="_width" type="uint16_t" accessor="width">
+            Pixels per row
+            </attribute>
+            
+            <attribute name="_height" type="uint16_t" accessor="height">
+            Pixels per column
+            </attribute>
+
+            <attribute name="_timestamp" type="uint32_t" accessor="timestamp">
+            hardware timestamp
+            </attribute>
+
+            <attribute name="_frameCounter" type="uint16_t" accessor="frameCounter">
+            hardware frame counter
+            </attribute>
+
+            <attribute name="_lostRows" type="uint16_t" accessor="lostRows">
+            lost row count
+            </attribute>
+
+            <attribute name="_data" type="uint16_t" shape="{self}._height,{self}._width" accessor="data">
+            </attribute>
+
+            <method name="depth" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="Depth" />
+            </method>
+
+            <method name="depth_bytes" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="(Depth+7)/8" />
+            </method>
 
         </pstype>
         
