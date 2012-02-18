@@ -149,11 +149,13 @@ class  pyana_image ( object ) :
         self.n_saved = 0
 
         # averages
+        self.max_good_images = {}
         self.sum_good_images = {}
         self.sum_dark_images = {}
         self.n_good = {}
         self.n_dark = {}
         for addr in self.sources :
+            self.max_good_images[addr] = None
             self.sum_good_images[addr] = None
             self.sum_dark_images[addr] = None
             self.n_good[addr] = 0
@@ -224,6 +226,7 @@ class  pyana_image ( object ) :
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
 
         ## load dark image from file
+        self.dark_image = None
         try:
             self.dark_image = np.load(self.darkfile)
         except:
@@ -363,7 +366,14 @@ class  pyana_image ( object ) :
                     self.sum_good_images[addr] = np.array(image,dtype=image.dtype)
                 else :
                     self.sum_good_images[addr] += image
-                        
+
+                if self.max_good_images[addr] is None:
+                    self.max_good_images[addr] = np.array(image,dtype=image.dtype)
+                else :
+                    # take the element-wise maximum of array elements
+                    # comparing this image with the previous maximum stored
+                    self.max_good_images[addr] = np.maximum( image, self.max_good_images[addr] )
+                    print "max images has been saved for ", addr
             
             # ---------------------------------------------------------------------------------------
             # Here's where we add the raw (or subtracted) image to the list for plotting
@@ -449,9 +459,21 @@ class  pyana_image ( object ) :
             if self.n_good[addr] > 0 :
                 name = "AvgHit_"+addr
                 title = "Average of %d hits"%self.n_good[addr]
-
+                print "adding", title
                 average_image = np.float_(self.sum_good_images[addr])/self.n_good[addr]
                 event_display_images.append( (name, title, average_image ) )
+
+                name = "MaxHit_"+addr
+                title = "Maximum projection of %d hits"%self.n_good[addr]
+                print "adding", title
+                event_display_images.append( (name,title,self.max_good_images[addr]) )
+
+                # and max minus average
+                name = "MaxOverAvg_"+addr
+                title = "Max normalized to average "
+                max_over_avg = np.float_(self.max_good_images[addr]) / average_image
+                print "adding", title
+                event_display_images.append( (name, title, max_over_avg) )
 
             rejected_image = None
             if self.n_dark[addr] > 0 :
