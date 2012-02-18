@@ -178,12 +178,61 @@ class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
 #-----------------------------
 # Test
 #-----------------------------
+
+def getRandom2DArray(shape=(100,200), mu=200, sigma=25) :
+    arr = mu + sigma*np.random.standard_normal(size=shape)
+    #arr.shape = shape
+    return arr
+
+#-----------------------------
+
+def getUniform2DArray(shape=(100,200), value=0, dtype=np.float) :
+    if value == 0 : return np.zeros(shape,dtype)
+    else          : return value * np.ones(shape,dtype)
+
+#-----------------------------
+
+def getSmouth2DArray(shape=(100,200), dtype=None) :
+    sizex, sizey = shape
+    arr = np.arange(sizex*sizey, dtype)
+    arr.shape = shape
+    return arr
+
+#-----------------------------
+
+def getRing2DArray(shape=(200,200), ring=(1,50,5), center=None, dtype=np.float32, modulation=None) :
+
+    arr = np.empty(shape, dtype) # make empty array
+    a1, r1, s1 = ring            # get amplitude, radius, and sigma of the ring
+
+    sizex, sizey = shape
+    if center == None : x0, y0 = sizex/2, sizey/2
+    else              : x0, y0 = center
+
+    x = np.arange(0,sizex,1,dtype) # np.linspace(0,200,201)
+    y = np.arange(0,sizey,1,dtype) # np.linspace(0,100,101)
+    X, Y = np.meshgrid(x-x0, y-y0)        
+    R   = np.sqrt(X*X+Y*Y)
+
+    if modulation == None :
+        amp = 1
+    else :                         # apply modulation along phi
+        T   = np.arctan2(Y,X)
+        NS, NC = modulation
+        amp = np.sin(NS*T) * np.cos(NC*T)
+    arr += a1 * amp * amp * gaussian(R, r1, s1)
+
+    return arr
+
+#-----------------------------
+
 import math
 def gaussian(r,r0,sigma) :
     factor = 1/ (math.sqrt(2) * sigma)
     rr = factor*(r-r0)
     return np.exp(-rr*rr)
 
+#-----------------------------
 
 def main():
 

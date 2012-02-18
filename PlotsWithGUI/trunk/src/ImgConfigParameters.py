@@ -116,6 +116,13 @@ class ImgConfigParameters :
         self.formCurrent  = self.formNone
 
         #----
+
+        self.eventNext     = 'Next'
+        self.eventCurrent  = 'Current'
+        self.eventPrevious = 'Previous'
+        self.eventIncrement= 1
+
+        #----
         #For main image
         self.gridIsOn      = False
         self.logIsOn       = False

@@ -97,17 +97,24 @@ class ImgControl :
 # Signals from ImgGUIPlayer.py
 
     def signal_get_event_previous( self ) :
-        self.reset_event_for_test()
+        self.get_image_and_redraw(self.icp.eventPrevious)
         
     def signal_get_event_current( self ) :
-        self.reset_event_for_test()
+        self.get_image_and_redraw(self.icp.eventCurrent)
 
     def signal_get_event_next( self ) :
-        self.reset_event_for_test()
+        self.get_image_and_redraw(self.icp.eventNext)
 
-    def reset_event_for_test( self ) :
+    def get_image_and_redraw( self, eventFlag) :
+        self.get_image(eventFlag, self.icp.eventIncrement)
+        self.redraw_event() 
+
+    def get_image( self, eventFlag, increment=None) :
+        print 'DEFAULT get_image(...) SHOULD BE OVERWRITTEN IN ORDER TO GET REAL IMAGES.'
         #self.set_image_array( self.get_array2d_for_test() )  # on_draw() is called automatically
         self.set_image_array( self.get_array2d_with_ring_for_test() )  # on_draw() is called automatically
+
+    def redraw_event( self ) :
         self.get_idrawontop().set_all_objs_need_in_redraw()
         self.get_idrawout().draw_outside()
 
