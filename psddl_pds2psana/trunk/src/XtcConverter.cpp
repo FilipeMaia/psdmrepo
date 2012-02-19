@@ -369,6 +369,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_TimepixData:
     if (version == 1) ::storeDataProxy<Timepix::DataV1>(xtc, evt);
+    if (version == 2) ::storeDataProxy<Timepix::DataV2>(xtc, evt);
     break;
   case Pds::TypeId::NumberOf:
     break;
