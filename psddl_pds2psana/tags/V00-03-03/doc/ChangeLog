@@ -1,0 +1,126 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_pds2psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-03-03
+2012-02-18 Andy Salnikov
+- forgot to add new Timepix::DataV2 class to XtcConverter
+
+Tag: V00-03-02
+2012-02-17 Andy Salnikov
+- upgrading to pdsdata V03-02-12
+- regenerate whole thing from psddldata V00-02-01
+
+Tag: V00-03-01
+2012-02-06 Andy Salnikov
+- adding forgotten cspad2x2.ddl.* files
+
+Tag: V00-03-00
+2012-02-06 Andy Salnikov
+- regenerate whole thing from psddldata V00-02-00
+- added support for cspad2x2 types
+
+Tag: V00-02-01
+2012-01-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-01-01 with psddl V00-01-02
+- new package timepix
+
+Tag: V00-02-00
+2011-12-09 Andy Salnikov
+- switching to ndarray
+- regenerate whole thing from psddldata V00-01-00 with psddl V00-01-00
+
+Tag: V00-01-06
+2011-11-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-14
+- new data types added to XtcConverter
+
+Tag: V00-01-05
+2011-10-05 Andy Salnikov
+- PSEnv::EpicsStore interface has changed to support multi-source
+  EPICS data, update client code here
+
+Tag: V00-01-04
+2011-10-04 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-13
+
+Tag: V00-01-03
+2011-09-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-12
+- added CsPad::MiniElementV1 to converter
+
+Tag: V00-01-02
+2011-08-29 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-11
+- added Bld::BldDataPimV1 to converter
+
+Tag: V00-01-01
+2011-08-22 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-10
+- added Princeton::ConfigV2 to converter
+
+Tag: V00-01-00
+2011-07-15 Andy Salnikov
+- PSEnv::ConfigStore renamed to PSEnv::EnvObjectStore, need to change 
+  few methods here
+
+Tag: V00-00-12
+2011-06-27 Andy Salnikov
+- implemented ordering of quadrants in CsPad
+
+Tag: V00-00-11
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-10
+2011-05-23 Andy Salnikov
+- catch DuplicateKey exceptions when adding stuff to event, print warning
+
+Tag: V00-00-09
+2011-04-26 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-08
+
+Tag: V00-00-08
+2011-04-07 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-07
+
+Tag: V00-00-07
+2011-04-01 Andy Salnikov
+- fix for PNCCD::FrameV1 proxy instantiation
+
+Tag: V00-00-06
+2011-03-31 Andy Salnikov
+- regenerated whole thing after changes in psddl
+
+Tag: V00-00-05
+2011-03-30 Andy Salnikov
+- adding support for AcqTdcData type (unknown size data)
+- constructor definition is added manually (in acqiris.cpp)
+- EvtProxy changed to pass additional size parameter to constructor
+
+Tag: V00-00-04
+2011-03-28 Andy Salnikov
+- few changes in epics classes, regenerated epics.ddh.*
+- XtcConverter now adds epics data to environment
+
+Tag: V00-00-03
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- changes in the array member access code
+
+Tag: V00-00-01
+2011-03-21 Andy Salnikov
+- first import into svn
+- mostly working, but there will be updates no doubt
