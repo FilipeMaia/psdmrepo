@@ -68,6 +68,8 @@ DumpIpimb::beginCalibCycle(Event& evt, Env& env)
       str << "\n  triggerCounter = " << config1->triggerCounter();
       str << "\n  serialID = " << config1->serialID();
       str << "\n  chargeAmpRange = " << config1->chargeAmpRange();
+      str << "\n  diodeGain = " << config1->diodeGain(0) << " " << config1->diodeGain(1) 
+          << " " << config1->diodeGain(2) << " " << config1->diodeGain(3);
       str << "\n  calibrationRange = " << config1->calibrationRange();
       str << "\n  resetLength = " << config1->resetLength();
       str << "\n  resetDelay = " << config1->resetDelay();
@@ -90,6 +92,8 @@ DumpIpimb::beginCalibCycle(Event& evt, Env& env)
       str << "\n  triggerCounter = " << config2->triggerCounter();
       str << "\n  serialID = " << config2->serialID();
       str << "\n  chargeAmpRange = " << config2->chargeAmpRange();
+      str << "\n  diodeGain = " << config2->diodeGain(0) << " " << config2->diodeGain(1) 
+          << " " << config2->diodeGain(2) << " " << config2->diodeGain(3);
       str << "\n  calibrationRange = " << config2->calibrationRange();
       str << "\n  resetLength = " << config2->resetLength();
       str << "\n  resetDelay = " << config2->resetDelay();

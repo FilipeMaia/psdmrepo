@@ -140,17 +140,37 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
 void 
 DumpTimepix::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::Timepix::DataV1> data = evt.get(m_src);
-  if (data.get()) {
+  shared_ptr<Psana::Timepix::DataV1> data1 = evt.get(m_src);
+  if (data1.get()) {
     WithMsgLog(name(), info, str) {
       str << "Timepix::DataV1:";
 
-      str << "\n  timestamp = " << data->timestamp();
-      str << "\n  frameCounter = " << data->frameCounter();
-      str << "\n  lostRows = " << data->lostRows();
+      str << "\n  timestamp = " << data1->timestamp();
+      str << "\n  frameCounter = " << data1->frameCounter();
+      str << "\n  lostRows = " << data1->lostRows();
 
-      const ndarray<uint16_t, 2>& img = data->data();
+      const ndarray<uint16_t, 2>& img = data1->data();
       str << "\n  data =";
+      str << " (" << img.shape()[0] << ", " << img.shape()[0] << ")";
+      for (int i = 0; i < 10; ++ i) {
+        str << " " << img[0][i];
+      }
+      str << " ...";
+    }
+  }
+
+  shared_ptr<Psana::Timepix::DataV2> data2 = evt.get(m_src);
+  if (data2.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Timepix::DataV2:";
+
+      str << "\n  timestamp = " << data2->timestamp();
+      str << "\n  frameCounter = " << data2->frameCounter();
+      str << "\n  lostRows = " << data2->lostRows();
+
+      const ndarray<uint16_t, 2>& img = data2->data();
+      str << "\n  data =";
+      str << " (" << img.shape()[0] << ", " << img.shape()[0] << ")";
       for (int i = 0; i < 10; ++ i) {
         str << " " << img[0][i];
       }
