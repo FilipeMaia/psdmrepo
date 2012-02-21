@@ -90,7 +90,7 @@ def coordinateToIndexProtected(V,VRange) :
  
 #----------------------------------    
 
-def transformCartToPolarArray(arr, RRange, ThetaRange, Origin) :
+def transformCartToPolarArray(arr, RRange, ThetaRange, Origin, rCorrIsOn=False) :
     """Input Cartesian array elements are summed together in 2D polar array bins
 
     This transformation works fine when the ThetaRange is inside a single sheet [-180,180] degree.
@@ -111,7 +111,12 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, Origin) :
     iTheta     = coordinateToIndexProtected(Theta,ThetaRange) #Theta is in the range [-180,180] 0-sheet
 
     #arrZeroes = np.zeros(shape,dtype=float)
-    arrMasked = np.select([iTheta<0, iTheta>=ThetaRange[2], iR<0, iR>=RRange[2]], [0,0,0,0], default=arr)
+
+    if rCorrIsOn :
+        factor = RRange[1]/R
+        arrMasked = np.select([iTheta<0, iTheta>=ThetaRange[2], iR<0, iR>=RRange[2]], [0,0,0,0], default=arr*factor)
+    else :
+        arrMasked = np.select([iTheta<0, iTheta>=ThetaRange[2], iR<0, iR>=RRange[2]], [0,0,0,0], default=arr)
 
     i1DInPolar = np.arange(ThetaRange[2] * RRange[2], dtype=np.int32)
 

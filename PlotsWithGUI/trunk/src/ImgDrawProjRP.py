@@ -82,7 +82,7 @@ class ImgDrawProjRP :
             fig_outside.canvas.manager.window.activateWindow() # Makes window active
             fig_outside.canvas.manager.window.raise_()         # Move window on top
 
-        self.drawImgAndProjsInWedge(fig_outside, self.arr, obj)
+        self.drawImgAndProjsInWedge(fig_outside, self.arr, obj, self.icp.r_corr_is_on)
 
         fig_outside.canvas.draw()
 
@@ -93,7 +93,7 @@ class ImgDrawProjRP :
 #-----------------------------
 
 
-    def drawImgAndProjsInWedge(self, fig, arr, obj) :
+    def drawImgAndProjsInWedge(self, fig, arr, obj, r_corr_is_on) :
 
         #x,y,w,h,lw,col,s,t,r = obj.get_list_of_rect_pars() 
         #nx_slices, ny_slices = obj.get_number_of_slices_for_rect()
@@ -115,7 +115,7 @@ class ImgDrawProjRP :
         nx_slices = n_rings
         ny_slices = n_sects
 
-        arrwin = self.getMultiSheetPolarArray(arr, RRange, ThetaRange, Origin)
+        arrwin = self.getMultiSheetPolarArray(arr, RRange, ThetaRange, Origin, r_corr_is_on)
 
         xyrange = [x, x+w, y, y+h]
       
@@ -198,7 +198,7 @@ class ImgDrawProjRP :
 
 #-----------------------------
 
-    def getMultiSheetPolarArray(self, arr, RRange, ThetaRange, Origin) :
+    def getMultiSheetPolarArray(self, arr, RRange, ThetaRange, Origin, rCorrIsOn=False) :
         """Split the theta range for necessary number of sheets, and hstack the entire array
         """
         print ' Origin    =', Origin    
@@ -217,20 +217,20 @@ class ImgDrawProjRP :
 
         if sheetTmax == 0 : # both Tmin and Tmax on 0 sheet
             ThetaRangeWhole = (Tmin, Tmax, Tmax-Tmin)
-            self.arrRPhi = fat.transformCartToPolarArray(arr, RRange, ThetaRangeWhole, Origin)
+            self.arrRPhi = fat.transformCartToPolarArray(arr, RRange, ThetaRangeWhole, Origin, rCorrIsOn)
 
         else :              # Tmin and Tmax on different sheets
             TRangeSheetFirst = (Tmin, 180, 180-Tmin)
-            self.arrRPhiFirst = fat.transformCartToPolarArray(arr, RRange, TRangeSheetFirst, Origin)
+            self.arrRPhiFirst = fat.transformCartToPolarArray(arr, RRange, TRangeSheetFirst, Origin, rCorrIsOn)
 
             TmaxOnZeroSheet = Tmax - self.get_theta_offset(Tmax)
             TRangeSheetLast = (-180, TmaxOnZeroSheet, TmaxOnZeroSheet+180)
-            self.arrRPhiLast = fat.transformCartToPolarArray(arr, RRange, TRangeSheetLast, Origin)
+            self.arrRPhiLast = fat.transformCartToPolarArray(arr, RRange, TRangeSheetLast, Origin, rCorrIsOn)
 
             if sheetTmax-sheetTmin > 1 : # Check if the entire ring needs to be inserted
                 print 'WARNING: WEDGE HAS MORE THAN ONE LOOP IN THETA... DO YOU REALLY NEED IT?'
                 TRangeRing = (-180, 180, 360)
-                self.arrRPhiRing = fat.transformCartToPolarArray(arr, RRange, TRangeRing, Origin)
+                self.arrRPhiRing = fat.transformCartToPolarArray(arr, RRange, TRangeRing, Origin, rCorrIsOn)
 
             self.arrRPhi = self.arrRPhiFirst
             for sheet in range(sheetTmax-sheetTmin-1) : # Loop over sheets and add entire theta-rings

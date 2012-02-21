@@ -148,8 +148,10 @@ class ImgConfigParameters :
         #For ProjRP image
         self.n_rings        = 3
         self.n_sects        = 5
+        self.r_corr_is_on   = True
 
         #----
+
         #For ImgDrawOnTop
         self.lwAdd          = 1   # on top object linewidth for mode Add
         self.colAdd         = 'g' # on top object color for mode Add
