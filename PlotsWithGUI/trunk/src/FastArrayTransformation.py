@@ -97,7 +97,7 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, Origin) :
     """
 
     arrShape = arr.shape 
-    print 'arrShape=\n', arrShape
+    #print 'arrShape=\n', arrShape
 
     dimY,dimX = arr.shape
     xc,yc = Origin

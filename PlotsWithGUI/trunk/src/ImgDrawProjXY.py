@@ -142,10 +142,7 @@ class ImgDrawProjXY :
         axsb.xaxis.set_ticks_position('top')
         axsb.yaxis.set_ticks_position('right')
 
-        # Rotate axis labels
-        for label in axsb.get_xticklabels() :
-            label.set_rotation(60)
-            label.set_horizontalalignment('center') # 'right'
+        self.rotate_lables_for_xaxis(axsb, angle=50, alignment='left')
 
         #------------------
         # Panel C
@@ -169,7 +166,16 @@ class ImgDrawProjXY :
         # Panel D
         axsd.hist(arrwin.flatten(), bins=100)#, range=range)
         axsd.yaxis.set_ticks_position('right')
+        self.rotate_lables_for_xaxis(axsd, angle=50, alignment='right')
 
+#-----------------------------
+
+    def rotate_lables_for_xaxis(self, axes, angle=50, alignment='center') : # 'right'
+        """Rotate axis labels by anble in degree
+        """
+        for label in axes.get_xticklabels() :
+            label.set_rotation(angle)
+            label.set_horizontalalignment(alignment)
 
 #-----------------------------
 

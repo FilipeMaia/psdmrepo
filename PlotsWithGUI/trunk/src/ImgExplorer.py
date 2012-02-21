@@ -141,39 +141,9 @@ class ImgExplorer (QtGui.QWidget, ic.ImgControl) :
 
 #-----------------------------
 # For test
+
     def get_array2d_for_test(self) :
-        print 'ImgExplorer.get_array2d_for_test() - generate the new image array'
-        mu, sigma = 20, 3
-        #arr = np.arange(2400)
-        arr = mu + sigma*np.random.standard_normal(size=250000)
-        arr.shape = (500,500)
-        #arr = mu + sigma*np.random.standard_normal(size=25)
-        #arr.shape = (5,5)
-        return arr
-
-    def get_array2d_of_zeros(self) :
-        print 'ImgExplorer.get_array2d_of_zeros() - generate the new image array'
-        shape = (500,500)
-        arr = np.zeros(shape,dtype=float)
-        return arr
-
-    def get_array2d_with_ring_for_test(self) :
-
-        a1, r1, s1 = 200, 160, 10 # amplitude, radius, and sigma of the ring
-
-        arr = self.get_array2d_for_test()
-        #arr = self.get_array2d_of_zeros()
-        npx, npy = arr.shape
-        x0,  y0  = npx/2, npy/2
-        x = np.arange(0,npx,1,dtype = np.float32) # np.linspace(0,200,201)
-        y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
-        X, Y = np.meshgrid(x-x0, y-y0)        
-        R = np.sqrt(X*X+Y*Y)
-        T = np.arctan2(Y,X)
-        amp  = np.sin(9*T) * np.sin(T)
-        arr += a1 * amp * amp * gaussian(R, r1, s1)
-
-        return arr
+        return getRandomWithRing2DArray()
 
 #-----------------------------
 # Test
@@ -200,9 +170,9 @@ def getSmouth2DArray(shape=(100,200), dtype=None) :
 
 #-----------------------------
 
-def getRing2DArray(shape=(200,200), ring=(1,50,5), center=None, dtype=np.float32, modulation=None) :
+def getRing2DArray(shape=(200,200), ring=(1,50,5), center=None, dtype=np.float, modulation=None) :
 
-    arr = np.empty(shape, dtype) # make empty array
+    arr = np.zeros(shape, dtype) # make empty array
     a1, r1, s1 = ring            # get amplitude, radius, and sigma of the ring
 
     sizex, sizey = shape
@@ -226,6 +196,16 @@ def getRing2DArray(shape=(200,200), ring=(1,50,5), center=None, dtype=np.float32
 
 #-----------------------------
 
+def getRandomWithRing2DArray(shape=(500,500)) :
+    sizex, sizey = shape
+    mycenter = (sizex/2, sizey/2)
+    Radius   = min(sizex, sizey)/3
+    arr  = getRandom2DArray(shape, mu=10, sigma=3)
+    arr += getRing2DArray(shape, ring=(100,Radius,5), center=mycenter, modulation=(9,1))
+    return arr
+
+#-----------------------------
+
 import math
 def gaussian(r,r0,sigma) :
     factor = 1/ (math.sqrt(2) * sigma)
@@ -241,8 +221,8 @@ def main():
     #w  = ImgExplorer(None, arr)
     w  = ImgExplorer(None)
     w.move(QtCore.QPoint(10,10))
-    w.set_image_array( w.get_array2d_with_ring_for_test() )
-    #w.set_image_array( w.get_array2d_for_test() )
+    w.set_image_array( getRandomWithRing2DArray() )
+    #w.set_image_array( getRandom2DArray(shape=(500,500)) )
     w.show()
 
     app.exec_()

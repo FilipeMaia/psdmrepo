@@ -52,8 +52,10 @@ class ImgGUIPlayer (QtGui.QWidget) :
         self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
-        self.titEvent     = QtGui.QLabel('Event:')
-        self.titSpace     = QtGui.QLabel(' ')
+        self.tit_event      = QtGui.QLabel('Image:')
+        self.tit_space      = QtGui.QLabel(' ')
+        self.tit_increment = QtGui.QLabel('Incr:')
+        self.edi_increment = QtGui.QLineEdit(str(self.icp.increment))
  
         self.but_previous = QtGui.QPushButton(u'\u25C0') # left-head triangle "Previous"
         self.but_current  = QtGui.QPushButton("Current")
@@ -67,38 +69,45 @@ class ImgGUIPlayer (QtGui.QWidget) :
 
         width      = 60
         width_half = 25
+        width_edi  = 30
         #self.cbox_onoff  .setMaximumWidth(width)
-        self.but_previous.setMaximumWidth(width_half)
-        self.but_current .setMaximumWidth(width)
-        self.but_next    .setMaximumWidth(width_half)
-        self.but_print   .setMaximumWidth(width)
-        self.but_save    .setMaximumWidth(width)
-        self.but_quit    .setMaximumWidth(width)
-        self.titEvent    .setMaximumWidth(width)
-        self.titSpace    .setMaximumWidth(width)
+        self.but_previous .setMaximumWidth(width_half)
+        self.but_current  .setMaximumWidth(width)
+        self.but_next     .setMaximumWidth(width_half)
+        self.but_print    .setMaximumWidth(width)
+        self.but_save     .setMaximumWidth(width)
+        self.but_quit     .setMaximumWidth(width)
+        self.tit_event    .setMaximumWidth(width)
+        self.tit_space    .setMaximumWidth(width)
+        self.edi_increment.setValidator(QtGui.QIntValidator(1,10000,self))
+        self.edi_increment.setMaximumWidth(width_edi)
 
-        self.connect(self.but_previous, QtCore.SIGNAL('clicked()'),         self.processPrevious)
-        self.connect(self.but_current,  QtCore.SIGNAL('clicked()'),         self.processCurrent)
-        self.connect(self.but_next,     QtCore.SIGNAL('clicked()'),         self.processNext)
-        self.connect(self.but_print,    QtCore.SIGNAL('clicked()'),         self.processPrint)
-        self.connect(self.but_save,     QtCore.SIGNAL('clicked()'),         self.processSave)
-        self.connect(self.but_quit,     QtCore.SIGNAL('clicked()'),         self.processQuit)
-        self.connect(self.cbox_onoff,   QtCore.SIGNAL('stateChanged(int)'), self.processOnOff)
+        
+        self.connect(self.but_previous,  QtCore.SIGNAL('clicked()'),           self.processPrevious)
+        self.connect(self.but_current,   QtCore.SIGNAL('clicked()'),           self.processCurrent)
+        self.connect(self.but_next,      QtCore.SIGNAL('clicked()'),           self.processNext)
+        self.connect(self.but_print,     QtCore.SIGNAL('clicked()'),           self.processPrint)
+        self.connect(self.but_save,      QtCore.SIGNAL('clicked()'),           self.processSave)
+        self.connect(self.but_quit,      QtCore.SIGNAL('clicked()'),           self.processQuit)
+        self.connect(self.cbox_onoff,    QtCore.SIGNAL('stateChanged(int)'),   self.processOnOff)
+        self.connect(self.edi_increment, QtCore.SIGNAL('editingFinished ()'),  self.onEditIncrement )
 
         # Layout with box sizers
         # 
         grid = QtGui.QGridLayout()
 
         row = 1
-        grid.addWidget(self.cbox_onoff  , row, 0)
-        grid.addWidget(self.titEvent    , row, 1)
-        grid.addWidget(self.but_previous, row, 2)
-        grid.addWidget(self.but_current , row, 3)
-        grid.addWidget(self.but_next    , row, 4)
-        grid.addWidget(self.titSpace    , row, 5)
-        grid.addWidget(self.but_print   , row, 6)
-        grid.addWidget(self.but_save    , row, 7)
-        grid.addWidget(self.but_quit    , row, 8)
+        grid.addWidget(self.cbox_onoff   , row, 0)
+        grid.addWidget(self.tit_event    , row, 1)
+        grid.addWidget(self.but_previous , row, 2)
+        grid.addWidget(self.but_current  , row, 3)
+        grid.addWidget(self.but_next     , row, 4)
+        grid.addWidget(self.tit_increment, row, 5) 
+        grid.addWidget(self.edi_increment, row, 6) 
+        grid.addWidget(self.tit_space    , row, 7)
+        grid.addWidget(self.but_print    , row, 8)
+        grid.addWidget(self.but_save     , row, 9)
+        grid.addWidget(self.but_quit     , row, 10)
         #row = 2
 
         vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
@@ -144,6 +153,11 @@ class ImgGUIPlayer (QtGui.QWidget) :
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
+
+
+    def onEditIncrement(self):
+        print 'onEditIncrement'
+        self.icp.increment = int(self.edi_increment.displayText())
 
 
     def processOnOff(self):

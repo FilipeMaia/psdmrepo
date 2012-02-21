@@ -117,10 +117,10 @@ class ImgConfigParameters :
 
         #----
 
-        self.eventNext     = 'Next'
-        self.eventCurrent  = 'Current'
-        self.eventPrevious = 'Previous'
-        self.eventIncrement= 1
+        self.imageNext     = 'Next'
+        self.imageCurrent  = 'Current'
+        self.imagePrevious = 'Previous'
+        self.increment     = 1
 
         #----
         #For main image
