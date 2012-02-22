@@ -124,6 +124,7 @@ class ImgDrawOnTop :
         list_of_objs = self.icp.list_of_cents
         initial_list_of_objs = list(list_of_objs) # COPY list
         list_len = len(list_of_objs)
+        if list_len < 1 : return
         obj_last = list_of_objs[list_len-1]
         # Remove all center objects except the last one:
         for obj in initial_list_of_objs :
