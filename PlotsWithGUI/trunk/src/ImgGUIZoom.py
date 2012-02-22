@@ -52,7 +52,7 @@ class ImgGUIZoom (QtGui.QWidget) :
         self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
-        self.txt_msg    = QtGui.QTextEdit('Zoom: use Add, Move, Select or Remove mode and click-and-drag mouse on image.')
+        self.txt_msg    = QtGui.QTextEdit('Zoom: 1) click on Add, Move, Select or Remove mode, 2) click-and-drag mouse on image.')
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
         #self.but_overlay= QtGui.QPushButton("Overlay")
         #self.but_draw   = QtGui.QPushButton("Draw")

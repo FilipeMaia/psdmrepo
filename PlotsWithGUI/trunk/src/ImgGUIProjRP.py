@@ -54,7 +54,7 @@ class ImgGUIProjRP (QtGui.QWidget) :
 
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
 
-        self.txt_msg      = QtGui.QTextEdit('Projections R and Phi: use Add, Move, Select or Remove mode and click-and-drag mouse on image.' + \
+        self.txt_msg      = QtGui.QTextEdit('Projections R and Phi: 1) click on Add, Move, Select or Remove mode, 2) click-and-drag mouse on image.' + \
                                             'The number of R-rings and Phi-sectors for projections can be selected.')
         self.but_reset    = QtGui.QPushButton('Reset')
         self.tit_nslices  = QtGui.QLabel('Number of r-rings, phi-sectors:')

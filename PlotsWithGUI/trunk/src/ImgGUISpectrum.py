@@ -53,7 +53,7 @@ class ImgGUISpectrum (QtGui.QWidget) :
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
 
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
-        self.txt_msg    = QtGui.QTextEdit('Spectrum: (1) select Add, Move, Select or Remove mode, (2) click and drag mouse on image.')
+        self.txt_msg    = QtGui.QTextEdit('Spectrum: 1) click on Add, Move, Select or Remove mode, 2) click and drag mouse on image.')
         #self.but_overlay= QtGui.QPushButton("Overlay")
         self.but_draw   = QtGui.QPushButton("Draw")
 

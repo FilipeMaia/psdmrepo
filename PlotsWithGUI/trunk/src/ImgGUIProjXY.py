@@ -54,7 +54,7 @@ class ImgGUIProjXY (QtGui.QWidget) :
 
         #self.gui_mode   = igm.ImgGUIMode(self.icp)
 
-        self.txt_msg      = QtGui.QTextEdit('Projections X and Y: use Add, Move, Select or Remove mode and click-and-drag mouse on image.' + \
+        self.txt_msg      = QtGui.QTextEdit('Projections X and Y: 1) click on Add, Move, Select or Remove mode, 2) click-and-drag mouse on image.' + \
                                             'The number of slices for X and Y projections can be selected.')
         self.but_reset    = QtGui.QPushButton('Reset')
         self.tit_nslices  = QtGui.QLabel('N slices X,Y:')
