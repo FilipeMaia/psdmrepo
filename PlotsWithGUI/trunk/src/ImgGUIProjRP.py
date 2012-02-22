@@ -60,6 +60,9 @@ class ImgGUIProjRP (QtGui.QWidget) :
         self.tit_nslices  = QtGui.QLabel('Number of r-rings, phi-sectors:')
         self.edi_nrings   = QtGui.QLineEdit(str(self.icp.n_rings))
         self.edi_nsects   = QtGui.QLineEdit(str(self.icp.n_sects))
+        self.cbox_rcorr   = QtGui.QCheckBox  ('1/r corr.')
+        self.cbox_rcorr.setChecked(self.icp.r_corr_is_on)
+
   
         width     = 60
         width_edi = 40
@@ -70,9 +73,10 @@ class ImgGUIProjRP (QtGui.QWidget) :
         self.edi_nrings.setValidator(QtGui.QIntValidator(1,1000,self))
         self.edi_nsects.setValidator(QtGui.QIntValidator(1,1000,self))
  
-        self.connect(self.but_reset,    QtCore.SIGNAL('clicked()'),          self.onReset )
+        self.connect(self.but_reset,  QtCore.SIGNAL('clicked()'),          self.onReset )
         self.connect(self.edi_nrings, QtCore.SIGNAL('editingFinished ()'), self.onEditNRings )
         self.connect(self.edi_nsects, QtCore.SIGNAL('editingFinished ()'), self.onEditNSects )
+        self.connect(self.cbox_rcorr, QtCore.SIGNAL('stateChanged(int)'),  self.onRCorr )
  
         # Layout with box sizers
         # 
@@ -80,8 +84,9 @@ class ImgGUIProjRP (QtGui.QWidget) :
         self.hboxB.addWidget(self.tit_nslices)
         self.hboxB.addWidget(self.edi_nrings)
         self.hboxB.addWidget(self.edi_nsects)
-        self.hboxB.addWidget(self.but_reset)
+        self.hboxB.addWidget(self.cbox_rcorr)
         self.hboxB.addStretch(1)
+        self.hboxB.addWidget(self.but_reset)
         
         #grid = QtGui.QGridLayout()
         #row = 0
@@ -125,6 +130,12 @@ class ImgGUIProjRP (QtGui.QWidget) :
         self.frame.setGeometry(self.rect())
 
 
+    def onRCorr(self):
+        #print 'onRCorr status', self.cbox_rcorr.isChecked()
+        self.icp.r_corr_is_on   = self.cbox_rcorr.isChecked()
+        #self.get_control().signal_...()
+
+
     def onEditNRings(self):
         print 'onEditNRings'
         self.icp.n_rings = int(self.edi_nrings.displayText())
@@ -140,6 +151,7 @@ class ImgGUIProjRP (QtGui.QWidget) :
         self.icp.n_sects=1
         self.edi_nrings.setText(str(self.icp.n_rings))
         self.edi_nsects.setText(str(self.icp.n_sects))
+        self.cbox_rcorr.setChecked(True)
 
         
     def processDraw(self):

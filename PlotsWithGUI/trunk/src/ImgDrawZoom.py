@@ -110,7 +110,7 @@ class ImgDrawZoom :
         #------------------
         # Panel A
         axim = axsa.imshow(arrwin, interpolation='nearest', aspect='auto', extent=xyrange)# , origin='bottom'
-        axsa.xaxis.set_major_formatter(mtick.NullFormatter()) 
+        #axsa.xaxis.set_major_formatter(mtick.NullFormatter()) 
 
         #------------------
         # Panel CB
