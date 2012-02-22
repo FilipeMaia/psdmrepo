@@ -1,0 +1,50 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PlotsWithGUI
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02	
+2012-02-22 Mikhail S. Dubrovin
+- This version has fully functional plots for 
+	1. spectrum in rect
+	2. zoom in rect
+	3. profile along the line
+	4. x-y projections of zoomed rect rigion with spectum
+	5. r-phi projections of the wedge rigion with spectum
+	6. center for wedge
+	
+- Adding a new type of plot for XXX
+	For GUI:
+	--------
+	1. copy ImgGUISpectrum.py -> ImgGUIXXX.py (edit)
+        2. add all necessary calls in ImgGUI.py (edit)
+        3. add necessary configuration parameters in ImgConfigParameters.py (edit)
+	4. ImgDrawOnTop.py    (edit for new geometry forms only)
+	5. ImgDrawOutside.py  (edit)
+	6. ImgDrawSpectrum.py -> ImgDrawXXX.py (edit)
+
+2011-11-08 Mikhail S. Dubrovin
+- add modules:
+	  DragLine.py
+	  Drag.py
+	  ImgGUISpectrum.py
+	  DragRectangle.py
+	  DragCircle.py
+	  ImgGUIXYZRanges.py
+	
+Tag: V00-00-01
+2011-10-21 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
