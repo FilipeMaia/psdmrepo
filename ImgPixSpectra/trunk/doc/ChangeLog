@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-02-23 Mikhail S. Dubrovin
+Tag: V00-00-04
+- CSPad2x2PixSpectra was renamed to CSPad2x2PixSpectra
+
 Tag: V00-00-03
 2012-02-06 Andy Salnikov
 - cspad.MiniElementV1 was renamed to cspad2x2.ElementV1, updating client code.
