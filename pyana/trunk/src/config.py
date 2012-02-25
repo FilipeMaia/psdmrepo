@@ -133,7 +133,7 @@ class config ( object ) :
         # verify that config file options have valid names
         for section in self._config.sections() :
             _log.debug("config section=%s", section)
-            if section == 'pyana' or section.startswith('pyana.') :
+            if section in self._sections:
                 for option in self._config.options(section):
                     _log.debug("config section=%s option=%s", section, option)
                     if option not in _options :

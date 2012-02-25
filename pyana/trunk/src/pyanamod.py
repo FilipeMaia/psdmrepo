@@ -97,11 +97,9 @@ def _proc(jobname, id, pipes, userObjects, jobConfig):
         # request is a tuple with first element being opcode
         if req[0] == OP_EVENT :
 
-            epics_data = req[1]
-            dg = req[2]
-            run = req[3]
+            epics_data, dg, run, expNum = req[1:]
 
-            evt = event.Event(dg, run, env)
+            evt = event.Event(dg, run=run, expNum=expNum, env=env)
             
             # update configuration objects
             env.updateConfig(evt)
@@ -122,7 +120,7 @@ def _proc(jobname, id, pipes, userObjects, jobConfig):
         elif req[0] == OP_FINISH :
             
             logging.info("proc-%s: received FIN", id)
-            evt = event.Event(None, run, env)
+            evt = event.Event(None, run=run, expNum=expNum, env=env)
             dispatch.finish(evt, env)
             
         elif req[0] == OP_RESULT :
@@ -222,10 +220,12 @@ def _pyana ( argv ) :
         ndamage = 0
         damagemask = 0
         next = 0
+        run = None
+        expNum = None
         vmsize = _vmsize()
 
         # read datagrams one by one
-        for dgtup in dgramGen( names ) :
+        for dg, fileName, fpos in dgramGen( names ) :
 
             # explicitly run garbage collector if memory grows too much
             if gc_debug: logging.info("VM size: %d", _vmsize())
@@ -241,12 +241,12 @@ def _pyana ( argv ) :
                 logging.info("event limit reached (%d), terminating", nevent)
                 break
     
-            dg, fileName, fpos, run = dgtup
-    
             damage = dg.xtc.damage.value()
             svc = dg.seq.service()
         
-            evt = event.Event(dg, run, env)
+            expNum = fileName.expNum()
+            run = fileName.run()
+            evt = event.Event(dg, run=run, expNum=expNum, env=env)
             
             # update environment
             env.update ( evt )
@@ -273,10 +273,10 @@ def _pyana ( argv ) :
                     # event data goes to next child
                     p = pipes[next]
                     next = (next+1) % len(pipes)
-                    p.sendEventData(dgtup, env)
+                    p.sendEventData(dg, fileName, fpos, run, expNum, env)
                 else :
                     # each transitions goes to each child
-                    for p in pipes : p.sendEventData(dgtup, env)
+                    for p in pipes : p.sendEventData(dg, fileName, fpos, run, expNum, env)
 
             else :
                 
@@ -293,7 +293,7 @@ def _pyana ( argv ) :
                     
                 
         # finish
-        evt = event.Event(None, run, env)
+        evt = event.Event(None, run=run, expNum=expNum, env=env)
         dispatch.finish(evt, env)
     
     

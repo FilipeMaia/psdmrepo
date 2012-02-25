@@ -96,10 +96,11 @@ class Event(object):
     about event, such as event time, run number, damage mask, etc. 
     """
     
-    def __init__( self, dg, run = -1, env = None ):
+    def __init__( self, dg, run = None, expNum = None, env = None ):
         
         self.m_dg = dg
         self.m_run = run
+        self.m_expNum = expNum
         self.m_env = env
         self.m_userData = {}
         
@@ -116,9 +117,17 @@ class Event(object):
         """ self.run() -> int
         
         Returns run number as integer value. Run number is extracted from the file names being processed. 
-        When the file name cannot be determined or has unknown format the above method will return negative number.
+        When the file name cannot be determined or has unknown format the above method will return None.
         """
         return self.m_run
+
+    def expNum(self) :
+        """ self.expNum() -> int
+        
+        Returns experiment number as integer value. EXperiment number is extracted from the file names being processed. 
+        When the file name cannot be determined or has unknown format the above method will return None.
+        """
+        return self.m_expNum
 
     def seq(self) :
         """ self.seq() -> Sequence

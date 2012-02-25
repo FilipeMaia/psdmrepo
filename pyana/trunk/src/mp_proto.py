@@ -94,11 +94,9 @@ class mp_proto ( object ) :
         """ Send arbitrary data using the underlying connection's send() method """
         self._conn.send(data)
 
-    def sendEventData ( self, dgtup, env ) :
+    def sendEventData ( self, dg, fileName, fpos, run, expNum, env ) :
         """ Send event data """
 
-        dg, fileName, fpos, run = dgtup
-        
         self.sendCode(OP_EVENT)
         
         mp_proto._sendEpicsList(self._conn, env.m_epics.m_name2epics)
@@ -109,6 +107,7 @@ class mp_proto ( object ) :
         else :
             self._conn.send_bytes(dg)
         self._conn.send(run)
+        self._conn.send(expNum)
 
     def getRequest(self):
         """ Generator function that returns all requests """
@@ -158,8 +157,9 @@ class mp_proto ( object ) :
                         dg = xtc.Dgram(data)
 
                     run = self._conn.recv()
+                    expNum = self._conn.recv()
 
-                    yield (opcode, epics_data, dg, run)
+                    yield (opcode, epics_data, dg, run, expNum)
                     
                 except EOFError, ex:
                     

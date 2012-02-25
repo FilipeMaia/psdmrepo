@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-39
+2012-02-24 Andy Salnikov
+- adding xtc_ouput module, the modu;le which writes datagrams
+  to output file
+- initial implementation, working but needs more work
+
 Tag: V00-00-38
 2012-02-15 Andy Salnikov
 - add support for event loop control from user modules

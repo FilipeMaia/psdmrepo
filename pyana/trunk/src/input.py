@@ -14,7 +14,7 @@ _log = logging.getLogger("pyana.input")
 
 
 def dgramGen(names):
-    """dgramGen(names) -> datagram
+    """dgramGen(names) -> tuple
     
     This is the generator method which takes the list of XTC file names
     and produces a sequence of XTC datagrams. As a generated it should be 
@@ -24,6 +24,11 @@ def dgramGen(names):
     This method uses pypdsdata.io.XtcMergeIterator class to correctly
     merge multiple XTC streams and chunks into a single stream of 
     time-ordered histrograms.
+    
+    Returned value is a tuple with the following elements:
+    1) Datagram object,
+    2) File name (io.XtcFileName object),
+    3) File offset for datagram.
     """
 
     # group files by run number
@@ -48,9 +53,8 @@ def dgramGen(names):
             
             fileName = dgiter.fileName()
             fpos = dgiter.fpos()
-            run = dgiter.run()
 
-            yield (dg, fileName, fpos, run)
+            yield (dg, fileName, fpos)
 
 
 class _DgramReaderThread ( threading.Thread ):
@@ -75,7 +79,7 @@ class _DgramReaderThread ( threading.Thread ):
             
 
 def threadedDgramGen( names, queueSize = 10 ):
-    """threadedDgramGen(names, queueSize = 10) -> datagram
+    """threadedDgramGen(names, queueSize = 10) -> tuple
     
     This is the generator method which takes the list of XTC file names
     and produces a sequence of XTC datagrams very much like dgramGen(). 
@@ -83,6 +87,11 @@ def threadedDgramGen( names, queueSize = 10 ):
     separate thread which should reduce waiting time for the consumer
     of the datagrams. Parameter ``queueSize`` controls maximum depth of
     the datagram queue, for optimal performance it should not be very large.
+
+    Returned value is a tuple with the following elements:
+    1) Datagram object,
+    2) File name (io.XtcFileName object),
+    3) File offset for datagram.
     """
 
     queue = Queue.Queue(queueSize)
