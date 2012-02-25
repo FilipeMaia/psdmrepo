@@ -404,17 +404,3 @@ class XtcMergeIterator(object) :
         """
         if not self.m_runiters: return None
         return self.m_runiters[0].fpos()
-
-    def run(self):
-        """self.run() -> int
-        
-        Returns the run number for the current file
-        """
-        if not self.m_runiters: return None
-        
-        fn = self.m_runiters[0].fileName()
-        run = None
-        if isinstance(fn, XtcFileName):
-            run = fn.run()
-        if run is None: run = -1
-        return run

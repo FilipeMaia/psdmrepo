@@ -95,6 +95,7 @@ Dgram_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds )
 
   // initialization from buffer objects
   py_this->m_obj = (Pds::Dgram*)buf;
+  py_this->m_size = bufsize;
   PyObject* parent = PyTuple_GetItem(args, 0);
   Py_INCREF(parent);
   py_this->m_parent = parent;
