@@ -1,0 +1,121 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $$Id$$
+#
+# Description:
+#  Script $class...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LCLS programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to 
+interpreter plus some extra options) and copied to arch/$SIT_ARCH/bin area.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $$Id$$ 
+
+@author $author
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$$Revision: 8 $$"
+# $$Source$$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# local variable accessible in this module only
+_OP_X = 'Y'
+
+# local method name starts with undescore
+def _localMethod() :
+	pass
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class $class ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-u', "--user", 
+								  default=None, help="specify user name" )
+        self._parser.add_option ( '-o', "--output-file", action="store", 
+								  default=None, help="send output to file" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if not self._args :
+            self._parser.error("one or more arguments required")
+            return 2
+
+        # open output file
+        if self._options.output_file :
+            self.debug( "Open alternative output file" )
+            out = open ( self._options.output_file, "w" )
+        else:
+            out = sys.stdout
+
+        # process all arguments
+        for arg in self._args :
+            self.process ( arg, out )
+
+
+    #
+    #  Does real processing job
+    #
+    def process ( self, arg, out ) :
+        """Processes one argument"""
+
+        self.trace( "Processing "+arg+"..." )
+
+        #.......................
+        pass
+	
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = $class()
+    rc = app.run()
+    sys.exit(rc)
