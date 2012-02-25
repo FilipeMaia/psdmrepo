@@ -12,8 +12,6 @@
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
-
 @version $$Id$$
 
 @author $author
@@ -118,27 +116,30 @@ class $class (object) :
 
         pass
 
-    def endcalibcycle( self, env ) :
+    def endcalibcycle( self, evt, env ) :
         """This optional method is called if present at the end of the 
         calibration cycle.
         
+        @param evt    event data object
         @param env    environment object
         """
         
         logging.info( "$class.endcalibcycle() called" )
 
-    def endrun( self, env ) :
+    def endrun( self, evt, env ) :
         """This optional method is called if present at the end of the run.
         
+        @param evt    event data object
         @param env    environment object
         """
         
         logging.info( "$class.endrun() called" )
 
-    def endjob( self, env ) :
+    def endjob( self, evt, env ) :
         """This method is called at the end of the job. It should do 
         final cleanup, e.g. close all open files.
         
+        @param evt    event data object
         @param env    environment object
         """
         

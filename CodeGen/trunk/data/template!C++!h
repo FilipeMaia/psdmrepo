@@ -48,16 +48,8 @@ namespace $package {
  *  with a blank line. The last paragraph before the tags (preceded by @) 
  *  should be the identification and copyright, as below.
  *
- *  Please note that KDOC comments must start with /** (a forward slash
- *  followed by TWO asterisks). Interface members should be documented
- *  with KDOC comments, as should be protected members that may be of interest
- *  to those deriving from your class. Private implementation should
- *  be commented with C++-style // (double forward slash) comments.
- *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $$Id$$
  *

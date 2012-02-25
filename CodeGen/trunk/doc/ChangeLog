@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2012-02-24 Andy Salnikov
+- updated templates, removed not-so-useful stuff from comments
+- added evt paraeter to all pyana module's methods
+
 Tag: V00-00-22
 2011-08-17 Andy Salnikov
 - improved doxygen comments in C++ templates
