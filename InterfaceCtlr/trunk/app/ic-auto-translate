@@ -43,6 +43,7 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 from InterfaceCtlr.InterfaceDb import InterfaceDb
 from LusiPython.DbConnection import DbConnection
+from RegDB.RegDb import RegDb
 
 #---------------------
 # Local definitions --
@@ -52,6 +53,9 @@ _icdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
 _regdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
 _logbook_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
 
+
+_xtc_path = "/reg/d/psdm/%(instr)s/%(exper)s/xtc/e%(expid)d-r%(run)04d-s%(stream)02d-c%(chunk)02d.xtc"
+
 #---------------------------------
 #  Application class definition --
 #---------------------------------
@@ -60,18 +64,19 @@ class IcAutoTranslate ( AppBase ) :
 
     def __init__ ( self ) :
 
-        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
 
         # add application options, see optparse module for details
-        self._parser.add_option ( '-c', "--config", 
-                                  default="/reg/g/psdm/psdatmgr/ic/ic-auto-translate.cfg", help="specify config file" )
-        self._parser.add_option ( '-d', "--icdb-conn", 
-                                  default=_icdb_conn_str, help="specify interface database connection string" )
-        self._parser.add_option ( '-r', "--regdb-conn", 
-                                  default=_regdb_conn_str, help="specify regdb connection string" )
-        self._parser.add_option ( '-l', "--logbook-conn", 
-                                  default=_logbook_conn_str, help="specify logbook connection string" )
-        
+        self._parser.set_defaults(icdb_conn=_icdb_conn_str,
+                                  regdb_conn=_regdb_conn_str,
+                                  logbook_conn=_logbook_conn_str,
+                                  dry_run=False)
+        self._parser.add_option ( '-d', "--icdb-conn", metavar="CONN_STR", help="specify interface database connection string" )
+        self._parser.add_option ( '-r', "--regdb-conn", metavar="CONN_STR", help="specify regdb connection string" )
+        self._parser.add_option ( '-l', "--logbook-conn", metavar="CONN_STR", help="specify logbook connection string" )
+        self._parser.add_option ( '-n', "--dry-run", action="store_true", help="do not submit any jobs" )
+     
+        self.n_old = 5  # number of latest experimets to keep AUTO flag
 
     #
     #  Run the whole thing after parsing the command argunments and 
@@ -89,154 +94,134 @@ class IcAutoTranslate ( AppBase ) :
             
             self.info('Starting next round')
 
-            # read config file
-            config = self._readConfig()
-            if not config :
-                # no config, pause and sleep a bit longer
-                self.info("No configuration, skip iteration")
-                delay = 180
-                continue
-            
             # Connect to databases
             try :
-                icdb_conn = DbConnection(conn_string=self._options.icdb_conn)
-                regdb_conn = DbConnection(conn_string=self._options.regdb_conn)
-                logbook_conn = DbConnection(conn_string=self._options.logbook_conn)
+                self.icdb_conn = DbConnection(conn_string=self._options.icdb_conn)
+                self.regdb_conn = DbConnection(conn_string=self._options.regdb_conn)
+                self.logbook_conn = DbConnection(conn_string=self._options.logbook_conn)
+                self.icdb = InterfaceDb( self.icdb_conn, self )
+                self.regdb = RegDb( self.regdb_conn, self )
             except Exception, ex:
-                self.warning('Failed to connect to one or more databases: %s', ex)
+                self.warning('Failed to connect to one or more databases: %s, wait 3 minutes', ex)
+                delay = 180
                 continue
-            
-            icdb = InterfaceDb( icdb_conn, self )
+
 
             # loop over active experiments
-            for instr, exper, options in config :
+            for instr in [name for id, name, descr in self.regdb.get_instruments()]:
 
-                self.info('processing experiment: %s %s', instr, exper)
-
-                # get the experiments id from regdb
-                q = """select e.id from instrument i, experiment e where 
-                    i.id = e.instr_id and i.name = %s and e.name = %s"""
-                cursor = regdb_conn.cursor()
-                cursor.execute( q, (instr, exper) )
-                ids = [ row[0] for row in cursor.fetchall() ]
-                if not ids:
-                    self.warning('Unknown experiment: %s %s', instr, exper)
-                    continue
-                if len(ids) > 1:
-                    self.warning('More than one matching experiment: %s %s', instr, exper)
-                    continue
-                expid = ids[0]
-
-                # get the list of runs from existing requests 
-                q = """select run_number from fileset where instrument = %s and experiment = %s"""
-                cursor = icdb_conn.cursor()
-                cursor.execute( q, (instr, exper) )
-                old_runs = set([ row[0] for row in cursor.fetchall() ])
-                self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
-
-                # get the list of all finished runs from logbook
-                q = """select num from run where exper_id = %s and end_time is not NULL"""
-                cursor = logbook_conn.cursor()
-                cursor.execute( q, (expid,) )
-                all_runs = set([ row[0] for row in cursor.fetchall() ])
-                self.trace('found %d finished runs: %s %s', len(all_runs), instr, exper)
-
-                # runs that have not been requested yet
-                new_runs = all_runs - old_runs
-                for run in new_runs :
-                    
-                    q = """select stream, chunk from file where exper_id = %s and run = %s"""
-                    cursor = regdb_conn.cursor()
-                    cursor.execute( q, (expid, run) )
-                    files = [ tuple(row) for row in cursor.fetchall() ]
-                    if not files:
-                        self.trace('No files for %s %s %d', instr, exper, run)
-                        continue
-
-                    # build the file names
-                    paths = []
-                    for stream, chunk in files :
-                        path = "/reg/d/psdm/%s/%s/xtc/e%d-r%04d-s%02d-c%02d.xtc" % \
-                            (instr, exper, expid, run, stream, chunk)
-                        paths.append(path)
-
-                    # check that all files exists
-                    all_files = True
-                    for path in paths:
-                        if not os.path.exists(path) : 
-                            self.trace('No file %s', path)
-                            all_files = False
-                            break
-                        else :
-                            self.debug('Found file %s', path)
-
-                    if all_files:
-
-                        # guess priority from the option value
-                        prio = options.get('priority', 0)
-                        if prio == 'run' :
-                            prio = run
-                        elif prio == 'invrun' :
-                            prio = 10000-run
-                        else :
-                            try :
-                                prio = int(prio)
-                            except:
-                                prio = 0
-                        
-                        # submit a request
-                        try:
-                            icdb.new_fileset(instr, exper, run, 'DATA', paths, priority=prio)
-                            self.info('Submitted %s %s %d', instr, exper, run)
-                        except Exception, ex:
-                            self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
-                            continue
-                            
-                        
-
-    def _readConfig(self):
-        """ Read config file and parse it. Every line in config file
-        must contain instrument name, experiment name, and possibly
-        empty list of options. Options have format 'option' or 'option=value'.
-        """            
-        
-        fname = self._options.config
-        try :
-            file = open(fname)
-        except Exception, ex:
-            self.warning('cannot open config file %s: %s', fname, ex)
-            return None
-        
-        config = []
-        try :
-            for linenum, line in enumerate(file):
+                # list of experiments with AUTO flag set
+                auto_exp = set()
                 
-                # skip empty lines and comments
-                line = line.strip()
-                if not line: continue
-                if line[0] == '#' : continue
+                for exp_dict in self.regdb.get_experiments(instr):
+    
+                    exper = exp_dict['name']
+                    expid = exp_dict['id']
+    
+                    # check AUTO flag
+                    auto = self.regdb.get_experiment_param(instr, exper, 'AUTO_TRANSLATE_HDF5')
+                    if auto is None: continue                    
+                    auto_exp.add(exper)
+    
+                    self.info('processing experiment: %s %s', instr, exper)
 
-                # must have at least two words, first word is instrument name
-                words = line.split()
-                if len(words) < 2 or len(words[0]) != 3:
-                    self.error('%s:%d invalid format', fname, linenum)
-                    return None
-
-                instr = words[0].upper()
-                exper = words[1]
-                options = {}
-                for w in words[2:]:
-                    option = w.split('=',1)+[None]
-                    options[option[0]] = option[1]
-
-                config.append((instr, exper, options))
-
-        except Exception, ex:
-            self.warning('error reading config file %s: %s', fname, ex)
-            return None
-            
-        return config
+                    # process a single experiment
+                    self._processExperiment(instr, exper, expid)
+    
+    
+                if auto_exp:
+                    
+                    # get the list of N latest experiments
+                    lastN = set(e[0] for e in self.regdb.last_experiment_switch(instr, self.n_old))
         
+                    # reset AUTO flag for older experiments
+                    for exper in auto_exp - lastN:
+                        self.info('cleaning AUTO flag for %s %s', instr, exper)
+                        self.regdb.delete_experiment_param(instr, exper, 'AUTO_TRANSLATE_HDF5')
+                    self.regdb.commit()
+        
+
+            # close all database connections
+            del self.icdb
+            del self.regdb
+            del self.icdb_conn
+            del self.regdb_conn
+            del self.logbook_conn
+
+
+    def _processExperiment(self, instr, exper, expid):
+    
+        # get the list of runs from existing requests 
+        old_runs = self._translatedRuns(instr, exper)
+        self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
+    
+        # get the list of all finished runs from logbook
+        all_runs = self._finishedRuns(expid)
+        self.trace('found %d finished runs: %s %s', len(all_runs), instr, exper)
+    
+        # runs that have not been requested yet
+        new_runs = all_runs - old_runs
+        for run in new_runs :
+            
+            # get all files for this run
+            files = self._getFiles(expid, run)
+            if not files:
+                self.trace('No files for %s %s %d', instr, exper, run)
+                continue
+    
+            # build the file names
+            paths = [_xtc_path % locals() for stream, chunk in files]
+    
+            # check that all files exists
+            all_files = True
+            for path in paths:
+                if not os.path.exists(path) : 
+                    self.trace('No file %s', path)
+                    all_files = False
+                    break
+                else :
+                    self.debug('Found file %s', path)
+    
+            if all_files:
+                
+                # submit a request
+                try:
+                    if not self._options.dry_run: self.icdb.new_fileset(instr, exper, run, 'DATA', paths)
+                    self.info('Submitted %s %s %d', instr, exper, run)
+                except Exception, ex:
+                    self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
+                    continue
+
+
+    def _getFiles(self, expid, run):
+        """
+        Get the list of liles for given experiment id and run.
+        returns list of tuples (stream, chunk). 
+        """
+        
+        cursor = self.regdb_conn.cursor()
+        cursor.execute("select stream, chunk from file where exper_id = %s and run = %s", (expid, run))
+        return map(tuple, cursor.fetchall())
+
+    def _translatedRuns(self, instr, exper):
+        """
+        Get the set of runs which are in translator already (translated or 
+        being translated). Returns set of integer numbers
+        """ 
+        q = """select run_number from fileset where instrument = %s and experiment = %s"""
+        cursor = self.icdb_conn.cursor()
+        cursor.execute( q, (instr, exper) )
+        return set(row[0] for row in cursor.fetchall())
+
+    def _finishedRuns(self, expid):
+        """
+        Get the set of runs which have finished. Returns set of integer numbers
+        """ 
+        q = """select num from run where exper_id = %s and end_time is not NULL"""
+        cursor = self.logbook_conn.cursor()
+        cursor.execute( q, (expid,) )
+        return set(row[0] for row in cursor.fetchall())
+
 #
 #  run application when imported as a main module
 #

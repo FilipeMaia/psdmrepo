@@ -10,6 +10,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-12
+2012-02-27 Andy Salnikov
+- changed ic-auto-translate to use regdb for AUTO flag instead of config file
+- regDb interface changed, needs update in TranslatorJob
+
 Tag: V01-00-11
 2011-12-11 Andy Salnikov
 - fix formatting of shutil.Error exceptions

@@ -555,7 +555,7 @@ class TranslatorJob(object) :
             try:
                 regdb = RegDb(DbConnection(conn_string=conn_str))
                 exp = regdb.last_experiment_switch(self._fs.instrument)
-                if exp and exp[0] == self._fs.experiment:
+                if exp and exp[0][0] == self._fs.experiment:
                     self.trace("use high-priority queue for active experiment %s", self._fs.experiment)
                     queue_param = 'lsf-queue-active'
             except Exception, ex:
