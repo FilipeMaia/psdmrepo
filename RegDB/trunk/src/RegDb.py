@@ -80,10 +80,41 @@ class RegDb ( object ) :
         self._conn.cursor().execute( 'COMMIT' )
 
 
+    # ===================
+    # Get instrument list
+    # ===================
+    def get_instruments(self):
+        """
+        Get a list of currently defined instruments. Returns a list of tuples
+        (instr_id, instr_name, descr). 
+        """
+        
+        cursor = self._conn.cursor()
+        cursor.execute("SELECT i.id, i.name, i.descr FROM instrument i ORDER BY i.id")
+        
+        return map(tuple, cursor.fetchall())
+
+
+    # ===================
+    # Get experiment list
+    # ===================
+    def get_experiments(self, instr):
+        """
+        Get a list of currently defined experiments for given instrument name. Returns
+        the list of dictionaries, elements will have the same structure as dictionary
+        return by find_experiment_by_id()
+        """
+        
+        cursor = self._conn.cursor( True )
+        q = """SELECT i.name AS instr_name, i.descr AS instr_descr, e.* FROM experiment e, instrument i WHERE i.name=%s AND e.instr_id=i.id"""
+        cursor.execute(q,  (instr,))
+        
+        return map(dict, cursor.fetchall())
+
+
     # =================================
     # Find experiment by its identifier
     # =================================
-
     def find_experiment_by_id(self, id):
         """
         Find experiment by its identifier. Return none or False if no such experiment
@@ -120,6 +151,9 @@ class RegDb ( object ) :
         return row
 
 
+    # ===========================
+    # Find experiment by its name
+    # ===========================
     def find_experiment_by_name(self, instrName, expName):
         """
         Find experiment by its name (plus instrument name). Returns
@@ -146,23 +180,112 @@ class RegDb ( object ) :
         return row
 
 
-    def last_experiment_switch(self, instr):
-        """Get the latest experiment for the given instrument name,
-        returns tuple (expName, time, user), time is LusiTime.Time object,
-        user is user name who requested switch. Returns None if cannot find
-        information for given instrument name."""
+    # ======================
+    # Get latest experiments
+    # ======================
+    def last_experiment_switch(self, instr, limit=1):
+        """Get one or few latest experiments for the given instrument name,
+        returns list of tuples (expName, time, user), time is LusiTime.Time object,
+        user is user name who requested switch. Returns empty list if cannot find
+        information for given instrument name. Returned list is ordered by time, 
+        latest entries come first."""
 
         cursor = self._conn.cursor()
         q = """SELECT e.name, sw.switch_time, sw.requestor_uid 
             FROM expswitch sw, experiment e, instrument i
             WHERE sw.exper_id = e.id AND e.instr_id = i.id AND i.name=%s
-            ORDER BY sw.switch_time DESC LIMIT 1"""
-        cursor.execute(q, (instr,))
-        
-        rows = cursor.fetchall()
-        if not rows: return None
+            ORDER BY sw.switch_time DESC LIMIT %s"""
+        cursor.execute(q, (instr, limit))
 
-        name, time, user = rows[0]
-        time = Time.from64(time);
+        return map(lambda x: (x[0], Time.from64(x[1]), x[2]), cursor.fetchall())
+
+
+    # =========================
+    # Get experiment parameters
+    # =========================
+    def get_experiment_param(self, instr, exper, param=None):
+        """
+        Returns experiment parameters defined in database. It takes instrument name,
+        experiment name, and optional parameter name. If parameter name is not 
+        specified or is None the it returns the list of all parameters, returned value 
+        in this case list of tuples (param_name, param_value, description). If parameter 
+        name is not None then it returns a value of that parameter or None if parameter
+        does not exist. Parameter value in all cases is string (possibly empty).
+        """
+        
+        cursor = self._conn.cursor()
+        if param:
             
-        return (name, time, user)
+            # parameter name is specified, find that param only
+            q = """SELECT p.val FROM experiment_param p, experiment e, instrument i
+                WHERE p.exper_id = e.id AND e.instr_id = i.id 
+                AND i.name=%s AND e.name=%s AND p.param=%s"""
+            cursor.execute(q, (instr, exper, param))
+
+            rows = cursor.fetchall()
+            if not rows: return None
+            return rows[0][0]
+        
+        else:
+            
+            # get all parameters
+            q = """SELECT p.param, p.val, p.descr 
+                FROM experiment_param p, experiment e, instrument i
+                WHERE p.exper_id = e.id AND e.instr_id = i.id AND i.name=%s AND e.name=%s"""
+            cursor.execute(q, (instr, exper))
+            
+            return map(tuple, cursor.fetchall())
+
+    # =========================
+    # Set experiment parameters
+    # =========================
+    def set_experiment_param(self, instr, exper, param, value):
+        """
+        Change experiment parameters defined in database. It takes instrument name,
+        experiment name, parameter name and new parameter value which must be a string.
+        """
+        
+        cursor = self._conn.cursor()
+        
+        # find experiment id
+        q = """SELECT e.id FROM experiment e, instrument i WHERE e.instr_id = i.id AND i.name=%s AND e.name=%s"""
+        cursor.execute(q, (instr, exper))
+        rows = cursor.fetchall()
+        if not rows: 
+            raise ValueError("unknown instrument or experiment name: %s/%s" % (instr, exper))
+        exper_id = rows[0][0]
+
+        # try to get its value and lock it if it's there
+        q = """SELECT p.val FROM experiment_param p WHERE p.exper_id = %s AND p.param=%s FOR UPDATE"""
+        cursor.execute(q, (exper_id, param))
+
+        rows = cursor.fetchall()
+        if not rows: 
+
+            # need to make new parameter
+            q = """INSERT INTO experiment_param (exper_id, param, val, descr) VALUES (%s, %s, %s, '')"""
+            cursor.execute(q, (exper_id, param, value))
+
+        else:
+            
+            # update existing parameter            
+            q = """UPDATE experiment_param p SET val=%s WHERE p.exper_id=%s AND p.param=%s"""
+            cursor.execute(q, (value, exper_id, param))
+
+        
+    # ===========================
+    # Delete experiment parameter
+    # ===========================
+    def delete_experiment_param(self, instr, exper, param):
+        """
+        Delete specified experiment parameter
+        """
+
+        cursor = self._conn.cursor()
+
+        # remove matching row
+        q = """DELETE FROM experiment_param
+            WHERE exper_id=(SELECT e.id FROM experiment e, instrument i WHERE e.instr_id = i.id AND i.name=%s AND e.name=%s)
+            AND param=%s"""
+        cursor.execute(q, (instr, exper, param))
+        
