@@ -1,12 +1,12 @@
-#ifndef CSPAD_MOD_CSPADPEDESTALS_H
-#define CSPAD_MOD_CSPADPEDESTALS_H
+#ifndef CSPAD_MOD_CSPAD2X2PEDESTALS_H
+#define CSPAD_MOD_CSPAD2X2PEDESTALS_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadPedestals.
+//	Class CsPad2x2Pedestals.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad2x2.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,7 +35,7 @@
 namespace cspad_mod {
 
 /**
- *  @brief Psana module which calculates pedestals from dark CsPad run.
+ *  @brief Psana module which calculates 2x2 pedestals from dark CsPad2x2 run.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -45,19 +45,18 @@ namespace cspad_mod {
  *  @author Andy Salnikov
  */
 
-class CsPadPedestals : public Module {
+class CsPad2x2Pedestals : public Module {
 public:
 
-  enum { MaxQuads = Psana::CsPad::MaxQuadsPerSensor };
-  enum { MaxSectors = Psana::CsPad::SectorsPerQuad };
-  enum { NumColumns = Psana::CsPad::ColumnsPerASIC };
-  enum { NumRows = Psana::CsPad::MaxRowsPerASIC*2 };
+  enum { MaxSectors = Psana::CsPad2x2::SectorsPerQuad };
+  enum { NumColumns = Psana::CsPad2x2::ColumnsPerASIC };
+  enum { NumRows = Psana::CsPad2x2::MaxRowsPerASIC*2 };
   
   // Default constructor
-  CsPadPedestals (const std::string& name) ;
+  CsPad2x2Pedestals (const std::string& name) ;
 
   // Destructor
-  virtual ~CsPadPedestals () ;
+  virtual ~CsPad2x2Pedestals () ;
 
   /// Method which is called at the beginning of the run
   virtual void beginRun(Event& evt, Env& env);
@@ -72,7 +71,7 @@ public:
 protected:
 
   /// collect statistics
-  void collectStat(unsigned qNum, const int16_t* data);
+  void collectStat(const int16_t* data);
   
 private:
 
@@ -81,14 +80,12 @@ private:
   
   Pds::Src m_src; // source address of the data object
   
-  unsigned m_segMask[MaxQuads];  // segment masks per quadrant
-  
   unsigned long m_count;  // number of events seen
-  double m_sum[MaxQuads][MaxSectors][NumColumns][NumRows];   // sum per pixel
-  double m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
-
+  double m_sum[NumColumns][NumRows][MaxSectors];   // sum per pixel
+  double m_sum2[NumColumns][NumRows][MaxSectors];  // sum of squares per pixel
+  
 };
 
 } // namespace cspad_mod
 
-#endif // CSPAD_MOD_CSPADPEDESTALS_H
+#endif // CSPAD_MOD_CSPAD2X2PEDESTALS_H

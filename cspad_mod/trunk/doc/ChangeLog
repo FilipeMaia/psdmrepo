@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2012-02-28 Andy Salnikov
+- CsPadPedestals did not always work for cspad2x2 data
+- split CsPadPedestals module into two, one for regular cspad, one for cspad2x2
+
 Tag: V00-04-00
 2012-02-08 Andy Salnikov
 - 2x2 calibrations now live in separate directory, fix calibration
