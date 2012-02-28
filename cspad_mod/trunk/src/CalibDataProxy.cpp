@@ -45,8 +45,8 @@ namespace {
   {
     if (src.level() == Pds::Level::Source) {
       const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src);
-      if (info.device() == Pds::DetInfo::Cspad2x2) return "CsPad2x2::ConfigV1";
-      if (info.device() == Pds::DetInfo::Cspad) return "CsPad::ConfigV1";
+      if (info.device() == Pds::DetInfo::Cspad2x2) return "CsPad2x2::CalibV1";
+      if (info.device() == Pds::DetInfo::Cspad) return "CsPad::CalibV1";
     }
     return std::string();
   }

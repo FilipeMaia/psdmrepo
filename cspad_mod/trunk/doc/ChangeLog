@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2012-02-28 Andy Salnikov
+- calibration "class name" was incorrect (ConfigV1 instead of CalibV1)
+  so calibrations were not found.
+
 Tag: V00-05-00
 2012-02-28 Andy Salnikov
 - CsPadPedestals did not always work for cspad2x2 data
