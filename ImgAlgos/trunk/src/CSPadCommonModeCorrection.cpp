@@ -29,6 +29,9 @@
 //#include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/cspad2x2.ddl.h"
 
+#include "cspad_mod/DataT.h"
+#include "cspad_mod/ElementT.h"
+
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -66,7 +69,7 @@ CSPadCommonModeCorrection::CSPadCommonModeCorrection (const std::string& name)
   // get the values from configuration or use defaults
   m_str_src    = configStr("source", "DetInfo(:Cspad)"); // "DetInfo()", "CxiDs1.0:Cspad.0", "CxiSc1.0:Cspad2x2.0"
   m_inkey      = configStr("inputKey", "calibrated");
-  m_outkey     = configStr("outputKey", "");
+  m_outkey     = configStr("outputKey", "cm_subtracted");
   m_maxEvents  = config   ("events", 20U); // 1<<31U
   m_ampThr     = config   ("ampthr", 30);
   m_filter     = config   ("filter", false);
@@ -174,10 +177,9 @@ CSPadCommonModeCorrection::event(Event& evt, Env& env)
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
   //-------------------- Time
 
-
   // loop over all objects in event and find CsPad stuff
   const std::list<PSEvt::EventKey>& keys = evt.keys();
-  for (std::list<PSEvt::EventKey>::const_iterator it = keys.begin(); it != keys.end(); ++ it) {
+  for  (std::list<PSEvt::EventKey>::const_iterator it = keys.begin(); it != keys.end(); ++ it) {
 
     const PSEvt::EventKey& key = *it;
 
@@ -189,46 +191,62 @@ CSPadCommonModeCorrection::event(Event& evt, Env& env)
 
   //-------------------- Time
   status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-  cout << "  Event: " << m_count 
-       << "  Time to process one event is " 
-       << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-       << " sec" << endl;
+  double dt = stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec);
+  std::stringstream s; s.setf(ios_base::fixed); s.width(6); s.fill(' '); s << m_count; // int -> fixed format string
+  MsgLog(name(), debug, "Event: " << s.str() << "  Time to process one event is " << dt << " sec");
   //-------------------- Time
-
 }
 
 /// A part of the event method
 void 
 CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std::string& key)
 {
+  // For DataV1, CsPad::ElementV1
+
     shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src, key, &m_actualSrc);
     if (data1.get()) {
   
       ++ m_count;
       
+      shared_ptr<cspad_mod::DataV1> newobj(new cspad_mod::DataV1());
+
       int nQuads = data1->quads_shape()[0];
       for (int iq = 0; iq != nQuads; ++ iq) {
         
         const CsPad::ElementV1& quad = data1->quads(iq); // get quad object
-        // process event for this quad
-        const ndarray<int16_t, 3>& data = quad.data();
-        processQuad(quad.quad(), data.data());
+        const ndarray<int16_t, 3>& data = quad.data();   // process event for this quad
+
+        int16_t* corrdata = new int16_t[data.size()];    // allocate memory for corrected quad-array
+        float common_mode[8];                            // should be supplied for all 8 sections
+        processQuad(quad.quad(), data.data(), corrdata, common_mode);
+
+        newobj->append(new cspad_mod::ElementV1(quad, corrdata, common_mode));
       }      
+      evt.put<Psana::CsPad::DataV1>(newobj, m_actualSrc, m_outkey);
     }
+
+  // For DataV2, CsPad::ElementV2
 
     shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, key, &m_actualSrc);
     if (data2.get()) {
   
       ++ m_count;
       
+      shared_ptr<cspad_mod::DataV2> newobj(new cspad_mod::DataV2());
+
       int nQuads = data2->quads_shape()[0];
       for (int iq = 0; iq != nQuads; ++ iq) {
         
         const CsPad::ElementV2& quad = data2->quads(iq); // get quad object  
-        // process event for this quad
-        const ndarray<int16_t, 3>& data = quad.data();
-        processQuad(quad.quad(), data.data());
+        const ndarray<int16_t, 3>& data = quad.data();   // process event for this quad
+
+        int16_t* corrdata = new int16_t[data.size()];    // allocate memory for corrected quad-array
+        float common_mode[8];                            // should be supplied for all 8 sections
+        processQuad(quad.quad(), data.data(), corrdata, common_mode);
+
+        newobj->append(new cspad_mod::ElementV2(quad, corrdata, common_mode));
       }
+      evt.put<Psana::CsPad::DataV2>(newobj, m_actualSrc, m_outkey);
     }
 }
   
@@ -252,7 +270,7 @@ CSPadCommonModeCorrection::endJob(Event& evt, Env& env)
 
 /// process event for quad
 void 
-CSPadCommonModeCorrection::processQuad(unsigned qNum, const int16_t* data)
+CSPadCommonModeCorrection::processQuad(unsigned qNum, const int16_t* data, int16_t* corrdata, float* common_mode)
 {
   // loop over segments
   int seg = 0;
@@ -271,9 +289,10 @@ CSPadCommonModeCorrection::processQuad(unsigned qNum, const int16_t* data)
           ++ npix;
       }                
 
-      int16_t average = (npix>0) ? int16_t(sum/npix) : 0 ;
-      //MsgLog(name(), info, "   sect: " << sect << "  sum = " << sum  << "  npix = " << npix << "  average = " << average  );          
-      int16_t* corrData = &m_data_corr[qNum][0][0][0] + seg*SectorSize;
+      common_mode[sect] = (npix>0) ? float(sum/npix) : 0;
+      int16_t average  = int16_t(common_mode[seg]);
+
+      int16_t* corrData = corrdata + seg*SectorSize;
 
       // Apply the common mode correction
       for (int i = 0; i < SectorSize; ++ i) { 
@@ -282,6 +301,7 @@ CSPadCommonModeCorrection::processQuad(unsigned qNum, const int16_t* data)
       ++seg;
     }
   }
+  //cout << "Common modes for q:" << qNum; for(int i=0;i<8;i++){ cout << "   " << common_mode[i]; } cout << endl;
 }
 
 } // namespace ImgAlgos

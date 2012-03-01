@@ -91,7 +91,7 @@ public:
 protected:
   /// A part of the event method
   void getAndProcessDataset(Event& evt, Env& env, const std::string& key);
-  void processQuad(unsigned qNum, const int16_t* data);
+  void processQuad(unsigned qNum, const int16_t* data, int16_t* corrdata, float* common_mode);
 
 private:
 
@@ -110,8 +110,8 @@ private:
 
   unsigned    m_segMask[MaxQuads];  // segment masks per quadrant
   long        m_count;
-  int16_t     m_data_corr[MaxQuads][MaxSectors][NumColumns][NumRows];
   int16_t     m_average;
+  //int16_t     m_data_corr[MaxQuads][MaxSectors][NumColumns][NumRows];
 };
 
 } // namespace ImgAlgos
