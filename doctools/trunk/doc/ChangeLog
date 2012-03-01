@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2012-02-29 Andy Salnikov
+- pydoc-driver: add autoclass option to add __init__ docstring to
+  class docstring
+
 Tag: V00-00-09
 2012-02-09 Andy Salnikov
 - filter non-existing packages in doxy-driver, makes it easier to 
