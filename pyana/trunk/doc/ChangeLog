@@ -11,6 +11,20 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-40
+2012-02-29 Andy Salnikov
+- event.Env class has new methods experiment(), instrument(), calibDir()
+- implementation of experiment() and instrument() is similar to psana and
+  uses the same database file, but is done in Python
+- by default experiment and instrument names are guessed from xtc file 
+  names but can be specified on command line or config file
+- calibDir has sensible default value but can be changed from command
+  line of config file as well
+- new package calib with one class CalibFileFinder, very similar to
+  C++ class PSCalib/CalibFileFinder. Use it to find name of the calibration 
+  file for current run.
+- some changes in xtc_output and pyana to pass skipped events to xtc_output
+
 Tag: V00-00-39
 2012-02-24 Andy Salnikov
 - adding xtc_ouput module, the modu;le which writes datagrams

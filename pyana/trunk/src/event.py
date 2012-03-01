@@ -13,7 +13,9 @@ import logging
 import numpy
 import os
 import tempfile
+from string import Template
 
+import pyana
 from pyana.histo import HistoMgr
 from pypdsdata import xtc
 from pypdsdata import epics
@@ -96,6 +98,13 @@ class Event(object):
     about event, such as event time, run number, damage mask, etc. 
     """
     
+    # Set of constants specifying event processing status
+    Normal = 0
+    Skip = 1
+    Stop = 2
+    Terminate = 3
+    
+
     def __init__( self, dg, run = None, expNum = None, env = None ):
         
         self.m_dg = dg
@@ -103,6 +112,7 @@ class Event(object):
         self.m_expNum = expNum
         self.m_env = env
         self.m_userData = {}
+        self.m_status = Event.Normal
         
         # set of wrapper methods
         self.m_wrappers = {
@@ -495,6 +505,22 @@ class Event(object):
         
         self.m_userData[key] = data
 
+    def status(self):
+        """
+        Returns processing status for this event, value returned would be one of 
+        Event.Normal, Event.Skip, Event.Stop, or Event.Terminate.
+        
+        Regular modules should not need to check status, only special kind of modules 
+        like output modules may be interested in the status value.
+        """
+        return self.m_status
+
+    def setStatus(self, status):
+        """
+        Sets processing status for this event, status value should be one of 
+        Event.Normal, Event.Skip, Event.Stop, or Event.Terminate.
+        """
+        self.m_status = status
 
     #
     # Private methods not to be used by clients directly
@@ -649,13 +675,15 @@ class Env(object):
     job options, histogram manager, etc.
     """
     
-    def __init__ (self, jobName="pyana", hmgr=None, subproc=-1 ):
+    def __init__ (self, jobName="pyana", hmgr=None, subproc=-1, calibDir="", expNameProvider=None):
         """If subproc is negative it means main process, non-negative
         would mean subprocess"""
         
         self.m_jobName = jobName
         self.m_hmgr = hmgr
         self.m_subproc = subproc
+        self.m_calibDir = Template(calibDir)
+        self.m_expNameProvider = expNameProvider
         
         self.m_epics = EpicsStore()
 
@@ -690,6 +718,32 @@ class Env(object):
             return self.m_jobName
         else :
             return "%s-%d" % (self.m_jobName, self.m_subproc)
+    
+    def instrument(self):
+        """
+        self.instrument() -> string
+        
+        Returns instrument name, or empty string if name is not known
+        """
+        if self.m_expNameProvider: return self.m_expNameProvider.instrument()
+        return ""
+    
+    def experiment(self):
+        """
+        self.experiment() -> string
+        
+        Returns experiment name, or empty string if name is not known
+        """
+        if self.m_expNameProvider: return self.m_expNameProvider.experiment()
+        return ""
+    
+    def calibDir(self):
+        """
+        self.calibDir() -> string
+        
+        Returns name of the calibration directory for current experiment.
+        """
+        return self.m_calibDir.substitute(instrument=self.instrument(), experiment=self.experiment())
     
     def hmgr(self):
         """ self.hmgr() -> pyana.histo.HistoMgr

@@ -125,15 +125,28 @@ class evt_dispatch(object) :
         elif svc == xtc.TransitionId.L1Accept :
             
             for userana in self.userObjects :
-                code = userana.event( evt, env )
-                if code == pyana.Skip:
-                    # skip the rest of the modules 
-                    _log.debug("User module %s requested event skip", userana.__modname__)
-                    break
-                if code in [pyana.Stop, pyana.Terminate]:
-                    # return it to caller 
-                    return code
                 
+                # When in Skip/Stop state here, will only call the modules
+                # which specifically request it
+                if evt.status() == pyana.Normal or getattr(userana, 'pyana_get_all_events', False):
+                    
+                    # call user module
+                    code = userana.event( evt, env )
+                    
+                    if code == pyana.Terminate:
+                        # will stop immediately
+                        _log.warning("User module %s requested termination", userana.__modname__)
+                        evt.setStatus(code)
+                        return                    
+                    elif code == pyana.Skip:
+                        # skip the rest of the modules 
+                        _log.debug("User module %s requested event skip", userana.__modname__)
+                        if evt.status() == pyana.Normal: evt.setStatus(code)
+                    elif code == pyana.Stop:
+                        # skip the rest of the modules 
+                        _log.info("User module %s requested stop", userana.__modname__)
+                        evt.setStatus(code)
+
 
     def finish(self, evt, env):
         

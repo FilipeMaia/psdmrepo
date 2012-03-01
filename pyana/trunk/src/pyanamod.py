@@ -51,6 +51,7 @@ from pyana.userana import mod_import, evt_dispatch
 from pyana.mp_proto import *
 from pyana.config import config
 from pyana.merger import merger
+from pyana.expname import *
 
 #----------------------------------
 # Local non-exported definitions --
@@ -65,7 +66,7 @@ def _rusage(msg, ru1, ru2):
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
 
-def _proc(jobname, id, pipes, userObjects, jobConfig):
+def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
     """ method which is running in child process when we do multi-processing """
 
     for i in range(len(pipes)):
@@ -82,7 +83,8 @@ def _proc(jobname, id, pipes, userObjects, jobConfig):
     ru1 = getrusage(RUSAGE_SELF)
     
     # create own environment, make unique job name
-    env = event.Env(jobname, subproc=id)
+    calibDir = jobConfig.getJobConfig("calib-dir", "/reg/d/psdm/$instrument/$experiment/calib")
+    env = event.Env(jobname, subproc=id, calibDir=calibDir, expNameProvider=expNameProvider)
 
     logging.info("proc-%s: starting job %s", id, jobname)
 
@@ -111,8 +113,8 @@ def _proc(jobname, id, pipes, userObjects, jobConfig):
             env.m_epics.m_name2epics = epics_data
     
             # process all data
-            code = dispatch.dispatch(evt, env)
-            if code is not None:
+            dispatch.dispatch(evt, env)
+            if evt.status() != pyana_.Normal:
                 logging.warning("event loop termination is not supported in multi-process mode")
 
             if evt.seq().service() == xtc.TransitionId.L1Accept : nevent += 1
@@ -194,6 +196,13 @@ def _pyana ( argv ) :
         # not all modules imported 
         return 2
 
+    # instantiate experiment name provider
+    if jobConfig.getJobConfig("experiment"):
+        expNameProvider = ExpNameFromConfig(jobConfig.getJobConfig("experiment"))
+    else:
+        expNameProvider = ExpNameFromXtc(names)
+    calibDir = jobConfig.getJobConfig("calib-dir", "/reg/d/psdm/$instrument/$experiment/calib")
+
     # start worker process if requested
     num_cpu = jobConfig.getJobConfig('num-cpu', 1)
     logging.info("num-cpu: %s", num_cpu)
@@ -202,16 +211,16 @@ def _pyana ( argv ) :
     logging.info("dg-ref: %s", dg_ref)
 
     conns = [ mp.Pipe() for i in range(nsub)]
-    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, jobConfig)) for i in range(nsub)]
+    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, jobConfig, expNameProvider)) for i in range(nsub)]
     for p in procs : p.start()
     for conn in conns : conn[1].close()
     pipes = [mp_proto(conn[0], dg_ref, 'prot-main') for conn in conns]
 
     status = 0
     try :
-    
+
         # create environment
-        env = event.Env(jobname)
+        env = event.Env(jobname, calibDir=calibDir, expNameProvider=expNameProvider)
     
         dispatch = evt_dispatch(userObjects)
         num_events = jobConfig.getJobConfig('num-events')
@@ -281,14 +290,12 @@ def _pyana ( argv ) :
             else :
                 
                 # process all data
-                code = dispatch.dispatch(evt, env)
-                if code == pyana_.Terminate:
+                dispatch.dispatch(evt, env)
+                if evt.status() == pyana_.Terminate:
                     # stop right here, return some strange error code
-                    logging.warning("terminating by user request")
                     return 12
-                if code == pyana_.Stop:
+                if evt.status() == pyana_.Stop:
                     # stop event loop
-                    logging.info("event loop stopped by user request")
                     break
                     
                 

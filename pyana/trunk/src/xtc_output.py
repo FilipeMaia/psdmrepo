@@ -35,6 +35,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import pyana
 from pypdsdata import xtc
 
 #----------------------------------
@@ -49,6 +50,9 @@ _defFileNameFmt = "e%(expNum)d-r%(run)04d-s%(stream)02d-c%(chunk)02d-filtered.xt
 class xtc_output (object) :
     """Class which implements output module for XTC datagrams."""
 
+    # special member which forces pyana to pass all events to this module
+    # even those that are skipped. 
+    pyana_get_all_events = True
 
     #----------------
     #  Constructor --
@@ -108,7 +112,11 @@ class xtc_output (object) :
     def event( self, evt, env ) :
 
         # send current datagram to file 
-        self._saveDg(evt.m_dg, "event", xtc.TransitionId.L1Accept)
+        if evt.status() == pyana.Normal:
+            self._saveDg(evt.m_dg, "event", xtc.TransitionId.L1Accept)
+        else:
+            logging.info( "xtc_output.event(): skipping event" )
+            
 
     def endcalibcycle( self, evt, env ) :
 
@@ -155,6 +163,10 @@ class xtc_output (object) :
         If type is different from expected then datagram is not written and warning 
         message is produced
         """
+        
+        if dg is None:
+            logging.warning("xtc_output.%s: no datagram provided", method)
+            return
         
         # check that datagram has correct transition type
         if dg.seq.service() != type:

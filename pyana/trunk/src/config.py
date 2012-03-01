@@ -67,6 +67,8 @@ _options = {
     'job-name'   : ( 'job_name',   _unity),
     'num-cpu'    : ( 'num_cpu',    int),
     'dg-ref'     : ( 'dg_ref',     _str2bool),
+    'experiment' : ( 'experiment', _unity),
+    'calib-dir'  : ( 'calib_dir', _unity),
     'gc-threshod': ( 'gc_threshod', int),
     'gc-debug'   : ( 'gc_debug',   _str2bool),
 }
@@ -83,6 +85,8 @@ _cmdoptions = [
     make_option( '-m', "--module", metavar="NAME", action="append", help="user module name, multiple modules allowed" ),
     make_option( '-p', "--num-cpu", metavar="NUMBER", type="int", help="number grater than 1 enables multi-processing" ),
     make_option( '-r', "--dg-ref", action="store_true",help="pass datagrams by-reference to children processes" ),
+    make_option( '-e', "--experiment", metavar="STRING", help="experiment name, format: XPP:xpp12311 or xpp12311, default is deduced from file name(s)" ),
+    make_option( '-b', "--calib-dir", metavar="STRING", help="calibration directory name, may include $experiment and $instrument" ),
     make_option( '-g', "--gc-threshod", metavar="NUMBER", type="int", help="threshold in MB for running garbage collector, use 0 to disable; def: 10" ),
     make_option( '-G', "--gc-debug", action="store_true",help="debug garbage collection" ),
 ]
