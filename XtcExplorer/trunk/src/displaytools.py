@@ -14,50 +14,103 @@ class DataDisplay(object):
 
     def show_ipimb(self, datalist ):
 
-        fig = plt.figure(200, figsize=(14,10))
-        plt.clf()
-        
-        if self.ipimb_disp is None: 
+        if len(datalist)==1:
+            self.show_ipimb_single(datalist)
+
+        elif len(datalist)==2:
+            self.show_ipimb_double(datalist)
+
+        else:
+            self.show_ipimb_multiple(datalist)
             
-            for ipimb in datalist:
-                #ipimb.show()
 
-                plt.suptitle(ipimb.name)
+    def show_ipimb_double(self,datalist):
 
-                ax1 = fig.add_subplot(221)
-                for ch in range (4):
-                    ax1.plot(ipimb.fex_channels[:,ch],label="Channel %d"%ch)
-                ax1.set_xlabel("event count")
-                ax1.set_ylabel("Intensity [V]")
-                ax1.set_title("Capacitor settings: %s"%ipimb.gain_settings)
-                ax1.legend()
-                
-                ax2 = ImageGrid(fig,222,
-                                nrows_ncols = (1,2),
-                                axes_pad = 1.0,
-                                add_all = True,
-                                label_mode = "all",
-                                aspect = False,
-                                )                                
-                ax2[0].plot(ipimb.fex_channels[:,0],ipimb.fex_channels[:,1],'o')
-                ax2[1].plot(ipimb.fex_channels[:,2],ipimb.fex_channels[:,3],'o')
-                ax2[0].set_xlabel("Ch0 [V]")
-                ax2[0].set_ylabel("Ch1 [V]")
-                ax2[1].set_xlabel("Ch2 [V]")
-                ax2[1].set_ylabel("Ch3 [V]")
-                
-                ax3 = fig.add_subplot(223)
-                ax3.plot(ipimb.fex_sum,label="FEX Sum")
-                ax3.set_xlabel("event count")
-                ax3.set_ylabel("Intensity [V]")
-                ax3.legend()
-                
-                ax4 = fig.add_subplot(224)
-                n,bins,patches = ax4.hist(ipimb.fex_sum, 100, histtype='stepfilled', color='b', label='Fex Sum')
-                ax4.set_xlabel("Sum of channels [V]")
-                ax4.set_ylabel("#Events")
-                
+        if self.ipimb_disp is None:
+            self.ipimb_disp = plt.figure(200, figsize=(14,10))
+            
+        fig = self.ipimb_disp
+        plt.clf()
+
+
+        ax1 = fig.add_subplot(221)
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(223)
+        ax4 = fig.add_subplot(224)
+
+        arrays = []
+        titles = []
+        for ipimb in datalist:
+            titles.append(ipimb.name)
+            ax1.plot(ipimb.fex_sum,label=ipimb.name )
+            arrays.append(ipimb.fex_sum)
+            
+        ax2.scatter(arrays[1], arrays[0], label="FEX Sum")
+        
+        n,bins,patches = ax3.hist(arrays[0], 100, histtype='stepfilled', color='b', label='Fex Sum')
+        n,bins,patches = ax4.hist(arrays[1], 100, histtype='stepfilled', color='b', label='Fex Sum')
+
+        plt.suptitle(" and ".join(titles))
+
+        ax1.set_xlabel("event count")
+        ax1.set_ylabel("Sum of channels [V]")
+        ax1.legend()                        
+
+        ax2.set_xlabel("%s sum [V]"%titles[0])
+        ax2.set_ylabel("%s sum [V]"%titles[1])
+
+        ax3.set_xlabel("%s sum [V]"%titles[0])
+        ax4.set_xlabel("%s sum [V]"%titles[1])
     
+
+    def show_ipimb_single(self,datalist):
+
+        if self.ipimb_disp is None:
+            self.ipimb_disp = plt.figure(200, figsize=(14,10))
+            
+        fig = self.ipimb_disp
+        plt.clf()
+
+        for ipimb in datalist:
+            #ipimb.show()
+
+            plt.suptitle(ipimb.name)
+            
+            ax1 = fig.add_subplot(221)
+            for ch in range (4):
+                ax1.plot(ipimb.fex_channels[:,ch],label="Channel %d"%ch)
+            ax1.set_xlabel("event count")
+            ax1.set_ylabel("Intensity [V]")
+            ax1.set_title("Capacitor settings: %s"%ipimb.gain_settings)
+            ax1.legend()
+            
+            ax2 = ImageGrid(fig,222,
+                            nrows_ncols = (1,2),
+                            axes_pad = 1.0,
+                            add_all = True,
+                            label_mode = "all",
+                            aspect = False,
+                            )                                
+            ax2[0].plot(ipimb.fex_channels[:,0],ipimb.fex_channels[:,1],'o')
+            ax2[1].plot(ipimb.fex_channels[:,2],ipimb.fex_channels[:,3],'o')
+            ax2[0].set_xlabel("Ch0 [V]")
+            ax2[0].set_ylabel("Ch1 [V]")
+            ax2[1].set_xlabel("Ch2 [V]")
+            ax2[1].set_ylabel("Ch3 [V]")
+                
+            ax3 = fig.add_subplot(223)
+            ax3.plot(ipimb.fex_sum,label="FEX Sum")
+            ax3.set_xlabel("event count")
+            ax3.set_ylabel("Intensity [V]")
+            ax3.legend()
+            
+            ax4 = fig.add_subplot(224)
+            n,bins,patches = ax4.hist(ipimb.fex_sum, 100, histtype='stepfilled', color='b', label='Fex Sum')
+            ax4.set_xlabel("Sum of channels [V]")
+            ax4.set_ylabel("#Events")
+            
+    
+
     def show_image(self, datalist ):
 
         if self.image_disp is None: 

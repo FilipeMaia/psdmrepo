@@ -230,7 +230,11 @@ class  pyana_ipimb ( object ) :
                 data_ipimb.append( self.data[source] )
 
             # give the list to the event object
-            evt.put( data_ipimb, 'data_ipimb' )
+            #event_data_ipimb = evt.get('data_ipimb')
+            #if event_data_ipimb is not None:
+            #    event_data_ipimb.extend( data_ipimb )
+            #    data_ipimb = event_data_ipimb
+            evt.put( data_ipimb, 'data_ipimb')
 
                         
         # --------- Reset -------------

@@ -230,7 +230,8 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             frame = evt.get( self.datatypes[device], addr )
-
+            if frame is None: continue
+            
             if addr.find("Cspad2x2")>0 :
                 # in this case 'frame' is the MiniElement
                 # call cspad library to assemble the image

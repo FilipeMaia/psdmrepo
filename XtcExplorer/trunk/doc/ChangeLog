@@ -11,7 +11,13 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-Feb-21 ofte Tag V00-01-20        rev
+2012-Mar-2 ofte Tag V00-01-21         
+2012-Mar-2 ofte                       rev 3007
+        - bug fix for pyana_ipimb. Can handle 1 or 2 ipimb sources now. Still to do: 
+	- handle multiple ipimb sources, 
+	- handle multiple modules for ipimbs. 
+	
+2012-Mar-1 ofte Tag V00-01-20        rev 3005
 	- isolate matplotlib depenency to improve speed and batch processing
 	-- utilities.py split into utilities.py and displaytools.py
 	-- matplotlib dependency removed from pyana_ipimb and pyana_image modules
