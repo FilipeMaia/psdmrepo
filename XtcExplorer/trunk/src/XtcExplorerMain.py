@@ -17,7 +17,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: gui_explorer_main 2011-01-27 14:15:00 ofte $
+@version $Id: XtcExplorerMain 2011-01-27 14:15:00 ofte $
 
 @author Ingrid Ofte
 """
@@ -83,7 +83,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
         Description
         """
-        print "gui_explorer_main"
+        print "XtcExplorerMain"
         QtGui.QMainWindow.__init__(self)
 
         QtCore.pyqtRemoveInputHook()
@@ -188,19 +188,20 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         #self.comboBoxExp.setGeometry(QtGui.QRect(110,210,170,30))
 
         # Line edit: enter run number
-        self.labelRun = QtGui.QLabel("Enter run number: ")
+        self.labelRun = QtGui.QLabel("Run number: ")
 
         self.lineEditRun = QtGui.QLineEdit("")
         self.lineEditRun.setMaximumWidth(80)
+        self.connect(self.lineEditRun, QtCore.SIGNAL('editingFinished()'), self.set_runnumber )
         self.connect(self.lineEditRun, QtCore.SIGNAL('returnPressed()'), self.set_runnumber )
 
-        self.okButtonRun = QtGui.QPushButton("&OK")
+        self.okButtonRun = QtGui.QPushButton("&Load")
         self.connect(self.okButtonRun, QtCore.SIGNAL('clicked()'), self.set_runnumber )
 
         self.labelOr = QtGui.QLabel(" ---- OR ---- ")
                 
         self.comboBoxIns.clear() 
-        self.comboBoxIns.addItem("Select instrument")
+        self.comboBoxIns.addItem("Instrument")
         self.comboBoxIns.addItem("AMO")
         self.comboBoxIns.addItem("SXR")
         self.comboBoxIns.addItem("XPP")
@@ -214,10 +215,11 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             print "index for instrument ", self.instrument, index
 
         self.comboBoxExp.clear()
-        self.comboBoxExp.addItem("Select experiment")
+        self.comboBoxExp.addItem("Experiment")
                                                                         
         self.connect(self.comboBoxIns, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_instrument )
         self.connect(self.comboBoxExp, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_experiment )
+        #self.connect(self.comboBoxExp, QtCore.SIGNAL('activated(int)'), self.set_experiment )
 
         #self.dmode_menu.addItem("Interactive")
         #self.dmode_menu.setCurrentIndex(1) # SlideShow
@@ -349,37 +351,53 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #--------------------
     #  Private methods --
     #--------------------
-    
-    def set_instrument(self):
-        self.comboBoxExp.clear()
-        self.comboBoxExp.addItem("Select experiment")
+    def set_instrument(self, value):
+        print "Selecting instrument: item %d, %s"%\
+              (value, self.sender().itemText(value))
 
-        self.instrument = self.comboBoxIns.currentText() 
-        #print "Changing directory from ", self.directory, " to ", 
-        
+        if value < 1:
+            self.instrument = None
+            self.directory = "/reg/d/psdm/"
+            return
+
+        self.instrument = self.sender().currentText() 
         self.directory = "/reg/d/psdm/"
         self.directory += (self.instrument + "/")
+
+        dirList=os.listdir(self.directory)
+        print "Current directory is now %s. It has %d experiment directories. "%(self.directory,len(dirList))
         
         # add subdirectories to experiment selector
-        dirList=os.listdir(self.directory)
+        self.comboBoxExp.clear()
+        self.comboBoxExp.addItem("Experiment")
         for fname in dirList:
             self.comboBoxExp.addItem(fname)
 
-        print "Current directory: %s (%s)"%(self.directory,os.path.exists(self.directory))
 
-    def set_experiment(self):
-        self.experiment = self.comboBoxExp.currentText()
+    def set_experiment(self, value):
+        if value < 1 :
+            return
+        print "Selecting experiment: item %d, %s "%\
+              (value, self.sender().itemText(value))
+        self.experiment = self.sender().currentText()
+
         try:
-            self.directory = "/reg/d/psdm/" + self.instrument + "/" + self.experiment + "/xtc/"
-            print "Current directory: %s (%s)"%(self.directory,os.path.exists(self.directory))
+            dir = "/reg/d/psdm/" + self.instrument + "/" + self.experiment + "/xtc/"
+            if os.path.exists(dir):
+                self.directory = dir
+                print "Current directory: %s "%(self.directory)
         except:
             pass
         
 
     def set_runnumber(self):
-
-        self.runnumber = int(self.lineEditRun.text())
-        fileNamePattern = "e*-r%04d-*.xtc"%(self.runnumber)
+        try:
+            self.runnumber = int(self.lineEditRun.text())
+            fileNamePattern = "e*-r%04d-*.xtc"%(self.runnumber)
+        except:
+            # ignore if not an integer
+            print "Please use an integer run number", self.lineEditRun.text()
+            return
 
         files = []
         try: 
@@ -396,6 +414,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.clear_file_list()
             for file in files:
                 self.add_file( str(file) )
+                #print "file %s added "%str(file)
+        else :
+            print "No files found"
         
     def add_file(self, filename):
         """Add file by name
@@ -406,9 +427,16 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
                 # update the select buttons for Instrument and Experiment
                 parts = filename.split('/')
-                self.instrument = parts[4]
-                self.experiment = parts[5]
-                self.runnumber = parts[7].split('-')[1].strip('r')
+                try:
+                    self.instrument = parts[4]
+                    self.experiment = parts[5]
+                    self.runnumber = parts[7].split('-')[1].strip('r')
+                except: 
+                    print "Failed adding file %s to list of input xtc files. " \
+                          "Cannot determine instrument, experiment or run number from its path."\
+                          % (filename)
+                    return
+
                 self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
                 self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
                 self.lineEditRun.setText(self.runnumber)
@@ -429,7 +457,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         are added to a list holding current files.
         """
         selectedfiles = QtGui.QFileDialog.getOpenFileNames( \
-            self, "Select File",self.directory,"xtc files (*.xtc)")
+            self, "Select File",self.directory,"xtc files (*.xtc);; All files (*.*)")
         
         # convert QStringList to python list of strings
         filename = ""

@@ -31,9 +31,9 @@ import numpy as np
 from pypdsdata.xtc import TypeId
 from cspad import CsPad
 
-from utilities import Threshold
-from utilities import PyanaOptions
-from utilities import ImageData
+from pyana_utilities.plotting import Threshold
+from pyana_utilities.opt_parser import PyanaOptions
+from pyana_utilities.data_storage import ImageData
 
 
 #---------------------
@@ -260,13 +260,13 @@ class  pyana_image_beta ( object ) :
         if self.source.find("Cspad2x2")>0 :
             # in this case 'frame' is the MiniElement
             # call cspad library to assemble the image
-            the_image = self.cspad[self.source].get_mini_image(frame)
+            the_image = self.cspad.get_mini_image(frame)
 
         elif self.source.find("Cspad")>0 :
             # in this case we need the specialized getter: 
             quads = evt.getCsPadQuads(self.source, env)
             # then call cspad library to assemble the image
-            the_image = self.cspad[self.source].get_detector_image(quads)
+            the_image = self.cspad.get_detector_image(quads)
 
         else:
             # all other cameras have simple arrays. 
@@ -459,6 +459,7 @@ class  pyana_image_beta ( object ) :
         if options is not None:
             self.mydata.roi = map(int,options) # a list
 
+        print "In book roi: ",
         print self.mydata.roi
             
     def book_spectrum_plot(self,image,options=None):

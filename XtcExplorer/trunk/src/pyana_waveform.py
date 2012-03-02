@@ -43,7 +43,7 @@ from pypdsdata import xtc
 
 from utilities import PyanaOptions
 from utilities import WaveformData
-from utilities import Plotter
+from displaytools import Plotter
 
 
 #----------------------------------

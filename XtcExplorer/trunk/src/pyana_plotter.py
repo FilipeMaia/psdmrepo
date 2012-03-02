@@ -28,6 +28,8 @@ import sys
 import logging
 import time
 
+import numpy as np
+
 #import matplotlib 
 #matplotlib.use('Qt4Agg')
 
@@ -46,6 +48,7 @@ from IPython.Shell import IPShellEmbed
 # Imports for other modules --
 #-----------------------------
 from utilities import PyanaOptions 
+from displaytools import DataDisplay
 
 #----------------------------------
 # Local non-exported definitions --
@@ -56,22 +59,6 @@ from utilities import PyanaOptions
 #---------------------
 #  Class definition --
 #---------------------
-#class ImagePlot(FigureCanvas) :
-#    def __init__(self, parent=None,
-#                 width=10, height=8, dpi=100, bgcolor=None, num=1 ):
-#        fig = Figure(figsize=(width,height),dpi=dpi,facecolor=bgcolor, edgecolor=bgcolor)
-#        FigureCanvas.__init__(self, fig)
-#        self.setParent(parent)
-#        fig.suptitle("ImagePlot Changed")
-#        self.axes = fig.add_subplot(111)
-#        #self.toolbar = NavigationToolbar(self,self)
-
-#    def draw_array(self,array):
-#        self.axesim = self.axes.imshow( array, origin='lower' )
-#        # axes image 
-#        self.show()
-
-
 class pyana_plotter (object) :
     """Class whose instance will be used as a user analysis module. """
 
@@ -79,9 +66,6 @@ class pyana_plotter (object) :
     #  Class variables --
     #--------------------
     
-    # usual convention is to prefix static variables with s_
-    s_staticVariable = 0
-
     #----------------
     #  Constructor --
     #----------------
@@ -109,6 +93,7 @@ class pyana_plotter (object) :
         opt = PyanaOptions() # convert option string to appropriate type        
         self.ipython      = opt.getOptBoolean(ipython)
 
+        self.data_display = DataDisplay()
 
     #-------------------
     #  Public methods --
@@ -191,21 +176,8 @@ class pyana_plotter (object) :
         # something new to show, since it's slow. 
         show_event = evt.get('show_event')
         if show_event and env.subprocess()<1 :
-            #print "pyana_plotter: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
 
-            if self.ipython :
-                plt.draw()
-                self.launch_ipython(evt)
-
-            if self.display_mode == 1:
-                # Interactive
-                plt.ioff()
-                plt.show()
-
-            elif self.display_mode == 2:
-                # SlideShow
-                plt.ion()
-                plt.draw()            
+            self.make_plots(evt)
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -237,24 +209,53 @@ class pyana_plotter (object) :
         #print "Start: %.3f, Stop: %.3f, Duration: %.4f" %(self.starttime,endtime,duration)
         print "\nTiming as measured by pyana_plotter endjob: %.4f s\n" %(duration)
 
-        if ( env.subprocess()<1 ):
-             
-            plt.draw()
-        
-            if self.ipython :
-                self.launch_ipython(evt)
-            
-            print "Pyana will exit once you close all the MatPlotLib windows"            
+        show_event = evt.get('show_event')
+        if show_event and env.subprocess()<1 :
+
+            self.make_plots(evt)
+
             if self.display_mode > 0 :
+                print "Pyana will exit once you close all the MatPlotLib windows"            
                 plt.ioff()
                 plt.show()
-
+                
         print "-------------------"
         print "Done running pyana."
         print "To run pyana again, edit config file if needed and hit \"Run pyana\" button again"
         print "Send any feedback on this program to ofte@slac.stanford.edu"
         print "Thank you!"
         print "-------------------"
+
+
+    def make_plots(self,evt):
+        print "pyana_plotter: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
+        self.data_display.event_number = self.n_shots
+
+        #
+        # get pointer to the data from each of the modules
+        data_ipimb = evt.get('data_ipimb')
+        if data_ipimb :
+            self.data_display.show_ipimb(data_ipimb)
+
+        data_image = evt.get('data_image')
+        if data_image :
+            newmode = self.data_display.show_image(data_image)                    
+            if newmode is not None:
+                self.display_mode = newmode
+                    
+        if self.ipython :
+            plt.draw()
+            self.launch_ipython(evt)
+
+        if self.display_mode == 1:
+            # Interactive
+            plt.ioff()
+            plt.show()
+
+        elif self.display_mode == 2:
+            # SlideShow
+            plt.ion()
+            plt.draw()            
 
 
     def launch_ipython(self, evt):

@@ -11,6 +11,24 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Feb-21 ofte Tag V00-01-20        rev
+	- isolate matplotlib depenency to improve speed and batch processing
+	-- utilities.py split into utilities.py and displaytools.py
+	-- matplotlib dependency removed from pyana_ipimb and pyana_image modules
+	   This change will come to the other modules too, shortly... 
+	-- only pyana_plotter.py uses matplotlib
+	- pyana_image.py bugfix (dark subtraction had disappeared)
+	- max projection for images now available
+	- displaytools has a new class DataDisplay that has all the 
+	display functionality for each of the data types. This can be 
+	made more configurable, but is only using standard display now. 
+	pyana_xxx.py files does nothing but store data in data containers 
+	and passing it on to the event. pyana_plotter uses DataDisplay for 
+	displaying each stored datatype. 
+	- pyana_ipimb.py gets the capacitor info and stores for display.
+	- improvements to XtcExplorerMain file selection. 
+	- automatic path for CsPad calibration files
+	
 2012-Feb-06 ofte                      rev 2858
 	- Fixed a bug in pyana_images title. 
 	- Automatic update of revision number in the 'about' gui (hope it works)

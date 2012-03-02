@@ -189,14 +189,12 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         #self.comboBoxExp.setGeometry(QtGui.QRect(110,210,170,30))
 
         # Line edit: enter run number
-        self.labelRun = QtGui.QLabel("Enter run number: ")
+        self.labelRun = QtGui.QLabel("Run number: ")
 
         self.lineEditRun = QtGui.QLineEdit("")
         self.lineEditRun.setMaximumWidth(80)
+        self.connect(self.lineEditRun, QtCore.SIGNAL('editingFinished()'), self.set_runnumber )
         self.connect(self.lineEditRun, QtCore.SIGNAL('returnPressed()'), self.set_runnumber )
-
-        self.okButtonRun = QtGui.QPushButton("&OK")
-        self.connect(self.okButtonRun, QtCore.SIGNAL('clicked()'), self.set_runnumber )
 
         self.labelOr = QtGui.QLabel(" ---- OR ---- ")
                 
@@ -273,7 +271,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         h3.addStretch()
         h3.addWidget( self.labelRun )
         h3.addWidget( self.lineEditRun )
-        h3.addWidget( self.okButtonRun )
 
         H1 = QtGui.QVBoxLayout()
         H1.addLayout(h3)
@@ -375,9 +372,12 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             pass
 
     def set_runnumber(self):
-
-        self.runnumber = int(self.lineEditRun.text())
-        fileNamePattern = "e*-r%04d-*.xtc"%(self.runnumber)
+        try:
+            self.runnumber = int(self.lineEditRun.text())
+            fileNamePattern = "e*-r%04d-*.xtc"%(self.runnumber)
+        except:
+            # ignore if not an integer
+            return
 
         files = []
         try: 
@@ -404,9 +404,16 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
                 # update the select buttons for Instrument and Experiment
                 parts = filename.split('/')
-                self.instrument = parts[4]
-                self.experiment = parts[5]
-                self.runnumber = parts[7].split('-')[1].strip('r')
+                try:
+                    self.instrument = parts[4]
+                    self.experiment = parts[5]
+                    self.runnumber = parts[7].split('-')[1].strip('r')
+                except: 
+                    print "Failed adding file %s to list of input xtc files. " \
+                          "Cannot determine instrument, experiment or run number from its path."\
+                          % (filename)
+                    return
+
                 self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
                 self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
                 self.lineEditRun.setText(self.runnumber)
@@ -427,7 +434,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         are added to a list holding current files.
         """
         selectedfiles = QtGui.QFileDialog.getOpenFileNames( \
-            self, "Select File",self.directory,"xtc files (*.xtc)")
+            self, "Select File",self.directory,"xtc files (*.xtc);; All files (*.*)")
         
         # convert QStringList to python list of strings
         filename = ""

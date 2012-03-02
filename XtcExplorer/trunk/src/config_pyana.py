@@ -46,6 +46,32 @@ class ModuleConfig( object ):
             
         return text
 
+class AlternativeImageModConfig( ModuleConfig ):
+    """Class ImageModConfig
+
+    Place to store configuration information for a pyana_image module
+    """ 
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self, "pyana_image_beta", address )
+
+        self.dark_file = None # no default dark file
+        self.threshold = None # no default threshold
+        self.roi       = None # no default region of interest
+        self.outfile   = None # no default output file
+
+        self.quantities.append('image') 
+
+    def config_snippet(self):
+        text = "[XtcExplorer.%s]\n" % self.name
+        if self.address :
+            text = "[XtcExplorer.%s:%s]\n" % (self.name,self.address)
+
+        if self.dark_file is not None:
+            text += "dark_file = %s\n" % self.dark_file
+
+
+
+
 class ImageModConfig( ModuleConfig ):
     """Class ImageModConfig
 
@@ -53,6 +79,7 @@ class ImageModConfig( ModuleConfig ):
     """ 
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_image_beta", address )
+
         # list of quantities to plot:
         self.update_options()
         

@@ -21,22 +21,23 @@ import sys
 import time
 
 import numpy as np
-import matplotlib.pyplot as plt
-#import h5py
+import scipy.misc
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 from pypdsdata.xtc import TypeId
+from pyana.calib import CalibFileFinder
 
 #-----------------------------
 # Imports for local modules --
 #-----------------------------
 from cspad     import CsPad
-from utilities import Plotter
+
 from utilities import Threshold
 from utilities import PyanaOptions
 from utilities import ImageData
+
 import algorithms as alg
 
 #---------------------
@@ -50,14 +51,13 @@ class  pyana_image ( object ) :
                    inputdark = None,
                    threshold = None,
                    algorithms = None,
+                   quantities = "image dark average",
                    # plotting options:
                    plot_every_n = None,
                    accumulate_n = None,
                    plot_vrange = None,                   
-                   show_projections = None,
                    # output options
                    outputfile = None,
-                   n_hdf5 = None ,
                    max_save = "0",
                    fignum = "1",
                    # data/calibration path (needed for CsPad)
@@ -69,15 +69,14 @@ class  pyana_image ( object ) :
         @param sources           address string of Detector-Id|Device-ID
         @param inputdark         name (base) of dark image file (numpy array) to be loaded, if any
         @param algorithms        (list of) algorithms to be applied to the image before plotting
-        @param threshold         value (xmin:xmax,ymin:xmax) type
+        @param threshold         lower= upper= type= roi=
+        @param quantities        string, list of quantities to plot: image average maximum projections
 
         @param plot_every_n      Frequency for plotting. If n=0, no plots till the end
         @param accumulate_n      Not implemented yet
         @param plot_vrange       value-range of interest
-        @param show_projections  0,1 or 2, for projecting nothing, average or maximum 
  
         @param outputfile        filename (If collecting: write to this file)
-        @param n_hdf5            if output file is hdf5, combine n events in each output file. 
         @param max_save          Maximum single-shot images to save
 
         @param calib_path        path to the calibration directory (expNUMBER/calib)
@@ -85,7 +84,8 @@ class  pyana_image ( object ) :
 
         opt = PyanaOptions() # convert option string to appropriate type
         self.plot_every_n  =  opt.getOptInteger(plot_every_n)
-        self.max_save = opt.getOptInteger(max_save)
+        self.accumulate_n  =  opt.getOptInteger(accumulate_n)
+        self.max_save      =  opt.getOptInteger(max_save)
         self.mpl_num = opt.getOptInteger(fignum)
 
         self.sources = opt.getOptStrings(sources)
@@ -98,40 +98,15 @@ class  pyana_image ( object ) :
         if self.darkfile is not None: print "Input dark image file: ", self.darkfile
 
         self.algorithms = opt.getOptStrings(algorithms)
-        print self.algorithms
+        print "Algorithms to apply: ", self.algorithms
 
+        self.quantities = opt.getOptStrings(quantities)
+        print "Quantities to plot: ", self.quantities
 
-        threshold_string = opt.getOptStrings(threshold)
-        # format: 'value (xlow:xhigh,ylow:yhigh) type',
-        
-        self.threshold = None
-        if len(threshold_string)>0:
-            self.threshold = Threshold()
-            self.threshold.value = opt.getOptFloat(threshold_string[0])
-            print "Using threshold value ", self.threshold.value
-        if len(threshold_string)>1:
-            self.threshold.area = np.array([0.,0.,0.,0.])
-                
-            intervals = threshold_string[1].strip('()').split(',')
-            xrange = intervals[0].split(":")
-            yrange = intervals[1].split(":")
-            self.threshold.area[0] = float(xrange[0])
-            self.threshold.area[1] = float(xrange[1])
-            self.threshold.area[2] = float(yrange[0])
-            self.threshold.area[3] = float(yrange[1])
+        self.threshold = Threshold(threshold)
             
-            print "Using threshold area ", self.threshold.area
-            
-            try:
-                type = threshold_string[2]
-                self.threshold.type = type
-            except:
-                pass
-
-        self.n_hdf5 = opt.getOptInteger(n_hdf5)
-
         self.output_file = opt.getOptString(outputfile)
-        #print "Output file name base: ", self.output_file
+        print "Output file name base: ", self.output_file
 
         self.plot_vmin = None
         self.plot_vmax = None
@@ -140,35 +115,11 @@ class  pyana_image ( object ) :
             self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
             print "Using plot_vrange = %.2f,%.2f"%(self.plot_vmin,self.plot_vmax)
 
-        self.show_projections = 0
-        if show_projections is not None:
-            self.show_projections = int(show_projections)
-
         # to keep track
         self.n_shots = None
         self.n_saved = 0
-
-        # averages
-        self.max_good_images = {}
-        self.sum_good_images = {}
-        self.sum_dark_images = {}
-        self.n_good = {}
-        self.n_dark = {}
-        for addr in self.sources :
-            self.max_good_images[addr] = None
-            self.sum_good_images[addr] = None
-            self.sum_dark_images[addr] = None
-            self.n_good[addr] = 0
-            self.n_dark[addr] = 0
-
-
-        self.plotter = Plotter()        
-        self.plotter.settings(7,7) # set default frame size
-        self.plotter.threshold = None
-        if self.threshold is not None:
-            self.plotter.threshold = self.threshold
-            self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
-            
+        self.initlists()
+        
         self.apply_dictionary = { 'rotate': alg.rotate,
                                   'shift' : alg.shift }
         
@@ -177,7 +128,7 @@ class  pyana_image ( object ) :
         
         self.cspad = {}
 
-        self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_CspadConfig ,
+        self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
                              'Cspad'     : TypeId.Type.Id_CspadConfig ,
                              'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
                              'TM6740'    : TypeId.Type.Id_TM6740Config,
@@ -196,6 +147,37 @@ class  pyana_image ( object ) :
                           'Princeton'     : TypeId.Type.Id_PrincetonFrame,
                           'Timepix'       : TypeId.Type.Id_TimepixData
                           }
+    def initlists(self):
+        self.accu_start = 0
+        # averages
+        self.max_good_images = {}
+        self.sum_good_images = {}
+        self.sum_dark_images = {}
+        self.n_good = {}
+        self.n_dark = {}
+        for addr in self.sources :
+            self.max_good_images[addr] = None
+            self.sum_good_images[addr] = None
+            self.sum_dark_images[addr] = None
+            self.n_good[addr] = 0
+            self.n_dark[addr] = 0
+
+            
+
+    def resetlists(self):
+        self.accu_start = self.n_shots
+        for addr in self.sources :
+            del self.max_good_images[addr]
+            del self.sum_good_images[addr]
+            del self.sum_dark_images[addr] 
+            self.max_good_images[addr] = None
+            self.sum_good_images[addr] = None
+            self.sum_dark_images[addr] = None
+            self.n_good[addr] = 0
+            self.n_dark[addr] = 0
+
+
+
 
     def beginjob ( self, evt, env ) : 
 
@@ -206,6 +188,14 @@ class  pyana_image ( object ) :
         for source in self.sources:
             self.data[source] = ImageData(source)
 
+	## load dark image from file
+        self.dark_image = None
+	try:
+            self.dark_image = np.load(self.darkfile)
+	except:
+            print "No dark image in file ", self.darkfile
+
+        calibfinder = CalibFileFinder(env.calibDir(),"CsPad::CalibV1")
         for addr in self.sources :
 
             # pick out the device name from the address
@@ -215,23 +205,15 @@ class  pyana_image ( object ) :
                 print '*** %s config object is missing ***'%addr
                 return
 
-            
-            #print "Config object has: "
-            #print dir(config)
-
-            if addr.find('Cspad')>=0:
+            if addr.find('Cspad2x2')>=0:
+                sections = config.sections()
+                self.cspad[addr] = CsPad(sections, path=self.calib_path)
+                
+            elif addr.find('Cspad')>=0:
                 quads = range(4)
                 sections = map(config.sections, quads)
-                
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
-
-        ## load dark image from file
-        self.dark_image = None
-        try:
-            self.dark_image = np.load(self.darkfile)
-        except:
-            print "No dark image in file ", self.darkfile
-            
+                self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
 
     # process event/shot data
     def event ( self, evt, env ) :
@@ -239,24 +221,10 @@ class  pyana_image ( object ) :
         # this one counts every event
         self.n_shots+=1
 
-        if evt.get('skip_event') :
-            return
-
-#        # new hdf5-file every N events
-#        if self.output_file is not None :
-#            if ".hdf5" in self.output_file and self.n_hdf5 is not None:
-#                if (self.n_shots%self.n_hdf5)==1 :
-#                    start = self.n_shots # this event
-#                    stop = self.n_shots+self.n_hdf5-1
-#                    self.sub_output_file = self.output_file.replace('.hdf5',"_%d-%d.hdf5"%(start,stop) )
-#                    print "opening %s for writing" % self.sub_output_file
-#                    self.hdf5file = h5py.File(self.sub_output_file, 'w')
-
-        # for each event, collect a list of images to be plotted 
-        event_display_images = []
-
-        # get the requested images
+        # -------------------------------------------------
+        # get the image(s) from the event datagram
         for addr in self.sources :
+
             image = None
 
             # pick out the device name from the address
@@ -296,14 +264,12 @@ class  pyana_image ( object ) :
 
             # ---------------------------------------------------------------------------------------
             # Subtract dark image
-            if self.dark_image is not None :
-                image -= self.dark_image
-            
-
-                                
+            dark = self.dark_image
+            if dark is not None :
+            	image -= dark
+                             
             # ---------------------------------------------------------------------------------------
             # Apply shift, rotation, scaling of this image if needed:
-
             if self.algorithms is not None:
 
                 # apply each algorithm in the list
@@ -324,19 +290,30 @@ class  pyana_image ( object ) :
 
             # prepare to apply threshold and see if this is a hit or a dark event
             isDark = False
+            isSaturated = False
             name = addr
             title = addr
 
+
             # ---------------------------------------------------------------------------------------
             # threshold filter
-            roi = None
-            if self.threshold is not None:
+            if not self.threshold.is_empty:
+
+                # apply mask if requested
+                if self.threshold.mask is not None:
+                    #hot_mask = np.ma.masked_greater_equal( image, self.threshold.mask )
+                    #image = np.ma.filled( hot_mask, 0 )
+
+                    # this should be faster: zero out hot masks: 
+                    image[image>self.threshold.mask]=0
+                
                 # first, assume we're considering the whole image
                 roi = image
-                if self.threshold.area is not None:
-                    # or set it to the selected threshold area
-                    roi = image[self.threshold.area[2]:self.threshold.area[3],   # rows (y-range)
-                                self.threshold.area[0]:self.threshold.area[1]]   # columns (x-range)
+                if self.threshold.region is not None:
+                    # or set it to the selected threshold region
+                    roi = image[self.threshold.region[2]:self.threshold.region[3],   # rows (y-range)
+                                self.threshold.region[0]:self.threshold.region[1]]   # columns (x-range)
+
                 dims = np.shape(roi)
                 maxbin = roi.argmax()
                 maxvalue = roi.ravel()[maxbin]
@@ -344,80 +321,97 @@ class  pyana_image ( object ) :
 
                 if self.threshold.type == 'average':
                     maxvalue = roi.mean()
-                
-                if maxvalue < self.threshold.value :
+                    #print "average value of the ROI = ", maxvalue
+                    
+                # apply the threshold
+                if self.threshold.lower is not None and maxvalue < self.threshold.lower :
                     isDark = True
                     name += "_dark"
                     title += " (dark)"
-                else:
-                    print "Not dark, max = ", maxvalue, maxbin_coord
+                    
+                if self.threshold.upper is not None and maxvalue > self.threshold.upper:
+                    isSaturated = True
+                    name += "_sat"
+                    title += " (saturated)"
 
+
+                VeryVerbose = False
+                if VeryVerbose :
+                    if (not isDark) and (not isSaturated): 
+                        print "%d accepting %s #%d, vmax = %.0f, hitrate: %.4f" % \
+                              (env.subprocess(), addr, self.n_shots, maxvalue, \
+                               float(self.n_good[addr]+1)/float(self.n_shots))
+                    else :
+                        print "%d rejecting %s #%d, vmax = %.0f"%(env.subprocess(), \
+                                                                  addr,self.n_shots, maxvalue)
+
+            
+            # ----------- Event Image -----------
+            if "image" in self.quantities:
+                self.data[addr].image   = image            
+
+            if "projections" in self.quantities:
+                self.data[addr].showProj = True
+                
             # ------------- DARK ----------------
             if isDark:
                 self.n_dark[addr]+=1
-                if self.sum_dark_images[addr] is None :
-                    self.sum_dark_images[addr] = np.array(image,dtype=image.dtype)
-                else :
-                    self.sum_dark_images[addr] += image
-            else :
-            # ------------- HIT ----------------
-                self.n_good[addr]+=1
-                if self.sum_good_images[addr] is None :
-                    self.sum_good_images[addr] = np.array(image,dtype=image.dtype)
-                else :
-                    self.sum_good_images[addr] += image
 
-                if self.max_good_images[addr] is None:
-                    self.max_good_images[addr] = np.array(image,dtype=image.dtype)
-                else :
-                    # take the element-wise maximum of array elements
-                    # comparing this image with the previous maximum stored
-                    self.max_good_images[addr] = np.maximum( image, self.max_good_images[addr] )
-                    print "max images has been saved for ", addr
-            
-            # ---------------------------------------------------------------------------------------
-            # Here's where we add the raw (or subtracted) image to the list for plotting
-            event_display_images.append( (name, title, image) )
-            
-            # This is for use by ipython
-            self.data[addr].image   = image
-            if self.n_good[addr] > 0 :
-                self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
-            if self.n_dark[addr] > 0 :
-                self.data[addr].dark    = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
+                if "darks" in self.quantities:
+                    try:
+                        self.sum_dark_images[addr] += image
+                    except TypeError:
+                        self.sum_dark_images[addr] = np.array(image,dtype=image.dtype)
+                    # collect dark
+                    self.data[addr].ndark = self.n_dark[addr]
+                    self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
+
+            elif isSaturated: 
+                pass 
+            else :
+                # ------------- HIT ----------------
+                self.n_good[addr]+=1
+
+                if "average" in self.quantities: 
+                    try:
+                        self.sum_good_images[addr] += image
+                    except TypeError:
+                        self.sum_good_images[addr] = np.array(image,dtype=image.dtype)
+
+                if "maximum" in self.quantities:
+                    try:
+                        # take the element-wise maximum of array elements
+                        # comparing this image with the previous maximum stored
+                        self.max_good_images[addr] = np.maximum( image, self.max_good_images[addr] )
+                    except TypeError: 
+                        self.max_good_images[addr] = np.array(image,dtype=image.dtype)
         
 
-        if len(event_display_images)==0 :
-            return
-            
-            
-                    
-        # -----------------------------------
-        # Draw images from this event
-        # -----------------------------------
 
-        # only call plotter if this is the main thread
-        if (env.subprocess()>0):
-            return
-
+                        
+        # ---------------------------------------------------------------------------------------
+        # Update data for storage and plotting
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+            for addr in self.sources:
+                # collect averages
+                if 'average' in self.quantities:
+                    self.data[addr].counter = self.n_good[addr]
+                    self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
+
+                ## collect maximum
+                if 'maximum' in self.quantities:
+                    self.data[addr].counter = self.n_good[addr]
+                    self.data[addr].maximum = self.max_good_images[addr]
+
+                ## collect avg darks
+                if 'darks' in self.quantities:
+                    self.data[addr].ndark = self.n_dark[addr]
+                    self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
+                            
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            for (name,title,image) in event_display_images:
-                self.plotter.add_frame(name,title,(image,))
-                self.plotter.frames[name].showProj=self.show_projections
-                
-            self.plotter.title = "Cameras shot#%d"%self.n_shots
-            newmode = self.plotter.plot_all_frames(fignum=self.mpl_num,ordered=True)
-
-            if newmode is not None:
-                # propagate new display mode to the evt object 
-                evt.put(newmode,'display_mode')
-                # reset
-                self.plotter.display_mode = None
-
             # convert dict to a list:
             data_image = []
             for source in self.sources :
@@ -432,17 +426,71 @@ class  pyana_image ( object ) :
         if (self.output_file is not None) and (self.n_saved < self.max_save) : 
             self.n_saved += 1
 
-            self.save_images( self.output_file, event_display_images, self.n_shots )
+            images_for_saving = []
+            for addr in self.sources:
+                if 'image' in self.quantities:
+                    images_for_saving.append( ('image', '%s ev %d'%(addr,self.n_shots), self.data[addr].image ))
+
+                if 'roi' in self.quantities:
+                    images_for_saving.append( ('roi', '%s ev %d'%(addr,self.n_shots), self.data[addr].roi ))
+
+                if 'average' in self.quantities:
+                    images_for_saving.append( ('average', '%s ev %d'%(addr,self.n_shots), self.data[addr].average ))
+                if 'darks' in self.quantities:
+                    images_for_saving.append( ('avgdark', '%s ev %d'%(addr,self.n_shots), self.data[addr].avgdark ))
+                if 'maximum' in self.quantities:
+                    images_for_saving.append( ('maximum', '%s ev %d'%(addr,self.n_shots), self.data[addr].maximum ))
+                
+            self.save_images( self.output_file, images_for_saving, self.n_shots )
+
+
+        # --------- Reset -------------
+        if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
+            self.resetlists()
+
 
     
 
     # after last event has been processed. 
     def endjob( self, evt, env ) :
 
-#        if self.hdf5file is not None :
-#            self.hdf5file.close()
-
         print "Done processing       ", self.n_shots, " events"
+
+        # no more events to process. Just fetch the collected data and redraw
+        if (env.subprocess()>0):
+            return
+
+        # flag for pyana_plotter
+        evt.put(True, 'show_event')
+            
+        # convert dict to a list:
+        data_image = []
+        for source in self.sources :
+            data_image.append( self.data[source] )
+            # give the list to the event object
+            evt.put( data_image, 'data_image' )
+            
+
+        if (self.output_file is not None):
+
+            images_for_saving = []
+            for addr in self.sources:
+                if 'image' in self.quantities:
+                    images_for_saving.append( ('image', '%s ev %d'%(addr,self.n_shots), self.data[addr].image ))
+
+                if 'roi' in self.quantities:
+                    images_for_saving.append( ('roi', '%s ev %d'%(addr,self.n_shots), self.data[addr].roi ))
+
+                if 'average' in self.quantities:
+                    images_for_saving.append( ('average', '%s ev %d'%(addr,self.n_shots), self.data[addr].average ))
+                if 'darks' in self.quantities:
+                    images_for_saving.append( ('avgdark', '%s ev %d'%(addr,self.n_shots), self.data[addr].avgdark ))
+                if 'maximum' in self.quantities:
+                    images_for_saving.append( ('maximum', '%s ev %d'%(addr,self.n_shots), self.data[addr].maximum ))
+                
+            self.save_images( self.output_file, images_for_saving)
+
+        return
 
         nsrc = 0
         for addr in self.sources:
@@ -488,13 +536,6 @@ class  pyana_image ( object ) :
                 return
             
             
-            self.plotter.draw_figurelist(self.mpl_num+nsrc,
-                                         event_display_images,
-                                         title="Endjob:  %s"%addr,
-                                         showProj=self.show_projections)
-        
-            plt.draw()
-        
 
         # -----------------------------------
         # Saving the final average to file(s)
@@ -516,42 +557,31 @@ class  pyana_image ( object ) :
 
     def save_images(self, filename, image_list, event=None ):
 
-            #if self.hdf5file is not None :
-            #    # save this event as a group in hdf5 file:
-            #    group = self.hdf5file.create_group("Event%d" % self.n_shots)
-
             for name,title,array in image_list :
 
-                print "save image ", name, title, array.shape
-
-                parts = filename.split('.')
+                fname = filename.split('.')
                 label = name #address.replace("|","_").strip()
                 
                 thename = ''
-                for i in range (len(parts)-1):
-                    thename+="%s"%parts[i]
+                for i in range (len(fname)-1):
+                    thename+="%s"%fname[i]
                     
                 thename+="_%s"%label
 
                 if event is not None:
                     thename+="_ev%d"%event
 
-                thename+=".%s"%parts[-1]
+                thename+=".%s"%fname[-1]
 
-                print "Writing to file ", thename
-
-#                # HDF5
-#                if self.hdf5file is not None :
-#                    # save each image as a dataset in this event group
-#                    dset = group.create_dataset("%s"%ad,data=array)
+                print "Saving \"%s\" (%s) %s to file %s"% (name, title, array.shape, thename)
 
                 # Numpy array
-                if ".npy" in thename :
+                if fname[-1] == "npy" :
                     np.save(thename, array)
-                elif ".txt" in thename :
+                elif fname[-1] == "txt" :
                     np.savetxt(thename, array) 
-                        
+                elif fname[-1] == "hdf5":
+                    print "HDF5 not implemented yet"
                 else :
-                    print "Output file does not have the expected file extension: ", fname[-1]
-                    print "Expected hdf5, txt or npy. Please correct."
-                    print "I'm not saving this event... "
+                    scipy.misc.imsave(thename, array)
+                    

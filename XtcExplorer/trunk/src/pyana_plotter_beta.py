@@ -45,8 +45,11 @@ from IPython.Shell import IPShellEmbed
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from utilities import PyanaOptions 
-from utilities import Plotter
+#from utilities import PyanaOptions 
+#from displaytools import Plotter
+
+from pyana_utilities.opt_parser import PyanaOptions 
+from pyana_utilities.plotting import Plotter
 
 #----------------------------------
 # Local non-exported definitions --
@@ -183,48 +186,26 @@ class pyana_plotter_beta (object) :
         if (env.subprocess()>0): return
             
 
-        # OK, go ahead
         
         #----------------------------------------------------------
-        # for xtcexplorernew: 
+        # OK, go ahead
         #----------------------------------------------------------
         plot_data = evt.get('plot_data')
 
         if plot_data is not None: 
-            self.make_plots(fignum=100,datalist=plot_data)
-            plt.suptitle("Event#%d"%self.n_shots)
 
-                
-        #----------------------------------------------------------
-        # for xtcexplorer (old)
-        #----------------------------------------------------------
-        event_display_images = evt.get( 'event_display_images')
-        if event_display_images is not None: 
-            print "pyana_plotter_beta: Plotting %d plots"%len(event_display_images)
-            newmode = self.plotter.draw_figurelist(200,
-                                                       event_display_images,
-                                                       title="Cameras shot#%d"%self.n_shots,
-                                                       showProj=False)
-            if newmode is not None:
-                self.display_mode = newmode
-                    
+            print "# Plot data in event %d:"%(self.n_shots)
+            for source in plot_data:
+                print "- %s:  "%(source.name)
+                plottables = source.get_plottables()
+                for key in plottables.keys():
+                    print "\t %s: %s "%(key,plottables[key].shape)
 
-            if self.ipython :
-                plt.draw()
-                self.launch_ipython(evt)
-            
-            if self.display_mode == 1:
-                # Interactive
-                plt.ioff()
-                plt.show()
-            
-            elif self.display_mode == 2:
-                # SlideShow
-                plt.ion()
-                plt.draw()            
-            
-            # wait for 'enter' before proceeding
-            # raw_input('Please hit \'enter\' to proceed to the next event') 
+                source.display()
+
+            self.show()
+
+
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -362,25 +343,8 @@ class pyana_plotter_beta (object) :
 
 
 
-    def make_plots(self,fignum=1,datalist=None):
+    def show(self):
 
-        if datalist is None:
-            print "Cannot plot nothing"
-            return
-
-        print "pyana_plotter event %d has found %d sources to plot from"%(self.n_shots,len(datalist))
-        
-        for data in datalist:
-            for name,array in data.get_plottables().iteritems():
-                title = "%s %s"%(data.name, name)
-                contents = (array,) # a tuple
-
-                #print title, [item.shape for item in contents]
-                self.plotter.add_frame(name,title,contents)
-                
-
-        self.plotter.plot_all_frames(fignum=fignum,ordered=True)
-                    
         if self.ipython :
             plt.draw()
             self.launch_ipython(evt)
@@ -393,7 +357,7 @@ class pyana_plotter_beta (object) :
         elif self.display_mode == 2:
             # SlideShow
             plt.ion()
-            plt.draw()            
+            plt.draw()
 
         else :
             print "Displaymode?? ", self.display_mode

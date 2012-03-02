@@ -31,7 +31,7 @@ import numpy as np
 from pypdsdata import xtc
 from cspad import CsPad
 
-from utilities import Plotter
+from displaytools import Plotter
 from utilities import Threshold
 from utilities import PyanaOptions
 from utilities import CsPadData

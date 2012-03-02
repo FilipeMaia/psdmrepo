@@ -26,7 +26,7 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys, random, os, signal, time
+import sys, random, os, signal, time, glob
 
 #---------------------------------
 #  Imports of base class module --
@@ -192,7 +192,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.run_n = None 
         self.skip_n = None 
         self.num_cpu = 1
-        self.plot_n = 1
+        self.plot_n = 10
         self.accum_n = 0
 
         self.bool_string = { False: "No" , True: "Yes" }
@@ -370,16 +370,16 @@ Start with selecting data of interest to you from list on the left and general r
         
         # Global Display mode
         self.dmode_layout = QtGui.QHBoxLayout()
-        self.displaymode = "Interactive"
-        self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
 
         self.dmode_menu = QtGui.QComboBox()
         self.dmode_menu.setMaximumWidth(90)
         self.dmode_menu.addItem("NoDisplay")
         self.dmode_menu.addItem("SlideShow")
         self.dmode_menu.addItem("Interactive")
-        self.dmode_menu.setCurrentIndex(2)
+        self.dmode_menu.setCurrentIndex(1)
         self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
+        self.displaymode = self.dmode_menu.currentText()
+        self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
         self.dmode_layout.addWidget(self.dmode_status)
         self.dmode_layout.addWidget(self.dmode_menu)
         self.help_layout.addLayout(self.dmode_layout, QtCore.Qt.AlignRight)
@@ -448,10 +448,6 @@ Start with selecting data of interest to you from list on the left and general r
         self.displaymode = self.dmode_menu.currentText()
         self.dmode_status.setText("Display mode is %s"%self.displaymode)
 
-        if self.displaymode == "NoDisplay" :
-            self.plot_n = 0
-            self.plotn_status.setText("Plot only after all shots")
-
         if self.configuration is not None:
             self.process_checkboxes()
 
@@ -465,10 +461,7 @@ Start with selecting data of interest to you from list on the left and general r
         else:
             self.plot_n = int(self.plot_n)
             self.plotn_status.setText("Plot every %d shots"%self.plot_n )
-            if self.displaymode == "NoDisplay" :
-                self.displaymode = "SlideShow"
-                self.dmode_status.setText("Display mode is %s"%self.displaymode)                
-                self.dmode_menu.setCurrentIndex(1) # SlideShow
+
         self.plotn_enter.setText("")
 
         if self.configuration is not None:
@@ -483,10 +476,7 @@ Start with selecting data of interest to you from list on the left and general r
         else:
             self.accum_n = int(self.accum_n)
             self.accumn_status.setText("Accumulate %d shots (reset after)"%self.accum_n )
-            if self.displaymode == "NoDisplay" :
-                self.displaymode = "SlideShow"
-                self.dmode_status.setText("Display mode is %s"%self.displaymode)                
-                self.dmode_menu.setCurrentIndex(1) # SlideShow
+
         self.accumn_enter.setText("")
 
         if self.configuration is not None:
@@ -751,7 +741,7 @@ Start with selecting data of interest to you from list on the left and general r
                     self.add_module(box, modules_to_run, options_for_mod)
                 
         nmodules = len(modules_to_run)
-        if nmodules > 0 :
+        if nmodules > 0 and self.displaymode != "NoDisplay" :
             # at the end, append plotter module:
             modules_to_run.append("XtcExplorer.pyana_plotter")
             options_for_mod.append([])
@@ -848,52 +838,6 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
 
-        # --- --- --- BLD IPM & DIO (Ipimb) --- --- --- 
-        if ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ):
-            try :
-                index = modules_to_run.index("XtcExplorer.pyana_ipimb")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcExplorer.pyana_ipimb")
-                options_for_mod.append([])
-
-            #print "XtcExplorer.pyana_ipimb at ", index
-            #address = str(box.text()).split(": ")[1].strip()
-            address = str(box.text()).strip()
-            options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
-            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
-            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            return
-                    
-
-        # --- --- --- BLD YAG (PIM) --- --- --- 
-        if ( str(box.text()).find("YAG")>=0 ):
-            try :
-                index = modules_to_run.index("XtcExplorer.pyana_image")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcExplorer.pyana_image")
-                options_for_mod.append([])
-
-            #print "XtcExplorer.pyana_image at ", index
-            #address = str(box.text()).split(": ")[1].strip()
-            address = str(box.text()).strip()
-            options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
-            options_for_mod[index].append("\nimage_rotations = " )
-            options_for_mod[index].append("\nimage_shifts = " )
-            options_for_mod[index].append("\nimage_scales = " )
-            options_for_mod[index].append("\nimage_manipulations = ")
-            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
-            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\nshow_projections = 0 ; 0: no projection, 1:project average, 2: project max values")
-            options_for_mod[index].append("\noutput_file = out.npy ")
-            options_for_mod[index].append("\nmax_save = 0   ; maximum number of event images to save" )
-            options_for_mod[index].append("\nn_hdf5 = ") 
-            return
 
 
         # --- --- --- BLD --- --- ---
@@ -944,7 +888,9 @@ Start with selecting data of interest to you from list on the left and general r
             return
                     
         # --- --- --- Ipimb --- --- ---
-        if str(box.text()).find("Ipimb")>=0 :
+        if ( str(box.text()).find("IPM")>=0 or
+             str(box.text()).find("DIO")>=0 or
+             str(box.text()).find("Ipimb")>=0 ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_ipimb")
             except ValueError :
@@ -956,14 +902,15 @@ Start with selecting data of interest to you from list on the left and general r
             #address = str(box.text()).split(": ")[1].strip()
             address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
+            options_for_mod[index].append("\nquantities = fex:channels fex:sum")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
         # --- --- --- All images --- --- ---
-        if ( str(box.text()).find("TM6740")>=0 
+        if ( str(box.text()).find("YAG")>=0 
+             or  str(box.text()).find("TM6740")>=0 
              or str(box.text()).find("Opal1000")>=0 
              or str(box.text()).find("Fccd")>=0 
              or str(box.text()).find("Princeton")>=0
@@ -981,15 +928,23 @@ Start with selecting data of interest to you from list on the left and general r
             #address = str(box.text()).split(": ")[1].strip()
             address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
-            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\ninputdark = ")
+            options_for_mod[index].append("\n;threshold = low-high (col1:col2,row1:row2) type")
+            options_for_mod[index].append("\n;algorithms = rotate shift")
+            options_for_mod[index].append("\nquantities = image average ; dark maximum")
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
+            #options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
             options_for_mod[index].append("\noutputfile = ")
             options_for_mod[index].append("\nmax_save = 0   ; max event images to save" )
-            options_for_mod[index].append("\nn_hdf5 = ") 
+            try:
+                calibpath = '/'.join( self.filenames[0].split('/')[0:6]) + "/calib/*/" +\
+                            address.replace('|',':').replace('-','.')
+                calibpath = glob.glob(calibpath)[0]
+                options_for_mod[index].append("\ncalib_path = %s"%calibpath)
+            except:
+                print calibpath
             return
 
 #        # --- --- --- CsPad --- --- ---

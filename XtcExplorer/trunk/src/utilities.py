@@ -184,12 +184,14 @@ class PyanaOptions( object ):
 #-----------------------------------------
 # Data Storage Classes
 #-----------------------------------------
+import numpy as np
 
 class BaseData( object ):
     """Base class for container objects storing event data
     in memory (as numpy arrays mainly). Useful for passing
     the data to e.g. ipython for further investigation
     """
+
     def __init__(self, name,type="BaseData"):
         self.name = name
         self.type = type
@@ -206,6 +208,14 @@ class BaseData( object ):
                     print item, ": ndarray of dimension(s) ", attr.shape
                 else:
                     print item, " = ", type(attr)
+                    
+    def show2( self ):
+        itsme = "\n%s from %s :" % (self.type, self.name)
+        myplottables = self.get_plottables()
+        for key, array in myplottables.iteritems():
+            itsme += "\n\t %s: \t %s   " % (key, array.shape)
+        print itsme
+        return
                     
     def get_plottables_base(self):
         plottables = {}
@@ -245,6 +255,7 @@ class IpimbData( BaseData ):
     """
     def __init__( self, name, type="IpimbData" ):
         BaseData.__init__(self,name,type)
+        self.gain_settings = None
         self.fex_sum = None
         self.fex_channels = None
         self.fex_position = None
@@ -309,14 +320,18 @@ class ImageData( BaseData ):
         BaseData.__init__(self,name,type)
         self.image = None      # the image
         self.average = None    # the average collected so far
+        self.maximum = None    # the max projection of images collected so far
         self.counter = 0       # nEvents in average
         self.dark = None       # the dark that was subtracted
+        self.avgdark = None    # the average of accumulated darks
+        self.ndark = 0         # counter for accumulated darks
         self.roi = None        # list of coordinates defining ROI
         
         # The following are 1D array if unbinned, 2D if binned (bin array being the first dim)
         self.spectrum = None   # Array of image intensities (1D, or 2D if binned)
-        self.projX = None      # Average image intensity projected onto horizontal axis
-        self.projY = None      # Average image intensity projected onto vertical axis
+        #self.projX = None      # Average image intensity projected onto horizontal axis
+        #self.projY = None      # Average image intensity projected onto vertical axis
+        self.showProj = False
         
         # The following are always 2D arrays, binned. bins vs. values
         self.projR = None      # Average image intensity projected onto radial axis (2D)
@@ -334,15 +349,6 @@ class ImageData( BaseData ):
                 print "setting ROI failed, did you define the image? "
         return plottables
                 
-class CsPadData( BaseData ):
-    """CsPad data
-    """
-    def __init__(self, name, type="CsPadData"):
-        BaseData.__init__(self,name,type)
-        self.image = None
-        self.average = None
-        self.dark = None
-
 
 
 #-------------------------------------------------------
@@ -353,839 +359,50 @@ class Threshold( object ) :
 
     To keep track of threshold settings (value and area of interest)
     """
-    def __init__( self,
-                  value = None,
-                  area = None,
-                  type = "maximum"
-                  ) :
+    def __init__( self, description = None ):
         """constructor
-        @param  value     threshold value (float)
-        @param  area      region for evaluating threshold (length 4 array of floats)
-        @param  type      type of evaluation. 'maximum' or 'average'
+        @param description  
         """
-        self.area = area        
-        self.value = value
-        self.type = type
+        self.lower = None
+        self.upper = None
+        self.mask = None
+        self.type = None
+        self.region = None
+        self.is_empty = False
 
-#-------------------------------------------------------
-# Plotter
-#-------------------------------------------------------
-import numpy as np
-
-from PyQt4 import QtCore
-
-# uncomment these two if you want to run the pyana job in batch mode
-# import matplotlib
-# matplotlib.use('PDF')
-
-# These don't work with SlideShow, for some reason:
-#import matplotlib 
-#matplotlib.use('Qt4Agg')
-
-import matplotlib.pyplot as plt
-
-import matplotlib.ticker as ticker
-
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mpl_toolkits.axes_grid1 import AxesGrid
-
-class Frame(object):
-    """Frame (axes/subplot) manager
-
-    In principle one should think that the 'figure' and 'axes' 
-    containers would be sufficient to navigate the plot, right?
-    Yet, I find no way to have access to everything, like colorbar.
-    # So I make my own container... let me know if you know a better way
-    """
-    def __init__(self, name="", title=""):
-        self.name = name
-        self.title = title
-
-        self.data = None       # the array to be plotted
-        self.ticks = {}        # tick marks for any axes if needed
-
-        self.axes = None       # the patch containing the image
-        self.axesim = None     # the image AxesImage
-
-        self.colb = None       # the colorbar
-        self.projx = None      # projection onto the horizontal axis
-        self.projy = None      # projection onto the vertical axis
-
-        # options
-        self.plot_type = None 
-        self.showProj = False  # only relevant for 2d plots
-        self.extent = None
-        self.axis_values = None
-        self.aspect = 'auto'
-
-        # threshold associated with this plot (image)
-        self.threshold = None
-
-        self.first = True
-
-        # display-limits for this plot (image)
-        self.vmin = None
-        self.vmax = None
-        self.orglims = None
-
-
-    def myticks(self, x, pos):
-        'The two args are the value and tick position'
-        if self.axis_values is None:
-            return x # change nothing
-
-        try:
-            val = self.axis_values[x]
-            return '%1.0f'%val
-        except:
-            print "axis values out of range, %1.1f not in %s"%( x, str(self.axis_values.shape))
-            return x
-
-
-    def show(self):
-        itsme = "%s"%self
-        itsme +="\n name = %s " % self.name        
-        itsme +="\n title = %s " % self.title
-        itsme +="\n axes = %s " % self.axes
-        itsme +="\n axesim = %s " % self.axesim
-        itsme +="\n threshold = %s " % self.threshold
-        itsme +="\n vmin = %s " % self.vmin
-        itsme +="\n vmax = %s " % self.vmax
-        itsme +="\n orglims = %s " % str(self.orglims)
-        itsme +="\n projx = %s " % self.projx
-        itsme +="\n projy = %s " % self.projy
-        print itsme
-
-    def update_axes(self):
-        if self.projx is None: return
-        if self.projy is None: return
+        if description is None or description == "":
+            self.is_empty = True
+            return None
+        
+        print "setting up Threshold object based on description:", description
             
-        # does nothing right now...
-        # but if needed, this is where to update axes of projection plots
-        # if these need to change when image colorscale changes
+        words = description.split(' ')
+        threshold = {}
+        for w in words:
+            n,d = w.split('=')
+            threshold[n] = d
 
-    #def set_ticks_new(self, nticks, lotick, hitick, axis="X"):
-    #    """Set ticks of this frame object's x,y or z axis
-    #    """
-    #    interval = (hitick-lotick)/(nticks)        
-
-    #    ticks = []
-    #    for tck in range (nticks+1):
-    #        tick = lotick + tck * interval
-    #        print tick
-    #        tick = np.round( tick )
-    #        ticks.append(tick)
-
-    #    self.ticks[axis] = ticks
-
-
-    def set_ticks(self, limits = None ):
-        
-        if limits is None: 
-            vmin, vmax = self.projy.get_xlim()
-            hmin, hmax = self.projx.get_ylim()
-            limits = (vmin,vmax,hmin,hmax)
-        vmin,vmax,hmin,hmax = limits
-
-        # -------------horizontal-------------------
-        roundto = 1
-        if hmax > 100 : roundto = 10
-        if hmax > 1000 : roundto = 100
-        if hmax > 10000 : roundto = 1000
-
-        nticks = 3
-        firsttick = roundto * np.around(hmin/roundto)
-        lasttick = roundto * np.around(hmax/roundto)
-        interval = roundto * np.around((hmax-hmin)/((nticks-1)*roundto))
-        ticks = []
-        for tck in range (nticks):
-            ticks.append( firsttick + tck * interval )
-                  
-        self.projx.set_yticks( ticks )
-        self.projx.set_ylim( np.min(ticks[0],hmin), np.max(ticks[-1],hmax) )
-        
-        # -------------vertical---------------
-        roundto = 1
-        if vmax > 100 : roundto = 10
-        if vmax > 1000 : roundto = 100
-        if vmax > 10000 : roundto = 1000
-
-        nticks = 3
-        firsttick = roundto * np.around(vmin/roundto)
-        lasttick = roundto * np.around(vmax/roundto)
-        interval = roundto * np.around((vmax-vmin)/((nticks-1)*roundto))
-        ticks = []
-        for tck in range (nticks):
-            ticks.append( firsttick + tck * interval )
-
-        self.projy.set_xticks( ticks )
-        self.projy.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
+        print "Threshold:",
+        if 'lower' in threshold:
+            self.lower = float(threshold['lower'])
+            print " lower = %.2f"% self.lower,
+        if 'upper' in threshold:
+            self.upper = float(threshold['upper']) 
+            print " upper = %.2f"% self.upper,
+        if 'mask' in threshold:
+            self.mask = float(threshold['mask']) 
+            print " mask = %.2f"% self.mask,
+        if 'type' in threshold:
+            self.type = threshold['type']
+            print " type = %s"% self.type,
+        if 'roi' in threshold:
+            roi = [range.split(':') for range in threshold['roi'].strip('()').split(',')]
+            self.region = [ int(roi[0][0]), int(roi[0][1]), int(roi[1][0]), int(roi[1][1]) ]
+            print " region = %s"% self.region,
+        print
 
 
-    def imshow( self, image, fignum=1, position=1):
-        """ extension of plt.imshow with
-        - interactive colorbar
-        - optional axis projections
-        - threshold management
-        - display mode management
-        """
-        if ( self.vmin is None) and (self.vmin is not None ):
-            self.vmin = self.vmin
-        if ( self.vmax is None) and (self.vmax is not None ):
-            self.vmax = self.vmax
-        
-
-        # AxesImage
-        myorigin = 'upper'
-        if self.showProj>0 : myorigin = 'lower'
-        self.axesim = self.axes.imshow( image,
-                                        origin=myorigin,
-                                        extent=self.extent,
-                                        interpolation='bilinear',
-                                        vmin=self.vmin,
-                                        vmax=self.vmax )
-
-        divider = make_axes_locatable(self.axes)
-        
-        self.axes.set_title(self.title)
-
-        if self.showProj>0 :
-            self.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=self.axes)
-            self.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=self.axes)
-            self.projx.set_title( self.axes.get_title() )
-            self.axes.set_title("") # clear the axis title
-
-            maskedimage = np.ma.masked_array(image, mask=(image==0) )
-
-            # --- average along each axis (or optionally maximum for special purposes)
-            proj_vert, proj_horiz = None, None
-            if self.showProj == 1:
-                proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
-                proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
-            elif self.showProj == 2: 
-                proj_vert = np.ma.max(maskedimage,1) # for each row, max of elements
-                proj_horiz = np.ma.max(maskedimage,0) # for each column, max of elements
-               
-            x1,x2,y1,y2 = self.axesim.get_extent()
-            start_x = x1
-            start_y = y1
-
-            # vertical and horizontal dimensions, axes, projections
-            vdim,hdim = self.axesim.get_size()        
-            hbins = np.arange(start_x, start_x+hdim, 1)
-            vbins = np.arange(start_y, start_y+vdim, 1)
-
-            self.projx.plot(hbins,proj_horiz)
-            self.projy.plot(proj_vert, vbins)
-            self.projx.get_xaxis().set_visible(False)
-        
-            self.projx.set_xlim( start_x, start_x+hdim)
-            self.projy.set_ylim( start_y+vdim, start_y)
-
-            self.set_ticks()
-            self.update_axes()
+            
             
 
-        cax = divider.append_axes("right",size="5%", pad=0.05)
-        self.colb = plt.colorbar(self.axesim,cax=cax)
-        # colb is the colorbar object
 
-        self.orglims = self.axesim.get_clim()
-        if self.vmin is not None:
-            self.orglims = ( self.vmin, self.orglims[1] )
-        if self.vmax is not None:
-            self.orglims = ( self.orglims[0], self.vmax )
-
-        self.vmin, self.vmax = self.orglims
-
-
-        # show the active region for thresholding
-        if self.threshold and self.threshold.area is not None:
-            xy = [self.threshold.area[0],self.threshold.area[2]]
-            w = self.threshold.area[1] - self.threshold.area[0]
-            h = self.threshold.area[3] - self.threshold.area[2]
-            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
-            self.axes.add_patch(self.thr_rect)
-            print "Plotting the red rectangle in area ", self.threshold.area
-
-
-class Plotter(object):
-    
-    """Figure (canvas) manager
-    """
-    def __init__(self):
-        self.fig = None
-        self.fignum = None
-        # a figure has one or more plots/frames
-        
-        self.frames = {} # dictionary / hash table to access the Frames
-
-        self.display_mode = None
-        # flag if interactively changed
-
-        # global title
-        self.title = ""
-        
-        self.threshold = None
-        self.vmin = None
-        self.vmax = None
-
-        self.first = True
-        self.cid1 = None
-        self.cid2 = None
-
-        self.set_ROI = False
-
-        self.settings() # defaults
-
-        # matplotlib backend is set to QtAgg, and this is needed to avoid
-        # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
-        QtCore.pyqtRemoveInputHook()
-
-
-    def add_image_frame(self, name="", title="",contents=None, plot_type="image", aspect='auto'):
-        """Forward to add_frame"""
-        return self.add_frame(name,title,contents,plot_type,aspect)
-
-
-    def add_frame(self, name="", title="",contents=None, plot_type=None, aspect='auto'):
-        """Add a frame to the plotter. 
-        @param  name       name of frame (must be unique, else returns the existing frame)
-        @param  title      current title, may be different from event to event
-        @param  contents   tuple of data arrays to be plotted (in one frame).
-        @param  type       type of plot. Defaults based on contents
-        @param  aspect     set aspect ratio of this frame (doesn't work)
-        """
-        aframe = None
-
-        if name == "":
-            name = "frame%d",len(self.frames)+1
-
-        # Add this frame to plotter's list of frames.
-        # If one with this name already exists, fetch it, don't make a new one
-        if name in self.frames:
-            aframe = self.frames[name]
-        else :
-            self.frames[name] = Frame(name)
-            aframe = self.frames[name]
-
-        # copy any threshold as default
-        aframe.threshold = self.threshold        
-        
-        aframe.title = title
-        aframe.data = contents
-        aframe.plot_type = plot_type
-        aframe.aspect = aspect
-        return aframe
-
-    def plot_all_frames(self, fignum=1, ordered=False):
-        """Draw all frames
-        """
-        nplots = len(self.frames)
-        
-        self.fignum = fignum
-
-        ncol = int(np.ceil( np.sqrt(nplots) ))
-        nrow = int(np.ceil( (1.0*nplots) / ncol ))
-
-        self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
-        self.fig.clf()
-
-        self.fig.suptitle(self.title)
-
-        i = 1
-        framenames = self.frames.iterkeys()
-        if ordered : framenames = sorted(framenames)
-        for name in framenames:
-
-            frame = self.frames[name]
-            frame.axes = self.fig.add_subplot(nrow,ncol,i)
-            i+=1
-
-            frame.axes.set_aspect(frame.aspect)
-
-            titles = frame.title.split(';')
-            frame.axes.set_title(titles[0])
-            try:
-                frame.axes.set_xlabel(titles[1])
-                frame.axes.set_ylabel(titles[2])
-            except:
-                pass
-
-
-            if frame.plot_type == "hist":
-                n, bins, patches = plt.hist(frame.data, 60, histtype='stepfilled')
-
-            elif frame.plot_type == 'image':
-                frame.imshow(frame.data, fignum=fignum)
-
-            elif frame.plot_type == 'scatter':
-                points = plt.scatter(frame.data[0],frame.data[1])
-
-            else :
-
-                # single image (2d array)
-                narrs = len(frame.data)
-                ndims = frame.data[0].ndim
-                
-                if ndims == 2 :
-                    if narrs == 1 :
-                        frame.imshow(frame.data[0], fignum=fignum)
-                    else :
-                        print "utilities: Plotter:plot_all_frames: unsure what to do about this"
-                    
-                elif ndims == 1 :
-                    # line plots
-                
-                    if narrs == 1 or narrs == 2:
-                        plt.plot(*frame.data)
-
-                    if narrs > 2 :
-                        xaxis = frame.data[0]
-                        others = frame.data[1:]
-                        myargs = []
-                        for o in others :
-                            myargs.append( xaxis )
-                            myargs.append( o )
-                            myargs.append('-o')
-                        
-                        plt.plot(*myargs)
-
-                    if len(frame.data)>1:
-                        frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
-
-            if frame.axis_values is not None:
-                formatter = ticker.FuncFormatter(frame.myticks)
-                frame.axes.xaxis.set_major_formatter(formatter)
-                
-
-                
-        self.fig.subplots_adjust(left=0.05,   right=0.95,
-                                 bottom=0.05, top=0.90,
-                                 wspace=0.2,  hspace=0.2 )
-        self.connect()
-
-        # for backward compatibility
-        return self.display_mode
-    
-        
-    def settings(self
-                 , width = 8 # width of a single plot
-                 , height = 7 # height of a single plot
-                 , nplots=1  # total number of plots in the figure
-                 , maxcol=3  # maximum number of columns
-                 ):
-        self.w = width
-        self.h = height
-        self.nplots = nplots
-        self.maxcol = maxcol
-        
-    def create_figure(self, fignum, nplots=1):
-        """ Make the matplotlib figure.
-        This clears and rebuilds the canvas, although
-        if the figure was made earlier, some of it is recycled
-        """
-        ncol = 1
-        nrow = 1
-        if nplots == 4:
-            ncol = 2
-            nrow = 2
-        elif nplots > 1 :
-            ncol = self.maxcol
-            if nplots<self.maxcol : ncol = nplots
-            nrow = int( nplots/ncol )
-            if (nplots%ncol) > 0 : nrow+=1
-        
-        #print "Figuresize: ", self.w*ncol,self.h*nrow
-        #print "Figure conf: %d rows x %d cols" % ( nrow, ncol)
-        
-        # --- sanity check ---
-        max =  ncol * nrow
-        if nplots > max :
-            print "utitilities.py: Something wrong with the subplot configuration"
-            print "                Not enough space for %d plots in %d x %d"%(nplots,ncol,nrow)
-
-
-        self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
-        self.fignum = fignum
-        self.fig.clf()
-        #self.fig.set_size_inches(self.w*ncol,self.h*nrow)
-
-        self.fig.subplots_adjust(left=0.05,   right=0.95,
-                                 bottom=0.05, top=0.90,
-                                 wspace=0.2,  hspace=0.2 )
-        
-        # add subplots and frames
-        for i in range (1,nplots+1):
-            ax = self.fig.add_subplot(nrow,ncol,i)
-
-            key = "fig%d_frame%d"%(fignum,i)
-            if key in self.frames :
-                self.frames[key].axes = ax
-            else :
-                aframe = self.add_frame(key)
-                aframe.axes = ax
-                #self.frames[key] = aframe 
-
-        self.connect()
-
-
-    def close_figure(self):
-        #print plt.get_fignums()
-        plt.close(self.fignum)
-        
-    def connect(self,plot=None):
-        if plot is None: 
-            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-            self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-        else :
-            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', plot.onclick)
-            self.cid2 = self.fig.canvas.mpl_connect('pick_event', plot.onpick)
-        #print "Now connected? ", self.cid1, self.cid2
-
-    def onpick(self, event):
-        print "The following clickable artist object was picked: ", event.artist
-
-        # in which Frame?
-        for aplot in self.frames.itervalues() :
-            if aplot.axes == event.artist.axes : 
-
-                print "Current   threshold = ", aplot.threshold.value
-                print "          active area [xmin xmax ymin ymax] = ", aplot.threshold.area
-                print "To change the Region of Interest, Left-click"
-                if event.mouseevent.button==1:
-                    self.set_ROI = True
-                    print "************************************"
-                    print "You can now select a new ROI        "
-                    print "To cancel, right-click.             "
-                    print "************************************"
-
-                if event.mouseevent.button==3:
-                    self.set_ROI = False
-                    print "*************************************"
-                    print "ROI selction has now been deactivated "
-                    print "To select ROI again, left-click on the rectangle "
-                    print "************************************"
-                    
-
-                """
-                print "To change threshold value, middle-click..." 
-                print "To change active area, right-click..." 
-                
-                if event.mouseevent.button == 3 :
-                    print "Enter new coordinates to change this area:"
-                    xxyy_string = raw_input("xmin xmax ymin ymax = ")
-                    xxyy_list = xxyy_string.split(" ")
-                    
-                    if len( xxyy_list ) != 4 :
-                        print "Invalid entry, ignoring"
-                        return
-                    
-                    for i in range (4):
-                        aplot.threshold.area[i] = float( xxyy_list[i] )
-            
-                    x = aplot.threshold.area[0]
-                    y = aplot.threshold.area[2]
-                    w = aplot.threshold.area[1] - aplot.threshold.area[0]
-                    h = aplot.threshold.area[3] - aplot.threshold.area[2]
-                    
-                    aplot.thr_rect.set_bounds(x,y,w,h)
-                    plt.draw()
-            
-                if event.mouseevent.button == 2 :
-                    text = raw_input("Enter new threshold value (current = %.2f) " % aplot.threshold.value)
-                    if text == "" :
-                        print "Invalid entry, ignoring"
-                    else :
-                        aplot.threshold.value = float(text)
-                        print "Threshold value has been changed to ", aplot.threshold.value
-                        plt.draw()
-
-                """            
-
-
-
-    # define what to do if we click on the plot
-    def onclick(self, event) :
-
-        if self.first : 
-            self.first = False
-            print """
-            To change the color scale, click on the color bar:
-            - left-click sets the lower limit
-            - right-click sets higher limit
-            - middle-click resets to original
-            """
-        
-        # -------------- clicks outside axes ----------------------
-        # can we open a dialogue box here?
-        if not event.inaxes and event.button == 3 :
-            print "can we open a menu here?"
-            #print "Close all mpl windows"
-            #plt.close('all')
-            
-
-        # change display mode
-        if not event.inaxes and event.button == 2 :
-            new_mode = None
-            new_mode_str = raw_input("Plotter: switch display mode? Enter new mode: ")
-            if new_mode_str != "":
-                
-                if new_mode_str == "NoDisplay"   :
-                    new_mode = 0
-                if new_mode_str == "0"           :
-                    new_mode = 0
-                    new_mode_str = "NoDisplay"
-
-                if new_mode_str == "Interactive" :
-                    new_mode = 1
-                if new_mode_str == "1"           :
-                    new_mode = 1
-                    new_mode_str = "Interactive" 
-
-                if new_mode_str == "SlideShow"   :
-                    new_mode = 2
-                if new_mode_str == "2"           :
-                    new_mode = 2
-                    new_mode_str = "SlideShow"   
-
-                print "Plotter display mode has been changed from %s to %d (%s)" % \
-                      (self.display_mode,new_mode,new_mode_str)
-                self.display_mode = new_mode 
-
-                if new_mode == 2 :
-                    # if we switch from Interactive to SlideShow mode
-                    # the figure needs to be properly closed 
-                    # and recreated after setting ion (mpl interactive mode)
-                    # if not, the figure remains hidden after you close the GUI
-                    #self.close_figure()
-                    plt.close('all')
-                    plt.ion()
-
-
-        # -------------- clicks inside axes ----------------------
-        if event.inaxes :
-
-            # find out which axes was clicked...
-
-            # ... colorbar?
-            for key,aplot in self.frames.iteritems() :
-                if aplot.colb and aplot.colb.ax == event.inaxes: 
-
-                    #print "You clicked on colorbar of plot ", aplot.name
-                    #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
-                    #print ' xdata=',event.xdata,' ydata=', event.ydata
-
-                    # color/value limits
-                    clims = aplot.axesim.get_clim()        
-                    aplot.vmin = clims[0]
-                    aplot.vmax = clims[1]
-
-                    range = aplot.vmax - aplot.vmin
-                    value = aplot.vmin + event.ydata * range
-                    #print "min,max,range,value = ",aplot.vmin,aplot.vmax,range,value
-            
-                    # left button
-                    if event.button == 1 :
-                        aplot.vmin = value
-                        print "mininum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
-                
-                    # middle button
-                    elif event.button == 2 :
-                        aplot.vmin, aplot.vmax = aplot.orglims
-                        print "reset %s to original: ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
-                        
-                    # right button
-                    elif event.button == 3 :
-                        aplot.vmax = value
-                        print "maximum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
-                
-                    aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
-                    aplot.update_axes()
-                    plt.draw()
-
-                
-                if aplot.axes == event.inaxes: 
-                    if self.set_ROI:
-                        print "New area ", event.xdata, event.ydata
-                        self.ROI_coordinates = plt.ginput(n=0) 
-                        print "New coordinates", self.ROI_coordinates
-
-    def plot_image(self, image, fignum=1, title="", showProj=0, extent=None):
-        """ plot_image
-        utility function for when plotting a single image outside of pyana
-        """
-        self.create_figure(fignum,1)
-        self.fig.suptitle(title)
-        self.drawframe(image, showProj=showProj, extent=extent)
-
-        plt.draw()
-        if self.display_mode == "Interactive" :
-            plt.show()
-
-############# This won't be missed (I think)
-#
-#    def plot_several(self, list_of_arrays, fignum=1, title="" ):
-#        """ Draw several frames in one canvas
-#        
-#        @list_of_arrays          a list of tuples (title, array)
-#        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-#        @return                  new display_mode if any (else return None)
-#        """
-#        #if self.fig is None: 
-#        self.create_figure(fignum, nplots=len(list_of_arrays))
-#        self.fig.suptitle(title)
-            
-#        pos = 0
-#        for tuple in list_of_arrays :
-#            pos += 1
-#            ad = tuple[0]
-#            im = tuple[1]
-#            xt = None
-#            if len(tuple)==3 : xt = tuple[2]
-
-#            if type(im)==np.ndarray:
-#                if len( im.shape ) > 1:
-#                    self.drawframe(im,title=ad,fignum=fignum,position=pos)
-#                else :
-#                    plt.plot(im)
-#            elif type(im)==tuple:
-#                print "tuple"
-#                pass
-                
-#        plt.draw()
-#        return self.display_mode
-
-    def draw_figurelist(self, fignum, event_display_images, title="",showProj=0,extent=None ) :
-        """ Draw several frames in one canvas
-        
-        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-        @event_display_images    a list of tuples (name,title,image,extent=None)
-        @return                  new display_mode if any (else return None)
-        """
-        #if self.fig is None: 
-        self.create_figure(fignum, nplots=len(event_display_images))
-        self.fig.suptitle(title)
-            
-        pos = 0
-        for tuple in event_display_images :
-            pos += 1
-            name  = tuple[0]
-            title = tuple[1]
-            img   = tuple[2]
-
-            xt = None
-            if len(tuple)==4 : xt = tuple[3]
-            
-            self.drawframe(img,title=title,fignum=fignum,position=pos,showProj=showProj,extent=xt)
-            
-        plt.draw()
-        return self.display_mode
-
-    def draw_figure( self, frameimage, title="", fignum=1,position=1, showProj = 0,extent=None):
-        """ Draw a single frame in one canvas
-        """
-        self.create_figure(fignum)
-        self.fig.suptitle(title)
-        self.drawframe(frameimage,title,fignum,position,showProj,extent)
-
-        plt.draw()
-        return self.display_mode
-
-
-        
-        
-    def drawframe( self, frameimage, title="", fignum=1,position=1, showProj=0, extent=None):
-        """ Draw a single interactive frame with optional projections and threshold
-        """
-        key = "fig%d_frame%d"%(fignum,position)
-        aplot = self.frames[key]
-        aplot.image = frameimage
-
-        if ( aplot.vmin is None) and (self.vmin is not None ):
-            aplot.vmin = self.vmin
-        if ( aplot.vmax is None) and (self.vmax is not None ):
-            aplot.vmax = self.vmax
-        
-        # get axes
-        aplot.axes = self.fig.axes[position-1]
-        aplot.axes.set_title( title )
-
-        if aplot.name == "" and title != "" :
-            aplot.name = title
-
-        # AxesImage
-        myorigin = 'upper'
-        if showProj>0 : myorigin = 'lower'
-
-        aplot.axesim = aplot.axes.imshow( frameimage,
-                                          origin=myorigin,
-                                          extent=extent,
-                                          interpolation='bilinear',
-                                          vmin=aplot.vmin,
-                                          vmax=aplot.vmax )
-
-        divider = make_axes_locatable(aplot.axes)
-
-        if showProj>0:
-            aplot.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
-            aplot.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
-            aplot.projx.set_title( aplot.axes.get_title() )
-            aplot.axes.set_title("") # clear the axis title
-
-            # --- sum or average along each axis, 
-            maskedimage = np.ma.masked_array(frameimage, mask=(frameimage==0) )
-
-            proj_vert, proj_horiz = None, None
-            if showProj == 1:
-                proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
-                proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
-            elif showProj == 2: 
-                proj_vert = np.ma.max(maskedimage,1) # for each row, max of elements
-                proj_horiz = np.ma.max(maskedimage,0) # for each column, max of elements
-                           
-            x1,x2,y1,y2 = aplot.axesim.get_extent()
-            start_x = x1
-            start_y = y1
-
-            # vertical and horizontal dimensions, axes, projections
-            vdim,hdim = aplot.axesim.get_size()        
-            hbins = np.arange(start_x, start_x+hdim, 1)
-            vbins = np.arange(start_y, start_y+vdim, 1)
-
-            aplot.projx.plot(hbins,proj_horiz)
-            aplot.projy.plot(proj_vert, vbins)
-            aplot.projx.get_xaxis().set_visible(False)
-        
-            aplot.projx.set_xlim( start_x, start_x+hdim)
-            aplot.projy.set_ylim( start_y+vdim, start_y)
-
-            aplot.set_ticks()
-            aplot.update_axes()
-            
-
-        cax = divider.append_axes("right",size="5%", pad=0.05)
-        aplot.colb = plt.colorbar(aplot.axesim,cax=cax)
-        # colb is the colorbar object
-
-        aplot.orglims = aplot.axesim.get_clim()
-        if aplot.vmin is not None:
-            aplot.orglims = ( aplot.vmin, aplot.orglims[1] )
-        if aplot.vmax is not None:
-            aplot.orglims = ( aplot.orglims[0], aplot.vmax )
-
-        aplot.vmin, aplot.vmax = aplot.orglims
-
-        
-        # show the active region for thresholding
-        if aplot.threshold and aplot.threshold.area is not None:
-            xy = [aplot.threshold.area[0],aplot.threshold.area[2]]
-            w = aplot.threshold.area[1] - aplot.threshold.area[0]
-            h = aplot.threshold.area[3] - aplot.threshold.area[2]
-            aplot.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
-            aplot.axes.add_patch(aplot.thr_rect)
-            #print "Plotting the red rectangle in area ", aplot.threshold.area
-
-        aplot.axes.set_title(title)
-        
-        

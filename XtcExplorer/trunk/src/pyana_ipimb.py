@@ -1,15 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
 #
-# ipimb.py: plot beamline data
+# Description:
+#   Module pyana_ipimb
 #
-# 
+"""User analysis module for pyana framework.
+
+This software was developed for the LCLS project.  If you use all or
+part of it, please give an appropriate acknowledgment.
+
+@author Ingrid Ofte
+"""
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-from   pypdsdata import xtc
+from pypdsdata.xtc import TypeId
 from utilities import PyanaOptions
 from utilities import IpimbData
-from utilities import Plotter
 
 # analysis class declaration
 class  pyana_ipimb ( object ) :
@@ -17,17 +25,13 @@ class  pyana_ipimb ( object ) :
     def __init__ ( self,
                    source = None,
                    sources = None,
-                   quantities = "fex:pos fex:sum fex:channels",
-                   # "raw:channels raw:voltages"
-                   # "fex:ch0 fex:ch1 fex:ch2 fex:ch3"
-                   # "raw:ch0 raw:ch1 raw:ch2 raw:ch3"
-                   # "raw:ch0volt raw:ch1volt raw:ch2volt raw:ch2volt"
+                   quantities = "fex:channels fex:sum",                   
                    plot_every_n = "0",
                    accumulate_n    = "0",
                    fignum = "1" ) :
         """
         @param sources           list of IPIMB addresses
-        @param quantities         list of quantities to plot
+        @param quantities        list of quantities to plot
         @param plot_every_n      Zero (don't plot until the end), or N (int, plot every N event)
         @param accumulate_n      Accumulate all (0) or reset the array every n shots
         @param fignum            matplotlib figure number
@@ -57,11 +61,10 @@ class  pyana_ipimb ( object ) :
         self.n_shots = None
         self.accu_start = None
 
-        self.plotter = None
-                
-        
         # lists to fill numpy arrays
+        print "Initializing lists..."
         self.initlists()
+        print "done"
 
 
 
@@ -94,36 +97,53 @@ class  pyana_ipimb ( object ) :
         
         self.data = {}
         for source in self.sources :
+            print source
             self.data[source] = IpimbData( source ) 
 
             # just for information:
-            config = env.getConfig( xtc.TypeId.Type.Id_IpimbConfig , source )
+            config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
             if config is not None:
                 print "IPIMB %s configuration info: "%source
-                print "   Acquisition window (ns) ", config.resetLength()
-                print "   Reset delay (ns) ", config.resetDelay()
-                print "   Reference voltage ", config.chargeAmpRefVoltage()
-                print "   Diode bias voltage ", config.diodeBias()
-                print "   Sampling delay (ns) ", config.trigDelay()
-                #print "   trigger counter ", config.triggerCounter()
-                #print "   serial ID ", config.serialID()
-                #print "   charge amp range ", config.chargeAmpRange()
-                #print "   calibration range ", config.calibrationRange()
-                #print "   calibration voltage ", config.calibrationVoltage()
-                #print "   status ", config.status()
-                #print "   errors ", config.errors()
-                #print "   calStrobeLength ", config.calStrobeLength()
-                #try: # These are only for ConfigV2
-                #    print "   trigger ps delay ", config.trigPsDelay()
-                #    print "   adc delay ", config.adcDelay()
-                #except:
-                #    pass
+                print "   Trigger counter:     0x%lx" % config.triggerCounter()
+                print "   serial ID:           0x%lx" %config.serialID()
+                print "   Charge amp settings: 0x%x "% config.chargeAmpRange()
+                print "   Acquisition window:  %ld ns" % config.resetLength()
+                print "   Reset delay:         %d ns"% config.resetDelay()
+                print "   Reference voltage:   %f V" % config.chargeAmpRefVoltage()
+                print "   Diode bias voltage:  %f V" % config.diodeBias()
+                print "   Sampling delay:      %ld ns" % config.trigDelay()
+                print "   calibration range:   ", config.calibrationRange()
+                print "   calibration voltage: ", config.calibrationVoltage()
+                print "   status:  ", config.status()
+                print "   errors:  ", config.errors()
+                print "   calStrobeLength:     ", config.calStrobeLength()
+                try: # These are only for ConfigV2
+                    print "   trigger ps delay:    ", config.trigPsDelay()
+                    print "   adc delay:           ", config.adcDelay()
+                except:
+                    pass
+
+                # oppskrift fra Henrik (capacitor setting / gain):
+                amprange = config.chargeAmpRange()
+
+                capacitor = { 'V1' : ['1pF', '100pF', '10nF'],
+                              'V2' : ["1pF", "4.7pF", "24pF", "120pF", "620pF", "3.3nF", "10nF", "expert"]
+                              }
+
+                # Convert chargeAmpRange (16 bits for ConfigV2, 8 bits for ConfigV1) to 4 integers
+                version, nbits, mask = 'V2', 4, 0xf
+                if str(type(config)).find("ConfigV1")>=0 :
+                    version, nbits, mask = 'V1', 2, 0x3
+
+                caval = []
+                for i in range(4):
+                    caval.append( ( amprange >> nbits*i) & mask )
+                    
+                self.data[source].gain_settings = [capacitor[version][i] for i in caval]
+                print "Capacitor settings for %s diodes: %s" %\
+                      (source, self.data[source].gain_settings)
 
 
-        self.plotter = Plotter()
-        self.plotter.settings(7,7) # set default frame size
-                
-            
     def event ( self, evt, env ) :
 
         self.n_shots+=1
@@ -142,14 +162,19 @@ class  pyana_ipimb ( object ) :
             # -------------------------------------------
 
             # try Shared IPIMB first
-            ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, source )
+            ipm = evt.get(TypeId.Type.Id_SharedIpimb, source )
             if ipm is not None:
                 ipm_raw = ipm.ipimbData
                 ipm_fex = ipm.ipmFexData
             else: 
                 # try to get the other data types for IPIMBs 
-                ipm_raw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
-                ipm_fex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
+                ipm_raw = evt.get(TypeId.Type.Id_IpimbData, source )
+                ipm_fex = evt.get(TypeId.Type.Id_IpmFex, source )
+
+            # --------------------------------------------------------------
+            # filter???
+            # --------------------------------------------------------------
+            
 
             # --------------------------------------------------------------
             # store arrays of the data that we want
@@ -191,16 +216,19 @@ class  pyana_ipimb ( object ) :
         # ----------------- Plotting ---------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
-            header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
-            self.old_make_plots(title=header)
-
             # flag for pyana_plotter
             evt.put(True, 'show_event')
 
-            # convert dict to a list:
+            # convert lists to arrays and dict to a list:
             data_ipimb = []
             for source in self.sources :
+                self.data[source].fex_sum = np.array(self.fex_sum[source])
+                self.data[source].fex_channels = np.array(self.fex_channels[source])
+                self.data[source].fex_position = np.array(self.fex_position[source])
+                self.data[source].raw_channels = np.array(self.raw_ch[source])
+                self.data[source].raw_voltages = np.array(self.raw_ch_volt[source])                
                 data_ipimb.append( self.data[source] )
+
             # give the list to the event object
             evt.put( data_ipimb, 'data_ipimb' )
 
@@ -216,10 +244,6 @@ class  pyana_ipimb ( object ) :
         if (env.subprocess()>0):
             return
 
-        # ----------------- Plotting ---------------------
-        header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
-        self.old_make_plots(title=header)
-
         # flag for pyana_plotter
         evt.put(True, 'show_event')
 
@@ -230,235 +254,3 @@ class  pyana_ipimb ( object ) :
             # give the list to the event object
             evt.put( data_ipimb, 'data_ipimb' )
 
-    def make_plots(self,title=""):
-
-        for source in self.sources :
-
-            xaxis = np.arange( self.accu_start, self.n_shots )
-
-            # --------------------------------------
-            if "fex:channels" in self.quantities:
-                name = "fex:channel(%s)"%source
-                title = "%s; %s; %s" % (source, "Event number", "Channel Fex")
-                
-                # turn the list into nx4 array
-                array = np.float_(self.fex_channels[source])
-
-                # turn nx4 array into list of channels, each a numpy array
-                channels = [ np.float_(column) for column in array.T.tolist() ]
-
-                # insert x-axis at the beginning of the list
-                channels.insert(0,xaxis)
-
-                # add frame to the canvas
-                self.plotter.add_frame(name,title, tuple(channels) )
-
-
-            # --------------------------------------
-            # fills a histogram with the sum of channels
-            if "fex:sum" in self.quantities:
-                name = "fex:sum(%s)"%source
-                title = "%s; %s; %s" % (source, "Event number", "Channel Sum")
-
-                array = np.float_(self.fex_sum[source])
-
-                # add frame to the canvas
-                self.plotter.add_frame(name, title, (array,), plot_type="hist" )
-
-
-        newmode = self.plotter.plot_all_frames(ordered=True)
-        
-    def old_make_plots(self, title = ""):
-
-        if self.n_shots == self.accu_start: 
-            print "Cannot do ", title
-            return
-
-        # -------- Begin: move this to beginJob
-        """ This part should move to begin job, but I can't get
-        it to update the plot in SlideShow mode when I don't recreate
-        the figure each time. Therefore plotting is slow... 
-        """
-        ncols = len(self.quantities)
-        nrows = len(self.sources)
-        height=4.0
-        width=height*1.2
-
-        if nrows * height > 12 : height = 12.0/nrows
-        if ncols * width > 22 : width = 22.0/ncols
-
-        fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
-        fig.clf()
- 
-        fig.subplots_adjust(left=0.1,   right=0.9,
-                            bottom=0.1,  top=0.8,
-                            wspace=0.3,  hspace=0.3 )
-        fig.suptitle(title)
-
-        self.ax = []
-        for i in range (0,ncols*nrows):
-            self.ax.append( fig.add_subplot(nrows, ncols, i) )
-        # -------- End: move this to beginJob
-
-        
-        
-        i = 0
-        for source in self.sources :
-
-            xaxis = np.arange( self.accu_start, self.n_shots )
-
-            array = np.float_(self.fex_sum[source])
-            if "fex:sum" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array, 60, histtype='stepfilled', color='r', label='Fex Sum')
-                plt.title(source)
-                plt.xlabel('Sum of channels',horizontalalignment='left') # the other right
-                i+=1
-            self.data[source].fex_sum = array
-            print "Checking the length of array: ", len(array)
-
-            array = np.float_(self.fex_channels[source])
-            if "fex:channels" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.plot(xaxis,array[:,0], label='Ch0')
-                plt.plot(xaxis,array[:,1], label='Ch1')
-                plt.plot(xaxis,array[:,2], label='Ch2')
-                plt.plot(xaxis,array[:,3], label='Ch3')
-                plt.title(source)
-                plt.ylabel('Channel Fex',horizontalalignment='left') # the other right
-                plt.xlabel('Shot number',horizontalalignment='left') # the other right
-                leg = self.ax[i].legend()#('ch0','ch1','ch2','ch3'),'upper center')
-                i+=1
-            if "fex:ch0" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,0], 60, histtype='stepfilled', color='r', label='Ch0')
-                plt.title(source)
-                plt.xlabel('Ch0 Fex',horizontalalignment='left') # the other right
-                i+=1
-            if "fex:ch1" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,1], 60, histtype='stepfilled', color='r', label='Ch1')
-                plt.title(source)
-                plt.xlabel('Ch1 Fex',horizontalalignment='left') # the other right
-                i+=1
-            if "fex:ch2" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,2], 60, histtype='stepfilled', color='r', label='Ch2')
-                plt.title(source)
-                plt.xlabel('Ch2 Fex',horizontalalignment='left') # the other right
-                i+=1
-            if "fex:ch3" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,3], 60, histtype='stepfilled', color='r', label='Ch3')
-                plt.title(source)
-                plt.xlabel('Ch3 Fex',horizontalalignment='left') # the other right
-                i+=1
-            
-            self.data[source].fex_channels = array
-
-            array = np.float_(self.raw_ch[source])
-            if "raw:channels" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.plot(xaxis,array[:,0], label='Ch0')
-                plt.plot(xaxis,array[:,1], label='Ch1')
-                plt.plot(xaxis,array[:,2], label='Ch2')
-                plt.plot(xaxis,array[:,3], label='Ch3')
-                plt.title(source)
-                plt.ylabel('Channel Raw',horizontalalignment='left') # the other right
-                plt.xlabel('Shot number',horizontalalignment='left') # the other right
-                leg = self.ax[i].legend()#('ch0','ch1','ch2','ch3'),'upper center')
-                i+=1
-            if "raw:ch0" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,0], 60, histtype='stepfilled', color='r', label='Ch0')
-                plt.title(source)
-                plt.xlabel('Ch0 Raw',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch1" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,1], 60, histtype='stepfilled', color='r', label='Ch1')
-                plt.title(source)
-                plt.xlabel('Ch1 Raw',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch2" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,2], 60, histtype='stepfilled', color='r', label='Ch2')
-                plt.title(source)
-                plt.xlabel('Ch2 Raw',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch3" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,3], 60, histtype='stepfilled', color='r', label='Ch3')
-                plt.title(source)
-                plt.xlabel('Ch3 Raw',horizontalalignment='left') # the other right
-                i+=1
-            self.data[source].raw_channels = array
-
-            array = np.float_(self.raw_ch_volt[source])
-            if "raw:voltage" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.plot(xaxis,array[:,0], label='Ch0')
-                plt.plot(xaxis,array[:,1], label='Ch1')
-                plt.plot(xaxis,array[:,2], label='Ch2')
-                plt.plot(xaxis,array[:,3], label='Ch3')
-                plt.title(source)
-                plt.ylabel('Channel Voltage',horizontalalignment='left') # the other right
-                plt.xlabel('Shot number',horizontalalignment='left') # the other right
-                leg = self.ax[i].legend()#('ch0','ch1','ch2','ch3'),'upper center')
-                i+=1
-            if "raw:ch0" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,0], 60, histtype='stepfilled', color='r', label='Ch0')
-                plt.title(source)
-                plt.xlabel('Ch0 Volt',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch1" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,1], 60, histtype='stepfilled', color='r', label='Ch1')
-                plt.title(source)
-                plt.xlabel('Ch1 Volt',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch2" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,2], 60, histtype='stepfilled', color='r', label='Ch2')
-                plt.title(source)
-                plt.xlabel('Ch2 Volt',horizontalalignment='left') # the other right
-                i+=1
-            if "raw:ch3" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                plt.hist(array[:,3], 60, histtype='stepfilled', color='r', label='Ch3')
-                plt.title(source)
-                plt.xlabel('Ch3 Volt',horizontalalignment='left') # the other right
-                i+=1
-            self.data[source].raw_channels_volt = array
-
-            if "fex:pos" in self.quantities:
-                self.ax[i].clear()
-                plt.axes(self.ax[i])
-                array2 = np.float_(self.fex_position[source])
-                plt.scatter(array2[:,0],array2[:,1])
-                plt.title(source)
-                plt.xlabel('Beam position X',horizontalalignment='left')
-                plt.ylabel('Beam position Y',horizontalalignment='left')
-                i+=1
-                self.data[source].fex_position = array2
-
-        plt.draw()
-
-                                            

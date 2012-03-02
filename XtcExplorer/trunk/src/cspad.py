@@ -1,9 +1,9 @@
 import numpy as np
+np.set_printoptions(precision=3,suppress=True)
+
 import math
 import scipy.ndimage.interpolation as interpol
-from utilities import Plotter
-import matplotlib.pyplot as plt
-np.set_printoptions(precision=3,suppress=True)
+
 import AppUtils.AppDataPath as apputils
 
 
@@ -56,6 +56,8 @@ class CsPad( object ):
         else :
             print "Reading CsPad tile alignment from ", path
             
+            #result = fnmatch.filter(os.listdir('/'), fileNamePattern):
+
         if file is None: # assume same file for all runs
             file = '0-end.data'
             
@@ -209,15 +211,6 @@ class CsPad( object ):
         print "Done making coordinate map of the CSPAD detector."
         #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
 
-        ## test
-        #plotter = Plotter()
-        #plotter.add_image_frame("xcoord","X-coordinates",self.make_image(self.x_coordinates),)
-        #plotter.add_image_frame("ycoord","Y-coordinates",self.make_image(self.y_coordinates),)
-        #plotter.add_image_frame("zcoord","Z-coordinates",self.make_image(self.z_coordinates),)
-        ##plotter.plot_image(self.image, title="Z-coordinates")
-        #plotter.plot_several(list_of_images, title="CS-Pad (2011-08-10-Metrology)")
-        #plotter.plot_all_frames()
-        #plt.show()
 
     def get_mini_image(self, element ):
         """get_2x2_image
@@ -254,7 +247,8 @@ class CsPad( object ):
         # pedestal subtraction here
         if self.pedestals is not None:
             self.pixels = self.pixels - self.pedestals
-
+            self.subtract_commonmode()
+            
         self.make_image( self.pixels )
         return self.image
 
@@ -316,6 +310,20 @@ class CsPad( object ):
             pass
 
 
+    def subtract_commonmode( self, threshold=30 ):
+        if self.pedestals is None:
+            print "No pedestals defined, cannot do common mode"
+            return
+        
+        array = self.pixels.reshape(32,185*388)
+        cmode = np.average(array, axis=1)#.reshape(4,8)
+        for i in xrange(32):
+            array[i] = array[i]-cmode[i]
+        self.pixels = array.reshape(4,8,185,388)
+        print "Common modes have been subtracted: ", cmode
+        return
+                
+                
     def save_pixels(self, pixelsfile ):
         """ save image as a pixel array with the same 
         format as the pedestals txt file: 5920 (lines) x 388 (columns)

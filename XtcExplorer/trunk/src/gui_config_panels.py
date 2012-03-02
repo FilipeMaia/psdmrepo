@@ -11,55 +11,59 @@ class RegionInput(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.name=name
 
-        self.label = QtGui.QLabel("Pixels [x1-x2:y1-y2]: ")
+        self.hrange = QtGui.QLabel("horizontal range: ")
+        self.vrange = QtGui.QLabel("vertical range: ")
+        
         self.xmin = QtGui.QLineEdit("")
-        self.xmin.setMaximumWidth(30)
+        self.xmin.setMaximumWidth(40)
         self.xmax = QtGui.QLineEdit("")
-        self.xmax.setMaximumWidth(30)
+        self.xmax.setMaximumWidth(40)
         self.ymin = QtGui.QLineEdit("")
-        self.ymin.setMaximumWidth(30)
+        self.ymin.setMaximumWidth(40)
         self.ymax = QtGui.QLineEdit("")
-        self.ymax.setMaximumWidth(30)
-        self.button = QtGui.QPushButton("OK") 
+        self.ymax.setMaximumWidth(40)
+        self.connectme()
 
         self.layout = layout
         self.module = module
 
     def add_to_layout(self):
-        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.hrange)
         self.layout.addWidget(self.xmin)
         self.layout.addWidget(self.xmax)
+        self.layout.addWidget(self.vrange)
         self.layout.addWidget(self.ymin)
         self.layout.addWidget(self.ymax)
-        self.layout.addWidget(self.button)
-        self.label.show()
+        self.hrange.show()
+        self.vrange.show()
         self.xmin.show()
         self.xmax.show()
         self.ymin.show()
         self.ymax.show()
-        self.button.show()
 
     def hide(self):
-        self.label.hide()
+        self.hrange.hide()
+        self.vrange.hide()
         self.xmin.hide()
         self.xmax.hide()
         self.ymin.hide()
         self.ymax.hide()
-        self.button.hide()
 
-    def update_label(self):
+    def register(self):
         x1 = str(self.xmin.text())
         x2 = str(self.xmax.text())
         y1 = str(self.ymin.text())
         y2 = str(self.ymax.text())
         pixels = "[%s,%s,%s,%s]"%(x1,x2,y1,y2)
-        self.label.setText("Pixels %s: " % pixels)
-        self.add_to_layout()
         self.module.add_modifier(quantity=self.name,modifier=pixels)
+        print "ROI registered change: ", self.module, self.module.options['quantities']
 
-    def connect_button(self):
+    def connectme(self):
         #print "Connected"
-        self.connect(self.button, QtCore.SIGNAL('clicked()'), self.update_label )
+        self.connect(self.xmin, QtCore.SIGNAL('editingFinished()'), self.register )
+        self.connect(self.xmax, QtCore.SIGNAL('editingFinished()'), self.register )
+        self.connect(self.ymin, QtCore.SIGNAL('editingFinished()'), self.register )
+        self.connect(self.ymax, QtCore.SIGNAL('editingFinished()'), self.register )
 
 
 class AxisInput(QtGui.QWidget):
@@ -366,20 +370,20 @@ class ImageConfigGui(QtGui.QWidget):
     def __init__(self, mod, parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.module = mod
-        self.parent = parent
+        
+        self.picsize = [1800,1800]
+
+        try:
+            nametag = mod.address
+            self.picsize = map(int, parent.moreinfo['DetInfo:%s'%nametag][0].split('x') )
+        except:
+            pass
 
         self.make_layout()
         
     def make_layout(self):
         # layout of this widget (ImageTab)
         page_layout = QtGui.QVBoxLayout(self)
-
-        nametag = self.module.address
-        picsize = [1800,1800]
-        try:
-            picsize = map( int, self.parent.moreinfo['DetInfo:%s'%nametag][0].split('x') )
-        except:
-            pass
         
         selection_box = QtGui.QGroupBox("Select what to plot:")
         selection_layout = QtGui.QVBoxLayout( selection_box )
@@ -401,7 +405,7 @@ class ImageConfigGui(QtGui.QWidget):
         
         # checkbox 'image'
         layout_image_conf = QtGui.QHBoxLayout()
-        checkbox_image = QtGui.QCheckBox("Main image (%d x %d)"% (picsize[0],picsize[1]), self)
+        checkbox_image = QtGui.QCheckBox("Main image (%d x %d)"% (self.picsize[0],self.picsize[1]), self)
         layout_image_conf.addWidget(checkbox_image)
         selection_layout.addLayout(layout_image_conf)
 
@@ -416,7 +420,11 @@ class ImageConfigGui(QtGui.QWidget):
         selection_layout.addLayout(roi_layout)
 
         roi_input = RegionInput("roi",self.module,roi_layout)
-        roi_input.connect_button()
+        # set default values: 
+        roi_input.xmin.insert("0")
+        roi_input.ymin.insert("0")
+        roi_input.xmax.insert(str(self.picsize[1]))
+        roi_input.ymax.insert(str(self.picsize[0]))
         def ask_about_roi(value):
             self.module.set_opt_roi(value)
             if value == 2 :
