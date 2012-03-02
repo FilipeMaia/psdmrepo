@@ -148,9 +148,6 @@ class  pyana_ipimb ( object ) :
 
         self.n_shots+=1
 
-        if evt.get('skip_event') :
-            return
-
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 
@@ -219,15 +216,7 @@ class  pyana_ipimb ( object ) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
 
-            # convert lists to arrays and dict to a list:
-            data_ipimb = []
-            for source in self.sources :
-                self.data[source].fex_sum = np.array(self.fex_sum[source])
-                self.data[source].fex_channels = np.array(self.fex_channels[source])
-                self.data[source].fex_position = np.array(self.fex_position[source])
-                self.data[source].raw_channels = np.array(self.raw_ch[source])
-                self.data[source].raw_voltages = np.array(self.raw_ch_volt[source])                
-                data_ipimb.append( self.data[source] )
+            data_ipimb = self.update_plot_data()
 
             # give the list to the event object
             #event_data_ipimb = evt.get('data_ipimb')
@@ -236,7 +225,6 @@ class  pyana_ipimb ( object ) :
             #    data_ipimb = event_data_ipimb
             evt.put( data_ipimb, 'data_ipimb')
 
-                        
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
             self.resetlists()
@@ -251,10 +239,19 @@ class  pyana_ipimb ( object ) :
         # flag for pyana_plotter
         evt.put(True, 'show_event')
 
-        # convert dict to a list:
-        data_ipimb = []
-        for source in self.sources :
-            data_ipimb.append( self.data[source] )
-            # give the list to the event object
-            evt.put( data_ipimb, 'data_ipimb' )
+        data_ipimb = self.update_plot_data()
+        # give the list to the event object
+        evt.put( data_ipimb, 'data_ipimb' )
 
+
+    def update_plot_data(self):
+            # convert lists to arrays and dict to a list:
+            data_ipimb = []
+            for source in self.sources :
+                self.data[source].fex_sum = np.array(self.fex_sum[source])
+                self.data[source].fex_channels = np.array(self.fex_channels[source])
+                self.data[source].fex_position = np.array(self.fex_position[source])
+                self.data[source].raw_channels = np.array(self.raw_ch[source])
+                self.data[source].raw_voltages = np.array(self.raw_ch_volt[source])                
+                data_ipimb.append( self.data[source] )
+            return data_ipimb
