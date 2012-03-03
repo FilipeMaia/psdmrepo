@@ -67,12 +67,12 @@ CSPadCommonModeCorrection::CSPadCommonModeCorrection (const std::string& name)
   , m_count(0)
  {
   // get the values from configuration or use defaults
-  m_str_src    = configStr("source", "DetInfo(:Cspad)"); // "DetInfo()", "CxiDs1.0:Cspad.0", "CxiSc1.0:Cspad2x2.0"
-  m_inkey      = configStr("inputKey", "calibrated");
+  m_str_src    = configStr("source",    "DetInfo(:Cspad)"); // "DetInfo()", "CxiDs1.0:Cspad.0", "CxiSc1.0:Cspad2x2.0"
+  m_inkey      = configStr("inputKey",  "calibrated");
   m_outkey     = configStr("outputKey", "cm_subtracted");
-  m_maxEvents  = config   ("events", 20U); // 1<<31U
-  m_ampThr     = config   ("ampthr", 30);
-  m_filter     = config   ("filter", false);
+  m_maxEvents  = config   ("events",    1<<31U);
+  m_ampThr     = config   ("ampthr",    30);
+  m_filter     = config   ("filter",    false);
 
    // initialize arrays
   std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
