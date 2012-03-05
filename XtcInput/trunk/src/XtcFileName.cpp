@@ -33,6 +33,15 @@ namespace {
 
   const char sep = '-' ;
 
+  // convert string to integer
+  unsigned _cvt ( const char* ptr, bool& stat )
+  {
+    char *eptr = 0 ;
+    int val = strtol ( ptr, &eptr, 10 ) ;
+    stat = ( *eptr == 0 ) and val >= 0 ;
+    return unsigned(val) ;
+  }
+
 }
 
 //		----------------------------------------
@@ -135,15 +144,6 @@ XtcFileName::operator<( const XtcFileName& other ) const
   if ( m_chunk < other.m_chunk ) return true ;
   return false ;
 
-}
-
-unsigned
-XtcFileName::_cvt ( const char* ptr, bool& stat ) const
-{
-  char *eptr = 0 ;
-  int val = strtol ( ptr, &eptr, 10 ) ;
-  stat = ( *eptr == 0 ) and val >= 0 ;
-  return unsigned(val) ;
 }
 
 std::ostream&

@@ -83,9 +83,6 @@ public:
 
 protected:
 
-  // helper methods
-  unsigned _cvt ( const char* ptr, bool& stat ) const ;
-
 private:
 
   // Data members
