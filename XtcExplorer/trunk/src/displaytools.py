@@ -14,6 +14,9 @@ class DataDisplay(object):
 
     def show_ipimb(self, datalist ):
 
+        self.ipimb_disp = plt.figure(200, figsize=(14,10))
+        plt.clf()
+
         if len(datalist)==1:
             self.show_ipimb_single(datalist)
 
@@ -25,13 +28,7 @@ class DataDisplay(object):
             
 
     def show_ipimb_double(self,datalist):
-
-        if self.ipimb_disp is None:
-            self.ipimb_disp = plt.figure(200, figsize=(14,10))
-            
-        fig = self.ipimb_disp
-        plt.clf()
-
+        fig = self.ipimb_disp 
 
         ax1 = fig.add_subplot(221)
         ax2 = fig.add_subplot(222)
@@ -64,13 +61,7 @@ class DataDisplay(object):
     
 
     def show_ipimb_single(self,datalist):
-
-        if self.ipimb_disp is None:
-            self.ipimb_disp = plt.figure(200, figsize=(14,10))
-
-            
-        fig = self.ipimb_disp
-        plt.clf()
+        fig = self.ipimb_disp 
 
         for ipimb in datalist:
             #ipimb.show()
