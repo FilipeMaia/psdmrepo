@@ -11,7 +11,13 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-Mar-2 ofte Tag V00-01-21         
+2012-Mar-5 ofte                       rev 3011
+	- ipimb single display improvement (using GridSpec)
+
+2012-Mar-2 ofte                       rev 3009
+        - another bugfix for pyana_ipimb.
+	
+2012-Mar-2 ofte Tag V00-01-21         rev 3008
 2012-Mar-2 ofte                       rev 3007
         - bug fix for pyana_ipimb. Can handle 1 or 2 ipimb sources now. Still to do: 
 	- handle multiple ipimb sources, 

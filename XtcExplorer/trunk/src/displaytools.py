@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import ImageGrid
 import matplotlib.ticker as ticker
-    
+from matplotlib.gridspec import GridSpec
 
 class DataDisplay(object):
 
@@ -67,6 +67,7 @@ class DataDisplay(object):
 
         if self.ipimb_disp is None:
             self.ipimb_disp = plt.figure(200, figsize=(14,10))
+
             
         fig = self.ipimb_disp
         plt.clf()
@@ -74,41 +75,49 @@ class DataDisplay(object):
         for ipimb in datalist:
             #ipimb.show()
 
-            plt.suptitle(ipimb.name)
+            plt.suptitle("%s   %s   shot#%d"%(ipimb.name,ipimb.gain_settings,self.event_number))
+
+            gs = GridSpec(4,4)
+            gs.update(wspace=0.4,hspace=0.6,left=0.10,right=0.95)
             
-            ax1 = fig.add_subplot(221)
+            ax1 = plt.subplot(gs[:2,:2])
             for ch in range (4):
                 ax1.plot(ipimb.fex_channels[:,ch],label="Channel %d"%ch)
             ax1.set_xlabel("event count")
             ax1.set_ylabel("Intensity [V]")
-            ax1.set_title("Capacitor settings: %s"%ipimb.gain_settings)
             ax1.legend()
+            ax1.set_title("Diode voltage per channel vs. event number")
+
+
+            ax2 = plt.subplot( gs[:2,2:3] )
+            ax2.plot(ipimb.fex_channels[:,0],ipimb.fex_channels[:,1],'o')
+            ax2.set_xlabel("Ch0 [V]")
+            ax2.set_ylabel("Ch1 [V]")
+            ax2.set_title("Ch1 vs. Ch0")
             
-            ax2 = ImageGrid(fig,222,
-                            nrows_ncols = (1,2),
-                            axes_pad = 1.0,
-                            add_all = True,
-                            label_mode = "all",
-                            aspect = False,
-                            )                                
-            ax2[0].plot(ipimb.fex_channels[:,0],ipimb.fex_channels[:,1],'o')
-            ax2[1].plot(ipimb.fex_channels[:,2],ipimb.fex_channels[:,3],'o')
-            ax2[0].set_xlabel("Ch0 [V]")
-            ax2[0].set_ylabel("Ch1 [V]")
-            ax2[1].set_xlabel("Ch2 [V]")
-            ax2[1].set_ylabel("Ch3 [V]")
-                
-            ax3 = fig.add_subplot(223)
-            ax3.plot(ipimb.fex_sum,label="FEX Sum")
-            ax3.set_xlabel("event count")
-            ax3.set_ylabel("Intensity [V]")
-            ax3.legend()
+            ax2.xaxis.major.formatter.set_powerlimits((0,0)) 
+            ax2.yaxis.major.formatter.set_powerlimits((0,0)) 
+
+            ax3 = plt.subplot( gs[:2,3:4]) #, sharey=ax2)
+            ax3.plot(ipimb.fex_channels[:,2],ipimb.fex_channels[:,3],'o')
+            ax3.set_xlabel("Ch2 [V]")
+            ax3.set_ylabel("Ch3 [V]")
+            ax3.set_title("Ch3 vs. Ch2")
+            ax3.xaxis.major.formatter.set_powerlimits((0,0)) 
+            ax3.yaxis.major.formatter.set_powerlimits((0,0)) 
+
+            ax4 = plt.subplot( gs[2:,:2])
+            ax4.plot(ipimb.fex_sum,label="FEX Sum")
+            ax4.set_xlabel("event count")
+            ax4.set_ylabel("Intensity [V]")
+            ax4.legend()
+            ax4.set_title("Diode voltage Sum vs. event number")
             
-            ax4 = fig.add_subplot(224)
-            n,bins,patches = ax4.hist(ipimb.fex_sum, 100, histtype='stepfilled', color='b', label='Fex Sum')
-            ax4.set_xlabel("Sum of channels [V]")
-            ax4.set_ylabel("#Events")
-            
+            ax5 = plt.subplot( gs[2:,2:] )
+            n,bins,patches = ax5.hist(ipimb.fex_sum, 100, histtype='stepfilled', color='b', label='Fex Sum')
+            ax5.set_xlabel("Sum of channels [V]")
+            ax5.set_ylabel("#Events")
+            ax5.set_title("Diode voltage sum, histogram")
     
 
     def show_image(self, datalist ):
