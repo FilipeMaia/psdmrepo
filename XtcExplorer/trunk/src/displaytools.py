@@ -14,54 +14,70 @@ class DataDisplay(object):
 
     def show_ipimb(self, datalist ):
 
-        self.ipimb_disp = plt.figure(200, figsize=(14,10))
-        plt.clf()
-
         if len(datalist)==1:
             self.show_ipimb_single(datalist)
-
-        elif len(datalist)==2:
-            self.show_ipimb_double(datalist)
 
         else:
             self.show_ipimb_multiple(datalist)
             
 
-    def show_ipimb_double(self,datalist):
-        fig = self.ipimb_disp 
+    def show_ipimb_multiple(self,datalist):
 
-        ax1 = fig.add_subplot(221)
-        ax2 = fig.add_subplot(222)
-        ax3 = fig.add_subplot(223)
-        ax4 = fig.add_subplot(224)
+        fig = plt.figure(200, figsize=(len(datalist)*5,10))
+        fig.subplots_adjust(wspace=0.3,left=0.10,right=0.96,bottom=0.08)
+        plt.clf()
 
+        self.ipimb_disp = fig
+
+        ndev = len(datalist)
+        ax = plt.subplot(2,ndev,1) # two rows, n columns) 
+        
         arrays = []
         titles = []
+        gain = []
         for ipimb in datalist:
             titles.append(ipimb.name)
-            ax1.plot(ipimb.fex_sum,label=ipimb.name )
-            arrays.append(ipimb.fex_sum)
-            
-        ax2.scatter(arrays[1], arrays[0], label="FEX Sum")
-        
-        n,bins,patches = ax3.hist(arrays[0], 100, histtype='stepfilled', color='b', label='Fex Sum')
-        n,bins,patches = ax4.hist(arrays[1], 100, histtype='stepfilled', color='b', label='Fex Sum')
+            gain.append("%s"%(ipimb.gain_settings))
+            arrays.append(ipimb.fex_sum) 
+            ax.plot(ipimb.fex_sum,label="%s"%(ipimb.name))
+        ax.set_xlabel("event count")
+        ax.set_ylabel("Sum [V]")
+        ax.legend()
 
-        plt.suptitle(" and ".join(titles))
 
-        ax1.set_xlabel("event count")
-        ax1.set_ylabel("Sum of channels [V]")
-        ax1.legend()                        
+        for j in range(0,ndev):
+            tpos = j+1
+            if tpos > 1 :
+                #print "Plotting ipimb scatter of %d and %d in position %d"% (j-1,j, tpos)
+                ax = plt.subplot(2,ndev,tpos)
+                ax.scatter(arrays[j-1],arrays[j])
+                ax.set_xlabel("%s sum [V]"%titles[j-1])
+                ax.set_ylabel("%s sum [V]"%titles[j])
 
-        ax2.set_xlabel("%s sum [V]"%titles[0])
-        ax2.set_ylabel("%s sum [V]"%titles[1])
+            bpos = j+1+ndev
+            #print "Plotting ipimb %d in position %d"%( j,bpos)
+            ax = plt.subplot(2,ndev,bpos)
+            n,bins,patches = ax.hist(arrays[j], 100, histtype='stepfilled', color='b', label='Fex Sum')
+            ax.set_xlabel("%s sum [V]"%titles[j])
+            if gain[j]!="None":
+                plt.text(0.6, 0.9,"Feedback capacitor settings:",
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         transform = ax.transAxes)
+                plt.text(0.6, 0.8, gain[j],
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         transform = ax.transAxes)
 
-        ax3.set_xlabel("%s sum [V]"%titles[0])
-        ax4.set_xlabel("%s sum [V]"%titles[1])
-    
+            plt.suptitle(", ".join(titles)+"  shot#%d"%self.event_number)
+
 
     def show_ipimb_single(self,datalist):
-        fig = self.ipimb_disp 
+
+        fig = plt.figure(200, figsize=(14,10))
+        plt.clf()
+
+        self.ipimb_disp = fig
 
         for ipimb in datalist:
             #ipimb.show()
@@ -70,10 +86,13 @@ class DataDisplay(object):
 
             gs = GridSpec(4,4)
             gs.update(wspace=0.4,hspace=0.6,left=0.10,right=0.95)
-            
+
+            gains = ["","","",""]
+            if ipimb.gain_settings is not None:
+                gains = ["(%s)"%s for s in ipimb.gain_settings]
             ax1 = plt.subplot(gs[:2,:2])
             for ch in range (4):
-                ax1.plot(ipimb.fex_channels[:,ch],label="Channel %d"%ch)
+                ax1.plot(ipimb.fex_channels[:,ch],label="Ch %d %s"%(ch,gains[ch]))
             ax1.set_xlabel("event count")
             ax1.set_ylabel("Intensity [V]")
             ax1.legend()

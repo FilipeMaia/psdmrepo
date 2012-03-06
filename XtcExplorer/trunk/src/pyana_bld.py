@@ -311,7 +311,6 @@ class  pyana_bld ( object ) :
                 plt.title('Beam Charge')
                 plt.xlabel('Beam Charge',horizontalalignment='left') # the other right
                 
-                plt.draw()
 
         if self.do_GasDet :
 
@@ -353,7 +352,6 @@ class  pyana_bld ( object ) :
                 plt.title('Energy 22')
                 plt.xlabel('Energy E[3]',horizontalalignment='left')
                 
-                plt.draw()
             
 
         if self.do_PC :
@@ -420,7 +418,6 @@ class  pyana_bld ( object ) :
                 plt.xlabel('Charge PC1',horizontalalignment='left')
                 plt.ylabel('Charge PC2',horizontalalignment='left')
                 
-                plt.draw()
 
             
         if self.do_ipimb :
@@ -465,5 +462,5 @@ class  pyana_bld ( object ) :
                 plt.xlabel('Shot number',horizontalalignment='left') # the other right
                 plt.title("Sum vs. time")
             
-                plt.draw()
+        plt.draw()
 

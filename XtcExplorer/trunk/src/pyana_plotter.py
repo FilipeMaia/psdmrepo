@@ -220,10 +220,7 @@ class pyana_plotter (object) :
                 plt.show()
                 
         print "-------------------"
-        print "Done running pyana."
-        print "To run pyana again, edit config file if needed and hit \"Run pyana\" button again"
-        print "Send any feedback on this program to ofte@slac.stanford.edu"
-        print "Thank you!"
+        print "'pyana' is done!   "
         print "-------------------"
 
 

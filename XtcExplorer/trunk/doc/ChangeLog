@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Mar-5 ofte                       rev 3015
+	- more improvements to ipimb plotting
+	
+2012-Mar-5 ofte                       rev 3012
+	- little bugfix
+
 2012-Mar-5 ofte                       rev 3011
 	- ipimb single display improvement (using GridSpec)
 
