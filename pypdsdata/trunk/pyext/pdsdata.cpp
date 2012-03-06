@@ -38,6 +38,9 @@
 #include "XtcFileIterator.h"
 #include "XtcIterator.h"
 
+#include "io/XtcFilter.h"
+#include "io/XtcFilterTypeId.h"
+
 #include "types/acqiris/ConfigV1.h"
 #include "types/acqiris/DataDescV1.h"
 #include "types/acqiris/HorizV1.h"
@@ -374,6 +377,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Timepix::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "timepix", module );
+
+  module = Py_InitModule3( "_pdsdata.io", 0, "The Python module for several I/O related classes" );
+  pypdsdata::XtcFilter::initType( module );
+  pypdsdata::XtcFilterTypeId::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "io", module );
 
   // import NumPy
   import_array();

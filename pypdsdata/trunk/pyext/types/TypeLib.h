@@ -58,6 +58,7 @@ inline PyObject* toPython(unsigned long int v) { return PyLong_FromUnsignedLong(
 inline PyObject* toPython(float v) { return PyFloat_FromDouble( v ); }
 inline PyObject* toPython(double v) { return PyFloat_FromDouble( v ); }
 inline PyObject* toPython(const char* v) { return PyString_FromString( v ); }
+inline PyObject* toPython(const std::string& v) { return PyString_FromStringAndSize(v.data(), v.size()); }
 
 // traits
 template <typename T>

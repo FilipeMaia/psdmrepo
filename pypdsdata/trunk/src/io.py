@@ -18,6 +18,7 @@ part of it, please give an appropriate acknowledgment.
 
 from _pdsdata import xtc
 from _pdsdata import Error
+from _pdsdata.io import *
 import logging
 import os
 
@@ -334,10 +335,10 @@ class XtcMergeIterator(object) :
 
         _log.debug("XtcMergeIterator: files=%s", xfiles)
         
-        # check they all from the same experiment and run
+        # check they all from the same experiment
         exp = set([file.expNum() for file in xfiles])
         if len(exp)>1 :
-            raise Error("file names from different runs or experiments")
+            raise Error("file names from different experiments")
 
         # group by runs and stream
         runmap = {}

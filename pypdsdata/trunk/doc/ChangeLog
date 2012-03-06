@@ -1,3 +1,17 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pypdsdata
+#------------------------------------------------------------------------
+
+Tag: V00-00-51
+2012-03-06 Andy Salnikov
+- adding classes pyext/io/XtcFilterTypeId and pyext/io/XtcFilter
+  which are wrappers for corresponding C++ classes from XTcInput
+  package
+- this classes can be used to filter datagram contents in Python
 
 Tag: V00-00-50
 2012-02-24 Andy Salnikov
