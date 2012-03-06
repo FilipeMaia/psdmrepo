@@ -32,6 +32,7 @@
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
 #include "XtcInput/XtcIterator.h"
+#include "XtcInput/XtcIterator.h"
 #include "XtcInput/XtcStreamMerger.h"
 
 //-----------------------------------------------------------------------
@@ -42,6 +43,29 @@ using namespace XtcInput;
 
 using namespace PSXtcInput;
 PSANA_INPUT_MODULE_FACTORY(XtcInputModule)
+
+namespace {
+
+
+  // return true if container contains EPICS data only
+  bool epicsOnly(Pds::Xtc* xtc)
+  {
+    XtcInput::XtcIterator iter(xtc);
+    while (Pds::Xtc* x = iter.next()) {
+      switch (x->contains.id()) {
+      case Pds::TypeId::Id_Xtc:
+      case Pds::TypeId::Id_Epics:
+        continue;
+      default:
+        return false;
+      }
+    }
+    return true;
+  }
+
+}
+
+
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -249,7 +273,13 @@ XtcInputModule::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
+      if (::epicsOnly(&(dg.dg()->xtc))) {
+
+        // datagram is likely filtered, has only epics data and users do not need to
+        // see it. Do not count it as an event too, just save EPICS data and move on.
+        fillEnv(dg, env);
+
+      } else if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
 
         // reached event limit, will go in simulated end-of-run
         MsgLog(name(), debug, name() << ": event limit reached, simulated EndCalibCycle");
@@ -269,6 +299,8 @@ XtcInputModule::event(Event& evt, Env& env)
         found = true;
         status = Skip;
 
+        ++m_l1Count;
+
       } else {
 
         fillEnv(dg, env);
@@ -278,8 +310,8 @@ XtcInputModule::event(Event& evt, Env& env)
         found = true;
         status = DoEvent;
 
+        ++m_l1Count;
       }
-      ++m_l1Count;
 
       break;
     
