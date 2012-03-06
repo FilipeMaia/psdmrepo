@@ -169,6 +169,26 @@ class Event(object):
         """
         return self.m_dg.seq.clock()
 
+
+    def keys(self):
+        """self.keys() -> list of tuples
+        
+        Returns the list of tuples (TypeId, Src), one tuple for every object contained in the 
+        event. For user objects first item in tuple would be the key, second item is None.
+        """
+        result = []
+        if self.m_dg:
+            for x in self._xtcGenerator(self.m_dg.xtc):
+                # filter out Epics too
+                if x.contains.id() not in [xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Id_Epics]:
+                    result.append((x.contains, x.src))
+
+        for k in self.m_userData.iterkeys():
+            result.append((k, None))
+
+        return result
+
+
     def find(self, **kw):
         """self.find(**kw) -> list of object
         
@@ -835,6 +855,19 @@ class Env(object):
                             self._storeConfig(typeid, x.src, cfgObj)
                         except Error, e:
                             _log.error('Failed to extract config object of type %s: %s', xtc.contains, e )
+
+    def configKeys(self):
+        """self.configKeys() -> list of tuples
+        
+        Returns the list of tuples (TypeId, Src), one tuple for every config object 
+        contained in the environment.
+        """
+        result = []
+        for k, v in self.m_config.iteritems():
+            for vk in v.iterkeys():
+                result.append((k, vk))
+                
+        return result
                     
     def getConfig(self, typeId, address=None):
         """ self.getConfig(typeId, address=None) -> config object

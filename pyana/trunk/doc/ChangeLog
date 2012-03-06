@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-41
+2012-03-06 Andy Salnikov
+- Event and Env classes have new methods to return list of event keys
+- new user module event_keys to dump event keys
+- xct_output module now keeps EPICS data in the events that are filtered
+  out and writes those events with EPICS data in them only
+- pyana now skips events that contain EPICS data only (after updating
+  EPICS values in environment), this is done for better filtering support
+
 Tag: V00-00-40
 2012-02-29 Andy Salnikov
 - event.Env class has new methods experiment(), instrument(), calibDir()

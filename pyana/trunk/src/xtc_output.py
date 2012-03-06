@@ -37,6 +37,7 @@ import logging
 #-----------------------------
 import pyana
 from pypdsdata import xtc
+from pypdsdata import io
 
 #----------------------------------
 # Local non-exported definitions --
@@ -65,6 +66,7 @@ class xtc_output (object) :
         self.chunk_size_MB = int(chunk_size_MB)
         self.name_fmt = name_fmt
         self.dir_name = dir_name
+        self.keep_epics = True
 
         self.chunk = 0
         self.run = 0
@@ -72,6 +74,7 @@ class xtc_output (object) :
         self.stream = 0
         
         self.file = None
+        self.filter = io.XtcFilter(io.XtcFilterTypeId([xtc.TypeId.Type.Id_Epics], []))
         
     #-------------------
     #  Public methods --
@@ -113,10 +116,16 @@ class xtc_output (object) :
 
         # send current datagram to file 
         if evt.status() == pyana.Normal:
+            logging.debug("xtc_output.event(): saving complete datagram")
             self._saveDg(evt.m_dg, "event", xtc.TransitionId.L1Accept)
         else:
-            logging.info( "xtc_output.event(): skipping event" )
-            
+            if self.keep_epics:
+                # filter out everything except Epics
+                logging.debug("xtc_output.event(): filtering datagram")
+                dg = self.filter.filter(evt.m_dg)
+                if dg:
+                    logging.debug("xtc_output.event(): saving epics datagram")
+                    self._saveDg(dg, "event", xtc.TransitionId.L1Accept)
 
     def endcalibcycle( self, evt, env ) :
 

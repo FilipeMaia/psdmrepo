@@ -65,6 +65,15 @@ def _rusage(msg, ru1, ru2):
     
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
+def _epicsOnly(xtcObj):
+    """ Returns true if container has EPICS data only """
+    for x in xtcObj:
+        if x.contains.id() == xtc.TypeId.Type.Id_Xtc:
+            if not _epicsOnly(x):
+                return False
+        elif x.contains.id() != xtc.TypeId.Type.Id_Epics: 
+            return False
+    return True
 
 def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
     """ method which is running in child process when we do multi-processing """
@@ -261,6 +270,11 @@ def _pyana ( argv ) :
             env.update ( evt )
 
             if svc == xtc.TransitionId.L1Accept :
+
+                if _epicsOnly(dg.xtc):
+                    # datagram is likely filtered, has only epics data and users do not need to
+                    # see it. Do not count it as an event too, just save EPICS data and move on.
+                    continue
                 
                 evtnum = nevent
                 nevent += 1
