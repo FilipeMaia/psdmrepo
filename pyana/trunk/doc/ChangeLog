@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-42
+2012-03-07 Andy Salnikov
+- switch config.py to use SafeConfigParser, need it to pass format string
+  to the module instead interpolating them
+- xtc_output now implements proper chunking of the output, stream number
+  can also be changed from config file
+
 Tag: V00-00-41
 2012-03-06 Andy Salnikov
 - Event and Env classes have new methods to return list of event keys

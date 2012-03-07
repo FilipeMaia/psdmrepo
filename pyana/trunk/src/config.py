@@ -127,11 +127,11 @@ class config ( object ) :
         configFile = self._options.config
         if configFile :
             _log.info("reading config file %s", configFile)
-            self._config = ConfigParser.ConfigParser()
+            self._config = ConfigParser.SafeConfigParser()
             self._config.readfp(file(configFile))
         else :
             _log.info("reading config file pyana.cfg")
-            self._config = ConfigParser.ConfigParser()
+            self._config = ConfigParser.SafeConfigParser()
             self._config.read("pyana.cfg")
 
         # verify that config file options have valid names

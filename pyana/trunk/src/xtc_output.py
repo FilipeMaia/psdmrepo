@@ -43,7 +43,7 @@ from pypdsdata import io
 # Local non-exported definitions --
 #----------------------------------
 
-_defFileNameFmt = "e%(expNum)d-r%(run)04d-s%(stream)02d-c%(chunk)02d-filtered.xtc"
+_defFileNameFmt = "e%(expNum)d-r%(run)04d-s%(stream)02d-c%(chunk)02d.xtcf"
 
 #---------------------
 #  Class definition --
@@ -58,22 +58,23 @@ class xtc_output (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, chunk_size_MB = 200*1024, name_fmt = _defFileNameFmt, dir_name = "." ) :
+    def __init__ ( self, stream = -1, chunk_size_mb = 500*1024, name_fmt = _defFileNameFmt, dir_name = ".", keep_epics = 1 ) :
         """
         Constructor takes set of parameters which can be changed in pyana configuration file
         """
 
-        self.chunk_size_MB = int(chunk_size_MB)
+        self.chunk_size_MB = int(chunk_size_mb)
         self.name_fmt = name_fmt
         self.dir_name = dir_name
-        self.keep_epics = True
+        self.keep_epics = int(keep_epics)
+        self.stream = int(stream)
 
         self.chunk = 0
         self.run = 0
         self.expNum = 0
-        self.stream = 0
         
         self.file = None
+        self.storedBytes = 0
         self.filter = io.XtcFilter(io.XtcFilterTypeId([xtc.TypeId.Type.Id_Epics], []))
         
     #-------------------
@@ -88,13 +89,11 @@ class xtc_output (object) :
         self.run = evt.run() or 0
         self.expNum = evt.expNum() or 0
 
-        # stream is determined from subprocess index
-        self.stream = env.subprocess()
-        if self.stream < 0: self.stream = 0
+        # stream is determined from subprocess index, but can be overwritten through module parameters
+        if self.stream < 0: 
+            self.stream = env.subprocess()
+            if self.stream < 0: self.stream = 0
         
-        # open file
-        self._openFile()
-
         # send current datagram to file 
         self._saveDg(evt.m_dg, "beginjob", xtc.TransitionId.Configure)
 
@@ -155,11 +154,6 @@ class xtc_output (object) :
         Open or re-open output file
         """
         
-        # if it is open the close it first
-        if self.file: 
-            self.file.close()
-            self.file = None
-
         # open file
         fname = os.path.join(self.dir_name, self.name_fmt % self.__dict__)
         logging.info( "xtc_output._openFile(): opening new file: %s", fname )
@@ -182,5 +176,21 @@ class xtc_output (object) :
             logging.warning("xtc_output.%s: datagram has unexpected type: %s, will skip datagram", method, dg.seq.service())
             return
 
+        # may need to close file if limit is reached
+        if self.storedBytes >= self.chunk_size_MB*1048576:
+            self.file.close()
+            self.file = None
+            self.storedBytes = 0
+            self.chunk += 1
+
+        # open file if necessary
+        if not self.file: self._openFile()
+
+        buf = buffer(dg)
+
         # save datagram
-        self.file.write(dg)
+        self.file.write(buf)
+
+        # update byte count
+        self.storedBytes += len(buf)
+        
