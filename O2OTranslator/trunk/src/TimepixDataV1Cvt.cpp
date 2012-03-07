@@ -77,7 +77,7 @@ TimepixDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_dataCont ) {
 
     // create container for frames
-    CvtDataContFactoryDef<H5DataTypes::TimepixDataV1> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // create container for frame data
@@ -90,15 +90,23 @@ TimepixDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   }
 
-  uint32_t height = data.height();
-  uint32_t width = data.width();
+  // DataV1 images come with some strange shuffling. To un-shuffle it we transform it
+  // into DataV2 which knows how to do it.
+  unsigned objSize = sizeof(Pds::Timepix::DataV2) + data.data_size();
+  char* buf = new char[objSize];
+  Pds::Timepix::DataV2* data2 = new (buf) Pds::Timepix::DataV2(data);
+
+  uint32_t height = data2->height();
+  uint32_t width = data2->width();
 
   // store the data
-  H5DataTypes::TimepixDataV1 tpdata(data);
+  H5DataTypes::TimepixDataV2 tpdata(*data2);
   m_dataCont->container(group)->append(tpdata);
-  hdf5pp::Type type = H5DataTypes::TimepixDataV1::stored_data_type(height, width) ;
-  m_imageCont->container(group,type)->append(*(uint16_t*)data.data(), type);
+  hdf5pp::Type type = H5DataTypes::TimepixDataV2::stored_data_type(height, width) ;
+  m_imageCont->container(group,type)->append(*(uint16_t*)data2->data(), type);
   m_timeCont->container(group)->append(time);
+
+  delete [] buf;
 }
 
 /// method called when the driver closes a group in the file

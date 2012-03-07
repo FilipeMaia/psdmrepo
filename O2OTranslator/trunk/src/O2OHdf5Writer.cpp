@@ -555,7 +555,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // very special converter for Timepix::DataV1
-  converter.reset( new TimepixDataV1Cvt ( "Timepix::DataV1", chunk_size, m_compression ) ) ;
+  // Note that it makes group DataV2 as internally it converts DataV1 into DataV2
+  converter.reset( new TimepixDataV1Cvt ( "Timepix::DataV2", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixData,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 

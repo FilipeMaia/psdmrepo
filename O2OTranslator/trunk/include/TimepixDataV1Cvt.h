@@ -22,10 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/TimepixDataV1.h"
+#include "H5DataTypes/TimepixDataV2.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
 #include "O2OTranslator/CvtDataContFactoryTyped.h"
+#include "pdsdata/timepix/DataV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -78,7 +79,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::TimepixDataV1> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ImageCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
