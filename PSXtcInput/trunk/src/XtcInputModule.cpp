@@ -112,7 +112,7 @@ XtcInputModule::~XtcInputModule ()
 
 /// Method which is called once at the beginning of the job
 void 
-XtcInputModule::beginJob(Env& env)
+XtcInputModule::beginJob(Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in beginJob()");
 
@@ -162,6 +162,8 @@ XtcInputModule::beginJob(Env& env)
   
   // Store configuration info in the environment
   fillEnv(dg, env);
+  fillEventDg(dg, evt);
+  fillEventId(dg, evt);
 
 }
 
@@ -332,7 +334,7 @@ XtcInputModule::event(Event& evt, Env& env)
 
 /// Method which is called once at the end of the job
 void 
-XtcInputModule::endJob(Env& env)
+XtcInputModule::endJob(Event& evt, Env& env)
 {
 }
 

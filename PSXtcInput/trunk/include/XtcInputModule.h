@@ -74,13 +74,13 @@ public:
   virtual ~XtcInputModule () ;
 
   /// Method which is called once at the beginning of the job
-  virtual void beginJob(Env& env);
+  virtual void beginJob(Event& evt, Env& env);
 
   /// Method which is called with event data
   virtual Status event(Event& evt, Env& env);
 
   /// Method which is called once at the end of the job
-  virtual void endJob(Env& env);
+  virtual void endJob(Event& evt, Env& env);
 
 protected:
   
