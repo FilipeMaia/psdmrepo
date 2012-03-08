@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-43
+2012-03-08 Andy Salnikov
+- reimplement ExpNameFromXtc and ExpNameFromConfig using new class
+  ExpNameDb.ExpNameDatabase
+
 Tag: V00-00-42
 2012-03-07 Andy Salnikov
 - switch config.py to use SafeConfigParser, need it to pass format string

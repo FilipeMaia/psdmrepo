@@ -86,8 +86,8 @@ class xtc_output (object) :
         logging.debug( "xtc_output.beginjob() called" )
 
         # run number should be known already at this point
-        self.run = evt.run() or 0
-        self.expNum = evt.expNum() or 0
+        if self.run <= 0: self.run = evt.run() or 0
+        if self.expNum <= 0: self.expNum = evt.expNum() or 0
 
         # stream is determined from subprocess index, but can be overwritten through module parameters
         if self.stream < 0: 
@@ -149,17 +149,6 @@ class xtc_output (object) :
         self.file = None
 
 
-    def _openFile(self):
-        """
-        Open or re-open output file
-        """
-        
-        # open file
-        fname = os.path.join(self.dir_name, self.name_fmt % self.__dict__)
-        logging.info( "xtc_output._openFile(): opening new file: %s", fname )
-        self.file = open(fname, "wb")
-
-
     def _saveDg(self, dg, method, type):
         """
         Write datagram to output file after checking that it has expected type.
@@ -184,7 +173,10 @@ class xtc_output (object) :
             self.chunk += 1
 
         # open file if necessary
-        if not self.file: self._openFile()
+        if not self.file:
+            fname = os.path.join(self.dir_name, self.name_fmt % self.__dict__)
+            logging.info( "xtc_output: opening new file: %s", fname )
+            self.file = open(fname, "wb")
 
         buf = buffer(dg)
 

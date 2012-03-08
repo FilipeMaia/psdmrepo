@@ -39,7 +39,7 @@ import logging
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import io
-from AppUtils.AppDataPath import AppDataPath
+from ExpNameDb.ExpNameDatabase import ExpNameDatabase
 
 #----------------------------------
 # Local non-exported definitions --
@@ -63,6 +63,7 @@ class ExpNameFromXtc(object):
 
         self.m_instrument = ""
         self.m_experiment = ""
+        self.m_expnum = 0
 
         if not files:
             logging.debug("ExpNameFromXtc: file list is missing, instrument/experiment will be empty")
@@ -71,24 +72,15 @@ class ExpNameFromXtc(object):
         expNums = set(io.XtcFileName(file).expNum() for file in files)
         if len(expNums) != 1: raise ValueError("ExpNameFromXtc: XTC files belong to different experiments: " + str(files))
         
-        expNum = expNums.pop()
-        logging.debug("ExpNameFromXtc: experiment number = %s", expNum)
-        if expNum is None: return
+        self.m_expnum = expNums.pop()
+        logging.debug("ExpNameFromXtc: experiment number = %s", self.m_expnum)
+        if self.m_expnum is None: return
 
-        # find/open experiment database
-        expdbpath = AppDataPath("psana/experiment-db.dat")
-        expdbpath = expdbpath.path()
-        logging.debug("ExpNameFromXtc: experiment database = %s", expdbpath)
-        if not expdbpath: return
-        
-        # read database
-        for line in open(expdbpath):
-            num, instr, exper = line.split()
-            if int(num) == expNum:
-                self.m_instrument = instr
-                self.m_experiment = exper
-                logging.debug("ExpNameFromXtc: found num=%s instr=%s exper=%s", num, instr, exper)
-                break
+        # find rest in experiment database
+        expdb = ExpNameDatabase()
+        self.m_instrument, self.m_experiment = expdb.getNames(self.m_expnum)
+        if not self.m_instrument:
+            logging.warning("ExpNameFromXtc: failed to find experiment ID = %d", self.m_expnum)
 
     #-------------------
     #  Public methods --
@@ -109,6 +101,14 @@ class ExpNameFromXtc(object):
         Returns experiment name, or empty string if name is not known
         """
         return self.m_experiment
+    
+    def expNum(self):
+        """
+        self.expNum() -> int
+        
+        Returns experiment ID, or 0.
+        """
+        return self.m_expnum
     
 
 
@@ -123,10 +123,10 @@ class ExpNameFromConfig(object):
 
         self.m_instrument = ""
         self.m_experiment = ""
+        self.m_expnum = 0
 
         words = expname.split(':')
         if len(words) == 1:
-            self.m_instrument = words[0][:3].upper()
             self.m_experiment = words[0]
         elif len(words) == 2:
             self.m_instrument = words[0]
@@ -134,7 +134,17 @@ class ExpNameFromConfig(object):
         else:
             raise ValueError("ExpNameFromConfig: experiment name has unexpected format: " + expname)
 
-        logging.debug("ExpNameFromConfig: instr=%s exper=%s", num, instr, exper)
+        # find rest in experiment database
+        expdb = ExpNameDatabase()
+        if not self.m_instrument:
+            self.m_instrument, self.m_expnum = expdb.getInstrumentAndID(self.m_experiment)
+            if not self.m_instrument:
+                logging.warning("ExpNameFromConfig: failed to find experiment = %s", self.m_experiment)
+        else:
+            self.m_expnum = expdb.getID(self.m_instrument, self.m_experiment)
+            if not self.m_expnum:
+                logging.warning("ExpNameFromConfig: failed to find experiment = %s:%s", self.m_instrument, self.m_experiment)
+
 
     #-------------------
     #  Public methods --
@@ -156,6 +166,13 @@ class ExpNameFromConfig(object):
         """
         return self.m_experiment
     
+    def expNum(self):
+        """
+        self.expNum() -> int
+        
+        Returns experiment ID, or 0.
+        """
+        return self.m_expnum
 
 
 #
