@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2012-03-08 Andy Salnikov
+- add methods PSEnv::expNum and IExpNameProvider::expNum
+
 Tag: V00-07-00
 2011-10-28 Andy Salnikov
 - proxy dict keys() method now takes source argument, updating 

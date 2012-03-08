@@ -62,6 +62,9 @@ public:
   /// Returns experiment name
   virtual const std::string& experiment() const = 0;
 
+  /// Returns experiment number or 0
+  virtual unsigned expNum() const = 0;
+
 protected:
 
   // Constructor

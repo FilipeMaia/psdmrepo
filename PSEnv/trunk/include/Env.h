@@ -95,6 +95,9 @@ public:
   /// Returns experiment name
   const std::string& experiment() const { return m_expNameProvider->experiment(); }
 
+  /// Returns experiment number or 0
+  const unsigned expNum() const { return m_expNameProvider->expNum(); }
+
   /// Returns that name of the calibration directory for current
   /// instrument/experiment.
   const std::string& calibDir() const;
