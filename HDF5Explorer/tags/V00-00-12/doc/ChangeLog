@@ -1,0 +1,234 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package HDF5Explorer
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+------------------------------
+Tag: V00-00-12
+2012-03-08 Mikhail S. Dubrovin
+- DrawEvent.py
+  Fix two problems, which do not allow to look at Princeton camera image
+  - do not try to get CSPad calibration if its dataset is not requested
+    for example for Princeton camera image
+  - do not use the image offset correction if it is not available in the dataset.
+
+Tag: V00-00-11
+2012-01-20 Mikhail S. Dubrovin
+
+- ConfigCSpad.py
+  add methods with new constants:
+  setCSpadParametersV0004() #DS1
+  setCSpadParametersV0005() #DSD
+  and
+  setCSpadParametersFromCalibDir()
+  for automatic access to calibration parameters from the official calibration derectory.
+
+	
+- DrawEvent.py
+  add methods getRunNumberFromHDF5FileName, getCSPadName, getCSPadCalibDir
+  in order to get automatically calibration parameters
+
+	
+- GlobalMethods.py
+  add a few methods to 
+	
+
+2011-11-08 Mikhail S. Dubrovin
+- In the GUI/plot for WF vs Ev:
+	add the range of events
+	fill 2-D array for indicated T-range only.
+- modified modules:
+	PlotsForWaveform.py
+	ConfigParameters.py
+	GUISettingsForWaveformWindow.py
+
+	
+Tag: V00-00-10
+2011-10-28 Mikhail S. Dubrovin
+- DrawEvent.py 
+  add method applyImageCorrections( arr1ev, dsname ), which 
+	1) converts image from uint -> float32
+	2) subtract the 'offset' from data record
+        3) subtract the 'const. offset' from the menu:
+- GUIWhatToDisplayForCSpadWindow.py	
+        Add "Const. offset" parameter with full functionality
+
+2011-10-27 Mikhail S. Dubrovin
+- add module CalibCycles.py
+- in GUIComplexCommands.py
+	add +1CC and -1CC buttons with complete functionality
+- modified modules:	
+	       src/GUIComplexCommands.py
+	       src/GUIMain.py
+	       src/DrawEvent.py
+	       src/PlotsForWaveform.py
+	       src/PrintHDF5.py
+
+2011-10-26 Mikhail S. Dubrovin
+- In src/HDF5TreeViewModel.py    _add_group_to_tree(...) 
+	add try-except protection against hdf5 corruption
+- PlotsForWaveform.py 
+	add plot for waveform vs event
+- GUIWhatToDisplayCBoxOther.py
+	add checkbox for "WF vs Event" with functionality
+- GUIComplexCommands.py
+	add button "WF vs Ev" with functionality
+- modified modules:
+	       doc/ChangeLog
+	       src/ConfigParameters.py
+	       src/DrawEvent.py
+	       src/GUIComplexCommands.py
+	       src/GUISelectQuadAndPair.py
+	       src/GUISettingsForWaveformWindow.py
+	       src/GUIWhatToDisplay.py
+	       src/GUIWhatToDisplayCBoxOther.py
+	       src/GUIWhatToDisplayForCSpad.py
+	       src/GUIWhatToDisplayForCSpadWindow.py
+	       src/GUIWhatToDisplayForImage.py
+	       src/HDF5TreeViewModel.py
+	       src/PlotsForCSpad.py
+	       src/PlotsForWaveform.py
+
+2011-10-24 Mikhail S. Dubrovin
+- CSPad GUI is chsnged: 
+	sliders are removed, 
+	multi-window GUI is added,
+	each window has a dataset - image is associated with dataset for each window.
+	!!! Geometry correction is taken for the 1st CSPad dataset !!!
+
+Tag: V00-00-09
+2011-09-26 Mikhail S. Dubrovin
+- CSPad image was calculated in int16 -> now in float
+- CSPad and camera images were saved in int -> now in float
+
+Tag: V00-00-08
+2011-09-26 Mikhail S. Dubrovin
+- Fix problem with incriment of the number of averaged events.
+	(once for test purpose it was not increased...)
+
+Tag: V00-00-07
+2011-09-13 Mikhail S. Dubrovin
+- add CSPad2x2 in the frame of CSPad plots, depending on 
+  CSPadMiniElement, or CSPadElement in the dataset name.
+- modified modules:
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/ConfigCSpad.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+	       HDF5Explorer/src/GlobalMethods.py
+
+Tag: V00-00-06
+2011-09-06 Mikhail S. Dubrovin
+- add CSPad detector spectrum plot, which represents the latest windoe or manual zoom-in region.	
+- modified modules:
+               HDF5Explorer/src/DrawEvent.py
+               HDF5Explorer/src/PlotsForCSpad.py
+               HDF5Explorer/src/GUIWhatToDisplayCBoxCSpad.py
+               HDF5Explorer/src/ConfigParameters.py	
+
+Tag: V00-00-05
+2011-08-23 Mikhail S. Dubrovin
+- add protection in 'Average' and drawing when the event index exceeds the dataset shape.
+- add more detailed printout for dataset structure; the dataset tree is printed.  
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/PrintHDF5.py	
+
+Tag: V00-00-04
+2011-08-19 Mikhail S. Dubrovin
+- Move icons from src/icons/* to data/icons/*
+- Get data directory using AppUtils.AppDataPath in
+	       HDF5Explorer/src/GUISelectItems.py
+	       HDF5Explorer/src/HDF5TreeViewModel.py
+	
+Tag: V00-00-03
+2011-08-18 Mikhail S. Dubrovin
+- Add saving of camera image in tiff file
+               HDF5Explorer/src/DrawEvent.py	      
+	
+2011-08-11 Mikhail S. Dubrovin
+- Add features of the background subtraction and gain correction for CSPad 
+
+New modules:	
+	       HDF5Explorer/src/GUIBackground.py
+	       HDF5Explorer/src/GUIGainCorrection.py
+
+Changed modules: 	
+	       HDF5Explorer/src/ConfigParameters.py
+	       HDF5Explorer/src/FastArrayTransformation.py
+	       HDF5Explorer/src/GUIWhatToDisplay.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+	
+Tag: V00-00-02
+2011-07-21 Mikhail S. Dubrovin
+- Add one more index for ipimb data set 
+  Changed modules: 	
+	       HDF5Explorer/src/ConfigParameters.py
+	       HDF5Explorer/src/GUICalibCycleWindow.py
+	       HDF5Explorer/src/GUICorrelationWindow.py
+	       HDF5Explorer/src/PlotsForCalibCycles.py
+	       HDF5Explorer/src/PlotsForCorrelations.py
+	       HDF5Explorer/src/PrintHDF5.py
+	
+	
+2011-06-29 Mikhail S. Dubrovin
+- Add time dependent alignment parameters for CSPad in modules:
+
+	       HDF5Explorer/src/ConfigCSpad.py
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+
+  New versions of alignment parameters should be included in the HDF5Explorer/src/ConfigCSpad.py
+    def setCSpadParameters( self ) : 
+    def setTimeOfRunStart( self ) :
+    def setCSpadParametersV00## ( self ) :	
+
+	
+2011-06-28 Mikhail S. Dubrovin	
+- Add alignment parameters V0002 for run 4. 
+- CSPad image size is increased from 1750 to 1765 in order to inscribe larger shift of quads
+  in the detector for cxi35711 experiment.
+
+- Automatically save text files for numpy arrays of the camera image right after Averege algorithm in
+  HDF5Explorer/src/DrawEvent.py
+    def saveArrayForDSNameInFile(self, dsname, arr1ev) :
+    file name: camera-ave-CAMERA-NAME.txt
+
+- Simple example of how to read/plot this file is in 
+
+	../test_matplotlib/PlotCameraImageFromFile.py	
+
+	import numpy as np
+	import matplotlib.pyplot as plt
+	fname = '/reg/neh/home/dubrovin/LCLS/HDF5Explorer-v01/camera-ave-CxiDg1.0:Tm6740.0.txt'
+	arr   = np.loadtxt(fname, dtype=np.float32)
+	plt.imshow(arr, origin='upper', interpolation='nearest', aspect='auto') #,extent=Range)
+	plt.show()	
+
+	
+  Earlier we had automatic file saving for CSPad detector and quad:
+	cspad-ave.txt
+	cspad-ave-quad-#.txt
+  These files are used in alignment package: CSPadAlignment
+	
+
+	
+2011-06-27 Mikhail S. Dubrovin	
+- Fix the configuration file name definition for CSPad in HDF5Explorer/src/DrawEvent.py
+    def getCSpadConfiguration( self, dsname ):	
+
+	
+Tag: V00-00-01
+2011-05-10 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
