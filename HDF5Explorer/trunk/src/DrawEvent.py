@@ -648,7 +648,13 @@ class DrawEvent ( object ) :
         """
         offset_dsname = gm.get_item_path_to_last_name(dsname) + '/data'
         ds = self.h5file[offset_dsname]
-        offset = ds['offset'][cp.confpars.eventCurrent] # !!! Indexes are reversed in order to use 'offset' as index
+        try:
+            offset = ds['offset'][cp.confpars.eventCurrent] # !!! Indexes are reversed in order to use 'offset' as index
+        except ValueError :
+            print "WARNING: For this image the parameter 'offset' is not found in the dataset\n", offset_dsname
+            print 'Set offset = 0'
+            offset = 0
+            
         if self.nwin == None :
             return np.array(arr2d1ev, dtype=float32) - offset
         else :
@@ -754,12 +760,9 @@ class DrawEvent ( object ) :
 
             self.getTimeHDF5File()
             self.getRunNumberFromHDF5FileName()
-            self.getCSPadName()
-            self.getCSPadCalibDir()
-
-            #if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
-            #else : cs.confcspad.setCSpadParameters()
-            cs.confcspad.setCSpadParameters()
+            if self.getCSPadName() :
+                self.getCSPadCalibDir()
+                cs.confcspad.setCSpadParameters()
 
 
     def getTimeHDF5File( self ) :
@@ -786,6 +789,7 @@ class DrawEvent ( object ) :
            1. finds the 1st in the list dataset for CSPad.
            2. get the detector name and data type as a parts of the dataset name
            3. save them in cs.confcspad.cspad_name and cs.confcspad.cspad_data_type for configuration
+           Return True if the found, False - not found
         """
         cs.confcspad.cspad_name      = ''
         cs.confcspad.cspad_data_type = ''
@@ -798,7 +802,8 @@ class DrawEvent ( object ) :
                 #print 'CSPad is found in dataset', dsname
                 #print 'CSPad name and data type =', cs.confcspad.cspad_name, cs.confcspad.cspad_data_type
                 #return name2
-                return
+                return True
+        return False 
 
 
     def getCSPadCalibDir( self ) :
