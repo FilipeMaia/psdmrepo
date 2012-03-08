@@ -84,17 +84,8 @@ O2OXtcIterator::process(Xtc* xtc)
   int result = 1 ;
   if ( type == Pds::TypeId::Id_Xtc ) {
 
-    if ( xtc->damage.value() & Pds::Damage::DroppedContribution ) {
-      //some types of damage cause troubles, filter them
-      // skip damaged data
-      MsgLogRoot( warning, "O2OXtcIterator::process -- damaged container xtc: "
-                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-                  << " payload = " << xtc->sizeofPayload()
-                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
-    } else {
-      // scan all sub-xtcs
-      this->iterate( xtc );
-    }
+    // scan all sub-xtcs, this takes care of the bad damage bit (IncompleteContribution)
+    this->iterate( xtc );
 
   } else if ( type == Pds::TypeId::Any ) {
 

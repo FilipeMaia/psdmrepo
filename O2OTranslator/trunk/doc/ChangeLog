@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-17-04
+2012-03-08 Andy Salnikov
+- removed buggy code which supposedly tested damage for 
+  DroppedContribution but in reality did not do anything, test for
+  DroppedContribution is not really needed.
+
 Tag: V00-17-03
 2012-03-07 Andy Salnikov
 - Timepix::DataV1 is converted to DavaV2 which has image data correctly 
