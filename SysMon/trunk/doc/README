@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package SysMon
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+Software components and tools for monitoring various aspects of the PCDS
+Data Management and Computing systems.
+
+Detailed description:
+=====================
+
+- database schema and Python interface for storing and retreiving values of select
+  EPICS PVs
+
+- database schema for storing Beam-Time Usage by LCLS experiments
