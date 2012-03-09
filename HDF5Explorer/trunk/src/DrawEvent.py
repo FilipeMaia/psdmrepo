@@ -287,7 +287,7 @@ class DrawEvent ( object ) :
                     self.ave1ev[indds] += self.arr1ev   
                     self.avedsname     .append(dsname)
                     self.eventEnd      = ds.shape[0]
-                    print 'Total numbr of events in averaged sample [', indds, '] =', self.eventEnd
+                    print 'Total number of events in averaged sample [', indds, '] =', self.eventEnd
 
             elif option == 1 :                                   # Normalization per 1 event
                 if self.numEventsSelected > 0 :
@@ -817,7 +817,7 @@ class DrawEvent ( object ) :
         dirList=gm.getListOfFilesInDir(calib_dir)
         self.calib_version = '' 
         for name in dirList: # loop
-            if name[0:5] == 'CsPad' :
+            if name[0:6] == 'CsPad:' :
                 self.calib_version = name # something like CsPad::CalibV1
 
         cs.confcspad.cspad_calib_dir = calib_dir + self.calib_version + '/' + cs.confcspad.cspad_name     

@@ -52,7 +52,7 @@ class ConfigCSpad ( object ) :
         #self.setCSpadParametersV0001() #DS1
         #self.setCSpadParametersV0002() #DS1
         #self.setCSpadParametersV0003() #CSPad for xpp36211
-        self.setCSpadParametersV0004() #DS1
+        self.setCSpadParametersV0004()  #DS1
         #self.setCSpadParametersV0005() #DSD
         #self.Print()
         self.run_start_seconds = 0
@@ -90,23 +90,26 @@ class ConfigCSpad ( object ) :
             self.setCSpadParametersV0002()        
             print 'set parameters for V0002'
 
-        elif self.t_sec_r0005 < self.run_start_seconds and self.run_start_seconds < self.t_sec_r0006:
-            self.setCSpadParametersV0003()        
-            print 'set parameters for V0003'
+        #elif self.t_sec_r0005 < self.run_start_seconds and self.run_start_seconds < self.t_sec_r0006:
+        #    self.setCSpadParametersV0003()        
+        #    print 'set parameters for V0003'
 
-        elif self.t_sec_r0006 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
+        elif self.t_sec_r0005 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
 
             #if   self.cspad_name == 'CxiDs1.0:Cspad.0' :
             #    self.setCSpadParametersV0004() # For DS1       
             #    print 'set parameters for V0004'
 
-            if   self.cspad_name == 'CxiDsd.0:Cspad.0' :
-                 self.setCSpadParametersV0005() # For DSD
-                 print 'set parameters for V0005'
+            #if   self.cspad_name == 'CxiDsd.0:Cspad.0' :
+            #     self.setCSpadParametersV0005() # For DSD
+            #     print 'set parameters for V0005'
 
-            else : 
-                 self.setCSpadParametersFromCalibDir() 
-                 print 'set parameters for from calib dir'
+            #else : 
+            #     self.setCSpadParametersFromCalibDir() 
+            #     print 'set parameters for from calib dir'
+                 
+            self.setCSpadParametersFromCalibDir() 
+            print 'Set parameters for from calib dir'
 
 #==========================================
 #==========================================

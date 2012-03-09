@@ -464,7 +464,7 @@ class PlotsForCSpad ( object ) :
             #plt.draw() # redraw the current figure
             fig.myZoomIsOn = False
 
-        arrwin = plt.gci().get_array() # this returns the full size imaje...
+        arrwin = plt.gci().get_array() # this returns the full size image...
         self.drawCSpadDetSpectrum(arrwin)
 
             

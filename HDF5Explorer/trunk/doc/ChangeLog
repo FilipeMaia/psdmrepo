@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-13
+2012-03-09 Mikhail S. Dubrovin
+- ConfigCSpad.py - steadly remove access to old hardwired constants.
+  almost everything should be available through the calib directory.
+
 Tag: V00-00-12
 2012-03-08 Mikhail S. Dubrovin
 - DrawEvent.py
