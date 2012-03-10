@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-03-09 Mikhail S. Dubrovin
+Tag: V00-00-03
+	
+- Add Alignment.py, in order to isolate alignment stuff from Examples.py
+- Remove the alignment stuff from Examples.py
+- In Alignment.py add loading pedestals from calib file and subtraction.
+- In HDF5Methods.py add method: getAverageCSPadEvent(...)
+
+#---------------------
 2012-01-23 Mikhail S. Dubrovin
 
 - HDF5Methods.py: add methods 
