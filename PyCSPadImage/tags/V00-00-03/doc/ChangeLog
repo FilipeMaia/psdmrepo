@@ -1,0 +1,92 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PyCSPadImage
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+#---------------------
+2012-03-09 Mikhail S. Dubrovin
+Tag: V00-00-03
+	
+- Add Alignment.py, in order to isolate alignment stuff from Examples.py
+- Remove the alignment stuff from Examples.py
+- In Alignment.py add loading pedestals from calib file and subtraction.
+- In HDF5Methods.py add method: getAverageCSPadEvent(...)
+
+#---------------------
+2012-01-23 Mikhail S. Dubrovin
+
+- HDF5Methods.py: add methods 
+  get_cspad_name_and_data_type_from_dataset_name( dsname )
+  get_root_calib_dir_from_hdf5_path( path )
+  def get_cspad_calib_dir( path, cspad_name='CxiDs1.0:Cspad.0' )	
+  get_run_number_from_hdf5_file_name( fname )
+
+- GlobalMethods.py add methods
+  get_item_last_three_names(dsname)
+  getListOfFilesInDir(dirname)
+  printListOfFilesInDir(dirname)	
+	
+2012-01-20 Mikhail S. Dubrovin
+Tag: V00-00-02
+
+- PyCSPadImage/src/CalibPars.py
+  order the file list: flist.sort() 
+  in order to have 0-end.data and 1150-end.data in a right order
+
+- Examples.py
+  is modified for calibration purpose.
+
+	
+2011-11-18 Mikhail S. Dubrovin
+        - add Examples.py
+        - Move examples from CSPadImageProducer.py to new module Examples.py
+	- Make examples more readable
+	- Commented print statements inside the modules CalibPars.py and HDF5Methods.py
+	- Add example for xpp47712
+	
+2011-10-19 Mikhail S. Dubrovin
+Tag: V00-00-01
+
+In CSPadConfigPars.py 
+	- add setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
+	- remove optimization: #if fname != self.fileNameWithAlreadySetCSPadConfiguration :
+          which does not work in case of swap between Ds1 and Dsd
+	- add 'try-except' protection in getQuadNumsInEvent(...)
+
+  In HDF5Methods.py change getOneCSPadEventForTest(...) :
+        - use setCSPadConfigurationFromOpenFile()
+        - add close() for hdf5 file
+	
+2011-10-18 Mikhail S. Dubrovin
+
+- Add in example access to cxi37411 constants
+- The HDF5Methods.getOneCSPadEventForTest() now retreave 
+  configuration for each event:
+	cspadconfig.setCSPadConfiguration( fname, dsname, event )
+  We need it if the set of sensors is not complete, 
+  like in Dsd now (3 2x1 are missing).
+	
+- Changed modules:
+	       src/CSPadConfigPars.py
+	       src/CSPadImageProducer.py
+	       src/CalibPars.py
+	       src/HDF5Methods.py
+
+2011-10-17 Mikhail S. Dubrovin
+	
+  CSPadImageProducer.py <- see the test example in main
+  CSPadConfigPars.py
+  CalibPars.py
+  CalibParsDefault.py
+  GlobalGraphics.py
+  GlobalMethods.py
+  HDF5Methods.py
+
