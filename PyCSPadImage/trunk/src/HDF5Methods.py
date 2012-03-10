@@ -31,7 +31,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 import h5py
-#import numpy as np
+import numpy as np
 
 #import ConfigParameters as cp
 import CSPadConfigPars  as ccp
@@ -198,6 +198,31 @@ def getOneCSPadEventForTest( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0
     ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
     dataset  = hdf5mets.get_dataset_from_hdf5_file(dsname)
     evdata   = dataset[event]
+    hdf5mets.close_hdf5_file()
+    return evdata
+
+#---------------------
+
+def getAverageCSPadEvent( fname   = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',
+                          dsname  = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data',
+                          event1  = 1,
+                          nevents = 10) :
+
+    print 'Average over', nevents, 'events, starting from', event1
+
+    hdf5file = hdf5mets.open_hdf5_file(fname)
+    ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5file, dsname, event1 )
+    dataset  = hdf5mets.get_dataset_from_hdf5_file(dsname)
+
+    evdata = np.zeros(dataset[event1].shape, dtype=np.float32)
+    for evt in range(event1, event1+nevents) :
+        evdata += dataset[evt]
+        if evt%10 == 0 :
+            print 'add event', evt
+            #print evdata[1,:]
+
+    evdata /= nevents
+
     hdf5mets.close_hdf5_file()
     return evdata
 
