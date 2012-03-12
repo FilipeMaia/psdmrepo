@@ -89,7 +89,7 @@ def main_example_alignment_test() :
         ped_arr = np.loadtxt(ped_fname, dtype=np.float32)
         print 'Load pedestals from file:', ped_fname
         print 'ped_arr.shape=\n', ped_arr.shape
-        ped_arr.shape = ds1ev.shape
+        ped_arr.shape = (32, 185, 388) # raw shape is (5920, 388)
         ds1ev -= ped_arr
 
 
