@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-44
+2012-03-12 Andy Salnikov
+- add "skip-epics" option to pyana, default is true, if set to false
+  then all EPICS-only datagrams are passed to framework as well
+
 Tag: V00-00-43
 2012-03-08 Andy Salnikov
 - reimplement ExpNameFromXtc and ExpNameFromConfig using new class

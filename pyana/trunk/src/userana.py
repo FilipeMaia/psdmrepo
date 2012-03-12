@@ -143,9 +143,11 @@ class evt_dispatch(object) :
                         _log.debug("User module %s requested event skip", userana.__modname__)
                         if evt.status() == pyana.Normal: evt.setStatus(code)
                     elif code == pyana.Stop:
-                        # skip the rest of the modules 
+                        # skip the rest of the modules, even those who want all events
                         _log.info("User module %s requested stop", userana.__modname__)
                         evt.setStatus(code)
+                        break
+                        
 
 
     def finish(self, evt, env):

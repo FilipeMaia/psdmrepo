@@ -58,7 +58,7 @@ class xtc_output (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, stream = -1, chunk_size_mb = 500*1024, name_fmt = _defFileNameFmt, dir_name = ".", keep_epics = 1 ) :
+    def __init__ ( self, stream = -1, chunk_size_mb = 512000, name_fmt = _defFileNameFmt, dir_name = ".", keep_epics = 1 ) :
         """
         Constructor takes set of parameters which can be changed in pyana configuration file
         """

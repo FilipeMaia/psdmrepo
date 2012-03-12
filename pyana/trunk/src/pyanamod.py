@@ -225,6 +225,9 @@ def _pyana ( argv ) :
     for conn in conns : conn[1].close()
     pipes = [mp_proto(conn[0], dg_ref, 'prot-main') for conn in conns]
 
+    skip_epics = jobConfig.getJobConfig('skip-epics', True)
+    logging.info("skip-epics: %s", skip_epics)
+
     status = 0
     try :
 
@@ -271,7 +274,7 @@ def _pyana ( argv ) :
 
             if svc == xtc.TransitionId.L1Accept :
 
-                if _epicsOnly(dg.xtc):
+                if skip_epics and _epicsOnly(dg.xtc):
                     # datagram is likely filtered, has only epics data and users do not need to
                     # see it. Do not count it as an event too, just save EPICS data and move on.
                     continue
