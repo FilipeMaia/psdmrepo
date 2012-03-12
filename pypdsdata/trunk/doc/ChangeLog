@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-52
+2012-03-12 Andy Salnikov
+- pyxtcreader: changed damage format to hex
+
 Tag: V00-00-51
 2012-03-06 Andy Salnikov
 - adding classes pyext/io/XtcFilterTypeId and pyext/io/XtcFilter

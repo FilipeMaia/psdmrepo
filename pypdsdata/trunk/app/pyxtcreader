@@ -48,7 +48,7 @@ def _scan( xtc, offset=1, verbose=0 ) :
     
     pfx = "  "*offset
     level = xtc.src.level()
-    print "%s%s level: payloadSize=%d damage=%d src=%s" % \
+    print "%s%s level: payloadSize=%d damage=%#x src=%s" % \
             ( pfx, level, xtc.sizeofPayload(), xtc.damage.value(), xtc.src ),
     
     # some kind of damage may break even 'contains'
