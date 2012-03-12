@@ -106,6 +106,7 @@ private:
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
+  bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
 };

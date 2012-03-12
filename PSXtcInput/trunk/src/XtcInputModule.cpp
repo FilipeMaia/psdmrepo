@@ -93,6 +93,7 @@ XtcInputModule::XtcInputModule (const std::string& name)
   ConfigSvc::ConfigSvc cfg;
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
+  m_skipEpics = cfg.get("psana", "skip-epics", true);
 }
 
 //--------------
@@ -275,7 +276,7 @@ XtcInputModule::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (::epicsOnly(&(dg.dg()->xtc))) {
+      if (m_skipEpics and ::epicsOnly(&(dg.dg()->xtc))) {
 
         // datagram is likely filtered, has only epics data and users do not need to
         // see it. Do not count it as an event too, just save EPICS data and move on.

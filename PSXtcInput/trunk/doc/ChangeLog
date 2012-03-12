@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-03-12 Andy Salnikov
+- add option "skip-epics" to XtcInputModule, default is true, if set to 
+  false than all EPICS-only datagrams are passed to framework as well
+
 Tag: V00-02-00
 2012-03-08 Andy Salnikov
 - add datagram object to event in all transition types including configure
