@@ -77,6 +77,7 @@
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "H5DataTypes/TimepixConfigV1.h"
+#include "H5DataTypes/TimepixConfigV2.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
@@ -368,6 +369,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::TimepixConfigV1> ( "Timepix::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::TimepixConfigV2> ( "Timepix::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixConfig, 2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPad2x2ConfigV1> ( "CsPad2x2::ConfigV1" ) ) ;
