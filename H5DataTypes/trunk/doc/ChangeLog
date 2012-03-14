@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-51
+2012-03-14 Andy Salnikov
+- upgrading to pdsdata V03-03-01
+- added TimepixConfigV2
+
 Tag: V00-00-50
 2012-02-17 Andy Salnikov
 - upgrading to pdsdata V03-02-12
