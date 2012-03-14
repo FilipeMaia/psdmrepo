@@ -371,6 +371,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 1) ::storeDataProxy<Timepix::DataV1>(xtc, evt);
     if (version == 2) ::storeDataProxy<Timepix::DataV2>(xtc, evt);
     break;
+  case Pds::TypeId::Id_CspadCompressedElement:
+    break;
   case Pds::TypeId::NumberOf:
     break;
 
@@ -521,8 +523,11 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_TimepixConfig:
     if (version == 1) ::storeCfgObject<Timepix::ConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<Timepix::ConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_TimepixData:
+    break;
+  case Pds::TypeId::Id_CspadCompressedElement:
     break;
   case Pds::TypeId::NumberOf:
     break;
