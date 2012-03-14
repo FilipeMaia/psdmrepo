@@ -19,7 +19,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-pdsdata_ver = "3.2.12"
+pdsdata_ver = "3.3.1a"
 PREFIX = pjoin(env['SIT_ROOT'],"sw/external/pdsdata",pdsdata_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
