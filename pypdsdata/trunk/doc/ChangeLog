@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-53
+2012-03-14 Andy Salnikov
+- upgrade to pdsdata V03-03-01A
+  - new class timepix.ConfigV2
+
 Tag: V00-00-52
 2012-03-12 Andy Salnikov
 - pyxtcreader: changed damage format to hex

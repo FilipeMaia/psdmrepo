@@ -102,6 +102,7 @@
 #include "types/pulnix/TM6740ConfigV2.h"
 
 #include "types/timepix/ConfigV1.h"
+#include "types/timepix/ConfigV2.h"
 #include "types/timepix/DataV1.h"
 #include "types/timepix/DataV2.h"
 
@@ -372,12 +373,16 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_TimepixConfig :
     if ( not obj ) obj = xtc2obj<Timepix::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Timepix::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TimepixData :
     if ( not obj ) obj = xtc2obj<Timepix::DataV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Timepix::DataV2, 2>(xtc, parent);
     break ;
+
+  case Pds::TypeId::Id_CspadCompressedElement :
+    break;
 
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum
