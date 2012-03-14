@@ -272,7 +272,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_PhasicsConfig, 48 )
         self.assertEqual ( TypeId.Type.Id_TimepixConfig, 49 )
         self.assertEqual ( TypeId.Type.Id_TimepixData, 50 )
-        self.assertEqual ( TypeId.Type.NumberOf, 51 )
+        self.assertEqual ( TypeId.Type.Id_CspadCompressedElement, 51 )
+        self.assertEqual ( TypeId.Type.NumberOf, 52 )
 
         # instantiation
         TypeId ()

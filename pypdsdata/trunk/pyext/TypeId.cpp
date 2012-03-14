@@ -85,6 +85,7 @@ namespace {
       { "Id_PhasicsConfig",   Pds::TypeId::Id_PhasicsConfig },
       { "Id_TimepixConfig",   Pds::TypeId::Id_TimepixConfig },
       { "Id_TimepixData",     Pds::TypeId::Id_TimepixData },
+      { "Id_CspadCompressedElement", Pds::TypeId::Id_CspadCompressedElement },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
