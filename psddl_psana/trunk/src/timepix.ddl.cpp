@@ -9,6 +9,9 @@ namespace Timepix {
 ConfigV1::~ConfigV1() {}
 
 
+ConfigV2::~ConfigV2() {}
+
+
 DataV1::~DataV1() {}
 
 

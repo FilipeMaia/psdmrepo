@@ -91,6 +91,103 @@ public:
   virtual int32_t dac3RefLvds() const = 0;
 };
 
+/** @class ConfigV2
+
+  
+*/
+
+
+class ConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_TimepixConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  enum { ChipCount = 4 };
+  enum { ChipNameMax = 16 };
+  enum { PixelThreshMax = ChipCount*256*256 };
+  enum ReadoutSpeed {
+    ReadoutSpeed_Slow = 0,
+    ReadoutSpeed_Fast = 1,
+  };
+  enum TriggerMode {
+    TriggerMode_ExtPos = 0,
+    TriggerMode_ExtNeg = 1,
+    TriggerMode_Soft = 2,
+  };
+  virtual ~ConfigV2();
+  virtual Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const = 0;
+  virtual Timepix::ConfigV2::TriggerMode triggerMode() const = 0;
+  virtual int32_t timepixSpeed() const = 0;
+  virtual int32_t dac0Ikrum() const = 0;
+  virtual int32_t dac0Disc() const = 0;
+  virtual int32_t dac0Preamp() const = 0;
+  virtual int32_t dac0BufAnalogA() const = 0;
+  virtual int32_t dac0BufAnalogB() const = 0;
+  virtual int32_t dac0Hist() const = 0;
+  virtual int32_t dac0ThlFine() const = 0;
+  virtual int32_t dac0ThlCourse() const = 0;
+  virtual int32_t dac0Vcas() const = 0;
+  virtual int32_t dac0Fbk() const = 0;
+  virtual int32_t dac0Gnd() const = 0;
+  virtual int32_t dac0Ths() const = 0;
+  virtual int32_t dac0BiasLvds() const = 0;
+  virtual int32_t dac0RefLvds() const = 0;
+  virtual int32_t dac1Ikrum() const = 0;
+  virtual int32_t dac1Disc() const = 0;
+  virtual int32_t dac1Preamp() const = 0;
+  virtual int32_t dac1BufAnalogA() const = 0;
+  virtual int32_t dac1BufAnalogB() const = 0;
+  virtual int32_t dac1Hist() const = 0;
+  virtual int32_t dac1ThlFine() const = 0;
+  virtual int32_t dac1ThlCourse() const = 0;
+  virtual int32_t dac1Vcas() const = 0;
+  virtual int32_t dac1Fbk() const = 0;
+  virtual int32_t dac1Gnd() const = 0;
+  virtual int32_t dac1Ths() const = 0;
+  virtual int32_t dac1BiasLvds() const = 0;
+  virtual int32_t dac1RefLvds() const = 0;
+  virtual int32_t dac2Ikrum() const = 0;
+  virtual int32_t dac2Disc() const = 0;
+  virtual int32_t dac2Preamp() const = 0;
+  virtual int32_t dac2BufAnalogA() const = 0;
+  virtual int32_t dac2BufAnalogB() const = 0;
+  virtual int32_t dac2Hist() const = 0;
+  virtual int32_t dac2ThlFine() const = 0;
+  virtual int32_t dac2ThlCourse() const = 0;
+  virtual int32_t dac2Vcas() const = 0;
+  virtual int32_t dac2Fbk() const = 0;
+  virtual int32_t dac2Gnd() const = 0;
+  virtual int32_t dac2Ths() const = 0;
+  virtual int32_t dac2BiasLvds() const = 0;
+  virtual int32_t dac2RefLvds() const = 0;
+  virtual int32_t dac3Ikrum() const = 0;
+  virtual int32_t dac3Disc() const = 0;
+  virtual int32_t dac3Preamp() const = 0;
+  virtual int32_t dac3BufAnalogA() const = 0;
+  virtual int32_t dac3BufAnalogB() const = 0;
+  virtual int32_t dac3Hist() const = 0;
+  virtual int32_t dac3ThlFine() const = 0;
+  virtual int32_t dac3ThlCourse() const = 0;
+  virtual int32_t dac3Vcas() const = 0;
+  virtual int32_t dac3Fbk() const = 0;
+  virtual int32_t dac3Gnd() const = 0;
+  virtual int32_t dac3Ths() const = 0;
+  virtual int32_t dac3BiasLvds() const = 0;
+  virtual int32_t dac3RefLvds() const = 0;
+  virtual int32_t driverVersion() const = 0;
+  virtual uint32_t firmwareVersion() const = 0;
+  virtual uint32_t pixelThreshSize() const = 0;
+  virtual ndarray<uint8_t, 1> pixelThresh() const = 0;
+  virtual const char* chip0Name() const = 0;
+  virtual const char* chip1Name() const = 0;
+  virtual const char* chip2Name() const = 0;
+  virtual const char* chip3Name() const = 0;
+  virtual int32_t chip0ID() const = 0;
+  virtual int32_t chip1ID() const = 0;
+  virtual int32_t chip2ID() const = 0;
+  virtual int32_t chip3ID() const = 0;
+  virtual int32_t chipCount() const = 0;
+};
+
 /** @class DataV1
 
   
