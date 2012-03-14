@@ -12,8 +12,6 @@
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
-
 @version $Id$
 
 @author Andy Salnikov
@@ -44,7 +42,7 @@ from pypdsdata import xtc
 #  Class definition --
 #---------------------
 class dump_timepix (object) :
-    """example analysis module which dumps Timepics objects"""
+    """example analysis module which dumps Timepix objects"""
 
     #----------------
     #  Constructor --
@@ -70,7 +68,16 @@ class dump_timepix (object) :
             
             print "  readoutSpeed =", config.readoutSpeed()
             print "  triggerMode =", config.triggerMode()
-            print "  shutterTimeout =", config.shutterTimeout()
+            try:
+                # ConfigV1
+                print "  shutterTimeout =", config.shutterTimeout()
+            except:
+                pass
+            try:
+                # ConfigV2
+                print "  timepixSpeed =", config.timepixSpeed()
+            except:
+                pass
             print "  dac0Ikrum =", config.dac0Ikrum()
             print "  dac0Disc =", config.dac0Disc()
             print "  dac0Preamp =", config.dac0Preamp()
@@ -127,6 +134,18 @@ class dump_timepix (object) :
             print "  dac3Ths =", config.dac3Ths()
             print "  dac3BiasLvds =", config.dac3BiasLvds()
             print "  dac3RefLvds =", config.dac3RefLvds()
+            
+            try:
+                # ConfigV2
+                print "  chipCount =", config.chipCount()
+                print "  driverVersion =", config.driverVersion()
+                print "  firmwareVersion =", config.firmwareVersion()
+                print "  pixelThreshSize =", config.pixelThreshSize()
+                print "  pixelThresh =", config.pixelThresh()
+                print "  chip names =", config.chip0Name(), config.chip1Name(), config.chip2Name(), config.chip3Name()
+                print "  chip IDs =", config.chip0ID(), config.chip1ID(), config.chip2ID(), config.chip3ID()
+            except:
+                pass
 
 
     def event( self, evt, env ) :

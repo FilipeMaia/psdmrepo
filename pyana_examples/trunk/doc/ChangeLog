@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2012-03-14 Andy Salnikov
+- dump_timepix: added extra info dumping for ConfigV2
+
 Tag: V00-00-17
 2012-02-15 Andy Salnikov
 - new module skip_stop_example
