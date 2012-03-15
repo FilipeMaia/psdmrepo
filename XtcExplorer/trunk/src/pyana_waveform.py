@@ -258,6 +258,7 @@ class pyana_waveform (object) :
         if (env.subprocess()>0):
             return
 
+        newmode = None
         if self.do_plots and (self.n_shots%self.plot_every_n)==0:
 
             # flag for pyana_plotter

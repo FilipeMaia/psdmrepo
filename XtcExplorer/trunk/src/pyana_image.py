@@ -143,6 +143,7 @@ class  pyana_image ( object ) :
                           'Cspad'         : TypeId.Type.Id_CspadElement,
                           'TM6740'        : TypeId.Type.Id_Frame,
                           'Opal1000'      : TypeId.Type.Id_Frame,
+                          'Fccd'          : TypeId.Type.Id_Frame,
                           'pnCCD'         : TypeId.Type.Id_pnCCDframe,
                           'Princeton'     : TypeId.Type.Id_PrincetonFrame,
                           'Timepix'       : TypeId.Type.Id_TimepixData
