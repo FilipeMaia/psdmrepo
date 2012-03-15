@@ -213,8 +213,12 @@ class  pyana_image ( object ) :
                 quads = range(4)
                 sections = map(config.sections, quads)
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
-                self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
-
+                try:
+                    self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
+                except OSError, e:
+                    print "  ", e
+                    print "  ", "No pedestals will be subtracted"
+                    
     # process event/shot data
     def event ( self, evt, env ) :
 

@@ -352,8 +352,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #  Private methods --
     #--------------------
     def set_instrument(self, value):
-        print "Selecting instrument: item %d, %s"%\
-              (value, self.sender().itemText(value))
+        #print "Selecting instrument: item %d, %s"%\
+        #      (value, self.sender().itemText(value))
 
         if value < 1:
             self.instrument = None
@@ -365,7 +365,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.directory += (self.instrument + "/")
 
         dirList=os.listdir(self.directory)
-        print "Current directory is now %s. It has %d experiment directories. "%(self.directory,len(dirList))
+        #print "Current directory is now %s. It has %d experiment directories. "%(self.directory,len(dirList))
         
         # add subdirectories to experiment selector
         self.comboBoxExp.clear()
@@ -377,15 +377,15 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     def set_experiment(self, value):
         if value < 1 :
             return
-        print "Selecting experiment: item %d, %s "%\
-              (value, self.sender().itemText(value))
+        #print "Selecting experiment: item %d, %s "%\
+        #      (value, self.sender().itemText(value))
         self.experiment = self.sender().currentText()
 
         try:
             dir = "/reg/d/psdm/" + self.instrument + "/" + self.experiment + "/xtc/"
             if os.path.exists(dir):
                 self.directory = dir
-                print "Current directory: %s "%(self.directory)
+                #print "Current directory: %s "%(self.directory)
         except:
             pass
         

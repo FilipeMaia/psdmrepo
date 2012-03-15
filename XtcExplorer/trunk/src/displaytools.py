@@ -7,18 +7,164 @@ from matplotlib.gridspec import GridSpec
 
 class DataDisplay(object):
 
-    def __init__(self):
+    def __init__(self, mode=0):
         self.event_number = 0
+        self.display_mode = mode
         self.ipimb_disp = None
         self.image_disp = None
+        self.bld_disp = None
+        self.figures = [] # keep a list of reference to all figures
 
+    def show_bld(self, datalist):
+        for bld in datalist:
+            if bld.name == "EBeam":
+                self.plot_ebeam(bld)
+            if bld.name == "GasDetector":
+                self.plot_gasdet(bld)
+            if bld.name == "PhaseCavity":
+                self.plot_phasecavity(bld)
+            plt.draw()
+        return
+
+
+    def plot_ebeam(self,ebeam):
+
+        print "Making plot of array of length %d"%ebeam.shots.size
+
+        # make figure                
+        fig = plt.figure(100, figsize=(8,8) )
+        fig.clf()
+        fig.subplots_adjust(wspace=0.4, hspace=0.4)
+        fig.suptitle("BldInfo:EBeam data shot#%d"%self.event_number)
+        
+        ax1 = fig.add_subplot(221)
+        if (np.size(ebeam.shots) != np.size(ebeam.energies) ):
+            print "event    ", self.n_shots
+            print "axis     ", np.size(ebeam.shots), np.shape(ebeam.shots)
+            print "energies ", np.size(ebeam.energies), np.shape(ebeam.energies)
+
+        plt.plot(ebeam.shots,ebeam.energies)
+        plt.title("Beam Energy")
+        plt.xlabel('Datagram record',horizontalalignment='left') # the other right
+        plt.ylabel('Beam Energy',horizontalalignment='right')
+        
+        ax2 = fig.add_subplot(222)
+        plt.scatter(ebeam.positions[:,0],ebeam.angles[:,0])
+        plt.title('Beam X')
+        plt.xlabel('position X',horizontalalignment='left')
+        plt.ylabel('angle X',horizontalalignment='left')
+            
+        ax3 = fig.add_subplot(223)
+        plt.scatter(ebeam.positions[:,1],ebeam.angles[:,1])
+        plt.title("Beam Y")
+        plt.xlabel('position Y',horizontalalignment='left')
+        plt.ylabel('angle Y',horizontalalignment='left')
+            
+        ax4 = fig.add_subplot(224)
+        n, bins, patches = plt.hist(ebeam.charge, 100, normed=1, histtype='stepfilled')
+        plt.setp(patches, 'facecolor', 'g', 'alpha', 0.75)
+        plt.title('Beam Charge')
+        plt.xlabel('Beam Charge',horizontalalignment='left') # the other right
+
+        return
+
+    def plot_gasdet(self,gasdet):
+        print "Making plot of gasdet of length %d"%gasdet.shots.size
+                
+        # make figure
+        fig = plt.figure(101, figsize=(8,8) )
+        fig.clf()
+        fig.subplots_adjust(wspace=0.4, hspace=0.4)
+        fig.suptitle("BldInfo:GasDetector data shot#%d"%self.event_number)
+        
+        # numpy array (4d)
+        ax1 = fig.add_subplot(221)
+        n, bins, patches = plt.hist(gasdet.energies[:,0], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
+        plt.title('Energy 11')
+        plt.xlabel('Energy E[0]',horizontalalignment='left')
+        
+        ax2 = fig.add_subplot(222)
+        n, bins, patches = plt.hist(gasdet.energies[:,1], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
+        plt.title('Energy 12')
+        plt.xlabel('Energy E[1]',horizontalalignment='left')
+        
+        ax3 = fig.add_subplot(223)
+        n, bins, patches = plt.hist(gasdet.energies[:,2], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
+        plt.title('Energy 21')
+        plt.xlabel('Energy E[2]',horizontalalignment='left')
+        
+        ax4 = fig.add_subplot(224)
+        n, bins, patches = plt.hist(gasdet.energies[:,3], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
+        plt.title('Energy 22')
+        plt.xlabel('Energy E[3]',horizontalalignment='left')
+        return
+            
+    def plot_phasecavity(self,pc):
+        print "Making plot of phasecavity, based on %d shots"%pc.shots.size
+
+        # make figure
+        fig = plt.figure(102, figsize=(12,8) )
+        fig.clf()
+        fig.subplots_adjust(wspace=0.4, hspace=0.4)
+        fig.suptitle("BldInfo:PhaseCavity data shot#%d"%self.event_number)
+        
+        ax1 = fig.add_subplot(231)
+        n, bins, patches = plt.hist(pc.time[0], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
+        plt.title('Time PC1')
+        plt.xlabel('Time PC1',horizontalalignment='left')
+        unit = bins[1] - bins[0]
+        x1min, x1max = (bins[0]-unit), (bins[-1]+unit)
+        plt.xlim(x1min,x1max)
+        
+        ax2 = fig.add_subplot(232)
+        n, bins, patches = plt.hist(pc.time[1], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
+        plt.title('Time PC2')
+        plt.xlabel('Time PC2',horizontalalignment='left')
+        unit = bins[1] - bins[0]
+        x2min, x2max = (bins[0]-unit), (bins[-1]+unit)
+        plt.xlim(x2min,x2max)
+        
+        ax3 = fig.add_subplot(233)
+        plt.scatter(pc.time[0],pc.time[1])
+        plt.title("Time PC1 vs. Time PC2")
+        plt.xlabel('Time PC1',horizontalalignment='left')
+        plt.ylabel('Time PC2',horizontalalignment='left')
+        plt.xlim(x1min,x1max)
+        plt.ylim(x2min,x2max)
+        
+        ax4 = fig.add_subplot(234)
+        n, bins, patches = plt.hist(pc.charge[0], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
+        plt.title('Charge PC1')
+        plt.xlabel('Charge PC1',horizontalalignment='left')
+        
+        ax5 = fig.add_subplot(235)
+        n, bins, patches = plt.hist(pc.charge[1], 60,histtype='stepfilled')
+        plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
+        plt.title('Charge PC2')
+        plt.xlabel('Charge PC2',horizontalalignment='left')
+        
+        ax6 = fig.add_subplot(236)
+        plt.scatter(pc.charge[0],pc.charge[1])
+        plt.title("Charge PC1 vs. Charge PC2")
+        plt.xlabel('Charge PC1',horizontalalignment='left')
+        plt.ylabel('Charge PC2',horizontalalignment='left')
+        
+
+        
     def show_ipimb(self, datalist ):
 
         if len(datalist)==1:
             self.show_ipimb_single(datalist)
-
         else:
             self.show_ipimb_multiple(datalist)
+        plt.draw()
             
 
     def show_ipimb_multiple(self,datalist):
@@ -39,7 +185,7 @@ class DataDisplay(object):
             titles.append(ipimb.name)
             gain.append("%s"%(ipimb.gain_settings))
             arrays.append(ipimb.fex_sum) 
-            ax.plot(ipimb.fex_sum,label="%s"%(ipimb.name))
+            ax.plot(ipimb.fex_sum,'.',label="%s"%(ipimb.name))
         ax.set_xlabel("event count")
         ax.set_ylabel("Sum [V]")
         ax.legend()
@@ -309,7 +455,7 @@ class Frame(object):
         self.axesim = self.axes.imshow( image,
                                         origin=myorigin,
                                         extent=self.extent,
-                                        interpolation='bilinear',
+                                        #interpolation='bilinear',
                                         vmin=self.vmin,
                                         vmax=self.vmax )
 

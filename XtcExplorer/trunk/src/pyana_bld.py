@@ -5,7 +5,7 @@
 
 import numpy as np
 import logging
-import matplotlib.pyplot as plt
+
 from utilities import PyanaOptions 
 from utilities import BldData
 from pypdsdata import xtc
@@ -21,7 +21,7 @@ class  pyana_bld ( object ) :
                    do_ipimb        = "False",
                    plot_every_n    = None,
                    accumulate_n    = "0",
-                   fignum          = "1" ):
+                   fignum          = "1"):
         """
         Initialize data. Parameters:
         @param do_ebeam            Plot data from EBeam object
@@ -41,7 +41,6 @@ class  pyana_bld ( object ) :
         self.do_ipimb     = opt.getOptBoolean(do_ipimb)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.accumulate_n = opt.getOptInteger(accumulate_n)
-        self.mpl_num      = opt.getOptInteger(fignum)
 
         # other
         self.n_shots = None
@@ -111,7 +110,6 @@ class  pyana_bld ( object ) :
         if self.do_EBeam:  self.data["EBeam"]       = BldData("EBeam") 
         if self.do_GasDet: self.data["GasDetector"] = BldData("GasDetector")
         if self.do_PC :    self.data["PhaseCavity"] = BldData("PhaseCavity") 
-        if self.do_ipimb : self.data["SharedIpimb"] = BldData("SharedIpimb") 
 
         self.doPlot = (env.subprocess()<1) and (self.plot_every_n != 0)
 
@@ -119,10 +117,6 @@ class  pyana_bld ( object ) :
         self.n_shots += 1
 
         do_plot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
-
-        # if a prior module has failed a filter...
-        if evt.get('skip_event'):
-            return
 
         self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
 
@@ -209,25 +203,20 @@ class  pyana_bld ( object ) :
                     self.IPM_fex_sum.append( 0.0 )
                     self.IPM_fex_position.append( [0.0,0.0] )
                     
+            
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0):
+            return
+
         # ----------------- Plotting --------------------- 
         if do_plot :
-            header = "shots %d-%d" % (self.accu_start, self.n_shots)
-            self.make_plots(self.mpl_num, suptitle=header)
 
-            # flag for pyana_plotter
             evt.put(True, 'show_event')
 
-            data_bld = []
-            for name,data in self.data.iteritems() :
-                data_bld.append( data )
-                    
-            # give the list to the event object
-            evt.put( data_bld, 'data_bld' )
-        #else:
-        #    print "bld doPlot is False ",
-        #    print "subprocess < 1 ? ", (env.subprocess()<1)
-        #    print "plot_every_n ? ", self.plot_every_n 
-        #    print "modulus? ", (self.n_shots%self.plot_every_n)
+            data_bld = self.update_plot_data()
+    
+            evt.put(data_bld, 'data_bld')
+
             
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
@@ -239,228 +228,41 @@ class  pyana_bld ( object ) :
         print "pyana_bld endjob has been reached, after processing %d events"%self.n_shots
 
         # ----------------- Plotting ---------------------
-        if (env.subprocess()<1):
-            header = "shots %d-%d" % (self.accu_start, self.n_shots)
-            self.make_plots(self.mpl_num, suptitle=header)
-
-            # flag for pyana_plotter
-            evt.put(True, 'show_event')
-
-            data_bld = []
-            for name,data in self.data.iteritems() :
-                data_bld.append( data )
-                
-            # give the list to the event object
-            evt.put( data_bld, 'data_bld' )
-
-
-    def make_plots(self, fignum = 1, suptitle = ""):
-
-        if self.accu_start == self.n_shots :
-            print "Can't do ", suptitle
+        if (env.subprocess()>0):
+            return
         
-        if self.do_EBeam :
-            if len(self.EB_charge) > 0 :
+        evt.put(True, 'show_event')
+        
+        data_bld = self.update_plot_data()
+    
+        evt.put(data_bld, 'data_bld')
+        # flag for pyana_plotter
+        evt.put(True, 'show_event')
 
-                print "Making plot of array of length %d"%len(self.EB_charge)
 
-                # numpy arrays
-                xaxis = np.arange( self.accu_start, self.n_shots ) 
-                charge = np.float_(self.EB_charge)
-                energies = np.float_(self.EB_energies)
-                positions = np.float_(self.EB_positions)
-                angles = np.float_(self.EB_angles)
 
-                # store for later (ipython)
-                self.data["EBeam"].charge = charge
-                self.data["EBeam"].energy = energies
-                self.data["EBeam"].position = positions
-                self.data["EBeam"].angle = angles
-                
-                # make figure                
-                fig = plt.figure(num=(fignum+1), figsize=(8,8) )
-                fig.clf()
-                fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:EBeam data " + suptitle)
+    def update_plot_data(self):
+        # convert lists to arrays and dict to a list:
+        data_bld = []
 
-                ax1 = fig.add_subplot(221)
-                if (np.size(xaxis) != np.size(energies) ):
-                    print "event    ", self.n_shots
-                    print "axis     ", np.size(xaxis), np.shape(xaxis)
-                    print "energies ", np.size(energies), np.shape(energies)
-                plt.plot(xaxis,energies)
-                plt.title("Beam Energy")
-                plt.xlabel('Datagram record',horizontalalignment='left') # the other right
-                plt.ylabel('Beam Energy',horizontalalignment='right')
-                
-                ax2 = fig.add_subplot(222)
-                plt.scatter(positions[:,0],angles[:,0])
-                plt.title('Beam X')
-                plt.xlabel('position X',horizontalalignment='left')
-                plt.ylabel('angle X',horizontalalignment='left')
+        if 'EBeam' in self.data:
+            self.data['EBeam'].shots = np.arange( self.accu_start, self.n_shots ) 
+            self.data['EBeam'].energies = np.array(self.EB_energies)
+            self.data['EBeam'].positions = np.array(self.EB_positions)
+            self.data['EBeam'].angles = np.array(self.EB_angles)
+            self.data['EBeam'].charge = np.array(self.EB_charge)
+        if 'GasDetector' in self.data:
+            self.data['GasDetector'].shots = np.arange( self.accu_start, self.n_shots ) 
+            self.data['GasDetector'].energies = np.array( self.GD_energies )
+        if 'PhaseCavity' in self.data:
+            self.data['PhaseCavity'].shots = np.arange( self.accu_start, self.n_shots )
+            self.data['PhaseCavity'].time = np.vstack( \
+                ( np.array( self.PC_ftime1), np.array(self.PC_ftime2) )).T
+            self.data['PhaseCavity'].charge = np.vstack( \
+                ( np.array( self.PC_fchrg1), np.array(self.PC_fchrg2) )).T
 
-                ax3 = fig.add_subplot(223)
-                plt.scatter(positions[:,1],angles[:,1])
-                plt.title("Beam Y")
-                plt.xlabel('position Y',horizontalalignment='left')
-                plt.ylabel('angle Y',horizontalalignment='left')
-
-                ax4 = fig.add_subplot(224)
-                n, bins, patches = plt.hist(self.EB_charge, 100, normed=1, histtype='stepfilled')
-                plt.setp(patches, 'facecolor', 'g', 'alpha', 0.75)
-                plt.title('Beam Charge')
-                plt.xlabel('Beam Charge',horizontalalignment='left') # the other right
-                
-
-        if self.do_GasDet :
-
-            if len(self.GD_energies) > 0 :
-
-                # numpy array (4d)
-                array = np.float_(self.GD_energies)
-
-                # store for later (ipython)
-                self.data["GasDetector"].energy = array
-
-                # make figure
-                fig = plt.figure(num=(fignum+2), figsize=(8,8) )
-                fig.clf()
-                fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:FEEGasDetEnergy data " + suptitle)
-
-                ax1 = fig.add_subplot(221)
-                n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
-                plt.title('Energy 11')
-                plt.xlabel('Energy E[0]',horizontalalignment='left')
-                
-                ax2 = fig.add_subplot(222)
-                n, bins, patches = plt.hist(array[:,1], 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
-                plt.title('Energy 12')
-                plt.xlabel('Energy E[1]',horizontalalignment='left')
-                
-                ax3 = fig.add_subplot(223)
-                n, bins, patches = plt.hist(array[:,2], 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
-                plt.title('Energy 21')
-                plt.xlabel('Energy E[2]',horizontalalignment='left')
-                
-                ax4 = fig.add_subplot(224)
-                n, bins, patches = plt.hist(array[:,3], 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
-                plt.title('Energy 22')
-                plt.xlabel('Energy E[3]',horizontalalignment='left')
-                
-            
-
-        if self.do_PC :
-
-            if len(self.PC_ftime1) > 0 :
-
-                # numpy arrays
-                ftime1 = np.float_(self.PC_ftime1)
-                ftime2 = np.float_(self.PC_ftime2)
-                fchrg1 = np.float_(self.PC_fchrg1)
-                fchrg2 = np.float_(self.PC_fchrg2)
-
-                # store for later (ipython)
-                self.data["PhaseCavity"].time = np.vstack( (ftime1, ftime2)).T
-                self.data["PhaseCavity"].charge = np.vstack( (fchrg1, fchrg2)).T
-                
-                # make figure
-                fig = plt.figure(num=(fignum+3), figsize=(12,8) )
-                fig.clf()
-                fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:PhaseCavity data " + suptitle)
-
-                ax1 = fig.add_subplot(231)
-                n, bins, patches = plt.hist(ftime1, 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
-                plt.title('Time PC1')
-                plt.xlabel('Time PC1',horizontalalignment='left')
-                unit = bins[1] - bins[0]
-                x1min, x1max = (bins[0]-unit), (bins[-1]+unit)
-                plt.xlim(x1min,x1max)
-             
-                ax2 = fig.add_subplot(232)
-                n, bins, patches = plt.hist(ftime2, 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
-                plt.title('Time PC2')
-                plt.xlabel('Time PC2',horizontalalignment='left')
-                unit = bins[1] - bins[0]
-                x2min, x2max = (bins[0]-unit), (bins[-1]+unit)
-                plt.xlim(x2min,x2max)
-
-                ax3 = fig.add_subplot(233)
-                plt.scatter(ftime1,ftime2)
-                plt.title("Time PC1 vs. Time PC2")
-                plt.xlabel('Time PC1',horizontalalignment='left')
-                plt.ylabel('Time PC2',horizontalalignment='left')
-                plt.xlim(x1min,x1max)
-                plt.ylim(x2min,x2max)
-                
-                ax4 = fig.add_subplot(234)
-                n, bins, patches = plt.hist(fchrg1, 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
-                plt.title('Charge PC1')
-                plt.xlabel('Charge PC1',horizontalalignment='left')
-             
-                ax5 = fig.add_subplot(235)
-                n, bins, patches = plt.hist(fchrg2, 60,histtype='stepfilled')
-                plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
-                plt.title('Charge PC2')
-                plt.xlabel('Charge PC2',horizontalalignment='left')
-                
-                ax6 = fig.add_subplot(236)
-                plt.scatter(fchrg1,fchrg2)
-                plt.title("Charge PC1 vs. Charge PC2")
-                plt.xlabel('Charge PC1',horizontalalignment='left')
-                plt.ylabel('Charge PC2',horizontalalignment='left')
-                
-
-            
-        if self.do_ipimb :
-
-            if len(self.IPM_fex_channels)>0 :
-
-                # numpy arrays
-                xaxis = np.arange( 0, len(self.IPM_fex_channels) ) 
-                arrayCh = np.float_(self.IPM_fex_channels)
-                arrayXY = np.float_(self.IPM_fex_position)               
-                arraySm = np.float_(self.IPM_fex_sum)
-
-                # store for later (ipython)
-                self.data["SharedIpimb"].fex_channels = arrayCh
-                self.data["SharedIpimb"].fex_position = arrayXY
-                self.data["SharedIpimb"].fex_sum = arraySm
-
-                # make figure
-                fig = plt.figure(num=(fignum+4), figsize=(12,4) ) 
-                fig.clf()
-                fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:SharedIpimb data " + suptitle)
-                
-                ax1 = fig.add_subplot(1,3,1)
-                plt.hist(arrayCh[:,0], 60, histtype='stepfilled', color='r', label='Ch0')
-                plt.hist(arrayCh[:,1], 60, histtype='stepfilled', color='b', label='Ch1')
-                plt.hist(arrayCh[:,2], 60, histtype='stepfilled', color='y', label='Ch2')
-                plt.hist(arrayCh[:,3], 60, histtype='stepfilled', color='m', label='Ch3')
-                plt.title("IPIMB Channels")
-                plt.xlabel('Channels',horizontalalignment='left') # the other right
-                leg = ax1.legend()
-                
-                ax2 = fig.add_subplot(1,3,2)
-                plt.scatter(arrayXY[:,0],arrayXY[:,1])
-                plt.title("Beam position")
-                plt.xlabel('Beam position X',horizontalalignment='left')
-                plt.ylabel('Beam position Y',horizontalalignment='left')
-                
-                ax3 = fig.add_subplot(1,3,3)
-                plt.plot(xaxis,arraySm)
-                plt.ylabel('Sum of channels',horizontalalignment='left') # the other right
-                plt.xlabel('Shot number',horizontalalignment='left') # the other right
-                plt.title("Sum vs. time")
-            
-        plt.draw()
-
+        for name,data in self.data.iteritems() :
+            #print "name, data = ", name, data            
+            data_bld.append( data )
+       
+        return data_bld

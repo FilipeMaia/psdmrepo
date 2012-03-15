@@ -239,6 +239,7 @@ class BldData( BaseData ):
         BaseData.__init__(self,name,type)
         self.time = None
         self.damage = None
+        self.shots = None
         self.energy = None
         self.position = None
         self.angle = None

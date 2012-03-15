@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Mar-15 ofte                     rev 3083
+        - pyana_bld also independent of matplotlib
+	- a few other small tweaks
+	
 2012-Mar-5 ofte                       rev 3015
 	- more improvements to ipimb plotting
 	

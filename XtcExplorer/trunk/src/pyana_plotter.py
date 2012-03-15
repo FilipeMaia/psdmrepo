@@ -89,11 +89,11 @@ class pyana_plotter (object) :
         if self.display_mode is None:
             print "Unknown display mode %s, using NoDisplay (0)"%display_mode
             self.display_mode = 0
-
+            
         opt = PyanaOptions() # convert option string to appropriate type        
         self.ipython      = opt.getOptBoolean(ipython)
 
-        self.data_display = DataDisplay()
+        self.data_display = DataDisplay(self.display_mode)
 
     #-------------------
     #  Public methods --
@@ -148,36 +148,15 @@ class pyana_plotter (object) :
         """
         self.n_shots += 1
 
-        if evt.get('skip_event'):
-            return
-
-        # if any module changed the display mode, pick it up (we're last)
-        evmode = evt.get('display_mode')
-        if evmode is not None:
-
-            if evmode != self.display_mode :
-                self.display_mode = evmode
-                print "pyana_plotter display mode changed: ", self.display_mode,
-                
-                if self.display_mode == 0:
-                    plt.ioff()
-                    print " (NoDisplay)" 
-                if self.display_mode == 1:
-                    plt.ioff()
-                    print " (Interactive)" 
-                if self.display_mode == 2:
-                    plt.ion()
-                    print " (SlideShow)" 
-                print
-
-            #print "pyana_plotter current display mode: ", self.display_mode
-
         # only call the plt.draw / plt.show is there's actually
         # something new to show, since it's slow. 
         show_event = evt.get('show_event')
         if show_event and env.subprocess()<1 :
 
             self.make_plots(evt)
+
+        #print "Waiting...."
+        #time.sleep(4)
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -230,28 +209,31 @@ class pyana_plotter (object) :
 
         #
         # get pointer to the data from each of the modules
+        data_bld = evt.get('data_bld')
+        if data_bld :
+            self.data_display.show_bld(data_bld)
+
         data_ipimb = evt.get('data_ipimb')
         if data_ipimb :
             self.data_display.show_ipimb(data_ipimb)
 
         data_image = evt.get('data_image')
         if data_image :
-            newmode = self.data_display.show_image(data_image)                    
-            if newmode is not None:
-                self.display_mode = newmode
+            self.data_display.show_image(data_image)                    
                     
         if self.ipython :
             plt.draw()
             self.launch_ipython(evt)
 
+
         if self.display_mode == 1:
             # Interactive
-            plt.ioff()
+            #plt.ioff()
             plt.show()
 
         elif self.display_mode == 2:
             # SlideShow
-            plt.ion()
+            #plt.ion()
             plt.draw()            
 
 
