@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-02-08
+2012-02-16
+- improved version of the Grabber & Poster now using JSON service when posting new
+messages. The service would return a status code and an id of a new message created.
+Removed older version of tools from the repository.
+
+Tag: V00-02-08
 2012-02-15
 - added updated implementations of the Grabber (LogBookGrabber4current4run4reply_RHEL6.py)
 and Poster (LogBookPost_RHEL6.py) which work accross all version of Python,

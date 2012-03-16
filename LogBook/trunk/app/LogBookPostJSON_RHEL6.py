@@ -41,6 +41,7 @@ logbook_author      = pwd.getpwuid(os.geteuid())[0]  # this is fixed
 logbook_instrument  = None                           # command line parameter
 logbook_experiment  = None                           # command line parameter (optional)
 logbook_use_current = False                          # assume current experiment if set to True
+logbook_child_cmd   = None
 
 # The dictionary of available experiments. Experiment names serve as keys.
 # This information is equested from the web service. If a specific experiment
@@ -72,7 +73,10 @@ def post_entry():
 
     exper_id = logbook_experiments[logbook_experiment]['id']
 
-    url = ws_url+'/LogBook/NewFFEntry4grabber.php'
+    url = ws_url+'/LogBook/NewFFEntry4grabberJSON.php'
+
+    child_output = ''
+    if logbook_child_cmd is not None: child_output = os.popen(logbook_child_cmd).read()
 
     if file2attach is None:
         datagen,headers = multipart_encode([
@@ -82,7 +86,8 @@ def post_entry():
             ('scope', 'experiment'),
             ('num_tags', '1'),
             ('tag_name_0',tag),
-            ('tag_value_0','') ])
+            ('tag_value_0',''),
+            ('text4child', child_output) ])
 
     else:
         idx = file2attach.rfind('/')
@@ -96,6 +101,7 @@ def post_entry():
             ('num_tags', '1'),
             ('tag_name_0',tag),
             ('tag_value_0',''),
+            ('text4child', child_output),
             MultipartParam.from_file("file1", file2attach),
             ("file1", file2attach_descr) ])
 
@@ -103,9 +109,11 @@ def post_entry():
         req = urllib2.Request(url, datagen, headers)
         response = urllib2.urlopen(req)
         the_page = response.read()
-        if the_page != '':
-            print "Error", the_page
+        result = simplejson.loads(the_page)
+        if result['status'] != 'success':
+            print "Error", result['message']
             sys.exit(1)
+        print 'New message ID:', int(result['message_id'])
 
     except urllib2.URLError, reason:
         print  "Submit New Message Error", reason
@@ -284,10 +292,20 @@ OPTIONS & PARAMETERS:
 
       an optional tag for the entry
 
+    -c command-for-child-message
+
+      allows posting a child message with a standard output of the specified
+      UNIX command (or an application) found after the option. The child
+      will be posted immediattely after the parrent message.
+
+      NOTE: using this option may delay the time taken by the Grabber
+            by a duration of time needed by the specified command to produce
+            its output
+
 """ % (progname)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p:m:a:t:')
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p:m:a:t:c:')
     except getopt.GetoptError, errmsg:
         print "ERROR:", errmsg
         sys.exit(1)
@@ -312,6 +330,8 @@ OPTIONS & PARAMETERS:
             file2attach = value
         elif name in ('-t',):
             tag = value
+        elif name in ('-c',):
+            logbook_child_cmd = value
         else:
             print "invalid argument:", name
             sys.exit(2)

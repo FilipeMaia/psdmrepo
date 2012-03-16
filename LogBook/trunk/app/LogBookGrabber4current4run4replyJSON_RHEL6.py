@@ -1,13 +1,24 @@
 #!/usr/bin/env python
 
+####################################################
+# Standard packages from a local Python installation
+
 import httplib
 import mimetools
 import mimetypes
 import os
 import os.path
+import pwd
+import simplejson
 import socket
 import stat
 import sys
+import tempfile
+
+import tkMessageBox
+from Tkinter import *
+from ScrolledText import *
+
 import urllib
 import urllib2
 
@@ -19,19 +30,12 @@ import urllib2
 # See more information on it from:
 #
 #   http://stackoverflow.com/questions/680305/using-multipartposthandler-to-post-form-data-with-python
-#
+
 from poster.encode import multipart_encode, MultipartParam
 from poster.streaminghttp import register_openers
 
 ######################################
 # And here follows the grabber's logic
-
-import os, pwd, tempfile
-import simplejson
-import tkMessageBox
-
-from Tkinter import *
-from ScrolledText import *
 
 # ------------------------------------------------------------
 # Unspecified values of the LogBook parameters must be set
@@ -43,6 +47,7 @@ logbook_author      = pwd.getpwuid(os.geteuid())[0]  # this is fixed
 logbook_instrument  = None                           # command line parameter
 logbook_experiment  = None                           # command line parameter (optional)
 logbook_use_current = False                          # assume current experiment if set to True
+logbook_child_cmd   = None
 
 # The dictionary of available experiments. Experiment names serve as keys.
 # This information is equested from the web service. If a specific experiment
@@ -202,9 +207,12 @@ class LogBookGrabberUI:
 
         exper_id = logbook_experiments[exper_name]['id']
 
-        url = ws_url+'/LogBook/NewFFEntry4grabber.php'
+        url = ws_url+'/LogBook/NewFFEntry4grabberJSON.php'
         run = self.run.get()
         message_id = self.message_id.get()
+
+        child_output = ''
+        if logbook_child_cmd is not None: child_output = os.popen(logbook_child_cmd).read()
 
         if(( run != '' ) and ( message_id != '' )):
             tkMessageBox.showerror (
@@ -221,6 +229,7 @@ class LogBookGrabberUI:
                 ('num_tags'       , '1'),
                 ('tag_name_0'     , 'SCREENSHOT'),
                 ('tag_value_0'    , ''),
+                ('text4child'     , child_output),
                 MultipartParam.from_file("file1", self.f_jpeg.name),
                 ("file1"          , self.descr.get()) ])
         elif( message_id != '' ): 
@@ -233,6 +242,7 @@ class LogBookGrabberUI:
                 ('num_tags'       , '1'),
                 ('tag_name_0'     , 'SCREENSHOT'),
                 ('tag_value_0'    , ''),
+                ('text4child'     , child_output),
                 MultipartParam.from_file("file1", self.f_jpeg.name),
                 ("file1"          , self.descr.get()) ])
         else:
@@ -244,6 +254,7 @@ class LogBookGrabberUI:
                 ('num_tags'       , '1'),
                 ('tag_name_0'     , 'SCREENSHOT'),
                 ('tag_value_0'    , ''),
+                ('text4child'     , child_output),
                 MultipartParam.from_file("file1", self.f_jpeg.name),
                 ("file1"          , self.descr.get()) ])
 
@@ -251,8 +262,10 @@ class LogBookGrabberUI:
             req = urllib2.Request(url, datagen, headers)
             response = urllib2.urlopen(req)
             the_page = response.read()
-            if the_page != '':
-                tkMessageBox.showerror ( "Error", the_page )
+            result = simplejson.loads(the_page)
+            if result['status'] != 'success':
+                tkMessageBox.showerror ( "Error", result['message'])
+             print 'New message ID:', int(result['message_id'])
 
         except urllib2.URLError, reason:
             tkMessageBox.showerror (
@@ -445,10 +458,20 @@ OPTIONS & PARAMETERS:
       the password to connect to the service. Its value
       is associated with the above mentioned service account.
 
+    -c command-for-child-message
+
+      allows posting a child message with a standard output of the specified
+      UNIX command (or an application) found after the option. The child
+      will be posted immediattely after the parrent message.
+
+      NOTE: using this option may delay the time taken by the Grabber
+            by a duration of time needed by the specified command to produce
+            its output
+
 """ % (progname)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p:')
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p:c:')
     except getopt.GetoptError, errmsg:
         print "ERROR:", errmsg
         sys.exit(1)
@@ -467,6 +490,8 @@ OPTIONS & PARAMETERS:
             ws_login_user = value
         elif name in ('-p',):
             ws_login_password = value
+        elif name in ('-c',):
+            logbook_child_cmd = value
         else:
             print "invalid argument:", name
             sys.exit(2)
