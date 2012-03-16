@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class EventShortListFilter...
+//	Class EventNumberFilter...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ImgAlgos/EventShortListFilter.h"
+#include "ImgAlgos/EventNumberFilter.h"
 
 //-----------------
 // C/C++ Headers --
@@ -35,7 +35,7 @@
 // This declares this class as psana module
 using namespace std;
 using namespace ImgAlgos;
-PSANA_MODULE_FACTORY(EventShortListFilter)
+PSANA_MODULE_FACTORY(EventNumberFilter)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -46,7 +46,7 @@ namespace ImgAlgos {
 //----------------
 // Constructors --
 //----------------
-EventShortListFilter::EventShortListFilter (const std::string& name)
+EventNumberFilter::EventNumberFilter (const std::string& name)
   : Module(name)
   , m_filter()
   , m_first()
@@ -67,39 +67,39 @@ EventShortListFilter::EventShortListFilter (const std::string& name)
 //--------------
 // Destructor --
 //--------------
-EventShortListFilter::~EventShortListFilter ()
+EventNumberFilter::~EventNumberFilter ()
 {
 }
 
 /// Method which is called once at the beginning of the job
 void 
-EventShortListFilter::beginJob(Event& evt, Env& env)
+EventNumberFilter::beginJob(Event& evt, Env& env)
 {
   printInputParameters();
 }
 
 /// Method which is called at the beginning of the run
 void 
-EventShortListFilter::beginRun(Event& evt, Env& env)
+EventNumberFilter::beginRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-EventShortListFilter::beginCalibCycle(Event& evt, Env& env)
+EventNumberFilter::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-EventShortListFilter::event(Event& evt, Env& env)
+EventNumberFilter::event(Event& evt, Env& env)
 {
   if ( !m_filter )            { ++ m_selected; return; } // If the filter is OFF then event is selected
 
   ++ m_count;
 
-  if ( m_event_list_is_empty ) {
+  if ( m_event_vector_is_empty ) {
 
     if ( m_count < m_first ) { skip(); return; } // event is discarded
     if ( m_count > m_last  ) { skip(); return; } // event is discarded
@@ -119,19 +119,19 @@ EventShortListFilter::event(Event& evt, Env& env)
   
 /// Method which is called at the end of the calibration cycle
 void 
-EventShortListFilter::endCalibCycle(Event& evt, Env& env)
+EventNumberFilter::endCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the end of the run
 void 
-EventShortListFilter::endRun(Event& evt, Env& env)
+EventNumberFilter::endRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called once at the end of the job
 void 
-EventShortListFilter::endJob(Event& evt, Env& env)
+EventNumberFilter::endJob(Event& evt, Env& env)
 {
   MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
 }
@@ -143,7 +143,7 @@ EventShortListFilter::endJob(Event& evt, Env& env)
 
 /// Print input parameters
 void 
-EventShortListFilter::printInputParameters()
+EventNumberFilter::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
@@ -151,7 +151,7 @@ EventShortListFilter::printInputParameters()
 	<< "\n m_first      : "     << m_first   
 	<< "\n m_last       : "     << m_last  
 	<< "\n m_evtstring  : "     << m_evtstring   
-	<< "\n m_event_list_is_empty : "  << m_event_list_is_empty
+	<< "\n m_event_vector_is_empty : "  << m_event_vector_is_empty
         << "\n";
 
     log << " Total number of events in the list = " << m_events.size() << "   event numbers:\n";
@@ -159,7 +159,7 @@ EventShortListFilter::printInputParameters()
     int count=0;
     std::vector<unsigned>::const_iterator it;
     for(it=m_events.begin(); it!=m_events.end(); it++) {
-      log << *it << "  ";
+      log << "  " << *it ;
       if (++count >= 10) {count=0; log << "\n";}
     }
       log << "\n";
@@ -169,7 +169,7 @@ EventShortListFilter::printInputParameters()
 //--------------------
 
 void 
-EventShortListFilter::parseEvtString()
+EventNumberFilter::parseEvtString()
 {
   char* separ = ",";
   char rec[80];
@@ -179,8 +179,8 @@ EventShortListFilter::parseEvtString()
 
   MsgLog(name(), debug, ":parseEvtString(): "  << m_evtstring );
 
-  if (m_evtstring.size() == 0) {m_event_list_is_empty = true;  return;}
-                                m_event_list_is_empty = false;
+  if (m_evtstring.size() == 0) {m_event_vector_is_empty = true;  return;}
+                                m_event_vector_is_empty = false;
   do {
     pos = m_evtstring.find(separ,pos1);
     pos2 = (pos != string::npos) ? pos : m_evtstring.size();
@@ -196,7 +196,7 @@ EventShortListFilter::parseEvtString()
 //--------------------
 
 void 
-EventShortListFilter::parseOneRecord(char* rec)
+EventNumberFilter::parseOneRecord(char* rec)
 {
   MsgLog(name(), debug, ":parseOneRecord: "  << rec );
 
@@ -229,11 +229,11 @@ EventShortListFilter::parseOneRecord(char* rec)
 
 //--------------------
 bool
-EventShortListFilter::eventIsInList()
+EventNumberFilter::eventIsInList()
 {
     std::vector<unsigned>::const_iterator it;
     for(it=m_events.begin(); it!=m_events.end(); it++) {
-      if ( m_count == *it) return true;
+      if (m_count == *it) return true;
     }
     return false;
 }

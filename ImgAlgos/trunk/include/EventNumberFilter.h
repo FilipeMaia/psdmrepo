@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_EVENTSHORTLISTFILTER_H
-#define IMGALGOS_EVENTSHORTLISTFILTER_H
+#ifndef IMGALGOS_EVENTNUMBERFILTER_H
+#define IMGALGOS_EVENTNUMBERFILTER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EventShortListFilter.
+//	Class EventNumberFilter.
 //
 //------------------------------------------------------------------------
 
@@ -48,14 +48,14 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class EventShortListFilter : public Module {
+class EventNumberFilter : public Module {
 public:
 
   // Default constructor
-  EventShortListFilter (const std::string& name) ;
+  EventNumberFilter (const std::string& name) ;
 
   // Destructor
-  virtual ~EventShortListFilter () ;
+  virtual ~EventNumberFilter () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -94,9 +94,9 @@ private:
   unsigned m_selected;
 
   std::vector<unsigned> m_events;
-  bool m_event_list_is_empty;
+  bool m_event_vector_is_empty;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_EVENTSHORTLISTFILTER_H
+#endif // IMGALGOS_EVENTNUMBERFILTER_H
