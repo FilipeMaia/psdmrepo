@@ -90,7 +90,7 @@ private:
   unsigned m_first;
   unsigned m_last;
   std::string m_evtstring;
-  unsigned m_print_level;
+  unsigned m_print_bits;
   unsigned m_count;
   unsigned m_selected;
 
