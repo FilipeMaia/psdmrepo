@@ -11,7 +11,7 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-02-08
+Tag: V00-02-09
 2012-02-16
 - improved version of the Grabber & Poster now using JSON service when posting new
 messages. The service would return a status code and an id of a new message created.
