@@ -11,7 +11,7 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-03-15
+Tag: V00-02-08
 2012-02-15
 - added updated implementations of the Grabber (LogBookGrabber4current4run4reply_RHEL6.py)
 and Poster (LogBookPost_RHEL6.py) which work accross all version of Python,
