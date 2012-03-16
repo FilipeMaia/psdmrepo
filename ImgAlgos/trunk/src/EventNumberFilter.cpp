@@ -52,6 +52,7 @@ EventNumberFilter::EventNumberFilter (const std::string& name)
   , m_first()
   , m_last()
   , m_evtstring()
+  , m_print_level()
   , m_count(-1)
   , m_selected(0)
 {
@@ -60,6 +61,7 @@ EventNumberFilter::EventNumberFilter (const std::string& name)
   m_first      = config   ("first",          0);
   m_last       = config   ("last",       1<<31);
   m_evtstring  = configStr("evtstring",     ""); 
+  m_print_level= config   ("print_level",    0);
 
   parseEvtString();
 }
@@ -111,7 +113,7 @@ EventNumberFilter::event(Event& evt, Env& env)
 
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
-    MsgLog(name(), debug, "Run: " << eventId->run() << " select event: " << m_count ); // "event ID: " << *eventId);
+    if( m_print_level > 1 ) MsgLog(name(), info, "Select event " << m_count << ", ID: " << *eventId); // "Run: " << eventId->run()
   }
 
   ++ m_selected; return; // event is selected
@@ -133,7 +135,7 @@ EventNumberFilter::endRun(Event& evt, Env& env)
 void 
 EventNumberFilter::endJob(Event& evt, Env& env)
 {
-  MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
+   if( m_print_level > 0 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
 }
 
 //--------------------
@@ -145,12 +147,15 @@ EventNumberFilter::endJob(Event& evt, Env& env)
 void 
 EventNumberFilter::printInputParameters()
 {
+  if( m_print_level < 1 ) return;
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-	<< "\n m_filter     : "     << m_filter   
-	<< "\n m_first      : "     << m_first   
-	<< "\n m_last       : "     << m_last  
-	<< "\n m_evtstring  : "     << m_evtstring   
+	<< "\n m_filter      : "     << m_filter   
+	<< "\n m_first       : "     << m_first   
+	<< "\n m_last        : "     << m_last  
+	<< "\n m_evtstring   : "     << m_evtstring   
+	<< "\n m_print_level : "     << m_print_level
 	<< "\n m_event_vector_is_empty : "  << m_event_vector_is_empty
         << "\n";
 
