@@ -265,7 +265,7 @@ class LogBookGrabberUI:
             result = simplejson.loads(the_page)
             if result['status'] != 'success':
                 tkMessageBox.showerror ( "Error", result['message'])
-             print 'New message ID:', int(result['message_id'])
+            print 'New message ID:', int(result['message_id'])
 
         except urllib2.URLError, reason:
             tkMessageBox.showerror (

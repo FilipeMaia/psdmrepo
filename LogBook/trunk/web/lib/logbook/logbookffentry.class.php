@@ -111,7 +111,11 @@ class LogBookFFEntry {
                 __METHOD__, "no run for the entry. Database may be corrupted." );
         return $run;
     }
-
+    public function parent_entry() {
+        return $this->parent_entry_id() ?
+            $this->parent()->find_entry_by_id( $this->parent_entry_id()) :
+            null;
+    }
     public function children() {
 
         $list = array();

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-10
+2012-02-16
+- a minor bug fix in the new Grabber
+- added a version of the message search service which would also include
+child messages (NOTE: the previous version is preserved under the following
+name: Search_NO_SEARCH_IN_CHILDREN.php).
+
 Tag: V00-02-09
 2012-02-16
 - improved version of the Grabber & Poster now using JSON service when posting new

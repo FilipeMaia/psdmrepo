@@ -518,50 +518,24 @@ try {
     	}
  
     	/* Get the info for entries and (if requested) for runs.
-         * 
-         * NOTE: If the full text search is involved then the search will
-         * propagate down to children subtrees as well. However, the resulting
-         * list of entries will only contain the top-level ("thread") messages.
-         * To ensure so we're going to pre-scan the result of the query to identify
-         * children and finding their top-level parents. The parents will be put into
-         * the result array. Also note that we're not bothering about having duplicate
-         * entries in the array becase this will be sorted out on the next step.
     	 */
-    	$entries = array();
-        foreach(
-            $e->search(
-                $e->id() == $id ? $shift_id : null,	// the parameter makes sense for the main experiment only
-                $e->id() == $id ? $run_id   : null,	// ditto
-                $text2search,
-                $search_in_messages,
-                $search_in_tags,
-                $search_in_values,
-                $posted_at_experiment,
-                $posted_at_shifts,
-                $posted_at_runs,
-                $begin,
-                $end,
-                $tag,
-                $author,
-                $since,
-                null, /* $limit */
-                $inject_deleted_messages,
-                $search_in_messages && ( $text2search != '' )   // include children into the search for
-                                                                // the full-text search in message bodies.
-            )
-            as $entry ) {
-                $parent = $entry->parent_entry();
-                if( is_null($parent)) {
-                    array_push ($entries, $entry);
-                } else {
-                    while(true ) {
-                        $parent_of_parent = $parent->parent_entry();
-                        if( is_null($parent_of_parent)) break;
-                        $parent = $parent_of_parent;
-                    }
-                    array_push ($entries, $parent);
-                }
-        }
+    	$entries = $e->search(
+        	$e->id() == $id ? $shift_id : null,	// the parameter makes sense for the main experiment only
+        	$e->id() == $id ? $run_id   : null,	// ditto
+        	$text2search,
+        	$search_in_messages,
+        	$search_in_tags,
+        	$search_in_values,
+        	$posted_at_experiment,
+        	$posted_at_shifts,
+        	$posted_at_runs,
+        	$begin,
+        	$end,
+        	$tag,
+        	$author,
+        	$since,
+        	null, /* $limit */
+        	$inject_deleted_messages );
 
 		$runs = !$inject_runs ? array() : $e->runs_in_interval( $begin4runs, $end4runs/*, $limit*/ );
 
@@ -680,8 +654,10 @@ HERE;
 
     $logbook->commit();
 
-} catch( LogBookException  $e ) { report_error( $e->toHtml()); }
-  catch( LusiTimeException $e ) { report_error( $e->toHtml()); }
-
+} catch( LogBookException $e ) {
+    report_error( $e->toHtml());
+} catch( LusiTimeException $e ) {
+    report_error( $e->toHtml());
+}
 ?>
 

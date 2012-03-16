@@ -617,7 +617,8 @@ HERE;
         $author='',
         $since=null,
         $limit=null,
-        $inject_deleted_messages=false ) {
+        $inject_deleted_messages=false,
+        $search_in_children=false ) {
 
         /* Verify parameters
          */
@@ -761,12 +762,13 @@ HERE;
                 $condition,
                 $limit,
                 $use_tags,
-                $inject_deleted_messages
+                $inject_deleted_messages,
+                $search_in_children
             )
         );
     }
 
-    private function sql_4_entries_by_ ( $extra_condition="", $limit=null, $use_tags=true, $inject_deleted_messages=false ) {
+    private function sql_4_entries_by_ ( $extra_condition="", $limit=null, $use_tags=true, $inject_deleted_messages=false, $search_in_children=false ) {
 
     	//throw new LogBookException(
         //	__METHOD__,
@@ -786,7 +788,7 @@ HERE;
             "FROM $tables\n".
             "WHERE h.exper_id = ".$this->attr['id']."\n".
             " AND h.id = e.hdr_id\n".
-            " AND e.parent_entry_id is NULL\n".
+            ( $search_in_children ? "" : " AND e.parent_entry_id is NULL\n" ).
         	( $inject_deleted_messages ? "" : " AND e.deleted_time is NULL\n" ).
             $extra_condition.
             "ORDER BY e.insert_time DESC\n".
