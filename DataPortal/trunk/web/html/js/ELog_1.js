@@ -1389,7 +1389,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 						'</div>';
 			}
 			html +=
-'    </div>';
+'    </div>'+
+'  </div>';
 			$(container).html(html);
 			$(container).find('.el-l-m-pr').button();
 			$(container).find('.el-l-m-ud').button();
@@ -1553,26 +1554,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			this.collapse_run(this.runs[i]);
 		}
 	};
-    this.expand_day = function(day_idx) {
-        var day = this.days2threads[day_idx];
-        for(var i = day.threads.length-1; i >= 0; i--) {
-            var thread_idx = day.threads[i];
-            this.expand_message(thread_idx, true);
-        }
-        var con = $('#'+this.base+'-m-d-con-'+day_idx);
-        con.find('.el-l-m-d-tgl').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-        con.find('.el-l-m-d-con').removeClass('el-l-m-d-hdn').addClass('el-l-m-d-vis');
-    };
-    this.collapse_day = function(day_idx) {
-        var day = this.days2threads[day_idx];
-        for(var i = day.threads.length-1; i >= 0; i--) {
-            var thread_idx = day.threads[i];
-            this.expand_message(thread_idx, false);
-        }
-        var con = $('#'+this.base+'-m-d-con-'+day_idx);
-        con.find('.el-l-m-d-tgl').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-        con.find('.el-l-m-d-con').removeClass('el-l-m-d-vis').addClass('el-l-m-d-hdn');
-    };
+
 
 	/**
 	 * Check if new messages/runs are available, and if so - refresh the view.
@@ -1670,7 +1652,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 										$('#'+that.base+'-m-d-con-'+day_idx).append(html);
 									} else {
 										that.days2threads[day_idx].threads.push(thread_idx);
-										$('#'+that.base+'-m-d-con-'+day_idx).find('.el-d-ctrl').next().prepend(html);
+										$('#'+that.base+'-m-d-con-'+day_idx).prepend(html);
 									}
 								}
 								var runs_messages_info = '<b>'+day.messages+'</b> messages'+( day.runs ? ', runs: <b>'+day.min_run+'</b> .. <b>'+day.max_run+'</b>' : '' );
@@ -1693,8 +1675,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 								that.days2threads.push(new_days2threads[i]);
 								$('#'+that.base+'-ms').prepend(html);
 							}
-                            $('.el-d-expand').button();
-                            $('.el-d-collapse').button();
 							that.expand_group_day(day_idx, true);
 							if(highlighter) highlighter('#'+that.base+'-m-d-hdr-'+day_idx);
 						}
@@ -1849,8 +1829,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		for(var day_idx = this.days2threads.length-1; day_idx >= 0; day_idx--)
 			html += this.live_day2html(day_idx);
 		$('#'+this.base+'-ms').html(html);
-        $('.el-d-expand').button();
-        $('.el-d-collapse').button();
 
 		if(this.days2threads.length) this.expand_group_day(this.days2threads.length-1, true);
 		this.live_update_info();
@@ -1877,11 +1855,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div style="float:right; margin-right:10px;" id="'+this.base+'-m-d-con-info-'+day_idx+'">'+runs_messages_info+'</div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
-'<div class="el-l-m-d-con el-l-m-d-hdn" id="'+this.base+'-m-d-con-'+day_idx+'" onmouseover="'+this.address+'.highlight_day('+"'"+day_idx+"'"+');">'+
-'  <div class="el-d-ctrl" >'+
-'    <button class="el-d-expand" onclick="'+this.address+'.expand_day('+"'"+day_idx+"'"+');" >Expand++</button>'+
-'    <button class="el-d-collapse" onclick="'+this.address+'.collapse_day('+"'"+day_idx+"'"+');" >Collapse--</button>'+
-'  </div>';
+'<div class="el-l-m-d-con el-l-m-d-hdn" id="'+this.base+'-m-d-con-'+day_idx+'" onmouseover="'+this.address+'.highlight_day('+"'"+day_idx+"'"+');">';
 
 		for(var i = day.threads.length-1; i >= 0; i--) {
 			var thread_idx = day.threads[i];

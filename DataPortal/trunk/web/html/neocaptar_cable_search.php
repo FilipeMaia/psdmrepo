@@ -161,6 +161,7 @@ try {
     // scanned below. Parameters (if specifid) are not allowed to have empty
     // values.
     //
+    $id                = NeoCaptarUtils::get_param_GET('id',               false);
     $project_id        = NeoCaptarUtils::get_param_GET('project_id',       false);
     $cablenumber       = NeoCaptarUtils::get_param_GET('cablenumber',      false);
     $prefix            = NeoCaptarUtils::get_param_GET('prefix',           false);
@@ -212,7 +213,11 @@ try {
         NeoCaptarUtils::report_error("format '{$format}' is either not supported or not implemented");
 
     $cables = array();
-    if( !is_null($project_id)) {
+    if(!is_null($id)) {
+        $cable = $neocaptar->find_cable_by_id($id);
+        array_push($cables, $cable);
+
+    } else if( !is_null($project_id)) {
         $project = $neocaptar->find_project_by_id($project_id);
         if( is_null($project)) NeoCaptarUtils::report_error("project not found for id: {$project_id}");
 

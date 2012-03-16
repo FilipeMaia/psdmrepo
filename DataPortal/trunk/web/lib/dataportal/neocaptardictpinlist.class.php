@@ -37,6 +37,7 @@ class NeoCaptarDictPinlist {
     public function connector    () { return $this->connector; }
     public function id           () { return $this->attr['id']; }
     public function name         () { return $this->attr['name']; }
+    public function documentation() { return $this->attr['documentation']; }
     public function created_time () { return LusiTime::from64( $this->attr['created_time'] ); }
     public function created_uid  () { return $this->attr['created_uid']; }
 }

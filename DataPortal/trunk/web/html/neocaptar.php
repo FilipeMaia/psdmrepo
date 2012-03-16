@@ -602,7 +602,38 @@ var current_application = null;
 
 var select_app = 'projects';
 var select_app_context = 'search';
-
+<?php
+$known_apps = array(
+    'projects' => True,
+    'dictionary' => True,
+    'search' => True,
+    'admin' => True
+);
+if( isset( $_GET['app'] )) {
+	$app_path = explode( ':', strtolower(trim($_GET['app'])));
+	$app = $app_path[0];
+	if( array_key_exists( $app, $known_apps )) {
+		echo "select_app = '{$app}';";
+		echo "select_app_context = '".(count($app_path) > 1 ? $app_path[1] : "")."';";
+	}
+}
+?>
+var select_params = {
+    project_id:null,
+    cable_id:null
+};
+<?php
+if( isset( $_GET['project_id'] )) {
+    $project_id = intval(trim($_GET['project_id']));
+    if($project_id) echo "select_params.project_id = {$project_id};";
+}
+?>
+<?php
+if( isset( $_GET['cable_id'] )) {
+    $cable_id = intval(trim($_GET['cable_id']));
+    if($cable_id) echo "select_params.cable_id = {$cable_id};";
+}
+?>
 /* Event handler for application selections from the top-level menu bar:
  * - fill set the current application context.
  */
@@ -703,10 +734,29 @@ $(function() {
 		var application = applications[id];
 		if(application.name == select_app) {
 			$('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
-			if( '' != select_app_context ) {
+			if( '' == select_app_context ) {
+				v_item_selected($('#v-menu > #'+select_app+' > #'+application.default_context));
+				application.select_default();
+            } else {
 				v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context));
-				application.select(select_app_context);
-			}
+				application.select(select_app_context);			
+            }
+            switch(application.name) {
+            case 'projects':
+                switch(application.context) {
+                case 'search':
+                    if(select_params.project_id) global_search_project_by_id(select_params.project_id);
+                    break;
+                }
+                break;
+            case 'search':
+                switch(application.context) {
+                case 'cables':
+                    if(select_params.cable_id) global_search_cable_by_id(select_params.cable_id);
+                    break;
+                }
+                break;
+            }
 		}
 	}
 });
@@ -730,6 +780,7 @@ function global_switch_context(application_name, context_name) {
 }
 function global_simple_search                     ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
 function global_search_cable_by_cablenumber       (cablenumber) { global_switch_context('search',  'cables').search_cable_by_cablenumber       (cablenumber); }
+function global_search_cable_by_id                (id)          { global_switch_context('search',  'cables').search_cable_by_id                (id); }
 function global_search_cables_by_prefix           (prefix)      { global_switch_context('search',  'cables').search_cables_by_prefix           (prefix); }
 function global_search_cables_by_jobnumber        (jobnumber)   { global_switch_context('search',  'cables').search_cables_by_jobnumber        (jobnumber); }
 function global_search_cables_by_jobnumber_prefix (prefix)      { global_switch_context('search',  'cables').search_cables_by_jobnumber_prefix (prefix); }
@@ -769,6 +820,21 @@ function global_export_cables(search_params,outformat) {
         }
     );
 }
+function global_truncate_cable    (str) { return str.substring(0, 8); }
+function global_truncate_connector(str) { return str.substring(0, 7); }
+function global_truncate_pinlist  (str) { return str.substring(0,16); }
+function global_truncate_location (str) { return str.substring(0, 6); }
+function global_truncate_rack     (str) { return str.substring(0, 6); }
+function global_truncate_routing  (str) { return str.substring(0,50); }
+function global_truncate_instr    (str) { return str.substring(0, 3); }
+function global_truncate_device   (str) { return str.substring(0,14); }
+function global_truncate_func     (str) { return str.substring(0,33); }
+function global_truncate_length   (str) { return str.substring(0, 4); }
+function global_truncate_ele      (str) { return str.substring(0, 2); }
+function global_truncate_side     (str) { return str.substring(0, 1); }
+function global_truncate_slot     (str) { return str.substring(0, 6); }
+function global_truncate_conn     (str) { return str.substring(0, 8); }
+function global_truncate_station  (str) { return str.substring(0, 6); }
 
 </script>
 
@@ -1032,7 +1098,7 @@ HERE;
         <div style="margin-top:20px; margin-bottom:10px;">
           <div style="float:left; padding-top: 4px; ">Add new cable type:</div>
           <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(8 chars)</div>
+          <div style="float:left; padding-top: 4px; ">(up to 8 chars)</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-types-cables"></div>
@@ -1041,7 +1107,7 @@ HERE;
         <div style="margin-top:20px; margin-bottom:10px;">
           <div style="float:left; padding-top:4px; ">Add new connector type:</div>
           <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(7 chars)</div>
+          <div style="float:left; padding-top:4px; ">(up to 7 chars)</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-types-connectors"></div>
@@ -1050,7 +1116,7 @@ HERE;
         <div style="margin-top:20px; margin-bottom:10px;">
           <div style="float:left; padding-top:4px; ">Add pin list:</div>
           <div style="float:left; "><input type="text" size="12" name="pinlist2add" title="fill in new pin list type, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(16 chars)</div>
+          <div style="float:left; padding-top:4px; ">(up to 16 chars)</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-types-pinlists"></div>
@@ -1064,7 +1130,7 @@ HERE;
         <div style="margin-top:20px; margin-bottom:10px;">
           <div style="float:left; padding-top: 4px; ">Add new location:</div>
           <div style="float:left; "><input type="text" size="12" name="location2add" title="fill in new location name, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(6 chars)</div>
+          <div style="float:left; padding-top: 4px; ">(upto 6 chars)</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-locations-locations"></div>
@@ -1073,7 +1139,7 @@ HERE;
         <div style="margin-top:20px; margin-bottom:10px;">
           <div style="float:left; padding-top:4px; ">Add new rack:</div>
           <div style="float:left; "><input type="text" size="12" name="rack2add" title="fill in new rack name, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(6 chars)</div>
+          <div style="float:left; padding-top:4px; ">(up to 6 chars)</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-locations-racks"></div>
@@ -1085,8 +1151,8 @@ HERE;
       <div><button id="dictionary-routings-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="margin-top:20px; margin-bottom:10px;">
         <div style="float:left; padding-top:4px; ">Add new routing:</div>
-        <div style="float:left; "><input type="text" size="12" name="routing2add" title="fill in new routing name, press RETURN to save" /></div>
-        <div style="float:left; padding-top:4px; "></div>
+        <div style="float:left; "><input type="text" size="32" name="routing2add" title="fill in new routing name, press RETURN to save" /></div>
+        <div style="float:left; padding-top:4px; "> (up to 50 chars)</div>
         <div style="clear:both; "></div>
       </div>
       <div id="dictionary-routings-routings"></div>
@@ -1098,7 +1164,7 @@ HERE;
       <div style="margin-top:20px; margin-bottom:10px;">
         <div style="float:left; padding-top: 4px; ">Add new instruction:</div>
         <div style="float:left; "><input type="text" size="1" name="instr2add" title="fill in new instr name, press RETURN to save" /></div>
-        <div style="float:left; padding-top: 4px; "> (1 digit)</div>
+        <div style="float:left; padding-top: 4px; "> (up to 3 digits)</div>
         <div style="clear:both; "></div>
       </div>
       <div id="dictionary-instrs-instrs"></div>

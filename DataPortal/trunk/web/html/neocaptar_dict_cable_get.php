@@ -38,9 +38,10 @@ try {
 			$pinlists = array();
 			foreach( $connector->pinlists() as $pinlist ) {
 				$pinlists[$pinlist->name()] = array(
-					'id'           => $pinlist->id(),
-					'created_time' => $pinlist->created_time()->toStringShort(),
-					'created_uid'  => $pinlist->created_uid()
+					'id'            => $pinlist->id(),
+                    'documentation' => $pinlist->documentation(),
+					'created_time'  => $pinlist->created_time()->toStringShort(),
+					'created_uid'   => $pinlist->created_uid()
 				);
 			}
 			$connectors[$connector->name()] = array(

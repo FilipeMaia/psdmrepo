@@ -24,9 +24,10 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
 
-    $cable_name     = NeoCaptarUtils::get_param_GET('cable');
-    $connector_name = NeoCaptarUtils::get_param_GET('connector',false);
-    $pinlist_name   = is_null($connector_name) ? null : NeoCaptarUtils::get_param_GET('pinlist',false);
+    $cable_name            = NeoCaptarUtils::get_param_GET('cable');
+    $connector_name        = NeoCaptarUtils::get_param_GET('connector',false);
+    $pinlist_name          = is_null($connector_name) ? null : NeoCaptarUtils::get_param_GET('pinlist',false);
+    $pinlist_documentation = is_null($pinlist_name) ? null : NeoCaptarUtils::get_param_GET('pinlist_documentation',true,true);
 
 	$created_time = LusiTime::now();
 
@@ -75,7 +76,7 @@ try {
 		if( !is_null( $pinlist_name )) {
 			$pinlist = $connector->find_pinlist_by_name( $pinlist_name );
 			if( is_null( $pinlist )) {
-				$pinlist = $connector->add_pinlist( $pinlist_name, $created_time, $created_uid  );
+				$pinlist = $connector->add_pinlist( $pinlist_name, $pinlist_documentation, $created_time, $created_uid  );
 				if( is_null( $pinlist )) {
 					$neocaptar->commit();
 					$neocaptar->begin();
@@ -92,9 +93,10 @@ try {
 		$pinlists = array();
 		foreach( $connector->pinlists() as $pinlist ) {
 			$pinlists[$pinlist->name()] = array(
-				'id'           => $pinlist->id(),
-				'created_time' => $pinlist->created_time()->toStringShort(),
-				'created_uid'  => $pinlist->created_uid()
+				'id'            => $pinlist->id(),
+                'documentation' => $pinlist->documentation(),
+				'created_time'  => $pinlist->created_time()->toStringShort(),
+				'created_uid'   => $pinlist->created_uid()
 			);
 		}
 		$connectors[$connector->name()] = array(

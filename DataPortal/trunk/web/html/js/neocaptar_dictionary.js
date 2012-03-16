@@ -25,6 +25,7 @@ function p_appl_dictionary() {
 	this.name      = 'dictionary';
 	this.full_name = 'Dictionary';
 	this.context   = '';
+    this.default_context = 'types';
 
     this.select = function(context) {
 		that.context = context;
@@ -32,7 +33,7 @@ function p_appl_dictionary() {
 	};
 	this.select_default = function() {
 		this.init();
-		if( this.context == '' ) this.context = 'types';
+		if( this.context == '' ) this.context = this.default_context;
 	};
 	this.if_ready2giveup = function(handler2call) {
 		this.init();
@@ -59,8 +60,8 @@ function p_appl_dictionary() {
 		this.save_cable    (cable.cable_type);
         this.save_connector(cable.cable_type, cable.origin.conntype);
         this.save_connector(cable.cable_type, cable.destination.conntype);
-		this.save_pinlist  (cable.cable_type, cable.origin.conntype,      cable.origin.pinlist);
-		this.save_pinlist  (cable.cable_type, cable.destination.conntype, cable.destination.pinlist);
+		this.save_pinlist  (cable.cable_type, cable.origin.conntype,      cable.origin.pinlist, '');
+		this.save_pinlist  (cable.cable_type, cable.destination.conntype, cable.destination.pinlist, '');
 
         this.save_location (cable.origin.loc);
         this.save_location (cable.destination.loc);
@@ -121,18 +122,21 @@ function p_appl_dictionary() {
             keyup(function(e) {
         		if( $(this).val() == '' ) { return; }
             	if( e.keyCode == 13     ) { that.new_cable(); return; }
+                $(this).val(global_truncate_cable($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-types').find('input[name="connector2add"]').
             keyup(function(e) {
     			if( $(this).val() == '' ) { return; }
         		if( e.keyCode == 13     ) { that.new_connector(); return; }
+                $(this).val(global_truncate_connector($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-types').find('input[name="pinlist2add"]').
     		keyup(function(e) {
         		if( $(this).val() == '' ) { return; }
             	if( e.keyCode == 13     ) {	that.new_pinlist(); return;	}
+                $(this).val(global_truncate_pinlist($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-types-reload').
@@ -164,7 +168,7 @@ function p_appl_dictionary() {
 		var pinlist_name = input.val();
 		if( this.pinlist_is_not_known(this.selected_cable, this.selected_connector, pinlist_name)) {
 			input.val('');
-			this.save_pinlist(this.selected_cable, this.selected_connector, pinlist_name);
+			this.save_pinlist(this.selected_cable, this.selected_connector, pinlist_name,'');
 		}
 	};
 	this.save_cable = function(cable_name) {
@@ -217,7 +221,7 @@ function p_appl_dictionary() {
 			});
 		}
 	};
-	this.save_pinlist = function(cable_name, connector_name, pinlist_name) {
+	this.save_pinlist = function(cable_name, connector_name, pinlist_name, pinlist_documentation) {
 		this.init();
 		if(( cable_name == '' ) || ( connector_name == '' ) || ( pinlist_name == '' )) return;
 		if( this.pinlist_is_not_known(cable_name, connector_name, pinlist_name)) {
@@ -231,7 +235,7 @@ function p_appl_dictionary() {
 				}
 			}
 			$('#dictionary-types-info').html('Saving...');
-			var params = {cable:cable_name, connector:connector_name, pinlist:pinlist_name};
+			var params = {cable:cable_name, connector:connector_name, pinlist:pinlist_name, pinlist_documentation:pinlist_documentation};
 			var jqXHR = $.get('../portal/neocaptar_dict_cable_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
@@ -243,6 +247,22 @@ function p_appl_dictionary() {
 				$('#dictionary-types-info').html('saving failed because of: '+jqXHR.statusText);
 			});
 		}
+	};
+	this.update_pinlist = function(cable_name, connector_name, pinlist_name, pinlist_documentation) {
+		this.init();
+        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
+		$('#dictionary-types-info').html('Updating...');
+		var params = {id:pinlist.id, documentation:pinlist_documentation};
+		var jqXHR = $.get('../portal/neocaptar_dict_pinlist_update.php',params,function(data) {
+			var result = eval(data);
+			if(result.status != 'success') { report_error(result.message, null); return; }
+			$('#dictionary-types-info').html('&nbsp;');
+			that.cables()[cable_name] = result.cable[cable_name];
+			that.display_cables();
+		},
+		'JSON').error(function () {
+			$('#dictionary-types-info').html('update failed because of: '+jqXHR.statusText);
+		});
 	};
 	this.delete_element = function(element,id) {
 		this.init();
@@ -309,14 +329,28 @@ function p_appl_dictionary() {
 '</tr>';
         return html;
     };
+    this.pinlist2url = function(cable,connector,pinlist_name) {
+        if(this.pinlist_is_not_known(cable,connector,pinlist_name)) return pinlist_name;
+        var pinlist_documentation = this.pinlists(cable,connector)[pinlist_name].documentation;
+        var html = '<a href="'+pinlist_documentation+'" target="_blank" title="click the link to get the external documentation">'+pinlist_name+'</a>';
+        return html;
+    };
+
     this.pinlist2html = function(cable_name,connector_name,pinlist_name) {
         var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-        var html =
-'<tr>'+
+        var params = "'"+cable_name+"','"+connector_name+"','"+pinlist_name+"'";
+        var html = 
+'<tr id="dict-pinlist-url-'+pinlist.id+'" >'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
 '    <button class="dict-table-pinlist-delete" name="'+pinlist.id+'" title="delete this pinlist from the dictionary">delete</button>'+
 '  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable">'+pinlist_name+'</td>'+
+'  <td nowrap="nowrap" class="table_cell "><a href="'+pinlist.documentation+'" target="_blank" title="click the link to get the external documentation">'+pinlist_name+'</a></td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+
+'    <input type="text" name="url" style="display:none;"></input>'+
+'    <button class="dict-table-pinlist-edit"   onclick="dict.edit_pinlist_url('+params+')"        title="edit URL for the pinlist">edit</button>'+
+'    <button class="dict-table-pinlist-save"   onclick="dict.edit_pinlist_url_save('+params+')"   title="edit URL for the pinlist">save</button>'+
+'    <button class="dict-table-pinlist-cancel" onclick="dict.edit_pinlist_url_cancel('+params+')" title="edit URL for the pinlist">cancel</button>'+
+'  </td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+pinlist.created_time+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+pinlist.created_uid+'</td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
@@ -349,6 +383,7 @@ function p_appl_dictionary() {
 '  <tr>'+
 '    <td nowrap="nowrap" class="table_hdr " ></td>'+
 '    <td nowrap="nowrap" class="table_hdr " >pin list type</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >documentation (URL)</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >added</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
@@ -439,6 +474,15 @@ function p_appl_dictionary() {
                     null
                 );
     		});
+		$('.dict-table-pinlist-edit').
+            button().
+            button(this.can_manage()?'enable':'disable');
+		$('.dict-table-pinlist-save').
+            button().
+            button('disable');
+		$('.dict-table-pinlist-cancel').
+            button().
+            button('disable');
         if(this.can_manage()) {
     		                                      $('#dictionary-types').find('input[name="cable2add"]'    ).removeAttr('disabled');
         	if( this.selected_cable     == null ) $('#dictionary-types').find('input[name="connector2add"]').attr      ('disabled','disabled');
@@ -447,6 +491,36 @@ function p_appl_dictionary() {
             else                                  $('#dictionary-types').find('input[name="pinlist2add"]'  ).removeAttr('disabled');
         }
 	};
+    this.edit_pinlist_url = function(cable_name,connector_name,pinlist_name) {
+        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
+        var elem = $('#dict-pinlist-url-'+pinlist.id);
+        elem.find('input[name="url"]').
+            css('display','block').
+            val(pinlist.documentation);
+        elem.find('button.dict-table-pinlist-edit').button('disable');
+        elem.find('button.dict-table-pinlist-save').button('enable');
+        elem.find('button.dict-table-pinlist-cancel').button('enable');
+    };
+    this.edit_pinlist_url_save = function(cable_name,connector_name,pinlist_name) {
+        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
+        var elem = $('#dict-pinlist-url-'+pinlist.id);
+        var pinlist_documentation = elem.find('input[name="url"]').
+            css('display','none').
+            val();
+        elem.find('button.dict-table-pinlist-edit').button('enable');
+        elem.find('button.dict-table-pinlist-save').button('disable');
+        elem.find('button.dict-table-pinlist-cancel').button('disable');
+        this.update_pinlist(cable_name, connector_name, pinlist_name, pinlist_documentation);
+    };
+    this.edit_pinlist_url_cancel = function(cable_name,connector_name,pinlist_name) {
+        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
+        var elem = $('#dict-pinlist-url-'+pinlist.id);
+        elem.find('input[name="url"]').
+            css('display','none');
+        elem.find('button.dict-table-pinlist-edit').button('enable');
+        elem.find('button.dict-table-pinlist-save').button('disable');
+        elem.find('button.dict-table-pinlist-cancel').button('disable');
+    };
 	this.select_cable = function(cable) {
 		if( this.selected_cable != cable ) {
 			this.selected_cable     = cable;
@@ -497,12 +571,14 @@ function p_appl_dictionary() {
     		keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_location(); return; }
+                $(this).val(global_truncate_location($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-locations').find('input[name="rack2add"]').
             keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_rack(); return; }
+                $(this).val(global_truncate_rack($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-locations-reload').
@@ -733,6 +809,7 @@ function p_appl_dictionary() {
             keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_routing(); return; }
+                $(this).val(global_truncate_routing($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-routings-reload').
@@ -869,6 +946,7 @@ function p_appl_dictionary() {
     		keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_instr(); return; }
+                $(this).val(global_truncate_instr($(this).val()));
     		}).
             attr('disabled','disabled');
 		$('#dictionary-instrs-reload').

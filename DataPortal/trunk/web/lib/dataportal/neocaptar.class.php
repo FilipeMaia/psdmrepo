@@ -32,6 +32,23 @@ class NeoCaptar {
         return NeoCaptar::$instance;
     }
 
+    // -----------------------------------
+    // --- E-mail notification service ---
+    // -----------------------------------
+
+    public static function notify( $address, $subject, $body ) {
+        $tmpfname = tempnam("/tmp", "neocaptar");
+        $handle = fopen( $tmpfname, "w" );
+        fwrite( $handle, $body );
+        fclose( $handle );
+
+        shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F 'PCDS Cable Manager'" );
+
+        // Delete the file only after piping its contents to the mailer command.
+        // Otherwise its contents will be lost before we use it.
+        //
+        unlink( $tmpfname );
+    }
     // -----------------------------------------
     // --- CORE CLASS AND ITS IMPLEMENTATION ---
     // -----------------------------------------
@@ -966,7 +983,35 @@ class NeoCaptar {
     		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
     		throw $e;
     	}
-	    return $this->find_project_by_( "id IN (SELECT LAST_INSERT_ID())" );
+        $project = $this->find_project_by_( "id IN (SELECT LAST_INSERT_ID())" );
+
+        $owner_gecos = $this->find_user_by_uid($project->owner())->name();
+        $due_str     = $project->due_time()->toStringDay();
+        $project_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/neocaptar?app=projects:search&project_id='.$project->id();
+
+        // Notify administrators on the new project
+        //
+        $body = <<<HERE
+Title:  "{$project->title()}"
+Owner:  {$project->owner()} ({$owner_gecos})
+Due by: {$due_str}
+URL:    {$project_url}
+
+{$project->description()}
+
+_________________________________________________________
+The message was sent by the automated notification system
+because your accont was registered as an administrator in
+the PCDS Cable Management Sefvice (Neo-CAPTAR). Please,
+contact PCDS Computing Management directly if you think
+this was done my mistake.
+HERE;
+        foreach( $this->users() as $user)
+            if( $user->is_administrator())
+                NeoCaptar::notify( "{$user->uid()}@slac.stanford.edu", "New Project Registered in Neo-CAPTAR", $body );
+
+        return $project;
+
     }
     public function  update_project($id, $owner, $title, $description, $due_time) {
         $owner_escaped = $this->connection->escape_string( trim( $owner ));

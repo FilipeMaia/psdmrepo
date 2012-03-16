@@ -172,12 +172,63 @@ function hdf_create() {
 			report_error('unable to perform the operation for run '+runnum+'  because of: '+jqXHR.statusText);
 		});
 	};
+    this.set_auto_translation = function(is_on) {
+        $.ajax({
+            type: 'POST',
+            url: '../regdb/SetAutoTranslate2HDF5.php',
+            data: {
+                exper_id: that.exp_id,
+                autotranslate2hdf5: is_on ? 1 : 0
+            },
+            success: function(data) {
+                if( data.Status != 'success' ) {
+                    report_error(data.Message);
+                    return;
+                }
+            },
+            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            dataType: 'json'
+        });
+    };
+    this.auto_translation = function(is_on) {
+        if(is_on)
+            $('#popupdialogs').html(
+                '<span class="ui-icon ui-icon-alert" style="float:left;"></span> '+
+                'You are about to request automatic HDF5 translaton of all (past and future) runs of the experiment. '+
+                'This may take substantial resources (CPU and disk storage). Are you sure you want to proceed with this operation?'
+            );
+        else
+            $('#popupdialogs').html(
+                '<span class="ui-icon ui-icon-alert" style="float:left;"></span> '+
+                'You are about to stop automatic HDF5 translaton of all (past and future) runs of the experiment. '+
+                'Note that this may potentially affect all members of the experiment. Are you sure you want to proceed with this operation?'
+            );
+        $('#popupdialogs').dialog({
+            resizable: false,
+            modal: true,
+            buttons: {
+                "Yes": function() {
+                    $( this ).dialog('close');
+                    that.set_auto_translation(is_on);
+                },
+                Cancel: function() {
+                    $(this).dialog('close');
+                    var elem = $('#hdf-manage-list').find('input.autotranslate2hdf5');
+                    if(is_on) elem.removeAttr('checked');
+                    else      elem.attr('checked','checked');
+                }
+            },
+            title: 'Confirmn HDF5 Translation Request'
+        });
+    };
 	this.manage_display = function() {
 		var result = this.manage_last_request;
+        var autotranslate2hdf5_str = this.manage_last_request.autotranslate2hdf5 ? 'checked="checked"' : '';
 		var html =
 '<button class="reverse not4print" style="margin-right:20px;">Show in Reverse Order</button>'+
 '<button class="translate_all not4print" value="" title="request translation for all selected runs which have not been translated">Translate selected runs</button>'+
 '<button class="stop_all not4print" style="margin-left:5px;" value="" title="remove translation requests from the translation queue for selected runs">Stop translation of selected runs</button>'+
+'<span style="margin-left:20px; font-weight:bold;">enable auto-translation: </span><input type="checkbox" value=1 class="autotranslate2hdf5 not4print" '+autotranslate2hdf5_str+' />'+
 '<br><br>'+
 '<table><tbody>'+
 '  <tr>'+
@@ -286,6 +337,9 @@ function hdf_create() {
 		});
 		$('#hdf-manage-list').find('.escalate').button().click(function() {
 			that.escalate_priority($(this).val());
+		});
+		$('#hdf-manage-list').find('input.autotranslate2hdf5').change(function() {
+			that.auto_translation(this.checked);
 		});
 		var html = '';
 		for(var status in summary) {

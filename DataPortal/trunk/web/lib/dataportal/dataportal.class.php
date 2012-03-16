@@ -150,6 +150,27 @@ function logout() {
 	} );
 }
 
+function edit_dialog( title, msg, on_save, on_cancel, width, height ) {
+	$('#editdialogs').html(msg);
+	$('#editdialogs').dialog({
+		title:     title,
+		resizable: true,
+        width:     width == null ? 460 : width,
+        height:    height == null ? 240 : height,
+		modal:     true,
+		buttons:   {
+			Save: function() {
+				$(this).dialog('close');
+				if( on_save != null ) on_save();
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+				if( on_cancel != null ) on_cancel();
+			}
+		}
+	});
+}
+    
 /* --------------------------------------------------- 
  * The starting point where the JavaScript code starts
  * ---------------------------------------------------
@@ -187,7 +208,9 @@ HERE;
       <table><tbody><tr>
         <td valign="bottom">
           <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" /></a></div>
+          <!--
           <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.gif" /></a></div>
+          -->
           <div style="clear:both;" class="not4print"></div>
         </td>
         <td>
@@ -272,6 +295,7 @@ HERE;
 		echo <<<HERE
 
   <div id="popupdialogs" style="display:none;"></div>
+  <div id="editdialogs"  style="display:none;"></div>
   <div id="forms" style="display:none;"></div>
   
 </div>

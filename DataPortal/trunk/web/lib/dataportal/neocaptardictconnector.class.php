@@ -88,11 +88,12 @@ class NeoCaptarDictConnector {
      *   DATABASE MODIFIERS
      * ======================
      */
-    public function add_pinlist( $name, $created, $uid ) {
+    public function add_pinlist( $name, $documentation, $created, $uid ) {
     	$name_escaped = $this->connection->escape_string( trim( $name ));
     	if( $name_escaped == '' )
     		throw new NeoCaptarException (
     			__METHOD__, "illegal pinlist type name. A valid non-empty string is expected." );
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
     	$uid_escaped = $this->connection->escape_string( trim( $uid ));
     	if( $uid_escaped == '' )
     		throw new NeoCaptarException (
@@ -107,13 +108,20 @@ class NeoCaptarDictConnector {
     	//
     	try {
     		$this->connection->query (
-    			"INSERT INTO {$this->connection->database}.dict_pinlist VALUES(NULL,{$this->id()},'{$name_escaped}',{$created->to64()},'{$uid_escaped}')"
+    			"INSERT INTO {$this->connection->database}.dict_pinlist VALUES(NULL,{$this->id()},'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}')"
     		);
     	} catch( NeoCaptarException $e ) {
     		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
     		throw $e;
     	}
     	return $this->find_pinlist_by_( "id IN (SELECT LAST_INSERT_ID())" );
+    }
+    public function update_pinlist( $pinlist_id, $documentation ) {
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
+   		$this->connection->query (
+   			"UPDATE {$this->connection->database}.dict_pinlist SET documentation='{$documentation_escaped}' WHERE id={$pinlist_id}"
+   		);
+        return $this->find_pinlist_by_id($pinlist_id);
     }
     public function delete_pinlist_by_name( $name ) {
     	$name_escaped = $this->connection->escape_string( trim( $name ));

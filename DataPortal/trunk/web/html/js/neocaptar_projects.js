@@ -25,6 +25,7 @@ function p_appl_projects() {
 	this.name      = 'projects';
 	this.full_name = 'Projects';
 	this.context   = '';
+    this.default_context = 'search';
 
     this.select = function(context,when_done) {
 		that.context   = context;
@@ -32,7 +33,7 @@ function p_appl_projects() {
 		this.init();
 	};
 	this.select_default = function() {
-		if( this.context == '' ) this.context = 'search';
+		if( this.context == '' ) this.context = this.default_context;
 		this.init();
 	};
 	this.if_ready2giveup = function(handler2call) {
@@ -86,7 +87,10 @@ function p_appl_projects() {
         return global_current_user.is_administrator || (global_current_user.can_manage_projects && (global_current_user.uid == this.project[pidx].owner));
     }
     this.can_define_new_types = function() {
-        return !global_current_user.is_administrator;
+        return global_current_user.is_administrator;
+    };
+    this.can_manage_workflow = function() {
+        return global_current_user.is_administrator;
     };
 	this.toggle_project = function(pidx) {
 		var toggler='#proj-tgl-'+pidx;
@@ -240,7 +244,7 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conn"    >&nbsp;'+c.origin.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+c.origin.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+c.origin.pinlist +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.origin.conntype,c.origin.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_right "                 ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
         html +=
 '</tr>'+
@@ -281,7 +285,7 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conn"    >&nbsp;'+c.destination.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conntype">&nbsp;'+c.destination.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_pinlist" >&nbsp;'+c.destination.pinlist +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.destination.conntype,c.destination.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight table_cell_right "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
         html +=
 '</tr>';
@@ -378,45 +382,59 @@ function p_appl_projects() {
 	};
 	this.update_cable_tools = function(pidx,cidx,editing) {
 		var cable = this.project[pidx].cable[cidx];
+        $('#proj-cable-action-'+pidx+'-'+cidx+' button').button('disable');
+        var tools_1 = $('#proj-cable-tools-'+pidx+'-'+cidx+'-1');
+        var tools_2 = $('#proj-cable-tools-'+pidx+'-'+cidx+'-2');
         if(!this.can_manage_project(pidx)) {
-            $('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit"]'       ).button('disable');
-            $('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_save"]'  ).button('disable');
-            $('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_cancel"]').button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="clone"]'      ).button('disable');
-            $('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="delete"]'     ).button('disable');
+            tools_1.find('button[name="edit"]'       ).button('disable');
+            tools_1.find('button[name="edit_save"]'  ).button('disable');
+            tools_1.find('button[name="edit_cancel"]').button('disable');
+			tools_2.find('button[name="clone"]'      ).button('disable');
+            tools_2.find('button[name="delete"]'     ).button('disable');
             if( cable.status == 'Planned') {
-                 $('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="label"]' ).button('disable');
+                tools_2.find('button[name="label"]').button('disable');
             } else {
-                $('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="label"]' ).button('enable');
+                tools_2.find('button[name="label"]').button('enable');
             }
-            $('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="history"]').button('enable');
-            $('#proj-cable-action-'+pidx+'-'+cidx+' button').button('disable');
+            tools_2.find('button[name="history"]').button('enable');
             return;
         }
 		if( editing ) {
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit"]'       ).button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_save"]'  ).button('enable' );
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_cancel"]').button('enable' );
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="clone"]'      ).button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="delete"]'     ).button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="label"]'      ).button('disable');
-			$('#proj-cable-action-'+pidx+'-'+cidx+' button').button('disable');
+			tools_1.find('button[name="edit"]'       ).button('disable');
+			tools_1.find('button[name="edit_save"]'  ).button('enable' );
+			tools_1.find('button[name="edit_cancel"]').button('enable' );
+			tools_2.find('button[name="clone"]'      ).button('disable');
+			tools_2.find('button[name="delete"]'     ).button('disable');
+			tools_2.find('button[name="label"]'      ).button('disable');
 			return;
 		}
-		$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_save"]'  ).button('disable');
-		$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit_cancel"]').button('disable');
-		if( cable.status == 'Planned') {
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit"]'  ).button('enable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="delete"]').button('enable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="label"]' ).button('disable');
-		} else {
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-1 button[name="edit"]'  ).button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="delete"]').button('disable');
-			$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="label"]' ).button('enable');
+		tools_1.find('button[name="edit_save"]'  ).button('disable');
+		tools_1.find('button[name="edit_cancel"]').button('disable');
+		switch( cable.status ) {
+        case 'Planned':
+        case 'Registered':
+        case 'Labeled':
+        case 'Fabrication':
+        case 'Ready':    
+            tools_1.find('button[name="edit"]').button('enable');
+            break;
+        default:
+            tools_1.find('button[name="edit"]').button('disable');
+            break;
 		}
-		$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="clone"]'  ).button('enable');
-		$('#proj-cable-tools-'+pidx+'-'+cidx+'-2 button[name="history"]').button('enable');
-		$('#proj-cable-action-'+pidx+'-'+cidx+' button').button('enable');
+		switch( cable.status ) {
+        case 'Planned':
+            tools_2.find('button[name="delete"]').button('enable');
+            tools_2.find('button[name="label"]' ).button('disable');
+            break;
+        default:
+            tools_2.find('button[name="delete"]').button('disable');
+            tools_2.find('button[name="label"]' ).button('enable');
+            break;
+        }
+		tools_2.find('button[name="clone"]'  ).button('enable');
+		tools_2.find('button[name="history"]').button('enable');
+		if(this.can_manage_workflow()) $('#proj-cable-action-'+pidx+'-'+cidx+' button').button('enable');
 	};
 	this.update_project_tools = function(pidx) {
 		var html = '';
@@ -635,9 +653,10 @@ function p_appl_projects() {
 			},
 			null );
 	};
-	this.cable_property_edit = function(pidx,cidx,prop,is_new) {
+	this.cable_property_edit = function(pidx,cidx,prop,is_new,is_disabled) {
 
         var cable  = this.project[pidx].cable[cidx];
+        var is_disabled_attr = is_disabled ? 'disabled="disabled"' : '';
 
         cable.editing = true;
 
@@ -659,12 +678,12 @@ function p_appl_projects() {
             break;
 
 		case 'device':
-			$(base_1).html('<input type="text" value="'+cable.device+'" size="10" />');
+			$(base_1).html('<input type="text" value="'+cable.device+'" size="10" '+is_disabled_attr+' />');
             cable.read_device = read_input_1;
 			break;
 
 		case 'func':
-			$(base_1).html('<input type="text" value="'+cable.func+'" size="24" />');
+			$(base_1).html('<input type="text" value="'+cable.func+'" size="24" '+is_disabled_attr+' />');
             cable.read_func = read_input_1;
 			break;
 
@@ -672,17 +691,17 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				$(base_1).html('<input type="text" value="" size="4" />');
+				$(base_1).html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.read_cable_type = read_input_1;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				$(base_1).html('<input type="text" value="'+cable.cable_type+'" size="4" />');
+				$(base_1).html('<input type="text" value="'+cable.cable_type+'" size="4" '+is_disabled_attr+' />');
 				cable.read_cable_type = read_input_1;
 
 			} else {
 
-				html = '<select>';
+				html = '<select '+is_disabled_attr+' >';
 				if( cable.cable_type == '' ) {
 					for( var t in dict.cables()) {
 						html += '<option';
@@ -711,16 +730,16 @@ function p_appl_projects() {
 				$(base_1).html(html);
 				$(base_1+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
-						that.cable_property_edit(pidx,cidx,'origin_conntype',true);
-						that.cable_property_edit(pidx,cidx,'origin_pinlist',true);
-						that.cable_property_edit(pidx,cidx,'destination_conntype',true);
-						that.cable_property_edit(pidx,cidx,'destination_pinlist',true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
+						that.cable_property_edit(pidx,cidx,'origin_conntype',true,false);
+						that.cable_property_edit(pidx,cidx,'origin_pinlist',true,false);
+						that.cable_property_edit(pidx,cidx,'destination_conntype',true,false);
+						that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
 					} else {
-						that.cable_property_edit(pidx,cidx,'origin_conntype',false);
-						that.cable_property_edit(pidx,cidx,'origin_pinlist',false);
-						that.cable_property_edit(pidx,cidx,'destination_conntype',false);
-						that.cable_property_edit(pidx,cidx,'destination_pinlist',false);
+						that.cable_property_edit(pidx,cidx,'origin_conntype',false,false);
+						that.cable_property_edit(pidx,cidx,'origin_pinlist',false,false);
+						that.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
+						that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
 					}
 				});
 				cable.read_cable_type = read_select_1;
@@ -728,7 +747,7 @@ function p_appl_projects() {
 			break;
 
 		case 'length':
-            $(base_1).html('<input type="text" value="'+cable.length+ '" size="1"  />');
+            $(base_1).html('<input type="text" value="'+cable.length+ '" size="1" '+is_disabled_attr+' />');
             cable.read_length = read_input_1;
 			break;
 
@@ -738,7 +757,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_1).html('<input type="text" value="" size="1" />');
+				$(base_1).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.read_routing = read_input_1;
 
 			} else {
@@ -748,7 +767,7 @@ function p_appl_projects() {
 				// add this as as the first option. If it's selected then it woudl be automatically
 				// added to the dictionary.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+' >';
 
 				if( dict.routing_is_not_known( cable.routing ))
 					html += '<option  selected="selected" value="'+cable.routing+'">'+cable.routing+'</option>';
@@ -762,7 +781,7 @@ function p_appl_projects() {
 				$(base_1).html(html);
 				$(base_1+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
 					}
 				});
 				cable.read_routing = read_select_1;
@@ -770,7 +789,7 @@ function p_appl_projects() {
 			break;
 
 		case 'origin_name':
-            $(base_1).html('<input type="text" value="'+cable.origin.name+ '" size="8" />');
+            $(base_1).html('<input type="text" value="'+cable.origin.name+ '" size="8" '+is_disabled_attr+' />');
             cable.origin.read_name = read_input_1;
 			break;
 
@@ -778,31 +797,31 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				$(base_1).html('<input type="text" value="" size="4" />');
+				$(base_1).html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_conntype = read_input_1;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" />');
+				$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_conntype = read_input_1;
 
 			} else {
 
 				if(	dict.cable_is_not_known( cable.read_cable_type())) {
 
-					$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" />');
+					$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
 					cable.origin.read_conntype = read_input_1;
 
 				} else {
 
 					if( dict.connector_dict_is_empty( cable.read_cable_type())) {
 
-						$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" />');
+						$(base_1).html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
 						cable.origin.read_conntype = read_input_1;
 
 					} else {
 
-						html = '<select>';
+						html = '<select '+is_disabled_attr+' >';
 						for( var t in dict.connectors( cable.read_cable_type())) {
 							html += '<option';
 							if( t == cable.origin.conntype ) html += ' selected="selected"';
@@ -813,10 +832,10 @@ function p_appl_projects() {
 						$(base_1).html(html);
 						$(base_1+' select').change(function() {
 							if( $(this).val() == '' ) {
-								that.cable_property_edit(pidx,cidx,prop,true);
-								that.cable_property_edit(pidx,cidx,'origin_pinlist',true);
+								that.cable_property_edit(pidx,cidx,prop,true,false);
+								that.cable_property_edit(pidx,cidx,'origin_pinlist',true,false);
 							} else {
-								that.cable_property_edit(pidx,cidx,'origin_pinlist', false);
+								that.cable_property_edit(pidx,cidx,'origin_pinlist',false,false);
 							}
 						});
 						cable.origin.read_conntype = read_select_1;
@@ -829,34 +848,34 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				$(base_1).html('<input type="text" value="" size="4" />');
+				$(base_1).html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_pinlist = read_input_1;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" />');
+				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_pinlist = read_input_1;
 
 			} else if( dict.cable_is_not_known( cable.read_cable_type())) {
 
-				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" />');
+				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_pinlist = read_input_1;
 
 			} else if( dict.connector_is_not_known( cable.read_cable_type(), cable.origin.read_conntype())) {
 
-				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" />');
+				$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_pinlist = read_input_1;
 
 			} else {
 
 				if( dict.pinlist_dict_is_empty( cable.read_cable_type(), cable.origin.read_conntype())) {
 
-					$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" />');
+					$(base_1).html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
 					cable.origin.read_pinlist = read_input_1;
 
 				} else {
 
-					html = '<select>';
+					html = '<select '+is_disabled_attr+' >';
 					for( var pinlist in dict.pinlists( cable.read_cable_type(), cable.origin.read_conntype())) {
 						html += '<option';
 						if( pinlist == cable.origin.pinlist ) html += ' selected="selected"';
@@ -867,7 +886,7 @@ function p_appl_projects() {
 					$(base_1).html(html);
 					$(base_1+' select').change(function() {
 						if( $(this).val() == '') {
-							that.cable_property_edit(pidx,cidx,prop,true);
+							that.cable_property_edit(pidx,cidx,prop,true,false);
 						}
 					});
 					cable.origin.read_pinlist = read_select_1;
@@ -881,7 +900,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_1).html('<input type="text" value="" size="1" />');
+				$(base_1).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.origin.read_loc = read_input_1;
 
 			} else {
@@ -891,7 +910,7 @@ function p_appl_projects() {
 				// add this as as the first option. If it's selected then it woudl be automatically
 				// added to the dictionary.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+' >';
 
 				if( dict.location_is_not_known( cable.origin.loc ))
 					html += '<option  selected="selected" value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
@@ -905,10 +924,10 @@ function p_appl_projects() {
 				$(base_1).html(html);
 				$(base_1+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop, true);
-						that.cable_property_edit(pidx,cidx,'origin_rack',true);
+						that.cable_property_edit(pidx,cidx,prop, true,false);
+						that.cable_property_edit(pidx,cidx,'origin_rack',true,false);
 					} else {
-						that.cable_property_edit(pidx,cidx,'origin_rack',false);
+						that.cable_property_edit(pidx,cidx,'origin_rack',false,false);
 					}
 				});
 				cable.origin.read_loc = read_select_1;
@@ -921,7 +940,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_1).html('<input type="text" value="" size="1" />');
+				$(base_1).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input_1;
 
 			} else if( dict.location_is_not_known( cable.origin.read_loc())) {
@@ -930,7 +949,7 @@ function p_appl_projects() {
 				// a choice of a rack because the current location is also not known to
 				// the dictionary.
 				//
-				$(base_1).html('<input type="text" value="'+cable.origin.rack+'" size="1" />');
+				$(base_1).html('<input type="text" value="'+cable.origin.rack+'" size="1" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input_1;
 
 			} else {
@@ -946,7 +965,7 @@ function p_appl_projects() {
 				//                 the right source to get the location then the rack would be carried over
 				//                 as a legitimate option between locations.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+' >';
 
 				if(( cable.origin.rack != '' ) && dict.rack_is_not_known( cable.origin.loc, cable.origin.rack ))
 					html += '<option selected="selected" value="'+cable.origin.rack+'">'+cable.origin.rack+'</option>';
@@ -960,7 +979,7 @@ function p_appl_projects() {
 				$(base_1).html(html);
 				$(base_1+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
 					}
 				});
 				cable.origin.read_rack = read_select_1;
@@ -968,27 +987,27 @@ function p_appl_projects() {
 			break;
 
         case 'origin_ele':
-			$(base_1).html('<input type="text" value="'+cable.origin.ele+'" size="1" />');
+			$(base_1).html('<input type="text" value="'+cable.origin.ele+'" size="1" '+is_disabled_attr+' />');
             cable.origin.read_ele = read_input_1;
 			break;
 
         case 'origin_side':
-			$(base_1).html('<input type="text" value="'+cable.origin.side+'" size="2" />');
+			$(base_1).html('<input type="text" value="'+cable.origin.side+'" size="2" '+is_disabled_attr+' />');
             cable.origin.read_side = read_input_1;
 			break;
 
         case 'origin_slot':
-			$(base_1).html('<input type="text" value="'+cable.origin.slot+'" size="2" />');
+			$(base_1).html('<input type="text" value="'+cable.origin.slot+'" size="2" '+is_disabled_attr+' />');
             cable.origin.read_slot = read_input_1;
 			break;
 
         case 'origin_conn':
-			$(base_1).html('<input type="text" value="'+cable.origin.conn+'" size="2" />');
+			$(base_1).html('<input type="text" value="'+cable.origin.conn+'" size="2" '+is_disabled_attr+' />');
             cable.origin.read_conn = read_input_1;
 			break;
 
         case 'origin_station':
-			$(base_1).html('<input type="text" value="'+cable.origin.station+'" size="2" />');
+			$(base_1).html('<input type="text" value="'+cable.origin.station+'" size="2" '+is_disabled_attr+' />');
             cable.origin.read_station = read_input_1;
 			break;
 
@@ -998,7 +1017,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_1).html('<input type="text" value="" size="1" />');
+				$(base_1).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.origin.read_instr = read_input_1;
 
 			} else {
@@ -1008,7 +1027,7 @@ function p_appl_projects() {
 				// add this as as the first option. If it's selected then it woudl be automatically
 				// added to the dictionary.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+'>';
 
 				if( dict.instr_is_not_known( cable.origin.instr ))
 					html += '<option  selected="selected" value="'+cable.origin.instr+'">'+cable.origin.instr+'</option>';
@@ -1022,7 +1041,7 @@ function p_appl_projects() {
 				$(base_1).html(html);
 				$(base_1+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
 					}
 				});
 				cable.origin.read_instr = read_select_1;
@@ -1030,7 +1049,7 @@ function p_appl_projects() {
 			break;
 
 		case 'destination_name':
-            $(base_2).html('<input type="text" value="'+cable.destination.name+ '" size="8" />');
+            $(base_2).html('<input type="text" value="'+cable.destination.name+ '" size="8" '+is_disabled_attr+' />');
             cable.destination.read_name = read_input_2;
 			break;
 
@@ -1038,30 +1057,30 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				$(base_2).html('<input type="text" value="" size="4" />');
+				$(base_2).html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_conntype = read_input_2;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" />');
+				$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_conntype = read_input_2;
 
 			} else {
 
 				if(	dict.cable_is_not_known( cable.read_cable_type())) {
 
-					$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" />');
+					$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
 					cable.destination.read_conntype = read_input_2;
 
 				} else {
 
 					if( dict.connector_dict_is_empty( cable.read_cable_type())) {
 
-						$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" />');
+						$(base_2).html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
 						cable.destination.read_conntype = read_input_2;
 
 					} else {
-						html = '<select>';
+						html = '<select '+is_disabled_attr+'>';
 
 						for( var t in dict.connectors( cable.read_cable_type())) {
 							html += '<option';
@@ -1073,10 +1092,10 @@ function p_appl_projects() {
 						$(base_2).html(html);
 						$(base_2+' select').change(function() {
 							if( $(this).val() == '' ) {
-								that.cable_property_edit(pidx,cidx,prop,true);
-								that.cable_property_edit(pidx,cidx,'destination_pinlist',true);
+								that.cable_property_edit(pidx,cidx,prop,true,false);
+								that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
 							} else {
-								that.cable_property_edit(pidx,cidx,'destination_pinlist', false);
+								that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
 							}
 						});
 						cable.destination.read_conntype = read_select_2;
@@ -1089,34 +1108,34 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				$(base_2).html('<input type="text" value="" size="4" />');
+				$(base_2).html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_pinlist = read_input_2;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" />');
+				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_pinlist = read_input_2;
 
 			} else if( dict.cable_is_not_known( cable.read_cable_type())) {
 
-				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" />');
+				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_pinlist = read_input_2;
 
 			} else if( dict.connector_is_not_known( cable.read_cable_type(), cable.destination.read_conntype())) {
 
-				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" />');
+				$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_pinlist = read_input_2;
 
 			} else {
 
 				if( dict.pinlist_dict_is_empty( cable.read_cable_type(), cable.destination.read_conntype())) {
 
-					$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" />');
+					$(base_2).html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
 					cable.destination.read_pinlist = read_input_2;
 
 				} else {
 
-					html = '<select>';
+					html = '<select '+is_disabled_attr+'>';
 					for( var pinlist in dict.pinlists( cable.read_cable_type(), cable.destination.read_conntype())) {
 						html += '<option';
 						if( pinlist == cable.destination.pinlist ) html += ' selected="selected"';
@@ -1127,7 +1146,7 @@ function p_appl_projects() {
 					$(base_2).html(html);
 					$(base_2+' select').change(function() {
 						if( $(this).val() == '') {
-							that.cable_property_edit(pidx,cidx,prop,true);
+							that.cable_property_edit(pidx,cidx,prop,true,false);
 						}
 					});
 					cable.destination.read_pinlist = read_select_2;
@@ -1141,7 +1160,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_2).html('<input type="text" value="" size="1" />');
+				$(base_2).html('<input type="text" value="" size="1" '+is_disabled_attr+' /> ');
 				cable.destination.read_loc = read_input_2;
 
 			} else {
@@ -1151,7 +1170,7 @@ function p_appl_projects() {
 				// add this as as the first option. If it's selected then it woudl be automatically
 				// added to the dictionary.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+'>';
 
 				if( dict.location_is_not_known( cable.destination.loc ))
 					html += '<option  selected="selected" value="'+cable.destination.loc+'">'+cable.destination.loc+'</option>';
@@ -1165,10 +1184,10 @@ function p_appl_projects() {
 				$(base_2).html(html);
 				$(base_2+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop, true);
-						that.cable_property_edit(pidx,cidx,'destination_rack',true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
+						that.cable_property_edit(pidx,cidx,'destination_rack',true,false);
 					} else {
-						that.cable_property_edit(pidx,cidx,'destination_rack',false);
+						that.cable_property_edit(pidx,cidx,'destination_rack',false,false);
 					}
 				});
 				cable.destination.read_loc = read_select_2;
@@ -1181,7 +1200,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_2).html('<input type="text" value="" size="1" />');
+				$(base_2).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input_2;
 
 			} else if( dict.location_is_not_known( cable.destination.read_loc())) {
@@ -1190,7 +1209,7 @@ function p_appl_projects() {
 				// a choice of a rack because the current location is also not known to
 				// the dictionary.
 				//
-				$(base_2).html('<input type="text" value="'+cable.destination.rack+'" size="1" />');
+				$(base_2).html('<input type="text" value="'+cable.destination.rack+'" size="1" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input_2;
 
 			} else {
@@ -1206,7 +1225,7 @@ function p_appl_projects() {
 				//                 the right source to get the location then the rack would be carried over
 				//                 as a legitimate option between locations.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+'>';
 
 				if(( cable.destination.rack != '' ) && dict.rack_is_not_known( cable.destination.loc, cable.destination.rack ))
 					html += '<option selected="selected" value="'+cable.destination.rack+'">'+cable.destination.rack+'</option>';
@@ -1220,7 +1239,7 @@ function p_appl_projects() {
 				$(base_2).html(html);
 				$(base_2+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
 					}
 				});
 				cable.destination.read_rack = read_select_2;
@@ -1228,27 +1247,27 @@ function p_appl_projects() {
 			break;
 
         case 'destination_ele':
-			$(base_2).html('<input type="text" value="'+cable.destination.ele+'" size="1" />');
+			$(base_2).html('<input type="text" value="'+cable.destination.ele+'" size="1" '+is_disabled_attr+' />');
             cable.destination.read_ele = read_input_2;
 			break;
 
         case 'destination_side':
-			$(base_2).html('<input type="text" value="'+cable.destination.side+'" size="2" />');
+			$(base_2).html('<input type="text" value="'+cable.destination.side+'" size="2" '+is_disabled_attr+' />');
             cable.destination.read_side = read_input_2;
 			break;
 
         case 'destination_slot':
-			$(base_2).html('<input type="text" value="'+cable.destination.slot+'" size="2" />');
+			$(base_2).html('<input type="text" value="'+cable.destination.slot+'" size="2" '+is_disabled_attr+' />');
             cable.destination.read_slot = read_input_2;
 			break;
 
         case 'destination_conn':
-			$(base_2).html('<input type="text" value="'+cable.destination.conn+'" size="2" />');
+			$(base_2).html('<input type="text" value="'+cable.destination.conn+'" size="2" '+is_disabled_attr+' />');
             cable.destination.read_conn = read_input_2;
 			break;
 
         case 'destination_station':
-			$(base_2).html('<input type="text" value="'+cable.destination.station+'" size="2" />');
+			$(base_2).html('<input type="text" value="'+cable.destination.station+'" size="2" '+is_disabled_attr+' />');
             cable.destination.read_station = read_input_2;
 			break;
 
@@ -1258,7 +1277,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				$(base_2).html('<input type="text" value="" size="1" />');
+				$(base_2).html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
 				cable.destination.read_instr = read_input_2;
 
 			} else {
@@ -1268,7 +1287,7 @@ function p_appl_projects() {
 				// add this as as the first option. If it's selected then it woudl be automatically
 				// added to the dictionary.
 				//
-				html = '<select>';
+				html = '<select '+is_disabled_attr+' >';
 
 				if( dict.instr_is_not_known( cable.destination.instr ))
 					html += '<option  selected="selected" value="'+cable.destination.instr+'">'+cable.destination.instr+'</option>';
@@ -1282,7 +1301,7 @@ function p_appl_projects() {
 				$(base_2).html(html);
 				$(base_2+' select').change(function() {
 					if( $(this).val() == '' ) {
-						that.cable_property_edit(pidx,cidx,prop,true);
+						that.cable_property_edit(pidx,cidx,prop,true,false);
 					}
 				});
 				cable.destination.read_instr = read_select_2;
@@ -1317,6 +1336,7 @@ function p_appl_projects() {
             $('#proj-con-'+pidx+' .table').addClass('top');
             $('body').bind('keyup',projects.cancel_editing);
         }
+        var cable = this.project[pidx].cable[cidx];
         var prev = $('#proj-cable-'+pidx+'-'+cidx+'-1').prev();
         if( !prev.hasClass('table_first_header')) {
             var html =
@@ -1347,36 +1367,36 @@ function p_appl_projects() {
 		this.update_cable_tools(pidx,cidx,true);
 		this.update_project_tools(pidx);
 
-		this.cable_property_edit(pidx,cidx,'status',false);
-		this.cable_property_edit(pidx,cidx,'device',false);
-		this.cable_property_edit(pidx,cidx,'func',false);
-		this.cable_property_edit(pidx,cidx,'cable_type',false);
-		this.cable_property_edit(pidx,cidx,'length',false);
-		this.cable_property_edit(pidx,cidx,'routing',false);
+        this.cable_property_edit(pidx,cidx,'status',              false,false);
+		this.cable_property_edit(pidx,cidx,'device',              false,false);
+		this.cable_property_edit(pidx,cidx,'func',                false,false);
+		this.cable_property_edit(pidx,cidx,'cable_type',          false,false);
+		this.cable_property_edit(pidx,cidx,'length',              false,false);
+		this.cable_property_edit(pidx,cidx,'routing',             false,false);
 
-		this.cable_property_edit(pidx,cidx,'origin_name',false);
-		this.cable_property_edit(pidx,cidx,'origin_loc',false);
-		this.cable_property_edit(pidx,cidx,'origin_rack',false);
-		this.cable_property_edit(pidx,cidx,'origin_ele',false);
-		this.cable_property_edit(pidx,cidx,'origin_side',false);
-		this.cable_property_edit(pidx,cidx,'origin_slot',false);
-		this.cable_property_edit(pidx,cidx,'origin_conn',false);
-		this.cable_property_edit(pidx,cidx,'origin_station',false);
-		this.cable_property_edit(pidx,cidx,'origin_conntype',false);
-		this.cable_property_edit(pidx,cidx,'origin_pinlist',false);
-		this.cable_property_edit(pidx,cidx,'origin_instr',false);
+		this.cable_property_edit(pidx,cidx,'origin_name',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_loc',          false,(cable.status != 'Planned'));
+		this.cable_property_edit(pidx,cidx,'origin_rack',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_ele',          false,false);
+		this.cable_property_edit(pidx,cidx,'origin_side',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_slot',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_conn',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_station',      false,false);
+		this.cable_property_edit(pidx,cidx,'origin_conntype',     false,false);
+		this.cable_property_edit(pidx,cidx,'origin_pinlist',      false,false);
+		this.cable_property_edit(pidx,cidx,'origin_instr',        false,false);
 
-		this.cable_property_edit(pidx,cidx,'destination_name',false);
-		this.cable_property_edit(pidx,cidx,'destination_loc',false);
-		this.cable_property_edit(pidx,cidx,'destination_rack',false);
-		this.cable_property_edit(pidx,cidx,'destination_ele',false);
-		this.cable_property_edit(pidx,cidx,'destination_side',false);
-		this.cable_property_edit(pidx,cidx,'destination_slot',false);
-		this.cable_property_edit(pidx,cidx,'destination_conn',false);
-		this.cable_property_edit(pidx,cidx,'destination_station',false);
-		this.cable_property_edit(pidx,cidx,'destination_conntype',false);
-		this.cable_property_edit(pidx,cidx,'destination_pinlist',false);
-		this.cable_property_edit(pidx,cidx,'destination_instr',false);
+		this.cable_property_edit(pidx,cidx,'destination_name',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_loc',     false,(cable.status != 'Planned'));
+		this.cable_property_edit(pidx,cidx,'destination_rack',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_ele',     false,false);
+		this.cable_property_edit(pidx,cidx,'destination_side',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_slot',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_conn',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_station', false,false);
+		this.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
+		this.cable_property_edit(pidx,cidx,'destination_pinlist', false,false);
+		this.cable_property_edit(pidx,cidx,'destination_instr',   false,false);
 	};
 	this.edit_cable_save = function(pidx,cidx) {
 
@@ -1387,35 +1407,35 @@ function p_appl_projects() {
 		//
         var params = {
             cable_id             : cable.id,
-            device               : cable.read_device(),
-            func                 : cable.read_func(),
-            cable_type           : cable.read_cable_type(),
-            length               : cable.read_length(),
-            routing              : cable.read_routing(),
+            device               : global_truncate_device (cable.read_device()),
+            func                 : global_truncate_func   (cable.read_func()),
+            cable_type           : global_truncate_cable  (cable.read_cable_type()),
+            length               : global_truncate_length (cable.read_length()),
+            routing              : global_truncate_routing(cable.read_routing()),
 
             origin_name          : cable.origin.read_name(),
-            origin_loc           : cable.origin.read_loc(),
-            origin_rack          : cable.origin.read_rack(),
-            origin_ele           : cable.origin.read_ele(),
-            origin_side          : cable.origin.read_side(),
-            origin_slot          : cable.origin.read_slot(),
-            origin_conn          : cable.origin.read_conn(),
-            origin_station       : cable.origin.read_station(),
-            origin_conntype      : cable.origin.read_conntype(),
-            origin_pinlist       : cable.origin.read_pinlist(),
-            origin_instr         : cable.origin.read_instr(),
+            origin_loc           : global_truncate_location (cable.origin.read_loc()),
+            origin_rack          : global_truncate_rack     (cable.origin.read_rack()),
+            origin_ele           : global_truncate_ele      (cable.origin.read_ele()),
+            origin_side          : global_truncate_side     (cable.origin.read_side()),
+            origin_slot          : global_truncate_slot     (cable.origin.read_slot()),
+            origin_conn          : global_truncate_conn     (cable.origin.read_conn()),
+            origin_station       : global_truncate_station  (cable.origin.read_station()),
+            origin_conntype      : global_truncate_connector(cable.origin.read_conntype()),
+            origin_pinlist       : global_truncate_pinlist  (cable.origin.read_pinlist()),
+            origin_instr         : global_truncate_instr    (cable.origin.read_instr()),
 
             destination_name     : cable.destination.read_name(),
-            destination_loc      : cable.destination.read_loc(),
-            destination_rack     : cable.destination.read_rack(),
-            destination_ele      : cable.destination.read_ele(),
-            destination_side     : cable.destination.read_side(),
-            destination_slot     : cable.destination.read_slot(),
-            destination_conn     : cable.destination.read_conn(),
-            destination_station  : cable.destination.read_station(),
-            destination_conntype : cable.destination.read_conntype(),
-            destination_pinlist  : cable.destination.read_pinlist(),
-            destination_instr    : cable.destination.read_instr()
+            destination_loc      : global_truncate_location (cable.destination.read_loc()),
+            destination_rack     : global_truncate_rack     (cable.destination.read_rack()),
+            destination_ele      : global_truncate_ele      (cable.destination.read_ele()),
+            destination_side     : global_truncate_side     (cable.destination.read_side()),
+            destination_slot     : global_truncate_slot     (cable.destination.read_slot()),
+            destination_conn     : global_truncate_conn     (cable.destination.read_conn()),
+            destination_station  : global_truncate_station  (cable.destination.read_station()),
+            destination_conntype : global_truncate_connector(cable.destination.read_conntype()),
+            destination_pinlist  : global_truncate_pinlist  (cable.destination.read_pinlist()),
+            destination_instr    : global_truncate_instr    (cable.destination.read_instr())
        };
         $.ajax({
             type: 'POST',
@@ -1511,7 +1531,7 @@ function p_appl_projects() {
         $(base_1+'origin_conn'    ).html('&nbsp;'+cable.origin.conn);
         $(base_1+'origin_station' ).html('&nbsp;'+cable.origin.station);
         $(base_1+'origin_conntype').html('&nbsp;'+cable.origin.conntype);
-        $(base_1+'origin_pinlist' ).html('&nbsp;'+cable.origin.pinlist);
+        $(base_1+'origin_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.cable_type,cable.origin.conntype,cable.origin.pinlist));
         $(base_1+'origin_instr'   ).html('&nbsp;'+cable.origin.instr);
 
         var base_2 = '#proj-cable-'+pidx+'-'+cidx+'-2 td div.';
@@ -1525,12 +1545,12 @@ function p_appl_projects() {
         $(base_2+'destination_conn'    ).html('&nbsp;'+cable.destination.conn);
         $(base_2+'destination_station' ).html('&nbsp;'+cable.destination.station);
         $(base_2+'destination_conntype').html('&nbsp;'+cable.destination.conntype);
-        $(base_2+'destination_pinlist' ).html('&nbsp;'+cable.destination.pinlist);
+        $(base_2+'destination_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.cable_type,cable.destination.conntype,cable.destination.pinlist));
         $(base_2+'destination_instr'   ).html('&nbsp;'+cable.destination.instr);
 	};
 	this.show_cable_label = function(pidx,cidx) {
 		var cable = this.project[pidx].cable[cidx];
-		report_error('show_cable_label: '+pidx+'.'+cidx);
+		window.open('../portal/neocaptar_cable_label.php?cable_id='+cable.id,'cable label');
 	};
     this.change_cable_status = function(pidx,cidx,new_status) {
 		var params = {cable_id: this.project[pidx].cable[cidx].id, status: new_status};
@@ -1586,6 +1606,9 @@ function p_appl_projects() {
 	};
 	this.project2html = function(idx) {
 		var p = this.project[idx];
+        var location = window.location.href;
+        var i = location.indexOf('?');
+        var project_url = (-1 == i ? location : location.substr(0,i))+'?app=projects:search&project_id='+p.id;
 		var html =
 '<div class="proj-hdr" id="proj-hdr-'+idx+'" onclick="projects.toggle_project('+idx+');">'+
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e" id="proj-tgl-'+idx+'"></span></div>'+
@@ -1608,6 +1631,9 @@ function p_appl_projects() {
 '</div>'+
 '<div class="proj-con proj-hdn" id="proj-con-'+idx+'">'+
 '  <div style="padding-bottom:10px;">'+
+'    <div style="margin-bottom:4px;">'+
+'      <span style="font-weight:bold;">Project URL: </span><a class="link" target="_blank" href="'+project_url+'">'+project_url+'</a>'+
+'    </div>'+
 '    <div style="float:left; width:695px; padding:5px; background-color:#f0f0f0; border-bottom:1px solid #c0c0c0; border-right:1px solid #c0c0c0;"><pre class="proj-description" style="font-family:Lucida Grande, Lucida Sans, Arial, sans-serif" title="Click on the Edit Project Attributes button to edit this description"></pre></div>'+
 '    <div style="float:left; margin-left:10px; ">'+
 '      <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="img/EXCEL_icon.gif" /></button>'+

@@ -29,16 +29,37 @@ February 14, 2012 (short term plan)
 
 + load the dictionary as early as possible
 
-- add pinlist descriptions in the dictionary to allow adding an external URL to some
-  document. Also make pinlist values in tables as URLs to those external documents
-  (if available). Allow to modify the dictionary entries to modify those URLs.
++ add pinlist descriptions in the dictionary to allow adding an external URL to some
+  document. Allow to modify the dictionary entries to modify those URLs.
 
-- make Excel spreadsheet document compatible with their existing standard (see examples
-  on Confluence page: https://confluence.slac.stanford.edu/display/PCDS/XCS+CAPTAR%2C+%28sheets+ordered+by+cable+number%29
++ enable partial editing of cables after they're 'Registered' (got official JOB and CABLE numbers).
+  Edit only those fields which are not source and destination location names.
 
-- implement cable labels in PDF
++ implement cable labels in PDF
+
++ implement project URL which can be used to communicate between various personnel
+  involved into cable management. Within each open project add an input field with
+  the project URL which can be cut and past.
+
++ prevent non-privileged project managers from changing cable status. Only managers
+  can do so. Ordinary project managers can only create projects and edit cables.
+
++ send e-mail notifications to all administrators when a new project is created
+
++ reinforce width of input fields in dictionary and cable editor
+
+
+- test printing cable labels
+
+- (Amedeo wanted this to be deferred) make Excel spreadsheet document compatible with their
+  existing standard (see examples on Confluence page:
+  https://confluence.slac.stanford.edu/display/PCDS/XCS+CAPTAR%2C+%28sheets+ordered+by+cable+number%29
 
 - expand the history table to record changes made when editing cables
+
+- Call for workflow review meeting (Amedeo and cable people). This is meant to refine
+  the workflow process: who can do what and in which sequence. We may need to define
+   more specific roles for people who're involved into implementing the cable requests.
 
 ___________________________________________________
 December 16, 2011 (notes after a meeting with Jing)

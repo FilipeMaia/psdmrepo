@@ -38,6 +38,7 @@ function p_appl_search() {
     this.name      = 'search';
 	this.full_name = 'Search';
 	this.context   = '';
+    this.default_context = 'cables';
 
     this.select = function(context, when_done) {
 		this.context   = context;
@@ -45,7 +46,7 @@ function p_appl_search() {
 		this.init();
 	};
 	this.select_default = function() {
-		if( this.context == '' ) this.context = 'cables';
+		if( this.context == '' ) this.context = this.default_context;
 		this.init();
 	};
 	this.if_ready2giveup = function(handler2call) {
@@ -62,6 +63,11 @@ function p_appl_search() {
         that.search_cables_reset();
         $('#search-cables-form').find('input[name="cable"]').val(cablenumber);
         this.search_cables_impl({cablenumber:cablenumber});
+    };
+    this.search_cable_by_id = function(id) {
+        this.init();
+        that.search_cables_reset();
+        this.search_cables_impl({id:id});
     };
     this.search_cables_by_prefix = function(prefix) {
         this.init();
@@ -190,7 +196,7 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conn"    >&nbsp;'+c.origin.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+c.origin.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+c.origin.pinlist +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.origin.conntype,c.origin.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_right "                 ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
         html +=
 '</tr>'+
@@ -223,7 +229,7 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conn"    >&nbsp;'+c.destination.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conntype">&nbsp;'+c.destination.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_pinlist" >&nbsp;'+c.destination.pinlist +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.destination.conntype,c.destination.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight table_cell_right "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
         html +=
 '</tr>';

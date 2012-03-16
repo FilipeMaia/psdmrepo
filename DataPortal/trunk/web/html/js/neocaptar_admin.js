@@ -29,6 +29,7 @@ function p_appl_admin() {
 	this.name      = 'admin';
 	this.full_name = 'Admin';
 	this.context   = '';
+    this.default_context = 'cablenumbers';
 
     this.select = function(context,when_done) {
 		that.context   = context;
@@ -36,7 +37,7 @@ function p_appl_admin() {
 		this.init();
 	};
 	this.select_default = function() {
-		if( this.context == '' ) this.context = 'cablenumbers';
+		if( this.context == '' ) this.context = this.default_context;
 		this.init();
 	};
 	this.if_ready2giveup = function(handler2call) {

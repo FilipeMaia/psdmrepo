@@ -10,6 +10,7 @@ use DataPortal\Translator;
 use DataPortal\DataPortal;
 use DataPortal\DataPortalException;
 
+use RegDB\RegDB;
 use RegDB\RegDBException;
 
 use LogBook\LogBookException;
@@ -92,6 +93,17 @@ function pre( $str, $width=null, $color=null ) {
 	return "<pre {$color_style}>".sprintf( "%{$width}s", $str ).'</pre>';
 }
 
+function get_auto_translation($exper_id) {
+    try {
+        $regdb = RegDB::instance();
+        $regdb->begin();
+        $experiment = $regdb->find_experiment_by_id( $exper_id );
+        if( !$experiment ) report_error( 'no such experiment' );
+        $autotranslate2hdf5 = !is_null($experiment->find_param_by_name('AUTO_TRANSLATE_HDF5'));
+        $regdb->commit();
+        return $autotranslate2hdf5;
+    } catch( RegDBException $e ) { report_error( $e->toHtml()); }
+}
 /* -----------------------------
  * Begin the main algorithm here
  * -----------------------------
@@ -109,6 +121,7 @@ try {
    		print
    		'{ "Status": '.json_encode("success").
    		', "updated": '.json_encode( LusiTime::now()->toStringShort()).
+   		', "autotranslate2hdf5": '.(get_auto_translation($exper_id) ? 1 : 0).
    		', "requests": '.json_encode( $requests ).
    		'}';
 

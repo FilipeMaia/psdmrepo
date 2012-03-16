@@ -1,23 +1,27 @@
 <?php
 
 require_once( 'authdb/authdb.inc.php' );
-require_once( 'regdb/regdb.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 require_once( 'pdf-php/class.ezpdf.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use RegDB\RegDBException;
-
 use LogBook\LogBook;
 use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
 
 use FileMgr\FileMgrIfaceCtrlWs;
 use FileMgr\FileMgrIrodsWs;
 use FileMgr\FileMgrException;
+
+use RegDB\RegDBException;
 
 class Pdf {
 
@@ -636,13 +640,9 @@ try {
     $pdf->pdf()->ezTable( $table_data );
 	$pdf->stream();    
 
-} catch( AuthDBException $e ) {
-	echo $e->toHtml();
-} catch( RegDBException $e ) {
-	echo $e->toHtml();
-} catch( LogBookException $e ) {
-	echo $e->toHtml();
-} catch( FileMgrException $e ) {
-	echo $e->toHtml();
-}
+} catch( AuthDBException   $e ) { echo $e->toHtml(); }
+  catch( LogBookException  $e ) { echo $e->toHtml(); }
+  catch( LusiTimeException $e ) { echo $e->toHtml(); }
+  catch( FileMgrException  $e ) { echo $e->toHtml(); }
+  catch( RegDBException    $e ) { echo $e->toHtml(); }
 ?>

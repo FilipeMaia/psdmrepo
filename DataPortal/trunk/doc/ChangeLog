@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2012-03-16 Igor Gaponenko
+- saving results of the on-going development
+- lots of new code added, including Beam-Time Monitor
+- improved e-log in Web Portal allowing to expand/collaps messages on
+a per-day basis
+- note this isn't a stable version of NeoCaptar!
+
 Tag: V00-01-04
 2012-02-14 Igor Gaponenko
 - saving results of the on-going development
