@@ -255,8 +255,17 @@ HERE;
         /* TODO: This is very inefficient implementation. Replace it by
          * a direct SQL statement for counting rows instead!.
          */
-        return count( $this->runs( $condition )); }
+        return count( $this->runs( $condition ));
+    }
 
+    /**
+     * Find runs which began within the specified interval.
+     * 
+     * @param type $begin - optional begin time of the interval
+     * @param type $end - optional end time of the interval
+     * @param type $limit - limit the number of entries returned by the operation
+     * @return array of runs
+     */
     public function runs_in_interval ( $begin=null, $end=null, $limit=null ) {
 
         $condition = '';
@@ -273,15 +282,39 @@ HERE;
         return $this->runs( $condition, $limit_str );
     }
 
+    /**
+     * Find runs which either ended or are still going on began within
+     * the specified interval. Note that this will also include runs
+     * which are wider than the interval, i.e. started before that interval
+     * and lasting beyong that interval.
+     * 
+     * @param type $begin
+     * @param type $end
+     * @param type $limit
+     * @return type 
+     */
+    public function runs_intersecting_interval ( $begin=null, $end=null, $limit=null ) {
+
+        $b64 = is_null($begin) ? null : $begin->to64();
+        $e64 = is_null($end)   ? null : $end->to64();
+
+        $condition = '';
+
+        if(      $b64 && $e64 ) $condition = " (( begin_time < {$b64} AND end_time IS NULL ) OR ( begin_time >= {$b64} AND begin_time < {$e64})) ";
+        else if( $b64         ) $condition = " (( begin_time < {$b64} AND end_time IS NULL ) OR   begin_time >= {$b64} )";
+        else if(         $e64 ) $condition = "    begin_time < {$e64} ";
+
+        return $this->runs( $condition, is_null($limit) ? '' : ' LIMIT '.$limit );
+    }
+
     public function runs ( $condition='', $limit='' ) {
 
         $list = array();
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
-        $result = $this->connection->query(
-            "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
-            ' ORDER BY num, begin_time DESC'.$limit );
-
+        $sql = "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
+               ' ORDER BY num, begin_time DESC'.$limit;
+        $result = $this->connection->query($sql);
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
             array_push(

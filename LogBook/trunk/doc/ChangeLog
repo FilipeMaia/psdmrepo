@@ -11,6 +11,17 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-15
+2012-02-15
+- added updated implementations of the Grabber (LogBookGrabber4current4run4reply_RHEL6.py)
+and Poster (LogBookPost_RHEL6.py) which work accross all version of Python,
+including 2.4, 2.5, 2.6 and 2.7 (not tested).
+Note, that this required a non-standard package availble from:
+http://atlee.ca/software/poster/index.html
+See more information on it from:
+http://stackoverflow.com/questions/680305/using-multipartposthandler-to-post-form-data-with-python
+- fixed bugs, added a new method runs_intersecting_interval in class LogBookExperiment
+
 Tag: V00-02-07
 2012-02-14
 - added an application (app/LogBookPost.py) for posting e-log entries from
