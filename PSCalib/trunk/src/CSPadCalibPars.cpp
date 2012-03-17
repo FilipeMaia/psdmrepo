@@ -126,7 +126,7 @@ void CSPadCalibPars::getCalibFileName ()
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
       m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
     }
-    cout << "CSPadCalibPars::openCalibFile: " << m_fname << endl;
+  MsgLog("CSPadCalibPars", debug, "getCalibFileName(): " << m_fname);
 }
 
 //----------------
@@ -177,7 +177,7 @@ void CSPadCalibPars::fillCalibParsV1 ()
 void CSPadCalibPars::printCalibPars()
 {
     WithMsgLog("CSPadCalibPars", info, str) {
-      str << "CSPadCalibPars::printCSPadCalibPars()" ;
+      str << "printCSPadCalibPars()" ;
       str << "\n getColSize_um()    = " << getColSize_um() ;
       str << "\n getRowSize_um()    = " << getRowSize_um() ;
       str << "\n getGapRowSize_um() = " << getGapRowSize_um() ;
