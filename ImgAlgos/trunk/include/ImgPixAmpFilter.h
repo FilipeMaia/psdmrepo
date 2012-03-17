@@ -99,6 +99,7 @@ private:
   float    m_ymax;
   unsigned m_numpixmin;
   bool     m_filter;
+  unsigned m_print_bits;
   long     m_count;
   long     m_selected;
 

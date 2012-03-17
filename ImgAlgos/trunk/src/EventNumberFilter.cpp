@@ -77,7 +77,7 @@ EventNumberFilter::~EventNumberFilter ()
 void 
 EventNumberFilter::beginJob(Event& evt, Env& env)
 {
-  printInputParameters();
+  if( m_filter ) printInputParameters();
 }
 
 /// Method which is called at the beginning of the run
@@ -135,7 +135,8 @@ EventNumberFilter::endRun(Event& evt, Env& env)
 void 
 EventNumberFilter::endJob(Event& evt, Env& env)
 {
-   if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
+  if( !m_filter ) return;
+  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
 }
 
 //--------------------

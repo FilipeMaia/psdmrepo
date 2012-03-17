@@ -55,7 +55,8 @@ ImgPixAmpFilter::ImgPixAmpFilter (const std::string& name)
   , m_ymax()
   , m_numpixmin()
   , m_filter()
-  , m_count(0)
+  , m_print_bits()
+  , m_count(-1)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
@@ -68,6 +69,7 @@ ImgPixAmpFilter::ImgPixAmpFilter (const std::string& name)
   m_ymax       = config   ("ymax",     100000);
   m_numpixmin  = config   ("numPixMin",   100);
   m_filter     = config   ("filterIsOn", true);
+  m_print_bits= config    ("print_bits",    0);
 }
 
 //--------------
@@ -105,6 +107,7 @@ ImgPixAmpFilter::event(Event& evt, Env& env)
   m_time -> startTimeOnce();
 
   ++ m_count;
+
   if ( !m_filter )            { ++ m_selected; return; } // If the filter is OFF then event is selected
 
   if ( getAndProcImage(evt) ) { ++ m_selected; return; } // if event is selected
@@ -128,7 +131,7 @@ void
 ImgPixAmpFilter::endJob(Event& evt, Env& env)
 {
   m_time -> stopTime(m_count);
-  MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
+  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
 }
 
 //--------------------
@@ -140,17 +143,20 @@ ImgPixAmpFilter::endJob(Event& evt, Env& env)
 void 
 ImgPixAmpFilter::printInputParameters()
 {
+  if( ! (m_print_bits & 1) ) return;
+
   WithMsgLog(name(), info, log) {
     log << "\nInput parameters:"
-        << "\nsource     : "     << m_src
-	<< "\nkey        : "     << m_key      
-	<< "\nthreshold  : "     << m_threshold
-	<< "\nxmin       : "     << m_xmin     
-	<< "\nxmax       : "     << m_xmax     
-	<< "\nymin       : "     << m_ymin     
-	<< "\nymax       : "     << m_ymax     
-	<< "\nnumPixMin  : "     << m_numpixmin
-	<< "\nfilterIsOn : "     << m_filter;   
+        << "\nsource      : "     << m_src
+	<< "\nkey         : "     << m_key      
+	<< "\nthreshold   : "     << m_threshold
+	<< "\nxmin        : "     << m_xmin     
+	<< "\nxmax        : "     << m_xmax     
+	<< "\nymin        : "     << m_ymin     
+	<< "\nymax        : "     << m_ymax     
+	<< "\nnumPixMin   : "     << m_numpixmin
+        << "\nm_print_bits: "     << m_print_bits
+ 	<< "\nfilterIsOn  : "     << m_filter;   
   }
 }
 
@@ -223,7 +229,7 @@ ImgPixAmpFilter::procImage()
 	  }
 	}
 
-	MsgLog(name(), info, "Event = " << m_count-1 << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
+	if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Event = " << m_count << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
 
      if (npix_above_thr > m_numpixmin) return true;
 
