@@ -46,7 +46,7 @@ PixCoordsQuad::PixCoordsQuad ( PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCali
   , m_cspad_calibpar(cspad_calibpar)
   , m_tiltIsApplied (tiltIsApplied)
 {
-  cout << "PixCoordsQuad::PixCoordsQuad" << endl;
+  //cout << "PixCoordsQuad" << endl;
   //m_pix_coords_2x1 -> print_member_data(); 
   //m_cspad_calibpar -> printCalibPars();
 

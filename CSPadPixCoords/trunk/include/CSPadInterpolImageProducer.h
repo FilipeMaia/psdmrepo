@@ -130,7 +130,7 @@ protected:
   void getConfigPars(Env& env);
   void cspad_image_init();
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
-  void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
+  void cspad_image_add_in_event(Event& evt);
   //void cspad_image_interpolated_fill (int16_t* data[], QuadParameters* quadpars[], bool quadIsAvailable[]);
   void cspad_image_interpolated_fill (ndarray<int16_t, 3> data[], QuadParameters* quadpars[], bool quadIsAvailable[]);
 
@@ -141,12 +141,15 @@ private:
   std::string m_typeGroupName;  // i.e. CsPad::CalibV1
   std::string m_source;         // i.e. CxiDs1.0:Cspad.0
    
-  Source   m_src;         // Data source set from config file
-  Pds::Src m_actualSrc;
-  unsigned m_maxEvents;
-  bool     m_filter;
-  bool     m_tiltIsApplied;
-  long     m_count;
+  Source      m_src;            // Data source set from config file
+  Pds::Src    m_actualSrc;
+  std::string m_inkey;          // i.e. "" or "calibrated"
+  std::string m_imgkey;         // i.e. "CSPad:Image"
+  unsigned    m_maxEvents;
+  bool        m_filter;
+  bool        m_tiltIsApplied;
+  unsigned    m_print_bits;
+  long        m_count;
 
   uint32_t m_roiMask        [4];
   uint32_t m_numAsicsStored [4];

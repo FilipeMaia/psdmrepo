@@ -94,6 +94,11 @@ public:
    */
   size_t getNRows       (int Nx90=0);
 
+  /**
+   *  @brief Returns pointer to data array
+   */
+  const T* data() { return m_data; }
+
   void printImage       (int Nx90=0);
   void printEntireImage (int Nx90=0);
   void saveImageInFile  (const std::string &fname, int Nx90=0);

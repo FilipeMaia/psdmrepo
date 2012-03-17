@@ -44,7 +44,7 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
   , m_cspad_calibpar (cspad_calibpar)
   , m_tiltIsApplied  (tiltIsApplied)
 {
-  cout << "PixCoordsQuad::PixCoordsCSPad" << endl;
+  //cout << "PixCoordsQuad::PixCoordsCSPad" << endl;
   //m_pix_coords_quad -> print_member_data(); 
   //m_cspad_calibpar  -> printCalibPars();
 
@@ -142,10 +142,10 @@ void PixCoordsCSPad::fillOneQuadTiltedCoordsInCSPad(uint32_t quad)
         double tilt     = m_cspad_calibpar -> getQuadTilt(quad);
         CSPadPixCoords::PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
 
-	cout << "Quad:"       << quad
-	     << "  rotation:" << rotation
-	     << "  tilt:"     << tilt
-	     << endl;
+	//cout << "Quad:"       << quad
+	//     << "  rotation:" << rotation
+	//     << "  tilt:"     << tilt
+	//     << endl;
 
         double tiltrad = tilt * m_degToRad;
         double sintilt = sin(tiltrad);

@@ -98,10 +98,11 @@ private:
 
   std::string m_source;      // i.e. CxiDs1.0:Cspad.0
   Source      m_src;         // Data source set from config file
+  std::string m_key;         // i.e. Image2D
   Pds::Src    m_actualSrc;
   unsigned    m_maxEvents;
   unsigned    m_eventSave;
-  bool        m_filter;
+  bool        m_saveAll;
   long        m_count;
 
 };

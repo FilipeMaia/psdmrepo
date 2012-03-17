@@ -55,17 +55,23 @@ CSPadInterpolImageProducer::CSPadInterpolImageProducer (const std::string& name)
   , m_typeGroupName()
   , m_source()
   , m_src()
+  , m_inkey()
+  , m_imgkey()
   , m_maxEvents()
   , m_filter()
   , m_tiltIsApplied()
+  , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
-  m_maxEvents     = config   ("events",        32U);
+  m_inkey         = configStr("key",           "");
+  m_imgkey        = configStr("imgkey",        "Image2D");
+  m_maxEvents     = config   ("events",        1<<31U);
   m_filter        = config   ("filter",        false);
   m_tiltIsApplied = config   ("tiltIsApplied", true);
+  m_print_bits    = config   ("print_bits",    0);
   m_src           = m_source;
 }
 
@@ -110,7 +116,7 @@ CSPadInterpolImageProducer::beginRun(Event& evt, Env& env)
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
 
-  m_cspad_calibpar  -> printCalibPars();
+  if( m_print_bits & 1<<0 ) m_cspad_calibpar  -> printCalibPars();
   //m_pix_coords_2x1  -> print_member_data();
   //m_pix_coords_quad -> print_member_data(); 
 
@@ -118,7 +124,7 @@ CSPadInterpolImageProducer::beginRun(Event& evt, Env& env)
 
   this -> fill_address_table_1();
   this -> fill_address_and_weights_of_4_neighbors();
-  cout << "CSPadInterpolImageProducer::beginRun: Initialization is done!!!\n";
+  if( m_print_bits & 1<<0 ) MsgLog(name(), info, "CSPadInterpolImageProducer::beginRun: Initialization is done!!!");
 }
 
 //--------------------
@@ -145,7 +151,7 @@ CSPadInterpolImageProducer::getConfigPars(Env& env)
   ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
   m_addr_empty = (ArrAddr){-1,-1,-1,-1};
-  cout << "TEST: m_addr_empty = " << m_addr_empty << endl;
+  if( m_print_bits & 1<<2 ) cout << "TEST: m_addr_empty = " << m_addr_empty << endl;
 
 }
 
@@ -173,7 +179,7 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
     int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
     //-------------------- Time
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, m_inkey, &m_actualSrc); // get m_actualSrc here
 
   if (data2.get()) {
 
@@ -201,14 +207,16 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
 
     this -> cspad_image_init ();
     this -> cspad_image_interpolated_fill (data, quadpars, quadIsAvailable);
-    this -> cspad_image_add_in_event(evt,"CSPad:Image");
+    this -> cspad_image_add_in_event(evt);
 
     //-------------------- Time
-    status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-    cout << "  Event: " << m_count 
-         << "  Time to fill cspad is " 
-         << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-         << " sec" << endl;
+    if( m_print_bits & 1<<1 ) {
+      status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
+      cout << "  Event: " << m_count 
+           << "  Time to fill cspad is " 
+           << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+           << " sec" << endl;
+    }
     //-------------------- Time
 
   } // if (data2.get())
@@ -319,7 +327,7 @@ CSPadInterpolImageProducer::fill_address_table_1()
     } // sect
     } // quad
 
-    cout << "TEST: m_address_table_1[100][100] = " << m_address_table_1[100][100] << endl;
+    if( m_print_bits & 1<<2 ) cout << "TEST: m_address_table_1[100][100] = " << m_address_table_1[100][100] << endl;
 }
 
 //--------------------
@@ -368,14 +376,14 @@ CSPadInterpolImageProducer::fill_address_and_weights_of_4_neighbors()
     }
     }
 
-    cout << "TEST: m_address[100][100][...] : \n" 
+    if( m_print_bits & 1<<2 ) cout << "TEST: m_address[100][100][...] : \n" 
          << "      [0]:" << m_address[100][100][0] 
          << "      [1]:" << m_address[100][100][1] 
          << "      [2]:" << m_address[100][100][2] 
          << "      [3]:" << m_address[100][100][3] 
          << endl;
 
-    cout << "TEST: m_weight[100][100][...] : " 
+    if( m_print_bits & 1<<2 ) cout << "TEST: m_weight[100][100][...] : " 
          << " [0]:" << m_weight[100][100][0] 
          << " [1]:" << m_weight[100][100][1] 
          << " [2]:" << m_weight[100][100][2] 
@@ -483,7 +491,7 @@ CSPadInterpolImageProducer::get_weight_of_4_neighbors(unsigned ix, unsigned iy)
      m_weight [ix][iy][3] = dxdy; 
 
      /*
-     cout << "TEST:"
+     if( m_print_bits & 1<<2 ) cout << "TEST:"
           << " ix="  << ix
           << " iy="  << iy
           << " x00=" << x00
@@ -573,10 +581,20 @@ CSPadInterpolImageProducer::cspad_image_save_in_file(const std::string &filename
   * Add the CSPad image array in the event.
   */ 
 void
-CSPadInterpolImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
+CSPadInterpolImageProducer::cspad_image_add_in_event(Event& evt)
 {
-  shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
-  evt.put(img2d, m_actualSrc, keyname);
+  if(m_imgkey == "Image2D") {
+
+    shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
+    evt.put(img2d, m_actualSrc, m_imgkey);
+
+  } else {
+
+    const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
+    shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(&m_arr_cspad_image[0][0],shape) );
+    evt.put(img2d, m_actualSrc, m_imgkey);
+  }
+
 }
 
 //--------------------

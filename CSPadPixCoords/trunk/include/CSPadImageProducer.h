@@ -112,7 +112,7 @@ protected:
   void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   //void cspad_image_fill (const ndarray<int16_t, 3>& data, const QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
-  void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
+  void cspad_image_add_in_event(Event& evt);
 
 private:
 
@@ -123,10 +123,12 @@ private:
    
   Source   m_src;         // Data source set from config file
   Pds::Src m_actualSrc;
-  std::string m_key; 
+  std::string m_inkey; 
+  std::string m_imgkey;   // i.e. "CSPad:Image"
   unsigned m_maxEvents;
   bool     m_filter;
   bool     m_tiltIsApplied;
+  unsigned m_print_bits;
   long     m_count;
 
   uint32_t m_roiMask        [4];
