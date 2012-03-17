@@ -10,7 +10,11 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-
+	
+Tag: V00-02-02
+2012-03-17 Mikhail S. Dubrovin
+- In many modules the "greeting" printout is commented or moved in the debug mode.
+	
 Tag: V00-02-01
 2012-01-19 Mikhail S. Dubrovin
 - in all psana modules replace the pointer by ndarray. 
