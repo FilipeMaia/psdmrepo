@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-11
+2012-02-19
+- added another version of the Grabber supporting user-selected tag:
+LogBookGrabber4current4run4replyTagsJSON_RHEL6.py
+
 Tag: V00-02-10
 2012-02-16
 - a minor bug fix in the new Grabber
