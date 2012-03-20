@@ -19,12 +19,12 @@
 // C/C++ Headers --
 //-----------------
 #include <math.h> // for exp
+#include <fstream> // for ofstream
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-//#include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/camera.ddl.h"
 #include "PSEvt/EventId.h"
 //#include "PSTime/Time.h"
@@ -34,9 +34,10 @@
 //-----------------------------------------------------------------------
 #include <iomanip> // for setw, setfill
 #include <sstream> // for streamstring
-
+#include <iostream>// for setf
 
 // This declares this class as psana module
+using namespace std;
 using namespace ImgAlgos;
 PSANA_MODULE_FACTORY(ImgPeakFinder)
 
@@ -63,8 +64,9 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   , m_xmax()
   , m_ymin()
   , m_ymax()
-  , m_filter()
+  , m_finderIsOn()
   , m_event()
+  , m_print_bits()
   , m_count(0)
   , m_selected(0)
 {
@@ -82,7 +84,8 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   m_ymin       = config   ("ymin",              0);
   m_ymax       = config   ("ymax",         100000);
   m_event      = config   ("testEvent",         0);
-  m_filter     = config   ("filterIsOn",     true);
+  m_finderIsOn = config   ("finderIsOn",     true);
+  m_print_bits = config   ("print_bits",        0);
   m_source     = m_src;
 }
 
@@ -104,7 +107,11 @@ ImgPeakFinder::beginJob(Event& evt, Env& env)
 void 
 ImgPeakFinder::beginRun(Event& evt, Env& env)
 {
-  printInputParameters();
+  evaluateWeights();
+  if( m_print_bits & 1<<0 ) {
+    printInputParameters();
+    printWeights();
+  }
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -121,7 +128,7 @@ ImgPeakFinder::event(Event& evt, Env& env)
   m_time -> startTimeOnce();
 
   ++ m_count;
-  if ( !m_filter )            { ++ m_selected; return; } // If the filter is OFF then event is selected
+  if ( !m_finderIsOn )        { ++ m_selected; return; } // If the filter is OFF then event is selected
 
   if ( getAndProcImage(evt) ) { ++ m_selected; return; } // if event is selected
   else                        { skip();        return; } // if event is discarded
@@ -144,7 +151,7 @@ void
 ImgPeakFinder::endJob(Event& evt, Env& env)
 {
   m_time -> stopTime(m_count);
-  MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
+  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
 }
 
 //--------------------
@@ -152,7 +159,7 @@ ImgPeakFinder::endJob(Event& evt, Env& env)
 //--------------------
 //--------------------
 
-/// Print input parameters
+// Print input parameters
 void 
 ImgPeakFinder::printInputParameters()
 {
@@ -171,7 +178,8 @@ ImgPeakFinder::printInputParameters()
 	<< "\n ymin       : "     << m_ymin     
 	<< "\n ymax       : "     << m_ymax     
 	<< "\n event      : "     << m_event     
-	<< "\n filterIsOn : "     << m_filter;   
+	<< "\n print_bits : "     << m_print_bits     
+	<< "\n finderIsOn : "     << m_finderIsOn;   
   }
 }
 
@@ -184,22 +192,23 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 
   shared_ptr< CSPadPixCoords::Image2D<double> > img2d = evt.get(m_src, m_key, &m_actualSrc); 
   if (img2d.get()) {
-    MsgLog(name(), info, "::procImage(...): Get image as Image2D<double>");
+    if( m_print_bits & 1<<4 ) MsgLog(name(), info, "getAndProcImage(...): Get image as Image2D<double>");
     m_img2d = img2d.get();
     const unsigned shape[] = {m_img2d->getNRows(), m_img2d->getNCols()};
     m_ndarr = new ndarray<double,2>(m_img2d->data(), shape);
-    return procImage();
+    return procImage(evt);
   }
 
   shared_ptr< ndarray<double,2> > img = evt.get(m_src, m_key, &m_actualSrc);
   if (img.get()) {
-    MsgLog(name(), info, "::procImage(...): Get image as ndarray<double,2>");
+    if( m_print_bits & 1<<4 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<double,2>");
     m_img2d = new CSPadPixCoords::Image2D<double>(img->data(), img->shape()[0], img->shape()[1]);
     m_ndarr = img.get();
-    return procImage();
+    return procImage(evt);
   }
 
-  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_source);
+  //shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_source);
+  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_source, "", &m_actualSrc);
   if (frmData.get()) {
 
     //unsigned h      = frmData->height();
@@ -212,19 +221,19 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 
       const ndarray<uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
-
+        if( m_print_bits & 1<<4 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint8_t,2>");
 	const unsigned *shape = data8.shape();
 	ndarray<uint8_t, 2>::const_iterator cit;
 	for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
 
         m_ndarr = new ndarray<double,2>(p_data, shape);
         m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
-        return procImage();
+        return procImage(evt);
       }
 
       const ndarray<uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
-
+        if( m_print_bits & 1<<4 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint16_t,2>");
 	const unsigned *shape = data16.shape();
 	ndarray<uint16_t, 2>::const_iterator cit;
 	// This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
@@ -232,7 +241,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 
         m_ndarr = new ndarray<double,2>(p_data, shape);
         m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
-        return procImage();
+        return procImage(evt);
       }
   }
 
@@ -241,7 +250,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 
 //--------------------
 
-/// Use input parameters and image dimensions and set the window range
+// Use input parameters and image dimensions and set the window range
 void 
 ImgPeakFinder::setWindowRange()
 {
@@ -266,24 +275,23 @@ ImgPeakFinder::setWindowRange()
     if (m_colmax < MARGIN1          ) m_colmax = MARGIN1;
     if (m_colmin >= m_ncols-MARGIN1 ) m_colmin = m_ncols-MARGIN1;
     if (m_colmax >= m_ncols-MARGIN  ) m_colmax = m_ncols-MARGIN;
-
-    evaluateWeights();
 }
 
 //--------------------
 
 bool
-ImgPeakFinder::procImage()
+ImgPeakFinder::procImage(Event& evt)
 {
+    m_Peaks.clear();
     setWindowRange();
     saveImageInFile0();
     initImage();         // non-zero pixels only in window above the lower threshold
     saveImageInFile1();
     smearImage();        // convolution with Gaussian
-    //smearImage();      // convolution with Gaussian
     saveImageInFile2();
-
-    //findPeaks();       // above higher threshold as a maximal in the center of 3x3 or 5x5 
+    findPeaks();         // above higher threshold as a maximal in the center of 3x3 or 5x5 
+    savePeaksInEvent(evt);
+    savePeaksInFile();
     return true;
 }
 
@@ -334,9 +342,9 @@ ImgPeakFinder::initImage()
 
   for (size_t r = m_rowmin; r < m_rowmax; r++) {
     for (size_t c = m_colmin; c < m_colmax; c++) {
-  	    ind = r*m_ncols + c;
-          val = p_data[ind];
-  	    m_work_arr[ind] = (val > m_thr_low) ? val : 0;
+      ind = r*m_ncols + c;
+      val = p_data[ind];
+      m_work_arr[ind] = (val > m_thr_low) ? val : 0;
     }
   }
   m_work2d = new CSPadPixCoords::Image2D<double>(&m_work_arr[0], m_nrows, m_ncols);
@@ -348,12 +356,10 @@ void
 ImgPeakFinder::smearImage()
 {
   unsigned ind=0;
-  const double *p_work = m_work2d->data();
-
   for (size_t r = m_rowmin; r < m_rowmax; r++) {
     for (size_t c = m_colmin; c < m_colmax; c++) {
-  	    ind = r*m_ncols + c;
-  	    if (p_work[ind]>0) m_work_arr[ind] = smearPixAmp(r,c);
+      ind = r*m_ncols + c;
+      if (m_work_arr[ind]>m_thr_low) m_work_arr[ind] = smearPixAmp(r,c);
     }
   }
 }
@@ -361,7 +367,7 @@ ImgPeakFinder::smearImage()
 //--------------------
 // Smearing of a single-pixel ampliude
 double 
-ImgPeakFinder::smearPixAmp(size_t r0, size_t c0)
+ImgPeakFinder::smearPixAmp(size_t& r0, size_t& c0)
 {
   double sum_aw = 0;
   double sum_w  = 0;
@@ -379,16 +385,131 @@ ImgPeakFinder::smearPixAmp(size_t r0, size_t c0)
       sum_aw += p_data[ind] * w;
 
       //cout << "dr, dc, ind, w=" << dr << " " << dc << " " << ind << " " << w << endl;
-
    }
   }
   return sum_aw / sum_w;
 }
 
 //--------------------
+// Find peaks in the image
+void 
+ImgPeakFinder::findPeaks()
+{
+  for (size_t r = m_rowmin; r < m_rowmax; r++) {
+    for (size_t c = m_colmin; c < m_colmax; c++) {
+      if (m_work_arr[r*m_ncols + c] > m_thr_high) checkIfPixIsPeak(r,c);
+    }
+  }
+
+  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Found number of peaks:" << m_Peaks.size() ) ;
+}
+
+//--------------------
+// Check if the pixel ampliude is a maximal in the surrounding matrix
+bool
+ImgPeakFinder::checkIfPixIsPeak(size_t& r0, size_t& c0)
+{
+  double   a0    = m_work_arr[r0*m_ncols + c0];
+  double   a     = 0;
+  double   sum_a = 0;
+  unsigned n_pix = 0;
+  //const double *p_data = m_img2d->data();
+
+  for (int dr = -m_npeak; dr <= m_npeak; dr++) { size_t r = r0 + dr;
+    for (int dc = -m_npeak; dc <= m_npeak; dc++) { size_t c = c0 + dc;
+
+      //a = p_data[ind];
+      a = m_work_arr[r*m_ncols + c];
+
+      if( a > a0 ) return false; // This is not a local peak...
+
+      if( a > m_thr_low ) {
+        sum_a += a;
+        n_pix += 1;
+      }
+    }
+  }
+
+  // Save the peak info here ----------
+  if( m_print_bits & 1<<3 ) printPeakInfo(r0, c0, a0, sum_a, n_pix );
+  savePeakInfo(r0, c0, a0, sum_a, n_pix );
+  return true;
+}
+
+//--------------------
+// Print peak info
+void 
+ImgPeakFinder::printPeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
+{
+    MsgLog(name(), info, "Peak is found: r0="    << row 
+                                    << " c0="    << col
+                                    << " a0="    << amp
+                                    << " sum_a=" << amp_tot 
+	                            << " n_pix=" << npix; );
+}
+
+//--------------------
+// Save peak info in vector
+void 
+ImgPeakFinder::savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
+{
+  Peak onePeak;
+  onePeak.x      = col;
+  onePeak.y      = row; 
+  onePeak.ampmax = amp;
+  onePeak.amptot = amp_tot;
+  onePeak.npix   = npix;  
+
+  m_Peaks.push_back(onePeak);
+}
+
+//--------------------
+// Save peak vector in the event
+void 
+ImgPeakFinder::savePeaksInEvent(Event& evt)
+{
+  shared_ptr< vector<Peak> > sppeaks( new vector<Peak>(m_Peaks) );
+  if( m_Peaks.size() > 0 ) evt.put(sppeaks, m_actualSrc, m_peaksKey);
+}
+
+//--------------------
+// Save peak vector info in the file for test event
+void 
+ImgPeakFinder::savePeaksInFile()
+{
+  if(m_count != m_event ) return;
+
+  string fname; fname = "image_peaks_ev" + stringEventN() + ".txt";
+  MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
+
+  ofstream file; 
+  file.open(fname.c_str(),ios_base::out);
+
+  for( vector<Peak>::const_iterator itv  = m_Peaks.begin();
+                                    itv != m_Peaks.end(); itv++ ) {
+
+    if( m_print_bits & 1<<4 ) 
+      cout << "  x="      << itv->x     
+           << "  y="      << itv->y     
+           << "  ampmax=" << itv->ampmax
+           << "  amptot=" << itv->amptot
+           << "  npix="   << itv->npix  
+           << endl; 
+
+    file << itv->x        << "  "
+         << itv->y	  << "  "
+         << itv->ampmax	  << "  "
+         << itv->amptot	  << "  "
+         << itv->npix     << endl; 
+  }
+
+  file.close();
+}
+
+//--------------------
 // Get smearing weight
 double 
-ImgPeakFinder::weight(int dr, int dc)
+ImgPeakFinder::weight(int& dr, int& dc)
 {
   return m_weights[abs(dr)][abs(dc)];
 }
@@ -398,25 +519,32 @@ ImgPeakFinder::weight(int dr, int dc)
 void 
 ImgPeakFinder::evaluateWeights()
 {
-  WithMsgLog(name(), info, log) { log << "::evaluateWeights():";
+    for (int r = 0; r <= m_nsm; r++) {
+      for (int c = 0; c <= m_nsm; c++) {
+        m_weights[r][c] = exp( -0.5*(r*r+c*c) / (m_sigma*m_sigma) );
+      }
+    }
+}
+
+//--------------------
+// Define smearing weighting matrix
+void 
+ImgPeakFinder::printWeights()
+{
+  WithMsgLog(name(), info, log) { log << "printWeights() - Weights for smearing";
     for (int r = 0; r <= m_nsm; r++) {
           log << "\n   row=" << r << ":     "; 
       for (int c = 0; c <= m_nsm; c++) {
-        m_weights[r][c] = exp( -0.5*(r*r+c*c) / (m_sigma*m_sigma) );
-          log << "   " << m_weights[r][c];       
+	  stringstream ssWeight; ssWeight.ios_base::setf(ios::left);
+          ssWeight << setw(10) << m_weights[r][c];
+          log << ssWeight.str();       
       }
     }
   } // WithMsgLog 
 }
 
 //--------------------
-//--------------------
-//--------------------
-//--------------------
-//--------------------
-//--------------------
-//--------------------
-//--------------------
-
 
 } // namespace ImgAlgos
+
+//---------EOF--------

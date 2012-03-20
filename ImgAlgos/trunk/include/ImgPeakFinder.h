@@ -50,6 +50,17 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
+struct Peak{
+   double x;
+   double y; 
+   double ampmax;
+   double amptot;
+   unsigned npix;
+   // ? double s1;
+   // ? double s2; 
+   // ? double tilt_angle;  
+} ;
+
 class ImgPeakFinder : public Module {
 public:
 
@@ -86,15 +97,22 @@ protected:
   void   setWindowRange();
   void   initImage();
   void   smearImage();
-  double smearPixAmp(size_t r0, size_t c0);
-  double weight(int dr, int dc);
+  double smearPixAmp(size_t& r0, size_t& c0);
+  double weight(int& dr, int& dc);
   void   evaluateWeights();
+  void   printWeights();
   void   saveImageInFile0();
   void   saveImageInFile1();
   void   saveImageInFile2();
   string stringEventN();
   bool   getAndProcImage(Event& evt);
-  bool   procImage();
+  bool   procImage(Event& evt);
+  void   findPeaks();
+  bool   checkIfPixIsPeak(size_t& r0, size_t& c0);
+  void   printPeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
+  void   savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
+  void   savePeaksInEvent(Event& evt);
+  void   savePeaksInFile();
 
 private:
 
@@ -115,8 +133,9 @@ private:
   float    m_xmax;
   float    m_ymin;
   float    m_ymax;
-  bool     m_filter;
+  bool     m_finderIsOn;
   long     m_event;
+  unsigned m_print_bits;
   long     m_count;
   long     m_selected;
 
@@ -136,6 +155,7 @@ private:
   double m_data_arr[MAX_IMG_SIZE];
   double m_work_arr[MAX_IMG_SIZE];
   TimeInterval *m_time;
+  vector<Peak> m_Peaks;
 };
 
 } // namespace ImgAlgos
