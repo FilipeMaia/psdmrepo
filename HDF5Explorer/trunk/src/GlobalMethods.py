@@ -252,7 +252,12 @@ def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16
 #----------------------------------
 
 def getListOfFilesInDir(dirname) :
-    return os.listdir(dirname)
+    list = []
+    try: 
+        return os.listdir(dirname)
+    except OSError:
+        print "WARNING: check the directory:" + dirname
+        return list
 
 #----------------------------------
 
