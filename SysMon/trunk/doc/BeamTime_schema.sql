@@ -26,6 +26,8 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_RUNS` (
   `end_time`   BIGINT UNSIGNED NOT NULL ,
   `exper_id`   INT             NOT NULL ,
   `runnum`     INT             NOT NULL ,
+  `exper_name` VARCHAR(255)    NOT NULL ,
+  `instr_name` VARCHAR(255)    NOT NULL ,
   INDEX `BEAMTIME_RUNS_BEGIN_TIME` (`begin_time`) ,
   INDEX `BEAMTIME_RUNS_END_TIME` (`begin_time`) ,
   UNIQUE KEY `run` (`exper_id`, `runnum`))
@@ -53,6 +55,7 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_COMMENTS` (
   `post_time`      BIGINT UNSIGNED NOT NULL ,
   `posted_by_uid`  VARCHAR(32)     NOT NULL ,
   `comment`        TEXT            NOT NULL ,
+  `system`         VARCHAR(255)    NOT NULL ,
   INDEX `BEAMTIME_COMMENTS_GAP_BEGIN_TIME` (`gap_begin_time`))
 ENGINE = InnoDB;
 
