@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-56
+2012-03-22 Andy Salnikov
+- upgrade to pdsdata V03-03-04
+  - new DEvice/Detector enums in DetInfo
+
 Tag: V00-00-54
 2012-03-14 Andy Salnikov
 - forgot to update TypeId and test
