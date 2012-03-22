@@ -11,6 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2012-03-21 Mikhail S. Dubrovin
+- add modules:
+         ImgPeakFinder.cpp
+         ImgPeakFilter.cpp
+- Add scripts for psana and graphical presentation of results
+         ImgAlgos/data
+         ImgAlgos/data/psana.cfg
+         ImgAlgos/data/PlotCameraImageFromFile.py
+         ImgAlgos/data/PlotCameraImageAndPeaks.py
+
 Tag: V00-00-01
 2012-03-17 Mikhail S. Dubrovin
 	- add EventNumberFilter.cpp
