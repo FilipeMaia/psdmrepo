@@ -399,7 +399,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.CxiSc1, 35 )
         self.assertEqual ( DetInfo.Detector.CxiDsd, 36 )
         self.assertEqual ( DetInfo.Detector.XcsBeamline, 37 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 38 )
+        self.assertEqual ( DetInfo.Detector.CxiSc2, 38 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 39 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )
@@ -419,7 +420,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Gsc16ai, 15 )
         self.assertEqual ( DetInfo.Device.Phasics, 16 )
         self.assertEqual ( DetInfo.Device.Timepix, 17 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 18 )
+        self.assertEqual ( DetInfo.Device.Opal2000, 18 )
+        self.assertEqual ( DetInfo.Device.Opal4000, 19 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 20 )
 
         
         o1 = DetInfo(0,0,0,0)

@@ -86,6 +86,7 @@ namespace {
       { "CxiSc1",      Pds::DetInfo::CxiSc1 },
       { "CxiDsd",      Pds::DetInfo::CxiDsd },
       { "XcsBeamline", Pds::DetInfo::XcsBeamline },
+      { "CxiSc2",      Pds::DetInfo::CxiSc2 },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -126,6 +127,8 @@ namespace {
       { "Gsc16ai",   Pds::DetInfo::Gsc16ai },
       { "Phasics",   Pds::DetInfo::Phasics },
       { "Timepix",   Pds::DetInfo::Timepix },
+      { "Opal2000",  Pds::DetInfo::Opal2000 },
+      { "Opal4000",  Pds::DetInfo::Opal4000 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };
