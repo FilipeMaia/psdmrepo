@@ -6,6 +6,7 @@
 # external application.
 # --------------------------------------------------------------
 
+import os
 import sys
 import time
 import subprocess
@@ -18,6 +19,7 @@ connect_timeout_sec   =  1.0
 get_timeout_sec       =  1.0
 sampling_interval_sec =  2.0
 force_interval_sec    = 10.0
+num_hearbeats2keep    =  1
 
 def get_pv(pvname):
     """
@@ -35,9 +37,10 @@ def get_pv(pvname):
     pv.disconnect()
     return value
 
-def store_pv(pvname,value,force=False):
-    cmd = ['python','LCLSBeamTimeStore.py',pvname,str(value)]
+def store_pv(pvname,value,force=False,num2keep=None):
+    cmd = ['python',"%s/LCLSBeamTimeStore.py" % os.path.dirname(__file__),pvname,str(value)]
     if force: cmd.append('-force')
+    if num2keep: cmd.extend(['-keep',str(num2keep)])
     subprocess.call(cmd)
 
 if __name__ == '__main__':
@@ -71,7 +74,7 @@ if __name__ == '__main__':
                 if value is not None:
                     store_pv(pvname,value)
 
-            store_pv('HEARTBEAT'," ".join(pvnames),force)
+            store_pv('HEARTBEAT'," ".join(pvnames),force,num_hearbeats2keep)
 
         except pyca.pyexc, e:
             print 'pyca exception:', e

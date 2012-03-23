@@ -39,15 +39,15 @@ if ! python -V 2>&1 | /bin/egrep -q 'Python 2.5' ; then
 fi
 
 if [[ -z "$PYTHONPATH" ]] ; then
-    export PYTHONPATH=/reg/neh/home/gapon/lib/amd64_linux26/lib/python2.5/site-packages/
+    export PYTHONPATH=/reg/g/pcds/pds/sysmon/lib/python2.5/site-packages/
 else
-    export PYTHONPATH=$PYTHONPATH:/reg/neh/home/gapon/lib/amd64_linux26/lib/python2.5/site-packages/
+    export PYTHONPATH=$PYTHONPATH:/reg/g/pcds/pds/sysmon/lib/python2.5/site-packages/
 fi
 
 # Check that all scripts needed by the Monitor are
 # available.
 #
-BASEDIR=$PWD
+BASEDIR=`dirname $0`/
 
 WATCH=LCLSBeamTimeWatch.py
 if [ ! -x $BASEDIR/$WATCH ] ; then

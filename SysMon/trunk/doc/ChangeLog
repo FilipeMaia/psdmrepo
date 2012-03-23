@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2012-03-22 Igor Gaponenko
+- added documentation
+- modified the driver script to be ready for the final deployement
+
 Tag: V00-00-02
 2012-03-21 Igor Gaponenko
 - the first implementation of the beam-time monitor is complete now.

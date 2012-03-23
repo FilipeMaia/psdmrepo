@@ -147,7 +147,7 @@ def get_pv_value_last(pv,scope):
    if not row: return None
    return (pv,scope,int(row['timestamp']),row['value'],)
 
-def store_pv(pv,scope,value,force=False):
+def store_pv(pv,scope,value,force=False,last_records2keep=None):
 
     """
     Store a value of the PV if either of the following is true:
@@ -159,7 +159,12 @@ def store_pv(pv,scope,value,force=False):
     The method will always return the latest value stored in the database,
     regardeless if it was stored by the current invocation of the method
     or it's been loaded from the database. The result list returned by
-    the method is the same as explained in function get_pv_value_last(). 
+    the method is the same as explained in function get_pv_value_last().
+
+    Optionally, if the last parameters is provided the function will
+    all so clean all previous entries of the PV from the database to keep
+    no more than the number specified in the parameter. 
+
     """
 
     last_entry = get_pv_value_last(pv,scope)
@@ -169,6 +174,14 @@ def store_pv(pv,scope,value,force=False):
         now = __now_64()
         __do_sql("INSERT INTO pv_val VALUES(%d,%d,'%s')" % (id,now,__escape_string(value_as_str)))
         last_entry = get_pv_value_last(pv,scope)
+
+    if last_records2keep:
+        id = get_pv_id(pv,scope)
+        rows = __do_select_many("SELECT timestamp FROM pv_val WHERE pv_id=%d ORDER BY timestamp DESC" % (id,))
+        if len(rows) > last_records2keep:
+            first_timestamp_2keep = rows[last_records2keep]['timestamp']
+            __do_sql("DELETE FROM pv_val WHERE pv_id=%d AND timestamp <= %d" % (id,first_timestamp_2keep,))
+
     return last_entry
 
 # -------------------------
@@ -177,7 +190,7 @@ def store_pv(pv,scope,value,force=False):
 
 def usage_and_exit(msg=None):
     if msg is not None: print msg
-    print "usage: %s <pvname> <value> [-force]" % sys.argv[0]
+    print "usage: %s <pvname> <value> [-force][-keep <last_records>]" % sys.argv[0]
     sys.exit(1)
 
 if __name__ == '__main__':
@@ -188,15 +201,40 @@ if __name__ == '__main__':
     pvname,value = sys.argv[1:3]
 
     force = False
+    last_records2keep = None  ## keep them all
+
     if len(sys.argv) > 3:
-        if sys.argv[3] != '-force':
-            usage_and_exit("unknown argument where -force expected")
-        force = True
+        numArgs = len(sys.argv) - 3
+        nextArg = 3
+        while numArgs:
+
+            optName = sys.argv[nextArg]
+            numArgs = numArgs - 1
+            nextArg = nextArg + 1
+
+            if optName == '-force':
+                force = True
+
+            elif optName == '-keep':
+
+                if not numArgs:
+                    usage_and_exit("missing value for option %s" % optName)
+                optValue = int(sys.argv[nextArg])
+
+                last_records2keep = int(sys.argv[nextArg])
+                numArgs = numArgs - 1
+                nextArg = nextArg + 1
+
+                if not last_records2keep:
+                    usage_and_exit("option %s should have a non-zero value" % optName)
+
+            else:
+                usage_and_exit("unknown option %s" % optName)
 
     scope = 'BeamTime'
 
     try:
-    	store_pv(pvname,scope,value,force)
+    	store_pv(pvname,scope,value,force,last_records2keep)
 
     except db.Error, e:
         print 'MySQL operation failed because of:', e
