@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "tables"
-pkg_ver = "2.1.2"
+pkg_ver = "2.1.2-1.8.6"
 PREFIX  = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
 
 PYDIR = "lib"
