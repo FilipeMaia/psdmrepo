@@ -61,6 +61,18 @@ def _vmsize():
     fname = '/proc/%d/stat' % os.getpid() 
     return int(file(fname).read().split()[22])
 
+def _gc(gc_debug, gc_threshod, vmsize):
+    # explicitly run garbage collector if memory grows too much
+    if gc_debug: logging.debug("VM size: %.2fMB", _vmsize()/1048576.)
+    if gc_threshod > 0:
+        newvmsize = _vmsize()
+        if newvmsize - vmsize > gc_threshod*1048576:
+            logging.debug("running garbage collector, virtual size: %.2fMB", newvmsize/1048576.)
+            gc.collect()
+            vmsize = _vmsize()
+            logging.debug("virtual size after GC: %.2fMB", vmsize/1048576.)
+    return vmsize
+
 def _rusage(msg, ru1, ru2):
     
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
@@ -146,14 +158,7 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
             break
 
         # explicitly run garbage collector if memory grows too much
-        if gc_debug: logging.info("VM size: %d", _vmsize())
-        if gc_threshod > 0:
-            newvmsize = _vmsize()
-            if newvmsize - vmsize > gc_threshod*1048576:
-                logging.debug("running garbage collector, virtual size: %d", newvmsize)
-                gc.collect()
-                vmsize = _vmsize()
-                logging.debug("virtual size after GC: %d", vmsize)
+        vmsize = _gc(gc_debug, gc_threshod, vmsize)
             
     # done with the environment
     env.finish()
@@ -249,14 +254,7 @@ def _pyana ( argv ) :
         for dg, fileName, fpos in dgramGen( names ) :
 
             # explicitly run garbage collector if memory grows too much
-            if gc_debug: logging.info("VM size: %d", _vmsize())
-            if gc_threshod > 0:
-                newvmsize = _vmsize()
-                if newvmsize - vmsize > gc_threshod*1048576:
-                    logging.debug("running garbage collector, virtual size: %d", newvmsize)
-                    gc.collect()
-                    vmsize = _vmsize()
-                    logging.debug("virtual size after GC: %d", vmsize)
+            vmsize = _gc(gc_debug, gc_threshod, vmsize)
     
             if num_events is not None and nevent >= num_events+skip_events :
                 logging.info("event limit reached (%d), terminating", nevent)

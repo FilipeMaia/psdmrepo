@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-45
+2012-03-26 Andy Salnikov
+- garbage collector had trouble collection after I added circular 
+  references from Event to bound methods to Event
+- breaking ref loop, it should work better now. 
+
 Tag: V00-00-44
 2012-03-12 Andy Salnikov
 - add "skip-epics" option to pyana, default is true, if set to false

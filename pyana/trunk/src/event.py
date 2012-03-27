@@ -114,14 +114,6 @@ class Event(object):
         self.m_userData = {}
         self.m_status = Event.Normal
         
-        # set of wrapper methods
-        self.m_wrappers = {
-            xtc.TypeId.Type.Id_Gsc16aiData: self._wrapGsc16aiData,
-            xtc.TypeId.Type.Id_AcqWaveform: self._wrapAcqirisData,
-            xtc.TypeId.Type.Id_pnCCDframe: self._wrapPnCcdData,
-            xtc.TypeId.Type.Id_PrincetonFrame: self._wrapPrincetonData,
-            xtc.TypeId.Type.Id_CspadElement: self._wrapCsPadQuads,
-            }
 
     def run(self) :
         """ self.run() -> int
@@ -271,7 +263,18 @@ class Event(object):
 
         # find a wrapper method for typeId
         typeId = xtcObj.contains.id()
-        wrapper = self.m_wrappers.get(typeId)
+        wrapper = None
+        if typeId == xtc.TypeId.Type.Id_Gsc16aiData:
+            wrapper = self._wrapGsc16aiData
+        elif typeId == xtc.TypeId.Type.Id_AcqWaveform:
+            wrapper = self._wrapAcqirisData
+        elif typeId == xtc.TypeId.Type.Id_pnCCDframe:
+            wrapper = self._wrapPnCcdData
+        elif typeId == xtc.TypeId.Type.Id_PrincetonFrame:
+            wrapper = self._wrapPrincetonData
+        elif typeId == xtc.TypeId.Type.Id_CspadElement:
+            wrapper = self._wrapCsPadQuads
+
         if wrapper:
             return wrapper(obj, typeId, xtcObj.contains.version(), xtcObj.src)
         else:
