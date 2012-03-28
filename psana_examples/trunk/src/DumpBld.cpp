@@ -58,6 +58,12 @@ DumpBld::~DumpBld ()
 {
 }
 
+void
+DumpBld::beginJob(Event& evt, Env& env)
+{
+  event(evt, env);
+}
+
 // Method which is called with event data
 void 
 DumpBld::event(Event& evt, Env& env)
@@ -104,6 +110,24 @@ DumpBld::event(Event& evt, Env& env)
           << "\n  ebeamLTUAngY=" << ebeam2->ebeamLTUAngY()
           << "\n  ebeamPkCurrBC2=" << ebeam2->ebeamPkCurrBC2()
           << "\n  ebeamEnergyBC2=" << ebeam2->ebeamEnergyBC2();
+    }
+  }
+
+  shared_ptr<Psana::Bld::BldDataEBeamV3> ebeam3 = evt.get(m_ebeamSrc);
+  if (ebeam3.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataEBeamV3:"
+          << "\n  damageMask=" << ebeam3->damageMask()
+          << "\n  ebeamCharge=" << ebeam3->ebeamCharge()
+          << "\n  ebeamL3Energy=" << ebeam3->ebeamL3Energy()
+          << "\n  ebeamLTUPosX=" << ebeam3->ebeamLTUPosX()
+          << "\n  ebeamLTUPosY=" << ebeam3->ebeamLTUPosY()
+          << "\n  ebeamLTUAngX=" << ebeam3->ebeamLTUAngX()
+          << "\n  ebeamLTUAngY=" << ebeam3->ebeamLTUAngY()
+          << "\n  ebeamPkCurrBC2=" << ebeam3->ebeamPkCurrBC2()
+          << "\n  ebeamEnergyBC2=" << ebeam3->ebeamEnergyBC2()
+          << "\n  ebeamPkCurrBC1=" << ebeam3->ebeamPkCurrBC1()
+          << "\n  ebeamEnergyBC1=" << ebeam3->ebeamEnergyBC1();
     }
   }
 

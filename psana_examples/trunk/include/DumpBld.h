@@ -55,6 +55,9 @@ public:
   // Destructor
   virtual ~DumpBld () ;
 
+  /// Method which is called at the beginning of job
+  virtual void beginJob(Event& evt, Env& env);
+
   /// Method which is called with event data
   virtual void event(Event& evt, Env& env);
   
