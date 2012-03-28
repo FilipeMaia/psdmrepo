@@ -178,6 +178,59 @@ private:
 };
 #pragma pack(pop)
 
+/** @class BldDataEBeamV3
+
+  
+*/
+
+#pragma pack(push,4)
+
+class BldDataEBeamV3 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 3 /**< XTC type version number */ };
+  BldDataEBeamV3(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2, double arg__fEbeamEnergyBC2, double arg__fEbeamPkCurrBC1, double arg__fEbeamEnergyBC1)
+    : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1)
+  {
+  }
+  /** Damage mask. */
+  uint32_t damageMask() const { return _uDamageMask; }
+  /** Beam charge in nC. */
+  double ebeamCharge() const { return _fEbeamCharge; }
+  /** Beam energy in MeV. */
+  double ebeamL3Energy() const { return _fEbeamL3Energy; }
+  /** LTU beam position in mm. */
+  double ebeamLTUPosX() const { return _fEbeamLTUPosX; }
+  /** LTU beam position in mm. */
+  double ebeamLTUPosY() const { return _fEbeamLTUPosY; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngX() const { return _fEbeamLTUAngX; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC2() const { return _fEbeamEnergyBC2; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
+  static uint32_t _sizeof()  { return 84; }
+private:
+  uint32_t	_uDamageMask;	/**< Damage mask. */
+  double	_fEbeamCharge;	/**< Beam charge in nC. */
+  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
+  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
+  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC2;	/**< Beam position in mm (related to beam energy). */
+  double	_fEbeamPkCurrBC1;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
+};
+#pragma pack(pop)
+
 /** @class BldDataPhaseCavity
 
   PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
