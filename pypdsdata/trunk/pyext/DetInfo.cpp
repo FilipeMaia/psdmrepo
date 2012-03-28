@@ -87,6 +87,12 @@ namespace {
       { "CxiDsd",      Pds::DetInfo::CxiDsd },
       { "XcsBeamline", Pds::DetInfo::XcsBeamline },
       { "CxiSc2",      Pds::DetInfo::CxiSc2 },
+      { "MecXuvSpectrometer", Pds::DetInfo::MecXuvSpectrometer },
+      { "MecXrtsForw", Pds::DetInfo::MecXrtsForw },
+      { "MecXrtsBack", Pds::DetInfo::MecXrtsBack },
+      { "MecFdi",      Pds::DetInfo::MecFdi },
+      { "MecTimeTool", Pds::DetInfo::MecTimeTool },
+      { "MecTargetChamber", Pds::DetInfo::MecTargetChamber },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };

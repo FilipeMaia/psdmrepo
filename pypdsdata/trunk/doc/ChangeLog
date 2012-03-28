@@ -6,6 +6,12 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-57
+2012-03-27 Andy Salnikov
+- upgrade to pdsdata V03-04-01
+- new Detector enums in DetInfo
+- new type BldDataEBeamV3
+
 Tag: V00-00-56
 2012-03-22 Andy Salnikov
 - upgrade to pdsdata V03-03-04

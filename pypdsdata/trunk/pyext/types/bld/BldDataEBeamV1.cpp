@@ -82,7 +82,7 @@ _repr( PyObject *self )
   if(not pdsObj) return 0;
 
   char buf[64];
-  snprintf( buf, sizeof buf, "BldDataEBeamV1(Charge=%f, L3Energy=%f, ...)",
+  snprintf( buf, sizeof buf, "BldDataEBeamV1(Charge=%g, L3Energy=%g, ...)",
             pdsObj->fEbeamCharge, pdsObj->fEbeamL3Energy );
   return PyString_FromString( buf );
 }

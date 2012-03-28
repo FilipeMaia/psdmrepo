@@ -33,6 +33,7 @@
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
+#include "types/bld/BldDataEBeamV3.h"
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
@@ -230,6 +231,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<BldDataEBeamV0, 0>(xtc, parent);
     if ( not obj ) obj = xtc2obj<BldDataEBeamV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<BldDataEBeamV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataEBeamV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
