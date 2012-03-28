@@ -187,6 +187,64 @@
 		
 		<!-- ========================================================================= -->
 		
+		<pstype name="BldDataEBeamV3" type_id="Id_EBeam" version="3" pack="4">
+		
+            <tag name="value-type"/>
+        
+            <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            Damage mask.
+            </attribute>
+
+            <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
+            Beam charge in nC.
+            </attribute>
+
+            <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
+            Beam energy in MeV.
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
+            LTU beam position in mm.
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
+            LTU beam position in mm.
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
+            LTU beam angle in mrad.
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
+            LTU beam angle in mrad.
+            </attribute>
+
+            <attribute name="_fEbeamPkCurrBC2" type="double" accessor="ebeamPkCurrBC2">
+            Beam current in Amps.
+            </attribute>
+
+            <attribute name="_fEbeamEnergyBC2" type="double" accessor="ebeamEnergyBC2">
+            Beam position in mm (related to beam energy).
+            </attribute>
+
+            <attribute name="_fEbeamPkCurrBC1" type="double" accessor="ebeamPkCurrBC1">
+            Beam current in Amps.
+            </attribute>
+
+            <attribute name="_fEbeamEnergyBC1" type="double" accessor="ebeamEnergyBC1">
+            Beam position in mm (related to beam energy).
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
 
 		<pstype name="BldDataPhaseCavity" type_id="Id_PhaseCavity" version="0" pack="4">
 
