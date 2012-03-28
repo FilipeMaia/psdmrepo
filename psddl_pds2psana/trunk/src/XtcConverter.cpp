@@ -280,6 +280,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 0) ::storeValueType<Psana::Bld::BldDataEBeamV0, PsddlPds::Bld::BldDataEBeamV0>(xtc, evt);
     if (version == 1) ::storeValueType<Psana::Bld::BldDataEBeamV1, PsddlPds::Bld::BldDataEBeamV1>(xtc, evt);
     if (version == 2) ::storeValueType<Psana::Bld::BldDataEBeamV2, PsddlPds::Bld::BldDataEBeamV2>(xtc, evt);
+    if (version == 3) ::storeValueType<Psana::Bld::BldDataEBeamV3, PsddlPds::Bld::BldDataEBeamV3>(xtc, evt);
     break;
   case Pds::TypeId::Id_PhaseCavity:
     if (version == 0) ::storeValueType<Psana::Bld::BldDataPhaseCavity, PsddlPds::Bld::BldDataPhaseCavity>(xtc, evt);

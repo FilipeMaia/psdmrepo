@@ -21,6 +21,8 @@ Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds);
 
 Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds);
 
+Psana::Bld::BldDataEBeamV3 pds_to_psana(PsddlPds::Bld::BldDataEBeamV3 pds);
+
 Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pds);
 
 
