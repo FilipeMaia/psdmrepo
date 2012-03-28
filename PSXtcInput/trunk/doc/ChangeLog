@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2012-03-27 Andy Salnikov
+- added event data conversion for Configure transition, there are some
+  "event-like" data objects such as BLD
+
 Tag: V00-03-00
 2012-03-12 Andy Salnikov
 - add option "skip-epics" to XtcInputModule, default is true, if set to 

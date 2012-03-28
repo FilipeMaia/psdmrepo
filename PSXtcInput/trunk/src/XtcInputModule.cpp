@@ -165,6 +165,8 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   fillEnv(dg, env);
   fillEventDg(dg, evt);
   fillEventId(dg, evt);
+  // there is BLD data in Configure which is event-like data
+  fillEvent(dg, evt, env);
 
 }
 
