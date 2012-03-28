@@ -30,6 +30,7 @@
 #include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeamV1.h"
 #include "H5DataTypes/BldDataEBeamV2.h"
+#include "H5DataTypes/BldDataEBeamV3.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/BldDataIpimbV0.h"
 #include "H5DataTypes/BldDataIpimbV1.h"
@@ -427,6 +428,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeamV2> (
       "Bld::BldDataEBeamV2", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 3
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeamV3> (
+      "Bld::BldDataEBeamV3", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 0
