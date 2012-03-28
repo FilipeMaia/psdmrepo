@@ -1,0 +1,407 @@
+#
+# $Id$
+#
+# Copyright (c) 2010 SLAC National Accelerator Laboratory
+# 
+
+"""
+Module which facilitates reading and merging of the datagrams from multiple 
+input XTC files.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@version $Id$
+
+@author Andrei Salnikov
+"""
+
+from _pdsdata import xtc
+from _pdsdata import Error
+from _pdsdata.io import *
+import logging
+import os
+
+_log = logging.getLogger("pdsdata.io")
+
+#
+# iterator which scans multiple chunk files
+#
+def _genXtcChunkIterator( files, bufsize=-1 ):
+    """ helper generator object """
+    for fname in files :
+        file = open(fname, 'rb', bufsize)
+        fpos = file.tell()
+        count = 0
+        for dg in xtc.XtcFileIterator( file ) :
+            yield ( dg, fname, count, fpos )
+            fpos = file.tell()
+            count += 1
+
+class XtcChunkIterator (object) :
+    """ 
+    Iterator class which returns sequential ordered datagrams from 
+    multiple chunked files. Constructor takes the list of file names
+    whcih will be scanned in the same order.
+    """
+    
+    def __init__ ( self, files, bufsize=-1 ) :
+        
+        _log.debug("XtcChunkIterator: files=%s", files)
+        self.m_gen = _genXtcChunkIterator( files, bufsize )
+
+        self.m_fname = None
+        self.m_fpos = 0
+        self.m_dgindex = 0
+
+    def __iter__ (self) :
+        """ Iterator protocol """
+        return self
+
+    def next(self):
+        """self.next() -> xtc.Dgram
+        
+        Advance to next datagram possibly switching to next file. 
+        """
+        
+        dg, self.m_fname, self.m_dgindex, self.m_fpos = self.m_gen.next()
+        return dg
+
+    def fileName(self):
+        """self.fileName() -> string
+        
+        Get the name of the currently read file.
+        """
+        return self.m_fname
+        
+    def basename(self):
+        """self.basename() -> string
+        
+        Get the basename of the currently read file.
+        """
+        return os.path.basename(self.m_fname)
+        
+    def fpos(self):
+        """self.fpos() -> int
+        
+        Get the position in the file with last read datagram.
+        """
+        return self.m_fpos
+        
+    def dgIndex(self):
+        """self.dgIndex() -> int
+        
+        Get the index of the last read datagram in a file.
+        """
+        return self.m_dgindex
+        
+
+#
+# iterator which merges multiple streams into one
+#
+class XtcStreamMerger(object) :
+    """
+    Iterator class which merges datagrams from several separate streams.
+    Constructor takes the list of the individual stream iterators, each iterator
+    is supposed to return a sequence of time-ordered datagrams.
+    """
+
+    def __init__ (self, streamItreators, l1OffsetSec = 0):
+
+        self.m_streams = streamItreators
+        self.m_l1OffsetSec = int(l1OffsetSec)
+        self.m_l1OffsetNsec = int((l1OffsetSec-self.m_l1OffsetSec)*1e9)
+        
+        # list of datagrams per stream
+        self.m_dgs = []
+        for stream in self.m_streams :
+            dg = XtcStreamMerger._readDgram(stream)
+            if dg: self._updateDgramTime(dg)
+            self.m_dgs.append( dg )
+            
+        self.m_fname = None
+        self.m_fpos = 0
+
+    @staticmethod
+    def _readDgram(stream):
+        """cls._readDgram(stream) -> xtc.Dgram
+        
+        Read next datagram from a stream, skip problematic stuff.
+        """
+        try :
+            while True :
+                dg = stream.next()
+                # skip Disable transitions, they mess up datagram order sometimes
+                if dg.seq.service() != xtc.TransitionId.Disable: break
+        except StopIteration :
+            dg = None
+        return dg
+
+    def _updateDgramTime(self, dg):
+        """self._updateDgramTime(dg: xtc.Dgram)
+        
+        Corrects datagram time for L1Accept transitions.
+        """
+        if dg.seq.service() != xtc.TransitionId.L1Accept :
+
+            time = dg.seq.clock()
+            sec = time.seconds() + self.m_l1OffsetSec;
+            nsec = time.nanoseconds() + self.m_l1OffsetNsec;
+            if nsec < 0 :
+                nsec += 1000000000
+                sec -= 1
+            elif nsec >= 1000000000 :
+                nsec -= 1000000000
+                sec += 1
+
+            newTime = xtc.ClockTime(sec, nsec) ;
+            dg.setClock( newTime )
+            
+    def __iter__ (self) :
+        """Iterator protocol"""
+        return self
+
+    def next(self):
+        """self.next() -> xtc.Dgram
+        
+        Returns next datagram in the time order.
+        """
+
+        # find stream/datagram with minimal time
+        ns = len(self.m_dgs)
+        stream = -1
+        for i in range(ns) :
+            if self.m_dgs[i] :
+                if stream < 0 or self.m_dgs[stream].seq.clock() > self.m_dgs[i].seq.clock() :
+                    stream = i
+                    
+        if stream < 0 :
+            # means no more non-empty streams left, stop iteration
+            raise StopIteration
+
+        nextdg = self.m_dgs[stream]
+        try :
+            self.m_fname = self.m_streams[stream].fileName()
+            self.m_fpos = self.m_streams[stream].fpos()
+        except :
+            pass
+
+
+        # check the type of the datagram, for L1Accept give it to the caller,
+        # all other datagram types must appear in all streams, return only one copy
+        if nextdg.seq.service() == xtc.TransitionId.L1Accept :
+
+            dg = XtcStreamMerger._readDgram(self.m_streams[stream])
+            if dg: self._updateDgramTime(dg)
+            self.m_dgs[stream] = dg
+
+        else :
+
+            # check that all streams are in sync
+            for i in range(ns) :
+                dg = self.m_dgs[i]
+                if dg and dg.seq.service() != nextdg.seq.service() :
+                    try:
+                        # this can throw if the iterator is not of XtcChunkIterator type
+                        _log.error("streams desynchronized:" +
+                                   "\n    stream[%d] = %s service = %s time = %s damage = %x " +
+                                   "\n    stream[%d] = %s service = %s time = %s damage = %x",
+                                    stream, self.m_streams[stream].basename(), nextdg.seq.service(), 
+                                    nextdg.seq.clock(), nextdg.xtc.damage.value(),
+                                    i, self.m_streams[i].basename(), dg.seq.service(), 
+                                    dg.seq.clock(), dg.xtc.damage.value()
+                                    )
+                    except :
+                        _log.error("streams desynchronized:" +
+                                   "\n    stream = %d service = %s time = %s damage = %x " +
+                                   "\n    stream = %d service = %s time = %s damage = %x",
+                                    stream, nextdg.seq.service(), 
+                                    nextdg.seq.clock(), nextdg.xtc.damage.value(),
+                                    i, dg.seq.service(), 
+                                    dg.seq.clock(), dg.xtc.damage.value()
+                                    )
+                    raise Error("streams desynchronized")
+
+            # advance all iterators to next datagram
+            for i in range(ns) :
+                dg = XtcStreamMerger._readDgram(self.m_streams[i])
+                if dg: self._updateDgramTime(dg)
+                self.m_dgs[i] = dg
+            
+        return nextdg
+
+    def fileName(self):
+        """self.fileName() -> string
+        
+        Get the name of the currently read file.
+        """
+        return self.m_fname
+
+    def fpos(self):
+        """self.fpos() -> int
+        
+        Get the position in the file with last read datagram.
+        """
+        return self.m_fpos
+
+def _cvt ( code, pfx ):
+    """Conversion function to extract number from a string with expected prefix"""
+    if len(code)>1 and code[0] == pfx :
+        try :
+            return int(code[1:])
+        except :
+            pass
+    return None
+    
+
+class XtcFileName(str) :
+    """
+    Class representing file name. It is ordinary string with few 
+    additional methods: expNum(), run(), stream(), chunk(). When
+    file name has format [/dirname/]eNN-rMM-sKK-cLL.ext then those
+    method will return corresponding numbers. Otherwise they all 
+    return None.
+    """
+
+    partsSep = '-'  #: Separator for the parts of a file name
+
+    def __init__ ( self, name ):
+        
+        str.__init__( self, name )
+        
+        # get all pieces
+        self.m_expNum = None
+        self.m_run = None
+        self.m_stream = None
+        self.m_chunk = None
+
+        # get basename drop extension
+        basename = os.path.basename(name).split('.')[0]
+        
+        # split into experiment-run-stream-chunk
+        parts = basename.split(XtcFileName.partsSep)
+        
+        # name must look like eNN-rNN-sNN-cNN
+        if len(parts) != 4 : return
+        
+        # convert to numbers
+        parts = map( _cvt, parts, ['e', 'r', 's', 'c'] )        
+        if None not in parts :
+            self.m_expNum = parts[0]
+            self.m_run = parts[1]
+            self.m_stream = parts[2]
+            self.m_chunk = parts[3]
+
+    def expNum(self):
+        """self.expNum() -> int
+        
+        Return experiment number or None
+        """
+        return self.m_expNum
+
+    def run(self):
+        """self.run() -> int
+        
+        Return run number or None
+        """
+        return self.m_run
+
+    def stream(self):
+        """self.stream() -> int
+        
+        Return stream number or None
+        """
+        return self.m_stream
+
+    def chunk(self):
+        """self.chunk() -> int
+        
+        Return chunk number or None
+        """
+        return self.m_chunk
+
+#
+# iterator which merges multiple streams into one
+#
+class XtcMergeIterator(object) :
+    """
+    Iterator class which merges datagrams from several separate streams.
+    Constructor takes the list of the file names acceptable by XtcFileName.
+    """
+
+    def __init__ (self, files, l1OffsetSec = 0, bufsize=-1):
+
+        xfiles = [ XtcFileName(f) for f in files ]
+
+        _log.debug("XtcMergeIterator: files=%s", xfiles)
+        
+        # check they all from the same experiment
+        exp = set([file.expNum() for file in xfiles])
+        if len(exp)>1 :
+            raise Error("file names from different experiments")
+
+        # group by runs and stream
+        runmap = {}
+        for file in xfiles :
+            streams = runmap.setdefault( file.run(), {} )
+            chunks = streams.setdefault( file.stream(), [] )
+            chunks.append( file )
+
+        # sorted list of runs
+        runs = sorted(runmap.iterkeys())
+        
+        # make iterators for each run
+        self.m_runiters = []
+        for r in runs:
+            
+            streams = runmap[r]
+            
+            streamIters = []
+            for stream, files in streams.iteritems() :
+                
+                chunks = set([f.chunk() for f in files])
+                if len(chunks) != len(files):
+                    raise Error("Non-unique chunk numbers for run %s stream %s" % (r, stream))
+
+                # sort files according to chunk number
+                files.sort( lambda x,y : cmp(x.chunk(), y.chunk()) )
+                streamIters.append( XtcChunkIterator(files, bufsize) ) 
+    
+            self.m_runiters.append( XtcStreamMerger( streamIters, l1OffsetSec ) )
+
+    def __iter__ (self) :
+        """Iterator protocol"""
+        return self
+
+    def next(self):
+        """self.next() -> xtc.Dgram
+        
+        Returns next datagram in the time order.
+        """
+        
+        while self.m_runiters:
+            try:
+                data = self.m_runiters[0].next()
+                return data
+            except StopIteration :
+                # go to next run
+                del self.m_runiters[0]
+                pass
+            
+        raise StopIteration
+
+    def fileName(self):
+        """self.fileName() -> string
+        
+        Get the name of the currently read file.
+        """
+        if not self.m_runiters: return None
+        return self.m_runiters[0].fileName()
+
+    def fpos(self):
+        """self.fpos() -> int
+        
+        Get the position in the file with last read datagram.
+        """
+        if not self.m_runiters: return None
+        return self.m_runiters[0].fpos()
