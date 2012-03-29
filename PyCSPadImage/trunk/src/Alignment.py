@@ -35,15 +35,16 @@ import numpy              as np
 import CalibPars          as calp
 import CSPadConfigPars    as ccp
 import CSPadImageProducer as cip
+import GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
 
 import GlobalGraphics     as gg # For test purpose in main only
 import HDF5Methods        as hm # For test purpose in main only
 
 #----------------------------------------------
 
-def main_example_alignment_test() :
+def main_alignment_test() :
 
-    print 'Start test in main_example_cxi()'
+    print 'Start test in main_alignment_test()'
 
     #path_calib, runnum = '/reg/d/psdm/CXI/cxi80410/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 1             # 2011-05-25
     #path_calib, runnum = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 1             # 2011-08-10
@@ -52,9 +53,12 @@ def main_example_alignment_test() :
     #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi80410-r1150-Ds1', 1150 # 2012-01-18
     #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi39112-r0009-Ds1', 9    # 2012-02-17
     #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2012-02-26/', 1437    # 2012-02-26
-    #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49812-r0073-Ds1', 73    # 2012-03-08
-    #or
-    path_calib, runnum = '/reg/d/psdm/CXI/cxi49812/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/', 73            # 2012-03-08    
+    #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49812-r0073-Ds1', 73   # 2012-03-08
+    #path_calib, runnum = '/reg/d/psdm/CXI/cxi49812/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/', 73           # 2012-03-08    
+    #path_calib, runnum = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49012-r0020-Ds1/', 20  # 2012-03-14
+    path_calib, runnum = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/', 20           # 2012-03-14    
+    #path_calib, runnum = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0', 1437           # 2012-03-23 check    
+
 
     #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
     #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
@@ -62,13 +66,17 @@ def main_example_alignment_test() :
     #fname   = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r1150.h5'
     #fname   = '/reg/d/psdm/CXI/cxi39112/hdf5/cxi39112-r0009.h5'
     #fname   = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5'
-    fname   = '/reg/d/psdm/CXI/cxi49812/hdf5/cxi49812-r0073.h5'
+    #fname   = '/reg/d/psdm/CXI/cxi49812/hdf5/cxi49812-r0073.h5'
+    fname   = '/reg/d/psdm/CXI/cxi49012/hdf5/cxi49012-r0020-raw.h5'
+    #fname   = '/reg/d/psdm/CXI/cxi49012/scratch/hdf5/r0020/LCLS_2012_Feb02_r0020_181548_1e67a_cspad.h5'
 
+
+    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
-    dsname  = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
-    #dsname  = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    #dsname  = '/data/data'
 
-    event   = 0
+    event   = 201
 
     print 'Load calibration parameters from', path_calib 
     calp.calibpars.setCalibParsForPath ( run = runnum, path = path_calib )
@@ -78,31 +86,33 @@ def main_example_alignment_test() :
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     #ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=10 )
-    #print 'ds1ev = ',ds1ev[1,:]
+    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=50 )
     print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
+    #print 'ds1ev = ',ds1ev[1,:]
 
 
-    ped_fname = '/reg/neh/home/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
-    doSubtractPedestals = True
-    if doSubtractPedestals :
-        ped_arr = np.loadtxt(ped_fname, dtype=np.float32)
-        print 'Load pedestals from file:', ped_fname
-        print 'ped_arr.shape=\n', ped_arr.shape
-        ped_arr.shape = (32, 185, 388) # raw shape is (5920, 388)
-        ds1ev -= ped_arr
+    #print 'Subtract pedestals'
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0008.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
+    ped_fname = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/9-37.data' # shape = (5920, 388)
+    #ds1ev  = gm.getCSPadArrayFromFile(ped_fname)
+    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat')
 
+    ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
     cspadimg = cip.CSPadImageProducer()
     arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
 
-    print 'Plot CSPad image'
 
-    AmpRange = (-10, 90)
+    print 'Plot CSPad image'
     #AmpRange = (950, 1350)
-    #AmpRange = (1600, 2400)
+    #AmpRange = (1900, 2200)
     #AmpRange = (900,  1400)
+    #AmpRange = (-10, 40)
+    AmpRange = (0, 200)
 
     gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
     gg.move(200,100)
@@ -114,85 +124,11 @@ def main_example_alignment_test() :
 
 #----------------------------------------------
 
-def main_example_cxi() :
-
-    print 'Start test in main_example_cxi()'
-
-    #path_calib, runnum = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0'
-    #path_calib = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
-    path_calib  = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
-
-    #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
-    #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
-    fname   = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
-
-    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
-    dsname  = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
-    event   = 5
-
-    print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run = 1, path = path_calib )
-
-    print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
-    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    print 'ds1ev.shape = ',ds1ev.shape
-
-    print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer()
-    arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
-
-    print 'Plot CSPad image'
-    gg.plotImage(arr,range=(-10,90),figsize=(11.6,10))
-    gg.move(200,100)
-    gg.plotSpectrum(arr,range=(-10,90))
-    gg.move(50,50)
-    #gg.plotImageAndSpectrum(arr,range=(1,2001))
-    print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
-    gg.show()
-
-#----------------------------------------------
-
-def main_example_xpp() :
-
-    print 'Start test in main_example_xpp()'
-
-    path_calib = '/reg/d/psdm/xpp/xpp47712/calib/CsPad::CalibV1/XppGon.0:Cspad.0'
-    fname      = '/reg/d/psdm/xpp/xpp47712/hdf5/xpp47712-r0043.h5'
-    dsname     = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
-
-    #path_calib = '/reg/d/psdm/XPP/xpp36211/calib/CsPad::CalibV1/XppGon.0:Cspad.0'
-    #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp36211-r0544'
-    #fname      = '/reg/d/psdm/xpp/xpp36211/hdf5/xpp36211-r0073.h5'
-    #dsname     = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
-
-    event      = 0
-
-    print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run = 1, path = path_calib )
-
-    print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
-    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    print 'ds1ev.shape = ',ds1ev.shape
-
-    print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer()
-    arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
-
-    print 'Plot CSPad image'
-    gg.plotImage(arr,range=(1200,2000),figsize=(11.6,10))
-    gg.move(200,100)
-    gg.plotSpectrum(arr,range=(1200,2000))
-    gg.move(50,50)
-    print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
-    gg.show()
-
-#----------------------------------------------
-
 if __name__ == "__main__" :
 
-    main_example_alignment_test()
-    #main_example_cxi()
-    #main_example_xpp()
+    main_alignment_test()
+    #main_example_cxi() # see Examples.py
+    #main_example_xpp() # see Examples.py
     sys.exit ( 'End of test.' )
 
 #----------------------------------------------

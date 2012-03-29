@@ -184,7 +184,7 @@ def get_run_number_from_hdf5_file_name( fname ) :
 
 def getOneCSPadEventForTest( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',
                              dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data',
-                             event  = 1 ) :
+                             event  = 0 ) :
 
     #ccp.cspadconfig.setCSPadConfiguration( fname, dsname, event )
     #ccp.cspadconfig.printCSPadConfigPars()

@@ -274,6 +274,22 @@ def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16
     return np.loadtxt(fname, dtype=datatype)
 
 #----------------------------------
+
+def getCSPadArrayFromFile(fname, dtype=np.float32, shape = (32, 185, 388)) : # raw shape is (5920, 388)
+    try :
+        arr = np.loadtxt(fname, dtype)
+        print 'Load array from file:\n', fname
+        print 'Input  arr.shape=', arr.shape
+        print 'Output arr.shape=', shape
+        arr.shape = shape
+        return arr
+
+    except IOError:
+        print 'IOError: CAN NOT OPEN FILE:', fname
+        sys.exit ( "THIS PROBLEM NEEDS TO BE FIXED BEFORE YOU CAN CONTINUE..." )
+        #return None
+
+#----------------------------------
 # Test
 
 def main() :    
