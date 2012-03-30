@@ -29,8 +29,8 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_RUNS` (
   `exper_name` VARCHAR(255)    NOT NULL ,
   `instr_name` VARCHAR(255)    NOT NULL ,
   INDEX `BEAMTIME_RUNS_BEGIN_TIME` (`begin_time`) ,
-  INDEX `BEAMTIME_RUNS_END_TIME` (`begin_time`) ,
-  UNIQUE KEY `run` (`exper_id`, `runnum`))
+  INDEX `BEAMTIME_RUNS_END_TIME`   (`begin_time`) ,
+  UNIQUE KEY `run`                 (`exper_id`, `runnum`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -41,8 +41,10 @@ DROP TABLE IF EXISTS `SYSMON`.`BEAMTIME_GAPS` ;
 CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_GAPS` (
   `begin_time` BIGINT UNSIGNED NOT NULL ,
   `end_time`   BIGINT UNSIGNED NOT NULL ,
+  `instr_name` VARCHAR(255)    NOT NULL ,
   INDEX `BEAMTIME_GAPS_BEGIN_TIME` (`begin_time`) ,
-  INDEX `BEAMTIME_GAPS_END_TIME` (`begin_time`))
+  INDEX `BEAMTIME_GAPS_END_TIME`   (`begin_time`) ,
+  INDEX `BEAMTIME_GAPS_INSTR`      (`instr_name`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -52,10 +54,12 @@ DROP TABLE IF EXISTS `SYSMON`.`BEAMTIME_COMMENTS` ;
 
 CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_COMMENTS` (
   `gap_begin_time` BIGINT UNSIGNED NOT NULL ,
+  `instr_name`     VARCHAR(255)    NOT NULL ,
   `post_time`      BIGINT UNSIGNED NOT NULL ,
   `posted_by_uid`  VARCHAR(32)     NOT NULL ,
   `comment`        TEXT            NOT NULL ,
   `system`         VARCHAR(255)    NOT NULL ,
+  UNIQUE KEY `gap_begin_time_instr_name`   (`gap_begin_time`,`instr_name`) ,
   INDEX `BEAMTIME_COMMENTS_GAP_BEGIN_TIME` (`gap_begin_time`))
 ENGINE = InnoDB;
 
