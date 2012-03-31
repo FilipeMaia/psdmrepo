@@ -66,6 +66,8 @@ class CSPadConfigPars(object) :
               [16,  17,  18,  19,  20,  21,  22,  23],
               [24,  25,  26,  27,  28,  29,  30,  31] ] )
 
+        self.quadNumsInEvent = [0, 1, 2, 3] # Numeration of quads in the event record
+
         self.pairInQaudOriInd = np.array(
             [ [   3,   3,   2,   2,   1,   1,   2,   2],
               [   3,   3,   2,   2,   1,   1,   2,   2],
@@ -74,7 +76,11 @@ class CSPadConfigPars(object) :
 
         self.quadInDetOriInd = [2, 1, 0, 3]
 
-        self.quadNumsInEvent = [0, 1, 2, 3] # Numeration of quads in the event record
+        self.margin    = 4    # For tilt spare space near frame
+
+        self.gapIn2x1  = 3    # Gap in 2x1 between two halfs
+        self.wid2x1    = 185   # Number of rows in 2x1 at rotation 0
+        self.len2x1    = 388  # Number of cols in 2x1 at rotation 0
 
         self.cspadQuad = 0    # Defauld quad number
         self.cspadPair = 0    # Defauld pair/section number
