@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-46
+2012-04-02 Andy Salnikov
+- Env.mkfile() creates temporary files in the same directory as 
+  final output file
+
 Tag: V00-00-45
 2012-03-26 Andy Salnikov
 - garbage collector had trouble collection after I added circular 

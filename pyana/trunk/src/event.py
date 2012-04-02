@@ -803,7 +803,7 @@ class Env(object):
             return open(filename, mode, bufsize)
         else :
             # in child open temporary file and record its name
-            fd, tmpname = tempfile.mkstemp()
+            fd, tmpname = tempfile.mkstemp(dir=os.path.dirname(filename))
             self.m_files[filename] = tmpname
             return os.fdopen(fd, mode, bufsize)
 
