@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_IMGPIXAMPFILTER_H
-#define IMGALGOS_IMGPIXAMPFILTER_H
+#ifndef IMGALGOS_CSPADARRAVERAGE_H
+#define IMGALGOS_CSPADARRAVERAGE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImgPixAmpFilter.
+//	Class CSPadArrAverage.
 //
 //------------------------------------------------------------------------
 
@@ -22,8 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "CSPadPixCoords/Image2D.h"
-#include "ImgAlgos/TimeInterval.h"
+#include "psddl_psana/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -50,14 +49,20 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class ImgPixAmpFilter : public Module {
+class CSPadArrAverage : public Module {
 public:
 
+    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
+    enum { MaxSectors = Psana::CsPad::SectorsPerQuad };    // 8
+    enum { NumColumns = Psana::CsPad::ColumnsPerASIC };    // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
+    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2 };  // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
+    enum { SectorSize = NumColumns * NumRows           };  // 185 * 388
+  
   // Default constructor
-  ImgPixAmpFilter (const std::string& name) ;
+  CSPadArrAverage (const std::string& name) ;
 
   // Destructor
-  virtual ~ImgPixAmpFilter () ;
+  virtual ~CSPadArrAverage () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -82,39 +87,27 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
+  void collectStat(unsigned quad, const int16_t* data);
   void printInputParameters();
   void printEventId(Event& evt);
-  void setWindowRange();
-  bool getAndProcImage(Event& evt);
-  bool procImage(Event& evt);
 
 private:
 
-  Pds::Src    m_actualSrc;
-  std::string m_src;
-  std::string m_key;
-  float    m_threshold;
-  float    m_xmin;
-  float    m_xmax;
-  float    m_ymin;
-  float    m_ymax;
-  unsigned m_numpixmin;
-  bool     m_filter;
-  unsigned m_print_bits;
-  long     m_count;
-  long     m_selected;
+  //Source         m_src;                // Data source set from config file
+  Pds::Src       m_src;                // source address of the data object
+  std::string    m_str_src;         // string with source name
+  std::string    m_key;             // string with key name
+  std::string    m_aveFile;
+  std::string    m_rmsFile;
+  unsigned       m_print_bits;   
+  unsigned long  m_count;  // number of events from the beginning of job
 
-  size_t   m_nrows;
-  size_t   m_ncols;
-  size_t   m_rowmin; 
-  size_t   m_rowmax;
-  size_t   m_colmin;
-  size_t   m_colmax;
-
-  CSPadPixCoords::Image2D<double> *m_img2d;
-  TimeInterval *m_time;
+  unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
+  unsigned long  m_stat[MaxQuads][MaxSectors][NumColumns][NumRows];  // statistics per pixel
+  double         m_sum [MaxQuads][MaxSectors][NumColumns][NumRows];  // sum per pixel
+  double         m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_IMGPIXAMPFILTER_H
+#endif // IMGALGOS_CSPADARRAVERAGE_H

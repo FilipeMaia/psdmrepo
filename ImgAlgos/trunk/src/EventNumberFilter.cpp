@@ -77,7 +77,7 @@ EventNumberFilter::~EventNumberFilter ()
 void 
 EventNumberFilter::beginJob(Event& evt, Env& env)
 {
-  if( m_filter ) printInputParameters();
+  if( m_filter && (m_print_bits & 1) ) printInputParameters();
 }
 
 /// Method which is called at the beginning of the run
@@ -148,8 +148,6 @@ EventNumberFilter::endJob(Event& evt, Env& env)
 void 
 EventNumberFilter::printInputParameters()
 {
-  if( ! (m_print_bits & 1) ) return;
-
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
 	<< "\n m_filter      : "     << m_filter   

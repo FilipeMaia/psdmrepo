@@ -25,13 +25,14 @@
 #include "MsgLogger/MsgLogger.h"
 #include "psddl_psana/acqiris.ddl.h"
 #include "PSEvt/EventId.h"
-//#include "PSTime/Time.h"
+#include "PSTime/Time.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
 // This declares this class as psana module
+using namespace std;
 using namespace ImgAlgos;
 PSANA_MODULE_FACTORY(ImgPixAmpFilter)
 
@@ -90,7 +91,7 @@ ImgPixAmpFilter::beginJob(Event& evt, Env& env)
 void 
 ImgPixAmpFilter::beginRun(Event& evt, Env& env)
 {
-  printInputParameters();
+  if( m_print_bits & 1 ) printInputParameters();
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -143,8 +144,6 @@ ImgPixAmpFilter::endJob(Event& evt, Env& env)
 void 
 ImgPixAmpFilter::printInputParameters()
 {
-  if( ! (m_print_bits & 1) ) return;
-
   WithMsgLog(name(), info, log) {
     log << "\nInput parameters:"
         << "\nsource      : "     << m_src
@@ -169,14 +168,14 @@ ImgPixAmpFilter::getAndProcImage(Event& evt)
   if (img2d.get()) {
     MsgLog(name(), debug, "::procImage(...): Get image as Image2D<double>");
     m_img2d = img2d.get();
-    return procImage();
+    return procImage(evt);
   }
 
   shared_ptr< ndarray<double,2> > img = evt.get(m_src, m_key, &m_actualSrc);
   if (img.get()) {
     MsgLog(name(), debug, "::procImage(...): Get image as ndarray<double,2> and wrap it in Image2D<double>");
     m_img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);
-    return procImage();
+    return procImage(evt);
   }
 
     return false; // if the image object is not found in evt
@@ -214,7 +213,7 @@ ImgPixAmpFilter::setWindowRange()
 //--------------------
 
 bool
-ImgPixAmpFilter::procImage()
+ImgPixAmpFilter::procImage(Event& evt)
 {
     setWindowRange();
 
@@ -229,12 +228,43 @@ ImgPixAmpFilter::procImage()
 	  }
 	}
 
-	if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Event = " << m_count << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
+	if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Event = " << m_count 
+                            << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
 
-     if (npix_above_thr > m_numpixmin) return true;
+	if (npix_above_thr > m_numpixmin) {
+         if( m_print_bits & 1<<3 ) printEventId(evt);
+         return true;
+	}
 
   return false;
 }
+
+//--------------------
+
+void 
+ImgPixAmpFilter::printEventId(Event& evt)
+{
+  shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) {
+    //MsgLog( name(), info, "event ID: " << *eventId);
+
+    //std::string t_str = asStringFormat( "%Y-%m-%d %H:%M:%S%f%z");
+    std::string t_str = (eventId->time()).asStringFormat( "%H%M%S");
+    time_t t_nsec = (eventId->time()).nsec(); 
+    int    t_msec = (int)(0.001 * t_nsec); 
+
+    std::stringstream ss;
+    ss << hex << t_msec;
+    string hex_msec = ss.str();
+
+    MsgLog( name(), info, "Run="   << eventId->run() 
+                     << " Time="   << eventId->time() 
+                     << " or "     << t_str.data() 
+                     << " nsec="   << t_nsec 
+                     << " hex_ms=" << hex_msec);
+  }
+}
+
 
 //--------------------
 
