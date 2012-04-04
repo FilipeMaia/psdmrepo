@@ -193,7 +193,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   PyObject* module = 0;
 
-  module = Py_InitModule3( "_pdsdata.xtc", 0, "The Python wrapper module for pdsdata/acqiris" );
+  module = Py_InitModule3( "_pdsdata.xtc", 0, "The Python wrapper module for pdsdata/xtc" );
   pypdsdata::BldInfo::initType( module );
   pypdsdata::ClockTime::initType( module );
   pypdsdata::Damage::initType( module );
