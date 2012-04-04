@@ -58,21 +58,27 @@ CSPadArrAverage::CSPadArrAverage (const std::string& name)
   , m_rmsFile()
   , m_print_bits()
   , m_count(0)
+  , m_nev_stage1()
+  , m_nev_stage2()
+  , m_gate_width1()
+  , m_gate_width2()
 {
   // get the values from configuration or use defaults
   m_str_src = configStr("source",  "DetInfo(:Cspad)");
   m_key     = configStr("key",     "");                 //"calibrated"
   m_aveFile = configStr("avefile", "cspad-ave.dat");
   m_rmsFile = configStr("rmsfile", "cspad-rms.dat");
-  m_print_bits = config("print_bits",      0);
-  //m_filter  = config   ("filter", false);
+  m_nev_stage1  = config("evts_stage1", 1<<31U);
+  m_nev_stage2  = config("evts_stage2",    100);
+  m_gate_width1 = config("gate_width1",      0); 
+  m_gate_width2 = config("gate_width2",      0); 
+  m_print_bits  = config("print_bits",       0);
 
-  
   // initialize arrays
   std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
-  std::fill_n(&m_stat[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
-  std::fill_n(&m_sum [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
-  std::fill_n(&m_sum2[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
+
+  m_gate_width = 0;
+  // resetStatArrays(); // <=== moved to procEvent
 }
 
 //--------------
@@ -165,6 +171,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
   if (data1.get()) {
 
     ++ m_count;
+    setCollectionMode();
     
     int nQuads = data1->quads_shape()[0];
     for (int iq = 0; iq != nQuads; ++ iq) {
@@ -179,6 +186,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
   if (data2.get()) {
 
     ++ m_count;
+    setCollectionMode();
     
     int nQuads = data2->quads_shape()[0];
     for (int iq = 0; iq != nQuads; ++ iq) {
@@ -189,7 +197,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
     } 
   }
 
-  if( m_print_bits & 1<<2 ) printEventId(evt);
+   if( m_print_bits & 1<<4 ) printEventId(evt);
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -208,38 +216,58 @@ CSPadArrAverage::endRun(Event& evt, Env& env)
 void 
 CSPadArrAverage::endJob(Event& evt, Env& env)
 {
-  MsgLog(name(), info, "collected total " << m_count << " events");
+
+  procStatArrays();
+  saveCSPadArrayInFile( m_aveFile, m_ave ); // &m_ave[0][0][0][0] );
+  saveCSPadArrayInFile( m_rmsFile, m_rms ); // &m_rms[0][0][0][0] );
+
+}
+
+//--------------------
+
+/// Process accumulated stat arrays and evaluate m_ave(rage) and m_rms arrays
+void 
+CSPadArrAverage::procStatArrays()
+{
+  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Process statistics for collected total " << m_count << " events");
   
-  if (not m_aveFile.empty()) {
-    // save averaged values in file
-    std::ofstream out(m_aveFile.c_str());
     for (int iq = 0; iq != MaxQuads; ++ iq) {
       for (int is = 0; is != MaxSectors; ++ is) {
         for (int ic = 0; ic != NumColumns; ++ ic) {
           for (int ir = 0; ir != NumRows; ++ ir) {
-            double avg = m_count ? m_sum[iq][is][ic][ir] / m_count : 0;
-            out << avg << ' ';
+
+	    double stat  = m_stat[iq][is][ic][ir];
+            if (stat > 1) {
+              double ave   = m_sum[iq][is][ic][ir] / stat;
+	      m_ave[iq][is][ic][ir] = ave;
+              m_rms[iq][is][ic][ir] = std::sqrt(m_sum2[iq][is][ic][ir] / stat - ave*ave);
+            } 
+            else 
+            {
+	      m_ave[iq][is][ic][ir] = 0;
+	      m_rms[iq][is][ic][ir] = 0;
+            }
           }
-          out << '\n';
         }
       }
     }
-    out.close();
-  }
+}
 
-  if (not m_rmsFile.empty()) {    
-    // save rms values in file
-    std::ofstream out(m_rmsFile.c_str());
+//--------------------
+
+/// Save 4-d array of CSPad structure in file
+void 
+CSPadArrAverage::saveCSPadArrayInFile(std::string& fname, double arr[MaxQuads][MaxSectors][NumColumns][NumRows])
+{  
+  if (not fname.empty()) {
+    if( m_print_bits & 1<<3 ) MsgLog(name(), info, "Save CSPad-shaped array in file " << fname.c_str());
+    std::ofstream out(fname.c_str());
     for (int iq = 0; iq != MaxQuads; ++ iq) {
       for (int is = 0; is != MaxSectors; ++ is) {
         for (int ic = 0; ic != NumColumns; ++ ic) {
           for (int ir = 0; ir != NumRows; ++ ir) {
-            double stdev = 0;
-            if (m_count > 1) {
-              double avg = m_sum[iq][is][ic][ir] / m_count;
-              stdev = std::sqrt(m_sum2[iq][is][ic][ir] / m_count - avg*avg);
-            }
-            out << stdev << ' ';
+
+            out << arr[iq][is][ic][ir] << ' ';
           }
           out << '\n';
         }
@@ -248,6 +276,49 @@ CSPadArrAverage::endJob(Event& evt, Env& env)
     out.close();
   }
 }
+
+//--------------------
+
+/// Reset arrays for statistics accumulation
+void
+CSPadArrAverage::resetStatArrays()
+{
+  std::fill_n(&m_stat[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0 );
+  std::fill_n(&m_sum [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
+  std::fill_n(&m_sum2[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
+}
+
+//--------------------
+
+/// Check the event counter and deside what to do next accumulate/change mode/etc.
+void 
+CSPadArrAverage::setCollectionMode()
+{
+  // Set the statistics collection mode without gate
+  if (m_count == 1 ) {
+    m_gate_width = 0;
+    resetStatArrays();
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 0: Event = " << m_count << " Begin to collect statistics without gate.");
+  }
+
+  // Change the statistics collection mode for gated stage 1
+  else if (m_count == m_nev_stage1 ) {
+    procStatArrays();
+    resetStatArrays();
+    m_gate_width = m_gate_width1;
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 1: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+  } 
+
+  // Change the statistics collection mode for gated stage 2
+  else if (m_count == m_nev_stage1 + m_nev_stage2 ) {
+    procStatArrays();
+    resetStatArrays();
+    m_gate_width = m_gate_width2;
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 2: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+  }
+}
+
+//--------------------
 
 /// Collect statistics
 void 
@@ -260,14 +331,22 @@ CSPadArrAverage::collectStat(unsigned quad, const int16_t* data)
     if (m_segMask[quad] & (1 << sect)) {
      
       // beginning of the segment data
-      double* sum  = &m_sum [quad][sect][0][0];
-      double* sum2 = &m_sum2[quad][sect][0][0];
+      unsigned* stat = &m_stat[quad][sect][0][0];
+      double*   sum  = &m_sum [quad][sect][0][0];
+      double*   sum2 = &m_sum2[quad][sect][0][0];
+      double*   ave  = &m_ave [quad][sect][0][0];
+      //double*   rms  = &m_rms [quad][sect][0][0];
       const int16_t* segData = data + ind_in_arr*SectorSize;
 
       // sum
       for (int i = 0; i < SectorSize; ++ i) {
-        sum [i] += double(segData[i]);
-        sum2[i] += double(segData[i])*double(segData[i]);
+
+	double amp = double(segData[i]);
+	if ( m_gate_width > 0 && abs(amp-ave[i]) > m_gate_width ) continue; // gate_width -> n_rms_gate_width * rms[i]
+
+        stat[i] ++;
+        sum [i] += amp;
+        sum2[i] += amp*amp;
       }          
       
       ++ind_in_arr;
@@ -283,18 +362,22 @@ CSPadArrAverage::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : "     << m_str_src
-        << "\n key        : "     << m_key      
-        << "\n m_aveFile  : "     << m_aveFile    
-        << "\n m_rmsFile  : "     << m_rmsFile    
-        << "\n print_bits : "     << m_print_bits
+        << "\n source     : " << m_str_src
+        << "\n key        : " << m_key      
+        << "\n m_aveFile  : " << m_aveFile    
+        << "\n m_rmsFile  : " << m_rmsFile    
+        << "\n print_bits : " << m_print_bits
+        << "\n evts_stage1: " << m_nev_stage1   
+        << "\n evts_stage2: " << m_nev_stage2  
+        << "\n gate_width1: " << m_gate_width1 
+        << "\n gate_width2: " << m_gate_width2 
         << "\n";     
 
-    log << "\n MaxQuads  : " << MaxQuads    
-        << "\n MaxSectors: " << MaxSectors  
-        << "\n NumColumns: " << NumColumns  
-        << "\n NumRows   : " << NumRows     
-        << "\n SectorSize: " << SectorSize  
+    log << "\n MaxQuads   : " << MaxQuads    
+        << "\n MaxSectors : " << MaxSectors  
+        << "\n NumColumns : " << NumColumns  
+        << "\n NumRows    : " << NumRows     
+        << "\n SectorSize : " << SectorSize  
         << "\n";
   }
 }

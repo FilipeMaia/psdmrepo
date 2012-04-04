@@ -87,12 +87,15 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
+  void setCollectionMode();
   void collectStat(unsigned quad, const int16_t* data);
   void printInputParameters();
   void printEventId(Event& evt);
+  void resetStatArrays();
+  void procStatArrays();
+  void saveCSPadArrayInFile(std::string& fname, double arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
 private:
-
   //Source         m_src;                // Data source set from config file
   Pds::Src       m_src;                // source address of the data object
   std::string    m_str_src;         // string with source name
@@ -101,11 +104,18 @@ private:
   std::string    m_rmsFile;
   unsigned       m_print_bits;   
   unsigned long  m_count;  // number of events from the beginning of job
+  unsigned long  m_nev_stage1;
+  unsigned long  m_nev_stage2;
+  double         m_gate_width1;
+  double         m_gate_width2;
 
+  double         m_gate_width;
   unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
-  unsigned long  m_stat[MaxQuads][MaxSectors][NumColumns][NumRows];  // statistics per pixel
+  unsigned       m_stat[MaxQuads][MaxSectors][NumColumns][NumRows];  // statistics per pixel
   double         m_sum [MaxQuads][MaxSectors][NumColumns][NumRows];  // sum per pixel
   double         m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
+  double         m_ave [MaxQuads][MaxSectors][NumColumns][NumRows];  // average per pixel
+  double         m_rms [MaxQuads][MaxSectors][NumColumns][NumRows];  // rms per pixel
 };
 
 } // namespace ImgAlgos
