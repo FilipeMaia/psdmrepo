@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Apr-5 ofte
+	- Bugfix: couldn't open files that weren't in the "standard" path
+	
 2012-Mar-15 ofte                     rev 3084
 	- small bugfixes
 	

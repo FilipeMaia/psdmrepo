@@ -431,15 +431,13 @@ class XtcExplorerMain (QtGui.QMainWindow) :
                     self.instrument = parts[4]
                     self.experiment = parts[5]
                     self.runnumber = parts[7].split('-')[1].strip('r')
-                except: 
-                    print "Failed adding file %s to list of input xtc files. " \
-                          "Cannot determine instrument, experiment or run number from its path."\
-                          % (filename)
-                    return
 
-                self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
-                self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
-                self.lineEditRun.setText(self.runnumber)
+                    self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
+                    self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
+                    self.lineEditRun.setText(self.runnumber)
+                except: 
+                    print "Failed to determine instrument, experiment or run number from the path (%s)."\
+                          % (filename)
 
                 # add the last file opened to the line dialog
                 self.lineedit.setText( str(filename) )
