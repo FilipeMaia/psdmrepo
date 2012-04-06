@@ -1,0 +1,38 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SysMon
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2012-04-06 Igor Gaponenko
+- fixed a bug in the Beam-Time Monitor driver script
+
+Tag: V00-00-04
+2012-03-30 Igor Gaponenko
+- modified database schema for the Beam-Time Monitor
+
+Tag: V00-00-03
+2012-03-22 Igor Gaponenko
+- added documentation
+- modified the driver script to be ready for the final deployement
+
+Tag: V00-00-02
+2012-03-21 Igor Gaponenko
+- the first implementation of the beam-time monitor is complete now.
+It brings the database schema, two python applications to separate
+EPICS and MySQL contexts (due to an alledged thread management bug in
+the Python EPICS code 'pyca'), and a shell script driver ro be run
+in a cron job (etc.) for constant monitoring of desired PV values.
+
+Tag: V00-00-01
+2012-03-09 Igor Gaponenko
+- saving results of the on-going development
+
