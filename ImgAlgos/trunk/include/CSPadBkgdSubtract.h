@@ -1,18 +1,22 @@
-#ifndef IMGALGOS_CSPADARRAVERAGE_H
-#define IMGALGOS_CSPADARRAVERAGE_H
+#ifndef IMGALGOS_CSPADBKGDSUBTRACT_H
+#define IMGALGOS_CSPADBKGDSUBTRACT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CSPadArrAverage.
+//	Class CSPadBkgdSubtract.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+//#include <iostream>
+//#include <string>
+//#include <vector>
+#include <fstream>  // open, close etc.
 
 //----------------------
 // Base Class Headers --
@@ -22,7 +26,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h"
+#include "psddl_psana/cspad.ddl.h" // for Psana::CsPad::MaxQuadsPerSensor etc.
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -49,7 +53,7 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CSPadArrAverage : public Module {
+class CSPadBkgdSubtract : public Module {
 public:
 
     enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
@@ -58,11 +62,11 @@ public:
     enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
     enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
   
-  // Default constructor
-  CSPadArrAverage (const std::string& name) ;
+   // Default constructor
+  CSPadBkgdSubtract (const std::string& name) ;
 
   // Destructor
-  virtual ~CSPadArrAverage () ;
+  virtual ~CSPadBkgdSubtract () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -87,37 +91,38 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-  void setCollectionMode();
-  void collectStat(unsigned quad, const int16_t* data);
   void printInputParameters();
   void printEventId(Event& evt);
-  void resetStatArrays();
-  void procStatArrays();
-  void saveCSPadArrayInFile(std::string& fname, double arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
+  std::string stringTimeStamp(Event& evt);
+
+  void getBkgdArray();
+  void printBkgdArray();
+  void openFile();
+  void closeFile();
+  void readArrFromFile();
 
 private:
-  //Source         m_src;             // Data source set from config file
+
+  // Data members, this is for example purposes only
+  
+  //Source m_src;         // Data source set from config file
+
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
   std::string    m_key;             // string with key name
-  std::string    m_aveFile;
-  std::string    m_rmsFile;
+  std::string    m_fname;
   unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
-  unsigned long  m_nev_stage1;
-  unsigned long  m_nev_stage2;
-  double         m_gate_width1;
-  double         m_gate_width2;
+ 
+  long m_count;
 
-  double         m_gate_width;
   unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
-  unsigned       m_stat[MaxQuads][MaxSectors][NumColumns][NumRows];  // statistics per pixel
-  double         m_sum [MaxQuads][MaxSectors][NumColumns][NumRows];  // sum per pixel
-  double         m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
-  double         m_ave [MaxQuads][MaxSectors][NumColumns][NumRows];  // average per pixel
-  double         m_rms [MaxQuads][MaxSectors][NumColumns][NumRows];  // rms per pixel
+  double         m_bkgd[MaxQuads][MaxSectors][NumColumns][NumRows];  // averaged per pixel background 
+
+  std::ifstream       m_file;
+  std::vector<double> v_parameters;
+
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CSPADARRAVERAGE_H
+#endif // IMGALGOS_CSPADBKGDSUBTRACT_H

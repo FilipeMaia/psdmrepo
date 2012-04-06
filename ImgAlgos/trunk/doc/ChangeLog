@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2012-04-04 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBkgdSubtract.cpp 
+	ImgAlgos/include/CSPadBkgdSubtract.h
+
+
 Tag: V00-00-03
 2012-04-03 Mikhail S. Dubrovin
 - add modules:
