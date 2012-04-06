@@ -1,39 +1,35 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-# cspad_filter3
-# : Simple test of algorithm3 for CXI filtering for liquids:
-# : Require a certain number of pixels above some ADC count, e.g. 1000 pixels > 50 ADU
+# cspad_assembly
+# : Fetch the data and create the CSPadAssembler for downstream modules to use
+# : The name of the CsPadAssembler object in the event will be: CsPadAssembler:<source>
 #------------------------------------------------------------------------
-import sys, os, fnmatch
+import sys, os, fnmatch, time
 import logging
 import numpy as np
 
 from pypdsdata.xtc import TypeId
 from cspad         import CsPadAssembler
 from pyana.calib   import CalibFileFinder
+from pyana import Skip
 
-class cspad_filter3 (object) :
+class cspad_assembly (object) :
     """Class whose instance will be used as a user analysis module. """
 
     def __init__ ( self,
                    source   = "CxiDs1-0|Cspad-0",
-                   adc_thr = 50,
-                   min_npix = 1000) :
+                   ) :
         """
         @param source    Address of detector/device in xtc file.
-        @param adc_thr   ADC threshold (count pixels above this threshold)
-        @param min_npix  minumum number of pixels above threshold
         """
         self.source = source
-        self.adc_thr = int(adc_thr)
-        self.min_npix = int(min_npix)
 
     def beginjob( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.beginjob() called" )
+        logging.info( "cspad_assembly.beginjob() called" )
 
         cdir = env.calibDir()
         # experiment calibration directory, specified or default
@@ -43,20 +39,17 @@ class cspad_filter3 (object) :
 
         self.cfinder = CalibFileFinder(cdir,cversion)
 
+        self.starttime = time.time()
+        self.n_proc = 0
+        self.n_pass = 0
+        self.npix_vetoed = []
+                
     def beginrun( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.beginrun() called" )
-
-
-    def begincalibcycle( self, evt, env ) :
-        """
-        @param evt    event data object
-        @param env    environment object
-        """
-        logging.info( "cspad_filter3.begincalibcycle() called" )
+        logging.info( "cspad_assembly.beginrun() called" )
 
         config = env.getConfig(TypeId.Type.Id_CspadConfig,self.source)
         if not config:
@@ -70,7 +63,20 @@ class cspad_filter3 (object) :
                                     config=config,
                                     calibfinder=self.cfinder,
                                     run=evt.run())
-                
+        self.cspad.load_pedestals()
+
+        # hand a reference over to the event
+        evt.put(self.cspad, "CsPadAssembler:%s"%self.source)
+
+
+    def begincalibcycle( self, evt, env ) :
+        """
+        @param evt    event data object
+        @param env    environment object
+        """
+        logging.info( "cspad_assembly.begincalibcycle() called" )
+
+        
     def event( self, evt, env ) :
         """
         @param evt    event data object
@@ -79,40 +85,37 @@ class cspad_filter3 (object) :
 
         # get CsPad elements from the datagram
         elements = evt.get(TypeId.Type.Id_CspadElement,self.source)
+        self.n_proc+=1
         
         # make one large array (4x8x185x388) of pixels
         # (and fill in any blanks if needed)
-        pixels = self.cspad.get_pixel_array(elements)
+        self.cspad.fill_pixel_array(elements)
+        self.cspad.subtract_pedestals()
 
-
-        # filter:
-        n = np.extract( pixels>self.adc_thr, pixels ).size
-
-        if n < self.min_npix :
-            return pyana.Skip
-
-        image = self.cspad.assemble_image()
-
-        # put the image
-        evt.put(image,self.source)
+        # universal shot counter
+        evt.put(self.n_proc,"shot_number")
 
     def endcalibcycle( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """        
-        logging.info( "cspad_filter3.endcalibcycle() called" )
+        logging.info( "cspad_assembly.endcalibcycle() called" )
 
     def endrun( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.endrun() called" )
+        logging.info( "cspad_assembly.endrun() called" )
 
     def endjob( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """        
-        logging.info( "cspad_filter3.endjob() called" )
+        logging.info( "cspad_assembly.endjob() called" )
+
+        duration = time.time() - self.starttime
+        logging.info("cspad_assembly: Time elapsed: %.3f s"%duration)
+

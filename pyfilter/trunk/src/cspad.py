@@ -22,15 +22,17 @@ class CsPadAssembler( object ):
         """
         
         self.sections = map(config.sections,range(4))
-
+        self.cfinder = calibfinder
+        self.dname = devicename
+        self.run = run
+        
         self.pedestals = None
-        self.image = None 
-        self.pixels = np.zeros((4,8,185,388), dtype="uint16")
-        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="float64")
+        self.pixels = None
+        self.image = None
 
         self.small_angle_tilt = False
 
-        self.read_alignment(calibfinder,devicename,run)
+        self.read_alignment()
         
         self.x_coordinates = None
         self.y_coordinates = None
@@ -38,34 +40,69 @@ class CsPadAssembler( object ):
         #self.make_coordinate_map()
 
 
-    def read_alignment(self, calibfinder, devicename, runnr):
+    def read_alignment(self):
         """Alignment calibrations as defined for psana.
         Read in these standard parameter files. Alternative
         path/file can be given by arguments
         """
         # angle of each section = rotation (nx90 degrees) + tilt (small angles)
         # ... (4 rows (quads) x 8 columns (sections))
-        self.rotation_array =  np.loadtxt( calibfinder.findCalibFile(devicename,"rotation",runnr))
-        self.tilt_array     =  np.loadtxt( calibfinder.findCalibFile(devicename,"tilt",    runnr))
-        self.section_angles = self.rotation_array + self.tilt_array
+        try:
+            self.rotation_array =  np.loadtxt( self.cfinder.findCalibFile(self.dname,"rotation",self.run))
+            self.tilt_array     =  np.loadtxt( self.cfinder.findCalibFile(self.dname,"tilt",    self.run))
+            self.section_angles = self.rotation_array + self.tilt_array
         
-        # read in center position of sections in each quadrant (quadrant coordinates)
-        # ... (3*4 rows (4 quads, 3 xyz coordinates) x 8 columns (sections))
-        centers              = np.loadtxt( calibfinder.findCalibFile(devicename,"center",runnr))
-        center_corrections   = np.loadtxt( calibfinder.findCalibFile(devicename,"center_corr",runnr))
-        self.section_centers = np.reshape( centers + center_corrections, (3,4,8) )
+            # read in center position of sections in each quadrant (quadrant coordinates)
+            # ... (3*4 rows (4 quads, 3 xyz coordinates) x 8 columns (sections))
+            centers              = np.loadtxt( self.cfinder.findCalibFile(self.dname,"center",self.run))
+            center_corrections   = np.loadtxt( self.cfinder.findCalibFile(self.dname,"center_corr",self.run))
+            self.section_centers = np.reshape( centers + center_corrections, (3,4,8) )
         
-        # read in the quadrant offset parameters (w.r.t. image 0,0 in upper left coner)
-        # ... (3 rows (xyz) x 4 columns (quads) )
-        quad_pos      = np.loadtxt(calibfinder.findCalibFile(devicename,"offset",runnr))
-        quad_pos_corr = np.loadtxt( calibfinder.findCalibFile(devicename,"offset_corr",runnr))
-        quad_position = quad_pos + quad_pos_corr
+            # read in the quadrant offset parameters (w.r.t. image 0,0 in upper left coner)
+            # ... (3 rows (xyz) x 4 columns (quads) )
+            quad_pos      = np.loadtxt(self.cfinder.findCalibFile(self.dname,"offset",self.run))
+            quad_pos_corr = np.loadtxt( self.cfinder.findCalibFile(self.dname,"offset_corr",self.run))
+            quad_position = quad_pos + quad_pos_corr
+            
 
+            # read in margins file:
+            # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
+            marg_gap_shift = np.loadtxt( self.cfinder.findCalibFile(self.dname,"marg_gap_shift",self.run))
 
-        # read in margins file:
-        # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
-        marg_gap_shift = np.loadtxt( calibfinder.findCalibFile(devicename,"marg_gap_shift",runnr))
+        except OSError,e: 
+            #print "Exception caught: ", e
+            print "File not found, using local geometry files instead"
 
+            calibdir = apputils.AppDataPath('XtcExplorer/calib/CSPad')
+            path = calibdir.path()
+            file = '0-end.data'
+
+            # angle of each section = rotation (nx90 degrees) + tilt (small angles)
+            # ... (4 rows (quads) x 8 columns (sections))
+            self.rotation_array =  np.loadtxt('%s/rotation/%s'%(path,file))
+            self.tilt_array =  np.loadtxt('%s/tilt/%s'%(path,file))
+            self.section_angles = self.rotation_array + self.tilt_array
+            
+            # read in center position of sections in each quadrant (quadrant coordinates)
+            # ... (3*4 rows (4 quads, 3 xyz coordinates) x 8 columns (sections))
+            centers = np.loadtxt('%s/center/%s'%(path,file))
+            center_corrections = np.loadtxt('%s/center_corr/%s'%(path,file))
+            self.section_centers = np.reshape( centers + center_corrections, (3,4,8) )
+            
+            # read in the quadrant offset parameters (w.r.t. image 0,0 in upper left coner)
+            # ... (3 rows (xyz) x 4 columns (quads) )
+            quad_pos = np.loadtxt('%s/offset/%s'%(path,file))
+            quad_pos_corr = np.loadtxt('%s/offset_corr/%s'%(path,file))
+            quad_position = quad_pos + quad_pos_corr
+            
+            
+            # read in margins file:
+            # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
+            marg_gap_shift = np.loadtxt('%s/marg_gap_shift/%s'%(path,file))
+            
+            
+            
+            
         # break it down (extract each column, make full arrays to be added to the above ones)
         self.sec_offset = marg_gap_shift[:,0]
 
@@ -195,7 +232,7 @@ class CsPadAssembler( object ):
         #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
 
 
-    def load_pedestals(self, pedestalsfile ):
+    def load_pedestals(self, pedestalsfile=None ):
         """ load dark from pedestal file:
         pedestals txt file is (4*8*185)=5920 (lines) x 388 (columns)
         accepted file formats: ascii and npy (binary)
@@ -208,10 +245,13 @@ class CsPadAssembler( object ):
             print "Pedestals has been loaded from %s"% pedestalsfile
             print "Pedestals will be subtracted from displayed images"
         except:
-            print "No pedestals loaded. File name requested was ", pedestalsfile
-            pass
-
-
+            # use default (done already in init)
+            # do the pedestals too if they're there:
+            try:
+                self.pedestals =  np.loadtxt( self.cfinder.findCalibFile(self.dname,"pedestals",self.run))
+            except:
+                print "No pedestals found in the default location"
+            
     def get_mini_image(self, element ):
         """get_2x2_image
         @param element      a single CsPad.MiniElementV1
@@ -238,48 +278,19 @@ class CsPadAssembler( object ):
         return image
 
 
-    def get_detector_image(self, elements, filter=None ):
-        """get_detector_image
-        @param elements     list of CsPad.ElementV1 from pyana evt.getCsPadQuads()
-        @param fiter        None, or tuple of (threshold,count)
-        """
-        self.pixels = self.get_pixel_array( elements )
-        #print "pixel average ", self.pixels.mean()
-
-        # pedestal subtraction here
-        if self.pedestals is not None:
-            self.pixels = self.pixels - self.pedestals
-            #print "after ped subt ", self.pixels.mean()
-
-            # common mode subtraction here (only if pedestal subtracted first)
-            #for q in xrange(4):
-            #    for s in xrange(8):
-            #        array = self.pixels[q][s]
-            #        self.pixels[q][s] = array - self.common_mode(array,30)
-            #print "after cm subt ", self.pixels.mean()
-
-            
-        self.assemble_image( self.pixels )
-        return self.image
-
-
-
-    def get_pixel_array( self, elements ):
+    def fill_pixel_array( self, elements ):
         """make pixel array (4,8,185,388) from pyana elements
         """             
+        self.pixels = np.zeros((4,8,185,388),dtype="int16")
         for e in elements: 
             data = e.data()
             quad = e.quad()
             self.pixels[quad] = self.complete_quad(data, quad)
+
         return self.pixels
 
-    def subtract_pedestals( self ):
-        try:
-            self.pixels = self.pixels - self.pedestals
-        except:
-            if self.pixels is None: print "pixels not yet set up "
-            if self.pedestals is None: print "pedestals not yet set up "
-        return self.pixels
+    def subtract_pedestals(self):
+        self.pixels = self.pixels - self.pedestals.reshape(4,8,185,388)
 
     def subtract_commonmode( self, threshold=30 ):
         if self.pedestals is None:
@@ -311,28 +322,35 @@ class CsPadAssembler( object ):
         return self.pixels
 
             
-    def assemble_image(self, data2d=None ):
+    def assemble_image(self, pixel_array=None ):
         """Assemble an image from 2D data array file (e.g. pedestals file),
         or if none is given, assemble an image from self.pixels 
         """
-        if data2d is not None:
-            self.pixels = data2d.reshape(4,8,185,388)
+        if pixel_array is None:
+            pixel_array = self.pixels
 
-        for quad in xrange (4):
 
-            quad_image = self.assemble_quad_image( self.pixels[quad], quad )
-            if quad>0:
-                # reorient the quad_image as needed
-                quad_image = np.rot90( quad_image, 4-quad)
+        # for each quad,
+        #       - assemble quad image
+        #       - rotate quad image
+        #       - insert in correct position
 
-            qoff_x = self.quad_offset[0,quad]
-            qoff_y = self.quad_offset[1,quad]
-            self.image[qoff_x:qoff_x+self.npix_quad, qoff_y:qoff_y+self.npix_quad]=quad_image
+        image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="int16" ) 
+        for q in xrange (4):
+            qim = self.assemble_quad_image( pixel_array[q], q )
 
-        # mask out hot/saturated pixels (16383)
-        #im_hot_masked = np.ma.masked_greater_equal( self.image, 16383 )
-        #self.image = np.ma.filled( im_hot_masked, 0)
-        return self.image
+            r1 = self.quad_offset[0,q]
+            c1 = self.quad_offset[1,q]
+            r2 = r1+self.npix_quad
+            c2 = c1+self.npix_quad
+
+            image[r1:r2,c1:c2] = qim
+
+        # update (do we want this?)
+        self.pixels = pixel_array
+        self.image = image
+
+        return image
          
 
     def complete_quad( self, data3d, qn ):
@@ -419,6 +437,10 @@ class CsPadAssembler( object ):
                 print "ERROR"
                 print rowp, ":", rowp+nrows, ", ", colp, ":",colp+ncols
 
+
+        if qn>0:
+            # reorient the quad_image as needed
+            quadrant = np.rot90( quadrant, 4-qn)
 
         return quadrant
 

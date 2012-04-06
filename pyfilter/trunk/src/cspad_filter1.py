@@ -4,21 +4,28 @@
 # : Simple test of algorithm1 for CXI filtering for crystals:
 # : Require a certain number of peaks with some intensity
 #------------------------------------------------------------------------
-import sys, os, fnmatch
+import sys, os, fnmatch, time
 import logging
 import numpy as np
 
 from pypdsdata.xtc import TypeId
 from cspad         import CsPadAssembler
 from pyana.calib   import CalibFileFinder
+from pyana import Skip
+
+#import matplotlib.pyplot as plt
 
 class cspad_filter1 (object) :
     """Class whose instance will be used as a user analysis module. """
 
     def __init__ ( self,
                    source   = "CxiDs1-0|Cspad-0",
-                   adc_thr = 50,
-                   min_npix = 1000) :
+                   do_pedestals = "1",
+                   do_commonmode = "0",
+                   roi = "0,1800,0,1800",
+                   adc_thr = "50",
+                   min_npix = "1000",
+                   max_bkgframes = "10") :
         """
         @param source    Address of detector/device in xtc file.
         @param adc_thr   ADC threshold (count pixels above this threshold)
@@ -27,13 +34,18 @@ class cspad_filter1 (object) :
         self.source = source
         self.adc_thr = int(adc_thr)
         self.min_npix = int(min_npix)
+        self.do_pedestals = bool(int(do_pedestals))
+        self.do_commonmode = bool(int(do_commonmode))
+        self.max_bkgframes = int(max_bkgframes)
+        self.roi = map(int,roi.split(','))         
+        self.n_std = 3 # n standard deviations (vertical scale region of interest)
 
     def beginjob( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.beginjob() called" )
+        logging.info( "cspad_filter1.beginjob() called" )
 
         cdir = env.calibDir()
         # experiment calibration directory, specified or default
@@ -43,20 +55,20 @@ class cspad_filter1 (object) :
 
         self.cfinder = CalibFileFinder(cdir,cversion)
 
+        self.starttime = time.time()
+        self.n_proc = 0
+        self.n_pass = 0
+        
+        # images stored for computing running average (for each pixel)
+        self.mu_stored = []
+        self.img_stored = []
+
     def beginrun( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.beginrun() called" )
-
-
-    def begincalibcycle( self, evt, env ) :
-        """
-        @param evt    event data object
-        @param env    environment object
-        """
-        logging.info( "cspad_filter3.begincalibcycle() called" )
+        logging.info( "cspad_filter1.beginrun() called" )
 
         config = env.getConfig(TypeId.Type.Id_CspadConfig,self.source)
         if not config:
@@ -70,6 +82,19 @@ class cspad_filter1 (object) :
                                     config=config,
                                     calibfinder=self.cfinder,
                                     run=evt.run())
+        if self.do_pedestals:
+            self.cspad.load_pedestals()
+            
+
+
+    def begincalibcycle( self, evt, env ) :
+        """
+        @param evt    event data object
+        @param env    environment object
+        """
+        logging.info( "cspad_filter1.begincalibcycle() called" )
+
+
                 
     def event( self, evt, env ) :
         """
@@ -79,20 +104,46 @@ class cspad_filter1 (object) :
 
         # get CsPad elements from the datagram
         elements = evt.get(TypeId.Type.Id_CspadElement,self.source)
-        
+        self.n_proc+=1
+
         # make one large array (4x8x185x388) of pixels
         # (and fill in any blanks if needed)
-        pixels = self.cspad.get_pixel_array(elements)
+        
+        self.cspad.fill_pixel_array(elements)
+        self.cspad.subtract_pedestals()
+
+        # get the full image: 
+        full_image = self.cspad.assemble_image(self.cspad.pixels)
+
+        # get the region of interest
+        x1,x2,y1,y2 = self.roi
+        image = np.copy(full_image[x1:x2,y1:y2])
+        
+        # Filter 
 
 
-        # filter:
-        n = np.extract( pixels>self.adc_thr, pixels ).size
+        # collect for averaging of background
+        self.img_stored.append(image)
+        n = len(self.img_stored)
+        if n >= self.max_bkgframes:
+            del self.img_stored[0]
+                
 
-        if n < self.min_npix :
-            return pyana.Skip
+        # compute running average of previously collected background frames
+        for img in self.img_stored:
+            try:
+                running_avg += img
+            except:
+                running_avg = img
+        running_avg = np.float_(running_avg) / n
 
-        image = self.cspad.assemble_image()
+        # Filter (require peaks)  
 
+
+        # Event has passed. 
+        print "Plotting background based on ", n, " background frames"
+        self.n_pass+=1
+        
         # put the image
         evt.put(image,self.source)
 
@@ -101,18 +152,22 @@ class cspad_filter1 (object) :
         @param evt    event data object
         @param env    environment object
         """        
-        logging.info( "cspad_filter3.endcalibcycle() called" )
+        logging.info( "cspad_filter1.endcalibcycle() called" )
 
     def endrun( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_filter3.endrun() called" )
+        logging.info( "cspad_filter1.endrun() called" )
 
     def endjob( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """        
-        logging.info( "cspad_filter3.endjob() called" )
+        logging.info( "cspad_filter1.endjob() called" )
+
+        duration = time.time() - self.starttime
+        logging.info("cspad_filter1: Time elapsed: %.3f s"%duration)
+        logging.info("cspad_filter1: %d shots selected out of %d processed"%(self.n_proc,self.n_pass))
