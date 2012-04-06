@@ -85,30 +85,21 @@ class LogBookGrabberUI:
         self.cancel.grid(row=0, column=3,padx=5,pady=5,sticky=W)
 
         Label(parent, text="Message: ").grid(row=1,column=0,padx=5,pady=5,sticky=W+N)
-        self.message = ScrolledText(parent, width=48,height=6)
+        self.message = ScrolledText(parent, width=48,height=9)
         self.message.grid(row=1,column=1,columnspan=4,rowspan=4,padx=5,pady=5,sticky=W+N)
 
-        f1 = Frame(parent)
-        Label(f1,text="Experiment:").grid(row=0,sticky=W+N)
-        f2 = Frame(f1)
+        Label(parent,text="Experiment:").grid(row=1,column=5,padx=5,pady=5,sticky=W+N)
         if logbook_experiment is None:
-            scrollbar = Scrollbar(f2, orient=VERTICAL)
-            self.experiment = Listbox(f2, yscrollcommand=scrollbar.set,height=2)
-            scrollbar.config(command=self.experiment.yview)
-            scrollbar.grid(row=1,column=4,padx=5,pady=0,sticky=W+N)
+            self.experiment = Listbox(parent,height=5)
             for e in logbook_experiments.keys():
                 self.experiment.insert(END, e)
             self.experiment.select_set(0)
-            self.experiment.grid(row=1,column=3,padx=5,pady=0,sticky=W+N)
+            self.experiment.grid(row=1,column=6,rowspan=1,padx=5,pady=5,sticky=W+N)
+            self.experiment.bind("<<ListboxSelect>>", self.onSelectExperiment)
         else:
             self.exp_name = StringVar()
             self.exp_name.set(logbook_experiment)
-            Label(f2,textvariable=self.exp_name).pack()
-        f2.grid(row=0,column=1,padx=2,sticky=W)
-        if logbook_use_current or logbook_experiment is None:
-            self.refresh = Button(f1,text="Update", command=self.on_refresh)
-            self.refresh.grid(row=2,column=1,padx=5,pady=5,sticky=W)
-        f1.grid(row=1,column=5,columnspan=2,rowspan=4,padx=5,pady=5,sticky=W+N)
+            Label(parent,textvariable=self.exp_name).grid(row=1,column=6,padx=5,pady=5,sticky=W+N)
 
         Label(parent, text="Author: ").grid(row=6,column=0,padx=5,pady=0,sticky=W+N)
         self.author = Label(parent, text=logbook_author)
@@ -132,33 +123,45 @@ class LogBookGrabberUI:
         self.descr.grid(row=9, column=1,columnspan=2,padx=5,pady=5,sticky=W+N)
 
         Label(parent, text="Tag: ").grid(row=10,column=0,padx=5,pady=5,sticky=W+N)
+        tags4experiment = []
         if logbook_experiment is None:
-            self.tag = Entry(parent)
-            self.tag.insert(0, "SCREENSHOT")
-            self.tag.grid(row=10,column=1,columnspan=2,padx=5,pady=5,sticky=W+N)
-            Label(parent, text="<- edit this tag if needed").grid(row=10,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
-
-            self.canvas = Canvas(background='black',width=0,height=0)
-            self.canvas.grid(row=11,column=0,padx=5,pady=10,columnspan=6,sticky=W+N+E+S)
+            for e in logbook_experiments.keys():
+                tags4experiment = logbook_experiments[e]['tags']
+                break
         else:
-            self.tags = Listbox(parent,height=5)
-            self.tags.insert(END,"SCREENSHOT")
-            for t in logbook_experiments[logbook_experiment]['tags']:
-                if t != "SCREENSHOT": self.tags.insert(END, t)
-            self.tags.select_set(0)
-            self.tags.grid(row=10,column=1,rowspan=1,padx=5,pady=5,sticky=W+N)
+            tags4experiment = logbook_experiments[logbook_experiment]['tags']
 
-            Label(parent, text="<- scroll to select an existing tag").grid(row=10,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
-            self.tag = Entry(parent)
-            self.tag.insert(0, "")
-            self.tag.grid(row=11,column=1,columnspan=2,padx=5,pady=0,sticky=W+N)
-            Label(parent, text="<- or use this tag (if the field is not empty)").grid(row=11,column=2,columnspan=4,padx=5,pady=0,sticky=W+N)
+        self.tags = Listbox(parent,height=5)
+        self.tags.insert(END,"SCREENSHOT")
+        for t in tags4experiment:
+            if t != "SCREENSHOT": self.tags.insert(END, t)
+        self.tags.select_set(0)
+        self.tags.grid(row=10,column=1,rowspan=1,padx=5,pady=5,sticky=W+N)
 
-            self.canvas = Canvas(background='black',width=0,height=0)
-            self.canvas.grid(row=15,column=0,padx=5,pady=10,columnspan=6,sticky=W+N+E+S)
+        Label(parent, text="<- scroll to select an existing tag").grid(row=10,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
+        self.tag = Entry(parent)
+        self.tag.insert(0, "")
+        self.tag.grid(row=11,column=1,columnspan=2,padx=5,pady=0,sticky=W+N)
+        Label(parent, text="<- edit this tag if needed").grid(row=11,column=2,columnspan=4,padx=5,pady=0,sticky=W+N)
+
+        self.tags.bind("<<ListboxSelect>>", self.onSelectTag)
+
+        self.canvas = Canvas(background='black',width=0,height=0)
+        self.canvas.grid(row=15,column=0,padx=5,pady=10,columnspan=6,sticky=W+N+E+S)
 
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
+
+    def onSelectExperiment(self,val):
+        self.tags.delete(0,END)
+        self.tags.insert(END,"SCREENSHOT")
+        for t in logbook_experiments[self.experiment.get(self.experiment.curselection())]['tags']:
+            if t != "SCREENSHOT": self.tags.insert(END, t)
+        self.tags.select_set(0)
+        
+    def onSelectTag(self,val):
+        self.tag.delete(0,END)
+        self.tag.insert(0,self.tags.get(self.tags.curselection()))
 
     def on_grab(self):
 
@@ -215,7 +218,6 @@ class LogBookGrabberUI:
         # let a user to select the one from the listbox.
         #
         exper_name = logbook_experiment
-        tag_name = self.tag.get()
         if logbook_experiment is None:
 
             # Get the experiment identifier from the current selection
@@ -228,21 +230,7 @@ class LogBookGrabberUI:
                 return
             exper_name = self.experiment.get( sel[0])
 
-        else:
-
-            # Get the tag identifier from the current selection
-            # if the alternative input area isn't empty
-            #
-            if not tag_name:
-                sel = self.tags.curselection()
-                if len(sel) != 1:
-                    tkMessageBox.showerror (
-                        "More Information requested",
-                        "No tag selected or provided in an alternative input area" )
-                    return
-                tag_name = self.tags.get( sel[0])
-
-        print 'Tag: ',tag_name
+        tag_name = self.tag.get()
 
         exper_id = logbook_experiments[exper_name]['id']
 
@@ -400,7 +388,7 @@ def ws_get_experiments (experiment=None):
             else:
                 for e in result['ResultSet']['Result']:
                     d[e['name']] = e
-                    d[e['name']] = ws_get_tags(e['id'])
+                    d[e['name']]['tags'] = ws_get_tags(e['id'])
 
         return d
 
