@@ -16,7 +16,7 @@ fi
 # Make sure the script is runing on the right host
 #
 HOST2RUN=psdev101
-if [ "$HOST" != "$HOST2RUN" ] ; then
+if [ `hostname` != "$HOST2RUN" ] ; then
   echo "error: the script should only be run on $HOST2RUN"
   exit 1
 fi

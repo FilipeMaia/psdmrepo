@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2012-04-06 Igor Gaponenko
+- fixed a bug in the Beam-Time Monitor driver script
+
 Tag: V00-00-04
 2012-03-30 Igor Gaponenko
 - modified database schema for the Beam-Time Monitor
