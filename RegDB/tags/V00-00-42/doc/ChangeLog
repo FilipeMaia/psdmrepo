@@ -1,0 +1,195 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RegDB
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-42
+2012-04-09 Igor Gaponenko
+- added Python module experiment_info.py
+
+Tag: V00-00-41
+2012-02-27 Andy
+- added few more methods to Python RegDb class
+
+Tag: V00-00-40
+2011-12-08 Igor Gaponenko
+- updated database schema: doc/RegDB_DataMigration_schema.sql in order to support
+the 'pull' mode (DAQ to OFFLINE files migration).
+
+Tag: V00-00-39
+2011-11-29 Andy Salnikov
+- added method RegDb.find_experiment_by_name() which returns experiment
+  information given instrument and experiment names
+
+Tag: V00-00-38
+2011-11-16 Igor Gaponenko
+- migrated to NetBeans IDE
+
+Tag: V00-00-37
+2011-11-16 Igor Gaponenko
+- SQL schema changed in the Data Migration table to allow registering files which are
+ready to be migrated but which haven't been tried (to be migrated) yet.
+
+Tag: V00-00-36
+2011-10-28 Igor Gaponenko
+- changed a bug in the newely introduced schema
+
+Tag: V00-00-35
+2011-10-28 Igor Gaponenko
+- fixed a bug in PHP class method RegDB::instance()
+- added and extended schema for database table regdb.file which now has two additional
+columns storing a host name where a file is open and directory path to the file
+on that host.
+
+Tag: V00-00-34
+2011-10-10 Andy Salnikov
+- added method RegDb.last_experiment_switch() which returns latest active 
+  experiment
+
+Tag: V00-00-33
+2011-09-22 Igor Gaponenko
+- added MySQL schema for table 'data_migration' which is meant to be used
+by the ONLINE-to-Lustre file migration process to report various events.
+
+Tag: V00-00-32
+2011-09-07 Igor Gaponenko
+- implemented the 'Data Path' Web interface and the corresponding Web service
+to allow a single point of view onto physical locations where experimental
+data are stored by the ONLIN-to-OFFLINE migration script.
+
+Tag: V00-00-31
+2011-07-01 Igor Gaponenko
+- reimplemented the GROPUP management service to report operations to
+a specially designed Logger from AuthDB.
+
+Tag: V00-00-30
+2011-06-30 Igor Gaponenko
+- implemented logging of group management operations for LDAP
+
+Tag: V00-00-29
+2011-06-10 Igor Gaponenko
+- fixed a logic flaw in the authorization test method
+
+Tag: V00-00-28
+2011-05-15 Igor Gaponenko
+- automated algorithm for discovering most common special groups to replace
+the static list
+
+Tag: V00-00-27
+2011-05-13 Igor Gaponenko
+- added more special groups
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-26
+2011-02-25 Igor Gaponenko
+- added SQL schema for experiment switch tables
+- bug fixes
+
+Tag: V00-00-25
+2010-07-28 Igor Gaponenko
+- more efficient implementation of RegDBConnection::find_user_account()
+which now avoids browsing through all known POSIX groups
+- added support for managing POSIX groups
+
+Tag: V00-00-23
+2010-07-20 Igor Gaponenko
+- extended input methods of the RegDBHtml utility class to allow disabling inputs
+- fully implemented LDAP group management
+
+Tag: V00-00-22
+2010-05-28 Igor Gaponenko
+- bug fix in RegDBHtml utility class
+- LDAP interfaces migration (yet to be fully completed)
+
+Tag: V00-00-20
+2010-04-26 Igor Gaponenko
+- a bug fix in CreateInstrument class
+- added a new test (see web/tests/ directory) to report parameters
+of the PHP installation
+
+Tag: V00-00-19
+2010-03-26 Igor Gaponenko
+- a bug fix in the CreateExperiment service
+
+Tag: V00-00-18
+2010-01-04 Igor Gaponenko
+- changes in the PHP HTML generator
+
+Tag: V00-00-17
+2009-11-14 Igor Gaponenko
+- added Python module RegDb and a simplified Python interface to the database
+for ONLINE applications
+
+Tag: V00-00-16
+2009-10-28 Igor Gaponenko
+- added fine grain methods for searching records in LDAP. These operations
+were needed for a more efficient implementation of some authorization
+operations.
+
+Tag: V00-00-15
+2009-10-27 Igor Gaponenko
+- reimplemented the PHP connection class to use persistent MySQL connections
+- added a support for locations & facilities (as alternatives for instruments
+and experiments)
+
+Tag: V00-00-14
+2009-10-12 Igor Gaponenko
+- added 'logout' to the Web app interface. It works only for WebAuth.
+
+Tag: V00-00-13
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+- added AuthDB protection for RegDB Web app
+- improved view for POSIX groups
+
+Tag: V00-00-12
+2009-09-28 Igor Gaponenko
+- extended PHP API to allow searching LDAP users
+
+Tag: V00-00-11
+2009-08-28 Igor Gaponenko
+- protect RegDB Web App and relevant Web services from unauthorized
+modifications (of the database) by unauthenticated users.
+- fix bugs
+
+Tag: V00-00-10
+2009-08-20 Igor Gaponenko
+- correctly implemented LDAP interface for PHP apps
+- spell checked Welcome.html
+
+Tag: V00-00-09
+2009-08-18 Igor Gaponenko
+- refactored menus in the RegDB Web app to get the same look and feel as
+for other web apps
+- temporarily relaxed the new experiment registration method due to
+a bug in the LDAP client code (PHP).
+
+Tag: V00-00-08
+2009-08-13 Igor Gaponenko
+- important correctons in PHP code dealing with LDAP
+
+Tag: V00-00-07
+2009-08-11 Igor Gaponenko
+- refactored the global configuration
+
+Tag: V00-00-03
+2009-07-18 Igor Gaponenko
+- extended PHP library
+
+Tag: V00-00-01
+2009-06-29 Igor Gaponenko
+- the first complete implementation of the application. This includes:
+the database schema (MySQL Workbench project, SQL initialization script and
+schema images in the PNG format), and two Web applications, one based on
+plain static HTML is meant to be used for low-level testings, and the "dynamic"
+one employs AJAX and PHP technologies.
