@@ -153,7 +153,7 @@ def active_experiment(instr):
     Get a record for the latest experiment activated for the given instrument.
     The function will return a tuple of:
 
-      (experiment, id, activated, user)
+      (instrument, experiment, id, activated, activated_local_str, user)
 
     Where:
 
