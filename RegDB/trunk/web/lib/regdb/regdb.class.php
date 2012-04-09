@@ -578,6 +578,7 @@ HERE;
     	if( is_null( $instr ) || ( $instr == 'XCS' )) {
             $groups['ps-xcs'] = True;
             $groups['xcsopr'] = True;
+            $groups['xcscom12'] = True;
     	}
     	return $groups;
     }

@@ -30,7 +30,8 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Trigger `
+-- Trigger `REGDB`.`REGDB_FILE_INSERT`
+-- -----------------------------------------------------
 
 DROP TRIGGER IF EXISTS `REGDB`.`REGDB_FILE_INSERT`;
 
@@ -38,6 +39,7 @@ DELIMITER |
 CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT` AFTER INSERT ON `REGDB`.`FILE`
   FOR EACH ROW
   BEGIN
+
     INSERT INTO `REGDB`.`DATA_MIGRATION`
     VALUES(
       NEW.exper_id ,
@@ -47,7 +49,8 @@ CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT` AFTER INSERT ON `REGDB`.`FILE`
       NULL ,
       NULL ,
       NEW.host ,
-      NEW.dirpath ) ;
+      REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1))) ;
+
     INSERT INTO `REGDB`.`DATA_MIGRATION`
     VALUES(
       NEW.exper_id ,
@@ -57,7 +60,8 @@ CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT` AFTER INSERT ON `REGDB`.`FILE`
       NULL ,
       NULL ,
       NEW.host ,
-      CONCAT(NEW.dirpath,'/index') ) ;
+      CONCAT(REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1)),'/index')) ;
+
   END; |
 DELIMITER ;
 
