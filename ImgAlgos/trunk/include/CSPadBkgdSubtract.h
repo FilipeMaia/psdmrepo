@@ -16,7 +16,7 @@
 //#include <iostream>
 //#include <string>
 //#include <vector>
-#include <fstream>  // open, close etc.
+//#include <fstream>  // open, close etc.
 
 //----------------------
 // Base Class Headers --
@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "psddl_psana/cspad.ddl.h" // for Psana::CsPad::MaxQuadsPerSensor etc.
+#include "ImgAlgos/CSPadBackgroundV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -94,12 +95,12 @@ protected:
   void printInputParameters();
   void printEventId(Event& evt);
   std::string stringTimeStamp(Event& evt);
-
-  void getBkgdArray();
   void printBkgdArray();
-  void openFile();
-  void closeFile();
-  void readArrFromFile();
+  void getBkgdArray();
+  void normalizeBkgd(Event& evt);
+  void subtractBkgd(Event& evt);
+  void processQuad(unsigned quad, const int16_t* data, int16_t* corrdata);
+  double normQuadBkgd(unsigned quad, const int16_t* data);
 
 private:
 
@@ -109,17 +110,22 @@ private:
 
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
-  std::string    m_key;             // string with key name
+  std::string    m_inkey;
+  std::string    m_outkey;
   std::string    m_fname;
+  unsigned       m_norm_sector;
   unsigned       m_print_bits;   
  
   long m_count;
 
   unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
-  double         m_bkgd[MaxQuads][MaxSectors][NumColumns][NumRows];  // averaged per pixel background 
+  float          m_common_mode[MaxSectors];
+  //double         m_bkgd[MaxQuads][MaxSectors][NumColumns][NumRows];  // averaged per pixel background 
+  //int16_t        m_corrdata[MaxQuads][MaxSectors][NumColumns][NumRows];  // max size array for corrected quad data
 
-  std::ifstream       m_file;
-  std::vector<double> v_parameters;
+  double         m_norm_factor;
+
+  ImgAlgos::CSPadBackgroundV1 *m_bkgd;
 
 };
 

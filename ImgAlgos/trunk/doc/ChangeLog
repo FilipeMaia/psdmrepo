@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 
+
+Tag: V00-00-XX
+2012-04-10 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBackgroundV1.cpp
+	ImgAlgos/include/CSPadBackgroundV1.h	
+
+
 2012-04-04 Mikhail S. Dubrovin
 - add modules:
         ImgAlgos/src/CSPadBkgdSubtract.cpp 
