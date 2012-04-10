@@ -62,6 +62,29 @@ HERE;
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript">
 
+/* ----------------------------------------------
+ * Window geometry (compatible with all browsers)
+ * ----------------------------------------------
+ */
+function document_inner_geometry() {
+    var winW = 630, winH = 460;
+    if (document.body && document.body.offsetWidth) {
+    winW = document.body.offsetWidth;
+    winH = document.body.offsetHeight;
+    }
+    if (document.compatMode=='CSS1Compat' &&
+        document.documentElement &&
+        document.documentElement.offsetWidth ) {
+        winW = document.documentElement.offsetWidth;
+        winH = document.documentElement.offsetHeight;
+    }
+    if (window.innerWidth && window.innerHeight) {
+        winW = window.innerWidth;
+        winH = window.innerHeight;
+    }
+    var result = {width: winW, height: winH };
+    return result;
+}
 /* ----------------------------------------
  * Authentication and authorization context
  * ----------------------------------------
@@ -170,7 +193,19 @@ function edit_dialog( title, msg, on_save, on_cancel, width, height ) {
 		}
 	});
 }
-    
+
+function large_dialog( title, msg ) {
+    var geom = document_inner_geometry();
+	$('#largedialogs').html(msg);
+	$('#largedialogs').dialog({
+		title:     title,
+		resizable: true,
+        width:     geom.width-20,
+        height:    geom.height-20,
+		modal:     true,
+	});
+}
+
 /* --------------------------------------------------- 
  * The starting point where the JavaScript code starts
  * ---------------------------------------------------
@@ -188,7 +223,7 @@ HERE;
 
 	/* --------------------------------------------------------------------------------------------
 	 */
-	static function body( $document_title, $document_subtitle=null, $document_subtitle_id=null ) {
+	static function body( $document_title, $document_subtitle=null, $document_subtitle_id=null, $extra=null ) {
 
 		require_once('authdb/authdb.inc.php');
 
@@ -204,6 +239,7 @@ HERE;
       <span class="document_title">{$document_title}</span>
       <span class="document_subtitle" id="{$document_subtitle_id}">{$document_subtitle}</span>
     </div>
+    <div style="float:left;">{$extra}</div>
     <div style="float:right;">
       <table><tbody><tr>
         <td valign="bottom">
@@ -296,6 +332,7 @@ HERE;
 
   <div id="popupdialogs" style="display:none;"></div>
   <div id="editdialogs"  style="display:none;"></div>
+  <div id="largedialogs"  style="display:none; overflow:auto;"></div>
   <div id="forms" style="display:none;"></div>
   
 </div>

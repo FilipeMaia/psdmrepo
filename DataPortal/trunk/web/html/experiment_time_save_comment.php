@@ -51,6 +51,9 @@ try {
     $gap_begin_time_64 = intval(trim( $_POST['gap_begin_time_64']));
     $gap_begin_time = LusiTime::from64($gap_begin_time_64);
 
+    if( !isset($_POST[ 'instr_name'] )) report_error( 'no instrumenet name parameter found' );
+    $instr_name = trim( $_POST['instr_name']);
+
     if( !isset($_POST[ 'comment'] )) report_error( 'no gap comment parameter found' );
     $comment_text = trim( $_POST['comment']);
 
@@ -60,19 +63,21 @@ try {
     $sysmon = SysMon::instance();
 	$sysmon->begin();
     if( $comment_text == '' )
-        $sysmon->beamtime_clear_gap_comment( $gap_begin_time );
+        $sysmon->beamtime_clear_gap_comment($gap_begin_time, $instr_name);
     else
         $sysmon->beamtime_set_gap_comment(
             $gap_begin_time,
+            $instr_name,
             $comment_text,
             $system_text,
             LusiTime::now(),
             AuthDB::instance()->authName());
 
-    $comment = $sysmon->beamtime_comment_at($gap_begin_time);
+    $comment = $sysmon->beamtime_comment_at($gap_begin_time, $instr_name);
     $comment_info = is_null($comment) ?
         array('available'     => 0) :
         array('available'     => 1,
+              'instr_name'    => $comment->instr_name(),
               'comment'       => $comment->comment(),
               'system'        => $comment->system(),
               'posted_by_uid' => $comment->posted_by_uid(),

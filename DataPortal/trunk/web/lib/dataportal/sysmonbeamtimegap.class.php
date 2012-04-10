@@ -35,5 +35,6 @@ class SysMonBeamTimeGap {
     public function sysmon    () { return                   $this->$sysmon; }
     public function begin_time() { return LusiTime::from64( $this->attr['begin_time'] ); }
     public function end_time  () { return LusiTime::from64( $this->attr['end_time'] ); }
+    public function instr_name() { return                   $this->attr['instr_name']; }
 }
 ?>

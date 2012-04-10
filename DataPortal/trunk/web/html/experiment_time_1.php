@@ -10,6 +10,7 @@ require_once( 'lusitime/lusitime.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
+use DataPortal\SysMon;
 use DataPortal\DataPortal;
 use DataPortal\DataPortalException;
 
@@ -24,14 +25,15 @@ use LusiTime\LusiTimeException;
  * implementive some adaptive algorithm for adjusting the vertical limits
  * according to the select font size and the gap width.
  */
-$total_height   = 860;
+$total_height   = 840;
 $time_width     =  60;
-$instr_width    = 100;
-$beamon_width   =  80;
+$lclson_width   = 140;
+$beamon_width   = 140;
+$run_width      = 140;
 $comments_width = 400;
 $system_width   =  80;
-$uid_width      =  80;
-$posted_width   = 120;
+$uid_width      = 100;
+$posted_width   = 150;
 
 $start_day = null;
 try {
@@ -56,7 +58,6 @@ try {
 
     $can_edit = $authdb->hasRole($authdb->authName(),null,'BeamTimeMonitor','Editor');
 
-    //DataPortal::begin( "LCLS Beam-Time Usage Monitor" );
     DataPortal::begin( "LCLS Data Taking Time Monitor" );
 
 ?>
@@ -66,32 +67,36 @@ try {
 <!------------------- Page-specific Styles ------------------------->
 <style type="text/css"> 
 
-#workarea {
-  padding: 20 20 0 20;
-  border-top: 1 solid #000000;
-}
 #controls {
-  float: left;
   margin-bottom: 20;
 }
-#statistics {
-  float: left;
+.instrument_container {
+  border-top: 1 solid #c0c0c0;
+  padding: 20;
+}
+.statistics {
   margin-bottom: 20;
-  margin-left: 20;
-  font-size: 28;
+  font-family: "Times", serif;
   font-weight: bold;
+  text-align: left;
+  font-size: 24;
 }
-#title {
+.beam_time_title {
   float: left;
-  margin-left: 40;
 }
-#beam {
-  float: left;
-  margin-left: 10;
-}
-#usage {
+.beam_time {
   float: left;
   margin-left: 10;
+  font-weight: normal;
+}
+.esimated_usage_title {
+  float: left;
+  margin-left: 20;
+}
+.estimated_usage {
+  float: left;
+  margin-left: 10;
+  font-weight: normal;
   color: green;
 }
 .table_column {
@@ -100,21 +105,26 @@ try {
   border-bottom: 1 solid #c0c0c0;
 }
 .table_column_time {
-  width: <?php echo $time_width; ?>;
+  width: <?php echo $time_width - 1; ?>;
   border-left: 0;
   border-right: 1 solid #080808;
 }
-.table_column_instr {
-  width: <?php echo $instr_width; ?>;
+.table_column_lclson {
+  width: <?php echo $lclson_width - 1; ?>;
   border-left: 0;
+  border-right: 1 solid #080808;
 }
 .table_column_beamon {
-  width: <?php echo $beamon_width; ?>;
+  width: <?php echo $beamon_width - 1; ?>;
   border-left: 0;
   border-right: 1 solid #080808;
 }
+.table_column_run {
+  width: <?php echo $run_width; ?>;
+  border-left: 0;
+}
 .table_column_comments {
-  width: <?php echo $comments_width; ?>;
+  width: <?php echo $comments_width - 1; ?>;
   border-left: 1 solid #080808;
 }
 .table_column_system {
@@ -128,10 +138,13 @@ try {
 }
 .table_column_header {
   padding: 4;
-  border-bottom: 1 solid #080808;
+  border-right: 2 solid #a0a0a0;
+  border-bottom: 2 solid #000000;
   background-color: #c0c0c0;
   text-align: center;
+  font-family: "Times", serif;
   font-weight: bold;
+  font-size: 18px;
 }
 .table_column_body {
   position:relative;
@@ -142,14 +155,18 @@ try {
   background-color:#c0c0c0;
   font-size: 12;
 }
+.lclson {
+  width: <?php echo $lclson_width; ?>;
+  background-color: #000000;
+}
 .beamon {
   width: <?php echo $beamon_width; ?>;
   background-color: #000000;
 }
 .comment {
-  width:  <?php echo $comments_width - 4; ?>;
+  width:  <?php echo $comments_width - 6; ?>;
   background-color: #ffffff;
-  padding-left: 2;
+  padding-left: 4;
   font-size: 12;
 }
 .comment2edit {
@@ -157,21 +174,24 @@ try {
   background-color: #B9DCF5;
 }
 .system {
-  width:  <?php echo $system_width; ?>;
+  width:  <?php echo $system_width - 6; ?>;
   background-color: #ffffff;
   border-left: 0;
+  padding-left: 4;
   font-size: 12;
 }
 .uid {
-  width:  <?php echo $uid_width; ?>;
+  width:  <?php echo $uid_width - 6; ?>;
   background-color: #ffffff;
   border-left: 0;
+  padding-left: 4;
   font-size: 12;
 }
 .posted {
-  width:  <?php echo $posted_width; ?>;
+  width:  <?php echo $posted_width - 6; ?>;
   background-color: #ffffff;
   border-left: 0;
+  padding-left: 4;
   font-size: 12;
 }
 </style>
@@ -192,8 +212,9 @@ try {
 
 var total_height   = <?php echo $total_height;   ?>;
 var time_width     = <?php echo $time_width;     ?>;
-var instr_width    = <?php echo $instr_width;    ?>;
+var lclson_width   = <?php echo $lclson_width;   ?>;
 var beamon_width   = <?php echo $beamon_width;   ?>;
+var run_width      = <?php echo $run_width;      ?>;
 var comments_width = <?php echo $comments_width; ?>;
 var system_width   = <?php echo $system_width;   ?>;
 var uid_width      = <?php echo $uid_width;      ?>;
@@ -243,18 +264,21 @@ function page_specific_init() {
                 7*24*3600);
         });
 
+    $('#tabs').tabs();
+
     load_shift(initial_shift,0);
 }
     
 function report_error(msg) {
     alert(msg);
 }
-function save_comment(gap_begin_time_64,comment,system) {
+function save_comment(gap_begin_time_64,instr_name,comment,system) {
     $.ajax({
         type: 'POST',
         url: '../portal/experiment_time_save_comment.php',
         data: {
             gap_begin_time_64: gap_begin_time_64,
+            instr_name: instr_name,
             comment: comment,
             system : system
         },
@@ -273,7 +297,7 @@ function system_changed() {
     var system = editor.find('select').val();
     editor.find('input').css('display', ( system ? 'none' : 'block' ));
 }
-function edit_comment(gap_begin_time_64) {
+function edit_comment(gap_begin_time_64,instr_name) {
     var html =
 '<div id="comment_editor" >'+
 '  <div style="margin-top:5px;">'+
@@ -287,10 +311,16 @@ function edit_comment(gap_begin_time_64) {
 '    </div>'+
 '    <div style="float:left; ">'+
 '      <select onchange="system_changed()">';
+    var num_systems = 0;
     for( var i in shift_data.systems ) {
+        num_systems++;
         var system = shift_data.systems[i];
         html +=
 '        <option value="'+system+'">'+system+'</option>';
+    }
+    if( !num_systems ) {
+        html +=
+'        <option value="'+instr_name+'">'+instr_name+'</option>';
     }
     html +=
 '        <option value="">Create New...</option>'+
@@ -313,9 +343,12 @@ function edit_comment(gap_begin_time_64) {
                 system = editor.find('input').val();
                 shift_data.systems.push(system);
             }
-            save_comment(gap_begin_time_64, comment, system);
+            save_comment(gap_begin_time_64, instr_name, comment, system);
         },
-        null,
+        function () {
+            large_dialog( 'test', 'a range of e-log messages will be here soon' );
+        },
+        //null,
         460,
         280
     );
@@ -324,17 +357,18 @@ function enable_comment_editor(elem,yes) {
     if(yes) $(elem).addClass   ('comment2edit');
     else    $(elem).removeClass('comment2edit');
 }
-function display_shift() {
+function display_shift(instr_data,instr_name) {
 
-    $('#beam').html(shift_data.beam+'%');
-    $('#usage').html(shift_data.usage+'%');
+    var stats = $('#tab_'+instr_name+' .instrument_container .statistics');
+    stats.find('.beam_time').html(instr_data.total_beam_time);
+    stats.find('.estimated_usage').html(instr_data.total_beam_usage_percent+' %');
 
     var stop_sec    = shift_data.stop_sec;
     var start_sec   = shift_data.start_sec;
 
     var plot =
 '<div class="table_column table_column_time" >'+
-'  <div class="table_column_header" >time</div>'+
+'  <div class="table_column_header" >Time</div>'+
 '  <div class="table_column_body table_column_body_time" >';
     for( var sec = 0.; sec <= stop_sec - start_sec; sec += 3600.) {
         var h = sec / 3600.;
@@ -342,7 +376,7 @@ function display_shift() {
         var h2 = Math.floor(h);
         var left = 0;
         var top1   = Math.floor( total_height * sec   / ( stop_sec - start_sec )) - 12;
-        var height = Math.floor( total_height * 1800. / ( stop_sec - start_sec ));
+        var height = Math.ceil ( total_height * 1800. / ( stop_sec - start_sec ));
         var top2   = top1 + height;
         if( h > 0. ) {
             plot +=
@@ -355,120 +389,132 @@ function display_shift() {
     plot +=
 '  </div>'+
 '</div>'+
-'<div class="table_column table_column_beamon" >'+
-'  <div class="table_column_header" >beam</div>'+
+'<div class="table_column table_column_lclson" >'+
+'  <div class="table_column_header" >LCLS beam</div>'+
 '  <div class="table_column_body" >';
-    {
-        var left   = 0;
-        var top    = 0;
-        var height = total_height;
-        plot +=
-'    <div class="beamon" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
-    }
-    plot +=
-'  </div>'+
-'</div>';
-
-    var plot4instr = {};
-    for( var i in shift_data.instrument_names )
-        plot4instr[shift_data.instrument_names[i]] = '';
-
-    for( var i in shift_data.runs ) {
-        var run     = shift_data.runs[i];
-        var left   = 0;
-        var top    = Math.floor( total_height *                           run.begin_rel2start_sec   / ( stop_sec - start_sec));
-        var height = Math.floor( total_height * ( run.end_rel2start_sec - run.begin_rel2start_sec ) / ( stop_sec - start_sec));
-        if( !height ) height = 1;
-        plot4instr[run.instr_name] +=
-'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+instr_width+'; height:'+height+'; background-color:#000000; "></div>';
-    }
-    for( var i in shift_data.instrument_names ) {
-        var instr_name = shift_data.instrument_names[i];
-        plot +=
-'<div class="table_column table_column_instr" >'+
-'  <div class="table_column_header" >'+instr_name+'</div>'+
-'  <div class="table_column_body" >';
-        for( var j in shift_data.gaps ) {
-            var gap = shift_data.gaps[j];
-            var left = 0;
-            var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec ));
-            var height = Math.floor( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+    for( var i in shift_data.lcls_status ) {
+        var ival   = shift_data.lcls_status[i];
+        if( ival.status > 0 ) {
+            var left   = 0;
+            var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
+            var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
             if( !height ) height = 1;
             plot +=
-'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+instr_width+'; height:'+height+'; background-color:#ffffff; "></div>';
+'    <div class="lclson" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
         }
-        plot +=
-plot4instr[instr_name]+
-'  </div>'+
-'</div>';
     }
     plot +=
-'<div class="table_column table_column_comments" >'+
-'  <div class="table_column_header" >downtime justification</div>'+
+'  </div>'+
+'</div>'+
+'<div class="table_column table_column_beamon" >'+
+'  <div class="table_column_header" >Beam in hatch</div>'+
 '  <div class="table_column_body" >';
-    for( var i in shift_data.gaps ) {
-        var gap = shift_data.gaps[i];
+    for( var i in instr_data.beam_status ) {
+        var ival   = instr_data.beam_status[i];
+        if( ival.status > 0 ) {
+            var left   = 0;
+            var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
+            var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
+            if( !height ) height = 1;
+            plot +=
+'    <div class="beamon" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
+        }
+    }
+    plot +=
+'  </div>'+
+'</div>'+
+'<div class="table_column table_column_run" >'+
+'  <div class="table_column_header" >Taking data</div>'+
+'  <div class="table_column_body" >';
+    for( var j in instr_data.gaps ) {
+        var gap = instr_data.gaps[j];
         var left = 0;
-        var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec  ));
-        var height = Math.floor( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+        var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec ));
+        var height = Math.ceil ( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
         if( !height ) height = 1;
         plot +=
-'    <div class="comment" id="comment_'+gap.begin_time_64+'" '+
+'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+run_width+'; height:'+height+'; background-color:#ffffff; "></div>';
+    }
+    for( var i in instr_data.runs ) {
+        var run     = instr_data.runs[i];
+        var left   = 0;
+        var top    = Math.floor( total_height *                           run.begin_rel2start_sec   / ( stop_sec - start_sec));
+        var height = Math.ceil ( total_height * ( run.end_rel2start_sec - run.begin_rel2start_sec ) / ( stop_sec - start_sec));
+        if( !height ) height = 1;
+        plot +=
+'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+run_width+'; height:'+height+'; background-color:#000000; "></div>';
+    }
+    plot +=
+'  </div>'+
+'</div>'+
+'<div class="table_column table_column_comments" >'+
+'  <div class="table_column_header" >Downtime justification</div>'+
+'  <div class="table_column_body" >';
+    for( var i in instr_data.gaps ) {
+        var gap = instr_data.gaps[i];
+        var left = 0;
+        var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec  ));
+        var height = Math.ceil ( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+        if( !height ) height = 1;
+        var gap_sec = gap.end_rel2start_sec - gap.begin_rel2start_sec;
+        var title = ( gap_sec > 3600 ? Math.floor( gap_sec / 3600 )+'h '+Math.floor(( gap_sec % 3600 ) / 60 )+'m' : Math.floor( gap_sec / 60 )+'m' )+' : click to edit';
+        plot +=
+'    <div class="comment" id="comment_'+instr_name+'_'+gap.begin_time_64+'" '+
     (can_edit ?
-' onclick="edit_comment('+gap.begin_time_64+')" onmouseover="enable_comment_editor(this,true)" onmouseout="enable_comment_editor(this,false)"' :
+' onclick="edit_comment('+gap.begin_time_64+','+"'"+instr_name+"'"+')" onmouseover="enable_comment_editor(this,true)" onmouseout="enable_comment_editor(this,false)"' :
 ''
     )+
-' style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; overflow:auto;" '+(can_edit ? ' title="click to edit"' : '')+' ></div>';
+' style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; overflow:auto;" '+(can_edit ? ' title="'+title+'"' : '')+' ></div>';
     }
     plot +=
 '  </div>'+
 '</div>'+
 '<div class="table_column table_column_system" >'+
-'  <div class="table_column_header" >system</div>'+
+'  <div class="table_column_header" >System</div>'+
 '  <div class="table_column_body" >';
-    for( var i in shift_data.gaps ) {
-        var gap = shift_data.gaps[i];
+    for( var i in instr_data.gaps ) {
+        var gap = instr_data.gaps[i];
         var left = 0;
         var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec  ));
-        var height = Math.floor( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+        var height = Math.ceil ( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
         if( !height ) height = 1;
         plot +=
 '    <div class="system" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " >'+
-'      <div id="system_'+gap.begin_time_64+'" ></div>'+
+'      <div id="system_'+instr_name+'_'+gap.begin_time_64+'" ></div>'+
 '    </div>';
     }
     plot +=
 '  </div>'+
 '</div>'+
 '<div class="table_column table_column_uid" >'+
-'  <div class="table_column_header" >posted by</div>'+
+'  <div class="table_column_header" >Posted by</div>'+
 '  <div class="table_column_body" >';
-    for( var i in shift_data.gaps ) {
-        var gap = shift_data.gaps[i];
+    for( var i in instr_data.gaps ) {
+        var gap = instr_data.gaps[i];
         var left = 0;
         var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec  ));
-        var height = Math.floor( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+        var height = Math.ceil ( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
         if( !height ) height = 1;
         plot +=
 '    <div class="uid" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " >'+
-'      <div id="uid_'+gap.begin_time_64+'" ></div>'+
+'      <div id="uid_'+instr_name+'_'+gap.begin_time_64+'" ></div>'+
 '    </div>';
     }
     plot +=
 '  </div>'+
 '</div>'+
 '<div class="table_column table_column_posted" >'+
-'  <div class="table_column_header" >post time</div>'+
+'  <div class="table_column_header" >Post time</div>'+
 '  <div class="table_column_body" >';
-    for( var i in shift_data.gaps ) {
-        var gap = shift_data.gaps[i];
+    for( var i in instr_data.gaps ) {
+        var gap = instr_data.gaps[i];
         var left = 0;
         var top    = Math.floor( total_height *                           gap.begin_rel2start_sec   / ( stop_sec - start_sec  ));
-        var height = Math.floor( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
+        var height = Math.ceil ( total_height * ( gap.end_rel2start_sec - gap.begin_rel2start_sec ) / ( stop_sec - start_sec ));
         if( !height ) height = 1;
         plot +=
 '    <div class="posted" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " >'+
-'      <div id="posted_'+gap.begin_time_64+'" ></div>'+
+'      <div id="posted_'+instr_name+'_'+gap.begin_time_64+'" ></div>'+
 '    </div>';
     }
     plot +=
@@ -476,36 +522,39 @@ plot4instr[instr_name]+
 '</div>'+
 '<div style="clear:both;"></div>';
 
-    $('#current_selection').html(plot);
-    for( var i in shift_data.gaps ) {
-        var gap = shift_data.gaps[i];
-        set_comment( gap.begin_time_64, gap.comment );
+    $('#tab_'+instr_name+' .instrument_container .table').html(plot);
+    for( var i in instr_data.gaps ) {
+        var gap = instr_data.gaps[i];
+        set_comment( gap.begin_time_64, instr_name, gap.comment );
     }
 }
-function set_comment(gap_begin_time_64, comment) {
+function set_comment(gap_begin_time_64, instr_name, comment) {
     if( comment.available ) {
-        $('#comment_'+gap_begin_time_64).text(comment.comment);
-        $('#system_' +gap_begin_time_64).text(comment.system);
-        $('#uid_'    +gap_begin_time_64).text(comment.posted_by_uid);
-        $('#posted_' +gap_begin_time_64).text(comment.post_time);
+        $('#comment_'+instr_name+'_'+gap_begin_time_64).text(comment.comment);
+        $('#system_' +instr_name+'_'+gap_begin_time_64).text(comment.system);
+        $('#uid_'    +instr_name+'_'+gap_begin_time_64).text(comment.posted_by_uid);
+        $('#posted_' +instr_name+'_'+gap_begin_time_64).text(comment.post_time);
     } else {
-        $('#comment_'+gap_begin_time_64).text('');
-        $('#system_' +gap_begin_time_64).text('');
-        $('#uid_'    +gap_begin_time_64).text('');
-        $('#posted_' +gap_begin_time_64).text('');
+        $('#comment_'+instr_name+'_'+gap_begin_time_64).text('');
+        $('#system_' +instr_name+'_'+gap_begin_time_64).text('');
+        $('#uid_'    +instr_name+'_'+gap_begin_time_64).text('');
+        $('#posted_' +instr_name+'_'+gap_begin_time_64).text('');
     }
 }
 function load_shift(shift,delta) {
     $.ajax({
         type: 'GET',
-        url: '../portal/experiment_time_get.php',
+        url: '../portal/experiment_time_get_1.php',
         data: {shift: shift, delta:delta},
         success: function(data) {
             if( data.status != 'success' ) { report_error(data.message); return; }
             shift_data = data;
             $('#controls').find('input[name="shift"]').
                 datepicker('setDate',shift_data.shift);
-            display_shift();
+            for( var i in shift_data.instrument_names ) {
+                var instr_name = shift_data.instrument_names[i];
+                display_shift(shift_data.instruments[instr_name],instr_name);
+            }
         },
         error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
@@ -517,8 +566,16 @@ function load_shift(shift,delta) {
 
 
 <?php
-    //DataPortal::body( "LCLS Beam-Time Usage Monitor" );
-    DataPortal::body( "LCLS Data Taking Time Monitor" );
+    $shift_controls = <<<HERE
+  <div id="controls" style="margin-left:20px; font-size:20;">
+      <button name="prev_week"  title="go to the previous week" > &lt;&lt; </button>
+      <button name="prev_shift" title="go to the previous shift" > &lt; </button>
+      <input style="padding:3; font-size:16;" type="text" size=7 name="shift" />
+      <button name="next_shift" title="go to the next shift" > &gt; </button>
+      <button name="next_week"  title="go to the next week"  > &gt;&gt;</button>
+  </div>
+HERE;
+    DataPortal::body( "LCLS Data Taking Time Monitor: ", null, null, $shift_controls );
 ?>
 
 
@@ -529,31 +586,38 @@ function load_shift(shift,delta) {
 
     echo <<<HERE
 
-<div id="workarea">
+<div id="tabs">
+    <ul>
+HERE;
 
-  <div id="controls">
+    foreach( SysMon::instrument_names() as $instr_name) {
+        echo <<<HERE
+      <li><a href="#tab_{$instr_name}">{$instr_name}</a></li>
+HERE;
+    }
+    echo <<<HERE
 
-    <button name="prev_week"  title="go to the previous week" > &lt;&lt; </button>
-    <button name="prev_shift" title="go to the previous shift" > &lt; </button>
+    </ul>
 
-    <input style="padding:3; font-size:16;" type="text" size=7 name="shift" />
+HERE;
 
-    <button name="next_shift" title="go to the next shift" > &gt; </button>
-    <button name="next_week"  title="go to the next week"  > &gt;&gt;</button>
-
-  </div>
-
-  <div id="statistics" >
-    <div id="title" >Beam time: </div>
-    <div id="beam" ></div>
-    <div id="title" >Usage: </div>
-    <div id="usage" ></div>
-    <div style="clear:both;"></div>
-  </div>
-
-  <div style="clear:both;"></div>
-
-  <div id="current_selection">Loading...</div>
+    foreach( SysMon::instrument_names() as $instr_name) {
+        echo <<<HERE
+    <div id="tab_{$instr_name}" >
+      <div class="instrument_container" >
+        <div class="statistics" >
+          <div class="beam_time_title" >Beam in hatch: </div>
+          <div class="beam_time" ></div>
+          <div class="esimated_usage_title" >Estimated usage: </div>
+          <div class="estimated_usage" ></div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="table">Loading...</div>
+      </div>
+    </div>
+HERE;
+    }
+    echo <<<HERE
 
 </div>
 
