@@ -171,8 +171,11 @@ class Event(object):
         result = []
         if self.m_dg:
             for x in self._xtcGenerator(self.m_dg.xtc):
+                typeid = x.contains.id()
+                # protection against badly corrupted data
+                if typeid < 0 or typeid >= xtc.TypeId.Type.NumberOf: continue
                 # filter out Epics too
-                if x.contains.id() not in [xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Id_Epics]:
+                if typeid not in [xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Id_Epics]:
                     result.append((x.contains, x.src))
 
         for k in self.m_userData.iterkeys():
@@ -851,6 +854,8 @@ class Env(object):
             for level in (xtc.Level.Source, xtc.Level.Control):
                 for x in evt.findXtc(level=level):
                     typeid = x.contains.id()
+                    # protection against badly corrupted data
+                    if typeid < 0 or typeid >= xtc.TypeId.Type.NumberOf: continue
                     if typeid not in [xtc.TypeId.Type.Id_Epics, xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Any]:
                         # don't store Epics data as config
                         try :

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-47
+2012-04-10 Andy Salnikov
+- added protection against corrupted type ID
+
 Tag: V00-00-46
 2012-04-02 Andy Salnikov
 - Env.mkfile() creates temporary files in the same directory as 
