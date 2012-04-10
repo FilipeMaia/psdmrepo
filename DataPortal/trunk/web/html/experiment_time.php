@@ -544,7 +544,7 @@ function set_comment(gap_begin_time_64, instr_name, comment) {
 function load_shift(shift,delta) {
     $.ajax({
         type: 'GET',
-        url: '../portal/experiment_time_get_1.php',
+        url: '../portal/experiment_time_get.php',
         data: {shift: shift, delta:delta},
         success: function(data) {
             if( data.status != 'success' ) { report_error(data.message); return; }
