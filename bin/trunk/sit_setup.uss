@@ -18,7 +18,7 @@
 def_sit_root=/reg/g/psdm
 
 # SCons versions
-scons_ver="1.2.0 1.1.0"
+scons_ver="2.1.0-python2.4 1.2.0"
 
 # The map which lists acceptable (compatible) architectures 
 # for the current processor. For example if system is detected
@@ -251,6 +251,9 @@ prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python2.4/s
 for v in $scons_ver ; do
   if [ -d "$SIT_ROOT/sw/external/scons/$v/$SIT_ARCH/bin" ] ; then
     prepend_path PATH "$SIT_ROOT/sw/external/scons/$v/$SIT_ARCH/bin"
+    break
+  elif [ -d "$SIT_ROOT/sw/external/scons/$v/bin" ] ; then
+    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v/bin"
     break
   fi
 done
