@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2012-04-11 Andy Salnikov
+- refactoring things a little bit
+- buildes that were installed in builders.py are now made SCons tools
+  and appear as individual tools in src/tools directory
+- Python extensions are now built with new builder (in tools/pyext)
+- work started on integrating Cython support
+
 Tag: V00-01-11
 2012-02-09 Andy Salnikov
 - add quiet option to pydoc-driver

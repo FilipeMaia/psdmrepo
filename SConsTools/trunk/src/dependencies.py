@@ -117,7 +117,7 @@ def findAllDependencies( node ):
         # take all children which are include files, i.e. they live in
         # .../arch/${SIT_ARCH}/genarch/Package/ or include/Package/ directory
         f = str(child)
-        trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
+        #trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
         p = _guessPackage ( f )
         if p : 
             res.add ( p )
@@ -238,6 +238,16 @@ def adjustPkgDeps ( env ) :
                 libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
                 lib.env['LIBS'].extend ( libs )
             trace ( str(lib)+" libs = " + str(map(str,lib.env['LIBS'])), "adjustPkgDeps", 4 )
+
+            #
+            # This is a hack to tell scons to rescan the library, otherwise
+            # it can decide in some cases that it has been scanned already
+            # and won't scan it again, and the libraries that we have just
+            # added will not be in the dependency list which can result in 
+            # the unnecessary rebuilding of the binary
+            # 
+            if lib.env['LIBS'] : 
+                lib.implicit = None
             
     # iterate over all binaries
     for pkg, bins in env['PKG_TREE_BINS'].iteritems() :

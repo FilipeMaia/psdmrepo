@@ -8,7 +8,7 @@
 
 import os
 import sys
-import pprint
+from pprint import *
 from os.path import join as pjoin
 
 from SCons.Defaults import *
@@ -32,35 +32,47 @@ def buildEnv () :
     env = DefaultEnvironment(ENV = os.environ, variables = vars)
 
     # set trace level based on the command line value
-    tracev = int(env['TRACE'])
-    setTraceLevel ( tracev )
+    setTraceLevel(int(env['TRACE']))
 
     # get repository list from it
-    sit_repos = env['SIT_REPOS']
-    sit_repos = [ r for r in sit_repos.split(':') if r ]
+    sit_repos = [ r for r in env['SIT_REPOS'].split(':') if r ]
+    
     # all repos including local
     all_sit_repos = [ '#' ] + sit_repos
+
+    # SIT_ROOT
+    sit_root = os.environ["SIT_ROOT"]
 
     # arch parts
     sit_arch = env['SIT_ARCH']
     sit_arch_parts = sit_arch.split('-')
     sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
-    # SIT_ROOT
-    sit_root = os.environ.get( "SIT_ROOT", "" )
-
+    # extend environment with tools
+    tools = ['pyext', 'cython', 'symlink', 'pycompile', 'unittest', 'script_install']
+    toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
+    trace ( "toolpath = " + pformat(toolpath), "buildEnv", 3 )
+    for tool in tools:
+        tool = env.Tool(tool, toolpath = toolpath)
+    
     # build all paths    
-    archdir = pjoin("#arch/",sit_arch)
+    archdir = pjoin("#arch/", sit_arch)
     archincdir = "${ARCHDIR}/geninc"
     bindir = "${ARCHDIR}/bin"
     libdir = "${ARCHDIR}/lib"
     pydir = "${ARCHDIR}/python"
     cpppath = []
     for r in all_sit_repos :
-        cpppath.append ( pjoin(r,"arch",sit_arch,"geninc") )
-        cpppath.append ( pjoin(r,"include") )
-    libpath = [ pjoin(r,"arch",sit_arch,"lib") for r in all_sit_repos ]
-    
+        cpppath.append(pjoin(r, "arch", sit_arch, "geninc"))
+        cpppath.append(pjoin(r, "include"))
+    libpath = [ pjoin(r, "arch", sit_arch, "lib") for r in all_sit_repos ]
+
+    cythonflags = ["--cplus", '-I', pjoin("arch", sit_arch, "geninc"), '-I', 'include']
+    for r in sit_repos :
+        cythonflags += ["-I", pjoin(r, "arch", sit_arch, "geninc")]
+        cythonflags += ["-I", pjoin(r, "include")]
+    cythonflags = ' '.join(cythonflags)
+
     # set other variables in environment
     env.Replace( ARCHDIR = archdir,
                  ARCHINCDIR = archincdir,
@@ -81,8 +93,12 @@ def buildEnv () :
                  PKG_TREE_BINDEPS = {},
                  PKG_TREE_LIB = {},
                  PKG_TREE_BINS = {},
-                 ALL_TARGETS = {} )
-    
+                 ALL_TARGETS = {},
+                 CXXFILESUFFIX = ".cpp",
+                 CYTHONFLAGS = cythonflags,
+                 CYTHONCFILESUFFIX = ".cpp"
+                 )
+
     # may want to use "relative" RPATH
     # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
 
@@ -91,10 +107,10 @@ def buildEnv () :
     env['ALL_TARGETS']['BINS'] = []
     env['ALL_TARGETS']['TESTS'] = []
 
-    # generate help    
+    # generate help
     Help(vars.GenerateHelpText(env))
     
-    #trace ( "Build env = "+pprint.pformat(env.Dictionary()), "buildEnv", 7 )
+    trace ( "Build env = " + pformat(env.Dictionary()), "buildEnv", 7 )
     
     #for r in sit_repos :
     #    trace ( "Add repository "+r, "<top>", 2 )

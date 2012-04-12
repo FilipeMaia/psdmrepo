@@ -20,6 +20,7 @@ from SConsTools.scons_functions import *
 
 
 _cplusplus_ext = [ 'cc', 'cpp', 'cxx', 'C', 'c' ]
+_cython_ext = [ 'pyx' ]
 
 # normalize source file path
 def _normbinsrc ( dir, f ):
@@ -143,16 +144,28 @@ def standardPyExt( **kw ) :
 
     env = DefaultEnvironment()
     pkg = _getpkg( kw )
-    extsrcs = Flatten ( [ MyGlob("pyext/*."+ext, source=True, strings=True, recursive=True) for ext in _cplusplus_ext ] )
+
+    # check for Cython files first    
+    cysrcs = Flatten([MyGlob("pyext/*."+ext, source=True, strings=True, recursive=True) for ext in _cython_ext])
+    trace ( "cysrcs = "+str(map(str, cysrcs)), "SConscript", 2 )
+    extsrcs = [env.Cython(src) for src in cysrcs]
+    trace ( "pyextsrc = "+str(map(str, extsrcs)), "SConscript", 2 )
+
+    # this glob will find *.c files produced by Cython so I don't add above files
+    extsrcs = Flatten([MyGlob("pyext/*."+ext, source=True, strings=True, recursive=True) for ext in _cplusplus_ext])
     if extsrcs :
         
-        trace ( "pyextsrc = "+str(map(str,extsrcs)), "SConscript", 2 )
+        trace ( "pyextsrc = "+str(map(str, extsrcs)), "SConscript", 2 )
         
         pydir = env['PYDIR']
 
         extmodname = kw.get('PYEXTMOD', pkg)
 
-        extmod = env.LoadableModule ( extmodname, source=extsrcs, LIBS=[], SHLIBPREFIX='' )
+        objects = [env.PythonObject(src) for src in extsrcs]
+        # if package builds standard library then add it to the link
+        libs = env['PKG_TREE_LIB'].get(pkg, [])
+        if libs: libs = [pkg]
+        extmod = env.PythonExtension ( extmodname, source=objects, LIBS=libs)
         iextmod = env.Install ( pydir, source=extmod )
         env['ALL_TARGETS']['LIBS'].extend ( iextmod )
         
@@ -186,7 +199,7 @@ def standardBins( **kw ) :
 def standardTests( **kw ) :
     
     env = DefaultEnvironment()
-    trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+    #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 
     # binaries in the test/ directory
     targets0 = _standardBins ( 'test', 'TESTS', False, **kw )
@@ -282,7 +295,7 @@ def _standardScripts( appdir, binenv, installdir, **kw ) :
     for s in scripts : 
         dst = pjoin(installdir,os.path.basename(s))
         trace ( "install script = "+dst, "SConscript", 2 )
-        script = env.ScriptInstall ( dst, s )
+        script = env.ScriptInstall(dst, s)
         targets.extend ( script )
 
     return targets
