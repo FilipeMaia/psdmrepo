@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-04-12 Andy Salnikov
+- unittest targes are made AlwaysBuild() as their dependencies 
+  are sometimes impossible to figure out (scripts)
+
 Tag: V00-02-00
 2012-04-11 Andy Salnikov
 - refactoring things a little bit

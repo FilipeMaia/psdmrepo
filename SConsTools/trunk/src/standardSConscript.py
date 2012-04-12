@@ -224,6 +224,9 @@ def standardTests( **kw ) :
     for u in utests :
         t = env.UnitTest ( str(u)+'.utest', u )
         env['ALL_TARGETS']['TESTS'].extend( t )
+        # dependencies for unit tests are difficult to figure out,
+        # especially for Python scripts, so make them run every time
+        env.AlwaysBuild(t)
 
 #
 # Build binaries, possibly install them
