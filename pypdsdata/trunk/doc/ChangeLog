@@ -6,6 +6,15 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-59
+2012-04-12 Andy Salnikov
+- upgrade to pdsdata V03-05-00
+- new class epics/ConfigV1, Python wrapper implemented but it needs 
+  additional non-trivial support in pyana to become useful
+- new classes oceanoptics/ConfigV1 and oceanoptics/DataV1, python
+  wrappers are there but this stuff is commented-out for now, some
+  things are not quite right and data are not produced yet
+
 Tag: V00-00-58
 2012-04-04 Andy Salnikov
 - small fix in _pdsdata.xtc docstring

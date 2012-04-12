@@ -54,6 +54,9 @@ namespace {
         { "HfxMonImb01",     Pds::BldInfo::HfxMonImb01 },
         { "HfxMonImb02",     Pds::BldInfo::HfxMonImb02 },
         { "HfxMonImb03",     Pds::BldInfo::HfxMonImb03 },
+        { "MecLasEm01",      Pds::BldInfo::MecLasEm01 },
+        { "MecLasDio01",     Pds::BldInfo::MecLasDio01 },
+        { "MecTcTrDio01",    Pds::BldInfo::MecTcTrDio01 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };

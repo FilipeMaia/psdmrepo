@@ -138,6 +138,9 @@
 #include "types/lusi/IpmFexV1.h"
 #include "types/lusi/PimImageConfigV1.h"
 
+#include "types/oceanoptics/ConfigV1.h"
+#include "types/oceanoptics/DataV1.h"
+
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
@@ -347,6 +350,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Lusi::PimImageConfigV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "lusi", module );
+
+//  module = Py_InitModule3( "_pdsdata.oceanoptics", 0, "The Python wrapper module for pdsdata/oceanoptics" );
+//  pypdsdata::OceanOptics::ConfigV1::initType( module );
+//  pypdsdata::OceanOptics::DataV1::initType( module );
+//  Py_INCREF( module );
+//  PyModule_AddObject( this_module, "oceanoptics", module );
 
   module = Py_InitModule3( "_pdsdata.opal1k", 0, "The Python wrapper module for pdsdata/opal1k" );
   pypdsdata::Opal1k::ConfigV1::initType( module );

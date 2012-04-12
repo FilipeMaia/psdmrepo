@@ -22,9 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ConfigV1.h"
 #include "EpicsPvCtrl.h"
 #include "EpicsPvTime.h"
 #include "epicsTimeStamp.h"
+#include "PvConfigV1.h"
 #include "pdsdata/epics/EpicsDbrTools.hh"
 
 //-----------------------------------------------------------------------
@@ -104,6 +106,8 @@ EpicsModule::getModule()
   // add types
   pypdsdata::EpicsPvCtrl::initType( module );
   pypdsdata::EpicsPvTime::initType( module );
+  pypdsdata::Epics::ConfigV1::initType( module );
+  pypdsdata::Epics::PvConfigV1::initType( module );
   pypdsdata::Epics::epicsTimeStamp::initType( module );
 
   // make the list of severity strings

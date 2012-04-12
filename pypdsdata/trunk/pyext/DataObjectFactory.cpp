@@ -60,6 +60,7 @@
 #include "types/encoder/DataV2.h"
 
 #include "types/epics/EpicsModule.h"
+#include "types/epics/ConfigV1.h"
 
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
@@ -87,6 +88,9 @@
 #include "types/lusi/IpmFexConfigV2.h"
 #include "types/lusi/IpmFexV1.h"
 #include "types/lusi/PimImageConfigV1.h"
+
+#include "types/oceanoptics/ConfigV1.h"
+#include "types/oceanoptics/DataV1.h"
 
 #include "types/opal1k/ConfigV1.h"
 
@@ -385,6 +389,18 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_CspadCompressedElement :
     break;
+
+  case Pds::TypeId::Id_OceanOpticsConfig :
+    //if ( not obj ) obj = xtc2obj<OceanOptics::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_OceanOpticsData :
+    //if ( not obj ) obj = xtc2obj<OceanOptics::DataV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_EpicsConfig :
+    if ( not obj ) obj = xtc2obj<Epics::ConfigV1, 1>(xtc, parent);
+    break ;
 
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum

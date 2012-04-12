@@ -135,6 +135,9 @@ namespace {
       { "Timepix",   Pds::DetInfo::Timepix },
       { "Opal2000",  Pds::DetInfo::Opal2000 },
       { "Opal4000",  Pds::DetInfo::Opal4000 },
+      { "OceanOptics", Pds::DetInfo::OceanOptics },
+      { "Opal1600",  Pds::DetInfo::Opal1600 },
+      { "Opal8000",  Pds::DetInfo::Opal8000 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

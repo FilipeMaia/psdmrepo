@@ -86,6 +86,9 @@ namespace {
       { "Id_TimepixConfig",   Pds::TypeId::Id_TimepixConfig },
       { "Id_TimepixData",     Pds::TypeId::Id_TimepixData },
       { "Id_CspadCompressedElement", Pds::TypeId::Id_CspadCompressedElement },
+      { "Id_OceanOpticsConfig", Pds::TypeId::Id_OceanOpticsConfig },
+      { "Id_OceanOpticsData", Pds::TypeId::Id_OceanOpticsData },
+      { "Id_EpicsConfig",     Pds::TypeId::Id_EpicsConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
