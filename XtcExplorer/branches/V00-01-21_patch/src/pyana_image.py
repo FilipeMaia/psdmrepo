@@ -131,6 +131,8 @@ class  pyana_image ( object ) :
         self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
                              'Cspad'     : TypeId.Type.Id_CspadConfig ,
                              'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
+                             'Opal2000'  : TypeId.Type.Id_Opal1kConfig,
+                             'Opal4000'  : TypeId.Type.Id_Opal1kConfig, 
                              'TM6740'    : TypeId.Type.Id_TM6740Config,
                              'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
                              'Princeton' : TypeId.Type.Id_PrincetonConfig,
@@ -143,6 +145,8 @@ class  pyana_image ( object ) :
                           'Cspad'         : TypeId.Type.Id_CspadElement,
                           'TM6740'        : TypeId.Type.Id_Frame,
                           'Opal1000'      : TypeId.Type.Id_Frame,
+                          'Opal2000'      : TypeId.Type.Id_Frame,
+                          'Opal4000'      : TypeId.Type.Id_Frame,
                           'pnCCD'         : TypeId.Type.Id_pnCCDframe,
                           'Princeton'     : TypeId.Type.Id_PrincetonFrame,
                           'Timepix'       : TypeId.Type.Id_TimepixData
