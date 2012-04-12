@@ -911,7 +911,8 @@ Start with selecting data of interest to you from list on the left and general r
         # --- --- --- All images --- --- ---
         if ( str(box.text()).find("YAG")>=0 
              or  str(box.text()).find("TM6740")>=0 
-             or str(box.text()).find("Opal1000")>=0 
+             #or str(box.text()).find("Opal1000")>=0
+             or str(box.text()).find("Opal")>=0 
              or str(box.text()).find("Fccd")>=0 
              or str(box.text()).find("Princeton")>=0
              or str(box.text()).find("pnCCD")>=0 

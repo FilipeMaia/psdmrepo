@@ -216,14 +216,14 @@ class  pyana_ipimb ( object ) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
 
-            data_ipimb = self.update_plot_data()
+            data_ipimbs = self.update_plot_data()
 
             # give the list to the event object
             #event_data_ipimb = evt.get('data_ipimb')
             #if event_data_ipimb is not None:
             #    event_data_ipimb.extend( data_ipimb )
             #    data_ipimb = event_data_ipimb
-            evt.put( data_ipimb, 'data_ipimb')
+            evt.put( data_ipimbs, 'data_ipimbs')
 
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :

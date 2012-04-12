@@ -9,11 +9,55 @@ class DataDisplay(object):
 
     def __init__(self, mode=0):
         self.event_number = 0
-        self.display_mode = mode
-        self.ipimb_disp = None
         self.image_disp = None
-        self.bld_disp = None
+        self.wf_disp = None
+        self.display_mode = mode
         self.figures = [] # keep a list of reference to all figures
+
+    def show_wf(self, datalist):
+        if self.wf_disp is None:
+            self.wf_disp = Plotter()
+            self.wf_disp.settings(7,7) # set default frame size
+            self.wf_disp.threshold = None
+            
+        i = 0
+        for wf_data in datalist:
+            """Single Waveform"""
+            if wf_data.wf is not None:
+                name = "wf(%s)"%wf_data.name
+                title = "Single event (#%d), %s"%(self.event_number,wf_data.name)
+                nbins = wf_data.wf.size
+                contents = (wf_data.ts[0:nbins],wf_data.wf)
+                self.wf_disp.add_frame(name,title,contents, aspect='auto')
+            
+            """Average Waveform"""
+            if wf_data.average is not None:
+                name = "wfavg(%s)"%wf_data.name
+                title = "Average of %d events, %s"%(wf_data.counter,wf_data.name)
+                nbins = wf_data.average.size
+                contents = (wf_data.ts[0:nbins],wf_data.average)
+                self.wf_disp.add_frame(name,title,contents, aspect='auto')
+                
+            """Stack"""
+            if wf_data.stack is not None:
+                name = "wfstack(%s)"%wf_data.name
+                title = "Stack, %s"%wf_data.name
+                wf_image = wf_data.stack
+                if type(wf_image).__name__=='list' :
+                    wf_image = np.float_(wf_image)
+                contents = (wf_image,) # a tuple
+                self.wf_disp.add_frame(name,title,contents,aspect='equal')
+                self.wf_disp.frames[name].axis_values = wf_data.ts
+
+                
+        newmode = self.wf_disp.plot_all_frames(ordered=True)
+
+        # This title is common to all the plots
+        plt.suptitle("Event %d" % (self.event_number))
+        return newmode
+            
+
+
 
     def show_bld(self, datalist):
         for bld in datalist:
@@ -173,8 +217,6 @@ class DataDisplay(object):
         fig.subplots_adjust(wspace=0.3,left=0.10,right=0.96,bottom=0.08)
         plt.clf()
 
-        self.ipimb_disp = fig
-
         ndev = len(datalist)
         ax = plt.subplot(2,ndev,1) # two rows, n columns) 
         
@@ -222,8 +264,6 @@ class DataDisplay(object):
 
         fig = plt.figure(200, figsize=(14,10))
         plt.clf()
-
-        self.ipimb_disp = fig
 
         for ipimb in datalist:
             #ipimb.show()
@@ -282,9 +322,9 @@ class DataDisplay(object):
             self.image_disp = Plotter()
             self.image_disp.settings(7,7)
             
+        i = 0
         for image_data in datalist:
-            
-            i = 0
+
             if image_data.image is not None:
                 i+=1
                 self.image_disp.add_frame("frame%d"%i,
@@ -531,6 +571,8 @@ class Plotter(object):
         self.fignum = None
         # a figure has one or more plots/frames
         
+        self.settings() # defaults
+
         self.frames = {} # dictionary / hash table to access the Frames
 
         self.display_mode = None
@@ -549,12 +591,21 @@ class Plotter(object):
 
         self.set_ROI = False
 
-        self.settings() # defaults
-
         # matplotlib backend is set to QtAgg, and this is needed to avoid
         # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
         #QtCore.pyqtRemoveInputHook()
 
+    def settings(self
+                 , width = 8 # width of a single plot
+                 , height = 7 # height of a single plot
+                 , nplots=1  # total number of plots in the figure
+                 , maxcol=3  # maximum number of columns
+                 ):
+        self.w = width
+        self.h = height
+        self.nplots = nplots
+        self.maxcol = maxcol
+        
 
     def add_image_frame(self, name="", title="",contents=None, plot_type="image", aspect='auto'):
         """Forward to add_frame"""
@@ -595,14 +646,16 @@ class Plotter(object):
         """Draw all frames
         """
         nplots = len(self.frames)
-        
         self.fignum = fignum
 
         ncol = int(np.ceil( np.sqrt(nplots) ))
         nrow = int(np.ceil( (1.0*nplots) / ncol ))
 
-        self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
+        figsize = (self.w*ncol, self.h*nrow)
+        self.fig = plt.figure(fignum,figsize)
         self.fig.clf()
+
+        self.fig.set_size_inches(self.w*ncol,self.h*nrow, forward=True)
 
         self.fig.suptitle(self.title)
 
@@ -677,21 +730,10 @@ class Plotter(object):
                                  bottom=0.05, top=0.90,
                                  wspace=0.2,  hspace=0.2 )
         self.connect()
-
+        
         # for backward compatibility
         return self.display_mode
     
-        
-    def settings(self
-                 , width = 8 # width of a single plot
-                 , height = 7 # height of a single plot
-                 , nplots=1  # total number of plots in the figure
-                 , maxcol=3  # maximum number of columns
-                 ):
-        self.w = width
-        self.h = height
-        self.nplots = nplots
-        self.maxcol = maxcol
         
     def create_figure(self, fignum, nplots=1):
         """ Make the matplotlib figure.

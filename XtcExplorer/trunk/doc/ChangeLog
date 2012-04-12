@@ -11,6 +11,13 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Apr-12 ofte         V00-01-22  
+	- commit all the changes so far, which includes 
+	pyana_waveform independence on matplotlib, and a few other fixes. 
+	
+2012-Apr-12 ofte         V00-01-21b  rev 3190
+	- a sidetrack to V00-01-21: added Opal support
+	
 2012-Apr-5 ofte
 	- Bugfix: couldn't open files that weren't in the "standard" path
 	

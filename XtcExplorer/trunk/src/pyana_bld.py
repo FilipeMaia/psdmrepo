@@ -118,7 +118,14 @@ class  pyana_bld ( object ) :
 
         do_plot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
 
+        # Event timestamp
         self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
+
+        ## Evr (Event receiver data)
+        #evrdata = evt.getEvrData("NoDetector-0|Evr-0")
+        #for i in range (evrdata.numFifoEvents()):
+        #    print "Event code: ", evrdata.fifoEvent(i).EventCode
+            
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
@@ -213,9 +220,9 @@ class  pyana_bld ( object ) :
 
             evt.put(True, 'show_event')
 
-            data_bld = self.update_plot_data()
+            data_blds = self.update_plot_data()
     
-            evt.put(data_bld, 'data_bld')
+            evt.put(data_blds, 'data_blds')
 
             
         # --------- Reset -------------
@@ -233,9 +240,9 @@ class  pyana_bld ( object ) :
         
         evt.put(True, 'show_event')
         
-        data_bld = self.update_plot_data()
+        data_blds = self.update_plot_data()
     
-        evt.put(data_bld, 'data_bld')
+        evt.put(data_blds, 'data_blds')
         # flag for pyana_plotter
         evt.put(True, 'show_event')
 

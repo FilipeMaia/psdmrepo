@@ -209,19 +209,23 @@ class pyana_plotter (object) :
 
         #
         # get pointer to the data from each of the modules
-        data_bld = evt.get('data_bld')
-        if data_bld :
-            self.data_display.show_bld(data_bld)
+        data_blds = evt.get('data_blds') 
+        if data_blds is not None:
+            self.data_display.show_bld(data_blds)
 
-        data_ipimb = evt.get('data_ipimb')
-        if data_ipimb :
-            self.data_display.show_ipimb(data_ipimb)
+        data_ipimbs = evt.get('data_ipimbs') 
+        if data_ipimbs is not None: 
+            self.data_display.show_ipimb(data_ipimbs)
+                
+        data_images = evt.get('data_images') 
+        if data_images is not None:
+            self.data_display.show_image(data_images)
 
-        data_image = evt.get('data_image')
-        if data_image :
-            self.data_display.show_image(data_image)                    
-                    
-        if self.ipython :
+        data_wf = evt.get('data_wf') 
+        if data_wf is not None:
+            self.data_display.show_wf(data_wf)
+            
+        if self.ipython:
             plt.draw()
             self.launch_ipython(evt)
 
@@ -234,7 +238,8 @@ class pyana_plotter (object) :
         elif self.display_mode == 2:
             # SlideShow
             #plt.ion()
-            plt.draw()            
+            plt.draw()
+
 
 
     def launch_ipython(self, evt):

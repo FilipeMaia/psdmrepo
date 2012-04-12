@@ -279,15 +279,17 @@ class WaveformData( BaseData ):
     """
     def __init__( self, name, type="WaveformData" ):
         BaseData.__init__(self,name,type)
-        self.wf_voltages = None
-        self.wf2_voltages = None
-        self.wf_time = None
+        self.wf = None
+        self.average = None
+        self.ts = None
+        self.counter = None
         self.channels = None
+        self.stack = None
 
     def get_plottables(self):
         plottables = self.get_plottables_base()
         for ch in self.channels: 
-            plottables["volt_vs_time_ch%d"%ch] = (self.wf_time[ch],self.wf_voltages[ch])
+            plottables["volt_vs_time_ch%d"%ch] = (self.ts[ch],self.wf[ch])
         return plottables
 
 class EpicsData( BaseData ):

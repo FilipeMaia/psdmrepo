@@ -32,18 +32,14 @@ import sys
 import logging
 import time
 import array
-
+import numpy as np
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import numpy as np
-import matplotlib.pyplot as plt
-
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
 from utilities import WaveformData
-from displaytools import Plotter
 
 
 #----------------------------------
@@ -93,7 +89,6 @@ class pyana_waveform (object) :
         self.accu_start = None
 
         self.do_plots = self.plot_every_n != 0
-        self.plotter = None
 
         # containers to store data from this job
         self.ctr = {} # source-specific event counter 
@@ -140,7 +135,7 @@ class pyana_waveform (object) :
         for source in self.sources:
             cfg = env.getAcqConfig(source)
 
-            nch = cfg.nbrChannels()
+            nch = cfg.nbrChannels() 
             nsmp = cfg.horiz().nbrSamples()
             unit = cfg.horiz().sampInterval() * 1.0e9 # nano-seconds
             span = nsmp * unit
@@ -157,7 +152,7 @@ class pyana_waveform (object) :
                 self.wf[label] = np.empty( nsmp, dtype='float64')
                 self.wf_accum[label] = np.empty( nsmp, dtype='float64')
                 self.wf2_accum[label] = np.empty( nsmp, dtype='float64')
-
+                
                 self.wf_stack[label] = None
                 if self.accumulate_n > 0 :
                     self.wf_stack[label] = np.empty( (self.accumulate_n, nsmp), dtype='float64')
@@ -165,16 +160,6 @@ class pyana_waveform (object) :
                     self.wf_stack[label] = []
                     
                 
-        self.plotter = Plotter()
-        self.plotter.settings(7,7) # set default frame size
-        self.plotter.threshold = None
-
-        #if self.threshold is not None:
-        #    self.plotter.threshold = self.threshold.value
-        #    self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
-
-
-
 
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -226,7 +211,7 @@ class pyana_waveform (object) :
                 awf = acqData.waveform() 
                 
                 self.ctr[label]+=1
-
+                
                 if self.quantities.find('single')>=0:
                     self.wf[label] = awf
 
@@ -263,17 +248,13 @@ class pyana_waveform (object) :
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
+
+            wfd = self.update_plot_data()
+            evt.put(wfd, 'data_wf')
             
-            newmode = self.make_plots()
-                
         if  ( self.accumulate_n != 0 and (self.n_shots%self.accumulate_n)==0 ):
             self.resetlists()
 
-        if newmode is not None:
-            # propagate new display mode to the evt object 
-            evt.put(newmode,'display_mode')
-            # reset
-            self.plotter.display_mode = None
                     
 
     def endcalibcycle( self, env ) :
@@ -301,58 +282,40 @@ class pyana_waveform (object) :
         
         logging.info( "pyana_waveform.endjob() called" )
 
-        self.make_plots()
+
+        newmode = None
+
+        # flag for pyana_plotter
+        evt.put(True, 'show_event')
         
-
-    def make_plots(self):
-
-        ## Plotting
-        suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
-
-        if self.quantities.find('single')>=0:
-            for source in self.src_ch :            
-                name = "wf(%s)"%source
-                title = "Single event (#%d), %s"%(self.n_shots,source)
-                nbins = self.wf[source].size
-                contents = (self.ts[source][0:nbins],self.wf[source])
-                self.plotter.add_frame(name,title,contents, aspect='auto')
-
-                # This title is common to all the plots
-                suptitle = "Event %d" % (self.n_shots)
-                # will be overwritten if 'average' or 'stack' is also requested
-
-        if self.quantities.find('average')>=0:
-            for source in self.src_ch :            
-                name = "wfavg(%s)"%source
-                title = "Average, %s"%source
-                nbins = self.wf_accum[source].size
-                contents = (self.ts[source][0:nbins],self.wf_accum[source]/self.ctr[source])
-                self.plotter.add_frame(name,title,contents, aspect='auto')
- 
-                # This title is common to all the plots
-                suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
-        
-        if self.quantities.find('stack')>=0:
-            for source in self.src_ch :            
-                name = "wfstack(%s)"%source
-                title = "Stack, %s"%source
-                wf_image = self.wf_stack[source]
-                if type(wf_image).__name__=='list' :
-                    wf_image = np.float_(self.wf_stack[source])
-                contents = (wf_image,) # a tuple
-                self.plotter.add_frame(name,title,contents,aspect='equal')
-                self.plotter.frames[name].axis_values = self.ts[source]
-
-                # This title is common to all the plots
-                suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
-
-                
-        newmode = self.plotter.plot_all_frames(ordered=True)
-
-        plt.suptitle(suptitle)
-        
-        return newmode
+        wfd = self.update_plot_data()
+        evt.put(wfd, 'data_wf')
             
 
 
 
+    def update_plot_data(self):
+
+        # convert dict to a list:
+        data_wf = []
+        for label in self.src_ch :
+            self.data[label].ts = self.ts[label]
+
+            #self.data[label].wf = None
+            #self.data[label].average = None
+            #self.data[label].stack = None
+            
+            if self.quantities.find('single')>=0 :
+                self.data[label].wf = self.wf[label]
+                
+            if self.quantities.find('average')>=0 :
+                self.data[label].average = self.wf_accum[label]/self.ctr[label]
+                self.data[label].counter = self.ctr[label]
+                
+            if self.quantities.find('stack')>=0 :
+                self.data[label].stack = self.wf_stack[label]
+
+            data_wf.append( self.data[label] )
+
+        return data_wf
+                                                            

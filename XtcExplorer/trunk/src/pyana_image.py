@@ -1,11 +1,3 @@
-#--------------------------------------------------------------------------
-# File and Version Information:
-#  $Id$
-#
-# Description:
-#   Module pyana_image
-#   pyana module with intensity threshold, plotting with matplotlib, allow rescale color plot
-#
 """User analysis module for pyana framework.
 
 This software was developed for the LCLS project.  If you use all or
@@ -13,6 +5,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Ingrid Ofte
 """
+__version__ = "$Revision: 3190 $"
 
 #--------------------------------
 #  Imports of standard modules --
@@ -131,6 +124,8 @@ class  pyana_image ( object ) :
         self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
                              'Cspad'     : TypeId.Type.Id_CspadConfig ,
                              'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
+                             'Opal2000'  : TypeId.Type.Id_Opal1kConfig,
+                             'Opal4000'  : TypeId.Type.Id_Opal1kConfig,
                              'TM6740'    : TypeId.Type.Id_TM6740Config,
                              'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
                              'Princeton' : TypeId.Type.Id_PrincetonConfig,
@@ -143,6 +138,8 @@ class  pyana_image ( object ) :
                           'Cspad'         : TypeId.Type.Id_CspadElement,
                           'TM6740'        : TypeId.Type.Id_Frame,
                           'Opal1000'      : TypeId.Type.Id_Frame,
+                          'Opal2000'      : TypeId.Type.Id_Frame,
+                          'Opal4000'      : TypeId.Type.Id_Frame,
                           'Fccd'          : TypeId.Type.Id_Frame,
                           'pnCCD'         : TypeId.Type.Id_pnCCDframe,
                           'Princeton'     : TypeId.Type.Id_PrincetonFrame,
@@ -419,11 +416,11 @@ class  pyana_image ( object ) :
             evt.put(True, 'show_event')
             
             # convert dict to a list:
-            data_image = []
+            data_images = []
             for source in self.sources :
-                data_image.append( self.data[source] )
+                data_images.append( self.data[source] )
                 # give the list to the event object
-                evt.put( data_image, 'data_image' )
+                evt.put( data_images, 'data_images' )
                                                             
 
         # -----------------------------------
