@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2012-04-16 Andy Salnikov
+- add -I. to CPPPATH, this should translate to the -I{PackageName}, this
+  should help for including header files from non-standard places such
+  as pyext.
+- Python extension module is excluded from package libraries
+
 Tag: V00-02-01
 2012-04-12 Andy Salnikov
 - unittest targes are made AlwaysBuild() as their dependencies 

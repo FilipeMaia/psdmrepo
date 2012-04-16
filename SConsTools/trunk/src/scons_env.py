@@ -61,13 +61,13 @@ def buildEnv () :
     bindir = "${ARCHDIR}/bin"
     libdir = "${ARCHDIR}/lib"
     pydir = "${ARCHDIR}/python"
-    cpppath = []
+    cpppath = ['.']   # this translates to package directory, not to top dir
     for r in all_sit_repos :
         cpppath.append(pjoin(r, "arch", sit_arch, "geninc"))
         cpppath.append(pjoin(r, "include"))
     libpath = [ pjoin(r, "arch", sit_arch, "lib") for r in all_sit_repos ]
 
-    cythonflags = ["--cplus", '-I', pjoin("arch", sit_arch, "geninc"), '-I', 'include']
+    cythonflags = ["--cplus", '-I', '.', '-I', pjoin("arch", sit_arch, "geninc"), '-I', 'include']
     for r in sit_repos :
         cythonflags += ["-I", pjoin(r, "arch", sit_arch, "geninc")]
         cythonflags += ["-I", pjoin(r, "include")]

@@ -171,7 +171,6 @@ def standardPyExt( **kw ) :
         
         # get the list of libraries need for this package
         addPkgLib ( env, pkg, extmod[0] )
-        addPkgLibs ( env, pkg, [extmodname] )
 
 #
 # Process app/ directory, install all scripts
