@@ -78,7 +78,7 @@ ImgPeakFilter::~ImgPeakFilter ()
 void 
 ImgPeakFilter::beginJob(Event& evt, Env& env)
 {
-  if( m_print_bits & 1<<0 ) printInputParameters();  
+  if( m_print_bits & 1 ) printInputParameters();  
 }
 
 /// Method which is called at the beginning of the run
@@ -128,7 +128,7 @@ ImgPeakFilter::endRun(Event& evt, Env& env)
 void 
 ImgPeakFilter::endJob(Event& evt, Env& env)
 {
-  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Job summary: number of selected events = " << m_selected << " of total " << m_count);
+  if( m_print_bits & 2 ) MsgLog(name(), info, "Job summary: number of selected events = " << m_selected << " of total " << m_count);
 }
 
 //--------------------
@@ -136,8 +136,8 @@ ImgPeakFilter::endJob(Event& evt, Env& env)
 bool
 ImgPeakFilter::eventIsSelected(Event& evt)
 {
-  if( m_print_bits & 1<<2 ) printPeaks();  
-  if( m_print_bits & 1<<3 ) printEventId(evt);
+  if( m_print_bits & 4 ) printPeaks();  
+  if( m_print_bits & 8 ) printEventId(evt);
 
   return peakSelector();
 }

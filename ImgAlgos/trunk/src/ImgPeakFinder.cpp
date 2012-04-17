@@ -289,7 +289,7 @@ ImgPeakFinder::procImage(Event& evt)
     saveImageInFile1();
     smearImage();        // convolution with Gaussian
     saveImageInFile2();
-    findPeaks();         // above higher threshold as a maximal in the center of 3x3 or 5x5 
+    findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
     savePeaksInEvent(evt);
     savePeaksInFile();
     return true;
@@ -329,6 +329,18 @@ ImgPeakFinder::stringEventN()
 {
   stringstream ssEvNum; ssEvNum << setw(6) << setfill('0') << m_count;
   return ssEvNum.str();
+}
+
+//--------------------
+
+std::string
+ImgPeakFinder::stringTimeStamp(Event& evt)
+{
+  shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) {
+    return (eventId->time()).asStringFormat("%Y%m%dT%H:%M:%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
+  }
+  return std::string("Time-stamp-is-unavailable");
 }
 
 //--------------------
@@ -393,7 +405,7 @@ ImgPeakFinder::smearPixAmp(size_t& r0, size_t& c0)
 //--------------------
 // Find peaks in the image
 void 
-ImgPeakFinder::findPeaks()
+ImgPeakFinder::findPeaks(Event& evt)
 {
   for (size_t r = m_rowmin; r < m_rowmax; r++) {
     for (size_t c = m_colmin; c < m_colmax; c++) {
@@ -401,7 +413,9 @@ ImgPeakFinder::findPeaks()
     }
   }
 
-  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Found number of peaks:" << m_Peaks.size() ) ;
+  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Event:" << m_count 
+                            << " Time:" << stringTimeStamp(evt) 
+                            << " Found number of peaks:" << m_Peaks.size() ) ;
 }
 
 //--------------------
@@ -489,12 +503,12 @@ ImgPeakFinder::savePeaksInFile()
                                     itv != m_Peaks.end(); itv++ ) {
 
     if( m_print_bits & 1<<4 ) 
-      cout << "  x="      << itv->x     
-           << "  y="      << itv->y     
-           << "  ampmax=" << itv->ampmax
-           << "  amptot=" << itv->amptot
-           << "  npix="   << itv->npix  
-           << endl; 
+      MsgLog( name(), info, "  x="      << itv->x     
+                         << "  y="      << itv->y     
+                         << "  ampmax=" << itv->ampmax
+                         << "  amptot=" << itv->amptot
+	                 << "  npix="   << itv->npix  << "\n") 
+
 
     file << itv->x        << "  "
          << itv->y	  << "  "

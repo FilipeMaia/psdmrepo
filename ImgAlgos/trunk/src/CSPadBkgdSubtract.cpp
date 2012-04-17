@@ -80,7 +80,7 @@ CSPadBkgdSubtract::beginJob(Event& evt, Env& env)
 {
   getBkgdArray();
   if( m_print_bits & 1 ) printInputParameters();
-  if( m_print_bits & 4 ) printBkgdArray();
+  if( m_print_bits & 8 ) printBkgdArray();
 }
 
 /// Method which is called at the beginning of the run
@@ -278,7 +278,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
     m_norm_factor = ( nQuads > 0 ) ? m_norm_factor /= nQuads : 0; 
   }
 
-  if( m_print_bits & 1 ) MsgLog( name(), info, "m_norm_factor="  << m_norm_factor ); 
+  if( m_print_bits & 4 ) MsgLog( name(), info, "Event="  << m_count << " Norm. factor="  << m_norm_factor ); 
 }
 
 //--------------------

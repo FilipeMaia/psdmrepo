@@ -57,7 +57,7 @@ ImgPixAmpFilter::ImgPixAmpFilter (const std::string& name)
   , m_numpixmin()
   , m_filter()
   , m_print_bits()
-  , m_count(-1)
+  , m_count(0)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
