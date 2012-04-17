@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_IMGPEAKFINDER_H
-#define IMGALGOS_IMGPEAKFINDER_H
+#ifndef IMGALGOS_IMGRADIALCORRECTION_H
+#define IMGALGOS_IMGRADIALCORRECTION_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImgPeakFinder.
+//	Class ImgRadialCorrection.
 //
 //------------------------------------------------------------------------
 
@@ -50,25 +50,16 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-struct Peak{
-   double x;
-   double y; 
-   double ampmax;
-   double amptot;
-   unsigned npix;
-   // ? double s1;
-   // ? double s2; 
-   // ? double tilt_angle;  
-} ;
-
-class ImgPeakFinder : public Module {
+class ImgRadialCorrection : public Module {
 public:
 
+  typedef double amplitude_t; 
+
   // Default constructor
-  ImgPeakFinder (const std::string& name) ;
+  ImgRadialCorrection (const std::string& name) ;
 
   // Destructor
-  virtual ~ImgPeakFinder () ;
+  virtual ~ImgRadialCorrection () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -93,72 +84,70 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-  void   printInputParameters();
-  void   setWindowRange();
-  void   initImage();
-  void   smearImage();
-  double smearPixAmp(size_t& r0, size_t& c0);
-  double weight(int& dr, int& dc);
-  void   evaluateWeights();
-  void   printWeights();
-  void   saveImageInFile0();
-  void   saveImageInFile1();
-  void   saveImageInFile2();
-  string stringEventN();
-  string stringTimeStamp(Event& evt);
-  bool   getAndProcImage(Event& evt);
-  bool   procImage(Event& evt);
-  void   findPeaks(Event& evt);
-  bool   checkIfPixIsPeak(size_t& r0, size_t& c0);
-  void   printPeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
-  void   savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
-  void   savePeaksInEvent(Event& evt);
-  void   savePeaksInFile();
+  void     printInputParameters();
+  bool     getAndProcImage(Event& evt);
+  bool     procImage(Event& evt);
+  void     initPixGeometry();
+  unsigned get_img_index(unsigned r, unsigned c);
+  unsigned index_for_value(double v, double vmin, double vmax, unsigned nbins);
+  void     bookHistograms();
+  void     resetHistograms();
+  void     accumulateHistograms();
+  void     normalizeHistograms();
+  void     saveHistograms();
+  void     applyRadialCorrection();
+  void     saveCorrectedImage();
+  void     add_corrected_img_in_event(Event& evt);
+
+  void     printEventId(Event& evt);
+  string   stringTimeStamp(Event& evt);
+  string   stringEventN();
+  //void   savePeaksInEvent(Event& evt);
 
 private:
 
   enum{ MAX_IMG_SIZE=4000000 };
   enum{ MARGIN=10, MARGIN1=11 };
 
-  Pds::Src    m_actualSrc;
-  Source      m_source;
-  std::string m_src;
-  std::string m_key;
-  std::string m_peaksKey;
-  double   m_thr_low;
-  double   m_thr_high;
-  double   m_sigma;    // smearing sigma in pixel size
-  int      m_nsm;      // number of pixels for smearing [i0-m_nsm, i0+m_nsm]
-  int      m_npeak;    // number of pixels for peak finding in [i0-m_npeak, i0+m_npeak]
-  float    m_xmin;
-  float    m_xmax;
-  float    m_ymin;
-  float    m_ymax;
-  bool     m_finderIsOn;
-  long     m_event;
-  unsigned m_print_bits;
-  long     m_count;
-  long     m_selected;
+  //Source      m_source;
+  Pds::Src    m_src;
+  std::string m_str_src;
+  std::string m_inkey;
+  std::string m_outkey;
+  double      m_xcenter;
+  double      m_ycenter;
+  double      m_rmin;
+  double      m_rmax;
+  unsigned    m_rnbins;
+  double      m_phimin;
+  double      m_phimax;
+  unsigned    m_pnbins;
+  unsigned    m_rpsize;
+  long        m_event;
+  unsigned    m_print_bits;
+  long        m_count;
 
-  size_t   m_nrows;
-  size_t   m_ncols;
-
-  size_t   m_rowmin; 
-  size_t   m_rowmax;
-  size_t   m_colmin;
-  size_t   m_colmax;
-
-  ndarray<double,2> *m_ndarr;
   CSPadPixCoords::Image2D<double> *m_img2d;
-  CSPadPixCoords::Image2D<double> *m_work2d;
+  ndarray<double,2> *m_ndarr;
+  //CSPadPixCoords::Image2D<double> *m_work2d;
 
-  double m_weights[MARGIN][MARGIN];
   double m_data_arr[MAX_IMG_SIZE];
-  double m_work_arr[MAX_IMG_SIZE];
+  //double m_weights[MARGIN][MARGIN];
+  //double m_work_arr[MAX_IMG_SIZE];
   TimeInterval *m_time;
-  vector<Peak> m_Peaks;
+
+  unsigned    m_nrows;
+  unsigned    m_ncols;
+  double*     m_radval;
+  double*     m_phival;
+  unsigned*   m_radind;
+  unsigned*   m_phiind;
+  double*     m_r_amp;
+  double*     m_rp_amp;
+  unsigned*   m_r_sta;
+  unsigned*   m_rp_sta;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_IMGPEAKFINDER_H
+#endif // IMGALGOS_IMGRADIALCORRECTION_H
