@@ -96,13 +96,13 @@ private:
 
   // Data members, this is for example purposes only
 
-  std::string m_source;      // i.e. CxiDs1.0:Cspad.0
-  Source      m_src;         // Data source set from config file
+  //Source      m_src;       // Data source set from config file
+  Pds::Src    m_src;
+  std::string m_str_src;     // i.e. CxiDs1.0:Cspad.0
   std::string m_key;         // i.e. Image2D
-  Pds::Src    m_actualSrc;
-  unsigned    m_maxEvents;
-  unsigned    m_eventSave;
-  bool        m_saveAll;
+  unsigned    m_eventSave;   // event number starting from 1 to be saved in file
+  bool        m_saveAll;     // should be true to save all events in files
+  std::string m_fname;       // common part of the file name
   long        m_count;
 
 };
