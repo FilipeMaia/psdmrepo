@@ -10,6 +10,7 @@ usage() {
   echo "    -p name   project name"
   echo "    -q        suppress normal output"
   echo "    -Q        suppress warnings (and normal output)"
+  echo "    -H        use html output instead of dirhtml"
   echo "    -d        debug (turn on -x shell option)"
   echo
   echo "If no package are provided then standard set is used"
@@ -27,8 +28,14 @@ classes() {
         tr ' ' '\n' | grep -v '^_' | sort
 }
 
+# print the list of functions in given package
+functions() {
+    python -c "import $1 as m; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type(len) and v.__module__ == m.__name__]);" |\
+        tr ' ' '\n' | grep -v '^_' | sort
+}
+
 genpkg() {
-    str="Package :py:mod:\`$1\`"
+    str="Package $1"
     echo "$str" >> $out
     echo "$str" | sed 's/./=/g' >> $out
     echo ".. automodule:: $1" >> $out
@@ -36,7 +43,7 @@ genpkg() {
 }
 
 genmod() {
-      str="Module :mod:\`$1\`"
+      str="Module $1"
       echo "$str" >> $out
       echo "$str" | sed 's/./-/g' >> $out
       echo ".. automodule:: $1" >> $out
@@ -45,7 +52,7 @@ genmod() {
 
 genclass() {
     cls="$1.$2"
-    str="Class :py:class:\`$2\`"
+    str="Class $cls"
     echo "$str" >> $out
     echo "$str" | sed 's/./^/g' >> $out
     echo ".. autoclass:: $cls" >> $out
@@ -55,15 +62,26 @@ genclass() {
     echo "" >> $out
 }
 
+genfun() {
+    fun="$1.$2"
+    str="Function $fun"
+    echo "$str" >> $out
+    echo "$str" | sed 's/./^/g' >> $out
+    echo ".. autofunction:: $fun" >> $out
+    echo "" >> $out
+}
+
 project=
 warn=
+format=dirhtml
 
 # get the options
-while getopts hqQdp: c ; do
+while getopts hqQHdp: c ; do
   case $c in
     h) usage ; exit 0 ;;
     q) warn=-q ;;
     Q) warn=-Q ;;
+    H) format=html ;;
     d) set -x ;;
     p) project="$OPTARG" ;;
     \?) usage ; exit 2 ;;
@@ -136,6 +154,10 @@ for pkg in $packages; do
       genclass $pkg $class >> $out
     done
 
+    for fun in `functions $pkg`; do
+      genfun $pkg $fun >> $out
+    done
+
     for module in `modules $pkg`; do
     	
       mod="$pkg.$module"
@@ -144,6 +166,10 @@ for pkg in $packages; do
       
       for class in `classes $mod`; do
         genclass $mod $class >> $out
+      done
+
+      for fun in `functions $mod`; do
+        genfun $mod $fun >> $out
       done
       
     done
@@ -168,6 +194,6 @@ autoclass_content = 'both'
 EOD
 
 # run sphinx
-sphinx-build $warn -b dirhtml "$tmpdir" "$output"
+sphinx-build $warn -b $format "$tmpdir" "$output"
 
 rm -rf "$tmpdir"
