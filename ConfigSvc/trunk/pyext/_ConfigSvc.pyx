@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Python wrapper for ConfigSvc class.
+"""Python wrapper for C++ ConfigSvc library.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -123,9 +123,18 @@ cdef extern from "ConfigSvc/ConfigSvc.h" namespace "ConfigSvc::ConfigSvc":
 #  Class definition --
 #---------------------
 
-def initConfigSvc(object file):
+def initConfigSvc(object file not None):
+    """
+    initConfigSvc(file)
     
-    """initConfigSvc(file)\n\nInitialize configuration service, accepts file name or file-like object"""
+    Initialize configuration service, accepts file name or file-like object.
+    If *file* parameter has string type then it is assumed to be a file name,
+    otherwise it is expected to be a file of file-like object which defines 
+    ``read()`` method.
+    
+    File contents is read and its contents is used for configuration parameters.
+    In case of any errors ``RuntimeError`` exception is raised.
+    """
     
     cdef auto_ptr[ConfigSvcImplI] ptr
     cdef string strfname
@@ -153,6 +162,17 @@ def initConfigSvc(object file):
     init(ptr)
 
 cdef class ConfigSvc:
+    """
+    Python wrapper for C++ class ConfigSvc. It does not provide exact same 
+    signatures for methods because C++ methods are all template-based, instead
+    this class defines more "Pythonic" interfaces to the same underlying C++
+    service.
+    
+    Note that before you can use any of the methods in this class configuration
+    service must be initialized. This is done with :py:func:`initConfigSvc` function 
+    defined in this module. If service is not initialized then calling any method
+    will result in ``RuntimeError`` exception.
+    """
 
     cdef ConfigSvcPyHelper* thisptr      # hold a C++ instance which we're wrapping
     
@@ -163,7 +183,17 @@ cdef class ConfigSvc:
         del self.thisptr
 
     
-    def getStr(self, char* section, char* param, defval = None):        
+    def getStr(self, char* section, char* param, defval = None):
+        """
+        self.getStr(section: str, param: str, defval: str = None) -> str
+        
+        Returns string value of the requested parameter. Takes section name and 
+        parameter name which are both strings. If *defval* parameter is ``None``
+        or missing then parameter must be defined; if parameter was not defined
+        then ``RuntimeError`` is raised. If *defval* is not ``None`` then 
+        it must have string type and it will be returned when parameter is not
+        defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef string tmpstr
@@ -177,6 +207,16 @@ cdef class ConfigSvc:
 
     
     def getBool(self, char* section, char* param, defval = None):
+        """
+        self.getBool(section: str, param: str, defval: int = None) -> bool
+        
+        Returns boolean value of the requested parameter. Takes section name and 
+        parameter name which are both strings. If *defval* parameter is ``None``
+        or missing then parameter must be defined; if parameter was not defined
+        then ``RuntimeError`` is raised. If *defval* is not ``None`` then 
+        it must have int or bool type and its boolean value will be returned when 
+        parameter is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
 
@@ -187,6 +227,16 @@ cdef class ConfigSvc:
 
     
     def getInt(self, char* section, char* param, defval = None):
+        """
+        self.getInt(section: str, param: str, defval: int = None) -> int
+        
+        Returns integer value of the requested parameter. Takes section name and 
+        parameter name which are both strings. If *defval* parameter is ``None``
+        or missing then parameter must be defined; if parameter was not defined
+        then ``RuntimeError`` is raised. If *defval* is not ``None`` then 
+        it must have int type and its value will be returned when parameter is 
+        not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         
@@ -197,6 +247,16 @@ cdef class ConfigSvc:
         
     
     def getFloat(self, char* section, char* param, defval = None):
+        """
+        self.getFloat(section: str, param: str, defval: float = None) -> float
+        
+        Returns floating point value of the requested parameter. Takes section 
+        name and parameter name which are both strings. If *defval* parameter is 
+        ``None`` or missing then parameter must be defined; if parameter was not 
+        defined then ``RuntimeError`` is raised. If *defval* is not ``None`` 
+        then it must have float type and its value will be returned when parameter 
+        is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         
@@ -207,6 +267,16 @@ cdef class ConfigSvc:
 
 
     def getStrList(self, char* section, char* param, list defval = None):
+        """
+        self.getStrList(section: str, param: str, defval: list = None) -> list of strings
+        
+        Returns value of the requested parameter as list of strings. Takes section 
+        name and parameter name which are both strings. If *defval* parameter is 
+        ``None`` or missing then parameter must be defined; if parameter was not 
+        defined then ``RuntimeError`` is raised. If *defval* is not ``None`` 
+        then it must have list type and all its items must have string type. 
+        Its value will be returned when parameter is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef vector[string] tmpvec
@@ -224,6 +294,16 @@ cdef class ConfigSvc:
         
 
     def getBoolList(self, char* section, char* param, list defval = None):
+        """
+        self.getBoolList(section: str, param: str, defval: list = None) -> list of bool
+        
+        Returns value of the requested parameter as list of booleans. Takes section 
+        name and parameter name which are both strings. If *defval* parameter is 
+        ``None`` or missing then parameter must be defined; if parameter was not 
+        defined then ``RuntimeError`` is raised. If *defval* is not ``None`` 
+        then it must have list type and all its items must have int or bool type. 
+        Its value will be returned when parameter is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef vector[int] tmpvec
@@ -240,6 +320,16 @@ cdef class ConfigSvc:
         
 
     def getIntList(self, char* section, char* param, list defval = None):
+        """
+        self.getIntList(section: str, param: str, defval: list = None) -> list of ints
+        
+        Returns value of the requested parameter as list of ints. Takes section 
+        name and parameter name which are both strings. If *defval* parameter is 
+        ``None`` or missing then parameter must be defined; if parameter was not 
+        defined then ``RuntimeError`` is raised. If *defval* is not ``None`` 
+        then it must have list type and all its items must have int type. 
+        Its value will be returned when parameter is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef vector[long] tmpvec
@@ -256,6 +346,16 @@ cdef class ConfigSvc:
         
 
     def getFloatList(self, char* section, char* param, list defval = None):
+        """
+        self.getFloatList(section: str, param: str, defval: list = None) -> list of floats
+        
+        Returns value of the requested parameter as list of floats. Takes section 
+        name and parameter name which are both strings. If *defval* parameter is 
+        ``None`` or missing then parameter must be defined; if parameter was not 
+        defined then ``RuntimeError`` is raised. If *defval* is not ``None`` 
+        then it must have list type and all its items must have float type. 
+        Its value will be returned when parameter is not defined.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef vector[double] tmpvec
@@ -273,6 +373,14 @@ cdef class ConfigSvc:
 
 
     def put(self, char* section, char* param, object value):
+        """
+        self.put(section: str, param: str, value: object)
+
+        Defines or updates parameter value.  Takes section name and parameter 
+        name which are both strings. *value* argument is converted to string
+        (with usual ``str(value)`` function) and the resulting value is stored 
+        as new parameter value.
+        """
         cdef string strsec = string(section)
         cdef string strparam = string(param)
         cdef object obj = PyObject_Str(value)

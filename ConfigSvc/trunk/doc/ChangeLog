@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2012-04-18 Andy Salnikov
+- adding docstrings to all Python classes/methods
+
 Tag: V00-00-07
 2012-04-16 Andy Salnikov
 - adding python wrapper for config service, implemented as Cython module
