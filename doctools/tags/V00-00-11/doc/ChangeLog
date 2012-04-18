@@ -1,0 +1,67 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package docutils
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-11
+2012-04-18 Andy Salnikov
+- pydoc-driver:
+  - add module-level autofunction
+  - -H option to make 'html' instead of 'dirhtml' output
+  - all links now make fully-qualified class/module names
+  - section headers do not include links
+
+Tag: V00-00-10
+2012-02-29 Andy Salnikov
+- pydoc-driver: add autoclass option to add __init__ docstring to
+  class docstring
+
+Tag: V00-00-09
+2012-02-09 Andy Salnikov
+- filter non-existing packages in doxy-driver, makes it easier to 
+  run in test release
+- use dirhtml generator for sphinx, makes nicer URLs
+
+Tag: V00-00-08
+2012-02-09 Andy Salnikov
+- add script pydoc-driver which runs sphinx on Python packages
+- add Python module doxy_kw_subs.py which is extension module for 
+  sphinx replacing Doxygen tags
+
+Tag: V00-00-07
+2012-01-19 Andy Salnikov
+- added ImgPixSpectra for psana-modules mode
+
+Tag: V00-00-06
+2011-12-09 Andy Salnikov
+- add MsgLogger, ndarray, and psddl_psana package to psana mode
+- add cspad_mod and psana_examples packages to psana-modules mode
+- change doxygen config to include all *.cpp and *.dox files
+
+Tag: V00-00-05
+2011-08-08 Andy Salnikov
+- add mode psana-modules to doxy-driver
+
+Tag: V00-00-04
+2011-06-29 Andrei Salnikov
+- doxy-driver tries to create output directory
+
+Tag: V00-00-03
+2011-06-29 Andrei Salnikov
+- added PSHist to psana package list
+
+Tag: V00-00-02
+2011-05-24 Andrei Salnikov
+- fixing argument parsing in doxy-driver
+
+Tag: V00-00-01
+2011-05-06 Andrei Salnikov
+- first commit, only app/doxy-driver is there
