@@ -53,12 +53,12 @@ namespace {
   PyObject* entries( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    { "sync_source",   sync_source,  METH_NOARGS, "self.sync_source() -> Source enum\n\nReturns Source enum" },
-    { "beam_source",   beam_source,  METH_NOARGS, "self.beam_source() -> Source enum\n\nReturns Source enum" },
+    { "sync_source",   sync_source,  METH_NOARGS, "self.sync_source() -> Source enum\n\nReturns :py:class:`Source` enum" },
+    { "beam_source",   beam_source,  METH_NOARGS, "self.beam_source() -> Source enum\n\nReturns :py:class:`Source` enum" },
     { "length",        length,       METH_NOARGS, "self.length() -> int\n\nReturns number of entries" },
     { "cycles",        cycles,       METH_NOARGS, "self.cycles() -> int\n\nReturns integer number" },
-    { "entries",       entries,      METH_NOARGS, "self.entries() -> list\n\nReturns list of SequencerEntry objects" },
-    { "entry",         entry,        METH_VARARGS, "self.entry(i: int) -> SequencerEntry\n\nReturns SequencerEntry object" },
+    { "entries",       entries,      METH_NOARGS, "self.entries() -> list\n\nReturns list of :py:class:`SequencerEntry` objects" },
+    { "entry",         entry,        METH_VARARGS, "self.entry(i: int) -> SequencerEntry\n\nReturns :py:class:`SequencerEntry` object" },
     {0, 0, 0, 0}
    };
 

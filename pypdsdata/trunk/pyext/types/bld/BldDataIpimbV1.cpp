@@ -41,9 +41,9 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
-    {"ipimbData",    ipimbData,    0, "attribute of type IpimbDataV2", 0},
-    {"ipimbConfig",  ipimbConfig,  0, "attribute of type IpimbConfigV2", 0},
-    {"ipmFexData",   ipmFexData,   0, "attribute of type IpmFexDataV1", 0},
+    {"ipimbData",    ipimbData,    0, "attribute of type :py:class:`_pdsdata.ipimb.DataV2`", 0},
+    {"ipimbConfig",  ipimbConfig,  0, "attribute of type :py:class:`_pdsdata.ipimb.ConfigV2`", 0},
+    {"ipmFexData",   ipmFexData,   0, "attribute of type :py:class:`_pdsdata.lusi.IpmFexV1`", 0},
     {0, 0, 0, 0, 0}
   };
 

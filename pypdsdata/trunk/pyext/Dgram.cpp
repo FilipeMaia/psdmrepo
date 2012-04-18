@@ -46,14 +46,14 @@ namespace {
 
   PyGetSetDef getset[] = {
     { "env", Dgram_env, 0, "Attribute contains the env field as an integer number.", 0 },
-    { "seq", Dgram_seq, 0, "Attribute contains seq field as an xtc.Sequence object.", 0 },
-    { "xtc", Dgram_xtc, 0, "Attribute contains top-level xtc.Xtc object.", 0 },
+    { "seq", Dgram_seq, 0, "Attribute contains seq field as an :py:class:`Sequence` object.", 0 },
+    { "xtc", Dgram_xtc, 0, "Attribute contains top-level :py:class:`Xtc` object.", 0 },
     {0, 0, 0, 0, 0}
   };
 
   PyMethodDef methods[] = {
     { "__getnewargs__",    Dgram_getnewargs, METH_NOARGS, "Pickle support" },
-    { "setClock",          Dgram_setClock,   METH_VARARGS, "self.setClock(clock: ClockTime)\n\nUpdates clock value for datagram" },
+    { "setClock",          Dgram_setClock,   METH_VARARGS, "self.setClock(clock: ClockTime)\n\nUpdates clock value for datagram, takes :py:class:`ClockTime` object" },
     {0, 0, 0, 0}
    };
 

@@ -25,7 +25,6 @@
 //-------------------------------
 #include "../../Exception.h"
 #include "../TypeLib.h"
-#include "../camera/FrameCoord.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

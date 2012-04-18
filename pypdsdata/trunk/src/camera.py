@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.camera. This module imports all _pdsdata.camera 
+"""Wrapper module for :py:mod:`_pdsdata.camera`. This module imports all :py:mod:`_pdsdata.camera` 
 classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 

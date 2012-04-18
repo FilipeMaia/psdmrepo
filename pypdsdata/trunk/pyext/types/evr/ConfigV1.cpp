@@ -43,9 +43,9 @@ namespace {
 
   PyMethodDef methods[] = {
     { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
-    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfig\n\nReturns pulse configuration" },
+    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfig\n\nReturns pulse configuration (:py:class:`PulseConfig`)" },
     { "noutputs",   noutputs,    METH_NOARGS,  "self.noutputs() -> int\n\nReturns number of output configurations" },
-    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration" },
+    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration (:py:class:`OutputMap`)" },
     { "size",       size,        METH_NOARGS,  "self.size() -> int\n\nRetuns structure size" },
     {0, 0, 0, 0}
    };

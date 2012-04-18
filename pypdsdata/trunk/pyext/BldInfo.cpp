@@ -78,11 +78,11 @@ namespace {
   ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::BldInfo, type, typeEnum);
 
   PyMethodDef methods[] = {
-    { "level",     BldInfo_level,     METH_NOARGS, "self.level() -> Level\n\nReturns source level object (Level class)" },
+    { "level",     BldInfo_level,     METH_NOARGS, "self.level() -> Level\n\nReturns source level object (:py:class:`Level` class)" },
     { "log",       log,       METH_NOARGS, "self.log() -> int\n\nReturns logical address of data source" },
     { "phy",       phy,       METH_NOARGS, "self.phy() -> int\n\nReturns physical address of data source" },
     { "processId", processId, METH_NOARGS, "self.processId() -> int\n\nReturns process ID" },
-    { "type",      type,      METH_NOARGS, "self.type() -> Type\n\nReturns BldInfo type" },
+    { "type",      type,      METH_NOARGS, "self.type() -> Type\n\nReturns BldInfo :py:class:`Type` enum" },
     {0, 0, 0, 0}
    };
 

@@ -45,7 +45,7 @@ namespace {
   char XtcIterator_doc[] = "Python class wrapping C++ Pds::XtcIterator class.\n\n"
       "Constructor of the class has one argument which is a Python XTC object. The\n"
       "instances of this class act as regular Python iterators which return objects\n"
-      "of type Xtc.";
+      "of type :py:class:`Xtc`.";
 
   PyTypeObject XtcIterator_Type = {
     PyObject_HEAD_INIT(0)

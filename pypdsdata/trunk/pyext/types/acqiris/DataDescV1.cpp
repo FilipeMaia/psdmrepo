@@ -55,11 +55,11 @@ namespace {
     {"nbrSegments",      nbrSegments,       METH_NOARGS,  "self.nbrSegments() -> int\n\nReturns integer number" },
     {"indexFirstPoint",  indexFirstPoint,   METH_NOARGS,  "self.indexFirstPoint() -> int\n\nReturns integer number" },
     {"timestamp",        timestamp,         METH_VARARGS,
-        "self.timestamp(seg: int) -> TimestampV1\n\nReturns TimestampV1 object for a given segment" },
+        "self.timestamp(seg: int) -> TimestampV1\n\nReturns :py:class:`TimestampV1` object for a given segment" },
     {"waveform",         waveform,          METH_VARARGS,
-        "self.waveform(hcfg: HorizV1) -> numpy.ndarray\n\nReturns waveform array given a HorizV1 object" },
+        "self.waveform(hcfg: HorizV1) -> numpy.ndarray\n\nReturns waveform array given a :py:class:`HorizV1` object" },
     {"nextChannel",      nextChannel,       METH_VARARGS,
-        "self.nextChannel(hcfg: HorizV1) -> DataDescV1\n\nReturns DataDescV1 for next channel (arg is HorizV1 object)" },
+        "self.nextChannel(hcfg: HorizV1) -> DataDescV1\n\nReturns :py:class:`DataDescV1` for next channel (argument is :py:class:`HorizV1` object)" },
     {0, 0, 0, 0}
    };
 

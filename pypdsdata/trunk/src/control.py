@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.control. This module imports all _pdsdata.control 
+"""Wrapper module for :py:mod:`_pdsdata.control`. This module imports all :py:mod:`_pdsdata.control` 
 classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 

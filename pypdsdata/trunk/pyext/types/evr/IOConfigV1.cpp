@@ -41,9 +41,9 @@ namespace {
   PyObject* channel( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    { "conn",      conn,       METH_NOARGS,  "self.conn() -> OutputMap.Conn enum\n\nReturns OutputMap.Conn enum" },
+    { "conn",      conn,       METH_NOARGS,  "self.conn() -> OutputMap.Conn enum\n\nReturns :py:class:`OutputMap.Conn` enum" },
     { "nchannels", nchannels,  METH_NOARGS,  "self.nchannels() -> int\n\nReturns number of channels" },
-    { "channel",   channel,    METH_VARARGS, "self.channel(i: int) -> IOChannel\n\nReturns IOChannel object" },
+    { "channel",   channel,    METH_VARARGS, "self.channel(i: int) -> IOChannel\n\nReturns :py:class:`IOChannel` object" },
     {0, 0, 0, 0}
    };
 

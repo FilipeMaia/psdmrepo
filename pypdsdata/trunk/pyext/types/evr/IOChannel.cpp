@@ -41,8 +41,8 @@ namespace {
 
   PyMethodDef methods[] = {
     { "name",    name,   METH_NOARGS,  "self.name() -> string\n\nReturns string" },
-    { "ninfo",   ninfo,  METH_NOARGS,  "self.ninfo() -> int\n\nReturns number of DetInfo objects" },
-    { "info",    info,   METH_VARARGS, "self.info(i: int) -> xtc.DetInfo\n\nReturns DetInfo object" },
+    { "ninfo",   ninfo,  METH_NOARGS,  "self.ninfo() -> int\n\nReturns number of :py:class:`_pdsdata.xtc.DetInfo` objects" },
+    { "info",    info,   METH_VARARGS, "self.info(i: int) -> xtc.DetInfo\n\nReturns :py:class:`_pdsdata.xtc.DetInfo` object" },
     {0, 0, 0, 0}
    };
 

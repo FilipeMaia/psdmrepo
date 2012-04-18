@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.cspad2x2. This module imports all _pdsdata.cspad2x2 
+"""Wrapper module for :py:mod:`_pdsdata.cspad2x2`. This module imports all :py:mod:`_pdsdata.cspad2x2` 
 classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 

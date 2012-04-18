@@ -7,8 +7,8 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.pnccd, provides wrapper for FrameV1
-class. All other classes are imported without change.
+"""Wrapper module for :py:mod:`_pdsdata.pnccd`, provides wrapper for 
+:py:class:`_pdsdata.pnccd.FrameV1` class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -51,13 +51,13 @@ from _pdsdata.pnccd import *
 # extend FrameV1
 class FrameV1(object) :
     """
-    This is a wrapper for _pdsdata.pnccd.FrameV1 which makes a larger frame
+    This is a wrapper for :py:class:`_pdsdata.pnccd.FrameV1` which makes a larger frame
     image out of four smaller frames. 
     """
 
     def __init__ (self, frames, cfg):
-        """ Constructor takes list of _pdsdata.pnccd.FrameV1 and 
-        one _pdsdata.acqiris.ConfigV1 object """
+        """ Constructor takes list of :py:class:`_pdsdata.pnccd.FrameV1` and 
+        one `_pdsdata.acqiris.ConfigV1` object """
 
         # at this moment can only work with 4 frames
         if len(frames) != 4 : 

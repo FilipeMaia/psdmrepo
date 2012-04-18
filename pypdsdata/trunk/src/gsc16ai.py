@@ -7,8 +7,8 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.gsc16ai, provides wrapper for DataV1
-class. All other classes are imported without change.
+"""Wrapper module for :py:mod:`_pdsdata.gsc16ai`, provides wrapper for 
+:py:class:`_pdsdata.gsc16ai.DataV1` class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -49,11 +49,13 @@ from _pdsdata.gsc16ai import *
 
 class DataV1(object):
     """
-    This is a wrapper for _pdsdata.gsc16ai.DataV1 which removes the need to pass 
+    This is a wrapper for :py:class:`_pdsdata.gsc16ai.DataV1` which removes the need to pass 
     configuration objects to several methods.
     """
     
     def __init__(self, data, cfg):
+        """ Constructor takes one :py:class:`_pdsdata.gsc16ai.DataV1` and one 
+        :py:class:`_pdsdata.gsc16ai.ConfigV1` object """
         self.__data = data
         self.__cfg = cfg
     

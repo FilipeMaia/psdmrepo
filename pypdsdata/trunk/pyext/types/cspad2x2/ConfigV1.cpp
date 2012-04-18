@@ -65,13 +65,13 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV1QuadReg\n\nReturns ConfigV1QuadReg object" },
+    {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV1QuadReg\n\nReturns :py:class:`ConfigV1QuadReg` object" },
     {"tdi",                 tdi,                 METH_NOARGS, "self.tdi() -> int\n\nReturns test data index" },
     {"protectionThreshold", protectionThreshold, METH_NOARGS,
         "self.protectionThresholds() -> CsPadProtectionSystemThreshold\n\nReturns CsPadProtectionSystemThreshold object" },
     {"protectionEnable",    protectionEnable,    METH_NOARGS, "self.protectionEnable() -> int\n\nReturns integer number" },
-    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "self.inactiveRunMode() -> RunModes enum\n\nReturns RunModes enum" },
-    {"activeRunMode",       activeRunMode,       METH_NOARGS, "self.activeRunMode() -> RunModes enum\n\nReturns RunModes enum" },
+    {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "self.inactiveRunMode() -> RunModes enum\n\nReturns :py:class:`ConfigV1.RunModes` enum" },
+    {"activeRunMode",       activeRunMode,       METH_NOARGS, "self.activeRunMode() -> RunModes enum\n\nReturns :py:class:`ConfigV1.RunModes` enum" },
     {"payloadSize",         payloadSize,         METH_NOARGS, "self.payloadSize() -> int\n\nReturns size of data" },
     {"badAsicMask",         badAsicMask,         METH_NOARGS, "self.badAsicMask() -> int\n\nRetuns bit mask" },
     {"asicMask",            asicMask,            METH_NOARGS, "self.asicMask() -> int\n\nRetuns bit mask" },

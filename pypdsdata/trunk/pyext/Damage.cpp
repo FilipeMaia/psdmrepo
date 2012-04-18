@@ -69,7 +69,8 @@ namespace {
     { "value",     value,            METH_NOARGS,  "self.value() -> int\n\nReturns complete damage mask" },
     { "bits",      bits,             METH_NOARGS,  "self.bits() -> int\n\nReturns damage mask excluding user bits" },
     { "userBits",  userBits,         METH_NOARGS,  "self.userBits() -> int\n\nReturns user bits of the damage mask" },
-    { "hasDamage", Damage_hasDamage, METH_VARARGS, "self.hasDamage(value: Value) -> bool\n\nReturns True if the damage bit is set, accepts values like Damage.OutOfOrder" },
+    { "hasDamage", Damage_hasDamage, METH_VARARGS,
+        "self.hasDamage(value: Value) -> bool\n\nReturns True if the damage bit is set, accepts values like :py:class:`Damage`.OutOfOrder" },
     {0, 0, 0, 0}
    };
 

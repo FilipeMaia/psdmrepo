@@ -68,9 +68,9 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::TrigV1, level)
 
   PyMethodDef methods[] = {
-    {"coupling",     coupling,    METH_NOARGS,  "self.coupling() -> Coupling enum\n\nReturns integer number, one of Coupling.DC, Coupling.AC, etc." },
-    {"input",        input,       METH_NOARGS,  "self.input() -> Source enum\n\nReturns integer number, Source.Internal or Source.External" },
-    {"slope",        slope,       METH_NOARGS,  "self.slope() -> Slope enum\n\nReturns integer number, one of Slope.Positive, Slope.Negative, etc." },
+    {"coupling",     coupling,    METH_NOARGS,  "self.coupling() -> Coupling enum\n\nReturns integer number, one of :py:class:`TrigV1.Coupling` enums" },
+    {"input",        input,       METH_NOARGS,  "self.input() -> Source enum\n\nReturns integer number, one of :py:class:`TrigV1.Source` enums" },
+    {"slope",        slope,       METH_NOARGS,  "self.slope() -> Slope enum\n\nReturns integer number, one of :py:class:`TrigV1.Slope` enums" },
     {"level",        level,       METH_NOARGS,  "self.level() -> float\n\nReturns floating number" },
     {0, 0, 0, 0}
    };

@@ -88,12 +88,12 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "voltageRange",      voltageRange,     METH_NOARGS, "self.voltageRange() -> VoltageRange enum\n\nReturns VoltageRange enum" },
+    { "voltageRange",      voltageRange,     METH_NOARGS, "self.voltageRange() -> VoltageRange enum\n\nReturns :py:class:`VoltageRange` enum" },
     { "firstChan",         firstChan,        METH_NOARGS, "self.firstChan() -> int\n\nReturns integer number" },
     { "lastChan",          lastChan,         METH_NOARGS, "self.lastChan() -> int\n\nReturns integer number" },
-    { "inputMode",         inputMode,        METH_NOARGS, "self.inputMode() -> InputMode enum\n\nReturns InputMode enum" },
-    { "triggerMode",       triggerMode,      METH_NOARGS, "self.triggerMode() -> TriggerMode enum\n\nReturns TriggerMode enum" },
-    { "dataFormat",        dataFormat,       METH_NOARGS, "self.dataFormat() -> DataFormat enum\n\nReturns DataFormat enum" },
+    { "inputMode",         inputMode,        METH_NOARGS, "self.inputMode() -> InputMode enum\n\nReturns :py:class:`InputMode` enum" },
+    { "triggerMode",       triggerMode,      METH_NOARGS, "self.triggerMode() -> TriggerMode enum\n\nReturns :py:class:`TriggerMode` enum" },
+    { "dataFormat",        dataFormat,       METH_NOARGS, "self.dataFormat() -> DataFormat enum\n\nReturns :py:class:`DataFormat` enum" },
     { "fps",               fps,              METH_NOARGS, "self.fps() -> int\n\nReturns integer number" },
     { "autocalibEnable",   autocalibEnable,  METH_NOARGS, "self.autocalibEnable() -> bool\n\nReturns boolean" },
     { "timeTagEnable",     timeTagEnable,    METH_NOARGS, "self.timeTagEnable() -> bool\n\nReturns boolean" },

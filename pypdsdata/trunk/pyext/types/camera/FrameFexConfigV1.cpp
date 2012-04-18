@@ -66,11 +66,11 @@ namespace {
 
   PyMethodDef methods[] = {
     {"forwarding",       forwarding,       METH_NOARGS,
-        "self.forwarding() -> Forwarding enum\n\nReturns forwarding policy for frame data." },
+        "self.forwarding() -> Forwarding enum\n\nReturns forwarding policy for frame data (:py:class:`FrameFexConfigV1.Forwarding`)." },
     {"forward_prescale", forward_prescale, METH_NOARGS,
         "self.forward_prescale() -> int\n\nReturns prescale of events with forwarded frames." },
     {"processing",       processing,       METH_NOARGS,
-        "self.processing() -> Processing enum\n\nReturns algorithm to apply to frames to produce processed output." },
+        "self.processing() -> Processing enum\n\nReturns algorithm to apply to frames to produce processed output (:py:class:`FrameFexConfigV1.Processing`)." },
     {"roiBegin",         roiBegin,         METH_NOARGS,
         "self.roiBegin() -> camera.FrameCoord\n\nReturns coordinates of start of rectangular region of interest (inclusive)." },
     {"roiEnd",           roiEnd,           METH_NOARGS,

@@ -41,9 +41,9 @@ namespace {
   PyObject* getPvConfig( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"getNumPv",     getNumPv,      METH_NOARGS,  "self.getNumPv() -> int\n\nReturns number of PvConfigV1 object." },
-    {"getPvConfigs", getPvConfigs,  METH_NOARGS,  "self.getPvConfigs() -> list of PvConfigV1\n\nReturns list of PvConfigV1 objects." },
-    {"getPvConfig",  getPvConfig,   METH_VARARGS, "self.getPvConfig(idx: int) -> PvConfigV1\n\nReturns PvConfigV1 for a given index." },
+    {"getNumPv",     getNumPv,      METH_NOARGS,  "self.getNumPv() -> int\n\nReturns number of :py:class:`PvConfigV1` object." },
+    {"getPvConfigs", getPvConfigs,  METH_NOARGS,  "self.getPvConfigs() -> list of PvConfigV1\n\nReturns list of :py:class:`PvConfigV1` objects." },
+    {"getPvConfig",  getPvConfig,   METH_VARARGS, "self.getPvConfig(idx: int) -> PvConfigV1\n\nReturns :py:class:`PvConfigV1` for a given index." },
     {0, 0, 0, 0}
    };
 

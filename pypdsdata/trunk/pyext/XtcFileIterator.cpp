@@ -46,7 +46,7 @@ namespace {
   char XtcFileIterator_doc[] = "Python class wrapping C++ Pds::XtcFileIterator class.\n\n"
       "Constructor of the class has one argument which is a Python file object. The\n"
       "instances of this class act as regular Python iterators which return objects\n"
-      "of type Dgram.";
+      "of type :py:class:`Dgram`.";
 
   PyTypeObject XtcFileIterator_Type = {
     PyObject_HEAD_INIT(0)

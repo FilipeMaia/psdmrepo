@@ -67,13 +67,13 @@ namespace {
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
-    { "beam",       beam,        METH_NOARGS, "self.beam() -> BeamCode enum\n\nReturns BeamCode enum" },
-    { "rate",       rate,        METH_NOARGS, "self.rate() -> RateCodeenum\n\nReturns RateCode enum" },
+    { "beam",       beam,        METH_NOARGS, "self.beam() -> BeamCode enum\n\nReturns :py:class:`BeamCode` enum" },
+    { "rate",       rate,        METH_NOARGS, "self.rate() -> RateCodeenum\n\nReturns :py:class:`RateCode` enum" },
     { "opcode",     opcode,      METH_NOARGS, "self.opcode() -> int\n\nReturns integer number" },
     { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
-    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfig\n\nReturns pulse configuration" },
+    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfig\n\nReturns pulse configuration (:py:class:`PulseConfig`)" },
     { "noutputs",   noutputs,    METH_NOARGS,  "self.noutputs() -> int\n\nReturns number of output configurations" },
-    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration" },
+    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration (:py:class:`OutputMap`)" },
     { "size",       size,        METH_NOARGS,  "self.size() -> int\n\nRetuns structure size" },
     {0, 0, 0, 0}
    };

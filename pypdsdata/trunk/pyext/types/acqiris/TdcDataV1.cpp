@@ -55,7 +55,8 @@ namespace {
   PyObject* data( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
-    {"data",    data,    METH_NOARGS,  "self.data() -> list\n\nReturns list of TdcDataV1Channel, TdcDataV1Common, and TdcDataV1Marker objects" },
+    {"data",    data,    METH_NOARGS,
+        "self.data() -> list\n\nReturns list of :py:class:`TdcDataV1Channel`, :py:class:`TdcDataV1Common`, and :py:class:`TdcDataV1Marker` objects" },
     {0, 0, 0, 0}
    };
 

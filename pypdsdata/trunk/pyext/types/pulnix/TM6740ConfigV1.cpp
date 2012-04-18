@@ -88,15 +88,15 @@ namespace {
     {"shutter_width",          shutter_width,           METH_NOARGS,  
         "self.shutter_width() -> int\n\nReturn shutter width in microseconds." },
     {"output_resolution",      output_resolution,       METH_NOARGS,  
-        "self.output_resolution() -> Depth enum\n\nReturns bit-depth of pixel counts (one of Depth.Eight_bit, Depth.Ten_bit)." },
+        "self.output_resolution() -> Depth enum\n\nReturns bit-depth of pixel counts (one of :py:class:`Depth` enums)." },
     {"output_resolution_bits", output_resolution_bits,  METH_NOARGS,  
         "self.output_resolution_bits() -> int\n\nReturns bit-depth of pixel counts (in actual bits)." },
     {"horizontal_binning",     horizontal_binning,      METH_NOARGS,  
-        "self.horizontal_binning() -> Binning enum\n\nReturns horizontal re-binning of output (consecutive columns summed), one of Binning.x1, Binning.x2, etc." },
+        "self.horizontal_binning() -> Binning enum\n\nReturns horizontal re-binning of output (consecutive columns summed), one of :py:class:`Binning` enums" },
     {"vertical_binning",       vertical_binning,        METH_NOARGS,  
-        "self.vertical_binning() -> Binning enum\n\nReturns vertical re-binning of output (consecutive rows summed), one of Binning.x1, Binning.x2, etc." },
+        "self.vertical_binning() -> Binning enum\n\nReturns vertical re-binning of output (consecutive rows summed), one of :py:class:`Binning` enums" },
     {"lookuptable_mode",       lookuptable_mode,        METH_NOARGS,  
-        "self.lookuptable_mode() -> LookupTable enum\n\nReturns one of LookupTable.Gamma, LookupTable.Linear" },
+        "self.lookuptable_mode() -> LookupTable enum\n\nReturns one of :py:class:`LookupTable` enums" },
     {0, 0, 0, 0}
    };
 

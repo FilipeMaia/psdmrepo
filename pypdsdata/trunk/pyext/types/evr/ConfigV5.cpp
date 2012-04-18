@@ -48,12 +48,12 @@ namespace {
 
   PyMethodDef methods[] = {
     { "neventcodes",neventcodes, METH_NOARGS,  "self.neventcodes() -> int\n\nReturns number of event codes" },
-    { "eventcode",  eventcode,   METH_VARARGS, "self.eventcode(i: int) -> EventCodeV5\n\nReturns event code (EventCodeV3 object)" },
+    { "eventcode",  eventcode,   METH_VARARGS, "self.eventcode(i: int) -> EventCodeV5\n\nReturns event code (:py:class:`EventCodeV5` object)" },
     { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
-    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfigV3\n\nReturns pulse configuration" },
+    { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfigV3\n\nReturns pulse configuration (:py:class:`PulseConfigV3`)" },
     { "noutputs",   noutputs,    METH_NOARGS,  "self.noutputs() -> int\n\nReturns number of output configurations" },
-    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration" },
-    { "seq_config", seq_config,  METH_NOARGS,  "self.seq_config() -> SequencerConfigV1\n\nReturns SequencerConfigV1 object" },
+    { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration (:py:class:`OutputMap`)" },
+    { "seq_config", seq_config,  METH_NOARGS,  "self.seq_config() -> SequencerConfigV1\n\nReturns :py:class:`SequencerConfigV1` object" },
     { "size",       size,        METH_NOARGS,  "self.size() -> int\n\nRetuns structure size" },
     {0, 0, 0, 0}
    };

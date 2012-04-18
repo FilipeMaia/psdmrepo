@@ -7,8 +7,8 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.princeton, provides wrapper for FrameV1
-class. All other classes are imported without change.
+"""Wrapper module for :py:mod:`_pdsdata.princeton`, provides wrapper for 
+:py:class:`_pdsdata.princeton.FrameV1` class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -49,11 +49,13 @@ from _pdsdata.princeton import *
 
 class FrameV1(object):
     """
-    This is a wrapper for _pdsdata.princeton.FrameV1 which removes the need to pass 
+    This is a wrapper for :py:class:`_pdsdata.princeton.FrameV1` which removes the need to pass 
     configuration objects to several methods.
     """
     
     def __init__(self, frame, cfg):
+        """ Constructor takes list of :py:class:`_pdsdata.princeton.FrameV1` and 
+        one `_pdsdata.princeton.ConfigV1` object """
         self.__frame = frame
         self.__cfg = cfg
     

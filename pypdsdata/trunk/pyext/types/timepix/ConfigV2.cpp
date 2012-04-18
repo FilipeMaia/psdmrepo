@@ -135,8 +135,8 @@ namespace {
   PyObject* _repr(PyObject *self);
 
   PyMethodDef methods[] = {
-    { "readoutSpeed",      readoutSpeed        , METH_NOARGS,  "self.readoutSpeed() -> ReadoutSpeed enum\n\nReturns ReadoutSpeed enum" },
-    { "triggerMode",       triggerMode         , METH_NOARGS,  "self.triggerMode() -> TriggerMode enum\n\nReturns TriggerMode enum" },
+    { "readoutSpeed",      readoutSpeed        , METH_NOARGS,  "self.readoutSpeed() -> ReadoutSpeed enum\n\nReturns :py:class:`ReadoutSpeed` enum" },
+    { "triggerMode",       triggerMode         , METH_NOARGS,  "self.triggerMode() -> TriggerMode enum\n\nReturns :py:class:`TriggerMode` enum" },
     { "timepixSpeed",      timepixSpeed        , METH_NOARGS,  "self.timepixSpeed() -> int\n\nReturns integer number" },
     { "dac0Ikrum",         dac0Ikrum           , METH_NOARGS,  "self.dac0Ikrum() -> int\n\nReturns integer number" },
     { "dac0Disc",          dac0Disc            , METH_NOARGS,  "self.dac0Disc() -> int\n\nReturns integer number" },

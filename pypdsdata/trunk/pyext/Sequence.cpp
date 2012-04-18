@@ -53,12 +53,12 @@ namespace {
 
   PyMethodDef methods[] = {
     { "type",       type,          METH_NOARGS,
-        "self.type() -> Type\n\nReturns type of this sequence, one of Type.Event, Type.Occurrence, or Type.Marker" },
-    { "service",    Sequence_service, METH_NOARGS, "self.service() -> TransitionId\n\nReturns the TransitionId type" },
+        "self.type() -> Type\n\nReturns type of this sequence, one of :py:class:`Type` enums" },
+    { "service",    Sequence_service, METH_NOARGS, "self.service() -> TransitionId\n\nReturns the :py:class:`TransitionId` type" },
     { "isExtended", isExtended,     METH_NOARGS, "self.isExtended() -> bool\n\nReturns True for extended sequence" },
     { "isEvent",    isEvent,        METH_NOARGS, "self.isEvent() -> bool\n\nReturns True for event sequence" },
-    { "clock",      Sequence_clock, METH_NOARGS, "self.clock() -> ClockTime\n\nReturns clock value (xtc.ClockTime) for sequence" },
-    { "stamp",      Sequence_stamp, METH_NOARGS, "self.stamp() -> TimeStamp\n\nReturns timestamp value (xtc.TimeStamp) for sequence" },
+    { "clock",      Sequence_clock, METH_NOARGS, "self.clock() -> ClockTime\n\nReturns clock value (:py:class:`ClockTime`) for sequence" },
+    { "stamp",      Sequence_stamp, METH_NOARGS, "self.stamp() -> TimeStamp\n\nReturns timestamp value (:py:class:`TimeStamp`) for sequence" },
     {0, 0, 0, 0}
    };
 

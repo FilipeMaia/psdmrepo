@@ -41,9 +41,9 @@ namespace {
   PyObject* veto( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
-    {"channel", channel, METH_VARARGS, "self.channel(idx: int) -> TdcChannel object\n\nReturns TdcChannel object for a given index" },
-    {"auxio",   auxio,   METH_VARARGS, "self.auxio(idx: int) -> TdcAuxIO object\n\nReturns TdcAuxIO object for a given index" },
-    {"veto",    veto,    METH_NOARGS,  "self.veto() -> TdcVetoIO object\n\nReturns TdcVetoIO object" },
+    {"channel", channel, METH_VARARGS, "self.channel(idx: int) -> TdcChannel object\n\nReturns :py:class:`TdcChannel` object for a given index" },
+    {"auxio",   auxio,   METH_VARARGS, "self.auxio(idx: int) -> TdcAuxIO object\n\nReturns :py:class:`TdcAuxIO` object for a given index" },
+    {"veto",    veto,    METH_NOARGS,  "self.veto() -> TdcVetoIO object\n\nReturns :py:class:`TdcVetoIO` object" },
     {0, 0, 0, 0}
    };
 

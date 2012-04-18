@@ -52,13 +52,13 @@ namespace {
   PyMethodDef methods[] = {
     { "sizeofPayload",  sizeofPayload,  METH_NOARGS, "self.sizeofPayload() -> int\n\nReturns the size of payload." },
     { "payload",        Xtc_payload,    METH_NOARGS, 
-        "self.payload() -> object\n\nReturns data object. If 'contains' is Any returns None. If 'contains' is Id_Xtc returns XtcIterator" },
+        "self.payload() -> object\n\nReturns data object. If 'contains' is Any returns None. If 'contains' is Id_Xtc returns :py:class:`XtcIterator`" },
     {0, 0, 0, 0}
    };
 
   PyGetSetDef getset[] = {
     {"damage",   Xtc_damage,   0, "Attribute which contains damage bitmask (xtc.Damage)", 0},
-    {"src",      Xtc_src,      0, "Attribute with data source object, one of BldInfo, DetInfo, or ProcInfo", 0},
+    {"src",      Xtc_src,      0, "Attribute with data source object, one of :py:class:`BldInfo`, :py:class:`DetInfo`, or :py:class:`ProcInfo`", 0},
     {"contains", Xtc_contains, 0, "Attribute containing TypeId of the contained object(s)", 0},
     {"extent",   extent,       0, "Attribute with extent size of the XTC", 0},
     {0, 0, 0, 0, 0}

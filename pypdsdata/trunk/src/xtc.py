@@ -7,8 +7,8 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.xtc. This module imports all _pdsdata.xtc 
-classes without any change. 
+"""Wrapper module for :py:mod:`_pdsdata.xtc`. This module imports all 
+:py:mod:`_pdsdata.xtc` classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.

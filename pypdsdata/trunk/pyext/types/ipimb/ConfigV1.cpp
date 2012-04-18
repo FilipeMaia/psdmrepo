@@ -82,7 +82,7 @@ namespace {
     { "calStrobeLength",     calStrobeLength,     METH_NOARGS, "self.calStrobeLength() -> int\n\nReturns integer number" },
     { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
     { "diodeGain",           diodeGain,           METH_VARARGS, 
-        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns CapacitorValue enum for given channel number (0..3)" },
+        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
     {0, 0, 0, 0}
    };
 

@@ -61,9 +61,9 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcVetoIO, term, termEnum)
 
   PyMethodDef methods[] = {
-    {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns Channel enum value" },
-    {"mode",      mode,     METH_NOARGS,  "self.mode() -> Mode enum\n\nReturns Mode enum value" },
-    {"term",      term,     METH_NOARGS,  "self.term() -> Termination enum\n\nReturns Termination enum value" },
+    {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns :py:class:`TdcVetoIO.Channel` enum value" },
+    {"mode",      mode,     METH_NOARGS,  "self.mode() -> Mode enum\n\nReturns :py:class:`TdcVetoIO.Mode` enum value" },
+    {"term",      term,     METH_NOARGS,  "self.term() -> Termination enum\n\nReturns :py:class:`TdcVetoIO.Termination` enum value" },
     {0, 0, 0, 0}
    };
 

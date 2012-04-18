@@ -76,7 +76,7 @@ namespace {
     {"edgeSelect",      edgeSelect,     METH_NOARGS, "self.edgeSelect() -> list of int\n\nReturns list of TwoByTwosPerQuad integer numbers" },
     {"readClkSet",      readClkSet,     METH_NOARGS, "self.readClkSet() -> int\n\nReturns integer number" },
     {"readClkHold",     readClkHold,    METH_NOARGS, "self.readClkHold() -> int\n\nReturns integer number" },
-    {"dataMode",        dataMode,       METH_NOARGS, "self.dataMode() -> DataModes enum\n\nReturns DataModes enum" },
+    {"dataMode",        dataMode,       METH_NOARGS, "self.dataMode() -> DataModes enum\n\nReturns :py:class:`ConfigV1QuadReg.DataModes` enum" },
     {"prstSel",         prstSel,        METH_NOARGS, "self.prstSel() -> int\n\nReturns integer number" },
     {"acqDelay",        acqDelay,       METH_NOARGS, "self.acqDelay() -> int\n\nReturns integer number" },
     {"intTime",         intTime,        METH_NOARGS, "self.intTime() -> int\n\nReturns integer number" },
@@ -93,10 +93,10 @@ namespace {
     {"kdConstant",      kdConstant,     METH_NOARGS, "self.kdConstant() -> int\n\nReturns integer number" },
     {"humidThold",      humidThold,     METH_NOARGS, "self.humidThold() -> int\n\nReturns integer number" },
     {"setPoint",        setPoint,       METH_NOARGS, "self.setPoint() -> int\n\nReturns integer number" },
-    {"ro",              readOnly,       METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns CsPadReadOnlyCfg object" },
-    {"dp",              digitalPots,    METH_NOARGS, "self.dp() -> CsPadDigitalPotsCfg\n\nReturns CsPadDigitalPotsCfg object" },
-    {"gm",              gainMap,        METH_NOARGS, "self.gm() -> CsPadGainMapCfg\n\nReturns CsPadGainMapCfg object" },
-    {"readOnly",        readOnly,       METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns CsPadReadOnlyCfg object, same as ro()" },
+    {"ro",              readOnly,       METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object" },
+    {"dp",              digitalPots,    METH_NOARGS, "self.dp() -> CsPadDigitalPotsCfg\n\nReturns :py:class:`CsPadDigitalPotsCfg` object" },
+    {"gm",              gainMap,        METH_NOARGS, "self.gm() -> CsPadGainMapCfg\n\nReturns :py:class:`CsPadGainMapCfg` object" },
+    {"readOnly",        readOnly,       METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object, same as ro()" },
     {0, 0, 0, 0}
    };
 

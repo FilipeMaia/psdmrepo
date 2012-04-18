@@ -81,7 +81,7 @@ namespace {
     { "trigPsDelay",         trigPsDelay,         METH_NOARGS, "self.trigPsDelay() -> int\n\nReturns integer number" },
     { "adcDelay",            adcDelay,            METH_NOARGS, "self.adcDelay() -> int\n\nReturns integer number" },
     { "diodeGain",           diodeGain,           METH_VARARGS, 
-        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns CapacitorValue enum for given channel number (0..3)" },
+        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
     {0, 0, 0, 0}
    };
 

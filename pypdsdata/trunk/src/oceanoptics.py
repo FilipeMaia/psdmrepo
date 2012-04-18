@@ -3,12 +3,12 @@
 #  $Id$
 #
 # Description:
-#  Module lusi...
+#  Module oceanoptics...
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for :py:mod:`_pdsdata.lusi`. This module imports all 
-:py:mod:`_pdsdata.lusi` classes without any change. 
+"""Wrapper module for :py:mod:`_pdsdata.oceanoptics`. This module imports all 
+:py:mod:`_pdsdata.oceanoptics` classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -45,4 +45,4 @@ __version__ = "$Revision$"
 # Exported definitions --
 #------------------------
 
-from _pdsdata.lusi import *
+#from _pdsdata.oceanoptics import *

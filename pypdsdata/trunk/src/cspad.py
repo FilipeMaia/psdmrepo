@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.cspad, provides wrapper for ElementV*
+"""Wrapper module for :py:mod:`_pdsdata.cspad`, provides wrapper for ElementV*
 classes. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
@@ -53,7 +53,7 @@ from _pdsdata.cspad import ElementV2 as _ElementV2
 # extend FrameV1
 class ElementV1(object) :
     """
-    This is a wrapper for _pdsdata.cspad.ElementV1 which removes the need to pass 
+    This is a wrapper for :py:class:`_pdsdata.cspad.ElementV1` which removes the need to pass 
     configuration objects to several methods.
     """
 
@@ -63,8 +63,8 @@ class ElementV1(object) :
     
 
     def __init__ (self, quad, cfg):
-        """ Constructor takes one _pdsdata.cspad.ElementV1 and one 
-        _pdsdata.cspad.ConfigV1 object """
+        """ Constructor takes one :py:class:`_pdsdata.cspad.ElementV1` and one 
+        :py:class:`_pdsdata.cspad.ConfigV1` object """
 
         self.__virtual_channel = quad.virtual_channel()
         self.__lane = quad.lane()
@@ -167,7 +167,7 @@ class ElementV1(object) :
 # extend FrameV1
 class ElementV2(object) :
     """
-    This is a wrapper for _pdsdata.cspad.ElementV2 which removes the need to pass 
+    This is a wrapper for :py:class:`_pdsdata.cspad.ElementV2` which removes the need to pass 
     configuration objects to several methods.
     """
 
@@ -177,8 +177,8 @@ class ElementV2(object) :
     
 
     def __init__ (self, quad, cfg):
-        """ Constructor takes one _pdsdata.cspad.ElementV2 and one 
-        _pdsdata.cspad.ConfigV2 object """
+        """ Constructor takes one :py:class:`_pdsdata.cspad.ElementV2` and one 
+        :py:class:`_pdsdata.cspad.ConfigV2` object """
 
         self.__virtual_channel = quad.virtual_channel()
         self.__lane = quad.lane()

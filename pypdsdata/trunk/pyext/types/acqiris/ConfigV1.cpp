@@ -49,9 +49,9 @@ namespace {
     {"channelMask",  channelMask,  METH_NOARGS,  "self.channelMask() -> int\n\nReturns integer number" },
     {"nbrChannels",  nbrChannels,  METH_NOARGS,  "self.nbrChannels() -> int\n\nReturns integer number" },
     {"nbrBanks",     nbrBanks,     METH_NOARGS,  "self.nbrBanks() -> int\n\nReturns integer number" },
-    {"horiz",        horiz,        METH_NOARGS,  "self.horiz() -> HorizV1\n\nReturns HorizV1 object" },
-    {"trig",         trig,         METH_NOARGS,  "self.trig() -> TrigV1\n\nReturns TrigV1 object" },
-    {"vert",         vert,         METH_VARARGS, "self.vert(channel: int) -> VertV1\n\nReturns VertV1 object for a given channel number" },
+    {"horiz",        horiz,        METH_NOARGS,  "self.horiz() -> HorizV1\n\nReturns :py:class:`HorizV1` object" },
+    {"trig",         trig,         METH_NOARGS,  "self.trig() -> TrigV1\n\nReturns :py:class:`TrigV1` object" },
+    {"vert",         vert,         METH_VARARGS, "self.vert(channel: int) -> VertV1\n\nReturns :py:class:`VertV1` object for a given channel number" },
     {0, 0, 0, 0}
    };
 

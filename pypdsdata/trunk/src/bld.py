@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.bld. This module imports all _pdsdata.bld 
+"""Wrapper module for :py:mod:`_pdsdata.bld`. This module imports all :py:mod:`_pdsdata.bld` 
 classes without any change. 
 
 This software was developed for the LUSI project.  If you use all or 

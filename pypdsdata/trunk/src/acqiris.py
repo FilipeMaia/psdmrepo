@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.acqiris, provides wrapper for DataDescV1
+"""Wrapper module for :py:mod:`_pdsdata.acqiris`, provides wrapper for DataDescV1
 class. All other classes are imported without change.
 
 This software was developed for the LUSI project.  If you use all or 
@@ -51,13 +51,13 @@ from _pdsdata.acqiris import *
 # extend DataDescV1
 class DataDescV1(object) :
     """
-    This is a wrapper for _pdsdata.acqiris.DataDescV1 which removes the need
+    This is a wrapper for :py:class:`_pdsdata.acqiris.DataDescV1` which removes the need
     to pass configuration objects to several methods.
     """
     
     def __init__(self, ddesc, hcfg, vcfg ):
-        """ Constructor takes _pdsdata.acqiris.DataDescV1,
-        _pdsdata.acqiris.HorizV1 and _pdsdata.acqiris.VertV1 objects
+        """ Constructor takes :py:class:`_pdsdata.acqiris.DataDescV1`,
+        :py:class:`_pdsdata.acqiris.HorizV1` and :py:class:`_pdsdata.acqiris.VertV1` objects
         """
         
         self.__ddesc = ddesc

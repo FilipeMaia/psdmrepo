@@ -43,7 +43,7 @@ namespace {
   PyGetSetDef getset[] = {
     {"xscale",   xscale,                0, "Floating point number", 0},
     {"yscale",   yscale,                0, "Floating point number", 0},
-    {"diode",    IpmFexConfigV1_diode,  0, "List of NCHANNELS DiodeFexConfigV1 objects", 0},
+    {"diode",    IpmFexConfigV1_diode,  0, "List of NCHANNELS :py:class:`DiodeFexConfigV1` objects", 0},
     {0, 0, 0, 0, 0}
   };
 
