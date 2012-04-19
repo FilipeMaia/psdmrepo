@@ -76,7 +76,7 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   m_peaksKey   = configStr("peaksKey",    "peaks");
   m_thr_low    = config   ("threshold_low",    10);
   m_thr_high   = config   ("threshold_high",  100);
-  m_sigma      = config   ("sigma",           1.5);
+  m_sigma      = config   ("sigma",            0.);
   m_nsm        = config   ("smear_radius",      1);
   m_npeak      = config   ("peak_radius",       3);
   m_xmin       = config   ("xmin",              0);
@@ -150,8 +150,10 @@ ImgPeakFinder::endRun(Event& evt, Env& env)
 void 
 ImgPeakFinder::endJob(Event& evt, Env& env)
 {
-  m_time -> stopTime(m_count);
-  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Number of selected events = " << m_selected << " of total " << m_count);
+  if( m_print_bits & 1<<1 ) {
+    MsgLog(name(), info, "Number of events with found data = " << m_selected << " of total " << m_count);
+    m_time -> stopTime(m_count);
+  }
 }
 
 //--------------------
@@ -282,16 +284,16 @@ ImgPeakFinder::setWindowRange()
 bool
 ImgPeakFinder::procImage(Event& evt)
 {
-    m_Peaks.clear();
-    setWindowRange();
-    saveImageInFile0();
-    initImage();         // non-zero pixels only in window above the lower threshold
-    saveImageInFile1();
-    smearImage();        // convolution with Gaussian
-    saveImageInFile2();
-    findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
-    savePeaksInEvent(evt);
-    savePeaksInFile();
+                     m_Peaks.clear();
+                     setWindowRange();
+                     saveImageInFile0();
+                     initImage();         // non-zero pixels only in window above the lower threshold
+                     saveImageInFile1();
+    if(m_sigma != 0) smearImage();        // convolution with Gaussian
+                     saveImageInFile2();
+                     findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
+                     savePeaksInEvent(evt);
+                     savePeaksInFile();
     return true;
 }
 
@@ -533,9 +535,11 @@ ImgPeakFinder::weight(int& dr, int& dc)
 void 
 ImgPeakFinder::evaluateWeights()
 {
+    if ( m_sigma == 0 ) { MsgLog( name(), info, "Smearing is turned OFF by sigma =" << m_sigma ); }
+
     for (int r = 0; r <= m_nsm; r++) {
       for (int c = 0; c <= m_nsm; c++) {
-        m_weights[r][c] = exp( -0.5*(r*r+c*c) / (m_sigma*m_sigma) );
+        m_weights[r][c] = ( m_sigma != 0 ) ? exp( -0.5*(r*r+c*c) / (m_sigma*m_sigma) ) : 0;
       }
     }
 }
@@ -545,6 +549,8 @@ ImgPeakFinder::evaluateWeights()
 void 
 ImgPeakFinder::printWeights()
 {
+  // if ( m_sigma == 0 ) { MsgLog( name(), info, "Smearing is turned OFF by sigma =" << m_sigma ); }
+
   WithMsgLog(name(), info, log) { log << "printWeights() - Weights for smearing";
     for (int r = 0; r <= m_nsm; r++) {
           log << "\n   row=" << r << ":     "; 

@@ -145,8 +145,10 @@ ImgRadialCorrection::endRun(Event& evt, Env& env)
 void 
 ImgRadialCorrection::endJob(Event& evt, Env& env)
 {
-  m_time -> stopTime(m_count);
-  if( m_print_bits & 2 ) MsgLog(name(), info, "Total number of events processed: " << m_count);
+  if( m_print_bits & 2 ) {
+    MsgLog(name(), info, "Total number of events processed: " << m_count);
+    m_time -> stopTime(m_count);
+  }
 }
 
 //--------------------
@@ -308,7 +310,7 @@ ImgRadialCorrection::initPixGeometry()
 {
   m_nrows = m_ndarr->shape()[0];
   m_ncols = m_ndarr->shape()[1];
-  cout << "Shape:" << m_nrows << " x " << m_ncols << endl; 
+  // cout << "Shape:" << m_nrows << " x " << m_ncols << endl; 
 
   m_radval = new double   [m_nrows * m_ncols];
   m_phival = new double   [m_nrows * m_ncols];

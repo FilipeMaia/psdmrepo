@@ -82,6 +82,8 @@ private:
   int m_status;
   struct timespec m_start, m_stop;
 
+  unsigned m_entrance_counter;
+
 };
 
 } // namespace ImgAlgos

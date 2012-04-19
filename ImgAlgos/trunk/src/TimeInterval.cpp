@@ -39,6 +39,7 @@ namespace ImgAlgos {
 //----------------
 TimeInterval::TimeInterval()
 {
+  m_entrance_counter = 0;
   //startTimeOnce();
 }
 
@@ -55,9 +56,8 @@ TimeInterval::~TimeInterval()
 void 
 TimeInterval::startTimeOnce()
 {
-  static unsigned entrance_counter = 0;
-  if( entrance_counter > 0 ) return;
-      entrance_counter ++;
+  if( m_entrance_counter > 0 ) return;
+      m_entrance_counter ++;
 
   startTime();
 }
@@ -82,7 +82,7 @@ TimeInterval::stopTime(long nevents)
 {
   m_status = clock_gettime( CLOCK_REALTIME, &m_stop ); // Get LOCAL time
   double dt = m_stop.tv_sec - m_start.tv_sec + 1e-9*(m_stop.tv_nsec - m_start.tv_nsec);
-  MsgLog("TimeInterval::stopTime", info, "Time to process "<< nevents << " events is " << dt << " sec,  or " << dt/nevents << " sec/event");
+  MsgLog("TimeInterval::stopTime", info, "Time to process "<< nevents << " events is " << dt << " sec, or " << dt/nevents << " sec/event");
 }
 
 //--------------------
