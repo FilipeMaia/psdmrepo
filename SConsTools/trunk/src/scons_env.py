@@ -96,7 +96,8 @@ def buildEnv () :
                  ALL_TARGETS = {},
                  CXXFILESUFFIX = ".cpp",
                  CYTHONFLAGS = cythonflags,
-                 CYTHONCFILESUFFIX = ".cpp"
+                 CYTHONCFILESUFFIX = ".cpp",
+                 TOOLPATH = toolpath
                  )
 
     # may want to use "relative" RPATH

@@ -219,7 +219,7 @@ def standardExternalPackage ( package, **kw ) :
                 env['ALL_TARGETS']['BINS'].extend ( targ )
 
     # add my libs to a package tree
-    addPkgLibs ( env, package, kw.get('PKGLIBS',[]) )
+    addPkgLibs ( package, kw.get('PKGLIBS',[]) )
     
     # add packages that I depend on
-    setPkgDeps ( env, package, kw.get('DEPS',[]) )
+    setPkgDeps ( package, kw.get('DEPS',[]) )

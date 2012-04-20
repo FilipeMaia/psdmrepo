@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2012-04-20 Andy Salnikov
+- adding Qt4 support to scons
+- packages that need Qt need to add NEED_QT=1 when calling standardSConscript()
+- only moc support has been added so far, no uic yet
+- still a bit experimental, may change in the future
+
 Tag: V00-02-02
 2012-04-16 Andy Salnikov
 - add -I. to CPPPATH, this should translate to the -I{PackageName}, this

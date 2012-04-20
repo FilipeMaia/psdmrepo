@@ -58,6 +58,7 @@ def standardSConscript( **kw ) :
         UTESTS - names of the unit tests to run, if not given then all tests are unit tests
         PYEXTMOD - name of the Python extension module, package name used by default
         CCFLAGS - additional flags passed to C/C++ compilers
+        NEED_QT - set to True to enable Qt support
     """
 
     pkg = _getpkg ( kw )
@@ -65,18 +66,48 @@ def standardSConscript( **kw ) :
 
     ukw = kw.copy()
     ukw['package'] = pkg
+    if 'env' in kw: del ukw['env']
     
-    standardLib( **ukw )
-    standardPyLib( **ukw )
-    standardPyExt( **ukw )
-    standardScripts( **ukw )
-    standardBins ( **ukw )
-    standardTests ( **ukw )
+    env = DefaultEnvironment()
+    if kw.get('NEED_QT', False):
+        # extend environment with QT stuff
+        env = env.Clone()
+        env.Tool('qt4', toolpath = env['TOOLPATH'])
+        ukw.setdefault('LIBS', []).extend(env['QT4_LIBS'])
+        ukw.setdefault('LIBPATH', []).extend(env['QT4_LIBDIR'])
+        
+
+    standardMoc( env, **ukw )
+    standardLib( env, **ukw )
+    standardPyLib( env, **ukw )
+    standardPyExt( env, **ukw )
+    standardScripts( env, **ukw )
+    standardBins ( env, **ukw )
+    standardTests ( env, **ukw )
+
+#
+# Process include/ directory, run moc on any include file which contains Q_OBJECT
+#
+def standardMoc( env, **kw ) :
+    
+    pkg = _getpkg( kw )
+    
+    # get headers    
+    headers = Glob("include/*.h", source=True)
+    headers = [str(h) for h in headers]
+
+    headers = [h for h in headers if 'Q_OBJECT' in file(h).read()]
+    trace ( "moc headers = "+str(map(str,headers)), "SConscript", 2 )
+
+    for h in headers:
+        base = os.path.splitext(os.path.basename(h))[0]
+        env.Moc(pjoin("src",base+"_moc.cpp"), h)
+
 
 #
 # Process src/ directory, make library from all compilable files
 #
-def standardLib( **kw ) :
+def standardLib( env, **kw ) :
     
     libsrcs = Flatten ( [ Glob("src/*."+ext, source=True, strings=True ) for ext in _cplusplus_ext ] )
     libsrcs.sort()
@@ -86,7 +117,6 @@ def standardLib( **kw ) :
 
         pkg = _getpkg( kw )
         
-        env = DefaultEnvironment()
         libdir = env['LIBDIR']
 
         binkw = {}
@@ -96,24 +126,25 @@ def standardLib( **kw ) :
             binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
         lib = env.SharedLibrary ( pkg, source=libsrcs, **binkw )
         ilib = env.Install ( libdir, source=lib )
-        env['ALL_TARGETS']['LIBS'].extend ( ilib )
+        DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( ilib )
         
         # get the list of libraries need for this package
         libs = [pkg] + _getkwlist ( kw, 'LIBS' )
-        addPkgLib ( env, pkg, lib[0] )
-        addPkgLibs ( env, pkg, libs )
+        addPkgLib ( pkg, lib[0] )
+        addPkgLibs ( pkg, libs )
+        
+        return lib
         
 #
 # Process src/ directory, link python sources
 #
-def standardPyLib( **kw ) :
+def standardPyLib( env, **kw ) :
 
     pysrcs = Glob("src/*.py", source=True, strings=True )
     if pysrcs :
         
         pkg = _getpkg( kw )
         
-        env = DefaultEnvironment()
         pydir = env['PYDIR']
 
         trace ( "pysrcs = "+str(map(str,pysrcs)), "SConscript", 2 )
@@ -128,21 +159,20 @@ def standardPyLib( **kw ) :
             pydst = pjoin(pydir,pkg,basename)
             env.Symlink ( pydst, source=src )
             pyc = env.PyCompile ( pydst+"c", source=pydst )
-            env['ALL_TARGETS']['LIBS'].extend ( pyc )
+            DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( pyc )
 
         if doinit :
             # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
             env.Command ( ini, "", [ Touch("$TARGET") ] )
             pyc = env.PyCompile ( ini+"c", source=ini )
-            env['ALL_TARGETS']['LIBS'].extend ( pyc )
+            DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( pyc )
 
 #
 # Process pyext/ directory, build python extension module
 #
-def standardPyExt( **kw ) :
+def standardPyExt( env, **kw ) :
 
-    env = DefaultEnvironment()
     pkg = _getpkg( kw )
 
     # check for Cython files first    
@@ -167,46 +197,41 @@ def standardPyExt( **kw ) :
         if libs: libs = [pkg]
         extmod = env.PythonExtension ( extmodname, source=objects, LIBS=libs)
         iextmod = env.Install ( pydir, source=extmod )
-        env['ALL_TARGETS']['LIBS'].extend ( iextmod )
+        DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( iextmod )
         
         # get the list of libraries need for this package
-        addPkgLib ( env, pkg, extmod[0] )
+        addPkgLib ( pkg, extmod[0] )
 
 #
 # Process app/ directory, install all scripts
 #
-def standardScripts( **kw ) :
+def standardScripts( env, **kw ) :
     
-    env = DefaultEnvironment()
-    
-    targets = _standardScripts ( 'app', 'SCRIPTS', env['BINDIR'], **kw )
-    env['ALL_TARGETS']['BINS'].extend( targets )
+    targets = _standardScripts ( env, 'app', 'SCRIPTS', env['BINDIR'], **kw )
+    DefaultEnvironment()['ALL_TARGETS']['BINS'].extend( targets )
 
 #
 # Process app/ directory, build all executables from C++ sources
 #
-def standardBins( **kw ) :
+def standardBins( env, **kw ) :
     
-    env = DefaultEnvironment()
-    
-    targets = _standardBins ( 'app', 'BINS', True, **kw )
-    env['ALL_TARGETS']['BINS'].extend( targets )
+    targets = _standardBins ( env, 'app', 'BINS', True, **kw )
+    DefaultEnvironment()['ALL_TARGETS']['BINS'].extend( targets )
 
 #
 # Process test/ directory, build all executables from C++ sources
 #
-def standardTests( **kw ) :
+def standardTests( env, **kw ) :
     
-    env = DefaultEnvironment()
     #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 
     # binaries in the test/ directory
-    targets0 = _standardBins ( 'test', 'TESTS', False, **kw )
-    env['ALL_TARGETS']['TESTS'].extend( targets0 )
+    targets0 = _standardBins ( env, 'test', 'TESTS', False, **kw )
+    DefaultEnvironment()['ALL_TARGETS']['TESTS'].extend( targets0 )
 
-    # also scripts in the tst/ directory
-    targets1 = _standardScripts ( 'test', 'TEST_SCRIPTS', "", **kw )
-    env['ALL_TARGETS']['TESTS'].extend( targets1 )
+    # also scripts in the test/ directory
+    targets1 = _standardScripts ( env, 'test', 'TEST_SCRIPTS', "", **kw )
+    DefaultEnvironment()['ALL_TARGETS']['TESTS'].extend( targets1 )
     
     targets = targets0 + targets1
 
@@ -222,7 +247,7 @@ def standardTests( **kw ) :
     trace ( "utests = "+str(map(str,utests)), "SConscript", 2 )
     for u in utests :
         t = env.UnitTest ( str(u)+'.utest', u )
-        env['ALL_TARGETS']['TESTS'].extend( t )
+        DefaultEnvironment()['ALL_TARGETS']['TESTS'].extend( t )
         # dependencies for unit tests are difficult to figure out,
         # especially for Python scripts, so make them run every time
         env.AlwaysBuild(t)
@@ -230,7 +255,7 @@ def standardTests( **kw ) :
 #
 # Build binaries, possibly install them
 #
-def _standardBins( appdir, binenv, install, **kw ) :
+def _standardBins( env, appdir, binenv, install, **kw ) :
 
     # make list of binaries and their dependencies if it has not been passed to us
     bins = kw.get(binenv,{})
@@ -252,7 +277,6 @@ def _standardBins( appdir, binenv, install, **kw ) :
 
         trace ( "bins = "+str(map(str,bins)), "SConscript", 2 )
 
-        env = DefaultEnvironment()
         bindir = env['BINDIR']
         
         # Program options
@@ -266,7 +290,7 @@ def _standardBins( appdir, binenv, install, **kw ) :
         for bin, srcs in bins.iteritems() :
             
             b = env.Program( bin, source=srcs, **binkw )
-            setPkgBins ( env, kw['package'], b[0] )
+            setPkgBins ( kw['package'], b[0] )
             if install : 
                 b = env.Install ( bindir, source=b )
                 
@@ -277,7 +301,7 @@ def _standardBins( appdir, binenv, install, **kw ) :
 #
 # Process app/ directory, install all scripts
 #
-def _standardScripts( appdir, binenv, installdir, **kw ) :
+def _standardScripts( env, appdir, binenv, installdir, **kw ) :
 
     scripts = kw.get(binenv,None)
     if scripts is None :
@@ -287,8 +311,6 @@ def _standardScripts( appdir, binenv, installdir, **kw ) :
         scripts = [ s[0] for s in scripts if not os.path.splitext(s[1])[1] and os.path.isfile(s[1]) ]
     else :
         scripts = [ _normbinsrc(appdir,s) for s in scripts ]
-
-    env = DefaultEnvironment()
 
     trace ( "scripts = "+str(map(str,scripts)), "SConscript", 2 )
 

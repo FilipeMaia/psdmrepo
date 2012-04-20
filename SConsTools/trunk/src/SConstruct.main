@@ -114,7 +114,7 @@ trace( "Loading existing package dependencies", "<top>", 1 )
 for r in reversed(env['SIT_REPOS']) :
     fname = pjoin ( r, env['PKG_DEPS_FILE'] )
     if os.path.isfile ( fname ) :
-        loadPkgDeps ( env, fname )
+        loadPkgDeps ( fname )
 
 
 #
@@ -134,13 +134,13 @@ for p in packages :
 # Analyze whole dependency tree and adjust dependencies and libraries
 #
 trace("Recalculating packages dependencies", "<top>", 1)
-adjustPkgDeps ( env )
+adjustPkgDeps()
 
 #
 # Now store the dependencies in case somebody else would want to use them later
 #
 trace("Storing packages dependencies", "<top>", 1)
-storePkgDeps ( env, env['PKG_DEPS_FILE'] )
+storePkgDeps ( env['PKG_DEPS_FILE'] )
 
 #
 # define few aliases and default targets

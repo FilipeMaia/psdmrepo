@@ -128,8 +128,9 @@ def findAllDependencies( node ):
 #
 # Define package libraries - everything that has to be linked to application
 #
-def addPkgLibs ( env, pkg, libs, libdirs = [] ):
+def addPkgLibs ( pkg, libs, libdirs = [] ):
 
+    env = DefaultEnvironment()
     if libs :
         pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(libs,(str,unicode)) : libs = libs.split()
@@ -142,23 +143,26 @@ def addPkgLibs ( env, pkg, libs, libdirs = [] ):
 #
 # Define package library
 #
-def addPkgLib ( env, pkg, lib ):
+def addPkgLib ( pkg, lib ):
 
+    env = DefaultEnvironment()
     pkg_info = env['PKG_TREE_LIB'].setdefault(pkg, []).append(lib)
 
 #
 # Define package library
 #
-def setPkgBins ( env, pkg, bin ):
+def setPkgBins ( pkg, bin ):
 
+    env = DefaultEnvironment()
     pkg_info = env['PKG_TREE_BINS'].setdefault( pkg, [] ).append(bin)
 
 #
 # Define package dependencies - the list of other package names that should
 # be linked when the package library is linked to the application
 #
-def setPkgDeps ( env, pkg, deps ):
+def setPkgDeps ( pkg, deps ):
     
+    env = DefaultEnvironment()
     if deps : 
         pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(deps,(str,unicode)) : deps = deps.split()
@@ -168,8 +172,9 @@ def setPkgDeps ( env, pkg, deps ):
 #
 # Store package dependency data in a file
 #
-def storePkgDeps ( env, fileName ):
+def storePkgDeps ( fileName ):
     
+    env = DefaultEnvironment()
     trace ( 'Storing release dependencies in file %s' % fileName, 'storePkgDeps', 2 )
     f = open ( fileName, 'wb' )
     cPickle.dump( env['PKG_TREE'], f )
@@ -178,8 +183,9 @@ def storePkgDeps ( env, fileName ):
 #
 # Restore package dependency data from a file
 #
-def loadPkgDeps ( env, fileName  ):
+def loadPkgDeps ( fileName  ):
     
+    env = DefaultEnvironment()
     trace ( 'Loading release dependencies from file %s' % fileName, 'loadPkgDeps', 2 )
     f = open ( fileName, 'rb' )
     env['PKG_TREE_BASE'].update( cPickle.load( f ) )
@@ -190,7 +196,7 @@ def loadPkgDeps ( env, fileName  ):
 #
 class _CycleError ( Exception ) :
     def __init__ (self, pkg1, pkg2):
-        Exception.__init__ ( self, "Dependecy cycle detected between packages "+pkg1+" and "+pkg2 )
+        Exception.__init__ ( self, "Dependency cycle detected between packages "+pkg1+" and "+pkg2 )
 
 _WHITE = 0
 _GRAY = 1
@@ -214,7 +220,9 @@ def _toposort ( pkg_tree, pkg, colors ):
 #
 # analyze complete dependency tree and adjust dependencies and libs
 #
-def adjustPkgDeps ( env ) :
+def adjustPkgDeps():
+
+    env = DefaultEnvironment()
 
     trace ( 'Resolving release dependencies', 'adjustPkgDeps', 2 )
 
@@ -231,7 +239,7 @@ def adjustPkgDeps ( env ) :
             # self-dependencies are not needed here
             deps.discard(pkg)
             trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
-            setPkgDeps ( env, pkg, deps )
+            setPkgDeps ( pkg, deps )
             
             # add all libraries from the packages
             for d in deps :
