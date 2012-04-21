@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-61
+2012-04-20 Andy Salnikov
+- upgrade to pdsdata V03-05-03
+- new BldInfo enums
+
 Tag: V00-00-60
 2012-04-18 Andy Salnikov
 - one more iteration through all docstrings to make correct links

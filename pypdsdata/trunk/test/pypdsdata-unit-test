@@ -560,7 +560,10 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.MecLasEm01, 20 )
         self.assertEqual ( BldInfo.Type.MecLasDio01, 21 )
         self.assertEqual ( BldInfo.Type.MecTcTrDio01, 22 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 23 )
+        self.assertEqual ( BldInfo.Type.MecXt2Ipm02, 23 )
+        self.assertEqual ( BldInfo.Type.MecXt2Ipm03, 24 )
+        self.assertEqual ( BldInfo.Type.MecHxmIpm01, 25 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 26 )
 
         o1 = BldInfo(0,0)
         

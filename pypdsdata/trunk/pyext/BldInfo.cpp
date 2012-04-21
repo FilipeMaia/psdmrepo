@@ -57,6 +57,9 @@ namespace {
         { "MecLasEm01",      Pds::BldInfo::MecLasEm01 },
         { "MecLasDio01",     Pds::BldInfo::MecLasDio01 },
         { "MecTcTrDio01",    Pds::BldInfo::MecTcTrDio01 },
+        { "MecXt2Ipm02",     Pds::BldInfo::MecXt2Ipm02 },
+        { "MecXt2Ipm03",     Pds::BldInfo::MecXt2Ipm03 },
+        { "MecHxmIpm01",     Pds::BldInfo::MecHxmIpm01 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
