@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CSPadBkgdSubtract...
+//	Class CSPadMaskApply...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ImgAlgos/CSPadBkgdSubtract.h"
+#include "ImgAlgos/CSPadMaskApply.h"
 
 //-----------------
 // C/C++ Headers --
@@ -37,7 +37,7 @@
 // This declares this class as psana module
 using namespace Psana;
 using namespace ImgAlgos;
-PSANA_MODULE_FACTORY(CSPadBkgdSubtract)
+PSANA_MODULE_FACTORY(CSPadMaskApply)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -48,21 +48,23 @@ namespace ImgAlgos {
 //----------------
 // Constructors --
 //----------------
-CSPadBkgdSubtract::CSPadBkgdSubtract (const std::string& name)
+CSPadMaskApply::CSPadMaskApply (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_inkey()
   , m_outkey()
+  , m_fname()
+  , m_masked_amp()
   , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src     = configStr("source", "DetInfo(:Cspad)");
-  m_inkey       = configStr("inputKey",  "");
-  m_outkey      = configStr("outputKey", "bkgd_subtracted");
-  m_fname       = configStr("bkgd_fname", "cspad_background.dat");
-  m_norm_sector = config("norm_sector", 0); // from 0 to 7
-  m_print_bits  = config("print_bits", 0);
+  m_str_src     = configStr("source",     "DetInfo(:Cspad)");
+  m_inkey       = configStr("inkey",      "");
+  m_outkey      = configStr("outkey",     "mask_applyed");
+  m_fname       = configStr("mask_fname", "cspad_mask.dat");
+  m_masked_amp  = config   ("masked_amp", 0);
+  m_print_bits  = config   ("print_bits", 0);
 
   std::fill_n(&m_common_mode[0], int(MaxSectors), float(0));
 }
@@ -70,22 +72,22 @@ CSPadBkgdSubtract::CSPadBkgdSubtract (const std::string& name)
 //--------------
 // Destructor --
 //--------------
-CSPadBkgdSubtract::~CSPadBkgdSubtract ()
+CSPadMaskApply::~CSPadMaskApply ()
 {
 }
 
 /// Method which is called once at the beginning of the job
 void 
-CSPadBkgdSubtract::beginJob(Event& evt, Env& env)
+CSPadMaskApply::beginJob(Event& evt, Env& env)
 {
-  getBkgdArray();
+  getMaskArray();
   if( m_print_bits & 1 ) printInputParameters();
-  if( m_print_bits & 8 ) printBkgdArray();
+  if( m_print_bits & 8 ) printMaskArray();
 }
 
 /// Method which is called at the beginning of the run
 void 
-CSPadBkgdSubtract::beginRun(Event& evt, Env& env)
+CSPadMaskApply::beginRun(Event& evt, Env& env)
 {
   // Find all configuration objects matching the source address
   // provided in configuration. If there is more than one configuration 
@@ -144,34 +146,33 @@ CSPadBkgdSubtract::beginRun(Event& evt, Env& env)
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-CSPadBkgdSubtract::beginCalibCycle(Event& evt, Env& env)
+CSPadMaskApply::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-CSPadBkgdSubtract::event(Event& evt, Env& env)
+CSPadMaskApply::event(Event& evt, Env& env)
 {
-  normalizeBkgd(evt);
-  subtractBkgd(evt);
+  applyMask(evt);
 }
 
 /// Method which is called at the end of the calibration cycle
 void 
-CSPadBkgdSubtract::endCalibCycle(Event& evt, Env& env)
+CSPadMaskApply::endCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the end of the run
 void 
-CSPadBkgdSubtract::endRun(Event& evt, Env& env)
+CSPadMaskApply::endRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called once at the end of the job
 void 
-CSPadBkgdSubtract::endJob(Event& evt, Env& env)
+CSPadMaskApply::endJob(Event& evt, Env& env)
 {
 }
 
@@ -179,7 +180,7 @@ CSPadBkgdSubtract::endJob(Event& evt, Env& env)
 
 // Print input parameters
 void 
-CSPadBkgdSubtract::printInputParameters()
+CSPadMaskApply::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
@@ -187,7 +188,7 @@ CSPadBkgdSubtract::printInputParameters()
         << "\n inkey      : " << m_inkey      
         << "\n outkey     : " << m_outkey      
         << "\n fname      : " << m_fname    
-        << "\n norm_sector: " << m_norm_sector 
+        << "\n masked_amp : " << m_masked_amp
         << "\n print_bits : " << m_print_bits
         << "\n";     
 
@@ -203,7 +204,7 @@ CSPadBkgdSubtract::printInputParameters()
 //--------------------
 
 void 
-CSPadBkgdSubtract::printEventId(Event& evt)
+CSPadMaskApply::printEventId(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
@@ -215,7 +216,7 @@ CSPadBkgdSubtract::printEventId(Event& evt)
 //--------------------
 
 std::string
-CSPadBkgdSubtract::stringTimeStamp(Event& evt)
+CSPadMaskApply::stringTimeStamp(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
@@ -227,65 +228,24 @@ CSPadBkgdSubtract::stringTimeStamp(Event& evt)
 //--------------------
 
 void
-CSPadBkgdSubtract::getBkgdArray()
+CSPadMaskApply::getMaskArray()
 {
-  m_bkgd = new ImgAlgos::CSPadBackgroundV1(m_fname);
+  m_mask = new ImgAlgos::CSPadMaskV1(m_fname);
 }
 
 //--------------------
 
 void 
-CSPadBkgdSubtract::printBkgdArray()
+CSPadMaskApply::printMaskArray()
 {
-  m_bkgd -> print(); 
+  m_mask -> print(); 
 }
 
 //--------------------
 
-/// Normalize the background
+/// Apply the mask and save array in the event
 void 
-CSPadBkgdSubtract::normalizeBkgd(Event& evt)
-{
-  m_norm_factor = 0;
-
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_inkey, &m_src);
-  if (data1.get()) {
-
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-
-      const CsPad::ElementV1& quad = data1->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
-
-      double quad_norm_factor = normQuadBkgd(quad.quad(), data.data());
-      if( quad_norm_factor > 0 ) m_norm_factor += quad_norm_factor; 
-    }    
-    m_norm_factor = ( nQuads ) ? m_norm_factor /= nQuads : 0; 
-  }
-  
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_inkey, &m_src);
-  if (data2.get()) {
-
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-      
-      const CsPad::ElementV2& quad = data2->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
-
-      double quad_norm_factor = normQuadBkgd(quad.quad(), data.data());
-      if( quad_norm_factor > 0 ) m_norm_factor += quad_norm_factor; 
-    } 
-    m_norm_factor = ( nQuads > 0 ) ? m_norm_factor /= nQuads : 0; 
-  }
-
-  if( m_print_bits & 4 ) MsgLog( name(), info, "Event="  << m_count << " Norm. factor="  << m_norm_factor ); 
-}
-
-//--------------------
-
-/// Subtract the background and save array in the event
-void 
-CSPadBkgdSubtract::subtractBkgd(Event& evt)
+CSPadMaskApply::applyMask(Event& evt)
 {
   shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_inkey, &m_src);
   if (data1.get()) {
@@ -338,7 +298,7 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
 
 /// Process data for all sectors in quad
 void 
-CSPadBkgdSubtract::processQuad(unsigned quad, const int16_t* data, int16_t* corrdata)
+CSPadMaskApply::processQuad(unsigned quad, const int16_t* data, int16_t* corrdata)
 {
   //cout << "processQuad =" << quad << endl;
 
@@ -349,53 +309,16 @@ CSPadBkgdSubtract::processQuad(unsigned quad, const int16_t* data, int16_t* corr
       // beginning of the segment data
       const int16_t* sectData = data     + ind_in_arr*SectorSize;
       int16_t*       corrData = corrdata + ind_in_arr*SectorSize;
-      double*        sectBkgd = m_bkgd->getBackground(quad,sect);
+      uint16_t*      sectMask = m_mask->getMask(quad,sect);
 
-      // Background subtraction
+      // Apply mask
       for (int i = 0; i < SectorSize; ++ i) {
 
-        corrData[i] = sectData[i] - int16_t(m_norm_factor * sectBkgd[i]);
+        corrData[i] = (sectMask[i] != 0) ? sectData[i] : m_masked_amp;
       }                
       ++ind_in_arr;
     }
   }  
-}
-
-//--------------------
-
-/// Process data for all sectors in quad
-double 
-CSPadBkgdSubtract::normQuadBkgd(unsigned quad, const int16_t* data)
-{
-  //cout << "normQuadBkgd: quad =" << quad;
-
-  double sum_data   = 0;
-  double sum_bkgd   = 0;  
-
-  int ind_in_arr = 0;
-  for (unsigned sect = 0; sect < MaxSectors; ++ sect) {
-    if ( m_segMask[quad] & (1<<sect) ) {
-      if ( sect == m_norm_sector ) {
-     
-        // beginning of the segment data
-        const int16_t* sectData = data     + ind_in_arr*SectorSize;
-        double*        sectBkgd = m_bkgd->getBackground(quad,sect);
-
-        // Background subtraction
-        for (int i = 0; i < SectorSize; ++ i) {
-          sum_data += sectData[i];
-          sum_bkgd += sectBkgd[i];
-        }                
-
-	break;
-      }
-      ++ind_in_arr;
-    }
-  }  
-
-  double quad_norm_factor = (sum_bkgd>0) ? sum_data/sum_bkgd : 0;
-  //cout << "  sum_data =" << sum_data <<  "  sum_bkgd =" << sum_bkgd <<  "  f =" << quad_norm_factor << endl; 
-  return quad_norm_factor;
 }
 
 //--------------------
