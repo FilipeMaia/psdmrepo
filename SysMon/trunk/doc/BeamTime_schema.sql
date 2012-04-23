@@ -61,7 +61,23 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_COMMENTS` (
   `system`         VARCHAR(255)    NOT NULL ,
   UNIQUE KEY `gap_begin_time_instr_name`   (`gap_begin_time`,`instr_name`) ,
   INDEX `BEAMTIME_COMMENTS_GAP_BEGIN_TIME` (`gap_begin_time`))
-ENGINE = InnoDB;
+ENGINE = InnoDB ;
+
+-- -----------------------------------------------------
+-- Table `SYSMON`.`BEAMTIME_SUBSCRIBER`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `SYSMON`.`BEAMTIME_SUBSCRIBER` ;
+
+CREATE TABLE IF NOT EXISTS `SYSMON`.`BEAMTIME_SUBSCRIBER` (
+  `id`              INT             NOT NULL AUTO_INCREMENT ,
+  `subscriber`      VARCHAR(32)     NOT NULL ,
+  `address`         VARCHAR(255)    NOT NULL ,
+  `subscribed_by`   VARCHAR(32)     NOT NULL ,
+  `subscribed_time` BIGINT UNSIGNED NOT NULL ,
+  `subscribed_host` varchar(255)    NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE KEY `BEAMTIME_SUBSCRIBER_IDX_1` (`subscriber`,`address`)
+) ENGINE = InnoDB ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
