@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-43
+2012-04-23 Igor Gaponenko
+- extended Python module experiment_info with a function returning a list
+of files created by the DAQ system in a context of an experiemnt and a run
+- added a unit test for the module
+
 Tag: V00-00-42
 2012-04-09 Igor Gaponenko
 - added Python module experiment_info.py

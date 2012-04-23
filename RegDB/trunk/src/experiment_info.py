@@ -65,13 +65,17 @@ def __escape_string(str):
     conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
     return conn.escape_string(str)
 
-def __do_select(statement):
+def __do_select_many(statement):
 
     conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
     cursor = conn.cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute(statement)
-    rows = cursor.fetchall()
+    return cursor.fetchall()
+
+def __do_select(statement):
+
+    rows = __do_select_many(statement)
     if not rows : return None
 
     return rows[0]
@@ -187,6 +191,70 @@ def active_experiment(instr):
     timestamp = int(row['switch_time'])
     return (instr, row['name'], int(row['id']), timestamp, time.ctime(timestamp / 1e9), row['requestor_uid'])
 
+# -----------------------------------------------------------------
+# Return a list of files open/created in a context of the specified
+# experiment and a run. If the run number is omitted then the most
+# recent run will be assumed.
+# -----------------------------------------------------------------
+
+def get_open_files(exper_id,runnum=None):
+
+    """
+    Return a list of files created (by the DAQ system) in a context of
+    the specified experiment and a run. If the run number is omitted
+    then the most recent run will be assumed.
+
+      @param exper_id  - numeric identifier of an experiemnt
+      @param runnum    - optional run number
+
+    The function will return a list of entries, where each entry will
+    represent one file described by a dictionary of:
+
+      'open'      - a floating point number corresponding to a time when
+                    the file was created. The number will have the same semantics
+                    as the one of Python Library function time.time().
+
+      'exper_id'  - a numeric identifier of teh experiment
+
+      'runnum'    - a run number
+
+      'stream'    - a stream number
+
+      'chunk'     - a chunk number
+
+      'host'      - a DSS host name where the file was created
+
+      'dirpath'   - an absolute path name of a base directory where the file is
+                    located
+
+    Note that the list won't be sorted. It's up to a caller's code
+    to do a proper sorting and an interpretation of the returned file
+    description entries. Here is a reminder how to build file names from
+    the above presented fields:
+
+      "e%d_r%04d_s%02d_c%02d", (exper_id,runnum,stream,chunk)
+
+    This will yield the output which would look like this:
+
+      e167_r0002_s01_c00
+
+    The function will return an empty list if no files were found for the
+    specified experiment/run.
+    """
+
+    if runnum is None:
+        row = __do_select("SELECT MAX(run) AS 'run' FROM file WHERE exper_id=%d" % (exper_id,))
+        if not row: return []
+        runnum = int(row['run'])
+
+    files = []
+    for row in __do_select_many("SELECT * FROM file WHERE exper_id=%d and run=%d ORDER BY stream, chunk" % (exper_id,runnum)):
+        row['open'] = row['open'] / 1e9
+        files.append(row)
+
+    return files
+
+
 # -------------------------------
 # Here folow a couple of examples
 # -------------------------------
@@ -214,6 +282,14 @@ if __name__ == "__main__" :
                 print "  %3s   | %-10s | %4d | %19d | %20s | %-8s" % exp_info
 
         print ""
+
+        print 'open files of the last run of experiment id 161:'
+        for file in get_open_files(161):
+            print file
+
+        print 'open files of run 1332 of experiment id 55:'
+        for file in get_open_files(55,1332):
+            print file
 
     except db.Error, e:
          print 'MySQL operation failed because of:', e
