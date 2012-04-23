@@ -56,6 +56,9 @@ try {
 	$authdb = AuthDB::instance();
 	$authdb->begin();
 
+    $sysmon = SysMon::instance();
+	$sysmon->begin();
+
     $can_edit = $authdb->hasRole($authdb->authName(),null,'BeamTimeMonitor','Editor');
 
     DataPortal::begin( "LCLS Data Taking Time Monitor" );
@@ -73,6 +76,12 @@ try {
 .instrument_container {
   border-top: 1 solid #c0c0c0;
   padding: 20;
+}
+.alerts_container {
+  border-top: 1 solid #c0c0c0;
+  padding: 20;
+  font-size: 110%;
+  font-family: Arial, sans-serif;
 }
 .statistics {
   margin-bottom: 20;
@@ -166,6 +175,7 @@ try {
 .comment {
   width:  <?php echo $comments_width - 6; ?>;
   background-color: #ffffff;
+  border: solid 1px red; 
   padding-left: 4;
   font-size: 12;
 }
@@ -193,6 +203,12 @@ try {
   border-left: 0;
   padding-left: 4;
   font-size: 12;
+}
+.visible {
+  display: block;
+}
+.hidden {
+  display: none;
 }
 </style>
 <!----------------------------------------------------------------->
@@ -266,6 +282,34 @@ function page_specific_init() {
 
     $('#tabs').tabs();
 
+    $('#unsubscribe_button').button().click(function() {
+		$.ajax({
+            type: 'GET',
+            url: '../portal/experiment_time_subscription_toggle.php',
+            data: {},
+			success: function(data) {
+                if( data.status != 'success' ) { report_error(data.message); return; }
+				$('#subscribe_area'  ).removeClass('hidden').addClass('visible');
+				$('#unsubscribe_area').removeClass('visible').addClass('hidden');
+			},
+            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            dataType: 'json'
+        });
+	});
+    $('#subscribe_button').button().click(function() {
+		$.ajax({
+            type: 'GET',
+            url: '../portal/experiment_time_subscription_toggle.php',
+            data: {},
+			success: function(data) {
+                if( data.status != 'success' ) { report_error(data.message); return; }
+				$('#subscribe_area'  ).removeClass('visible').addClass('hidden');
+				$('#unsubscribe_area').removeClass('hidden').addClass('visible');
+			},
+            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            dataType: 'json'
+        });
+	});
     load_shift(initial_shift,0);
 }
     
@@ -284,7 +328,7 @@ function save_comment(gap_begin_time_64,instr_name,comment,system) {
         },
         success: function(data) {
             if( data.status != 'success' ) { report_error(data.message); return; }
-            set_comment( gap_begin_time_64, data.comment );
+            set_comment( gap_begin_time_64, instr_name, data.comment );
         },
         error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
@@ -292,6 +336,104 @@ function save_comment(gap_begin_time_64,instr_name,comment,system) {
 }
 
 var shift_data = null;
+
+function time_and_lcls2html(start_sec,stop_sec) {
+    var plot =
+'<div class="table_column table_column_time" >'+
+'  <div class="table_column_header" >Time</div>'+
+'  <div class="table_column_body table_column_body_time" >';
+    for( var sec = 0.; sec <= stop_sec - start_sec; sec += 3600.) {
+        var h = sec / 3600.;
+        if( h >= 24. ) continue;
+        var h2 = Math.floor(h);
+        var left = 0;
+        var top1   = Math.floor( total_height * sec   / ( stop_sec - start_sec )) - 12;
+        var height = Math.ceil ( total_height * 1800. / ( stop_sec - start_sec ));
+        var top2   = top1 + height;
+        if( h > 0. ) {
+            plot +=
+'    <div style="position:absolute; left:'+left+'; top:'+top1+'; height:'+height+'; padding-left:12; ">'+h2+':00</div>'+
+'    <div style="position:absolute; left:'+left+'; top:'+top1+'; height:'+height+'; padding-left:48; font-weight:bold;">-</div>';
+        }
+        plot +=
+'    <div style="position:absolute; left:'+left+'; top:'+top2+'; height:'+height+'; padding-left:48; font-weight:bold;">-</div>';
+    }
+    plot +=
+'  </div>'+
+'</div>'+
+'<div class="table_column table_column_lclson" >'+
+'  <div class="table_column_header" >LCLS beam</div>'+
+'  <div class="table_column_body" >';
+    for( var i in shift_data.lcls_status ) {
+        var ival = shift_data.lcls_status[i];
+        if( ival.status > 0 ) {
+            var left   = 0;
+            var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
+            var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
+            if( !height ) height = 1;
+            plot +=
+'    <div class="lclson" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
+        }
+    }
+    plot +=
+'  </div>'+
+'</div>';
+    return plot;
+}
+function display_beams() {
+
+    var stats = $('#tab_beams .instrument_container .statistics');
+    stats.find('.beam_time').html(shift_data.total_beam_time);
+    stats.find('.estimated_usage').html(shift_data.total_beam_usage_percent+' %');
+
+    var stop_sec  = shift_data.stop_sec;
+    var start_sec = shift_data.start_sec;
+
+    var plot = time_and_lcls2html(start_sec,stop_sec);
+
+    for( var i in shift_data.instrument_names ) {
+        var instr_name = shift_data.instrument_names[i];
+        var instr_data = shift_data.instruments[instr_name];
+        plot +=
+'<div class="table_column table_column_beamon" >'+
+'  <div class="table_column_header" >'+instr_name+'</div>'+
+'  <div class="table_column_body" >';
+        for( var i in instr_data.beam_status ) {
+            var ival   = instr_data.beam_status[i];
+            if( ival.status > 0 ) {
+                var left   = 0;
+                var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
+                var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
+                if( !height ) height = 1;
+                plot +=
+'    <div class="beamon" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
+            }
+        }
+/*
+        plot +=
+'  </div>'+
+'</div>'+
+'<div class="table_column table_column_run" >'+
+'  <div class="table_column_header" >Taking data</div>'+
+'  <div class="table_column_body" >';
+        for( var i in instr_data.runs ) {
+            var run     = instr_data.runs[i];
+            var left   = 0;
+            var top    = Math.floor( total_height *                           run.begin_rel2start_sec   / ( stop_sec - start_sec));
+            var height = Math.ceil ( total_height * ( run.end_rel2start_sec - run.begin_rel2start_sec ) / ( stop_sec - start_sec));
+            if( !height ) height = 1;
+            plot +=
+'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+run_width+'; height:'+height+'; background-color:#000000; "></div>';
+        }
+*/
+        plot +=
+'  </div>'+
+'</div>';
+    }
+    plot +=
+'<div style="clear:both;"></div>';
+    $('#tab_beams .instrument_container .table').html(plot);
+}
 function system_changed() {
     var editor = $('#comment_editor');
     var system = editor.find('select').val();
@@ -303,7 +445,7 @@ function edit_comment(gap_begin_time_64,instr_name) {
 '  <div style="margin-top:5px;">'+
 '    <b>Comment:</b>'+
 '    <br>'+
-'    <textarea style="margin-top:5px; padding:2;" rows=8 cols=56 >'+$('#comment_'+gap_begin_time_64).text()+'</textarea>'+
+'    <textarea style="margin-top:5px; padding:2;" rows=8 cols=56 >'+$('#comment_'+instr_name+'_'+gap_begin_time_64).text()+'</textarea>'+
 '  </div>'+
 '  <div style="margin-top:5px;">'+
 '    <div style="float:left; padding-top:4; ">'+
@@ -346,7 +488,7 @@ function edit_comment(gap_begin_time_64,instr_name) {
             save_comment(gap_begin_time_64, instr_name, comment, system);
         },
         function () {
-            large_dialog( 'test', 'a range of e-log messages will be here soon' );
+            //large_dialog( 'test', 'a range of e-log messages will be here soon' );
         },
         //null,
         460,
@@ -366,48 +508,12 @@ function display_shift(instr_data,instr_name) {
     var stop_sec    = shift_data.stop_sec;
     var start_sec   = shift_data.start_sec;
 
-    var plot =
-'<div class="table_column table_column_time" >'+
-'  <div class="table_column_header" >Time</div>'+
-'  <div class="table_column_body table_column_body_time" >';
-    for( var sec = 0.; sec <= stop_sec - start_sec; sec += 3600.) {
-        var h = sec / 3600.;
-        if( h >= 24. ) continue;
-        var h2 = Math.floor(h);
-        var left = 0;
-        var top1   = Math.floor( total_height * sec   / ( stop_sec - start_sec )) - 12;
-        var height = Math.ceil ( total_height * 1800. / ( stop_sec - start_sec ));
-        var top2   = top1 + height;
-        if( h > 0. ) {
-            plot +=
-'    <div style="position:absolute; left:'+left+'; top:'+top1+'; height:'+height+'; padding-left:12; ">'+h2+':00</div>'+
-'    <div style="position:absolute; left:'+left+'; top:'+top1+'; height:'+height+'; padding-left:48; font-weight:bold;">-</div>';
-        }
-        plot +=
-'    <div style="position:absolute; left:'+left+'; top:'+top2+'; height:'+height+'; padding-left:48; font-weight:bold;">-</div>';
-    }
+    var plot = time_and_lcls2html(start_sec,stop_sec);
+    $('#tab_'+instr_name+' .instrument_container .table').html(plot);
+
     plot +=
-'  </div>'+
-'</div>'+
-'<div class="table_column table_column_lclson" >'+
-'  <div class="table_column_header" >LCLS beam</div>'+
-'  <div class="table_column_body" >';
-    for( var i in shift_data.lcls_status ) {
-        var ival   = shift_data.lcls_status[i];
-        if( ival.status > 0 ) {
-            var left   = 0;
-            var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
-            var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
-            if( !height ) height = 1;
-            plot +=
-'    <div class="lclson" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
-        }
-    }
-    plot +=
-'  </div>'+
-'</div>'+
 '<div class="table_column table_column_beamon" >'+
-'  <div class="table_column_header" >Beam in hatch</div>'+
+'  <div class="table_column_header" >Beam in hutch</div>'+
 '  <div class="table_column_body" >';
     for( var i in instr_data.beam_status ) {
         var ival   = instr_data.beam_status[i];
@@ -461,7 +567,7 @@ function display_shift(instr_data,instr_name) {
         plot +=
 '    <div class="comment" id="comment_'+instr_name+'_'+gap.begin_time_64+'" '+
     (can_edit ?
-' onclick="edit_comment('+gap.begin_time_64+','+"'"+instr_name+"'"+')" onmouseover="enable_comment_editor(this,true)" onmouseout="enable_comment_editor(this,false)"' :
+' onclick="edit_comment('+"'"+gap.begin_time_64+"','"+instr_name+"'"+')" onmouseover="enable_comment_editor(this,true)" onmouseout="enable_comment_editor(this,false)"' :
 ''
     )+
 ' style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; overflow:auto;" '+(can_edit ? ' title="'+title+'"' : '')+' ></div>';
@@ -551,6 +657,7 @@ function load_shift(shift,delta) {
             shift_data = data;
             $('#controls').find('input[name="shift"]').
                 datepicker('setDate',shift_data.shift);
+            display_beams();
             for( var i in shift_data.instrument_names ) {
                 var instr_name = shift_data.instrument_names[i];
                 display_shift(shift_data.instruments[instr_name],instr_name);
@@ -588,25 +695,23 @@ HERE;
 
 <div id="tabs">
     <ul>
-HERE;
+      <li><a href="#tab_beams">Beam time</a></li>
 
+HERE;
     foreach( SysMon::instrument_names() as $instr_name) {
         echo <<<HERE
       <li><a href="#tab_{$instr_name}">{$instr_name}</a></li>
+
 HERE;
     }
     echo <<<HERE
-
+      <li><a href="#tab_alerts">e-mail alerts</a></li>
     </ul>
 
-HERE;
-
-    foreach( SysMon::instrument_names() as $instr_name) {
-        echo <<<HERE
-    <div id="tab_{$instr_name}" >
+    <div id="tab_beams" >
       <div class="instrument_container" >
         <div class="statistics" >
-          <div class="beam_time_title" >Beam in hatch: </div>
+          <div class="beam_time_title" >Beam in hutches: </div>
           <div class="beam_time" ></div>
           <div class="esimated_usage_title" >Estimated usage: </div>
           <div class="estimated_usage" ></div>
@@ -615,9 +720,49 @@ HERE;
         <div class="table">Loading...</div>
       </div>
     </div>
+
+HERE;
+    foreach( SysMon::instrument_names() as $instr_name) {
+        echo <<<HERE
+    <div id="tab_{$instr_name}" >
+      <div class="instrument_container" >
+        <div class="statistics" >
+          <div class="beam_time_title" >Beam in hutch: </div>
+          <div class="beam_time" ></div>
+          <div class="esimated_usage_title" >Estimated usage: </div>
+          <div class="estimated_usage" ></div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="table">Loading...</div>
+      </div>
+    </div>
+
 HERE;
     }
+	$subscriber = $authdb->authName();
+	$address    = $subscriber.'@slac.stanford.edu';
+    $is_subscribed = $sysmon->check_if_subscribed4justifications( $subscriber, $address );
+    $subscribe_class   = $is_subscribed ? 'hidden'  : 'visible';
+    $unsubscribe_class = $is_subscribed ? 'visible' : 'hidden';
     echo <<<HERE
+
+    <div id="tab_alerts" >
+      <div class="alerts_container" >
+        <p>This subscription will allow you to receive prompt notificatons on downtime<br>
+           justification comments posted for gaps between runs.
+        </p>
+        <div id="subscribe_area" class="{$subscribe_class}">
+          Your SLAC account <b>{$subscriber}</b> is <b>NOT</b> subscribed for notifications.<br>
+          Subscribe to receive alerts at: <b>{$address}</b>.<br>
+          <button id="subscribe_button" style="font-size:9px; margin-top:15px;">Subscribe</button>
+        </div>
+        <div id="unsubscribe_area" class="{$unsubscribe_class}">
+          Your SLAC account <b>{$subscriber}</b> is already subscribed for notifications.<br>
+          Alerts are sent to: <b>{$address}</b>.<br>
+          <button id="unsubscribe_button" style="font-size:9px; margin-top:15px;">Unsubscribe</button>
+        </div>
+      </div>
+    </div>
 
 </div>
 

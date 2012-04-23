@@ -383,14 +383,47 @@ class SysMon {
 
     private function intersect_candidate_gap_with_beam_status($beam_status, $instr_name, $begin_time_64, $end_time_64, $min_gap_width_64 ) {
         $gaps = array();
-        array_push(
-            $gaps,
-            array(
-                'begin'      => LusiTime::from64($begin_time_64),
-                'end'        => LusiTime::from64($end_time_64),
-                'instr_name' => $instr_name
-            )
-        );
+
+        // Consider only those beam time intervals where the beam time status
+        // was corresponding to the requested detector.
+        //
+        $instr_mask = SysMon::beam_destination_mask($instr_name);
+
+        foreach( $beam_status as $ival ) {
+
+            // Skip beam time intervals ended before the candidate begins and
+            // began after the candidate ends.
+            //
+            $ival_end_64 = $ival['end_time']->to64();
+            if( $ival_end_64 <= $begin_time_64 ) continue;
+
+            $ival_begin_64 = $ival['begin_time']->to64();
+            if( $ival_begin_64 >= $end_time_64 ) break;
+
+            // Skip beam time intervals which are not relevant
+            // to the requested instrument.
+            //
+            if( $ival['status'] != $instr_mask ) continue;
+
+            // Finally, we seem to have hit the rigth beam time interval.
+            // Find its intersection with the candidate gap and evaluate the duration
+            // of the intersection to see if it qualifies as the real gap (the one
+            // which would have required minimum duration).
+            //
+            $gap_begin_64 = $ival_begin_64 < $begin_time_64 ? $begin_time_64 : $ival_begin_64;
+            $gap_end_64   = $ival_end_64   > $end_time_64   ? $end_time_64   : $ival_end_64;
+
+            if(( $gap_end_64 - $gap_begin_64 ) >= $min_gap_width_64 ) {
+                array_push(
+                    $gaps,
+                    array(
+                        'begin'      => LusiTime::from64($gap_begin_64),
+                        'end'        => LusiTime::from64($gap_end_64),
+                        'instr_name' => $instr_name
+                    )
+                );
+            }
+        }
         return $gaps;
     }
     public function populate($pvname, $min_gap_width_sec=null) {
@@ -421,7 +454,7 @@ class SysMon {
 
         if( array_key_exists( 'last_run_begin_time', $config ) &&
             array_key_exists( 'min_gap_width_sec',   $config ) &&
-          ( !isset($min_gap_width_sec) || ( $min_gap_width_sec == $config['min_gap_width_sec'] ))) {
+          ( is_null($min_gap_width_sec) || ( $min_gap_width_sec == $config['min_gap_width_sec'] ))) {
 
             // This is the only scenario when we can offord optimizing
             // the current operation.
@@ -429,7 +462,7 @@ class SysMon {
             $last_run_begin_time = LusiTime::parse( $config['last_run_begin_time']->toStringDay().' 00:00:00' );
             $min_gap_width_64 = $config['min_gap_width_sec'] * ( 1000 * 1000 * 1000 );
 
-        } else if( isset($min_gap_width_sec)) {
+        } else if( !is_null($min_gap_width_sec)) {
 
             $min_gap_width_64 = $min_gap_width_sec * ( 1000 * 1000 * 1000 );
         }
@@ -563,7 +596,15 @@ class SysMon {
                 // Generate the last gap (if any)
                 //
                 if(( $stop_64 > $prev_end_run_64 ) && ( $stop_64 - $prev_end_run_64 > $min_gap_width_64 )) {
-                    $this->add_beamtime_gap( LusiTime::from64( $prev_end_run_64), LusiTime::from64( $stop_64 ), $instr_name);
+                    foreach(
+                        SysMon::intersect_candidate_gap_with_beam_status(
+                            $beam_status,
+                            $instr_name,
+                            $prev_end_run_64,
+                            $stop_64,
+                            $min_gap_width_64 ) as $gap ) {
+                        $this->add_beamtime_gap( $gap['begin'], $gap['end'], $instr_name);
+                    }
                 }
             }
         }
@@ -579,6 +620,171 @@ class SysMon {
     private static function cmp_runs_by_begin_time($a, $b) {
         if($a == $b) return 0;
         return ($a < $b) ? -1 : 1;
+    }
+
+    /* =================================================
+     *   METHODS FOR MANAGING NOTIFICATION SUBSCRIPTIONS
+     * =================================================
+     */
+
+    /* Subscribe the current user for e-mail notifications on downtime justifications
+     * if the flag value is set to TRUE. Unsubscribe otherwise.
+     */
+    public function subscribe4justifications_if ( $subscribe, $subscriber, $address ) {
+
+    	$this->connect();
+
+    	$authdb = AuthDB::instance();
+    	$authdb->begin();
+
+    	$subscriber_str = $this->escape_string( trim( $subscriber ));
+    	$address_str    = $this->escape_string( trim( $address ));
+    	$by             = $this->escape_string( trim( $authdb->authName()));
+    	$now            = LusiTime::now();
+    	$host_str       = $this->escape_string( trim( $authdb->authRemoteAddr()));
+
+    	$this->query(
+			$subscribe ?
+    		"INSERT INTO beamtime_subscriber VALUES (NULL,'{$subscriber_str}','{$address_str}','{$by}',{$now->to64()},'{$host_str}')" :
+    		"DELETE FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
+		);
+
+		$url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
+
+        if( $subscribe )                
+        	$this->do_notify(
+                'LCLS Data Taking Monitor',
+        		$address,
+        		"*** SUBSCRIBED ***",
+				<<<HERE
+                             ** ATTENTION **
+
+The message was sent by the automated notification system because this e-mail
+has been just registered to recieve alerts on downtime justifications posted
+for long gaps between PCDS DAQ runs.
+
+The registration has been requested by:
+
+  '{$authdb->authName()}' @ {$authdb->authRemoteAddr()} [ {$now->toStringShort()} ]
+
+To unsubscribe from this service, please use the LCLS Data Taking Time Monitor app:
+
+  {$url}
+
+HERE
+       		);
+        else
+        	$this->do_notify(
+                'LCLS Data Taking Monitor',
+        		$address,
+        		"*** UNSUBSCRIBED ***",
+				<<<HERE
+                             ** ATTENTION **
+
+The message was sent by the automated notification system because this e-mail
+has been just unregistered from recieving alerts on downtime justifications posted
+for long gaps between PCDS DAQ runs.
+
+The change has been requested by:
+
+  '{$authdb->authName()}' @ {$authdb->authRemoteAddr()} [ {$now->toStringShort()} ]
+
+To subscribe back to this service, please use the LCLS Data Taking Time Monitor app:
+
+  {$url}
+
+HERE
+			);
+    }
+
+    /* Check if the current user is subscribed for e-mail notifications on downtime
+     * justifications, and if so return an array with the details of the subscription.
+     * Return null otherwise.
+     *
+     *   Key             | Type            | Description
+     *   ----------------+-----------------+------------------------------------------------------------------------------
+     *   id              | unsigned number | unique identifier of the record in the database
+     *   subscriber      | string          | user account of a person subscribed
+     *   address         | string          | e-mail address of the subscriber
+     *   subscribed_by   | LusiTime        | user account of a person who requested the subscription 
+     *   subscribed_time | LusiTime        | time when the subscription was made 
+     *   subscribed_host | string          | host (IP address or DNS name) name from which the operation was requested
+     *
+     */
+    public function check_if_subscribed4justifications ( $subscriber, $address ) {
+
+        $this->connect();
+
+    	$subscriber_str = $this->escape_string( trim( $subscriber ));
+    	$address_str    = $this->escape_string( trim( $address ));
+    	$result = $this->query(
+    		"SELECT * FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
+    	);
+    	$nrows = mysql_numrows( $result );
+    	if( !$nrows ) return null;
+    	if( $nrows != 1 )
+			throw new DataPortalException (
+				__METHOD__,
+				"duplicate entries for downtime justifications subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
+		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+       	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
+       	return $row;
+    }
+
+    /* Get all known subscribers for downtime justification notifications.
+     * 
+     * The method will return an array (a list) of entries similar to
+     * the ones reported by the previous method.
+     */
+    public function get_all_subscribed4justifications () {
+	    $list = array();
+   		$this->connect();
+    	$result = $this->query( "SELECT * FROM beamtime_subscriber" );
+    	$nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ ) {
+        	$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+        	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
+        	array_push ( $list, $row );
+        }
+        return $list;
+    }
+
+    public function notify_allsubscribed4justifications ($instr_name, $gap_begin_time) {
+        $this->connect();
+		$url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
+        foreach( $this->get_all_subscribed4justifications() as $subscriber ) {
+            $address = $subscriber['address'];
+            $this->do_notify(
+                'LCLS Data Taking Monitor',
+        		$address,
+        		"*** DOWNTIME JUSTIFICATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
+				<<<HERE
+                             ** ATTENTION **
+
+The message was sent by the automated notification system because this e-mail
+was found registered to recieve alerts on downtime justifications posted
+for long gaps between PCDS DAQ runs.
+
+To subscribe back to this service, please use the LCLS Data Taking Time Monitor app:
+
+  {$url}
+
+HERE
+            );
+        }
+    }
+    public function do_notify( $application, $address, $subject, $body ) {
+        $tmpfname = tempnam("/tmp", "webportal");
+        $handle = fopen( $tmpfname, "w" );
+        fwrite( $handle, $body );
+        fclose( $handle );
+
+        shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F '{$application}'" );
+
+        // Delete the file only after piping its contents to the mailer command.
+        // Otherwise its contents will be lost before we use it.
+        //
+        unlink( $tmpfname );
     }
 
     /*

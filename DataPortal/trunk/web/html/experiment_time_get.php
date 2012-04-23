@@ -96,6 +96,7 @@ try {
     foreach( SysMon::instrument_names() as $instr )
         $instruments[$instr] = array(
             'runs'                     => array(),
+            'runs_duration_sec'        => 0.0,
             'beam_status'              => array(),
             'total_beam_time_sec'      => 0.0,
             'total_beam_time'          => '00 hr 00 min',
@@ -125,6 +126,8 @@ try {
                 'runnum'              => $run->runnum(),
                 'instr_name'          => $instr_name,
                 'exper_name'          => $run->exper_name()));
+
+        $instruments[$instr_name]['runs_duration_sec'] += $run->end_time()->to_float() - $run->begin_time()->to_float();
     }
 
     // Process gaps intersecting the requested interval.
@@ -134,8 +137,10 @@ try {
     //       instruments.
     //
     foreach( $sysmon->beamline_gaps($start,$stop) as $gap ) {
+
         $instr = $gap->instr_name();
-        $comment = $sysmon->beamtime_comment_at($gap->begin_time(), $instr);
+
+        $comment      = $sysmon->beamtime_comment_at($gap->begin_time(), $instr);
         $comment_info = is_null($comment) ?
             array('available'     => 0) :
             array('available'     => 1,
@@ -144,6 +149,7 @@ try {
                   'system'        => $comment->system(),
                   'posted_by_uid' => $comment->posted_by_uid(),
                   'post_time'     => $comment->post_time()->toStringShort());
+
         $gap_begin_sec = $gap->begin_time()->to_float();
         $gap_end_sec   = $gap->end_time()->to_float();
         array_push(
@@ -176,27 +182,7 @@ try {
     //   time as if there were no beam after now. And this is based on the
     //   same rationale as explained above for the future shifts.
     //
-    if( $now_sec <= $start_sec ) {
-        
-        $ival_begin_sec = $start_sec;
-        $ival_end_sec   = $stop_sec;
-
-        foreach( SysMon::instrument_names() as $instr ) {
-            array_push(
-                $instruments[$instr]['beam_status'],
-                array(
-                    'status' => 0,
-                    'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
-                    'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-        }
-        array_push(
-            $lcls_status,
-            array(
-                'status' => 0,
-                'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
-                'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-
-    } else {
+    if( $now_sec > $start_sec ) {
 
         // Beam time statistics
         //
@@ -221,30 +207,19 @@ try {
             foreach( SysMon::instrument_names() as $instr ) {
 
                 $status = $ival['status'] & SysMon::beam_destination_mask($instr);
-            
-                array_push(
-                    $instruments[$instr]['beam_status'],
-                    array(
-                        'status' => $status,
-                        'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
-                        'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-                if( $status )
-                    $instruments[$instr]['total_beam_time_sec'] += $ival_end_sec - $ival_begin_sec;
 
-                // Inject the last entry for the rest of today's day (starting from now)
-                // since we don't know the beam status for the future.
-                //
-                if( $shift_is4today && $cut_short ) {
-                    $ival_begin_sec = $now_sec;
-                    $ival_end_sec   = $stop_sec;
+                if( $status ) {
                     array_push(
                         $instruments[$instr]['beam_status'],
                         array(
-                            'status' => 0,
+                            'status' => $status,
                             'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
                             'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-                    break;
+
+                    $instruments[$instr]['total_beam_time_sec'] += $ival_end_sec - $ival_begin_sec;
                 }
+                if( $shift_is4today && $cut_short ) break;  // Finish here  since we don't know the beam status
+                                                            // for rest of today's day (starting from now).
             }
         }
 
@@ -265,60 +240,66 @@ try {
                     $cut_short = true;
                 }
             }
-            array_push(
-                $lcls_status,
-                array(
-                    'status' => $ival['status'],
-                    'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
-                    'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-            if( $ival['status'] )
-                $total_lcls_time_sec += $ival_end_sec - $ival_begin_sec;
 
-            // Inject the last entry for the rest of today's day (starting from now)
-            // since we don't know the beam status for the future.
-            //
-            if( $shift_is4today && $cut_short ) {
-                $ival_begin_sec = $now_sec;
-                $ival_end_sec   = $stop_sec;
+            $status = $ival['status'];
+            if( $status ) {
                 array_push(
                     $lcls_status,
                     array(
-                        'status' => 0,
+                        'status' => $status,
                         'begin_rel2start_sec' => $ival_begin_sec - $start_sec,
                         'end_rel2start_sec'   => $ival_end_sec   - $start_sec));
-                break;
+
+                $total_lcls_time_sec += $ival_end_sec - $ival_begin_sec;
             }
+            if( $shift_is4today && $cut_short ) break;  // Finish here since we don't know the beam status
+                                                        // for the rest of today's day (starting from now).
         }
     }
+    $total_beam_time_sec     = 0.0;
+    $total_runs_duration_sec = 0.0;
     foreach( SysMon::instrument_names() as $instr ) {
 
-        $total_beam_time_sec = $instruments[$instr]['total_beam_time_sec'];
+        $total_hutch_beam_time_sec = $instruments[$instr]['total_beam_time_sec'];
+        $total_beam_time_sec += $total_hutch_beam_time_sec;
 
-        $hours   = floor(  $total_beam_time_sec / 3600. );
-        $minutes = floor(( $total_beam_time_sec % 3600. ) / 60. );
+        $hours   = floor(  $total_hutch_beam_time_sec / 3600. );
+        $minutes = floor(( $total_hutch_beam_time_sec % 3600. ) / 60. );
         $instruments[$instr]['total_beam_time'] = sprintf("%02d hr %02d min", $hours, $minutes );
 
         $total_beam_usage_percent = 0.;
-        $gaps_duration_sec   = $instruments[$instr]['gaps_duration_sec'];
-        if( $total_beam_time_sec > 0.) {
-            $total_beam_usage_percent =  100. * (( $shift_is4today ? $now_sec : $stop_sec ) - $start_sec - $gaps_duration_sec ) / $total_beam_time_sec;
+        $runs_duration_sec = $instruments[$instr]['runs_duration_sec'];
+        $total_runs_duration_sec += $runs_duration_sec;
+        if( $total_hutch_beam_time_sec > 0.) {
+            $total_beam_usage_percent =  100. * $runs_duration_sec / $total_hutch_beam_time_sec;
             if( $total_beam_usage_percent > 100. ) $total_beam_usage_percent = 100.;
         }
         $instruments[$instr]['total_beam_usage_percent'] = sprintf("%5.1f", $total_beam_usage_percent);
     }
+    $total_beam_usage_percent = 0.0;
+    if( $total_beam_time_sec > 0.) {
+        $total_beam_usage_percent =  100. * $total_runs_duration_sec / $total_beam_time_sec;
+        if( $total_beam_usage_percent > 100. ) $total_beam_usage_percent = 100.;
+    }
+    $hours   = floor(  $total_beam_time_sec / 3600. );
+    $minutes = floor(( $total_beam_time_sec % 3600. ) / 60. );
+    $total_beam_time = sprintf("%02d hr %02d min", $hours, $minutes );
 
     $logbook->commit();
     $regdb->commit();
 	$sysmon->commit();
 
     report_success( array(
-        'shift'            => $start->toStringDay(),
-        'start_sec'        => $start_sec,
-        'stop_sec'         => $stop_sec,
-        'instrument_names' => SysMon::instrument_names(),
-        'lcls_status'      => $lcls_status,
-        'instruments'      => $instruments,
-        'systems'          => $systems,
+        'shift'                    => $start->toStringDay(),
+        'start_sec'                => $start_sec,
+        'stop_sec'                 => $stop_sec,
+        'instrument_names'         => SysMon::instrument_names(),
+        'lcls_status'              => $lcls_status,
+        'total_beam_time_sec'      => $total_beam_time_sec,
+        'total_beam_time'          => $total_beam_time,
+        'total_beam_usage_percent' => sprintf("%5.1f", $total_beam_usage_percent),
+        'instruments'              => $instruments,
+        'systems'                  => $systems
     ));
 
 } catch( AuthDBException     $e ) { report_error( $e->toHtml()); }

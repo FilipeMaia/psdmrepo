@@ -73,6 +73,8 @@ try {
             LusiTime::now(),
             AuthDB::instance()->authName());
 
+    $sysmon->notify_allsubscribed4justifications($instr_name, $gap_begin_time);
+
     $comment = $sysmon->beamtime_comment_at($gap_begin_time, $instr_name);
     $comment_info = is_null($comment) ?
         array('available'     => 0) :

@@ -91,7 +91,7 @@ HERE;
 </div>
 HERE;
 
-    $sysmon->populate($min_gap_width_sec);
+    $sysmon->populate('XRAY_DESTINATIONS',$min_gap_width_sec);
 
 	$authdb->commit();
     $logbook->commit();
