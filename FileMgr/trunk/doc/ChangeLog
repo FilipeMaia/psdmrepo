@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2012-04-23 Igor Gaponenko
+- added Web service GetExtendedFileStatusJSON.php to be used by ONLINE
+cleanup script to determine which files are safe to be removed from DSS
+nodes
+- added Python module file_status for inquering file status from the Data Manager
+using the above mentiond Web service. Also added a simple test script.
+
 Tag: V00-00-09
 2011-11-17 Igor Gaponenko
 - migrated to NetBeans IDE
