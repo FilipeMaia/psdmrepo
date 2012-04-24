@@ -25,6 +25,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelGainV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 
 //-----------------------------------------------------------------------
@@ -76,6 +77,7 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
 
   // get calibration data
   boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals = m_calibStore.get(m_key.src());
+  boost::shared_ptr<pdscalibdata::CsPadPixelGainV1> pixelGain = m_calibStore.get(m_key.src());
   boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStatusCalib = m_calibStore.get(m_key.src());
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib = m_calibStore.get(m_key.src());
 
@@ -132,6 +134,12 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
         peddata = &pedestals->pedestals()[iq][is][0][0];
       }
 
+      // this sector's pixel gain data
+      const float* gaindata = 0;
+      if (pixelGain) {
+        gaindata = &pixelGain->pixelGains()[iq][is][0][0];
+      }
+
       // calculate common mode if requested
       float cmode = 0;
       if (cModeCalib.get()) {
@@ -146,10 +154,21 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
         }
       }
 
-      // subtract pedestals and common mode, plus round to nearest int
-      if (peddata) {
+      // subtract pedestals and common mode, apply pixel gain, and round to
+      // nearest int; pixel gain is _inverse_ gain so we multiply it
+      if (peddata and gaindata) {
+        for (unsigned i = 0; i != ssize; ++ i) {
+          double val = (sdata[i] - peddata[i] - cmode) * gaindata[i];
+          output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+        }
+      } else if (peddata) {
         for (unsigned i = 0; i != ssize; ++ i) {
           double val = sdata[i] - peddata[i] - cmode;
+          output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+        }
+      } else if (gaindata) {
+        for (unsigned i = 0; i != ssize; ++ i) {
+          double val = (sdata[i] - cmode) * gaindata[i];
           output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
         }
       } else {

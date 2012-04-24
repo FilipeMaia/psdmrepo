@@ -28,8 +28,10 @@
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelGainV1.h"
 #include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelGainV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "PSCalib/CalibFileFinder.h"
 #include "psddl_psana/cspad.ddl.h"
@@ -66,6 +68,7 @@ CsPadCalib::CsPadCalib (const std::string& name)
   m_doPedestals = config("doPedestals", true);
   m_doPixelStatus = config("doPixelStatus", true);
   m_doCommonMode = config("doCommonMode", true);
+  m_doPixelGain = config("doPixelGain", true);
 }
 
 //--------------
@@ -121,6 +124,16 @@ CsPadCalib::beginRun(Event& evt, Env& env)
     boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadCommonModeSubV1> > proxy(
         new CalibDataProxy<pdscalibdata::CsPadCommonModeSubV1>(env.calibDir(), "common_mode", run));
     calibStore.putProxy(proxy, PSEvt::EventKey::anySource());
+  }
+
+  if (m_doPixelGain) {
+    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPad2x2PixelGainV1> > proxy1(
+        new CalibDataProxy<pdscalibdata::CsPad2x2PixelGainV1>(env.calibDir(), "pixel_gain", run));
+    calibStore.putProxy(proxy1, PSEvt::EventKey::anySource());
+
+    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadPixelGainV1> > proxy2(
+        new CalibDataProxy<pdscalibdata::CsPadPixelGainV1>(env.calibDir(), "pixel_gain", run));
+    calibStore.putProxy(proxy2, PSEvt::EventKey::anySource());
   }
 
 }

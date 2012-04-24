@@ -24,10 +24,12 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelGainV1.h"
 #include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelGainV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "PSCalib/CalibFileFinder.h"
@@ -117,10 +119,12 @@ CalibDataProxy<T>::getTypedImpl(PSEvt::ProxyDictI* dict,
 
 // explicit instantiation
 template class CalibDataProxy<pdscalibdata::CsPad2x2PedestalsV1>;
+template class CalibDataProxy<pdscalibdata::CsPad2x2PixelGainV1>;
 template class CalibDataProxy<pdscalibdata::CsPad2x2PixelStatusV1>;
 template class CalibDataProxy<pdscalibdata::CsPadCommonModeSubV1>;
 template class CalibDataProxy<pdscalibdata::CsPadFilterV1>;
 template class CalibDataProxy<pdscalibdata::CsPadPedestalsV1>;
+template class CalibDataProxy<pdscalibdata::CsPadPixelGainV1>;
 template class CalibDataProxy<pdscalibdata::CsPadPixelStatusV1>;
 
 } // namespace cspad_mod

@@ -98,6 +98,7 @@ private:
   bool m_doPedestals;  ///< do pedestal subtraction if set
   bool m_doPixelStatus;  ///< use pixel status data if set
   bool m_doCommonMode;  ///< do common mode correction if set
+  bool m_doPixelGain;  ///< do pixel gain correction if set
 
   
 };

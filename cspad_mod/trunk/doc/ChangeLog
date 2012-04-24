@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2012-04-23 Andy Salnikov
+- adding pixel gain correction to CsPadCalib module
+
 Tag: V00-05-01
 2012-02-28 Andy Salnikov
 - calibration "class name" was incorrect (ConfigV1 instead of CalibV1)

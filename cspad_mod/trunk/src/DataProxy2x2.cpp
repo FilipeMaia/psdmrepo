@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPad2x2PedestalsV1.h"
+#include "pdscalibdata/CsPad2x2PixelGainV1.h"
 #include "pdscalibdata/CsPad2x2PixelStatusV1.h"
 
 //-----------------------------------------------------------------------
@@ -75,6 +76,7 @@ DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, cons
 
   // get calibration data
   boost::shared_ptr<pdscalibdata::CsPad2x2PedestalsV1> pedestals = m_calibStore.get(m_key.src());
+  boost::shared_ptr<pdscalibdata::CsPad2x2PixelGainV1> pixelGain = m_calibStore.get(m_key.src());
   boost::shared_ptr<pdscalibdata::CsPad2x2PixelStatusV1> pixStatusCalib = m_calibStore.get(m_key.src());
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib = m_calibStore.get(m_key.src());
 
@@ -113,6 +115,12 @@ DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, cons
       peddata = &pedestals->pedestals()[0][0][sect];
     }
 
+    // this sector's pixel gain data
+    const float* gaindata = 0;
+    if (pixelGain) {
+      gaindata = &pixelGain->pixelGains()[0][0][sect];
+    }
+
     // calculate common mode if requested
     float cmode = 0;
     if (cModeCalib.get()) {
@@ -127,11 +135,24 @@ DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, cons
       }
     }
 
-    // subtract pedestals and common mode, plus round to nearest int
-    if (peddata) {
+    // subtract pedestals and common mode, apply pixel gain, and round to
+    // nearest int; pixel gain is _inverse_ gain so we multiply it
+    if (peddata and gaindata) {
+      unsigned last = ssize*nSect;
+      for (unsigned i = 0; i != last; i += nSect) {
+        double val = (sdata[i] - peddata[i] - cmode) * gaindata[i];
+        output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+      }
+    } else if (peddata) {
       unsigned last = ssize*nSect;
       for (unsigned i = 0; i != last; i += nSect) {
         double val = sdata[i] - peddata[i] - cmode;
+        output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+      }
+    } else if (gaindata) {
+      unsigned last = ssize*nSect;
+      for (unsigned i = 0; i != last; i += nSect) {
+        double val = (sdata[i] - cmode) * gaindata[i];
         output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
       }
     } else {
