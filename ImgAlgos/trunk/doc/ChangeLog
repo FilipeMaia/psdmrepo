@@ -11,12 +11,18 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
-Tag: V00-00-XX
+Tag: V00-00-04
+2012-04-24 Mikhail S. Dubrovin
+- add/updated scripts:
+        ImgAlgos/data/MakePixelMask.py
+        ImgAlgos/data/PlotCSPadArrayFromFile.py
+        ImgAlgos/data/PlotCameraImageAndPeaks.py
+        ImgAlgos/data/PlotCameraImageFromFile.py
+        ImgAlgos/data/PlotHDF5Dataset.py
+        ImgAlgos/data/PrintHDF5Structure.py
 
 2012-04-20 Mikhail S. Dubrovin
 - add modules:
-        ImgAlgos/test/hello.cpp
         ImgAlgos/include/CSPadMaskApply.h
         ImgAlgos/include/CSPadMaskV1.h
         ImgAlgos/src/CSPadMaskApply.cpp
