@@ -90,6 +90,9 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
+  std::string strTimeStamp(Event& evt);
+  std::string strRunNumber(Event& evt);
+  std::string strEventCounter();
   void saveImageInFile(Event& evt);
 
 private:

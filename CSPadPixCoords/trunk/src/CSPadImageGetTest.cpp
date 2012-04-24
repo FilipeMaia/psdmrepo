@@ -62,7 +62,7 @@ CSPadImageGetTest::CSPadImageGetTest (const std::string& name)
   m_key           = configStr("key",      "Image2D");
   m_eventSave     = config   ("eventSave", 0);
   m_saveAll       = config   ("saveAll",   false);
-  m_fname         = configStr("fname",    "cspad_image_ev");
+  m_fname         = configStr("fname",    "cspad-image");
 }
 
 
@@ -141,12 +141,54 @@ CSPadImageGetTest::endJob(Event& evt, Env& env)
 //--------------------
 //--------------------
 
+std::string  
+CSPadImageGetTest::strTimeStamp(Event& evt)
+{
+  shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) {
+
+    //m_time = eventId->time();
+    //std::stringstream ss;
+    //ss << hex << t_msec;
+    //string hex_msec = ss.str();
+
+    return (eventId->time()).asStringFormat( "%Y-%m-%d-%H%M%S%f"); // "%Y-%m-%d %H:%M:%S%f%z"
+  }
+  else
+    return std::string("time-stamp-is-not-defined");
+}
+
+//--------------------
+
+std::string  
+CSPadImageGetTest::strRunNumber(Event& evt)
+{
+  shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) {
+    stringstream ssRunNum; ssRunNum << "r" << setw(4) << setfill('0') << eventId->run();
+    return ssRunNum.str();
+  }
+  else
+    return std::string("run-is-not-defined");
+}
+
+//--------------------
+
+std::string
+CSPadImageGetTest::strEventCounter()
+{
+  stringstream ssEvNum; ssEvNum << setw(6) << setfill('0') << m_count;
+  return ssEvNum.str();
+}
+
+//--------------------
+
 void 
 CSPadImageGetTest::saveImageInFile(Event& evt)
 {
   // Define the file name
   stringstream ssEvNum; ssEvNum << setw(6) << setfill('0') << m_count;
-  string fname = m_fname + ssEvNum.str() + ".txt";
+  string fname = m_fname + "-" + strRunNumber(evt) + "-" + strTimeStamp(evt) + ".txt";
 
   // In case if m_key == "Image2D" 
 
