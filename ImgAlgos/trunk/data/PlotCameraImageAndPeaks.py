@@ -46,38 +46,79 @@ def plot_peaks (arr_peaks, store=None) :
         axes.add_artist(circ)
 
 #--------------------
-# Read and plot array
 
-print ' sys.argv[0]: ', sys.argv[0]
-print ' len(sys.argv): ', len(sys.argv)
+def get_array_from_file(fname) :
+    print 'get_array_from_file:', fname
+    return np.loadtxt(fname, dtype=np.float32)
 
-if len(sys.argv) == 2 : fname = sys.argv[1]
-else                  : fname = './image0_ev000115.txt'
+#--------------------
 
-print 'fname=', fname
-arr = np.loadtxt(fname, dtype=np.float32)
-print arr
-print 'arr.shape=', arr.shape
+def get_input_parameters() :
 
-# Read peaks form file
-fname_peaks = 'image_peaks_' + fname.rsplit('_')[1]
-arr_peaks = np.loadtxt(fname_peaks, dtype=np.double)
-print 'Try to get peaks from file: ', fname_peaks
+    fname_def = './image0_ev000115.txt'
+    Amin_def  =   0
+    Amax_def  = 100
 
-s = Storage()
+    nargs = len(sys.argv)
+    print 'sys.argv[0]: ', sys.argv[0]
+    print 'nargs: ', nargs
 
-#ampRange = (1000,1500)
-#ampRange = (-20,100) # For subtracted pedestals
-ampRange = (-100,500) # For subtracted pedestals
+    if nargs == 1 :
+        print 'Will use all default parameters\n',\
+              'Expected command: ' + sys.argv[0] + ' <infname> <Amin> <Amax>' 
+        sys.exit('CHECK INPUT PARAMETERS!')
 
-plot_image(arr, zrange=ampRange, store=s)
-plt.get_current_fig_manager().window.move(10,10)
+    if nargs  > 1 : fname = sys.argv[1]
+    else          : fname = fname_def
 
-plot_peaks(arr_peaks, store=s)
+    if nargs  > 2 : Amin = int(sys.argv[2])
+    else          : Amin = Amin_def
 
-plot_histogram(arr,range=ampRange, store=s)
-plt.get_current_fig_manager().window.move(950,10)
+    if nargs  > 3 : Amax = int(sys.argv[3])
+    else          : Amax = Amax_def
 
-plt.show()
+    if nargs  > 4 :         
+        print 'WARNING: Too many input arguments! Exit program.\n'
+        sys.exit('CHECK INPUT PARAMETERS!')
+
+    ampRange = (Amin, Amax)
+
+    print 'Input file name  :', fname
+    print 'ampRange         :', ampRange
+ 
+    return fname,ampRange 
+
+#--------------------
+
+def do_main() :
+
+    fname, ampRange = get_input_parameters()
+
+    arr = get_array_from_file(fname)
+    print 'arr:\n', arr
+    print 'arr.shape=', arr.shape
+
+    # Get peaks form file
+    fname_peaks = 'image_peaks_' + fname.rsplit('_')[1]
+    arr_peaks = np.loadtxt(fname_peaks, dtype=np.double)
+    print 'Try to get peaks from file: ', fname_peaks
+
+    s = Storage()
+
+    plot_image(arr, zrange=ampRange, store=s)
+    plt.get_current_fig_manager().window.move(10,10)
+
+    plot_peaks(arr_peaks, store=s)
+
+    plot_histogram(arr,range=ampRange, store=s)
+    plt.get_current_fig_manager().window.move(950,10)
+
+    plt.show()
+
+#--------------------
+
+if __name__ == '__main__' :
+    do_main()
+    sys.exit('The End')
 
 #--------------------
