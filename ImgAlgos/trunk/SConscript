@@ -26,6 +26,7 @@ Import('*')
 # PYEXTMOD - name of the Python extension module, package name used by default
 #
 #
-# standardSConscript()
+#standardSConscript(NEED_QT=1, UTESTS=[])
 
-standardSConscript(NEED_QT=1, UTESTS=[])
+standardSConscript()
+

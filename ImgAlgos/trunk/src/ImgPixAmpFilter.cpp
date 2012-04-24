@@ -228,12 +228,14 @@ ImgPixAmpFilter::procImage(Event& evt)
 	  }
 	}
 
-	if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Event = " << m_count 
-                            << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
+	if(  m_print_bits & 4 ||
+	    (m_print_bits & 8 && m_count%100 == 0) ) 
+                               MsgLog(name(), info, "Event = " << m_count 
+                               << "  Npix (Amp>Threshold) : Nmin = " << npix_above_thr << " : " << m_numpixmin);
 
 	if (npix_above_thr > m_numpixmin) {
-         if( m_print_bits & 1<<3 ) printEventId(evt);
-         return true;
+          if( m_print_bits & 16 ) printEventId(evt);
+          return true;
 	}
 
   return false;
