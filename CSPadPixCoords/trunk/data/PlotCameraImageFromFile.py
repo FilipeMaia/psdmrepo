@@ -4,13 +4,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import h5py
 
 #--------------------
 # Define graphical methods
-
-#plt.imshow(arr, origin='upper', interpolation='nearest', aspect='auto') #,extent=Range)
-#plt.clim(1000,2000)
-#plt.show()
 
 def plot_image (arr, range=None, zrange=None) :    # range = (left, right, low, high), zrange=(zmin,zmax)
     fig = plt.figure(num=1, figsize=(12,12), dpi=80, facecolor='w',edgecolor='w',frameon=True)
@@ -27,29 +24,69 @@ def plot_histogram(arr,range=(0,500),figsize=(5,5)) :
     #fig.canvas.manager.window.move(500,10)
     
 #--------------------
-# Read and plot array
 
+def get_array_from_file(fname) :
+    print 'get_array_from_file:', fname
+    return np.loadtxt(fname, dtype=np.float32)
 
-print ' sys.argv[0]: ', sys.argv[0]
-print ' len(sys.argv): ', len(sys.argv)
+#--------------------
 
-if len(sys.argv) == 2 : fname = sys.argv[1]
-else                  : fname = '/reg/neh/home/dubrovin/LCLS/PSANA-test/image.txt'
+def get_input_parameters() :
 
-#fname    = '/reg/neh/home/dubrovin/LCLS/HDF5Explorer-v01/camera-ave-CxiDg1.0:Tm6740.0.txt'
-print 'fname=', fname
+    fname_def = './image0_ev000115.txt'
+    Amin_def  =   0
+    Amax_def  = 100
 
-arr = np.loadtxt(fname, dtype=np.float32)
-print arr
+    nargs = len(sys.argv)
+    print 'sys.argv[0]: ', sys.argv[0]
+    print 'nargs: ', nargs
 
-ampRange = (-20,20)
-#ampRange = (0,2000)
-plot_image(arr, zrange=ampRange)
-plt.get_current_fig_manager().window.move(10,10)
+    if nargs == 1 :
+        print 'Will use all default parameters\n',\
+              'Expected command: ' + sys.argv[0] + ' <infname> <Amin> <Amax>' 
+        sys.exit('CHECK INPUT PARAMETERS!')
 
-plot_histogram(arr,range=ampRange)
-plt.get_current_fig_manager().window.move(950,10)
+    if nargs  > 1 : fname = sys.argv[1]
+    else          : fname = fname_def
 
-plt.show()
+    if nargs  > 2 : Amin = int(sys.argv[2])
+    else          : Amin = Amin_def
+
+    if nargs  > 3 : Amax = int(sys.argv[3])
+    else          : Amax = Amax_def
+
+    if nargs  > 4 :         
+        print 'WARNING: Too many input arguments! Exit program.\n'
+        sys.exit('CHECK INPUT PARAMETERS!')
+
+    ampRange = (Amin, Amax)
+
+    print 'Input file name  :', fname
+    print 'ampRange         :', ampRange
+ 
+    return fname,ampRange 
+
+#--------------------
+
+def do_main() :
+
+    fname, ampRange = get_input_parameters()
+    arr = get_array_from_file(fname) 
+    print 'arr:\n', arr
+    print 'arr.shape=', arr.shape
+
+    plot_image(arr, zrange=ampRange)
+    plt.get_current_fig_manager().window.move(10,10)
+
+    plot_histogram(arr,range=ampRange)
+    plt.get_current_fig_manager().window.move(950,10)
+
+    plt.show()
+
+#--------------------
+
+if __name__ == '__main__' :
+    do_main()
+    sys.exit('The End')
 
 #--------------------
