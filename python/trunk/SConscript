@@ -19,10 +19,9 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 python_ver = env['PYTHON_VERSION']
-PREFIX  = "/usr"
-INCDIR = "include/python"+python_ver
-LIBDIR  = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
+PREFIX = "/usr"
+INCDIR = env['PYTHON_INCDIR']
+LIBDIR  = env['PYTHON_LIBDIR']
 PKGLIBS = "python"+python_ver
 LINKLIBS = "libpython"+python_ver+".so*"
 
