@@ -54,6 +54,7 @@ pkgs = {'boost_date_time' : 'boost',
         'boost_system' : 'boost',
         'boost_thread' : 'boost',
         'boost_unit_test_framework' : 'boost', 
+        'boost_python' : 'boost python', 
         }
 for pkg, dep in pkgs.iteritems() :
     DEPS = dep
