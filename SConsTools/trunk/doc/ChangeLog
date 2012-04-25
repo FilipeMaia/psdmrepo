@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-05
+2012-04-25 Andy Salnikov
+- adding boost_python to dependency analyzer
+- boost_python needs Python include directory flag in CPPPATH
+- added PYTHON_INCDIR and PYTHON_LIBDIR to build env for above
+
 Tag: V00-02-04
 2012-04-20 Andy Salnikov
 - bug fix in Qt stuff

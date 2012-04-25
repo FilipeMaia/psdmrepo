@@ -54,6 +54,9 @@ def setupCompilers ( env ) :
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     env['PYTHON_VERSION'] = "2.4"
+    env['PYTHON_INCDIR'] = "/usr/include/python"+env['PYTHON_VERSION']
+    env['PYTHON_LIBDIR'] = "/usr/lib"
+    if env['SIT_ARCH_PROC'] == 'x86_64' : env['PYTHON_LIBDIR'] = "/usr/lib64"
     env['PYTHON'] = "/usr/bin/python"+env['PYTHON_VERSION']
 
     # various substitutions for the scripts 

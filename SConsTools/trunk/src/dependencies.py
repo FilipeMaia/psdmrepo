@@ -63,6 +63,8 @@ _boostPackages = {
         'thread' : 'boost_thread',
         'thread.hpp' : 'boost_thread',
         'test' : 'boost_unit_test_framework', 
+        'python' : 'boost_python', 
+        'python.hpp' : 'boost_python', 
         }
 def _guessBoostPackage ( p ) :
     return _boostPackages.get ( p, 'boost' )
@@ -238,6 +240,8 @@ def adjustPkgDeps():
             deps = findAllDependencies ( lib )
             # self-dependencies are not needed here
             deps.discard(pkg)
+            # dirty hack
+            if 'boost_python' in deps: env.Append(CPPPATH=env['PYTHON_INCDIR'])
             trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
             setPkgDeps ( pkg, deps )
             
