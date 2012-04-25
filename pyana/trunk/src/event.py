@@ -88,7 +88,7 @@ class Event(object):
     data belonging to currently processed event.
 
     Clients typically use generic get() method or one of the specific
-    getXYZ() methods to get access to event data. TYpically event object
+    getXYZ() methods to get access to event data. Typically event object
     contains all the data that are read from XTC file (some data from XTC 
     is stored in environment). Additionally users can add their own objects
     to event using put() method which allows sharing of the user data  
@@ -134,14 +134,14 @@ class Event(object):
     def seq(self) :
         """ self.seq() -> Sequence
         
-        Returns _pdsdata.xtc.Sequence object corresponding to current event.
+        Returns :py:class:`_pdsdata.xtc.Sequence` object corresponding to current event.
         """
         return self.m_dg.seq
 
     def env(self) :
         """ self.env() -> Env
         
-        Returns environment object. User code does not typically need to use this method as user code 
+        Returns environment object (:py:class:`Env`). User code does not typically need to use this method as user code 
         receives environment object via method arguments.
         """
         return self.m_dg.env
@@ -149,7 +149,7 @@ class Event(object):
     def damage(self) :
         """ self.damage() -> int
         
-        Returns object of type _pdsdata.xtc.Damage representing damage mask. The damage mask is returned for 
+        Returns object of type :py:class:`_pdsdata.xtc.Damage` representing damage mask. The damage mask is returned for 
         the top-level XTC, individual sub-objects may contain different damage masks.
         """
         return self.m_dg.xtc.damage
@@ -157,7 +157,7 @@ class Event(object):
     def getTime(self) :
         """ self.getTime() -> ClockTime
         
-        Returns _pdsdata.xtc.ClockTime object, equivalent to dg.seq.clock().
+        Returns :py:class:`_pdsdata.xtc.ClockTime` object, equivalent to ``dg.seq.clock()``.
         """
         return self.m_dg.seq.clock()
 
@@ -165,8 +165,9 @@ class Event(object):
     def keys(self):
         """self.keys() -> list of tuples
         
-        Returns the list of tuples (TypeId, Src), one tuple for every object contained in the 
-        event. For user objects first item in tuple would be the key, second item is None.
+        Returns the list of tuples (:py:class:`_pdsdata.xtc.TypeId`, :py:class:`_pdsdata.xtc.DetInfo`), 
+        one tuple for every object contained in the event. For user objects first item in tuple would be 
+        the key, second item is None.
         """
         result = []
         if self.m_dg:
@@ -192,16 +193,16 @@ class Event(object):
         If some arguments are given then only those objects that satisfy a particular criteria are returned. 
         
         The list of possible keyword arguments: 
-        ``typeId`` - accepts enum xtc.TypeId.Type, only return objects which have that TypeId;
-        ``version`` - accepts number, only return objects whose type version number is equal to number;
-        ``level`` - accepts one of xtc.Level values, only returns objects originated at that level;
-        ``detector`` - accepts enum xtc.DetInfo.Detector values, only returns objects produced by this detector;
-        ``detId`` - accepts number, only returns objects produced by this detector ID;
-        ``device`` - accepts enum xtc.DetInfo.Device values, only returns objects produced by this device;
-        ``devId`` - accepts number, only returns objects produced by this device ID;
-        ``address`` - xtc.DetInfo object or an address string.
+        *typeId* - accepts enum :py:class:`_pdsdata.xtc.TypeId.Type`, only return objects which have that TypeId;
+        *version* - accepts number, only return objects whose type version number is equal to number;
+        *level* - accepts one of :py:class:`_pdsdata.xtc.Level` values, only returns objects originated at that level;
+        *detector* - accepts enum :py:class:`_pdsdata.xtc.DetInfo.Detector` values, only returns objects produced by this detector;
+        *detId* - accepts number, only returns objects produced by this detector ID;
+        *device* - accepts enum :py:class:`_pdsdata.xtc.DetInfo.Device` values, only returns objects produced by this device;
+        *devId* - accepts number, only returns objects produced by this device ID;
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string.
     
-        The parameters ``address`` and any of the ``detector``, ``detId``, ``device``, ``devId`` are incompatible, 
+        The parameters *address* and any of the *detector*, *detId*, *device*, *devId* are incompatible, 
         specify only one or another.
         """
 
@@ -241,9 +242,9 @@ class Event(object):
         """self.get(key, address=None) -> object
         
         Generic get method, retrieves detector data or user data. 
-        If first argument (``key``) is an integer then it is assumed to be 
-        TypeId value (such as xtc.TypeId.Type.Id_AcqWaveform), second
-        argument in this case is an address string or DetInfo object.
+        If first argument (*key*) is an integer then it is assumed to be 
+        :py:class:`_pdsdata.xtc.TypeId` value (such as xtc.TypeId.Type.Id_AcqWaveform), second
+        argument in this case is an address string or :py:class:`_pdsdata.xtc.DetInfo` object.
         Otherwise the first argument is assumed to be a key (usually a 
         string) for user data added to event with put() method. """
         
@@ -362,9 +363,9 @@ class Event(object):
         If address given is not very specific then the first matching object is returned.
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string;
-        ``channel`` - channel number from 0 to max number of channels;
-        ``env`` - environment object containing Acqiris configuration object.
+        *address* - xtc.DetInfo object or an address string;
+        *channel* - channel number from 0 to max number of channels;
+        *env* - environment object containing Acqiris configuration object.
 
         Channel number is an integer number, total number of channels can be extracted from the Acqiris configuration object.
         """
@@ -405,9 +406,9 @@ class Event(object):
         """self.getEvrData(address) -> object
         
         Returns data object of type pypdsdata.evr.DataV* for given address.
-        Parameters: ``address`` xtc.DetInfo object or an address string.
+        Parameters: *address* xtc.DetInfo object or an address string.
 
-        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_EvrData, address)``.
+        This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_EvrData, ad*ess)``.
         """
         return self.findFirst( typeId=xtc.TypeId.Type.Id_EvrData, address=address )
 
@@ -415,7 +416,7 @@ class Event(object):
         """self.getFeeGasDet() -> list of floats
         
         Returns the list of 4 floating numbers [f_11_ENRC, f_12_ENRC, f_21_ENRC, f_22_ENRC] 
-        obtained from bld.BldDataFEEGasDetEnergy object.
+        obtained from :py:class:`_pdsdata.bld.BldDataFEEGasDetEnergy` object.
         """
         obj = self.findFirst( typeId=xtc.TypeId.Type.Id_FEEGasDetEnergy )
         if obj :
@@ -428,7 +429,7 @@ class Event(object):
         not very specific then the first matching object is returned.
 
         Parameters:
-        ``address`` - xtc.DetInfo object or an address string.
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string.
 
         This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_Frame, address)``.
         """
@@ -441,7 +442,7 @@ class Event(object):
         is not very specific then the first matching object is returned.
 
         Parameters:
-        ``address`` - xtc.DetInfo object or an address string.
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string.
 
         This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_IpimbData, address)``.
         """
@@ -453,7 +454,7 @@ class Event(object):
     def getPhaseCavity(self):
         """self.getPhaseCavity() -> object
         
-        Returns data object of type pypdsdata.bld.BldDataPhaseCavity.
+        Returns data object of type :py:class:`_pdsdata.bld.BldDataPhaseCavity`.
         
         This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_PhaseCavity, address)``.
         """
@@ -466,8 +467,8 @@ class Event(object):
         If address given is not very specific then the first matching object is returned.
 
         Parameters:
-        ``address`` - xtc.DetInfo object or an address string;
-        ``env`` - environment object containing pnCCD configuration object.
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string;
+        *env* - environment object containing pnCCD configuration object.
         
         This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_pnCCDframe, address)``.
         """
@@ -486,8 +487,8 @@ class Event(object):
         If address given is not very specific then the first matching object is returned.
 
         Parameters:
-        ``address`` - xtc.DetInfo object or an address string;
-        ``env`` - environment object containing Acqiris configuration object.
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string;
+        *env* - environment object containing Acqiris configuration object.
                 
         This method is equivalent to ``evt.get(xtc.TypeId.Type.Id_PrincetonFrame, address)``.
         """
@@ -506,10 +507,10 @@ class Event(object):
         If address given is not very specific then the first matching object is returned.
 
         Parameters:
-        ``address`` - xtc.DetInfo object or an address string;
-        ``env`` - environment object containing CsPad configuration object.
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string;
+        *env* - environment object containing CsPad configuration object.
 
-        The size of the list is determined by the CsPad configuration (``numQuads()`` method of the configuration object).
+        The size of the list is determined by the CsPad configuration (*numQuads()* method of the configuration object).
         """
         
         _log.debug("Event.getCsPadElements: address=%s", address)
@@ -525,7 +526,7 @@ class Event(object):
         
         Add user data to the event, key identifies the data. User data can be any kind 
         of Python object. Key is usually a string but can have any type except integer type.
-        Use the same key as the first argument of ``get()`` method to retrieve stored object.
+        Use the same key as the first argument of *get()* method to retrieve stored object.
         This mechanism allows sharing of data between different modules.
         """
         
@@ -646,16 +647,34 @@ class EpicsStore(object):
     """
     
     def __init__ (self):
-        
+
+        # Every PV in the whole system is identified by its DetInfo and PV ID,
+        # we use full DetInfo (including process ID) because we have multiple
+        # sources with the same address (EpicsArch.0:NoDevice:0) which are 
+        # distinguished only by the process ID. Full Id is a triplet of 
+        # (src.log(), src.phy(), iPvId). Every PV has a unique name (PV name)
+        # as it is defined in EPICS. Additionally each PV may have an alias 
+        # defined for it (coming from epics.ConfigV1 object). Alias names are
+        # also unique [not sure about uniqueness between PV and alias names]. 
+        #
+        # Store manager keeps few mappings:
+        # 1. triplet ID -> PV name
+        # 2. PV name or alias name -> EPICS data
+        # 3. PV name -> alias name
+        # 4. alias name -> PV name
+
         self.m_id2name = {}
         self.m_name2epics = {}
+        self.m_pv2alias = {}
+        self.m_alias2pv = {}
         
     def update(self, evt):
         """ self.update(evt)
         
-        This method updates environment EPICS data from event object. 
+        This method updates environment EPICS data from :py:class:`Event` object.
         """
         
+        # get all PVs
         epicsData = evt.findXtc(typeId=xtc.TypeId.Type.Id_Epics)
         for extc in epicsData :
             
@@ -681,19 +700,98 @@ class EpicsStore(object):
                     self.m_id2name[id] = name
                 else:
                     name = self.m_id2name.get(id, None)
-                    
+
+                # store for both PV name and alias name
                 self.m_name2epics[name] = e
+                alias = self.m_pv2alias.get(name, None)
+                if alias is not None: self.m_name2epics[alias] = e
+
+
+        # check for Config object
+        epicsConfigs = evt.findXtc(typeId=xtc.TypeId.Type.Id_EpicsConfig)
+        for extc in epicsConfigs:
+        
+            src = extc.src
+            config = extc.payload()
+            if config is None:
+                
+                _log.warning("Zero-size EPICS data found in the event")
+                
+            else:
+
+                # loop over aliases definitions
+                for pvConfig in config.getPvConfigs():
+
+                    alias = pvConfig.sPvDesc
+                    id = (src.log(), src.phy(), pvConfig.iPvId)
+
+                    # get PV name
+                    name = self.m_id2name.get(id, None)
+                    if name is None:
+                        
+                        _log.warning("EPICS alias `%s' has no corresponding PV", alias)
+                        
+                    else:
+
+                        # fill PV name <-> alias mappings
+                        self.m_pv2alias[name] = alias
+                        self.m_alias2pv[alias] = name
+
+                        # if data is already stored then add alias name
+                        e = self.m_name2epics.get(name, None)
+                        if e is not None: self.m_name2epics[alias] = e
+
 
     def value(self, name):
         """ self.value(name) -> EPICS object
         
-        Parameters: ``name`` - name of the EPICS channel.
+        Parameters: *name* - name of the EPICS channel, PV name or alias name.
         
         This is the primary method to access EPICS information in pyana jobs.
         Returns current value of the EPICS channel with the given name. The type of returned data 
         is either epics.EpicsPvCtrl or epics.EpicsPvTime.
         """
         return self.m_name2epics.get(name, None)
+
+    def names(self):
+        """ self.names() -> list of strings
+        
+        Returns full list of PV names and aliases.
+        """
+        return self.m_name2epics.keys()
+
+    def pvNames(self):
+        """ self.pvNames() -> list of strings
+        
+        Returns list of PV names, not including aliases.
+        """
+        return list(set(self.m_name2epics.keys()) - set(self.m_alias2pv.keys()))
+
+    def aliases(self):
+        """ self.aliases() -> list of strings
+        
+        Returns list of aliases, excludes PV names.
+        """
+        return self.m_alias2pv.keys()
+
+    def alias(self, pvName):
+        """ self.alias(pvName) -> string
+
+        Parameters: *pvName* - PV name of the EPICS channel.
+        
+        Returns corresponding alias name or None.
+        """
+        return self.m_pv2alias.get(pvName, None)
+
+    def pvName(self, alias):
+        """ self.pvName(alias) -> string
+
+        Parameters: *alias* - alias name of the EPICS channel.
+        
+        Returns corresponding PV name or None.
+        """
+        return self.m_alias2pv.get(alias, None)
+
 
 class Env(object):
     """
@@ -814,7 +912,7 @@ class Env(object):
         """ self.epicsStore() -> EpicsStore
         
         This is the primary method for user code to access EPICS data. 
-        It returns event.EpicsStore object which can be used to retrieve the state of the 
+        It returns :py:class:`EpicsStore` object which can be used to retrieve the state of the 
         individual EPICS channels.
         """
         
@@ -823,7 +921,7 @@ class Env(object):
     def update(self, evt):
         """ self.update(evt)
         
-        Parameters: ``evt`` - event object of type event.Event.
+        Parameters: *evt* - event object of type :py:class:`Event`.
         
         This method updates environment contents with selected data from event object. 
         This is equivalent to calling env.updateEpics() and env.updateConfig().
@@ -836,7 +934,7 @@ class Env(object):
     def updateEpics(self, evt):
         """ self.updateEpics(evt)
         
-        This method updates environment EPICS data from event object. 
+        This method updates environment EPICS data from :py:class:`Event` object. 
         """        
         # epics
         self.m_epics.update( evt )
@@ -844,7 +942,7 @@ class Env(object):
     def updateConfig(self, evt):
         """ self.updateConfig(evt)
         
-        This method copies configuration objects from event object into environment.
+        This method copies configuration objects from :py:class:`Event` object into environment.
         """
         
         # store config objects 
@@ -867,8 +965,8 @@ class Env(object):
     def configKeys(self):
         """self.configKeys() -> list of tuples
         
-        Returns the list of tuples (TypeId, Src), one tuple for every config object 
-        contained in the environment.
+        Returns the list of tuples (:py:class:`_pdsdata.xtc.TypeId`, :py:class:`_pdsdata.xtc.DetInfo`), 
+        one tuple for every config object contained in the environment.
         """
         result = []
         for k, v in self.m_config.iteritems():
@@ -881,8 +979,8 @@ class Env(object):
         """ self.getConfig(typeId, address=None) -> config object
         
         Parameters: 
-        ``typeId`` - one of the enum xtc.TypeId.Type values; 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *typeId* - one of the enum :py:class:`_pdsdata.xtc.TypeId.Type` values;
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string;
         return type - configuration object or None.
     
         This is a generic method for finding a configuration object of given type. 
@@ -895,7 +993,7 @@ class Env(object):
         """ self.getAcqConfig(address=None) -> config object
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string; 
         return type - configuration object or None.
     
         Returns Acqiris configuration object for a given device address. If more than one object 
@@ -910,7 +1008,7 @@ class Env(object):
         """ self.getGsc16aiConfig(address=None) -> config object
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string; 
         return type - configuration object or None.
     
         Returns Gsc16ai configuration object for a given device address. If more than one object 
@@ -925,7 +1023,7 @@ class Env(object):
         """ self.getOpal1kConfig(address=None) -> config object
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string; 
         return type - configuration object or None.
     
         Returns Opal1k configuration object for a given device address. If more than one object 
@@ -940,7 +1038,7 @@ class Env(object):
         """ self.getPnCCDConfig(address=None) -> config object
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string; 
         return type - configuration object or None.
     
         Returns PnCCD configuration object for a given device address. If more than one object 
@@ -955,7 +1053,7 @@ class Env(object):
         """ self.getPrincetonConfig(address=None) -> config object
         
         Parameters: 
-        ``address`` - xtc.DetInfo object or an address string; 
+        *address* - :py:class:`_pdsdata.xtc.DetInfo` object or an address string; 
         return type - configuration object or None.
     
         Returns Princeton configuration object for a given device address. If more than one object 

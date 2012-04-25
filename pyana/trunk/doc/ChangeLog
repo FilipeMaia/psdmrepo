@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-48
+2012-04-24 Andy Salnikov
+- implemented EPICS aliases support
+- updated docstrings to include references to classes
+
 Tag: V00-00-47
 2012-04-10 Andy Salnikov
 - added protection against corrupted type ID

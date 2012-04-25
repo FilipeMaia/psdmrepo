@@ -110,7 +110,7 @@ class CalibFileFinder(object):
         Finds calibration file for given parameter set and returns its name or None.
         First parameter is the data source which can be either string (format is
         "Detector-N|Device-M" or "Detector.N:Device.M") or DetInfo object.
-        dataType is the type of calibration such as "pedestals", "common_mode", etc.
+        *dataType* is the type of calibration such as "pedestals", "common_mode", etc.
         If no file found then None is returned.
         """
         
