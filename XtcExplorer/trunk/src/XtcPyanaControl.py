@@ -9,7 +9,7 @@
 
 """Brief one-line description of the module.
 
-@see XtcExplorerMain.py
+@see XtcPyanaControl.py
 
 @version $Id: template!python!py 4 2011-02-04 16:01:36Z ofte $
 
@@ -44,6 +44,8 @@ import threading
 import multiprocessing as mp
 import subprocess 
 from pyana import pyanamod
+
+import AppUtils.AppDataPath as apputils
 
 #----------------------------------
 # Local non-exported definitions --
@@ -145,8 +147,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
             
+        self.lclsLogo = apputils.AppDataPath("XtcExplorer/icons/lclsLogo.gif")
         self.setWindowTitle('Pyana Control Center')
-        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path()))
 
         print "XtcPyanaControl printing data ", data
             
@@ -212,7 +215,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # header: icon
         h0 = QtGui.QHBoxLayout()
         pic = QtGui.QLabel(self)
-        pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
+        pic.setPixmap( QtGui.QPixmap(self.lclsLogo.path()))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
 
@@ -685,7 +688,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.pvWindow = QtGui.QWidget()
         self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
         self.pvWindow.setWindowTitle('Available Epics PVs')
-        self.pvWindow.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.pvWindow.setWindowIcon(QtGui.QIcon(self.lclsLogo.path()))
         self.pvWindow.setMinimumWidth(300)
         self.pvWindow.setMinimumHeight(700)
 
