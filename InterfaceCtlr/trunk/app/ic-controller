@@ -166,9 +166,11 @@ class Controller ( AppBase ) :
 
                 # re-read configurations
                 self._read_config()
+                
+                activeOnly = self._config.get('active-exp-only', default=False)
 
                 # get the list of filesets being translated
-                filesets = self._db.get_filesets(('PENDING', 'RUN', 'SUSPENDED'), self._controller.instruments)
+                filesets = self._db.get_filesets(('PENDING', 'RUN', 'SUSPENDED'), self._controller.instruments, activeOnly)
                 for fs in filesets:
 
                     # TranslatorJob needs to have non-Null jobid, otherwise it will try to start new job
@@ -189,7 +191,7 @@ class Controller ( AppBase ) :
                 # which we need to find the files on disk
                 
                 # check if there are filesets with Initial_Entry and find files for it
-                filesets = self._db.get_filesets('WAIT_FILES', self._controller.instruments)
+                filesets = self._db.get_filesets('WAIT_FILES', self._controller.instruments, activeOnly)
                 for fs in filesets:
                     # check the files
                     if fs.xtc_files :
@@ -205,7 +207,7 @@ class Controller ( AppBase ) :
                             self._db.change_fileset_status (fs.id, 'WAIT')
 
                 # now try to see if there is a fileset with files
-                filesets = self._db.get_filesets('WAIT', self._controller.instruments)
+                filesets = self._db.get_filesets('WAIT', self._controller.instruments, activeOnly)
                 
                 # We want to limit job submission rate to 1Hz, so if there are jobs to 
                 # submit then submit the first one (with the highest priority) and

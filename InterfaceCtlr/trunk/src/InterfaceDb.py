@@ -408,9 +408,12 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def get_filesets ( self, status, instruments=None, cursor=None ) :
+    def get_filesets ( self, status, instruments=None, activeOnly=True, cursor=None ) :
         """Finds and returns a list of filesets with a given status. 
-        Filesets will be ordered by their priority."""
+        Filesets will be ordered by their priority. If activeOnly is true then
+        filesets from active experiments will be returned, otherwise from all
+        experiments.
+        """
         
         if type(status) in [types.TupleType, types.ListType]:
             statfmt = ",".join(['%s']*len(status))
@@ -420,12 +423,19 @@ class InterfaceDb ( object ) :
             vars = (status,)
         
         # find a matching fileset and lock it for update
-        q = """SELECT fs.id id, fs.experiment, fs.instrument, run_type, run_number, 
-                      stat.name status, tr.id tr_id, tr.jobid, tr.output_dir, fs.priority
-                    FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
-                    fileset_status_def stat, active_exp act
-                    WHERE stat.name IN (%s) AND fs.fk_fileset_status = stat.id 
-                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment""" % statfmt
+        if activeOnly:
+            q = """SELECT fs.id id, fs.experiment, fs.instrument, run_type, run_number, 
+                          stat.name status, tr.id tr_id, tr.jobid, tr.output_dir, fs.priority
+                        FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
+                        fileset_status_def stat, active_exp act
+                        WHERE stat.name IN (%s) AND fs.fk_fileset_status = stat.id 
+                        AND fs.instrument = act.instrument AND fs.experiment = act.experiment""" % statfmt
+        else:
+            q = """SELECT fs.id id, fs.experiment, fs.instrument, run_type, run_number, 
+                          stat.name status, tr.id tr_id, tr.jobid, tr.output_dir, fs.priority
+                        FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
+                        fileset_status_def stat
+                        WHERE stat.name IN (%s) AND fs.fk_fileset_status = stat.id""" % statfmt
         if instruments :
             fmt = ','.join(['%s']*len(instruments))
             q += ' AND fs.instrument IN (%s)' % fmt

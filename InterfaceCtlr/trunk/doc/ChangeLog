@@ -10,6 +10,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-13
+2012-04-27 Andy Salnikov
+- make active experiment optional when selecting datasets from database,
+  by default it selects any experiment but if option "active-exp-only"
+  is set then only active experiments will be translated
+
 Tag: V01-00-12
 2012-02-27 Andy Salnikov
 - changed ic-auto-translate to use regdb for AUTO flag instead of config file
