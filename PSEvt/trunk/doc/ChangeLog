@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2012-04-27 Andy Salnikov
+- replace shared_ptr(new T) with make_shared<T>
+
 Tag: V00-04-01
 2012-01-27 Andy Salnikov
 - Source::parse now can understand old detector names

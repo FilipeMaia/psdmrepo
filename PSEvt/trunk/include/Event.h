@@ -17,6 +17,7 @@
 #include <list>
 #include <typeinfo>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/utility.hpp>
 
 //----------------------
@@ -146,7 +147,7 @@ public:
   template <typename T>
   void put(const boost::shared_ptr<T>& data, const std::string& key=std::string()) 
   {
-    boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
+    boost::shared_ptr<ProxyI> proxyPtr(boost::make_shared<DataProxy<T> >(data) );
     EventKey evKey(&typeid(const T), EventKey::noSource(), key);
     m_dict->put(proxyPtr, evKey);
   }
@@ -163,7 +164,7 @@ public:
            const Pds::Src& source, 
            const std::string& key=std::string()) 
   {
-    boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
+    boost::shared_ptr<ProxyI> proxyPtr(boost::make_shared<DataProxy<T> >(data) );
     EventKey evKey(&typeid(const T), source, key);
     m_dict->put(proxyPtr, evKey);
   }
