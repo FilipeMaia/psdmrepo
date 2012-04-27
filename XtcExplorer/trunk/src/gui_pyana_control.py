@@ -31,6 +31,7 @@ from pyana import pyanamod
 
 import config_pyana as cfg
 import gui_config_panels as panels
+import AppUtils.AppDataPath as apputils
 
 #----------------------------------
 # Local non-exported definitions --
@@ -133,7 +134,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
         self.setWindowTitle('Pyana Control Center')
-        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.lclsLogo = apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
+        self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path()))
 
         # container for information about the data
         self.filenames = data.files
@@ -198,7 +200,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # header: icon
         h0 = QtGui.QHBoxLayout()
         pic = QtGui.QLabel(self)
-        pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
+        pic.setPixmap( QtGui.QPixmap(self.lclsLogo.path()))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
         label = QtGui.QLabel(self)
@@ -673,7 +675,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.pvWindow = QtGui.QWidget()
         self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
         self.pvWindow.setWindowTitle('Available Epics PVs')
-        self.pvWindow.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
+        self.pvWindow.setWindowIcon(QtGui.QIcon(self.lclsLogo.path()))
         self.pvWindow.setMinimumWidth(300)
         self.pvWindow.setMinimumHeight(700)
 
