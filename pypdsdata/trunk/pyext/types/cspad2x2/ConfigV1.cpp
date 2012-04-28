@@ -68,7 +68,7 @@ namespace {
     {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV1QuadReg\n\nReturns :py:class:`ConfigV1QuadReg` object" },
     {"tdi",                 tdi,                 METH_NOARGS, "self.tdi() -> int\n\nReturns test data index" },
     {"protectionThreshold", protectionThreshold, METH_NOARGS,
-        "self.protectionThresholds() -> CsPadProtectionSystemThreshold\n\nReturns CsPadProtectionSystemThreshold object" },
+        "self.protectionThreshold() -> CsPadProtectionSystemThreshold\n\nReturns :py:class:`CsPadProtectionSystemThreshold` object" },
     {"protectionEnable",    protectionEnable,    METH_NOARGS, "self.protectionEnable() -> int\n\nReturns integer number" },
     {"inactiveRunMode",     inactiveRunMode,     METH_NOARGS, "self.inactiveRunMode() -> RunModes enum\n\nReturns :py:class:`ConfigV1.RunModes` enum" },
     {"activeRunMode",       activeRunMode,       METH_NOARGS, "self.activeRunMode() -> RunModes enum\n\nReturns :py:class:`ConfigV1.RunModes` enum" },

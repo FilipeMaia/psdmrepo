@@ -112,13 +112,13 @@ _repr( PyObject *self )
   std::ostringstream str;
   str << "epics.ConfigV1(numPv=" << obj->getNumPv() << ", PvConfigs=[";
   unsigned size = obj->getNumPv();
-  for ( unsigned i = 0; i < size and i < 3; ++ i ) {
+  for ( unsigned i = 0; i < size and i < 256; ++ i ) {
     const Pds::Epics::PvConfigV1* pv = obj->getPvConfig(i);
     if (i) str << ", ";
     str << "(pvId=" << pv->iPvId << ", desc=\"" << pv->sPvDesc
         << "\", interval=" << pv->fInterval << ")";
   }
-  if (size > 3) str << ", ...";
+  if (size > 256) str << ", ...";
   str << "])";
   
   return PyString_FromString(str.str().c_str());

@@ -40,9 +40,9 @@ namespace {
   PyObject* Epics_from_buffer( PyObject*, PyObject* args );
 
   PyMethodDef methods[] = {
-    {"dbr_type_is_TIME", Epics_dbr_type_is_TIME,  METH_VARARGS,  "Returns true for DBR_TIME type IDs." },
-    {"dbr_type_is_CTRL", Epics_dbr_type_is_CTRL,  METH_VARARGS,  "Returns true for DBR_CTRL type IDs." },
-    {"from_buffer", Epics_from_buffer,  METH_VARARGS,  "Build EPICS object from memory buffer." },
+    {"dbr_type_is_TIME", Epics_dbr_type_is_TIME,  METH_VARARGS,  "dbr_type_is_TIME(typeid: int) -> bool\n\nReturns true for DBR_TIME type IDs." },
+    {"dbr_type_is_CTRL", Epics_dbr_type_is_CTRL,  METH_VARARGS,  "dbr_type_is_CTRL(typeid: int) -> bool\n\nReturns true for DBR_CTRL type IDs." },
+    {"from_buffer", Epics_from_buffer,  METH_VARARGS,  "from_buffer(buffer) -> object\n\nBuild EPICS object from memory buffer." },
     {0, 0, 0, 0}
    };
 

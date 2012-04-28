@@ -61,7 +61,7 @@ namespace {
     {"fiducials",       fiducials,      METH_NOARGS,  "self.fiducials() -> int\n\nReturns integer number" },
     {"frame_type",      frame_type,     METH_NOARGS,  "self.frame_type() -> int\n\nReturns integer number" },
     {"sb_temp",         sb_temp,        METH_VARARGS,  "self.sb_temp(i: int) -> int\n\nRetuns integer number, index i in the range (0..3)" },
-    {"next",            next,           METH_VARARGS,  "self.next(cfg: ConfigV*) -> ElementV1\n\nReturns next quadrant element" },
+    {"next",            next,           METH_VARARGS,  "self.next(cfg: ConfigV*) -> ElementV2\n\nReturns next quadrant element" },
     {"data",            data,           METH_VARARGS,  "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns data array for this quadrant" },
     {0, 0, 0, 0}
    };

@@ -60,7 +60,7 @@ namespace {
     { "readoutEventCode",  readoutEventCode,  METH_NOARGS, "self.readoutEventCode() -> int\n\nReturns integer number" },
     { "delayMode",         delayMode,         METH_NOARGS, "self.delayMode() -> int\n\nReturns integer number" },
     { "size",              size,              METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
-    { "frameSize",         frameSize,         METH_NOARGS, "self.height() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
+    { "frameSize",         frameSize,         METH_NOARGS, "self.frameSize() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
     {0, 0, 0, 0}
    };
 

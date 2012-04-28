@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-62
+2012-04-27 Andy Salnikov
+- fixing docstrings in few wrapper classes
+
 Tag: V00-00-61
 2012-04-20 Andy Salnikov
 - upgrade to pdsdata V03-05-03
