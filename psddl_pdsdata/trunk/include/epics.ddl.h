@@ -868,6 +868,53 @@ private:
   Epics::dbr_time_double	_dbr;
   //double	_data[this->numElements()];
 };
+
+/** @class PvConfigV1
+
+  
+*/
+
+#pragma pack(push,4)
+
+class PvConfigV1 {
+public:
+  enum { iMaxPvDescLength = 64 };
+  int16_t pvId() const { return iPvId; }
+  const char* description() const { return sPvDesc; }
+  float interval() const { return fInterval; }
+  static uint32_t _sizeof()  { return ((2+(1*(iMaxPvDescLength)))+2)+4; }
+private:
+  int16_t	iPvId;
+  char	sPvDesc[iMaxPvDescLength];
+  int16_t	_pad0;
+  float	fInterval;
+};
+#pragma pack(pop)
+
+/** @class ConfigV1
+
+  
+*/
+
+#pragma pack(push,4)
+
+class ConfigV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  int32_t numPv() const { return _iNumPv; }
+  const Epics::PvConfigV1& pvControls(uint32_t i0) const { ptrdiff_t offset=4;
+  const Epics::PvConfigV1* memptr = (const Epics::PvConfigV1*)(((const char*)this)+offset);
+  size_t memsize = memptr->_sizeof();
+  return *(const Epics::PvConfigV1*)((const char*)memptr + (i0)*memsize); }
+  uint32_t _sizeof() const { return 4+(Epics::PvConfigV1::_sizeof()*(this->_iNumPv)); }
+  /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */
+  std::vector<int> pvControls_shape() const;
+private:
+  int32_t	_iNumPv;
+  //Epics::PvConfigV1	_pvControls[this->_iNumPv];
+};
+#pragma pack(pop)
 } // namespace Epics
 } // namespace PsddlPds
 #endif // PSDDLPDS_EPICS_DDL_H

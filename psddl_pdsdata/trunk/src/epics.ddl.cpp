@@ -135,5 +135,12 @@ double
 EpicsPvTimeDouble::value(uint32_t i) const {
   return data()[i];
 }
+std::vector<int>
+ConfigV1::pvControls_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(this->_iNumPv);
+  return shape;
+}
 } // namespace Epics
 } // namespace PsddlPds
