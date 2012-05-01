@@ -16,27 +16,15 @@ from os.path import join as pjoin
 from SConsTools.standardExternalPackage import standardExternalPackage
 
 #
-# Find out suffix for boost libs
-#
-libsfxs = { 
-    'g++34' : '-gcc34-mt',
-    'g++-3.4' : '-gcc34-mt',
-    'g++41' : '-gcc41-mt',
-    'g++-4.1' : '-gcc41-mt',
-    'g++' : '-gcc41-mt',
-}
-libsfx = libsfxs.get ( env['CXX'], '' )
-
-#
 # For the standard external packages which contain includes, libraries, 
 # and applications it is usually sufficient to call standardExternalPackage()
 # giving some or all parameters.
 #
 
-boost_ver = "1.36.0"
+boost_ver = "1.49.0"
 
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/boost",boost_ver,env['SIT_ARCH'])
-INCDIR  = "include/boost-1_36/boost"
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/boost", boost_ver+'-python'+env['PYTHON_VERSION'], env['SIT_ARCH'])
+INCDIR  = "include/boost"
 
 # Mother of all other boost packages, this will only link 
 # include directory into release
@@ -47,17 +35,25 @@ del INCDIR
 LIBDIR = "lib"
 
 # boost packages and their dependencies
-pkgs = {'boost_date_time' : 'boost', 
+pkgs = {'boost_chrono' : 'boost',
+        'boost_date_time' : 'boost', 
         'boost_filesystem' : 'boost_system boost', 
+        'boost_graph' : 'boost', 
         'boost_iostreams' : 'boost',
+        'boost_program_options' : 'boost',
+        'boost_python' : 'boost python', 
+        'boost_random' : 'boost',
         'boost_regex' : 'boost',
+        'boost_serialization' : 'boost',
+        'boost_signals' : 'boost',
         'boost_system' : 'boost',
         'boost_thread' : 'boost',
         'boost_unit_test_framework' : 'boost', 
-        'boost_python' : 'boost python', 
+        'boost_wave' : 'boost', 
+        'boost_wserialization' : 'boost', 
         }
 for pkg, dep in pkgs.iteritems() :
     DEPS = dep
-    PKGLIBS = pkg+libsfx
+    PKGLIBS = pkg
     LINKLIBS = 'lib'+PKGLIBS+'*.so*' 
     standardExternalPackage ( pkg, **locals() )
