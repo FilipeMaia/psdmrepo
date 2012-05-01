@@ -124,6 +124,14 @@ public:
     return DataSet<T>::openDataSet ( *m_id, name ) ;
   }
 
+  /**
+   *   Create soft link
+   *
+   *   @param[in] targetPath Path to the link target, can be absolute or relative to this group
+   *   @param[in] linkName   Name of this link, relative to this group
+   */
+  void makeSoftLink(const std::string& targetPath, const std::string& linkName);
+
   // close the group
   void close() ;
 

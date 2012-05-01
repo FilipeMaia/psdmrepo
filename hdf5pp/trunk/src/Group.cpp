@@ -111,6 +111,16 @@ Group::hasChild ( const std::string& name ) const
   return Group(f_id).hasChild(std::string(name, p+1));
 }
 
+// Create soft link
+void
+Group::makeSoftLink(const std::string& targetPath, const std::string& linkName)
+{
+  herr_t err = H5Lcreate_soft(targetPath.c_str(), *m_id, linkName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+  if ( err < 0 ) {
+    throw Hdf5CallException("Group::makeSoftLink", "H5Lcreate_soft");
+  }
+}
+
 // close the group
 void
 Group::close()
