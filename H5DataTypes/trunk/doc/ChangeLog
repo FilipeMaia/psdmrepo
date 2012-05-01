@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-54
+2012-04-12 Andy Salnikov
+- new class EpicsConfigV1 (not likely to be used by translator)
+
 Tag: V00-00-53
 2012-04-12 Andy Salnikov
 - upgrading to pdsdata V03-05-00
