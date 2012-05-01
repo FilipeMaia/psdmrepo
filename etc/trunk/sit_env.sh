@@ -12,8 +12,11 @@
 SIT_ENV="default"; export SIT_ENV
 
 tmp_sh=/tmp/uss-$$.sh
+tmp_sit_root=${SIT_ROOT:-/reg/g/psdm}
 
-/reg/g/psdm/bin/uss.sh -s /reg/g/psdm/etc/sit_env.uss > $tmp_sh
+$tmp_sit_root/bin/uss.sh -s $tmp_sit_root/etc/sit_env.uss > $tmp_sh
 . $tmp_sh
 rm $tmp_sh
+
 unset tmp_sh
+unset tmp_sit_root

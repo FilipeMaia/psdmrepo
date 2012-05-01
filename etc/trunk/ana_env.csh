@@ -12,8 +12,12 @@
 setenv SIT_ENV "ana"
 
 set tmp_sh=/tmp/uss-$$.csh
+set tmp_sit_root='/reg/g/psdm'
+if ( ${?SIT_ROOT} ) set tmp_sit_root=${SIT_ROOT}
 
-/reg/g/psdm/bin/uss.sh -c /reg/g/psdm/etc/sit_env.uss > $tmp_sh
+$tmp_sit_root/bin/uss.sh -c $tmp_sit_root/etc/sit_env.uss > $tmp_sh
 source $tmp_sh
 rm $tmp_sh
+
 unset tmp_sh
+unset tmp_sit_root
