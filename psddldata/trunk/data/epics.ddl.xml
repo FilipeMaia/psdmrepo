@@ -750,5 +750,29 @@
         
 		<!-- ========================================================================= -->
 		
+		<pstype name="PvConfigV1" pack="4">
+
+            <const name="iMaxPvDescLength" value="64"/>
+
+			<attribute name="iPvId" type="int16_t" accessor="pvId"/>
+			<attribute name="sPvDesc" type="char" shape="iMaxPvDescLength" accessor="description" shape_method="None"/>
+			<attribute name="_pad0" type="int16_t"/>			
+			<attribute name="fInterval" type="float" accessor="interval"/>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_EpicsConfig" pack="4">
+
+			<attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
+
+			<attribute name="_pvControls" type="PvConfigV1" shape="{self}._iNumPv" accessor="pvControls"/>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		
 	</package>
 </psddl>
