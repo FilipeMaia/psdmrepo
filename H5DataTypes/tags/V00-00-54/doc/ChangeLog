@@ -1,0 +1,276 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package H5DataTypes
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-54
+2012-04-12 Andy Salnikov
+- new class EpicsConfigV1 (not likely to be used by translator)
+
+Tag: V00-00-53
+2012-04-12 Andy Salnikov
+- upgrading to pdsdata V03-05-00
+- OceanOpticsDataV1 and OceanOpticsConfigV1 implemented, but they may
+  still change so they are not in translator now
+
+Tag: V00-00-52
+2012-03-27 Andy Salnikov
+- upgrading to pdsdata V03-04-01
+- added BldDataEBeamV3
+
+Tag: V00-00-51
+2012-03-14 Andy Salnikov
+- upgrading to pdsdata V03-03-01
+- added TimepixConfigV2
+
+Tag: V00-00-50
+2012-02-17 Andy Salnikov
+- upgrading to pdsdata V03-02-12
+- added TimepixDataV2
+
+Tag: V00-00-49
+2012-02-08 Andy Salnikov
+- renamed CsPadMini classes to CsPad2x2
+
+Tag: V00-00-48
+2012-02-06 Andy Salnikov
+- upgrading to pdsdata V03-02-11
+- renamed CsPadMiniElementV1 to CsPad2x2ElementV1
+- added CsPad2x2ConfigV1
+
+Tag: V00-00-47
+2012-01-12 Andy Salnikov
+- adding TimepixConfigV1 and TimepixDataV1 classes
+
+Tag: V00-00-46
+2011-12-10 Andy Salnikov
+- migration cspad calibration classes to ndarray use
+
+Tag: V00-00-45
+2011-12-08 Andy Salnikov
+- ObjectContainer class now has smarter algorithm for determining 
+  chunk size for dataset and also changing the chunk cache properties
+
+Tag: V00-00-44
+2011-11-11 Andy Salnikov
+- added EncoderConfigV2 class
+- added Gsc16aiConfigV1 and Gsc16aiDataV1 classes
+- started work on FexampConfigV1 and FexampElementV1 but their
+  Pds classes are broken, so pausing until it gets fixed
+
+Tag: V00-00-43
+2011-10-03 Andy Salnikov
+- add protection for creating new dataset when dataset exists already,
+  this is necessary workaround for "multisource" EPICS
+
+Tag: V00-00-42
+2011-09-07 Andy Salnikov
+- removed NBIT compression from ObjectContainer constructor
+- added shuffle compression option to ObjectContainer
+
+Tag: V00-00-41
+2011-09-01 Andy Salnikov
+- refactored CsPadElement stuff, header data now live in separate file
+  CsPadElementHeader
+- added bunch of classes for CsPad::MiniElementV1, both regular data and
+  calibration classes.
+
+Tag: V00-00-40
+2011-08-29 Andy Salnikov
+- adding implementation for BldDataPimV1 class
+- fixed old bug in PulnixTM6740ConfigV1 and PulnixTM6740ConfigV2
+  classes which contained uninitialized data
+- get rid of some *_Data classes, moved data members into the
+  main class
+
+Tag: V00-00-39
+2011-08-22 Andy Salnikov
+- upgrading to pdsdata V02-13-03
+- only Princeton stuff implemented other changes are not in production yet 
+
+Tag: V00-00-38
+2011-06-15 Andy Salnikov
+- upgrading to pdsdata V02-11-05
+
+Tag: V00-00-37
+2011-05-23 Andy Salnikov
+- removed SITConfig include, not useful any more
+
+Tag: V00-00-36
+2011-05-23 Andy Salnikov
+- suppress compilation warning in CsPadPixelStatusV1.cpp
+
+Tag: V00-00-35
+2011-03-08 Andy Salnikov
+- bug fix in CameraFrameV1, dimensions of images were swapped
+
+Tag: V00-00-34
+2011-02-15 Andy Salnikov
+- adding new data type CsPadFilterV1
+
+Tag: V00-00-33
+2011-01-18 Andy Salnikov
+- upgrading to pdsdata V02-10-03
+- enum constant name changed in Acqiris::TdcDataV1::Source
+
+Tag: V00-00-32
+2011-01-05 Andy Salnikov
+- upgrading to pdsdata V02-10-02
+- new classes AcqirisTdcConfigV1 and AcqirisTdcDataV1
+
+Tag: V00-00-31
+2010-12-01 Andy Salnikov
+- upgrading to pdsdata V02-10-00
+- new class EvrConfigV5
+
+Tag: V00-00-30
+2010-11-23 Andy Salnikov
+- upgrading to pdsdata V02-09-02
+- new class BldDataIpimb
+
+Tag: V00-00-29
+2010-11-22 Andy Salnikov
+- adding new data type CsPadCommonModeSubV1
+- extending schema for CsPadElementV1 and CsPadElementV2 to include 
+  separate dataset for common mode data
+
+Tag: V00-00-28
+2010-11-16 Andy Salnikov
+- new class CsPadPixelStatusV1 which stores pixel status bits data from CsPad
+
+Tag: V00-00-27
+2010-11-09 Andy Salnikov
+- new class CsPadPedestalsV1 which stores pedestals data from CsPad
+
+Tag: V00-00-26
+2010-10-14 Andy Salnikov
+- update for pdsdata V02-09-00
+- new class EncoderDataV2
+
+Tag: V00-00-25
+2010-10-05 Andy Salnikov
+- extened IpimbDataV1 to include voltages data which are derived from
+  counts
+
+Tag: V00-00-24
+2010-10-01 Andy Salnikov
+- update for pdsdata V02-08-00
+- new classes CspadConfigV2 and CspadElementV2
+- layout of CspadElementV1 has changed, data is not compatible with the
+  previous version
+
+Tag: V00-00-23
+2010-09-24 Andy Salnikov
+- forgot to set correct dimensions of the member array in LusiIpmFexConfigV1
+
+Tag: V00-00-22
+2010-09-03 Andy Salnikov
+- updated for pdsdata V02-07-00
+- completed cspad implementation
+
+Tag: V00-00-21
+2010-08-11 Andy Salnikov
+- updated for pdsdata V02-06-00
+- lusi package implemented
+- cspad implementation incomplete
+
+Tag: V00-00-20
+2010-06-15 Andy Salnikov
+- updated for pdsdata V02-04-00
+
+Tag: V00-00-19
+2010-06-08 Andy Salnikov
+- updated for pdsdata V02-02-00
+
+Tag: V00-00-18
+2010-05-12 Andy Salnikov
+- replaced Lusi/Lusi.h with SITConfig stuff
+
+Tag: V00-00-17
+2010-05-12 Andy Salnikov
+- changed EvrDataV3 class to use variable length data array
+
+Tag: V00-00-16
+2010-05-12 Andy Salnikov
+- adding more classes for pdsdata V02-00-01
+
+Tag: V00-00-14
+2010-03-24 Andy Salnikov
+- bug fix in AcqirisDataDescV1, waveform type must be signed
+
+Tag: V00-00-13
+2009-12-17 Andy Salnikov
+- update for pdsdata V01-08-00, evr::ConfigV2 has an additional enum value
+
+Tag: V00-00-12
+2009-11-24 Andy Salnikov
+- removed ObjectContainer constructor with implicit type
+- new classes PnCCDConfigV1 and PnCCDFrameV1
+
+Tag: V00-00-11
+2009-11-20 Andy Salnikov
+- new types added corresponding to pdsdata V01-06-00
+
+Tag: V00-00-10
+2009-10-30 Andy Salnikov
+- adding new static method xtcSize() to a bunch of classes,
+  they are used to verify size of the XTC in files
+
+Tag: V00-00-09
+2009-10-28 Andy Salnikov
+- adding couple of new data classes
+  - extracted part of the EvrConfigV1 into separate EvrConfigData to be used
+    by both EvrConfigV1 and EvrConfigV2
+  - new class EvrConfigV2 corresponding to new XTC class
+  - new class BldDataPhaseCavity
+
+Tag: V00-00-08
+2009-10-08 Andy Salnikov
+- EpicsPvHeader: test class for EPICS data (headers only)
+
+Tag: V00-00-07
+2009-10-08 Andy Salnikov
+- ControlDataPVControlV1: fixed types for strings
+
+Tag: V00-00-06
+2009-09-30 Andy Salnikov
+- few more types, need pdsdata-20090930
+
+Tag: V00-00-05
+2009-08-04 Andy Salnikov
+- update for pdsdata-20090722:
+  - added new class PulnixTM6740ConfigV1
+  - renamed members in AcqirisTrigV1
+
+Tag: V00-00-04
+2009-04-22 Andy Salnikov
+- added option to use n-bit compression to ObjectContainer
+
+Tag: V00-00-03
+2009-04-22 Andy Salnikov
+- small refactoring, store() method becomes a static member of the 
+  corresponding classes
+- finished implementation for AcqirisDataDescV1 class
+
+Tag: V00-00-02
+2009-04-10 Andy Salnikov
+- ObjectContainer: allow passing dynamic object type to all operations
+- implemented CameraFrameV1 data
+
+Tag: V00-00-01
+2009-04-07 Andy Salnikov
+- small scale refactoring following changes in hdf5pp TypeTraits 
+
+Tag: V00-00-00
+2009-04-06 Andy Salnikov
+- first import into repository
+- just few types defined
+
