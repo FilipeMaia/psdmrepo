@@ -48,7 +48,7 @@ namespace {
     CalibFile(const fs::path& path) 
       : m_path(path)
     {
-      std::string basename = path.stem();
+      std::string basename = path.stem().string();
       std::string::size_type p = basename.find('-');
       if (p == std::string::npos) { 
         throw std::runtime_error("missing dash in filename: " + path.string());
