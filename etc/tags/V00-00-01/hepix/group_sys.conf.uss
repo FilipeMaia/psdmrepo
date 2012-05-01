@@ -1,0 +1,31 @@
+#!/reg/g/psdm/bin/uss.sh
+###########################################################
+#
+# group_sys.conf.uss
+#
+# description: Environment for LUSI users
+#
+# $Id$
+#
+###########################################################
+
+echo "hepix/group_sys.conf is deprecated, use /reg/g/psdm/etc/sit_env.(c)sh" 1>&2
+
+# LUSI root directory
+test -n "$LUSI_ROOT" || set_env LUSI_ROOT "/reg/g/psdm"
+
+#Set GROUP_DIR if not already set
+test -n "$GROUP_DIR" || set_env GROUP_DIR "${LUSI_ROOT}/etc/hepix"
+
+# Subversion root directory
+test -n "$LUSI_SVN" || set_env LUSI_SVN "svn+ssh://yakut/afs/slac.stanford.edu/g/lusi/svnrepo"
+
+# prepend LUSI dirs to PATH
+prepend_path PATH "${LUSI_ROOT}/bin"
+
+# set alias for sit_setup
+test $uss_mode = "csh" && set_alias sit_setup "source $LUSI_ROOT/bin/sit_setup.csh"
+test $uss_mode = "sh" && set_alias sit_setup ". $LUSI_ROOT/bin/sit_setup.sh"
+
+# source the main script too
+. $LUSI_ROOT/bin/sit_setup.uss

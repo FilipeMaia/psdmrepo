@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# Shell script which runs ic-store-files script
+#
+# $Id$
+#
+
+# release directory
+release=/reg/g/psdm/sw/releases/current
+#release=/reg/neh/home/salnikov/releases/test-0.2.2
+
+# database options
+icdb_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
+
+# config section names to read from database
+config="ic-store-files fm-irods"
+
+# log directory
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+# ===================================================================
+
+usage () {
+  echo "Usage: $(basename $0) [options]"
+  echo "  Options:"
+  echo "    -h        - print this message"
+  echo "    -r path   - release directory, def: $release"
+  echo "    -p path   - PID file path, def: none"
+}
+
+while getopts hr:p: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    r) release="$OPTARG" ;;
+    p) pidfile="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# do not allow world access
+#umask 027
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+log="$logdir/ic-store-files-`hostname`.log"
+exec >> "$log" 2>&1
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "+++ Time: $time Release: $release Config: $config"
+
+# see if there is a "lock" left 
+oldpid=''
+test -n "$pidfile" -a -f "$pidfile" && oldpid=`cat "$pidfile"`
+test -n "$oldpid" -a ! -d /proc/$oldpid || oldpid=''
+
+if [ -z "$oldpid" ] ; then 
+
+    test -n "$pidfile" && echo $$ > "$pidfile"
+
+	# have to be in release directory
+	cd "$release"
+	
+	# run setup script, it should guess everything based on the current directory
+	. /reg/g/psdm/bin/sit_setup.sh
+	
+	# set config options
+	config_opt=""
+	for c in $config ; do
+		config_opt="$config_opt -c $c"
+	done
+	
+	# run it
+    ic-store-files -d "file:${icdb_file}" $config_opt -v
+    status=$?
+
+fi
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "--- Time: $time"
+
+exit $status
