@@ -19,8 +19,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-root_ver = "5.24.00"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/root",root_ver)
+root_ver = "5.30.06"
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/root", root_ver+"-python"+env["PYTHON_VERSION"])
 
 INCDIR = "include/root"
 
