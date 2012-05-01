@@ -164,6 +164,14 @@ MetaDataScanner::levelEnd ( const Pds::Src& src )
 
 }
 
+// visit the data object in configure or begincalibcycle transitions
+void
+MetaDataScanner::configObject(const void* data, size_t size,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+
+}
+
 // visit the data object
 void
 MetaDataScanner::dataObject ( const void* data, size_t size,

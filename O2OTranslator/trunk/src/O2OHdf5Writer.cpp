@@ -527,8 +527,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 //  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // Epics converter, non-default chunk size
-  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", 16*1024, m_compression ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
+  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", m_configStore, 16*1024, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Epics, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 1
@@ -806,21 +806,24 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
   MsgLog( logger, debug, "O2OHdf5Writer::levelEnd " << Pds::Level::name(src.level()) ) ;
 }
 
+// visit the data object in configure or begincalibcycle transitions
+void
+O2OHdf5Writer::configObject(const void* data, size_t size,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // for Configure and BeginCalibCycle transitions store config objects at Source level
+  MsgLog( logger, debug, "O2OHdf5Writer: store config object "
+      << src.top()
+      << " name=" <<  Pds::TypeId::name(typeId.id())
+      << " version=" <<  typeId.version() ) ;
+  m_configStore.store(typeId, src.top(), data, size);
+}
+
 // visit the data object
 void
 O2OHdf5Writer::dataObject ( const void* data, size_t size,
     const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
-  // for Configure and BeginCalibCycle transitions store config objects at Source level
-  if ( ( m_transition == Pds::TransitionId::Configure
-      or m_transition == Pds::TransitionId::BeginCalibCycle )  ) {
-    MsgLog( logger, debug, "O2OHdf5Writer: store config object "
-        << src.top()
-        << " name=" <<  Pds::TypeId::name(typeId.id())
-        << " version=" <<  typeId.version() ) ;
-    m_configStore.store(typeId, src.top(), data, size);
-  }
-  
   // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
   if ( it != m_cvtMap.end() ) {
@@ -839,7 +842,7 @@ O2OHdf5Writer::dataObject ( const void* data, size_t size,
 
     } while ( it != m_cvtMap.end() and it->first == typeId.value() ) ;
 
-  } else {
+  } else if (typeId.id() != Pds::TypeId::Id_EpicsConfig) {
 
     MsgLogRoot( error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
                 << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() ) ;

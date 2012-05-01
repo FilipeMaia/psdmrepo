@@ -95,6 +95,10 @@ public:
   virtual void dataObject ( const void* data, size_t size,
       const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
+  // visit the data object in configure or begincalibcycle transitions
+  virtual void configObject(const void* data, size_t size,
+      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+
 protected:
 
   // Construct a group name

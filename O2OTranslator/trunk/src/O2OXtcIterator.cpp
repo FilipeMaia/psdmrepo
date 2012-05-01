@@ -41,10 +41,11 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-O2OXtcIterator::O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner )
+O2OXtcIterator::O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner, bool config )
   : Pds::XtcIterator( xtc )
   , m_scanner( scanner )
   , m_src()
+  , m_config(config)
 {
 }
 
@@ -102,7 +103,11 @@ O2OXtcIterator::process(Xtc* xtc)
                   << " payload = " << xtc->sizeofPayload()
                   << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
     } else {
-      m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
+      if (m_config) {
+        m_scanner->configObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
+      } else {
+        m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
+      }
     }
 
   } else {

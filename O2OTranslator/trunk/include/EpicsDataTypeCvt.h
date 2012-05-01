@@ -15,7 +15,7 @@
 //-----------------
 #include <string>
 #include <map>
-#include <tr1/tuple>
+#include <utility>
 
 //----------------------
 // Base Class Headers --
@@ -41,6 +41,8 @@
 
 namespace O2OTranslator {
 
+class ConfigObjectStore;
+
 /**
  *  Converter type for EPICS XTC data
  *
@@ -61,6 +63,7 @@ public:
 
   // Default constructor
   EpicsDataTypeCvt ( const std::string& topGroupName,
+                     const ConfigObjectStore& configStore,
                      hsize_t chunk_size,
                      int deflate ) ;
 
@@ -88,8 +91,20 @@ private:
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
 
-  // PV id is: src.log(), src.phy(), epics.pvId
-  typedef std::tr1::tuple<uint32_t, uint32_t, int> PvId;
+  // PV id is: (src, epics.pvId)
+  typedef std::pair<Pds::Src, int> PvId;
+
+  // compare op for PvId
+  struct _PvIdCmp {
+    bool operator()(const PvId& lhs, const PvId& rhs) const {
+      if ( lhs.first.log() < rhs.first.log() ) return true ;
+      if ( lhs.first.log() > rhs.first.log() ) return false ;
+      if ( lhs.first.phy() < rhs.first.phy() ) return true ;
+      if ( lhs.first.phy() > rhs.first.phy() ) return false ;
+      if ( lhs.second < rhs.second ) return true ;
+      return false ;
+    }
+  };
 
   struct _pvdata {
     _pvdata() : timeCont(0), dataCont(0) {}
@@ -103,9 +118,10 @@ private:
   typedef std::map<hdf5pp::Group, PV2Group> Subgroups ;   // maps Src group to (PV id -> Group) mapping
   typedef std::map<hdf5pp::Group, PV2Type> Types ;        // maps Src group to (PV id -> Type) mapping
   typedef std::map<std::string, _pvdata> PVDataMap ;      // maps PV name to containers
-  typedef std::map<PvId, std::string> PVNameMap ;         // maps PV id to its name
+  typedef std::map<PvId, std::string, _PvIdCmp> PVNameMap;// maps PV id to its name
 
   // Data members
+  const ConfigObjectStore& m_configStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
   Subgroups m_subgroups ;  // maps top EPICS group (.../Epics::EpicsPv/EpicsArch.0:NoDevice.0) to PV2Group mapping

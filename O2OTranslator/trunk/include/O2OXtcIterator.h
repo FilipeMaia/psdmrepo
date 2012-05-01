@@ -55,7 +55,7 @@ class O2OXtcIterator : public Pds::XtcIterator {
 public:
 
   // Default constructor
-  O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner ) ;
+  O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner, bool config = false ) ;
 
   // Destructor
   virtual ~O2OXtcIterator () ;
@@ -70,6 +70,7 @@ private:
   // Data members
   O2OXtcScannerI* m_scanner ;
   O2OXtcSrc m_src ;
+  bool m_config;
 
   // Copy constructor and assignment are disabled by default
   O2OXtcIterator ( const O2OXtcIterator& ) ;

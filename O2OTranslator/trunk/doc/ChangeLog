@@ -11,6 +11,24 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-00
+2012-05-01 Andy Salnikov
+- adding support for EPICS aliases
+- datagrams from Configure and BeginCalibCycle contain both config
+  objects and regular data objects (EPICS config and EPICS data),
+  to process data objects one needs to have config object ready,
+  so for these two transitions we do double scan now, once for 
+  config objects, second time for data objects
+- O2OXtcScannerI has new method configObject() which is called on 
+  the first scan, existing method dataObject() is called on second 
+  scan.
+- O2OXtcIterator gets optional parameter in ctor, iif set to true 
+  then it calls scanner::configObject() otherwise scanner::dataObject()
+- O2OHdf5Writer::dataObject() implementation is now split between two 
+  above methods
+- EpicsDataTypeCvt now creates soft links for aliases pointing to the 
+  original PV groups.
+
 Tag: V00-17-06
 2012-03-27 Andy Salnikov
 - upgrading to pdsdata V03-04-01

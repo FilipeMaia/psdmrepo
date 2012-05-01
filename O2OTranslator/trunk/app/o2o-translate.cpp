@@ -262,9 +262,17 @@ O2O_Translate::runApp ()
         O2OXtcScannerI* scanner = *i ;
 
         try {
-          if ( scanner->eventStart ( *dgptr ) ) {    
-              O2OXtcIterator iter( &(dgptr->xtc), scanner );
+          if ( scanner->eventStart ( *dgptr ) ) {
+            Pds::TransitionId::Value trans = dgptr->seq.service();
+            if (trans == Pds::TransitionId::Configure or trans == Pds::TransitionId::BeginCalibCycle) {
+              // For Configure and BeginCalibCycle we make two iterations, on first iteration
+              // scanner's methods configObject() is called for every object
+              O2OXtcIterator iter( &(dgptr->xtc), scanner, true );
               iter.iterate();
+            }
+            // on second iteration normal dataObejct() method is called for this scanner
+            O2OXtcIterator iter( &(dgptr->xtc), scanner );
+            iter.iterate();
           }    
           scanner->eventEnd ( *dgptr ) ;
         } catch ( std::exception& e ) {

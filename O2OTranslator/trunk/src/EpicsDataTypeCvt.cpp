@@ -24,6 +24,8 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/ConfigObjectStore.h"
+#include "pdsdata/epics/ConfigV1.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -45,9 +47,11 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 EpicsDataTypeCvt::EpicsDataTypeCvt ( const std::string& topGroupName,
+                                     const ConfigObjectStore& configStore,
                                      hsize_t chunk_size,
                                      int deflate )
   : EvtDataTypeCvt<Pds::EpicsPvHeader>( topGroupName )
+  , m_configStore(configStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
   , m_subgroups()
@@ -86,11 +90,8 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
     return;
   }
 
-  const Pds::Src& pvSrc = src.top();
-  PvId pvid(pvSrc.log(), pvSrc.phy(), data.iPvId);
-
   // get the name
-  const std::string pvname = pvName(data, pvSrc);
+  const std::string pvname = pvName(data, src.top());
 
   // see if there is a structure setup already for this PV
   PVDataMap::iterator pv_it = m_pvdatamap.find(pvname) ;
@@ -115,9 +116,25 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not subgroup.valid() ) {
     MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
     if (group.hasChild(pvname)) {
+
       subgroup = group.openGroup( pvname ) ;
+
     } else {
+
       subgroup = group.createGroup( pvname ) ;
+
+      // there may be an alias defined for this PV
+      Pds::TypeId typeId(Pds::TypeId::Id_EpicsConfig, 1);
+      if (const Pds::Epics::ConfigV1* ecfg = m_configStore.find<Pds::Epics::ConfigV1>(typeId, src.top())) {
+        for (int i = 0; i != ecfg->getNumPv(); ++ i) {
+          const Pds::Epics::PvConfigV1& pvcfg = *ecfg->getPvConfig(i);
+          if (pvcfg.iPvId == data.iPvId) {
+            group.makeSoftLink(pvname, pvcfg.sPvDesc);
+            break;
+          }
+        }
+      }
+
     }
     m_subgroups[group][pvname] = subgroup ;
   }
@@ -157,7 +174,7 @@ EpicsDataTypeCvt::closeSubgroup( hdf5pp::Group group )
 std::string
 EpicsDataTypeCvt::pvName (const XtcType& data, const Pds::Src& src)
 {
-  PvId pvid(src.log(), src.phy(), data.iPvId);
+  PvId pvid(src, data.iPvId);
 
   std::string name = m_pvnames[pvid] ;
   if ( name.empty() ) {

@@ -68,6 +68,12 @@ public:
                             const Pds::TypeId& typeId, 
                             const O2OXtcSrc& src ) = 0 ;
 
+  // visit the data object in configure or begincalibcycle transitions
+  virtual void configObject(const void* data,
+                            size_t size,
+                            const Pds::TypeId& typeId,
+                            const O2OXtcSrc& src) = 0;
+
 protected:
 
   // Default constructor
