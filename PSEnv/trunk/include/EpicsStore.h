@@ -168,6 +168,11 @@ public:
     m_impl->store(pv, src);
   }
 
+  /// Store alias name for EPICS PV.
+  void storeAlias(const Pds::Src& src, int pvId, const std::string& alias) {
+    m_impl->storeAlias(src, pvId, alias);
+  }
+
   /// Get the list of PV names, all known names are returned.
   std::vector<std::string> pvNames() const 
   {

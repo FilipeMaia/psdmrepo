@@ -72,6 +72,9 @@ public:
   /// Store EPICS PV
   void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src);
   
+  /// Store alias name for EPICS PV.
+  void storeAlias(const Pds::Src& src, int pvId, const std::string& alias);
+
   /// Get the list of PV names
   void pvNames(std::vector<std::string>& pvNames) const ;
 
@@ -134,6 +137,9 @@ protected:
   /// Implementation of the getTime which returns generic pointer
   boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> getTimeImpl(const std::string& name) const;
   
+  /// return PV name for given alias name or empty string if alias not defined
+  std::string alias2pv(const std::string& name) const;
+
 private:
 
   // PV id is: src.log(), src.phy(), epics.pvId
@@ -142,6 +148,9 @@ private:
   /// Type for mapping from PV id to PV name
   typedef std::map<PvId, std::string> ID2Name;
   
+  /// Type for mapping from alias name to PV id
+  typedef std::map<std::string, PvId> Alias2ID;
+
   /// Type for mapping from PV name to EpicsPvCtrl* objects
   typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> > CrtlMap;
 
@@ -149,9 +158,10 @@ private:
   typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> > TimeMap;
   
   // Data members
-  ID2Name m_id2name;  ///< Mapping from PV name to its ID.
-  CrtlMap m_ctrlMap;  ///< Mapping from ID to EPICS object for CTRL objects
-  TimeMap m_timeMap;  ///< Mapping from ID to EPICS object for TIME objects
+  ID2Name m_id2name;  ///< Mapping from PV ID to its name.
+  Alias2ID m_alias2id;  ///< Mapping from alias name to its ID.
+  CrtlMap m_ctrlMap;  ///< Mapping from PV name to EPICS object for CTRL objects
+  TimeMap m_timeMap;  ///< Mapping from PV name to EPICS object for TIME objects
 
 };
 

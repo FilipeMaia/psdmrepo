@@ -49,6 +49,7 @@ namespace PSEnv {
 //----------------
 EpicsStoreImpl::EpicsStoreImpl ()
   : m_id2name()
+  , m_alias2id()
   , m_ctrlMap()
   , m_timeMap()
 {
@@ -102,16 +103,29 @@ EpicsStoreImpl::store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, 
   }
 }
 
+
+/// Store alias name for EPICS PV.
+void
+EpicsStoreImpl::storeAlias(const Pds::Src& src, int pvId, const std::string& alias)
+{
+  m_alias2id[alias] = PvId(src.log(), src.phy(), pvId);
+}
+
+
 /// Get base class object for given EPICS PV name
 boost::shared_ptr<Psana::Epics::EpicsPvHeader> 
 EpicsStoreImpl::getAny(const std::string& name) const 
 {
+  // check for alias
+  std::string pvName = alias2pv(name);
+  if (pvName.empty()) pvName = name;
+
   // try TIME objects first
-  TimeMap::const_iterator time_it = m_timeMap.find(name);
+  TimeMap::const_iterator time_it = m_timeMap.find(pvName);
   if (time_it != m_timeMap.end()) return time_it->second;
 
   // try CTRL objects
-  CrtlMap::const_iterator ctrl_it = m_ctrlMap.find(name);
+  CrtlMap::const_iterator ctrl_it = m_ctrlMap.find(pvName);
   if (ctrl_it != m_ctrlMap.end()) return ctrl_it->second;
   
   return boost::shared_ptr<Psana::Epics::EpicsPvHeader>();
@@ -122,9 +136,12 @@ void
 EpicsStoreImpl::pvNames(std::vector<std::string>& pvNames) const 
 {
   pvNames.clear();
-  pvNames.reserve(m_ctrlMap.size());
+  pvNames.reserve(m_ctrlMap.size() + m_alias2id.size());
   for (ID2Name::const_iterator it = m_id2name.begin(); it != m_id2name.end(); ++ it) {
     pvNames.push_back(it->second);
+  }
+  for (Alias2ID::const_iterator it = m_alias2id.begin(); it != m_alias2id.end(); ++ it) {
+    pvNames.push_back(it->first);
   }
 }
 
@@ -132,7 +149,11 @@ EpicsStoreImpl::pvNames(std::vector<std::string>& pvNames) const
 boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> 
 EpicsStoreImpl::getCtrlImpl(const std::string& name) const
 {
-  CrtlMap::const_iterator pvit = m_ctrlMap.find(name);
+  // check for alias
+  std::string pvName = alias2pv(name);
+  if (pvName.empty()) pvName = name;
+
+  CrtlMap::const_iterator pvit = m_ctrlMap.find(pvName);
   if (pvit == m_ctrlMap.end()) return boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader>();
   return pvit->second;
 }
@@ -141,7 +162,11 @@ EpicsStoreImpl::getCtrlImpl(const std::string& name) const
 boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> 
 EpicsStoreImpl::getTimeImpl(const std::string& name) const
 {
-  TimeMap::const_iterator pvit = m_timeMap.find(name);
+  // check for alias
+  std::string pvName = alias2pv(name);
+  if (pvName.empty()) pvName = name;
+
+  TimeMap::const_iterator pvit = m_timeMap.find(pvName);
   if (pvit == m_timeMap.end()) return boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>();
   return pvit->second;
 }
@@ -150,8 +175,12 @@ EpicsStoreImpl::getTimeImpl(const std::string& name) const
 void
 EpicsStoreImpl::getStatus(const std::string& name, int& status, int& severity, PSTime::Time& time) const 
 {
+  // check for alias
+  std::string pvName = alias2pv(name);
+  if (pvName.empty()) pvName = name;
+
   // try TIME objects first
-  TimeMap::const_iterator time_it = m_timeMap.find(name);
+  TimeMap::const_iterator time_it = m_timeMap.find(pvName);
   if (time_it != m_timeMap.end()) {
     Psana::Epics::EpicsPvTimeHeader* tpv = time_it->second.get();
     status = tpv->status();
@@ -162,7 +191,7 @@ EpicsStoreImpl::getStatus(const std::string& name, int& status, int& severity, P
   }
 
   // try CTRL objects
-  CrtlMap::const_iterator ctrl_it = m_ctrlMap.find(name);
+  CrtlMap::const_iterator ctrl_it = m_ctrlMap.find(pvName);
   if (ctrl_it != m_ctrlMap.end()) {
     Psana::Epics::EpicsPvCtrlHeader* cpv = ctrl_it->second.get();
     status = cpv->status();
@@ -175,5 +204,18 @@ EpicsStoreImpl::getStatus(const std::string& name, int& status, int& severity, P
   throw ExceptionEpicsName(ERR_LOC, name);
 }
 
+/// return PV name for given alias name or empty string if alias not defined
+std::string
+EpicsStoreImpl::alias2pv(const std::string& name) const
+{
+  Alias2ID::const_iterator alias_it = m_alias2id.find(name);
+  if (alias_it != m_alias2id.end()) {
+    // PV name
+    ID2Name::const_iterator id_it = m_id2name.find(alias_it->second);
+    if (id_it != m_id2name.end()) return id_it->second;
+  }
+
+  return std::string();
+}
 
 } // namespace PSEnv
