@@ -664,5 +664,50 @@ const Psana::Epics::dbr_time_double& EpicsPvTimeDouble::dbr() const { return _db
 ndarray<double, 1> EpicsPvTimeDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvTimeDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
+PvConfigV1::PvConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Epics::PvConfigV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+PvConfigV1::~PvConfigV1()
+{
+}
+
+
+int16_t PvConfigV1::pvId() const { return m_xtcObj->pvId(); }
+
+const char* PvConfigV1::description() const { return m_xtcObj->description(); }
+
+float PvConfigV1::interval() const { return m_xtcObj->interval(); }
+ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Epics::ConfigV1()
+  , m_xtcObj(xtcPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->pvControls_shape();
+    _pvControls.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::Epics::PvConfigV1& d = xtcPtr->pvControls(i0);
+      boost::shared_ptr<const PsddlPds::Epics::PvConfigV1> dPtr(m_xtcObj, &d);
+      _pvControls.push_back(psddl_pds2psana::Epics::PvConfigV1(dPtr));
+    }
+  }
+}
+ConfigV1::~ConfigV1()
+{
+}
+
+
+int32_t ConfigV1::numPv() const { return m_xtcObj->numPv(); }
+
+const Psana::Epics::PvConfigV1& ConfigV1::pvControls(uint32_t i0) const { return _pvControls[i0]; }
+std::vector<int> ConfigV1::pvControls_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_pvControls.size());
+  return shape;
+}
+
 } // namespace Epics
 } // namespace psddl_pds2psana

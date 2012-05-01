@@ -204,7 +204,7 @@ namespace {
     boost::shared_ptr<XtcType> xptr(xtc, (XtcType*)(xtc->payload()));
     
     // create and store psana object in epics store
-    boost::shared_ptr<Psana::Epics::EpicsPvHeader> obj(new FinalType(xptr));
+    boost::shared_ptr<Psana::Epics::EpicsPvHeader> obj = boost::make_shared<FinalType>(xptr);
     eStore.store(obj, xtc->src);
   }
 
@@ -374,6 +374,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_CspadCompressedElement:
     break;
+  case Pds::TypeId::Id_EpicsConfig:
+    break;
   case Pds::TypeId::NumberOf:
     break;
 
@@ -529,6 +531,9 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_TimepixData:
     break;
   case Pds::TypeId::Id_CspadCompressedElement:
+    break;
+  case Pds::TypeId::Id_EpicsConfig:
+    if (version == 1) ::storeCfgObject<Epics::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::NumberOf:
     break;

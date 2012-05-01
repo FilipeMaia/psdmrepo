@@ -461,6 +461,37 @@ private:
   Psana::Epics::dbr_time_double _dbr;
 };
 
+
+class PvConfigV1 : public Psana::Epics::PvConfigV1 {
+public:
+  typedef PsddlPds::Epics::PvConfigV1 XtcType;
+  typedef Psana::Epics::PvConfigV1 PsanaType;
+  PvConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~PvConfigV1();
+  virtual int16_t pvId() const;
+  virtual const char* description() const;
+  virtual float interval() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+class ConfigV1 : public Psana::Epics::ConfigV1 {
+public:
+  typedef PsddlPds::Epics::ConfigV1 XtcType;
+  typedef Psana::Epics::ConfigV1 PsanaType;
+  ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV1();
+  virtual int32_t numPv() const;
+  virtual const Psana::Epics::PvConfigV1& pvControls(uint32_t i0) const;
+  virtual std::vector<int> pvControls_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  std::vector< psddl_pds2psana::Epics::PvConfigV1 > _pvControls;
+};
+
 } // namespace Epics
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_EPICS_DDL_H
