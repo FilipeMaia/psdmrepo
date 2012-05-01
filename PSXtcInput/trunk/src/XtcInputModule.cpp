@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "psddl_psana/epics.ddl.h"
 #include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
 #include "PSXtcInput/XtcEventId.h"
@@ -415,7 +416,19 @@ XtcInputModule::fillEnv(const XtcInput::Dgram& dg, Env& env)
         // call the converter which will fill config store
         m_cvt.convertConfig(xptr, env.configStore());
       }
-      
+
+      if (xtc->contains.id() == Pds::TypeId::Id_EpicsConfig) {
+        // need to tell Epics store about aliases
+        boost::shared_ptr<Psana::Epics::ConfigV1> cfgV1 = env.configStore().get(xtc->src);
+        if (cfgV1) {
+          int numPv = cfgV1->numPv();
+          for (int i = 0; i != numPv; ++ i) {
+            const Psana::Epics::PvConfigV1& pvcfg = cfgV1->pvControls(i);
+            env.epicsStore().storeAlias(xtc->src, pvcfg.pvId(), pvcfg.description());
+          }
+        }
+      }
+
     }
       
   }
