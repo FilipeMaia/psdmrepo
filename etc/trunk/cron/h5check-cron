@@ -107,7 +107,6 @@ for job in $jobs; do
     	time=`date +'%Y-%m-%d %H:%M:%S'`
     	echo "... Time: $time Checking file $fname"
     	h5check $fname || status=$?
-    	echo $reqid > "$reqIDfile"
     fi
 done    		
 

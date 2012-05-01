@@ -50,7 +50,7 @@ cd "$release"
 # run setup script, it should guess everything based on the current directory
 . /reg/g/psdm/bin/sit_setup.sh
 
-ic-auto-translate -v -v &
+PYTHONUNBUFFERED=x ic-auto-translate -v -v &
 pid=$!
 
 # store PID
