@@ -779,6 +779,38 @@ public:
   virtual ndarray<double, 1> data() const = 0;
   virtual double value(uint32_t i) const = 0;
 };
+
+/** @class PvConfigV1
+
+  
+*/
+
+
+class PvConfigV1 {
+public:
+  enum { iMaxPvDescLength = 64 };
+  virtual ~PvConfigV1();
+  virtual int16_t pvId() const = 0;
+  virtual const char* description() const = 0;
+  virtual float interval() const = 0;
+};
+
+/** @class ConfigV1
+
+  
+*/
+
+
+class ConfigV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~ConfigV1();
+  virtual int32_t numPv() const = 0;
+  virtual const Epics::PvConfigV1& pvControls(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */
+  virtual std::vector<int> pvControls_shape() const = 0;
+};
 } // namespace Epics
 } // namespace Psana
 #endif // PSANA_EPICS_DDL_H
