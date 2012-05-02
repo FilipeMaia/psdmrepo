@@ -21,13 +21,14 @@ psvn-specific subcommands:
    newpkg    - create directory structure for new package
    export    - extracts code and adds .sit-tag file
    mktxtprop - set svn properties for text-like files
+   tar       - make tarball from a package in repository
 
 EOD
 }
 
 help_() {
   case "$1" in
-    tags|tag|newpkg|export|mktxtprop) help_$1 ;;
+    tags|tag|newpkg|export|mktxtprop|tar) help_$1 ;;
     '') usage ;;
     *) svn help "$@" ;;
   esac
@@ -83,7 +84,7 @@ EOD
 help_mktxtprop() {
   cat << EOD
 
-Usage: `basename $0` [options] mktxtprop file [...]
+Usage: `basename $0` mktxtprop [options] file [...]
 
   Sets SVN properties for specified files: 
      svn:keywords : Author Date Id Revision
@@ -91,6 +92,23 @@ Usage: `basename $0` [options] mktxtprop file [...]
     
   Available options:
     -R    descend recursively
+EOD
+}
+
+help_tar() {
+  cat << EOD
+
+Usage: `basename $0` tar [options] <package> <tag> [<file-name>]
+
+  Extract package from repository and make tarball out of it.
+  If file-name is not specified then top directory name will be
+  used (given with -d option, default is package name) with 
+  added .tar, .tar.gz, or .tar.bz2 extension.
+
+  Available options:
+    -d directory   Tar top-level directory name, default is package name
+    -z             Compress tar file with gzip
+    -j             Compress tar file with bzip2
 EOD
 }
 
@@ -142,7 +160,44 @@ exec_export() {
 }
 
 #
-# Export the package
+# Make tarball
+#
+exec_tar() {
+    
+  dir=""
+  taropt=""
+  ext=".tar"
+  # get the options
+  OPTIND=1
+  while getopts d:zj c ; do
+    case $c in
+      d) dir="$OPTARG" ;;
+      z) taropt="-z"; ext="$ext.gz" ;;
+      j) taropt="-j"; ext="$ext.bz2" ;;
+      \?) help_tar ; exit 2 ;;
+    esac
+  done
+  shift `expr $OPTIND - 1`
+  
+  pkg=${1:?No package name provided}
+  tag=${2:?No tag name provided}
+  dir="${dir:-${pkg}}"
+  tar="${3:-${dir}${ext}}"
+
+  repo="$SIT_SVN/$pkg/tags/$tag"
+  test "$tag" = "HEAD" && repo="$SIT_SVN/$pkg/trunk"
+
+  # make temporary directory
+  tmpdir=${TMPDIR:-${TMP:-/tmp}}/svn-tar-$$
+  mkdir "$tmpdir"
+  svn export "$repo" "$tmpdir/$dir" &&
+     echo "$tag" > "$tmpdir/$dir/.sit-tag" &&
+     tar -c $taropt -C "$tmpdir" -f "$tar" "$dir"
+  rm -rf "$tmpdir"
+}
+
+#
+# Change properties
 #
 exec_mktxtprop() {
 
@@ -223,6 +278,6 @@ esac
 # dispatch
 case "$1" in
   help) shift ; help_ $1 ;;
-  tags|tag|newpkg|export|mktxtprop) c=$1; shift ; exec_$c "$@" ;;
+  tags|tag|newpkg|export|mktxtprop|tar) c=$1; shift ; exec_$c "$@" ;;
   *) svn "$@" ;;
 esac

@@ -151,7 +151,7 @@ fi
 #
 # processor architecture
 #
-if [ -z "$SIT_arch" -a -z "$proc" ] ; then
+if [ -z "$sit_arch" -a -z "$proc" ] ; then
   proc=`uname -p`
   mach=`uname -m`
   # use i686 instead of athlon
@@ -167,33 +167,26 @@ fi
 #
 # OS type
 #
-if [ -z "$SIT_arch" -a -z "$os" ] ; then
+if [ -z "$sit_arch" -a -z "$os" ] ; then
   os=`uname -s`
   if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
     rh=`cat /etc/redhat-release | tr ' ' _`
     case $rh in
-      Scientific_Linux_*_release_4.*)
-        os=slc4
-        ;;
-      Scientific_Linux_*_release_3.*)
-        os=slc3
-        ;;
-      Red_Hat_Enterprise_Linux_*_release_5.*)
-        os=rhel5
-        ;;
+      Scientific_Linux_*_release_4.*)           os=slc4 ;;
+      Scientific_Linux_*_release_3.*)           os=slc3 ;;
+      Red_Hat_Enterprise_Linux_*_release_5.*)   os=rhel5 ;;
+      Red_Hat_Enterprise_Linux_*_release_6.*)   os=rhel6 ;;
     esac
-  fi
-  if [ "$os" = "SunOS" ] ; then
+  elif [ "$os" = "Linux" -a -r /etc/lsb-release ] ; then
+    . /etc/lsb-release
+    if [ "$DISTRIB_ID" = "Ubuntu" ] ; then
+      os=`echo ubu${DISTRIB_RELEASE} | cut -d. -f1`
+    fi
+  elif [ "$os" = "SunOS" ] ; then
     case `uname -r` in
-      5.8) os="sol8" ;;
-      5.9) os="sol9" ;;
+      5.8)  os="sol8" ;;
+      5.9)  os="sol9" ;;
       5.10) os="sol10" ;;
-    esac
-  fi
-  if [ "$os" = "CYGWIN_NT-5.1" ] ; then
-    case `uname -r` in
-      1.5.*) os="cygwin_xp_15" ;;
-      *) os="cygwin_xp" ;;
     esac
   fi
   test -n "$os" || err "Failed to determine OS type"
@@ -204,13 +197,13 @@ fi
 # architectures in the release. If you need something different, 
 # then override it later via SIT_ARCH
 #
-if [ -z "$SIT_arch" -a -z "$comp" ] ; then
+if [ -z "$sit_arch" -a -z "$comp" ] ; then
   pfx="$proc-$os"
   rel="current"
   test "$SIT_RELEASE" = "nobase" || rel="$SIT_RELEASE"
   compilers=`/bin/ls -1 "$SIT_RELDIR/$rel/arch" | grep "$pfx" | cut -d- -f3 | sort -u | tr ' ' ','`
   if [ -z "$compilers" ] ; then
-    warn "OS or processor type ($os/$proc) are not supported in release \"$SIT_RELEASE\""
+    warn "OS or processor type ($os/$proc) are not supported in release \"$rel\""
     compilers="gcc34,gcc41,CC"
   fi
   comp=`set_intersect $options $compilers`
@@ -220,16 +213,16 @@ fi
 #
 # Choose build type/optimization
 #
-if [ -z "$SIT_arch" -a -z "$build" ] ; then
+if [ -z "$sit_arch" -a -z "$build" ] ; then
   build=`set_intersect $options "opt,deb,dbg,prof" | filter_first`
   test -z "$build" && build="opt"
 fi
 
 # define architecture
-if [ -z "$SIT_arch" ] ; then
+if [ -z "$sit_arch" ] ; then
   set_env SIT_ARCH "$proc-$os-$comp-$build"
 else
-  set_env SIT_ARCH "$SIT_arch"
+  set_env SIT_ARCH "$sit_arch"
 fi
 
 # remove all PSDM dirs from PATHs for the moment
