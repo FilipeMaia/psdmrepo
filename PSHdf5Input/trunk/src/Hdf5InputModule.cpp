@@ -47,7 +47,15 @@ namespace PSHdf5Input {
 Hdf5InputModule::Hdf5InputModule (const std::string& name)
   : psana::InputModule(name)
   , m_iter()
+  , m_cvt()
+  , m_skipEvents(0)
+  , m_maxEvents(0)
+  , m_l1Count(0)
 {
+  // get number of events to process/skip from psana configuration
+  ConfigSvc::ConfigSvc cfg;
+  m_skipEvents = cfg.get("psana", "skip-events", 0UL);
+  m_maxEvents = cfg.get("psana", "events", 0UL);
 }
 
 //--------------
@@ -109,24 +117,35 @@ Hdf5InputModule::event(Event& evt, Env& env)
     ret = InputModule::BeginCalibCycle;
     break;
   case Hdf5IterData::Event:
-    fillEventId(data, evt);
-    fillEvent(data, evt);
-    fillEpics(data, env);
-    ret = InputModule::DoEvent;
+    if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
+      ret = InputModule::Stop;
+    } else if (m_l1Count < m_skipEvents) {
+      ret = InputModule::Skip;
+    } else {
+      fillEventId(data, evt);
+      fillEvent(data, evt, env);
+      fillEpics(data, env);
+      ret = InputModule::DoEvent;
+    }
+    ++m_l1Count;
     break;
   case Hdf5IterData::EndCalibCycle:
     fillEventId(data, evt);
+    m_cvt.resetCache();
     ret = InputModule::EndCalibCycle;
     break;
   case Hdf5IterData::EndRun:
     fillEventId(data, evt);
+    m_cvt.resetCache();
     ret = InputModule::EndRun;
     break;
   case Hdf5IterData::UnConfigure:
     fillEventId(data, evt);
+    m_cvt.resetCache();
     ret = InputModule::Skip;
     break;
   case Hdf5IterData::Stop:
+    m_cvt.resetCache();
     ret = InputModule::Stop;
     break;
   }
@@ -145,13 +164,25 @@ void
 Hdf5InputModule::fillConfig(const Hdf5IterData& data, Env& env)
 {
   MsgLog(name(), debug, name() << ": in fillConfig()");
+
+  // call converter for every piece of data
+  const Hdf5IterData::seq_type& pieces = data.data();
+  for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
+    m_cvt.convertConfig(it->group, it->index, env.configStore());
+  }
 }
 
 // Store EPICS data in environment
 void
 Hdf5InputModule::fillEpics(const Hdf5IterData& data, Env& env)
 {
-  MsgLog(name(), debug, name() << ": in fillConfig()");
+  MsgLog(name(), debug, name() << ": in fillEpics()");
+
+  // call converter for every piece of data
+  const Hdf5IterData::seq_type& pieces = data.data();
+  for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
+    m_cvt.convertEpics(it->group, it->index, env.epicsStore());
+  }
 }
 
 // Store event ID object
@@ -167,9 +198,15 @@ Hdf5InputModule::fillEventId(const Hdf5IterData& data, Event& evt)
 
 // Store event data objects
 void
-Hdf5InputModule::fillEvent(const Hdf5IterData& data, Event& evt)
+Hdf5InputModule::fillEvent(const Hdf5IterData& data, Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in fillEvent()");
+
+  // call converter for every piece of data
+  const Hdf5IterData::seq_type& pieces = data.data();
+  for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
+    m_cvt.convert(it->group, it->index, evt, env.configStore());
+  }
 }
 
 } // namespace PSHdf5Input

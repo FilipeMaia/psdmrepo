@@ -60,7 +60,8 @@ public:
   template <typename T>
   static T getAttr(hdf5pp::Group& grp, const std::string& attr, T def = T())
   {
-    if (grp.hasAttr(attr)) return grp.openAttr<T>(attr).read();
+    hdf5pp::Attribute<T> attrObj = grp.openAttr<T>(attr);
+    if (attrObj.valid()) return attrObj.read();
     return def;
   }
 

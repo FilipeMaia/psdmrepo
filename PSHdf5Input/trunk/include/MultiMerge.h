@@ -15,6 +15,8 @@
 //-----------------
 #include <vector>
 #include <iterator>
+#include <algorithm>
+#include <utility>
 
 //----------------------
 // Base Class Headers --
@@ -76,8 +78,12 @@ protected:
   
 private:
 
+  // enum values selected so that std::pair<Status, value_type>(Present, val1)
+  // is always less than std::pair<Status, value_type>(Missing, val2) for any val1 and val2.
+  enum Status { Present = 0, Missing = 1 };
+
   std::vector< std::pair<Iter,Iter> > m_iters;   ///< Set of begin/end iterators
-  std::vector< std::pair<value_type,bool> > m_data;  ///< List of current data objects from each iterator
+  std::vector<std::pair<Status, value_type> > m_data;  ///< List of current data objects from each iterator
 
 };
 
@@ -95,8 +101,8 @@ template <typename Iter>
 void 
 MultiMerge<Iter>::add(Iter begin, Iter end)
 {
-  m_iters.push_back(std::pair<Iter,Iter>(begin, end));
-  m_data.push_back(std::pair<value_type,bool>(value_type(), false));
+  m_iters.push_back(std::pair<Iter, Iter>(begin, end));
+  m_data.push_back(std::pair<Status, value_type>(Missing, value_type()));
   advance(m_iters.size()-1);
 }
 
@@ -107,12 +113,12 @@ MultiMerge<Iter>::advance(size_t i)
 {
   std::pair<Iter,Iter>& iters = m_iters[i];
   if (iters.first != iters.second) {
-    m_data[i].first = *iters.first;
-    m_data[i].second = true;
+    m_data[i].first = Present;
+    m_data[i].second = *iters.first;
     ++ iters.first;
   } else {
-    m_data[i].first = value_type();
-    m_data[i].second = false;
+    m_data[i].first = Missing;
+    m_data[i].second = value_type();
   }
 }
 
@@ -122,32 +128,29 @@ template <typename OutIter>
 bool 
 MultiMerge<Iter>::next(OutIter result)
 {
-  unsigned niter = m_data.size();
-  
-  // find data with the minimum "value"
-  int minidx = -1;
-  for (unsigned i = 0; i < niter; ++ i) {
-    if (m_data[i].second and (minidx < 0 or m_data[i].first < m_data[minidx].first)) {
-      minidx = i;
-    }
-  }
+  // find data with the minimum value
+  typename std::vector<std::pair<Status, value_type> >::const_iterator minIter = 
+          std::min_element(m_data.begin(), m_data.end());
 
   // if minidx is still negative means all iterators are done
-  if (minidx < 0) return false;
+  if (minIter == m_data.end() or minIter->first == Missing) return false;
+
+  // minimum value
+  value_type minval = minIter->second;
 
   // select those data items which compare exactly
+  unsigned niter = m_data.size();
   for (unsigned i = 0; i < niter; ++ i) {
-    if (m_data[i].second and not (m_data[minidx].first < m_data[i].first)) {
+    // there may be multiple items in one stream, get them all
+    using namespace std::rel_ops;
+    while (m_data[i].first == Present and m_data[i].second <= minval) {
       // copy the data to output sink
-      *result = m_data[i].first;
+      *result = m_data[i].second;
       ++ result;
-      // move corresponding iterator forward, but do not advance the one we 
-      // use for comparison, we'll advance it later
-      if (i != unsigned(minidx)) advance(i);
+      // move corresponding iterator forward
+      advance(i);
     }
   }
-  // it is now safe to advance it
-  advance(minidx);
   
   return true;
 }

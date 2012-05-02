@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "psddl_hdf2psana/HdfConverter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -88,12 +89,16 @@ protected:
   void fillEventId(const Hdf5IterData& data, Event& evt);
 
   // Store event data objects
-  void fillEvent(const Hdf5IterData& data, Event& evt);
+  void fillEvent(const Hdf5IterData& data, Event& evt, Env& env);
 
 private:
 
   boost::scoped_ptr<Hdf5FileListIter> m_iter;
-  
+  psddl_hdf2psana::HdfConverter m_cvt;
+  unsigned long m_skipEvents;                         ///< Number of events to skip
+  unsigned long m_maxEvents;                          ///< Number of events to process
+  unsigned long m_l1Count;                            ///< Number of events seen so far
+
 };
 
 } // namespace PSHdf5Input

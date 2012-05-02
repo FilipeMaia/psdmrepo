@@ -104,12 +104,14 @@ Hdf5RunIter::next()
     Hdf5IterData res(Hdf5IterData::BeginCalibCycle);
     hdf5pp::GroupIter giter(grp);
     for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
-      hdf5pp::GroupIter subgiter(grp1);
-      for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-        if (not grp2.hasChild("time")) {
-          res.add(grp2, 0);
+      if (grp1.basename() != "Epics::EpicsPv") {
+        hdf5pp::GroupIter subgiter(grp1);
+        for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
+          if (not grp2.hasChild("time")) {
+            res.add(grp2, 0);
+          }
         }
-      }    
+      }
     }
 
     res.setTime(Hdf5Utils::getTime(m_ccIter->group(), "start"));

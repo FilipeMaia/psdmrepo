@@ -34,8 +34,18 @@ namespace {
 
   const char logger[] = "Hdf5DatasetIter";
 
+
+  // make data type for time dataset
+  hdf5pp::Type initIterDataType()
+  {
+    hdf5pp::CompoundType dataType = hdf5pp::CompoundType::compoundType<PSHdf5Input::Hdf5DatasetIterData>() ;
+    dataType.insert_native<uint32_t>("seconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, sec));
+    dataType.insert_native<uint32_t>("nanoseconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, nsec));
+    return dataType;
+  }
+
   // data type for in-memory data
-  hdf5pp::Type* iterDataType = 0;
+  hdf5pp::Type iterDataType = initIterDataType();
 }
 
 
@@ -52,15 +62,6 @@ Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, Tag tag)
   , m_index(0)
   , m_data()
 {
-  // need to initialize type once
-  // NOTE: this is not thread-safe
-  if (not iterDataType) {
-    hdf5pp::CompoundType dataType = hdf5pp::CompoundType::compoundType<Hdf5DatasetIterData>() ;
-    dataType.insert_native<uint32_t>("seconds", offsetof(Hdf5DatasetIterData, sec));
-    dataType.insert_native<uint32_t>("nanoseconds", offsetof(Hdf5DatasetIterData, nsec));
-    iterDataType = new hdf5pp::Type(dataType);
-  }
-  
   // fill constant part of data object
   m_data.group = grp;
   
@@ -103,7 +104,7 @@ Hdf5DatasetIter::updateData()
   hsize_t count[1] = { 1 };
   m_dsp.select_hyperslab(H5S_SELECT_SET, offset, 0, count, 0);
   
-  m_ds.read(mem_ds, m_dsp, &m_data, *::iterDataType);
+  m_ds.read(mem_ds, m_dsp, &m_data, ::iterDataType);
 }
 
 } // namespace PSHdf5Input
