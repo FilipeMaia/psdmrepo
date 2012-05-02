@@ -207,7 +207,7 @@
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
                 <bitfield name="_bf_isLatch" size="1" type="uint8_t" accessor="isLatch"/>                
@@ -264,24 +264,16 @@
             </enum>
 		
             <attribute name="_v" type="uint32_t" accessor="value">
+                <bitfield name="_bf_source" size="8" type="Source" accessor="source">
+                </bitfield>
+                <bitfield name="_bf_source_id" size="8" type="uint8_t" accessor="source_id">
+                </bitfield>
+                <bitfield name="_bf_conn" size="8" type="Conn" accessor="conn">
+                </bitfield>
+                <bitfield name="_bf_conn_id" size="8" type="uint8_t" accessor="conn_id">
+                </bitfield>
             </attribute>
 
-
-            <method name="source" type="Source">
-                <expr lang="C++" value="Source(_v &amp; 0xff)"/>
-            </method>
-            
-            <method name="source_id" type="uint8_t">
-                <expr lang="C++" value="(_v &gt;&gt; 8) &amp; 0xff"/>
-            </method>
-            
-            <method name="conn" type="Conn">
-                <expr lang="C++" value="Conn((_v &gt;&gt; 16) &amp; 0xff)"/>
-            </method>
-
-            <method name="conn_id" type="uint8_t">
-                <expr lang="C++" value="_v &gt;&gt; 24"/>
-            </method>
 
             <ctor>
                 Default constructor
@@ -298,6 +290,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_EvrConfig">
+		
+			<tag name="config-type"/>
 		
             <attribute name="_npulses" type="uint32_t" accessor="npulses">
             </attribute>
@@ -318,6 +312,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_EvrConfig">
+		
+			<tag name="config-type"/>
 		
 		    <const name="beamOn" value="100"/>
 		    <const name="baseRate" value="40"/>
@@ -373,6 +369,8 @@
 		
 		<pstype name="ConfigV3" version="3" type_id="Id_EvrConfig" pack="4">
 		
+			<tag name="config-type"/>
+		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
 
@@ -397,6 +395,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV4" version="4" type_id="Id_EvrConfig" pack="4">
+		
+			<tag name="config-type"/>
 		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
@@ -499,6 +499,8 @@
 		
 		<pstype name="ConfigV5" version="5" type_id="Id_EvrConfig" pack="4">
 		
+			<tag name="config-type"/>
+		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
 
@@ -597,6 +599,8 @@
         
         <pstype name="IOConfigV1" version="1" type_id="Id_EvrIOConfig" pack="4">
         
+			<tag name="config-type"/>
+		
             <attribute name="_conn" type="uint16_t">
             </attribute>
 

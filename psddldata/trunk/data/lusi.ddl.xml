@@ -11,6 +11,8 @@
 		
 		<pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">
 		
+			<tag name="config-type"/>
+		
             <tag name="value-type"/>
 
 		    <const name="NRANGES" value="3" />
@@ -37,6 +39,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="DiodeFexConfigV2" version="2" type_id="Id_DiodeFexConfig" pack="4">
+		
+			<tag name="config-type"/>
 		
             <tag name="value-type"/>
 
@@ -84,6 +88,8 @@
 
         <pstype name="IpmFexConfigV1" version="1" type_id="Id_IpmFexConfig" pack="4">
         
+			<tag name="config-type"/>
+		
             <const name="NCHANNELS" value="4" />
         
             <attribute name="_diode" type="DiodeFexConfigV1" shape="NCHANNELS" accessor="diode">
@@ -103,6 +109,8 @@
 
         <pstype name="IpmFexConfigV2" version="2" type_id="Id_IpmFexConfig" pack="4">
         
+			<tag name="config-type"/>
+		
             <const name="NCHANNELS" value="4" />
         
             <attribute name="_diode" type="DiodeFexConfigV2" shape="NCHANNELS" accessor="diode">
@@ -153,6 +161,8 @@
 
         <pstype name="PimImageConfigV1" version="1" type_id="Id_PimImageConfig" pack="4">
         
+			<tag name="config-type"/>
+		
             <tag name="value-type"/>
 
             <attribute name="_xscale" type="float" accessor="xscale">

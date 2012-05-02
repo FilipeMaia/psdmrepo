@@ -210,6 +210,8 @@
 		
             Configuration data for complete CsPad device.
         
+			<tag name="config-type"/>
+		
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 

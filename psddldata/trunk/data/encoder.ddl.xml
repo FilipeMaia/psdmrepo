@@ -11,6 +11,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_EncoderConfig">
 		
+			<tag name="config-type"/>
+		
 		    <enum name="count_mode_type">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
@@ -50,6 +52,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_EncoderConfig">
+		
+			<tag name="config-type"/>
 		
 		    <enum name="count_mode_type">
                 <enum-const name="WRAP_FULL"/>

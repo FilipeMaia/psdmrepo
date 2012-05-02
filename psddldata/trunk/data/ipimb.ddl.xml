@@ -23,6 +23,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_IpimbConfig" pack="4">
 		
+			<tag name="config-type"/>
+		
 		    <enum name="CapacitorValue">
 	            <enum-const name="c_1pF" />
 	            <enum-const name="c_100pF" />
@@ -75,7 +77,7 @@
                 nReturns CapacitorValue enum for given channel number (0..3).
                 <tag name="inline"/>
                 <arg name="ch" type="uint32_t"/>
-                <expr lang="C++" value="CapacitorValue((_chargeAmpRange &gt;&gt; (ch*2)) &amp; 0x3)" />
+                <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*2)) &amp; 0x3)" />
             </method>
 
         </pstype>
@@ -84,6 +86,8 @@
 	
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_IpimbConfig" pack="4">
+		
+			<tag name="config-type"/>
 		
 		
 		    <enum name="CapacitorValue">
@@ -149,7 +153,7 @@
                 nReturns CapacitorValue enum for given channel number (0..3).
                 <tag name="inline"/>
                 <arg name="ch" type="uint32_t"/>
-                <expr lang="C++" value="CapacitorValue((_chargeAmpRange &gt;&gt; (ch*4)) &amp; 0xf)" />
+                <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf)" />
             </method>
 
         </pstype>

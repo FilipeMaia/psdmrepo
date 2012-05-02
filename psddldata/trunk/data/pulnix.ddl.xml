@@ -11,6 +11,8 @@
 		
 		<pstype name="TM6740ConfigV1" version="1" type_id="Id_TM6740Config">
 				
+			<tag name="config-type"/>
+		
             <enum name="Depth">
                 <enum-const name="Eight_bit" />
                 <enum-const name="Ten_bit" />
@@ -61,6 +63,8 @@
 		
 		<pstype name="TM6740ConfigV2" version="2" type_id="Id_TM6740Config">
 				
+			<tag name="config-type"/>
+		
             <enum name="Depth">
                 <enum-const name="Eight_bit" />
                 <enum-const name="Ten_bit" />

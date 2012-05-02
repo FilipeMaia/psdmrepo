@@ -167,6 +167,9 @@
         
             Class containing all Acqiris configuration data.
 
+			<tag name="config-type"/>
+		
+		
             <const name="MaxChan" value="20">
             Maximum number of the configured channels.
             </const>
@@ -524,6 +527,8 @@
         
             Class with complete Acqiris TDC configuration. 
 
+			<tag name="config-type"/>
+		
             <const name="NChannels" value="8">
             Total number of channel configurations.
             </const>

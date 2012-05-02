@@ -12,6 +12,8 @@
 		
 		pnCCD configuration class ConfigV1
 		
+			<tag name="config-type"/>
+		
 			<attribute name="_numLinks" type="uint32_t" accessor="numLinks">
 			Number of links in the pnCCD.
 			</attribute>
@@ -29,6 +31,8 @@
 		<pstype name="ConfigV2" version="2" type_id="Id_pnCCDconfig" levels="Source">
 		
         pnCCD configuration class ConfigV2
+		
+			<tag name="config-type"/>
 		
 			<attribute name="_numLinks" type="uint32_t" accessor="numLinks">
             Number of links in the pnCCD.

@@ -39,6 +39,8 @@
 		
 		    This class was never defined/implemented.
 		
+			<tag name="config-type"/>
+		
 		</pstype>
 		
 		<!-- ========================================================================= -->
@@ -46,6 +48,8 @@
 		<pstype name="FrameFexConfigV1" version="1" type_id="Id_FrameFexConfig">
 
             Class containing configuration data for online frame feature extraction process.
+		
+            <tag name="config-type"/>
 		
             <enum name="Forwarding">
                 <enum-const name="NoFrame" />

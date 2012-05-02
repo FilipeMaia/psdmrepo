@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-05-02 Andy Salnikov
+- all config types now have "config-type" type
+- evr.ddl.xml: one field is split into bitfields, neded to generate 
+  constructor for HDF5 data  
+
 Tag: V00-02-04
 2012-05-01 Andy Salnikov
 - new class epics.ConfigV1

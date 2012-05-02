@@ -11,6 +11,8 @@
         
         <pstype name="ConfigV1" version="1" type_id="Id_Gsc16aiConfig" pack="4">
 
+			<tag name="config-type"/>
+		
             <const name="LowestChannel" value="0"/>
             <const name="HighestChannel" value="15"/>
             <const name="LowestFps" value="1"/>

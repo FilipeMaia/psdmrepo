@@ -10,6 +10,8 @@
 	
 		<pstype name="PVControl" pack="4">
 		
+        	<tag name="config-type"/>
+		
             <tag name="value-type"/>
         
 		    <const name="NameSize" value="32">

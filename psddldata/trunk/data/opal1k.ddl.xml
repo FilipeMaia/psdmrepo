@@ -14,6 +14,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_Opal1kConfig">
 		
+			<tag name="config-type"/>
+		
             <enum name="Depth">
             Image bit depth modes.
                 <enum-const name="Eight_bit" />

@@ -11,6 +11,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_PrincetonConfig" pack="4">
 		
+			<tag name="config-type"/>
+		
             <attribute name="_uWidth" type="uint32_t" accessor="width">
             </attribute>
 
@@ -73,6 +75,8 @@
 	
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_PrincetonConfig" pack="4">
+		
+			<tag name="config-type"/>
 		
             <attribute name="_uWidth" type="uint32_t" accessor="width">
             </attribute>

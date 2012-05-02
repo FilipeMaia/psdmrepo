@@ -11,6 +11,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_TimepixConfig" pack="4">
 				
+			<tag name="config-type"/>
+		
             <enum name="ReadoutSpeed">
                 <enum-const name="ReadoutSpeed_Slow" value="0" />
                 <enum-const name="ReadoutSpeed_Fast" value="1" />

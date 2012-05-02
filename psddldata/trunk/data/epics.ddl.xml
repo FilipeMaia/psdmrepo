@@ -765,6 +765,8 @@
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_EpicsConfig" pack="4">
 
+            <tag name="config-type"/>
+
 			<attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
 
 			<attribute name="_pvControls" type="PvConfigV1" shape="{self}._iNumPv" accessor="pvControls"/>

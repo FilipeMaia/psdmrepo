@@ -11,6 +11,8 @@
 		
 		<pstype name="FccdConfigV1" version="1" type_id="Id_FccdConfig">
 		
+			<tag name="config-type"/>
+		
             <enum name="Depth">
                 <enum-const name="Sixteen_bit" value="16" />
             </enum>
@@ -51,6 +53,8 @@
 	
 		
 		<pstype name="FccdConfigV2" version="2" type_id="Id_FccdConfig" pack="4">
+		
+			<tag name="config-type"/>
 		
             <enum name="Depth">
                 <enum-const name="Eight_bit" value="8" />
