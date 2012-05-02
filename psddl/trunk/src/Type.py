@@ -84,6 +84,8 @@ class Type ( Namespace ) :
 
         self.ctors = []   # constructors
 
+        self.h5schemas = []    # list of hdf schemas for this type.
+
     @property
     def basic(self):
         return 'basic' in self.tags
@@ -102,7 +104,7 @@ class Type ( Namespace ) :
     @property
     def external(self):
         if 'external' in self.tags : return True
-        if self._parent: return self._parent.external
+        if self.parent: return self.parent.external
         return False
 
     @property
@@ -114,8 +116,8 @@ class Type ( Namespace ) :
         sep = {'C++' : '::'}.get(lang, '.')
         name = self.name
         if lang == 'C++' and 'c++-name' in self.tags: name = self.tags['c++-name']
-        if self._parent: 
-            parent = self._parent.fullName(lang, topNs)
+        if self.parent: 
+            parent = self.parent.fullName(lang, topNs)
             if parent: 
                 name = parent + sep + name
             elif topNs:

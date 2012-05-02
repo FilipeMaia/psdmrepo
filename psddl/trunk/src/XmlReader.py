@@ -51,6 +51,9 @@ from psddl.Method import Method
 from psddl.Namespace import Namespace
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.H5Type import H5Type
+from psddl.H5Dataset import H5Dataset
+from psddl.H5Attribute import H5Attribute
 
 #----------------------------------
 # Local non-exported definitions --
@@ -69,6 +72,15 @@ def _cmpFiles(f1, f2):
     c1 = file(f1).read()
     c2 = file(f2).read()
     return c1 == c2
+
+def _setTag(obj, tagelem):
+    """Add tag to object"""
+    
+    # every tag must have a name
+    tagname = tagelem.get('name')
+    if not tagname: raise ValueError('tag element missing name')
+
+    obj.tags[tagname] = tagelem.get('value')
 
 #---------------------
 #  Class definition --
@@ -205,6 +217,10 @@ class XmlReader ( object ) :
 
                 self._parseType(subpkgel, pkg, included)
 
+            elif subpkgel.tag == 'h5schema' :
+
+                self._parseH5Type(subpkgel, pkg, included)
+
             elif subpkgel.tag == _const_tag :
 
                 self._parseConstant(subpkgel, pkg, included)
@@ -285,16 +301,92 @@ class XmlReader ( object ) :
                 
             elif propel.tag == 'tag' :
 
-                # every tag must have a name
-                tagname = propel.get('name')
-                if not tagname: raise ValueError('tag element missing name')
+                _setTag(type, propel)
 
-                type.tags[tagname] = propel.get('value')
 
-                
         # calculate offsets for the data members
         type.calcOffsets()
     
+
+    def _parseH5Type(self, typeel, pkg, included):
+        """Method which parses definition of h5schema"""
+
+        # every type must have a name
+        schemaname = typeel.get('name')
+        if not schemaname: raise ValueError('h5schema element missing name')
+
+        # find corresponding pstype
+        pstype = pkg.lookup(schemaname, Type)
+        if not pstype: raise ValueError('h5schema element: cannot find pstype '+schemaname)
+
+        # make new type object
+        type = H5Type(schemaname,
+                      package = pkg,
+                      pstype = pstype,
+                      version = typeel.get('version'),
+                      included = included,
+                      location = self.location[-1] )
+        pstype.h5schemas.append(type)
+
+        # loop over sub-elements
+        for propel in list(typeel) :
+
+            if propel.tag == "dataset" :
+                
+                self._parseH5Dataset(propel, type, pstype)
+                                
+            elif propel.tag == 'tag' :
+
+                _setTag(type, propel)
+
+                
+    def _parseH5Dataset(self, dselem, h5type, pstype):
+        """Method which parses definition of h5 dataset"""
+
+        # dataset must have a name
+        dsname = dselem.get('name')
+        if not dsname: raise ValueError('h5 dataset element missing name')
+
+        # make dataset
+        ds = H5Dataset(name = dsname)
+        h5type.datasets.append(ds)
+
+        # loop over sub-elements
+        for propel in list(dselem) :
+
+            if propel.tag == "attribute" :
+                
+                self._parseH5Attribute(propel, ds, pstype)
+                                
+            elif propel.tag == 'tag' :
+
+                _setTag(ds, propel)
+
+    def _parseH5Attribute(self, elem, ds, pstype):
+        """Method which parses definition of h5 attribute"""
+
+        # attribute must have a name
+        aname = elem.get('name')
+        if not aname: raise ValueError('h5 attribute element is missing name')
+
+        atype = elem.get('type')
+        if atype:
+            atype = pstype.lookup(atype, Type)
+            if not atype: raise ValueError('attribute element has unknown type '+attrel.get('type'))
+
+        # make attribute
+        attr = H5Attribute(name = aname, 
+                           type = atype,
+                           method = elem.get('method'),
+                           rank = elem.get('rank'))
+        ds.attributes.append(attr)
+
+        # loop over sub-elements
+        for propel in list(elem) :
+
+            if propel.tag == 'tag' :
+
+                _setTag(attr, propel)
 
     def _parseAttr(self, attrel, type):
     
@@ -328,10 +420,13 @@ class XmlReader ( object ) :
         # accessor method for it
         accessor = attrel.get('accessor')
         if accessor :
+            rank = 0
+            if attr.shape: rank = len(attr.shape.dims)
             method = Method(accessor, 
                             attribute = attr, 
                             parent = type, 
                             type = atype,
+                            rank = rank,
                             comment = attr.comment)
             attr.accessor = method
             logging.debug("XmlReader._parseAttr: new method: %s", method)

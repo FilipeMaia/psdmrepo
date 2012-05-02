@@ -64,6 +64,7 @@ class Bitfield ( object ) :
         self.type = kw.get('type')
         self.parent = kw.get('parent')
         self.comment = kw.get('comment')
+        self.accessor = kw.get('accessor')
 
         self.parent.bitfields.append(self)
 

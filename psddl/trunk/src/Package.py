@@ -82,7 +82,7 @@ class Package ( Namespace ) :
     @property
     def external(self):
         if 'external' in self.tags : return True
-        if self._parent: return self._parent.external
+        if self.parent: return self.parent.external
         return False
     
     def fullName(self, lang=None, topNs=None):
@@ -90,8 +90,8 @@ class Package ( Namespace ) :
         sep = {'C++' : '::'}.get(lang, '.')
         name = self.name
         if lang == 'C++' and 'c++-name' in self.tags: name = self.tags['c++-name']
-        if self._parent: 
-            parent = self._parent.fullName(lang, topNs)
+        if self.parent: 
+            parent = self.parent.fullName(lang, topNs)
             if parent: 
                 name = parent + sep + name
             elif topNs:

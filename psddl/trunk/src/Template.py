@@ -12,8 +12,6 @@
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
-
 @version $Id$
 
 @author Andy Salnikov
@@ -55,7 +53,26 @@ import string
 #  Class definition --
 #---------------------
 class Template(string.Template) :
+    """
+    Wrapper class for string.Template, it adds two methods to Template class
+    which simplify code calling Template.substitute() method. The first method
+    is __call__() which makes template instance callable; this method is 
+    equivalent to substitute() and provides shorter notation::
+    
+      res = Template("$name -> $code")(name=name, code=code)
+      res = Template("$name -> $code")({'name': name, 'code': code})
+      
+    Second method uses indexing notation to simplify substitution based on 
+    object attributes::
 
+      res = Template("$name -> $code")[object]
+      
+    In this case object must have attributes *name* and *code*. This is 
+    equivalent to:
+
+      res = Template("$name -> $code").substitute(object.__dict__)
+      
+    """
 
     #----------------
     #  Constructor --
@@ -68,10 +85,20 @@ class Template(string.Template) :
     #-------------------
 
     def __call__(self, *args, **kws) :
+        """
+        self(*args, **kwargs) -> string
+        
+        Shorthand for substitute(*args, **kwargs), see string.Template documentation.
+        """
         return self.substitute(*args, **kws)
 
     def __getitem__(self, obj) :
-        """Support for template[object]"""
+        """
+        self[object] -> string
+        
+        Object must have attributes with names identical to identifiers
+        used in template string.
+        """
         return self.substitute(obj.__dict__)
 
 #

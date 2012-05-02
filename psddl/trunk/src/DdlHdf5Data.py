@@ -43,10 +43,33 @@ from psddl.Attribute import Attribute
 from psddl.Enum import Enum
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.H5Type import H5Type
+from psddl.H5Dataset import H5Dataset
+from psddl.H5Attribute import H5Attribute
+from psddl.Template import Template as T
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+def _interpolate(expr, typeobj):
+    
+    expr = expr.replace('{xtc-config}', 'cfg')
+    expr = expr.replace('{type}.', typeobj.name+"::")
+    expr = expr.replace('{self}.', "this->")
+    return expr
+
+def _typename(type):
+    
+    return type.fullName('C++')
+
+def _typedecl(type):
+    typename = _typename(type)
+    if not type.basic : typename = "const "+typename+'&'
+    return typename
+
+def _argdecl(name, type):    
+    return _typedecl(type) + ' ' + name
 
 #------------------------
 # Exported definitions --
@@ -70,6 +93,8 @@ class DdlHdf5Data ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
+        self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
+        self.psana_ns = backend_options.get('psana-ns', "Psana")
 
         #include guard
         g = os.path.split(self.incname)[1]
@@ -94,13 +119,18 @@ class DdlHdf5Data ( object ) :
         print >>self.inc, msg
         print >>self.cpp, msg
 
-        # add necessary includes
-        print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
-        print >>self.inc, "#include <vector>"
-        print >>self.inc, "#include <cstddef>\n"
-
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
-        print >>self.cpp, "#include \"%s\"\n" % inc
+        print >>self.cpp, "#include \"%s\"" % inc
+        inc = os.path.join(self.psana_inc, os.path.basename(self.incname))
+        print >>self.inc, "#include \"%s\"" % inc
+
+        # add necessary includes
+        print >>self.inc, "#include \"hdf5pp/Group.h\""
+        print >>self.inc, "#include \"hdf5pp/Type.h\""
+        print >>self.cpp, "#include \"hdf5pp/CompoundType.h\""
+        print >>self.cpp, "#include \"hdf5pp/EnumType.h\""
+        print >>self.cpp, "#include \"hdf5pp/Utils.h\""
+
 
         # headers for other included packages
         for use in model.use:
@@ -194,70 +224,319 @@ class DdlHdf5Data ( object ) :
         # skip included types
         if type.included : return
 
+        if not type.h5schemas:
+            type.h5schemas = [self._defaultSchema(type)]
+
         for schema in type.h5schemas:
             self._genSchema(type, schema)
+
+        # make factory method
+        psanatypename = type.fullName('C++', self.psana_ns)
+        typename = type.name
+        print >>self.inc, T("boost::shared_ptr<$psanatypename> make_$typename(int version, hdf5pp::Group group, hsize_t idx);")(locals())
+        print >>self.cpp, T("boost::shared_ptr<$psanatypename> make_$typename(int version, hdf5pp::Group group, hsize_t idx) {")(locals())
+        print >>self.cpp, "  switch (version) {"
+        for schema in type.h5schemas:
+            print >>self.cpp, T("  case $version: return boost::make_shared<${name}_v${version}>(group, idx);")[schema]
+        print >>self.cpp, T("  default: return boost::shared_ptr<$psanatypename>();")(locals())
+        print >>self.cpp, "  }\n}"
 
 
     def _genSchema(self, type, schema):
 
-        # find schema version
-        schemaVersion = 1
-        if schema: schemaVersion = schema.version
+        logging.debug("_genSchema: %s", repr(schema))
+
+        for ds in schema.datasets:
+            # generate datasets classes
+            self._genDs(ds, schema)
             
-        className = "%s_s%s" % (type.name, schemaVersion)
+        if not type.value_type :
+            self._genAbsType(type, schema)
+        else:
+            self._genValueType(type, schema)
             
-        # class-level comment
-        print >>self.inc, "\n/** @class %s\n\n  %s\n*/\n" % (className, type.comment)
 
-        # declare config classes if needed
-        for cfg in type.xtcConfig:
-            print >>self.inc, "class %s;" % cfg.name
+    def _genDs(self, ds, schema):
 
-        # base class
-        base = ""
-        if type.base : base = ": public %s" % type.base.name
+        logging.debug("_genDs: %s", repr(ds))
+        
+        logging.debug("_genDs: schema %s", schema)
+
+        ns = T("ns_${name}_v${version}")[schema]
+        dsClassName = T("dataset_${name}")[ds]
+
+        print >>self.inc, "\nnamespace %s {" % ns
+        
+        print >>self.inc, "struct %s {" % dsClassName
+
+        self._genH5TypeFunc(ds, ns, dsClassName, "stored")
+        self._genH5TypeFunc(ds, ns, dsClassName, "native")
+
+        for attr in ds.attributes:
+            if attr.type.basic:
+                name = attr.name
+                if isinstance(attr.type, Enum):
+                    attr_type_name = "int32_t"
+                else:
+                    attr_type_name = attr.type.name
+                print >>self.inc, T("  $type $name;")(type=attr_type_name, name=attr.name)
+
+        print >>self.inc, "}; // class %s" % dsClassName
+        
+        print >>self.inc, "} // namespace %s" % ns
 
 
-        # start class declaration
-        print >>self.inc, "\nclass %s%s {" % (type.name, base)
-        print >>self.inc, "public:"
+    def _genH5TypeFunc(self, ds, ns, className, func):
+        """
+        Generate native_type()/stored_type() static method for dataset class.
+        """
 
-        # enums for version and typeId
-        if type.version is not None: 
-            doc = '/**< XTC type version number */'
-            print >>self.inc, "  enum {\n    Version = %s %s\n  };" % (type.version, doc)
-        if type.type_id is not None: 
-            doc = '/**< XTC type ID value (from Pds::TypeId class) */'
-            print >>self.inc, "  enum {\n    TypeId = Pds::TypeId::%s %s\n  };" % (type.type_id, doc)
+        print >>self.inc, T("  static hdf5pp::Type ${func}_type();")(locals())
 
-        # enums for constants
-        for const in type.constants() :
-            self._genConst(const)
+        print >>self.cpp, T("\nhdf5pp::Type ${ns}_${className}_${func}_type()\n{")(locals())
+        print >>self.cpp, T("  typedef $ns::$className DsType;")(locals())
+        print >>self.cpp, "  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>() ;"
+        for attr in ds.attributes:
+            self._genH5TypeFuncAttr(attr, func);
+        print >>self.cpp, "  return type;\n}"
 
-        # regular enums
-        for enum in type.enums() :
-            self._genEnum(enum)
+        print >>self.cpp, T("\nhdf5pp::Type ${ns}::${className}::${func}_type()\n{")(locals())
+        print >>self.cpp, T("  static hdf5pp::Type type = ${ns}_${className}_${func}_type();")(locals())
+        print >>self.cpp, "  return type;\n}"
 
-        # generate method declaration for public members without accessors
-        for attr in type.attributes() :
-            if attr.access == "public" and attr.accessor is None:
-                self._genPubAttrMethod(attr)
+    def _genH5TypeFuncAttr(self, attr, func):
 
-        # generate declaration for public methods only
-        pub_meth = [meth for meth in type.methods() if meth.access == "public"]
-        for meth in pub_meth: 
-            self._genMethDecl(meth)
+        if attr.type.basic:
+            name = attr.name
+            if isinstance(attr.type, Enum):
+                base_type = "int32_t"
+                enum_type = T("${name}_enum")(locals())
+                print >>self.cpp, T('  hdf5pp::EnumType<$base_type> $enum_type = hdf5pp::EnumType<$base_type>::enumType();')(locals())
+                for c in attr.type.constants():
+                    # take enum values from psana
+                    ename = c.name
+                    type_name = attr.type.parent.fullName('C++', self.psana_ns)
+                    print >>self.cpp, T('  $enum_type.insert("$ename", $type_name::$ename);')(locals())
+                print >>self.cpp, T('  type.insert("$name", offsetof(DsType, $name), $enum_type);')(locals())
+            else:
+                type_name = attr.type.name
+                print >>self.cpp, T('  type.insert_$func<$type_name>("$name", offsetof(DsType, $name));')(locals())
 
-        # generate _shape() methods for array attributes
-        for attr in type.attributes() :
-            self._genAttrShapeDecl(attr)
 
-        # data members
-        for attr in type.attributes() :
-            self._genAttrDecl(attr)
+    def _genAbsType(self, type, schema):
+        
+        def _types(type):
+            """Generator for the type list of the given type plus all it bases"""
+            if type.base:
+                for t in _types(type.base): yield t
+            yield type
+        
+        logging.debug("_genAbsType: type=%s", repr(type))
+
+        className = T("${name}_v${version}")[schema]
+        psanatypename = type.fullName('C++', self.psana_ns)
+
+        print >>self.inc, T("\nclass $className : public $psanatypename {\npublic:")(locals())
+
+        print >>self.inc, T("  typedef $psanatypename PsanaType;")(locals())
+        
+        # constructor
+        print >>self.inc, T("  $className(hdf5pp::Group group, hsize_t idx)")(locals())
+        print >>self.inc, "    : m_group(group), m_idx(idx) {}"
+        
+        # destructor
+        print >>self.inc, T("  virtual ~$className();")(locals())
+        print >>self.cpp, T("$className::~$className()\n{\n}\n")(locals())
+
+        # declarations for public methods 
+        for t in _types(type):
+            for meth in t.methods(): 
+                if meth.access == 'public': self._genMethod(meth, type, schema, className)
+
+        print >>self.inc, "private:"
+
+        print >>self.inc, "  mutable hdf5pp::Group m_group;"
+        print >>self.inc, "  hsize_t m_idx;"
+
+        for ds in schema.datasets:
+            dsClassName = T("ns_${name}_v${version}")[schema] + T("::dataset_${name}")[ds]
+            dsName = ds.name
+            print >>self.inc, T("  mutable boost::shared_ptr<$dsClassName> m_ds_$dsName;")(locals())
+            print >>self.inc, T("  void read_ds_$dsName() const;")(locals())
+            print >>self.cpp, T("void $className::read_ds_$dsName() const {")(locals())
+            print >>self.cpp, T("  m_ds_$dsName = hdf5pp::Utils::readGroup<$dsClassName>(m_group, \"$dsName\", m_idx);")(locals())
+            print >>self.cpp, "}"
+        
 
         # close class declaration
-        print >>self.inc, "};"
+        print >>self.inc, "};\n"
+
+
+    def _genMethod(self, meth, type, schema, className):
+        """Generate method declaration and definition"""
+
+        def _method2ds(method, schema):
+            for ds in schema.datasets:
+                for attr in ds.attributes:
+                    if attr.method == meth.name:
+                        return (ds, attr)
+            return (None, None)
+
+
+        if meth.name == "_sizeof" : return
+
+        logging.debug("_genMethod: meth: %s", meth)
+        
+
+        ds, attr = _method2ds(meth, schema)
+
+        if attr :
+            
+            # data is stored in a dataset
+            args = []
+            ret_type = attr.type.fullName('C++', self.psana_ns)
+            if attr.rank:
+                if attr.type.name == 'char':
+                    ret_type = "const char*"
+                    args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
+                else:
+                    ret_type = T("ndarray<$type, $rank>")(type=rettype, rank=len(attr.shape.dims))
+            
+            meth_name = meth.name
+            print >>self.inc, T("  virtual $ret_type $meth_name() const;")(locals())
+            print >>self.cpp, T("$ret_type $className::$meth_name() const {")(locals())
+            print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
+            print >>self.cpp, T("  return m_ds_$name->$attr_name;")(name=ds.name, attr_name=attr.name)
+            print >>self.cpp, "}"
+
+            
+        else:
+            
+            # data is not stored, if method defines body then use it, otherwise skip
+            # definition but declare it anyway
+            
+            # if no type given then it does not return anything
+            type = meth.type
+            if type is None:
+                type = "void"
+            else:
+                type = type.fullName('C++', self.psana_ns)
+                if meth.rank > 0:
+                    type = "ndarray<%s, %d>" % (type, meth.rank)
+
+            # make method body
+            body = meth.code.get("C++")
+            if not body : body = meth.code.get("Any")
+            if not body :
+                expr = meth.expr.get("C++")
+                if not expr : expr = meth.expr.get("Any")
+                if expr:
+                    body = expr
+                    if type: body = "return %s;" % expr
+                
+            # config objects may be needed 
+            cfgNeeded = False
+            if body: 
+                cfgNeeded = body.find('{xtc-config}') >= 0
+                body = _interpolate(body, meth.parent)
+
+            # default is not inline, can change with a tag
+            inline = 'inline' in meth.tags
+            
+            configs = [None]
+            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
+            for cfg in configs:
+
+                args = []
+                if cfg: args = [('cfg', cfg)]
+                args += meth.args
+
+                self._genMethodBody(meth.name, type, body, args, inline, static=meth.static, doc=meth.comment)
+
+    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
+        """ Generate method, both declaration and definition, given the body of the method"""
+        
+        # make argument list
+        argsspec = ', '.join([_argdecl(*arg) for arg in args])
+
+        if static:
+            static = "static "
+            const = ""
+        else:
+            static = ""
+            const = "const"
+        
+
+        if doc: print >>self.inc, T('  /** $doc */')(locals())
+
+        if not body:
+
+            # declaration only, implementation provided somewhere else
+            print >>self.inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
+
+        elif inline:
+            
+            # inline method
+            print >>self.inc, T("  $static$rettype $methname($argsspec) $const { $body }")(locals())
+        
+        else:
+            
+            # out-of-line method
+            classname = self._type.name
+            print >>self.inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
+            print >>self.cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
+
+
+    def _defaultSchema(self, type):
+        """Generate default schema for a types from type itself"""
+
+        logging.debug("_defaultSchema: type=%s", type)
+
+        # get a list of all public methods which are accessors to attributes or bitfields or take no arguments
+        methods = [ meth for meth in type.methods() 
+                   if meth.access == "public" and meth.name != '_sizeof' and 
+                   (meth.attribute is not None or meth.bitfield is not None or not meth.args)]
+        
+        schema = H5Type(type.name, package=type.package, pstype=type, version=0, included=type.included)
+        
+        # all non-array attributes of basic types will go into separate dataset
+        ds = None
+        for meth in methods:
+            if meth.rank == 0 and meth.type.basic:
+                if not ds:
+                    dsname = 'data'
+                    if "config-type" in type.tags: dsname = 'config' 
+                    ds = H5Dataset(name=dsname, pstype=type)
+                    schema.datasets.append(ds)
+                attr = H5Attribute(name=meth.name, type=meth.type, rank=0, method=meth.name)
+                ds.attributes.append(attr)
+        if ds: logging.debug("_defaultSchema: scalars dataset: %s", ds)
+
+        # for non-array attributes of user-defined types create individual datasets
+        for meth in methods:
+            if meth.rank == 0 and not meth.type.basic:
+                # get/make that type schema
+                if not meth.type.h5schemas:
+                    meth.type.h5schemas = [self._defaultSchema(meth.type)]
+                # find its schema v0
+                mschema = [s for s in meth.type.h5schemas if s.version == 0]
+                if not mschema: raise ValueError("cannot find schema V0 for type "+meth.type.name)
+                mschema = mschema[0]
+                if ds: logging.debug("_defaultSchema: sub-typedataset: %s", mschema)
+                if len(mschema.datasets) != 1: raise ValueError("schema for sub-type "+type.name+"."+meth.type.name+" contains more than 1 dataset")
+                # copy it into this schema
+                schema.datasets.append(mschema.datasets[0])
+
+        # for array attributes create individual datasets
+        for meth in methods:
+            if meth.rank > 0:
+                ds = H5Dataset(name=meth.name)
+                schema.datasets.append(ds)
+                attr = H5Attribute(name=meth.name, parent=ds, type=meth.type, rank=0, method=meth.name)
+                ds.attributes.append(attr)
+
+        return schema
+
 
     #--------------------
     #  Private methods --

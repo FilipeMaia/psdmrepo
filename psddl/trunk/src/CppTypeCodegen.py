@@ -499,10 +499,18 @@ class CppTypeCodegen ( object ) :
             if 'auto' in ctor.tags:
                 # make one argument per type attribute
                 for attr in self._type.attributes():
-                    name = "arg_"+attr.name
-                    type = attr.type
-                    dest = attr
-                    args.append((name, type, dest))
+                    if attr.bitfields:
+                        for bf in attr.bitfields:
+                            if bf.accessor:
+                                name = "arg_bf_"+bf.name
+                                type = bf.type
+                                dest = bf
+                                args.append((name, type, dest))
+                    else:
+                        name = "arg_"+attr.name
+                        type = attr.type
+                        dest = attr
+                        args.append((name, type, dest))
         
         else:
             

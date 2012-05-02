@@ -87,10 +87,10 @@ class DdlPds2Psana ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
-        self.psana_inc = backend_options.get('psana-inc', "")
-        self.pdsdata_inc = backend_options.get('pdsdata-inc', "")
-        self.psana_ns = backend_options.get('psana-ns', "")
-        self.pdsdata_ns = backend_options.get('pdsdata-ns', "")
+        self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
+        self.pdsdata_inc = backend_options.get('pdsdata-inc', "psddl_pdsdata")
+        self.psana_ns = backend_options.get('psana-ns', "Psana")
+        self.pdsdata_ns = backend_options.get('pdsdata-ns', "PsddlPds")
 
         #include guard
         g = os.path.split(self.incname)[1]
@@ -257,10 +257,19 @@ class DdlPds2Psana ( object ) :
         if 'auto' in ctor.tags:
             # make one argument per type attribule
             for attr in type.attributes():
-                name = "arg_"+attr.name
-                atype = attr.type
-                dest = attr
-                args.append((name, atype, dest))
+                if attr.bitfields:
+                    for bf in attr.bitfields:
+                        if bf.accessor:
+                            name = "arg_bf_"+bf.name
+                            type = bf.type
+                            dest = bf
+                            args.append((name, type, dest))
+                else:
+                    name = "arg_"+attr.name
+                    type = attr.type
+                    dest = attr
+                    args.append((name, type, dest))
+    
         else:
             # convert destination names to attribute objects
             args = [(name, atype, name2attr(dest, type)) for name, atype, dest in ctor.args]
@@ -285,7 +294,7 @@ class DdlPds2Psana ( object ) :
                     # accessor returns ndarray, we need pointer
                     expr = "pds."+dest.accessor.name+"().data()"
                 
-            if not atype.basic and not atype.external and not isinstance(atype, Enum):
+            if not atype.basic and not atype.external or isinstance(atype, Enum):
                 expr = T("pds_to_psana($expr)")(expr=expr)
             ctor_args.append(expr)
 

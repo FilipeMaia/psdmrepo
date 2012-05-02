@@ -61,7 +61,7 @@ class Namespace ( object ) :
     #----------------
     def __init__ ( self, name, parent ) :
         self.name = name
-        self._parent = parent
+        self.parent = parent
         self._children = {}
         self._ordered = []
 
@@ -70,8 +70,8 @@ class Namespace ( object ) :
     def fullName(self, lang=None, topNs=None):
         sep = {'C++' : '::'}.get(lang, '.')
         name = self.name
-        if self._parent: 
-            parent = self._parent.fullName(lang, topNs)
+        if self.parent: 
+            parent = self.parent.fullName(lang, topNs)
             if parent: 
                 name = parent + sep + name
             elif topNs:
@@ -103,8 +103,8 @@ class Namespace ( object ) :
         if obj is None:
 
             # go ask parent
-            if self._parent is not None : 
-                obj = self._parent.lookup(namestr, type)
+            if self.parent is not None : 
+                obj = self.parent.lookup(namestr, type)
                 
         else :
         

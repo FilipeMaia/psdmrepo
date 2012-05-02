@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2012-05-02 Andy Salnikov
+- bitfieds now have accessor attribute which generates methods
+  for accessing bitfield values
+- above is needed to generate (calls to) constructors which take
+  bitfield values, auto-generated constructors now accept
+  bitfield values instead of whole attribute value
+- more progress on HDF5 generator, Xml parser now has code
+  to parse HDF5 schema
+
 Tag: V00-01-03
 2012-01-12 Andy Salnikov
 - use templates ($name substitution) instead of formatting (%s) for 
