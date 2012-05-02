@@ -40,7 +40,7 @@ public:
   uint16_t calStrobeLength() const { return _calStrobeLength; }
   uint32_t trigDelay() const { return _trigDelay; }
   /** nReturns CapacitorValue enum for given channel number (0..3). */
-  Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const { return CapacitorValue((_chargeAmpRange >> (ch*2)) & 0x3); }
+  Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*2)) & 0x3); }
   static uint32_t _sizeof()  { return 52; }
 private:
   uint64_t	_triggerCounter;
@@ -97,7 +97,7 @@ public:
   uint32_t trigPsDelay() const { return _trigPsDelay; }
   uint32_t adcDelay() const { return _adcDelay; }
   /** nReturns CapacitorValue enum for given channel number (0..3). */
-  Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const { return CapacitorValue((_chargeAmpRange >> (ch*4)) & 0xf); }
+  Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*4)) & 0xf); }
   static uint32_t _sizeof()  { return 60; }
 private:
   uint64_t	_triggerCounter;
