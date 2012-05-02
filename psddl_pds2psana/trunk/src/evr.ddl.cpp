@@ -11,7 +11,7 @@ namespace psddl_pds2psana {
 namespace EvrData {
 Psana::EvrData::PulseConfig pds_to_psana(PsddlPds::EvrData::PulseConfig pds)
 {
-  return Psana::EvrData::PulseConfig(pds.pulse(), pds._input_control_value(), pds._output_control_value(), pds.prescale(), pds.delay(), pds.width());
+  return Psana::EvrData::PulseConfig(pds.pulse(), pds.bf_trigger(), pds.bf_set(), pds.bf_clear(), pds.polarity(), pds.map_set_enable(), pds.map_reset_enable(), pds.map_trigger_enable(), pds.prescale(), pds.delay(), pds.width());
 }
 
 Psana::EvrData::PulseConfigV3 pds_to_psana(PsddlPds::EvrData::PulseConfigV3 pds)
@@ -21,17 +21,17 @@ Psana::EvrData::PulseConfigV3 pds_to_psana(PsddlPds::EvrData::PulseConfigV3 pds)
 
 Psana::EvrData::EventCodeV3 pds_to_psana(PsddlPds::EvrData::EventCodeV3 pds)
 {
-  return Psana::EvrData::EventCodeV3(pds.code(), pds._u16MaskEventAttr_value(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
+  return Psana::EvrData::EventCodeV3(pds.code(), pds.isReadout(), pds.isTerminator(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
 }
 
 Psana::EvrData::EventCodeV4 pds_to_psana(PsddlPds::EvrData::EventCodeV4 pds)
 {
-  return Psana::EvrData::EventCodeV4(pds.code(), pds._u16MaskEventAttr_value(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
+  return Psana::EvrData::EventCodeV4(pds.code(), pds.isReadout(), pds.isTerminator(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
 }
 
 Psana::EvrData::EventCodeV5 pds_to_psana(PsddlPds::EvrData::EventCodeV5 pds)
 {
-  return Psana::EvrData::EventCodeV5(pds.code(), pds._u16MaskEventAttr_value(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc());
+  return Psana::EvrData::EventCodeV5(pds.code(), pds.isReadout(), pds.isTerminator(), pds.isLatch(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc());
 }
 
 Psana::EvrData::OutputMap::Source pds_to_psana(PsddlPds::EvrData::OutputMap::Source e)
@@ -46,7 +46,7 @@ Psana::EvrData::OutputMap::Conn pds_to_psana(PsddlPds::EvrData::OutputMap::Conn 
 
 Psana::EvrData::OutputMap pds_to_psana(PsddlPds::EvrData::OutputMap pds)
 {
-  return Psana::EvrData::OutputMap(pds.value());
+  return Psana::EvrData::OutputMap(pds_to_psana(pds.source()), pds.source_id(), pds_to_psana(pds.conn()), pds.conn_id());
 }
 
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)

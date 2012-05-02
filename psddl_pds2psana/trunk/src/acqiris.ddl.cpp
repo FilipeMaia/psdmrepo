@@ -169,7 +169,7 @@ Psana::Acqiris::TdcChannel::Slope pds_to_psana(PsddlPds::Acqiris::TdcChannel::Sl
 
 Psana::Acqiris::TdcChannel pds_to_psana(PsddlPds::Acqiris::TdcChannel pds)
 {
-  return Psana::Acqiris::TdcChannel(pds._channel_int(), pds._mode_int(), pds.level());
+  return Psana::Acqiris::TdcChannel(pds._channel_int(), pds_to_psana(pds.slope()), pds_to_psana(pds.mode()), pds.level());
 }
 
 Psana::Acqiris::TdcAuxIO::Channel pds_to_psana(PsddlPds::Acqiris::TdcAuxIO::Channel e)
@@ -255,7 +255,7 @@ Psana::Acqiris::TdcDataV1_Item::Source pds_to_psana(PsddlPds::Acqiris::TdcDataV1
 
 Psana::Acqiris::TdcDataV1_Item pds_to_psana(PsddlPds::Acqiris::TdcDataV1_Item pds)
 {
-  return Psana::Acqiris::TdcDataV1_Item(pds.value());
+  return Psana::Acqiris::TdcDataV1_Item(pds.bf_val_(), pds_to_psana(pds.source()), pds.bf_ofv_());
 }
 
 Psana::Acqiris::TdcDataV1Marker::Type pds_to_psana(PsddlPds::Acqiris::TdcDataV1Marker::Type e)
