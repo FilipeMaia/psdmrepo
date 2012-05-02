@@ -69,6 +69,13 @@ public:
   /// return size of the type in bytes
   size_t size() const ;
 
+  /// get type class, one of the H5T_class_t enum values like H5T_INTEGER,
+  /// H5T_ARRAY, etc.
+  H5T_class_t tclass() const;
+
+  /// get type from which this type was derived
+  Type super() const;
+
   /// make unlocked copy of the type
   Type copy() const ;
 
@@ -86,7 +93,7 @@ protected:
   // constructor
   Type ( hid_t id, bool doClose ) ;
 
-private:
+protected:
 
   // Data members
   boost::shared_ptr<hid_t> m_id ;

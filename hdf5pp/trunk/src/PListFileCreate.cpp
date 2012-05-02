@@ -56,7 +56,7 @@ PListFileCreate::set_istore_k(unsigned ik)
 {
   herr_t stat = H5Pset_istore_k ( m_impl.id(), ik ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileCreate::set_istore_k", "H5Pset_istore_k" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_istore_k" ) ;
   }
 }
 
@@ -67,7 +67,7 @@ PListFileCreate::set_sym_k(unsigned ik, unsigned lk)
 {
   herr_t stat = H5Pset_sym_k ( m_impl.id(), ik, lk ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileCreate::set_sym_k", "H5Pset_sym_k" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_sym_k" ) ;
   }
 }
 
@@ -78,7 +78,7 @@ PListFileCreate::set_userblock(hsize_t size)
 {
   herr_t stat = H5Pset_userblock ( m_impl.id(), size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileCreate::set_userblock", "H5Pset_userblock" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_userblock" ) ;
   }
 }
 
@@ -89,7 +89,7 @@ PListFileCreate::set_sizes(size_t sizeof_addr, size_t sizeof_size)
 {
   herr_t stat = H5Pset_sizes ( m_impl.id(), sizeof_addr, sizeof_size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileCreate::set_sizes", "H5Pset_sizes" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_sizes" ) ;
   }
 }
 

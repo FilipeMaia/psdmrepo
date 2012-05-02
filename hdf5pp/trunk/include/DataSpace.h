@@ -71,12 +71,15 @@ public:
   // Destructor
   ~DataSpace () ;
 
-  /// Hyperslab selection
-  void select_hyperslab ( H5S_seloper_t op,
-                          const hsize_t *start,
-                          const hsize_t *stride,
-                          const hsize_t *count,
-                          const hsize_t *block ) ;
+  /// Hyperslab selection, returns this object
+  DataSpace select_hyperslab ( H5S_seloper_t op,
+                              const hsize_t *start,
+                              const hsize_t *stride,
+                              const hsize_t *count,
+                              const hsize_t *block ) ;
+
+  /// Selection which includes single element from rank-1 dataset, returns this object
+  DataSpace select_single(hsize_t index) ;
 
   /// get the rank of the data space
   unsigned rank() const ;

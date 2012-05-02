@@ -45,7 +45,7 @@ GroupIter::GroupIter (const Group& group)
   // get the number of links in a group
   H5G_info_t g_info;
   if (H5Gget_info(*m_group.m_id, &g_info) < 0) {
-    throw Hdf5CallException( "GroupIter", "H5Gget_info") ;
+    throw Hdf5CallException( ERR_LOC, "H5Gget_info") ;
   }
   m_nlinks = g_info.nlinks;
 }
@@ -67,7 +67,7 @@ GroupIter::next()
     // open object
     hid_t hid = H5Oopen_by_idx(*m_group.m_id, ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, H5P_DEFAULT);
     if (hid < 0) {
-      throw Hdf5CallException( "GroupIter::next", "H5Oopen_by_idx") ;      
+      throw Hdf5CallException( ERR_LOC, "H5Oopen_by_idx") ;
     }
 
     // only care about groups

@@ -59,13 +59,13 @@ public:
   // make an enum type based on some integer type
   static EnumType enumType() {
     hid_t tid = H5Tenum_create( TypeTraits<T>::native_type().id() ) ;
-    if ( tid < 0 ) throw Hdf5CallException ( "EnumType::enumType", "H5Tenum_create" ) ;
+    if ( tid < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tenum_create" ) ;
     return EnumType ( tid ) ;
   }
 
   void insert ( const char* name, T value ) {
     herr_t stat = H5Tenum_insert( id(), name, static_cast<void *>(&value) ) ;
-    if ( stat < 0 ) throw Hdf5CallException ( "EnumType::insert", "H5Tenum_insert" ) ;
+    if ( stat < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tenum_insert" ) ;
   }
 
 protected:

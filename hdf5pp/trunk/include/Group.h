@@ -79,15 +79,18 @@ public:
   /// Determines if the group has a child (link) with the given nae
   bool hasChild ( const std::string& name ) const ;
 
+  // get parent for this group, returns non-valid object if no parent group exists
+  Group parent() const ;
+
   /// create attribute for this group
   template <typename T>
   Attribute<T> createAttr ( const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) {
     return Attribute<T>::createAttr ( *m_id, name, dspc ) ;
   }
 
-  /// open existing attribute
+  /// open existing attribute, returns non-valid attribute if does not exist
   template <typename T>
-  Attribute<T> openAttr ( const std::string& name ) {
+  Attribute<T> openAttr ( const std::string& name ) const {
     return Attribute<T>::openAttr ( *m_id, name ) ;
   }
 

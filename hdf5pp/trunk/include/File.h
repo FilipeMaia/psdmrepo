@@ -112,6 +112,8 @@ public:
 
 protected:
 
+  friend class Group;
+
   // Constructor
   File ( hid_t id ) ;
 

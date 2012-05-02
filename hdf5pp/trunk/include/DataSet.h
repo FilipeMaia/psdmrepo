@@ -111,11 +111,22 @@ public:
     m_impl.read( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
   }
 
+  // reclaim space allocated to vlen structures
+  void vlen_reclaim(const DataSpace& memDspc,
+                    T* data,
+                    const hdf5pp::Type& native_type = TypeTraits<T>::native_type())
+  {
+    m_impl.vlen_reclaim( native_type, memDspc, TypeTraits<T>::address( *data ) ) ;
+  }
+
   // close the data set
   void close() { m_impl.close() ; }
 
   /// access data space
   DataSpace dataSpace() { return m_impl.dataSpace() ; }
+
+  /// access dataset type
+  Type type() { return m_impl.type() ; }
 
   // returns true if there is a real object behind
   bool valid() const { return m_impl.valid() ; }

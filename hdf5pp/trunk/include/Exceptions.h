@@ -18,7 +18,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include <stdexcept>
+#include "ErrSvc/Issue.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -48,28 +48,36 @@
 namespace hdf5pp {
 
 /// Base class for all exceptions in the package
-class Exception : public std::runtime_error {
+class Exception : public ErrSvc::Issue {
 public:
 
   // Constructor
-  Exception ( const std::string& className, const std::string& what )
-    : std::runtime_error( className+": "+what) {}
+  Exception ( const ErrSvc::Context& ctx, const std::string& className, const std::string& what )
+    : ErrSvc::Issue( ctx, className+": "+what) {}
 
 };
 
 class Hdf5CallException : public Exception {
 public:
 
-  Hdf5CallException( const std::string& method, const std::string& function )
-    : Exception( "Hdf5CallException", method+" - HDF5 error in call to function "+function ) {}
+  Hdf5CallException( const ErrSvc::Context& ctx, const std::string& function )
+    : Exception( ctx, "Hdf5CallException", "HDF5 error in call to function "+function ) {}
 
 };
 
 class Hdf5DataSpaceSizeException : public Exception {
 public:
 
-  Hdf5DataSpaceSizeException( const std::string& method )
-    : Exception( "Hdf5DataSpaceSizeException", method+" - dataspace size mismatch" ) {}
+  Hdf5DataSpaceSizeException( const ErrSvc::Context& ctx )
+    : Exception( ctx, "Hdf5DataSpaceSizeException", "dataspace size mismatch" ) {}
+
+};
+
+class Hdf5BadTypeCast : public Exception {
+public:
+
+  Hdf5BadTypeCast( const ErrSvc::Context& ctx, const std::string& newtype )
+    : Exception( ctx, "Hdf5BadTypeCast", "Illegal type cast to " + newtype ) {}
 
 };
 

@@ -65,7 +65,7 @@ DataSpace::~DataSpace ()
 DataSpace DataSpace::makeScalar ()
 {
   hid_t dsid = H5Screate ( H5S_SCALAR ) ;
-  if ( dsid < 0 ) throw Hdf5CallException( "DataSpace::makeScalar", "H5Screate") ;
+  if ( dsid < 0 ) throw Hdf5CallException( ERR_LOC, "H5Screate") ;
   return DataSpace( dsid ) ;
 }
 
@@ -74,7 +74,7 @@ DataSpace
 DataSpace::makeSimple ( int rank, const hsize_t * dims, const hsize_t * maxdims )
 {
   hid_t dsid = H5Screate_simple ( rank, dims, maxdims ) ;
-  if ( dsid < 0 ) throw Hdf5CallException( "DataSpace::makeSimple", "H5Screate_simple") ;
+  if ( dsid < 0 ) throw Hdf5CallException( ERR_LOC, "H5Screate_simple") ;
   return DataSpace( dsid ) ;
 }
 
@@ -90,7 +90,7 @@ DataSpace
 DataSpace::makeNull ()
 {
   hid_t dsid = H5Screate ( H5S_NULL ) ;
-  if ( dsid < 0 ) throw Hdf5CallException( "DataSpace::makeSimple", "H5Screate") ;
+  if ( dsid < 0 ) throw Hdf5CallException( ERR_LOC, "H5Screate") ;
   return DataSpace( dsid ) ;
 }
 
@@ -102,7 +102,7 @@ DataSpace::makeAll ()
 }
 
 /// Hyperslab selection
-void
+DataSpace
 DataSpace::select_hyperslab ( H5S_seloper_t op,
                               const hsize_t *start,
                               const hsize_t *stride,
@@ -110,16 +110,25 @@ DataSpace::select_hyperslab ( H5S_seloper_t op,
                               const hsize_t *block )
 {
   herr_t stat = H5Sselect_hyperslab ( *m_id, op, start, stride, count, block ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "DataSpace::select_hyperslab", "H5Sselect_hyperslab") ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Sselect_hyperslab") ;
+  return *this;
 }
 
+/// Selection which includes single element from rank-1 dataset
+DataSpace
+DataSpace::select_single(hsize_t index)
+{
+  hsize_t start[] = { index } ;
+  hsize_t size[] = { 1 } ;
+  return select_hyperslab ( H5S_SELECT_SET, start, 0, size, 0 );
+}
 
 /// get the rank of the data space
 unsigned
 DataSpace::rank() const
 {
   int rank = H5Sget_simple_extent_ndims(*m_id) ;
-  if ( rank < 0 ) throw Hdf5CallException( "DataSpace::rank", "H5Sget_simple_extent_ndims") ;
+  if ( rank < 0 ) throw Hdf5CallException( ERR_LOC, "H5Sget_simple_extent_ndims") ;
   return rank ;
 }
 

@@ -74,9 +74,28 @@ Type::size() const
 {
   size_t size = H5Tget_size( *m_id ) ;
   if ( size == 0 ) {
-    throw Hdf5CallException( "Type::size", "H5Tget_size" ) ;
+    throw Hdf5CallException( ERR_LOC, "H5Tget_size" ) ;
   }
   return size ;
+}
+
+/// get type class, one of the H5T_class_t enum values like H5T_INTEGER,
+/// H5T_ARRAY, etc.
+H5T_class_t
+Type::tclass() const
+{
+  return H5Tget_class(*m_id);
+}
+
+/// get type from which this type was derived
+Type
+Type::super() const
+{
+  hid_t tid = H5Tget_super(*m_id) ;
+  if ( tid < 0 ) {
+    throw Hdf5CallException( ERR_LOC, "H5Tget_super" ) ;
+  }
+  return UnlockedType( tid ) ;
 }
 
 /// make unlocked copy of the type
@@ -85,7 +104,7 @@ Type::copy() const
 {
   hid_t tid = H5Tcopy(*m_id) ;
   if ( tid < 0 ) {
-    throw Hdf5CallException( "Type::copy", "H5Tcopy" ) ;
+    throw Hdf5CallException( ERR_LOC, "H5Tcopy" ) ;
   }
   return UnlockedType( tid ) ;
 }
@@ -95,7 +114,7 @@ void
 Type::set_size( size_t size )
 {
   if ( H5Tset_size( *m_id, size ) ) {
-    throw Hdf5CallException( "Type::set_size", "H5Tset_size" ) ;
+    throw Hdf5CallException( ERR_LOC, "H5Tset_size" ) ;
   }
 }
 
@@ -104,7 +123,7 @@ void
 Type::set_precision( size_t precision )
 {
   if ( H5Tset_precision( *m_id, precision ) ) {
-    throw Hdf5CallException( "Type::set_precision", "H5Tset_precision" ) ;
+    throw Hdf5CallException( ERR_LOC, "H5Tset_precision" ) ;
   }
 }
 

@@ -55,7 +55,7 @@ PListDataSetCreate::set_chunk ( int rank, const hsize_t chunk_size[] )
 {
   herr_t stat = H5Pset_chunk ( m_impl.id(), rank, chunk_size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_chunk", "H5Pset_chunk" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_chunk" ) ;
   }
 }
 
@@ -65,7 +65,7 @@ PListDataSetCreate::set_chunk ( const hsize_t chunk_size )
 {
   herr_t stat = H5Pset_chunk ( m_impl.id(), 1, &chunk_size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_chunk", "H5Pset_chunk" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_chunk" ) ;
   }
 }
 
@@ -75,7 +75,7 @@ PListDataSetCreate::set_deflate ( unsigned level )
 {
   herr_t stat = H5Pset_deflate ( m_impl.id(), level ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_deflate", "H5Pset_deflate" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_deflate" ) ;
   }
 }
 
@@ -85,7 +85,7 @@ PListDataSetCreate::set_szip( unsigned mask, unsigned block_size )
 {
   herr_t stat = H5Pset_szip ( m_impl.id(), mask, block_size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_szip", "H5Pset_szip" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_szip" ) ;
   }
 }
 
@@ -95,7 +95,7 @@ PListDataSetCreate::set_shuffle ()
 {
   herr_t stat = H5Pset_shuffle( m_impl.id() ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_shuffle", "H5Pset_shuffle" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_shuffle" ) ;
   }
 }
 
@@ -105,7 +105,7 @@ PListDataSetCreate::set_nbit ()
 {
   herr_t stat = H5Pset_nbit ( m_impl.id() ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListDataSetCreate::set_nbit", "H5Pset_nbit" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_nbit" ) ;
   }
 }
 

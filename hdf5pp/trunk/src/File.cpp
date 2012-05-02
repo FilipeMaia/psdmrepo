@@ -79,7 +79,7 @@ File::create( const std::string& path,
   if ( mode == Truncate ) flags = H5F_ACC_TRUNC ;
   hid_t f_id = H5Fcreate ( path.c_str(), flags, plCreate.plist(), plAccess.plist() ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "File::create", "H5Fcreate") ;
+    throw Hdf5CallException( ERR_LOC, "H5Fcreate") ;
   }
   return File(f_id) ;
 }
@@ -96,7 +96,7 @@ File::open( const std::string& path,
   if ( mode == Update ) flags = H5F_ACC_RDWR ;
   hid_t f_id = H5Fopen ( path.c_str(), flags, plAccess.plist() ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "File::open", "H5Fopen") ;
+    throw Hdf5CallException( ERR_LOC, "H5Fopen") ;
   }
   return File(f_id) ;
 }

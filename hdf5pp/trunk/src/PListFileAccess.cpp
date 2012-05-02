@@ -55,7 +55,7 @@ PListFileAccess::set_family_driver ( hsize_t memb_size, const PListFileAccess& m
 {
   herr_t stat = H5Pset_fapl_family ( m_impl.id(), memb_size, memb_fapl.plist() ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileAccess::set_family_driver", "H5Pset_fapl_family" ) ;
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_fapl_family" ) ;
   }
 }
 

@@ -99,11 +99,17 @@ public:
             const DataSpace& fileDspc,
             void* data) ;
 
+  // reclaim space allocated to vlen structures
+  void vlen_reclaim(const hdf5pp::Type& type, const DataSpace& memDspc, void* data);
+
   // close the data set
   void close() { m_id.reset() ; }
 
   /// access data space
   DataSpace dataSpace() ;
+
+  /// access dataset type
+  Type type();
 
   // returns true if there is a real object behind
   bool valid() const { return m_id.get() ; }

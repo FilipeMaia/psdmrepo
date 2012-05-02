@@ -45,7 +45,7 @@ NameIter::NameIter (const Group& group)
   // get the number of links in a group
   H5G_info_t g_info;
   if (H5Gget_info(*m_group.m_id, &g_info) < 0) {
-    throw Hdf5CallException( "GroupIter", "H5Gget_info") ;
+    throw Hdf5CallException( ERR_LOC, "H5Gget_info") ;
   }
   m_nlinks = g_info.nlinks;
 }
@@ -67,7 +67,7 @@ NameIter::next()
   // first try with the fixed buffer size
   ssize_t size = H5Lget_name_by_idx(*m_group.m_id, ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, buf, maxsize, H5P_DEFAULT);
   if (size < 0) {
-    throw Hdf5CallException( "Group::name", "H5Iget_name") ;
+    throw Hdf5CallException( ERR_LOC, "H5Iget_name") ;
   }
   if (size == 0) {
     // name is not known

@@ -11,6 +11,19 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-05-02 Andy Salnikov
+- added utility class Utils with couple of methods to read data from
+  HDF5 datasets
+- Group class adds parent() method
+- exceptions now use ErrSvc::Issue for base class
+- DataSet class has new method vlen_reclaim()
+- DataSet class has new method type() returning hdf5pp::Type for dataset
+- Type class has tclass() method returning type's "class", and super()
+  method returning Type for type's super class
+- DataSpace adds select_single() method to select single element from 
+  rank-1 dataset
+
 Tag: V00-02-02
 2012-05-01 Andy Salnikov
 - Group class has new method makeSoftLink()

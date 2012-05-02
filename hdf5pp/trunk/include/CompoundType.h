@@ -63,13 +63,13 @@ public:
   void insert ( const char* name, size_t offset, const Type& t ) ;
 
   template <typename U>
-  void insert_native ( const char* name, size_t offset ) {
-    return insert ( name, offset, TypeTraits<U>::native_type() ) ;
+  void insert_native ( const char* name, size_t offset, size_t size=0 ) {
+    return insert ( name, offset, TypeTraits<U>::native_type(size) ) ;
   }
 
   template <typename U>
-  void insert_stored ( const char* name, size_t offset ) {
-    return insert ( name, offset, TypeTraits<U>::stored_type() ) ;
+  void insert_stored ( const char* name, size_t offset, size_t size=0 ) {
+    return insert ( name, offset, TypeTraits<U>::stored_type(size) ) ;
   }
 
 protected:

@@ -55,8 +55,10 @@ template <typename T>
 class Attribute  {
 public:
 
-  // factory methods
+  // create new attribute
   static Attribute createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) ;
+
+  // Open existing attribute, returns non-valid object if does not exist
   static Attribute openAttr ( hid_t parent, const std::string& name ) ;
 
   // Destructor
@@ -80,6 +82,7 @@ public:
 protected:
 
   // Constructor
+  Attribute () {}
   Attribute ( hid_t id, const DataSpace& dspc ) ;
 
 private:
@@ -112,7 +115,7 @@ Attribute<T>
 Attribute<T>::createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc )
 {
   hid_t aid = H5Acreate2 ( parent, name.c_str(), TypeTraits<T>::stored_type().id(), dspc.id(), H5P_DEFAULT, H5P_DEFAULT ) ;
-  if ( aid < 0 ) throw Hdf5CallException( "Attribute::createAttr", "H5Acreate2" ) ;
+  if ( aid < 0 ) throw Hdf5CallException( ERR_LOC, "H5Acreate2" ) ;
   return Attribute<T>( aid, dspc ) ;
 }
 
@@ -120,10 +123,13 @@ template <typename T>
 Attribute<T>
 Attribute<T>::openAttr ( hid_t parent, const std::string& name )
 {
+  htri_t rc = H5Aexists(parent, name.c_str()) ;
+  if ( rc < 0 ) throw Hdf5CallException( ERR_LOC, "H5Aexists" ) ;
+  if ( rc == 0 ) return Attribute<T>();
   hid_t aid = H5Aopen ( parent, name.c_str(), H5P_DEFAULT ) ;
-  if ( aid < 0 ) throw Hdf5CallException( "Attribute::openAttr", "H5Aopen" ) ;
+  if ( aid < 0 ) throw Hdf5CallException( ERR_LOC, "H5Aopen" ) ;
   hid_t dspc = H5Aget_space( aid ) ;
-  if ( dspc < 0 ) throw Hdf5CallException( "Attribute::openAttr", "H5Aget_space" ) ;
+  if ( dspc < 0 ) throw Hdf5CallException( ERR_LOC, "H5Aget_space" ) ;
   return Attribute<T>( aid, DataSpace(dspc) ) ;
 }
 
@@ -132,9 +138,9 @@ template <typename T>
 void
 Attribute<T>::store( const T& value )
 {
-  if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( "Attribute::store" );
+  if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( ERR_LOC );
   herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::native_type().id(), TypeTraits<T>::address(value) ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "Attribute::store", "H5Awrite" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Awrite" ) ;
 }
 
 /// store attribute value (for arbitrary attributes)
@@ -142,9 +148,9 @@ template <typename T>
 void
 Attribute<T>::store( unsigned size, const T value[] )
 {
-  if ( m_dspc.size() != size ) throw Hdf5DataSpaceSizeException ( "Attribute::store" );
+  if ( m_dspc.size() != size ) throw Hdf5DataSpaceSizeException ( ERR_LOC );
   herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::native_type().id(), (void*)(value) ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "Attribute::store", "H5Awrite" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Awrite" ) ;
 }
 
 /// read attribute value (for scalar attributes)
@@ -152,10 +158,10 @@ template <typename T>
 T 
 Attribute<T>::read()
 {
-  if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( "Attribute::read" );
+  if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( ERR_LOC );
   T value;
   herr_t stat = H5Aread ( *m_id, TypeTraits<T>::native_type().id(), TypeTraits<T>::address(value) ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "Attribute::read", "H5Aread" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Aread" ) ;
   return value;
 }
 

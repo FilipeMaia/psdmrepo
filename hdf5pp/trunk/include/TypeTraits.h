@@ -48,13 +48,14 @@
 namespace hdf5pp {
 
 struct TypeTraitsHelper {
-  static Type string_h5type() ;
+  static Type string_h5type(size_t size) ;
+  static Type sized_h5type(const Type& type, size_t size) ;
 };
 
 template <typename T>
 struct TypeTraits  {
-  static Type stored_type() { return T::stored_type() ; }
-  static Type native_type() { return T::native_type() ; }
+  static Type stored_type(size_t size=0) { return TypeTraitsHelper::sized_h5type(T::stored_type(), size); }
+  static Type native_type(size_t size=0) { return TypeTraitsHelper::sized_h5type(T::native_type(), size); }
   static const void* address( const T& value ) { return static_cast<const void*>(&value) ; }
   static void* address( T& value ) { return static_cast<void*>(&value) ; }
 };
@@ -66,8 +67,8 @@ struct TypeTraits<const T> : public TypeTraits<T> {
 
 #define TYPE_TRAITS_SIMPLE(CPP_TYPE,H5_TYPE) \
   template <> struct TypeTraits<CPP_TYPE> { \
-    static Type stored_type() { return Type::LockedType(H5_TYPE); } \
-    static Type native_type() { return Type::LockedType(H5_TYPE); } \
+    static Type stored_type(size_t size=0) { return TypeTraitsHelper::sized_h5type(Type::LockedType(H5_TYPE), size); } \
+    static Type native_type(size_t size=0) { return TypeTraitsHelper::sized_h5type(Type::LockedType(H5_TYPE), size); } \
     static const void* address( const CPP_TYPE& value ) { return static_cast<const void*>(&value) ; } \
     static void* address( CPP_TYPE& value ) { return static_cast<void*>(&value) ; } \
   }
@@ -88,8 +89,8 @@ TYPE_TRAITS_SIMPLE(uint64_t,H5T_NATIVE_UINT64);
 template <>
 struct TypeTraits<const char*> {
   typedef const char* vtype ;
-  static Type stored_type() { return TypeTraitsHelper::string_h5type() ; }
-  static Type native_type() { return TypeTraitsHelper::string_h5type() ; }
+  static Type stored_type(size_t size=0) { return TypeTraitsHelper::string_h5type(size) ; }
+  static Type native_type(size_t size=0) { return TypeTraitsHelper::string_h5type(size) ; }
   static const void* address( const vtype& value ) { return static_cast<const void*>(&value) ; }
   static void* address( vtype& value ) { return static_cast<void*>(&value) ; }
 };

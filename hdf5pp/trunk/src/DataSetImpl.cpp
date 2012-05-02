@@ -50,7 +50,7 @@ DataSetImpl::createDataSet ( hid_t parent,
 {
   hid_t ds = H5Dcreate2 ( parent, name.c_str(), type.id(), dspc.id(),
                           H5P_DEFAULT, plistDScreate.plist(), plistDSaccess.plist() ) ;
-  if ( ds < 0 ) throw Hdf5CallException( "DataSet::createDataSet", "H5Dcreate2" ) ;
+  if ( ds < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dcreate2" ) ;
   return DataSetImpl ( ds ) ;
 }
 
@@ -59,7 +59,7 @@ DataSetImpl
 DataSetImpl::openDataSet ( hid_t parent, const std::string& name )
 {
   hid_t ds = H5Dopen2 ( parent, name.c_str(), H5P_DEFAULT ) ;
-  if ( ds < 0 ) throw Hdf5CallException( "DataSet::openDataSet", "H5Dopen2" ) ;
+  if ( ds < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dopen2" ) ;
   return DataSetImpl ( ds ) ;
 }
 
@@ -68,7 +68,7 @@ void
 DataSetImpl::set_extent ( const hsize_t size[] )
 {
   herr_t stat = H5Dset_extent( *m_id, size ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "DataSet::set_extent", "H5Dset_extent" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dset_extent" ) ;
 }
 
 
@@ -80,7 +80,7 @@ DataSetImpl::store ( const Type& memType,
                      const void* data )
 {
   herr_t stat = H5Dwrite( *m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data ) ;
-  if ( stat < 0 ) throw Hdf5CallException( "DataSet::store", "H5Dwrite" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dwrite" ) ;
 }
 
 // read the data
@@ -91,7 +91,15 @@ DataSetImpl::read(const Type& memType,
                   void* data)
 {
   herr_t stat = H5Dread(*m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data);
-  if ( stat < 0 ) throw Hdf5CallException( "DataSetImpl::read", "H5Dread" ) ;
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dread" ) ;
+}
+
+// reclaim space allocated to vlen structures
+void
+DataSetImpl::vlen_reclaim(const hdf5pp::Type& type, const DataSpace& memDspc, void* data)
+{
+  herr_t stat = H5Dvlen_reclaim(type.id(), memDspc.id(), H5P_DEFAULT, data);
+  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dvlen_reclaim" ) ;
 }
 
 /// access data space
@@ -99,8 +107,17 @@ DataSpace
 DataSetImpl::dataSpace()
 {
   hid_t dspc = H5Dget_space( *m_id ) ;
-  if ( dspc < 0 ) throw Hdf5CallException( "DataSetImpl::dataSpace", "H5Dget_space" ) ;
+  if ( dspc < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dget_space" ) ;
   return DataSpace ( dspc ) ;
+}
+
+/// access dataset type
+Type
+DataSetImpl::type()
+{
+  hid_t typeId = H5Dget_type( *m_id ) ;
+  if ( typeId < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dget_type" ) ;
+  return Type::UnlockedType(typeId) ;
 }
 
 

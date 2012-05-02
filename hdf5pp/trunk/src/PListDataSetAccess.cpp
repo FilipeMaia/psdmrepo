@@ -55,7 +55,7 @@ PListDataSetAccess::set_chunk_cache(size_t rdcc_nslots, size_t rdcc_nbytes, doub
 {
   herr_t stat = H5Pset_chunk_cache(m_impl.id(), rdcc_nslots, rdcc_nbytes, rdcc_w0);
   if (stat < 0) {
-    throw Hdf5CallException("PListDataSetCreate::set_chunk", "H5Pset_chunk");
+    throw Hdf5CallException(ERR_LOC, "H5Pset_chunk");
   }
 }
 

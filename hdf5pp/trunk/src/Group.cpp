@@ -73,7 +73,7 @@ Group::createGroup ( hid_t parent, const std::string& name )
   hid_t f_id = H5Gcreate2 ( parent, name.c_str(), lcpl_id, H5P_DEFAULT, H5P_DEFAULT ) ;
   H5Pclose( lcpl_id ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "Group::createGroup", "H5Gcreate2") ;
+    throw Hdf5CallException( ERR_LOC, "H5Gcreate2") ;
   }
   return Group(f_id) ;
 }
@@ -83,7 +83,7 @@ Group::openGroup ( hid_t parent, const std::string& name )
 {
   hid_t f_id = H5Gopen2 ( parent, name.c_str(), H5P_DEFAULT ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "Group::openGroup", "H5Gopen2") ;
+    throw Hdf5CallException( ERR_LOC, "H5Gopen2") ;
   }
   return Group(f_id) ;
 }
@@ -106,9 +106,22 @@ Group::hasChild ( const std::string& name ) const
   // open child group
   hid_t f_id = H5Gopen2 ( *m_id, child.c_str(), H5P_DEFAULT ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "Group::openGroup", "H5Gopen2") ;
+    throw Hdf5CallException( ERR_LOC, "H5Gopen2") ;
   }
   return Group(f_id).hasChild(std::string(name, p+1));
+}
+
+// get parent for this group, returns non-valid object if no parent group exists
+Group
+Group::parent() const
+{
+  std::string path = name();
+  if (path.empty() or path == "/") return Group();
+
+  std::string::size_type p = path.rfind('/');
+  if (p != std::string::npos) path.erase(p);
+
+  return openGroup(*m_id, path);
 }
 
 // Create soft link
@@ -117,7 +130,7 @@ Group::makeSoftLink(const std::string& targetPath, const std::string& linkName)
 {
   herr_t err = H5Lcreate_soft(targetPath.c_str(), *m_id, linkName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
   if ( err < 0 ) {
-    throw Hdf5CallException("Group::makeSoftLink", "H5Lcreate_soft");
+    throw Hdf5CallException( ERR_LOC, "H5Lcreate_soft") ;
   }
 }
 
@@ -138,7 +151,7 @@ Group::name() const
   // first try with the fixed buffer size
   ssize_t size = H5Iget_name(*m_id, buf, maxsize+1);
   if (size < 0) {
-    throw Hdf5CallException( "Group::name", "H5Iget_name") ;
+    throw Hdf5CallException( ERR_LOC, "H5Iget_name") ;
   }
   if (size == 0) {
     // name is not known

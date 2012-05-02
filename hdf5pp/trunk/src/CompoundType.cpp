@@ -39,7 +39,7 @@ CompoundType
 CompoundType::compoundType( size_t size )
 {
   hid_t tid = H5Tcreate ( H5T_COMPOUND, size ) ;
-  if ( tid < 0 ) throw Hdf5CallException ( "CompoundType::compoundType", "H5Tcreate" ) ;
+  if ( tid < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tcreate" ) ;
   return CompoundType ( tid ) ;
 }
 
@@ -48,7 +48,7 @@ void
 CompoundType::insert ( const char* name, size_t offset, const Type& t )
 {
   herr_t stat = H5Tinsert ( id(), name, offset, t.id() ) ;
-  if ( stat < 0 ) throw Hdf5CallException ( "CompoundType::compoundType", "H5Tcreate" ) ;
+  if ( stat < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tinsert" ) ;
 }
 
 } // namespace hdf5pp

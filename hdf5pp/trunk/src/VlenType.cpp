@@ -40,7 +40,7 @@ VlenType
 VlenType::vlenType( const Type& baseType )
 {
   hid_t tid = H5Tvlen_create( baseType.id() ) ;
-  if ( tid < 0 ) throw Hdf5CallException ( "VlenType::vlenType", "H5Tvlen_create" ) ;
+  if ( tid < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tvlen_create" ) ;
   return VlenType ( tid ) ;
 }
 

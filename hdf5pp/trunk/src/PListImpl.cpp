@@ -42,7 +42,7 @@ PListImpl::PListImpl ( hid_t cls )
   : m_id()
 {
   m_id = H5Pcreate ( cls ) ;
-  if ( m_id < 0 ) throw Hdf5CallException ( "PListImpl", "H5Pcreate" ) ;
+  if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcreate" ) ;
 }
 
 // copy constructor
@@ -50,7 +50,7 @@ PListImpl::PListImpl ( const PListImpl& o )
   : m_id()
 {
   m_id = H5Pcopy ( o.m_id ) ;
-  if ( m_id < 0 ) throw Hdf5CallException ( "PListImpl", "H5Pcopy" ) ;
+  if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
 }
 
 //--------------
@@ -66,9 +66,9 @@ PListImpl&
 PListImpl::operator = ( const PListImpl& o )
 {
   if ( &o != this ) {
-    if ( H5Pclose(m_id) < 0 ) throw Hdf5CallException ( "PListImpl", "H5Pclose" ) ;
+    if ( H5Pclose(m_id) < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pclose" ) ;
     m_id = H5Pcopy ( o.m_id ) ;
-    if ( m_id < 0 ) throw Hdf5CallException ( "PListImpl", "H5Pcopy" ) ;
+    if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
   }
   return *this ;
 }
