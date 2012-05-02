@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-05-02 Andy Salnikov
+- bug fix for latest commit, _parent should have been renamed to 
+  parent everywhere
+- forgot to add few files to svn
+
 Tag: V00-02-00
 2012-05-02 Andy Salnikov
 - bitfieds now have accessor attribute which generates methods

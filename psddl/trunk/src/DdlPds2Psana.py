@@ -571,7 +571,7 @@ class DdlPds2Psana ( object ) :
         if attr.type.external:
             print >>self.cpp, T("  , $name($expr)")(locals())
         elif attr.type.value_type:
-            ns = attr.type._parent.fullName('C++', self.top_pkg)
+            ns = attr.type.parent.fullName('C++', self.top_pkg)
             print >>self.cpp, T("  , $name($ns::pds_to_psana($expr))")(locals())
         else :
             xtc_type = attr.type.fullName('C++', self.pdsdata_ns)
@@ -632,7 +632,7 @@ class DdlPds2Psana ( object ) :
                 if attr.type.external:
                     pass
                 elif attr.type.value_type:
-                    ns = attr.type._parent.fullName('C++', self.top_pkg)
+                    ns = attr.type.parent.fullName('C++', self.top_pkg)
                     expr = T("$ns::pds_to_psana($expr)")(locals())
                 else:
                     attrXtcType = attr.type.fullName('C++', self.pdsdata_ns)
@@ -671,7 +671,7 @@ class DdlPds2Psana ( object ) :
         if attr.type.external:
             elem_expr = '*it'
         else:
-            ns = attr.type._parent.fullName('C++', self.top_pkg)
+            ns = attr.type.parent.fullName('C++', self.top_pkg)
             elem_expr = T('$ns::pds_to_psana(*it)')(locals())
             
         # ndarray initialization
