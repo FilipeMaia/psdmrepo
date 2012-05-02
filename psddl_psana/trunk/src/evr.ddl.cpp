@@ -24,22 +24,6 @@ EventCodeV5::desc_shape() const {
   shape.push_back(DescSize);
   return shape;
 }
-EvrData::OutputMap::Source
-OutputMap::source() const {
-  return Source(_v & 0xff);
-}
-uint8_t
-OutputMap::source_id() const {
-  return (_v >> 8) & 0xff;
-}
-EvrData::OutputMap::Conn
-OutputMap::conn() const {
-  return Conn((_v >> 16) & 0xff);
-}
-uint8_t
-OutputMap::conn_id() const {
-  return _v >> 24;
-}
 
 ConfigV1::~ConfigV1() {}
 

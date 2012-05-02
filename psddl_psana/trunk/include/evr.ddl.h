@@ -28,8 +28,8 @@ public:
   PulseConfig()
   {
   }
-  PulseConfig(uint32_t arg__pulse, uint32_t arg__input_control, uint32_t arg__output_control, uint32_t arg__prescale, uint32_t arg__delay, uint32_t arg__width)
-    : _pulse(arg__pulse), _input_control(arg__input_control), _output_control(arg__output_control), _prescale(arg__prescale), _delay(arg__delay), _width(arg__width)
+  PulseConfig(uint32_t arg__pulse, int16_t arg_bf__bf_trigger, int16_t arg_bf__bf_set, int16_t arg_bf__bf_clear, uint8_t arg_bf__bf_polarity, uint8_t arg_bf__bf_map_set_enable, uint8_t arg_bf__bf_map_reset_enable, uint8_t arg_bf__bf_map_trigger_enable, uint32_t arg__prescale, uint32_t arg__delay, uint32_t arg__width)
+    : _pulse(arg__pulse), _input_control((arg_bf__bf_trigger & 0xff)|((arg_bf__bf_set & 0xff)<<8)|((arg_bf__bf_clear & 0xff)<<16)), _output_control((arg_bf__bf_polarity & 0x1)|((arg_bf__bf_map_set_enable & 0x1)<<1)|((arg_bf__bf_map_reset_enable & 0x1)<<2)|((arg_bf__bf_map_trigger_enable & 0x1)<<3)), _prescale(arg__prescale), _delay(arg__delay), _width(arg__width)
   {
   }
   /** internal pulse generation channel */
@@ -111,8 +111,8 @@ public:
   EventCodeV3()
   {
   }
-  EventCodeV3(uint16_t arg__u16Code, uint16_t arg__u16MaskEventAttr, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr(arg__u16MaskEventAttr), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV3(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
   uint16_t code() const { return _u16Code; }
@@ -144,8 +144,8 @@ public:
   EventCodeV4()
   {
   }
-  EventCodeV4(uint16_t arg__u16Code, uint16_t arg__u16MaskEventAttr, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr(arg__u16MaskEventAttr), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV4(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
   uint16_t code() const { return _u16Code; }
@@ -182,13 +182,12 @@ public:
   EventCodeV5()
   {
   }
-  EventCodeV5(uint16_t arg__u16Code, uint16_t arg__u16MaskEventAttr, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr(arg__u16MaskEventAttr), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV5(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
     std::copy(arg__desc, arg__desc+(16), _desc);
   }
   uint16_t code() const { return _u16Code; }
-  uint16_t _u16MaskEventAttr_value() const { return _u16MaskEventAttr; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
   uint8_t isLatch() const { return uint8_t((this->_u16MaskEventAttr>>2) & 0x1); }
@@ -235,15 +234,15 @@ public:
   OutputMap()
   {
   }
-  OutputMap(uint32_t arg__v)
-    : _v(arg__v)
+  OutputMap(EvrData::OutputMap::Source arg_bf__bf_source, uint8_t arg_bf__bf_source_id, EvrData::OutputMap::Conn arg_bf__bf_conn, uint8_t arg_bf__bf_conn_id)
+    : _v((arg_bf__bf_source & 0xff)|((arg_bf__bf_source_id & 0xff)<<8)|((arg_bf__bf_conn & 0xff)<<16)|((arg_bf__bf_conn_id & 0xff)<<24))
   {
   }
   uint32_t value() const { return _v; }
-  EvrData::OutputMap::Source source() const;
-  uint8_t source_id() const;
-  EvrData::OutputMap::Conn conn() const;
-  uint8_t conn_id() const;
+  EvrData::OutputMap::Source source() const { return Source(this->_v & 0xff); }
+  uint8_t source_id() const { return uint8_t((this->_v>>8) & 0xff); }
+  EvrData::OutputMap::Conn conn() const { return Conn((this->_v>>16) & 0xff); }
+  uint8_t conn_id() const { return uint8_t((this->_v>>24) & 0xff); }
   static uint32_t _sizeof()  { return 4; }
 private:
   uint32_t	_v;
