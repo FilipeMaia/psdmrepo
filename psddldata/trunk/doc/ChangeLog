@@ -11,9 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2012-05-03 Andy Salnikov
+- upgrade to pdsdata V03-06-00
+- new packages fli.ddl.xml, oceanoptics.ddl.xml
+- princeton adds new type ConfigV3
+
 Tag: V00-03-00
 2012-05-02 Andy Salnikov
-- all config types now have "config-type" type
+- all config types now have "config-type" tag
 - evr.ddl.xml: one field is split into bitfields, neded to generate 
   constructor for HDF5 data  
 
