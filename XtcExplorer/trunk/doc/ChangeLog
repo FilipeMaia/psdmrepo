@@ -11,7 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-Apr-12 ofte         V00-01-22  
+2012-May-3 ofte                     rev 3329
+	- some "experimental" changes to xtcexplorernew
+	- some additional features of the xtcscanner (-c max calibcaycle, and counting)
+	
+2012-Apr-12 ofte         V00-01-22  rev 3193
 	- commit all the changes so far, which includes 
 	pyana_waveform independence on matplotlib, and a few other fixes. 
 	

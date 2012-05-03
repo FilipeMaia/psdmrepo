@@ -48,8 +48,8 @@ from IPython.Shell import IPShellEmbed
 #from utilities import PyanaOptions 
 #from displaytools import Plotter
 
-from pyana_utilities.opt_parser import PyanaOptions 
-from pyana_utilities.plotting import Plotter
+from utilities import PyanaOptions 
+from displaytools import Plotter
 
 #----------------------------------
 # Local non-exported definitions --

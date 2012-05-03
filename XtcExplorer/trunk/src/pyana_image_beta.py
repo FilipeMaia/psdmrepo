@@ -31,9 +31,9 @@ import numpy as np
 from pypdsdata.xtc import TypeId
 from cspad import CsPad
 
-from pyana_utilities.plotting import Threshold
-from pyana_utilities.opt_parser import PyanaOptions
-from pyana_utilities.data_storage import ImageData
+from utilities import Threshold
+from utilities import PyanaOptions
+from utilities import ImageData
 
 
 #---------------------

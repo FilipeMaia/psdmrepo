@@ -86,7 +86,10 @@ class XtcScanner ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self, filenames = [], options={'ndatagrams':-1, 'l1_offset': 0, 'verbose': 0, 'epics':False } ):
+    def __init__(self,
+                 filenames = [],
+                 options={'nevents':-1, 'ncalibcycles':-1,'l1_offset': 0, 'verbose': 0, 'epics':False }
+                 ):
         """Constructor.
 
         Initialize list of files and options and creates
@@ -105,7 +108,7 @@ class XtcScanner ( object ) :
         self.nevents = []
                         
         # keep track of current state
-        self._state = ''
+        self._state = None
         self._counter = 0
         
 
@@ -134,49 +137,64 @@ class XtcScanner ( object ) :
             print "You need to select an xtc file"
             return
 
+        self.fsize = 0
+        for fname in self.files :
+            self.fsize += os.path.getsize(fname)
+            
         print "Start parsing files: \n", self.files
         start = time.clock()
 
         # read datagrams one by one
+        
 
-        # print progress bar
-        progr = 0
-        print ". ",
+        # counters
+        ndg = 0 # datagrams
+        self.dgsize = 0 # size read so far
 
         xtciter = io.XtcMergeIterator( self.files, self.options['l1_offset'] )
         for dg in xtciter :
+            ndg+=1
+            self.dgsize += dg.xtc.sizeofPayload()
 
-            if self.options['ndatagrams']>-1 :
-                if progr > self.options['ndatagrams'] : break
-            seq = dg.seq
-            xtc = dg.xtc
 
-            self._state = str(seq.service())
+            self._state = dg.seq.service()
 
-            if self._state == "BeginCalibCycle" :
-                self.ncalib+=1;
+            if self._state == TransitionId.Configure :
+                pass
+            
+            elif self._state == TransitionId.BeginCalibCycle:
+                if self.options['ncalibcycles']>-1 :
+                    if self.ncalib >= self.options['ncalibcycles'] : break 
+                self.ncalib+=1
                 self.nevents.append(0)
-            if self._state == "L1Accept" :
+
+            elif self._state == TransitionId.L1Accept:
+                if self.options['nevents']>-1 :
+                    if sum(self.nevents) >= self.options['nevents'] : break 
                 self.nevents[(self.ncalib-1)]+=1
 
+            else :
+                # ignore all other transitions
+                continue
 
             # recursively dump Xtc info
-            self._scan ( xtc )
+            self._scan ( dg.xtc )
 
-            # progress bar
-            progr+=1
-            if (progr%100) == 1:
-                print "\r  %d datagrams read " % progr ,
+
+            # print progress bar
+            frac = float(self.dgsize)/float(self.fsize)
+            if (ndg%100) == 1:
+                print "\r  %d datagrams read (%.0f%%)" % (ndg, 100*frac) ,
                 sys.stdout.flush()
-            if (progr%10) == 0:
+            if (ndg%10) == 0:
                 print " . " ,
                 sys.stdout.flush()
 
         elapsed = ( time.clock() - start )
-        print "\r  %d datagrams read in %f s " % (progr, elapsed)
+        frac = float(self.dgsize)/float(self.fsize)
+        print "\r  %d datagrams read (approx %.0f %% of run) in %f s " % (ndg, 100*frac, elapsed)
 
         self.printSummary(opt_epics=self.options['epics'])
-
 
     def addCountInfo(self):
         pass
@@ -226,6 +244,7 @@ class XtcScanner ( object ) :
     # set one or more options
     def setOption(self, anoption):
         self.options.update(anoption)
+        print "What's here?"
 
     def showOptions(self):
         print self.options
@@ -259,7 +278,6 @@ class XtcScanner ( object ) :
             for x in xtc :
                 self._scan( x )
         else :
-
             source = str(xtc.src).split('(')[1].strip(')')
             contents = str(xtc.contains)
             worthknowing = None
@@ -269,16 +287,19 @@ class XtcScanner ( object ) :
             if ( dtype=='BldInfo' ):
                 #dname = str(xtc.src.type()).split('.')[1]
                 dname = source
-            if ( dtype=='DetInfo' ):
+            elif ( dtype=='DetInfo' ):
                 dtn = str(xtc.src.detector()).split('.')[1]
                 dti = str(xtc.src.detId())
                 dvn = str(xtc.src.device()).split('.')[1]
                 dvi = str(xtc.src.devId());
                 dname = dtn+"-"+dti+"|"+dvn+"-"+dvi
-
+            elif ( dtype=='ProcInfo'):
+                dname = source.split(",")[0]
+            else:
+                print dtype, xtc.src
             dkey = dtype + ':' + dname
-
-            if self._state == "Configure" :
+            
+            if self._state == TransitionId.Configure:
                 if xtc.contains.id() == TypeId.Type.Id_ControlConfig :
                     data = xtc.payload()
                     for i in range(0,data.npvControls()):
@@ -319,6 +340,19 @@ class XtcScanner ( object ) :
                     data = xtc.payload()
                     worthknowing = "%dx%d" % (data.numRows(),data.numChannels())
 
+
+            if self._state == TransitionId.BeginCalibCycle:
+                """ Look for run control to check nevents of a calibcycle
+                """
+                if xtc.contains.id() == TypeId.Type.Id_ControlConfig:
+                    data = xtc.payload()
+                    if data.uses_duration():
+                        worthknowing = "Calibcycle Duration = %s "% str(data.duration())
+                        print worthknowing
+                    if data.uses_events():
+                        worthknowing = "Each calibcycle a %d events"% data.events()
+                        
+
             if dkey not in self.devices :
                 # first occurence of this detector/device
                 self.devices[dkey] = []
@@ -326,7 +360,7 @@ class XtcScanner ( object ) :
                 self.moreinfo[dkey] = []
                 self.moreinfo[dkey].append(worthknowing) 
                 self.counters[dkey] = []
-                self.counters[dkey].append( 1 )
+                self.counters[dkey].append( 1 ) 
             else :
                 # new type of data contents
                 if self.devices[dkey].count( contents )==0 :
@@ -347,8 +381,9 @@ class XtcScanner ( object ) :
 if __name__ == "__main__" :
 
     parser = OptionParser(usage="%prog [options] xtc-files ...")
-    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0, epics=False)
-    parser.add_option('-n', "--ndatagrams",  type='int')
+    parser.set_defaults(nevents=-1, verbose=0, l1_offset=0, epics=False)
+    parser.add_option('-n', "--nevents",  type='int')
+    parser.add_option('-c', "--ndcalibcycles",  type='int')
     parser.add_option('-v', "--verbose", action='count')
     parser.add_option('-l', "--l1-offset", type='float')
     parser.add_option('-e', "--epics", action='store_true')
