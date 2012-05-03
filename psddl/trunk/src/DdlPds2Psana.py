@@ -471,11 +471,12 @@ class DdlPds2Psana ( object ) :
         cfg = ''
         if cfgNeeded :
             print >>self.cpp, T("\n$type $Class::$meth($args) const {")(type=typedecl, Class=type.name, meth=name, args=argdecl)
+            if passargs: passargs = ', '+passargs
             for i in range(len(type.xtcConfig)):
                 if cvt:
-                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$i));")(locals())
+                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$i$passargs));")(locals())
                 else:
-                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return m_xtcObj->$name(*m_cfgPtr$i);")(locals())
+                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return m_xtcObj->$name(*m_cfgPtr$i$passargs);")(locals())
             print >>self.cpp, T("  throw std::runtime_error(\"$Class::$meth: config object pointer is zero\");")(Class=type.name, meth=name)
             print >>self.cpp, "}\n"
         else:
