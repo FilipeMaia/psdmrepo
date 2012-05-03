@@ -40,6 +40,12 @@ XtcClockTime::XtcClockTime ( const Pds::ClockTime& time )
 {
 }
 
+XtcClockTime::XtcClockTime ( uint32_t sec, uint32_t nsec )
+  : seconds(sec)
+  , nanoseconds(nsec)
+{
+}
+
 hdf5pp::Type
 XtcClockTime::stored_type()
 {

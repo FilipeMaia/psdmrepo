@@ -38,21 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Princeton::ConfigV2
 //
-struct PrincetonConfigV2_Data  {
-  uint32_t width;
-  uint32_t height;
-  uint32_t orgX;
-  uint32_t orgY;
-  uint32_t binX;
-  uint32_t binY;
-  float    exposureTime;
-  float    coolingTemp;
-  uint16_t gainIndex;
-  uint16_t readoutSpeedIndex;
-  uint16_t readoutEventCode;
-  uint16_t delayMode;
-};
-
 class PrincetonConfigV2  {
 public:
 
@@ -71,7 +56,18 @@ public:
 
 private:
 
-  PrincetonConfigV2_Data m_data ;
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float    exposureTime;
+  float    coolingTemp;
+  uint16_t gainIndex;
+  uint16_t readoutSpeedIndex;
+  uint16_t readoutEventCode;
+  uint16_t delayMode;
 
 };
 

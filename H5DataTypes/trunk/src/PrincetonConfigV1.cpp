@@ -37,18 +37,18 @@
 namespace H5DataTypes {
 
 PrincetonConfigV1::PrincetonConfigV1 ( const Pds::Princeton::ConfigV1& data )
+  : width(data.width())
+  , height(data.height())
+  , orgX(data.orgX())
+  , orgY(data.orgY())
+  , binX(data.binX())
+  , binY(data.binY())
+  , exposureTime(data.exposureTime())
+  , coolingTemp(data.coolingTemp())
+  , readoutSpeedIndex(data.readoutSpeedIndex())
+  , readoutEventCode(data.readoutEventCode())
+  , delayMode(data.delayMode())
 {
-  m_data.width = data.width();
-  m_data.height = data.height();
-  m_data.orgX = data.orgX();
-  m_data.orgY = data.orgY();
-  m_data.binX = data.binX();
-  m_data.binY = data.binY();
-  m_data.exposureTime = data.exposureTime();
-  m_data.coolingTemp = data.coolingTemp();
-  m_data.readoutSpeedIndex = data.readoutSpeedIndex();
-  m_data.readoutEventCode = data.readoutEventCode();
-  m_data.delayMode = data.delayMode();
 }
 
 hdf5pp::Type
@@ -61,17 +61,17 @@ hdf5pp::Type
 PrincetonConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<PrincetonConfigV1>() ;
-  confType.insert_native<uint32_t>( "width", offsetof(PrincetonConfigV1_Data,width) );
-  confType.insert_native<uint32_t>( "height", offsetof(PrincetonConfigV1_Data,height) );
-  confType.insert_native<uint32_t>( "orgX", offsetof(PrincetonConfigV1_Data,orgX) );
-  confType.insert_native<uint32_t>( "orgY", offsetof(PrincetonConfigV1_Data,orgY) );
-  confType.insert_native<uint32_t>( "binX", offsetof(PrincetonConfigV1_Data,binX) );
-  confType.insert_native<uint32_t>( "binY", offsetof(PrincetonConfigV1_Data,binY) );
-  confType.insert_native<float>( "exposureTime", offsetof(PrincetonConfigV1_Data,exposureTime) );
-  confType.insert_native<float>( "coolingTemp", offsetof(PrincetonConfigV1_Data,coolingTemp) );
-  confType.insert_native<uint32_t>( "readoutSpeedIndex", offsetof(PrincetonConfigV1_Data,readoutSpeedIndex) );
-  confType.insert_native<uint16_t>( "readoutEventCode", offsetof(PrincetonConfigV1_Data,readoutEventCode) );
-  confType.insert_native<uint16_t>( "delayMode", offsetof(PrincetonConfigV1_Data,delayMode) );
+  confType.insert_native<uint32_t>( "width", offsetof(PrincetonConfigV1, width) );
+  confType.insert_native<uint32_t>( "height", offsetof(PrincetonConfigV1, height) );
+  confType.insert_native<uint32_t>( "orgX", offsetof(PrincetonConfigV1, orgX) );
+  confType.insert_native<uint32_t>( "orgY", offsetof(PrincetonConfigV1, orgY) );
+  confType.insert_native<uint32_t>( "binX", offsetof(PrincetonConfigV1, binX) );
+  confType.insert_native<uint32_t>( "binY", offsetof(PrincetonConfigV1, binY) );
+  confType.insert_native<float>( "exposureTime", offsetof(PrincetonConfigV1, exposureTime) );
+  confType.insert_native<float>( "coolingTemp", offsetof(PrincetonConfigV1, coolingTemp) );
+  confType.insert_native<uint32_t>( "readoutSpeedIndex", offsetof(PrincetonConfigV1, readoutSpeedIndex) );
+  confType.insert_native<uint16_t>( "readoutEventCode", offsetof(PrincetonConfigV1, readoutEventCode) );
+  confType.insert_native<uint16_t>( "delayMode", offsetof(PrincetonConfigV1, delayMode) );
 
   return confType ;
 }

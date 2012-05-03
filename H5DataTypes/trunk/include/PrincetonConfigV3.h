@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_PRINCETONCONFIGV1_H
-#define H5DATATYPES_PRINCETONCONFIGV1_H
+#ifndef H5DATATYPES_PRINCETONCONFIGV3_H
+#define H5DATATYPES_PRINCETONCONFIGV3_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PrincetonConfigV1.
+//	Class PrincetonConfigV3.
 //
 //------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/princeton/ConfigV1.hh"
+#include "pdsdata/princeton/ConfigV3.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -36,15 +36,15 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::Princeton::ConfigV1
+// Helper type for Pds::Princeton::ConfigV3
 //
-class PrincetonConfigV1  {
+class PrincetonConfigV3  {
 public:
 
-  typedef Pds::Princeton::ConfigV1 XtcType ;
+  typedef Pds::Princeton::ConfigV3 XtcType ;
 
-  PrincetonConfigV1 () {}
-  PrincetonConfigV1 ( const XtcType& data ) ;
+  PrincetonConfigV3 () {}
+  PrincetonConfigV3 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -64,12 +64,12 @@ private:
   uint32_t binY;
   float    exposureTime;
   float    coolingTemp;
-  uint32_t readoutSpeedIndex;
-  uint16_t readoutEventCode;
-  uint16_t delayMode;
-
+  uint8_t  gainIndex;
+  uint8_t  readoutSpeedIndex;
+  uint16_t exposureEventCode;
+  uint32_t numDelayShots;
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_PRINCETONCONFIGV1_H
+#endif // H5DATATYPES_PRINCETONCONFIGV3_H

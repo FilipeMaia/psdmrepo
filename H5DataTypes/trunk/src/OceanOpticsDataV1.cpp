@@ -40,16 +40,16 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 OceanOpticsDataV1::OceanOpticsDataV1(const XtcType& data)
-  : frameCounter(const_cast<XtcType&>(data).frameCounter())
-  , numDelayedFrames(const_cast<XtcType&>(data).numDelayedFrames())
-  , numDiscardFrames(const_cast<XtcType&>(data).numDiscardFrames())
-  , timeFrameStart(Pds::ClockTime(const_cast<XtcType&>(data).timeFrameStart()))
-  , timeFrameFirstData(Pds::ClockTime(const_cast<XtcType&>(data).timeFrameFirstData()))
-  , timeFrameEnd(Pds::ClockTime(const_cast<XtcType&>(data).timeFrameEnd()))
-  , numSpectraInData(const_cast<XtcType&>(data).numSpectraInData())
-  , numSpectraInQueue(const_cast<XtcType&>(data).numSpectraInQueue())
-  , numSpectraUnused(const_cast<XtcType&>(data).numSpectraUnused())
-  , durationOfFrame(const_cast<XtcType&>(data).durationOfFrame())
+  : frameCounter(data.frameCounter())
+  , numDelayedFrames(data.numDelayedFrames())
+  , numDiscardFrames(data.numDiscardFrames())
+  , timeFrameStart(data.timeFrameStart().tv_sec, data.timeFrameStart().tv_nsec)
+  , timeFrameFirstData(data.timeFrameFirstData().tv_sec, data.timeFrameFirstData().tv_nsec)
+  , timeFrameEnd(data.timeFrameEnd().tv_sec, data.timeFrameEnd().tv_nsec)
+  , numSpectraInData(data.numSpectraInData())
+  , numSpectraInQueue(data.numSpectraInQueue())
+  , numSpectraUnused(data.numSpectraUnused())
+  , durationOfFrame(data.durationOfFrame())
 {
 }
 
@@ -91,7 +91,7 @@ OceanOpticsDataV1::stored_data_type()
 hdf5pp::Type
 OceanOpticsDataV1::stored_corrected_data_type()
 {
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<double>::native_type() ;
+  hdf5pp::Type baseType = hdf5pp::TypeTraits<float>::native_type() ;
 
   hsize_t dims[] = { Pds::OceanOptics::DataV1::iNumPixels } ;
   return hdf5pp::ArrayType::arrayType ( baseType, 1, dims );

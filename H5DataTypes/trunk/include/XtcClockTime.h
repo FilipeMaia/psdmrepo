@@ -52,6 +52,7 @@ public:
   // Default constructor
   XtcClockTime () {}
   XtcClockTime ( const Pds::ClockTime& time ) ;
+  XtcClockTime ( uint32_t sec, uint32_t nsec ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
