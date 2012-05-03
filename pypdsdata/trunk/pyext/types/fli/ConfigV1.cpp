@@ -32,19 +32,20 @@
 namespace {
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, width)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, height)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, orgX)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, orgY)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, binX)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, binY)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, exposureTime)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, coolingTemp)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, readoutSpeedIndex)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, readoutEventCode)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, delayMode)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, size)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, frameSize)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, width)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, height)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, orgX)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, orgY)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, binX)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, binY)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, exposureTime)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, coolingTemp)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, gainIndex)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, readoutSpeedIndex)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, exposureEventCode)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, numDelayShots)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, size)
+  FUN0_WRAPPER(pypdsdata::Fli::ConfigV1, frameSize)
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
@@ -56,15 +57,16 @@ namespace {
     { "binY",              binY,              METH_NOARGS, "self.binY() -> int\n\nReturns binning in Y" },
     { "exposureTime",      exposureTime,      METH_NOARGS, "self.exposureTime() -> float\n\nReturns exposure time" },
     { "coolingTemp",       coolingTemp,       METH_NOARGS, "self.coolingTemp() -> float\n\nReturns integer number" },
+    { "gainIndex",         gainIndex,         METH_NOARGS, "self.gainIndex() -> int\n\nReturns integer number" },
     { "readoutSpeedIndex", readoutSpeedIndex, METH_NOARGS, "self.readoutSpeedIndex() -> int\n\nReturns integer number" },
-    { "readoutEventCode",  readoutEventCode,  METH_NOARGS, "self.readoutEventCode() -> int\n\nReturns integer number" },
-    { "delayMode",         delayMode,         METH_NOARGS, "self.delayMode() -> int\n\nReturns integer number" },
+    { "exposureEventCode", exposureEventCode, METH_NOARGS, "self.exposureEventCode() -> int\n\nReturns integer number" },
+    { "numDelayShots",     numDelayShots,     METH_NOARGS, "self.numDelayShots() -> int\n\nReturns integer number" },
     { "size",              size,              METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
     { "frameSize",         frameSize,         METH_NOARGS, "self.frameSize() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Princeton::ConfigV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Fli::ConfigV1 class.";
 
 }
 
@@ -73,7 +75,7 @@ namespace {
 //		----------------------------------------
 
 void
-pypdsdata::Princeton::ConfigV1::initType( PyObject* module )
+pypdsdata::Fli::ConfigV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -89,18 +91,18 @@ namespace {
 PyObject*
 _repr( PyObject *self )
 {
-  Pds::Princeton::ConfigV1* obj = pypdsdata::Princeton::ConfigV1::pdsObject(self);
+  Pds::Fli::ConfigV1* obj = pypdsdata::Fli::ConfigV1::pdsObject(self);
   if(not obj) return 0;
 
   std::ostringstream str;
-  str << "princeton.ConfigV1(width=" << obj->width()
+  str << "Fli.ConfigV1(width=" << obj->width()
       << ", height=" << obj->height()
       << ", orgX=" << obj->orgX()
       << ", orgY=" << obj->orgY()
       << ", binX=" << obj->binX()
       << ", binY=" << obj->binY()
-      << ", readoutEventCode=" << obj->readoutEventCode()
-      << ", delayMode=" << obj->delayMode()
+<< ", exposureEventCode=" << obj->exposureEventCode()
+      << ", numDelayShots=" << obj->numDelayShots()
       << ", ...)";
 
   return PyString_FromString( str.str().c_str() );

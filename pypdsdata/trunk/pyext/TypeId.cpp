@@ -89,6 +89,8 @@ namespace {
       { "Id_OceanOpticsConfig", Pds::TypeId::Id_OceanOpticsConfig },
       { "Id_OceanOpticsData", Pds::TypeId::Id_OceanOpticsData },
       { "Id_EpicsConfig",     Pds::TypeId::Id_EpicsConfig },
+      { "Id_FliConfig",       Pds::TypeId::Id_FliConfig },
+      { "Id_FliFrame",        Pds::TypeId::Id_FliFrame },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

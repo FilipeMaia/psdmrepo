@@ -73,6 +73,9 @@
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
 
+#include "types/fli/ConfigV1.h"
+#include "types/fli/FrameV1.h"
+
 #include "types/gsc16ai/ConfigV1.h"
 #include "types/gsc16ai/DataV1.h"
 
@@ -100,6 +103,7 @@
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/ConfigV2.h"
+#include "types/princeton/ConfigV3.h"
 #include "types/princeton/FrameV1.h"
 #include "types/princeton/InfoV1.h"
 
@@ -250,6 +254,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_PrincetonConfig :
     if ( not obj ) obj = xtc2obj<Princeton::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Princeton::ConfigV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Princeton::ConfigV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EvrData :
@@ -400,6 +405,14 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EpicsConfig :
     if ( not obj ) obj = xtc2obj<Epics::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_FliConfig :
+    if ( not obj ) obj = xtc2obj<Fli::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_FliFrame :
+    if ( not obj ) obj = xtc2obj<Fli::FrameV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

@@ -6,6 +6,15 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-63
+2012-05-03 Andy Salnikov
+- upgrade to pdsdata V03-06-00
+- new class princeton.ConfigV3
+- new package fli with classes ConfigV1 and FrameV1, very similar to Princeton
+- added new DetInfo and TypeId enums
+- I think there was a bug in princeton.FrameV1.data() method, it did not take 
+  into account pixel binning, should be fixed now
+
 Tag: V00-00-62
 2012-04-27 Andy Salnikov
 - fixing docstrings in few wrapper classes

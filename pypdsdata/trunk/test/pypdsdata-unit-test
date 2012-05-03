@@ -276,7 +276,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_OceanOpticsConfig, 52 )
         self.assertEqual ( TypeId.Type.Id_OceanOpticsData, 53 )
         self.assertEqual ( TypeId.Type.Id_EpicsConfig, 54 )
-        self.assertEqual ( TypeId.Type.NumberOf, 55 )
+        self.assertEqual ( TypeId.Type.Id_FliConfig, 55 )
+        self.assertEqual ( TypeId.Type.Id_FliFrame, 56 )
+        self.assertEqual ( TypeId.Type.NumberOf, 57 )
 
         # instantiation
         TypeId ()
@@ -434,7 +436,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.OceanOptics, 20 )
         self.assertEqual ( DetInfo.Device.Opal1600, 21 )
         self.assertEqual ( DetInfo.Device.Opal8000, 22 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 23 )
+        self.assertEqual ( DetInfo.Device.Fli, 23 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 24 )
 
         
         o1 = DetInfo(0,0,0,0)
@@ -558,7 +561,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.HfxMonImb02, 18 )
         self.assertEqual ( BldInfo.Type.HfxMonImb03, 19 )
         self.assertEqual ( BldInfo.Type.MecLasEm01, 20 )
-        self.assertEqual ( BldInfo.Type.MecLasDio01, 21 )
+        self.assertEqual ( BldInfo.Type.MecTctrPip01, 21 )
         self.assertEqual ( BldInfo.Type.MecTcTrDio01, 22 )
         self.assertEqual ( BldInfo.Type.MecXt2Ipm02, 23 )
         self.assertEqual ( BldInfo.Type.MecXt2Ipm03, 24 )

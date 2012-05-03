@@ -143,7 +143,7 @@ timeFrameStart( PyObject* self, PyObject* )
   Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
   if(not obj) return 0;
 
-  const struct timespec& ts = obj->timeFrameStart();
+  const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
   PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
   PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));
@@ -157,7 +157,7 @@ timeFrameFirstData( PyObject* self, PyObject* )
   Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
   if(not obj) return 0;
 
-  const struct timespec& ts = obj->timeFrameStart();
+  const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
   PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
   PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));
@@ -171,7 +171,7 @@ timeFrameEnd( PyObject* self, PyObject* )
   Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
   if(not obj) return 0;
 
-  const struct timespec& ts = obj->timeFrameStart();
+  const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
   PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
   PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));

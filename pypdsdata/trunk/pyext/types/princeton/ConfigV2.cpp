@@ -97,6 +97,10 @@ _repr( PyObject *self )
   std::ostringstream str;
   str << "princeton.ConfigV2(width=" << obj->width()
       << ", height=" << obj->height()
+      << ", orgX=" << obj->orgX()
+      << ", orgY=" << obj->orgY()
+      << ", binX=" << obj->binX()
+      << ", binY=" << obj->binY()
       << ", readoutEventCode=" << obj->readoutEventCode()
       << ", delayMode=" << obj->delayMode()
       << ", ...)";

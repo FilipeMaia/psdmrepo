@@ -122,6 +122,9 @@
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
 
+#include "types/fli/ConfigV1.h"
+#include "types/fli/FrameV1.h"
+
 #include "types/gsc16ai/ConfigV1.h"
 #include "types/gsc16ai/DataV1.h"
 
@@ -149,6 +152,7 @@
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/ConfigV2.h"
+#include "types/princeton/ConfigV3.h"
 #include "types/princeton/FrameV1.h"
 #include "types/princeton/InfoV1.h"
 
@@ -326,6 +330,12 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "fccd", module );
 
+  module = Py_InitModule3( "_pdsdata.fli", 0, "The Python wrapper module for pdsdata/fli" );
+  pypdsdata::Fli::ConfigV1::initType( module );
+  pypdsdata::Fli::FrameV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "fli", module );
+
   module = Py_InitModule3( "_pdsdata.gsc16ai", 0, "The Python wrapper module for pdsdata/gsc16ai" );
   pypdsdata::Gsc16ai::ConfigV1::initType( module );
   pypdsdata::Gsc16ai::DataV1::initType( module );
@@ -372,6 +382,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.princeton", 0, "The Python wrapper module for pdsdata/princeton" );
   pypdsdata::Princeton::ConfigV1::initType( module );
   pypdsdata::Princeton::ConfigV2::initType( module );
+  pypdsdata::Princeton::ConfigV3::initType( module );
   pypdsdata::Princeton::FrameV1::initType( module );
   pypdsdata::Princeton::InfoV1::initType( module );
   Py_INCREF( module );

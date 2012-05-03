@@ -138,6 +138,7 @@ namespace {
       { "OceanOptics", Pds::DetInfo::OceanOptics },
       { "Opal1600",  Pds::DetInfo::Opal1600 },
       { "Opal8000",  Pds::DetInfo::Opal8000 },
+      { "Fli",       Pds::DetInfo::Fli },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };
