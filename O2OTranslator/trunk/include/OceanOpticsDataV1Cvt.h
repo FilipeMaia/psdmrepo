@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_PRINCETONFRAMEV1CVT_H
-#define O2OTRANSLATOR_PRINCETONFRAMEV1CVT_H
+#ifndef O2OTRANSLATOR_OCEANOPTICSDATAV1CVT_H
+#define O2OTRANSLATOR_OCEANOPTICSDATAV1CVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PrincetonFrameV1Cvt.
+//	Class OceanOpticsDataV1Cvt.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/PrincetonFrameV1.h"
+#include "H5DataTypes/OceanOpticsDataV1.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
 #include "O2OTranslator/CvtDataContFactoryTyped.h"
@@ -39,30 +39,34 @@ namespace O2OTranslator {
 
 class ConfigObjectStore;
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Special converter class for Pds::Princeton::FrameV1 XTC class
+ *  @ingroup O2OTranslator
  *
- *  This software was developed for the LCLS project.  If you use all or
+ *  @brief Special converter class for Pds::OceanOptics::DataV1 XTC class
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
  *
- *  @author Andrei Salnikov
+ *  @author Andy Salnikov
  */
 
-class PrincetonFrameV1Cvt : public EvtDataTypeCvt<Pds::Princeton::FrameV1> {
+class OceanOpticsDataV1Cvt : public EvtDataTypeCvt<Pds::OceanOptics::DataV1> {
 public:
 
-  typedef Pds::Princeton::FrameV1 XtcType ;
+  typedef Pds::OceanOptics::DataV1 XtcType ;
 
-  // constructor
-  PrincetonFrameV1Cvt ( const std::string& typeGroupName,
-                        const ConfigObjectStore& configStore,
-                        hsize_t chunk_size,
-                        int deflate ) ;
+  // Default constructor
+  OceanOpticsDataV1Cvt(const std::string& typeGroupName,
+                       const ConfigObjectStore& configStore,
+                       hsize_t chunk_size,
+                       int deflate);
 
   // Destructor
-  virtual ~PrincetonFrameV1Cvt () ;
+  virtual ~OceanOpticsDataV1Cvt () ;
 
 protected:
 
@@ -79,24 +83,22 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::PrincetonFrameV1> > FrameCont ;
-  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > FrameDataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::OceanOpticsDataV1> > ObjectCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CorrectedDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
-  FrameCont* m_frameCont ;
-  FrameDataCont* m_frameDataCont ;
+  ObjectCont* m_objCont ;
+  DataCont* m_dataCont ;
+  CorrectedDataCont* m_corrDataCont ;
   XtcClockTimeCont* m_timeCont ;
-
-  // Copy constructor and assignment are disabled by default
-  PrincetonFrameV1Cvt ( const PrincetonFrameV1Cvt& ) ;
-  PrincetonFrameV1Cvt& operator = ( const PrincetonFrameV1Cvt& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_PRINCETONFRAMEV1CVT_H
+#endif // O2OTRANSLATOR_OCEANOPTICSDATAV1CVT_H

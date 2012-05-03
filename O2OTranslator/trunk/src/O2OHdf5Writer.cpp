@@ -57,6 +57,7 @@
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
+#include "H5DataTypes/FliConfigV1.h"
 #include "H5DataTypes/Gsc16aiConfigV1.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbConfigV2.h"
@@ -69,11 +70,13 @@
 #include "H5DataTypes/LusiIpmFexConfigV2.h"
 #include "H5DataTypes/LusiIpmFexV1.h"
 #include "H5DataTypes/LusiPimImageConfigV1.h"
+#include "H5DataTypes/OceanOpticsConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
 #include "H5DataTypes/PrincetonConfigV2.h"
+#include "H5DataTypes/PrincetonConfigV3.h"
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
@@ -93,10 +96,12 @@
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
+#include "O2OTranslator/FliFrameV1Cvt.h"
 #include "O2OTranslator/Gsc16aiDataV1Cvt.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "O2OTranslator/OceanOpticsDataV1Cvt.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
 #include "O2OTranslator/PrincetonFrameV1Cvt.h"
 #include "O2OTranslator/TimepixDataV1Cvt.h"
@@ -308,6 +313,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonConfig,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PrincetonConfigV3> ( "Princeton::ConfigV3" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonConfig,3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::FccdConfigV1> ( "FCCD::FccdConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_FccdConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
@@ -378,6 +387,14 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPad2x2ConfigV1> ( "CsPad2x2::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Cspad2x2Config, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::OceanOpticsConfigV1> ( "OceanOptics::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_OceanOpticsConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::FliConfigV1> ( "Fli::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_FliConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter object for CsPad calibration data
@@ -575,6 +592,16 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   // very special converter for Timepix::DataV2
   converter.reset( new TimepixDataV2Cvt ( "Timepix::DataV2", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixData,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for OceanOptics::DataV1, it needs two types of data
+  converter.reset( new OceanOpticsDataV1Cvt ( "OceanOptics::DataV1", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_OceanOpticsData, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Fli::FrameV1, it needs two types of data
+  converter.reset( new FliFrameV1Cvt ( "Fli::FrameV1", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_FliFrame,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }

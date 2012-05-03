@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-02
+2012-05-03 Andy Salnikov
+- upgrading to pdsdata V03-06-00
+- new classes added: PrincetonConfigV3, FliConfigV1, FliFrameV1
+- finished implementation of OceanOptics stuff
+- I think there was a bug in Princeton.FrameV1 converter, it did not take 
+  into account pixel binning, should be fixed now
+
 Tag: V00-18-01
 2012-05-03 Andy Salnikov
 - add protection for non-unique alias names
