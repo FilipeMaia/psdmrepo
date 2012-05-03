@@ -19,14 +19,14 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-pdsdata_ver = "3.5.3"
-PREFIX = pjoin(env['SIT_ROOT'],"sw/external/pdsdata",pdsdata_ver)
+pdsdata_ver = "3.6.0"
+PREFIX = pjoin(env['SIT_ROOT'], "sw/external/pdsdata", pdsdata_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
 INCDIR = "pdsdata"
 PKGLIBS = """
 acqdata bld camdata controldata cspad2x2data cspaddata encoderdata epics
-evrdata fccddata fexampdata gsc16aidata indexdata ipimbdata lusidata
+evrdata fccddata fexampdata flidata gsc16aidata indexdata ipimbdata lusidata
 oceanopticsdata opal1kdata phasicsdata pnccddata princetondata pulnixdata
 timepixdata xampsdata xtcdata
 """
