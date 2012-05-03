@@ -104,6 +104,54 @@ private:
 };
 #pragma pack(pop)
 
+/** @class ConfigV3
+
+  
+*/
+
+#pragma pack(push,4)
+
+class ConfigV3 {
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 3 /**< XTC type version number */ };
+  uint32_t width() const { return _uWidth; }
+  uint32_t height() const { return _uHeight; }
+  uint32_t orgX() const { return _uOrgX; }
+  uint32_t orgY() const { return _uOrgY; }
+  uint32_t binX() const { return _uBinX; }
+  uint32_t binY() const { return _uBinY; }
+  float exposureTime() const { return _f32ExposureTime; }
+  float coolingTemp() const { return _f32CoolingTemp; }
+  uint8_t gainIndex() const { return _u8GainIndex; }
+  uint8_t readoutSpeedIndex() const { return _u8ReadoutSpeedIndex; }
+  uint16_t exposureEventCode() const { return _u16ExposureEventCode; }
+  uint32_t numDelayShots() const { return _u32NumDelayShots; }
+  /** Total size in bytes of the Frame object */
+  uint32_t frameSize() const;
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  static uint32_t _sizeof()  { return 40; }
+private:
+  uint32_t	_uWidth;
+  uint32_t	_uHeight;
+  uint32_t	_uOrgX;
+  uint32_t	_uOrgY;
+  uint32_t	_uBinX;
+  uint32_t	_uBinY;
+  float	_f32ExposureTime;
+  float	_f32CoolingTemp;
+  uint8_t	_u8GainIndex;
+  uint8_t	_u8ReadoutSpeedIndex;
+  uint16_t	_u16ExposureEventCode;
+  uint32_t	_u32NumDelayShots;
+};
+#pragma pack(pop)
+
 /** @class FrameV1
 
   
@@ -111,6 +159,7 @@ private:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
 #pragma pack(push,4)
 
 class FrameV1 {
@@ -125,8 +174,12 @@ public:
   ndarray<uint16_t, 2> data(const Princeton::ConfigV2& cfg) const { ptrdiff_t offset=8;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
+  ndarray<uint16_t, 2> data(const Princeton::ConfigV3& cfg) const { ptrdiff_t offset=8;
+  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
   static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
   static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
+  static uint32_t _sizeof(const Princeton::ConfigV3& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;
