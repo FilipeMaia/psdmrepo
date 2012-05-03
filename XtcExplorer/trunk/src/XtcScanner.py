@@ -18,9 +18,10 @@ part of it, please give an appropriate acknowledgment.
 
 @see pyxtcsummary
 
-@version $Id: XtcScanner 0 2011-01-24 11:45:00 ofte $
-
-@author Ingrid Ofte
+@id      $Id: XtcScanner 0 2011-01-24 11:45:00 ofte $
+@version $Revision: $
+@author  $Author: $ 
+@data    $Date: $
 """
 
 
