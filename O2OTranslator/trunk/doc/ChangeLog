@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-01
+2012-05-03 Andy Salnikov
+- add protection for non-unique alias names
+
 Tag: V00-18-00
 2012-05-01 Andy Salnikov
 - adding support for EPICS aliases

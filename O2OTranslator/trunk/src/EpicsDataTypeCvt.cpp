@@ -114,13 +114,14 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
   // is there a subgroup for this PV?
   hdf5pp::Group subgroup = m_subgroups[group][pvname] ;
   if ( not subgroup.valid() ) {
-    MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
     if (group.hasChild(pvname)) {
 
+      MsgLog(logger,trace, "EpicsDataTypeCvt -- opening subgroup " << pvname ) ;
       subgroup = group.openGroup( pvname ) ;
 
     } else {
 
+      MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
       subgroup = group.createGroup( pvname ) ;
 
       // there may be an alias defined for this PV
@@ -129,8 +130,15 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
         for (int i = 0; i != ecfg->getNumPv(); ++ i) {
           const Pds::Epics::PvConfigV1& pvcfg = *ecfg->getPvConfig(i);
           if (pvcfg.iPvId == data.iPvId) {
-            group.makeSoftLink(pvname, pvcfg.sPvDesc);
-            break;
+            if (pvname == pvcfg.sPvDesc) {
+              MsgLog(logger, debug, "EpicsDataTypeCvt -- alias is the same as PV name " << pvcfg.sPvDesc );
+            } else if (group.hasChild(pvcfg.sPvDesc)) {
+              MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << pvcfg.sPvDesc );
+            } else {
+              MsgLog(logger,trace, "EpicsDataTypeCvt -- creating alias " << pvcfg.sPvDesc ) ;
+              group.makeSoftLink(pvname, pvcfg.sPvDesc);
+              break;
+            }
           }
         }
       }
