@@ -65,12 +65,41 @@ private:
 };
 
 
+class ConfigV3 : public Psana::Princeton::ConfigV3 {
+public:
+  typedef PsddlPds::Princeton::ConfigV3 XtcType;
+  typedef Psana::Princeton::ConfigV3 PsanaType;
+  ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV3();
+  virtual uint32_t width() const;
+  virtual uint32_t height() const;
+  virtual uint32_t orgX() const;
+  virtual uint32_t orgY() const;
+  virtual uint32_t binX() const;
+  virtual uint32_t binY() const;
+  virtual float exposureTime() const;
+  virtual float coolingTemp() const;
+  virtual uint8_t gainIndex() const;
+  virtual uint8_t readoutSpeedIndex() const;
+  virtual uint16_t exposureEventCode() const;
+  virtual uint32_t numDelayShots() const;
+  virtual uint32_t frameSize() const;
+  virtual uint32_t numPixelsX() const;
+  virtual uint32_t numPixelsY() const;
+  virtual uint32_t numPixels() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
 class FrameV1 : public Psana::Princeton::FrameV1 {
 public:
   typedef PsddlPds::Princeton::FrameV1 XtcType;
   typedef Psana::Princeton::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr);
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV2>& cfgPtr);
+  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV3>& cfgPtr);
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const;
   virtual float readoutTime() const;
@@ -80,6 +109,7 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   boost::shared_ptr<const PsddlPds::Princeton::ConfigV1> m_cfgPtr0;
   boost::shared_ptr<const PsddlPds::Princeton::ConfigV2> m_cfgPtr1;
+  boost::shared_ptr<const PsddlPds::Princeton::ConfigV3> m_cfgPtr2;
 };
 
 Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds);

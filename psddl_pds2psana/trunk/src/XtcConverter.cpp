@@ -38,9 +38,11 @@
 #include "psddl_pds2psana/epics.ddl.h"
 #include "psddl_pds2psana/evr.ddl.h"
 #include "psddl_pds2psana/fccd.ddl.h"
+#include "psddl_pds2psana/fli.ddl.h"
 #include "psddl_pds2psana/gsc16ai.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/lusi.ddl.h"
+#include "psddl_pds2psana/oceanoptics.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/pnccd.ddl.h"
 #include "psddl_pds2psana/princeton.ddl.h"
@@ -157,6 +159,16 @@ namespace {
     return false;
   }
   
+  template<typename FinalType, typename XtcConfigType1, typename XtcConfigType2, typename XtcConfigType3>
+  bool
+  storeDataProxyCfg3(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
+  {
+    if (storeDataProxyCfg<FinalType, XtcConfigType1>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType2>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType3>(xtc, evt, cfgStore)) return true;
+    return false;
+  }
+
   template<typename PsanaType, typename XtcType>
   void 
   storeValueType(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt)
@@ -286,7 +298,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 0) ::storeValueType<Psana::Bld::BldDataPhaseCavity, PsddlPds::Bld::BldDataPhaseCavity>(xtc, evt);
     break;
   case Pds::TypeId::Id_PrincetonFrame:
-    if (version == 1) ::storeDataProxyCfg2<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg3<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2, PsddlPds::Princeton::ConfigV3>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_PrincetonConfig:
     break;
@@ -374,7 +386,17 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_CspadCompressedElement:
     break;
+  case Pds::TypeId::Id_OceanOpticsConfig:
+    break;
+  case Pds::TypeId::Id_OceanOpticsData:
+    if (version == 1) ::storeDataProxyCfg<OceanOptics::DataV1, PsddlPds::OceanOptics::ConfigV1>(xtc, evt, cfgStore);
+    break;
   case Pds::TypeId::Id_EpicsConfig:
+    break;
+  case Pds::TypeId::Id_FliConfig:
+    break;
+  case Pds::TypeId::Id_FliFrame:
+    if (version == 1) ::storeDataProxyCfg<Fli::FrameV1, PsddlPds::Fli::ConfigV1>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::NumberOf:
     break;
@@ -444,6 +466,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_PrincetonConfig:
     if (version == 1) ::storeCfgObject<Princeton::ConfigV1>(xtc, cfgStore);
     if (version == 2) ::storeCfgObject<Princeton::ConfigV2>(xtc, cfgStore);
+    if (version == 3) ::storeCfgObject<Princeton::ConfigV3>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_EvrData:
     break;
@@ -532,8 +555,18 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_CspadCompressedElement:
     break;
+  case Pds::TypeId::Id_OceanOpticsConfig:
+    if (version == 1) ::storeCfgObject<OceanOptics::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_OceanOpticsData:
+    break;
   case Pds::TypeId::Id_EpicsConfig:
     if (version == 1) ::storeCfgObject<Epics::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_FliConfig:
+    if (version == 1) ::storeCfgObject<Fli::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_FliFrame:
     break;
   case Pds::TypeId::NumberOf:
     break;
