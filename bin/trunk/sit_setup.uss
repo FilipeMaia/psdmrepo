@@ -172,10 +172,12 @@ if [ -z "$sit_arch" -a -z "$os" ] ; then
   if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
     rh=`cat /etc/redhat-release | tr ' ' _`
     case $rh in
-      Scientific_Linux_*_release_4.*)           os=slc4 ;;
-      Scientific_Linux_*_release_3.*)           os=slc3 ;;
       Red_Hat_Enterprise_Linux_*_release_5.*)   os=rhel5 ;;
       Red_Hat_Enterprise_Linux_*_release_6.*)   os=rhel6 ;;
+      CentOS_release_5.*)                       os=rhel5 ;;
+      CentOS_release_6.*)                       os=rhel6 ;;
+      Scientific_Linux_*_release_3.*)           os=slc3 ;;
+      Scientific_Linux_*_release_4.*)           os=slc4 ;;
     esac
   elif [ "$os" = "Linux" -a -r /etc/lsb-release ] ; then
     . /etc/lsb-release
