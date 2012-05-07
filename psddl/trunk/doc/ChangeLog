@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2012-05-07 Andy Salnikov
+- fix for missing include file causing psddlc crash with incorrect
+  dignostics
+
 Tag: V00-02-02
 2012-05-03 Andy Salnikov
 - DdlPds2Psana did not pass all arguments to forwarded modules

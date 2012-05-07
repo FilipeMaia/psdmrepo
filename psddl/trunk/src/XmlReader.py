@@ -166,6 +166,9 @@ class XmlReader ( object ) :
 
         logging.debug("XmlReader._parseUse: locating include file %s", file)
         path = self._findInclude(file)
+        if path is None:
+            raise ValueError("Cannot find include file: "+file)
+        logging.debug("XmlReader._parseUse: found file %s", path)
 
         # if this file was processed already just skip it
         if self._processed(path):
@@ -178,12 +181,6 @@ class XmlReader ( object ) :
             if f not in self.processed and _cmpFiles(path, f) :
                 included = False
                 break
-
-        logging.debug("XmlReader._parseUse: locating include file %s", file)
-        path = self._findInclude(file)
-        if path is None:
-            raise ValueError("Cannot find include file: "+file)
-        logging.debug("XmlReader._parseUse: found file %s", path)
 
         model.use.append(dict(file=file, cpp_headers=headers))
 
