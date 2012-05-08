@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-8 ofte                     rev 3358
+	- added a few more Shared IPIMB types to the list
+
 2012-May-8 ofte                     rev 3357
         - Added Fli data frames to the explorer. 
 	- Bugfix for image plotting 

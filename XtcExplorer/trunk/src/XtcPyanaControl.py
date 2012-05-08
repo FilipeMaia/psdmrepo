@@ -893,6 +893,8 @@ Start with selecting data of interest to you from list on the left and general r
         # --- --- --- Ipimb --- --- ---
         if ( str(box.text()).find("IPM")>=0 or
              str(box.text()).find("DIO")>=0 or
+             str(box.text()).find("LAS-EM")>=0 or
+             str(box.text()).find("TCTR")>=0 or             
              str(box.text()).find("Ipimb")>=0 ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_ipimb")
