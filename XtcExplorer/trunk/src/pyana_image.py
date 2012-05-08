@@ -12,6 +12,7 @@ __version__ = "$Revision: 3190 $"
 #--------------------------------
 import sys
 import time
+import logging
 
 import numpy as np
 import scipy.misc
@@ -131,7 +132,8 @@ class  pyana_image ( object ) :
                              'Princeton' : TypeId.Type.Id_PrincetonConfig,
                              'Fccd'      : TypeId.Type.Id_FccdConfig,
                              'PIM'       : TypeId.Type.Id_PimImageConfig,
-                             'Timepix'   : TypeId.Type.Id_TimepixConfig
+                             'Timepix'   : TypeId.Type.Id_TimepixConfig,
+                             'Fli'       : TypeId.Type.Id_FliConfig
                              }
 
         self.datatypes = {'Cspad2x2'      : TypeId.Type.Id_Cspad2x2Element, 
@@ -143,7 +145,8 @@ class  pyana_image ( object ) :
                           'Fccd'          : TypeId.Type.Id_Frame,
                           'pnCCD'         : TypeId.Type.Id_pnCCDframe,
                           'Princeton'     : TypeId.Type.Id_PrincetonFrame,
-                          'Timepix'       : TypeId.Type.Id_TimepixData
+                          'Timepix'       : TypeId.Type.Id_TimepixData,
+                          'Fli'           : TypeId.Type.Id_FliFrame
                           }
     def initlists(self):
         self.accu_start = 0
@@ -178,6 +181,7 @@ class  pyana_image ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        logging.info( "pyana_image.beginjob()" )
 
         self.n_shots = 0
         self.n_accum = 0
@@ -198,18 +202,18 @@ class  pyana_image ( object ) :
 
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
-            config = env.getConfig( self.configtypes[device], addr )
-            if not config:
+            self.config = env.getConfig( self.configtypes[device], addr )
+            if not self.config:
                 print '*** %s config object is missing ***'%addr
                 return
 
             if addr.find('Cspad2x2')>=0:
-                sections = config.sections()
+                sections = self.config.sections()
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
                 
             elif addr.find('Cspad')>=0:
                 quads = range(4)
-                sections = map(config.sections, quads)
+                sections = map(self.config.sections, quads)
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
                 try:
                     self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
@@ -219,6 +223,7 @@ class  pyana_image ( object ) :
                     
     # process event/shot data
     def event ( self, evt, env ) :
+        logging.debug( "pyana_image.event()" )
 
         # this one counts every event
         self.n_shots+=1
@@ -232,7 +237,9 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             frame = evt.get( self.datatypes[device], addr )
-            if frame is None: continue
+            if frame is None:
+                print "No frame from ", addr
+                return
             
             if addr.find("Cspad2x2")>0 :
                 # in this case 'frame' is the MiniElement
@@ -244,6 +251,9 @@ class  pyana_image ( object ) :
                 quads = evt.getCsPadQuads(addr, env)
                 # then call cspad library to assemble the image
                 image = self.cspad[addr].get_detector_image(quads)
+
+            elif addr.find("Fli")>0:
+                image = frame.data(self.config)
 
             else:
                 # all other cameras have simple arrays. 
@@ -348,9 +358,9 @@ class  pyana_image ( object ) :
                         print "%d rejecting %s #%d, vmax = %.0f"%(env.subprocess(), \
                                                                   addr,self.n_shots, maxvalue)
 
-            
             # ----------- Event Image -----------
             if "image" in self.quantities:
+                print "Adding image "
                 self.data[addr].image   = image            
 
             if "projections" in self.quantities:
@@ -376,6 +386,7 @@ class  pyana_image ( object ) :
                 self.n_good[addr]+=1
 
                 if "average" in self.quantities: 
+                    print "Adding average" 
                     try:
                         self.sum_good_images[addr] += image
                     except TypeError:
@@ -398,6 +409,7 @@ class  pyana_image ( object ) :
             for addr in self.sources:
                 # collect averages
                 if 'average' in self.quantities:
+                    print "saving average from ", self.n_good[addr], " events. "
                     self.data[addr].counter = self.n_good[addr]
                     self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
 
@@ -456,6 +468,7 @@ class  pyana_image ( object ) :
 
     # after last event has been processed. 
     def endjob( self, evt, env ) :
+        logging.info( "pyana_image.endjob()" )
 
         print "Done processing       ", self.n_shots, " events"
 

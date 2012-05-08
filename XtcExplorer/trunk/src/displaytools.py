@@ -326,6 +326,7 @@ class DataDisplay(object):
         for image_data in datalist:
 
             if image_data.image is not None:
+                print "Image"
                 i+=1
                 self.image_disp.add_frame("frame%d"%i,
                                           "%s image from shot #%d" % (image_data.name,self.event_number),
@@ -333,6 +334,7 @@ class DataDisplay(object):
                 if image_data.showProj: self.image_disp.frames["frame%d"%i].showProj = True
 
             if image_data.average is not None:
+                print "Average" 
                 i+=1
                 self.image_disp.add_frame("frame%d"%i,
                                           "%s average of %d" % (image_data.name,image_data.counter),
@@ -355,6 +357,8 @@ class DataDisplay(object):
 
             self.image_disp.title = "Cameras shot#%d"%self.event_number
 
+            print "Number of images in event ", self.event_number, ": ", len(self.image_disp.frames)
+            
         newmode = self.image_disp.plot_all_frames(fignum=100,ordered=True)
         return newmode
     
