@@ -32,8 +32,9 @@ import sys
 import os
 import numpy              as np
 
-import CalibPars          as calp
 import CalibParsDefault   as cald
+import CalibPars          as calp
+import CalibParsEvaluated as cpe
 import CSPadConfigPars    as ccp
 import CSPadImageProducer as cip
 import GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
@@ -78,13 +79,14 @@ def main_alignment_test() :
     event   = 201
 
     print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run = runnum, path = path_calib )
+    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
     #calp.calibpars.printCalibPars()
     #calp.calibpars.printCalibFiles ()
     #calp.calibpars.printListOfCalibTypes()
     #cald.calibparsdefault.printListOfCalibTypes()
     #cald.calibparsdefault.printCalibParsDefault()
     #cald.calibparsdefault.printCalibParsDefault('center_global')
+    cpe.cpeval.printCalibParsEvaluatedAll() 
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
@@ -106,14 +108,14 @@ def main_alignment_test() :
     ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer(rotation=3, tiltIsOn=True)#, mirror=True)
+    cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True)#, mirror=True)
     #cspadimg.printInputPars()
     #cspadimg.printGeometryPars()
     #arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
     arr = cspadimg.getCSPadImage( ds1ev )
 
     print 'Plot CSPad image'
-    AmpRange = (1500, 3000)
+    #AmpRange = (1500, 3000)
     #AmpRange = (900,  1400)
     #AmpRange = (-10, 40)
     AmpRange = (0, 100)

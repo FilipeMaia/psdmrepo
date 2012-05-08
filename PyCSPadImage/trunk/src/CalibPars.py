@@ -32,7 +32,8 @@ import sys
 import os
 #from PyQt4 import QtGui, QtCore
 import numpy as np
-import CalibParsDefault as cpdef
+import CalibParsDefault   as cpdef
+import CalibParsEvaluated as cpe
 
 #---------------------
 #  Class definition --
@@ -129,6 +130,10 @@ class CalibPars (object) :
             if type == 'center' or type == 'center_corr' : calibpars.shape = (3,4,8)
             #print 'calibpars.shape = ', calibpars.shape
             self.cpars[type] = calibpars
+
+        #=================================
+        cpe.cpeval.setCalibParsEvaluated()
+        #=================================
 
 #---------------------
 
@@ -230,18 +235,15 @@ calibpars = CalibPars() # Sets default calibration parameters.
 
 def main() :
 
-    #calibpars.setCalibPars(20, '/reg/d/psdm/CXI/cxi80410/calib', 'CsPad::CalibV1', 'CxiDs1.0:Cspad.0')
-    #calibpars.setCalibPars(30, '/reg/d/psdm/XPP/xpp36211/calib', 'CsPad::CalibV1', 'XppGon.0:Cspad.0')
+    calibpars.printListOfCalibTypes()
+    calibpars.printCalibPars() # prints the default calib pars
 
-    #calibpars.setRun(10)
+    #calibpars.setCalibPars(10, '/reg/d/psdm/CXI/cxi35711/calib', 'CsPad::CalibV1', 'CxiDs1.0:Cspad.0')
+    calibpars.setCalibParsForPath (run=10, path='/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0')
+    calibpars.printCalibPars()
+    cpe.cpeval.printCalibParsEvaluatedAll() 
 
     #calibpars.printCalibFiles()
-    calibpars.printCalibPars()
-    calibpars.printListOfCalibTypes()
-
-    calibpars.setCalibPars(10, '/reg/d/psdm/CXI/cxi35711/calib', 'CsPad::CalibV1', 'CxiDs1.0:Cspad.0')
-    calibpars.printCalibPars()
-
     #calibpars.findCalibFile(999)
     #print calibpars.getCalibPars('offset')
     #print calibpars.getCalibPars('XxX')

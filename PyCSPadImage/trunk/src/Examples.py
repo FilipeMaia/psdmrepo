@@ -58,12 +58,12 @@ def main_example_cxi() :
     event   = 5
 
     print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run = runnum, path = path_calib )
+    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
     #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=50 )
-    print 'ds1ev.shape = ',ds1ev.shape
+    print 'CSPad array shape =',ds1ev.shape
 
     #print 'Subtract pedestals, if they were not subtracted in translator...'
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
@@ -71,8 +71,10 @@ def main_example_cxi() :
     #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer()
-    arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
+    cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True)#, mirror=True)
+
+    #arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
+    arr = cspadimg.getCSPadImage( ds1ev ) # This works faster
 
     print 'Plot CSPad image'
     AmpRange = (-10,90)
@@ -105,21 +107,24 @@ def main_example_xpp() :
     event = 0
 
     print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run = runnum, path = path_calib )
+    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
     #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=50 )
-    print 'ds1ev.shape = ',ds1ev.shape
+    print 'CSPad array shape =',ds1ev.shape
 
     #print 'Subtract pedestals, if they were not subtracted in translator...'
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
     #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer()
-    arr = arr_raw = cspadimg.getImageArrayForCSPadElement(ds1ev)
-    arr = np.rot90(arr_raw,2) # index for N*90 degree rotation
+    #cspadimg = cip.CSPadImageProducer()
+    cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True) #, mirror=True)
+    arr = cspadimg.getCSPadImage( ds1ev ) # This works faster
+
+    #arr = arr_raw = cspadimg.getImageArrayForCSPadElement(ds1ev)
+    #arr = np.rot90(arr_raw,2) # index for N*90 degree rotation
 
     print 'Plot CSPad image'
     AmpRange = (1600,2500)

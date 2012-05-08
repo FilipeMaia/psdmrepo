@@ -278,9 +278,9 @@ def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16
 def getCSPadArrayFromFile(fname, dtype=np.float32, shape = (32, 185, 388)) : # raw shape is (5920, 388)
     try :
         arr = np.loadtxt(fname, dtype)
-        print 'Load array from file:\n', fname
-        print 'Input  arr.shape=', arr.shape
-        print 'Output arr.shape=', shape
+        print 'Load array from file:', fname
+        #print 'Input  arr.shape=', arr.shape
+        #print 'Output arr.shape=', shape
         arr.shape = shape
         return arr
 

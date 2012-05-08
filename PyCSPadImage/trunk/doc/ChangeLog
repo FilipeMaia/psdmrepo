@@ -12,6 +12,20 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-05-08 Mikhail S. Dubrovin
+Tag: V00-00-04
+	
+- Add/modify modules in order to work with CSPad clobal 
+  2x1 coordimates
+A       PyCSPadImage/src/CalibParsEvaluated.py
+M       PyCSPadImage/src/Examples.py
+M       PyCSPadImage/src/Alignment.py
+M       PyCSPadImage/src/CalibPars.py
+M       PyCSPadImage/src/CSPadImageProducer.py
+M       PyCSPadImage/src/GlobalMethods.py
+M       PyCSPadImage/src/CSPadConfigPars.py
+	
+#---------------------
 2012-03-09 Mikhail S. Dubrovin
 Tag: V00-00-03
 	

@@ -52,6 +52,15 @@ class CSPadConfigPars(object) :
     indPairsInQuads,
     quadNumsInEvent
     """
+    nquads      =   4    # Total number of quads in cspad
+    nsects      =   8    # Total number of sections in quad
+    wid2x1      = 185    # Number of rows in 2x1 at rotation 0
+    len2x1      = 388    # Number of cols in 2x1 at rotation 0
+    gapIn2x1    =   3    # Gap in 2x1 between two halfs
+
+    pixSize     = 109.92 # Pixel size in um (micrometer)
+    pixSizeWide = 274.80 # Wide pixel size in um (micrometer)
+
 
 #---------------------
 
@@ -77,10 +86,6 @@ class CSPadConfigPars(object) :
         self.quadInDetOriInd = [2, 1, 0, 3]
 
         self.margin    = 4    # For tilt spare space near frame
-
-        self.gapIn2x1  = 3    # Gap in 2x1 between two halfs
-        self.wid2x1    = 185   # Number of rows in 2x1 at rotation 0
-        self.len2x1    = 388  # Number of cols in 2x1 at rotation 0
 
         self.cspadQuad = 0    # Defauld quad number
         self.cspadPair = 0    # Defauld pair/section number

@@ -157,7 +157,6 @@ class CSPadImageProducer (object) :
         #print 'arr2dquad=\n', arr2dquad
         return arr2dquad
 
-
 #---------------------
 
     def getImageArrayForCSPadElement( self, arr1ev ):
@@ -183,7 +182,10 @@ class CSPadImageProducer (object) :
         quadXOffset = [offX[0]-gapX+shiftX, offX[1]-gapX-shiftX, offX[2]+gapX-shiftX, offX[3]+gapX+shiftX]
         quadYOffset = [offY[0]-gapY-shiftY, offY[1]+gapY-shiftY, offY[2]+gapY+shiftY, offY[3]-gapY+shiftY]
 
-        #for quad in range(4) :
+        #print 'quadXOffset = ', quadXOffset 
+        #print 'quadYOffset = ', quadYOffset 
+
+        #for iq in range(1) :
         for iq in range(len(quadNumsInEvent)) :
             quad = int(quadNumsInEvent[iq]) # uint8 -> int
             arr2dquad = self.getImageArrayForQuad(arr1ev, quad)
@@ -256,9 +258,14 @@ class CSPadImageProducer (object) :
 #---------------------
 #---------------------
 #---------------------
+# New approach to the CSPad geometry
+# All 2x1 centers of entire CSPad are defined in the same coordinate frame.
+#---------------------
+#---------------------
+#---------------------
 
     def getCSPadArrayWithGap(self, arr, gap=3) :
-        print 'getCSPadArrayWithGap(...): Input array shape =', arr.shape
+        #print 'getCSPadArrayWithGap(...): Input array shape =', arr.shape
         arr.shape = (arr.size/388,388)
         nrows,ncols = arr.shape # (32*185,388) = (5920,388) # <== expected input array shape for all sections
         if ncols != 388 or nrows<185 :
@@ -281,8 +288,8 @@ class CSPadImageProducer (object) :
         gap              = ccp.cspadconfig.gapIn2x1
         dPhi             = calp.calibpars.getCalibPars ('tilt')
 
-        print 'quadNumsInEvent =', quadNumsInEvent
-        print 'indPairsInQuads =\n',  indPairsInQuads
+        #print 'quadNumsInEvent =', quadNumsInEvent
+        #print 'indPairsInQuads =\n',  indPairsInQuads
 
         arr_all       = self.getCSPadArrayWithGap(arr, gap)
 
@@ -291,11 +298,9 @@ class CSPadImageProducer (object) :
         dim1 = arr_all.size/dim3/dim2
         arr_all.shape = (dim1,dim2,dim3) # Reshape for quad and segment indexes
 
-        print 'dims          =', dim1, dim2, dim3
+        #print 'dims          =', dim1, dim2, dim3
         #print 'arr_all.shape =', arr_all.shape
 
-        #arr_cspad_img = np.zeros( (1765,1765), dtype=np.float32 )
-        #arr_cspad_img = np.zeros( (1697,1697), dtype=np.float32 )
         arr_cspad_img = np.zeros( (self.detDimX,self.detDimY), dtype=np.float32 )
 
         for indq in range(len(quadNumsInEvent)) :
@@ -372,6 +377,8 @@ def main_calib() :
     #                             group    = 'CsPad::CalibV1',
     #                             source   = 'CxiDs1.0:Cspad.0' )
 
+    runnum=0
+
     #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0039-Dsd/' 
     #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0080-Ds1' 
     #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det' 
@@ -383,9 +390,9 @@ def main_calib() :
     #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
     #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
     #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
-    fname  = '/reg/d/psdm/XPP/xpp47712/hdf5/xpp47712-r0043.h5'
+    #fname  = '/reg/d/psdm/XPP/xpp47712/hdf5/xpp47712-r0043.h5'
     #fname  = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5'
-
+    fname, runnum = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5', 1437
 
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
@@ -394,14 +401,15 @@ def main_calib() :
     event  = 0
 
     print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run=1, path=path_calib )
+    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
     print 'ds1ev.shape = ',ds1ev.shape
 
     print 'Make the CSPad image from raw array'
-    cspadimg = CSPadImageProducer(rotation=3, tiltIsOn=False, mirror=False)
+    #cspadimg = CSPadImageProducer(rotation=3, tiltIsOn=False, mirror=False)
+    cspadimg = CSPadImageProducer(rotation=0, tiltIsOn=False, mirror=False)
     cspadimg.printInputPars()
     cspadimg.printGeometryPars()
     #arr = cspadimg.getImageArrayForPair( ds1ev, pairNum=3 )
@@ -410,11 +418,14 @@ def main_calib() :
     arr = cspadimg.getCSPadImage( ds1ev )
     #print 'arr = \n',arr
 
+    AmpRange = (1700,2000)
+    #AmpRange = (0, 100)
+
     print 'Plot CSPad image'
-    gg.plotImage(arr,range=(-10,2000),figsize=(11.6,10))
+    gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
     gg.move(200,100)
     #gg.plotImageAndSpectrum(arr,range=(1,2001))
-    gg.plotSpectrum(arr,range=(-10,2000))
+    gg.plotSpectrum(arr,range=AmpRange)
     gg.move(50,50)
     print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
     gg.show()
