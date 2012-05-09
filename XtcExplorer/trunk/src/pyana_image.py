@@ -15,7 +15,6 @@ import time
 import logging
 
 import numpy as np
-import scipy.misc
 
 #-----------------------------
 # Imports for other modules --
@@ -593,11 +592,15 @@ class  pyana_image ( object ) :
 
                 # Numpy array
                 if fname[-1] == "npy" :
-                    np.save(thename, array)
+                    np.save(thename, np.int_(array))
                 elif fname[-1] == "txt" :
-                    np.savetxt(thename, array) 
+                    np.savetxt(thename, np.int_(array)) 
                 elif fname[-1] == "hdf5":
                     print "HDF5 not implemented yet"
+                elif fname[-1] == "mat":
+                    import scipy.io
+                    scipy.io.savemat(thename,{"Image":np.int_(array)})
                 else :
-                    scipy.misc.imsave(thename, array)
+                    import scipy.misc
+                    scipy.misc.imsave(thename, np.int_(array))
                     

@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-9 ofte V00-01-23           rev 3361
+	- added writing of matlab file to list of image  outputs
+	
 2012-May-8 ofte                     rev 3358
 	- added a few more Shared IPIMB types to the list
 
