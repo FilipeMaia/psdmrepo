@@ -113,7 +113,7 @@ class psddlc ( LusiPyApp ) :
     def _run ( self ) :
 
         if self._options.list_backends:
-            print "Availabale backens: " + " ".join(self.backends.keys())
+            print "Available backends: " + " ".join(self.backends.keys())
             return 0
 
         # check the arguments
