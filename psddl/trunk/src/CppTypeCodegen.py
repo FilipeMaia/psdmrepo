@@ -68,6 +68,9 @@ def _typedecl(type):
 def _argdecl(name, type):    
     return _typedecl(type) + ' ' + name
 
+def _argdecl2(name, type):    
+    return name
+
 def _dims(dims):
     return ''.join(['[%s]'%d for d in dims])
 
@@ -90,13 +93,15 @@ class CppTypeCodegen ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, inc, cpp, type, abstract=False ) :
+    def __init__ ( self, inc, cpp, type, abstract=False, wrapper=False, namespace_prefix="" ) :
 
         # define instance variables
         self._inc = inc
         self._cpp = cpp
         self._type = type
         self._abs = abstract
+        self._wrapper = wrapper
+        self._namespace_prefix = namespace_prefix
 
     #-------------------
     #  Public methods --
@@ -120,11 +125,22 @@ class CppTypeCodegen ( object ) :
 
         # base class
         base = ""
-        if self._type.base : base = T(": public $name")[self._type.base]
+        if self._type.base and not self._wrapper : base = T(": public $name")[self._type.base]
+
+        # this class (class being generated)
+        name = self._type.name
+        if self._wrapper:
+            wrapped = name
+            name = wrapped + "_Wrapper"
 
         # start class declaration
-        print >>self._inc, T("\nclass $name$base {")(name = self._type.name, base = base)
+        print >>self._inc, T("\nclass $name$base {")(name = name, base = base)
         access = "private"
+
+        if self._wrapper:
+            # shared_ptr and C++ pointer to wrapped object
+            print >>self._inc, T("  boost::shared_ptr<$wrapped> _o;")(wrapped = wrapped)
+            print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
 
         # enums for version and typeId
         access = self._access("public", access)
@@ -145,17 +161,24 @@ class CppTypeCodegen ( object ) :
         for enum in self._type.enums() :
             self._genEnum(enum)
 
-        if not self._abs:
-            # constructor, all should be declared explicitly
-            for ctor in self._type.ctors :
-                access = self._access(ctor.access, access)
-                self._genCtor(ctor)
-
-        if self._abs:
-            # need virtual destructor
+        # constructors and destructors
+        if self._wrapper:
+            # constructor
             access = self._access("public", access)
-            print >>self._inc, T("  virtual ~$name();")[self._type]
-            print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
+            print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
+            print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
+            print >>self._cpp, T("\n  class_<$name>(\"${prefix}${wrapped}\", no_init)")(name = name, prefix = self._namespace_prefix, wrapped = wrapped)
+        else:
+            if not self._abs:
+                # constructor, all should be declared explicitly
+                for ctor in self._type.ctors :
+                    access = self._access(ctor.access, access)
+                    self._genCtor(ctor)
+            if self._abs:
+                # need virtual destructor
+                access = self._access("public", access)
+                print >>self._inc, T("  virtual ~$name();")[self._type]
+                print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
@@ -175,6 +198,8 @@ class CppTypeCodegen ( object ) :
 
         # close class declaration
         print >>self._inc, "};"
+        if self._wrapper:
+            print >>self._cpp, "    ;"
 
         # close pragma pack
         if needPragmaPack : 
@@ -440,6 +465,28 @@ class CppTypeCodegen ( object ) :
         
         # make argument list
         argsspec = ', '.join([_argdecl(*arg) for arg in args])
+
+        if self._wrapper:
+            args = ', '.join([_argdecl2(*arg) for arg in args])
+            index = rettype.find("ndarray<")
+            if index == 0:
+                ctype_ndim = rettype[8:]
+                index = ctype_ndim.rfind(">")
+                if index != -1:
+                    ctype_ndim = ctype_ndim[:index]
+                print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype_ndim); }")(locals())
+            elif "&" in rettype and "::" in rettype:
+                type = rettype.replace("&", "").replace("const ", "")
+                index = type.find("::")
+                if index != -1:
+                    type = type[2+index:] # remove "Namespace::"
+                wrappertype = type + "_Wrapper"
+                print >>self._inc, T("  $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); } // copy_const_reference")(locals())
+            else:
+                print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
+
+            print >>self._cpp, T("    .def(\"$methname\", &${classname}_Wrapper::$methname)")(methname=methname, classname=self._type.name)
+            return
 
         if static:
             static = "static "

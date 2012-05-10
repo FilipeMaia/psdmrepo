@@ -33,6 +33,7 @@ import sys
 import os
 import logging
 import types
+import string
 
 #---------------------------------
 #  Imports of base class module --
@@ -71,6 +72,7 @@ class DdlPsanaInterfaces ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
+        self.wrapper = not not backend_options.get('pywrapper')
 
         #include guard
         g = os.path.split(self.incname)[1]
@@ -102,7 +104,26 @@ class DdlPsanaInterfaces ( object ) :
         print >>self.inc, "#include \"ndarray/ndarray.h\""
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
-        print >>self.cpp, "#include \"%s\"" % inc
+
+        if not self.wrapper:
+            print >>self.cpp, "#include \"%s\"" % inc
+        else:
+            inc_no_wrapper = string.replace(self.incname, ".wrapper", "")
+            print >>self.cpp, "#include <boost/python/class.hpp>"
+            print >>self.cpp, "#include \"psddl_psana/%s\"" % inc_no_wrapper
+            print >>self.cpp, "#include \"psana/%s\"" % inc
+            print >>self.cpp, ""
+
+            print >>self.inc, "#include <boost/python.hpp>"
+            print >>self.inc, "#include <numpy/arrayobject.h>"
+            print >>self.inc, ""
+            print >>self.inc, "namespace psana {"
+            print >>self.inc, "  extern PyObject* ndConvert(void* data, const unsigned* shape, const unsigned ndim, char* ctype);"
+            print >>self.inc, "}"
+            print >>self.inc, "#ifndef ND_CONVERT"
+            print >>self.inc, "#define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a = value; return psana::ndConvert((void *) a.data(), a.shape(), ndim, #ctype)"
+            print >>self.inc, "#endif"
+            print >>self.inc, ""
 
         # headers for other included packages
         for use in model.use:
@@ -118,6 +139,29 @@ class DdlPsanaInterfaces ( object ) :
         if self.top_pkg : 
             print >>self.inc, T("namespace $top_pkg {")[self]
             print >>self.cpp, T("namespace $top_pkg {")[self]
+
+        if self.wrapper:
+            """
+            print >>self.inc, ''
+            print >>self.inc, '#ifndef EVT_AND_ENV_GETTER'
+            print >>self.inc, '#define EVT_AND_ENV_GETTER 1'
+            print >>self.inc, 'class EvtGetter {'
+            print >>self.inc, 'public:'
+            print >>self.inc, 'virtual string getTypeName() = 0;'
+            print >>self.inc, 'virtual object get(Event& evt, Source& src) = 0;'
+            print >>self.inc, 'virtual ~EvtGetter() {}'
+            print >>self.inc, '};'
+            print >>self.inc, ''
+            print >>self.inc, 'class EnvGetter {'
+            print >>self.inc, 'public:'
+            print >>self.inc, 'virtual string getTypeName() = 0;'
+            print >>self.inc, 'virtual object get(EnvWrapper& env, Source& src) = 0;'
+            print >>self.inc, 'virtual ~EnvGetter() {}'
+            print >>self.inc, '};'
+            print >>self.inc, '#endif // EVT_AND_ENV_GETTER'
+            print >>self.inc, ''
+            """
+            pass
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -143,15 +187,20 @@ class DdlPsanaInterfaces ( object ) :
         print >>self.inc, T("namespace $name {")[pkg]
         print >>self.cpp, T("namespace $name {")[pkg]
 
-        # enums for constants
-        for const in pkg.constants() :
-            if not const.included :
-                self._genConst(const)
+        if not self.wrapper:
+            # enums for constants
+            for const in pkg.constants() :
+                if not const.included :
+                    self._genConst(const)
 
-        # regular enums
-        for enum in pkg.enums() :
-            if not enum.included :
-                self._genEnum(enum)
+            # regular enums
+            for enum in pkg.enums() :
+                if not enum.included :
+                    self._genEnum(enum)
+        else:
+            print >>self.inc, "\nextern void createWrappers();\n"
+            print >>self.cpp, "using namespace boost::python;\n"
+            print >>self.cpp, "void createWrappers() {"
 
         # loop over packages and types
         for ns in pkg.namespaces() :
@@ -162,13 +211,30 @@ class DdlPsanaInterfaces ( object ) :
             
             elif isinstance(ns, Type) :
     
-                self._parseType(type = ns)
+                if not self.wrapper:
+                    self._parseType(type = ns)
+                else:
+                    namespace_prefix = pkg.name + "::"
+                    if self.top_pkg : 
+                        namespace_prefix = self.top_pkg + "::" + namespace_prefix
+                    self._parseType(type = ns, namespace_prefix = namespace_prefix)
+
+        if self.wrapper:
+            # end createWrappers()
+            print >>self.cpp, "}"
+            # now create EventGetter and EnvironmentGetter classes
+            for ns in pkg.namespaces() :
+                if isinstance(ns, Type) :
+                    namespace_prefix = pkg.name + "::"
+                    if self.top_pkg : 
+                        namespace_prefix = self.top_pkg + "::" + namespace_prefix
+                    self._parseType2(type = ns, namespace_prefix = namespace_prefix)
 
         # close namespaces
         print >>self.inc, T("} // namespace $name")[pkg]
         print >>self.cpp, T("} // namespace $name")[pkg]
 
-    def _parseType(self, type):
+    def _parseType(self, type, namespace_prefix = ""):
 
         logging.debug("_parseType: type=%s", repr(type))
 
@@ -177,9 +243,15 @@ class DdlPsanaInterfaces ( object ) :
 
         # type is abstract by default but can be reset with tag "value-type"
         abstract = not type.value_type
-
-        codegen = CppTypeCodegen(self.inc, self.cpp, type, abstract)
+        codegen = CppTypeCodegen(self.inc, self.cpp, type, abstract, self.wrapper, namespace_prefix)
         codegen.codegen()
+
+    def _parseType2(self, type, namespace_prefix = ""):
+        type_name = type.name
+        if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
+            print >>self.inc, "  // XXX should create EvtGetter for %s" % type_name
+        elif type_name.find('ConfigV') == 0:
+            print >>self.inc, "  // XXX should create EnvGetter for %s" % type_name
 
     def _genConst(self, const):
         
