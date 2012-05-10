@@ -944,6 +944,7 @@ Start with selecting data of interest to you from list on the left and general r
             #options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
             options_for_mod[index].append("\noutputfile = ")
             options_for_mod[index].append("\nmax_save = 0   ; max event images to save" )
+            options_for_mod[index].append("\nsmall_tilt = False");
             try:
                 calibpath = '/'.join( self.filenames[0].split('/')[0:6]) + "/calib/*/" +\
                             address.replace('|',':').replace('-','.')

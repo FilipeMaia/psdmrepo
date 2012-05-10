@@ -54,7 +54,8 @@ class  pyana_image ( object ) :
                    max_save = "0",
                    fignum = "1",
                    # data/calibration path (needed for CsPad)
-                   calib_path = None ):
+                   calib_path = None,
+                   small_tilt = False ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
@@ -73,6 +74,7 @@ class  pyana_image ( object ) :
         @param max_save          Maximum single-shot images to save
 
         @param calib_path        path to the calibration directory (expNUMBER/calib)
+        @param small_tilt        apply small tilt angles (using array interpolation). Default is False. 
         """
 
         opt = PyanaOptions() # convert option string to appropriate type
@@ -120,6 +122,7 @@ class  pyana_image ( object ) :
         self.calib_path = calib_path
         
         self.cspad = {}
+        self.small_tilt = opt.getOptBoolean(small_tilt)
 
         self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
                              'Cspad'     : TypeId.Type.Id_CspadConfig ,
@@ -214,6 +217,9 @@ class  pyana_image ( object ) :
                 quads = range(4)
                 sections = map(self.config.sections, quads)
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
+                if self.small_tilt :
+                    self.cspad[addr].small_angle_tilt = True
+
                 try:
                     self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
                 except OSError, e:

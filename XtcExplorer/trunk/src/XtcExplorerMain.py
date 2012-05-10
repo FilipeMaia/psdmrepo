@@ -26,7 +26,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision$"
+__version__ = "$Revision: 3368 $"
 # $Source$
 
 #-----------------------------
