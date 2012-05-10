@@ -125,6 +125,17 @@ void CSPadCalibPars::getCalibFileName ()
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
       m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
+
+      // Check if the file name is empty:
+      if (m_fname == std::string()) { 
+	MsgLog("CSPadCalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
+                  << ", type=" << m_cur_calibname 
+                  << ", run=" <<  m_runNumber
+                  << " is not found ..."
+	          << "\nWARNING: Default CSPad alignment constants can not guarantee correct geometry and are not available yet."
+	          << "\nWARNING: Please provide all expected CSPad alignment constants under the directory .../<experiment>/calib/...");
+	abort();
+      }
     }
   MsgLog("CSPadCalibPars", debug, "getCalibFileName(): " << m_fname);
 }
@@ -134,6 +145,12 @@ void CSPadCalibPars::getCalibFileName ()
 void CSPadCalibPars::openCalibFile ()
 {
    m_file.open(m_fname.c_str());
+
+   if (not m_file.good()) {
+     const std::string msg = "Failed to open file: "+m_fname;
+     MsgLogRoot(error, msg);
+     //throw std::runtime_error(msg);
+   }
 }
 
 //----------------
