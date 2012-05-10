@@ -1,0 +1,112 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSCalib
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-03
+2012-05-10 Mikhail S. Dubrovin
+- in CSPadCalibPars.cpp 
+  Add warning message and abort() if the calibration file is not found.
+  DEFAULT CONSTANTS ARE NOT PROVIDED YET !!!!!!!!!!!!!!!!! IN MY TO DO LIST....
+	
+Tag: V00-01-02
+2012-05-01 Andy Salnikov
+- upgrading to boost 1.49.0, some return types have changed in 
+  boost::filesystem
+
+Tag: V00-01-01
+2012-03-17 Mikhail S. Dubrovin
+- in CSPadCalibPars.cpp the printout is commented
+	
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- in CalibFileFinder class moved source argument to findCalibFile()
+  method instead of constructor, more convenient for use.
+- added exceptions classes, exception is thrown when somebody passes
+  source address which is not DetInfo
+
+Tag: V00-00-05
+2011-09-01 Andy Salnikov
+- pass run number to CalibFileFinder::findCalibFile() method by
+  value instead of by reference
+
+Tag: V00-00-04
+2011-08-09 Mikhail S. Dubrovin
+- change float -> double
+
+Tag: V00-00-03
+2011-08-08 Andy Salnikov
+- moved test app from app/ to test/, disable unit tests running
+- added @addtogroup to all headers to generate separate module for this 
+  package in doxygen documentation
+
+Tag: V00-00-02
+2011-08-05 Mikhail S. Dubrovin
+- Class CSPadCalibPars provides access to the calibration parameters 
+  for CSPad geometry.
+
+Tag: V00-00-01
+2011-07-21 Mikhail S. Dubrovin
+
+-----------------------------------------------------------------------
+	
+- Class PSCalib/CalibFileFinder is created with central method 
+  CalibFileFinder::findCalibFile(...) which similar to the 
+  CsPadCalibV1Cvt::findCalibFile(...) from O2OTranslator/CsPadCalibV1Cvt
+  All necessary parameters should be specified at constructor initialization.
+	
+- add example PSCalib/app/ex_calib_file_finder.cpp
+
+	
+2011-07-11 Mikhail S. Dubrovin	
+
+Description of calibration subdirectories:
+------------------------------------------
+https://confluence.slac.stanford.edu/display/PCDS/CsPad+calibration+in+translator
+
+
+Package created on on psdev:
+----------------------------
+cd LCLS/
+newrel ana-current PSCalib-V00
+cd PSCalib-V00/
+sit_setup
+newpkg PSCalib
+mkdir PSCalib/src
+mkdir PSCalib/app
+mkdir PSCalib/include
+psvn newpkg PSCalib
+addpkg PSCalib
+	
+cp $SIT_RELDIR/ana-current/O2OTranslator/src/CsPadCalibV1Cvt.cpp    PSCalib/src/
+cp $SIT_RELDIR/ana-current/O2OTranslator/include/CsPadCalibV1Cvt.h  PSCalib/include/
+
+Change names, edit these files, add applications for test etc.
+
+svn add PSCalib/include/
+svn add PSCalib/src/
+svn add PSCalib/app/
+...
+	
+svn update
+svn status PSCalib
+svn commit -m "Work in progress." PSCalib
+
+List tags:
+----------
+psvn tags PSCalib
+
+Create new tag:
+---------------
+cd PSCalib
+svn update
+psvn tag V00-00-01
+==================
