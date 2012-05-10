@@ -596,10 +596,15 @@ class  pyana_image ( object ) :
                 elif fname[-1] == "txt" :
                     np.savetxt(thename, np.int_(array)) 
                 elif fname[-1] == "hdf5":
-                    print "HDF5 not implemented yet"
+                    #print "HDF5 not implemented yet"
+                    import h5py
+                    file_handle = h5py.File(thename, 'w')
+                    group = file_handle.create_group("Data")
+                    dataset = group.create_dataset(title,data=np.int_(array))
+                    file_handle.close()                    
                 elif fname[-1] == "mat":
                     import scipy.io
-                    scipy.io.savemat(thename,{"Image":np.int_(array)})
+                    scipy.io.savemat(thename,{title:np.int_(array)})
                 else :
                     import scipy.misc
                     scipy.misc.imsave(thename, np.int_(array))

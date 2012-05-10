@@ -755,7 +755,7 @@ Start with selecting data of interest to you from list on the left and general r
         for m in range(0,nmodules):
             tmpoptions = {}
             for options in options_for_mod[m] :
-                n,v = options.split("=")
+                n,v = options.split(" = ")
                 if n in tmpoptions :
                     oldvalue = tmpoptions[n]
                     if oldvalue!=v:   # avoid duplicates
@@ -765,7 +765,7 @@ Start with selecting data of interest to you from list on the left and general r
 
             newoptions = []
             for n, v in tmpoptions.iteritems() :
-                optstring = "%s = %s" % (n, v)
+                optstring = "%s = %s" % (n,v)
                 newoptions.append(optstring)
 
             options_for_mod[m] = newoptions
@@ -935,7 +935,7 @@ Start with selecting data of interest to you from list on the left and general r
             address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\ninputdark = ")
-            options_for_mod[index].append("\n;threshold = low-high (col1:col2,row1:row2) type")
+            options_for_mod[index].append("\n;threshold = lower=0 upper=1200 roi=(x1:x2,y1:y2) type=maximum")
             options_for_mod[index].append("\n;algorithms = rotate shift")
             options_for_mod[index].append("\nquantities = image average ; dark maximum")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)

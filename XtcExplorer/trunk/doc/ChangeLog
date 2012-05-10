@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-10 ofte V00-01-24          rev 3368
+	- added example line for image threshold
+	- fixed bug due to xtcscanner change (ndatagrams->nevents)
+	- hdf5 save of single event added (discouraged)
+	
 2012-May-9 ofte V00-01-23           rev 3361
 	- added writing of matlab file to list of image  outputs
 	
