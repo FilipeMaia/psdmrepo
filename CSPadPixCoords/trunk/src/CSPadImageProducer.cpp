@@ -52,6 +52,7 @@ namespace CSPadPixCoords {
 
 CSPadImageProducer::CSPadImageProducer (const std::string& name)
   : Module(name)
+  , m_calibDir()
   , m_typeGroupName()
   , m_source()
   , m_src()
@@ -64,6 +65,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
+  m_calibDir      = configStr("calibDir",      ""); // if not provided default from env will be used
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
   m_inkey         = configStr("key",           "");
@@ -109,9 +111,11 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
     MsgLog(name(), warning, "Cannot determine run number, will use 0.");
   }
 
+  std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
+
   //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
                                                       // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(env.calibDir(), m_typeGroupName, m_source, run);
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_source, run);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );

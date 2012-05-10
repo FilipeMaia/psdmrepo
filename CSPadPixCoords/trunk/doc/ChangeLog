@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 	
+Tag: V00-02-04
+2012-05-10 Mikhail S. Dubrovin
+M       include/CSPadInterpolImageProducer.h
+M       include/CSPadImageProducer.h
+M       src/CSPadInterpolImageProducer.cpp
+M       src/CSPadImageProducer.cpp
+- add the std::string calibDir parameter. By default it is empty and 
+	the calib directory name is taken from env.calibDir.
+
 Tag: V00-02-03
 2012-03-17 Mikhail S. Dubrovin
 - In CSPadImageGetTest.cpp

@@ -138,6 +138,7 @@ private:
 
   // Data members, this is for example purposes only
 
+  std::string m_calibDir;       // i.e. ./calib
   std::string m_typeGroupName;  // i.e. CsPad::CalibV1
   std::string m_source;         // i.e. CxiDs1.0:Cspad.0
    
