@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02
+2012-05-11 Andy Salnikov
+- upgrade to pdsdata V03-07-00
+- evr adds new type ConfigV6
+
 Tag: V00-03-01
 2012-05-03 Andy Salnikov
 - upgrade to pdsdata V03-06-00

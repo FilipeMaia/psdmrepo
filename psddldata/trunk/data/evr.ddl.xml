@@ -289,6 +289,52 @@
 		
 		<!-- ========================================================================= -->
 		
+
+		<pstype name="OutputMapV2">
+		
+            <tag name="value-type"/>
+        
+		    <enum name="Source">
+		        <enum-const name="Pulse" />
+		        <enum-const name="DBus" />
+		        <enum-const name="Prescaler" />
+		        <enum-const name="Force_High" />
+		        <enum-const name="Force_Low" />
+		    </enum>
+
+            <enum name="Conn">
+                <enum-const name="FrontPanel" />
+                <enum-const name="UnivIO" />
+            </enum>
+		
+            <attribute name="_v" type="uint32_t" accessor="value">
+                <bitfield name="_bf_source" size="4" type="Source" accessor="source">
+                </bitfield>
+                <bitfield name="_bf_source_id" size="8" type="uint8_t" accessor="source_id">
+                </bitfield>
+                <bitfield name="_bf_conn" size="4" type="Conn" accessor="conn">
+                </bitfield>
+                <bitfield name="_bf_conn_id" size="8" type="uint8_t" accessor="conn_id">
+                </bitfield>
+                <bitfield name="_bf_module" size="8" type="uint8_t" accessor="module">
+                </bitfield>
+            </attribute>
+
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
 		<pstype name="ConfigV1" version="1" type_id="Id_EvrConfig">
 		
 			<tag name="config-type"/>
@@ -501,6 +547,9 @@
 		
 			<tag name="config-type"/>
 		
+            <const name="MaxPulses" value="32"/>
+            <const name="EvrOutputs" value="10"/>
+
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
 
@@ -517,6 +566,43 @@
             </attribute>
 
             <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
+            </attribute>
+
+            <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV6" version="6" type_id="Id_EvrConfig" pack="4">
+		
+			<tag name="config-type"/>
+		
+		    <const name="MaxPulses" value="256">
+		    Maximum pulses in the system
+		    </const>
+		    <const name="MaxOutputs" value="256">
+		    Maximum outputs in the system
+		    </const>
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="EventCodeV5" shape="{self}._neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMapV2" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
