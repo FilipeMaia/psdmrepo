@@ -42,18 +42,18 @@ namespace H5DataTypes {
 // Helper type for Pds::EvrData::PulseConfig
 //
 EvrPulseConfig::EvrPulseConfig ( const Pds::EvrData::PulseConfig& pconfig )
+  : pulse(pconfig.pulse())
+  , trigger(pconfig.trigger())
+  , set(pconfig.set())
+  , clear(pconfig.clear())
+  , polarity(pconfig.polarity())
+  , map_set_enable(pconfig.map_set_enable())
+  , map_reset_enable(pconfig.map_reset_enable())
+  , map_trigger_enable(pconfig.map_trigger_enable())
+  , prescale(pconfig.prescale())
+  , delay(pconfig.delay())
+  , width(pconfig.width())
 {
-  m_data.pulse = pconfig.pulse() ;
-  m_data.trigger = pconfig.trigger() ;
-  m_data.set = pconfig.set() ;
-  m_data.clear = pconfig.clear() ;
-  m_data.polarity = pconfig.polarity() ;
-  m_data.map_set_enable = pconfig.map_set_enable() ;
-  m_data.map_reset_enable = pconfig.map_reset_enable() ;
-  m_data.map_trigger_enable = pconfig.map_trigger_enable() ;
-  m_data.prescale = pconfig.prescale() ;
-  m_data.delay = pconfig.delay() ;
-  m_data.width = pconfig.width() ;
 }
 
 hdf5pp::Type
@@ -65,18 +65,18 @@ EvrPulseConfig::stored_type()
 hdf5pp::Type
 EvrPulseConfig::native_type()
 {
-  hdf5pp::CompoundType pulseType = hdf5pp::CompoundType::compoundType< EvrPulseConfig_Data >() ;
-  pulseType.insert_native<uint32_t>( "pulse", offsetof(EvrPulseConfig_Data,pulse) ) ;
-  pulseType.insert_native<int16_t>( "trigger", offsetof(EvrPulseConfig_Data,trigger) ) ;
-  pulseType.insert_native<int16_t>( "set", offsetof(EvrPulseConfig_Data,set) ) ;
-  pulseType.insert_native<int16_t>( "clear", offsetof(EvrPulseConfig_Data,clear) ) ;
-  pulseType.insert_native<uint8_t>( "polarity", offsetof(EvrPulseConfig_Data,polarity) ) ;
-  pulseType.insert_native<uint8_t>( "map_set_enable", offsetof(EvrPulseConfig_Data,map_set_enable) ) ;
-  pulseType.insert_native<uint8_t>( "map_reset_enable", offsetof(EvrPulseConfig_Data,map_reset_enable) ) ;
-  pulseType.insert_native<uint8_t>( "map_trigger_enable", offsetof(EvrPulseConfig_Data,map_trigger_enable) ) ;
-  pulseType.insert_native<uint32_t>( "prescale", offsetof(EvrPulseConfig_Data,prescale) ) ;
-  pulseType.insert_native<uint32_t>( "delay", offsetof(EvrPulseConfig_Data,delay) ) ;
-  pulseType.insert_native<uint32_t>( "width", offsetof(EvrPulseConfig_Data,width) ) ;
+  hdf5pp::CompoundType pulseType = hdf5pp::CompoundType::compoundType< EvrPulseConfig >() ;
+  pulseType.insert_native<uint32_t>( "pulse", offsetof(EvrPulseConfig,pulse) ) ;
+  pulseType.insert_native<int16_t>( "trigger", offsetof(EvrPulseConfig,trigger) ) ;
+  pulseType.insert_native<int16_t>( "set", offsetof(EvrPulseConfig,set) ) ;
+  pulseType.insert_native<int16_t>( "clear", offsetof(EvrPulseConfig,clear) ) ;
+  pulseType.insert_native<uint8_t>( "polarity", offsetof(EvrPulseConfig,polarity) ) ;
+  pulseType.insert_native<uint8_t>( "map_set_enable", offsetof(EvrPulseConfig,map_set_enable) ) ;
+  pulseType.insert_native<uint8_t>( "map_reset_enable", offsetof(EvrPulseConfig,map_reset_enable) ) ;
+  pulseType.insert_native<uint8_t>( "map_trigger_enable", offsetof(EvrPulseConfig,map_trigger_enable) ) ;
+  pulseType.insert_native<uint32_t>( "prescale", offsetof(EvrPulseConfig,prescale) ) ;
+  pulseType.insert_native<uint32_t>( "delay", offsetof(EvrPulseConfig,delay) ) ;
+  pulseType.insert_native<uint32_t>( "width", offsetof(EvrPulseConfig,width) ) ;
 
   return pulseType ;
 }
@@ -85,12 +85,12 @@ EvrPulseConfig::native_type()
 // Helper type for Pds::EvrData::PulseConfigV3
 //
 EvrPulseConfigV3::EvrPulseConfigV3 ( const Pds::EvrData::PulseConfigV3& pconfig )
+  : pulseId(pconfig.pulseId())
+  , polarity(pconfig.polarity())
+  , prescale(pconfig.prescale())
+  , delay(pconfig.delay())
+  , width(pconfig.width())
 {
-  m_data.pulseId = pconfig.pulseId() ;
-  m_data.polarity = pconfig.polarity() ;
-  m_data.prescale = pconfig.prescale() ;
-  m_data.delay = pconfig.delay() ;
-  m_data.width = pconfig.width() ;
 }
 
 hdf5pp::Type
@@ -102,12 +102,12 @@ EvrPulseConfigV3::stored_type()
 hdf5pp::Type
 EvrPulseConfigV3::native_type()
 {
-  hdf5pp::CompoundType pulseType = hdf5pp::CompoundType::compoundType< EvrPulseConfigV3_Data >() ;
-  pulseType.insert_native<uint16_t>( "pulseId", offsetof(EvrPulseConfigV3_Data,pulseId) ) ;
-  pulseType.insert_native<uint16_t>( "polarity", offsetof(EvrPulseConfigV3_Data,polarity) ) ;
-  pulseType.insert_native<uint32_t>( "prescale", offsetof(EvrPulseConfigV3_Data,prescale) ) ;
-  pulseType.insert_native<uint32_t>( "delay", offsetof(EvrPulseConfigV3_Data,delay) ) ;
-  pulseType.insert_native<uint32_t>( "width", offsetof(EvrPulseConfigV3_Data,width) ) ;
+  hdf5pp::CompoundType pulseType = hdf5pp::CompoundType::compoundType< EvrPulseConfigV3 >() ;
+  pulseType.insert_native<uint16_t>( "pulseId", offsetof(EvrPulseConfigV3,pulseId) ) ;
+  pulseType.insert_native<uint16_t>( "polarity", offsetof(EvrPulseConfigV3,polarity) ) ;
+  pulseType.insert_native<uint32_t>( "prescale", offsetof(EvrPulseConfigV3,prescale) ) ;
+  pulseType.insert_native<uint32_t>( "delay", offsetof(EvrPulseConfigV3,delay) ) ;
+  pulseType.insert_native<uint32_t>( "width", offsetof(EvrPulseConfigV3,width) ) ;
 
   return pulseType ;
 }
@@ -116,11 +116,11 @@ EvrPulseConfigV3::native_type()
 // Helper type for Pds::EvrData::OutputMap
 //
 EvrOutputMap::EvrOutputMap ( const Pds::EvrData::OutputMap& mconfig )
+  : source(mconfig.source())
+  , source_id(mconfig.source_id())
+  , conn(mconfig.conn())
+  , conn_id(mconfig.conn_id())
 {
-  m_data.source = mconfig.source() ;
-  m_data.source_id = mconfig.source_id() ;
-  m_data.conn = mconfig.conn() ;
-  m_data.conn_id = mconfig.conn_id() ;
 }
 
 hdf5pp::Type
@@ -141,11 +141,11 @@ EvrOutputMap::native_type()
 
   hdf5pp::Type connEnumType = conn_type() ;
 
-  hdf5pp::CompoundType mapType = hdf5pp::CompoundType::compoundType< EvrOutputMap_Data >() ;
-  mapType.insert( "source", offsetof(EvrOutputMap_Data,source), srcEnumType ) ;
-  mapType.insert_native<int16_t>( "source_id", offsetof(EvrOutputMap_Data,source_id) ) ;
-  mapType.insert( "conn", offsetof(EvrOutputMap_Data,conn), connEnumType ) ;
-  mapType.insert_native<int16_t>( "conn_id", offsetof(EvrOutputMap_Data,conn_id) ) ;
+  hdf5pp::CompoundType mapType = hdf5pp::CompoundType::compoundType< EvrOutputMap >() ;
+  mapType.insert( "source", offsetof(EvrOutputMap,source), srcEnumType ) ;
+  mapType.insert_native<int16_t>( "source_id", offsetof(EvrOutputMap,source_id) ) ;
+  mapType.insert( "conn", offsetof(EvrOutputMap,conn), connEnumType ) ;
+  mapType.insert_native<int16_t>( "conn_id", offsetof(EvrOutputMap,conn_id) ) ;
 
   return mapType ;
 }
@@ -162,16 +162,67 @@ EvrOutputMap::conn_type()
 
 
 //
+// Helper type for Pds::EvrData::OutputMap
+//
+EvrOutputMapV2::EvrOutputMapV2 ( const Pds::EvrData::OutputMapV2& mconfig )
+  : source(mconfig.source())
+  , source_id(mconfig.source_id())
+  , conn(mconfig.conn())
+  , conn_id(mconfig.conn_id())
+  , module(mconfig.module())
+{
+}
+
+hdf5pp::Type
+EvrOutputMapV2::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrOutputMapV2::native_type()
+{
+  hdf5pp::EnumType<int16_t> srcEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
+  srcEnumType.insert ( "Pulse", Pds::EvrData::OutputMapV2::Pulse ) ;
+  srcEnumType.insert ( "DBus", Pds::EvrData::OutputMapV2::DBus ) ;
+  srcEnumType.insert ( "Prescaler", Pds::EvrData::OutputMapV2::Prescaler ) ;
+  srcEnumType.insert ( "Force_High", Pds::EvrData::OutputMapV2::Force_High ) ;
+  srcEnumType.insert ( "Force_Low", Pds::EvrData::OutputMapV2::Force_Low ) ;
+
+  hdf5pp::Type connEnumType = conn_type() ;
+
+  hdf5pp::CompoundType mapType = hdf5pp::CompoundType::compoundType< EvrOutputMapV2 >() ;
+  mapType.insert( "source", offsetof(EvrOutputMapV2,source), srcEnumType ) ;
+  mapType.insert_native<int16_t>( "source_id", offsetof(EvrOutputMapV2, source_id) ) ;
+  mapType.insert( "conn", offsetof(EvrOutputMapV2,conn), connEnumType ) ;
+  mapType.insert_native<int16_t>( "conn_id", offsetof(EvrOutputMapV2, conn_id) ) ;
+  mapType.insert_native<int16_t>( "module", offsetof(EvrOutputMapV2, module) ) ;
+
+  return mapType ;
+}
+
+hdf5pp::Type
+EvrOutputMapV2::conn_type()
+{
+  hdf5pp::EnumType<int16_t> connEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
+  connEnumType.insert ( "FrontPanel", Pds::EvrData::OutputMapV2::FrontPanel ) ;
+  connEnumType.insert ( "UnivIO", Pds::EvrData::OutputMapV2::UnivIO ) ;
+
+  return connEnumType;
+}
+
+
+//
 // Helper type for Pds::EvrData::EventCodeV3
 //
 EvrEventCodeV3::EvrEventCodeV3 ( const Pds::EvrData::EventCodeV3& evtcode )
+  : code(evtcode.code())
+  , isReadout(evtcode.isReadout())
+  , isTerminator(evtcode.isTerminator())
+  , maskTrigger(evtcode.maskTrigger())
+  , maskSet(evtcode.maskSet())
+  , maskClear(evtcode.maskClear())
 {
-  m_data.code = evtcode.code();
-  m_data.isReadout = evtcode.isReadout();
-  m_data.isTerminator = evtcode.isTerminator();
-  m_data.maskTrigger = evtcode.maskTrigger();
-  m_data.maskSet = evtcode.maskSet();
-  m_data.maskClear = evtcode.maskClear();
 }
 
 hdf5pp::Type
@@ -183,13 +234,13 @@ EvrEventCodeV3::stored_type()
 hdf5pp::Type
 EvrEventCodeV3::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV3_Data >() ;
-  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV3_Data,code) ) ;
-  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV3_Data,isReadout) ) ;
-  type.insert_native<uint8_t>( "isTerminator", offsetof(EvrEventCodeV3_Data,isTerminator) ) ;
-  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV3_Data,maskTrigger) ) ;
-  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV3_Data,maskSet) ) ;
-  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV3_Data,maskClear) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV3 >() ;
+  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV3,code) ) ;
+  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV3,isReadout) ) ;
+  type.insert_native<uint8_t>( "isTerminator", offsetof(EvrEventCodeV3,isTerminator) ) ;
+  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV3,maskTrigger) ) ;
+  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV3,maskSet) ) ;
+  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV3,maskClear) ) ;
 
   return type ;
 }
@@ -198,15 +249,15 @@ EvrEventCodeV3::native_type()
 // Helper type for Pds::EvrData::EventCodeV4
 //
 EvrEventCodeV4::EvrEventCodeV4 ( const Pds::EvrData::EventCodeV4& evtcode )
+  : code(evtcode.code())
+  , isReadout(evtcode.isReadout())
+  , isTerminator(evtcode.isTerminator())
+  , reportDelay(evtcode.reportDelay())
+  , reportWidth(evtcode.reportWidth())
+  , maskTrigger(evtcode.maskTrigger())
+  , maskSet(evtcode.maskSet())
+  , maskClear(evtcode.maskClear())
 {
-  m_data.code = evtcode.code();
-  m_data.isReadout = evtcode.isReadout();
-  m_data.isTerminator = evtcode.isTerminator();
-  m_data.reportDelay = evtcode.reportDelay();
-  m_data.reportWidth = evtcode.reportWidth();
-  m_data.maskTrigger = evtcode.maskTrigger();
-  m_data.maskSet = evtcode.maskSet();
-  m_data.maskClear = evtcode.maskClear();
 }
 
 hdf5pp::Type
@@ -218,15 +269,15 @@ EvrEventCodeV4::stored_type()
 hdf5pp::Type
 EvrEventCodeV4::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV4_Data >() ;
-  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV4_Data,code) ) ;
-  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV4_Data,isReadout) ) ;
-  type.insert_native<uint8_t>( "isTerminator", offsetof(EvrEventCodeV4_Data,isTerminator) ) ;
-  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV4_Data,reportDelay) ) ;
-  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV4_Data,reportWidth) ) ;
-  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV4_Data,maskTrigger) ) ;
-  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV4_Data,maskSet) ) ;
-  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV4_Data,maskClear) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV4 >() ;
+  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV4,code) ) ;
+  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV4,isReadout) ) ;
+  type.insert_native<uint8_t>( "isTerminator", offsetof(EvrEventCodeV4,isTerminator) ) ;
+  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV4,reportDelay) ) ;
+  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV4,reportWidth) ) ;
+  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV4,maskTrigger) ) ;
+  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV4,maskSet) ) ;
+  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV4,maskClear) ) ;
 
   return type ;
 }
@@ -235,55 +286,54 @@ EvrEventCodeV4::native_type()
 // Helper type for Pds::EvrData::EventCodeV5
 //
 EvrEventCodeV5::EvrEventCodeV5 ()
+  : desc(0)
 {
-  m_data.desc = 0;
 }
 
 EvrEventCodeV5::EvrEventCodeV5 ( const Pds::EvrData::EventCodeV5& evtcode )
-{
-  m_data.code = evtcode.code();
-  m_data.isReadout = evtcode.isReadout();
-  m_data.isCommand = evtcode.isCommand();
-  m_data.isLatch = evtcode.isLatch();
-  m_data.reportDelay = evtcode.reportDelay();
-  m_data.reportWidth = evtcode.reportWidth();
-  m_data.releaseCode = evtcode.releaseCode();
-  m_data.maskTrigger = evtcode.maskTrigger();
-  m_data.maskSet = evtcode.maskSet();
-  m_data.maskClear = evtcode.maskClear();
-  
+  : code(evtcode.code())
+  , isReadout(evtcode.isReadout())
+  , isCommand(evtcode.isCommand())
+  , isLatch(evtcode.isLatch())
+  , reportDelay(evtcode.reportDelay())
+  , reportWidth(evtcode.reportWidth())
+  , releaseCode(evtcode.releaseCode())
+  , maskTrigger(evtcode.maskTrigger())
+  , maskSet(evtcode.maskSet())
+  , maskClear(evtcode.maskClear())
+{  
   const char* p = evtcode.desc();
   int len = strlen(p)+1;
-  m_data.desc = new char[len];
-  std::copy(p, p+len, m_data.desc);
+  desc = new char[len];
+  std::copy(p, p+len, desc);
 }
 
 EvrEventCodeV5&
 EvrEventCodeV5::operator= ( const Pds::EvrData::EventCodeV5& evtcode )
 {
-  m_data.code = evtcode.code();
-  m_data.isReadout = evtcode.isReadout();
-  m_data.isCommand = evtcode.isCommand();
-  m_data.isLatch = evtcode.isLatch();
-  m_data.reportDelay = evtcode.reportDelay();
-  m_data.reportWidth = evtcode.reportWidth();
-  m_data.releaseCode = evtcode.releaseCode();
-  m_data.maskTrigger = evtcode.maskTrigger();
-  m_data.maskSet = evtcode.maskSet();
-  m_data.maskClear = evtcode.maskClear();
+  code = evtcode.code();
+  isReadout = evtcode.isReadout();
+  isCommand = evtcode.isCommand();
+  isLatch = evtcode.isLatch();
+  reportDelay = evtcode.reportDelay();
+  reportWidth = evtcode.reportWidth();
+  releaseCode = evtcode.releaseCode();
+  maskTrigger = evtcode.maskTrigger();
+  maskSet = evtcode.maskSet();
+  maskClear = evtcode.maskClear();
   
-  delete [] m_data.desc;
+  delete [] desc;
   const char* p = evtcode.desc();
   int len = strlen(p)+1;
-  m_data.desc = new char[len];
-  std::copy(p, p+len, m_data.desc);
+  desc = new char[len];
+  std::copy(p, p+len, desc);
   
   return *this;
 }
 
 EvrEventCodeV5::~EvrEventCodeV5 ()
 {
-  delete [] m_data.desc;
+  delete [] desc;
 }
 
 hdf5pp::Type
@@ -295,18 +345,18 @@ EvrEventCodeV5::stored_type()
 hdf5pp::Type
 EvrEventCodeV5::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV5_Data >() ;
-  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV5_Data,code) ) ;
-  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV5_Data,isReadout) ) ;
-  type.insert_native<uint8_t>( "isCommand", offsetof(EvrEventCodeV5_Data,isCommand) ) ;
-  type.insert_native<uint8_t>( "isLatch", offsetof(EvrEventCodeV5_Data,isLatch) ) ;
-  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV5_Data,reportDelay) ) ;
-  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV5_Data,reportWidth) ) ;
-  type.insert_native<uint32_t>( "releaseCode", offsetof(EvrEventCodeV5_Data,releaseCode) ) ;
-  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV5_Data,maskTrigger) ) ;
-  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV5_Data,maskSet) ) ;
-  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV5_Data,maskClear) ) ;
-  type.insert_native<const char*>( "desc", offsetof(EvrEventCodeV5_Data,desc) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV5 >() ;
+  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV5,code) ) ;
+  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV5,isReadout) ) ;
+  type.insert_native<uint8_t>( "isCommand", offsetof(EvrEventCodeV5,isCommand) ) ;
+  type.insert_native<uint8_t>( "isLatch", offsetof(EvrEventCodeV5,isLatch) ) ;
+  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV5,reportDelay) ) ;
+  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV5,reportWidth) ) ;
+  type.insert_native<uint32_t>( "releaseCode", offsetof(EvrEventCodeV5,releaseCode) ) ;
+  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV5,maskTrigger) ) ;
+  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV5,maskSet) ) ;
+  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV5,maskClear) ) ;
+  type.insert_native<const char*>( "desc", offsetof(EvrEventCodeV5,desc) ) ;
 
   return type ;
 }
@@ -316,56 +366,56 @@ EvrEventCodeV5::native_type()
 //
 
 EvrIOChannel::EvrIOChannel ()
+  : name(0)
+  , info(0)
 {
-  m_data.name = 0;
-  m_data.info = 0;
 }
 
 EvrIOChannel::EvrIOChannel ( const Pds::EvrData::IOChannel& chan )
+  : name(0)
+  , ninfo(chan.ninfo())
+  , info(0)
 {
-  m_data.name = 0;
-  m_data.ninfo = chan.ninfo();
-  m_data.info = 0;
 
   const char* p = chan.name();
   int len = strlen(p)+1;
-  m_data.name = new char[len];
-  std::copy(p, p+len, m_data.name);
+  name = new char[len];
+  std::copy(p, p+len, name);
   
-  m_data.info = new EvrIOChannelDetInfo_Data[m_data.ninfo];
-  for ( size_t i = 0 ; i != m_data.ninfo ; ++ i ) {
+  info = new EvrIOChannelDetInfo_Data[ninfo];
+  for ( size_t i = 0 ; i != ninfo ; ++ i ) {
     const Pds::DetInfo& detinfo = chan.info(i);
-    m_data.info[i].processId = detinfo.processId();
-    m_data.info[i].detector = Pds::DetInfo::name(detinfo.detector());
-    m_data.info[i].device = Pds::DetInfo::name(detinfo.device());
-    m_data.info[i].detId = detinfo.devId();
-    m_data.info[i].devId = detinfo.devId();
+    info[i].processId = detinfo.processId();
+    info[i].detector = Pds::DetInfo::name(detinfo.detector());
+    info[i].device = Pds::DetInfo::name(detinfo.device());
+    info[i].detId = detinfo.devId();
+    info[i].devId = detinfo.devId();
   }
 }
 
 EvrIOChannel&
 EvrIOChannel::operator= ( const Pds::EvrData::IOChannel& chan )
 {
-  delete [] m_data.name;
-  delete [] m_data.info;
+  delete [] name;
+  delete [] info;
 
-  m_data.name = 0;
-  m_data.ninfo = chan.ninfo();
-  m_data.info = 0;
+  name = 0;
+  ninfo = chan.ninfo();
+  info = 0;
 
   const char* p = chan.name();
   int len = strlen(p)+1;
-  m_data.name = new char[len];
-  std::copy(p, p+len, m_data.name);
+  name = new char[len];
+  std::copy(p, p+len, name);
   
-  m_data.info = new EvrIOChannelDetInfo_Data[m_data.ninfo];
-  for ( size_t i = 0 ; i != m_data.ninfo ; ++ i ) {
+  info = new EvrIOChannelDetInfo_Data[ninfo];
+  for ( size_t i = 0 ; i != ninfo ; ++ i ) {
     const Pds::DetInfo& detinfo = chan.info(i);
-    m_data.info[i].processId = detinfo.processId();
-    m_data.info[i].detector = Pds::DetInfo::name(detinfo.detector());
-    m_data.info[i].device = Pds::DetInfo::name(detinfo.device());
-    m_data.info[i].detId = detinfo.devId();
-    m_data.info[i].devId = detinfo.devId();
+    info[i].processId = detinfo.processId();
+    info[i].detector = Pds::DetInfo::name(detinfo.detector());
+    info[i].device = Pds::DetInfo::name(detinfo.device());
+    info[i].detId = detinfo.devId();
+    info[i].devId = detinfo.devId();
   }
   
   return *this;
@@ -373,8 +423,8 @@ EvrIOChannel::operator= ( const Pds::EvrData::IOChannel& chan )
 
 EvrIOChannel::~EvrIOChannel ()
 {
-  delete [] m_data.name;
-  delete [] m_data.info;
+  delete [] name;
+  delete [] info;
 }
 
 hdf5pp::Type
@@ -398,9 +448,9 @@ EvrIOChannel::native_type()
   hdf5pp::Type infoType = hdf5pp::VlenType::vlenType ( detInfoType );
 
   // Channel type
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrIOChannel_Data >() ;
-  type.insert_native<const char*>( "name", offsetof(EvrIOChannel_Data, name) ) ;
-  type.insert( "info", offsetof(EvrIOChannel_Data, ninfo), infoType ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrIOChannel >() ;
+  type.insert_native<const char*>( "name", offsetof(EvrIOChannel, name) ) ;
+  type.insert( "info", offsetof(EvrIOChannel, ninfo), infoType ) ;
 
   return type ;
 }
@@ -410,29 +460,29 @@ EvrIOChannel::native_type()
 //
 
 EvrSequencerConfigV1::EvrSequencerConfigV1 ()
+  : entries(0)
 {
-  m_data.entries = 0;
 }
 
 EvrSequencerConfigV1::EvrSequencerConfigV1 ( const Pds::EvrData::SequencerConfigV1& data )
+  : sync_source(data.sync_source())
+  , beam_source(data.beam_source())
+  , cycles(data.cycles())
+  , length(data.length())
+  , nentries(data.length())
 {
-  m_data.sync_source = data.sync_source();
-  m_data.beam_source = data.beam_source();
-  m_data.cycles = data.cycles();
-  m_data.length = data.length();
-  m_data.nentries = data.length();
 
-  m_data.entries = new EvrSequencerEntry_Data[m_data.nentries];
-  for ( size_t i = 0 ; i != m_data.nentries ; ++ i ) {
+  entries = new EvrSequencerEntry_Data[nentries];
+  for ( size_t i = 0 ; i != nentries ; ++ i ) {
     const Pds::EvrData::SequencerEntry& entry = data.entry(i);
-    m_data.entries[i].eventcode = entry.eventcode();
-    m_data.entries[i].delay = entry.delay();
+    entries[i].eventcode = entry.eventcode();
+    entries[i].delay = entry.delay();
   }
 }
 
 EvrSequencerConfigV1::~EvrSequencerConfigV1 ()
 {
-  delete [] m_data.entries;
+  delete [] entries;
 }
 
 hdf5pp::Type
@@ -463,12 +513,12 @@ EvrSequencerConfigV1::native_type()
   srcEnumType.insert ( "Disable", Pds::EvrData::SequencerConfigV1::Disable ) ;
 
   // SequencerConfigV1 type
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrSequencerConfigV1_Data >() ;
-  type.insert( "sync_source", offsetof(EvrSequencerConfigV1_Data, sync_source), srcEnumType ) ;
-  type.insert( "beam_source", offsetof(EvrSequencerConfigV1_Data, beam_source), srcEnumType ) ;
-  type.insert_native<uint32_t>( "cycles", offsetof(EvrSequencerConfigV1_Data, cycles) ) ;
-  type.insert_native<uint32_t>( "length", offsetof(EvrSequencerConfigV1_Data, length) ) ;
-  type.insert( "entries", offsetof(EvrSequencerConfigV1_Data, nentries), entriesType ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrSequencerConfigV1 >() ;
+  type.insert( "sync_source", offsetof(EvrSequencerConfigV1, sync_source), srcEnumType ) ;
+  type.insert( "beam_source", offsetof(EvrSequencerConfigV1, beam_source), srcEnumType ) ;
+  type.insert_native<uint32_t>( "cycles", offsetof(EvrSequencerConfigV1, cycles) ) ;
+  type.insert_native<uint32_t>( "length", offsetof(EvrSequencerConfigV1, length) ) ;
+  type.insert( "entries", offsetof(EvrSequencerConfigV1, nentries), entriesType ) ;
 
   return type ;
 }
