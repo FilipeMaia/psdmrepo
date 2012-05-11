@@ -248,6 +248,43 @@ private:
   uint32_t	_v;
 };
 
+/** @class OutputMapV2
+
+  
+*/
+
+
+class OutputMapV2 {
+public:
+  enum Source {
+    Pulse,
+    DBus,
+    Prescaler,
+    Force_High,
+    Force_Low,
+  };
+  enum Conn {
+    FrontPanel,
+    UnivIO,
+  };
+  OutputMapV2()
+  {
+  }
+  OutputMapV2(EvrData::OutputMapV2::Source arg_bf__bf_source, uint8_t arg_bf__bf_source_id, EvrData::OutputMapV2::Conn arg_bf__bf_conn, uint8_t arg_bf__bf_conn_id, uint8_t arg_bf__bf_module)
+    : _v((arg_bf__bf_source & 0xf)|((arg_bf__bf_source_id & 0xff)<<4)|((arg_bf__bf_conn & 0xf)<<12)|((arg_bf__bf_conn_id & 0xff)<<16)|((arg_bf__bf_module & 0xff)<<24))
+  {
+  }
+  uint32_t value() const { return _v; }
+  EvrData::OutputMapV2::Source source() const { return Source(this->_v & 0xf); }
+  uint8_t source_id() const { return uint8_t((this->_v>>4) & 0xff); }
+  EvrData::OutputMapV2::Conn conn() const { return Conn((this->_v>>12) & 0xf); }
+  uint8_t conn_id() const { return uint8_t((this->_v>>16) & 0xff); }
+  uint8_t module() const { return uint8_t((this->_v>>24) & 0xff); }
+  static uint32_t _sizeof()  { return 4; }
+private:
+  uint32_t	_v;
+};
+
 /** @class ConfigV1
 
   
@@ -399,6 +436,8 @@ class ConfigV5 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
+  enum { MaxPulses = 32 };
+  enum { EvrOutputs = 10 };
   virtual ~ConfigV5();
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
@@ -406,6 +445,28 @@ public:
   virtual ndarray<EvrData::EventCodeV5, 1> eventcodes() const = 0;
   virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
   virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
+};
+
+/** @class ConfigV6
+
+  
+*/
+
+
+class ConfigV6 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 6 /**< XTC type version number */ };
+  enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  virtual ~ConfigV6();
+  virtual uint32_t neventcodes() const = 0;
+  virtual uint32_t npulses() const = 0;
+  virtual uint32_t noutputs() const = 0;
+  virtual ndarray<EvrData::EventCodeV5, 1> eventcodes() const = 0;
+  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<EvrData::OutputMapV2, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
 };
 

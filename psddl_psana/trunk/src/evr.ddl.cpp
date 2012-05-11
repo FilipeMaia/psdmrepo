@@ -43,6 +43,9 @@ SequencerConfigV1::~SequencerConfigV1() {}
 ConfigV5::~ConfigV5() {}
 
 
+ConfigV6::~ConfigV6() {}
+
+
 DataV3::~DataV3() {}
 
 std::vector<int>
