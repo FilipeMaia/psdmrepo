@@ -439,6 +439,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 3) ::storeCfgObject<EvrData::ConfigV3>(xtc, cfgStore);
     if (version == 4) ::storeCfgObject<EvrData::ConfigV4>(xtc, cfgStore);
     if (version == 5) ::storeCfgObject<EvrData::ConfigV5>(xtc, cfgStore);
+    if (version == 6) ::storeCfgObject<EvrData::ConfigV6>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_TM6740Config:
     if (version == 1) ::storeCfgObject<Pulnix::TM6740ConfigV1>(xtc, cfgStore);
