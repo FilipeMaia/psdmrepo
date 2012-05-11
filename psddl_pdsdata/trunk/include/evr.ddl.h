@@ -249,6 +249,43 @@ private:
   uint32_t	_v;
 };
 
+/** @class OutputMapV2
+
+  
+*/
+
+
+class OutputMapV2 {
+public:
+  enum Source {
+    Pulse,
+    DBus,
+    Prescaler,
+    Force_High,
+    Force_Low,
+  };
+  enum Conn {
+    FrontPanel,
+    UnivIO,
+  };
+  OutputMapV2()
+  {
+  }
+  OutputMapV2(EvrData::OutputMapV2::Source arg_bf__bf_source, uint8_t arg_bf__bf_source_id, EvrData::OutputMapV2::Conn arg_bf__bf_conn, uint8_t arg_bf__bf_conn_id, uint8_t arg_bf__bf_module)
+    : _v((arg_bf__bf_source & 0xf)|((arg_bf__bf_source_id & 0xff)<<4)|((arg_bf__bf_conn & 0xf)<<12)|((arg_bf__bf_conn_id & 0xff)<<16)|((arg_bf__bf_module & 0xff)<<24))
+  {
+  }
+  uint32_t value() const { return _v; }
+  EvrData::OutputMapV2::Source source() const { return Source(this->_v & 0xf); }
+  uint8_t source_id() const { return uint8_t((this->_v>>4) & 0xff); }
+  EvrData::OutputMapV2::Conn conn() const { return Conn((this->_v>>12) & 0xf); }
+  uint8_t conn_id() const { return uint8_t((this->_v>>16) & 0xff); }
+  uint8_t module() const { return uint8_t((this->_v>>24) & 0xff); }
+  static uint32_t _sizeof()  { return 4; }
+private:
+  uint32_t	_v;
+};
+
 /** @class ConfigV1
 
   
@@ -464,6 +501,8 @@ class ConfigV5 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
+  enum { MaxPulses = 32 };
+  enum { EvrOutputs = 10 };
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -485,6 +524,44 @@ private:
   //EvrData::EventCodeV5	_eventcodes[this->_neventcodes];
   //EvrData::PulseConfigV3	_pulses[this->_npulses];
   //EvrData::OutputMap	_output_maps[this->_noutputs];
+  //EvrData::SequencerConfigV1	_seq_config;
+};
+#pragma pack(pop)
+
+/** @class ConfigV6
+
+  
+*/
+
+#pragma pack(push,4)
+
+class ConfigV6 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 6 /**< XTC type version number */ };
+  enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  uint32_t neventcodes() const { return _neventcodes; }
+  uint32_t npulses() const { return _npulses; }
+  uint32_t noutputs() const { return _noutputs; }
+  ndarray<EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
+  EvrData::EventCodeV5* data = (EvrData::EventCodeV5*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_neventcodes); }
+  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
+  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_npulses); }
+  ndarray<EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
+  EvrData::OutputMapV2* data = (EvrData::OutputMapV2*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_noutputs); }
+  const EvrData::SequencerConfigV1& seq_config() const { ptrdiff_t offset=((12+(40*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
+  return *(const EvrData::SequencerConfigV1*)(((const char*)this)+offset); }
+private:
+  uint32_t	_neventcodes;
+  uint32_t	_npulses;
+  uint32_t	_noutputs;
+  //EvrData::EventCodeV5	_eventcodes[this->_neventcodes];
+  //EvrData::PulseConfigV3	_pulses[this->_npulses];
+  //EvrData::OutputMapV2	_output_maps[this->_noutputs];
   //EvrData::SequencerConfigV1	_seq_config;
 };
 #pragma pack(pop)
