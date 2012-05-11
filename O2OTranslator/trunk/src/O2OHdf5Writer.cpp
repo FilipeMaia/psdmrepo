@@ -54,6 +54,7 @@
 #include "H5DataTypes/EvrConfigV3.h"
 #include "H5DataTypes/EvrConfigV4.h"
 #include "H5DataTypes/EvrConfigV5.h"
+#include "H5DataTypes/EvrConfigV6.h"
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
@@ -287,6 +288,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV5> ( "EvrData::ConfigV5" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,5).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV6> ( "EvrData::ConfigV6" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,6).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrIOConfigV1> ( "EvrData::IOConfigV1" ) ) ;

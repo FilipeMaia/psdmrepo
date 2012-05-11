@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-04
+2012-05-11 Andy Salnikov
+- upgrading to pdsdata V03-07-00
+- new class added EvrConfigV6
+
 Tag: V00-18-03
 2012-05-07 Andy Salnikov
 - add protection for illegal characters in EPICS alias names 
