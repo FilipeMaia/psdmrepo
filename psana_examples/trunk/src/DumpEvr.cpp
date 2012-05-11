@@ -55,6 +55,16 @@ namespace {
         << " conn_id=" << int(ocfg.conn_id());
   }
 
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::OutputMapV2& ocfg)
+  {
+    str << "\n  output config #" << i
+        << ": source=" << ocfg.source()
+        << " source_id=" << int(ocfg.source_id())
+        << " conn=" << ocfg.conn()
+        << " conn_id=" << int(ocfg.conn_id())
+        << " module=" << int(ocfg.module());
+  }
+
   void print(std::ostream& str, unsigned i, const Psana::EvrData::PulseConfigV3& pcfg)
   {
     str << "\n  pulse config #" << i
@@ -245,6 +255,31 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
       ::print_array(str, config5->eventcodes());
 
       const Psana::EvrData::SequencerConfigV1& scfg = config5->seq_config();
+      str << "\n  seq_config: sync_source=" << scfg.sync_source()
+          << " beam_source=" << scfg.beam_source()
+          << " length=" << scfg.length()
+          << " cycles=" << scfg.cycles();
+
+      ::print_array(str, scfg.entries());
+
+    }
+    
+  }
+
+  // Try to get V6 config object
+  shared_ptr<Psana::EvrData::ConfigV6> config6 = env.configStore().get(m_src);
+  if (config6.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "EvrData::ConfigV5: npulses = " << config6->npulses()
+          << " noutputs = " << config6->noutputs()
+          << " neventcodes = " << config6->neventcodes();
+
+      ::print_array(str, config6->pulses());
+      ::print_array(str, config6->output_maps());
+      ::print_array(str, config6->eventcodes());
+
+      const Psana::EvrData::SequencerConfigV1& scfg = config6->seq_config();
       str << "\n  seq_config: sync_source=" << scfg.sync_source()
           << " beam_source=" << scfg.beam_source()
           << " length=" << scfg.length()
