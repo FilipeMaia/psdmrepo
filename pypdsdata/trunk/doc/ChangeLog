@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-64
+2012-05-11 Andy Salnikov
+- upgrade to pdsdata V03-07-00
+
 Tag: V00-00-63
 2012-05-03 Andy Salnikov
 - upgrade to pdsdata V03-06-00
