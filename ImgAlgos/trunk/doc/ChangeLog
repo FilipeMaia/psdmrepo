@@ -11,7 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-//////Tag: V00-00-04
+Tag: V00-00-04
+2012-05-11 Mikhail S. Dubrovin
+- modified modules:
+M       include/CSPadArrNoise.h
+M       include/CSPadMaskV1.h
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       src/CSPadArrNoise.cpp
+
+
 2012-05-09 Mikhail S. Dubrovin
 - add modules:
 A         ImgAlgos/include/CSPadArrNoise.h

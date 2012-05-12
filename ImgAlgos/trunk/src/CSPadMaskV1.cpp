@@ -36,15 +36,25 @@ namespace ImgAlgos {
 
 CSPadMaskV1::CSPadMaskV1 ()
 {
-  // Fill the mask array by zeros
-  std::fill_n(&m_mask[0][0][0][0], int(SIZE_OF_ARRAY), mask_t(0));
+  // Fill the mask array by ones (transparent) by default
+  std::fill_n(&m_mask[0][0][0][0], int(SIZE_OF_ARRAY), mask_t(1));
+}
+
+//----------------
+
+CSPadMaskV1::CSPadMaskV1 (mask_t value)
+{
+  // Fill the mask array by value
+  std::fill_n(&m_mask[0][0][0][0], int(SIZE_OF_ARRAY), value);
 }
 
 //----------------
 
 CSPadMaskV1::CSPadMaskV1( const std::string& fname )
 {
+  MsgLog(":print()",  info, "Read mask from file: " << fname.c_str() );
   // Open file
+
   std::ifstream in(fname.c_str());
   if (not in.good()) {
     const std::string msg = "Failed to open the mask file: "+fname;
@@ -93,7 +103,7 @@ void CSPadMaskV1::fillArrFromVector( const std::vector<mask_t> v_parameters )
 
 void CSPadMaskV1::print()
 {
-  MsgLog("CSPadMaskV1::print()",  info, "Print part of the data for test purpose only.");
+  MsgLog(":print()",  info, "Print part of the data for test purpose only.");
     for (int iq = 0; iq != Quads; ++ iq) {
       cout << "Quad: " << iq << "\n"; 
       for (int is = 0; is != Sectors; ++ is) {
@@ -109,6 +119,26 @@ void CSPadMaskV1::print()
         }
       }
     }
+}
+
+//----------------
+
+void CSPadMaskV1::printMaskStatistics()
+{
+
+  mask_t* p = &m_mask[0][0][0][0];
+
+  int counter0=0;
+  int counter1=0;
+
+  for (int i = 0; i < SIZE_OF_ARRAY; ++ i) {
+      if (p[i] == 0) counter0++;
+      if (p[i] == 1) counter1++;
+  }
+
+  MsgLog(":printMaskStatistics()",  info, "Mask statistics: number of 0: " << counter0 
+                                       << " number of 1: " << counter1
+                                       << " total number of elements: " << SIZE_OF_ARRAY);
 }
 
 //----------------

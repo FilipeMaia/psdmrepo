@@ -51,7 +51,7 @@ CSPadArrNoise::CSPadArrNoise (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
-  , m_statusFile()
+  , m_fracFile()
   , m_maskFile()
   , m_rmin()
   , m_dr()
@@ -63,8 +63,8 @@ CSPadArrNoise::CSPadArrNoise (const std::string& name)
   // get the values from configuration or use defaults
   m_str_src         = configStr("source",     "DetInfo(:Cspad)");
   m_key             = configStr("key",        "");                 //"calibrated"
-  m_statusFile      = configStr("statusfile", "cspad-pix-status.dat");
-  m_maskFile        = configStr("maskfile",   "cspad-pix-mask.dat");
+  m_fracFile      = configStr("fracfile", "cspad-pix-frac.dat");
+  m_maskFile        = configStr("maskfile", "cspad-pix-mask.dat");
   m_rmin            = config   ("rmin",              3);
   m_dr              = config   ("dr",                2);
   m_SoNThr          = config   ("SoNThr",            3);
@@ -217,7 +217,7 @@ void
 CSPadArrNoise::endJob(Event& evt, Env& env)
 {
   procStatArrays();
-  saveCSPadArrayInFile<float>( m_statusFile, m_status );
+  saveCSPadArrayInFile<float>( m_fracFile, m_status );
   saveCSPadArrayInFile<uint16_t>( m_maskFile,   m_mask );  //or &m_mask[0][0][0][0] );
 }
 
@@ -472,7 +472,7 @@ CSPadArrNoise::printInputParameters()
     log << "\n Input parameters:"
         << "\n source            : " << m_str_src
         << "\n key               : " << m_key      
-        << "\n m_statusFile      : " << m_statusFile    
+        << "\n m_fracFile        : " << m_fracFile    
         << "\n m_maskFile        : " << m_maskFile    
         << "\n m_rmin            : " << m_rmin    
         << "\n m_dr              : " << m_dr     

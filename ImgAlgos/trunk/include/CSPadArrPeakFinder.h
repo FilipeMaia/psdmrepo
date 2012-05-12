@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "psddl_psana/cspad.ddl.h"
+#include "ImgAlgos/CSPadMaskV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -63,6 +64,8 @@ struct MedianResult {
 };
 
 struct Peak{
+   double quad;
+   double sect; 
    double col;
    double row; 
    double sigma_col;
@@ -76,13 +79,14 @@ struct Peak{
 class CSPadArrPeakFinder : public Module {
 public:
 
-    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
-    enum { NumColumns1= NumColumns - 1};
-    enum { NumRows1   = NumRows    - 1};
+    enum { MaxQuads      = Psana::CsPad::MaxQuadsPerSensor }; // 4
+    enum { MaxSectors    = Psana::CsPad::SectorsPerQuad    }; // 8
+    enum { NumColumns    = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
+    enum { NumRows       = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
+    enum { SectorSize    = NumColumns * NumRows            }; // 185 * 388
+    enum { SIZE_OF_ARRAY = MaxQuads * MaxSectors * SectorSize }; 
+    enum { NumColumns1   = NumColumns - 1};
+    enum { NumRows1      = NumRows    - 1};
     enum SELECTION_MODE{ SELECTION_OFF, SELECTION_ON, SELECTION_INV };
   
   // Default constructor
@@ -122,6 +126,7 @@ protected:
     bool peakSelector();
     void savePeakInfo();
     void printVectorOfPeaks();
+    void maskUpdateControl();
     void setSelectionMode();
     bool eventSelector();
 
@@ -142,13 +147,25 @@ protected:
     template <typename T>
     void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
+    void getMaskFromFile();
+    void printMaskStatistics();
+
+    std::string strEventCounter();
+    std::string strTimeStamp(Event& evt);
+    std::string strRunNumber(Event& evt);
+    void doOperationsForSelectedEvents(Event& evt);
+    void savePeaksInEvent(Event& evt);
+
 private:
   //Source         m_src;             // Data source set from config file
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
   std::string    m_key;             // string with key name
-  std::string    m_fracFile;        // [out] file with pixel status info: fraction of noisy images (events)
-  std::string    m_maskFile;        // [out] file with mask 
+  std::string    m_key_peaks_out;   // string with key for found peaks in selected events
+  std::string    m_maskFile_inp;    // [in]  file with mask 
+  std::string    m_maskFile_out;    // [out] file with mask 
+  std::string    m_fracFile_out;    // [out] file with pixel status info: fraction of noisy images (events)
+  std::string    m_evtFile_out;     // [out] file name prefix for event array output
   float          m_rmin;            // radial parameter of the area for median algorithm
   float          m_dr;              // radial band width of the area for median algorithm 
   float          m_SoNThr;          // S/N threshold for outlier pix finder
@@ -160,11 +177,17 @@ private:
 
   unsigned       m_event_npeak_min;  // Minimum number of peaks in the event for selector
   double         m_event_amp_tot_thr;// Amplitude threshold on total signal amplitude in all peaks
+
+  unsigned       m_nevents_mask_update;
+  unsigned       m_nevents_mask_accum;
+
   std::string    m_sel_mode_str;
   SELECTION_MODE m_sel_mode;
-  bool           m_save_in_file;
+  unsigned       m_out_file_bits;     // Yes/No bits to control output files
   unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
+  unsigned long  m_count;             // number of events from the beginning of job
+  unsigned long  m_count_mask_update; // number of events from the beginning of job
+  unsigned long  m_count_mask_accum;  // number of events from the beginning of job
 
   unsigned       m_segMask         [MaxQuads];  // segment masks per quadrant
   unsigned       m_stat            [MaxQuads][MaxSectors][NumColumns][NumRows];
@@ -172,6 +195,8 @@ private:
   float          m_frac_noisy_evts [MaxQuads][MaxSectors][NumColumns][NumRows];
   int16_t        m_signal          [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_proc_status     [MaxQuads][MaxSectors][NumColumns][NumRows];
+
+  ImgAlgos::CSPadMaskV1 *m_mask_initial;
 
   std::vector<TwoIndexes> v_indForMediane;
 

@@ -121,11 +121,11 @@ protected:
     void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
 private:
-  //Source         m_src;             // Data source set from config file
+  //Source         m_src;            // Data source set from config file
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
   std::string    m_key;             // string with key name
-  std::string    m_statusFile;      // [out] file with pixel status info: fraction of noisy images (events)
+  std::string    m_fracFile;        // [out] file with fraction of noisy events in eac pixel
   std::string    m_maskFile;        // [out] file with mask 
   float          m_rmin;            // radial parameter of the area for median algorithm
   float          m_dr;              // radial band width of the area for median algorithm 

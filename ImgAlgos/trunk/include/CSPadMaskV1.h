@@ -51,25 +51,23 @@ public:
 
   // Constructors
   CSPadMaskV1 () ;
-
-  CSPadMaskV1( const std::string& fname );
+  CSPadMaskV1 ( mask_t value=1 ) ;
+  CSPadMaskV1 ( const std::string& fname );
 
   // Destructor
   virtual ~CSPadMaskV1 () ;
 
   // Access methods
-  mask_t  getMask(size_t quad, size_t sect, size_t col, size_t row){ return m_mask[quad][sect][col][row]; };
+  mask_t* getMask(size_t quad, size_t sect=0, size_t col=0, size_t row=0 ){ return &m_mask[quad][sect][col][row]; };
 
   mask_t* getMask(){ return &m_mask[0][0][0][0]; };
-
-  mask_t* getMask(size_t quad, size_t sect){ return &m_mask[quad][sect][0][0]; };
 
   ndarray<mask_t, 4> getMask() const {
     return make_ndarray(&m_mask[0][0][0][0], Quads, Sectors, Columns, Rows);
   }
 
   void  print();
-
+  void  printMaskStatistics();
 
 protected:
   void fillArrFromVector( const std::vector<mask_t> v_pars );
