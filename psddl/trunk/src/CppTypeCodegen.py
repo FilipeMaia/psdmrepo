@@ -167,7 +167,7 @@ class CppTypeCodegen ( object ) :
             access = self._access("public", access)
             print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
             print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
-            print >>self._cpp, T("\n  class_<$name>(\"${prefix}${wrapped}\", no_init)")(name = name, prefix = self._namespace_prefix, wrapped = wrapped)
+            print >>self._cpp, T("\n#define _CLASS(n) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
         else:
             if not self._abs:
                 # constructor, all should be declared explicitly
@@ -199,7 +199,12 @@ class CppTypeCodegen ( object ) :
         # close class declaration
         print >>self._inc, "};"
         if self._wrapper:
-            print >>self._cpp, "    ;"
+            print >>self._cpp, ""
+            print >>self._cpp, T("  _CLASS($name);")(locals())
+            if not self._abs:
+                print >>self._cpp, T("  _CLASS($wrapped);")(locals())
+            print >>self._cpp, "#undef _CLASS";
+            print >>self._cpp, ""
 
         # close pragma pack
         if needPragmaPack : 
@@ -485,7 +490,7 @@ class CppTypeCodegen ( object ) :
             else:
                 print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
 
-            print >>self._cpp, T("    .def(\"$methname\", &${classname}_Wrapper::$methname)")(methname=methname, classname=self._type.name)
+            print >>self._cpp, T("    .def(\"$methname\", &${classname}_Wrapper::$methname)\\")(methname=methname, classname=self._type.name)
             return
 
         if static:
