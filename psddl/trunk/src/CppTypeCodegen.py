@@ -204,6 +204,10 @@ class CppTypeCodegen ( object ) :
             if not self._abs:
                 print >>self._cpp, T("  _CLASS($wrapped);")(locals())
             print >>self._cpp, "#undef _CLASS";
+            if name.find('DataV') == 0 or name.find('DataDescV') == 0:
+                print >>self._cpp, T("  EVT_GETTER($wrapped);")(locals())
+            elif name.find('ConfigV') == 0:
+                print >>self._cpp, T("  ENV_GETTER($wrapped);")(locals())
             print >>self._cpp, ""
 
         # close pragma pack
