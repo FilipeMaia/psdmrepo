@@ -39,14 +39,6 @@ namespace Psana {
     void operator()(PyObject* obj) { Py_CLEAR(obj); }
   };
 
-
-
-
-namespace Acqiris { extern void createWrappers(); }
-namespace CsPad { extern void createWrappers(); }
-
-  extern void createAcqirisWrappers();
-
   class EnvWrapper {
   private:
     Env& _env;
@@ -109,6 +101,10 @@ namespace CsPad { extern void createWrappers(); }
     return object(none);
   }
 
+  namespace CreateWrappers {
+    extern void createWrappers();
+  }
+
   void createWrappers()
   {
     // Required initialization of numpy array support
@@ -153,8 +149,7 @@ namespace CsPad { extern void createWrappers(); }
       .def("getConfig", &getConfig)
       ;
 
-    CsPad::createWrappers();
-    Acqiris::createWrappers();
+    CreateWrappers::createWrappers();
   }
 
   map<string, EvtGetter*> eventGetter_map;
