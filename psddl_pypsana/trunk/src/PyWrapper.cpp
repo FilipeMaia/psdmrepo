@@ -199,10 +199,8 @@ namespace CsPad { extern void createWrappers(); }
   }
 
   // call specific method
-  void call(PyObject* method, Event& evt, Env& env)
+  boost::shared_ptr<PyObject> call(PyObject* method, Event& evt, Env& env)
   {
-    if (not method) return;
-
     object envWrapper = Psana::getEnvWrapper(env);
     object evtWrapper = Psana::getEvtWrapper(evt);
 
@@ -211,10 +209,7 @@ namespace CsPad { extern void createWrappers(); }
     PyTuple_SET_ITEM(args.get(), 1, envWrapper.ptr());
 
     PyObjPtr res(PyObject_Call(method, args.get(), NULL), PyRefDelete());
-    if (not res) {
-      PyErr_Print();
-      //throw ExceptionGenericPyError(ERR_LOC, "exception raised while calling Python method"); // XXX
-    }
+    return res;
   }
 
 

@@ -27,7 +27,7 @@ namespace Psana {
   extern std::map<std::string, EvtGetter*> eventGetter_map;
   extern std::map<std::string, EnvGetter*> environmentGetter_map;
   extern void createWrappers();
-  extern void call(PyObject* method, PSEvt::Event& evt, PSEnv::Env& env);
+  extern boost::shared_ptr<PyObject> call(PyObject* method, PSEvt::Event& evt, PSEnv::Env& env);
 }
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a = value; return Psana::ndConvert((void *) a.data(), a.shape(), ndim, #ctype)
