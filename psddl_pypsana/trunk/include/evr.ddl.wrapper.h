@@ -166,7 +166,6 @@ public:
   EventCodeV5_Wrapper(boost::shared_ptr<EventCodeV5> obj) : _o(obj), o(_o.get()) {}
   EventCodeV5_Wrapper(EventCodeV5* obj) : o(obj) {}
   uint16_t code() const { return o->code(); }
-  uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
   uint8_t isReadout() const { return o->isReadout(); }
   uint8_t isTerminator() const { return o->isTerminator(); }
   uint8_t isLatch() const { return o->isLatch(); }
@@ -218,6 +217,40 @@ public:
   uint8_t source_id() const { return o->source_id(); }
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
   uint8_t conn_id() const { return o->conn_id(); }
+  uint32_t _sizeof() const { return o->_sizeof(); }
+private:
+  uint32_t	_v;
+};
+
+/** @class OutputMapV2
+
+  
+*/
+
+
+class OutputMapV2_Wrapper {
+  boost::shared_ptr<OutputMapV2> _o;
+  OutputMapV2* o;
+public:
+  enum Source {
+    Pulse,
+    DBus,
+    Prescaler,
+    Force_High,
+    Force_Low,
+  };
+  enum Conn {
+    FrontPanel,
+    UnivIO,
+  };
+  OutputMapV2_Wrapper(boost::shared_ptr<OutputMapV2> obj) : _o(obj), o(_o.get()) {}
+  OutputMapV2_Wrapper(OutputMapV2* obj) : o(obj) {}
+  uint32_t value() const { return o->value(); }
+  EvrData::OutputMapV2::Source source() const { return o->source(); }
+  uint8_t source_id() const { return o->source_id(); }
+  EvrData::OutputMapV2::Conn conn() const { return o->conn(); }
+  uint8_t conn_id() const { return o->conn_id(); }
+  uint8_t module() const { return o->module(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 private:
   uint32_t	_v;
@@ -388,6 +421,8 @@ class ConfigV5_Wrapper {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
+  enum { MaxPulses = 32 };
+  enum { EvrOutputs = 10 };
   ConfigV5_Wrapper(boost::shared_ptr<ConfigV5> obj) : _o(obj), o(_o.get()) {}
   ConfigV5_Wrapper(ConfigV5* obj) : o(obj) {}
   uint32_t neventcodes() const { return o->neventcodes(); }
@@ -396,6 +431,31 @@ public:
   PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV5, 1); }
   PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
   PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
+  SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); } // copy_const_reference
+};
+
+/** @class ConfigV6
+
+  
+*/
+
+
+class ConfigV6_Wrapper {
+  boost::shared_ptr<ConfigV6> _o;
+  ConfigV6* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 6 /**< XTC type version number */ };
+  enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  ConfigV6_Wrapper(boost::shared_ptr<ConfigV6> obj) : _o(obj), o(_o.get()) {}
+  ConfigV6_Wrapper(ConfigV6* obj) : o(obj) {}
+  uint32_t neventcodes() const { return o->neventcodes(); }
+  uint32_t npulses() const { return o->npulses(); }
+  uint32_t noutputs() const { return o->noutputs(); }
+  PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV5, 1); }
+  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
+  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMapV2, 1); }
   SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); } // copy_const_reference
 };
 
@@ -530,6 +590,16 @@ public:
     }
     boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
       return boost::python::api::object(ConfigV5_Wrapper(env.configStore().get(src, 0)));
+    }
+  };
+
+  class ConfigV6_EnvGetter : public Psana::EnvGetter {
+  public:
+    std::string getTypeName() {
+      return "Psana::EvrData::ConfigV6";
+    }
+    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV6_Wrapper(env.configStore().get(src, 0)));
     }
   };
 

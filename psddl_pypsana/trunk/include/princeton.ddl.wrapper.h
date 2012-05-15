@@ -76,6 +76,38 @@ public:
   uint32_t numPixels() const { return o->numPixels(); }
 };
 
+/** @class ConfigV3
+
+  
+*/
+
+
+class ConfigV3_Wrapper {
+  boost::shared_ptr<ConfigV3> _o;
+  ConfigV3* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 3 /**< XTC type version number */ };
+  ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
+  ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
+  uint32_t width() const { return o->width(); }
+  uint32_t height() const { return o->height(); }
+  uint32_t orgX() const { return o->orgX(); }
+  uint32_t orgY() const { return o->orgY(); }
+  uint32_t binX() const { return o->binX(); }
+  uint32_t binY() const { return o->binY(); }
+  float exposureTime() const { return o->exposureTime(); }
+  float coolingTemp() const { return o->coolingTemp(); }
+  uint8_t gainIndex() const { return o->gainIndex(); }
+  uint8_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
+  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
+  uint32_t numDelayShots() const { return o->numDelayShots(); }
+  uint32_t frameSize() const { return o->frameSize(); }
+  uint32_t numPixelsX() const { return o->numPixelsX(); }
+  uint32_t numPixelsY() const { return o->numPixelsY(); }
+  uint32_t numPixels() const { return o->numPixels(); }
+};
+
 /** @class FrameV1
 
   
@@ -83,6 +115,7 @@ public:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
 
 class FrameV1_Wrapper {
   boost::shared_ptr<FrameV1> _o;
@@ -134,6 +167,16 @@ private:
     }
     boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
       return boost::python::api::object(ConfigV2_Wrapper(env.configStore().get(src, 0)));
+    }
+  };
+
+  class ConfigV3_EnvGetter : public Psana::EnvGetter {
+  public:
+    std::string getTypeName() {
+      return "Psana::Princeton::ConfigV3";
+    }
+    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV3_Wrapper(env.configStore().get(src, 0)));
     }
   };
 } // namespace Princeton

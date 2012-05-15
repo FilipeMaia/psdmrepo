@@ -81,7 +81,6 @@ void createWrappers() {
 
 #define _CLASS(n) class_<n>("Psana::EvrData::EventCodeV5", no_init)\
     .def("code", &EventCodeV5_Wrapper::code)\
-    .def("_u16MaskEventAttr_value", &EventCodeV5_Wrapper::_u16MaskEventAttr_value)\
     .def("isReadout", &EventCodeV5_Wrapper::isReadout)\
     .def("isTerminator", &EventCodeV5_Wrapper::isTerminator)\
     .def("isLatch", &EventCodeV5_Wrapper::isLatch)\
@@ -109,6 +108,20 @@ void createWrappers() {
 
   _CLASS(OutputMap_Wrapper);
   _CLASS(OutputMap);
+#undef _CLASS
+
+
+#define _CLASS(n) class_<n>("Psana::EvrData::OutputMapV2", no_init)\
+    .def("value", &OutputMapV2_Wrapper::value)\
+    .def("source", &OutputMapV2_Wrapper::source)\
+    .def("source_id", &OutputMapV2_Wrapper::source_id)\
+    .def("conn", &OutputMapV2_Wrapper::conn)\
+    .def("conn_id", &OutputMapV2_Wrapper::conn_id)\
+    .def("module", &OutputMapV2_Wrapper::module)\
+    .def("_sizeof", &OutputMapV2_Wrapper::_sizeof)\
+
+  _CLASS(OutputMapV2_Wrapper);
+  _CLASS(OutputMapV2);
 #undef _CLASS
 
 
@@ -196,6 +209,20 @@ void createWrappers() {
   _CLASS(ConfigV5_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV5);
+
+
+#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV6", no_init)\
+    .def("neventcodes", &ConfigV6_Wrapper::neventcodes)\
+    .def("npulses", &ConfigV6_Wrapper::npulses)\
+    .def("noutputs", &ConfigV6_Wrapper::noutputs)\
+    .def("eventcodes", &ConfigV6_Wrapper::eventcodes)\
+    .def("pulses", &ConfigV6_Wrapper::pulses)\
+    .def("output_maps", &ConfigV6_Wrapper::output_maps)\
+    .def("seq_config", &ConfigV6_Wrapper::seq_config)\
+
+  _CLASS(ConfigV6_Wrapper);
+#undef _CLASS
+  ENV_GETTER(ConfigV6);
 
 
 #define _CLASS(n) class_<n>("Psana::EvrData::FIFOEvent", no_init)\

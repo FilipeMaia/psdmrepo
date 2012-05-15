@@ -378,6 +378,25 @@ void createWrappers() {
   _CLASS(EpicsPvTimeDouble_Wrapper);
 #undef _CLASS
 
+
+#define _CLASS(n) class_<n>("Psana::Epics::PvConfigV1", no_init)\
+    .def("pvId", &PvConfigV1_Wrapper::pvId)\
+    .def("description", &PvConfigV1_Wrapper::description)\
+    .def("interval", &PvConfigV1_Wrapper::interval)\
+
+  _CLASS(PvConfigV1_Wrapper);
+#undef _CLASS
+
+
+#define _CLASS(n) class_<n>("Psana::Epics::ConfigV1", no_init)\
+    .def("numPv", &ConfigV1_Wrapper::numPv)\
+    .def("pvControls", &ConfigV1_Wrapper::pvControls)\
+    .def("pvControls_shape", &ConfigV1_Wrapper::pvControls_shape)\
+
+  _CLASS(ConfigV1_Wrapper);
+#undef _CLASS
+  ENV_GETTER(ConfigV1);
+
 }
 } // namespace Epics
 } // namespace Psana

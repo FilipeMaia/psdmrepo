@@ -55,6 +55,29 @@ void createWrappers() {
   ENV_GETTER(ConfigV2);
 
 
+#define _CLASS(n) class_<n>("Psana::Princeton::ConfigV3", no_init)\
+    .def("width", &ConfigV3_Wrapper::width)\
+    .def("height", &ConfigV3_Wrapper::height)\
+    .def("orgX", &ConfigV3_Wrapper::orgX)\
+    .def("orgY", &ConfigV3_Wrapper::orgY)\
+    .def("binX", &ConfigV3_Wrapper::binX)\
+    .def("binY", &ConfigV3_Wrapper::binY)\
+    .def("exposureTime", &ConfigV3_Wrapper::exposureTime)\
+    .def("coolingTemp", &ConfigV3_Wrapper::coolingTemp)\
+    .def("gainIndex", &ConfigV3_Wrapper::gainIndex)\
+    .def("readoutSpeedIndex", &ConfigV3_Wrapper::readoutSpeedIndex)\
+    .def("exposureEventCode", &ConfigV3_Wrapper::exposureEventCode)\
+    .def("numDelayShots", &ConfigV3_Wrapper::numDelayShots)\
+    .def("frameSize", &ConfigV3_Wrapper::frameSize)\
+    .def("numPixelsX", &ConfigV3_Wrapper::numPixelsX)\
+    .def("numPixelsY", &ConfigV3_Wrapper::numPixelsY)\
+    .def("numPixels", &ConfigV3_Wrapper::numPixels)\
+
+  _CLASS(ConfigV3_Wrapper);
+#undef _CLASS
+  ENV_GETTER(ConfigV3);
+
+
 #define _CLASS(n) class_<n>("Psana::Princeton::FrameV1", no_init)\
     .def("shotIdStart", &FrameV1_Wrapper::shotIdStart)\
     .def("readoutTime", &FrameV1_Wrapper::readoutTime)\

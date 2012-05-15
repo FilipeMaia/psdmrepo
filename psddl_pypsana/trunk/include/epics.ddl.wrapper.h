@@ -746,6 +746,53 @@ public:
   PyObject* data() const { ND_CONVERT(o->data(), double, 1); }
   double value(uint32_t i) const { return o->value(i); }
 };
+
+/** @class PvConfigV1
+
+  
+*/
+
+
+class PvConfigV1_Wrapper {
+  boost::shared_ptr<PvConfigV1> _o;
+  PvConfigV1* o;
+public:
+  enum { iMaxPvDescLength = 64 };
+  PvConfigV1_Wrapper(boost::shared_ptr<PvConfigV1> obj) : _o(obj), o(_o.get()) {}
+  PvConfigV1_Wrapper(PvConfigV1* obj) : o(obj) {}
+  int16_t pvId() const { return o->pvId(); }
+  const char* description() const { return o->description(); }
+  float interval() const { return o->interval(); }
+};
+
+/** @class ConfigV1
+
+  
+*/
+
+
+class ConfigV1_Wrapper {
+  boost::shared_ptr<ConfigV1> _o;
+  ConfigV1* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  int32_t numPv() const { return o->numPv(); }
+  PvConfigV1_Wrapper pvControls(uint32_t i0) const { return PvConfigV1_Wrapper((PvConfigV1*) &o->pvControls(i0)); } // copy_const_reference
+  std::vector<int> pvControls_shape() const { return o->pvControls_shape(); }
+};
+
+  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  public:
+    std::string getTypeName() {
+      return "Psana::Epics::ConfigV1";
+    }
+    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV1_Wrapper(env.configStore().get(src, 0)));
+    }
+  };
 } // namespace Epics
 } // namespace Psana
 #endif // PSANA_EPICS_DDL_WRAPPER_H
