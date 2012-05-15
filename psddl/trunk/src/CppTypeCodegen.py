@@ -93,14 +93,14 @@ class CppTypeCodegen ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, inc, cpp, type, abstract=False, wrapper=False, namespace_prefix="" ) :
+    def __init__ ( self, inc, cpp, type, abstract=False, pywrapper=False, namespace_prefix="" ) :
 
         # define instance variables
         self._inc = inc
         self._cpp = cpp
         self._type = type
         self._abs = abstract
-        self._wrapper = wrapper
+        self._pywrapper = pywrapper
         self._namespace_prefix = namespace_prefix
 
     #-------------------
@@ -125,11 +125,11 @@ class CppTypeCodegen ( object ) :
 
         # base class
         base = ""
-        if self._type.base and not self._wrapper : base = T(": public $name")[self._type.base]
+        if self._type.base and not self._pywrapper : base = T(": public $name")[self._type.base]
 
         # this class (class being generated)
         name = self._type.name
-        if self._wrapper:
+        if self._pywrapper:
             wrapped = name
             name = wrapped + "_Wrapper"
 
@@ -137,7 +137,7 @@ class CppTypeCodegen ( object ) :
         print >>self._inc, T("\nclass $name$base {")(name = name, base = base)
         access = "private"
 
-        if self._wrapper:
+        if self._pywrapper:
             # shared_ptr and C++ pointer to wrapped object
             print >>self._inc, T("  boost::shared_ptr<$wrapped> _o;")(wrapped = wrapped)
             print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
@@ -162,7 +162,7 @@ class CppTypeCodegen ( object ) :
             self._genEnum(enum)
 
         # constructors and destructors
-        if self._wrapper:
+        if self._pywrapper:
             # constructor
             access = self._access("public", access)
             print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
@@ -198,7 +198,7 @@ class CppTypeCodegen ( object ) :
 
         # close class declaration
         print >>self._inc, "};"
-        if self._wrapper:
+        if self._pywrapper:
             print >>self._cpp, ""
             print >>self._cpp, T("  _CLASS($name);")(locals())
             if not self._abs:
@@ -475,7 +475,7 @@ class CppTypeCodegen ( object ) :
         # make argument list
         argsspec = ', '.join([_argdecl(*arg) for arg in args])
 
-        if self._wrapper:
+        if self._pywrapper:
             args = ', '.join([_argdecl2(*arg) for arg in args])
             index = rettype.find("ndarray<")
             if index == 0:
