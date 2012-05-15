@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2012-05-15 Ingrid Ofte
+- Removed the chunk and stream from output file data name. 
+  There's only one output file, this makes that explicit. 
+	
 Tag: V00-00-01
 2012-03-08 Andy Salnikov
 - Fist version, more or less tested

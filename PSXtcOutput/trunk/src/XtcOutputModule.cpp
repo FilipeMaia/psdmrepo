@@ -79,7 +79,8 @@ XtcOutputModule::XtcOutputModule (const std::string& name)
 {
   // get the values from configuration or use defaults
   m_chunkSizeMB = config("chunkSizeMB", 512000U);
-  m_nameFmt = configStr("nameFmt", "e%1$d-r%2$04d-s%3$02d-c%4$02d.xtcf");
+  //m_nameFmt = configStr("nameFmt", "e%1$d-r%2$04d-s%3$02d-c%4$02d.xtcf");
+  m_nameFmt = configStr("nameFmt", "e%1$d-r%2$04d.xtcf");
   m_dirName = configStr("dirName", ".");
   m_keepEpics = config("keepEpics", true);
   m_expNum = config("expNum", 0);
@@ -243,7 +244,10 @@ XtcOutputModule::saveData(Pds::Dgram* dg, Pds::TransitionId::Value transition)
     // build the name
     std::string fname;
     try {
-      fname = boost::str(boost::format(m_nameFmt) % m_expNum % m_run % m_stream % m_chunk);
+      // Ingrid Ofte: I have removed the stream and chunk from the output file name, 
+      // because this only a single file... Change it back if needed in the future... 
+      //fname = boost::str(boost::format(m_nameFmt) % m_expNum % m_run % m_stream % m_chunk);
+      fname = boost::str(boost::format(m_nameFmt) % m_expNum % m_run);
       fs::path path(m_dirName);
       path /= fname;
       fname = path.string();
