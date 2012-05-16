@@ -21,10 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "pyrods"
 pkg_ver = "2.4.1"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/PyRods",pkg_ver)
-
-PYDIR = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
-PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
+PREFIX  = pjoin(env['SIT_EXTERNAL_SW'], "PyRods", pkg_ver)
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 
 standardExternalPackage ( pkg, **locals() )
