@@ -21,11 +21,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "h5py"
 pkg_ver = "1.3.0-vlen-1.8.4p1"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/h5py",pkg_ver)
 
-PYDIR = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
-PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "h5py", pkg_ver)
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 
-standardExternalPackage ( pkg, **locals() )
-
+standardExternalPackage(pkg, **locals())
