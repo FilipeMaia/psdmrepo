@@ -6,21 +6,18 @@
 #  SConscript file for package pyfits
 #------------------------------------------------------------------------
 
-import os.path
-
 # Do not delete following line, it must be present in 
 # SConscript file for any SIT project
 Import('*')
 
+from os.path import join as pjoin
 from SConsTools.standardExternalPackage import standardExternalPackage
 
 
 pkg = "pyfits"
 pkg_ver = "2.3.1"
 
-PREFIX  = os.path.join(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
-PYDIR = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
-PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 
-standardExternalPackage ( pkg, **locals() )
+standardExternalPackage(pkg, **locals())
