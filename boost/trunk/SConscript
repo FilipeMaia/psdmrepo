@@ -10,9 +10,7 @@
 # SConscript file for any SIT project
 Import('*')
 
-import os
 from os.path import join as pjoin
-
 from SConsTools.standardExternalPackage import standardExternalPackage
 
 #
@@ -23,12 +21,12 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 boost_ver = "1.49.0"
 
-PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/boost", boost_ver+'-python'+env['PYTHON_VERSION'], env['SIT_ARCH'])
-INCDIR  = "include/boost"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "boost", boost_ver + '-' + env['PYTHON'], env['SIT_ARCH'])
+INCDIR = "include/boost"
 
 # Mother of all other boost packages, this will only link 
 # include directory into release
-standardExternalPackage ( 'boost', **locals() )
+standardExternalPackage('boost', **locals())
 
 # INCDIR needed any more
 del INCDIR
@@ -36,24 +34,25 @@ LIBDIR = "lib"
 
 # boost packages and their dependencies
 pkgs = {'boost_chrono' : 'boost',
-        'boost_date_time' : 'boost', 
-        'boost_filesystem' : 'boost_system boost', 
-        'boost_graph' : 'boost', 
+        'boost_date_time' : 'boost',
+        'boost_filesystem' : 'boost_system boost',
+        'boost_graph' : 'boost',
         'boost_iostreams' : 'boost',
         'boost_program_options' : 'boost',
-        'boost_python' : 'boost python', 
+        'boost_python' : 'boost python',
         'boost_random' : 'boost',
         'boost_regex' : 'boost',
         'boost_serialization' : 'boost',
         'boost_signals' : 'boost',
         'boost_system' : 'boost',
         'boost_thread' : 'boost',
-        'boost_unit_test_framework' : 'boost', 
-        'boost_wave' : 'boost', 
-        'boost_wserialization' : 'boost', 
+        'boost_unit_test_framework' : 'boost',
+        'boost_wave' : 'boost',
+        'boost_wserialization' : 'boost',
         }
-for pkg, dep in pkgs.iteritems() :
+for pkg, dep in pkgs.iteritems():
     DEPS = dep
     PKGLIBS = pkg
-    LINKLIBS = 'lib'+PKGLIBS+'*.so*' 
-    standardExternalPackage ( pkg, **locals() )
+    LINKLIBS = 'lib' + PKGLIBS + '*.so*'
+    PKGINFO = None
+    standardExternalPackage(pkg, **locals())
