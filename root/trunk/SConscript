@@ -20,10 +20,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 root_ver = "5.30.06"
-PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/root", root_ver+"-python"+env["PYTHON_VERSION"])
-
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "root", root_ver + "-" + env["PYTHON"])
 INCDIR = "include/root"
-
 LIBDIR = "lib"
 LINKLIBS = "lib*.so*"
 PKGLIBS = "Core Cint RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread m dl"
@@ -34,4 +32,4 @@ LINKBINS = "root root.exe rootcint root-config"
 PYDIR = "lib"
 LINKPY = "*.py libPyROOT.so*"
 
-standardExternalPackage ( 'root', **locals() )
+standardExternalPackage('root', **locals())
