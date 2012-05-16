@@ -21,18 +21,17 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 szip_ver = "2.1"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/szip",szip_ver)
-LIBDIR  = "lib"
-PKGLIBS = "sz" 
-standardExternalPackage ( 'szip', **locals() )
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "szip", szip_ver)
+LIBDIR = "lib"
+PKGLIBS = "sz"
+standardExternalPackage('szip', **locals())
 
 
 hdf5_ver = "1.8.6"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/hdf5",hdf5_ver)
-INCDIR  = "include"
-LIBDIR  = "lib"
-BINDIR  = "bin"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "hdf5", hdf5_ver)
+INCDIR = "include"
+LIBDIR = "lib"
+BINDIR = "bin"
 PKGLIBS = "hdf5"
-DEPS    = "szip"
-standardExternalPackage ( 'hdf5', **locals() )
-
+DEPS = "szip"
+standardExternalPackage('hdf5', **locals())
