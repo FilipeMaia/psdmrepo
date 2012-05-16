@@ -21,7 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 env = DefaultEnvironment()
 env = env.Clone()
-env.Tool('qt4', toolpath = env['TOOLPATH'])
+env.Tool('qt4', toolpath=env['TOOLPATH'])
 
 PREFIX = env['QT4_PREFIX']
 BINDIR = "bin"
