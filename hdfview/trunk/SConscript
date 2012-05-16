@@ -21,9 +21,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "hdfview"
 pkg_ver = "2.7"
-PREFIX  = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
 BINDIR = ""
 LINKBINS = "hdfview"
 
-standardExternalPackage ( pkg, **locals() )
-
+standardExternalPackage(pkg, **locals())
