@@ -21,11 +21,9 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "sip"
 pkg_ver = "4.10.1"
-PREFIX  = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
 
-PYDIR = "lib/python"+env['PYTHON_VERSION']+"/site-packages"
-
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
 BINDIR = "bin"
 
-standardExternalPackage ( pkg, **locals() )
-
+standardExternalPackage (pkg, **locals())
