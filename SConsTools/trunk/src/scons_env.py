@@ -20,41 +20,61 @@ from trace import *
 #   Setup default build environment
 # ===================================
 def buildEnv () :
+
+    # SIT_ROOT
+    sit_root = os.environ["SIT_ROOT"]
     
-    
+    # SIT_RELEASE
+    sit_release = os.environ['SIT_RELEASE']
+
+    # default DESTDIR
+    destdir = pjoin(sit_root, "sw/releases", sit_release)
+
+    # SIT_EXTERNAL_SW
+    sit_external_sw = pjoin(sit_root, "sw/external")
+
     vars = Variables()
-    vars.Add('SIT_ARCH', "Use to change the SIT_ARCH value during build", os.environ['SIT_ARCH'] )
-    vars.Add('SIT_REPOS', "Use to change the SIT_REPOS value during build", os.environ.get('SIT_REPOS',"") )
-    vars.Add('PKG_DEPS_FILE', "name of the package dependency file", '.pkg_tree.pkl' )
-    vars.Add('TRACE', "Set to positive value to trace processing", 0)
-    
+    vars.AddVariables(
+        ('SIT_ARCH', "Use to change the SIT_ARCH value during build", os.environ['SIT_ARCH']),
+        ('SIT_RELEASE', "Use to change the SIT_RELEASE value during build", sit_release),
+        ('SIT_REPOS', "Use to change the SIT_REPOS value during build", os.environ.get('SIT_REPOS', "")),
+        PathVariable('SIT_EXTERNAL_SW', "Use to change the SIT_EXTERNAL_SW value during build", sit_external_sw, PathVariable.PathIsDir),
+        PathVariable('PKG_DEPS_FILE', "Name of the package dependency file", '.pkg_tree.pkl', PathVariable.PathAccept),
+        PathVariable('RPM_SPEC_FILE', "Name of the RPM SPEC file", sit_release+'.spec', PathVariable.PathAccept),
+        PathVariable('DESTDIR', "destination directory for install target", destdir, PathVariable.PathAccept),
+        ('TRACE', "Set to positive value to trace processing", 0)
+    )
+
     # make environment, also make it default
-    env = DefaultEnvironment(ENV = os.environ, variables = vars)
+    env = DefaultEnvironment(ENV=os.environ, variables=vars)
 
     # set trace level based on the command line value
     setTraceLevel(int(env['TRACE']))
 
     # get repository list from it
     sit_repos = [ r for r in env['SIT_REPOS'].split(':') if r ]
-    
+
     # all repos including local
     all_sit_repos = [ '#' ] + sit_repos
 
-    # SIT_ROOT
-    sit_root = os.environ["SIT_ROOT"]
+    # SIT_EXTERNAL_SW
+    sit_external_sw = pjoin(sit_root, "sw", "external")
 
     # arch parts
     sit_arch = env['SIT_ARCH']
     sit_arch_parts = sit_arch.split('-')
     sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
+    # LIB_ABI will translate aither to lib or lib64 depending on which architecture we are
+    lib_abi = {'x86_64': "lib64", 'ia64': "lib64"}.get(sit_arch_parts[0], "lib")
+
     # extend environment with tools
-    tools = ['pyext', 'cython', 'symlink', 'pycompile', 'unittest', 'script_install']
+    tools = ['pyext', 'cython', 'symlink', 'pycompile', 'unittest', 'script_install', 'rpm_spec', 'release_install']
     toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
-    trace ( "toolpath = " + pformat(toolpath), "buildEnv", 3 )
+    trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
     for tool in tools:
-        tool = env.Tool(tool, toolpath = toolpath)
-    
+        tool = env.Tool(tool, toolpath=toolpath)
+
     # build all paths    
     archdir = pjoin("#arch/", sit_arch)
     archincdir = "${ARCHDIR}/geninc"
@@ -74,31 +94,34 @@ def buildEnv () :
     cythonflags = ' '.join(cythonflags)
 
     # set other variables in environment
-    env.Replace( ARCHDIR = archdir,
-                 ARCHINCDIR = archincdir,
-                 BINDIR = bindir,
-                 LIBDIR = libdir,
-                 PYDIR = pydir,
-                 CPPPATH = cpppath,
-                 LIBPATH = libpath,
-                 SIT_ROOT = sit_root,
-                 SIT_ARCH_PROC = sit_arch_parts[0],
-                 SIT_ARCH_OS = sit_arch_parts[1],
-                 SIT_ARCH_COMPILER = sit_arch_parts[2],
-                 SIT_ARCH_OPT = sit_arch_parts[3],
-                 SIT_ARCH_BASE = sit_arch_base,
-                 SIT_REPOS = sit_repos,
-                 PKG_TREE = {},
-                 PKG_TREE_BASE = {},
-                 PKG_TREE_BINDEPS = {},
-                 PKG_TREE_LIB = {},
-                 PKG_TREE_BINS = {},
-                 ALL_TARGETS = {},
-                 CXXFILESUFFIX = ".cpp",
-                 CYTHONFLAGS = cythonflags,
-                 CYTHONCFILESUFFIX = ".cpp",
-                 TOOLPATH = toolpath
-                 )
+    env.Replace(ARCHDIR=archdir,
+                ARCHINCDIR=archincdir,
+                BINDIR=bindir,
+                LIBDIR=libdir,
+                PYDIR=pydir,
+                CPPPATH=cpppath,
+                LIBPATH=libpath,
+                LIB_ABI=lib_abi,
+                SIT_ROOT=sit_root,
+                SIT_ARCH_PROC=sit_arch_parts[0],
+                SIT_ARCH_OS=sit_arch_parts[1],
+                SIT_ARCH_COMPILER=sit_arch_parts[2],
+                SIT_ARCH_OPT=sit_arch_parts[3],
+                SIT_ARCH_BASE=sit_arch_base,
+                SIT_RELEASE=sit_release,
+                SIT_REPOS=sit_repos,
+                PKG_TREE={},
+                PKG_TREE_BASE={},
+                PKG_TREE_BINDEPS={},
+                PKG_TREE_LIB={},
+                PKG_TREE_BINS={},
+                ALL_TARGETS={},
+                CXXFILESUFFIX=".cpp",
+                CYTHONFLAGS=cythonflags,
+                CYTHONCFILESUFFIX=".cpp",
+                TOOLPATH=toolpath,
+                EXT_PACKAGE_INFO = {}
+                )
 
     # may want to use "relative" RPATH
     # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
@@ -110,9 +133,9 @@ def buildEnv () :
 
     # generate help
     Help(vars.GenerateHelpText(env))
-    
-    trace ( "Build env = " + pformat(env.Dictionary()), "buildEnv", 7 )
-    
+
+    trace ("Build env = " + pformat(env.Dictionary()), "buildEnv", 7)
+
     #for r in sit_repos :
     #    trace ( "Add repository "+r, "<top>", 2 )
     #    Repository( r )

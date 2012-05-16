@@ -11,6 +11,18 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-05-16 Andy Salnikov
+- adding new tools and targets to make SPEC file and copy (install) the release
+- adding some common variables to the environment such as SIT_EXTERNAL_SW and
+  LIB_ABI to simplify SConscript files for external packages
+- env['PYTHON'] is now python name (like python2.4 or python 2.7), 
+  env['PYTHON_BIN'] is now what env['PYTHON'] was (full path to python
+  executable)
+- standardExternalPackage() now fills EXT_PACKAGE_INFO dict in the environment
+  with the package information, this is used by rpm_spec tool to build the list
+  of dependencies
+
 Tag: V00-02-05
 2012-04-25 Andy Salnikov
 - adding boost_python to dependency analyzer

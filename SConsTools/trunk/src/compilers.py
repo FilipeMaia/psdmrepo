@@ -29,7 +29,7 @@ _ld_opt = { 'opt' : '',
 # ===================================
 #   Setup default build environment
 # ===================================
-def setupCompilers ( env ) :
+def setupCompilers( env ) :
     
     proc = env['SIT_ARCH_PROC']
     os = env['SIT_ARCH_OS']
@@ -54,11 +54,12 @@ def setupCompilers ( env ) :
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     env['PYTHON_VERSION'] = "2.4"
-    env['PYTHON_INCDIR'] = "/usr/include/python"+env['PYTHON_VERSION']
+    env['PYTHON'] = "python"+env['PYTHON_VERSION']
+    env['PYTHON_INCDIR'] = "/usr/include/"+env['PYTHON']
     env['PYTHON_LIBDIR'] = "/usr/lib"
     if env['SIT_ARCH_PROC'] == 'x86_64' : env['PYTHON_LIBDIR'] = "/usr/lib64"
-    env['PYTHON'] = "/usr/bin/python"+env['PYTHON_VERSION']
+    env['PYTHON_BIN'] = "/usr/bin/"+env['PYTHON']
 
     # various substitutions for the scripts 
     env.SetDefault (SCRIPT_SUBS = {})
-    env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON']
+    env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON_BIN']
