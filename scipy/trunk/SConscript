@@ -21,10 +21,10 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 # it also needs ATLAS numeric stuff (shared libs only)
 atlas_ver = "3.8.3"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/atlas",atlas_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "atlas", atlas_ver)
 LIBDIR = 'lib'
 LINKLIBS = "*.so"
-standardExternalPackage ( 'atlas', **locals() )
+standardExternalPackage('atlas', **locals())
 
 
 del LIBDIR
@@ -32,11 +32,9 @@ del LINKLIBS
 
 scipy_ver = "0.7.1"
 python_ver = env['PYTHON_VERSION']
-PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/scipy", scipy_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "scipy", scipy_ver)
 
-PYDIR = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
-PYDIR += "/python"+python_ver+"/site-packages/scipy"
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages/scipy")
 PYDIRSEP = True
 
-standardExternalPackage ( 'scipy', **locals() )
+standardExternalPackage('scipy', **locals())
