@@ -20,10 +20,10 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 gppy_ver = "1.8"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/gnuplot-py",gppy_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "gnuplot-py", gppy_ver)
 
 python_ver = env['PYTHON_VERSION']
-PYDIR = "lib/python"+python_ver+"/site-packages/Gnuplot"
+PYDIR = pjoin("lib", env['PYTHON'], "site-packages", "Gnuplot")
 PYDIRSEP = True
 
-standardExternalPackage ( 'Gnuplot', **locals() )
+standardExternalPackage('Gnuplot', **locals())
