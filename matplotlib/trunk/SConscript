@@ -20,11 +20,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 mpl_ver = "1.0.0"
-python_ver = env['PYTHON_VERSION']
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/matplotlib",mpl_ver)
 
-PYDIR = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
-PYDIR += "/python"+python_ver+"/site-packages"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "matplotlib", mpl_ver)
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 
-standardExternalPackage ( 'matplotlib', **locals() )
+standardExternalPackage('matplotlib', **locals())
