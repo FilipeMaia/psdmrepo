@@ -1,0 +1,24 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package ipython
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+
+pkg = "ipython"
+pkg_ver = "0.9.1"
+
+PREFIX = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
+PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
+BINDIR = "bin"
+
+standardExternalPackage(pkg, **locals())
