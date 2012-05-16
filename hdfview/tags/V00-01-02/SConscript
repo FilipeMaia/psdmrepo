@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package hdfview
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "hdfview"
+pkg_ver = "2.7"
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+BINDIR = ""
+LINKBINS = "hdfview"
+
+standardExternalPackage(pkg, **locals())
