@@ -239,8 +239,8 @@ class DdlPsanaInterfaces ( object ) :
             print >> self.inc, '    std::string getTypeName() {'
             print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
             print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(env.configStore().get(src, 0)));')(locals())
+            print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {'
+            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(store.get(src, 0)));')(locals())
             print >> self.inc, '    }'
             print >> self.inc, '  };'
 
