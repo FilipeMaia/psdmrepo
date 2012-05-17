@@ -1,13 +1,13 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: dump_acqiris.py 2622 2011-11-11 14:35:00Z salnikov@SLAC.STANFORD.EDU $
+#  $Id: dump_simple.py 2622 2011-11-11 14:35:00Z salnikov@SLAC.STANFORD.EDU $
 #
 # Description:
-#  Pyana user analysis module dump_princeton...
+#  Class dump_acqiris
 #
 #------------------------------------------------------------------------
 
-"""Example module for accessing SharedIpimb data.
+"""Example module for accessing Acqiris data.
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -49,37 +49,33 @@ class dump_acqiris (object) :
     #  Constructor --
     #----------------
     def __init__ ( self, source="" ) :
-        """Class constructor takes the name of the data source.
-
-        @param source   data source
-        """
-        
         self.m_src = source
 
     #-------------------
     #  Public methods --
     #-------------------
-    def beginJob( self, evt, env ) :
-        
+    def beginCalibCycle( self, evt, env ) :
         self.source = env.configStr("source", "DetInfo(:Acqiris)")
-        config = env.configStore().get("Psana::Acqiris::ConfigV1", self.source)
-        if config:
+        config = env.configStore().get("Psana::Acqiris::Config", self.source)
+        if not config:
+            return
         
-            print "%s: %s" % (config.__class__.__name__, self.m_src)
+        print "%s: %s" % (config.__class__.__name__, self.m_src)
             
-            print "  nbrBanks =", config.nbrBanks(),
-            print "channelMask =", config.channelMask(),
-            print "nbrChannels =", config.nbrChannels(),
-            print "nbrConvertersPerChannel =", config.nbrConvertersPerChannel()
+        print "  nbrBanks =", config.nbrBanks(),
+        print "channelMask =", config.channelMask(),
+        print "nbrChannels =", config.nbrChannels(),
+        print "nbrConvertersPerChannel =", config.nbrConvertersPerChannel()
      
-            h = config.horiz()
-            print "  horiz: sampInterval =", h.sampInterval(),
-            print "delayTime =", h.delayTime(),
-            print "nbrSegments =", h.nbrSegments(),
-            print "nbrSamples =", h.nbrSamples()
+        h = config.horiz()
+        print "  horiz: sampInterval =", h.sampInterval(),
+        print "delayTime =", h.delayTime(),
+        print "nbrSegments =", h.nbrSegments(),
+        print "nbrSamples =", h.nbrSamples()
 
-            nch = config.nbrChannels()
-            for ch in range(nch):
+        nch = config.nbrChannels()
+        for ch in range(nch):
+            try:
                 v = config.vert(ch)
                 print "  vert(%d):" % ch,
                 print "fullScale =", v.fullScale(),
@@ -87,33 +83,48 @@ class dump_acqiris (object) :
                 print "offset =", v.offset(),
                 print "coupling =", v.coupling(),
                 print "bandwidth=", v.bandwidth()
-
+            except:
+                print "  [ ERROR fetching vert(%d) ]" % ch
 
     def event( self, evt, env ) :
-        """This method is called for every L1Accept transition.
-
-        @param evt    event data object
-        @param env    environment object
-        """
-
         acqData = evt.get("Psana::Acqiris::DataDesc", self.source)
+        if not acqData:
+            return
 
+        # find matching config object
+        acqConfig = env.configStore().get("Psana::Acqiris::Config", self.source)
+
+        # loop over channels
         nchan = acqData.data_shape()[0];
         for chan in range(nchan):
             elem = acqData.data(chan);
             print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
             print "  nbrSegments =", elem.nbrSegments()
             print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
+
+            v_array = acqConfig.vert();
             """
-            print "type(elem.timestamp())=", type(elem.timestamp())
-            print "elem.timestamp()=", elem.timestamp()
-            print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
+            v = v_array.at(chan);
+            print "v=", v
+            slope = v.slope();
+            print "slope=", slope
+            offset = v.offset();
+            print "offset=", offset
             """
+
+            timestamp = elem.timestamp()
+            print "type(timestamp)=", type(timestamp)
+            print "timestamp.ndim=", timestamp.ndim
+            print "timestamp.shape=", timestamp.shape
+            print "timestamp.dtype=", timestamp.dtype
+            print "timestamp.itemsize=", timestamp.itemsize
+            print "timestamp.size=", timestamp.size
+            """
+            print "timestamp[0]=", timestamp[0]
+            print "timestamp=", timestamp
+            """
+            #print "elem.timestamp()=", elem.timestamp()
+            #print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
+
             wf = elem.waveforms()
             print "  waveform [len=%d] = %s" % (len(wf), wf)
-
-
-    def endJob( self, evt, env ) :
-        
-        pass
-

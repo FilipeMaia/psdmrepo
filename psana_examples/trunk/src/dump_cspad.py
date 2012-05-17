@@ -69,7 +69,7 @@ class dump_cspad ( object ) :
     #  Public methods --
     #-------------------
 
-    def beginJob( self, evt, env ) :
+    def beginCalibCycle( self, evt, env ) :
 
         self.source = env.configStr("source", "DetInfo(:Cspad)")
         config = env.configStore().get("Psana::CsPad::Config", self.source)
@@ -125,7 +125,3 @@ class dump_cspad ( object ) :
             # image data as 3-dimentional array
             data = q.data()
             print "    Data shape: %s" % str(data.shape)
-            
-        
-    def endJob( self, env ) :
-        pass
