@@ -19,7 +19,7 @@ namespace Psana {
   class EnvGetter {
   public:
     virtual std::string getTypeName() = 0;
-    virtual boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) = 0;
+    virtual boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) = 0;
     virtual ~EnvGetter() {}
   };
 
@@ -27,7 +27,7 @@ namespace Psana {
   extern std::map<std::string, EvtGetter*> eventGetter_map;
   extern std::map<std::string, EnvGetter*> environmentGetter_map;
   extern void createWrappers();
-  extern boost::shared_ptr<PyObject> call(PyObject* method, PSEvt::Event& evt, PSEnv::Env& env);
+  extern boost::shared_ptr<PyObject> call(PyObject* method, PSEvt::Event& evt, PSEnv::Env& env, const std::string& name, const std::string& className);
 }
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a = value; return Psana::ndConvert((void *) a.data(), a.shape(), ndim, #ctype)

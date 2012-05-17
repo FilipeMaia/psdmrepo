@@ -548,8 +548,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV1";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -558,8 +558,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV2";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV2_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -568,8 +568,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV3";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV3_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV3_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -578,8 +578,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV4";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV4_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV4_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -588,8 +588,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV5";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV5_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV5_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -598,8 +598,8 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::ConfigV6";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV6_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV6_Wrapper(store.get(src, 0)));
     }
   };
 

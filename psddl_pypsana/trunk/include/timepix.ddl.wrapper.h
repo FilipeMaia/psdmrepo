@@ -258,8 +258,8 @@ public:
     std::string getTypeName() {
       return "Psana::Timepix::ConfigV1";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -268,8 +268,8 @@ public:
     std::string getTypeName() {
       return "Psana::Timepix::ConfigV2";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV2_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
     }
   };
 

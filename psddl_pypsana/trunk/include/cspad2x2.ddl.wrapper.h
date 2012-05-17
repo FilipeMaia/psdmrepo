@@ -177,8 +177,8 @@ public:
     std::string getTypeName() {
       return "Psana::CsPad2x2::ConfigV1QuadReg";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1QuadReg_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV1QuadReg_Wrapper(store.get(src, 0)));
     }
   };
 
@@ -187,8 +187,8 @@ public:
     std::string getTypeName() {
       return "Psana::CsPad2x2::ConfigV1";
     }
-    boost::python::api::object get(PSEnv::Env& env, PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1_Wrapper(env.configStore().get(src, 0)));
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
     }
   };
 } // namespace CsPad2x2
