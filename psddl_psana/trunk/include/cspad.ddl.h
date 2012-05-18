@@ -67,6 +67,7 @@ namespace CsPad {
 class CsPadDigitalPotsCfg {
 public:
   virtual ~CsPadDigitalPotsCfg();
+  bool operator==(const CsPadDigitalPotsCfg &t) const { return this == &t; }
   virtual ndarray<uint8_t, 1> pots() const = 0;
 };
 
@@ -79,6 +80,7 @@ public:
 class CsPadReadOnlyCfg {
 public:
   virtual ~CsPadReadOnlyCfg();
+  bool operator==(const CsPadReadOnlyCfg &t) const { return this == &t; }
   virtual uint32_t shiftTest() const = 0;
   virtual uint32_t version() const = 0;
 };
@@ -92,6 +94,7 @@ public:
 class ProtectionSystemThreshold {
 public:
   virtual ~ProtectionSystemThreshold();
+  bool operator==(const ProtectionSystemThreshold &t) const { return this == &t; }
   virtual uint32_t adcThreshold() const = 0;
   virtual uint32_t pixelCountThreshold() const = 0;
 };
@@ -105,6 +108,7 @@ public:
 class CsPadGainMapCfg {
 public:
   virtual ~CsPadGainMapCfg();
+  bool operator==(const CsPadGainMapCfg &t) const { return this == &t; }
   /** Array with the gain map for single ASIC. */
   virtual ndarray<uint16_t, 2> gainMap() const = 0;
 };
@@ -118,6 +122,7 @@ public:
 class ConfigV1QuadReg {
 public:
   virtual ~ConfigV1QuadReg();
+  bool operator==(const ConfigV1QuadReg &t) const { return this == &t; }
   virtual ndarray<uint32_t, 1> shiftSelect() const = 0;
   virtual ndarray<uint32_t, 1> edgeSelect() const = 0;
   virtual uint32_t readClkSet() const = 0;
@@ -148,6 +153,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
   virtual uint32_t eventCode() const = 0;
@@ -178,6 +184,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   virtual ~ConfigV2();
+  bool operator==(const ConfigV2 &t) const { return this == &t; }
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
   virtual uint32_t eventCode() const = 0;
@@ -214,6 +221,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~ConfigV3();
+  bool operator==(const ConfigV3 &t) const { return this == &t; }
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
   virtual uint32_t eventCode() const = 0;
@@ -255,6 +263,7 @@ class ElementV1 {
 public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   virtual ~ElementV1();
+  bool operator==(const ElementV1 &t) const { return this == &t; }
   /** Virtual channel number. */
   virtual uint32_t virtual_channel() const = 0;
   /** Lane number. */
@@ -292,6 +301,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~DataV1();
+  bool operator==(const DataV1 &t) const { return this == &t; }
   /** Data objects, one element per quadrant. The size of the array is determined by 
             the numQuads() method of the configuration object. */
   virtual const CsPad::ElementV1& quads(uint32_t i0) const = 0;
@@ -311,6 +321,7 @@ class ElementV2 {
 public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   virtual ~ElementV2();
+  bool operator==(const ElementV2 &t) const { return this == &t; }
   /** Virtual channel number. */
   virtual uint32_t virtual_channel() const = 0;
   /** Lane number. */
@@ -347,6 +358,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   virtual ~DataV2();
+  bool operator==(const DataV2 &t) const { return this == &t; }
   /** Data objects, one element per quadrant. The size of the array is determined by 
             the numQuads() method of the configuration object. */
   virtual const CsPad::ElementV2& quads(uint32_t i0) const = 0;

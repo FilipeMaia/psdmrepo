@@ -32,6 +32,7 @@ public:
     : _pulse(arg__pulse), _input_control((arg_bf__bf_trigger & 0xff)|((arg_bf__bf_set & 0xff)<<8)|((arg_bf__bf_clear & 0xff)<<16)), _output_control((arg_bf__bf_polarity & 0x1)|((arg_bf__bf_map_set_enable & 0x1)<<1)|((arg_bf__bf_map_reset_enable & 0x1)<<2)|((arg_bf__bf_map_trigger_enable & 0x1)<<3)), _prescale(arg__prescale), _delay(arg__delay), _width(arg__width)
   {
   }
+  bool operator==(const PulseConfig &t) const { return this == &t; }
   /** internal pulse generation channel */
   uint32_t pulse() const { return _pulse; }
   /** Pulse input control */
@@ -80,6 +81,7 @@ public:
     : _u16PulseId(arg__u16PulseId), _u16Polarity(arg__u16Polarity), _u32Prescale(arg__u32Prescale), _u32Delay(arg__u32Delay), _u32Width(arg__u32Width)
   {
   }
+  bool operator==(const PulseConfigV3 &t) const { return this == &t; }
   uint16_t pulseId() const { return _u16PulseId; }
   /** 0 -> positive polarity , 1 -> negative polarity */
   uint16_t polarity() const { return _u16Polarity; }
@@ -115,6 +117,7 @@ public:
     : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
+  bool operator==(const EventCodeV3 &t) const { return this == &t; }
   uint16_t code() const { return _u16Code; }
   uint16_t _u16MaskEventAttr_value() const { return _u16MaskEventAttr; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -148,6 +151,7 @@ public:
     : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
+  bool operator==(const EventCodeV4 &t) const { return this == &t; }
   uint16_t code() const { return _u16Code; }
   uint16_t _u16MaskEventAttr_value() const { return _u16MaskEventAttr; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -187,6 +191,7 @@ public:
   {
     std::copy(arg__desc, arg__desc+(16), _desc);
   }
+  bool operator==(const EventCodeV5 &t) const { return this == &t; }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
@@ -238,6 +243,7 @@ public:
     : _v((arg_bf__bf_source & 0xff)|((arg_bf__bf_source_id & 0xff)<<8)|((arg_bf__bf_conn & 0xff)<<16)|((arg_bf__bf_conn_id & 0xff)<<24))
   {
   }
+  bool operator==(const OutputMap &t) const { return this == &t; }
   uint32_t value() const { return _v; }
   EvrData::OutputMap::Source source() const { return Source(this->_v & 0xff); }
   uint8_t source_id() const { return uint8_t((this->_v>>8) & 0xff); }
@@ -274,6 +280,7 @@ public:
     : _v((arg_bf__bf_source & 0xf)|((arg_bf__bf_source_id & 0xff)<<4)|((arg_bf__bf_conn & 0xf)<<12)|((arg_bf__bf_conn_id & 0xff)<<16)|((arg_bf__bf_module & 0xff)<<24))
   {
   }
+  bool operator==(const OutputMapV2 &t) const { return this == &t; }
   uint32_t value() const { return _v; }
   EvrData::OutputMapV2::Source source() const { return Source(this->_v & 0xf); }
   uint8_t source_id() const { return uint8_t((this->_v>>4) & 0xff); }
@@ -296,6 +303,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
   virtual ndarray<EvrData::PulseConfig, 1> pulses() const = 0;
@@ -331,6 +339,7 @@ public:
     On,
   };
   virtual ~ConfigV2();
+  bool operator==(const ConfigV2 &t) const { return this == &t; }
   virtual uint32_t opcode() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
@@ -351,6 +360,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~ConfigV3();
+  bool operator==(const ConfigV3 &t) const { return this == &t; }
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
@@ -370,6 +380,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 4 /**< XTC type version number */ };
   virtual ~ConfigV4();
+  bool operator==(const ConfigV4 &t) const { return this == &t; }
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
@@ -393,6 +404,7 @@ public:
     : _value((delay & 0xffffff)|((eventcode & 0xff)<<24))
   {
   }
+  bool operator==(const SequencerEntry &t) const { return this == &t; }
   uint32_t delay() const { return uint32_t(this->_value & 0xffffff); }
   uint32_t eventcode() const { return uint32_t((this->_value>>24) & 0xff); }
   static uint32_t _sizeof()  { return 4; }
@@ -419,6 +431,7 @@ public:
     Disable,
   };
   virtual ~SequencerConfigV1();
+  bool operator==(const SequencerConfigV1 &t) const { return this == &t; }
   virtual EvrData::SequencerConfigV1::Source sync_source() const = 0;
   virtual EvrData::SequencerConfigV1::Source beam_source() const = 0;
   virtual uint32_t length() const = 0;
@@ -439,6 +452,7 @@ public:
   enum { MaxPulses = 32 };
   enum { EvrOutputs = 10 };
   virtual ~ConfigV5();
+  bool operator==(const ConfigV5 &t) const { return this == &t; }
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
@@ -461,6 +475,7 @@ public:
   enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
   enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
   virtual ~ConfigV6();
+  bool operator==(const ConfigV6 &t) const { return this == &t; }
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
@@ -485,6 +500,7 @@ public:
     : _timestampHigh(arg__timestampHigh), _timestampLow(arg__timestampLow), _eventCode(arg__eventCode)
   {
   }
+  bool operator==(const FIFOEvent &t) const { return this == &t; }
   uint32_t timestampHigh() const { return _timestampHigh; }
   uint32_t timestampLow() const { return _timestampLow; }
   uint32_t eventCode() const { return _eventCode; }
@@ -506,6 +522,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~DataV3();
+  bool operator==(const DataV3 &t) const { return this == &t; }
   virtual uint32_t numFifoEvents() const = 0;
   virtual ndarray<EvrData::FIFOEvent, 1> fifoEvents() const = 0;
 };
@@ -529,6 +546,7 @@ public:
     std::copy(arg__name, arg__name+(12), _name);
     std::copy(arg__info, arg__info+(8), _info);
   }
+  bool operator==(const IOChannel &t) const { return this == &t; }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
   ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
@@ -552,6 +570,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~IOConfigV1();
+  bool operator==(const IOConfigV1 &t) const { return this == &t; }
   virtual uint16_t nchannels() const = 0;
   virtual ndarray<EvrData::IOChannel, 1> channels() const = 0;
   virtual EvrData::OutputMap::Conn conn() const = 0;

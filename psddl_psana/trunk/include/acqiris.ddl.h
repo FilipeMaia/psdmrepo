@@ -43,6 +43,7 @@ public:
     : _fullScale(arg__fullScale), _offset(arg__offset), _coupling(arg__coupling), _bandwidth(arg__bandwidth)
   {
   }
+  bool operator==(const VertV1 &t) const { return this == &t; }
   /** Full vertical scale. */
   double fullScale() const { return _fullScale; }
   /** Offset value. */
@@ -79,6 +80,7 @@ public:
     : _sampInterval(arg__sampInterval), _delayTime(arg__delayTime), _nbrSamples(arg__nbrSamples), _nbrSegments(arg__nbrSegments)
   {
   }
+  bool operator==(const HorizV1 &t) const { return this == &t; }
   /** Interval for single sample. */
   double sampInterval() const { return _sampInterval; }
   /** Delay time. */
@@ -136,6 +138,7 @@ public:
     : _coupling(arg__coupling), _input(arg__input), _slope(arg__slope), _level(arg__level)
   {
   }
+  bool operator==(const TrigV1 &t) const { return this == &t; }
   uint32_t coupling() const { return _coupling; }
   /** Trigger source */
   uint32_t input() const { return _input; }
@@ -164,6 +167,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { MaxChan = 20 /**< Maximum number of the configured channels. */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   /** Number of ADCs per channel. */
   virtual uint32_t nbrConvertersPerChannel() const = 0;
   /** Bit mask for channels. */
@@ -197,6 +201,7 @@ public:
     : _horPos(arg__horPos), _timeStampLo(arg__timeStampLo), _timeStampHi(arg__timeStampHi)
   {
   }
+  bool operator==(const TimestampV1 &t) const { return this == &t; }
   double pos() const { return _horPos; }
   uint32_t timeStampLo() const { return _timeStampLo; }
   uint32_t timeStampHi() const { return _timeStampHi; }
@@ -224,6 +229,7 @@ public:
   enum { BitShift = 6 };
   enum { _extraSize = 32 };
   virtual ~DataDescV1Elem();
+  bool operator==(const DataDescV1Elem &t) const { return this == &t; }
   /** Number of samples in one segment. */
   virtual uint32_t nbrSamplesInSeg() const = 0;
   virtual uint32_t indexFirstPoint() const = 0;
@@ -247,6 +253,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_AcqWaveform /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~DataDescV1();
+  bool operator==(const DataDescV1 &t) const { return this == &t; }
   /** Waveform data, one object per channel. */
   virtual const Acqiris::DataDescV1Elem& data(uint32_t i0) const = 0;
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
@@ -289,6 +296,7 @@ public:
     : _channel(arg__channel), _mode((arg_bf__bf_slope & 0x1)|((arg_bf__bf_mode & 0x1)<<31)), _level(arg__level)
   {
   }
+  bool operator==(const TdcChannel &t) const { return this == &t; }
   /** Channel type as integer number, clients should use channel() method instead. */
   uint32_t _channel_int() const { return _channel; }
   /** Bitfield value, should not be used directly. Use mode() and slope()
@@ -337,6 +345,7 @@ public:
     : _channel(arg__channel), _signal(arg__signal), _qualifier(arg__qualifier)
   {
   }
+  bool operator==(const TdcAuxIO &t) const { return this == &t; }
   /** Channel type as integer number, clients should use channel() method instead. */
   uint32_t channel_int() const { return _channel; }
   /** Mode as integer number, clients should use mode() method instead. */
@@ -383,6 +392,7 @@ public:
     : _channel(ChVeto), _signal(mode), _qualifier(term)
   {
   }
+  bool operator==(const TdcVetoIO &t) const { return this == &t; }
   /** Mode as integer number, clients should use mode() method instead. */
   uint32_t signal_int() const { return _signal; }
   /** Termination as integer number, clients should use term() method instead. */
@@ -411,6 +421,7 @@ public:
   enum { NChannels = 8 /**< Total number of channel configurations. */ };
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
   virtual ~TdcConfigV1();
+  bool operator==(const TdcConfigV1 &t) const { return this == &t; }
   /** Channel configurations, one object per channel. */
   virtual ndarray<Acqiris::TdcChannel, 1> channels() const = 0;
   /** Axiliary configurations, one object per channel. */
@@ -446,6 +457,7 @@ public:
     : _value((arg_bf__bf_val & 0xfffffff)|((arg_bf__bf_source & 0x7)<<28)|((arg_bf__bf_ovf & 0x1)<<31))
   {
   }
+  bool operator==(const TdcDataV1_Item &t) const { return this == &t; }
   /** Value as integer number whiis composed of several bit fields. Do not use value directly,
                 instead cast this object to one of the actual types and use corresponding methods. */
   uint32_t value() const { return _value; }
@@ -468,6 +480,7 @@ private:
 
 class TdcDataV1Common: public TdcDataV1_Item {
 public:
+  bool operator==(const TdcDataV1Common &t) const { return this == &t; }
   /** Returns number of hits. */
   uint32_t nhits() const;
   /** Returns overflow status. */
@@ -483,6 +496,7 @@ public:
 
 class TdcDataV1Channel: public TdcDataV1_Item {
 public:
+  bool operator==(const TdcDataV1Channel &t) const { return this == &t; }
   /** Returns number of ticks. */
   uint32_t ticks() const;
   /** Returns overflow status. */
@@ -508,6 +522,7 @@ public:
     MemFullSwitch = 2,
     AuxIOMarker = 16,
   };
+  bool operator==(const TdcDataV1Marker &t) const { return this == &t; }
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
   static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
@@ -525,6 +540,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~TdcDataV1();
+  bool operator==(const TdcDataV1 &t) const { return this == &t; }
   /** Access TDC data items. The data_shape() method should be used to 
             obtain the number of elements. */
   virtual ndarray<Acqiris::TdcDataV1_Item, 1> data() const = 0;

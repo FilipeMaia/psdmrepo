@@ -20,6 +20,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
   virtual uint32_t orgX() const = 0;
@@ -52,6 +53,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   virtual ~ConfigV2();
+  bool operator==(const ConfigV2 &t) const { return this == &t; }
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
   virtual uint32_t orgX() const = 0;
@@ -85,6 +87,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~ConfigV3();
+  bool operator==(const ConfigV3 &t) const { return this == &t; }
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
   virtual uint32_t orgX() const = 0;
@@ -121,6 +124,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~FrameV1();
+  bool operator==(const FrameV1 &t) const { return this == &t; }
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
   virtual ndarray<uint16_t, 2> data() const = 0;
@@ -140,6 +144,7 @@ public:
     : _fTemperature(arg__fTemperature)
   {
   }
+  bool operator==(const InfoV1 &t) const { return this == &t; }
   float temperature() const { return _fTemperature; }
   static uint32_t _sizeof()  { return 4; }
 private:

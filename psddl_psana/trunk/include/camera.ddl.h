@@ -24,6 +24,7 @@ public:
     : _column(arg__column), _row(arg__row)
   {
   }
+  bool operator==(const FrameCoord &t) const { return this == &t; }
   /** Column index (x value). */
   uint16_t column() const { return _column; }
   /** Row index (y value). */
@@ -45,6 +46,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_FrameFccdConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~FrameFccdConfigV1();
+  bool operator==(const FrameFccdConfigV1 &t) const { return this == &t; }
 };
 
 /** @class FrameFexConfigV1
@@ -69,6 +71,7 @@ public:
     GssThreshold,
   };
   virtual ~FrameFexConfigV1();
+  bool operator==(const FrameFexConfigV1 &t) const { return this == &t; }
   /** Forwarding policy for frame data. */
   virtual Camera::FrameFexConfigV1::Forwarding forwarding() const = 0;
   /** Prescale of events with forwarded frames */
@@ -98,6 +101,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_Frame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~FrameV1();
+  bool operator==(const FrameV1 &t) const { return this == &t; }
   /** Number of pixels in a row. */
   virtual uint32_t width() const = 0;
   /** Number of pixels in a column. */
@@ -128,6 +132,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_TwoDGaussian /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~TwoDGaussianV1();
+  bool operator==(const TwoDGaussianV1 &t) const { return this == &t; }
   virtual uint64_t integral() const = 0;
   virtual double xmean() const = 0;
   virtual double ymean() const = 0;

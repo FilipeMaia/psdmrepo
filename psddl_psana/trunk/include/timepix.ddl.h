@@ -30,6 +30,7 @@ public:
     TriggerMode_Soft = 2,
   };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const = 0;
   virtual Timepix::ConfigV1::TriggerMode triggerMode() const = 0;
   virtual int32_t shutterTimeout() const = 0;
@@ -114,6 +115,7 @@ public:
     TriggerMode_Soft = 2,
   };
   virtual ~ConfigV2();
+  bool operator==(const ConfigV2 &t) const { return this == &t; }
   virtual Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const = 0;
   virtual Timepix::ConfigV2::TriggerMode triggerMode() const = 0;
   virtual int32_t timepixSpeed() const = 0;
@@ -204,6 +206,7 @@ public:
   enum { DepthBytes = 2 };
   enum { MaxPixelValue = 11810 };
   virtual ~DataV1();
+  bool operator==(const DataV1 &t) const { return this == &t; }
   virtual uint32_t timestamp() const = 0;
   virtual uint16_t frameCounter() const = 0;
   virtual uint16_t lostRows() const = 0;
@@ -227,6 +230,7 @@ public:
   enum { Depth = 14 };
   enum { MaxPixelValue = 11810 };
   virtual ~DataV2();
+  bool operator==(const DataV2 &t) const { return this == &t; }
   /** Pixels per row */
   virtual uint16_t width() const = 0;
   /** Pixels per column */

@@ -83,6 +83,7 @@ public:
     : _secPastEpoch(arg__secPastEpoch), _nsec(arg__nsec)
   {
   }
+  bool operator==(const epicsTimeStamp &t) const { return this == &t; }
   /** Seconds since Jan 1, 1990 00:00 UTC */
   uint32_t sec() const { return _secPastEpoch; }
   /** Nanoseconds within second. */
@@ -106,6 +107,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp)
   {
   }
+  bool operator==(const dbr_time_string &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -129,6 +131,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp), RISC_pad(0)
   {
   }
+  bool operator==(const dbr_time_short &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -153,6 +156,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp)
   {
   }
+  bool operator==(const dbr_time_float &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -176,6 +180,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp), RISC_pad(0)
   {
   }
+  bool operator==(const dbr_time_enum &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -200,6 +205,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp), RISC_pad1(0)
   {
   }
+  bool operator==(const dbr_time_char &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -225,6 +231,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp)
   {
   }
+  bool operator==(const dbr_time_long &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -248,6 +255,7 @@ public:
     : _status(status), _severity(severity), _stamp(stamp), RISC_pad(0)
   {
   }
+  bool operator==(const dbr_time_double &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
@@ -272,6 +280,7 @@ public:
     : _status(status), _severity(severity)
   {
   }
+  bool operator==(const dbr_sts_string &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   static uint32_t _sizeof()  { return 4; }
@@ -294,6 +303,7 @@ public:
   {
     std::copy(units, units+(8), _units);
   }
+  bool operator==(const dbr_ctrl_short &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const char* units() const { return _units; }
@@ -336,6 +346,7 @@ public:
   {
     std::copy(units, units+(8), _units);
   }
+  bool operator==(const dbr_ctrl_float &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   int16_t precision() const { return _precision; }
@@ -381,6 +392,7 @@ public:
   {
     std::copy(strings, strings+(416), _strs[0]);
   }
+  bool operator==(const dbr_ctrl_enum &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   int16_t no_str() const { return _no_str; }
@@ -409,6 +421,7 @@ public:
   {
     std::copy(units, units+(8), _units);
   }
+  bool operator==(const dbr_ctrl_char &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const char* units() const { return _units; }
@@ -452,6 +465,7 @@ public:
   {
     std::copy(units, units+(8), _units);
   }
+  bool operator==(const dbr_ctrl_long &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const char* units() const { return _units; }
@@ -494,6 +508,7 @@ public:
   {
     std::copy(units, units+(8), _units);
   }
+  bool operator==(const dbr_ctrl_double &t) const { return this == &t; }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   int16_t precision() const { return _precision; }
@@ -534,6 +549,7 @@ private:
 class EpicsPvHeader {
 public:
   virtual ~EpicsPvHeader();
+  bool operator==(const EpicsPvHeader &t) const { return this == &t; }
   /** PV ID number assigned by DAQ. */
   virtual int16_t pvId() const = 0;
   /** DBR structure type. */
@@ -561,6 +577,7 @@ public:
 class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
   virtual ~EpicsPvCtrlHeader();
+  bool operator==(const EpicsPvCtrlHeader &t) const { return this == &t; }
   /** PV name. */
   virtual const char* pvName() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by pvName() method. */
@@ -576,6 +593,7 @@ public:
 class EpicsPvTimeHeader: public EpicsPvHeader {
 public:
   virtual ~EpicsPvTimeHeader();
+  bool operator==(const EpicsPvTimeHeader &t) const { return this == &t; }
   /** EPICS timestamp value. */
   virtual Epics::epicsTimeStamp stamp() const = 0;
 };
@@ -589,6 +607,7 @@ public:
 class EpicsPvCtrlString: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlString();
+  bool operator==(const EpicsPvCtrlString &t) const { return this == &t; }
   virtual const Epics::dbr_sts_string& dbr() const = 0;
   virtual const char* data(uint32_t i0) const = 0;
   virtual const char* value(uint32_t i) const = 0;
@@ -605,6 +624,7 @@ public:
 class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlShort();
+  bool operator==(const EpicsPvCtrlShort &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_short& dbr() const = 0;
   virtual ndarray<int16_t, 1> data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
@@ -619,6 +639,7 @@ public:
 class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlFloat();
+  bool operator==(const EpicsPvCtrlFloat &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_float& dbr() const = 0;
   virtual ndarray<float, 1> data() const = 0;
   virtual float value(uint32_t i) const = 0;
@@ -633,6 +654,7 @@ public:
 class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlEnum();
+  bool operator==(const EpicsPvCtrlEnum &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_enum& dbr() const = 0;
   virtual ndarray<uint16_t, 1> data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
@@ -647,6 +669,7 @@ public:
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlChar();
+  bool operator==(const EpicsPvCtrlChar &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_char& dbr() const = 0;
   virtual ndarray<uint8_t, 1> data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
@@ -661,6 +684,7 @@ public:
 class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlLong();
+  bool operator==(const EpicsPvCtrlLong &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_long& dbr() const = 0;
   virtual ndarray<int32_t, 1> data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
@@ -675,6 +699,7 @@ public:
 class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlDouble();
+  bool operator==(const EpicsPvCtrlDouble &t) const { return this == &t; }
   virtual const Epics::dbr_ctrl_double& dbr() const = 0;
   virtual ndarray<double, 1> data() const = 0;
   virtual double value(uint32_t i) const = 0;
@@ -689,6 +714,7 @@ public:
 class EpicsPvTimeString: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeString();
+  bool operator==(const EpicsPvTimeString &t) const { return this == &t; }
   virtual const Epics::dbr_time_string& dbr() const = 0;
   virtual const char* data(uint32_t i0) const = 0;
   virtual const char* value(uint32_t i) const = 0;
@@ -705,6 +731,7 @@ public:
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeShort();
+  bool operator==(const EpicsPvTimeShort &t) const { return this == &t; }
   virtual const Epics::dbr_time_short& dbr() const = 0;
   virtual ndarray<int16_t, 1> data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
@@ -719,6 +746,7 @@ public:
 class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeFloat();
+  bool operator==(const EpicsPvTimeFloat &t) const { return this == &t; }
   virtual const Epics::dbr_time_float& dbr() const = 0;
   virtual ndarray<float, 1> data() const = 0;
   virtual float value(uint32_t i) const = 0;
@@ -733,6 +761,7 @@ public:
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeEnum();
+  bool operator==(const EpicsPvTimeEnum &t) const { return this == &t; }
   virtual const Epics::dbr_time_enum& dbr() const = 0;
   virtual ndarray<uint16_t, 1> data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
@@ -747,6 +776,7 @@ public:
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeChar();
+  bool operator==(const EpicsPvTimeChar &t) const { return this == &t; }
   virtual const Epics::dbr_time_char& dbr() const = 0;
   virtual ndarray<uint8_t, 1> data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
@@ -761,6 +791,7 @@ public:
 class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeLong();
+  bool operator==(const EpicsPvTimeLong &t) const { return this == &t; }
   virtual const Epics::dbr_time_long& dbr() const = 0;
   virtual ndarray<int32_t, 1> data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
@@ -775,6 +806,7 @@ public:
 class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeDouble();
+  bool operator==(const EpicsPvTimeDouble &t) const { return this == &t; }
   virtual const Epics::dbr_time_double& dbr() const = 0;
   virtual ndarray<double, 1> data() const = 0;
   virtual double value(uint32_t i) const = 0;
@@ -790,6 +822,7 @@ class PvConfigV1 {
 public:
   enum { iMaxPvDescLength = 64 };
   virtual ~PvConfigV1();
+  bool operator==(const PvConfigV1 &t) const { return this == &t; }
   virtual int16_t pvId() const = 0;
   virtual const char* description() const = 0;
   virtual float interval() const = 0;
@@ -806,6 +839,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual int32_t numPv() const = 0;
   virtual const Epics::PvConfigV1& pvControls(uint32_t i0) const = 0;
   /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */

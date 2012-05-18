@@ -67,6 +67,7 @@ namespace CsPad2x2 {
 class CsPad2x2DigitalPotsCfg {
 public:
   virtual ~CsPad2x2DigitalPotsCfg();
+  bool operator==(const CsPad2x2DigitalPotsCfg &t) const { return this == &t; }
   virtual ndarray<uint8_t, 1> pots() const = 0;
 };
 
@@ -79,6 +80,7 @@ public:
 class CsPad2x2ReadOnlyCfg {
 public:
   virtual ~CsPad2x2ReadOnlyCfg();
+  bool operator==(const CsPad2x2ReadOnlyCfg &t) const { return this == &t; }
   virtual uint32_t shiftTest() const = 0;
   virtual uint32_t version() const = 0;
 };
@@ -92,6 +94,7 @@ public:
 class ProtectionSystemThreshold {
 public:
   virtual ~ProtectionSystemThreshold();
+  bool operator==(const ProtectionSystemThreshold &t) const { return this == &t; }
   virtual uint32_t adcThreshold() const = 0;
   virtual uint32_t pixelCountThreshold() const = 0;
 };
@@ -105,6 +108,7 @@ public:
 class CsPad2x2GainMapCfg {
 public:
   virtual ~CsPad2x2GainMapCfg();
+  bool operator==(const CsPad2x2GainMapCfg &t) const { return this == &t; }
   /** Array with the gain map for single ASIC. */
   virtual ndarray<uint16_t, 2> gainMap() const = 0;
 };
@@ -118,6 +122,7 @@ public:
 class ConfigV1QuadReg {
 public:
   virtual ~ConfigV1QuadReg();
+  bool operator==(const ConfigV1QuadReg &t) const { return this == &t; }
   virtual uint32_t shiftSelect() const = 0;
   virtual uint32_t edgeSelect() const = 0;
   virtual uint32_t readClkSet() const = 0;
@@ -157,6 +162,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint32_t concentratorVersion() const = 0;
   virtual const CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const = 0;
   virtual uint32_t protectionEnable() const = 0;
@@ -185,6 +191,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   virtual ~ElementV1();
+  bool operator==(const ElementV1 &t) const { return this == &t; }
   /** Virtual channel number. */
   virtual uint32_t virtual_channel() const = 0;
   /** Lane number. */
