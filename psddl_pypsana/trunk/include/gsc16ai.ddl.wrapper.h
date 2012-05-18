@@ -50,6 +50,7 @@ public:
   };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint16_t voltageRange() const { return o->voltageRange(); }
   uint16_t firstChan() const { return o->firstChan(); }
   uint16_t lastChan() const { return o->lastChan(); }
@@ -77,8 +78,9 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  PyObject* timestamp() const { ND_CONVERT(o->timestamp(), uint16_t, 1); }
-  PyObject* channelValue() const { ND_CONVERT(o->channelValue(), uint16_t, 1); }
+  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
+  std::vector<uint16_t> timestamp() const { VEC_CONVERT(o->timestamp(), uint16_t); }
+  std::vector<uint16_t> channelValue() const { VEC_CONVERT(o->channelValue(), uint16_t); }
 };
 
   class ConfigV1_EnvGetter : public Psana::EnvGetter {

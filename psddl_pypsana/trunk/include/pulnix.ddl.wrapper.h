@@ -42,6 +42,7 @@ public:
   };
   TM6740ConfigV1_Wrapper(boost::shared_ptr<TM6740ConfigV1> obj) : _o(obj), o(_o.get()) {}
   TM6740ConfigV1_Wrapper(TM6740ConfigV1* obj) : o(obj) {}
+  bool operator==(const TM6740ConfigV1_Wrapper &t) const { return this == &t; }
   uint16_t gain_a() const { return o->gain_a(); }
   uint16_t gain_b() const { return o->gain_b(); }
   uint16_t vref() const { return o->vref(); }
@@ -83,6 +84,7 @@ public:
   };
   TM6740ConfigV2_Wrapper(boost::shared_ptr<TM6740ConfigV2> obj) : _o(obj), o(_o.get()) {}
   TM6740ConfigV2_Wrapper(TM6740ConfigV2* obj) : o(obj) {}
+  bool operator==(const TM6740ConfigV2_Wrapper &t) const { return this == &t; }
   uint16_t gain_a() const { return o->gain_a(); }
   uint16_t gain_b() const { return o->gain_b(); }
   uint16_t vref_a() const { return o->vref_a(); }

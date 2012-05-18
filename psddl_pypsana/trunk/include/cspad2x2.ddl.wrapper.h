@@ -25,7 +25,8 @@ class CsPad2x2DigitalPotsCfg_Wrapper {
 public:
   CsPad2x2DigitalPotsCfg_Wrapper(boost::shared_ptr<CsPad2x2DigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2DigitalPotsCfg_Wrapper(CsPad2x2DigitalPotsCfg* obj) : o(obj) {}
-  PyObject* pots() const { ND_CONVERT(o->pots(), uint8_t, 1); }
+  bool operator==(const CsPad2x2DigitalPotsCfg_Wrapper &t) const { return this == &t; }
+  std::vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
 };
 
 /** @class CsPad2x2ReadOnlyCfg
@@ -40,6 +41,7 @@ class CsPad2x2ReadOnlyCfg_Wrapper {
 public:
   CsPad2x2ReadOnlyCfg_Wrapper(boost::shared_ptr<CsPad2x2ReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2ReadOnlyCfg_Wrapper(CsPad2x2ReadOnlyCfg* obj) : o(obj) {}
+  bool operator==(const CsPad2x2ReadOnlyCfg_Wrapper &t) const { return this == &t; }
   uint32_t shiftTest() const { return o->shiftTest(); }
   uint32_t version() const { return o->version(); }
 };
@@ -56,6 +58,7 @@ class ProtectionSystemThreshold_Wrapper {
 public:
   ProtectionSystemThreshold_Wrapper(boost::shared_ptr<ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
   ProtectionSystemThreshold_Wrapper(ProtectionSystemThreshold* obj) : o(obj) {}
+  bool operator==(const ProtectionSystemThreshold_Wrapper &t) const { return this == &t; }
   uint32_t adcThreshold() const { return o->adcThreshold(); }
   uint32_t pixelCountThreshold() const { return o->pixelCountThreshold(); }
 };
@@ -72,6 +75,7 @@ class CsPad2x2GainMapCfg_Wrapper {
 public:
   CsPad2x2GainMapCfg_Wrapper(boost::shared_ptr<CsPad2x2GainMapCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2GainMapCfg_Wrapper(CsPad2x2GainMapCfg* obj) : o(obj) {}
+  bool operator==(const CsPad2x2GainMapCfg_Wrapper &t) const { return this == &t; }
   PyObject* gainMap() const { ND_CONVERT(o->gainMap(), uint16_t, 2); }
 };
 
@@ -87,6 +91,7 @@ class ConfigV1QuadReg_Wrapper {
 public:
   ConfigV1QuadReg_Wrapper(boost::shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV1QuadReg_Wrapper(ConfigV1QuadReg* obj) : o(obj) {}
+  bool operator==(const ConfigV1QuadReg_Wrapper &t) const { return this == &t; }
   uint32_t shiftSelect() const { return o->shiftSelect(); }
   uint32_t edgeSelect() const { return o->edgeSelect(); }
   uint32_t readClkSet() const { return o->readClkSet(); }
@@ -108,9 +113,9 @@ public:
   uint32_t kdConstant() const { return o->kdConstant(); }
   uint32_t humidThold() const { return o->humidThold(); }
   uint32_t setPoint() const { return o->setPoint(); }
-  CsPad2x2ReadOnlyCfg_Wrapper ro() const { return CsPad2x2ReadOnlyCfg_Wrapper((CsPad2x2ReadOnlyCfg*) &o->ro()); } // copy_const_reference
-  CsPad2x2DigitalPotsCfg_Wrapper dp() const { return CsPad2x2DigitalPotsCfg_Wrapper((CsPad2x2DigitalPotsCfg*) &o->dp()); } // copy_const_reference
-  CsPad2x2GainMapCfg_Wrapper gm() const { return CsPad2x2GainMapCfg_Wrapper((CsPad2x2GainMapCfg*) &o->gm()); } // copy_const_reference
+  const CsPad2x2ReadOnlyCfg_Wrapper ro() const { return CsPad2x2ReadOnlyCfg_Wrapper((CsPad2x2ReadOnlyCfg*) &o->ro()); }
+  const CsPad2x2DigitalPotsCfg_Wrapper dp() const { return CsPad2x2DigitalPotsCfg_Wrapper((CsPad2x2DigitalPotsCfg*) &o->dp()); }
+  const CsPad2x2GainMapCfg_Wrapper gm() const { return CsPad2x2GainMapCfg_Wrapper((CsPad2x2GainMapCfg*) &o->gm()); }
 };
 
 /** @class ConfigV1
@@ -127,8 +132,9 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
-  ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThreshold()); } // copy_const_reference
+  const ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThreshold()); }
   uint32_t protectionEnable() const { return o->protectionEnable(); }
   uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
   uint32_t activeRunMode() const { return o->activeRunMode(); }
@@ -137,7 +143,7 @@ public:
   uint32_t badAsicMask() const { return o->badAsicMask(); }
   uint32_t asicMask() const { return o->asicMask(); }
   uint32_t roiMask() const { return o->roiMask(); }
-  ConfigV1QuadReg_Wrapper quad() const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quad()); } // copy_const_reference
+  const ConfigV1QuadReg_Wrapper quad() const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quad()); }
   uint32_t numAsicsRead() const { return o->numAsicsRead(); }
   uint32_t numAsicsStored() const { return o->numAsicsStored(); }
 };
@@ -157,6 +163,7 @@ public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   ElementV1_Wrapper(boost::shared_ptr<ElementV1> obj) : _o(obj), o(_o.get()) {}
   ElementV1_Wrapper(ElementV1* obj) : o(obj) {}
+  bool operator==(const ElementV1_Wrapper &t) const { return this == &t; }
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
   uint32_t tid() const { return o->tid(); }
@@ -166,7 +173,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
+  std::vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   float common_mode(uint32_t section) const { return o->common_mode(section); }

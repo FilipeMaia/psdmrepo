@@ -10,188 +10,200 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::CsPad::CsPadDigitalPotsCfg", no_init)\
-    .def("pots", &CsPadDigitalPotsCfg_Wrapper::pots)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::CsPadDigitalPotsCfg", no_init)\
+    .def("pots", &n::pots)\
 
-  _CLASS(CsPadDigitalPotsCfg_Wrapper);
+  _CLASS(CsPadDigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(CsPadDigitalPotsCfg_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::CsPadReadOnlyCfg", no_init)\
-    .def("shiftTest", &CsPadReadOnlyCfg_Wrapper::shiftTest)\
-    .def("version", &CsPadReadOnlyCfg_Wrapper::version)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::CsPadReadOnlyCfg", no_init)\
+    .def("shiftTest", &n::shiftTest)\
+    .def("version", &n::version)\
 
-  _CLASS(CsPadReadOnlyCfg_Wrapper);
+  _CLASS(CsPadReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(CsPadReadOnlyCfg_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ProtectionSystemThreshold", no_init)\
-    .def("adcThreshold", &ProtectionSystemThreshold_Wrapper::adcThreshold)\
-    .def("pixelCountThreshold", &ProtectionSystemThreshold_Wrapper::pixelCountThreshold)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ProtectionSystemThreshold", no_init)\
+    .def("adcThreshold", &n::adcThreshold)\
+    .def("pixelCountThreshold", &n::pixelCountThreshold)\
 
-  _CLASS(ProtectionSystemThreshold_Wrapper);
+  _CLASS(ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ProtectionSystemThreshold_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::CsPadGainMapCfg", no_init)\
-    .def("gainMap", &CsPadGainMapCfg_Wrapper::gainMap)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::CsPadGainMapCfg", no_init)\
+    .def("gainMap", &n::gainMap)\
 
-  _CLASS(CsPadGainMapCfg_Wrapper);
+  _CLASS(CsPadGainMapCfg_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(CsPadGainMapCfg_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ConfigV1QuadReg", no_init)\
-    .def("shiftSelect", &ConfigV1QuadReg_Wrapper::shiftSelect)\
-    .def("edgeSelect", &ConfigV1QuadReg_Wrapper::edgeSelect)\
-    .def("readClkSet", &ConfigV1QuadReg_Wrapper::readClkSet)\
-    .def("readClkHold", &ConfigV1QuadReg_Wrapper::readClkHold)\
-    .def("dataMode", &ConfigV1QuadReg_Wrapper::dataMode)\
-    .def("prstSel", &ConfigV1QuadReg_Wrapper::prstSel)\
-    .def("acqDelay", &ConfigV1QuadReg_Wrapper::acqDelay)\
-    .def("intTime", &ConfigV1QuadReg_Wrapper::intTime)\
-    .def("digDelay", &ConfigV1QuadReg_Wrapper::digDelay)\
-    .def("ampIdle", &ConfigV1QuadReg_Wrapper::ampIdle)\
-    .def("injTotal", &ConfigV1QuadReg_Wrapper::injTotal)\
-    .def("rowColShiftPer", &ConfigV1QuadReg_Wrapper::rowColShiftPer)\
-    .def("ro", &ConfigV1QuadReg_Wrapper::ro)\
-    .def("dp", &ConfigV1QuadReg_Wrapper::dp)\
-    .def("gm", &ConfigV1QuadReg_Wrapper::gm)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ConfigV1QuadReg", no_init)\
+    .def("shiftSelect", &n::shiftSelect)\
+    .def("edgeSelect", &n::edgeSelect)\
+    .def("readClkSet", &n::readClkSet)\
+    .def("readClkHold", &n::readClkHold)\
+    .def("dataMode", &n::dataMode)\
+    .def("prstSel", &n::prstSel)\
+    .def("acqDelay", &n::acqDelay)\
+    .def("intTime", &n::intTime)\
+    .def("digDelay", &n::digDelay)\
+    .def("ampIdle", &n::ampIdle)\
+    .def("injTotal", &n::injTotal)\
+    .def("rowColShiftPer", &n::rowColShiftPer)\
+    .def("ro", &n::ro, policy)\
+    .def("dp", &n::dp, policy)\
+    .def("gm", &n::gm, policy)\
 
-  _CLASS(ConfigV1QuadReg_Wrapper);
+  _CLASS(ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1QuadReg);
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ConfigV1", no_init)\
-    .def("concentratorVersion", &ConfigV1_Wrapper::concentratorVersion)\
-    .def("runDelay", &ConfigV1_Wrapper::runDelay)\
-    .def("eventCode", &ConfigV1_Wrapper::eventCode)\
-    .def("inactiveRunMode", &ConfigV1_Wrapper::inactiveRunMode)\
-    .def("activeRunMode", &ConfigV1_Wrapper::activeRunMode)\
-    .def("tdi", &ConfigV1_Wrapper::tdi)\
-    .def("payloadSize", &ConfigV1_Wrapper::payloadSize)\
-    .def("badAsicMask0", &ConfigV1_Wrapper::badAsicMask0)\
-    .def("badAsicMask1", &ConfigV1_Wrapper::badAsicMask1)\
-    .def("asicMask", &ConfigV1_Wrapper::asicMask)\
-    .def("quadMask", &ConfigV1_Wrapper::quadMask)\
-    .def("quads", &ConfigV1_Wrapper::quads)\
-    .def("numAsicsRead", &ConfigV1_Wrapper::numAsicsRead)\
-    .def("numQuads", &ConfigV1_Wrapper::numQuads)\
-    .def("numSect", &ConfigV1_Wrapper::numSect)\
-    .def("quads_shape", &ConfigV1_Wrapper::quads_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ConfigV1", no_init)\
+    .def("concentratorVersion", &n::concentratorVersion)\
+    .def("runDelay", &n::runDelay)\
+    .def("eventCode", &n::eventCode)\
+    .def("inactiveRunMode", &n::inactiveRunMode)\
+    .def("activeRunMode", &n::activeRunMode)\
+    .def("tdi", &n::tdi)\
+    .def("payloadSize", &n::payloadSize)\
+    .def("badAsicMask0", &n::badAsicMask0)\
+    .def("badAsicMask1", &n::badAsicMask1)\
+    .def("asicMask", &n::asicMask)\
+    .def("quadMask", &n::quadMask)\
+    .def("quads", &n::quads, policy)\
+    .def("numAsicsRead", &n::numAsicsRead)\
+    .def("numQuads", &n::numQuads)\
+    .def("numSect", &n::numSect)\
+    .def("quads_shape", &n::quads_shape)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ConfigV2", no_init)\
-    .def("concentratorVersion", &ConfigV2_Wrapper::concentratorVersion)\
-    .def("runDelay", &ConfigV2_Wrapper::runDelay)\
-    .def("eventCode", &ConfigV2_Wrapper::eventCode)\
-    .def("inactiveRunMode", &ConfigV2_Wrapper::inactiveRunMode)\
-    .def("activeRunMode", &ConfigV2_Wrapper::activeRunMode)\
-    .def("tdi", &ConfigV2_Wrapper::tdi)\
-    .def("payloadSize", &ConfigV2_Wrapper::payloadSize)\
-    .def("badAsicMask0", &ConfigV2_Wrapper::badAsicMask0)\
-    .def("badAsicMask1", &ConfigV2_Wrapper::badAsicMask1)\
-    .def("asicMask", &ConfigV2_Wrapper::asicMask)\
-    .def("quadMask", &ConfigV2_Wrapper::quadMask)\
-    .def("quads", &ConfigV2_Wrapper::quads)\
-    .def("numAsicsRead", &ConfigV2_Wrapper::numAsicsRead)\
-    .def("roiMask", &ConfigV2_Wrapper::roiMask)\
-    .def("numAsicsStored", &ConfigV2_Wrapper::numAsicsStored)\
-    .def("numQuads", &ConfigV2_Wrapper::numQuads)\
-    .def("numSect", &ConfigV2_Wrapper::numSect)\
-    .def("quads_shape", &ConfigV2_Wrapper::quads_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ConfigV2", no_init)\
+    .def("concentratorVersion", &n::concentratorVersion)\
+    .def("runDelay", &n::runDelay)\
+    .def("eventCode", &n::eventCode)\
+    .def("inactiveRunMode", &n::inactiveRunMode)\
+    .def("activeRunMode", &n::activeRunMode)\
+    .def("tdi", &n::tdi)\
+    .def("payloadSize", &n::payloadSize)\
+    .def("badAsicMask0", &n::badAsicMask0)\
+    .def("badAsicMask1", &n::badAsicMask1)\
+    .def("asicMask", &n::asicMask)\
+    .def("quadMask", &n::quadMask)\
+    .def("quads", &n::quads, policy)\
+    .def("numAsicsRead", &n::numAsicsRead)\
+    .def("roiMask", &n::roiMask)\
+    .def("numAsicsStored", &n::numAsicsStored)\
+    .def("numQuads", &n::numQuads)\
+    .def("numSect", &n::numSect)\
+    .def("quads_shape", &n::quads_shape)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ConfigV3", no_init)\
-    .def("concentratorVersion", &ConfigV3_Wrapper::concentratorVersion)\
-    .def("runDelay", &ConfigV3_Wrapper::runDelay)\
-    .def("eventCode", &ConfigV3_Wrapper::eventCode)\
-    .def("protectionThresholds", &ConfigV3_Wrapper::protectionThresholds)\
-    .def("protectionEnable", &ConfigV3_Wrapper::protectionEnable)\
-    .def("inactiveRunMode", &ConfigV3_Wrapper::inactiveRunMode)\
-    .def("activeRunMode", &ConfigV3_Wrapper::activeRunMode)\
-    .def("tdi", &ConfigV3_Wrapper::tdi)\
-    .def("payloadSize", &ConfigV3_Wrapper::payloadSize)\
-    .def("badAsicMask0", &ConfigV3_Wrapper::badAsicMask0)\
-    .def("badAsicMask1", &ConfigV3_Wrapper::badAsicMask1)\
-    .def("asicMask", &ConfigV3_Wrapper::asicMask)\
-    .def("quadMask", &ConfigV3_Wrapper::quadMask)\
-    .def("quads", &ConfigV3_Wrapper::quads)\
-    .def("numAsicsRead", &ConfigV3_Wrapper::numAsicsRead)\
-    .def("roiMask", &ConfigV3_Wrapper::roiMask)\
-    .def("numAsicsStored", &ConfigV3_Wrapper::numAsicsStored)\
-    .def("numQuads", &ConfigV3_Wrapper::numQuads)\
-    .def("numSect", &ConfigV3_Wrapper::numSect)\
-    .def("protectionThresholds_shape", &ConfigV3_Wrapper::protectionThresholds_shape)\
-    .def("quads_shape", &ConfigV3_Wrapper::quads_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ConfigV3", no_init)\
+    .def("concentratorVersion", &n::concentratorVersion)\
+    .def("runDelay", &n::runDelay)\
+    .def("eventCode", &n::eventCode)\
+    .def("protectionThresholds", &n::protectionThresholds, policy)\
+    .def("protectionEnable", &n::protectionEnable)\
+    .def("inactiveRunMode", &n::inactiveRunMode)\
+    .def("activeRunMode", &n::activeRunMode)\
+    .def("tdi", &n::tdi)\
+    .def("payloadSize", &n::payloadSize)\
+    .def("badAsicMask0", &n::badAsicMask0)\
+    .def("badAsicMask1", &n::badAsicMask1)\
+    .def("asicMask", &n::asicMask)\
+    .def("quadMask", &n::quadMask)\
+    .def("quads", &n::quads, policy)\
+    .def("numAsicsRead", &n::numAsicsRead)\
+    .def("roiMask", &n::roiMask)\
+    .def("numAsicsStored", &n::numAsicsStored)\
+    .def("numQuads", &n::numQuads)\
+    .def("numSect", &n::numSect)\
+    .def("protectionThresholds_shape", &n::protectionThresholds_shape)\
+    .def("quads_shape", &n::quads_shape)\
 
-  _CLASS(ConfigV3_Wrapper);
+  _CLASS(ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV3);
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ElementV1", no_init)\
-    .def("virtual_channel", &ElementV1_Wrapper::virtual_channel)\
-    .def("lane", &ElementV1_Wrapper::lane)\
-    .def("tid", &ElementV1_Wrapper::tid)\
-    .def("acq_count", &ElementV1_Wrapper::acq_count)\
-    .def("op_code", &ElementV1_Wrapper::op_code)\
-    .def("quad", &ElementV1_Wrapper::quad)\
-    .def("seq_count", &ElementV1_Wrapper::seq_count)\
-    .def("ticks", &ElementV1_Wrapper::ticks)\
-    .def("fiducials", &ElementV1_Wrapper::fiducials)\
-    .def("sb_temp", &ElementV1_Wrapper::sb_temp)\
-    .def("frame_type", &ElementV1_Wrapper::frame_type)\
-    .def("data", &ElementV1_Wrapper::data)\
-    .def("sectionMask", &ElementV1_Wrapper::sectionMask)\
-    .def("common_mode", &ElementV1_Wrapper::common_mode)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ElementV1", no_init)\
+    .def("virtual_channel", &n::virtual_channel)\
+    .def("lane", &n::lane)\
+    .def("tid", &n::tid)\
+    .def("acq_count", &n::acq_count)\
+    .def("op_code", &n::op_code)\
+    .def("quad", &n::quad)\
+    .def("seq_count", &n::seq_count)\
+    .def("ticks", &n::ticks)\
+    .def("fiducials", &n::fiducials)\
+    .def("sb_temp", &n::sb_temp)\
+    .def("frame_type", &n::frame_type)\
+    .def("data", &n::data)\
+    .def("sectionMask", &n::sectionMask)\
+    .def("common_mode", &n::common_mode)\
 
-  _CLASS(ElementV1_Wrapper);
+  _CLASS(ElementV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ElementV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::DataV1", no_init)\
-    .def("quads", &DataV1_Wrapper::quads)\
-    .def("quads_shape", &DataV1_Wrapper::quads_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::DataV1", no_init)\
+    .def("quads", &n::quads, policy)\
+    .def("quads_shape", &n::quads_shape)\
 
-  _CLASS(DataV1_Wrapper);
+  _CLASS(DataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV1);
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::ElementV2", no_init)\
-    .def("virtual_channel", &ElementV2_Wrapper::virtual_channel)\
-    .def("lane", &ElementV2_Wrapper::lane)\
-    .def("tid", &ElementV2_Wrapper::tid)\
-    .def("acq_count", &ElementV2_Wrapper::acq_count)\
-    .def("op_code", &ElementV2_Wrapper::op_code)\
-    .def("quad", &ElementV2_Wrapper::quad)\
-    .def("seq_count", &ElementV2_Wrapper::seq_count)\
-    .def("ticks", &ElementV2_Wrapper::ticks)\
-    .def("fiducials", &ElementV2_Wrapper::fiducials)\
-    .def("sb_temp", &ElementV2_Wrapper::sb_temp)\
-    .def("frame_type", &ElementV2_Wrapper::frame_type)\
-    .def("data", &ElementV2_Wrapper::data)\
-    .def("sectionMask", &ElementV2_Wrapper::sectionMask)\
-    .def("common_mode", &ElementV2_Wrapper::common_mode)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::ElementV2", no_init)\
+    .def("virtual_channel", &n::virtual_channel)\
+    .def("lane", &n::lane)\
+    .def("tid", &n::tid)\
+    .def("acq_count", &n::acq_count)\
+    .def("op_code", &n::op_code)\
+    .def("quad", &n::quad)\
+    .def("seq_count", &n::seq_count)\
+    .def("ticks", &n::ticks)\
+    .def("fiducials", &n::fiducials)\
+    .def("sb_temp", &n::sb_temp)\
+    .def("frame_type", &n::frame_type)\
+    .def("data", &n::data)\
+    .def("sectionMask", &n::sectionMask)\
+    .def("common_mode", &n::common_mode)\
 
-  _CLASS(ElementV2_Wrapper);
+  _CLASS(ElementV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ElementV2_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::CsPad::DataV2", no_init)\
-    .def("quads", &DataV2_Wrapper::quads)\
-    .def("quads_shape", &DataV2_Wrapper::quads_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::CsPad::DataV2", no_init)\
+    .def("quads", &n::quads, policy)\
+    .def("quads_shape", &n::quads_shape)\
 
-  _CLASS(DataV2_Wrapper);
+  _CLASS(DataV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV2);
 

@@ -33,6 +33,7 @@ public:
   enum { Map_Trigger_Ena_Shift = 3 };
   PulseConfig_Wrapper(boost::shared_ptr<PulseConfig> obj) : _o(obj), o(_o.get()) {}
   PulseConfig_Wrapper(PulseConfig* obj) : o(obj) {}
+  bool operator==(const PulseConfig_Wrapper &t) const { return this == &t; }
   uint32_t pulse() const { return o->pulse(); }
   uint32_t _input_control_value() const { return o->_input_control_value(); }
   int16_t bf_trigger() const { return o->bf_trigger(); }
@@ -72,6 +73,7 @@ class PulseConfigV3_Wrapper {
 public:
   PulseConfigV3_Wrapper(boost::shared_ptr<PulseConfigV3> obj) : _o(obj), o(_o.get()) {}
   PulseConfigV3_Wrapper(PulseConfigV3* obj) : o(obj) {}
+  bool operator==(const PulseConfigV3_Wrapper &t) const { return this == &t; }
   uint16_t pulseId() const { return o->pulseId(); }
   uint16_t polarity() const { return o->polarity(); }
   uint32_t prescale() const { return o->prescale(); }
@@ -100,6 +102,7 @@ class EventCodeV3_Wrapper {
 public:
   EventCodeV3_Wrapper(boost::shared_ptr<EventCodeV3> obj) : _o(obj), o(_o.get()) {}
   EventCodeV3_Wrapper(EventCodeV3* obj) : o(obj) {}
+  bool operator==(const EventCodeV3_Wrapper &t) const { return this == &t; }
   uint16_t code() const { return o->code(); }
   uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
   uint8_t isReadout() const { return o->isReadout(); }
@@ -130,6 +133,7 @@ class EventCodeV4_Wrapper {
 public:
   EventCodeV4_Wrapper(boost::shared_ptr<EventCodeV4> obj) : _o(obj), o(_o.get()) {}
   EventCodeV4_Wrapper(EventCodeV4* obj) : o(obj) {}
+  bool operator==(const EventCodeV4_Wrapper &t) const { return this == &t; }
   uint16_t code() const { return o->code(); }
   uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
   uint8_t isReadout() const { return o->isReadout(); }
@@ -165,6 +169,7 @@ public:
   enum { DescSize = 16 };
   EventCodeV5_Wrapper(boost::shared_ptr<EventCodeV5> obj) : _o(obj), o(_o.get()) {}
   EventCodeV5_Wrapper(EventCodeV5* obj) : o(obj) {}
+  bool operator==(const EventCodeV5_Wrapper &t) const { return this == &t; }
   uint16_t code() const { return o->code(); }
   uint8_t isReadout() const { return o->isReadout(); }
   uint8_t isTerminator() const { return o->isTerminator(); }
@@ -212,6 +217,7 @@ public:
   };
   OutputMap_Wrapper(boost::shared_ptr<OutputMap> obj) : _o(obj), o(_o.get()) {}
   OutputMap_Wrapper(OutputMap* obj) : o(obj) {}
+  bool operator==(const OutputMap_Wrapper &t) const { return this == &t; }
   uint32_t value() const { return o->value(); }
   EvrData::OutputMap::Source source() const { return o->source(); }
   uint8_t source_id() const { return o->source_id(); }
@@ -245,6 +251,7 @@ public:
   };
   OutputMapV2_Wrapper(boost::shared_ptr<OutputMapV2> obj) : _o(obj), o(_o.get()) {}
   OutputMapV2_Wrapper(OutputMapV2* obj) : o(obj) {}
+  bool operator==(const OutputMapV2_Wrapper &t) const { return this == &t; }
   uint32_t value() const { return o->value(); }
   EvrData::OutputMapV2::Source source() const { return o->source(); }
   uint8_t source_id() const { return o->source_id(); }
@@ -270,10 +277,11 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfig, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
+  std::vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
+  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class ConfigV2
@@ -308,11 +316,12 @@ public:
   };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
+  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t opcode() const { return o->opcode(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfig, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
+  std::vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
+  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
   EvrData::ConfigV2::BeamCode beam() const { return o->beam(); }
   EvrData::ConfigV2::RateCode rate() const { return o->rate(); }
 };
@@ -331,12 +340,13 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
+  bool operator==(const ConfigV3_Wrapper &t) const { return this == &t; }
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV3, 1); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
+  std::vector<EvrData::EventCodeV3> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV3); }
+  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class ConfigV4
@@ -353,12 +363,13 @@ public:
   enum { Version = 4 /**< XTC type version number */ };
   ConfigV4_Wrapper(boost::shared_ptr<ConfigV4> obj) : _o(obj), o(_o.get()) {}
   ConfigV4_Wrapper(ConfigV4* obj) : o(obj) {}
+  bool operator==(const ConfigV4_Wrapper &t) const { return this == &t; }
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV4, 1); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
+  std::vector<EvrData::EventCodeV4> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV4); }
+  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class SequencerEntry
@@ -373,6 +384,7 @@ class SequencerEntry_Wrapper {
 public:
   SequencerEntry_Wrapper(boost::shared_ptr<SequencerEntry> obj) : _o(obj), o(_o.get()) {}
   SequencerEntry_Wrapper(SequencerEntry* obj) : o(obj) {}
+  bool operator==(const SequencerEntry_Wrapper &t) const { return this == &t; }
   uint32_t delay() const { return o->delay(); }
   uint32_t eventcode() const { return o->eventcode(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -402,11 +414,12 @@ public:
   };
   SequencerConfigV1_Wrapper(boost::shared_ptr<SequencerConfigV1> obj) : _o(obj), o(_o.get()) {}
   SequencerConfigV1_Wrapper(SequencerConfigV1* obj) : o(obj) {}
+  bool operator==(const SequencerConfigV1_Wrapper &t) const { return this == &t; }
   EvrData::SequencerConfigV1::Source sync_source() const { return o->sync_source(); }
   EvrData::SequencerConfigV1::Source beam_source() const { return o->beam_source(); }
   uint32_t length() const { return o->length(); }
   uint32_t cycles() const { return o->cycles(); }
-  PyObject* entries() const { ND_CONVERT(o->entries(), EvrData::SequencerEntry, 1); }
+  std::vector<EvrData::SequencerEntry> entries() const { VEC_CONVERT(o->entries(), EvrData::SequencerEntry); }
 };
 
 /** @class ConfigV5
@@ -425,13 +438,14 @@ public:
   enum { EvrOutputs = 10 };
   ConfigV5_Wrapper(boost::shared_ptr<ConfigV5> obj) : _o(obj), o(_o.get()) {}
   ConfigV5_Wrapper(ConfigV5* obj) : o(obj) {}
+  bool operator==(const ConfigV5_Wrapper &t) const { return this == &t; }
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV5, 1); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMap, 1); }
-  SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); } // copy_const_reference
+  std::vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
+  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); }
 };
 
 /** @class ConfigV6
@@ -450,13 +464,14 @@ public:
   enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
   ConfigV6_Wrapper(boost::shared_ptr<ConfigV6> obj) : _o(obj), o(_o.get()) {}
   ConfigV6_Wrapper(ConfigV6* obj) : o(obj) {}
+  bool operator==(const ConfigV6_Wrapper &t) const { return this == &t; }
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  PyObject* eventcodes() const { ND_CONVERT(o->eventcodes(), EvrData::EventCodeV5, 1); }
-  PyObject* pulses() const { ND_CONVERT(o->pulses(), EvrData::PulseConfigV3, 1); }
-  PyObject* output_maps() const { ND_CONVERT(o->output_maps(), EvrData::OutputMapV2, 1); }
-  SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); } // copy_const_reference
+  std::vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
+  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  std::vector<EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMapV2); }
+  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); }
 };
 
 /** @class FIFOEvent
@@ -471,6 +486,7 @@ class FIFOEvent_Wrapper {
 public:
   FIFOEvent_Wrapper(boost::shared_ptr<FIFOEvent> obj) : _o(obj), o(_o.get()) {}
   FIFOEvent_Wrapper(FIFOEvent* obj) : o(obj) {}
+  bool operator==(const FIFOEvent_Wrapper &t) const { return this == &t; }
   uint32_t timestampHigh() const { return o->timestampHigh(); }
   uint32_t timestampLow() const { return o->timestampLow(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -495,8 +511,9 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   DataV3_Wrapper(boost::shared_ptr<DataV3> obj) : _o(obj), o(_o.get()) {}
   DataV3_Wrapper(DataV3* obj) : o(obj) {}
+  bool operator==(const DataV3_Wrapper &t) const { return this == &t; }
   uint32_t numFifoEvents() const { return o->numFifoEvents(); }
-  PyObject* fifoEvents() const { ND_CONVERT(o->fifoEvents(), EvrData::FIFOEvent, 1); }
+  std::vector<EvrData::FIFOEvent> fifoEvents() const { VEC_CONVERT(o->fifoEvents(), EvrData::FIFOEvent); }
 };
 
 /** @class IOChannel
@@ -513,9 +530,10 @@ public:
   enum { MaxInfos = 8 };
   IOChannel_Wrapper(boost::shared_ptr<IOChannel> obj) : _o(obj), o(_o.get()) {}
   IOChannel_Wrapper(IOChannel* obj) : o(obj) {}
+  bool operator==(const IOChannel_Wrapper &t) const { return this == &t; }
   const char* name() const { return o->name(); }
   uint32_t ninfo() const { return o->ninfo(); }
-  PyObject* infos() const { ND_CONVERT(o->infos(), Pds::DetInfo, 1); }
+  std::vector<Pds::DetInfo> infos() const { VEC_CONVERT(o->infos(), Pds::DetInfo); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   std::vector<int> name_shape() const { return o->name_shape(); }
 private:
@@ -538,8 +556,9 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   IOConfigV1_Wrapper(boost::shared_ptr<IOConfigV1> obj) : _o(obj), o(_o.get()) {}
   IOConfigV1_Wrapper(IOConfigV1* obj) : o(obj) {}
+  bool operator==(const IOConfigV1_Wrapper &t) const { return this == &t; }
   uint16_t nchannels() const { return o->nchannels(); }
-  PyObject* channels() const { ND_CONVERT(o->channels(), EvrData::IOChannel, 1); }
+  std::vector<EvrData::IOChannel> channels() const { VEC_CONVERT(o->channels(), EvrData::IOChannel); }
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
 };
 

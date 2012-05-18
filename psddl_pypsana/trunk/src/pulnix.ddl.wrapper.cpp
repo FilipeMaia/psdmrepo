@@ -10,35 +10,37 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Pulnix::TM6740ConfigV1", no_init)\
-    .def("gain_a", &TM6740ConfigV1_Wrapper::gain_a)\
-    .def("gain_b", &TM6740ConfigV1_Wrapper::gain_b)\
-    .def("vref", &TM6740ConfigV1_Wrapper::vref)\
-    .def("shutter_width", &TM6740ConfigV1_Wrapper::shutter_width)\
-    .def("gain_balance", &TM6740ConfigV1_Wrapper::gain_balance)\
-    .def("output_resolution", &TM6740ConfigV1_Wrapper::output_resolution)\
-    .def("horizontal_binning", &TM6740ConfigV1_Wrapper::horizontal_binning)\
-    .def("vertical_binning", &TM6740ConfigV1_Wrapper::vertical_binning)\
-    .def("lookuptable_mode", &TM6740ConfigV1_Wrapper::lookuptable_mode)\
-    .def("output_resolution_bits", &TM6740ConfigV1_Wrapper::output_resolution_bits)\
+#define _CLASS(n, policy) class_<n>("Psana::Pulnix::TM6740ConfigV1", no_init)\
+    .def("gain_a", &n::gain_a)\
+    .def("gain_b", &n::gain_b)\
+    .def("vref", &n::vref)\
+    .def("shutter_width", &n::shutter_width)\
+    .def("gain_balance", &n::gain_balance)\
+    .def("output_resolution", &n::output_resolution)\
+    .def("horizontal_binning", &n::horizontal_binning)\
+    .def("vertical_binning", &n::vertical_binning)\
+    .def("lookuptable_mode", &n::lookuptable_mode)\
+    .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(TM6740ConfigV1_Wrapper);
+  _CLASS(TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TM6740ConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Pulnix::TM6740ConfigV2", no_init)\
-    .def("gain_a", &TM6740ConfigV2_Wrapper::gain_a)\
-    .def("gain_b", &TM6740ConfigV2_Wrapper::gain_b)\
-    .def("vref_a", &TM6740ConfigV2_Wrapper::vref_a)\
-    .def("vref_b", &TM6740ConfigV2_Wrapper::vref_b)\
-    .def("gain_balance", &TM6740ConfigV2_Wrapper::gain_balance)\
-    .def("output_resolution", &TM6740ConfigV2_Wrapper::output_resolution)\
-    .def("horizontal_binning", &TM6740ConfigV2_Wrapper::horizontal_binning)\
-    .def("vertical_binning", &TM6740ConfigV2_Wrapper::vertical_binning)\
-    .def("lookuptable_mode", &TM6740ConfigV2_Wrapper::lookuptable_mode)\
-    .def("output_resolution_bits", &TM6740ConfigV2_Wrapper::output_resolution_bits)\
+#define _CLASS(n, policy) class_<n>("Psana::Pulnix::TM6740ConfigV2", no_init)\
+    .def("gain_a", &n::gain_a)\
+    .def("gain_b", &n::gain_b)\
+    .def("vref_a", &n::vref_a)\
+    .def("vref_b", &n::vref_b)\
+    .def("gain_balance", &n::gain_balance)\
+    .def("output_resolution", &n::output_resolution)\
+    .def("horizontal_binning", &n::horizontal_binning)\
+    .def("vertical_binning", &n::vertical_binning)\
+    .def("lookuptable_mode", &n::lookuptable_mode)\
+    .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(TM6740ConfigV2_Wrapper);
+  _CLASS(TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TM6740ConfigV2_Wrapper);
 #undef _CLASS
 
 }

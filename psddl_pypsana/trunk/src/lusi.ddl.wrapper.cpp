@@ -10,72 +10,84 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Lusi::DiodeFexConfigV1", no_init)\
-    .def("base", &DiodeFexConfigV1_Wrapper::base)\
-    .def("scale", &DiodeFexConfigV1_Wrapper::scale)\
-    .def("_sizeof", &DiodeFexConfigV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::DiodeFexConfigV1", no_init)\
+    .def("base", &n::base)\
+    .def("scale", &n::scale)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(DiodeFexConfigV1_Wrapper);
-  _CLASS(DiodeFexConfigV1);
+  _CLASS(DiodeFexConfigV1, return_value_policy<copy_const_reference>());
+  _CLASS(DiodeFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DiodeFexConfigV1);
+  std_vector_class_(DiodeFexConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::DiodeFexConfigV2", no_init)\
-    .def("base", &DiodeFexConfigV2_Wrapper::base)\
-    .def("scale", &DiodeFexConfigV2_Wrapper::scale)\
-    .def("_sizeof", &DiodeFexConfigV2_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::DiodeFexConfigV2", no_init)\
+    .def("base", &n::base)\
+    .def("scale", &n::scale)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(DiodeFexConfigV2_Wrapper);
-  _CLASS(DiodeFexConfigV2);
+  _CLASS(DiodeFexConfigV2, return_value_policy<copy_const_reference>());
+  _CLASS(DiodeFexConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DiodeFexConfigV2);
+  std_vector_class_(DiodeFexConfigV2_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::DiodeFexV1", no_init)\
-    .def("value", &DiodeFexV1_Wrapper::value)\
-    .def("_sizeof", &DiodeFexV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::DiodeFexV1", no_init)\
+    .def("value", &n::value)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(DiodeFexV1_Wrapper);
-  _CLASS(DiodeFexV1);
+  _CLASS(DiodeFexV1, return_value_policy<copy_const_reference>());
+  _CLASS(DiodeFexV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DiodeFexV1);
+  std_vector_class_(DiodeFexV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::IpmFexConfigV1", no_init)\
-    .def("diode", &IpmFexConfigV1_Wrapper::diode)\
-    .def("xscale", &IpmFexConfigV1_Wrapper::xscale)\
-    .def("yscale", &IpmFexConfigV1_Wrapper::yscale)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::IpmFexConfigV1", no_init)\
+    .def("diode", &n::diode)\
+    .def("xscale", &n::xscale)\
+    .def("yscale", &n::yscale)\
 
-  _CLASS(IpmFexConfigV1_Wrapper);
+  _CLASS(IpmFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(IpmFexConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::IpmFexConfigV2", no_init)\
-    .def("diode", &IpmFexConfigV2_Wrapper::diode)\
-    .def("xscale", &IpmFexConfigV2_Wrapper::xscale)\
-    .def("yscale", &IpmFexConfigV2_Wrapper::yscale)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::IpmFexConfigV2", no_init)\
+    .def("diode", &n::diode)\
+    .def("xscale", &n::xscale)\
+    .def("yscale", &n::yscale)\
 
-  _CLASS(IpmFexConfigV2_Wrapper);
+  _CLASS(IpmFexConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(IpmFexConfigV2_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::IpmFexV1", no_init)\
-    .def("channel", &IpmFexV1_Wrapper::channel)\
-    .def("sum", &IpmFexV1_Wrapper::sum)\
-    .def("xpos", &IpmFexV1_Wrapper::xpos)\
-    .def("ypos", &IpmFexV1_Wrapper::ypos)\
-    .def("_sizeof", &IpmFexV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::IpmFexV1", no_init)\
+    .def("channel", &n::channel)\
+    .def("sum", &n::sum)\
+    .def("xpos", &n::xpos)\
+    .def("ypos", &n::ypos)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(IpmFexV1_Wrapper);
-  _CLASS(IpmFexV1);
+  _CLASS(IpmFexV1, return_value_policy<copy_const_reference>());
+  _CLASS(IpmFexV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(IpmFexV1);
+  std_vector_class_(IpmFexV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Lusi::PimImageConfigV1", no_init)\
-    .def("xscale", &PimImageConfigV1_Wrapper::xscale)\
-    .def("yscale", &PimImageConfigV1_Wrapper::yscale)\
-    .def("_sizeof", &PimImageConfigV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Lusi::PimImageConfigV1", no_init)\
+    .def("xscale", &n::xscale)\
+    .def("yscale", &n::yscale)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(PimImageConfigV1_Wrapper);
-  _CLASS(PimImageConfigV1);
+  _CLASS(PimImageConfigV1, return_value_policy<copy_const_reference>());
+  _CLASS(PimImageConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(PimImageConfigV1);
+  std_vector_class_(PimImageConfigV1_Wrapper);
 #undef _CLASS
 
 }

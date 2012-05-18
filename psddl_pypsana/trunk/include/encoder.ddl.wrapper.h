@@ -41,6 +41,7 @@ public:
   };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t chan_num() const { return o->chan_num(); }
   uint32_t count_mode() const { return o->count_mode(); }
   uint32_t quadrature_mode() const { return o->quadrature_mode(); }
@@ -77,6 +78,7 @@ public:
   };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
+  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t chan_mask() const { return o->chan_mask(); }
   uint32_t count_mode() const { return o->count_mode(); }
   uint32_t quadrature_mode() const { return o->quadrature_mode(); }
@@ -99,6 +101,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
+  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
   uint32_t timestamp() const { return o->timestamp(); }
   uint32_t encoder_count() const { return o->encoder_count(); }
 };
@@ -118,8 +121,9 @@ public:
   enum { NEncoders = 3 /**< Number of encoders. */ };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
+  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
   uint32_t timestamp() const { return o->timestamp(); }
-  PyObject* encoder_count() const { ND_CONVERT(o->encoder_count(), uint32_t, 1); }
+  std::vector<uint32_t> encoder_count() const { VEC_CONVERT(o->encoder_count(), uint32_t); }
 };
 
   class ConfigV1_EnvGetter : public Psana::EnvGetter {

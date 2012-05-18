@@ -10,42 +10,45 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::PNCCD::ConfigV1", no_init)\
-    .def("numLinks", &ConfigV1_Wrapper::numLinks)\
-    .def("payloadSizePerLink", &ConfigV1_Wrapper::payloadSizePerLink)\
+#define _CLASS(n, policy) class_<n>("Psana::PNCCD::ConfigV1", no_init)\
+    .def("numLinks", &n::numLinks)\
+    .def("payloadSizePerLink", &n::payloadSizePerLink)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::PNCCD::ConfigV2", no_init)\
-    .def("numLinks", &ConfigV2_Wrapper::numLinks)\
-    .def("payloadSizePerLink", &ConfigV2_Wrapper::payloadSizePerLink)\
-    .def("numChannels", &ConfigV2_Wrapper::numChannels)\
-    .def("numRows", &ConfigV2_Wrapper::numRows)\
-    .def("numSubmoduleChannels", &ConfigV2_Wrapper::numSubmoduleChannels)\
-    .def("numSubmoduleRows", &ConfigV2_Wrapper::numSubmoduleRows)\
-    .def("numSubmodules", &ConfigV2_Wrapper::numSubmodules)\
-    .def("camexMagic", &ConfigV2_Wrapper::camexMagic)\
-    .def("info", &ConfigV2_Wrapper::info)\
-    .def("timingFName", &ConfigV2_Wrapper::timingFName)\
-    .def("info_shape", &ConfigV2_Wrapper::info_shape)\
-    .def("timingFName_shape", &ConfigV2_Wrapper::timingFName_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::PNCCD::ConfigV2", no_init)\
+    .def("numLinks", &n::numLinks)\
+    .def("payloadSizePerLink", &n::payloadSizePerLink)\
+    .def("numChannels", &n::numChannels)\
+    .def("numRows", &n::numRows)\
+    .def("numSubmoduleChannels", &n::numSubmoduleChannels)\
+    .def("numSubmoduleRows", &n::numSubmoduleRows)\
+    .def("numSubmodules", &n::numSubmodules)\
+    .def("camexMagic", &n::camexMagic)\
+    .def("info", &n::info)\
+    .def("timingFName", &n::timingFName)\
+    .def("info_shape", &n::info_shape)\
+    .def("timingFName_shape", &n::timingFName_shape)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::PNCCD::FrameV1", no_init)\
-    .def("specialWord", &FrameV1_Wrapper::specialWord)\
-    .def("frameNumber", &FrameV1_Wrapper::frameNumber)\
-    .def("timeStampHi", &FrameV1_Wrapper::timeStampHi)\
-    .def("timeStampLo", &FrameV1_Wrapper::timeStampLo)\
-    .def("data", &FrameV1_Wrapper::data)\
+#define _CLASS(n, policy) class_<n>("Psana::PNCCD::FrameV1", no_init)\
+    .def("specialWord", &n::specialWord)\
+    .def("frameNumber", &n::frameNumber)\
+    .def("timeStampHi", &n::timeStampHi)\
+    .def("timeStampLo", &n::timeStampLo)\
+    .def("data", &n::data)\
 
-  _CLASS(FrameV1_Wrapper);
+  _CLASS(FrameV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
 
 }

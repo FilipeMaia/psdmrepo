@@ -10,259 +10,288 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::EvrData::PulseConfig", no_init)\
-    .def("pulse", &PulseConfig_Wrapper::pulse)\
-    .def("_input_control_value", &PulseConfig_Wrapper::_input_control_value)\
-    .def("bf_trigger", &PulseConfig_Wrapper::bf_trigger)\
-    .def("bf_set", &PulseConfig_Wrapper::bf_set)\
-    .def("bf_clear", &PulseConfig_Wrapper::bf_clear)\
-    .def("_output_control_value", &PulseConfig_Wrapper::_output_control_value)\
-    .def("polarity", &PulseConfig_Wrapper::polarity)\
-    .def("map_set_enable", &PulseConfig_Wrapper::map_set_enable)\
-    .def("map_reset_enable", &PulseConfig_Wrapper::map_reset_enable)\
-    .def("map_trigger_enable", &PulseConfig_Wrapper::map_trigger_enable)\
-    .def("prescale", &PulseConfig_Wrapper::prescale)\
-    .def("delay", &PulseConfig_Wrapper::delay)\
-    .def("width", &PulseConfig_Wrapper::width)\
-    .def("trigger", &PulseConfig_Wrapper::trigger)\
-    .def("set", &PulseConfig_Wrapper::set)\
-    .def("clear", &PulseConfig_Wrapper::clear)\
-    .def("_sizeof", &PulseConfig_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::PulseConfig", no_init)\
+    .def("pulse", &n::pulse)\
+    .def("_input_control_value", &n::_input_control_value)\
+    .def("bf_trigger", &n::bf_trigger)\
+    .def("bf_set", &n::bf_set)\
+    .def("bf_clear", &n::bf_clear)\
+    .def("_output_control_value", &n::_output_control_value)\
+    .def("polarity", &n::polarity)\
+    .def("map_set_enable", &n::map_set_enable)\
+    .def("map_reset_enable", &n::map_reset_enable)\
+    .def("map_trigger_enable", &n::map_trigger_enable)\
+    .def("prescale", &n::prescale)\
+    .def("delay", &n::delay)\
+    .def("width", &n::width)\
+    .def("trigger", &n::trigger)\
+    .def("set", &n::set)\
+    .def("clear", &n::clear)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(PulseConfig_Wrapper);
-  _CLASS(PulseConfig);
+  _CLASS(PulseConfig, return_value_policy<copy_const_reference>());
+  _CLASS(PulseConfig_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(PulseConfig);
+  std_vector_class_(PulseConfig_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::PulseConfigV3", no_init)\
-    .def("pulseId", &PulseConfigV3_Wrapper::pulseId)\
-    .def("polarity", &PulseConfigV3_Wrapper::polarity)\
-    .def("prescale", &PulseConfigV3_Wrapper::prescale)\
-    .def("delay", &PulseConfigV3_Wrapper::delay)\
-    .def("width", &PulseConfigV3_Wrapper::width)\
-    .def("_sizeof", &PulseConfigV3_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::PulseConfigV3", no_init)\
+    .def("pulseId", &n::pulseId)\
+    .def("polarity", &n::polarity)\
+    .def("prescale", &n::prescale)\
+    .def("delay", &n::delay)\
+    .def("width", &n::width)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(PulseConfigV3_Wrapper);
-  _CLASS(PulseConfigV3);
+  _CLASS(PulseConfigV3, return_value_policy<copy_const_reference>());
+  _CLASS(PulseConfigV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(PulseConfigV3);
+  std_vector_class_(PulseConfigV3_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::EventCodeV3", no_init)\
-    .def("code", &EventCodeV3_Wrapper::code)\
-    .def("_u16MaskEventAttr_value", &EventCodeV3_Wrapper::_u16MaskEventAttr_value)\
-    .def("isReadout", &EventCodeV3_Wrapper::isReadout)\
-    .def("isTerminator", &EventCodeV3_Wrapper::isTerminator)\
-    .def("maskTrigger", &EventCodeV3_Wrapper::maskTrigger)\
-    .def("maskSet", &EventCodeV3_Wrapper::maskSet)\
-    .def("maskClear", &EventCodeV3_Wrapper::maskClear)\
-    .def("_sizeof", &EventCodeV3_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::EventCodeV3", no_init)\
+    .def("code", &n::code)\
+    .def("_u16MaskEventAttr_value", &n::_u16MaskEventAttr_value)\
+    .def("isReadout", &n::isReadout)\
+    .def("isTerminator", &n::isTerminator)\
+    .def("maskTrigger", &n::maskTrigger)\
+    .def("maskSet", &n::maskSet)\
+    .def("maskClear", &n::maskClear)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(EventCodeV3_Wrapper);
-  _CLASS(EventCodeV3);
+  _CLASS(EventCodeV3, return_value_policy<copy_const_reference>());
+  _CLASS(EventCodeV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(EventCodeV3);
+  std_vector_class_(EventCodeV3_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::EventCodeV4", no_init)\
-    .def("code", &EventCodeV4_Wrapper::code)\
-    .def("_u16MaskEventAttr_value", &EventCodeV4_Wrapper::_u16MaskEventAttr_value)\
-    .def("isReadout", &EventCodeV4_Wrapper::isReadout)\
-    .def("isTerminator", &EventCodeV4_Wrapper::isTerminator)\
-    .def("reportDelay", &EventCodeV4_Wrapper::reportDelay)\
-    .def("reportWidth", &EventCodeV4_Wrapper::reportWidth)\
-    .def("maskTrigger", &EventCodeV4_Wrapper::maskTrigger)\
-    .def("maskSet", &EventCodeV4_Wrapper::maskSet)\
-    .def("maskClear", &EventCodeV4_Wrapper::maskClear)\
-    .def("_sizeof", &EventCodeV4_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::EventCodeV4", no_init)\
+    .def("code", &n::code)\
+    .def("_u16MaskEventAttr_value", &n::_u16MaskEventAttr_value)\
+    .def("isReadout", &n::isReadout)\
+    .def("isTerminator", &n::isTerminator)\
+    .def("reportDelay", &n::reportDelay)\
+    .def("reportWidth", &n::reportWidth)\
+    .def("maskTrigger", &n::maskTrigger)\
+    .def("maskSet", &n::maskSet)\
+    .def("maskClear", &n::maskClear)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(EventCodeV4_Wrapper);
-  _CLASS(EventCodeV4);
+  _CLASS(EventCodeV4, return_value_policy<copy_const_reference>());
+  _CLASS(EventCodeV4_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(EventCodeV4);
+  std_vector_class_(EventCodeV4_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::EventCodeV5", no_init)\
-    .def("code", &EventCodeV5_Wrapper::code)\
-    .def("isReadout", &EventCodeV5_Wrapper::isReadout)\
-    .def("isTerminator", &EventCodeV5_Wrapper::isTerminator)\
-    .def("isLatch", &EventCodeV5_Wrapper::isLatch)\
-    .def("reportDelay", &EventCodeV5_Wrapper::reportDelay)\
-    .def("reportWidth", &EventCodeV5_Wrapper::reportWidth)\
-    .def("maskTrigger", &EventCodeV5_Wrapper::maskTrigger)\
-    .def("maskSet", &EventCodeV5_Wrapper::maskSet)\
-    .def("maskClear", &EventCodeV5_Wrapper::maskClear)\
-    .def("desc", &EventCodeV5_Wrapper::desc)\
-    .def("_sizeof", &EventCodeV5_Wrapper::_sizeof)\
-    .def("desc_shape", &EventCodeV5_Wrapper::desc_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::EventCodeV5", no_init)\
+    .def("code", &n::code)\
+    .def("isReadout", &n::isReadout)\
+    .def("isTerminator", &n::isTerminator)\
+    .def("isLatch", &n::isLatch)\
+    .def("reportDelay", &n::reportDelay)\
+    .def("reportWidth", &n::reportWidth)\
+    .def("maskTrigger", &n::maskTrigger)\
+    .def("maskSet", &n::maskSet)\
+    .def("maskClear", &n::maskClear)\
+    .def("desc", &n::desc)\
+    .def("_sizeof", &n::_sizeof)\
+    .def("desc_shape", &n::desc_shape)\
 
-  _CLASS(EventCodeV5_Wrapper);
-  _CLASS(EventCodeV5);
+  _CLASS(EventCodeV5, return_value_policy<copy_const_reference>());
+  _CLASS(EventCodeV5_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(EventCodeV5);
+  std_vector_class_(EventCodeV5_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::OutputMap", no_init)\
-    .def("value", &OutputMap_Wrapper::value)\
-    .def("source", &OutputMap_Wrapper::source)\
-    .def("source_id", &OutputMap_Wrapper::source_id)\
-    .def("conn", &OutputMap_Wrapper::conn)\
-    .def("conn_id", &OutputMap_Wrapper::conn_id)\
-    .def("_sizeof", &OutputMap_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::OutputMap", no_init)\
+    .def("value", &n::value)\
+    .def("source", &n::source)\
+    .def("source_id", &n::source_id)\
+    .def("conn", &n::conn)\
+    .def("conn_id", &n::conn_id)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(OutputMap_Wrapper);
-  _CLASS(OutputMap);
+  _CLASS(OutputMap, return_value_policy<copy_const_reference>());
+  _CLASS(OutputMap_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(OutputMap);
+  std_vector_class_(OutputMap_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::OutputMapV2", no_init)\
-    .def("value", &OutputMapV2_Wrapper::value)\
-    .def("source", &OutputMapV2_Wrapper::source)\
-    .def("source_id", &OutputMapV2_Wrapper::source_id)\
-    .def("conn", &OutputMapV2_Wrapper::conn)\
-    .def("conn_id", &OutputMapV2_Wrapper::conn_id)\
-    .def("module", &OutputMapV2_Wrapper::module)\
-    .def("_sizeof", &OutputMapV2_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::OutputMapV2", no_init)\
+    .def("value", &n::value)\
+    .def("source", &n::source)\
+    .def("source_id", &n::source_id)\
+    .def("conn", &n::conn)\
+    .def("conn_id", &n::conn_id)\
+    .def("module", &n::module)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(OutputMapV2_Wrapper);
-  _CLASS(OutputMapV2);
+  _CLASS(OutputMapV2, return_value_policy<copy_const_reference>());
+  _CLASS(OutputMapV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(OutputMapV2);
+  std_vector_class_(OutputMapV2_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV1", no_init)\
-    .def("npulses", &ConfigV1_Wrapper::npulses)\
-    .def("noutputs", &ConfigV1_Wrapper::noutputs)\
-    .def("pulses", &ConfigV1_Wrapper::pulses)\
-    .def("output_maps", &ConfigV1_Wrapper::output_maps)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV1", no_init)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV2", no_init)\
-    .def("opcode", &ConfigV2_Wrapper::opcode)\
-    .def("npulses", &ConfigV2_Wrapper::npulses)\
-    .def("noutputs", &ConfigV2_Wrapper::noutputs)\
-    .def("pulses", &ConfigV2_Wrapper::pulses)\
-    .def("output_maps", &ConfigV2_Wrapper::output_maps)\
-    .def("beam", &ConfigV2_Wrapper::beam)\
-    .def("rate", &ConfigV2_Wrapper::rate)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV2", no_init)\
+    .def("opcode", &n::opcode)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
+    .def("beam", &n::beam)\
+    .def("rate", &n::rate)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV3", no_init)\
-    .def("neventcodes", &ConfigV3_Wrapper::neventcodes)\
-    .def("npulses", &ConfigV3_Wrapper::npulses)\
-    .def("noutputs", &ConfigV3_Wrapper::noutputs)\
-    .def("eventcodes", &ConfigV3_Wrapper::eventcodes)\
-    .def("pulses", &ConfigV3_Wrapper::pulses)\
-    .def("output_maps", &ConfigV3_Wrapper::output_maps)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV3", no_init)\
+    .def("neventcodes", &n::neventcodes)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("eventcodes", &n::eventcodes)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
 
-  _CLASS(ConfigV3_Wrapper);
+  _CLASS(ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV3);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV4", no_init)\
-    .def("neventcodes", &ConfigV4_Wrapper::neventcodes)\
-    .def("npulses", &ConfigV4_Wrapper::npulses)\
-    .def("noutputs", &ConfigV4_Wrapper::noutputs)\
-    .def("eventcodes", &ConfigV4_Wrapper::eventcodes)\
-    .def("pulses", &ConfigV4_Wrapper::pulses)\
-    .def("output_maps", &ConfigV4_Wrapper::output_maps)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV4", no_init)\
+    .def("neventcodes", &n::neventcodes)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("eventcodes", &n::eventcodes)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
 
-  _CLASS(ConfigV4_Wrapper);
+  _CLASS(ConfigV4_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV4);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::SequencerEntry", no_init)\
-    .def("delay", &SequencerEntry_Wrapper::delay)\
-    .def("eventcode", &SequencerEntry_Wrapper::eventcode)\
-    .def("_sizeof", &SequencerEntry_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::SequencerEntry", no_init)\
+    .def("delay", &n::delay)\
+    .def("eventcode", &n::eventcode)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(SequencerEntry_Wrapper);
-  _CLASS(SequencerEntry);
+  _CLASS(SequencerEntry, return_value_policy<copy_const_reference>());
+  _CLASS(SequencerEntry_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(SequencerEntry);
+  std_vector_class_(SequencerEntry_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::SequencerConfigV1", no_init)\
-    .def("sync_source", &SequencerConfigV1_Wrapper::sync_source)\
-    .def("beam_source", &SequencerConfigV1_Wrapper::beam_source)\
-    .def("length", &SequencerConfigV1_Wrapper::length)\
-    .def("cycles", &SequencerConfigV1_Wrapper::cycles)\
-    .def("entries", &SequencerConfigV1_Wrapper::entries)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::SequencerConfigV1", no_init)\
+    .def("sync_source", &n::sync_source)\
+    .def("beam_source", &n::beam_source)\
+    .def("length", &n::length)\
+    .def("cycles", &n::cycles)\
+    .def("entries", &n::entries)\
 
-  _CLASS(SequencerConfigV1_Wrapper);
+  _CLASS(SequencerConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(SequencerConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV5", no_init)\
-    .def("neventcodes", &ConfigV5_Wrapper::neventcodes)\
-    .def("npulses", &ConfigV5_Wrapper::npulses)\
-    .def("noutputs", &ConfigV5_Wrapper::noutputs)\
-    .def("eventcodes", &ConfigV5_Wrapper::eventcodes)\
-    .def("pulses", &ConfigV5_Wrapper::pulses)\
-    .def("output_maps", &ConfigV5_Wrapper::output_maps)\
-    .def("seq_config", &ConfigV5_Wrapper::seq_config)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV5", no_init)\
+    .def("neventcodes", &n::neventcodes)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("eventcodes", &n::eventcodes)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
+    .def("seq_config", &n::seq_config, policy)\
 
-  _CLASS(ConfigV5_Wrapper);
+  _CLASS(ConfigV5_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV5_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV5);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::ConfigV6", no_init)\
-    .def("neventcodes", &ConfigV6_Wrapper::neventcodes)\
-    .def("npulses", &ConfigV6_Wrapper::npulses)\
-    .def("noutputs", &ConfigV6_Wrapper::noutputs)\
-    .def("eventcodes", &ConfigV6_Wrapper::eventcodes)\
-    .def("pulses", &ConfigV6_Wrapper::pulses)\
-    .def("output_maps", &ConfigV6_Wrapper::output_maps)\
-    .def("seq_config", &ConfigV6_Wrapper::seq_config)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::ConfigV6", no_init)\
+    .def("neventcodes", &n::neventcodes)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("eventcodes", &n::eventcodes)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
+    .def("seq_config", &n::seq_config, policy)\
 
-  _CLASS(ConfigV6_Wrapper);
+  _CLASS(ConfigV6_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV6_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV6);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::FIFOEvent", no_init)\
-    .def("timestampHigh", &FIFOEvent_Wrapper::timestampHigh)\
-    .def("timestampLow", &FIFOEvent_Wrapper::timestampLow)\
-    .def("eventCode", &FIFOEvent_Wrapper::eventCode)\
-    .def("_sizeof", &FIFOEvent_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::FIFOEvent", no_init)\
+    .def("timestampHigh", &n::timestampHigh)\
+    .def("timestampLow", &n::timestampLow)\
+    .def("eventCode", &n::eventCode)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(FIFOEvent_Wrapper);
-  _CLASS(FIFOEvent);
+  _CLASS(FIFOEvent, return_value_policy<copy_const_reference>());
+  _CLASS(FIFOEvent_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FIFOEvent);
+  std_vector_class_(FIFOEvent_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::DataV3", no_init)\
-    .def("numFifoEvents", &DataV3_Wrapper::numFifoEvents)\
-    .def("fifoEvents", &DataV3_Wrapper::fifoEvents)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::DataV3", no_init)\
+    .def("numFifoEvents", &n::numFifoEvents)\
+    .def("fifoEvents", &n::fifoEvents)\
 
-  _CLASS(DataV3_Wrapper);
+  _CLASS(DataV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV3_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV3);
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::IOChannel", no_init)\
-    .def("name", &IOChannel_Wrapper::name)\
-    .def("ninfo", &IOChannel_Wrapper::ninfo)\
-    .def("infos", &IOChannel_Wrapper::infos)\
-    .def("_sizeof", &IOChannel_Wrapper::_sizeof)\
-    .def("name_shape", &IOChannel_Wrapper::name_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::IOChannel", no_init)\
+    .def("name", &n::name)\
+    .def("ninfo", &n::ninfo)\
+    .def("infos", &n::infos)\
+    .def("_sizeof", &n::_sizeof)\
+    .def("name_shape", &n::name_shape)\
 
-  _CLASS(IOChannel_Wrapper);
-  _CLASS(IOChannel);
+  _CLASS(IOChannel, return_value_policy<copy_const_reference>());
+  _CLASS(IOChannel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(IOChannel);
+  std_vector_class_(IOChannel_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::EvrData::IOConfigV1", no_init)\
-    .def("nchannels", &IOConfigV1_Wrapper::nchannels)\
-    .def("channels", &IOConfigV1_Wrapper::channels)\
-    .def("conn", &IOConfigV1_Wrapper::conn)\
+#define _CLASS(n, policy) class_<n>("Psana::EvrData::IOConfigV1", no_init)\
+    .def("nchannels", &n::nchannels)\
+    .def("channels", &n::channels)\
+    .def("conn", &n::conn)\
 
-  _CLASS(IOConfigV1_Wrapper);
+  _CLASS(IOConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(IOConfigV1_Wrapper);
 #undef _CLASS
 
 }

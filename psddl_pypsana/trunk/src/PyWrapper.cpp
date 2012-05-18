@@ -1,3 +1,5 @@
+#define AAA 1
+
 #include <psddl_pypsana/PyWrapper.h>
 #include "MsgLogger/MsgLogger.h"
 #include "PSEnv/Env.h"
@@ -93,7 +95,7 @@ namespace Psana {
       return object(none);
     }
 
-    list<EventKey> keys(const Source& source = Source()) const { return _store.keys(); }
+    std::list<EventKey> keys(const Source& source = Source()) const { return _store.keys(); }
   };
 
   class EnvWrapper {
@@ -153,15 +155,24 @@ namespace Psana {
     _import_array();
     array::set_module_and_type("numpy", "ndarray");
 
-#define class_std_vector(T) class_<vector<T> >("std_vector_" #T, no_init)\
+#if 0
+
+#define std_vector_class_(T) class_<vector<T> >("std_vector_" #T, no_init)\
     .def(vector_indexing_suite<vector<T> >())\
     .def("size", &vector<T>::size)
 
-    class_std_vector(int);
-    class_std_vector(short);
-    class_std_vector(unsigned);
-    class_std_vector(unsigned short);
+      class_<std::vector<X> >("XVec")
+        .def(vector_indexing_suite<std::vector<X> >())
+        ;
+
+    //    std_vector_class_(FOO*);
 #undef class_std_vector
+#endif
+
+    std_vector_class_(int);
+    std_vector_class_(short);
+    std_vector_class_(unsigned);
+    std_vector_class_(unsigned short);
 
     class_<EnvObjectStore::GetResultProxy>("PSEnv::EnvObjectStore::GetResultProxy", no_init)
       ;
@@ -206,44 +217,45 @@ namespace Psana {
   map<string, EvtGetter*> eventGetter_map;
   map<string, EnvGetter*> environmentGetter_map;
 
-  PyObject* ndConvert(void* data, const unsigned* shape, const unsigned ndim, char *_ctype) {
-    _import_array();
-    array::set_module_and_type("numpy", "ndarray");
+  PyObject* ndConvert(void* data, const unsigned* shape, const unsigned ndim, char *_ctype, size_t eltsize) {
+    _import_array(); // XXX already done above
+    array::set_module_and_type("numpy", "ndarray"); // XXX already done above
 
+    npy_intp dims[ndim];
+    int count = 1;
+    for (unsigned int i = 0; i < ndim; i++) {
+      count *= (dims[i] = shape[i]);
+    }
+
+    PyArray_Descr* descr = NULL;
     string ctype(_ctype);
-    int ptype;
-
-    if (ctype.find("::") != string::npos) {
+    if (ctype == "int8_t") {
+      descr = PyArray_DescrFromType(PyArray_BYTE);
+    } else if (ctype == "uint8_t") {
+      descr = PyArray_DescrFromType(PyArray_UBYTE);
+    } else if (ctype == "int16_t") {
+      descr = PyArray_DescrFromType(PyArray_SHORT);
+    } else if (ctype == "uint16_t") {
+      descr = PyArray_DescrFromType(PyArray_USHORT);
+    } else if (ctype == "int32_t") {
+      descr = PyArray_DescrFromType(PyArray_INT);
+    } else if (ctype == "uint32_t") {
+      descr = PyArray_DescrFromType(PyArray_UINT);
+    } else if (ctype == "float") {
+      descr = PyArray_DescrFromType(PyArray_CFLOAT);
+    } else if (ctype == "double") {
+      descr = PyArray_DescrFromType(PyArray_CDOUBLE);
+    } else {
       printf("!!!!!!!!! ndConvert(%s):%d\n", _ctype, __LINE__);
       printf("!!!!!!!!! ndConvert(%s):%d: pointer=%p\n", _ctype, __LINE__, data);
       printf("!!!!!!!!! ndConvert(%s):%d: data=0x%x\n", _ctype, __LINE__, *(char *)data);
-      ptype = PyArray_OBJECT;
-    } else if (ctype == "int8_t") {
-      ptype = PyArray_BYTE;
-    } else if (ctype == "uint8_t") {
-      ptype = PyArray_UBYTE;
-    } else if (ctype == "int16_t") {
-      ptype = PyArray_SHORT;
-    } else if (ctype == "uint16_t") {
-      ptype = PyArray_USHORT;
-    } else if (ctype == "int32_t") {
-      ptype = PyArray_INT;
-    } else if (ctype == "uint32_t") {
-      ptype = PyArray_UINT;
-    } else if (ctype == "float") {
-      ptype = PyArray_CFLOAT;
-    } else if (ctype == "double") {
-      ptype = PyArray_CDOUBLE;
-    } else {
-      printf("Cannot convert ctype %s to PyArray type\n", ctype.c_str());
-      exit(1);
-    }
+      printf("!!!!!!!!! ndConvert(%s):%d: eltsize=%d\n", _ctype, __LINE__, (int) eltsize);
+      printf("Cannot convert ctype %s to PyArray type; will approximate with bytes\n", ctype.c_str());
 
-    npy_intp dims[ndim];
-    for (unsigned int i = 0; i < ndim; i++) {
-      dims[i] = shape[i];
+      descr = PyArray_DescrFromType(PyArray_BYTE);
     }
-    PyObject* result = PyArray_SimpleNewFromData(ndim, dims, ptype, data);
+    PyObject* result = PyArray_NewFromDescr(&PyArray_Type, descr, ndim, dims, NULL, data, 0, NULL);
+      //PyObject* result = PyArray_SimpleNewFromData(ndim, dims, ptype, data);
     return result;
   }
 
@@ -256,7 +268,6 @@ namespace Psana {
     PyObjPtr args(PyTuple_New(2), PyRefDelete());
     PyTuple_SET_ITEM(args.get(), 0, evtWrapper.ptr());
     PyTuple_SET_ITEM(args.get(), 1, envWrapper.ptr());
-
     PyObjPtr res(PyObject_Call(method, args.get(), NULL), PyRefDelete());
     return res;
   }

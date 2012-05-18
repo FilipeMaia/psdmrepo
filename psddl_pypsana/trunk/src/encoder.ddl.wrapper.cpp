@@ -10,46 +10,50 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Encoder::ConfigV1", no_init)\
-    .def("chan_num", &ConfigV1_Wrapper::chan_num)\
-    .def("count_mode", &ConfigV1_Wrapper::count_mode)\
-    .def("quadrature_mode", &ConfigV1_Wrapper::quadrature_mode)\
-    .def("input_num", &ConfigV1_Wrapper::input_num)\
-    .def("input_rising", &ConfigV1_Wrapper::input_rising)\
-    .def("ticks_per_sec", &ConfigV1_Wrapper::ticks_per_sec)\
+#define _CLASS(n, policy) class_<n>("Psana::Encoder::ConfigV1", no_init)\
+    .def("chan_num", &n::chan_num)\
+    .def("count_mode", &n::count_mode)\
+    .def("quadrature_mode", &n::quadrature_mode)\
+    .def("input_num", &n::input_num)\
+    .def("input_rising", &n::input_rising)\
+    .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Encoder::ConfigV2", no_init)\
-    .def("chan_mask", &ConfigV2_Wrapper::chan_mask)\
-    .def("count_mode", &ConfigV2_Wrapper::count_mode)\
-    .def("quadrature_mode", &ConfigV2_Wrapper::quadrature_mode)\
-    .def("input_num", &ConfigV2_Wrapper::input_num)\
-    .def("input_rising", &ConfigV2_Wrapper::input_rising)\
-    .def("ticks_per_sec", &ConfigV2_Wrapper::ticks_per_sec)\
+#define _CLASS(n, policy) class_<n>("Psana::Encoder::ConfigV2", no_init)\
+    .def("chan_mask", &n::chan_mask)\
+    .def("count_mode", &n::count_mode)\
+    .def("quadrature_mode", &n::quadrature_mode)\
+    .def("input_num", &n::input_num)\
+    .def("input_rising", &n::input_rising)\
+    .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::Encoder::DataV1", no_init)\
-    .def("timestamp", &DataV1_Wrapper::timestamp)\
-    .def("encoder_count", &DataV1_Wrapper::encoder_count)\
+#define _CLASS(n, policy) class_<n>("Psana::Encoder::DataV1", no_init)\
+    .def("timestamp", &n::timestamp)\
+    .def("encoder_count", &n::encoder_count)\
 
-  _CLASS(DataV1_Wrapper);
+  _CLASS(DataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Encoder::DataV2", no_init)\
-    .def("timestamp", &DataV2_Wrapper::timestamp)\
-    .def("encoder_count", &DataV2_Wrapper::encoder_count)\
+#define _CLASS(n, policy) class_<n>("Psana::Encoder::DataV2", no_init)\
+    .def("timestamp", &n::timestamp)\
+    .def("encoder_count", &n::encoder_count)\
 
-  _CLASS(DataV2_Wrapper);
+  _CLASS(DataV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV2);
 

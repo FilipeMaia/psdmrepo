@@ -10,89 +10,95 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Princeton::ConfigV1", no_init)\
-    .def("width", &ConfigV1_Wrapper::width)\
-    .def("height", &ConfigV1_Wrapper::height)\
-    .def("orgX", &ConfigV1_Wrapper::orgX)\
-    .def("orgY", &ConfigV1_Wrapper::orgY)\
-    .def("binX", &ConfigV1_Wrapper::binX)\
-    .def("binY", &ConfigV1_Wrapper::binY)\
-    .def("exposureTime", &ConfigV1_Wrapper::exposureTime)\
-    .def("coolingTemp", &ConfigV1_Wrapper::coolingTemp)\
-    .def("readoutSpeedIndex", &ConfigV1_Wrapper::readoutSpeedIndex)\
-    .def("readoutEventCode", &ConfigV1_Wrapper::readoutEventCode)\
-    .def("delayMode", &ConfigV1_Wrapper::delayMode)\
-    .def("frameSize", &ConfigV1_Wrapper::frameSize)\
-    .def("numPixelsX", &ConfigV1_Wrapper::numPixelsX)\
-    .def("numPixelsY", &ConfigV1_Wrapper::numPixelsY)\
-    .def("numPixels", &ConfigV1_Wrapper::numPixels)\
+#define _CLASS(n, policy) class_<n>("Psana::Princeton::ConfigV1", no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("orgX", &n::orgX)\
+    .def("orgY", &n::orgY)\
+    .def("binX", &n::binX)\
+    .def("binY", &n::binY)\
+    .def("exposureTime", &n::exposureTime)\
+    .def("coolingTemp", &n::coolingTemp)\
+    .def("readoutSpeedIndex", &n::readoutSpeedIndex)\
+    .def("readoutEventCode", &n::readoutEventCode)\
+    .def("delayMode", &n::delayMode)\
+    .def("frameSize", &n::frameSize)\
+    .def("numPixelsX", &n::numPixelsX)\
+    .def("numPixelsY", &n::numPixelsY)\
+    .def("numPixels", &n::numPixels)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Princeton::ConfigV2", no_init)\
-    .def("width", &ConfigV2_Wrapper::width)\
-    .def("height", &ConfigV2_Wrapper::height)\
-    .def("orgX", &ConfigV2_Wrapper::orgX)\
-    .def("orgY", &ConfigV2_Wrapper::orgY)\
-    .def("binX", &ConfigV2_Wrapper::binX)\
-    .def("binY", &ConfigV2_Wrapper::binY)\
-    .def("exposureTime", &ConfigV2_Wrapper::exposureTime)\
-    .def("coolingTemp", &ConfigV2_Wrapper::coolingTemp)\
-    .def("gainIndex", &ConfigV2_Wrapper::gainIndex)\
-    .def("readoutSpeedIndex", &ConfigV2_Wrapper::readoutSpeedIndex)\
-    .def("readoutEventCode", &ConfigV2_Wrapper::readoutEventCode)\
-    .def("delayMode", &ConfigV2_Wrapper::delayMode)\
-    .def("frameSize", &ConfigV2_Wrapper::frameSize)\
-    .def("numPixelsX", &ConfigV2_Wrapper::numPixelsX)\
-    .def("numPixelsY", &ConfigV2_Wrapper::numPixelsY)\
-    .def("numPixels", &ConfigV2_Wrapper::numPixels)\
+#define _CLASS(n, policy) class_<n>("Psana::Princeton::ConfigV2", no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("orgX", &n::orgX)\
+    .def("orgY", &n::orgY)\
+    .def("binX", &n::binX)\
+    .def("binY", &n::binY)\
+    .def("exposureTime", &n::exposureTime)\
+    .def("coolingTemp", &n::coolingTemp)\
+    .def("gainIndex", &n::gainIndex)\
+    .def("readoutSpeedIndex", &n::readoutSpeedIndex)\
+    .def("readoutEventCode", &n::readoutEventCode)\
+    .def("delayMode", &n::delayMode)\
+    .def("frameSize", &n::frameSize)\
+    .def("numPixelsX", &n::numPixelsX)\
+    .def("numPixelsY", &n::numPixelsY)\
+    .def("numPixels", &n::numPixels)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::Princeton::ConfigV3", no_init)\
-    .def("width", &ConfigV3_Wrapper::width)\
-    .def("height", &ConfigV3_Wrapper::height)\
-    .def("orgX", &ConfigV3_Wrapper::orgX)\
-    .def("orgY", &ConfigV3_Wrapper::orgY)\
-    .def("binX", &ConfigV3_Wrapper::binX)\
-    .def("binY", &ConfigV3_Wrapper::binY)\
-    .def("exposureTime", &ConfigV3_Wrapper::exposureTime)\
-    .def("coolingTemp", &ConfigV3_Wrapper::coolingTemp)\
-    .def("gainIndex", &ConfigV3_Wrapper::gainIndex)\
-    .def("readoutSpeedIndex", &ConfigV3_Wrapper::readoutSpeedIndex)\
-    .def("exposureEventCode", &ConfigV3_Wrapper::exposureEventCode)\
-    .def("numDelayShots", &ConfigV3_Wrapper::numDelayShots)\
-    .def("frameSize", &ConfigV3_Wrapper::frameSize)\
-    .def("numPixelsX", &ConfigV3_Wrapper::numPixelsX)\
-    .def("numPixelsY", &ConfigV3_Wrapper::numPixelsY)\
-    .def("numPixels", &ConfigV3_Wrapper::numPixels)\
+#define _CLASS(n, policy) class_<n>("Psana::Princeton::ConfigV3", no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("orgX", &n::orgX)\
+    .def("orgY", &n::orgY)\
+    .def("binX", &n::binX)\
+    .def("binY", &n::binY)\
+    .def("exposureTime", &n::exposureTime)\
+    .def("coolingTemp", &n::coolingTemp)\
+    .def("gainIndex", &n::gainIndex)\
+    .def("readoutSpeedIndex", &n::readoutSpeedIndex)\
+    .def("exposureEventCode", &n::exposureEventCode)\
+    .def("numDelayShots", &n::numDelayShots)\
+    .def("frameSize", &n::frameSize)\
+    .def("numPixelsX", &n::numPixelsX)\
+    .def("numPixelsY", &n::numPixelsY)\
+    .def("numPixels", &n::numPixels)\
 
-  _CLASS(ConfigV3_Wrapper);
+  _CLASS(ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV3);
 
 
-#define _CLASS(n) class_<n>("Psana::Princeton::FrameV1", no_init)\
-    .def("shotIdStart", &FrameV1_Wrapper::shotIdStart)\
-    .def("readoutTime", &FrameV1_Wrapper::readoutTime)\
-    .def("data", &FrameV1_Wrapper::data)\
+#define _CLASS(n, policy) class_<n>("Psana::Princeton::FrameV1", no_init)\
+    .def("shotIdStart", &n::shotIdStart)\
+    .def("readoutTime", &n::readoutTime)\
+    .def("data", &n::data)\
 
-  _CLASS(FrameV1_Wrapper);
+  _CLASS(FrameV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Princeton::InfoV1", no_init)\
-    .def("temperature", &InfoV1_Wrapper::temperature)\
-    .def("_sizeof", &InfoV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Princeton::InfoV1", no_init)\
+    .def("temperature", &n::temperature)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(InfoV1_Wrapper);
-  _CLASS(InfoV1);
+  _CLASS(InfoV1, return_value_policy<copy_const_reference>());
+  _CLASS(InfoV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(InfoV1);
+  std_vector_class_(InfoV1_Wrapper);
 #undef _CLASS
 
 }

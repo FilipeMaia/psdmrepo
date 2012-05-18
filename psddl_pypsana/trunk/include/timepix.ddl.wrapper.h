@@ -37,6 +37,7 @@ public:
   };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV1::TriggerMode triggerMode() const { return o->triggerMode(); }
   int32_t shutterTimeout() const { return o->shutterTimeout(); }
@@ -124,6 +125,7 @@ public:
   };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
+  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV2::TriggerMode triggerMode() const { return o->triggerMode(); }
   int32_t timepixSpeed() const { return o->timepixSpeed(); }
@@ -186,7 +188,7 @@ public:
   int32_t driverVersion() const { return o->driverVersion(); }
   uint32_t firmwareVersion() const { return o->firmwareVersion(); }
   uint32_t pixelThreshSize() const { return o->pixelThreshSize(); }
-  PyObject* pixelThresh() const { ND_CONVERT(o->pixelThresh(), uint8_t, 1); }
+  std::vector<uint8_t> pixelThresh() const { VEC_CONVERT(o->pixelThresh(), uint8_t); }
   const char* chip0Name() const { return o->chip0Name(); }
   const char* chip1Name() const { return o->chip1Name(); }
   const char* chip2Name() const { return o->chip2Name(); }
@@ -217,6 +219,7 @@ public:
   enum { MaxPixelValue = 11810 };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
+  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
   uint32_t timestamp() const { return o->timestamp(); }
   uint16_t frameCounter() const { return o->frameCounter(); }
   uint16_t lostRows() const { return o->lostRows(); }
@@ -243,6 +246,7 @@ public:
   enum { MaxPixelValue = 11810 };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
+  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
   uint16_t width() const { return o->width(); }
   uint16_t height() const { return o->height(); }
   uint32_t timestamp() const { return o->timestamp(); }

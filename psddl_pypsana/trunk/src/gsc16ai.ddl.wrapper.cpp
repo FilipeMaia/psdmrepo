@@ -10,28 +10,30 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Gsc16ai::ConfigV1", no_init)\
-    .def("voltageRange", &ConfigV1_Wrapper::voltageRange)\
-    .def("firstChan", &ConfigV1_Wrapper::firstChan)\
-    .def("lastChan", &ConfigV1_Wrapper::lastChan)\
-    .def("inputMode", &ConfigV1_Wrapper::inputMode)\
-    .def("triggerMode", &ConfigV1_Wrapper::triggerMode)\
-    .def("dataFormat", &ConfigV1_Wrapper::dataFormat)\
-    .def("fps", &ConfigV1_Wrapper::fps)\
-    .def("autocalibEnable", &ConfigV1_Wrapper::autocalibEnable)\
-    .def("timeTagEnable", &ConfigV1_Wrapper::timeTagEnable)\
-    .def("numChannels", &ConfigV1_Wrapper::numChannels)\
+#define _CLASS(n, policy) class_<n>("Psana::Gsc16ai::ConfigV1", no_init)\
+    .def("voltageRange", &n::voltageRange)\
+    .def("firstChan", &n::firstChan)\
+    .def("lastChan", &n::lastChan)\
+    .def("inputMode", &n::inputMode)\
+    .def("triggerMode", &n::triggerMode)\
+    .def("dataFormat", &n::dataFormat)\
+    .def("fps", &n::fps)\
+    .def("autocalibEnable", &n::autocalibEnable)\
+    .def("timeTagEnable", &n::timeTagEnable)\
+    .def("numChannels", &n::numChannels)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Gsc16ai::DataV1", no_init)\
-    .def("timestamp", &DataV1_Wrapper::timestamp)\
-    .def("channelValue", &DataV1_Wrapper::channelValue)\
+#define _CLASS(n, policy) class_<n>("Psana::Gsc16ai::DataV1", no_init)\
+    .def("timestamp", &n::timestamp)\
+    .def("channelValue", &n::channelValue)\
 
-  _CLASS(DataV1_Wrapper);
+  _CLASS(DataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV1);
 

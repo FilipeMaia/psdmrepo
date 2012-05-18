@@ -10,94 +10,98 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Ipimb::ConfigV1", no_init)\
-    .def("triggerCounter", &ConfigV1_Wrapper::triggerCounter)\
-    .def("serialID", &ConfigV1_Wrapper::serialID)\
-    .def("chargeAmpRange", &ConfigV1_Wrapper::chargeAmpRange)\
-    .def("calibrationRange", &ConfigV1_Wrapper::calibrationRange)\
-    .def("resetLength", &ConfigV1_Wrapper::resetLength)\
-    .def("resetDelay", &ConfigV1_Wrapper::resetDelay)\
-    .def("chargeAmpRefVoltage", &ConfigV1_Wrapper::chargeAmpRefVoltage)\
-    .def("calibrationVoltage", &ConfigV1_Wrapper::calibrationVoltage)\
-    .def("diodeBias", &ConfigV1_Wrapper::diodeBias)\
-    .def("status", &ConfigV1_Wrapper::status)\
-    .def("errors", &ConfigV1_Wrapper::errors)\
-    .def("calStrobeLength", &ConfigV1_Wrapper::calStrobeLength)\
-    .def("trigDelay", &ConfigV1_Wrapper::trigDelay)\
-    .def("diodeGain", &ConfigV1_Wrapper::diodeGain)\
+#define _CLASS(n, policy) class_<n>("Psana::Ipimb::ConfigV1", no_init)\
+    .def("triggerCounter", &n::triggerCounter)\
+    .def("serialID", &n::serialID)\
+    .def("chargeAmpRange", &n::chargeAmpRange)\
+    .def("calibrationRange", &n::calibrationRange)\
+    .def("resetLength", &n::resetLength)\
+    .def("resetDelay", &n::resetDelay)\
+    .def("chargeAmpRefVoltage", &n::chargeAmpRefVoltage)\
+    .def("calibrationVoltage", &n::calibrationVoltage)\
+    .def("diodeBias", &n::diodeBias)\
+    .def("status", &n::status)\
+    .def("errors", &n::errors)\
+    .def("calStrobeLength", &n::calStrobeLength)\
+    .def("trigDelay", &n::trigDelay)\
+    .def("diodeGain", &n::diodeGain)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Ipimb::ConfigV2", no_init)\
-    .def("triggerCounter", &ConfigV2_Wrapper::triggerCounter)\
-    .def("serialID", &ConfigV2_Wrapper::serialID)\
-    .def("chargeAmpRange", &ConfigV2_Wrapper::chargeAmpRange)\
-    .def("calibrationRange", &ConfigV2_Wrapper::calibrationRange)\
-    .def("resetLength", &ConfigV2_Wrapper::resetLength)\
-    .def("resetDelay", &ConfigV2_Wrapper::resetDelay)\
-    .def("chargeAmpRefVoltage", &ConfigV2_Wrapper::chargeAmpRefVoltage)\
-    .def("calibrationVoltage", &ConfigV2_Wrapper::calibrationVoltage)\
-    .def("diodeBias", &ConfigV2_Wrapper::diodeBias)\
-    .def("status", &ConfigV2_Wrapper::status)\
-    .def("errors", &ConfigV2_Wrapper::errors)\
-    .def("calStrobeLength", &ConfigV2_Wrapper::calStrobeLength)\
-    .def("trigDelay", &ConfigV2_Wrapper::trigDelay)\
-    .def("trigPsDelay", &ConfigV2_Wrapper::trigPsDelay)\
-    .def("adcDelay", &ConfigV2_Wrapper::adcDelay)\
-    .def("diodeGain", &ConfigV2_Wrapper::diodeGain)\
+#define _CLASS(n, policy) class_<n>("Psana::Ipimb::ConfigV2", no_init)\
+    .def("triggerCounter", &n::triggerCounter)\
+    .def("serialID", &n::serialID)\
+    .def("chargeAmpRange", &n::chargeAmpRange)\
+    .def("calibrationRange", &n::calibrationRange)\
+    .def("resetLength", &n::resetLength)\
+    .def("resetDelay", &n::resetDelay)\
+    .def("chargeAmpRefVoltage", &n::chargeAmpRefVoltage)\
+    .def("calibrationVoltage", &n::calibrationVoltage)\
+    .def("diodeBias", &n::diodeBias)\
+    .def("status", &n::status)\
+    .def("errors", &n::errors)\
+    .def("calStrobeLength", &n::calStrobeLength)\
+    .def("trigDelay", &n::trigDelay)\
+    .def("trigPsDelay", &n::trigPsDelay)\
+    .def("adcDelay", &n::adcDelay)\
+    .def("diodeGain", &n::diodeGain)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::Ipimb::DataV1", no_init)\
-    .def("triggerCounter", &DataV1_Wrapper::triggerCounter)\
-    .def("config0", &DataV1_Wrapper::config0)\
-    .def("config1", &DataV1_Wrapper::config1)\
-    .def("config2", &DataV1_Wrapper::config2)\
-    .def("channel0", &DataV1_Wrapper::channel0)\
-    .def("channel1", &DataV1_Wrapper::channel1)\
-    .def("channel2", &DataV1_Wrapper::channel2)\
-    .def("channel3", &DataV1_Wrapper::channel3)\
-    .def("checksum", &DataV1_Wrapper::checksum)\
-    .def("channel0Volts", &DataV1_Wrapper::channel0Volts)\
-    .def("channel1Volts", &DataV1_Wrapper::channel1Volts)\
-    .def("channel2Volts", &DataV1_Wrapper::channel2Volts)\
-    .def("channel3Volts", &DataV1_Wrapper::channel3Volts)\
+#define _CLASS(n, policy) class_<n>("Psana::Ipimb::DataV1", no_init)\
+    .def("triggerCounter", &n::triggerCounter)\
+    .def("config0", &n::config0)\
+    .def("config1", &n::config1)\
+    .def("config2", &n::config2)\
+    .def("channel0", &n::channel0)\
+    .def("channel1", &n::channel1)\
+    .def("channel2", &n::channel2)\
+    .def("channel3", &n::channel3)\
+    .def("checksum", &n::checksum)\
+    .def("channel0Volts", &n::channel0Volts)\
+    .def("channel1Volts", &n::channel1Volts)\
+    .def("channel2Volts", &n::channel2Volts)\
+    .def("channel3Volts", &n::channel3Volts)\
 
-  _CLASS(DataV1_Wrapper);
+  _CLASS(DataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Ipimb::DataV2", no_init)\
-    .def("triggerCounter", &DataV2_Wrapper::triggerCounter)\
-    .def("config0", &DataV2_Wrapper::config0)\
-    .def("config1", &DataV2_Wrapper::config1)\
-    .def("config2", &DataV2_Wrapper::config2)\
-    .def("channel0", &DataV2_Wrapper::channel0)\
-    .def("channel1", &DataV2_Wrapper::channel1)\
-    .def("channel2", &DataV2_Wrapper::channel2)\
-    .def("channel3", &DataV2_Wrapper::channel3)\
-    .def("channel0ps", &DataV2_Wrapper::channel0ps)\
-    .def("channel1ps", &DataV2_Wrapper::channel1ps)\
-    .def("channel2ps", &DataV2_Wrapper::channel2ps)\
-    .def("channel3ps", &DataV2_Wrapper::channel3ps)\
-    .def("checksum", &DataV2_Wrapper::checksum)\
-    .def("channel0Volts", &DataV2_Wrapper::channel0Volts)\
-    .def("channel1Volts", &DataV2_Wrapper::channel1Volts)\
-    .def("channel2Volts", &DataV2_Wrapper::channel2Volts)\
-    .def("channel3Volts", &DataV2_Wrapper::channel3Volts)\
-    .def("channel0psVolts", &DataV2_Wrapper::channel0psVolts)\
-    .def("channel1psVolts", &DataV2_Wrapper::channel1psVolts)\
-    .def("channel2psVolts", &DataV2_Wrapper::channel2psVolts)\
-    .def("channel3psVolts", &DataV2_Wrapper::channel3psVolts)\
+#define _CLASS(n, policy) class_<n>("Psana::Ipimb::DataV2", no_init)\
+    .def("triggerCounter", &n::triggerCounter)\
+    .def("config0", &n::config0)\
+    .def("config1", &n::config1)\
+    .def("config2", &n::config2)\
+    .def("channel0", &n::channel0)\
+    .def("channel1", &n::channel1)\
+    .def("channel2", &n::channel2)\
+    .def("channel3", &n::channel3)\
+    .def("channel0ps", &n::channel0ps)\
+    .def("channel1ps", &n::channel1ps)\
+    .def("channel2ps", &n::channel2ps)\
+    .def("channel3ps", &n::channel3ps)\
+    .def("checksum", &n::checksum)\
+    .def("channel0Volts", &n::channel0Volts)\
+    .def("channel1Volts", &n::channel1Volts)\
+    .def("channel2Volts", &n::channel2Volts)\
+    .def("channel3Volts", &n::channel3Volts)\
+    .def("channel0psVolts", &n::channel0psVolts)\
+    .def("channel1psVolts", &n::channel1psVolts)\
+    .def("channel2psVolts", &n::channel2psVolts)\
+    .def("channel3psVolts", &n::channel3psVolts)\
 
-  _CLASS(DataV2_Wrapper);
+  _CLASS(DataV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV2);
 

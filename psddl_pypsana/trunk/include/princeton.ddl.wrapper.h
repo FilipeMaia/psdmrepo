@@ -27,6 +27,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t orgX() const { return o->orgX(); }
@@ -58,6 +59,7 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
+  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t orgX() const { return o->orgX(); }
@@ -90,6 +92,7 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
+  bool operator==(const ConfigV3_Wrapper &t) const { return this == &t; }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t orgX() const { return o->orgX(); }
@@ -125,6 +128,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   FrameV1_Wrapper(boost::shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
   FrameV1_Wrapper(FrameV1* obj) : o(obj) {}
+  bool operator==(const FrameV1_Wrapper &t) const { return this == &t; }
   uint32_t shotIdStart() const { return o->shotIdStart(); }
   float readoutTime() const { return o->readoutTime(); }
   PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
@@ -144,6 +148,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   InfoV1_Wrapper(boost::shared_ptr<InfoV1> obj) : _o(obj), o(_o.get()) {}
   InfoV1_Wrapper(InfoV1* obj) : o(obj) {}
+  bool operator==(const InfoV1_Wrapper &t) const { return this == &t; }
   float temperature() const { return o->temperature(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 private:

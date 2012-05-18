@@ -25,6 +25,7 @@ class FrameCoord_Wrapper {
 public:
   FrameCoord_Wrapper(boost::shared_ptr<FrameCoord> obj) : _o(obj), o(_o.get()) {}
   FrameCoord_Wrapper(FrameCoord* obj) : o(obj) {}
+  bool operator==(const FrameCoord_Wrapper &t) const { return this == &t; }
   uint16_t column() const { return o->column(); }
   uint16_t row() const { return o->row(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -47,6 +48,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   FrameFccdConfigV1_Wrapper(boost::shared_ptr<FrameFccdConfigV1> obj) : _o(obj), o(_o.get()) {}
   FrameFccdConfigV1_Wrapper(FrameFccdConfigV1* obj) : o(obj) {}
+  bool operator==(const FrameFccdConfigV1_Wrapper &t) const { return this == &t; }
 };
 
 /** @class FrameFexConfigV1
@@ -74,14 +76,15 @@ public:
   };
   FrameFexConfigV1_Wrapper(boost::shared_ptr<FrameFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   FrameFexConfigV1_Wrapper(FrameFexConfigV1* obj) : o(obj) {}
+  bool operator==(const FrameFexConfigV1_Wrapper &t) const { return this == &t; }
   Camera::FrameFexConfigV1::Forwarding forwarding() const { return o->forwarding(); }
   uint32_t forward_prescale() const { return o->forward_prescale(); }
   Camera::FrameFexConfigV1::Processing processing() const { return o->processing(); }
-  FrameCoord_Wrapper roiBegin() const { return FrameCoord_Wrapper((FrameCoord*) &o->roiBegin()); } // copy_const_reference
-  FrameCoord_Wrapper roiEnd() const { return FrameCoord_Wrapper((FrameCoord*) &o->roiEnd()); } // copy_const_reference
+  const FrameCoord_Wrapper roiBegin() const { return FrameCoord_Wrapper((FrameCoord*) &o->roiBegin()); }
+  const FrameCoord_Wrapper roiEnd() const { return FrameCoord_Wrapper((FrameCoord*) &o->roiEnd()); }
   uint32_t threshold() const { return o->threshold(); }
   uint32_t number_of_masked_pixels() const { return o->number_of_masked_pixels(); }
-  PyObject* masked_pixel_coordinates() const { ND_CONVERT(o->masked_pixel_coordinates(), Camera::FrameCoord, 1); }
+  std::vector<Camera::FrameCoord> masked_pixel_coordinates() const { VEC_CONVERT(o->masked_pixel_coordinates(), Camera::FrameCoord); }
 };
 
 /** @class FrameV1
@@ -98,11 +101,12 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   FrameV1_Wrapper(boost::shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
   FrameV1_Wrapper(FrameV1* obj) : o(obj) {}
+  bool operator==(const FrameV1_Wrapper &t) const { return this == &t; }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t depth() const { return o->depth(); }
   uint32_t offset() const { return o->offset(); }
-  PyObject* _int_pixel_data() const { ND_CONVERT(o->_int_pixel_data(), uint8_t, 1); }
+  std::vector<uint8_t> _int_pixel_data() const { VEC_CONVERT(o->_int_pixel_data(), uint8_t); }
   PyObject* data8() const { ND_CONVERT(o->data8(), uint8_t, 2); }
   PyObject* data16() const { ND_CONVERT(o->data16(), uint16_t, 2); }
 };
@@ -121,6 +125,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   TwoDGaussianV1_Wrapper(boost::shared_ptr<TwoDGaussianV1> obj) : _o(obj), o(_o.get()) {}
   TwoDGaussianV1_Wrapper(TwoDGaussianV1* obj) : o(obj) {}
+  bool operator==(const TwoDGaussianV1_Wrapper &t) const { return this == &t; }
   uint64_t integral() const { return o->integral(); }
   double xmean() const { return o->xmean(); }
   double ymean() const { return o->ymean(); }

@@ -10,58 +10,64 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Camera::FrameCoord", no_init)\
-    .def("column", &FrameCoord_Wrapper::column)\
-    .def("row", &FrameCoord_Wrapper::row)\
-    .def("_sizeof", &FrameCoord_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameCoord", no_init)\
+    .def("column", &n::column)\
+    .def("row", &n::row)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(FrameCoord_Wrapper);
-  _CLASS(FrameCoord);
+  _CLASS(FrameCoord, return_value_policy<copy_const_reference>());
+  _CLASS(FrameCoord_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameCoord);
+  std_vector_class_(FrameCoord_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Camera::FrameFccdConfigV1", no_init)\
+#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameFccdConfigV1", no_init)\
 
-  _CLASS(FrameFccdConfigV1_Wrapper);
+  _CLASS(FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameFccdConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Camera::FrameFexConfigV1", no_init)\
-    .def("forwarding", &FrameFexConfigV1_Wrapper::forwarding)\
-    .def("forward_prescale", &FrameFexConfigV1_Wrapper::forward_prescale)\
-    .def("processing", &FrameFexConfigV1_Wrapper::processing)\
-    .def("roiBegin", &FrameFexConfigV1_Wrapper::roiBegin)\
-    .def("roiEnd", &FrameFexConfigV1_Wrapper::roiEnd)\
-    .def("threshold", &FrameFexConfigV1_Wrapper::threshold)\
-    .def("number_of_masked_pixels", &FrameFexConfigV1_Wrapper::number_of_masked_pixels)\
-    .def("masked_pixel_coordinates", &FrameFexConfigV1_Wrapper::masked_pixel_coordinates)\
+#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameFexConfigV1", no_init)\
+    .def("forwarding", &n::forwarding)\
+    .def("forward_prescale", &n::forward_prescale)\
+    .def("processing", &n::processing)\
+    .def("roiBegin", &n::roiBegin, policy)\
+    .def("roiEnd", &n::roiEnd, policy)\
+    .def("threshold", &n::threshold)\
+    .def("number_of_masked_pixels", &n::number_of_masked_pixels)\
+    .def("masked_pixel_coordinates", &n::masked_pixel_coordinates)\
 
-  _CLASS(FrameFexConfigV1_Wrapper);
+  _CLASS(FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameFexConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Camera::FrameV1", no_init)\
-    .def("width", &FrameV1_Wrapper::width)\
-    .def("height", &FrameV1_Wrapper::height)\
-    .def("depth", &FrameV1_Wrapper::depth)\
-    .def("offset", &FrameV1_Wrapper::offset)\
-    .def("_int_pixel_data", &FrameV1_Wrapper::_int_pixel_data)\
-    .def("data8", &FrameV1_Wrapper::data8)\
-    .def("data16", &FrameV1_Wrapper::data16)\
+#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameV1", no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("depth", &n::depth)\
+    .def("offset", &n::offset)\
+    .def("_int_pixel_data", &n::_int_pixel_data)\
+    .def("data8", &n::data8)\
+    .def("data16", &n::data16)\
 
-  _CLASS(FrameV1_Wrapper);
+  _CLASS(FrameV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Camera::TwoDGaussianV1", no_init)\
-    .def("integral", &TwoDGaussianV1_Wrapper::integral)\
-    .def("xmean", &TwoDGaussianV1_Wrapper::xmean)\
-    .def("ymean", &TwoDGaussianV1_Wrapper::ymean)\
-    .def("major_axis_width", &TwoDGaussianV1_Wrapper::major_axis_width)\
-    .def("minor_axis_width", &TwoDGaussianV1_Wrapper::minor_axis_width)\
-    .def("major_axis_tilt", &TwoDGaussianV1_Wrapper::major_axis_tilt)\
+#define _CLASS(n, policy) class_<n>("Psana::Camera::TwoDGaussianV1", no_init)\
+    .def("integral", &n::integral)\
+    .def("xmean", &n::xmean)\
+    .def("ymean", &n::ymean)\
+    .def("major_axis_width", &n::major_axis_width)\
+    .def("minor_axis_width", &n::minor_axis_width)\
+    .def("major_axis_tilt", &n::major_axis_tilt)\
 
-  _CLASS(TwoDGaussianV1_Wrapper);
+  _CLASS(TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TwoDGaussianV1_Wrapper);
 #undef _CLASS
 
 }

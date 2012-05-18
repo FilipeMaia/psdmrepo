@@ -25,7 +25,8 @@ class CsPadDigitalPotsCfg_Wrapper {
 public:
   CsPadDigitalPotsCfg_Wrapper(boost::shared_ptr<CsPadDigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadDigitalPotsCfg_Wrapper(CsPadDigitalPotsCfg* obj) : o(obj) {}
-  PyObject* pots() const { ND_CONVERT(o->pots(), uint8_t, 1); }
+  bool operator==(const CsPadDigitalPotsCfg_Wrapper &t) const { return this == &t; }
+  std::vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
 };
 
 /** @class CsPadReadOnlyCfg
@@ -40,6 +41,7 @@ class CsPadReadOnlyCfg_Wrapper {
 public:
   CsPadReadOnlyCfg_Wrapper(boost::shared_ptr<CsPadReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadReadOnlyCfg_Wrapper(CsPadReadOnlyCfg* obj) : o(obj) {}
+  bool operator==(const CsPadReadOnlyCfg_Wrapper &t) const { return this == &t; }
   uint32_t shiftTest() const { return o->shiftTest(); }
   uint32_t version() const { return o->version(); }
 };
@@ -56,6 +58,7 @@ class ProtectionSystemThreshold_Wrapper {
 public:
   ProtectionSystemThreshold_Wrapper(boost::shared_ptr<ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
   ProtectionSystemThreshold_Wrapper(ProtectionSystemThreshold* obj) : o(obj) {}
+  bool operator==(const ProtectionSystemThreshold_Wrapper &t) const { return this == &t; }
   uint32_t adcThreshold() const { return o->adcThreshold(); }
   uint32_t pixelCountThreshold() const { return o->pixelCountThreshold(); }
 };
@@ -72,6 +75,7 @@ class CsPadGainMapCfg_Wrapper {
 public:
   CsPadGainMapCfg_Wrapper(boost::shared_ptr<CsPadGainMapCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadGainMapCfg_Wrapper(CsPadGainMapCfg* obj) : o(obj) {}
+  bool operator==(const CsPadGainMapCfg_Wrapper &t) const { return this == &t; }
   PyObject* gainMap() const { ND_CONVERT(o->gainMap(), uint16_t, 2); }
 };
 
@@ -87,8 +91,9 @@ class ConfigV1QuadReg_Wrapper {
 public:
   ConfigV1QuadReg_Wrapper(boost::shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV1QuadReg_Wrapper(ConfigV1QuadReg* obj) : o(obj) {}
-  PyObject* shiftSelect() const { ND_CONVERT(o->shiftSelect(), uint32_t, 1); }
-  PyObject* edgeSelect() const { ND_CONVERT(o->edgeSelect(), uint32_t, 1); }
+  bool operator==(const ConfigV1QuadReg_Wrapper &t) const { return this == &t; }
+  std::vector<uint32_t> shiftSelect() const { VEC_CONVERT(o->shiftSelect(), uint32_t); }
+  std::vector<uint32_t> edgeSelect() const { VEC_CONVERT(o->edgeSelect(), uint32_t); }
   uint32_t readClkSet() const { return o->readClkSet(); }
   uint32_t readClkHold() const { return o->readClkHold(); }
   uint32_t dataMode() const { return o->dataMode(); }
@@ -99,9 +104,9 @@ public:
   uint32_t ampIdle() const { return o->ampIdle(); }
   uint32_t injTotal() const { return o->injTotal(); }
   uint32_t rowColShiftPer() const { return o->rowColShiftPer(); }
-  CsPadReadOnlyCfg_Wrapper ro() const { return CsPadReadOnlyCfg_Wrapper((CsPadReadOnlyCfg*) &o->ro()); } // copy_const_reference
-  CsPadDigitalPotsCfg_Wrapper dp() const { return CsPadDigitalPotsCfg_Wrapper((CsPadDigitalPotsCfg*) &o->dp()); } // copy_const_reference
-  CsPadGainMapCfg_Wrapper gm() const { return CsPadGainMapCfg_Wrapper((CsPadGainMapCfg*) &o->gm()); } // copy_const_reference
+  const CsPadReadOnlyCfg_Wrapper ro() const { return CsPadReadOnlyCfg_Wrapper((CsPadReadOnlyCfg*) &o->ro()); }
+  const CsPadDigitalPotsCfg_Wrapper dp() const { return CsPadDigitalPotsCfg_Wrapper((CsPadDigitalPotsCfg*) &o->dp()); }
+  const CsPadGainMapCfg_Wrapper gm() const { return CsPadGainMapCfg_Wrapper((CsPadGainMapCfg*) &o->gm()); }
 };
 
 /** @class ConfigV1
@@ -118,6 +123,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
+  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -129,7 +135,7 @@ public:
   uint32_t badAsicMask1() const { return o->badAsicMask1(); }
   uint32_t asicMask() const { return o->asicMask(); }
   uint32_t quadMask() const { return o->quadMask(); }
-  ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); } // copy_const_reference
+  const ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); }
   uint32_t numAsicsRead() const { return o->numAsicsRead(); }
   uint32_t numQuads() const { return o->numQuads(); }
   uint32_t numSect() const { return o->numSect(); }
@@ -150,6 +156,7 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
+  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -161,7 +168,7 @@ public:
   uint32_t badAsicMask1() const { return o->badAsicMask1(); }
   uint32_t asicMask() const { return o->asicMask(); }
   uint32_t quadMask() const { return o->quadMask(); }
-  ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); } // copy_const_reference
+  const ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); }
   uint32_t numAsicsRead() const { return o->numAsicsRead(); }
   uint32_t roiMask(uint32_t iq) const { return o->roiMask(iq); }
   uint32_t numAsicsStored(uint32_t iq) const { return o->numAsicsStored(iq); }
@@ -184,10 +191,11 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
+  bool operator==(const ConfigV3_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
-  ProtectionSystemThreshold_Wrapper protectionThresholds(uint32_t i0) const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThresholds(i0)); } // copy_const_reference
+  const ProtectionSystemThreshold_Wrapper protectionThresholds(uint32_t i0) const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThresholds(i0)); }
   uint32_t protectionEnable() const { return o->protectionEnable(); }
   uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
   uint32_t activeRunMode() const { return o->activeRunMode(); }
@@ -197,7 +205,7 @@ public:
   uint32_t badAsicMask1() const { return o->badAsicMask1(); }
   uint32_t asicMask() const { return o->asicMask(); }
   uint32_t quadMask() const { return o->quadMask(); }
-  ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); } // copy_const_reference
+  const ConfigV1QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV1QuadReg_Wrapper((ConfigV1QuadReg*) &o->quads(i0)); }
   uint32_t numAsicsRead() const { return o->numAsicsRead(); }
   uint32_t roiMask(uint32_t iq) const { return o->roiMask(iq); }
   uint32_t numAsicsStored(uint32_t iq) const { return o->numAsicsStored(iq); }
@@ -222,6 +230,7 @@ public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   ElementV1_Wrapper(boost::shared_ptr<ElementV1> obj) : _o(obj), o(_o.get()) {}
   ElementV1_Wrapper(ElementV1* obj) : o(obj) {}
+  bool operator==(const ElementV1_Wrapper &t) const { return this == &t; }
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
   uint32_t tid() const { return o->tid(); }
@@ -231,7 +240,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
+  std::vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   uint32_t sectionMask() const { return o->sectionMask(); }
@@ -254,7 +263,8 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  ElementV1_Wrapper quads(uint32_t i0) const { return ElementV1_Wrapper((ElementV1*) &o->quads(i0)); } // copy_const_reference
+  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
+  const ElementV1_Wrapper quads(uint32_t i0) const { return ElementV1_Wrapper((ElementV1*) &o->quads(i0)); }
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };
 
@@ -273,6 +283,7 @@ public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   ElementV2_Wrapper(boost::shared_ptr<ElementV2> obj) : _o(obj), o(_o.get()) {}
   ElementV2_Wrapper(ElementV2* obj) : o(obj) {}
+  bool operator==(const ElementV2_Wrapper &t) const { return this == &t; }
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
   uint32_t tid() const { return o->tid(); }
@@ -282,7 +293,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
+  std::vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   uint32_t sectionMask() const { return o->sectionMask(); }
@@ -305,7 +316,8 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
-  ElementV2_Wrapper quads(uint32_t i0) const { return ElementV2_Wrapper((ElementV2*) &o->quads(i0)); } // copy_const_reference
+  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
+  const ElementV2_Wrapper quads(uint32_t i0) const { return ElementV2_Wrapper((ElementV2*) &o->quads(i0)); }
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };
 

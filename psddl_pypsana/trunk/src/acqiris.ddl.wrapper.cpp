@@ -10,186 +10,213 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::VertV1", no_init)\
-    .def("fullScale", &VertV1_Wrapper::fullScale)\
-    .def("offset", &VertV1_Wrapper::offset)\
-    .def("coupling", &VertV1_Wrapper::coupling)\
-    .def("bandwidth", &VertV1_Wrapper::bandwidth)\
-    .def("slope", &VertV1_Wrapper::slope)\
-    .def("_sizeof", &VertV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::VertV1", no_init)\
+    .def("fullScale", &n::fullScale)\
+    .def("offset", &n::offset)\
+    .def("coupling", &n::coupling)\
+    .def("bandwidth", &n::bandwidth)\
+    .def("slope", &n::slope)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(VertV1_Wrapper);
-  _CLASS(VertV1);
+  _CLASS(VertV1, return_value_policy<copy_const_reference>());
+  _CLASS(VertV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(VertV1);
+  std_vector_class_(VertV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::HorizV1", no_init)\
-    .def("sampInterval", &HorizV1_Wrapper::sampInterval)\
-    .def("delayTime", &HorizV1_Wrapper::delayTime)\
-    .def("nbrSamples", &HorizV1_Wrapper::nbrSamples)\
-    .def("nbrSegments", &HorizV1_Wrapper::nbrSegments)\
-    .def("_sizeof", &HorizV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::HorizV1", no_init)\
+    .def("sampInterval", &n::sampInterval)\
+    .def("delayTime", &n::delayTime)\
+    .def("nbrSamples", &n::nbrSamples)\
+    .def("nbrSegments", &n::nbrSegments)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(HorizV1_Wrapper);
-  _CLASS(HorizV1);
+  _CLASS(HorizV1, return_value_policy<copy_const_reference>());
+  _CLASS(HorizV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(HorizV1);
+  std_vector_class_(HorizV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TrigV1", no_init)\
-    .def("coupling", &TrigV1_Wrapper::coupling)\
-    .def("input", &TrigV1_Wrapper::input)\
-    .def("slope", &TrigV1_Wrapper::slope)\
-    .def("level", &TrigV1_Wrapper::level)\
-    .def("_sizeof", &TrigV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TrigV1", no_init)\
+    .def("coupling", &n::coupling)\
+    .def("input", &n::input)\
+    .def("slope", &n::slope)\
+    .def("level", &n::level)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TrigV1_Wrapper);
-  _CLASS(TrigV1);
+  _CLASS(TrigV1, return_value_policy<copy_const_reference>());
+  _CLASS(TrigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TrigV1);
+  std_vector_class_(TrigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::ConfigV1", no_init)\
-    .def("nbrConvertersPerChannel", &ConfigV1_Wrapper::nbrConvertersPerChannel)\
-    .def("channelMask", &ConfigV1_Wrapper::channelMask)\
-    .def("nbrBanks", &ConfigV1_Wrapper::nbrBanks)\
-    .def("trig", &ConfigV1_Wrapper::trig)\
-    .def("horiz", &ConfigV1_Wrapper::horiz)\
-    .def("vert", &ConfigV1_Wrapper::vert)\
-    .def("nbrChannels", &ConfigV1_Wrapper::nbrChannels)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::ConfigV1", no_init)\
+    .def("nbrConvertersPerChannel", &n::nbrConvertersPerChannel)\
+    .def("channelMask", &n::channelMask)\
+    .def("nbrBanks", &n::nbrBanks)\
+    .def("trig", &n::trig, policy)\
+    .def("horiz", &n::horiz, policy)\
+    .def("vert", &n::vert)\
+    .def("nbrChannels", &n::nbrChannels)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TimestampV1", no_init)\
-    .def("pos", &TimestampV1_Wrapper::pos)\
-    .def("timeStampLo", &TimestampV1_Wrapper::timeStampLo)\
-    .def("timeStampHi", &TimestampV1_Wrapper::timeStampHi)\
-    .def("value", &TimestampV1_Wrapper::value)\
-    .def("_sizeof", &TimestampV1_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TimestampV1", no_init)\
+    .def("pos", &n::pos)\
+    .def("timeStampLo", &n::timeStampLo)\
+    .def("timeStampHi", &n::timeStampHi)\
+    .def("value", &n::value)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TimestampV1_Wrapper);
-  _CLASS(TimestampV1);
+  _CLASS(TimestampV1, return_value_policy<copy_const_reference>());
+  _CLASS(TimestampV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TimestampV1);
+  std_vector_class_(TimestampV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::DataDescV1Elem", no_init)\
-    .def("nbrSamplesInSeg", &DataDescV1Elem_Wrapper::nbrSamplesInSeg)\
-    .def("indexFirstPoint", &DataDescV1Elem_Wrapper::indexFirstPoint)\
-    .def("nbrSegments", &DataDescV1Elem_Wrapper::nbrSegments)\
-    .def("timestamp", &DataDescV1Elem_Wrapper::timestamp)\
-    .def("waveforms", &DataDescV1Elem_Wrapper::waveforms)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::DataDescV1Elem", no_init)\
+    .def("nbrSamplesInSeg", &n::nbrSamplesInSeg)\
+    .def("indexFirstPoint", &n::indexFirstPoint)\
+    .def("nbrSegments", &n::nbrSegments)\
+    .def("timestamp", &n::timestamp)\
+    .def("waveforms", &n::waveforms)\
 
-  _CLASS(DataDescV1Elem_Wrapper);
+  _CLASS(DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataDescV1Elem_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataDescV1Elem);
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::DataDescV1", no_init)\
-    .def("data", &DataDescV1_Wrapper::data)\
-    .def("data_shape", &DataDescV1_Wrapper::data_shape)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::DataDescV1", no_init)\
+    .def("data", &n::data, policy)\
+    .def("data_shape", &n::data_shape)\
 
-  _CLASS(DataDescV1_Wrapper);
+  _CLASS(DataDescV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataDescV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataDescV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcChannel", no_init)\
-    .def("_channel_int", &TdcChannel_Wrapper::_channel_int)\
-    .def("_mode_int", &TdcChannel_Wrapper::_mode_int)\
-    .def("slope", &TdcChannel_Wrapper::slope)\
-    .def("mode", &TdcChannel_Wrapper::mode)\
-    .def("level", &TdcChannel_Wrapper::level)\
-    .def("channel", &TdcChannel_Wrapper::channel)\
-    .def("_sizeof", &TdcChannel_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcChannel", no_init)\
+    .def("_channel_int", &n::_channel_int)\
+    .def("_mode_int", &n::_mode_int)\
+    .def("slope", &n::slope)\
+    .def("mode", &n::mode)\
+    .def("level", &n::level)\
+    .def("channel", &n::channel)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcChannel_Wrapper);
-  _CLASS(TdcChannel);
+  _CLASS(TdcChannel, return_value_policy<copy_const_reference>());
+  _CLASS(TdcChannel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcChannel);
+  std_vector_class_(TdcChannel_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcAuxIO", no_init)\
-    .def("channel_int", &TdcAuxIO_Wrapper::channel_int)\
-    .def("signal_int", &TdcAuxIO_Wrapper::signal_int)\
-    .def("qualifier_int", &TdcAuxIO_Wrapper::qualifier_int)\
-    .def("channel", &TdcAuxIO_Wrapper::channel)\
-    .def("mode", &TdcAuxIO_Wrapper::mode)\
-    .def("term", &TdcAuxIO_Wrapper::term)\
-    .def("_sizeof", &TdcAuxIO_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcAuxIO", no_init)\
+    .def("channel_int", &n::channel_int)\
+    .def("signal_int", &n::signal_int)\
+    .def("qualifier_int", &n::qualifier_int)\
+    .def("channel", &n::channel)\
+    .def("mode", &n::mode)\
+    .def("term", &n::term)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcAuxIO_Wrapper);
-  _CLASS(TdcAuxIO);
+  _CLASS(TdcAuxIO, return_value_policy<copy_const_reference>());
+  _CLASS(TdcAuxIO_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcAuxIO);
+  std_vector_class_(TdcAuxIO_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcVetoIO", no_init)\
-    .def("signal_int", &TdcVetoIO_Wrapper::signal_int)\
-    .def("qualifier_int", &TdcVetoIO_Wrapper::qualifier_int)\
-    .def("channel", &TdcVetoIO_Wrapper::channel)\
-    .def("mode", &TdcVetoIO_Wrapper::mode)\
-    .def("term", &TdcVetoIO_Wrapper::term)\
-    .def("_sizeof", &TdcVetoIO_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcVetoIO", no_init)\
+    .def("signal_int", &n::signal_int)\
+    .def("qualifier_int", &n::qualifier_int)\
+    .def("channel", &n::channel)\
+    .def("mode", &n::mode)\
+    .def("term", &n::term)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcVetoIO_Wrapper);
-  _CLASS(TdcVetoIO);
+  _CLASS(TdcVetoIO, return_value_policy<copy_const_reference>());
+  _CLASS(TdcVetoIO_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcVetoIO);
+  std_vector_class_(TdcVetoIO_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcConfigV1", no_init)\
-    .def("channels", &TdcConfigV1_Wrapper::channels)\
-    .def("auxio", &TdcConfigV1_Wrapper::auxio)\
-    .def("veto", &TdcConfigV1_Wrapper::veto)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcConfigV1", no_init)\
+    .def("channels", &n::channels)\
+    .def("auxio", &n::auxio)\
+    .def("veto", &n::veto, policy)\
 
-  _CLASS(TdcConfigV1_Wrapper);
+  _CLASS(TdcConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcDataV1_Item", no_init)\
-    .def("value", &TdcDataV1_Item_Wrapper::value)\
-    .def("bf_val_", &TdcDataV1_Item_Wrapper::bf_val_)\
-    .def("source", &TdcDataV1_Item_Wrapper::source)\
-    .def("bf_ofv_", &TdcDataV1_Item_Wrapper::bf_ofv_)\
-    .def("_sizeof", &TdcDataV1_Item_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcDataV1_Item", no_init)\
+    .def("value", &n::value)\
+    .def("bf_val_", &n::bf_val_)\
+    .def("source", &n::source)\
+    .def("bf_ofv_", &n::bf_ofv_)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcDataV1_Item_Wrapper);
-  _CLASS(TdcDataV1_Item);
+  _CLASS(TdcDataV1_Item, return_value_policy<copy_const_reference>());
+  _CLASS(TdcDataV1_Item_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcDataV1_Item);
+  std_vector_class_(TdcDataV1_Item_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcDataV1Common", no_init)\
-    .def("nhits", &TdcDataV1Common_Wrapper::nhits)\
-    .def("overflow", &TdcDataV1Common_Wrapper::overflow)\
-    .def("_sizeof", &TdcDataV1Common_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcDataV1Common", no_init)\
+    .def("nhits", &n::nhits)\
+    .def("overflow", &n::overflow)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcDataV1Common_Wrapper);
-  _CLASS(TdcDataV1Common);
+  _CLASS(TdcDataV1Common, return_value_policy<copy_const_reference>());
+  _CLASS(TdcDataV1Common_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcDataV1Common);
+  std_vector_class_(TdcDataV1Common_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcDataV1Channel", no_init)\
-    .def("ticks", &TdcDataV1Channel_Wrapper::ticks)\
-    .def("overflow", &TdcDataV1Channel_Wrapper::overflow)\
-    .def("time", &TdcDataV1Channel_Wrapper::time)\
-    .def("_sizeof", &TdcDataV1Channel_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcDataV1Channel", no_init)\
+    .def("ticks", &n::ticks)\
+    .def("overflow", &n::overflow)\
+    .def("time", &n::time)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcDataV1Channel_Wrapper);
-  _CLASS(TdcDataV1Channel);
+  _CLASS(TdcDataV1Channel, return_value_policy<copy_const_reference>());
+  _CLASS(TdcDataV1Channel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcDataV1Channel);
+  std_vector_class_(TdcDataV1Channel_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcDataV1Marker", no_init)\
-    .def("type", &TdcDataV1Marker_Wrapper::type)\
-    .def("_sizeof", &TdcDataV1Marker_Wrapper::_sizeof)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcDataV1Marker", no_init)\
+    .def("type", &n::type)\
+    .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(TdcDataV1Marker_Wrapper);
-  _CLASS(TdcDataV1Marker);
+  _CLASS(TdcDataV1Marker, return_value_policy<copy_const_reference>());
+  _CLASS(TdcDataV1Marker_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcDataV1Marker);
+  std_vector_class_(TdcDataV1Marker_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n) class_<n>("Psana::Acqiris::TdcDataV1", no_init)\
-    .def("data", &TdcDataV1_Wrapper::data)\
+#define _CLASS(n, policy) class_<n>("Psana::Acqiris::TdcDataV1", no_init)\
+    .def("data", &n::data)\
 
-  _CLASS(TdcDataV1_Wrapper);
+  _CLASS(TdcDataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(TdcDataV1_Wrapper);
 #undef _CLASS
 
 }

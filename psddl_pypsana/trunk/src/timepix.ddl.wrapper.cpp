@@ -10,177 +10,181 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n) class_<n>("Psana::Timepix::ConfigV1", no_init)\
-    .def("readoutSpeed", &ConfigV1_Wrapper::readoutSpeed)\
-    .def("triggerMode", &ConfigV1_Wrapper::triggerMode)\
-    .def("shutterTimeout", &ConfigV1_Wrapper::shutterTimeout)\
-    .def("dac0Ikrum", &ConfigV1_Wrapper::dac0Ikrum)\
-    .def("dac0Disc", &ConfigV1_Wrapper::dac0Disc)\
-    .def("dac0Preamp", &ConfigV1_Wrapper::dac0Preamp)\
-    .def("dac0BufAnalogA", &ConfigV1_Wrapper::dac0BufAnalogA)\
-    .def("dac0BufAnalogB", &ConfigV1_Wrapper::dac0BufAnalogB)\
-    .def("dac0Hist", &ConfigV1_Wrapper::dac0Hist)\
-    .def("dac0ThlFine", &ConfigV1_Wrapper::dac0ThlFine)\
-    .def("dac0ThlCourse", &ConfigV1_Wrapper::dac0ThlCourse)\
-    .def("dac0Vcas", &ConfigV1_Wrapper::dac0Vcas)\
-    .def("dac0Fbk", &ConfigV1_Wrapper::dac0Fbk)\
-    .def("dac0Gnd", &ConfigV1_Wrapper::dac0Gnd)\
-    .def("dac0Ths", &ConfigV1_Wrapper::dac0Ths)\
-    .def("dac0BiasLvds", &ConfigV1_Wrapper::dac0BiasLvds)\
-    .def("dac0RefLvds", &ConfigV1_Wrapper::dac0RefLvds)\
-    .def("dac1Ikrum", &ConfigV1_Wrapper::dac1Ikrum)\
-    .def("dac1Disc", &ConfigV1_Wrapper::dac1Disc)\
-    .def("dac1Preamp", &ConfigV1_Wrapper::dac1Preamp)\
-    .def("dac1BufAnalogA", &ConfigV1_Wrapper::dac1BufAnalogA)\
-    .def("dac1BufAnalogB", &ConfigV1_Wrapper::dac1BufAnalogB)\
-    .def("dac1Hist", &ConfigV1_Wrapper::dac1Hist)\
-    .def("dac1ThlFine", &ConfigV1_Wrapper::dac1ThlFine)\
-    .def("dac1ThlCourse", &ConfigV1_Wrapper::dac1ThlCourse)\
-    .def("dac1Vcas", &ConfigV1_Wrapper::dac1Vcas)\
-    .def("dac1Fbk", &ConfigV1_Wrapper::dac1Fbk)\
-    .def("dac1Gnd", &ConfigV1_Wrapper::dac1Gnd)\
-    .def("dac1Ths", &ConfigV1_Wrapper::dac1Ths)\
-    .def("dac1BiasLvds", &ConfigV1_Wrapper::dac1BiasLvds)\
-    .def("dac1RefLvds", &ConfigV1_Wrapper::dac1RefLvds)\
-    .def("dac2Ikrum", &ConfigV1_Wrapper::dac2Ikrum)\
-    .def("dac2Disc", &ConfigV1_Wrapper::dac2Disc)\
-    .def("dac2Preamp", &ConfigV1_Wrapper::dac2Preamp)\
-    .def("dac2BufAnalogA", &ConfigV1_Wrapper::dac2BufAnalogA)\
-    .def("dac2BufAnalogB", &ConfigV1_Wrapper::dac2BufAnalogB)\
-    .def("dac2Hist", &ConfigV1_Wrapper::dac2Hist)\
-    .def("dac2ThlFine", &ConfigV1_Wrapper::dac2ThlFine)\
-    .def("dac2ThlCourse", &ConfigV1_Wrapper::dac2ThlCourse)\
-    .def("dac2Vcas", &ConfigV1_Wrapper::dac2Vcas)\
-    .def("dac2Fbk", &ConfigV1_Wrapper::dac2Fbk)\
-    .def("dac2Gnd", &ConfigV1_Wrapper::dac2Gnd)\
-    .def("dac2Ths", &ConfigV1_Wrapper::dac2Ths)\
-    .def("dac2BiasLvds", &ConfigV1_Wrapper::dac2BiasLvds)\
-    .def("dac2RefLvds", &ConfigV1_Wrapper::dac2RefLvds)\
-    .def("dac3Ikrum", &ConfigV1_Wrapper::dac3Ikrum)\
-    .def("dac3Disc", &ConfigV1_Wrapper::dac3Disc)\
-    .def("dac3Preamp", &ConfigV1_Wrapper::dac3Preamp)\
-    .def("dac3BufAnalogA", &ConfigV1_Wrapper::dac3BufAnalogA)\
-    .def("dac3BufAnalogB", &ConfigV1_Wrapper::dac3BufAnalogB)\
-    .def("dac3Hist", &ConfigV1_Wrapper::dac3Hist)\
-    .def("dac3ThlFine", &ConfigV1_Wrapper::dac3ThlFine)\
-    .def("dac3ThlCourse", &ConfigV1_Wrapper::dac3ThlCourse)\
-    .def("dac3Vcas", &ConfigV1_Wrapper::dac3Vcas)\
-    .def("dac3Fbk", &ConfigV1_Wrapper::dac3Fbk)\
-    .def("dac3Gnd", &ConfigV1_Wrapper::dac3Gnd)\
-    .def("dac3Ths", &ConfigV1_Wrapper::dac3Ths)\
-    .def("dac3BiasLvds", &ConfigV1_Wrapper::dac3BiasLvds)\
-    .def("dac3RefLvds", &ConfigV1_Wrapper::dac3RefLvds)\
+#define _CLASS(n, policy) class_<n>("Psana::Timepix::ConfigV1", no_init)\
+    .def("readoutSpeed", &n::readoutSpeed)\
+    .def("triggerMode", &n::triggerMode)\
+    .def("shutterTimeout", &n::shutterTimeout)\
+    .def("dac0Ikrum", &n::dac0Ikrum)\
+    .def("dac0Disc", &n::dac0Disc)\
+    .def("dac0Preamp", &n::dac0Preamp)\
+    .def("dac0BufAnalogA", &n::dac0BufAnalogA)\
+    .def("dac0BufAnalogB", &n::dac0BufAnalogB)\
+    .def("dac0Hist", &n::dac0Hist)\
+    .def("dac0ThlFine", &n::dac0ThlFine)\
+    .def("dac0ThlCourse", &n::dac0ThlCourse)\
+    .def("dac0Vcas", &n::dac0Vcas)\
+    .def("dac0Fbk", &n::dac0Fbk)\
+    .def("dac0Gnd", &n::dac0Gnd)\
+    .def("dac0Ths", &n::dac0Ths)\
+    .def("dac0BiasLvds", &n::dac0BiasLvds)\
+    .def("dac0RefLvds", &n::dac0RefLvds)\
+    .def("dac1Ikrum", &n::dac1Ikrum)\
+    .def("dac1Disc", &n::dac1Disc)\
+    .def("dac1Preamp", &n::dac1Preamp)\
+    .def("dac1BufAnalogA", &n::dac1BufAnalogA)\
+    .def("dac1BufAnalogB", &n::dac1BufAnalogB)\
+    .def("dac1Hist", &n::dac1Hist)\
+    .def("dac1ThlFine", &n::dac1ThlFine)\
+    .def("dac1ThlCourse", &n::dac1ThlCourse)\
+    .def("dac1Vcas", &n::dac1Vcas)\
+    .def("dac1Fbk", &n::dac1Fbk)\
+    .def("dac1Gnd", &n::dac1Gnd)\
+    .def("dac1Ths", &n::dac1Ths)\
+    .def("dac1BiasLvds", &n::dac1BiasLvds)\
+    .def("dac1RefLvds", &n::dac1RefLvds)\
+    .def("dac2Ikrum", &n::dac2Ikrum)\
+    .def("dac2Disc", &n::dac2Disc)\
+    .def("dac2Preamp", &n::dac2Preamp)\
+    .def("dac2BufAnalogA", &n::dac2BufAnalogA)\
+    .def("dac2BufAnalogB", &n::dac2BufAnalogB)\
+    .def("dac2Hist", &n::dac2Hist)\
+    .def("dac2ThlFine", &n::dac2ThlFine)\
+    .def("dac2ThlCourse", &n::dac2ThlCourse)\
+    .def("dac2Vcas", &n::dac2Vcas)\
+    .def("dac2Fbk", &n::dac2Fbk)\
+    .def("dac2Gnd", &n::dac2Gnd)\
+    .def("dac2Ths", &n::dac2Ths)\
+    .def("dac2BiasLvds", &n::dac2BiasLvds)\
+    .def("dac2RefLvds", &n::dac2RefLvds)\
+    .def("dac3Ikrum", &n::dac3Ikrum)\
+    .def("dac3Disc", &n::dac3Disc)\
+    .def("dac3Preamp", &n::dac3Preamp)\
+    .def("dac3BufAnalogA", &n::dac3BufAnalogA)\
+    .def("dac3BufAnalogB", &n::dac3BufAnalogB)\
+    .def("dac3Hist", &n::dac3Hist)\
+    .def("dac3ThlFine", &n::dac3ThlFine)\
+    .def("dac3ThlCourse", &n::dac3ThlCourse)\
+    .def("dac3Vcas", &n::dac3Vcas)\
+    .def("dac3Fbk", &n::dac3Fbk)\
+    .def("dac3Gnd", &n::dac3Gnd)\
+    .def("dac3Ths", &n::dac3Ths)\
+    .def("dac3BiasLvds", &n::dac3BiasLvds)\
+    .def("dac3RefLvds", &n::dac3RefLvds)\
 
-  _CLASS(ConfigV1_Wrapper);
+  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Timepix::ConfigV2", no_init)\
-    .def("readoutSpeed", &ConfigV2_Wrapper::readoutSpeed)\
-    .def("triggerMode", &ConfigV2_Wrapper::triggerMode)\
-    .def("timepixSpeed", &ConfigV2_Wrapper::timepixSpeed)\
-    .def("dac0Ikrum", &ConfigV2_Wrapper::dac0Ikrum)\
-    .def("dac0Disc", &ConfigV2_Wrapper::dac0Disc)\
-    .def("dac0Preamp", &ConfigV2_Wrapper::dac0Preamp)\
-    .def("dac0BufAnalogA", &ConfigV2_Wrapper::dac0BufAnalogA)\
-    .def("dac0BufAnalogB", &ConfigV2_Wrapper::dac0BufAnalogB)\
-    .def("dac0Hist", &ConfigV2_Wrapper::dac0Hist)\
-    .def("dac0ThlFine", &ConfigV2_Wrapper::dac0ThlFine)\
-    .def("dac0ThlCourse", &ConfigV2_Wrapper::dac0ThlCourse)\
-    .def("dac0Vcas", &ConfigV2_Wrapper::dac0Vcas)\
-    .def("dac0Fbk", &ConfigV2_Wrapper::dac0Fbk)\
-    .def("dac0Gnd", &ConfigV2_Wrapper::dac0Gnd)\
-    .def("dac0Ths", &ConfigV2_Wrapper::dac0Ths)\
-    .def("dac0BiasLvds", &ConfigV2_Wrapper::dac0BiasLvds)\
-    .def("dac0RefLvds", &ConfigV2_Wrapper::dac0RefLvds)\
-    .def("dac1Ikrum", &ConfigV2_Wrapper::dac1Ikrum)\
-    .def("dac1Disc", &ConfigV2_Wrapper::dac1Disc)\
-    .def("dac1Preamp", &ConfigV2_Wrapper::dac1Preamp)\
-    .def("dac1BufAnalogA", &ConfigV2_Wrapper::dac1BufAnalogA)\
-    .def("dac1BufAnalogB", &ConfigV2_Wrapper::dac1BufAnalogB)\
-    .def("dac1Hist", &ConfigV2_Wrapper::dac1Hist)\
-    .def("dac1ThlFine", &ConfigV2_Wrapper::dac1ThlFine)\
-    .def("dac1ThlCourse", &ConfigV2_Wrapper::dac1ThlCourse)\
-    .def("dac1Vcas", &ConfigV2_Wrapper::dac1Vcas)\
-    .def("dac1Fbk", &ConfigV2_Wrapper::dac1Fbk)\
-    .def("dac1Gnd", &ConfigV2_Wrapper::dac1Gnd)\
-    .def("dac1Ths", &ConfigV2_Wrapper::dac1Ths)\
-    .def("dac1BiasLvds", &ConfigV2_Wrapper::dac1BiasLvds)\
-    .def("dac1RefLvds", &ConfigV2_Wrapper::dac1RefLvds)\
-    .def("dac2Ikrum", &ConfigV2_Wrapper::dac2Ikrum)\
-    .def("dac2Disc", &ConfigV2_Wrapper::dac2Disc)\
-    .def("dac2Preamp", &ConfigV2_Wrapper::dac2Preamp)\
-    .def("dac2BufAnalogA", &ConfigV2_Wrapper::dac2BufAnalogA)\
-    .def("dac2BufAnalogB", &ConfigV2_Wrapper::dac2BufAnalogB)\
-    .def("dac2Hist", &ConfigV2_Wrapper::dac2Hist)\
-    .def("dac2ThlFine", &ConfigV2_Wrapper::dac2ThlFine)\
-    .def("dac2ThlCourse", &ConfigV2_Wrapper::dac2ThlCourse)\
-    .def("dac2Vcas", &ConfigV2_Wrapper::dac2Vcas)\
-    .def("dac2Fbk", &ConfigV2_Wrapper::dac2Fbk)\
-    .def("dac2Gnd", &ConfigV2_Wrapper::dac2Gnd)\
-    .def("dac2Ths", &ConfigV2_Wrapper::dac2Ths)\
-    .def("dac2BiasLvds", &ConfigV2_Wrapper::dac2BiasLvds)\
-    .def("dac2RefLvds", &ConfigV2_Wrapper::dac2RefLvds)\
-    .def("dac3Ikrum", &ConfigV2_Wrapper::dac3Ikrum)\
-    .def("dac3Disc", &ConfigV2_Wrapper::dac3Disc)\
-    .def("dac3Preamp", &ConfigV2_Wrapper::dac3Preamp)\
-    .def("dac3BufAnalogA", &ConfigV2_Wrapper::dac3BufAnalogA)\
-    .def("dac3BufAnalogB", &ConfigV2_Wrapper::dac3BufAnalogB)\
-    .def("dac3Hist", &ConfigV2_Wrapper::dac3Hist)\
-    .def("dac3ThlFine", &ConfigV2_Wrapper::dac3ThlFine)\
-    .def("dac3ThlCourse", &ConfigV2_Wrapper::dac3ThlCourse)\
-    .def("dac3Vcas", &ConfigV2_Wrapper::dac3Vcas)\
-    .def("dac3Fbk", &ConfigV2_Wrapper::dac3Fbk)\
-    .def("dac3Gnd", &ConfigV2_Wrapper::dac3Gnd)\
-    .def("dac3Ths", &ConfigV2_Wrapper::dac3Ths)\
-    .def("dac3BiasLvds", &ConfigV2_Wrapper::dac3BiasLvds)\
-    .def("dac3RefLvds", &ConfigV2_Wrapper::dac3RefLvds)\
-    .def("driverVersion", &ConfigV2_Wrapper::driverVersion)\
-    .def("firmwareVersion", &ConfigV2_Wrapper::firmwareVersion)\
-    .def("pixelThreshSize", &ConfigV2_Wrapper::pixelThreshSize)\
-    .def("pixelThresh", &ConfigV2_Wrapper::pixelThresh)\
-    .def("chip0Name", &ConfigV2_Wrapper::chip0Name)\
-    .def("chip1Name", &ConfigV2_Wrapper::chip1Name)\
-    .def("chip2Name", &ConfigV2_Wrapper::chip2Name)\
-    .def("chip3Name", &ConfigV2_Wrapper::chip3Name)\
-    .def("chip0ID", &ConfigV2_Wrapper::chip0ID)\
-    .def("chip1ID", &ConfigV2_Wrapper::chip1ID)\
-    .def("chip2ID", &ConfigV2_Wrapper::chip2ID)\
-    .def("chip3ID", &ConfigV2_Wrapper::chip3ID)\
-    .def("chipCount", &ConfigV2_Wrapper::chipCount)\
+#define _CLASS(n, policy) class_<n>("Psana::Timepix::ConfigV2", no_init)\
+    .def("readoutSpeed", &n::readoutSpeed)\
+    .def("triggerMode", &n::triggerMode)\
+    .def("timepixSpeed", &n::timepixSpeed)\
+    .def("dac0Ikrum", &n::dac0Ikrum)\
+    .def("dac0Disc", &n::dac0Disc)\
+    .def("dac0Preamp", &n::dac0Preamp)\
+    .def("dac0BufAnalogA", &n::dac0BufAnalogA)\
+    .def("dac0BufAnalogB", &n::dac0BufAnalogB)\
+    .def("dac0Hist", &n::dac0Hist)\
+    .def("dac0ThlFine", &n::dac0ThlFine)\
+    .def("dac0ThlCourse", &n::dac0ThlCourse)\
+    .def("dac0Vcas", &n::dac0Vcas)\
+    .def("dac0Fbk", &n::dac0Fbk)\
+    .def("dac0Gnd", &n::dac0Gnd)\
+    .def("dac0Ths", &n::dac0Ths)\
+    .def("dac0BiasLvds", &n::dac0BiasLvds)\
+    .def("dac0RefLvds", &n::dac0RefLvds)\
+    .def("dac1Ikrum", &n::dac1Ikrum)\
+    .def("dac1Disc", &n::dac1Disc)\
+    .def("dac1Preamp", &n::dac1Preamp)\
+    .def("dac1BufAnalogA", &n::dac1BufAnalogA)\
+    .def("dac1BufAnalogB", &n::dac1BufAnalogB)\
+    .def("dac1Hist", &n::dac1Hist)\
+    .def("dac1ThlFine", &n::dac1ThlFine)\
+    .def("dac1ThlCourse", &n::dac1ThlCourse)\
+    .def("dac1Vcas", &n::dac1Vcas)\
+    .def("dac1Fbk", &n::dac1Fbk)\
+    .def("dac1Gnd", &n::dac1Gnd)\
+    .def("dac1Ths", &n::dac1Ths)\
+    .def("dac1BiasLvds", &n::dac1BiasLvds)\
+    .def("dac1RefLvds", &n::dac1RefLvds)\
+    .def("dac2Ikrum", &n::dac2Ikrum)\
+    .def("dac2Disc", &n::dac2Disc)\
+    .def("dac2Preamp", &n::dac2Preamp)\
+    .def("dac2BufAnalogA", &n::dac2BufAnalogA)\
+    .def("dac2BufAnalogB", &n::dac2BufAnalogB)\
+    .def("dac2Hist", &n::dac2Hist)\
+    .def("dac2ThlFine", &n::dac2ThlFine)\
+    .def("dac2ThlCourse", &n::dac2ThlCourse)\
+    .def("dac2Vcas", &n::dac2Vcas)\
+    .def("dac2Fbk", &n::dac2Fbk)\
+    .def("dac2Gnd", &n::dac2Gnd)\
+    .def("dac2Ths", &n::dac2Ths)\
+    .def("dac2BiasLvds", &n::dac2BiasLvds)\
+    .def("dac2RefLvds", &n::dac2RefLvds)\
+    .def("dac3Ikrum", &n::dac3Ikrum)\
+    .def("dac3Disc", &n::dac3Disc)\
+    .def("dac3Preamp", &n::dac3Preamp)\
+    .def("dac3BufAnalogA", &n::dac3BufAnalogA)\
+    .def("dac3BufAnalogB", &n::dac3BufAnalogB)\
+    .def("dac3Hist", &n::dac3Hist)\
+    .def("dac3ThlFine", &n::dac3ThlFine)\
+    .def("dac3ThlCourse", &n::dac3ThlCourse)\
+    .def("dac3Vcas", &n::dac3Vcas)\
+    .def("dac3Fbk", &n::dac3Fbk)\
+    .def("dac3Gnd", &n::dac3Gnd)\
+    .def("dac3Ths", &n::dac3Ths)\
+    .def("dac3BiasLvds", &n::dac3BiasLvds)\
+    .def("dac3RefLvds", &n::dac3RefLvds)\
+    .def("driverVersion", &n::driverVersion)\
+    .def("firmwareVersion", &n::firmwareVersion)\
+    .def("pixelThreshSize", &n::pixelThreshSize)\
+    .def("pixelThresh", &n::pixelThresh)\
+    .def("chip0Name", &n::chip0Name)\
+    .def("chip1Name", &n::chip1Name)\
+    .def("chip2Name", &n::chip2Name)\
+    .def("chip3Name", &n::chip3Name)\
+    .def("chip0ID", &n::chip0ID)\
+    .def("chip1ID", &n::chip1ID)\
+    .def("chip2ID", &n::chip2ID)\
+    .def("chip3ID", &n::chip3ID)\
+    .def("chipCount", &n::chipCount)\
 
-  _CLASS(ConfigV2_Wrapper);
+  _CLASS(ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV2);
 
 
-#define _CLASS(n) class_<n>("Psana::Timepix::DataV1", no_init)\
-    .def("timestamp", &DataV1_Wrapper::timestamp)\
-    .def("frameCounter", &DataV1_Wrapper::frameCounter)\
-    .def("lostRows", &DataV1_Wrapper::lostRows)\
-    .def("data", &DataV1_Wrapper::data)\
-    .def("width", &DataV1_Wrapper::width)\
-    .def("height", &DataV1_Wrapper::height)\
-    .def("depth", &DataV1_Wrapper::depth)\
-    .def("depth_bytes", &DataV1_Wrapper::depth_bytes)\
+#define _CLASS(n, policy) class_<n>("Psana::Timepix::DataV1", no_init)\
+    .def("timestamp", &n::timestamp)\
+    .def("frameCounter", &n::frameCounter)\
+    .def("lostRows", &n::lostRows)\
+    .def("data", &n::data)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("depth", &n::depth)\
+    .def("depth_bytes", &n::depth_bytes)\
 
-  _CLASS(DataV1_Wrapper);
+  _CLASS(DataV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV1);
 
 
-#define _CLASS(n) class_<n>("Psana::Timepix::DataV2", no_init)\
-    .def("width", &DataV2_Wrapper::width)\
-    .def("height", &DataV2_Wrapper::height)\
-    .def("timestamp", &DataV2_Wrapper::timestamp)\
-    .def("frameCounter", &DataV2_Wrapper::frameCounter)\
-    .def("lostRows", &DataV2_Wrapper::lostRows)\
-    .def("data", &DataV2_Wrapper::data)\
-    .def("depth", &DataV2_Wrapper::depth)\
-    .def("depth_bytes", &DataV2_Wrapper::depth_bytes)\
+#define _CLASS(n, policy) class_<n>("Psana::Timepix::DataV2", no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("timestamp", &n::timestamp)\
+    .def("frameCounter", &n::frameCounter)\
+    .def("lostRows", &n::lostRows)\
+    .def("data", &n::data)\
+    .def("depth", &n::depth)\
+    .def("depth_bytes", &n::depth_bytes)\
 
-  _CLASS(DataV2_Wrapper);
+  _CLASS(DataV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
   EVT_GETTER(DataV2);
 
