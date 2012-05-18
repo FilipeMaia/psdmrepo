@@ -167,7 +167,7 @@ class CppTypeCodegen ( object ) :
             access = self._access("public", access)
             print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
             print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
-            print >>self._cpp, T("\n#define _CLASS(n) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
+            print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
         else:
             if not self._abs:
                 # constructor, all should be declared explicitly
@@ -179,6 +179,9 @@ class CppTypeCodegen ( object ) :
                 access = self._access("public", access)
                 print >>self._inc, T("  virtual ~$name();")[self._type]
                 print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
+
+        # generate an operator== method (required for boost::python::vector_indexing_suite)
+        print >>self._inc, T("  bool operator==(const $name &t) const { return this == &t; }")(locals())
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
@@ -200,9 +203,12 @@ class CppTypeCodegen ( object ) :
         print >>self._inc, "};"
         if self._pywrapper:
             print >>self._cpp, ""
-            print >>self._cpp, T("  _CLASS($name);")(locals())
             if not self._abs:
-                print >>self._cpp, T("  _CLASS($wrapped);")(locals())
+                print >>self._cpp, T("  _CLASS($wrapped, return_value_policy<copy_const_reference>());")(locals())
+            print >>self._cpp, T("  _CLASS($name, return_value_policy<return_by_value>());")(locals())
+            if not self._abs:
+                print >>self._cpp, T("  std_vector_class_($wrapped);")(locals())
+            print >>self._cpp, T("  std_vector_class_($name);")(locals())
             print >>self._cpp, "#undef _CLASS";
             if name.find('DataV') == 0 or name.find('DataDescV') == 0:
                 print >>self._cpp, T("  EVT_GETTER($wrapped);")(locals())
@@ -476,6 +482,7 @@ class CppTypeCodegen ( object ) :
         argsspec = ', '.join([_argdecl(*arg) for arg in args])
 
         if self._pywrapper:
+            policy = ""
             args = ', '.join([_argdecl2(*arg) for arg in args])
             index = rettype.find("ndarray<")
             if index == 0:
@@ -483,18 +490,27 @@ class CppTypeCodegen ( object ) :
                 index = ctype_ndim.rfind(">")
                 if index != -1:
                     ctype_ndim = ctype_ndim[:index]
-                print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype_ndim); }")(locals())
+                index = ctype_ndim.find(", ")
+                ctype = ctype_ndim[:index]
+                ndim = int(ctype_ndim[index + 2:])
+                if ndim == 1 or "::" in ctype:
+                    if ndim > 1:
+                        print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional std::vector<%s> instead" % (ctype, ndim, ctype)
+                    print >>self._inc, T("  std::vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
+                else:
+                    print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
             elif "&" in rettype and "::" in rettype:
                 type = rettype.replace("&", "").replace("const ", "")
                 index = type.find("::")
                 if index != -1:
                     type = type[2+index:] # remove "Namespace::"
                 wrappertype = type + "_Wrapper"
-                print >>self._inc, T("  $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); } // copy_const_reference")(locals())
+                print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
+                policy = ", policy"
             else:
                 print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
 
-            print >>self._cpp, T("    .def(\"$methname\", &${classname}_Wrapper::$methname)\\")(methname=methname, classname=self._type.name)
+            print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
             return
 
         if static:
