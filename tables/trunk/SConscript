@@ -26,6 +26,6 @@ pkg_dir = "2.1.2-1.8.6"
 PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_dir)
 PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 BINDIR = "bin"
-PKGINFO = (pkg, pkg_ver)
+PKGINFO = (pkg, pkg_ver, env['PYTHON'], env['SIT_ARCH'])
 
 standardExternalPackage(pkg, **locals())
