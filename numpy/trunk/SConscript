@@ -22,7 +22,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "numpy"
 pkg_ver = "1.3.0"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, numpy_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
 
 PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages", pkg)
 PYDIRSEP = True
