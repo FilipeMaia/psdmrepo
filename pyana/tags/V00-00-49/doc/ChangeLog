@@ -1,0 +1,284 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyana
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-49
+2012-05-19 Andy Salnikov
+- the code that detects zero-size EPICS payload crashed when very first
+  epics in an event had zero size
+
+Tag: V00-00-48
+2012-04-24 Andy Salnikov
+- implemented EPICS aliases support
+- updated docstrings to include references to classes
+
+Tag: V00-00-47
+2012-04-10 Andy Salnikov
+- added protection against corrupted type ID
+
+Tag: V00-00-46
+2012-04-02 Andy Salnikov
+- Env.mkfile() creates temporary files in the same directory as 
+  final output file
+
+Tag: V00-00-45
+2012-03-26 Andy Salnikov
+- garbage collector had trouble collection after I added circular 
+  references from Event to bound methods to Event
+- breaking ref loop, it should work better now. 
+
+Tag: V00-00-44
+2012-03-12 Andy Salnikov
+- add "skip-epics" option to pyana, default is true, if set to false
+  then all EPICS-only datagrams are passed to framework as well
+
+Tag: V00-00-43
+2012-03-08 Andy Salnikov
+- reimplement ExpNameFromXtc and ExpNameFromConfig using new class
+  ExpNameDb.ExpNameDatabase
+
+Tag: V00-00-42
+2012-03-07 Andy Salnikov
+- switch config.py to use SafeConfigParser, need it to pass format string
+  to the module instead interpolating them
+- xtc_output now implements proper chunking of the output, stream number
+  can also be changed from config file
+
+Tag: V00-00-41
+2012-03-06 Andy Salnikov
+- Event and Env classes have new methods to return list of event keys
+- new user module event_keys to dump event keys
+- xct_output module now keeps EPICS data in the events that are filtered
+  out and writes those events with EPICS data in them only
+- pyana now skips events that contain EPICS data only (after updating
+  EPICS values in environment), this is done for better filtering support
+
+Tag: V00-00-40
+2012-02-29 Andy Salnikov
+- event.Env class has new methods experiment(), instrument(), calibDir()
+- implementation of experiment() and instrument() is similar to psana and
+  uses the same database file, but is done in Python
+- by default experiment and instrument names are guessed from xtc file 
+  names but can be specified on command line or config file
+- calibDir has sensible default value but can be changed from command
+  line of config file as well
+- new package calib with one class CalibFileFinder, very similar to
+  C++ class PSCalib/CalibFileFinder. Use it to find name of the calibration 
+  file for current run.
+- some changes in xtc_output and pyana to pass skipped events to xtc_output
+
+Tag: V00-00-39
+2012-02-24 Andy Salnikov
+- adding xtc_ouput module, the modu;le which writes datagrams
+  to output file
+- initial implementation, working but needs more work
+
+Tag: V00-00-38
+2012-02-15 Andy Salnikov
+- add support for event loop control from user modules
+
+Tag: V00-00-37
+2012-02-11 Andy Salnikov
+- adding protection for zero-size EPICS channel data in the event
+- print a warning in case zero-size EPICS channel data is detected,
+  not much else can be done to correct the problem, and masking it 
+  completely does not look like a right thing to do
+
+Tag: V00-00-36
+2012-02-10 Andy Salnikov
+- gc.collect() on every event takes too much CPU, implementing better 
+  algorithm. Now GC runs only if VM size grows larger than configured 
+  number since (after) last GC run. Default for delta is 10MB. This
+  should avoid running it frequently for small jobs
+
+Tag: V00-00-35
+2012-02-09 Andy Salnikov
+- updating python docstrings everywhere
+
+Tag: V00-00-34
+2011-12-13 Andy Salnikov
+- call gc.collect() in the event loops to clean up cycles from memory,
+  without this virtual size tends to grow too much
+
+Tag: V00-00-33
+2011-11-11 Andy Salnikov
+- few changes to Event class, mostly transparent to users
+  - constructor now takes Evn object, used internally by new 
+    wrapper methods
+  - get() method now returns correctly wrapped data objects
+    similar to all getXxxData()
+
+Tag: V00-00-32
+2011-10-11 Andy Salnikov
+- bug fix in passing epics data to subprocesses
+
+Tag: V00-00-31
+2011-10-05 Andy Salnikov
+- add fix to EPICS "multi-source" data
+
+Tag: V00-00-30
+2011-08-29 Andy Salnikov
+- fix for EPICS bug in multi-process mode
+
+Tag: V00-00-29
+2011-06-27 Andy Salnikov
+- added support for specifying BldInfo addresses in evt.get()
+
+Tag: V00-00-28
+2011-06-27 Andy Salnikov
+- implemented ordering of cspad quadrants
+
+Tag: V00-00-27
+2011-05-21 - Andy Salnikov
+- modules' methods endjob, endtrun, endcalibcycle now can
+  be declared with three arguments (self, evt, env) instead of
+  two arguments (self, env). 
+- Number of arguments is discovered at run time, so this change 
+  should be backward compatible
+- With three arguments the methods receive standard event object 
+  which can be used to exchange data between modules. 
+
+Tag: V00-00-26
+2011-03-31 - Andy Salnikov
+- fix for zero-sized Epics XTC objects
+
+Tag: V00-00-25
+2011-03-28 - Andy Salnikov
+- changed method dispatch so that beginjob/endjob is called only
+  once per job, not per configure/unconfigure.
+- if there are multiple configure transition in the same job the 
+  warning will be printed.
+
+Tag: V00-00-24
+2011-02-24 - Andy Salnikov
+- previous tag accidentally "overloaded" event.get() method, doing
+  proper overload now
+
+Tag: V00-00-23
+2011-02-23 - Andy Salnikov
+- added support for user data stored in event
+
+Tag: V00-00-22
+2011-02-22 - Andy Salnikov
+- move pyana code to a separate module pyanamod 
+- can be imported into other apps and called by passing parameters 
+  through keyword arguments.
+
+Tag: V00-00-21
+2010-11-09 - Andy Salnikov
+- event.py: change how DroppedContribution are handled at the container 
+  level while scanning XTC containers 
+
+Tag: V00-00-20
+2010-10-14 - Andy Salnikov
+- some changes in cspad module need update for event class 
+
+Tag: V00-00-19
+2010-09-21 - Andy Salnikov
+- store config objects from Control level (ControlConfig) in environment
+  in addition to standard Source level objects
+
+Tag: V00-00-18
+2010-09-03 - Andy Salnikov
+- upgrade to pdsdata V02-07-00, Event class has new method getCsPadQuads()
+
+Tag: V00-00-17
+2010-08-23 - Andy Salnikov
+- bug fix, user module endrun() was not called if -n N option was given
+  to pyana (https://pswww.slac.stanford.edu/trac/psdm/ticket/30) 
+
+Tag: V00-00-16
+2010-07-07 - Andy Salnikov
+- in pyana update environment even if we skip the events, EPICS data 
+  come at random and need to  be remembered
+
+Tag: V00-00-15
+2010-07-07 - Andy Salnikov
+- added skip option to pyanato not process fist N events
+- user midules may have optional begincalibcycle and endcalibcycle
+  methods which will be called for appropriate transitions
+- beginrun and endrun methods were made optional too
+- avoid creating ROOT files when not needed
+
+Tag: V00-00-14
+2010-06-23 - Andy Salnikov
+- relax a bit filtering of damaged events
+
+Tag: V00-00-13
+2010-06-22 - Andy Salnikov
+- event.py: filter out all bad XTC except those having ContainsIncomplete
+
+Tag: V00-00-12
+2010-06-22 - Andy Salnikov
+- histo.py fix, ROOT now is not in module scope
+
+Tag: V00-00-11
+2010-06-22 - Andy Salnikov
+- process damaged events too, do not look inside damaged XTCs ad detector 
+  data level
+- do not import ROOT unless really necessary, it interferes badly with 
+  matplotlib
+- add protection when loading config objects of unknown type
+
+Tag: V00-00-10
+2010-06-17 - Andy Salnikov
+- HistoMgr is instantiated on demand only
+- event object now has run() method, run number is guessed from
+  the file name
+- disappearing sub-process should be handled better now, the main
+  process detects socket errors and stops
+
+Tag: V00-00-09
+2010-06-08 - Andy Salnikov
+- changed Env.updateConfig to store all types of config objects 
+  instead of selected subset
+
+Tag: V00-00-08
+2010-05-13 - Andy Salnikov
+- updated event.Evt and event.Env for new types
+- removed getConfig* methods from Event interface, use Env
+
+Tag: V00-00-06
+2010-04-14 - Andy Salnikov
+- moved examples to a new package pyana_examples/
+- bug fix in src/config, readfp(0 instead of read()
+
+Tag: V00-00-05
+2010-04-13 - Andy Salnikov
+- subprocess ID is know available in environment, can be used to construct
+  unique names
+- updated example myana.py to use simple scipy algorithm 
+
+Tag: V00-00-04
+2010-04-12 - Andy Salnikov
+- src/event.py: changed keyword params from detInfo to address
+- src/config.py: all configuration stuff including command line options
+  was moved here. Small refactoring oof pyana main().
+
+Tag: V00-00-03
+2010-04-09 - Andy Salnikov
+- src/histo.py: added h1i() and h2i() methods
+- src/merger.py: delete temporary files after merging them
+- src/event.py: more uniform handling of address strings
+- src/userana.py: allow multiple instances of the same analysis class
+- examples/myana.py: updated to support many instances
+
+Tag: V00-00-02
+2010-04-02 - Andy Salnikov
+- adding support for merging results from subprocesses 
+- options can now be specified in config file, the same config file
+  can contain options for user modules, see examples/myana.cfg
+
+Tag: V00-00-01
+2010-03-28 - Andy Salnikov
+- first import into repository
+- first half-working version of pyana
