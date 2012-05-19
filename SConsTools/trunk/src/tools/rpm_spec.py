@@ -9,6 +9,7 @@ AUTHORS:
 
 import os
 import time
+import sys
 from string import Template
 
 import SCons
@@ -131,13 +132,19 @@ class _makeRpmSpec:
         trace("RpmSpec package: %s, version %s" % (package, version), "makeRpmSpec", 4)
 
         # build requirements list
-        requires = []
+        requires = ["psdm-root"]
         for pkg, pkginfos in env['EXT_PACKAGE_INFO'].iteritems():
             trace("package %s, pkginfos %s" % (pkg, pkginfos), "makeRpmSpec", 4)
             for pkginfo in pkginfos:
                 dep = '-'.join(pkginfo)
-                requires.append("Requires:      " + dep)
-                requires.append("BuildRequires: " + dep)
+                requires.append(dep)
+
+        # add also scons, need to guess version name and python version
+        pkg = "scons-%s-python%d.%d" % (SCons.__version__, sys.version_info[0], sys.version_info[1])
+        requires.append(pkg)
+        
+        requires = ["Requires:      " + req for req in requires] + \
+            ["BuildRequires: " + req for req in requires]
         requires = '\n'.join(requires)
         trace("requires: %s" % (requires), "makeRpmSpec", 4)
 
