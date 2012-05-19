@@ -19,12 +19,14 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-numpy_ver = "1.3.0"
+pkg = "numpy"
+pkg_ver = "1.3.0"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "numpy", numpy_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, numpy_ver)
 
-PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages", "numpy")
+PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages", pkg)
 PYDIRSEP = True
-INCDIR = PYDIR + "/core/include/numpy"
+INCDIR = PYDIR + "/core/include/" + pkg
+PKGINFO = (pkg, pkg_ver, env['PYTHON'], env['SIT_ARCH'])
 
-standardExternalPackage('numpy', **locals())
+standardExternalPackage(pkg, **locals())
