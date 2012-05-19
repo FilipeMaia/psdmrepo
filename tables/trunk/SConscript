@@ -20,10 +20,12 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "tables"
-pkg_ver = "2.1.2-1.8.6"
+pkg_ver = "2.1.2"
+pkg_dir = "2.1.2-1.8.6"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_dir)
 PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
 BINDIR = "bin"
+PKGINFO = (pkg, pkg_ver)
 
 standardExternalPackage(pkg, **locals())
