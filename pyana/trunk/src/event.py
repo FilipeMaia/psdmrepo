@@ -676,14 +676,17 @@ class EpicsStore(object):
         
         # get all PVs
         epicsData = evt.findXtc(typeId=xtc.TypeId.Type.Id_Epics)
+        lastPvId = None
         for extc in epicsData :
             
             src = extc.src
             e = extc.payload()
             if e is None:
-                
-                guessId = (src.log(), src.phy(), lastPvId+1)
-                guessName = self.m_id2name.get(id, None)
+
+                guessName = None
+                if lastPvId is not None:
+                    guessId = (src.log(), src.phy(), lastPvId+1)
+                    guessName = self.m_id2name.get(id, None)
                 if guessName:
                     _log.warning("Zero-size EPICS data found in the event, expected name is %s", guessName)
                 else:

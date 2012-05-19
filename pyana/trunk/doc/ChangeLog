@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-49
+2012-05-19 Andy Salnikov
+- the code that detects zero-size EPICS payload crashed when very first
+  epics in an event had zero size
+
 Tag: V00-00-48
 2012-04-24 Andy Salnikov
 - implemented EPICS aliases support
