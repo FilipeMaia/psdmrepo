@@ -11,11 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2012-05-20 Andy Salnikov
+- re-tagging V00-03-03 as V00-04-01
+
 Tag: V00-03-03
 2012-05-20 Andy Salnikov
 - small fixes to rmp_spec tool
 
-Tag: V00-03-02
+Tag: V00-04-00
 2012-05-20 Andy Salnikov
 - moved defs from compilers.py to psdm_cplusplucs and psdm_python tools
 - scons will by default run in parallel and use half of all CPUs/cores
