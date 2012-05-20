@@ -26,8 +26,7 @@ unixodbc_ver = "2.2.12"
 PREFIX  = "/usr"
 INCDIR  = "include"
 INCLUDES = "autotest.h odbcinst*.h sql.h sqlext.h sqltypes.h sqlucode.h uodbc_stats.h"
-LIBDIR  = "lib"
-if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
+LIBDIR  = env['LIB_ABI']
 PKGLIBS = "odbc"
 LINKLIBS = "libodbc.so*"
 standardExternalPackage ( 'unixodbc', **locals() )
