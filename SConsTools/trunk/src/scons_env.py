@@ -16,10 +16,23 @@ from SCons.Script import *
 
 from trace import *
 
+
+def _getNumCpus():
+    # determin a number of CPUs in a system
+    try:
+        return os.sysconf('SC_NPROCESSORS_ONLN')
+    except:
+        # guess minimum is one but modern systems
+        # have at least couple of cores
+        return 2
+
 # ===================================
 #   Setup default build environment
 # ===================================
 def buildEnv () :
+
+    # use half of all CPUs
+    SetOption('num_jobs', _getNumCpus()/2)
 
     # SIT_ROOT
     sit_root = os.environ["SIT_ROOT"]
@@ -65,15 +78,12 @@ def buildEnv () :
     sit_arch_parts = sit_arch.split('-')
     sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
-    # LIB_ABI will translate aither to lib or lib64 depending on which architecture we are
-    lib_abi = {'x86_64': "lib64", 'ia64': "lib64"}.get(sit_arch_parts[0], "lib")
-
-    # extend environment with tools
-    tools = ['pyext', 'cython', 'symlink', 'pycompile', 'unittest', 'script_install', 'rpm_spec', 'release_install']
+    # location of the tools
     toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
-    trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
-    for tool in tools:
-        tool = env.Tool(tool, toolpath=toolpath)
+
+    # LIB_ABI will translate either to lib or lib64 depending on which architecture we are
+    lib_abis = {'x86_64-rhel5': "lib64", 'x86_64-rhel6': "lib64"}
+    lib_abi = lib_abis.get(sit_arch_parts[0]+'-'+sit_arch_parts[1], "lib")
 
     # build all paths    
     archdir = pjoin("#arch/", sit_arch)
@@ -120,13 +130,23 @@ def buildEnv () :
                 CYTHONFLAGS=cythonflags,
                 CYTHONCFILESUFFIX=".cpp",
                 TOOLPATH=toolpath,
-                EXT_PACKAGE_INFO = {}
+                EXT_PACKAGE_INFO = {},
+                SCRIPT_SUBS = {}
                 )
+
+    # extend environment with tools
+    tools = ['psdm_cplusplus', 'psdm_python', 'pyext', 'cython', 'symlink', 
+             'pycompile', 'unittest', 'script_install', 'rpm_spec', 
+             'release_install']
+    trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
+    for tool in tools:
+        tool = env.Tool(tool, toolpath=toolpath)
 
     # may want to use "relative" RPATH
     # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
 
     # these lists will be filled by standard rules
+    env['ALL_TARGETS']['INCLUDES'] = []
     env['ALL_TARGETS']['LIBS'] = []
     env['ALL_TARGETS']['BINS'] = []
     env['ALL_TARGETS']['TESTS'] = []

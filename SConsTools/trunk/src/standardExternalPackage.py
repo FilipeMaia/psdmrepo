@@ -128,7 +128,9 @@ def standardExternalPackage(package, **kw) :
 
             # link the whole include directory
             target = pjoin(archinc, package)
-            if not os.path.lexists(target) : os.symlink(inc_dir, target)
+            if not os.path.lexists(target) : 
+                targ = os.symlink(inc_dir, target)
+                env['ALL_TARGETS']['INCLUDES'].append(targ)
 
         else:
 
@@ -142,6 +144,7 @@ def standardExternalPackage(package, **kw) :
                 loc = pjoin(inc_dir, inc)
                 target = pjoin(targetdir, inc)
                 targ = env.Symlink(target, loc)
+                env['ALL_TARGETS']['INCLUDES'].extend(targ)
                 trace("linkinc: %s -> %s" % (str(targ[0]), loc), "standardExternalPackage", 5)
 
 

@@ -1,20 +1,10 @@
-#===============================================================================
-#
-# Main SCons script for SIT release building
-#
-# $Id$
-#
-#===============================================================================
-
+"""
+Tool which selects correct C++ compiler version and options for PSDM releases.
+"""
 import os
-import sys
-import pprint
-from os.path import join as pjoin
 
-from SCons.Defaults import *
-from SCons.Script import *
-
-from trace import *
+from SConsTools.trace import *
+from SConsTools.scons_functions import *
 
 _gcc_opt = { 'opt' : '-O3',
             'dbg' : '-g',
@@ -26,12 +16,8 @@ _ld_opt = { 'opt' : '',
             'deb' : '-g',     # 'deb' was an unfortunate name for 'dbg'
             'prof' : '-pg -static' }
 
-# ===================================
-#   Setup default build environment
-# ===================================
-def setupCompilers( env ) :
+def generate(env):
     
-    proc = env['SIT_ARCH_PROC']
     os = env['SIT_ARCH_OS']
     comp = env['SIT_ARCH_COMPILER']
     opt = env['SIT_ARCH_OPT']
@@ -53,13 +39,15 @@ def setupCompilers( env ) :
         env['CXXFLAGS'] = '-Wno-invalid-offsetof'
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
-    env['PYTHON_VERSION'] = "2.4"
-    env['PYTHON'] = "python"+env['PYTHON_VERSION']
-    env['PYTHON_INCDIR'] = "/usr/include/"+env['PYTHON']
-    env['PYTHON_LIBDIR'] = "/usr/lib"
-    if env['SIT_ARCH_PROC'] == 'x86_64' : env['PYTHON_LIBDIR'] = "/usr/lib64"
-    env['PYTHON_BIN'] = "/usr/bin/"+env['PYTHON']
+    elif comp == 'gcc46' :
+        env['CC'] = 'gcc-4.6'
+        env['CXX'] = 'g++-4.6'
+        env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
+        env['CXXFLAGS'] = '-Wno-invalid-offsetof'
+        env['LDFLAGS'] = _ld_opt.get(opt,'')
 
-    # various substitutions for the scripts 
-    env.SetDefault (SCRIPT_SUBS = {})
-    env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON_BIN']
+    
+    trace ( "Initialized psdm_python tool", "psdm_python", 2 )
+
+def exists(env):
+    return _qtdir(env) is not None

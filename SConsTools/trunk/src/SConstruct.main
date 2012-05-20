@@ -78,7 +78,6 @@ for dirs in [("SConsTools/src", "SConsTools"), ("SConsTools/src/tools", "SConsTo
 from SConsTools.trace import *
 from SConsTools.scons_functions import *
 from SConsTools.scons_env import buildEnv
-from SConsTools.compilers import setupCompilers
 from SConsTools.standardSConscript import standardSConscript
 from SConsTools.dependencies import *
 
@@ -86,7 +85,6 @@ from SConsTools.dependencies import *
 #   Setup default build environment
 # ===================================
 env = buildEnv()
-setupCompilers(env)
 
 # re-build dependencies based on timestamps
 env.Decider('timestamp-newer')
@@ -153,11 +151,16 @@ storePkgDeps(env['PKG_DEPS_FILE'])
 #
 # define few aliases and default targets
 #
+incs = env.Alias('includes', env['ALL_TARGETS']['INCLUDES'])
 libs = env.Alias('lib', env['ALL_TARGETS']['LIBS'])
 bins = env.Alias('bin', env['ALL_TARGETS']['BINS'])
-all = env.Alias('all', libs + bins)
+all = env.Alias('all', incs + libs + bins)
 tests = env.Alias('test', env['ALL_TARGETS']['TESTS'])
+# these are not strictly necessary, just to make it look more make-ish
 env.Requires(env['ALL_TARGETS']['TESTS'], all)
+env.Requires(libs, incs)
+env.Requires(bins, libs)
+# default is to build all
 env.Default(all)
 
 #
