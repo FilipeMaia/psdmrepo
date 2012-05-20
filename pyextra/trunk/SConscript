@@ -21,11 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "pyextra"
 
-if env['PYTHON'] == "python2.4":
-    PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg)
-else:
-    PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg + "-" + env['PYTHON'])
-
+PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg + "-" + env['PYTHON'])
 PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
 PYDIRSEP = True
 PKGINFO = (pkg, env['PYTHON'], env['SIT_ARCH'])
