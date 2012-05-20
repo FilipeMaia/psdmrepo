@@ -78,9 +78,6 @@ def buildEnv () :
     sit_arch_parts = sit_arch.split('-')
     sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
-    # location of the tools
-    toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
-
     # LIB_ABI will translate either to lib or lib64 depending on which architecture we are
     lib_abis = {'x86_64-rhel5': "lib64", 'x86_64-rhel6': "lib64"}
     lib_abi = lib_abis.get(sit_arch_parts[0]+'-'+sit_arch_parts[1], "lib")
@@ -96,12 +93,6 @@ def buildEnv () :
         cpppath.append(pjoin(r, "arch", sit_arch, "geninc"))
         cpppath.append(pjoin(r, "include"))
     libpath = [ pjoin(r, "arch", sit_arch, "lib") for r in all_sit_repos ]
-
-    cythonflags = ["--cplus", '-I', '.', '-I', pjoin("arch", sit_arch, "geninc"), '-I', 'include']
-    for r in sit_repos :
-        cythonflags += ["-I", pjoin(r, "arch", sit_arch, "geninc")]
-        cythonflags += ["-I", pjoin(r, "include")]
-    cythonflags = ' '.join(cythonflags)
 
     # set other variables in environment
     env.Replace(ARCHDIR=archdir,
@@ -127,12 +118,13 @@ def buildEnv () :
                 PKG_TREE_BINS={},
                 ALL_TARGETS={},
                 CXXFILESUFFIX=".cpp",
-                CYTHONFLAGS=cythonflags,
-                CYTHONCFILESUFFIX=".cpp",
-                TOOLPATH=toolpath,
                 EXT_PACKAGE_INFO = {},
                 SCRIPT_SUBS = {}
                 )
+
+    # location of the tools
+    toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
+    env.Replace(TOOLPATH=toolpath)
 
     # extend environment with tools
     tools = ['psdm_cplusplus', 'psdm_python', 'pyext', 'cython', 'symlink', 
@@ -141,6 +133,14 @@ def buildEnv () :
     trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
     for tool in tools:
         tool = env.Tool(tool, toolpath=toolpath)
+
+    # override some CYTHON vars
+    cythonflags = ["--cplus", '-I', '.', '-I', pjoin("arch", sit_arch, "geninc"), '-I', 'include']
+    for r in sit_repos :
+        cythonflags += ["-I", pjoin(r, "arch", sit_arch, "geninc")]
+        cythonflags += ["-I", pjoin(r, "include")]
+    cythonflags = ' '.join(cythonflags)
+    env.Replace(CYTHONFLAGS=cythonflags, CYTHONCFILESUFFIX=".cpp")
 
     # may want to use "relative" RPATH
     # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
