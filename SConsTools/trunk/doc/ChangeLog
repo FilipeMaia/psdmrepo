@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2012-05-20 Andy Salnikov
+- one more fix for rpm_spec tool
+
 Tag: V00-04-01
 2012-05-20 Andy Salnikov
 - re-tagging V00-03-03 as V00-04-01

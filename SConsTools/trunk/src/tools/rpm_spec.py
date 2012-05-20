@@ -60,7 +60,7 @@ PSDM software release $sit_release.
 # =============== Scripts =====================
 
 %prep
-%setup -q -n %{sit_release}
+%setup -q -n $sit_release
 
 %build
 . %{sit_root}/bin/sit_setup.sh
