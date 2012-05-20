@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package pyextra
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "pyextra"
+
+if env['PYTHON'] == "python2.4":
+    PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg)
+else:
+    PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg + "-" + env['PYTHON'])
+
+PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
+PYDIRSEP = True
+PKGINFO = (pkg, env['PYTHON'], env['SIT_ARCH'])
+
+standardExternalPackage(pkg, **locals())
