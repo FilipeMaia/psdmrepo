@@ -60,16 +60,18 @@ PSDM software release $sit_release.
 # =============== Scripts =====================
 
 %prep
-%setup -q
+%setup -q -n %{sit_release}
 
 %build
-scons -j4
-scons -j4 test
-scons -j4 doc
-find . -wholename ./arch -prune -o -wholename ./build -prune -o -wholename ./__FileList__ -o -print > __FileList__ 
+. %{sit_root}/bin/sit_setup.sh
+scons
+scons test
+scons doc
+find . -wholename ./arch -prune -o -wholename ./build -prune -o -wholename ./__FileList__ -o -print | sed 's#^\.#%{instdir}#' > __FileList__ 
 
 %install
-scons -j4 install DESTDIR=%{buildroot}/%{instdir}
+. %{sit_root}/bin/sit_setup.sh
+scons install DESTDIR=%{buildroot}/%{instdir}
 
 %clean
 rm -rf %{buildroot}
@@ -90,7 +92,7 @@ Summary:  PSDM software release $sit_release, platform-specific files.
 PSDM software release $sit_release, platform-specific files.
 
 %files -n %{pkg}-%{version}-%{sit_arch}
-arch/
+%{instdir}/arch/%{sit_arch}
 
 # ================= ChangeLog =========================
 
