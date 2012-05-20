@@ -276,4 +276,15 @@ test -d "$SIT_ROOT/data/_override" && prepend_path SIT_DATA "$SIT_ROOT/data/_ove
 test -d "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE" && prepend_path SIT_DATA "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE"
 prepend_path SIT_DATA "./data"
 
-test "$SIT_RELEASE" = "nobase" && unset_env SIT_RELEASE
+# if there is no base release but .sit_release is there then use it
+if [ "$SIT_RELEASE" = "nobase" ]; then
+  rel=`cat .sit_release`
+  if [ -n "$rel" ] ; then
+    set_env SIT_RELEASE "$rel"
+  else
+    unset_env SIT_RELEASE
+  fi
+fi
+
+# return success
+true

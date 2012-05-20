@@ -76,7 +76,8 @@ Usage: `basename $0` export [options] <package> <tag> <path>
   with the tag name.
 
   Available options:
-    -f|--force   override the content of the directory
+    -f          override the content of the directory
+    -q          quiet operation
     
 EOD
 }
@@ -146,15 +147,23 @@ exec_newpkg() {
 exec_export() {
 	
   force=""
-  if [ "$1" == "-f" -o "$1" == "--force" ] ; then
-  	force="--force"
-  	shift
-  fi
+  quiet=""
+  # get the options
+  OPTIND=1
+  while getopts fq c ; do
+    case $c in
+      f) force="--force" ;;
+      q) quiet="--quiet" ;;
+      \?) help_export ; exit 2 ;;
+    esac
+  done
+  shift `expr $OPTIND - 1`
+
   pkg=${1:?No package name provided}
   tag=${2:?No tag name provided}
   path=${3:?No path provided}
 
-  svn export $force "$SIT_SVN/$pkg/tags/$tag" "$path" &&
+  svn export $quiet $force "$SIT_SVN/$pkg/tags/$tag" "$path" &&
      echo "$tag" > "$path/.sit-tag"
 
 }

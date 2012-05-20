@@ -6,6 +6,8 @@
 #
 #
 
+set -e
+
 #
 # various functions definition
 #
@@ -26,6 +28,7 @@ Usage: `basename $0` [options] [release ...]
     -f file     read list of packages from a file
     -a          list all packages from all releases
     -t string   field delimiter string
+    -P          only use production-style tags from REPO
     
 Release name can be any valid release name from \$SIT_RELDIR,
 "REPO" for repository information, "." for current test release, or
@@ -43,7 +46,7 @@ getPkgList() {
   if [ "$rel" == "REPO" ] ; then
     # not a release, but SVN repository
     repo="$SIT_SVN"
-    svn -v list "$repo" | sed 's%.* \([^ ]*\)/$%\1%'
+    svn list "$repo" | sed 's%\(.*\)/$%\1%'
   else
     # get the list of directories with SConscript file inside
     if [ "$rel" != "." ] ; then
@@ -66,8 +69,15 @@ getPkgTag() {
   if [ "$rel" == "REPO" ] ; then
   	
   	# get most recent tag from SVN repository
+    filter="cat"
     repo="$SIT_SVN"
-  	svn -v list "$repo/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
+    if [ "$prod" = "yes" ]; then
+      tag=`svn -v list "$repo/$pkg/tags" | sort -k1,1n | sed 's%.* \([^ ]*\)/$%\1%' | grep -E "^V[0-9]{2}-[0-9]{2}-[0-9]{2}$" | tail -1`
+    else
+      tag=`svn -v list "$repo/$pkg/tags" | sort -k1,1n | sed 's%.* \([^ ]*\)/$%\1%' | tail -1`
+    fi
+  	test "$tag" = '.' && tag=""
+  	echo $tag
   	
   else
   
@@ -180,9 +190,10 @@ delim=""
 decorate="yes"
 allpkgs="no"
 skip="no"
+prod="no"
 
 # get the options
-while getopts hdnt:rsap:f: c ; do
+while getopts hdnt:rsap:f:P c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
@@ -193,6 +204,7 @@ while getopts hdnt:rsap:f: c ; do
     r) decorate="no" ;;
     s) skip="yes" ;;
     a) allpkgs="yes" ;;
+    P) prod="yes" ;;
     \?) usage ; exit 2 ;;
   esac
 done
@@ -237,6 +249,7 @@ for p in $packages ; do
   
   for r in $relnums ; do
     tag=`getPkgTag $r $p` || exit 2
+    test -z "$tag" && tag="-"
     l="$l$tsep$tag"
     tsep=' '
   done
@@ -254,6 +267,6 @@ if [ -n "$delim" ] ; then
   echo $lines | tr ':' '\n' | sed "s/ /$delim/"
 else
   # human-friendly formatting
-  fmt=`echo $lines | tr ':' '\n' | gawk '{ if (nf<NF) nf=NF ; for(i=1;i<=NF;i++) { l=length($i); if ( w[i]<l ) w[i]=l ; } } END {for(i=1;i<=nf;i++) printf "%%-%ds:", w[i]+3}'`
+  fmt=`echo $lines | tr ':' '\n' | gawk '{ if (nf<NF) nf=NF ; for(i=1;i<=NF;i++) { l=length($i); if ( w[i]<l ) w[i]=l ; } } END {for(i=1;i<=nf-1;i++) printf "%%-%ds:", w[i]+3; printf "%%s"}'`
   echo $lines | tr ':' '\n' | gawk -v fmt=$fmt 'BEGIN { split(fmt,fmta,":");} { for (i=1;i<=NF;++i) printf fmta[i], $i; printf "\n" }'
 fi

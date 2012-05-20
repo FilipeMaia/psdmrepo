@@ -16,6 +16,7 @@ Usage: `basename $0` [options] [package-name [package-tag]]
     -d          debug (turn on -x shell option)
     -c          checkout from CVS [default is SVN]
     -x          export instead of checkout
+    -q          quiet operation
     -f {file|-} read the list of tags from file or standard input
 
   Checks out the packages from repository, the tag can be either a real 
@@ -94,13 +95,13 @@ checkout_svn() {
       echo "Cannot export, package $1 already exist"
       exit 2
   	else
-      $svncmd export "$1" "$2" "$1"
+      $svncmd export $quiet "$1" "$2" "$1"
     fi
   else
     if [ -d "$1/.svn" ] ; then
-      svn switch "$repo123" "$1"
+      $svncmd switch $quiet "$repo123" "$1"
     else
-      svn checkout "$repo123" "$1"
+      $svncmd checkout $quiet "$repo123" "$1"
     fi
   fi
 }
@@ -110,14 +111,16 @@ mode="svn"
 link_scons="no"
 tag_file=""
 export="checkout"
+quiet=""
 
 # get the options
-while getopts hdcxf: c ; do
+while getopts hdcxqf: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     c) mode="cvs" ;;
     x) export="export" ;;
+    q) quiet="-q" ;;
     f) tag_file="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
@@ -177,4 +180,3 @@ else
   checkout "$pkg" "$tag" "$base_release" "$mode" "$export"
     
 fi
-  

@@ -1,0 +1,103 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Script for convenient checkout of the whole release from repository
+# and making a tarball from it.
+#
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [options] <release-name> <tags-file> [<description-file>]
+
+  Available options:
+    -h          This message
+    -o file     Name of output tarball, default is <release name>.tar[.gz|.bz2]
+    -z          Compress tar file with gzip
+    -j          Compress tar file with bzip2
+    -s file     Name of RPM SPEC file, by default SPEC is not generated
+    -t dir      Temporary directory name, default is /tmp
+
+First argument is a required release name such as 5.2.1 or ana-6.3.12. Second 
+argument is a required file name with the package tags (same as accepted by
+addpkg script). If optional third argument is given then it is copied into
+release with the name release-notes.
+
+If option -s with the file name is provided then this script also produces
+SPEC file for RPM that can be used to build the release.
+EOD
+}
+
+# default values for options
+spec=""
+compress=""
+file=""
+tmpdir="/tmp"
+
+# get the options
+while getopts hzjo:s:t: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    z) compress="-z" ;;
+    j) compress="-j" ;;
+    o) file="$OPTARG" ;;
+    s) spec="$OPTARG" ;;
+    t) tmpdir="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check arguments
+if [ $# -lt 2 ] ; then
+  echo "Required parameters missing" 1>&2
+  usage
+  exit 2
+fi
+
+rel="$1"
+tags="$2"
+desc="$3"
+
+#
+# check that tags file is there 
+#
+if [ ! -f "$tags" ] ; then
+    echo "Tags file $tags does not exist, aborting." 1>&2
+    exit 2
+fi
+
+# make tar file name
+if [ -z "$file" ]; then
+    file="${rel}.tar"
+    test "$compress" = "-z" && file="${file}.gz"
+    test "$compress" = "-j" && file="${file}.bz2"
+fi
+
+# create random directory
+tmpdir="$tmpdir/rel-make-tarball-$$"
+mkdir -p "$tmpdir"
+
+# make new release
+(cd "$tmpdir"; newrel $rel $rel)
+
+# copy tags and relnotes
+cp "$tags" "$tmpdir/$rel/tags"
+test -n "$desc" -a -f "$desc" && cp "$desc" "$tmpdir/$rel/release-notes"
+
+# checkout packages
+(cd "$tmpdir/$rel"; addpkg -q -x -f ./tags)
+
+# make tarball
+tar -C "$tmpdir" -c -f "$file" $compress "$rel"
+
+# run scons to make a SPEC file
+if [ -n "$spec" ]; then
+    (cd "$tmpdir/$rel"; . $SIT_ROOT/bin/sit_setup.sh "$rel"; export SIT_RELEASE="$rel"; \
+        scons RPM_SPEC_FILE=./release.spec rpm_spec)
+    cp "$tmpdir/$rel/release.spec" "$spec"
+fi
+
+# cleanup
+rm -rf "$tmpdir"
