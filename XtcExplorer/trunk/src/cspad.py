@@ -275,7 +275,7 @@ class CsPad( object ):
         """
         self.pixels = data2d.reshape(4,8,185,388)
 
-        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="float64")
+        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype=self.pixels.dtype)
         for quad in xrange (4):
 
             quad_image = self.get_quad_image( self.pixels[quad], quad )

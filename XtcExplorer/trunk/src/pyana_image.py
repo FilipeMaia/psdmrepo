@@ -51,6 +51,7 @@ class  pyana_image ( object ) :
                    plot_vrange = None,                   
                    # output options
                    outputfile = None,
+                   output_format = None,
                    max_save = "0",
                    fignum = "1",
                    # data/calibration path (needed for CsPad)
@@ -101,6 +102,7 @@ class  pyana_image ( object ) :
         self.threshold = Threshold(threshold)
             
         self.output_file = opt.getOptString(outputfile)
+        self.output_format = opt.getOptString(output_format) or 'int16'
         print "Output file name base: ", self.output_file
 
         self.plot_vmin = None
@@ -596,22 +598,33 @@ class  pyana_image ( object ) :
 
                 print "Saving \"%s\" (%s) %s to file %s"% (name, title, array.shape, thename)
 
-                # Numpy array
-                if fname[-1] == "npy" :
-                    np.save(thename, np.int_(array))
-                elif fname[-1] == "txt" :
-                    np.savetxt(thename, np.int_(array)) 
+                array = array.astype(self.output_format)
+                
+                # output files... 
+                if fname[-1] == "txt" :  # Ascii
+                    np.savetxt(thename, array, fmt="%d")
+
+                elif fname[-1] == "npy" : # Numpy binary 
+                    np.save(thename, array)
+
+                elif fname[-1] == 'dat' : # Raw binary
+                    array.tofile(thename)
+                elif fname[-1] == 'bin' : # Raw binary
+                    array.tofile(thename)
+
                 elif fname[-1] == "hdf5":
                     #print "HDF5 not implemented yet"
                     import h5py
                     file_handle = h5py.File(thename, 'w')
                     group = file_handle.create_group("Data")
-                    dataset = group.create_dataset(title,data=np.int_(array))
+                    dataset = group.create_dataset(title,data=array)
                     file_handle.close()                    
+
                 elif fname[-1] == "mat":
                     import scipy.io
-                    scipy.io.savemat(thename,{title:np.int_(array)})
-                else :
-                    import scipy.misc
-                    scipy.misc.imsave(thename, np.int_(array))
+                    scipy.io.savemat(thename,{title:array})
+
+                else :  # Some image format... JPG, tiff, etc... 
+                    import scipy.misc 
+                    scipy.misc.imsave(thename, array)
                     

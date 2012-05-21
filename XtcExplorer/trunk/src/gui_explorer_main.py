@@ -592,9 +592,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.scanner = XtcScanner()                
         self.scanner.setFiles(self.filenames)        
         if quick :
-            self.scanner.setOption({'ndatagrams':(self.nev_qscan+3)})
+            self.scanner.setOption({'nevents':(self.nev_qscan+3)})
         else :
-            self.scanner.setOption({'ndatagrams':-1}) # all
+            self.scanner.setOption({'nevents':-1}) # all
         self.scanner.scan()
 
         # (re)make the pyana control object

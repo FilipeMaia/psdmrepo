@@ -53,7 +53,6 @@ import webbrowser
 # Local non-exported definitions --
 #----------------------------------
 
-
 #------------------------
 # Exported definitions --
 #------------------------
@@ -92,14 +91,25 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
-        self.lclsLogo =  apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
         self.setWindowTitle("LCLS Xtc Explorer")
+
+        self.lclsLogo =  apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
         self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path() ))
 
-        self.directory = "/reg/d/psdm/"
-        self.instrument = instrument
+        self.info = {}
+        self.info['files'] = [] # list of current files
+        self.info['dir'] = "/reg/d/psdm/"
+        self.info['instrument'] = instrument
+        self.info['expname'] = None
+        self.info['expnumber'] = None
+        self.info['runnumber'] = None
+
+        self.directory = '/reg/d/psdm/' #default
         self.filenames = []
-        # list of current files
+        self.instrument = instrument
+        self.experiment = None
+        self.expnumber = None
+        self.runnumber = None
 
         # keep reference to these objects at all times, they know a lot...
         self.scanner = None
@@ -117,6 +127,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         # Icon
         self.pic = QtGui.QLabel(self)
         self.pic.setPixmap( QtGui.QPixmap(self.lclsLogo.path()))
+
+        logo2 =  apputils.AppDataPath('XtcExplorer/icons/xtcexplorer_logo2.gif')
+        pic2 = QtGui.QLabel(self)
+        pic2.setPixmap( QtGui.QPixmap(logo2.path()))
 
         # menu
         self.help_menu = QtGui.QMenu('&Help', self)
@@ -244,8 +258,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         # header
         h0 = QtGui.QHBoxLayout()
         h0.addWidget( self.pic )
+        h0.addWidget( pic2 )
         h0.setAlignment( self.pic, QtCore.Qt.AlignLeft )
-
+        h0.setAlignment( pic2, QtCore.Qt.AlignLeft )
+        
         # files
         fgroup = QtGui.QGroupBox("File section")        
 
@@ -425,20 +441,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             if os.path.isfile(filename) :
                 self.filenames.append(filename)
 
-                # update the select buttons for Instrument and Experiment
-                parts = filename.split('/')
-                try:
-                    self.instrument = parts[4]
-                    self.experiment = parts[5]
-                    self.runnumber = parts[7].split('-')[1].strip('r')
-
-                    self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
-                    self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
-                    self.lineEditRun.setText(self.runnumber)
-                except: 
-                    print "Failed to determine instrument, experiment or run number from the path (%s)."\
-                          % (filename)
-
                 # add the last file opened to the line dialog
                 self.lineedit.setText( str(filename) )
                 self.update_currentfiles()
@@ -493,7 +495,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         # number of files
         nfiles = len(self.filenames)
         status = "Currently selected:  %d file(s)  " % nfiles
-        
+
+        if nfiles > 0: 
+            self.extract_experiment_info()
+
         # total file size
         self.filesize = 0.0
         for filename in self.filenames :
@@ -501,32 +506,32 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             
         filesizetxt = ""
         scantext = "Scan all events"
-        if nfiles > 0 :
-            filesize = self.filesize/1024
-            if filesize < 1024 :
-                filesizetxt = "%.1fk" % (filesize)
-            elif filesize < 1024**2 :
-                filesizetxt = "%.1fM" % (filesize/1024)
-            elif filesize < 1024**3 :
-                filesizetxt = "%.1fG" % (filesize/1024**2)
-            elif filesize < 1024**4 :
-                filesizetxt = "%.1fT" % (filesize/1024**3)
-            else :
-                filesizetxt = "Big! "
 
-            # if files, enable the buttons
-            if self.qscan_button :
-                self.qscan_button.setEnabled(True)
-            if self.scan_button and self.scan_label :
-                # automatically enable full scan if smaller than 1.2G
-                if self.filesize < 1.2*1024**3 :
-                    scantext = "Scan all events (%s)"%filesizetxt
-                    self.scan_button.setEnabled(True)
-                    self.scan_enable_button.setText("Disable full scan")
-                else :
-                    scantext = "Scan all events (%s!)"%filesizetxt
-                    self.scan_button.setDisabled(True)
-                    self.scan_enable_button.setText("Enable full scan")
+        filesize = self.filesize/1024
+        if filesize < 1024 :
+            filesizetxt = "%.1fk" % (filesize)
+        elif filesize < 1024**2 :
+            filesizetxt = "%.1fM" % (filesize/1024)
+        elif filesize < 1024**3 :
+            filesizetxt = "%.1fG" % (filesize/1024**2)
+        elif filesize < 1024**4 :
+            filesizetxt = "%.1fT" % (filesize/1024**3)
+        else :
+            filesizetxt = "Big! "
+
+        # if files, enable the buttons
+        if self.qscan_button :
+            self.qscan_button.setEnabled(True)
+        if self.scan_button and self.scan_label :
+            # automatically enable full scan if smaller than 1.2G
+            if self.filesize < 1.2*1024**3 :
+                scantext = "Scan all events (%s)"%filesizetxt
+                self.scan_button.setEnabled(True)
+                self.scan_enable_button.setText("Disable full scan")
+            else :
+                scantext = "Scan all events (%s!)"%filesizetxt
+                self.scan_button.setDisabled(True)
+                self.scan_enable_button.setText("Enable full scan")
 
         status+="\t %s \n" % filesizetxt
         for filename in self.filenames :
@@ -536,6 +541,41 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.currentfiles.setText(status)
         self.scan_label.setText(scantext)
         self.fileinfo.setText("")
+            
+    def extract_experiment_info(self):
+        dirname, filename = os.path.split( self.filenames[-1] )
+        # guess instrument, experiment, runnumber 
+        self.expnumber = int(filename.split('-')[0].strip('e'))
+        self.runnumber = int(filename.split('-')[1].strip('r'))
+
+        parts = set(dirname.split('/'))
+        instr = ['amo','sxr','xpp','cxi','xcs','mec']
+        #l = [ x for x in parts if x in   instr]
+        for i in parts.intersection( instr ):
+            self.instrument = i.upper()
+            
+        candidates = [x for x in parts if len(x)==8 ]
+        for c in candidates:
+            self.experiment = c
+            self.instrument = c[:3].upper()
+
+        # update the select buttons for Instrument and Experiment
+        try:
+            self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
+            self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
+            self.lineEditRun.setText(self.runnumber)
+            print "Line edit has been updated, no?"
+        except: 
+            print "Failed to determine instrument, experiment or run number from the path (%s)."
+
+        print "Filenames:          ", self.filenames
+        print "Directory:          ", self.directory
+        print "Experiment number:  ", self.expnumber
+        print "Experiment name:    ", self.experiment
+        print "Instrument:         ", self.instrument
+        print "Run number:         ", self.runnumber        
+            
+        
 
 
     def change_nev_qscan(self):

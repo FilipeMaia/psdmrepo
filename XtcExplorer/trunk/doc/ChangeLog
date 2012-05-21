@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-17 ofte V00-01-26          rev 3530
+        - some more output formats for pyana_image
+	- improved record-keeping and guessing of instrument/experiment
 	
 2012-May-10 ofte V00-01-25          rev 3373
        - added a flag to rotate CSPad with small tilt angles (interpolating the array)
