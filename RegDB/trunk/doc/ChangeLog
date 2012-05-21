@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-44
+2012-05-21 Igor Gaponenko
+- JQuery, JQuery UI migration
+
 Tag: V00-00-43
 2012-04-23 Igor Gaponenko
 - extended Python module experiment_info with a function returning a list
