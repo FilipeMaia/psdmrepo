@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2012-05-21 Andy Salnikov
+- during the build python modules are now copied to build/... directory
+  instead of arch/...
+- removed SConscript files, not really needed
+- update rpm_spec tool to build more packages
+- cython location is specified explicitly, do not rely on $PATH
+- standardExternalPackage updated to use rules instead of explicit mkdir()/symlink()
+
 Tag: V00-04-03
 2012-05-20 Andy Salnikov
 - fixing scons_env, things were done a bit out of order

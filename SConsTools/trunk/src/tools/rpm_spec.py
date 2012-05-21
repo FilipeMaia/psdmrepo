@@ -33,7 +33,8 @@ Source100:  sit_env.spec.inc
 # everything will go under SIT_ROOT
 %define prefix   %{sit_root}
 # installation directory for the package
-%define instdir  %{prefix}/sw/releases/$sit_release
+%define sit_reldir %{prefix}/sw/releases
+%define instdir  %{sit_reldir}/$sit_release
 
 Name:       %{pkg}-%{version}
 Version:    %{version}
@@ -63,15 +64,20 @@ PSDM software release $sit_release.
 %setup -q -n $sit_release
 
 %build
-. %{sit_root}/bin/sit_setup.sh
+. %{sit_root}/bin/sit_setup.sh opt
 scons
 scons test
 scons doc
-find . -wholename ./arch -prune -o -wholename ./build -prune -o -wholename ./__FileList__ -o -print | sed 's#^\.#%{instdir}#' > __FileList__ 
+. %{sit_root}/bin/sit_setup.sh dbg
+scons
+scons test
+find . -wholename ./arch -prune -o -wholename ./build -prune -o -wholename ./.sconsign.dblite \
+    -o -wholename ./__FileList__ -o -print | sed 's#^\.#%{instdir}#' > __FileList__ 
 
 %install
 . %{sit_root}/bin/sit_setup.sh
 scons install DESTDIR=%{buildroot}/%{instdir}
+ln -sf %{buildroot}/%{sit_reldir}/$current_link $sit_release
 
 %clean
 rm -rf %{buildroot}
@@ -80,7 +86,7 @@ rm -rf %{buildroot}
 
 # ================== Platform-specific subpackage ==================
 
-%package -n %{pkg}-%{version}-%{sit_arch}
+%package -n %{pkg}-%{version}-%{sit_arch_base}-opt
 
 Requires: %{pkg}-%{version}
 Group:    PSDM Analysis Software
@@ -88,11 +94,43 @@ Prefix:   %{prefix}
 Autoreq:  0 
 Summary:  PSDM software release $sit_release, platform-specific files.
 
-%description -n %{pkg}-%{version}-%{sit_arch}
-PSDM software release $sit_release, platform-specific files.
+%description -n %{pkg}-%{version}-%{sit_arch_base}-opt
+PSDM software release $sit_release, platform-specific files for optimized builds.
 
-%files -n %{pkg}-%{version}-%{sit_arch}
-%{instdir}/arch/%{sit_arch}
+%files -n %{pkg}-%{version}-%{sit_arch_base}-opt
+%{instdir}/arch/%{sit_arch_base}-opt
+
+# ================== Platform-specific subpackage ==================
+
+%package -n %{pkg}-%{version}-%{sit_arch_base}-dbg
+
+Requires: %{pkg}-%{version}
+Group:    PSDM Analysis Software
+Prefix:   %{prefix}
+Autoreq:  0 
+Summary:  PSDM software release $sit_release, platform-specific files.
+
+%description -n %{pkg}-%{version}-%{sit_arch_base}-dbg
+PSDM software release $sit_release, platform-specific files for debug builds.
+
+%files -n %{pkg}-%{version}-%{sit_arch_base}-dbg
+%{instdir}/arch/%{sit_arch_base}-dbg
+
+# ================== "Current" subpackage ==================
+
+%package -n %{pkg}-current-%{version}
+
+Requires: %{pkg}-%{version}
+Group:    PSDM Analysis Software
+Prefix:   %{prefix}
+Autoreq:  0 
+Summary:  Current link for PSDM software release $sit_release.
+
+%description -n %{pkg}-current-%{version}
+Current link for PSDM software release $sit_release.
+
+%files -n %{pkg}-current-%{version}
+%{sit_reldir}/$current_link
 
 # ================= ChangeLog =========================
 
@@ -128,9 +166,11 @@ class _makeRpmSpec:
         if len(pkg_ver) == 1:
             package = "psdm-release"
             version = pkg_ver[0]
+            current_link = "current"
         else:
             package = "psdm-release-" + pkg_ver[0]
             version = pkg_ver[1]
+            current_link = pkg_ver[0] + "-current"
         trace("RpmSpec package: %s, version %s" % (package, version), "makeRpmSpec", 4)
 
         # build requirements list
@@ -141,7 +181,7 @@ class _makeRpmSpec:
                 dep = '-'.join(pkginfo)
                 requires.append(dep)
 
-        # add also scons, need to guess version name and python version
+        # add also scons, need to guess version name and python version (which is python running scons)
         pkg = "scons-%s-python%d.%d" % (SCons.__version__, sys.version_info[0], sys.version_info[1])
         requires.append(pkg)
         
@@ -155,7 +195,7 @@ class _makeRpmSpec:
         
         # substitute everything in a template
         subs = dict(sit_release=sit_release, package=package, version=version, 
-                requires=requires, date=date)
+                requires=requires, current_link=current_link, date=date)
         spec = _spec.substitute(subs)
         
         # write it out

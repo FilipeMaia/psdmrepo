@@ -45,7 +45,8 @@ def cython_suffix_emitter(env, source):
 
 def generate(env):
     
-    env["CYTHON"] = "cython"
+    # cython comes from pyextra package
+    env["CYTHON"] = "$SIT_EXTERNAL_SW/pyextra-$PYTHON/$SIT_ARCH/bin/cython"
     env["CYTHONCOM"] = "$CYTHON $CYTHONFLAGS -o $TARGET $SOURCE"
     env["CYTHONCFILESUFFIX"] = ".c"
 

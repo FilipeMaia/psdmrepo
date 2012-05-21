@@ -22,6 +22,9 @@ for var in ["SIT_ARCH", "SIT_ROOT", "SIT_RELEASE"]:
 
 sit_arch = os.environ["SIT_ARCH"]
 
+# add build/$SIT_ARCH/SConsTools/python to PYTHONPATH (this is where we link files, see below)
+sys.path.insert(0, pjoin(cwd, "build", sit_arch, "SConsTools/python"))
+
 # check .sit_release
 try:
     test_rel = file('.sit_release').read().strip()
@@ -38,7 +41,7 @@ if os.environ["SIT_RELEASE"] != test_rel:
 
 #
 # Before doing any other imports link the python files from
-# SConsTools/src/*.py and SConsTools/src/tools/*.py to arch/$SIT_ARCH/python/SConsTools/...
+# SConsTools/src/*.py and SConsTools/src/tools/*.py to build/$SIT_ARCH/SConsTools/python/...
 #
 for dirs in [("SConsTools/src", "SConsTools"), ("SConsTools/src/tools", "SConsTools/tools")]:
     if os.path.isdir(dirs[0]):
@@ -47,7 +50,7 @@ for dirs in [("SConsTools/src", "SConsTools"), ("SConsTools/src/tools", "SConsTo
         pys = set(f for f in os.listdir(dirs[0]) if os.path.splitext(f)[1] == ".py")
 
         # list of links in arch/$SIT_ARCH/python/SConsTools
-        d = pjoin("arch", sit_arch, "python", dirs[1])
+        d = pjoin("build", sit_arch, "SConsTools/python", dirs[1])
         if not os.path.isdir(d): os.makedirs(d)
         links = set(f for f in os.listdir(d) if os.path.splitext(f)[1] == ".py")
 
