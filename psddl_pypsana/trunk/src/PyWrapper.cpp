@@ -84,11 +84,11 @@ namespace Psana {
     EnvObjectStore::GetResultProxy get2(const Source& source, Src* foundSrc = 0) { return _store.get(source, foundSrc); }
 
     object get(const string& typeNameGeneric, const Source& source) {
-      string typeName = getTypeNameWithHighestVersion<EnvGetter>(environmentGetter_map, typeNameGeneric);
+      string typeName = getTypeNameWithHighestVersion<EnvGetter>(envGetter_map, typeNameGeneric);
       if (typeName == "") {
         return object(none);
       }
-      EnvGetter *getter = environmentGetter_map[typeName];
+      EnvGetter *getter = envGetter_map[typeName];
       if (getter) {
         return getter->get(_store, source);
       }
@@ -141,12 +141,20 @@ namespace Psana {
   }
 
   object getFromEvent(Event& evt, const string& typeNameGeneric, Source& src) {
-    string typeName = getTypeNameWithHighestVersion<EvtGetter>(eventGetter_map, typeNameGeneric);
+    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
     if (typeName == "") {
       return object(none);
     }
-    EvtGetter *g = eventGetter_map[typeName];
+    EvtGetter *g = evtGetter_map[typeName];
     return g->get(evt, src);
+  }
+
+  PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data) {
+    npy_intp dims[ndim];
+    for (unsigned i = 0; i < ndim; i++) {
+      dims[i] = shape[i];
+    }
+    return PyArray_SimpleNewFromData(ndim, dims, ptype, data);
   }
 
   void createWrappers()
@@ -154,20 +162,6 @@ namespace Psana {
     // Required initialization of numpy array support
     _import_array();
     array::set_module_and_type("numpy", "ndarray");
-
-#if 0
-
-#define std_vector_class_(T) class_<vector<T> >("std_vector_" #T, no_init)\
-    .def(vector_indexing_suite<vector<T> >())\
-    .def("size", &vector<T>::size)
-
-      class_<std::vector<X> >("XVec")
-        .def(vector_indexing_suite<std::vector<X> >())
-        ;
-
-    //    std_vector_class_(FOO*);
-#undef class_std_vector
-#endif
 
     std_vector_class_(int);
     std_vector_class_(short);
@@ -214,50 +208,8 @@ namespace Psana {
     CreateWrappers::createWrappers();
   }
 
-  map<string, EvtGetter*> eventGetter_map;
-  map<string, EnvGetter*> environmentGetter_map;
-
-  PyObject* ndConvert(void* data, const unsigned* shape, const unsigned ndim, char *_ctype, size_t eltsize) {
-    _import_array(); // XXX already done above
-    array::set_module_and_type("numpy", "ndarray"); // XXX already done above
-
-    npy_intp dims[ndim];
-    int count = 1;
-    for (unsigned int i = 0; i < ndim; i++) {
-      count *= (dims[i] = shape[i]);
-    }
-
-    PyArray_Descr* descr = NULL;
-    string ctype(_ctype);
-    if (ctype == "int8_t") {
-      descr = PyArray_DescrFromType(PyArray_BYTE);
-    } else if (ctype == "uint8_t") {
-      descr = PyArray_DescrFromType(PyArray_UBYTE);
-    } else if (ctype == "int16_t") {
-      descr = PyArray_DescrFromType(PyArray_SHORT);
-    } else if (ctype == "uint16_t") {
-      descr = PyArray_DescrFromType(PyArray_USHORT);
-    } else if (ctype == "int32_t") {
-      descr = PyArray_DescrFromType(PyArray_INT);
-    } else if (ctype == "uint32_t") {
-      descr = PyArray_DescrFromType(PyArray_UINT);
-    } else if (ctype == "float") {
-      descr = PyArray_DescrFromType(PyArray_CFLOAT);
-    } else if (ctype == "double") {
-      descr = PyArray_DescrFromType(PyArray_CDOUBLE);
-    } else {
-      printf("!!!!!!!!! ndConvert(%s):%d\n", _ctype, __LINE__);
-      printf("!!!!!!!!! ndConvert(%s):%d: pointer=%p\n", _ctype, __LINE__, data);
-      printf("!!!!!!!!! ndConvert(%s):%d: data=0x%x\n", _ctype, __LINE__, *(char *)data);
-      printf("!!!!!!!!! ndConvert(%s):%d: eltsize=%d\n", _ctype, __LINE__, (int) eltsize);
-      printf("Cannot convert ctype %s to PyArray type; will approximate with bytes\n", ctype.c_str());
-
-      descr = PyArray_DescrFromType(PyArray_BYTE);
-    }
-    PyObject* result = PyArray_NewFromDescr(&PyArray_Type, descr, ndim, dims, NULL, data, 0, NULL);
-      //PyObject* result = PyArray_SimpleNewFromData(ndim, dims, ptype, data);
-    return result;
-  }
+  map<string, EvtGetter*> evtGetter_map;
+  map<string, EnvGetter*> envGetter_map;
 
   // call specific method
   boost::shared_ptr<PyObject> call(PyObject* method, Event& evt, Env& env, const string& name, const string& className)
