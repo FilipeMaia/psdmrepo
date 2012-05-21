@@ -40,6 +40,7 @@ try {
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
+
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/neocaptar.css" rel="Stylesheet" />
 <link type="text/css" href="css/Table.css" rel="Stylesheet" />
