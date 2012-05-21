@@ -118,20 +118,14 @@ def standardExternalPackage(package, **kw) :
 
         trace("include_dir: %s" % inc_dir, "standardExternalPackage", 5)
 
-        # make 'geninc' directory if not there yet
-        archinc = env.Command(env.Dir("$ARCHINCDIR"), [], Mkdir("$TARGET"))
-
         includes = kw.get('INCLUDES')
         if not includes :
 
             # link the whole include directory
-            targ = env.Symlink(env.Dir(pjoin("$ARCHINCDIR", package)), env.Dir(inc_dir))
+            targ = env.Symlink(pjoin("$ARCHINCDIR", package), env.Dir(inc_dir))
             env['ALL_TARGETS']['INCLUDES'].extend(targ)
 
         else:
-
-            # make target package directory if needed
-            targetdir = env.Command(env.Dir(pjoin("$ARCHINCDIR", package)), [], Mkdir("$TARGET"))
 
             # copy individual files
             includes = _glob(inc_dir, includes)
@@ -147,11 +141,9 @@ def standardExternalPackage(package, **kw) :
     if py_dir is not None :
         trace("py_dir: %s" % py_dir, "standardExternalPackage", 5)
         
-        toppydir = env.Command(env.Dir("$PYDIR"), [], Mkdir("$TARGET"))
-        
         if kw.get('PYDIRSEP', False) :
             # make a link to the whole dir
-            targ = env.Symlink(env.Dir("$PYDIR/" + package), env.Dir(py_dir))
+            targ = env.Symlink("$PYDIR/" + package, env.Dir(py_dir))
             env['ALL_TARGETS']['LIBS'].extend(targ)
         else :
             # make links for every file in the directory
@@ -162,7 +154,7 @@ def standardExternalPackage(package, **kw) :
                 if not os.path.isdir(loc) :
                     targ = env.Symlink("$PYDIR/" + f, loc)
                 else :
-                    targ = env.Symlink(env.Dir("$PYDIR/" + f), env.Dir(loc))
+                    targ = env.Symlink("$PYDIR/" + f, env.Dir(loc))
                 trace("linkpy: %s -> %s" % (str(targ[0]), loc), "standardExternalPackage", 5)
                 env['ALL_TARGETS']['LIBS'].extend(targ)
 
