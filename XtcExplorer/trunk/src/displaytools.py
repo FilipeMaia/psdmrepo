@@ -488,6 +488,15 @@ class Frame(object):
         - threshold management
         - display mode management
         """
+        print "Debugging"
+        print "    ", image.min(), image.max()
+        print "    ", self.vmin, self.vmax
+        print "    "
+        print "    "
+        print "    "
+
+        self.orglims = image.min(), image.max()
+
         if ( self.vmin is None) and (self.vmin is not None ):
             self.vmin = self.vmin
         if ( self.vmax is None) and (self.vmax is not None ):
@@ -548,14 +557,6 @@ class Frame(object):
         self.colb = plt.colorbar(self.axesim,cax=cax)
         # colb is the colorbar object
 
-        self.orglims = self.axesim.get_clim()
-        if self.vmin is not None:
-            self.orglims = ( self.vmin, self.orglims[1] )
-        if self.vmax is not None:
-            self.orglims = ( self.orglims[0], self.vmax )
-
-        self.vmin, self.vmax = self.orglims
-
 
         # show the active region for thresholding
         if self.threshold and self.threshold.area is not None:
@@ -565,6 +566,10 @@ class Frame(object):
             self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
             self.axes.add_patch(self.thr_rect)
             print "Plotting the red rectangle in area ", self.threshold.area
+
+
+        # slider?!
+        
 
 
 class Plotter(object):    

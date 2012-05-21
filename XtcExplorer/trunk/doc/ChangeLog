@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-21 ofte V00-01-27          rev 3558
+	- bugfix with the plot vrange 
+	
 2012-May-17 ofte V00-01-26          rev 3530
         - some more output formats for pyana_image
 	- improved record-keeping and guessing of instrument/experiment
