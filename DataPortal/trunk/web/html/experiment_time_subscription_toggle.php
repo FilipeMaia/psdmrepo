@@ -16,7 +16,7 @@ use LusiTime\LusiTimeException;
 
 /**
  * This service will togle current user's subscription for notifications
- * posted when downtime justification comments are posted to the database.
+ * posted when downtime explanation comments are posted to the database.
  */
 function report_error($msg) {
 	return_result(
@@ -50,8 +50,8 @@ try {
 	$subscriber = $authdb->authName();
 	$address    = $subscriber.'@slac.stanford.edu';
 
-    $sysmon->subscribe4justifications_if(
-		is_null( $sysmon->check_if_subscribed4justifications( $subscriber, $address )),
+    $sysmon->subscribe4explanations_if(
+		is_null( $sysmon->check_if_subscribed4explanations( $subscriber, $address )),
 		$subscriber,
 		$address );
 

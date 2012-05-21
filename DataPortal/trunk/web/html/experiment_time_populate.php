@@ -52,6 +52,9 @@ if( isset($_GET['min_gap_width_sec'])) {
     if(!$min_gap_width_sec)
         report_error('please, provide a positive number for parameter: min_gap_width_sec');
 }
+$no_beam_correction4gaps = isset($_GET['no_beam_correction4gaps']);
+$force = isset($_GET['force']);
+
 try {
     $authdb = AuthDB::instance();
 	$authdb->begin();
@@ -91,7 +94,11 @@ HERE;
 </div>
 HERE;
 
-    $sysmon->populate('XRAY_DESTINATIONS',$min_gap_width_sec);
+    $sysmon->populate (
+        'XRAY_DESTINATIONS',
+        $min_gap_width_sec,
+        $no_beam_correction4gaps,
+        $force );
 
 	$authdb->commit();
     $logbook->commit();

@@ -39,12 +39,13 @@ try {
 <title><?php echo $document_title ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/neocaptar.css" rel="Stylesheet" />
+<link type="text/css" href="css/Table.css" rel="Stylesheet" />
 
-<script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
@@ -53,6 +54,7 @@ try {
 <script type="text/javascript" src="js/neocaptar_dictionary.js"></script>
 <script type="text/javascript" src="js/neocaptar_search.js"></script>
 <script type="text/javascript" src="js/neocaptar_admin.js"></script>
+<script type="text/javascript" src="js/Table.js"></script>
 
 
 <!----------- Window layout styles and supppot actions ----------->
@@ -262,14 +264,18 @@ div.v-item:hover {
   padding: 0.25em;
   padding-left: 0.5em;
 
+  /*
   background-color: #DEF0CD;
+  */
   border: 2px solid #a0a0a0;
 
   border-left:0;
   border-top:0;
+  border-right:0;
+  /*
   border-radius: 5px;
   -moz-border-radius: 5px;
-
+  */
   font-family: "Times", serif;
   font-size: 36px;
   font-weight: bold;
@@ -469,8 +475,8 @@ function set_context(app) {
 function show_email( user, addr ) {
 	$('#popupdialogs').html( '<p>'+addr+'</p>' );
 	$('#popupdialogs').dialog({
-		modal:  true,
-		title:  'e-mail: '+user
+		modal: true,
+		title: 'e-mail: '+user
 	});
 }
 
@@ -498,11 +504,11 @@ function ask_yes_no( title, msg, on_yes, on_cancel ) {
 		buttons: {
 			"Yes": function() {
 				$( this ).dialog('close');
-				if( on_yes != null ) on_yes();
+				if(on_yes) on_yes();
 			},
 			Cancel: function() {
 				$(this).dialog('close');
-				if( on_cancel != null ) on_cancel();
+				if(on_cancel) on_cancel();
 			}
 		},
 		title: title
@@ -519,7 +525,7 @@ function report_error( msg, on_cancel ) {
 		buttons: {
 			Cancel: function() {
 				$(this).dialog('close');
-				if( on_cancel != null ) on_cancel();
+				if(on_cancel) on_cancel();
 			}
 		},
 		title: 'Error'
@@ -531,13 +537,6 @@ function report_info( title, msg ) {
 	$('#infodialogs').dialog({
 		resizable: true,
 		modal: true,
-/*
-        buttons: {
-			Cancel: function() {
-				$(this).dialog('close');
-			}
-		},
-*/
 		title: title
 	});
 }
@@ -794,6 +793,10 @@ function global_search_cables_by_dict_instr_id    (id)          { global_switch_
 function global_search_project_by_id              (id)          { global_switch_context('projects','search').search_project_by_id              (id); }
 function global_search_projects_by_owner          (uid)         { global_switch_context('projects','search').search_projects_by_owner          (uid); }
 
+function global_search_cables_by_dict_device_location_id (id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_location_id (id); }
+function global_search_cables_by_dict_device_region_id   (id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_region_id   (id); }
+function global_search_cables_by_dict_device_component_id(id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_component_id(id); }
+
 function global_export_cables(search_params,outformat) {
     search_params.format = outformat;
     var html = '<img src="../logbook/images/ajaxloader.gif" />';
@@ -827,7 +830,6 @@ function global_truncate_location (str) { return str.substring(0, 6); }
 function global_truncate_rack     (str) { return str.substring(0, 6); }
 function global_truncate_routing  (str) { return str.substring(0,50); }
 function global_truncate_instr    (str) { return str.substring(0, 3); }
-function global_truncate_device   (str) { return str.substring(0,14); }
 function global_truncate_func     (str) { return str.substring(0,33); }
 function global_truncate_length   (str) { return str.substring(0, 4); }
 function global_truncate_ele      (str) { return str.substring(0, 2); }
@@ -835,6 +837,38 @@ function global_truncate_side     (str) { return str.substring(0, 1); }
 function global_truncate_slot     (str) { return str.substring(0, 6); }
 function global_truncate_conn     (str) { return str.substring(0, 8); }
 function global_truncate_station  (str) { return str.substring(0, 6); }
+
+function global_truncate_device          (str) { return str.substring(0,18); }
+function global_truncate_device_location (str) { return str.substring(0, 3); }
+function global_truncate_device_region   (str) { return str.substring(0, 3); }
+function global_truncate_device_component(str) { return str.substring(0, 3); }
+function global_truncate_device_counter  (str) { return str.substring(0, 2); }
+function global_truncate_device_suffix   (str) { return str.substring(0, 3); }
+
+function global_cable_status2rank(status) {
+    switch(status) {
+        case 'Planned':      return 0;
+        case 'Registered':   return 1;
+        case 'Labeled':      return 2;
+        case 'Fabrication':  return 3;
+        case 'Ready':        return 4;
+        case 'Installed':    return 5;
+        case 'Commissioned': return 6;
+        case 'Damaged':      return 7;
+        case 'Retired':      return 8;
+    }
+    return -1;
+}
+function global_cable_sorter_by_status     (a,b) { return global_cable_status2rank(a.status) - global_cable_status2rank(b.status); }
+function sort_as_text                      (a,b) { return a == b ? 0 : ( a < b ? -1 : 1 ); }
+function global_cable_sorter_by_project    (a,b) { return sort_as_text(a.project_title,    b.project_title); }
+function global_cable_sorter_by_job        (a,b) { return sort_as_text(a.job,              b.job); }
+function global_cable_sorter_by_cable      (a,b) { return sort_as_text(a.cable,            b.cable); }
+function global_cable_sorter_by_device     (a,b) { return sort_as_text(a.device,           b.device); }
+function global_cable_sorter_by_function   (a,b) { return sort_as_text(a.func,             b.func); }
+function global_cable_sorter_by_origin     (a,b) { return sort_as_text(a.origin.name,      b.origin.name); }
+function global_cable_sorter_by_destination(a,b) { return sort_as_text(a.destination.name, b.destination.name); }
+function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b.modified.time_64; }
 
 </script>
 
@@ -927,6 +961,11 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
         <div style="float:left;" >Routings</div>
         <div style="clear:both;"></div>
       </div>
+      <div class="v-item" id="devices">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Device Name</div>
+        <div style="clear:both;"></div>
+      </div>
       <div class="v-item" id="instrs">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div style="float:left;" >Instructions</div>
@@ -943,6 +982,16 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
     </div>
 
     <div id="admin" class="hidden">
+      <div class="v-item" id="access">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Access Control</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="notifications">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >E-mail Notifications</div>
+        <div style="clear:both;"></div>
+      </div>
       <div class="v-item" id="cablenumbers">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div style="float:left;" >Cable Numbers</div>
@@ -951,11 +1000,6 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
       <div class="v-item" id="jobnumbers">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div style="float:left;" >Job Numbers</div>
-        <div style="clear:both;"></div>
-      </div>
-      <div class="v-item" id="access">
-        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-        <div style="float:left;" >Access Control</div>
         <div style="clear:both;"></div>
       </div>
     </div>
@@ -1016,6 +1060,7 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
           <div style="float:left; margin-left:20px; width:100px;"><span class="proj-table-hdr">Created</span></div>
           <div style="float:left;                   width: 70px;"><span class="proj-table-hdr">Owner</span></div>
           <div style="float:left;                   width:300px;"><span class="proj-table-hdr">Title</span></div>
+          <div style="float:left;                   width: 70px;"><span class="proj-table-hdr">Job #</span></div>
           <div style="float:left; margin-right: 9px; border-right:1px solid #000000; width: 60px;"><span class="proj-table-hdr">Cables</span></div>
           <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Pln</span></div>
           <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Reg</span></div>
@@ -1044,20 +1089,26 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
         print <<<HERE
       <div style="margin-bottom:20px; border-bottom:1px dashed #c0c0c0;">
         <div style="float:left;">
+          <div style="color:maroon; margin-bottom:10px; width:480px;">
+            When making a clone of an existing project make sure the new project title differs
+            from the original one. All cables of the original project will be copied into the new one.
+            The copied cables will all be put into the 'Planned' state, and they won't have numbers.
+            Make sure the cables are properly edited to avoid potential conflicts with the original
+            ones before finalizing cable labesl.
+          </div>
           <form id="projects-create-form">
             <table style="font-size:95%;"><tbody>
-              <tr>
-                <td><b>Owner:{$required_field_html}</b></td><td><input type="text" name="owner" size="5"  class="projects-create-form-element" style="padding:2px;" value="{$authdb->authName()}" /></td>
-              </tr>
-              <tr>
-                <td><b>Title:{$required_field_html}</b></td><td><input type="text" name="title"  size="50" class="projects-create-form-element" style="padding:2px;" value="" /></td>
-              </tr>
-              <tr>
-                <td><b>Descr: </b></td><td colspan="4"><textarea cols=54 rows=4 name="description" class="projects-create-form-element" style="padding:4px;" title="Here be the project description"></textarea></td>
-              </tr>
-              <tr>
-                <td><b>Due by:{$required_field_html}</b></td><td><input type="text" name="due_time" size="6" class="projects-create-form-element" value="" /></td>
-              </tr>
+              <tr><td><b>Project to clone:</b></td>
+                  <td><input type="text" name="project2clone" size="16" class="projects-create-form-element" style="padding:2px;" value="" /></td></tr>
+              <tr><td>&nbsp;</td></tr>
+              <tr><td><b>Owner:{$required_field_html}</b></td>
+                  <td><input type="text" name="owner" size="5" class="projects-create-form-element" style="padding:2px;" value="{$authdb->authName()}" /></td></tr>
+              <tr><td><b>Title:{$required_field_html}</b></td>
+                  <td><input type="text" name="title"  size="50" class="projects-create-form-element" style="padding:2px;" value="" /></td></tr>
+              <tr><td><b>Descr: </b></td>
+                  <td colspan="4"><textarea cols=54 rows=4 name="description" class="projects-create-form-element" style="padding:4px;" title="Here be the project description"></textarea></td></tr>
+              <tr><td><b>Due by:{$required_field_html}</b></td>
+                  <td><input type="text" name="due_time" size="6" class="projects-create-form-element" value="" /></td></tr>
             </tbody></table>
           </form>
         </div>
@@ -1158,6 +1209,37 @@ HERE;
       <div id="dictionary-routings-routings"></div>
     </div>
 
+    <div id="dictionary-devices" class="application-workarea hidden">
+      <div><button id="dictionary-devices-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="float:left;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top: 4px; ">Add new location of instruments (LLL):</div>
+          <div style="float:left; "><input type="text" size="3" name="device_location2add" title="fill in new location (LLL), press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; ">(3 chars)</div>
+          <div style="clear:both; "></div>
+        </div>
+        <div id="dictionary-devices-locations"></div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top:4px; ">Add new region (RRR):</div>
+          <div style="float:left; "><input type="text" size="3" name="device_region2add" title="fill in new region, press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; ">(3 chars)</div>
+          <div style="clear:both; "></div>
+        </div>
+        <div id="dictionary-devices-regions"></div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px; margin-bottom:10px;">
+          <div style="float:left; padding-top:4px; ">Add new component (CCC):</div>
+          <div style="float:left; "><input type="text" size="3" name="device_component2add" title="fill in new component, press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; ">(3 chars)</div>
+          <div style="clear:both; "></div>
+        </div>
+        <div id="dictionary-devices-components"></div>
+      </div>
+      <div style="clear:both;"></div>
+    </div>
 
     <div id="dictionary-instrs" class="application-workarea hidden">
       <div><button id="dictionary-instrs-reload" title="reload the dictionary from the database">Reload</button></div>
@@ -1194,70 +1276,223 @@ HERE;
       </div>
       <div style="padding:10px">
         <div style="padding-bottom:10px;">
-          <div style="float:left;  padding-top:5px; padding-bottom:10px;">
-            <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="img/EXCEL_icon.gif" /></button>
-          </div>
           <div style="float:right;" id="search-cables-info">&nbsp;</div>
           <div style="clear:both;"></div>
           <div id="search-cables-display">
-            <input type="checkbox" name="project" checked="checked"></input>project
-            <input type="checkbox" name="job"     checked="checked"></input>job #
-            <input type="checkbox" name="cable"   checked="checked"></input>cable #
-            <input type="checkbox" name="device"  checked="checked"></input>device
-            <input type="checkbox" name="func"    checked="checked"></input>function
-            <input type="checkbox" name="length"  checked="checked"></input>length
-            <input type="checkbox" name="routing" checked="checked"></input>routing
-            <input type="checkbox" name="sd"      checked="checked"></input>source & destination
+            <div style=font-size:80%;">
+              <table style="font-size:120%;"><tbody>
+                <tr>
+                  <td rowspan=2><button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="img/EXCEL_icon.gif" /></button></td>
+                  <td><div style="width:20px;"></div></td>
+                  <td><input type="checkbox" name="status"   checked="checked"></input>status</td>
+                  <td><input type="checkbox" name="project"  checked="checked"></input>project</td>
+                  <td><input type="checkbox" name="job"      checked="checked"></input>job #</td>
+                  <td><input type="checkbox" name="cable"    checked="checked"></input>cable #</td>
+                  <td><input type="checkbox" name="device"   checked="checked"></input>device</td>
+                  <td><input type="checkbox" name="func"     checked="checked"></input>function</td>
+                  <td rowspan=2><div style="width:20px;"></div></td>
+                  <td rowspan=2><b>Sort by:</b></td>
+                  <td rowspan=2><select name="sort" style="padding:1px;">
+                        <option>status</option>
+                        <option>project</option>
+                        <option>job</option>
+                        <option>cable</option>
+                        <option>device</option>
+                        <option>function</option>
+                        <option>origin</option>
+                        <option>destination</option>
+                        <option>modified</option>
+                      </select></td>
+                  <td rowspan=2><div style="width:20px;"></div></td>
+                  <td rowspan=2><button name="reverse">Show in Reverse Order</button></td>
+                </tr>
+                <tr>
+                  <td colspan=1></td>
+                  <td          ><input type="checkbox" name="length"   checked="checked"></input>length</td>
+                  <td          ><input type="checkbox" name="routing"  checked="checked"></input>routing</td>
+                  <td colspan=3><input type="checkbox" name="sd"                        ></input>expanded ORIGIN/DESTINATION</td>
+                  <td          ><input type="checkbox" name="modified"                  ></input>modified</td>
+                </tr>
+              </tbody></table>
+            </div>
           </div>
         </div>
         <div id="search-cables-result"></div>
       </div>
     </div>
 
+    <div id="admin-access" class="application-workarea hidden">
+      <div style="float:left;" ><button id="admin-access-reload" title="reload from the database">Reload</button></div>
+      <div style="clear:both; "></div>
+
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
+        <p>This section allows to assign user accounts to various roles defined in a context of the application.
+        See a detailed description of each role in the corresponding subsection below.</p>
+      </div>
+
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+		  <li><a href="#administrators">Administrators</a></li>
+		  <li><a href="#projmanagers">Project Managers</a></li>
+	    </ul>
+
+        <div id="administrators" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>Administrators posses highest level privileges in the application as they're allowed
+            to perform any operation on projects, cables and other users. The only restriction is that
+            an administrator is not allowed to remove their own account from the list of administrators.</p>
+          </div>
+          <div style="float:left; "><input type="text" size="5" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+          <div style="clear:both; "></div>
+          <div id="admin-access-administrators"></div>
+        </div>
+
+        <div id="projmanagers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>Project managers can create new projects, and, delete or edit cables, and also manage certain
+            aspects of the cables life-cycle.</p>
+          </div>
+          <div style="float:left; "><input type="text" size="5" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+          <div style="clear:both; "></div>
+          <div id="admin-access-projmanagers"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-notifications" class="application-workarea hidden">
+      <div style="float:left;" ><button id="admin-notifications-reload" title="reload from the database">Reload</button></div>
+      <div style="clear:both; "></div>
+
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
+        <p>In order to avoid an excessive e-mail traffic the notification system
+        will send just one message for any modification made in a specific context. For the very same
+        reason the default behavior of the system is to send a summary daily message with all changes
+        made before a time specified below, unless this site administrators choose a different policy
+        (such as instantaneous notification).</p>
+       </div>
+
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+		  <li><a href="#myself">My Notifications</a></li>
+		  <li><a href="#others">Other Users</a></li>
+		  <li><a href="#pending">Pending</a></li>
+	    </ul>
+
+        <div id="myself" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>This section is aiming at project managers who might be interested to track changes
+            made to their projects by other people involved into various stages
+            of the project workflow. Note that project managers will not get notifications
+            on changes made by themselves.</p>
+            <p>Notification settings found in this section can only be managed by project managers themselves
+            or by administrators of the application.</p>
+          </div>
+          <div style="margin-bottom:20px;"">
+            <select name="policy4myself">
+              <option name="daily">daily notification (08:00am)</option>
+              <option name="instant">instant notification</option>
+            </select>
+          </div>
+          <div id="admin-notifications-myself"></div>
+        </div>
+
+        <div id="others" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>This section is aiming at users (not necessarily project managers) who are involved
+            into various stages of the project workflow.</p>
+            <p>Only administrators of this application are
+            allowed to modify notification settings found on this page.</p>
+          </div>
+          <div style="margin-bottom:20px;"">
+            <select name="policy4others">
+              <option name="daily">daily notification (08:00am)</option>
+              <option name="instant">instant notification</option>
+            </select>
+          </div>
+          <div style="float:left; "><input type="text" size="5" name="listener2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+          <div style="clear:both; "></div>
+          <div id="admin-notifications-others"></div>
+        </div>
+
+        <div id="pending" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>Pending/scheduled notifications (if any found below) can be submitted for instant delivery by pressing a group 'Submit' button or individually if needed.
+            Notifications can also be deleted if needed. An additional dialog will be initiated to confirm group operations.</p>
+            <p>Only administrators of this application are authorized for these operations.</p>
+          </div>
+          <div style="margin-bottom:20px;"">
+            <button name="submit_all" title="Submit all pending notifications to be instantly delivered to their recipient">submit</button>
+            <button name="delete_all" title="Delete all pending notifications">delete</button>
+          </div>
+          <div id="admin-notifications-pending"></div>
+        </div>
+
+      </div>
+    </div>
+
     <div id="admin-cablenumbers" class="application-workarea hidden">
       <div style="float:left;" ><button id="admin-cablenumbers-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both; "></div>
-      <div style="margin-top:30px;">
-        <div class="section3">Ranges</div>
-        <div id="admin-cablenumbers-cablenumbers"></div>
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
+        <p>PCDS is allocated a set of "official" cable identifiers (so called "cable numbers") which are managed by
+        this application. A particular cable number begins with a two-letter prefix corresponding to a building where
+        the cable "originates" from and it's followed by 4 digits. A unique cable number is generated each time
+        a cable gets "registered" in the cable editor of the projects management tab.
+        The current section is designed for configuring a generator of cable numbers and monitoring
+        the allocation of the numbers.</p>
+      </div>
+
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+		  <li><a href="#cablenumbers">Ranges</a></li>
+	    </ul>
+
+        <div id="cablenumbers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>For each PCDS building there is a range of cable numbers. The range is configured below.
+            Only administrators of this application are allowed to modify the ranges.</p>
+          </div>
+          <div id="admin-cablenumbers-cablenumbers"></div>
+        </div>
       </div>
     </div>
 
     <div id="admin-jobnumbers" class="application-workarea hidden">
       <div style="float:left;" ><button id="admin-jobnumbers-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both; "></div>
-      <div style="margin-top:30px;">
-        <div class="section3">Ranges</div>
-        <div id="admin-jobnumbers-jobnumbers"></div>
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
+        <p>PCDS is allocated a set of "official" job identifiers (so called "job numbers") which are managed by
+        this application. A particular job number begins with a three-letter prefix corresponding to a user who's
+        responsible for the job and it's followed by 3 digits. A unique job number is generated each time
+        a new project is created in the projects management tab.
+        The current section is designed for configuring a generator of job numbers and monitoring
+        the allocation of the numbers.</p>
       </div>
-      <div style="margin-top:30px;">
-        <div class="section3">Allocated Numbers</div>
-        <div id="admin-jobnumbers-allocations"></div>
-      </div>
-    </div>
 
-    <div id="admin-access" class="application-workarea hidden">
-      <div style="float:left;" ><button id="admin-access-reload" title="reload from the database">Reload</button></div>
-      <div style="clear:both; "></div>
-      <div style="margin-top:30px;">
-        <div class="section3">Administrators</div>
-        <div style="padding-left:20px; padding-top:20px;">
-          <div style="float:left; padding-top: 4px; ">Add new administrator:</div>
-          <div style="float:left; "><input type="text" size="12" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(valid UNIX account)</div>
-          <div style="clear:both; "></div>
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+		  <li><a href="#ranges">Ranges</a></li>
+		  <li><a href="#allocations">Allocated Numbers</a></li>
+	    </ul>
+
+        <div id="ranges" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>Each user (including administrators and project managers) who's authorized to create new projects
+            is assigned a range of cable numbers. The range is configured below.
+            Only administrators of this application are allowed to modify the ranges.</p>
+          </div>
+          <div id="admin-jobnumbers-jobnumbers"></div>
         </div>
-        <div id="admin-access-administrators"></div>
-      </div>
-      <div style="margin-top:30px;">
-        <div class="section3">Project Managers</div>
-        <div style="padding-left:20px; padding-top:20px;">
-          <div style="float:left; padding-top: 4px; ">Add new project manager:</div>
-          <div style="float:left; "><input type="text" size="12" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(valid UNIX account)</div>
-          <div style="clear:both; "></div>
+      
+        <div id="allocations" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>This section shows all job numbers allocated by the application.</p>
+          </div>
+          <div id="admin-jobnumbers-allocations"></div>
         </div>
-        <div id="admin-access-projmanagers"></div>
       </div>
     </div>
 

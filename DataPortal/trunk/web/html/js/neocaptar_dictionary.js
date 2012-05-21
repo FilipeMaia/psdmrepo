@@ -51,6 +51,7 @@ function p_appl_dictionary() {
 		this.init_cables();
 		this.init_locations();
         this.init_routings();
+        this.init_devices();
         this.init_instrs();
 	};
     this.can_manage = function() {
@@ -302,7 +303,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-cable-delete" name="'+cable.id+'" title="delete this cable from the dictionary">delete</button>'+
+'    <button class="dict-table-cable-delete" name="'+cable.id+'" title="delete this cable from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_cable?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_cable('+"'"+cable_name+"'"+')" >'+cable_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+cable.created_time+'</td>'+
@@ -318,7 +319,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-connector-delete" name="'+connector.id+'" title="delete this connector from the dictionary">delete</button>'+
+'    <button class="dict-table-connector-delete" name="'+connector.id+'" title="delete this connector from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_connector?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_connector('+"'"+connector_name+"'"+')" >'+connector_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+connector.created_time+'</td>'+
@@ -342,7 +343,7 @@ function p_appl_dictionary() {
         var html = 
 '<tr id="dict-pinlist-url-'+pinlist.id+'" >'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-pinlist-delete" name="'+pinlist.id+'" title="delete this pinlist from the dictionary">delete</button>'+
+'    <button class="dict-table-pinlist-delete" name="'+pinlist.id+'" title="delete this pinlist from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell "><a href="'+pinlist.documentation+'" target="_blank" title="click the link to get the external documentation">'+pinlist_name+'</a></td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+
@@ -675,7 +676,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-location-delete" name="'+location.id+'" title="delete this location from the dictionary">delete</button>'+
+'    <button class="dict-table-location-delete" name="'+location.id+'" title="delete this location from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_location?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_location('+"'"+location_name+"'"+')" >'+location_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+location.created_time+'</td>'+
@@ -691,7 +692,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-rack-delete" name="'+rack.id+'" title="delete this rack from the dictionary">delete</button>'+
+'    <button class="dict-table-rack-delete" name="'+rack.id+'" title="delete this rack from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-nonselectable" >'+rack_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+rack.created_time+'</td>'+
@@ -710,7 +711,7 @@ function p_appl_dictionary() {
 '    <td nowrap="nowrap" class="table_hdr " >locations</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >added</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># of uses</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
 '  </tr>';
         var html_racks =
 '<table><tbody>'+
@@ -719,7 +720,7 @@ function p_appl_dictionary() {
 '    <td nowrap="nowrap" class="table_hdr " >racks</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >added</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># of uses</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
 '  </tr>';
 		for( var location_name in this.locations()) {
 			if( this.selected_location == null ) { this.selected_location = location_name; }
@@ -871,7 +872,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-routing-delete" name="'+routing.id+'" title="delete this routing from the dictionary">delete</button>'+
+'    <button class="dict-table-routing-delete" name="'+routing.id+'" title="delete this routing from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable onclick="dict.select_routing('+"'"+routing_name+"'"+')">'+routing_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+routing.created_time+'</td>'+
@@ -890,7 +891,7 @@ function p_appl_dictionary() {
 '    <td nowrap="nowrap" class="table_hdr " >routings</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >added</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># of uses</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
 '  </tr>';
 		for( var routing_name in this.routings()) html += this.routing2html(routing_name);
         html +=
@@ -918,6 +919,410 @@ function p_appl_dictionary() {
             $('#dictionary-routings').find('input[name="routing2add"]').removeAttr('disabled');
         }
 	};
+
+
+    // -------------------------------------------
+    // DEVICE NAME: LOCATIONS, REGIONS, COMPONENTS
+    // -------------------------------------------
+
+	this.selected_device_location = null;
+	this.selected_device_region = null;
+	this.device_location = {};
+	this.get_device_location = function() {
+		this.init();
+		return this.device_location;
+	};
+	this.device_location_dict_is_empty = function() {
+		for( var device_location in this.device_locations()) return false;
+		return true;
+	}
+	this.device_location_is_not_known = function(device_location) {
+		return this.device_location_dict_is_empty() || ( device_location == null ) || ( typeof this.device_locations()[device_location] === 'undefined' );
+	};
+	this.device_region_dict_is_empty = function(device_location) {
+		for( var device_region in this.device_regions(device_location)) return false;
+		return true;
+	};
+	this.device_region_is_not_known = function(device_location,device_region) {
+		return this.device_location_is_not_known(device_location) || ( device_region == null ) || ( typeof this.device_regions(device_location)[device_region] === 'undefined' );
+	};
+	this.device_component_dict_is_empty = function(device_location,device_region) {
+		for( var device_component in this.device_components(device_location, device_region)) return false;
+		return true;
+	};
+	this.device_component_is_not_known = function(device_location,device_region,device_component) {
+		return this.device_region_is_not_known(device_location,device_region) || ( device_component == null ) || ( typeof this.device_components(device_location,device_region)[device_component] === 'undefined' );
+	};
+	this.device_locations = function() {
+		return this.get_device_location();
+	};
+	this.device_regions = function(device_location) {
+		if( this.device_location_is_not_known(device_location)) return {};
+		return this.device_locations()[device_location]['region'];
+	};
+	this.device_components = function(device_location,device_region) {
+		if( this.device_region_is_not_known(device_location,device_region)) return {};
+		return this.device_regions(device_location)[device_region]['component'];
+	};
+	this.init_devices = function() {
+		$('#dictionary-devices').find('input[name="device_location2add"]').
+            keyup(function(e) {
+        		if( $(this).val() == '' ) { return; }
+            	if( e.keyCode == 13     ) { that.new_device_location(); return; }
+                $(this).val(global_truncate_device_location($(this).val()));
+            }).
+            attr('disabled','disabled');
+		$('#dictionary-devices').find('input[name="device_region2add"]').
+            keyup(function(e) {
+    			if( $(this).val() == '' ) { return; }
+        		if( e.keyCode == 13     ) { that.new_device_region(); return; }
+                $(this).val(global_truncate_device_region($(this).val()));
+            }).
+            attr('disabled','disabled');
+		$('#dictionary-devices').find('input[name="device_component2add"]').
+    		keyup(function(e) {
+        		if( $(this).val() == '' ) { return; }
+            	if( e.keyCode == 13     ) {	that.new_device_component(); return;	}
+                $(this).val(global_truncate_device_component($(this).val()));
+            }).
+            attr('disabled','disabled');
+		$('#dictionary-devices-reload').
+            button().
+    		click(function() { that.load_device_locations(); });
+		this.load_device_locations();
+	};
+	this.new_device_location = function() {
+		var input = $('#dictionary-devices').find('input[name="device_location2add"]');
+		var location_name = input.val();
+		if( this.device_location_is_not_known(location_name)) {
+			input.val('');
+			this.selected_device_location = location_name;
+			this.selected_device_region = null;
+			this.save_device_location(this.selected_device_location);
+		}
+	};
+	this.new_device_region = function() {
+		var input = $('#dictionary-devices').find('input[name="device_region2add"]');
+		var region_name = input.val();
+		if( this.device_region_is_not_known(this.selected_device_location, region_name)) {
+			input.val('');
+			this.selected_device_region = region_name;
+			this.save_device_region(this.selected_device_location, this.selected_device_region);
+		}
+	};
+	this.new_device_component = function() {
+		var input = $('#dictionary-devices').find('input[name="device_component2add"]');
+		var component_name = input.val();
+		if( this.device_component_is_not_known(this.selected_device_location, this.selected_device_region, component_name)) {
+			input.val('');
+			this.save_device_component(this.selected_device_location, this.selected_device_region, component_name,'');
+		}
+	};
+	this.save_device_location = function(location_name) {
+		this.init();
+		if( location_name == '' ) return;
+		if( this.device_location_is_not_known(location_name)) {
+			this.device_locations()[location_name] = {id:0, created_time:'', created_uid:'', device_region:{}};
+			if( this.selected_device_location == null ) {
+				this.selected_device_location = location_name;
+				this.selected_device_region = null;
+			}
+			var params = {location:location_name};
+			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+				var result = eval(data);
+				if(result.status != 'success') { report_error(result.message, null); return; }
+				that.device_locations()[location_name] = result.location[location_name];
+				that.display_device_locations();
+			},
+			'JSON').error(function () {
+                report_error('failed to contact the Web service to save device location in a dictionary of device names');
+			});
+		}
+	};
+	this.save_device_region = function(location_name, region_name) {
+		this.init();
+		if(( location_name == '' ) || ( region_name == '' )) return;
+		if( this.device_region_is_not_known(location_name, region_name)) {
+			this.device_regions(location_name)[region_name] = {id:0, created_time:'', created_uid:'', device_component:{}};
+			if( this.selected_device_location == null ) {
+				this.selected_device_location = location_name;
+				this.selected_device_region = region_name;
+			} else {
+				if(( this.selected_device_location == location_name ) && ( this.selected_device_region == null ))  {
+					this.selected_device_region = region_name;
+				}
+			}
+			var params = {location:location_name, region:region_name};
+			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+				var result = eval(data);
+				if(result.status != 'success') { report_error(result.message, null); return; }
+				that.device_locations()[location_name] = result.location[location_name];
+				that.display_device_locations();
+			},
+			'JSON').error(function () {
+                report_error('failed to contact the Web service to save device region in a dictionary of device names');
+			});
+		}
+	};
+	this.save_device_component = function(location_name, region_name, component_name) {
+		this.init();
+		if(( location_name == '' ) || ( region_name == '' ) || ( component_name == '' )) return;
+		if( this.device_component_is_not_known(location_name, region_name, component_name)) {
+			this.device_components(location_name, region_name)[component_name] = {id:0, created_time:'', created_uid:''};
+			if( this.selected_device_location == null ) {
+				this.selected_device_location = location_name;
+				this.selected_device_region = region_name;
+			} else {
+				if(( this.selected_device_location == location_name ) && ( this.selected_device_region == null ))  {
+					this.selected_device_region = region_name;
+				}
+			}
+			var params = {location:location_name, region:region_name, component:component_name};
+			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+				var result = eval(data);
+				if(result.status != 'success') { report_error(result.message, null); return; }
+				that.device_locations()[location_name] = result.location[location_name];
+				that.display_device_locations();
+			},
+			'JSON').error(function () {
+                report_error('failed to contact the Web service to save device region in a dictionary of device names');
+			});
+		}
+	};
+	this.delete_device_element = function(element,id) {
+		this.init();
+		var params = {scope:element, id:id};
+		var jqXHR = $.get('../portal/neocaptar_dict_device_location_delete.php',params,function(data) {
+			var result = eval(data);
+			if(result.status != 'success') { report_error(result.message, null); return; }
+			that.load_device_locations();
+		},
+		'JSON').error(function () {
+			report_error('failed to contact the Web service to delete '+element+' from a dictionary of device names');
+		});
+	};
+	this.load_device_locations = function() {
+		var params = {};
+		var jqXHR = $.get('../portal/neocaptar_dict_device_location_get.php',params,function(data) {
+			var result = eval(data);
+			if(result.status != 'success') { report_error(result.message, null); return; }
+			that.device_location = result.location;
+			if( that.device_location_is_not_known(that.selected_device_location)) {
+				that.selected_device_location = null;
+				that.selected_device_region   = null;
+			} else if( that.device_region_is_not_known(that.selected_device_location, that.selected_device_region)) {
+				that.selected_device_region = null;
+			}
+			that.display_device_locations();
+		},
+		'JSON').error(function () {
+			report_error('failed to contact the Web service to load a dictionary of device names');
+		});
+	};
+    this.device_location2html = function(location_name,is_selected_device_location) {
+        var device_location = this.device_locations()[location_name];
+        var html =
+'<tr>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
+'    <button class="dict-table-device-location-delete" name="'+device_location.id+'" title="delete this device_location from the dictionary">X</button>'+
+'  </td>'+
+'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_device_location?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_device_location('+"'"+location_name+"'"+')" >'+location_name+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_location.created_time+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_location.created_uid+'</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
+'    <button class="dict-table-device-location-search" name="'+device_location.id+'" title="search all uses of this device_location type">search</button>'+
+'  </td>'+
+'</tr>';
+        return html;
+    };
+    this.device_region2html = function(location_name,region_name,is_selected_device_region) {
+        var device_region = this.device_regions(location_name)[region_name];
+        var html =
+'<tr>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
+'    <button class="dict-table-device-region-delete" name="'+device_region.id+'" title="delete this device_region from the dictionary">X</button>'+
+'  </td>'+
+'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_device_region?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_device_region('+"'"+region_name+"'"+')" >'+region_name+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_region.created_time+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_region.created_uid+'</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
+'    <button class="dict-table-device-region-search" name="'+device_region.id+'" title="search all uses of this device_region type">search</button>'+
+'  </td>'+
+'</tr>';
+        return html;
+    };
+    this.device_component2url = function(device_location,device_region,component_name) {
+        if(this.device_component_is_not_known(device_location,device_region,component_name)) return component_name;
+        var device_component_documentation = this.device_components(device_location,device_region)[component_name].documentation;
+        var html = '<a href="'+device_component_documentation+'" target="_blank" title="click the link to get the external documentation">'+component_name+'</a>';
+        return html;
+    };
+
+    this.device_component2html = function(location_name,region_name,component_name) {
+        var device_component = this.device_components(location_name,region_name)[component_name];
+        var params = "'"+location_name+"','"+region_name+"','"+component_name+"'";
+        var html = 
+'<tr id="dict-device-component-url-'+device_component.id+'" >'+
+'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
+'    <button class="dict-table-device-component-delete" name="'+device_component.id+'" title="delete this device_component from the dictionary">X</button>'+
+'  </td>'+
+'  <td nowrap="nowrap" class="table_cell ">'+component_name+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_component.created_time+'</td>'+
+'  <td nowrap="nowrap" class="table_cell " >'+device_component.created_uid+'</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
+'    <button class="dict-table-device-component-search" name="'+device_component.id+'" title="search all uses of this device_component">search</button>'+
+'  </td>'+
+'</tr>';
+        return html;
+    };
+	this.display_device_locations = function() {
+		var html_device_locations =
+'<table><tbody>'+
+'  <tr>'+
+'    <td nowrap="nowrap" class="table_hdr " ></td>'+
+'    <td nowrap="nowrap" class="table_hdr " >device location</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
+'  </tr>';
+		var html_device_regions = 
+'<table><tbody>'+
+'  <tr>'+
+'    <td nowrap="nowrap" class="table_hdr " ></td>'+
+'    <td nowrap="nowrap" class="table_hdr " >device region</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
+'  </tr>';
+		var html_device_components = 
+'<table><tbody>'+
+'  <tr>'+
+'    <td nowrap="nowrap" class="table_hdr " ></td>'+
+'    <td nowrap="nowrap" class="table_hdr " >device component type</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
+'  </tr>';
+		for( var location_name in this.device_locations()) {
+			if( this.selected_device_location == null ) {
+				this.selected_device_location = location_name;
+				this.selected_device_region = null;
+			}
+			var is_selected_device_location = this.selected_device_location === location_name;
+			html_device_locations += this.device_location2html(location_name,is_selected_device_location);
+			if( is_selected_device_location ) {
+				for( var region_name in this.device_regions(location_name)) {
+					if( this.selected_device_region == null ) {
+						this.selected_device_region = region_name;
+					}
+					var is_selected_device_region = this.selected_device_region === region_name;
+					html_device_regions += this.device_region2html(location_name,region_name,is_selected_device_region);
+					if( is_selected_device_region ) {
+						for( var component_name in this.device_components(location_name, region_name)) {
+							html_device_components += this.device_component2html(location_name,region_name,component_name);
+						}
+					}
+				}
+			}
+		}
+        html_device_locations +=
+'</tbody></table>';
+        html_device_regions +=
+'</tbody></table>';
+        html_device_components +=
+'</tbody></table>';
+        $('#dictionary-devices-locations' ).html(html_device_locations);
+		$('#dictionary-devices-regions'   ).html(html_device_regions);
+		$('#dictionary-devices-components').html(html_device_components);
+
+		$('.dict-table-device-location-delete').
+            button().
+            button(this.can_manage()?'enable':'disable').
+            click(function() {
+                var device_location_id = this.name;
+                ask_yes_no(
+                    'Data Deletion Warning',
+                    'You are about to delete the device_location type entry and all information associated with it. Are you sure?',
+                    function() { that.delete_device_element('location',device_location_id); },
+                    null
+                );
+            });
+		$('.dict-table-device-location-search').
+            button().
+            click(function() {
+    			var device_location_id = this.name;
+                global_search_cables_by_dict_device_location_id(device_location_id);
+            });
+		$('.dict-table-device-region-search').
+            button().
+            click(function() {
+    			var device_region_id = this.name;
+                global_search_cables_by_dict_device_region_id(device_region_id);
+            });
+		$('.dict-table-device-component-search').
+            button().
+            click(function() {
+    			var device_component_id = this.name;
+                global_search_cables_by_dict_device_component_id(device_component_id);
+            });
+		$('.dict-table-device-region-delete').
+            button().
+            button(this.can_manage()?'enable':'disable').
+            click(function() {
+    			var device_region_id = this.name;
+        		ask_yes_no(
+            		'Data Deletion Warning',
+                	'You are about to delete the device_region type entry and all information associated with it. Are you sure?',
+                    function() { that.delete_device_element('region',device_region_id); },
+                    null
+                );
+            });
+		$('.dict-table-device-component-delete').
+            button().
+            button(this.can_manage()?'enable':'disable').
+            click(function() {
+    			var device_component_id = this.name;
+        		ask_yes_no(
+            		'Data Deletion Warning',
+                	'You are about to delete the device_component type entry and all information associated with it. Are you sure?',
+                    function() { that.delete_device_element('component',device_component_id); },
+                    null
+                );
+    		});
+		$('.dict-table-device-component-edit').
+            button().
+            button(this.can_manage()?'enable':'disable');
+		$('.dict-table-device-component-save').
+            button().
+            button('disable');
+		$('.dict-table-device-component-cancel').
+            button().
+            button('disable');
+        if(this.can_manage()) {
+    		                                            $('#dictionary-devices').find('input[name="device_location2add"]' ).removeAttr('disabled');
+        	if( this.selected_device_location == null ) $('#dictionary-devices').find('input[name="device_region2add"]'   ).attr      ('disabled','disabled');
+            else                                        $('#dictionary-devices').find('input[name="device_region2add"]'   ).removeAttr('disabled');
+            if( this.selected_device_region   == null ) $('#dictionary-devices').find('input[name="device_component2add"]').attr      ('disabled','disabled');
+            else                                        $('#dictionary-devices').find('input[name="device_component2add"]').removeAttr('disabled');
+        }
+	};
+	this.select_device_location = function(device_location) {
+		if( this.selected_device_location != device_location ) {
+			this.selected_device_location = device_location;
+			this.selected_device_region   = null;
+			this.display_device_locations();
+		}
+	};
+	this.select_device_region = function(device_region) {
+		if( this.selected_device_region != device_region ) {
+			this.selected_device_region = device_region;
+			this.display_device_locations();
+		}
+	};
+
+
+
+
 
 
 
@@ -1008,7 +1413,7 @@ function p_appl_dictionary() {
         var html =
 '<tr>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-instr-delete" name="'+instr.id+'" title="delete this instr from the dictionary">delete</button>'+
+'    <button class="dict-table-instr-delete" name="'+instr.id+'" title="delete this instr from the dictionary">X</button>'+
 '  </td>'+
 '  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable onclick="dict.select_instr('+"'"+instr_name+"'"+')">'+instr_name+'</td>'+
 '  <td nowrap="nowrap" class="table_cell " >'+instr.created_time+'</td>'+
@@ -1027,7 +1432,7 @@ function p_appl_dictionary() {
 '    <td nowrap="nowrap" class="table_hdr " >instruction</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >added</td>'+
 '    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># of uses</td>'+
+'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
 '  </tr>';
 		for(var instr_name in this.instrs()) html += this.instr2html(instr_name);
         html +=

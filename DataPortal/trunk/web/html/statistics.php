@@ -24,8 +24,8 @@ function report_error( $msg ) {
     	$msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
     	print <<< HERE
 {
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
+  "status": {$status_encoded},
+  "message": {$msg_encoded}
 }
 HERE;
 	} else {
@@ -291,65 +291,65 @@ try {
     	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
     	
    		print '
-{ "status":  '.json_encode("success").                        ',
-  "updated": '.json_encode( LusiTime::now()->toStringShort()).',
-  "total": {
-    "runs": '.$total_runs.',
-    "files":       { "xtc" : '.                 $total_files_xtc         .', "hdf5" : '.                 $total_files_hdf5         .' },
-    "files_disk":  { "xtc" : '.                 $total_files_xtc_disk    .', "hdf5" : '.                 $total_files_hdf5_disk    .' },
-    "size_tb:      { "xtc" : '.sprintf( "%.1f", $total_size_tb_xtc      ).', "hdf5" : '.sprintf( "%.1f", $total_size_tb_hdf5      ).' },
-    "size_tb_disk: { "xtc" : '.sprintf( "%.1f", $total_size_tb_xtc_disk ).', "hdf5" : '.sprintf( "%.1f", $total_size_tb_hdf5_disk ).' }
+{ status:  '.json_encode("success").                        ',
+  updated: '.json_encode( LusiTime::now()->toStringShort()).',
+  total: {
+    runs: '.$total_runs.',
+    files:       { xtc : '.                 $total_files_xtc         .', hdf5 : '.                 $total_files_hdf5         .' },
+    files_disk:  { xtc : '.                 $total_files_xtc_disk    .', hdf5 : '.                 $total_files_hdf5_disk    .' },
+    size_tb:     { xtc : '.sprintf( "%.1f", $total_size_tb_xtc      ).', hdf5 : '.sprintf( "%.1f", $total_size_tb_hdf5      ).' },
+    size_tb_disk:{ xtc : '.sprintf( "%.1f", $total_size_tb_xtc_disk ).', hdf5 : '.sprintf( "%.1f", $total_size_tb_hdf5_disk ).' }
   },
-  "filesystem": [';
+  filesystem: [';
 
 		$first = true;
     	foreach( $data_path_keys as $path ) {
        		$t = $data_path[$path];
 			print ( $first ? '' : ',' ).'
-    { "name": '.$path.',
-      "runs": '.$t['num_runs'].',
-      "files":       { "xtc" : '.                 $t['num_files_xtc'     ]  .', "hdf5" : '.                 $t['num_files_hdf5'     ]  .' },
-      "files_disk":  { "xtc" : '.                 $t['num_files_xtc_disk']  .', "hdf5" : '.                 $t['num_files_hdf5_disk']  .' },
-      "size_tb:      { "xtc" : '.sprintf( "%.1f", $t['size_tb_xtc'       ] ).', "hdf5" : '.sprintf( "%.1f", $t['size_tb_hdf5'       ] ).' },
-      "size_tb_disk: { "xtc" : '.sprintf( "%.1f", $t['size_tb_xtc_disk'  ] ).', "hdf5" : '.sprintf( "%.1f", $t['size_tb_hdf5_disk'  ] ).' }
+    { name: '.json_encode($path).',
+      runs: '.$t['num_runs'].',
+      files:       { xtc : '.                 $t['num_files_xtc'     ]  .', hdf5 : '.                 $t['num_files_hdf5'     ]  .' },
+      files_disk:  { xtc : '.                 $t['num_files_xtc_disk']  .', hdf5 : '.                 $t['num_files_hdf5_disk']  .' },
+      size_tb:     { xtc : '.sprintf( "%.1f", $t['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $t['size_tb_hdf5'       ] ).' },
+      size_tb_disk:{ xtc : '.sprintf( "%.1f", $t['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $t['size_tb_hdf5_disk'  ] ).' }
     }';
 			$first = false;
 		}
 		print '
   ],
-  "instruments": [';
+  instruments: [';
 
 		$first = true;
     	foreach( $instrument_keys as $instr_name ) {
        		$i = $instruments[$instr_name];
 			print ( $first ? '' : ',' ).'
-    { "name": '.$instr_name.',
-      "runs": '.$i['num_runs'].',
-      "files":       { "xtc" : '.                 $i['num_files_xtc'     ]  .', "hdf5" : '.                 $i['num_files_hdf5'     ]  .' },
-      "files_disk":  { "xtc" : '.                 $i['num_files_xtc_disk']  .', "hdf5" : '.                 $i['num_files_hdf5_disk']  .' },
-      "size_tb:      { "xtc" : '.sprintf( "%.1f", $i['size_tb_xtc'       ] ).', "hdf5" : '.sprintf( "%.1f", $i['size_tb_hdf5'       ] ).' },
-      "size_tb_disk: { "xtc" : '.sprintf( "%.1f", $i['size_tb_xtc_disk'  ] ).', "hdf5" : '.sprintf( "%.1f", $i['size_tb_hdf5_disk'  ] ).' }
+    { name: '.json_encode($instr_name).',
+      runs: '.$i['num_runs'].',
+      files:       { xtc : '.                 $i['num_files_xtc'     ]  .', hdf5 : '.                 $i['num_files_hdf5'     ]  .' },
+      files_disk:  { xtc : '.                 $i['num_files_xtc_disk']  .', hdf5 : '.                 $i['num_files_hdf5_disk']  .' },
+      size_tb:     { xtc : '.sprintf( "%.1f", $i['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $i['size_tb_hdf5'       ] ).' },
+      size_tb_disk:{ xtc : '.sprintf( "%.1f", $i['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $i['size_tb_hdf5_disk'  ] ).' }
     }';
 			$first = false;
     	}
 		print '
   ],
-  "experiments": [';
+  experiments: [';
 
 		$first = true;
 		foreach( $experiment_keys as $k ) {
 			$e = $experiments[$k];
 			print ( $first ? '' : ',' ).'
-    { "instr_name"      : '.$e['instr_name'].',
-      "exper_name"      : '.$e['exper_name'].',
-      "exper_id"        : '.$e['exper_id'  ].',
-      "first_run_begin" : '.json_encode( $e['first_run_begin'] ).',
-      "last_run_begin"  : '.json_encode( $e['last_run_begin' ] ).',
-      "runs"            : '.$e['num_runs'].',
-      "files"           : { "xtc" : '.                 $e['num_files_xtc'     ].  ', "hdf5" : '.                 $e['num_files_hdf5'     ]  .' },
-      "files_disk"      : { "xtc" : '.                 $e['num_files_xtc_disk'].  ', "hdf5" : '.                 $e['num_files_hdf5_disk']  .' },
-      "size_tb          : { "xtc" : '.sprintf( "%.1f", $e['size_tb_xtc'       ] ).', "hdf5" : '.sprintf( "%.1f", $e['size_tb_hdf5'       ] ).' },
-      "size_tb_disk     : { "xtc" : '.sprintf( "%.1f", $e['size_tb_xtc_disk'  ] ).', "hdf5" : '.sprintf( "%.1f", $e['size_tb_hdf5_disk'  ] ).' }
+    { instr_name      : '.json_encode($e['instr_name']).',
+      exper_name      : '.json_encode($e['exper_name']).',
+      exper_id        : '.$e['exper_id'  ].',
+      first_run_begin : '.json_encode( $e['first_run_begin'] ).',
+      last_run_begin  : '.json_encode( $e['last_run_begin' ] ).',
+      runs            : '.$e['num_runs'].',
+      files           : { xtc : '.                 $e['num_files_xtc'     ].  ', hdf5 : '.                 $e['num_files_hdf5'     ]  .' },
+      files_disk      : { xtc : '.                 $e['num_files_xtc_disk'].  ', hdf5 : '.                 $e['num_files_hdf5_disk']  .' },
+      size_tb         : { xtc : '.sprintf( "%.1f", $e['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $e['size_tb_hdf5'       ] ).' },
+      size_tb_disk    : { xtc : '.sprintf( "%.1f", $e['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $e['size_tb_hdf5_disk'  ] ).' }
     }';
 			$first = false;
 		}

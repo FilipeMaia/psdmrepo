@@ -42,7 +42,7 @@ class DataPortal {
 <title>{$page_name}</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="css/default.css" rel="Stylesheet" />
 
 HERE;
@@ -57,8 +57,8 @@ HERE;
 		
 		echo <<<HERE
 
-<script type="text/javascript" src="/jquery/js/jquery-1.4.4.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript">
 
@@ -202,7 +202,7 @@ function large_dialog( title, msg ) {
 		resizable: true,
         width:     geom.width-20,
         height:    geom.height-20,
-		modal:     true,
+		modal:     true
 	});
 }
 

@@ -29,7 +29,7 @@ function p_appl_admin() {
 	this.name      = 'admin';
 	this.full_name = 'Admin';
 	this.context   = '';
-    this.default_context = 'cablenumbers';
+    this.default_context = 'access';
 
     this.select = function(context,when_done) {
 		that.context   = context;
@@ -46,6 +46,8 @@ function p_appl_admin() {
 	};
     this.update = function() {
 		this.init();
+		this.load_access();
+        this.load_notify();
         this.load_cablenumbers();
         this.load_jobnumbers();
     };
@@ -58,28 +60,58 @@ function p_appl_admin() {
 	this.init = function() {
 		if( this.initialized ) return;
 		this.initialized = true;
-		$('#admin-cablenumbers-reload').button().click(function() { that.load_cablenumbers(); });
-		$('#admin-jobnumbers-reload'  ).button().click(function() { that.load_jobnumbers  (); });
-		$('#admin-access-reload'      ).button().click(function() { that.load_access      (); });
-		var administrator2add = $('#admin-access').find('input[name="administrator2add"]');
+
+		$('#admin-access-reload'       ).button().click(function() { that.load_access       (); });
+		$('#admin-notifications-reload').button().click(function() { that.load_notify(); });
+		$('#admin-cablenumbers-reload' ).button().click(function() { that.load_cablenumbers (); });
+		$('#admin-jobnumbers-reload'   ).button().click(function() { that.load_jobnumbers   (); });
+
+        var administrator2add = $('#admin-access').find('input[name="administrator2add"]');
         administrator2add.
             keyup(function(e) {
                 var uid = $(this).val();
                 if( uid == '' ) { return; }
                 if( e.keyCode == 13 ) { that.new_administrator(uid); return; }});
-		var projmanager2add = $('#admin-access').find('input[name="projmanager2add"]');
+
+        var projmanager2add = $('#admin-access').find('input[name="projmanager2add"]');
         projmanager2add.
             keyup(function(e) {
                 var uid = $(this).val();
                 if( uid == '' ) { return; }
                 if( e.keyCode == 13 ) { that.new_projmanager(uid); return; }});
+
+        var listener2add = $('#admin-notifications').find('input[name="listener2add"]');
+        listener2add.
+            keyup(function(e) {
+                var uid = $(this).val();
+                if( uid == '' ) { return; }
+                if( e.keyCode == 13 ) { that.new_listener(uid); return; }});
+
+        var submit_pending = $('#admin-notifications').find('button[name="submit_all"]').
+            button().
+            click(function() { that.submit_notify(); });
+
+        var delete_pending = $('#admin-notifications').find('button[name="delete_all"]').
+            button().
+            click(function() { that.delete_notify(); });
+
         if(!this.can_manage_access()) {
             administrator2add.attr('disabled','disabled');
-            projmanager2add.attr('disabled','disabled');
+            administrator2add.attr('disabled','disabled');
+                 listener2add.attr('disabled','disabled');
+               submit_pending.attr('disabled','disabled');
+               delete_pending.attr('disabled','disabled');
         }
+
+        $('#admin-access').find('#tabs').tabs();
+        $('#admin-notifications').find('#tabs').tabs();
+        $('#admin-cablenumbers').find('#tabs').tabs();
+        $('#admin-jobnumbers').find('#tabs').tabs();
+
+		this.load_access();
+        this.load_notify();
 		this.load_cablenumbers();
 		this.load_jobnumbers();
-		this.load_access();
 	};
     this.can_manage_access = function() {
         return global_current_user.is_administrator;
@@ -90,6 +122,7 @@ function p_appl_admin() {
      * -----------------
      */
     this.cablenumber = null;
+
     this.cable_name2html = function(cnidx) {
         var c = this.cablenumber[cnidx];
         var html =
@@ -98,52 +131,65 @@ function p_appl_admin() {
             '<a href="javascript:global_search_cable_by_cablenumber('+"'"+c.recently_allocated_name+"'"+')">'+c.recently_allocated_name+'</a>';
         return html;
     };
-    this.cablenumber2html = function(cnidx) {
-        var c = this.cablenumber[cnidx];
-        var html =
-'<tr id="admin-cablenumbers-'+cnidx+'" >'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " id="admin-cablenumbers-tools-'+cnidx+'">'+
-'    <button class="admin-cablenumbers-tools " name="edit"        onclick="admin.edit_cablenumber       ('+cnidx+')" title="edit"                                 ><b>E</b></button>'+
-'    <button class="admin-cablenumbers-tools " name="edit_save"   onclick="admin.edit_cablenumber_save  ('+cnidx+')" title="save changes to the database"         >save</button>'+
-'    <button class="admin-cablenumbers-tools " name="edit_cancel" onclick="admin.edit_cablenumber_cancel('+cnidx+')" title="cancel editing and ignore any changes">cancel</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell "                                          >&nbsp;'+c.location                       +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  prefix "                  >&nbsp;'+c.prefix                         +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  range "                   >&nbsp;'+c.first+' - '+c.last             +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  num_in_use "              >&nbsp;'+
-'    <button class="admin-cablenumbers-search" name="'+cnidx+'" title="search all cables using this range">search</button>'+
-'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  num_available "           >&nbsp;'+c.num_available                  +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  next_available "          >&nbsp;'+c.next_available                 +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recently_allocated_name " >&nbsp;'+this.cable_name2html(cnidx)      +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recent_allocation_time "  >&nbsp;'+c.recent_allocation_time         +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recent_allocation_uid "   >&nbsp;'+c.recent_allocation_uid          +'</td>'+
-'</tr>';
-        return html;
-    };
 	this.display_cablenumbers = function() {
-        var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " >TOOLS</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >location</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >prefix</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >range</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >in use</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># available</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >next</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >previously allocated</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >last allocation</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >requested by</td>'+
-'  </tr>';
-        for( var cnidx in this.cablenumber ) html += this.cablenumber2html(cnidx);
-        html +=
-'</tbody></table>';
-        $('#admin-cablenumbers-cablenumbers').html(html);
+
+        var rows = [];
         for( var cnidx in this.cablenumber ) {
-			$('#admin-cablenumbers-tools-'+cnidx+' button.admin-cablenumbers-tools').
-                button().
-                button(this.can_manage_access()?'enable':'disable');
+            var c = this.cablenumber[cnidx];
+            rows.push([
+                this.can_manage_access() ?
+                    Button_HTML('E', {
+                        name:    'edit_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.edit_cablenumber('"+cnidx+"')",
+                        title:   'edit'
+                    })+' '+
+                    Button_HTML('save', {
+                        name:    'save_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.edit_cablenumber_save('"+cnidx+"')",
+                        title:   'save changes to the database'
+                    })+' '+
+                    Button_HTML('cancel', {
+                        name:    'edit_cancel_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.edit_cablenumber_cancel('"+cnidx+"')",
+                        title:   'cancel editing and ignore any changes'
+                    }) : '',
+
+                '<div name="location_'+cnidx+'">'+c.location          +'</div>',
+                '<div name="prefix_'  +cnidx+'">'+c.prefix            +'</div>',
+                '<div name="range_'   +cnidx+'">'+c.first+' - '+c.last+'</div>',
+
+                Button_HTML('search', {
+                    name:    cnidx,
+                    classes: 'admin-cablenumbers-search',
+                    title:   'search all cables using this range'
+                }),
+
+                '<div name="num_available_'          +cnidx+'">'+c.num_available            +'</div>',
+                '<div name="next_available_'         +cnidx+'">'+c.next_available           +'</div>',
+                '<div name="recently_allocated_name_'+cnidx+'">'+this.cable_name2html(cnidx)+'</div>',
+                '<div name="recent_allocation_time_' +cnidx+'">'+c.recent_allocation_time   +'</div>',
+                '<div name="recent_allocation_uid_'  +cnidx+'">'+c.recent_allocation_uid    +'</div>'
+            ]);
+        }
+        var table = new Table('admin-cablenumbers-cablenumbers', [
+            { name: 'TOOLS',                sorted: false },
+            { name: 'location',             sorted: false },
+            { name: 'prefix',               sorted: false },
+            { name: 'range',                sorted: false },
+            { name: 'in use',               sorted: false },
+            { name: '# available',          sorted: false },
+            { name: 'next',                 sorted: false },
+            { name: 'previously allocated', sorted: false },
+            { name: 'last allocation',      sorted: false },
+            { name: 'requested by',         sorted: false } ],
+            rows
+        );
+        table.display();
+        for( var cnidx in this.cablenumber ) {
+			$('#admin-cablenumbers-cablenumbers').find('button.admin-cablenumbers-tools').button();
             this.update_cablenumber_tools(cnidx,false);
         }
         $('.admin-cablenumbers-search').
@@ -156,13 +202,14 @@ function p_appl_admin() {
     };
 	this.update_cablenumber = function(cnidx) {
         var c = this.cablenumber[cnidx];
-        $('#admin-cablenumbers-'+cnidx+' .prefix'                 ).html('&nbsp;'+c.prefix);
-        $('#admin-cablenumbers-'+cnidx+' .range'                  ).html('&nbsp;'+c.first+' - '+c.last);
-        $('#admin-cablenumbers-'+cnidx+' .num_available'          ).html('&nbsp;'+c.num_available);
-        $('#admin-cablenumbers-'+cnidx+' .next_available'         ).html('&nbsp;'+c.next_available);
-        $('#admin-cablenumbers-'+cnidx+' .recently_allocated_name').html('&nbsp;'+this.cable_name2html(cnidx));
-        $('#admin-cablenumbers-'+cnidx+' .recent_allocation_time' ).html('&nbsp;'+c.recent_allocation_time);
-        $('#admin-cablenumbers-'+cnidx+' .recent_allocation_uid'  ).html('&nbsp;'+c.recent_allocation_uid);
+        var elem = $('#admin-cablenumbers-cablenumbers');
+        elem.find('div[name="prefix_'                 +cnidx+'"]').html(c.prefix);
+        elem.find('div[name="range_'                  +cnidx+'"]').html(c.first+' - '+c.last);
+        elem.find('div[name="num_available_'          +cnidx+'"]').html(c.num_available);
+        elem.find('div[name="next_available_'         +cnidx+'"]').html(c.next_available);
+        elem.find('div[name="recently_allocated_name_'+cnidx+'"]').html(this.cable_name2html(cnidx));
+        elem.find('div[name="recent_allocation_time_' +cnidx+'"]').html(c.recent_allocation_time);
+        elem.find('div[name="recent_allocation_uid_'  +cnidx+'"]').html(c.recent_allocation_uid);
         this.update_cablenumber_tools(cnidx,false);
     };
     this.update_cablenumber_tools = function(cnidx,editing) {
@@ -170,45 +217,49 @@ function p_appl_admin() {
             this.disable_cablenumber_tools(cnidx);
             return;
         }
+        var elem = $('#admin-cablenumbers-cablenumbers');
 		if( editing ) {
-			$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit"]'       ).button('disable');
-			$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_save"]'  ).button('enable' );
-			$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_cancel"]').button('enable' );
+			elem.find('button[name="edit_'       +cnidx+'"]').button('disable');
+			elem.find('button[name="edit_save_'  +cnidx+'"]').button('enable' );
+			elem.find('button[name="edit_cancel_'+cnidx+'"]').button('enable' );
 			return;
 		}
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit"]'       ).button('enable' );
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_save"]'  ).button('disable');
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_cancel"]').button('disable');
+		elem.find('button[name="edit_'       +cnidx+'"]').button('enable' );
+		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
     };
     this.disable_cablenumber_tools = function(cnidx) {
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit"]'       ).button('disable');
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_save"]'  ).button('disable');
-		$('#admin-cablenumbers-tools-'+cnidx).find('button[name="edit_cancel"]').button('disable');
+        var elem = $('#admin-cablenumbers-cablenumbers');
+		elem.find('button[name="edit_'       +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
     };
     this.edit_cablenumber = function(cnidx) {
         this.update_cablenumber_tools(cnidx,true);
         var c = this.cablenumber[cnidx];
-        $('#admin-cablenumbers-'+cnidx+' .range').html(
+        var elem = $('#admin-cablenumbers-cablenumbers');
+        elem.find('div[name="range_'+cnidx+'"]').html(
             '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" /><input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
         );
         if(c.prefix == '')
-            $('#admin-cablenumbers-'+cnidx+' .prefix').html(
+            elem.find('div[name="prefix_'+cnidx+'"]').html(
                 '<input type="text" size=2 name="prefix" value="'+c.prefix+'" />'
             );
     };
     this.edit_cablenumber_save = function(cnidx) {
         this.disable_cablenumber_tools(cnidx);
-        var c = this.cablenumber[cnidx];
-        var first  = parseInt($('#admin-cablenumbers-'+cnidx).find('input[name="first"]' ).val());
-        var last   = parseInt($('#admin-cablenumbers-'+cnidx).find('input[name="last"]'  ).val());
+        var c     = this.cablenumber[cnidx];
+        var elem  = $('#admin-cablenumbers-cablenumbers');
+        var first = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="first"]' ).val());
+        var last  = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="last"]'  ).val());
         if( last <= first ) {
             report_error('invalid range: last number must be strictly larger than the first one', null);
             this.update_cablenumber_tools(cnidx,true);
             return;
         }
-        var params = {id:c.id,first:first,last:last};
+        var params = { id: c.id, first:first, last:last };
         if(c.prefix == '') {
-            var prefix = $('#admin-cablenumbers-'+cnidx).find('input[name="prefix"]').val();
+            var prefix = elem.find('div[name="range_'+cnidx+'"]').find('input[name="prefix"]').val();
             if( prefix != '' ) params.prefix = prefix;
         }
         var jqXHR = $.get('../portal/neocaptar_cablenumber_save.php',params,function(data) {
@@ -259,56 +310,56 @@ function p_appl_admin() {
     this.jobnumber2html = function(jnidx) {
         var j = this.jobnumber[jnidx];
         var html =
-'<tr id="admin-jobnumbers-'+jnidx+'" >'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " id="admin-jobnumbers-tools-'+jnidx+'">'+
-'    <button class="admin-jobnumbers-tools " name="edit"        onclick="admin.edit_jobnumber       ('+jnidx+')" title="edit"                                 ><b>E</b></button>'+
-'    <button class="admin-jobnumbers-tools " name="edit_save"   onclick="admin.edit_jobnumber_save  ('+jnidx+')" title="save changes to the database"         >save</button>'+
-'    <button class="admin-jobnumbers-tools " name="edit_cancel" onclick="admin.edit_jobnumber_cancel('+jnidx+')" title="cancel editing and ignore any changes">cancel</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell "                                          >&nbsp;'+j.owner                  +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  prefix "                  >&nbsp;'+j.prefix                 +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  range "                   >&nbsp;'+j.first+' - '+j.last     +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  num_in_use "              >&nbsp;'+
-'    <button class="admin-jobnumbers-search" name="'+jnidx+'" title="search all cables using job numbers in this range">search</button>'+
-'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  num_available "           >&nbsp;'+j.num_available          +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  next_available "          >&nbsp;'+j.next_available         +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recently_allocated_name " >&nbsp;'+this.job_name2html(j.recently_allocated_name)+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recent_allocation_time "  >&nbsp;'+j.recent_allocation_time +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  recent_allocation_uid "   >&nbsp;'+j.recent_allocation_uid  +'</td>'+
-'</tr>';
+            '<tr id="admin-jobnumbers-'+jnidx+'" >'+
+            '  <td nowrap="nowrap" class="table_cell table_cell_left " id="admin-jobnumbers-tools-'+jnidx+'">'+
+            '    <button class="admin-jobnumbers-tools " name="edit"        onclick="admin.edit_jobnumber       ('+jnidx+')" title="edit"                                 ><b>E</b></button>'+
+            '    <button class="admin-jobnumbers-tools " name="edit_save"   onclick="admin.edit_jobnumber_save  ('+jnidx+')" title="save changes to the database"         >save</button>'+
+            '    <button class="admin-jobnumbers-tools " name="edit_cancel" onclick="admin.edit_jobnumber_cancel('+jnidx+')" title="cancel editing and ignore any changes">cancel</button>'+
+            '  </td>'+
+            '  <td nowrap="nowrap" class="table_cell "                                          >&nbsp;'+j.owner                  +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  prefix "                  >&nbsp;'+j.prefix                 +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  range "                   >&nbsp;'+j.first+' - '+j.last     +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  num_in_use "              >&nbsp;'+
+            '    <button class="admin-jobnumbers-search" name="'+jnidx+'" title="search all cables using job numbers in this range">search</button>'+
+            '</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  num_available "           >&nbsp;'+j.num_available          +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  next_available "          >&nbsp;'+j.next_available         +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  recently_allocated_name " >&nbsp;'+this.job_name2html(j.recently_allocated_name)+'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  recent_allocation_time "  >&nbsp;'+j.recent_allocation_time +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                  recent_allocation_uid "   >&nbsp;'+j.recent_allocation_uid  +'</td>'+
+            '</tr>';
         return html;
     };
     this.jobnumber_allocation2html = function(jnaidx) {
         var ja = this.jobnumber_allocation[jnaidx];
         var html =
-'<tr id="admin-jobnumber-allocations-'+jnaidx+'" >'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >&nbsp;'+this.job_name2html(ja.jobnumber_name)+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.owner         +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.num_cables    +'</td>'+
-'  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.allocated_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.project_title +'</td>'+
-'</tr>';
+            '<tr id="admin-jobnumber-allocations-'+jnaidx+'" >'+
+            '  <td nowrap="nowrap" class="table_cell table_cell_left " >&nbsp;'+this.job_name2html(ja.jobnumber_name)+'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.owner         +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.num_cables    +'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.allocated_time+'</td>'+
+            '  <td nowrap="nowrap" class="table_cell                 " >&nbsp;'+ja.project_title +'</td>'+
+            '</tr>';
         return html;
     };
 	this.display_jobnumbers = function() {
         var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " >TOOLS</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >owner</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >prefix</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >range</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># in use</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># available</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >next</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >previously allocated</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >last allocation</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >requested by</td>'+
-'  </tr>';
+            '<table><tbody>'+
+            '  <tr>'+
+            '    <td nowrap="nowrap" class="table_hdr " >TOOLS</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >owner</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >prefix</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >range</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " ># in use</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " ># available</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >next</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >previously allocated</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >last allocation</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >requested by</td>'+
+            '  </tr>';
         for( var jnidx in this.jobnumber ) html += this.jobnumber2html(jnidx);
         html +=
-'</tbody></table>';
+            '</tbody></table>';
         $('#admin-jobnumbers-jobnumbers').html(html);
         for( var jnidx in this.jobnumber ) {
 			$('#admin-jobnumbers-tools-'+jnidx+' button.admin-jobnumbers-tools').
@@ -316,19 +367,18 @@ function p_appl_admin() {
                 button(this.can_manage_access()?'enable':'disable');
             this.update_jobnumber_tools(jnidx,false);
         }
-
         html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " >job</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >owner</td>'+
-'    <td nowrap="nowrap" class="table_hdr " ># cables</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >allocated</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >project</td>'+
-'  </tr>';
+            '<table><tbody>'+
+            '  <tr>'+
+            '    <td nowrap="nowrap" class="table_hdr " >job</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >owner</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " ># cables</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >allocated</td>'+
+            '    <td nowrap="nowrap" class="table_hdr " >project</td>'+
+            '  </tr>';
         for( var jnaidx in this.jobnumber_allocation ) html += this.jobnumber_allocation2html(jnaidx);
         html +=
-'</tbody></table>';
+            '</tbody></table>';
         $('#admin-jobnumbers-allocations').html(html);
         $('.admin-jobnumbers-search').
             button().
@@ -429,79 +479,57 @@ function p_appl_admin() {
     };
 
 
-
-
+    /* ------------------
+     *   Access control
+     * ------------------
+     */
     this.access = null;
-    this.new_administrator = function(uid) {
-        this.new_user(uid,'administrator');
-    };
-    this.administrator2html = function(aidx) {
-        var a = this.access.administrator[aidx];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left  "><button name="delete" onclick="admin.delete_user('+"'"+a.uid+"'"+')" title="delete this user from the list" ><b>delete</b></button></td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.added_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.last_active_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right "><button name="projects" onclick="global_search_projects_by_owner('+"'"+a.uid+"'"+')" title="search projects owned by this user" ><b>search</b></button></td>'+
-'</tr>';
-        return html;
-    };
-    this.new_projmanager = function(uid) {
-        this.new_user(uid,'projmanager');
-    };
-    this.projmanager2html = function(aidx) {
-        var a = this.access.projmanager[aidx];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left  "><button name="delete" onclick="admin.delete_user('+"'"+a.uid+"'"+')" title="delete this user from the list" ><b>delete</b></button></td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.added_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell                  ">'+a.last_active_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right "><button name="projects" onclick="global_search_projects_by_owner('+"'"+a.uid+"'"+')" title="search projects owned by this user" ><b>search</b></button></td>'+
-'</tr>';
-        return html;
-    };
-    this.display_access = function()
-    {
-        var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " >&nbsp</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >UID</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >user</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >last active</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >projects</td>'+
-'  </tr>';
-        for( var aidx in this.access.administrator ) html += this.administrator2html(aidx);
-        html +=
-'</tbody></table>';
-        var admins = $('#admin-access-administrators');
-        admins.html(html);
-        admins.find('button[name="delete"]').button().button(this.can_manage_access()? 'enable':'disable');
-        admins.find('button[name="projects"]').button();
+    this.new_administrator = function(uid) { this.new_user(uid,'administrator'); };
+    this.new_projmanager   = function(uid) { this.new_user(uid,'projmanager'); };
+ 
+    this.display_access_users = function(id,users) {
+        var rows = [];
+        for( var i in users ) {
+            var a = users[i];
+            rows.push([
+                this.can_manage_access() ? 
+                    Button_HTML('delete', {
+                        name:     'delete',
+                        onclick:  "admin.delete_user('"+a.uid+"')",
+                        title:    'delete this user from the list'
+                    }) : '',
+                a.uid,
+                a.name,
+                a.added_time,
+                a.last_active_time,
+                Button_HTML('search', {
+                    name:    'projects',
+                    onclick: "global_search_projects_by_owner('"+a.uid+"')",
+                    title:   'search projects owned by this user'
+                })
+            ]);            
+        }
+        var table = new Table(id, [
+            { name: '',            sorted: false },
+            { name: 'UID',         sorted: false },
+            { name: 'user',        sorted: false },
+            { name: 'added',       sorted: false },
+            { name: 'last active', sorted: false },
+            { name: 'projects',    sorted: false } ],
+            rows );
+            table.display();
 
-        html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " >&nbsp</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >UID</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >user</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >last active</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >projects</td>'+
-'  </tr>';
-        for( var aidx in this.access.projmanager ) html += this.projmanager2html(aidx);
-        html +=
-'</tbody></table>';
-        var managers = $('#admin-access-projmanagers');
-        managers.html(html);
-        managers.find('button[name="delete"]').button().button(this.can_manage_access()? 'enable':'disable');
-        managers.find('button[name="projects"]').button();
+        var elem = $('#'+id);
+
+        elem.find('button[name="delete"]').button();
+        elem.find('button[name="projects"]').button();
     };
+
+    this.display_access = function() {
+        this.display_access_users('admin-access-administrators', this.access.administrator);
+        this.display_access_users('admin-access-projmanagers',   this.access.projmanager);
+    };
+
     this.load_access = function() {
         var params = {};
         var jqXHR = $.get('../portal/neocaptar_access_get.php',params,function(data) {
@@ -514,6 +542,7 @@ function p_appl_admin() {
             return;
         });
     };
+
     this.new_user = function(uid,role) {
         var params = {uid:uid,role:role};
         var jqXHR = $.get('../portal/neocaptar_access_new.php',params,function(data) {
@@ -526,6 +555,7 @@ function p_appl_admin() {
             return;
         });
     };
+
     this.delete_user = function(uid) {
         var params = {uid:uid};
         var jqXHR = $.get('../portal/neocaptar_access_delete.php',params,function(data) {
@@ -537,6 +567,136 @@ function p_appl_admin() {
             report_error('failed to delete this user from the access control list because of: '+jqXHR.statusText, null);
             return;
         });
+    };
+
+
+    /* -----------------
+     *   Notifications
+     * -----------------
+     */
+    this.can_manage_notify  = this.can_manage_access;
+    this.notify             = null;
+    this.notify_event_types = null;
+
+    this.display_notify_projmanager = function() {
+        
+        if( !global_current_user.can_manage_projects ) {
+            $('#admin-notifications-myself').html(
+                '<div style="color:maroon;">'+
+                '  We are sorry! Your account has not been found among registered project administrators.'+
+                '</div>');
+            return;
+        }
+        
+        var rows = [];
+        for( var i in this.notify_event_types.PROJMANAGER ) {
+            var event  = this.notify_event_types.PROJMANAGER[i];
+            var notify = this.notify.myself;
+            rows.push([
+                event.description,
+                Checkbox_HTML({
+                    classes: event.name,
+                    checked: notify[event.name] }) ]);
+        }
+        var table = new Table( 'admin-notifications-myself', [
+            { name: 'event',  sorted: false },
+            { name: 'notify', sorted: false } ],
+            rows );
+        table.display();
+    };
+
+    this.display_notify_other = function() {
+
+        var hdr = [ {name: '', sorted: false } ];
+        for( var i in this.notify.others )
+            hdr.push( {
+                name: this.notify.others[i].uid,
+                sorted: false });
+
+        var rows = [];
+        for( var i in this.notify_event_types.OTHER ) {
+            var event = this.notify_event_types.OTHER[i];
+            var row   = [ event.description ];
+            for( var j in this.notify.others ) {
+                var notify = this.notify.others[j];
+                row.push( Checkbox_HTML({
+                    classes: event.name,
+                    name:    notify.uid,
+                    checked: notify[event.name] }));
+            }
+            rows.push(row);
+        }
+        var row = [''];
+        for( var i in this.notify.others )
+            row.push( Button_HTML('x',{
+                classes: 'delete_listener',
+                name   : this.notify.others[i].uid,
+                title  : 'remove this user from the list' }));
+        rows.push(row);
+
+        var table = new Table('admin-notifications-others', hdr, rows );
+        table.display();
+
+        var others = $('#admin-notifications-others');
+        others.find('button.delete_listener').
+            button().
+            button(this.can_manage_notify? 'enable':'disable').
+            click(function() {
+                alert(this.name);
+            });
+    };
+
+    this.display_notify = function() {
+        this.display_notify_projmanager();
+        this.display_notify_other();
+    };
+
+    this.load_notify = function() {
+        var params = {};
+        var jqXHR = $.get('../portal/neocaptar_notify_get.php',params,function(data) {
+            if(data.status != 'success') { report_error(data.message, null); return; }
+            that.notify_event_types = data.event_types;
+            that.notify = data.notify;
+            that.display_notify();
+        },
+        'JSON').error(function () {
+            report_error('failed to load noditications list because of: '+jqXHR.statusText, null);
+            return;
+        });
+    };
+
+    this.new_listener = function(uid,role) {
+        var params = {uid:uid};
+        var jqXHR = $.get('../portal/neocaptar_notify_new.php',params,function(data) {
+            if(data.status != 'success') { report_error(data.message, null); return; }
+            that.notify = data.notify;
+            that.display_notify();
+        },
+        'JSON').error(function () {
+            report_error('failed to add a new user to the notifications list because of: '+jqXHR.statusText, null);
+            return;
+        });
+    };
+
+    this.delete_listener = function(uid) {
+        var params = {uid:uid};
+        var jqXHR = $.get('../portal/neocaptar_notify_delete.php',params,function(data) {
+            if(data.status != 'success') { report_error(data.message, null); return; }
+            that.notify = data.notify;
+            that.display_notify();
+        },
+        'JSON').error(function () {
+            report_error('failed to delete this user from the notifications list because of: '+jqXHR.statusText, null);
+            return;
+        });
+    };
+
+    this.submit_notify = function(idx) {
+        alert('submit_notify: not implemented');
+    };
+
+    this.delete_notify = function(idx) {
+        alert('delete_notify: not implemented');
     };
     return this;
 }

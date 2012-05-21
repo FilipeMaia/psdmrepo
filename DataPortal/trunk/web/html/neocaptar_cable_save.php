@@ -60,6 +60,11 @@ try {
         //
         $param_names = array(
             "device",
+            "device_location",
+            "device_region",
+            "device_component",
+            "device_counter",
+            "device_suffix",
             "func",
             "cable_type",
             "length",
@@ -100,45 +105,55 @@ try {
         // Making a status transition for the cable //
         //////////////////////////////////////////////
 
-        function assure_status($condition,$cable,$status) {
-            if(!$condition)
-                NeoCaptarUtils::report_error("can't change cable status from '{$cable->status()}' to '{$status}' for cable id: {$cable->id()}");
+        function assert_status($cable,$status) {
+            NeoCaptarUtils::report_error("can't change cable status from '{$cable->status()}' to '{$status}' for cable id: {$cable->id()}");
         }
         switch( $status ) {
+            case 'Planned':
+                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->un_register_cable  ($cable);
+                else                                        assert_status($cable,$status);
+                break;
             case 'Registered':
-                assure_status($cable->status() == 'Planned',$cable,$status);
-                $cable = $neocaptar->register_cable($cable);
+                if     ($cable->status() == 'Planned'     ) $cable = $neocaptar->register_cable     ($cable);
+                else if($cable->status() == 'Labeled'     ) $cable = $neocaptar->un_label_cable     ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Labeled':
-                assure_status($cable->status() == 'Registered',$cable,$status);
-                $cable = $neocaptar->label_cable($cable);
+                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->label_cable        ($cable);
+                else if($cable->status() == 'Fabrication' ) $cable = $neocaptar->un_fabricate_cable ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Fabrication':
-                assure_status($cable->status() == 'Labeled',$cable,$status);
-                $cable = $neocaptar->fabricate_cable($cable);
+                if     ($cable->status() == 'Labeled'     ) $cable = $neocaptar->fabricate_cable    ($cable);
+                else if($cable->status() == 'Ready'       ) $cable = $neocaptar->un_ready_cable     ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Ready':
-                assure_status($cable->status() == 'Fabrication',$cable,$status);
-                $cable = $neocaptar->ready_cable($cable);
+                if     ($cable->status() == 'Fabrication' ) $cable = $neocaptar->ready_cable        ($cable);
+                else if($cable->status() == 'Installed'   ) $cable = $neocaptar->un_install_cable   ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Installed':
-                assure_status($cable->status() == 'Ready',$cable,$status);
-                $cable = $neocaptar->install_cable($cable);
+                if     ($cable->status() == 'Ready'       ) $cable = $neocaptar->install_cable      ($cable);
+                else if($cable->status() == 'Commissioned') $cable = $neocaptar->un_commission_cable($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Commissioned':
-                assure_status($cable->status() == 'Installed',$cable,$status);
-                $cable = $neocaptar->commission_cable($cable);
+                if     ($cable->status() == 'Installed'   ) $cable = $neocaptar->commission_cable   ($cable);
+                else if($cable->status() == 'Damaged'     ) $cable = $neocaptar->un_damage_cable    ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Damaged':
-                assure_status($cable->status() == 'Commissioned',$cable,$status);
-                $cable = $neocaptar->damage_cable($cable);
+                if     ($cable->status() == 'Commissioned') $cable = $neocaptar->damage_cable       ($cable);
+                else if($cable->status() == 'Retired'     ) $cable = $neocaptar->un_retire_cable    ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             case 'Retired':
-                assure_status($cable->status() == 'Damaged',$cable,$status);
-                $cable = $neocaptar->retire_cable($cable);
+                if     ($cable->status() == 'Damaged'     ) $cable = $neocaptar->retire_cable       ($cable);
+                else                                        assert_status($cable,$status);
                 break;
             default:
-                assure_status(false,$cable,$status);
+                assert_status($cable,$status);
                 break;
         }
     }

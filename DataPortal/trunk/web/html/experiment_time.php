@@ -90,21 +90,33 @@ try {
   text-align: left;
   font-size: 24;
 }
+.delivered_beam_time_title {
+  float: left;
+  margin-right: 10;
+}
+.delivered_beam_time {
+  float: left;
+  margin-right: 30;
+  font-weight: normal;
+  color: green;
+}
 .beam_time_title {
   float: left;
+  margin-right: 10;
 }
 .beam_time {
   float: left;
-  margin-left: 10;
+  margin-right: 30;
   font-weight: normal;
+  color: green;
 }
 .esimated_usage_title {
   float: left;
-  margin-left: 20;
+  margin-right: 10;
 }
 .estimated_usage {
   float: left;
-  margin-left: 10;
+  margin-right: 30;
   font-weight: normal;
   color: green;
 }
@@ -166,11 +178,16 @@ try {
 }
 .lclson {
   width: <?php echo $lclson_width; ?>;
-  background-color: #000000;
+  background-color: #8A0829;
 }
 .beamon {
   width: <?php echo $beamon_width; ?>;
-  background-color: #000000;
+  background-color: green;
+}
+.data_taking {
+  position: absolute;
+  width: <?php echo $run_width; ?>;
+  background-color: green;
 }
 .comment {
   width:  <?php echo $comments_width - 6; ?>;
@@ -337,7 +354,7 @@ function save_comment(gap_begin_time_64,instr_name,comment,system) {
 
 var shift_data = null;
 
-function time_and_lcls2html(start_sec,stop_sec) {
+function time_and_lcls2html(start_sec,stop_sec,instr_name) {
     var plot =
 '<div class="table_column table_column_time" >'+
 '  <div class="table_column_header" >Time</div>'+
@@ -362,7 +379,7 @@ function time_and_lcls2html(start_sec,stop_sec) {
 '  </div>'+
 '</div>'+
 '<div class="table_column table_column_lclson" >'+
-'  <div class="table_column_header" >LCLS beam</div>'+
+'  <div class="table_column_header" >LCLS status</div>'+
 '  <div class="table_column_body" >';
     for( var i in shift_data.lcls_status ) {
         var ival = shift_data.lcls_status[i];
@@ -378,28 +395,58 @@ function time_and_lcls2html(start_sec,stop_sec) {
     plot +=
 '  </div>'+
 '</div>';
+    var destination;
+    switch(instr_name) {
+        case 'AMO':
+        case 'SXR':
+        case 'XPP': destination = 'FEE'; break;
+        case 'XCS':
+        case 'CXI':
+        case 'MEC': destination = 'XRT'; break;
+    }
+    if(destination) {
+        plot +=
+'<div class="table_column table_column_lclson" >'+
+'  <div class="table_column_header" >beam in '+destination+'</div>'+
+'  <div class="table_column_body" >';
+    for( var i in shift_data.beam_destinations[destination].beam_status ) {
+        var ival = shift_data.beam_destinations[destination].beam_status[i];
+        if( ival.status > 0 ) {
+            var left   = 0;
+            var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
+            var height = Math.ceil ( total_height * ( ival.end_rel2start_sec - ival.begin_rel2start_sec ) / ( stop_sec - start_sec));
+            if( !height ) height = 1;
+            plot +=
+'    <div class="beamon" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
+        }
+    }
+    plot +=
+'  </div>'+
+'</div>';
+    }
     return plot;
 }
 function display_beams() {
 
     var stats = $('#tab_beams .instrument_container .statistics');
+    stats.find('.delivered_beam_time').html(shift_data.total_beam_destinations);
     stats.find('.beam_time').html(shift_data.total_beam_time);
-    stats.find('.estimated_usage').html(shift_data.total_beam_usage_percent+' %');
+    stats.find('.estimated_usage').html(shift_data.total_data_taking);
 
     var stop_sec  = shift_data.stop_sec;
     var start_sec = shift_data.start_sec;
 
     var plot = time_and_lcls2html(start_sec,stop_sec);
 
-    for( var i in shift_data.instrument_names ) {
-        var instr_name = shift_data.instrument_names[i];
-        var instr_data = shift_data.instruments[instr_name];
+    for( var i in shift_data.beam_destination_names ) {
+        var dest_name = shift_data.beam_destination_names[i];
+        var dest_data = shift_data.beam_destinations[dest_name];
         plot +=
 '<div class="table_column table_column_beamon" >'+
-'  <div class="table_column_header" >'+instr_name+'</div>'+
+'  <div class="table_column_header" >'+dest_name+'</div>'+
 '  <div class="table_column_body" >';
-        for( var i in instr_data.beam_status ) {
-            var ival   = instr_data.beam_status[i];
+        for( var i in dest_data.beam_status ) {
+            var ival   = dest_data.beam_status[i];
             if( ival.status > 0 ) {
                 var left   = 0;
                 var top    = Math.floor( total_height *                            ival.begin_rel2start_sec   / ( stop_sec - start_sec));
@@ -409,23 +456,6 @@ function display_beams() {
 '    <div class="beamon" style="position:absolute; left:'+left+'; top:'+top+'; height:'+height+'; " ></div>';
             }
         }
-/*
-        plot +=
-'  </div>'+
-'</div>'+
-'<div class="table_column table_column_run" >'+
-'  <div class="table_column_header" >Taking data</div>'+
-'  <div class="table_column_body" >';
-        for( var i in instr_data.runs ) {
-            var run     = instr_data.runs[i];
-            var left   = 0;
-            var top    = Math.floor( total_height *                           run.begin_rel2start_sec   / ( stop_sec - start_sec));
-            var height = Math.ceil ( total_height * ( run.end_rel2start_sec - run.begin_rel2start_sec ) / ( stop_sec - start_sec));
-            if( !height ) height = 1;
-            plot +=
-'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+run_width+'; height:'+height+'; background-color:#000000; "></div>';
-        }
-*/
         plot +=
 '  </div>'+
 '</div>';
@@ -475,7 +505,7 @@ function edit_comment(gap_begin_time_64,instr_name) {
 '  </div>'+
 '</div>';
     edit_dialog(
-        'Edit Downtime Justification',
+        'Comment Editor',
         html,
         function () {
             var editor = $('#comment_editor');
@@ -503,17 +533,17 @@ function display_shift(instr_data,instr_name) {
 
     var stats = $('#tab_'+instr_name+' .instrument_container .statistics');
     stats.find('.beam_time').html(instr_data.total_beam_time);
-    stats.find('.estimated_usage').html(instr_data.total_beam_usage_percent+' %');
+    stats.find('.estimated_usage').html(instr_data.total_data_taking);
 
     var stop_sec    = shift_data.stop_sec;
     var start_sec   = shift_data.start_sec;
 
-    var plot = time_and_lcls2html(start_sec,stop_sec);
+    var plot = time_and_lcls2html(start_sec,stop_sec,instr_name);
     $('#tab_'+instr_name+' .instrument_container .table').html(plot);
 
     plot +=
 '<div class="table_column table_column_beamon" >'+
-'  <div class="table_column_header" >Beam in hutch</div>'+
+'  <div class="table_column_header" >Beam in hatch</div>'+
 '  <div class="table_column_body" >';
     for( var i in instr_data.beam_status ) {
         var ival   = instr_data.beam_status[i];
@@ -548,13 +578,13 @@ function display_shift(instr_data,instr_name) {
         var height = Math.ceil ( total_height * ( run.end_rel2start_sec - run.begin_rel2start_sec ) / ( stop_sec - start_sec));
         if( !height ) height = 1;
         plot +=
-'    <div style="position:absolute; left:'+left+'; top:'+top+'; width:'+run_width+'; height:'+height+'; background-color:#000000; "></div>';
+'    <div class="data_taking" style="left:'+left+'; top:'+top+'; height:'+height+'; "></div>';
     }
     plot +=
 '  </div>'+
 '</div>'+
 '<div class="table_column table_column_comments" >'+
-'  <div class="table_column_header" >Downtime justification</div>'+
+'  <div class="table_column_header" >Comments</div>'+
 '  <div class="table_column_body" >';
     for( var i in instr_data.gaps ) {
         var gap = instr_data.gaps[i];
@@ -695,7 +725,7 @@ HERE;
 
 <div id="tabs">
     <ul>
-      <li><a href="#tab_beams">Beam time</a></li>
+      <li><a href="#tab_beams">X-Ray destinations</a></li>
 
 HERE;
     foreach( SysMon::instrument_names() as $instr_name) {
@@ -711,9 +741,11 @@ HERE;
     <div id="tab_beams" >
       <div class="instrument_container" >
         <div class="statistics" >
-          <div class="beam_time_title" >Beam in hutches: </div>
+          <div class="delivered_beam_time_title" >Beam delivered: </div>
+          <div class="delivered_beam_time" ></div>
+          <div class="beam_time_title" >Beam in instrument hatches: </div>
           <div class="beam_time" ></div>
-          <div class="esimated_usage_title" >Estimated usage: </div>
+          <div class="esimated_usage_title" >Taking data: </div>
           <div class="estimated_usage" ></div>
           <div style="clear:both;"></div>
         </div>
@@ -727,9 +759,9 @@ HERE;
     <div id="tab_{$instr_name}" >
       <div class="instrument_container" >
         <div class="statistics" >
-          <div class="beam_time_title" >Beam in hutch: </div>
+          <div class="beam_time_title" >Beam in hatch: </div>
           <div class="beam_time" ></div>
-          <div class="esimated_usage_title" >Estimated usage: </div>
+          <div class="esimated_usage_title" >Taking data: </div>
           <div class="estimated_usage" ></div>
           <div style="clear:both;"></div>
         </div>
@@ -741,7 +773,7 @@ HERE;
     }
 	$subscriber = $authdb->authName();
 	$address    = $subscriber.'@slac.stanford.edu';
-    $is_subscribed = $sysmon->check_if_subscribed4justifications( $subscriber, $address );
+    $is_subscribed = $sysmon->check_if_subscribed4explanations( $subscriber, $address );
     $subscribe_class   = $is_subscribed ? 'hidden'  : 'visible';
     $unsubscribe_class = $is_subscribed ? 'visible' : 'hidden';
     echo <<<HERE
@@ -749,7 +781,7 @@ HERE;
     <div id="tab_alerts" >
       <div class="alerts_container" >
         <p>This subscription will allow you to receive prompt notificatons on downtime<br>
-           justification comments posted for gaps between runs.
+           explanations posted for gaps between runs.
         </p>
         <div id="subscribe_area" class="{$subscribe_class}">
           Your SLAC account <b>{$subscriber}</b> is <b>NOT</b> subscribed for notifications.<br>

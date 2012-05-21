@@ -354,8 +354,10 @@ HERE;
         </div>
       </form>
     </div>
-    <div style="float:right; margin-left:4px;"><button id="elog-post-reset">Reset form</button></div>
-    <div style="float:right; margin-left:5px;"><button id="elog-post-submit">Submit</button></div>
+    <div style="float:left; margin-left:20px; padding-top:30px;">
+      <button id="elog-post-submit">Post</button>
+      <button id="elog-post-reset" style="margin-left:5px;">Reset form</button>
+    </div>
     <div style="clear:both;"></div>
   </div>
   <div style="margin-top:10px;">
@@ -456,8 +458,10 @@ Make sure the Begin and End time limits are not used!"/>
       <div style="clear:both;"></div>
     </form>
   </div>
-  <div style="float:right; margin-left:4px;"><button id="elog-search-reset">Reset form</button></div>
-  <div style="float:right; margin-left:5px;"><button id="elog-search-submit">Submit</button></div>
+  <div style="float:left; margin-left:20px;">
+    <button id="elog-search-submit">Search</button>
+    <button id="elog-search-reset" style="margin-left:5px;">Reset form</button>
+  </div>
   <div style="clear:both;"></div>
 </div>
 <div class="el-wa">
@@ -547,7 +551,22 @@ HERE;
 
     	$elog_runs_workarea =<<<HERE
 <div id="el-r-ctrl">
-  <div style="float:right; margin-left:5px;"><button id="el-r-refresh" title="click to refresh the runs list">Refresh</button></div>
+  <div style="float:left;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Search runs:</div>
+      <div style="margin-top:5px;">
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Specify a simple range of runs or a single run  number. For the range use the following syntax: 10-20"></input>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Messages to display:</div>
+      <div style="margin-top:5px;">
+        <input type="checkbox" name="messages_run" checked="checked" disabled="disabled" />explicitly associated with runs<br>
+        <input type="checkbox" name="messages_any" />anything posted within run boundaries and before next run
+      </div>
+    </div>
+  </div>
+  <div style="float:left; margin-left:5px;"><button id="el-r-refresh" title="click to refresh the runs list">Search</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="el-r-wa">
@@ -917,7 +936,7 @@ HERE;
 <title>Web Portal of Experiment: <?php echo $instrument->name()?> / <?php echo $experiment->name()?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/ELog.css" rel="Stylesheet" />
@@ -925,8 +944,8 @@ HERE;
 <link type="text/css" href="css/Data.css" rel="Stylesheet" />
 <link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
-<script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 

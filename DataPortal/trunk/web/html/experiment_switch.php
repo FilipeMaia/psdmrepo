@@ -362,7 +362,7 @@ HERE;
 
     	$checked_readonly = 'checked="checked"'; //'checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true"';
 
-    	$admins = array( 'perazzo', 'gapon', 'mcmesser', 'salnikov' );
+    	$admins = array( 'perazzo', 'gapon', 'salnikov' );
     	$admins_html = '';
     	foreach( $admins as $uid ) {
     		$account = $regdb->find_user_account( $uid );

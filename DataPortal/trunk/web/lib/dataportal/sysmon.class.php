@@ -49,10 +49,22 @@ class SysMon {
         'CXI',
         'MEC'
     );
+    private static $beam_destinations = array(
+        'FEE',
+        'AMO',
+        'SXR',
+        'XPP',
+        'XRT',
+        'XCS',
+        'CXI',
+        'MEC'
+    );
     private static $beam_destination_masks = array(
-        'AMO' =>  2,
-        'SXR' =>  4,
-        'XPP' =>  8,
+        'FEE' =>   1,
+        'AMO' =>   2,
+        'SXR' =>   4,
+        'XPP' =>   8,
+        'XRT' =>  16,
         'XCS' =>  32,
         'CXI' =>  64,
         'MEC' => 128
@@ -109,17 +121,47 @@ class SysMon {
     public static function instrument_names() { return SysMon::$instrument_names; }
 
     /**
-     * Return a bitmask for an instruments as it's defined for
-     * EPICS PV 'XRAY_DESTINATIONS'. An exception is thrown if a non-valid
-     * experiment name is passed into the method for which no mask is defined.
+     * Check if the specified name is a name of an intrument rather than just
+     * an X-Ray destination. Return True if so. Return False otherwise. Throw
+     * an exception if the passed name doesn't correspond to any known X-Ray
+     * destinations.
      *
-     * @param type $instr_name
+     * @param type $name
+     * @return type boolean
+     */
+    public static function is_instrument_name($name) {
+        $name_trimmed = strtoupper(trim($name));
+        if( false === array_search($name_trimmed, SysMon::$beam_destinations))
+            throw new DataPortalException (
+                __METHOD__,
+                "illegal parameter value '{$name_trimmed}', beam destination name was expected" );
+        if( false === array_search($name_trimmed, SysMon::$instrument_names)) return false;
+        return true;
+    }
+
+    /**
+     * Return an array of properly ordered X-Ray beam destination names.
+     * This array is a subset of instruments names since it also includes
+     * beam locations in between or before or after instrument hatches.
+     * The names are ordered according to a physical location of beams
+     * positions.
+     *
+     * @return type array
+     */
+    public static function beam_destinations() { return SysMon::$beam_destinations; }
+
+    /**
+     * Return a bitmask for an instrument or location (between instruments) as 
+     * t's defined for EPICS PV 'XRAY_DESTINATIONS'. An exception is thrown if
+     * a non-valid name is passed into the method for which no mask is defined.
+     *
+     * @param type $name
      * @return type integer mask
      */
-    public static function beam_destination_mask($instr_name) {
-        $instr_name_trimmed = strtoupper(trim($instr_name));
-        if( array_key_exists($instr_name_trimmed, SysMon::$beam_destination_masks ))
-            return SysMon::$beam_destination_masks[$instr_name_trimmed];
+    public static function beam_destination_mask($name) {
+        $name_trimmed = strtoupper(trim($name));
+        if( array_key_exists($name_trimmed, SysMon::$beam_destination_masks ))
+            return SysMon::$beam_destination_masks[$name_trimmed];
         throw new DataPortalException (
             __METHOD__,
             "unexpected result set returned by the query" );
@@ -148,7 +190,7 @@ class SysMon {
         return $config;
     }
 
-    public function beamline_runs( $begin_time=null, $end_time=null ) {
+    public function beamtime_runs( $begin_time=null, $end_time=null ) {
         $list = array();
    		$this->connect();
         $interval = '';
@@ -165,7 +207,7 @@ class SysMon {
         return $list;
     }
 
-    public function beamline_gaps( $begin_time=null, $end_time=null ) {
+    public function beamtime_gaps( $begin_time=null, $end_time=null ) {
         $list = array();
    		$this->connect();
         $interval = '';
@@ -181,7 +223,7 @@ class SysMon {
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
     }
-    public function beamline_comments( $begin_time=null, $end_time=null ) {
+    public function beamtime_comments( $begin_time=null, $end_time=null ) {
         $list = array();
    		$this->connect();
         $interval = '';
@@ -197,7 +239,7 @@ class SysMon {
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
     }
-    public function beamline_systems() {
+    public function beamtime_systems() {
         $list = array();
    		$this->connect();
     	$result = $this->query( "SELECT DISTINCT system FROM beamtime_comments WHERE system != ''" );
@@ -381,52 +423,80 @@ class SysMon {
         $this->query("DELETE FROM beamtime_comments WHERE gap_begin_time={$gap_begin_time->to64()} AND instr_name='{$instr_name_escaped}'");
     }
 
-    private function intersect_candidate_gap_with_beam_status($beam_status, $instr_name, $begin_time_64, $end_time_64, $min_gap_width_64 ) {
+    private function intersect_candidate_gap_with_beam_status_unless(
+        $no_beam_correction4gaps,
+        $beam_status,
+        $instr_name,
+        $begin_time_64,
+        $end_time_64,
+        $min_gap_width_64 ) {
+
         $gaps = array();
 
-        // Consider only those beam time intervals where the beam time status
-        // was corresponding to the requested detector.
-        //
-        $instr_mask = SysMon::beam_destination_mask($instr_name);
-
-        foreach( $beam_status as $ival ) {
-
-            // Skip beam time intervals ended before the candidate begins and
-            // began after the candidate ends.
-            //
-            $ival_end_64 = $ival['end_time']->to64();
-            if( $ival_end_64 <= $begin_time_64 ) continue;
-
-            $ival_begin_64 = $ival['begin_time']->to64();
-            if( $ival_begin_64 >= $end_time_64 ) break;
-
-            // Skip beam time intervals which are not relevant
-            // to the requested instrument.
-            //
-            if( $ival['status'] != $instr_mask ) continue;
-
-            // Finally, we seem to have hit the rigth beam time interval.
-            // Find its intersection with the candidate gap and evaluate the duration
-            // of the intersection to see if it qualifies as the real gap (the one
-            // which would have required minimum duration).
-            //
-            $gap_begin_64 = $ival_begin_64 < $begin_time_64 ? $begin_time_64 : $ival_begin_64;
-            $gap_end_64   = $ival_end_64   > $end_time_64   ? $end_time_64   : $ival_end_64;
-
-            if(( $gap_end_64 - $gap_begin_64 ) >= $min_gap_width_64 ) {
-                array_push(
+        if( $no_beam_correction4gaps ) {
+            array_push(
                     $gaps,
                     array(
-                        'begin'      => LusiTime::from64($gap_begin_64),
-                        'end'        => LusiTime::from64($gap_end_64),
+                        'begin'      => LusiTime::from64($begin_time_64),
+                        'end'        => LusiTime::from64($end_time_64),
                         'instr_name' => $instr_name
                     )
                 );
+        } else {
+
+            // Consider only those beam time intervals where the beam time status
+            // was corresponding to the requested detector.
+            //
+            $instr_mask = SysMon::beam_destination_mask($instr_name);
+
+            foreach( $beam_status as $ival ) {
+
+                // Skip beam time intervals ended before the candidate begins and
+                // began after the candidate ends.
+                //
+                $ival_end_64 = $ival['end_time']->to64();
+                if( $ival_end_64 <= $begin_time_64 ) continue;
+
+                $ival_begin_64 = $ival['begin_time']->to64();
+                if( $ival_begin_64 >= $end_time_64 ) break;
+
+                // Skip beam time intervals which are not relevant
+                // to the requested instrument.
+                //
+                if( $ival['status'] != $instr_mask ) continue;
+
+                // Finally, we seem to have hit the rigth beam time interval.
+                // Find its intersection with the candidate gap and evaluate the duration
+                // of the intersection to see if it qualifies as the real gap (the one
+                // which would have required minimum duration).
+                //
+                $gap_begin_64 = $ival_begin_64 < $begin_time_64 ? $begin_time_64 : $ival_begin_64;
+                $gap_end_64   = $ival_end_64   > $end_time_64   ? $end_time_64   : $ival_end_64;
+
+                if(( $gap_end_64 - $gap_begin_64 ) >= $min_gap_width_64 ) {
+                    array_push(
+                        $gaps,
+                        array(
+                            'begin'      => LusiTime::from64($gap_begin_64),
+                            'end'        => LusiTime::from64($gap_end_64),
+                            'instr_name' => $instr_name
+                        )
+                    );
+                }
             }
         }
         return $gaps;
     }
-    public function populate($pvname, $min_gap_width_sec=null) {
+    /**
+     * Update/populate the database content if needed to add more runs or
+     * if forced.
+     *
+     * @param type $pvname
+     * @param type $min_gap_width_sec
+     * @param type $no_beam_correction4gaps
+     * @param type $force 
+     */
+    public function populate($pvname, $min_gap_width_sec=null, $no_beam_correction4gaps=false, $force=false) {
 
         // ATTENTION: This will increase the default value for the maximum
         //            execution time limit from 30 seconds to 300 seconds.
@@ -449,22 +519,39 @@ class SysMon {
         //
         // And the default value of the minimum gap is 30 minutes.
         //
+        // NOTE: No optimization in the 'force' mode - rebuild derived
+        //       data from the very first run known at the database.
+        //       Always give an explicitly specified gap width the highest
+        //       priority. Use the gaps width value (if any exists) stored
+        //       in the database if no explicit gap is provided. And assume
+        //       the default one as a final resort if no gap width found
+        //       in the database.
+        //
         $last_run_begin_time = LusiTime::parse('2009-09-01 00:00:00');
         $min_gap_width_64 = 1800 * ( 1000 * 1000 * 1000 );
 
-        if( array_key_exists( 'last_run_begin_time', $config ) &&
-            array_key_exists( 'min_gap_width_sec',   $config ) &&
-          ( is_null($min_gap_width_sec) || ( $min_gap_width_sec == $config['min_gap_width_sec'] ))) {
+        if( $force ) {
+            if( is_null($min_gap_width_sec)) {
+                if( array_key_exists( 'min_gap_width_sec', $config ))
+                    $min_gap_width_64 = $config['min_gap_width_sec'] * ( 1000 * 1000 * 1000 );
+            } else
+                $min_gap_width_64 = intval($min_gap_width_sec) * ( 1000 * 1000 * 1000 );
+        } else {
+            if( array_key_exists( 'last_run_begin_time', $config ) &&
+                array_key_exists( 'min_gap_width_sec',   $config ) &&
+               ( is_null($min_gap_width_sec) || ( $min_gap_width_sec == $config['min_gap_width_sec'] ))) {
 
-            // This is the only scenario when we can offord optimizing
-            // the current operation.
-            //
-            $last_run_begin_time = LusiTime::parse( $config['last_run_begin_time']->toStringDay().' 00:00:00' );
-            $min_gap_width_64 = $config['min_gap_width_sec'] * ( 1000 * 1000 * 1000 );
+                // This is the only scenario when we can afford optimizing
+                // the current operation by limiting a scope of runs by those
+                // taken since the last run recorded as a configuration parameter.
+                //
+                $last_run_begin_time = LusiTime::parse( $config['last_run_begin_time']->toStringDay().' 00:00:00' );
+                $min_gap_width_64 = $config['min_gap_width_sec'] * ( 1000 * 1000 * 1000 );
 
-        } else if( !is_null($min_gap_width_sec)) {
+            } else if( !is_null($min_gap_width_sec)) {
 
-            $min_gap_width_64 = $min_gap_width_sec * ( 1000 * 1000 * 1000 );
+                $min_gap_width_64 = $min_gap_width_sec * ( 1000 * 1000 * 1000 );
+            }
         }
         $this->beamtime_clear_from($last_run_begin_time);
 
@@ -573,7 +660,8 @@ class SysMon {
                     //
                     if(( $begin_time_64 > $prev_end_run_64 ) && ( $begin_time_64 - $prev_end_run_64 > $min_gap_width_64 )) {
                         foreach(
-                            SysMon::intersect_candidate_gap_with_beam_status(
+                            SysMon::intersect_candidate_gap_with_beam_status_unless(
+                                $no_beam_correction4gaps,
                                 $beam_status,
                                 $instr_name,
                                 $prev_end_run_64,
@@ -597,7 +685,8 @@ class SysMon {
                 //
                 if(( $stop_64 > $prev_end_run_64 ) && ( $stop_64 - $prev_end_run_64 > $min_gap_width_64 )) {
                     foreach(
-                        SysMon::intersect_candidate_gap_with_beam_status(
+                        SysMon::intersect_candidate_gap_with_beam_status_unless(
+                            $no_beam_correction4gaps,
                             $beam_status,
                             $instr_name,
                             $prev_end_run_64,
@@ -627,10 +716,10 @@ class SysMon {
      * =================================================
      */
 
-    /* Subscribe the current user for e-mail notifications on downtime justifications
+    /* Subscribe the current user for e-mail notifications on downtime explanations
      * if the flag value is set to TRUE. Unsubscribe otherwise.
      */
-    public function subscribe4justifications_if ( $subscribe, $subscriber, $address ) {
+    public function subscribe4explanations_if ( $subscribe, $subscriber, $address ) {
 
     	$this->connect();
 
@@ -660,7 +749,7 @@ class SysMon {
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
-has been just registered to recieve alerts on downtime justifications posted
+has been just registered to recieve alerts on downtime explanations posted
 for long gaps between PCDS DAQ runs.
 
 The registration has been requested by:
@@ -682,7 +771,7 @@ HERE
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
-has been just unregistered from recieving alerts on downtime justifications posted
+has been just unregistered from recieving alerts on downtime explanations posted
 for long gaps between PCDS DAQ runs.
 
 The change has been requested by:
@@ -698,7 +787,7 @@ HERE
     }
 
     /* Check if the current user is subscribed for e-mail notifications on downtime
-     * justifications, and if so return an array with the details of the subscription.
+     * explanations, and if so return an array with the details of the subscription.
      * Return null otherwise.
      *
      *   Key             | Type            | Description
@@ -711,7 +800,7 @@ HERE
      *   subscribed_host | string          | host (IP address or DNS name) name from which the operation was requested
      *
      */
-    public function check_if_subscribed4justifications ( $subscriber, $address ) {
+    public function check_if_subscribed4explanations ( $subscriber, $address ) {
 
         $this->connect();
 
@@ -725,18 +814,18 @@ HERE
     	if( $nrows != 1 )
 			throw new DataPortalException (
 				__METHOD__,
-				"duplicate entries for downtime justifications subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
+				"duplicate entries for downtime explanations subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
 		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
        	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
        	return $row;
     }
 
-    /* Get all known subscribers for downtime justification notifications.
+    /* Get all known subscribers for downtime explanation notifications.
      * 
      * The method will return an array (a list) of entries similar to
      * the ones reported by the previous method.
      */
-    public function get_all_subscribed4justifications () {
+    public function get_all_subscribed4explanations () {
 	    $list = array();
    		$this->connect();
     	$result = $this->query( "SELECT * FROM beamtime_subscriber" );
@@ -749,20 +838,20 @@ HERE
         return $list;
     }
 
-    public function notify_allsubscribed4justifications ($instr_name, $gap_begin_time) {
+    public function notify_allsubscribed4explanations ($instr_name, $gap_begin_time) {
         $this->connect();
 		$url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
-        foreach( $this->get_all_subscribed4justifications() as $subscriber ) {
+        foreach( $this->get_all_subscribed4explanations() as $subscriber ) {
             $address = $subscriber['address'];
             $this->do_notify(
                 'LCLS Data Taking Monitor',
         		$address,
-        		"*** DOWNTIME JUSTIFICATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
+        		"*** DOWNTIME EXPLANATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
 				<<<HERE
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
-was found registered to recieve alerts on downtime justifications posted
+was found registered to recieve alerts on downtime explanations posted
 for long gaps between PCDS DAQ runs.
 
 To subscribe back to this service, please use the LCLS Data Taking Time Monitor app:

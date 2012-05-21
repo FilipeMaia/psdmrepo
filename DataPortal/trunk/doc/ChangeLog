@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2012-05-17 Igor Gaponenko
+- updated database schema for NeoCaptar
+
 Tag: V00-01-06
 2012-04-23 Igor Gaponenko
 - first production version of the Data Taking (Beam Time) Monitor application

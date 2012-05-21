@@ -139,23 +139,37 @@ function p_appl_search() {
 			if( e.keyCode == 13     ) { that.search_cables(); }
 		});
         that.cols2display = {
-            project: true,
-            job:     true,
-            cable:   true,
-            device:  true,
-            func:    true,
-            length:  true,
-            routing: true,
-            sd:      true
+            project:  true,
+            job:      true,
+            cable:    true,
+            device:   true,
+            func:     true,
+            length:   true,
+            routing:  true,
+            sd:       false,
+            modified: false
         };
-        $('#search-cables-display input').change( function() {
+        $('#search-cables-display').find('input').change( function() {
             that.cols2display[this.name] = this.checked;
             that.display_cables();
         });
+        $('#search-cables-display').find('select[name="sort"]').change( function() {
+            that.sort_cables();
+            that.display_cables();
+        });
+        $('#search-cables-display').find('button[name="reverse"]').
+            button().
+            click(function() {
+                that.cable.reverse();
+                that.display_cables();
+            }
+        );
         $('#search-cables').find('.export:button').
             button().
             click(function() {
-                global_export_cables(that.params,this.name); });
+                global_export_cables(that.params,this.name);
+            }
+        );
         this.enable_export_tools_if(false);
     };
     this.enable_export_tools_if = function(is_set) {
@@ -186,8 +200,9 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="length"         >&nbsp;'+c.length         +'</div></td>' : '';
         html += this.cols2display.routing ?
 '  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="routing"        >&nbsp;'+c.routing        +'</div></td>' : '';
+        html +=
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_name"    >&nbsp;'+c.origin.name    +'</div></td>';
         html += this.cols2display.sd ?
-'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_name"    >&nbsp;'+c.origin.name    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_loc"     >&nbsp;'+c.origin.loc     +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_rack"    >&nbsp;'+c.origin.rack    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_ele"     >&nbsp;'+c.origin.ele     +'</div></td>'+
@@ -197,8 +212,10 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+c.origin.conntype+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.origin.conntype,c.origin.pinlist)+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right "                 ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
-        html +=
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
+        html += this.cols2display.modified ?
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom                 "><div class="modified"       >&nbsp;'+c.modified.time  +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom table_cell_right"><div class="modified_uid"   >&nbsp;'+c.modified.uid   +'</div></td>' : '';        html +=
 '</tr>'+
 '<tr id="search-cables-'+cidx+'-2" class="table_row ">'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_left " align="right">&nbsp;</td>';
@@ -219,18 +236,22 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
         html += this.cols2display.routing ?
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
+        html +=
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_name"    >&nbsp;'+c.destination.name    +'</div></td>';
         html += this.cols2display.sd ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_name"    >&nbsp;'+c.destination.name    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_loc"     >&nbsp;'+c.destination.loc     +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_rack"    >&nbsp;'+c.destination.rack    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_ele"     >&nbsp;'+c.destination.ele     +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_side"    >&nbsp;'+c.destination.side    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_slot"    >&nbsp;'+c.destination.slot    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conn"    >&nbsp;'+c.destination.conn    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_conntype">&nbsp;'+c.destination.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "                 ><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.destination.conntype,c.destination.pinlist)+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight table_cell_right "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_loc"     >&nbsp;'+c.destination.loc     +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_rack"    >&nbsp;'+c.destination.rack    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_ele"     >&nbsp;'+c.destination.ele     +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_side"    >&nbsp;'+c.destination.side    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_slot"    >&nbsp;'+c.destination.slot    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conn"    >&nbsp;'+c.destination.conn    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conntype">&nbsp;'+c.destination.conntype+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.destination.conntype,c.destination.pinlist)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
+        html += this.cols2display.modified ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom                  ">&nbsp;</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_right ">&nbsp;</td>' : '';
         html +=
 '</tr>';
 		return html;
@@ -270,8 +291,9 @@ function p_appl_search() {
 '    <td nowrap="nowrap" class="table_hdr">length</td>' : '';
         html += this.cols2display.routing ?
 '    <td nowrap="nowrap" class="table_hdr">routing</td>' : '';
+        html +=
+'    <td nowrap="nowrap" class="table_hdr">ORIGIN / DESTINATION</td>';
         html += this.cols2display.sd ?
-'    <td nowrap="nowrap" class="table_hdr">ORIGIN / DESTINATION</td>'+
 '    <td nowrap="nowrap" class="table_hdr">loc</td>'+
 '    <td nowrap="nowrap" class="table_hdr">rack</td>'+
 '    <td nowrap="nowrap" class="table_hdr">ele</td>'+
@@ -282,12 +304,31 @@ function p_appl_search() {
 '    <td nowrap="nowrap" class="table_hdr">contype</td>'+
 '    <td nowrap="nowrap" class="table_hdr">pinlist</td>'+
 '    <td nowrap="nowrap" class="table_hdr">instr</td>' : '';
+        html += this.cols2display.modified ?
+'    <td nowrap="nowrap" class="table_hdr">modified</td>'+
+'    <td nowrap="nowrap" class="table_hdr">by user</td>' : '';
 		for( var cidx in this.cable ) html += this.cable2html(cidx);
         html +=
 '  </tr>'+
 '</tbody></table>';
         $('#search-cables-result').html(html);
 	};
+    this.sort_cables = function() {
+        var sort_by = $('#search-cables-display').find('select[name="sort"]').val();
+        var sorter  = null;
+        switch(sort_by) {
+            case "status"     : sorter = global_cable_sorter_by_status;      break;
+            case "project"    : sorter = global_cable_sorter_by_project;     break;
+            case "job"        : sorter = global_cable_sorter_by_job;         break;
+            case "cable"      : sorter = global_cable_sorter_by_cable;       break;
+            case "device"     : sorter = global_cable_sorter_by_device;      break;
+            case "function"   : sorter = global_cable_sorter_by_function;    break;
+            case "origin"     : sorter = global_cable_sorter_by_origin;      break;
+            case "destination": sorter = global_cable_sorter_by_destination; break;
+            case "modified"   : sorter = global_cable_sorter_by_modified;    break;
+        }
+        this.cable.sort(sorter);
+    };
     this.select_cables_by_status = function() {
 		var status = $('#search-cables-result').find('select[name="status"]').val();
 		if( '- status -' == status ) {
@@ -361,6 +402,7 @@ function p_appl_search() {
 				}
 				that.cable = data.cable;
                 that.proj_id2title = data.proj_id2title;
+                that.sort_cables();
 				that.display_cables();
                 $('#search-cables-info').html(data.cable.length+' cables');
                 that.enable_export_tools_if(true);

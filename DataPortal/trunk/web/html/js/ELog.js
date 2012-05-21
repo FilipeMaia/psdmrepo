@@ -725,8 +725,12 @@ function elog_create() {
 			// Instantiate the simplified message viewer and let it full control over
 			// the container for displaying anything which is related to the run.
 			//
+            var any_messages = $('#el-r-ctrl').find('input[name="messages_any"]').attr('checked');
+            var posted_at_experiment = any_messages;
+            var posted_at_shifts = any_messages;
+            var posted_at_runs = true;
 			r.viewer = new elog_message_viewer4run_create('elog.runs_last_request['+idx+'].viewer', this, 'el-r-con-'+r.id, r.num);
-			r.viewer.reload();
+			r.viewer.reload(posted_at_experiment, posted_at_shifts, posted_at_runs);
 
 		} else {
 			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
@@ -777,7 +781,10 @@ function elog_create() {
 	};
 	this.update_runs = function() {
 		$('#el-r-updated').html('Updating runs...');
-		var params = {exper_id: that.exp_id};
+		var params = {
+            exper_id: that.exp_id,
+            range_of_runs: $('#el-r-ctrl').find('input[name="runs"]').val()
+        };
 		var jqXHR = $.get('../logbook/RequestAllRuns.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') {
@@ -795,6 +802,8 @@ function elog_create() {
 	};
 	this.runs_init = function() {
 		$('#el-r-refresh').button().click(function() { that.update_runs(); });
+        $('#el-r-ctrl').find('input[name="runs"]').keyup(function(e) { if( e.keyCode == 13 ) that.update_runs(); });
+        $('#el-r-ctrl').find('input[name="messages_any"]').click(function() { that.update_runs(); });
 		$('#el-r-wa' ).find('select[name="sort"]').change(function() {
 			that.sort_runs();
 			that.display_runs();
@@ -1331,10 +1340,17 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
 '    </div>';
 			} else {
-				if(this.parent.editor)
+				if(this.parent.editor) {
+                    if( entry.run_id) {
+                        html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
+                    } else {
+                        html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
+                    }
 					html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+                }
 				html +=
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-pr" id="'+this.base+'-m-pr-'+entry.id+'" onclick="'+this.address+'.live_message_print('+idx+');" title="print this message and all its children if any">print</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_message_delete('+idx+');" title="delete this message and all its children if any">delete</button></div>'+
@@ -2248,10 +2264,66 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		that.live_enable_message_buttons(id, false);
 		$('#'+this.base+'-m-edlg-'+id+' textarea').focus();
 	};
-	this.live_message_move = function(id, is_child) {
-	    that.create_live_message_dialogs(id, is_child);
-		$('#'+this.base+'-m-mdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
-		that.live_enable_message_buttons(id, false);
+	this.live_message_move = function(idx, into_run) {
+		var entry = this.threads[idx];
+        if( into_run ) {
+    		$('#popupdialogs').html(
+            	'Run: <input type="text" name="run_num" value="" />'
+            );
+        } else {
+            $('#popupdialogs').html(
+        		'<p style="color:red;"><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+            	'You have requested to dettach the selected message from run '+entry.run_num+'. Are you sure?</p>'
+            );
+        }
+		$('#popupdialogs').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				'Submit': function() {
+
+                    var params = {id: entry.id, scope: 'run'};
+                    if( into_run ) {
+                        params.run_num = $('#popupdialogs').find('input[name="run_num"]').val();
+                    }
+
+					$( this ).dialog('close');
+
+					var jqXHR = $.get(
+						'../logbook/MoveFFEntry4portalJSON.php',
+                        params,
+						function(data) {
+
+							if( data.status != 'success' ) {
+								that.parent.report_error( data.message );
+								return;
+							}
+                            entry.run_id  = data.run_id;
+							entry.run_num = data.run_num;
+
+                            var elem = $('#'+that.base+'-m-hdr-'+idx).find('.el-l-m-run');
+                            if( entry.run_id ) elem.html('<sup><b>run: '+entry.run_num+'</b></sup>');
+                            else               elem.html('');
+
+                            // Close and reopen the message container, so that the control buttons
+                            // for the run would be properly toggled.
+                            //
+                            that.expand_message( idx, false );
+                            that.expand_message( idx, true );
+						},
+						'JSON'
+					).error( function () {
+						that.parent.report_error('failed because of: '+jqXHR.statusText); }
+					).complete( function() {
+						;
+					});
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			title: into_run ? 'Associating Message With Run' : 'Dettaching Message from Run'
+		});
 	};
 
 	this.live_message_reply_cancel = function(id) {
@@ -2733,11 +2805,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	}
 
 	function run_sign(num) {
-		if( num ) {
-			var html = '<div style="float:right; margin-right:10px;"><sup><b>run: '+num+'</b></sup></div>';
-			return html;
-		}
-		return '';
+        var html = '<div style="float:right; margin-right:10px;" class="el-l-m-run">'+(num ? '<sup><b>run: '+num+'</b></sup>' : '')+'</div>';
+		return html;
 	}
 
 	/* ATTENTION: Watch for dependencies! These functiona will call a function from
@@ -2790,8 +2859,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 	this.expand_message = function(idx, on) {
 		var entry = that.threads[idx];
-		var toggler='#'+that.base+'-m-tgl-'+entry.id;
-		var container='#'+that.base+'-m-con-'+entry.id;
+		var toggler = '#'+that.base+'-m-tgl-'+entry.id;
+		var container = '#'+that.base+'-m-con-'+entry.id;
 
 		// REIMPLEMENTED THIS:
 		//   Initialize the thread container if this is the first call
@@ -2809,10 +2878,17 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 			entry.thread_idx = idx;
 			var html =
 '    <div class="el-l-m-body">';
-			if(this.parent.editor)
+			if(this.parent.editor) {
+                if( entry.run_id) {
+    				html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
+                } else {
+    				html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
+                }
 				html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+            }
 			html +=
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
@@ -2979,7 +3055,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 			$(container).removeClass('el-l-r-vis').addClass('el-l-r-hdn');
 		}
 	};
-	this.reload = function() {
+	this.reload = function(posted_at_experiment, posted_at_shifts, posted_at_runs) {
 
 		var params = {
 			id: this.parent.exp_id,
@@ -2987,9 +3063,9 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 			search_in_messages: 1,
 			search_in_tags: 1,
 			search_in_values: 1,
-			posted_at_experiment: 1,
-			posted_at_shifts: 1,
-			posted_at_runs: 1,
+			posted_at_experiment: posted_at_experiment ? 1 : 0,
+			posted_at_shifts: posted_at_shifts ? 1 : 0,
+			posted_at_runs: posted_at_runs ? 1 : 0,
 			range_of_runs: this.run_num,
 			inject_runs: '',
 			format: 'detailed'
@@ -3202,10 +3278,66 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		that.live_enable_message_buttons(id, false);
 		$('#'+this.base+'-m-edlg-'+id+' textarea').focus();
 	};
-	this.live_message_move = function(id, is_child) {
-	    that.create_live_message_dialogs(id, is_child);
-		$('#'+this.base+'-m-mdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
-		that.live_enable_message_buttons(id, false);
+	this.live_message_move = function(idx, into_run) {
+		var entry = this.threads[idx];
+        if( into_run ) {
+    		$('#popupdialogs').html(
+            	'Run: <input type="text" name="run_num" value="" />'
+            );
+        } else {
+            $('#popupdialogs').html(
+        		'<p style="color:red;"><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+            	'You have requested to dettach the selected message from run '+entry.run_num+'. Are you sure?</p>'
+            );
+        }
+		$('#popupdialogs').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				'Submit': function() {
+
+                    var params = {id: entry.id, scope: 'run'};
+                    if( into_run ) {
+                        params.run_num = $('#popupdialogs').find('input[name="run_num"]').val();
+                    }
+
+					$( this ).dialog('close');
+
+					var jqXHR = $.get(
+						'../logbook/MoveFFEntry4portalJSON.php',
+                        params,
+						function(data) {
+
+							if( data.status != 'success' ) {
+								that.parent.report_error( data.message );
+								return;
+							}
+                            entry.run_id  = data.run_id;
+							entry.run_num = data.run_num;
+
+                            var elem = $('#'+that.base+'-m-hdr-'+idx).find('.el-l-m-run');
+                            if( entry.run_id ) elem.html('<sup><b>run: '+entry.run_num+'</b></sup>');
+                            else               elem.html('');
+
+                            // Close and reopen the message container, so that the control buttons
+                            // for the run would be properly toggled.
+                            //
+                            that.expand_message( idx, false );
+                            that.expand_message( idx, true );
+						},
+						'JSON'
+					).error( function () {
+						that.parent.report_error('failed because of: '+jqXHR.statusText); }
+					).complete( function() {
+						;
+					});
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			title: into_run ? 'Associating Message With Run' : 'Dettaching Message from Run'
+		});
 	};
 
 	this.live_message_reply_cancel = function(id) {
@@ -3688,13 +3820,9 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff; font-size:12px;">'+entry.id+'</div>';
 		return html;
 	}
-
 	function run_sign(num) {
-		if( num ) {
-			var html = '<div style="float:right; margin-right:10px;"><sup><b>run: '+num+'</b></sup></div>';
-			return html;
-		}
-		return '';
+        var html = '<div style="float:right; margin-right:10px;" class="el-l-m-run">'+(num ? '<sup><b>run: '+num+'</b></sup>' : '')+'</div>';
+		return html;
 	}
 }
 
