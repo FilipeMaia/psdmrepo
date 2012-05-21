@@ -1,14 +1,14 @@
 <?php
 
 require_once( 'authdb/authdb.inc.php' );
-require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'neocaptar/neocaptar.inc.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\NeoCaptar;
-use DataPortal\NeoCaptarUtils;
-use DataPortal\NeoCaptarException;
+use NeoCaptar\NeoCaptar;
+use NeoCaptar\NeoCaptarUtils;
+use NeoCaptar\NeoCaptarException;
 
 /**
  * This service will delete an existing cable and return a JSON object with

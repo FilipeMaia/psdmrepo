@@ -1,8 +1,8 @@
 <?php
 
-namespace DataPortal;
+namespace NeoCaptar;
 
-require_once( 'dataportal.inc.php' );
+require_once( 'neocaptar.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 use LusiTime\LusiTime;

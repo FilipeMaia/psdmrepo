@@ -1,7 +1,7 @@
 <?php
 
 require_once( 'authdb/authdb.inc.php' );
-require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'neocaptar/neocaptar.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 require_once( 'pdf-php/class.ezpdf.php' );
@@ -9,9 +9,9 @@ require_once( 'pdf-php/class.ezpdf.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\NeoCaptar;
-use DataPortal\NeoCaptarUtils;
-use DataPortal\NeoCaptarException;
+use NeoCaptar\NeoCaptar;
+use NeoCaptar\NeoCaptarUtils;
+use NeoCaptar\NeoCaptarException;
 
 use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
