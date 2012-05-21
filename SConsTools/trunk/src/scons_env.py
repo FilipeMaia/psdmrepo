@@ -109,6 +109,8 @@ def buildEnv () :
                 SIT_ARCH_COMPILER=sit_arch_parts[2],
                 SIT_ARCH_OPT=sit_arch_parts[3],
                 SIT_ARCH_BASE=sit_arch_base,
+                SIT_ARCH_BASE_OPT=sit_arch_base+"-opt",
+                SIT_ARCH_BASE_DBG=sit_arch_base+"-dbg",
                 SIT_RELEASE=sit_release,
                 SIT_REPOS=sit_repos,
                 PKG_TREE={},
