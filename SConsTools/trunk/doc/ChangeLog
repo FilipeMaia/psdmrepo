@@ -11,9 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2012-05-21 Andy Salnikov
+- still messing with symlink mess
+
 Tag: V00-05-01
 2012-05-21 Andy Salnikov
-- trying to unmess symlik mess
+- trying to unmess symlink mess
 
 Tag: V00-05-00
 2012-05-21 Andy Salnikov
