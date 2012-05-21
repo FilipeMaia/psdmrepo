@@ -134,9 +134,9 @@ try {
                 // Compute status flags accordingly.
                 //
                 $flags = array();
-                if( array_key_exists($file_name, $data_migration_files))          array_push($flags,'IN_MIGRATION_DATABASE');
-                if( array_search    ($file_name, $files_in_irods['lustre-resc'])) array_push($flags,'DISK');
-                if( array_search    ($file_name, $files_in_irods['hpss-resc'  ])) array_push($flags,'HPSS');
+                if( array_key_exists      ($file_name, $data_migration_files))          array_push($flags,'IN_MIGRATION_DATABASE');
+                if( False !== array_search($file_name, $files_in_irods['lustre-resc'])) array_push($flags,'DISK');
+                if( False !== array_search($file_name, $files_in_irods['hpss-resc'  ])) array_push($flags,'HPSS');
 
                 array_push(
                     $files_extended,
