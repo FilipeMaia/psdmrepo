@@ -234,13 +234,8 @@ remove_from_path PATH "[.]/arch/[^/]*/bin/*"
 remove_from_path LD_LIBRARY_PATH "$SIT_ROOT/sw/.*"
 remove_from_path LD_LIBRARY_PATH "[.]/arch/[^/]*/lib/*"
 remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
-remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*"
+remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*.*"
 unset_env SIT_REPOS
-
-# we have a directory with extra Python modules, add it to PATH and PYTHONPATH
-prepend_path PATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/bin"
-prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python2.4"
-prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python2.4/site-packages"
 
 # add SCons to the PATH
 for v in $scons_ver ; do
@@ -266,6 +261,19 @@ prepend_path LD_LIBRARY_PATH "./arch/$SIT_ARCH/lib"
 test "$SIT_RELEASE" = "nobase" || set_env SIT_REPOS "$SIT_RELDIR/$SIT_RELEASE"
 
 # extend PYTHONPATH
+has_pyextra="no"
+# for releases without base (these are brand new releases) assume that they all have pyextra links, 
+# otherwise check base release for pyextra and current release too
+test "$SIT_RELEASE" = "nobase" -o -f "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra" && has_pyextra="yes"
+test -d "./pyextra" && has_pyextra="yes"
+if [ $has_pyextra = "yes" ]; then
+  test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra"
+  prepend_path PYTHONPATH "./arch/$SIT_ARCH/python/pyextra"
+else
+  # we have a directory with extra Python modules, add it to PATH and PYTHONPATH
+  prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python2.4/site-packages"
+  prepend_path PATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/bin"
+fi
 test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python"
 prepend_path PYTHONPATH "./arch/$SIT_ARCH/python"
 
