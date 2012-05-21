@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2012-05-21 Igor Gaponenko
+- extended interface to the LusiTime class (needed by Data Taking Time Monitor)
+- addded an interval class
 
 Tag: V00-00-22
 2012-02-14 Igor Gaponenko

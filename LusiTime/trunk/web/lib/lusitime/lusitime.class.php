@@ -131,6 +131,14 @@ class LusiTime {
     public function toStringDay() {
         return date("Y-m-d", $this->sec); }
 
+    /* Return a day(yer-month-day) part of the timestamp in the human-readable
+     * format:
+     * 
+     *   20-FEB-12
+     */
+    public function toStringDay_1() {
+        return date("d", $this->sec).'-'.strtoupper(date("M", $this->sec)).'-'.date("y", $this->sec); }
+
     /* Unlike the previous methods this one would return just the hours-minutes-seconds
      * part of the timestamp in the human-readable format.
      */
@@ -144,13 +152,27 @@ class LusiTime {
         
     /* Return 4-digit year number of the timestamp.
      */
-    public function year() {
-        return (int)date("Y", $this->sec); }
+    public function year() { return (int)date("Y", $this->sec); }
 
     /* Return 2-digit month number of the timestamp.
      */
-    public function month() {
-        return (int)date("m", $this->sec); }
+    public function month() { return (int)date("m", $this->sec); }
+
+    /* Return 2-digit hour number of the timestamp.
+     */
+    public function day() { return (int)date("d", $this->sec); }
+
+    /* Return 2-digit hour number of the timestamp.
+     */
+    public function hour() { return (int)date("H", $this->sec); }
+
+    /* Return 2-digit minute number of the timestamp.
+     */
+    public function minute() { return (int)date("i", $this->sec); }
+
+    /* Return 2-digit second number of the timestamp.
+     */
+    public function second() { return (int)date("s", $this->sec); }
 
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.
@@ -169,6 +191,9 @@ class LusiTime {
         if(is_object($time)) return $time->to64();
         return $time;
     }
+
+    public function to_float() {
+        return $this->sec + 10e-9 * $this->nsec; }
 
     /* Create an object of the current class out of a packed 64-bit
      * numeric representation.
