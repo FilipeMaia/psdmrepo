@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-13
+2012-05-21
+- attaching/dettaching messages to/from runs
+
 Tag: V00-02-12
 2012-04-06
 - added Python module message_poster.py for posting messages into e-log

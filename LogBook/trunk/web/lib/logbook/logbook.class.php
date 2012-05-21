@@ -217,6 +217,19 @@ class LogBook {
                 "DELETE FROM {$this->connection->database}.entry WHERE id={$id}" );
     }
 
+    public function dettach_entry_from_run( $entry ) {
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.header SET run_id = NULL WHERE id={$entry->hdr_id()} AND exper_id={$entry->parent()->id()}"
+        );
+        return $this->find_entry_by_id( $entry->id());
+    }
+    public function attach_entry_to_run( $entry, $run ) {
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.header SET run_id = {$run->id()} WHERE id={$entry->hdr_id()} AND exper_id={$entry->parent()->id()}"
+        );
+        return $this->find_entry_by_id( $entry->id());
+    }
+
     public function find_shift_by_id( $id ) {
 
         // Find an experiment the shift belongs to
