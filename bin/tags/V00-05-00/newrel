@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Script for creation of the new software release
+#
+
+#
+# Steps to create a release
+#  1. Create new directory for release
+#  2. Create .sit_release in that directory
+#  3. Copy SConstruct file from base release
+#
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [options] release directory
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+
+  Creates directory structure for the software release.
+
+EOD
+}
+
+
+# default values for options
+
+# get the options
+while getopts hd c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check arguments
+if [ $# -ne 2 ] ; then
+  usage
+  exit 2
+fi
+
+release="$1"
+directory="$2"
+
+test -n "$SIT_RELDIR" && reldir="$SIT_RELDIR"
+
+# check it
+if [ -d "$directory" ] ; then
+  echo "Directory $directory already exists"
+  exit 2
+fi
+
+mkdir "$directory" || exit 3
+
+# if release is linked to another one get its real name
+if [ -f "$reldir/$release/.sit_release" ] ; then
+  release=`cat "$reldir/$release/.sit_release"`
+fi
+
+# store its number
+echo "$release" > "$directory/.sit_release" || exit 3
+
+# copy SConstruct 
+if [ -r "$reldir/$release/SConstruct" ] ; then
+  cp "$reldir/$release/SConstruct" "$directory"
+fi
