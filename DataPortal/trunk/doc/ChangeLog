@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2012-05-21 Igor Gaponenko
+- moved NeoCaptar into a dedicated package
+
 Tag: V00-01-07
 2012-05-17 Igor Gaponenko
 - updated database schema for NeoCaptar
