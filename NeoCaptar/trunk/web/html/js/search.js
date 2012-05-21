@@ -394,7 +394,7 @@ function p_appl_search() {
 		$('#search-cables-reset').button('disable');
 		$('#search-cables-info').html('Searching...');
 		var jqXHR = $.get(
-			'../portal/neocaptar_cable_search.php', this.params,
+			'../neocaptar/cable_search.php', this.params,
 			function(data) {
 				if( data.status != 'success') {
 					report_error('failed to load cables because of: '+data.message);

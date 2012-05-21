@@ -183,7 +183,7 @@ function p_appl_dictionary() {
 			}
 			$('#dictionary-types-info').html('Saving...');
 			var params = {cable:cable_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_cable_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				$('#dictionary-types-info').html('&nbsp;');
@@ -210,7 +210,7 @@ function p_appl_dictionary() {
 			}
 			$('#dictionary-types-info').html('Saving...');
 			var params = {cable:cable_name, connector:connector_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_cable_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				$('#dictionary-types-info').html('&nbsp;');
@@ -237,7 +237,7 @@ function p_appl_dictionary() {
 			}
 			$('#dictionary-types-info').html('Saving...');
 			var params = {cable:cable_name, connector:connector_name, pinlist:pinlist_name, pinlist_documentation:pinlist_documentation};
-			var jqXHR = $.get('../portal/neocaptar_dict_cable_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				$('#dictionary-types-info').html('&nbsp;');
@@ -254,7 +254,7 @@ function p_appl_dictionary() {
         var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
 		$('#dictionary-types-info').html('Updating...');
 		var params = {id:pinlist.id, documentation:pinlist_documentation};
-		var jqXHR = $.get('../portal/neocaptar_dict_pinlist_update.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_pinlist_update.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			$('#dictionary-types-info').html('&nbsp;');
@@ -269,7 +269,7 @@ function p_appl_dictionary() {
 		this.init();
 		$('#dictionary-types-info').html('Deleting '+element+'...');
 		var params = {scope:element, id:id};
-		var jqXHR = $.get('../portal/neocaptar_dict_cable_delete.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_cable_delete.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			$('#dictionary-types-info').html('&nbsp;');
@@ -281,7 +281,7 @@ function p_appl_dictionary() {
 	};
 	this.load_cables = function() {
 		var params = {};
-		var jqXHR = $.get('../portal/neocaptar_dict_cable_get.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_cable_get.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			$('#dictionary-types-info').html('&nbsp;');
@@ -613,7 +613,7 @@ function p_appl_dictionary() {
 				this.selected_location = location_name;
 			}
 			var params = {location:location_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_location_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_location_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.locations()[location_name] = result.location[location_name];
@@ -633,7 +633,7 @@ function p_appl_dictionary() {
 				this.selected_location = location_name;
 			}
 			var params = {location:location_name, rack:rack_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_location_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_location_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.locations()[location_name] = result.location[location_name];
@@ -647,7 +647,7 @@ function p_appl_dictionary() {
 	this.delete_location_element = function(element,id) {
 		this.init();
 		var params = {scope:element, id:id};
-		var jqXHR = $.get('../portal/neocaptar_dict_location_delete.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_location_delete.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.load_locations();
@@ -658,7 +658,7 @@ function p_appl_dictionary() {
 	};
 	this.load_locations = function() {
 		var params = {};
-		var jqXHR = $.get('../portal/neocaptar_dict_location_get.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_location_get.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.location = result.location;
@@ -832,7 +832,7 @@ function p_appl_dictionary() {
 		if( this.routing_is_not_known(routing_name)) {
 			this.routings()[routing_name] = {id:0, created_time:'', created_uid:''};
 			var params = {routing:routing_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_routing_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_routing_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.routings()[routing_name] = result.routing[routing_name];
@@ -846,7 +846,7 @@ function p_appl_dictionary() {
 	this.delete_routing_element = function(element,id) {
 		this.init();
 		var params = {scope:element, id:id};
-		var jqXHR = $.get('../portal/neocaptar_dict_routing_delete.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_routing_delete.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.load_routings();
@@ -857,7 +857,7 @@ function p_appl_dictionary() {
 	};
 	this.load_routings = function() {
 		var params = {};
-		var jqXHR = $.get('../portal/neocaptar_dict_routing_get.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_routing_get.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.routing = result.routing;
@@ -1028,7 +1028,7 @@ function p_appl_dictionary() {
 				this.selected_device_region = null;
 			}
 			var params = {location:location_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.device_locations()[location_name] = result.location[location_name];
@@ -1053,7 +1053,7 @@ function p_appl_dictionary() {
 				}
 			}
 			var params = {location:location_name, region:region_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.device_locations()[location_name] = result.location[location_name];
@@ -1078,7 +1078,7 @@ function p_appl_dictionary() {
 				}
 			}
 			var params = {location:location_name, region:region_name, component:component_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_device_location_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.device_locations()[location_name] = result.location[location_name];
@@ -1092,7 +1092,7 @@ function p_appl_dictionary() {
 	this.delete_device_element = function(element,id) {
 		this.init();
 		var params = {scope:element, id:id};
-		var jqXHR = $.get('../portal/neocaptar_dict_device_location_delete.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_device_location_delete.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.load_device_locations();
@@ -1103,7 +1103,7 @@ function p_appl_dictionary() {
 	};
 	this.load_device_locations = function() {
 		var params = {};
-		var jqXHR = $.get('../portal/neocaptar_dict_device_location_get.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_device_location_get.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.device_location = result.location;
@@ -1373,7 +1373,7 @@ function p_appl_dictionary() {
 		if( this.instr_is_not_known(instr_name)) {
 			this.instrs()[instr_name] = {id:0, created_time:'', created_uid:''};
 			var params = {instr:instr_name};
-			var jqXHR = $.get('../portal/neocaptar_dict_instr_new.php',params,function(data) {
+			var jqXHR = $.get('../neocaptar/dict_instr_new.php',params,function(data) {
 				var result = eval(data);
 				if(result.status != 'success') { report_error(result.message, null); return; }
 				that.instrs()[instr_name] = result.instr[instr_name];
@@ -1387,7 +1387,7 @@ function p_appl_dictionary() {
 	this.delete_instr_element = function(element,id) {
 		this.init();
 		var params = {scope:element, id:id};
-		var jqXHR = $.get('../portal/neocaptar_dict_instr_delete.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_instr_delete.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.load_instrs();
@@ -1398,7 +1398,7 @@ function p_appl_dictionary() {
 	};
 	this.load_instrs = function() {
 		var params = {};
-		var jqXHR = $.get('../portal/neocaptar_dict_instr_get.php',params,function(data) {
+		var jqXHR = $.get('../neocaptar/dict_instr_get.php',params,function(data) {
 			var result = eval(data);
 			if(result.status != 'success') { report_error(result.message, null); return; }
 			that.instr = result.instr;

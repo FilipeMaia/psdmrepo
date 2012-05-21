@@ -262,7 +262,7 @@ function p_appl_admin() {
             var prefix = elem.find('div[name="range_'+cnidx+'"]').find('input[name="prefix"]').val();
             if( prefix != '' ) params.prefix = prefix;
         }
-        var jqXHR = $.get('../portal/neocaptar_cablenumber_save.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/cablenumber_save.php',params,function(data) {
             if(data.status != 'success') {
                 report_error(data.message, null);
                 that.update_cablenumber_tools(cnidx,true);
@@ -282,7 +282,7 @@ function p_appl_admin() {
     };
 	this.load_cablenumbers = function() {
         var params = {};
-        var jqXHR = $.get('../portal/neocaptar_cablenumber_get.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/cablenumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.cablenumber = data.cablenumber;
             that.display_cablenumbers();
@@ -446,7 +446,7 @@ function p_appl_admin() {
             var prefix = $('#admin-jobnumbers-'+jnidx).find('input[name="prefix"]').val();
             if( prefix != '' ) params.prefix = prefix;
         }
-        var jqXHR = $.get('../portal/neocaptar_jobnumber_save.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/jobnumber_save.php',params,function(data) {
             if(data.status != 'success') {
                 report_error(data.message, null);
                 that.update_jobnumber_tools(jnidx,true);
@@ -466,7 +466,7 @@ function p_appl_admin() {
     };
 	this.load_jobnumbers = function() {
         var params = {};
-        var jqXHR = $.get('../portal/neocaptar_jobnumber_get.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/jobnumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.jobnumber = data.jobnumber;
             that.jobnumber_allocation = data.jobnumber_allocation;
@@ -532,7 +532,7 @@ function p_appl_admin() {
 
     this.load_access = function() {
         var params = {};
-        var jqXHR = $.get('../portal/neocaptar_access_get.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/access_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
             that.display_access();
@@ -545,7 +545,7 @@ function p_appl_admin() {
 
     this.new_user = function(uid,role) {
         var params = {uid:uid,role:role};
-        var jqXHR = $.get('../portal/neocaptar_access_new.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/access_new.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
             that.display_access();
@@ -558,7 +558,7 @@ function p_appl_admin() {
 
     this.delete_user = function(uid) {
         var params = {uid:uid};
-        var jqXHR = $.get('../portal/neocaptar_access_delete.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/access_delete.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
             that.display_access();
@@ -653,7 +653,7 @@ function p_appl_admin() {
 
     this.load_notify = function() {
         var params = {};
-        var jqXHR = $.get('../portal/neocaptar_notify_get.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/notify_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.notify_event_types = data.event_types;
             that.notify = data.notify;
@@ -667,7 +667,7 @@ function p_appl_admin() {
 
     this.new_listener = function(uid,role) {
         var params = {uid:uid};
-        var jqXHR = $.get('../portal/neocaptar_notify_new.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/notify_new.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.notify = data.notify;
             that.display_notify();
@@ -680,7 +680,7 @@ function p_appl_admin() {
 
     this.delete_listener = function(uid) {
         var params = {uid:uid};
-        var jqXHR = $.get('../portal/neocaptar_notify_delete.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/notify_delete.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.notify = data.notify;
             that.display_notify();

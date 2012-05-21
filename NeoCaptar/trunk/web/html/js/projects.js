@@ -176,7 +176,7 @@ function p_appl_projects() {
         var elem = $('#proj-editor-'+pidx);
         $.ajax({
             type: 'POST',
-            url: '../portal/neocaptar_project_save.php',
+            url: '../neocaptar/project_save.php',
             data: {
                 id:          proj.id,
                 owner:       elem.find('select[name="owner"]').val(),
@@ -391,7 +391,7 @@ function p_appl_projects() {
 		$('#proj-cables-load-'+pidx).html('Loading...');
 		var params = {project_id:this.project[pidx].id};
 		var jqXHR = $.get(
-			'../portal/neocaptar_cable_search.php', params,
+			'../neocaptar/cable_search.php', params,
 			function(data) {
 				if( data.status != 'success') {
 					report_error('failed to load cables because of: '+data.message);
@@ -474,7 +474,7 @@ function p_appl_projects() {
 		//
         $.ajax({
             type: 'POST',
-            url: '../portal/neocaptar_cable_new.php',
+            url: '../neocaptar/cable_new.php',
             data: {project_id:proj.id},
             success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
@@ -509,7 +509,7 @@ function p_appl_projects() {
             title:         title,
             description:   description,
             due_time:      due_time};
-        var jqXHR = $.get('../portal/neocaptar_project_new.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/project_new.php',params,function(data) {
             $('#projects-create-info').html('&nbsp;');
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.create_form_changed = false;
@@ -537,7 +537,7 @@ function p_appl_projects() {
 			'You are about to delete the project and all cables associated with it. Are you sure?',
 			function() {
                 var params = {project_id:that.project[pidx].id};
-                var jqXHR = $.get('../portal/neocaptar_project_delete.php',params,function(data) {
+                var jqXHR = $.get('../neocaptar/project_delete.php',params,function(data) {
                     if(data.status != 'success') { report_error(data.message, null); return; }
                     delete that.project[pidx];
                     that.display();
@@ -555,7 +555,7 @@ function p_appl_projects() {
     };
 	this.show_cable_history = function(pidx,cidx) {
         var params = {id:this.project[pidx].cable[cidx].id};
-        var jqXHR = $.get('../portal/neocaptar_cable_history.php',params,function(data) {
+        var jqXHR = $.get('../neocaptar/cable_history.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             var html =
 '<table><tbody>'+
@@ -599,7 +599,7 @@ function p_appl_projects() {
 		//
         $.ajax({
             type: 'POST',
-            url: '../portal/neocaptar_cable_new.php',
+            url: '../neocaptar/cable_new.php',
             data: {cable_id: cable.id},
             success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
@@ -621,7 +621,7 @@ function p_appl_projects() {
 				var proj  = that.project[pidx];
 				var cable = proj.cable[cidx];
                 var params = {cable_id:cable.id};
-                var jqXHR = $.get('../portal/neocaptar_cable_delete.php',params,function(data) {
+                var jqXHR = $.get('../neocaptar/cable_delete.php',params,function(data) {
                     var result = eval(data);
                     if(result.status != 'success') { report_error(result.message, null); return; }
                     //
@@ -1686,7 +1686,7 @@ required_field_html+' required feild';
        };
         $.ajax({
             type: 'POST',
-            url: '../portal/neocaptar_cable_save.php',
+            url: '../neocaptar/cable_save.php',
             data: params,
             success: function(data) {
                 if( data.status != 'success' ) {
@@ -1773,16 +1773,16 @@ required_field_html+' required feild';
 	this.show_cable_label = function(pidx,cidx) {
         if(cidx) {
     		var cable = this.project[pidx].cable[cidx];
-        	window.open('../portal/neocaptar_cable_label.php?cable_id='+cable.id,'cable label');
+        	window.open('../neocaptar/cable_label.php?cable_id='+cable.id,'cable label');
         } else {
     		var proj = this.project[pidx];
-        	window.open('../portal/neocaptar_cable_label.php?project_id='+proj.id,'cable labels for the project');
+        	window.open('../neocaptar/cable_label.php?project_id='+proj.id,'cable labels for the project');
         }
 	};
     this.change_cable_status = function(pidx,cidx,new_status) {
 		var params = {cable_id: this.project[pidx].cable[cidx].id, status: new_status};
 		var jqXHR = $.post(
-			'../portal/neocaptar_cable_save.php', params,
+			'../neocaptar/cable_save.php', params,
 			function(data) {
 				if( data.status != 'success' ) {
 					report_error(data.message);
@@ -2030,7 +2030,7 @@ required_field_html+' required feild';
 		$('#projects-search-info').html('Searching...');
 		var params = {id:id};
 		var jqXHR = $.get(
-			'../portal/neocaptar_project_search.php', params,
+			'../neocaptar/project_search.php', params,
 			function(data) {
 				if( data.status != 'success' ) {
 					report_error( data.message );
@@ -2087,7 +2087,7 @@ required_field_html+' required feild';
 	this.search_impl = function(params) {
         $('#projects-search-info').html('Searching...');
 		var jqXHR = $.get(
-			'../portal/neocaptar_project_search.php', params,
+			'../neocaptar/project_search.php', params,
 			function(data) {
 				if( data.status != 'success' ) {
 					report_error( data.message );

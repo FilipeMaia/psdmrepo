@@ -50,10 +50,10 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
-<script type="text/javascript" src="js/neocaptar_projects.js"></script>
-<script type="text/javascript" src="js/neocaptar_dictionary.js"></script>
-<script type="text/javascript" src="js/neocaptar_search.js"></script>
-<script type="text/javascript" src="js/neocaptar_admin.js"></script>
+<script type="text/javascript" src="js/projects.js"></script>
+<script type="text/javascript" src="js/dictionary.js"></script>
+<script type="text/javascript" src="js/search.js"></script>
+<script type="text/javascript" src="js/admin.js"></script>
 <script type="text/javascript" src="js/Table.js"></script>
 
 
@@ -802,7 +802,7 @@ function global_export_cables(search_params,outformat) {
     var html = '<img src="../logbook/images/ajaxloader.gif" />';
     var dialog = report_action('Generating Document: '+outformat,html);
     var jqXHR = $.get(
-        '../portal/neocaptar_cable_search.php', search_params,
+        '../neocaptar/cable_search.php', search_params,
         function(data) {
             if( data.status != 'success' ) {
                 report_error( data.message );
