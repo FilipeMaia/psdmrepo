@@ -22,8 +22,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "pyqt"
 pkg_ver = "4.7.2"
 
-PREFIX  = pjoin(env['SIT_EXTERNAL_SW'], "PyQt", pkg_ver)
-PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
+PREFIX  = pjoin('$SIT_EXTERNAL_SW', "PyQt", pkg_ver)
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
 BINDIR = "bin"
 
 standardExternalPackage( pkg, **locals() )
