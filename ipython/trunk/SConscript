@@ -17,8 +17,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "ipython"
 pkg_ver = "0.9.1"
 
-PREFIX = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
-PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
 BINDIR = "bin"
 
 standardExternalPackage(pkg, **locals())
