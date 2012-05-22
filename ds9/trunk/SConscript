@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "ds9"
 pkg_ver = "6.1.2"
 
-PREFIX = os.path.join(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 BINDIR = "bin"
 
 standardExternalPackage(pkg, **locals())
