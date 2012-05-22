@@ -71,7 +71,7 @@ class dump_cspad ( object ) :
 
     def beginCalibCycle( self, evt, env ) :
 
-        self.source = env.configStr("source", "DetInfo(:Cspad)")
+        self.source = env.configSource("DetInfo(:Cspad)") # returns PSEvt::Source
         config = env.configStore().get("Psana::CsPad::Config", self.source)
         if not config:
             return

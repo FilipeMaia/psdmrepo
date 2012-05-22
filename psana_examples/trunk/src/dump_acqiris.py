@@ -57,7 +57,7 @@ class dump_acqiris (object) :
     #  Public methods --
     #-------------------
     def beginCalibCycle( self, evt, env ) :
-        self.source = env.configStr("source", "DetInfo(:Acqiris)")
+        self.source = env.configSource("DetInfo(:Acqiris)") # returns PSEvt::Source
         config = env.configStore().get("Psana::Acqiris::Config", self.source)
         if not config:
             return
