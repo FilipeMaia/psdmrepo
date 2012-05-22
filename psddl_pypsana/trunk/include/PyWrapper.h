@@ -30,10 +30,10 @@ namespace Psana {
   extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);
   extern void createWrappers();
   extern boost::shared_ptr<PyObject> call(PyObject* method, PSEvt::Event& evt, PSEnv::Env& env, const std::string& name, const std::string& className);
+  extern bool class_needed(const char* ctype);
 }
 
-#define std_vector_class_(T) boost::python::class_<vector<T> >("std::vector<" #T ">")\
-    .def(boost::python::vector_indexing_suite<std::vector<T> >())
+#define std_vector_class_(T) if (Psana::class_needed( "std::vector<" #T ">" )) boost::python::class_<vector<T> >("std::vector<" #T ">").def(boost::python::vector_indexing_suite<std::vector<T> >())
 
 #define associate_PyArrayType(ctype, ptype) const int PyArray_ ## ctype = ptype
 associate_PyArrayType(int8_t, PyArray_BYTE);

@@ -15,6 +15,7 @@
 #include <boost/utility.hpp>
 #include <numpy/arrayobject.h>
 #include <string>
+#include <set>
 
 #include "psddl_psana/acqiris.ddl.h"
 #include "psddl_pypsana/acqiris.ddl.wrapper.h"
@@ -30,6 +31,7 @@ using boost::python::return_value_policy;
 using boost::python::vector_indexing_suite;
 
 using std::map;
+using std::set;
 using std::string;
 using std::vector;
 using std::list;
@@ -54,7 +56,6 @@ namespace Psana {
   };
 
   static boost::shared_ptr<char> none((char *)0);
-  static const string NO_DEFAULT = "";
   static object Event_Class;
   static object EnvWrapper_Class;
 
@@ -115,19 +116,41 @@ namespace Psana {
     PSEnv::EpicsStore& epicsStore() { return _env.epicsStore(); }
     RootHistoManager::RootHMgr& rhmgr() { return _env.rhmgr(); }
     PSHist::HManager& hmgr() { return _env.hmgr(); }
-    Source configStr(const string& parameter, const string& _default = NO_DEFAULT) {
+    Env& getEnv() { return _env; };
+
+    const char* configStr(const string& parameter) {
+      ConfigSvc::ConfigSvc cfg;
+      try {
+        return cfg.getStr(_name, parameter).c_str();
+      } catch (const ConfigSvc::ExceptionMissing& ex) {
+        try {
+          return cfg.getStr(_className, parameter).c_str();
+        } catch (const ConfigSvc::ExceptionMissing& ex) {
+          return 0;
+        }
+      }
+    }
+
+    string configStr2(const string& parameter, const char* _default) {
+      if (_default == 0) {
+        return configStr(parameter);
+      }
       ConfigSvc::ConfigSvc cfg;
       try {
         return cfg.getStr(_name, parameter);
       } catch (const ConfigSvc::ExceptionMissing& ex) {
-        if (&_default == &NO_DEFAULT) {
-          return cfg.getStr(_className, parameter);
-        } else {
-          return cfg.getStr(_className, parameter, _default);
-        }
+        return cfg.getStr(_className, parameter, _default);
       }
     }
-    Env& getEnv() { return _env; };
+
+    Source configSource(const string& _default) {
+      const char* value = configStr("source");
+      if (value) {
+        return Source(value);
+      } else {
+        return Source(_default);
+      }
+    }
   };
 
   object getEnvWrapper(Env& env, const string& name, const string& className) {
@@ -157,8 +180,14 @@ namespace Psana {
     return PyArray_SimpleNewFromData(ndim, dims, ptype, data);
   }
 
+  static bool createWrappersDone = false;
+
   void createWrappers()
   {
+    if (createWrappersDone) {
+      return;
+    }
+
     // Required initialization of numpy array support
     _import_array();
     array::set_module_and_type("numpy", "ndarray");
@@ -202,14 +231,33 @@ namespace Psana {
       .def("epicsStore", &EnvWrapper::epicsStore, return_value_policy<reference_existing_object>())
       .def("rhmgr", &EnvWrapper::rhmgr, return_value_policy<reference_existing_object>())
       .def("hmgr", &EnvWrapper::hmgr, return_value_policy<reference_existing_object>())
+      .def("configSource", &EnvWrapper::configSource)
       .def("configStr", &EnvWrapper::configStr)
+      .def("configStr2", &EnvWrapper::configStr2)
       ;
 
     CreateWrappers::createWrappers();
+
+    createWrappersDone = true;
   }
 
   map<string, EvtGetter*> evtGetter_map;
   map<string, EnvGetter*> envGetter_map;
+
+  static set<string> class_set;
+
+  bool class_needed(const char* _ctype) {
+#if 1
+    return true;
+#else
+    const string ctype(_ctype);
+    if (class_set.count(ctype) == 0) {
+      class_set.insert(ctype); // assume that it will be added by the caller
+      return true;
+    }
+    return false;
+#endif
+  }
 
   // call specific method
   boost::shared_ptr<PyObject> call(PyObject* method, Event& evt, Env& env, const string& name, const string& className)
