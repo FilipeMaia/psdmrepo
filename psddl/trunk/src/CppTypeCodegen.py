@@ -165,9 +165,15 @@ class CppTypeCodegen ( object ) :
         if self._pywrapper:
             # constructor
             access = self._access("public", access)
-            print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
-            print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
-            print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
+            #print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
+            #print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
+            #print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
+
+
+            print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
+            print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
+            print >>self._cpp, T("\n#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\\")(locals())
+
         else:
             if not self._abs:
                 # constructor, all should be declared explicitly
@@ -202,18 +208,19 @@ class CppTypeCodegen ( object ) :
         # close class declaration
         print >>self._inc, "};"
         if self._pywrapper:
+            prefix = self._namespace_prefix
             print >>self._cpp, ""
             if not self._abs:
-                print >>self._cpp, T("  _CLASS($wrapped, return_value_policy<copy_const_reference>());")(locals())
-            print >>self._cpp, T("  _CLASS($name, return_value_policy<return_by_value>());")(locals())
+                print >>self._cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
+            print >>self._cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
             if not self._abs:
-                print >>self._cpp, T("  std_vector_class_($wrapped);")(locals())
-            print >>self._cpp, T("  std_vector_class_($name);")(locals())
-            print >>self._cpp, "#undef _CLASS";
+                print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
+            print >>self._cpp, T('  std_vector_class_($name);')(locals())
+            print >>self._cpp, '#undef _CLASS';
             if name.find('DataV') == 0 or name.find('DataDescV') == 0:
-                print >>self._cpp, T("  EVT_GETTER($wrapped);")(locals())
+                print >>self._cpp, T('  EVT_GETTER($wrapped);')(locals())
             elif name.find('ConfigV') == 0:
-                print >>self._cpp, T("  ENV_GETTER($wrapped);")(locals())
+                print >>self._cpp, T('  ENV_GETTER($wrapped);')(locals())
             print >>self._cpp, ""
 
         # close pragma pack
