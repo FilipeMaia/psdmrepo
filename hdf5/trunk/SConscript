@@ -21,14 +21,14 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 szip_ver = "2.1"
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "szip", szip_ver)
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "szip", szip_ver)
 LIBDIR = "lib"
 PKGLIBS = "sz"
 standardExternalPackage('szip', **locals())
 
 
 hdf5_ver = "1.8.6"
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "hdf5", hdf5_ver)
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "hdf5", hdf5_ver)
 INCDIR = "include"
 LIBDIR = "lib"
 BINDIR = "bin"
