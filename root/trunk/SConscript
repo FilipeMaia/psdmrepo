@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 root_ver = "5.30.06"
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "root", root_ver + "-" + env["PYTHON"])
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "root", root_ver + "-$PYTHON")
 INCDIR = "include/root"
 LIBDIR = "lib"
 LINKLIBS = "lib*.so*"
