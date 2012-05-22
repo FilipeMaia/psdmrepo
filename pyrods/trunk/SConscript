@@ -21,7 +21,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "pyrods"
 pkg_ver = "2.4.1"
-PREFIX  = pjoin(env['SIT_EXTERNAL_SW'], "PyRods", pkg_ver)
-PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
+
+PREFIX  = pjoin('$SIT_EXTERNAL_SW', "PyRods", pkg_ver)
+PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages")
 
 standardExternalPackage ( pkg, **locals() )
