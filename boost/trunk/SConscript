@@ -21,7 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 boost_ver = "1.49.0"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "boost", boost_ver + '-' + env['PYTHON'], env['SIT_ARCH'])
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "boost", boost_ver + '-$PYTHON')
 INCDIR = "include/boost"
 
 # Mother of all other boost packages, this will only link 
