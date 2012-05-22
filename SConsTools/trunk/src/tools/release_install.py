@@ -18,14 +18,14 @@ from SConsTools.scons_functions import *
 
 
 def _fmtList(lst):
-    return '[' + ','.join(map(str, target)) + ']'
+    return '[' + ','.join(map(str, lst)) + ']'
 
 class _makeReleaseInstall:
 
     def __call__(self, target, source, env) :
         """Target should be a single file, no source is needed"""
-        if len(target) != 1 : fail("unexpected number of targets for RpmSpec: " + str(target))
-        if len(source) != 0 : fail("unexpected number of sources for RpmSpec: " + str(source))
+        if len(target) != 1 : fail("unexpected number of targets for ReleaseInstall: " + str(target))
+        if len(source) != 0 : fail("unexpected number of sources for ReleaseInstall: " + str(source))
 
         destdir = str(target[0])
         trace("Executing ReleaseInstall: destdir=%s" % (destdir,), "makeReleaseInstall", 3)
@@ -36,10 +36,10 @@ class _makeReleaseInstall:
         # make dest directory
         os.makedirs(destdir)
 
-        # copy all files/directories except for build dir
+        # copy all files/directories except for build-time only files
         for file in os.listdir('.'):
             
-            if file != 'build':
+            if file not in ['build', '.sconsign.dblite']:
                 if os.path.isdir(file):
                     dst = os.path.join(destdir, file)
                     trace("ReleaseInstall: copy dir `%s' to `%s'" % (file, dst), "makeReleaseInstall", 3)
@@ -65,7 +65,7 @@ def create_builder(env):
     return builder
 
 def generate(env):
-    """Add Builders and construction variables for making RPM SPEC file."""
+    """Add special Builder for installing release to a new location."""
 
     # Create the PythonExtension builder
     create_builder(env)

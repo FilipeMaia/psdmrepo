@@ -11,6 +11,18 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2012-05-22 Andy Salnikov
+- removed rpm_spec tool
+- added pkg_list tool which prints the list of external packages
+- PKG_LIST_FILE variable (def: /dev/stdout) defines name of the output 
+  file for  pkg_list tool
+- target SConsTools.pkg_list uses new pkg_list tool
+- standardExternalPackage: in PKGINFO string $SIT_ARCH.found is replaced
+  with actual "found" value for the package
+- standardExternalPackage: PREFIX and other arguments can use $VAR variables
+  from environment, they will be substituted correctly
+
 Tag: V00-05-04
 2012-05-21 Andy Salnikov
 - update cython tool, there is only an optimized build for pyextra/cython

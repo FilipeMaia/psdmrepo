@@ -17,7 +17,7 @@ from SConsTools.trace import *
 from SConsTools.scons_functions import *
 
 def _fmtList ( lst ):
-    return '[' + ','.join(map(str,target)) + ']'
+    return '[' + ','.join(map(str, lst)) + ']'
 
 class _unitTest :
     

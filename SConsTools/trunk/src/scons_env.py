@@ -53,7 +53,7 @@ def buildEnv () :
         ('SIT_REPOS', "Use to change the SIT_REPOS value during build", os.environ.get('SIT_REPOS', "")),
         PathVariable('SIT_EXTERNAL_SW', "Use to change the SIT_EXTERNAL_SW value during build", sit_external_sw, PathVariable.PathIsDir),
         PathVariable('PKG_DEPS_FILE', "Name of the package dependency file", '.pkg_tree.pkl', PathVariable.PathAccept),
-        PathVariable('RPM_SPEC_FILE', "Name of the RPM SPEC file", sit_release+'.spec', PathVariable.PathAccept),
+        PathVariable('PKG_LIST_FILE', "Name of the package list file", '/dev/stdout', PathVariable.PathAccept),
         PathVariable('DESTDIR', "destination directory for install target", destdir, PathVariable.PathAccept),
         ('TRACE', "Set to positive value to trace processing", 0)
     )
@@ -130,7 +130,7 @@ def buildEnv () :
 
     # extend environment with tools
     tools = ['psdm_cplusplus', 'psdm_python', 'pyext', 'cython', 'symlink', 
-             'pycompile', 'unittest', 'script_install', 'rpm_spec', 
+             'pycompile', 'unittest', 'script_install', 'pkg_list', 
              'release_install']
     trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
     for tool in tools:

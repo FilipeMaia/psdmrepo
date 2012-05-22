@@ -176,12 +176,12 @@ env.Alias('install', [install])
 env.Requires(install, all)
 
 #
-# Special target for RPM SPEC file
+# Special target for package list file
 #
-rpm_spec = env['RPM_SPEC_FILE']
-rpm_spec = env.RpmSpec([rpm_spec], [])
-env.AlwaysBuild(rpm_spec)
-env.Alias('rpm_spec', rpm_spec)
+#pkg_list = env['PKG_LIST_FILE']
+pkg_list = env.PackageList(['SConsTools.pkg_list'], [])
+env.AlwaysBuild(pkg_list)
+#env.Alias('SConsTools.pkg_list', pkg_list)
 
 #
 # Additional targets for documentation generation

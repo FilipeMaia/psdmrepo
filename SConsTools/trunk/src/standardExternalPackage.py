@@ -24,34 +24,39 @@ from SConsTools.dependencies import *
 #
 
 #
-# Find a correct prefix directory.
+# Find a correct prefix directory, returns tuple (prefix, arch)
 #
 def _prefix(prefix, env):
 
-    # if prefix ends with SIT_ARCH, discard it
+    # if prefix ends with SIT_ARCH, discard it for now, find real arch
+    prefix = env.subst(prefix)
     head, tail = os.path.split(prefix)
     if not tail : head, tail = os.path.split(head)
-    if tail == env['SIT_ARCH'] : prefix = head
+    if tail == env['SIT_ARCH']: prefix = head
 
     # First try $SIT_ARCH
-    pfx = pjoin(prefix, env['SIT_ARCH'])
-    if os.path.isdir(pfx) : return pfx
+    arch = env['SIT_ARCH']
+    if os.path.isdir(pjoin(prefix, arch)) and not os.path.islink(pjoin(prefix, arch)):
+        return (prefix, arch)
 
     # for 'prof' try to substitute with 'dbg'
     if env['SIT_ARCH_OPT'] == 'prof' :
-        pfx = pjoin(prefix, env['SIT_ARCH_BASE'] + '-dbg')
-        if os.path.isdir(pfx) : return pfx
-
-    # Then try $SIT_ARCH_BASE
-    pfx = pjoin(prefix, env['SIT_ARCH_BASE'])
-    if os.path.isdir(pfx) : return pfx
+        arch = env['SIT_ARCH_BASE_DBG']
+        if os.path.isdir(pjoin(prefix, arch)) and not os.path.islink(pjoin(prefix, arch)):
+            return (prefix, arch)
 
     # otherwise try 'opt'
-    pfx = pjoin(prefix, env['SIT_ARCH_BASE'] + '-opt')
-    if os.path.isdir(pfx) : return pfx
+    arch = env['SIT_ARCH_BASE_OPT']
+    if os.path.isdir(pjoin(prefix, arch)) and not os.path.islink(pjoin(prefix, arch)):
+        return (prefix, arch)
+    
+    # Then try $SIT_ARCH_BASE
+    arch = env['SIT_ARCH_BASE']
+    if os.path.isdir(pjoin(prefix, arch)) and not os.path.islink(pjoin(prefix, arch)):
+        return (prefix, arch)
 
     # nothing works, just return what we have
-    return prefix
+    return (prefix, "")
 
 
 # build package name from prefix and directory
@@ -109,7 +114,9 @@ def standardExternalPackage(package, **kw) :
 
     env = DefaultEnvironment()
 
-    prefix = _prefix(kw.get('PREFIX'), env)
+    prefix, arch = _prefix(kw.get('PREFIX'), env)
+    trace("prefix, arch: %s, %s" % (prefix, arch), "standardExternalPackage", 3)
+    if arch: prefix = os.path.join(prefix, arch)
     trace("prefix: %s" % prefix, "standardExternalPackage", 3)
 
     # link include directory
@@ -128,7 +135,7 @@ def standardExternalPackage(package, **kw) :
 
             # link the whole include directory
             target = pjoin(archinc, package)
-            if not os.path.lexists(target) : 
+            if not os.path.lexists(target) :
                 targ = os.symlink(inc_dir, target)
                 env['ALL_TARGETS']['INCLUDES'].append(targ)
 
@@ -234,7 +241,13 @@ def standardExternalPackage(package, **kw) :
     pkginfo = None
     if 'PKGINFO' in kw:
         pkginfo = kw.get('PKGINFO')
-        if isinstance(pkginfo, types.StringTypes): pkginfo = (pkginfo,)
+        if isinstance(pkginfo, types.StringTypes):
+            # if contains literal $SIT_ARCH.found replace it with real arch
+            pkginfo = pkginfo.replace('$SIT_ARCH.found', arch)
+            pkginfo = tuple(pkginfo,)
+        elif pkginfo is not None:
+            # if contains literal $SIT_ARCH.found replace it with real arch
+            pkginfo = tuple([info.replace('$SIT_ARCH.found', arch) for info in pkginfo])
     elif prefix:
         # if PREFIX starts with SIT_EXTERNAL_SW then strip it and split remaining path
         # then add the result to the list in the environment
