@@ -48,8 +48,8 @@ INCLUDES = " ".join((
   "tilde.h",
   "typelib.h",
   "xmalloc.h" ))
-LIBDIR  = "lib/mysql"
-if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64/mysql"
+LIBDIR  = "$LIB_ABI/mysql"
 PKGLIBS = "mysqlclient"
 LINKLIBS = "libmysqlclient.so*"
+
 standardExternalPackage ( 'mysql', **locals() )
