@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-01
+2012-05-22 Andy Salnikov
+- standardExternalPackage: not all variables were expanded correctly
+
 Tag: V00-06-00
 2012-05-22 Andy Salnikov
 - removed rpm_spec tool
