@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package qt
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+# to do Qt stuff we need additional tool but we don't want to pollute
+# default environment, just clone default one and add a tool
+env = DefaultEnvironment()
+env = env.Clone()
+env.Tool('qt4', toolpath=env['TOOLPATH'])
+
+PREFIX = env['QT4_PREFIX']
+BINDIR = "bin"
+LIBDIR = "lib"
+LINKBINS = "assistant designer moc rcc uic"
+PKGLIBS = "QtGui QtCore"
+standardExternalPackage('qt4', **locals())
