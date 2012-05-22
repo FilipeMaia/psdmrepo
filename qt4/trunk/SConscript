@@ -19,11 +19,13 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
+# to do Qt stuff we need additional tool but we don't want to pollute
+# default environment, just clone default one and add a tool
 env = DefaultEnvironment()
 env = env.Clone()
 env.Tool('qt4', toolpath=env['TOOLPATH'])
 
-PREFIX = env['QT4_PREFIX']
+PREFIX = '$QT4_PREFIX'
 BINDIR = "bin"
 LIBDIR = "lib"
 LINKBINS = "assistant designer moc rcc uic"
