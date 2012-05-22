@@ -26,7 +26,7 @@ PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 
 PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages", pkg)
 PYDIRSEP = True
-INCDIR = pjoin(PYDIR, "/core/include/", pkg)
+INCDIR = pjoin(PYDIR, "core", "include", pkg)
 PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
