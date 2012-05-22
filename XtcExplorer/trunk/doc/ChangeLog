@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-22 ofte V00-01-28          rev 3619
+        - GUI: Autoscan
+	- Image vrange: slider. Not perfect (rather ugly), but it works. 
+	
 2012-May-21 ofte V00-01-27          rev 3558
 	- bugfix with the plot vrange 
 	

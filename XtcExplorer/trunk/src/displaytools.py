@@ -4,7 +4,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import ImageGrid
 import matplotlib.ticker as ticker
 from matplotlib.gridspec import GridSpec
-
+from matplotlib.widgets import Slider, SpanSelector
+from matplotlib.patches import Circle, Rectangle, Polygon
 class DataDisplay(object):
 
     def __init__(self, mode=0):
@@ -437,6 +438,10 @@ class Frame(object):
     def update_axes(self):
         if self.projx is None: return
         if self.projy is None: return
+        
+        clims = self.axesim.get_clim()        
+        self.slider_vmin.set_val(clims[0])
+        self.slider_vmax.set_val(clims[1])
 
     def set_ticks(self, limits = None ):
         
@@ -553,9 +558,15 @@ class Frame(object):
             self.update_axes()
             
 
+        #cax = divider.append_axes("right",size="5%", pad=0.05)
         cax = divider.append_axes("right",size="5%", pad=0.05)
-        self.colb = plt.colorbar(self.axesim,cax=cax)
+        self.colb = plt.colorbar(self.axesim,cax=cax, orientation='vertical')
         # colb is the colorbar object
+
+
+        slider_vmin_ax = divider.append_axes("bottom",size="2%",pad=0.45)
+        #slider_vmin_ax.patch.set_facecolor('blue')
+        slider_vmax_ax = divider.append_axes("bottom",size="2%",pad=0.05)
 
 
         # show the active region for thresholding
@@ -567,8 +578,24 @@ class Frame(object):
             self.axes.add_patch(self.thr_rect)
             print "Plotting the red rectangle in area ", self.threshold.area
 
+        clim = self.colb.get_clim()
+        edges = self.orglims
 
         # slider?!
+        self.slider_vmin = Slider(slider_vmin_ax, 'Min', edges[0], edges[1],
+                                  valinit=clim[0],
+                                  facecolor='white', edgecolor='red', lw=2.5)
+        self.slider_vmax = Slider(slider_vmax_ax,'Max', edges[0], edges[1],
+                                  valinit=clim[1], slidermin=self.slider_vmin,
+                                  facecolor='white',edgecolor='red',lw=2.5)
+        
+        def update(val):            
+            self.axesim.set_clim(self.slider_vmin.val, self.slider_vmax.val)
+            self.update_axes()
+            plt.draw()
+            
+        self.slider_vmin.on_changed(update)        
+        self.slider_vmax.on_changed(update)
         
 
 
