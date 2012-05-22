@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) class_<n>("Psana::Pulnix::TM6740ConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref", &n::vref)\
@@ -22,12 +22,12 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Pulnix::TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Pulnix::TM6740ConfigV2", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref_a", &n::vref_a)\
@@ -39,7 +39,7 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Pulnix::TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV2_Wrapper);
 #undef _CLASS
 

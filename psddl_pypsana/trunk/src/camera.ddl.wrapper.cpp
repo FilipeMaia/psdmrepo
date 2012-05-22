@@ -10,26 +10,26 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameCoord", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("column", &n::column)\
     .def("row", &n::row)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(FrameCoord, return_value_policy<copy_const_reference>());
-  _CLASS(FrameCoord_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Camera::FrameCoord, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Camera::FrameCoord_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameCoord);
   std_vector_class_(FrameCoord_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameFccdConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
 
-  _CLASS(FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Camera::FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFccdConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameFexConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("forwarding", &n::forwarding)\
     .def("forward_prescale", &n::forward_prescale)\
     .def("processing", &n::processing)\
@@ -39,12 +39,12 @@ void createWrappers() {
     .def("number_of_masked_pixels", &n::number_of_masked_pixels)\
     .def("masked_pixel_coordinates", &n::masked_pixel_coordinates)\
 
-  _CLASS(FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Camera::FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFexConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Camera::FrameV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("depth", &n::depth)\
@@ -53,12 +53,12 @@ void createWrappers() {
     .def("data8", &n::data8)\
     .def("data16", &n::data16)\
 
-  _CLASS(FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Camera::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Camera::TwoDGaussianV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("integral", &n::integral)\
     .def("xmean", &n::xmean)\
     .def("ymean", &n::ymean)\
@@ -66,7 +66,7 @@ void createWrappers() {
     .def("minor_axis_width", &n::minor_axis_width)\
     .def("major_axis_tilt", &n::major_axis_tilt)\
 
-  _CLASS(TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Camera::TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TwoDGaussianV1_Wrapper);
 #undef _CLASS
 

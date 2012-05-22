@@ -10,19 +10,19 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) class_<n>("Psana::FCCD::FccdConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::FCCD::FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::FCCD::FccdConfigV2", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("ccdEnable", &n::ccdEnable)\
     .def("focusMode", &n::focusMode)\
@@ -34,7 +34,7 @@ void createWrappers() {
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::FCCD::FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV2_Wrapper);
 #undef _CLASS
 

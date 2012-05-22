@@ -10,122 +10,122 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::epicsTimeStamp", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("sec", &n::sec)\
     .def("nsec", &n::nsec)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(epicsTimeStamp, return_value_policy<copy_const_reference>());
-  _CLASS(epicsTimeStamp_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::epicsTimeStamp, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::epicsTimeStamp_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(epicsTimeStamp);
   std_vector_class_(epicsTimeStamp_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_string", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_string, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_string_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_string, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_string_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_string);
   std_vector_class_(dbr_time_string_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_short", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_short, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_short_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_short, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_short_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_short);
   std_vector_class_(dbr_time_short_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_float", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_float, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_float_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_float, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_float_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_float);
   std_vector_class_(dbr_time_float_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_enum", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_enum, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_enum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_enum, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_enum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_enum);
   std_vector_class_(dbr_time_enum_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_char", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_char, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_char_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_char, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_char_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_char);
   std_vector_class_(dbr_time_char_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_long", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_long, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_long_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_long, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_long_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_long);
   std_vector_class_(dbr_time_long_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_time_double", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_time_double, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_time_double_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_time_double, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_time_double_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_time_double);
   std_vector_class_(dbr_time_double_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_sts_string", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(dbr_sts_string, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_sts_string_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_sts_string, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_sts_string_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_sts_string);
   std_vector_class_(dbr_sts_string_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_short", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -140,14 +140,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("units_shape", &n::units_shape)\
 
-  _CLASS(dbr_ctrl_short, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_short_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_short, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_short_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_short);
   std_vector_class_(dbr_ctrl_short_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_float", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("precision", &n::precision)\
@@ -163,14 +163,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("units_shape", &n::units_shape)\
 
-  _CLASS(dbr_ctrl_float, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_float_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_float, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_float_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_float);
   std_vector_class_(dbr_ctrl_float_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_enum", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("no_str", &n::no_str)\
@@ -178,14 +178,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("strings_shape", &n::strings_shape)\
 
-  _CLASS(dbr_ctrl_enum, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_enum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_enum, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_enum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_enum);
   std_vector_class_(dbr_ctrl_enum_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_char", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -200,14 +200,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("units_shape", &n::units_shape)\
 
-  _CLASS(dbr_ctrl_char, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_char_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_char, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_char_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_char);
   std_vector_class_(dbr_ctrl_char_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_long", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -222,14 +222,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("units_shape", &n::units_shape)\
 
-  _CLASS(dbr_ctrl_long, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_long_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_long, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_long_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_long);
   std_vector_class_(dbr_ctrl_long_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::dbr_ctrl_double", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("precision", &n::precision)\
@@ -245,14 +245,14 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
     .def("units_shape", &n::units_shape)\
 
-  _CLASS(dbr_ctrl_double, return_value_policy<copy_const_reference>());
-  _CLASS(dbr_ctrl_double_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::dbr_ctrl_double, return_value_policy<copy_const_reference>());
+  _CLASS(Psana::Epics::dbr_ctrl_double_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(dbr_ctrl_double);
   std_vector_class_(dbr_ctrl_double_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvHeader", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("pvId", &n::pvId)\
     .def("dbrType", &n::dbrType)\
     .def("numElements", &n::numElements)\
@@ -262,186 +262,186 @@ void createWrappers() {
     .def("status", &n::status)\
     .def("severity", &n::severity)\
 
-  _CLASS(EpicsPvHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvHeader_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlHeader", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("pvName", &n::pvName)\
     .def("pvName_shape", &n::pvName_shape)\
 
-  _CLASS(EpicsPvCtrlHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlHeader_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeHeader", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("stamp", &n::stamp)\
 
-  _CLASS(EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeHeader_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlString", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
     .def("data_shape", &n::data_shape)\
 
-  _CLASS(EpicsPvCtrlString_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlString_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlShort", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlShort_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlShort_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlFloat", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlFloat_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlFloat_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlEnum", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlEnum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlEnum_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlChar", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlChar_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlChar_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlLong", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlLong_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlLong_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvCtrlDouble", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvCtrlDouble_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvCtrlDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlDouble_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeString", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
     .def("data_shape", &n::data_shape)\
 
-  _CLASS(EpicsPvTimeString_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeString_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeShort", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeShort_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeShort_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeFloat", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeFloat_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeFloat_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeEnum", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeEnum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeEnum_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeChar", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeChar_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeChar_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeLong", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeLong_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeLong_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::EpicsPvTimeDouble", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(EpicsPvTimeDouble_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::EpicsPvTimeDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeDouble_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::PvConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("pvId", &n::pvId)\
     .def("description", &n::description)\
     .def("interval", &n::interval)\
 
-  _CLASS(PvConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::PvConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(PvConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) class_<n>("Psana::Epics::ConfigV1", no_init)\
+#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
     .def("numPv", &n::numPv)\
     .def("pvControls", &n::pvControls, policy)\
     .def("pvControls_shape", &n::pvControls_shape)\
 
-  _CLASS(ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Epics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ENV_GETTER(ConfigV1);
