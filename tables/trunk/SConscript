@@ -23,9 +23,9 @@ pkg = "tables"
 pkg_ver = "2.1.2"
 pkg_dir = "2.1.2-1.8.6"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_dir)
-PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
+PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages")
 BINDIR = "bin"
-PKGINFO = (pkg, pkg_ver, env['PYTHON'], env['SIT_ARCH'])
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
