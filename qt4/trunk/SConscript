@@ -25,7 +25,7 @@ env = DefaultEnvironment()
 env = env.Clone()
 env.Tool('qt4', toolpath=env['TOOLPATH'])
 
-PREFIX = '$QT4_PREFIX'
+PREFIX = env['QT4_PREFIX']
 BINDIR = "bin"
 LIBDIR = "lib"
 LINKBINS = "assistant designer moc rcc uic"
