@@ -23,8 +23,8 @@ pkg = "h5py"
 pkg_dir = "1.3.0-vlen-1.8.4p1"
 pkg_ver = "1.3.0"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], "h5py", pkg_dir)
-PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages")
-PKGINFO = (pkg, pkg_ver, env['PYTHON'], env['SIT_ARCH'])
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "h5py", pkg_dir)
+PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
