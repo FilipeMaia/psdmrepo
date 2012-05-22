@@ -22,11 +22,11 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "numpy"
 pkg_ver = "1.3.0"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg, pkg_ver)
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 
-PYDIR = pjoin(env['LIB_ABI'], env['PYTHON'], "site-packages", pkg)
+PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages", pkg)
 PYDIRSEP = True
-INCDIR = PYDIR + "/core/include/" + pkg
-PKGINFO = (pkg, pkg_ver, env['PYTHON'], env['SIT_ARCH'])
+INCDIR = pjoin(PYDIR, "/core/include/", pkg)
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
