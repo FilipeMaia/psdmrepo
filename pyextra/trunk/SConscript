@@ -21,11 +21,11 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "pyextra"
 
-PREFIX = pjoin(env['SIT_EXTERNAL_SW'], pkg + "-" + env['PYTHON'])
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg + "-$PYTHON")
 BINDIR = "bin"
 LINKBINS = "buildbot cython easy_install pylint sphinx-autogen sphinx-apidoc sphinx-build sphinx-quickstart virtualenv"
-PYDIR = pjoin("lib", env['PYTHON'], "site-packages")
+PYDIR = pjoin("lib", '$PYTHON', 'site-packages')
 PYDIRSEP = True
-PKGINFO = (pkg, env['PYTHON'], env['SIT_ARCH'])
+PKGINFO = (pkg, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
