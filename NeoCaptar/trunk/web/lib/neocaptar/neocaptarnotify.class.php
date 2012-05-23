@@ -36,7 +36,5 @@ class NeoCaptarNotify {
     public function uid()         { return $this->attr['uid']; }
     public function event_type()  { return $this->neocaptar()->find_notify_event_type_by_id($this->attr['event_type_id']); }
     public function enabled()     { return 'ON' == $this->attr['enabled']; }
-    public function mode()        { return $this->attr['mode']; }
-
 }
 ?>

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This service will return notification lists.
+ * This service will perform varios operations on entries in the notification
+ * queue and return an updated notification lists.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
@@ -21,12 +22,21 @@ header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
+
+    $action  = NeoCaptarUtils::get_param_GET('action');
+    $id      = NeoCaptarUtils::get_param_GET('id', false, false);
+
 	$authdb = AuthDB::instance();
 	$authdb->begin();
 
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
+    if( is_null($id)) {
+        NeoCaptarUtils::report_error('operation is not implemented for action: '.$action);
+    } else {
+        NeoCaptarUtils::report_error('operation is not implemented for action: '.$action.' and id: '.$id);
+    }
     $notificatons2return = NeoCaptarUtils::notifications2array($neocaptar);
 
     $authdb->commit();

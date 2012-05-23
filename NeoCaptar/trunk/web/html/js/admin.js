@@ -46,10 +46,10 @@ function p_appl_admin() {
 	};
     this.update = function() {
 		this.init();
-		this.load_access();
-        this.load_notify();
-        this.load_cablenumbers();
-        this.load_jobnumbers();
+		this.access_load();
+        this.notify_load();
+        this.cablenumbers_load();
+        this.jobnumbers_load();
     };
     
     /* ----------------------------------------
@@ -61,44 +61,44 @@ function p_appl_admin() {
 		if( this.initialized ) return;
 		this.initialized = true;
 
-		$('#admin-access-reload'       ).button().click(function() { that.load_access       (); });
-		$('#admin-notifications-reload').button().click(function() { that.load_notify(); });
-		$('#admin-cablenumbers-reload' ).button().click(function() { that.load_cablenumbers (); });
-		$('#admin-jobnumbers-reload'   ).button().click(function() { that.load_jobnumbers   (); });
+		$('#admin-access-reload'       ).button().click(function() { that.access_load       (); });
+		$('#admin-notifications-reload').button().click(function() { that.notify_load(); });
+		$('#admin-cablenumbers-reload' ).button().click(function() { that.cablenumbers_load (); });
+		$('#admin-jobnumbers-reload'   ).button().click(function() { that.jobnumbers_load   (); });
 
         var administrator2add = $('#admin-access').find('input[name="administrator2add"]');
         administrator2add.
             keyup(function(e) {
                 var uid = $(this).val();
                 if( uid == '' ) { return; }
-                if( e.keyCode == 13 ) { that.new_administrator(uid); return; }});
+                if( e.keyCode == 13 ) { that.access_create_administrator(uid); return; }});
 
         var projmanager2add = $('#admin-access').find('input[name="projmanager2add"]');
         projmanager2add.
             keyup(function(e) {
                 var uid = $(this).val();
                 if( uid == '' ) { return; }
-                if( e.keyCode == 13 ) { that.new_projmanager(uid); return; }});
+                if( e.keyCode == 13 ) { that.access_create_projmanager(uid); return; }});
 
-        var listener2add = $('#admin-notifications').find('input[name="listener2add"]');
-        listener2add.
+        var other2add = $('#admin-access').find('input[name="other2add"]');
+        other2add.
             keyup(function(e) {
                 var uid = $(this).val();
                 if( uid == '' ) { return; }
-                if( e.keyCode == 13 ) { that.new_listener(uid); return; }});
+                if( e.keyCode == 13 ) { that.access_create_other(uid); return; }});
 
         var submit_pending = $('#admin-notifications').find('button[name="submit_all"]').
             button().
-            click(function() { that.submit_notify(); });
+            click(function() { that.notify_pending_submit(); });
 
         var delete_pending = $('#admin-notifications').find('button[name="delete_all"]').
             button().
-            click(function() { that.delete_notify(); });
+            click(function() { that.notify_pending_delete(); });
 
         if(!this.can_manage_access()) {
             administrator2add.attr('disabled','disabled');
-            administrator2add.attr('disabled','disabled');
-                 listener2add.attr('disabled','disabled');
+              projmanager2add.attr('disabled','disabled');
+                    other2add.attr('disabled','disabled');
                submit_pending.attr('disabled','disabled');
                delete_pending.attr('disabled','disabled');
         }
@@ -108,14 +108,13 @@ function p_appl_admin() {
         $('#admin-cablenumbers').find('#tabs').tabs();
         $('#admin-jobnumbers').find('#tabs').tabs();
 
-		this.load_access();
-        this.load_notify();
-		this.load_cablenumbers();
-		this.load_jobnumbers();
+		this.access_load();
+        this.notify_load();
+		this.cablenumbers_load();
+		this.jobnumbers_load();
 	};
-    this.can_manage_access = function() {
-        return global_current_user.is_administrator;
-    };
+    this.can_manage_access = function() { return global_current_user.is_administrator; };
+    this.can_manage_notify = this.can_manage_access;
 
     /* -----------------
      *   Cable numbers
@@ -131,7 +130,7 @@ function p_appl_admin() {
             '<a href="javascript:global_search_cable_by_cablenumber('+"'"+c.recently_allocated_name+"'"+')">'+c.recently_allocated_name+'</a>';
         return html;
     };
-	this.display_cablenumbers = function() {
+	this.cablenumbers_display = function() {
 
         var rows = [];
         for( var cnidx in this.cablenumber ) {
@@ -141,19 +140,19 @@ function p_appl_admin() {
                     Button_HTML('E', {
                         name:    'edit_'+cnidx,
                         classes: 'admin-cablenumbers-tools',
-                        onclick: "admin.edit_cablenumber('"+cnidx+"')",
+                        onclick: "admin.cablenumbers_edit('"+cnidx+"')",
                         title:   'edit'
                     })+' '+
                     Button_HTML('save', {
                         name:    'save_'+cnidx,
                         classes: 'admin-cablenumbers-tools',
-                        onclick: "admin.edit_cablenumber_save('"+cnidx+"')",
+                        onclick: "admin.cablenumbers_edit_save('"+cnidx+"')",
                         title:   'save changes to the database'
                     })+' '+
                     Button_HTML('cancel', {
                         name:    'edit_cancel_'+cnidx,
                         classes: 'admin-cablenumbers-tools',
-                        onclick: "admin.edit_cablenumber_cancel('"+cnidx+"')",
+                        onclick: "admin.cablenumbers_edit_cancel('"+cnidx+"')",
                         title:   'cancel editing and ignore any changes'
                     }) : '',
 
@@ -190,7 +189,7 @@ function p_appl_admin() {
         table.display();
         for( var cnidx in this.cablenumber ) {
 			$('#admin-cablenumbers-cablenumbers').find('button.admin-cablenumbers-tools').button();
-            this.update_cablenumber_tools(cnidx,false);
+            this.cablenumbers_update_tools(cnidx,false);
         }
         $('.admin-cablenumbers-search').
             button().
@@ -200,7 +199,7 @@ function p_appl_admin() {
                 global_search_cables_by_prefix(cn.prefix);
             });
     };
-	this.update_cablenumber = function(cnidx) {
+	this.cablenumbers_update = function(cnidx) {
         var c = this.cablenumber[cnidx];
         var elem = $('#admin-cablenumbers-cablenumbers');
         elem.find('div[name="prefix_'                 +cnidx+'"]').html(c.prefix);
@@ -210,11 +209,11 @@ function p_appl_admin() {
         elem.find('div[name="recently_allocated_name_'+cnidx+'"]').html(this.cable_name2html(cnidx));
         elem.find('div[name="recent_allocation_time_' +cnidx+'"]').html(c.recent_allocation_time);
         elem.find('div[name="recent_allocation_uid_'  +cnidx+'"]').html(c.recent_allocation_uid);
-        this.update_cablenumber_tools(cnidx,false);
+        this.cablenumbers_update_tools(cnidx,false);
     };
-    this.update_cablenumber_tools = function(cnidx,editing) {
+    this.cablenumbers_update_tools = function(cnidx,editing) {
         if(!this.can_manage_access()) {
-            this.disable_cablenumber_tools(cnidx);
+            this.cablenumbers_tools_disable(cnidx);
             return;
         }
         var elem = $('#admin-cablenumbers-cablenumbers');
@@ -228,14 +227,14 @@ function p_appl_admin() {
 		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
 		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
     };
-    this.disable_cablenumber_tools = function(cnidx) {
+    this.cablenumbers_tools_disable = function(cnidx) {
         var elem = $('#admin-cablenumbers-cablenumbers');
 		elem.find('button[name="edit_'       +cnidx+'"]').button('disable');
 		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
 		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
     };
-    this.edit_cablenumber = function(cnidx) {
-        this.update_cablenumber_tools(cnidx,true);
+    this.cablenumbers_edit = function(cnidx) {
+        this.cablenumbers_update_tools(cnidx,true);
         var c = this.cablenumber[cnidx];
         var elem = $('#admin-cablenumbers-cablenumbers');
         elem.find('div[name="range_'+cnidx+'"]').html(
@@ -246,15 +245,15 @@ function p_appl_admin() {
                 '<input type="text" size=2 name="prefix" value="'+c.prefix+'" />'
             );
     };
-    this.edit_cablenumber_save = function(cnidx) {
-        this.disable_cablenumber_tools(cnidx);
+    this.cablenumbers_edit_save = function(cnidx) {
+        this.cablenumbers_tools_disable(cnidx);
         var c     = this.cablenumber[cnidx];
         var elem  = $('#admin-cablenumbers-cablenumbers');
         var first = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="first"]' ).val());
         var last  = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="last"]'  ).val());
         if( last <= first ) {
             report_error('invalid range: last number must be strictly larger than the first one', null);
-            this.update_cablenumber_tools(cnidx,true);
+            this.cablenumbers_update_tools(cnidx,true);
             return;
         }
         var params = { id: c.id, first:first, last:last };
@@ -265,27 +264,27 @@ function p_appl_admin() {
         var jqXHR = $.get('../neocaptar/cablenumber_save.php',params,function(data) {
             if(data.status != 'success') {
                 report_error(data.message, null);
-                that.update_cablenumber_tools(cnidx,true);
+                that.cablenumbers_update_tools(cnidx,true);
                 return;
             }
             that.cablenumber[cnidx] = data.cablenumber;
-            that.update_cablenumber(cnidx);
+            that.cablenumbers_update(cnidx);
         },
         'JSON').error(function () {
             report_error('failed to contact the Web service due to: '+jqXHR.statusText, null);
-            that.update_cablenumber_tools(cnidx,true);
+            that.cablenumbers_update_tools(cnidx,true);
             return;
         });
     };
-    this.edit_cablenumber_cancel = function(cnidx) {
-       this.update_cablenumber(cnidx);
+    this.cablenumbers_edit_cancel = function(cnidx) {
+       this.cablenumbers_update(cnidx);
     };
-	this.load_cablenumbers = function() {
+	this.cablenumbers_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/cablenumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.cablenumber = data.cablenumber;
-            that.display_cablenumbers();
+            that.cablenumbers_display();
         },
         'JSON').error(function () {
             report_error('failed to load cable numbers info because of: '+jqXHR.statusText, null);
@@ -312,9 +311,9 @@ function p_appl_admin() {
         var html =
             '<tr id="admin-jobnumbers-'+jnidx+'" >'+
             '  <td nowrap="nowrap" class="table_cell table_cell_left " id="admin-jobnumbers-tools-'+jnidx+'">'+
-            '    <button class="admin-jobnumbers-tools " name="edit"        onclick="admin.edit_jobnumber       ('+jnidx+')" title="edit"                                 ><b>E</b></button>'+
-            '    <button class="admin-jobnumbers-tools " name="edit_save"   onclick="admin.edit_jobnumber_save  ('+jnidx+')" title="save changes to the database"         >save</button>'+
-            '    <button class="admin-jobnumbers-tools " name="edit_cancel" onclick="admin.edit_jobnumber_cancel('+jnidx+')" title="cancel editing and ignore any changes">cancel</button>'+
+            '    <button class="admin-jobnumbers-tools " name="edit"        onclick="admin.jobnumbers_edit       ('+jnidx+')" title="edit"                                 ><b>E</b></button>'+
+            '    <button class="admin-jobnumbers-tools " name="edit_save"   onclick="admin.jobnumbers_edit_save  ('+jnidx+')" title="save changes to the database"         >save</button>'+
+            '    <button class="admin-jobnumbers-tools " name="edit_cancel" onclick="admin.jobnumbers_edit_cancel('+jnidx+')" title="cancel editing and ignore any changes">cancel</button>'+
             '  </td>'+
             '  <td nowrap="nowrap" class="table_cell "                                          >&nbsp;'+j.owner                  +'</td>'+
             '  <td nowrap="nowrap" class="table_cell                  prefix "                  >&nbsp;'+j.prefix                 +'</td>'+
@@ -330,7 +329,7 @@ function p_appl_admin() {
             '</tr>';
         return html;
     };
-    this.jobnumber_allocation2html = function(jnaidx) {
+    this.jobnumbers_allocation2html = function(jnaidx) {
         var ja = this.jobnumber_allocation[jnaidx];
         var html =
             '<tr id="admin-jobnumber-allocations-'+jnaidx+'" >'+
@@ -342,7 +341,7 @@ function p_appl_admin() {
             '</tr>';
         return html;
     };
-	this.display_jobnumbers = function() {
+	this.jobnumbers_display = function() {
         var html =
             '<table><tbody>'+
             '  <tr>'+
@@ -365,7 +364,7 @@ function p_appl_admin() {
 			$('#admin-jobnumbers-tools-'+jnidx+' button.admin-jobnumbers-tools').
                 button().
                 button(this.can_manage_access()?'enable':'disable');
-            this.update_jobnumber_tools(jnidx,false);
+            this.jobnumbers_update_tools(jnidx,false);
         }
         html =
             '<table><tbody>'+
@@ -376,7 +375,7 @@ function p_appl_admin() {
             '    <td nowrap="nowrap" class="table_hdr " >allocated</td>'+
             '    <td nowrap="nowrap" class="table_hdr " >project</td>'+
             '  </tr>';
-        for( var jnaidx in this.jobnumber_allocation ) html += this.jobnumber_allocation2html(jnaidx);
+        for( var jnaidx in this.jobnumber_allocation ) html += this.jobnumbers_allocation2html(jnaidx);
         html +=
             '</tbody></table>';
         $('#admin-jobnumbers-allocations').html(html);
@@ -388,7 +387,7 @@ function p_appl_admin() {
                 global_search_cables_by_jobnumber_prefix(jn.prefix);
             });
     };
-	this.update_jobnumber = function(jnidx) {
+	this.jobnumbers_update = function(jnidx) {
         var j = this.jobnumber[jnidx];
         $('#admin-jobnumbers-'+jnidx+' .prefix'                 ).html('&nbsp;'+j.prefix);
         $('#admin-jobnumbers-'+jnidx+' .range'                  ).html('&nbsp;'+j.first+' - '+j.last);
@@ -398,11 +397,11 @@ function p_appl_admin() {
         $('#admin-jobnumbers-'+jnidx+' .recently_allocated_name').html('&nbsp;'+this.job_name2html(j.recently_allocated_name));
         $('#admin-jobnumbers-'+jnidx+' .recent_allocation_time' ).html('&nbsp;'+j.recent_allocation_time);
         $('#admin-jobnumbers-'+jnidx+' .recent_allocation_uid'  ).html('&nbsp;'+j.recent_allocation_uid);
-        this.update_jobnumber_tools(jnidx,false);
+        this.jobnumbers_update_tools(jnidx,false);
     };
-    this.update_jobnumber_tools = function(jnidx,editing) {
+    this.jobnumbers_update_tools = function(jnidx,editing) {
         if(!this.can_manage_access()) {
-            this.disable_jobnumber_tools(jnidx);
+            this.jobnumbers_disable_tools(jnidx);
             return;
         }
 		if( editing ) {
@@ -415,13 +414,13 @@ function p_appl_admin() {
 		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
 		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
     };
-    this.disable_jobnumber_tools = function(jnidx) {
+    this.jobnumbers_disable_tools = function(jnidx) {
 		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('disable');
 		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
 		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
     };
-    this.edit_jobnumber = function(jnidx) {
-        this.update_jobnumber_tools(jnidx,true);
+    this.jobnumbers_edit = function(jnidx) {
+        this.jobnumbers_update_tools(jnidx,true);
         var c = this.jobnumber[jnidx];
         $('#admin-jobnumbers-'+jnidx+' .range').html(
             '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" /><input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
@@ -431,14 +430,14 @@ function p_appl_admin() {
                 '<input type="text" size=2 name="prefix" value="'+c.prefix+'" />'
             );
     };
-    this.edit_jobnumber_save = function(jnidx) {
-        this.disable_jobnumber_tools(jnidx);
+    this.jobnumbers_edit_save = function(jnidx) {
+        this.jobnumbers_disable_tools(jnidx);
         var c = this.jobnumber[jnidx];
         var first  = parseInt($('#admin-jobnumbers-'+jnidx).find('input[name="first"]' ).val());
         var last   = parseInt($('#admin-jobnumbers-'+jnidx).find('input[name="last"]'  ).val());
         if( last <= first ) {
             report_error('invalid range: last number must be strictly larger than the first one', null);
-            this.update_jobnumber_tools(jnidx,true);
+            this.jobnumbers_update_tools(jnidx,true);
             return;
         }
         var params = {id:c.id,first:first,last:last};
@@ -449,28 +448,28 @@ function p_appl_admin() {
         var jqXHR = $.get('../neocaptar/jobnumber_save.php',params,function(data) {
             if(data.status != 'success') {
                 report_error(data.message, null);
-                that.update_jobnumber_tools(jnidx,true);
+                that.jobnumbers_update_tools(jnidx,true);
                 return;
             }
             that.jobnumber[jnidx] = data.jobnumber;
-            that.update_jobnumber(jnidx);
+            that.jobnumbers_update(jnidx);
         },
         'JSON').error(function () {
             report_error('failed to contact the Web service due to: '+jqXHR.statusText, null);
-            that.update_jobnumber_tools(jnidx,true);
+            that.jobnumbers_update_tools(jnidx,true);
             return;
         });
     };
-    this.edit_jobnumber_cancel = function(jnidx) {
-       this.update_jobnumber(jnidx);
+    this.jobnumbers_edit_cancel = function(jnidx) {
+       this.jobnumbers_update(jnidx);
     };
-	this.load_jobnumbers = function() {
+	this.jobnumbers_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/jobnumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.jobnumber = data.jobnumber;
             that.jobnumber_allocation = data.jobnumber_allocation;
-            that.display_jobnumbers();
+            that.jobnumbers_display();
         },
         'JSON').error(function () {
             report_error('failed to load job numbers info because of: '+jqXHR.statusText, null);
@@ -484,19 +483,20 @@ function p_appl_admin() {
      * ------------------
      */
     this.access = null;
-    this.new_administrator = function(uid) { this.new_user(uid,'administrator'); };
-    this.new_projmanager   = function(uid) { this.new_user(uid,'projmanager'); };
+    this.access_create_administrator = function(uid) { this.access_create_user(uid,'ADMINISTRATOR'); };
+    this.access_create_projmanager   = function(uid) { this.access_create_user(uid,'PROJMANAGER'); };
+    this.access_create_other         = function(uid) { this.access_create_user(uid,'OTHER'); };
  
-    this.display_access_users = function(id,users) {
+    this.access_display_users = function(id,users) {
         var rows = [];
         for( var i in users ) {
             var a = users[i];
             rows.push([
                 this.can_manage_access() ? 
                     Button_HTML('delete', {
-                        name:     'delete',
-                        onclick:  "admin.delete_user('"+a.uid+"')",
-                        title:    'delete this user from the list'
+                        name:    'delete',
+                        onclick: "admin.access_delete_user('"+a.uid+"')",
+                        title:   'delete this user from the list'
                     }) : '',
                 a.uid,
                 a.name,
@@ -525,17 +525,18 @@ function p_appl_admin() {
         elem.find('button[name="projects"]').button();
     };
 
-    this.display_access = function() {
-        this.display_access_users('admin-access-administrators', this.access.administrator);
-        this.display_access_users('admin-access-projmanagers',   this.access.projmanager);
+    this.access_display = function() {
+        this.access_display_users('admin-access-ADMINISTRATOR', this.access.ADMINISTRATOR);
+        this.access_display_users('admin-access-PROJMANAGER',   this.access.PROJMANAGER);
+        this.access_display_users('admin-access-OTHER',         this.access.OTHER);
     };
 
-    this.load_access = function() {
+    this.access_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/access_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
-            that.display_access();
+            that.access_display();
         },
         'JSON').error(function () {
             report_error('failed to load access control info because of: '+jqXHR.statusText, null);
@@ -543,12 +544,13 @@ function p_appl_admin() {
         });
     };
 
-    this.new_user = function(uid,role) {
+    this.access_create_user = function(uid,role) {
         var params = {uid:uid,role:role};
         var jqXHR = $.get('../neocaptar/access_new.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
-            that.display_access();
+            that.access_display();
+            that.notify_load();
         },
         'JSON').error(function () {
             report_error('failed to add a new user to the access control list because of: '+jqXHR.statusText, null);
@@ -556,12 +558,13 @@ function p_appl_admin() {
         });
     };
 
-    this.delete_user = function(uid) {
+    this.access_delete_user = function(uid) {
         var params = {uid:uid};
         var jqXHR = $.get('../neocaptar/access_delete.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.access = data.access;
-            that.display_access();
+            that.access_display();
+            that.notify_load();
         },
         'JSON').error(function () {
             report_error('failed to delete this user from the access control list because of: '+jqXHR.statusText, null);
@@ -574,129 +577,183 @@ function p_appl_admin() {
      *   Notifications
      * -----------------
      */
-    this.can_manage_notify  = this.can_manage_access;
     this.notify             = null;
     this.notify_event_types = null;
 
-    this.display_notify_projmanager = function() {
-        
+    this.notify_display_projmanager = function() {
+        var role = 'PROJMANAGER';
         if( !global_current_user.can_manage_projects ) {
-            $('#admin-notifications-myself').html(
+            $('#admin-notifications-'+role).html(
                 '<div style="color:maroon;">'+
-                '  We are sorry! Your account has not been found among registered project administrators.'+
+                '  We are sorry! Your account doesn\'t have sufficient privileges to manage projects.'+
                 '</div>');
             return;
         }
-        
+        this.notify_display_impl(role);
+    };
+    this.notify_display_administrator = function() {  this.notify_display_impl('ADMINISTRATOR');  };
+    this.notify_display_other         = function() {  this.notify_display_impl('OTHER');          };
+
+    this.notify_display_impl = function(role) {
+
+        var hdr  = [ {name: 'event', sorted: false } ];
         var rows = [];
-        for( var i in this.notify_event_types.PROJMANAGER ) {
-            var event  = this.notify_event_types.PROJMANAGER[i];
-            var notify = this.notify.myself;
+
+        switch( role ) {
+
+            case 'PROJMANAGER':
+
+                hdr.push({ name: 'notify', sorted: false });
+                for( var i in this.notify_event_types[role] ) {
+                    var event  = this.notify_event_types[role][i];
+                    var notify = this.notify[role][global_current_user.uid] || {};
+                    var attr = {
+                        classes: event.name,
+                        name: global_current_user.uid,
+                        checked: notify[event.name] == true };
+                    rows.push([
+                        event.description,
+                        Checkbox_HTML(attr) ]);
+                }
+                break;
+
+            case 'ADMINISTRATOR':
+            case 'OTHER':
+
+                for( var i in this.notify_access[role] ) {
+                    var user = this.notify_access[role][i];
+                    hdr.push({name: user.uid, sorted: false});
+                }
+                for( var i in this.notify_event_types[role] ) {
+                    var event = this.notify_event_types[role][i];
+                    var row   = [ event.description ];
+                    for( var j in this.notify_access[role] ) {
+                        var user = this.notify_access[role][j];
+                        var notify = this.notify[role][user.uid] || {};
+                        var attr = {
+                            classes: event.name,
+                            name:    user.uid,
+                            checked: notify[event.name] == true };
+                        if( !( this.can_manage_notify() || ( global_current_user.uid == user.uid )))
+                            attr.disabled = 'disabled';
+                        row.push( Checkbox_HTML(attr));
+                    }
+                    rows.push(row);
+                }
+                break;
+        }
+        var table = new Table('admin-notifications-'+role, hdr, rows );
+        table.display();
+
+        var policy = $('#admin-notifications').find('select[name="policy4'+role+'"]');
+        policy.val(this.notify_schedule[role]);
+        policy.change(function() {
+            that.notify_schedule_save(role, $(this).val());
+        });
+        if(this.can_manage_notify()) policy.removeAttr('disabled');
+        $('#admin-notifications-'+role).find('input[type="checkbox"]').click(function() {
+            that.notify_save(role, this.name, $(this).attr('class'), $(this).is(':checked'));
+        });
+    };
+    this.notify_display_pending = function() {
+        var hdr = [
+            { name:   'time' },
+            { name:   'event' },
+            { name:   'originator' },
+            { name:   'recipient' },
+            { name:   'ACTIONS',
+              sorted: false,
+              type:   { after_sort: function() { $('.admin-notifications-pending-tools').button(); }}}
+        ];
+        var rows = [];
+        for( var i in this.notify_pending ) {
+            var entry = this.notify_pending[i];
             rows.push([
-                event.description,
-                Checkbox_HTML({
-                    classes: event.name,
-                    checked: notify[event.name] }) ]);
+                entry.event_time,
+                entry.event_type_name,
+                entry.originator_uid,
+                entry.recipient_uid,
+                this.can_manage_access() ?
+                    Button_HTML('submit', {
+                        name:    'submit_'+i,
+                        classes: 'admin-notifications-pending-tools',
+                        onclick: "admin.notify_pending_submit('"+i+"')",
+                        title:   'submit this event for teh instant delivery'
+                    })+' '+
+                    Button_HTML('delete', {
+                        name:    'delete_'+i,
+                        classes: 'admin-notifications-pending-tools',
+                        onclick: "admin.notify_pending_delete('"+i+"')",
+                        title:   'delete this entry from the queue'
+                    }) : ''
+                ]);
         }
-        var table = new Table( 'admin-notifications-myself', [
-            { name: 'event',  sorted: false },
-            { name: 'notify', sorted: false } ],
-            rows );
+        var table = new Table('admin-notifications-pending', hdr, rows );
         table.display();
+        
+        $('.admin-notifications-pending-tools').button();
+    };
+    this.notify_display = function() {
+        this.notify_display_projmanager();
+        this.notify_display_administrator();
+        this.notify_display_other();
+        this.notify_display_pending();
     };
 
-    this.display_notify_other = function() {
-
-        var hdr = [ {name: '', sorted: false } ];
-        for( var i in this.notify.others )
-            hdr.push( {
-                name: this.notify.others[i].uid,
-                sorted: false });
-
-        var rows = [];
-        for( var i in this.notify_event_types.OTHER ) {
-            var event = this.notify_event_types.OTHER[i];
-            var row   = [ event.description ];
-            for( var j in this.notify.others ) {
-                var notify = this.notify.others[j];
-                row.push( Checkbox_HTML({
-                    classes: event.name,
-                    name:    notify.uid,
-                    checked: notify[event.name] }));
-            }
-            rows.push(row);
-        }
-        var row = [''];
-        for( var i in this.notify.others )
-            row.push( Button_HTML('x',{
-                classes: 'delete_listener',
-                name   : this.notify.others[i].uid,
-                title  : 'remove this user from the list' }));
-        rows.push(row);
-
-        var table = new Table('admin-notifications-others', hdr, rows );
-        table.display();
-
-        var others = $('#admin-notifications-others');
-        others.find('button.delete_listener').
-            button().
-            button(this.can_manage_notify? 'enable':'disable').
-            click(function() {
-                alert(this.name);
-            });
-    };
-
-    this.display_notify = function() {
-        this.display_notify_projmanager();
-        this.display_notify_other();
-    };
-
-    this.load_notify = function() {
-        var params = {};
-        var jqXHR = $.get('../neocaptar/notify_get.php',params,function(data) {
+    this.notify_action = function(url,params) {
+        var jqXHR = $.get(url,params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
+
+            that.notify_access      = data.access;
             that.notify_event_types = data.event_types;
-            that.notify = data.notify;
-            that.display_notify();
+            that.notify_schedule    = data.schedule;
+            that.notify             = data.notify;
+            that.notify_pending     = data.pending;
+
+            that.notify_display();
         },
         'JSON').error(function () {
             report_error('failed to load noditications list because of: '+jqXHR.statusText, null);
             return;
         });
     };
-
-    this.new_listener = function(uid,role) {
-        var params = {uid:uid};
-        var jqXHR = $.get('../neocaptar/notify_new.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.notify = data.notify;
-            that.display_notify();
-        },
-        'JSON').error(function () {
-            report_error('failed to add a new user to the notifications list because of: '+jqXHR.statusText, null);
-            return;
-        });
+    this.notify_load = function() {
+        this.notify_action(
+            '../neocaptar/notify_get.php',
+            {}
+        );
     };
-
-    this.delete_listener = function(uid) {
-        var params = {uid:uid};
-        var jqXHR = $.get('../neocaptar/notify_delete.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.notify = data.notify;
-            that.display_notify();
-        },
-        'JSON').error(function () {
-            report_error('failed to delete this user from the notifications list because of: '+jqXHR.statusText, null);
-            return;
-        });
+    this.notify_save = function(recipient, uid, event_name, enabled) {
+        this.notify_action(
+            '../neocaptar/notify_save.php',
+            {   recipient:  recipient,
+                uid:        uid,
+                event_name: event_name,
+                enabled:    enabled ? 1 : 0 }
+        );
     };
-
-    this.submit_notify = function(idx) {
-        alert('submit_notify: not implemented');
+    this.notify_schedule_save = function(recipient, policy) {
+        this.notify_action(
+            '../neocaptar/notify_save.php',
+            {   recipient:  recipient,
+                policy:     policy }
+        );
     };
-
-    this.delete_notify = function(idx) {
-        alert('delete_notify: not implemented');
+    this.notify_pending_submit = function(idx) {
+        var params = { action: 'submit' };
+        if( idx !== undefined ) params.id = this.notify_pending[idx].id;
+        this.notify_action(
+            '../neocaptar/notify_queue.php',
+            params
+        );
+    };
+    this.notify_pending_delete = function(idx) {
+        var params = { action: 'delete' };
+        if( idx !== undefined ) params.id = this.notify_pending[idx].id;
+        this.notify_action(
+            '../neocaptar/notify_queue.php',
+            params
+        );
     };
     return this;
 }

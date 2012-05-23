@@ -859,6 +859,53 @@ class NeoCaptar {
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
+    public function find_notify_event_type($recipient,$name) {
+        $recipient_escaped = $this->connection->escape_string(trim($recipient));
+        $name_escaped      = $this->connection->escape_string(trim($name));
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_event_type WHERE recipient='{$recipient_escaped}' and name='{$name_escaped}'");
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows != 1 )
+            throw new NeoCaptarException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+        return new NeoCaptarNotifyEventType(
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+    }
+    public function notify_schedule() {
+        $dictionary = array();
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_schedule");
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            $dictionary[$attr['recipient']] = $attr['mode'];
+        }
+        return $dictionary;
+    }
+    public function notify_event_name2description($name) {
+
+        // TODO: re-implement this method to read descriptions from
+        // a special database table which wouln't be bopund to
+        // specific recipients.
+        //
+        $name_escaped = $this->connection->escape_string(trim($name));
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_event_type WHERE name='{$name_escaped}'");
+        $nrows = mysql_numrows( $result );
+
+        // If no description found then return teh name itself.
+        // This will be taken care of later.
+        //
+        if( $nrows == 0 ) return $name;
+
+        // Pick the first description. Don't care about others.
+        //
+        $event_type = new NeoCaptarNotifyEventType(
+            $this->connection,
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        return $event_type->description();
+    }
     public function notifications($uid=null) {
         $list = array();
         $uid_condition = is_null($uid) ? '' : "WHERE uid='{$this->connection->escape_string(trim($uid))}'";
@@ -867,6 +914,37 @@ class NeoCaptar {
             array_push(
                 $list,
                 new NeoCaptarNotify(
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+        return $list;
+    }
+    public function find_notification_by_id($id) {
+        return $this->find_notification_by_("id={$id}");
+    }
+    public function find_notification($uid, $event_type_id) {
+        $uid_escaped  = $this->connection->escape_string(trim($uid));
+        return $this->find_notification_by_("uid='{$uid_escaped}' AND event_type_id={$event_type_id}");
+    }
+    public function find_notification_by_($condition) {
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify WHERE {$condition}");
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows != 1 )
+            throw new NeoCaptarException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+        return new NeoCaptarNotify(
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+    }
+    public function notify_queue() {
+        $list = array();
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_queue ORDER BY event_time");
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ )
+            array_push(
+                $list,
+                new NeoCaptarNotifyQueuedEntry(
                     $this->connection,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
@@ -1411,8 +1489,6 @@ HERE;
     public function add_user($uid, $name, $role) {
         $uid_escaped = $this->connection->escape_string(trim($uid));
         $role_uc = strtoupper(trim($role));
-        if(!(($role_uc == 'ADMINISTRATOR') || ($role_uc == 'PROJMANAGER')))
-            throw new NeoCaptarException(__METHOD__, "no such role: {$role}");
         $name_escaped = $this->connection->escape_string(trim($name));
         $added_time = LusiTime::now()->to64();
         $added_uid_escaped = $this->connection->escape_string(trim( AuthDB::instance()->authName()));
@@ -1422,8 +1498,8 @@ HERE;
     }
     public function delete_user($uid) {
         $uid_escaped = $this->connection->escape_string(trim($uid));
-        $sql = "DELETE FROM {$this->connection->database}.user WHERE uid='{$uid_escaped}'";
-        $this->connection->query($sql);
+        $this->connection->query("DELETE FROM {$this->connection->database}.user WHERE uid='{$uid_escaped}'");
+        $this->connection->query("DELETE FROM {$this->connection->database}.notify WHERE uid='{$uid_escaped}'");
     }
     public function update_current_user_activity() {
         $user = $this->current_user();
@@ -1432,6 +1508,128 @@ HERE;
         $current_time = LusiTime::now()->to64();
         $sql = "UPDATE {$this->connection->database}.user SET last_active_time={$current_time} WHERE uid='{$uid_escaped}'";
         $this->connection->query($sql);
+    }
+
+    public function add_notification($uid, $event_type_id, $enabled) {
+        $uid_escaped  = $this->connection->escape_string(trim($uid));
+        $enabled_flag = $enabled ? 'ON' : 'OFF';
+        $this->connection->query("INSERT INTO {$this->connection->database}.notify VALUES(NULL,'{$uid_escaped}',{$event_type_id},'{$enabled_flag}')");
+        return $this->find_notification_by_('id IN (SELECT LAST_INSERT_ID())');       
+    }
+    public function update_notification($id, $enabled) {
+        $enabled_flag = $enabled ? 'ON' : 'OFF';
+        $this->connection->query("UPDATE {$this->connection->database}.notify SET enabled='{$enabled_flag}' WHERE id={$id}");
+        return $this->find_notification_by_id($id);       
+    }
+    public function update_notification_schedule($recipient, $policy) {
+        $recipient_escaped = $this->connection->escape_string(trim($recipient));
+        $policy_escaped    = $this->connection->escape_string(trim($policy));
+        $this->connection->query("UPDATE {$this->connection->database}.notify_schedule SET mode='{$policy_escaped}' WHERE recipient='{$recipient_escaped}'");
+    }
+
+    public function add_notification_event4project($event_name, $project_id) {
+
+        $event_name = trim($event_name);
+        $event_time = LusiTime::now();
+
+        $originator_uid = trim(AuthDB::instance()->authName());
+
+        $project = $this->find_project_by_id($project_id);
+        if( is_null($project))
+            throw new NeoCaptarException( __METHOD__, "invalid project identifier passed into the method." );
+
+        // Look for who might be interested in the event
+        //
+        $recipients = array();
+        foreach( $this->notifications() as $notify ) {
+
+            // Skip notifications which aren't enabled regardless of what
+            // they're abou.
+            //
+            if( !$notify->enabled()) continue;
+
+            // Skip unrelated notifications
+            //
+            $event_type = $notify->event_type();
+
+            if( !(( $event_type->scope() == 'PROJECT' ) &&
+                  (( $event_type->name() == $event_name ) || ( $event_type->name() == 'on_any' )))) continue;
+
+            // Skip project managers who aren't supposed to be interested in someone
+            // else's projects.
+            //
+            $recipient_uid  = $notify->uid();
+            $recipient_type = $event_type->recipient();
+
+            if(( $recipient_type == 'PROJMANAGER' ) &&
+               ( $project->owner() != $recipient_uid )) continue;
+
+            $recipients[$recipient_uid] = $event_type;
+        }
+
+        // Evaluate each recipient to see if an instant event notification
+        // has to be sent now, or it has to be placed into the wait queue.
+        //
+        $schedule = $this->notify_schedule();
+        $event_type_description = $this->notify_event_name2description($event_name);
+
+        foreach( $recipients as $recipient => $event_type ) {
+            switch($schedule[$event_type->recipient()]) {
+                case 'INSTANT':
+                    $this->notify4project_instant (
+                        $recipient,
+                        $event_type_description,
+                        $project,
+                        $originator_uid,
+                        $event_time );
+                    break;
+                case 'DELAYED':
+                    $this->notify4project_instant (
+                        $recipient,
+                        $event_type_description,
+                        $project,
+                        $originator_uid,
+                        $event_time );
+                    break;
+            }
+        }
+    }
+    private function notify4project_instant (
+        $recipient_uid,
+        $event_type_description,
+        $project,
+        $originator_uid,
+        $event_time ) {
+
+        $address = 'gapon@slac.stanford.edu';
+        $subject = 'Project Notification';
+        $body =<<<HERE
+This is an automated notification message on the following event:
+        
+  {$event_type_description}
+
+Project title: {$project->title()}
+Project owner: {$project->owner()}
+
+Project URL (if the project is still available):
+
+  https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=projects:search&project_id={$project->id()}
+
+The change was made by user:       {$originator_uid}
+The time when the change was made: {$event_time->toStringShort()}
+
+
+    **********************************************************************************
+    * The message was sent by the automated notification system because your account *
+    * was subscribed to recieve notifications on certain cable management events.    *
+    * You can manage your subscriptions using the following URL:                     *
+    *                                                                                *
+    *   https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=admin:notifications  *
+    *                                                                                *
+    **********************************************************************************
+
+HERE;
+        $this->notify( $address, $subject, $body );
     }
 }
 

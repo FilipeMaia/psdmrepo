@@ -48,12 +48,7 @@ try {
 
     $user = $neocaptar->add_user($user['uid'], $user['gecos'], $role);
 
-    $access2array = array(
-        'administrator' => array(),
-        'projmanager' => array()
-    );
-    foreach( $neocaptar->users() as $u )
-        array_push($access2array[$u->role()], NeoCaptarUtils::user2array($u));
+    $access2array = NeoCaptarUtils::access2array($neocaptar->users());
 
 	$authdb->commit();
 	$neocaptar->commit();

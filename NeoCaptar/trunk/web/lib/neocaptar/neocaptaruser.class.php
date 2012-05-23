@@ -33,7 +33,7 @@ class NeoCaptarUser {
      */
     public function neocaptar()         { return $this->neocaptar; }
     public function uid()               { return $this->attr['uid']; }
-    public function role()              { return strtolower ($this->attr['role']); }
+    public function role()              { return $this->attr['role']; }
     public function name()              { return $this->attr['name']; }
     public function added_time()        { return LusiTime::from64( $this->attr['added_time'] ); }
     public function added_uid()         { return $this->attr['added_uid']; }
@@ -41,8 +41,8 @@ class NeoCaptarUser {
 
     /* Helper functions
      */
-    public function is_administrator() { return 'administrator' == $this->role(); }
-    public function is_projmanager  () { return 'projmanager'   == $this->role(); }
-    public function is_other        () { return 'other'         == $this->role(); }
+    public function is_administrator() { return 'ADMINISTRATOR' == $this->role(); }
+    public function is_projmanager  () { return 'PROJMANAGER'   == $this->role(); }
+    public function is_other        () { return 'OTHER'         == $this->role(); }
 }
 ?>

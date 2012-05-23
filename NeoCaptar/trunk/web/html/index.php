@@ -1335,6 +1335,7 @@ HERE;
         <ul>
 		  <li><a href="#administrators">Administrators</a></li>
 		  <li><a href="#projmanagers">Project Managers</a></li>
+		  <li><a href="#others">Other Users</a></li>
 	    </ul>
 
         <div id="administrators" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
@@ -1343,10 +1344,10 @@ HERE;
             to perform any operation on projects, cables and other users. The only restriction is that
             an administrator is not allowed to remove their own account from the list of administrators.</p>
           </div>
-          <div style="float:left; "><input type="text" size="5" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; "><input type="text" size="8" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
           <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
           <div style="clear:both; "></div>
-          <div id="admin-access-administrators"></div>
+          <div id="admin-access-ADMINISTRATOR"></div>
         </div>
 
         <div id="projmanagers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
@@ -1354,10 +1355,20 @@ HERE;
             <p>Project managers can create new projects, and, delete or edit cables, and also manage certain
             aspects of the cables life-cycle.</p>
           </div>
-          <div style="float:left; "><input type="text" size="5" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; "><input type="text" size="8" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
           <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
           <div style="clear:both; "></div>
-          <div id="admin-access-projmanagers"></div>
+          <div id="admin-access-PROJMANAGER"></div>
+        </div>
+
+        <div id="others" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>Other users may be allowed some limited access to manage certain aspects of the cables life-cycle.</p>
+          </div>
+          <div style="float:left; "><input type="text" size="8" name="other2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+          <div style="clear:both; "></div>
+          <div id="admin-access-OTHER"></div>
         </div>
       </div>
     </div>
@@ -1376,8 +1387,9 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#myself">My Notifications</a></li>
-		  <li><a href="#others">Other Users</a></li>
+		  <li><a href="#myself">On my project(s)</a></li>
+		  <li><a href="#administrators">Sent to administrators</a></li>
+		  <li><a href="#others">Sent to other users</a></li>
 		  <li><a href="#pending">Pending</a></li>
 	    </ul>
 
@@ -1390,13 +1402,29 @@ HERE;
             <p>Notification settings found in this section can only be managed by project managers themselves
             or by administrators of the application.</p>
           </div>
-          <div style="margin-bottom:20px;"">
-            <select name="policy4myself">
-              <option name="daily">daily notification (08:00am)</option>
-              <option name="instant">instant notification</option>
+          <div style="margin-bottom:20px;">
+            <select name="policy4PROJMANAGER" disabled="disabled">
+              <option value="DELAYED">daily notification (08:00am)</option>
+              <option value="INSTANT">instant notification</option>
             </select>
           </div>
-          <div id="admin-notifications-myself"></div>
+          <div id="admin-notifications-PROJMANAGER"></div>
+        </div>
+
+        <div id="administrators" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="margin-bottom:10px; width:720px;">
+            <p>This section is aiming at administrators of this software who might be interested to track major changes
+            made to the projects, user accounts or software configuration. Note that administrators will not get notifications
+            on changes made by themselves.</p>
+            <p>Notification settings found in this section can only be managed by any administrator of the software.</p>
+          </div>
+          <div style="margin-bottom:20px;">
+            <select name="policy4ADMINISTRATOR" disabled="disabled">
+              <option value="DELAYED">daily notification (08:00am)</option>
+              <option value="INSTANT">instant notification</option>
+            </select>
+          </div>
+          <div id="admin-notifications-ADMINISTRATOR"></div>
         </div>
 
         <div id="others" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
@@ -1406,16 +1434,13 @@ HERE;
             <p>Only administrators of this application are
             allowed to modify notification settings found on this page.</p>
           </div>
-          <div style="margin-bottom:20px;"">
-            <select name="policy4others">
-              <option name="daily">daily notification (08:00am)</option>
-              <option name="instant">instant notification</option>
+          <div style="margin-bottom:20px;">
+            <select name="policy4OTHER" disabled="disabled">
+              <option value="DELAYED">daily notification (08:00am)</option>
+              <option value="INSTANT">instant notification</option>
             </select>
           </div>
-          <div style="float:left; "><input type="text" size="5" name="listener2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
-          <div style="clear:both; "></div>
-          <div id="admin-notifications-others"></div>
+          <div id="admin-notifications-OTHER"></div>
         </div>
 
         <div id="pending" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">

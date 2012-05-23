@@ -192,21 +192,101 @@ class NeoCaptarUtils {
 
     /**
      *
-     * Return an array representation of a user. The array
+     * Return an array representation of a list of known users. The array
      * is suitable for exporting by Web services.
      *
-     * @param NeoCaptarUser $u
+     * @param array of NeoCaptarUser $users
      * @return array 
      */
-    public static function user2array($u) {
-        return array (
-            'uid'               => $u->uid(),
-            'role'              => $u->role(),
-            'name'              => $u->name(),
-            'added_time'        => $u->added_time()->toStringShort(),
-            'added_uid'         => $u->added_uid(),
-            'last_active_time'  => $u->last_active_time() == '' ? '' : $u->last_active_time()->toStringShort()
-        );
+    public static function access2array($users) {
+        $result = array();
+        foreach( $users as $u ) {
+            if( !array_key_exists( $u->role(), $result ))
+                $result[$u->role()] = array();
+            array_push(
+                $result[$u->role()],
+                array (
+                    'uid'               => $u->uid(),
+                    'role'              => $u->role(),
+                    'name'              => $u->name(),
+                    'added_time'        => $u->added_time()->toStringShort(),
+                    'added_uid'         => $u->added_uid(),
+                    'last_active_time'  => $u->last_active_time() == '' ? '' : $u->last_active_time()->toStringShort()
+                )
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * Harvest notification info from the database and return an array of
+     * data ready to be serialized into a JSON object and be sent to a Web client.
+     *
+     * @param type $neocaptar
+     * @return array of objects ready to be seriealized into JSON
+     */
+    public static function notifications2array($neocaptar) {
+
+        $access2array = NeoCaptarUtils::access2array($neocaptar->users());
+
+        $notifications2array = array();
+        $event_types         = array();
+
+        foreach( $neocaptar->notify_event_types() as $e ) {
+
+            $recipient_type = $e->recipient();
+
+            if( !array_key_exists($recipient_type, $notifications2array))
+                $notifications2array[$recipient_type] = array();
+
+            if( !array_key_exists($recipient_type,$event_types))
+                $event_types[$recipient_type] = array();
+
+            array_push(
+                $event_types[$recipient_type],
+                array(
+                    'name'        => $e->name(),
+                    'description' => $e->description()
+                )
+            );
+        }
+        $schedule = $neocaptar->notify_schedule();
+
+        foreach( $neocaptar->notifications() as $notify ) {
+
+            $uid            = $notify->uid();
+            $event_type     = $notify->event_type(); 
+            $recipient_type = $event_type->recipient();
+
+            if( !array_key_exists($uid, $notifications2array[$recipient_type]))
+                 $notifications2array[$recipient_type][$uid] = array(
+                     'uid' => $uid
+                 );
+
+            $notifications2array[$recipient_type][$uid][$event_type->name()] = $notify->enabled();
+        }
+
+        $pending = array();
+        foreach( $neocaptar->notify_queue() as $entry ) {
+            array_push(
+                $pending,
+                array(
+                    'id'              => $entry->id(),
+                    'event_type_id'   => $entry->event_type()->id(),
+                    'event_type_name' => $entry->event_type()->name(),
+                    'event_time'      => $entry->event_time()->toStringShort(),
+                    'event_time_64'   => $entry->event_time()->to64(),
+                    'originator_uid'  => $entry->originator_uid(),
+                    'recipient_uid'   => $entry->recipient_uid()
+                )
+            );
+        }
+        return array(
+            'access'      => $access2array,
+            'event_types' => $event_types,
+            'schedule'    => $schedule,
+            'notify'      => $notifications2array,
+            'pending'     => $pending );
     }
 
     /**
