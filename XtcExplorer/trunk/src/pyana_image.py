@@ -286,7 +286,7 @@ class  pyana_image ( object ) :
             # Subtract dark image
             dark = self.dark_image
             if dark is not None :
-            	image -= dark
+            	image = image - dark
                              
             # ---------------------------------------------------------------------------------------
             # Apply shift, rotation, scaling of this image if needed:
@@ -367,7 +367,6 @@ class  pyana_image ( object ) :
 
             # ----------- Event Image -----------
             if "image" in self.quantities:
-                print "Adding image "
                 self.data[addr].image   = image            
 
             if "projections" in self.quantities:
@@ -393,7 +392,6 @@ class  pyana_image ( object ) :
                 self.n_good[addr]+=1
 
                 if "average" in self.quantities: 
-                    print "Adding average" 
                     try:
                         self.sum_good_images[addr] += image
                     except TypeError:
@@ -409,28 +407,11 @@ class  pyana_image ( object ) :
         
 
 
-                        
-        # ---------------------------------------------------------------------------------------
-        # Update data for storage and plotting
+        # make plot? if so, pass this info to the event. 
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
-            for addr in self.sources:
-                # collect averages
-                if 'average' in self.quantities:
-                    print "saving average from ", self.n_good[addr], " events. "
-                    self.data[addr].counter = self.n_good[addr]
-                    self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
-
-                ## collect maximum
-                if 'maximum' in self.quantities:
-                    self.data[addr].counter = self.n_good[addr]
-                    self.data[addr].maximum = self.max_good_images[addr]
-
-                ## collect avg darks
-                if 'darks' in self.quantities:
-                    self.data[addr].ndark = self.n_dark[addr]
-                    self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
-                            
-
+            # update averages 
+            self.update()
+            
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
@@ -447,6 +428,9 @@ class  pyana_image ( object ) :
         # -----------------------------------
         if (self.output_file is not None) and (self.n_saved < self.max_save) : 
             self.n_saved += 1
+
+            # update averages
+            self.update()
 
             images_for_saving = []
             for addr in self.sources:
@@ -491,13 +475,14 @@ class  pyana_image ( object ) :
         for source in self.sources :
             data_image.append( self.data[source] )
             # give the list to the event object
-            evt.put( data_image, 'data_image' )
+            evt.put( data_image, 'data_images' )
             
 
         if (self.output_file is not None):
-
+            self.update()
             images_for_saving = []
             for addr in self.sources:
+                print "Adding to list: ", addr, dir(self.data[addr])
                 if 'image' in self.quantities:
                     images_for_saving.append( ('image', '%s ev %d'%(addr,self.n_shots), self.data[addr].image ))
 
@@ -573,22 +558,43 @@ class  pyana_image ( object ) :
         for source in self.sources :
             data_image.append( self.data[source] )
             # give the list to the event object
-            evt.put( data_image, 'data_image' )
+            evt.put( data_image, 'data_images' )
             
 
 
 
+    # ---------------------------------------------------------------------------------------
+    def update(self):
+        # Update data for storage and plotting
+        for addr in self.sources:
+            # collect averages
+            if 'average' in self.quantities:
+                print "saving average from ", self.n_good[addr], " events. "
+                self.data[addr].counter = self.n_good[addr]
+                self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
+
+            ## collect maximum
+            if 'maximum' in self.quantities:
+                self.data[addr].counter = self.n_good[addr]
+                self.data[addr].maximum = self.max_good_images[addr]
+
+            ## collect avg darks
+            if 'darks' in self.quantities:
+                self.data[addr].ndark = self.n_dark[addr]
+                self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
+                            
+
     def save_images(self, filename, image_list, event=None ):
 
-            for name,title,array in image_list :
-
-                fname = filename.split('.')
-                label = name #address.replace("|","_").strip()
+        for name,title,array in image_list :
+            
+            fname = filename.split('.')
+            label = name #address.replace("|","_").strip()
+            
+            thename = ''
+            for i in range (len(fname)-1):
+                thename+="%s"%fname[i]
                 
-                thename = ''
-                for i in range (len(fname)-1):
-                    thename+="%s"%fname[i]
-                    
                 thename+="_%s"%label
 
                 if event is not None:

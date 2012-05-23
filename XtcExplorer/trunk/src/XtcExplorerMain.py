@@ -478,6 +478,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         filename = str(self.lineedit.text())
         self.add_file(filename)
 
+        self.scan_files_quick()
         
     def clear_file_list(self):
         """Empty the file list

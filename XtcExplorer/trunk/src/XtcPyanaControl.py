@@ -451,6 +451,10 @@ Start with selecting data of interest to you from list on the left and general r
         self.displaymode = self.dmode_menu.currentText()
         self.dmode_status.setText("Display mode is %s"%self.displaymode)
 
+        if self.displaymode == "NoDisplay":
+            self.plot_n = 0
+            self.plotn_change()
+
         if self.configuration is not None:
             self.process_checkboxes()
 

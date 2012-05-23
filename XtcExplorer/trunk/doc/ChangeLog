@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package XtcEventBrowser
+#  ChangeLog file for package XtcExplorer
 #------------------------------------------------------------------------
 
 Package author: Ingrid Ofte
@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-23 ofte V00-01-29          rev 3622
+        - GUI: Autoscan, now also for "add" (textfield)
+	- Image vrange sliders improved, and only used in Interactive mode
+	- pyana_images bugfix
+        - switched the 'order' of displaymodes of pyana_plotter, to match that of the gui
+	
 2012-May-22 ofte V00-01-28          rev 3619
         - GUI: Autoscan
 	- Image vrange: slider. Not perfect (rather ugly), but it works. 

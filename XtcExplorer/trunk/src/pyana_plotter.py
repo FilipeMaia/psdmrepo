@@ -84,8 +84,8 @@ class pyana_plotter (object) :
 
         self.display_mode = None
         if display_mode == "NoDisplay" : self.display_mode = 0
-        if display_mode == "Interactive" : self.display_mode = 1
-        if display_mode == "SlideShow" :   self.display_mode = 2
+        if display_mode == "SlideShow" :   self.display_mode = 1
+        if display_mode == "Interactive" : self.display_mode = 2
         if self.display_mode is None:
             print "Unknown display mode %s, using NoDisplay (0)"%display_mode
             self.display_mode = 0
@@ -112,12 +112,12 @@ class pyana_plotter (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called with displaymode %d"%self.display_mode )
 
-        if self.display_mode == 0 :
+        if self.display_mode == 0 : # No display
             plt.ioff()
-        if self.display_mode == 1 :
-            plt.ioff()
-        if self.display_mode == 2 :
+        if self.display_mode == 1 : # SlideShow (keep window open while going on to the next event)
             plt.ion()
+        if self.display_mode == 2 : # Interactive (plot and wait for input or closing windoe)
+            plt.ioff()
 
 
     def beginrun( self, evt, env ) :
@@ -218,6 +218,7 @@ class pyana_plotter (object) :
             self.data_display.show_ipimb(data_ipimbs)
                 
         data_images = evt.get('data_images') 
+        print "Data images: ", data_images
         if data_images is not None:
             self.data_display.show_image(data_images)
 
@@ -231,15 +232,12 @@ class pyana_plotter (object) :
 
 
         if self.display_mode == 1:
-            # Interactive
-            #plt.ioff()
-            plt.show()
-
-        elif self.display_mode == 2:
             # SlideShow
-            #plt.ion()
             plt.draw()
 
+        elif self.display_mode == 2:
+            # Interactive
+            plt.show()
 
 
     def launch_ipython(self, evt):

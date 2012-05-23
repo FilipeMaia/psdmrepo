@@ -18,6 +18,7 @@ class DataDisplay(object):
     def show_wf(self, datalist):
         if self.wf_disp is None:
             self.wf_disp = Plotter()
+            self.wf_disp.display_mode = self.display_mode
             self.wf_disp.settings(7,7) # set default frame size
             self.wf_disp.threshold = None
             
@@ -321,6 +322,7 @@ class DataDisplay(object):
 
         if self.image_disp is None: 
             self.image_disp = Plotter()
+            self.image_disp.display_mode = self.display_mode
             self.image_disp.settings(7,7)
             
         i = 0
@@ -376,9 +378,10 @@ class Frame(object):
     Yet, I find no way to have access to everything, like colorbar.
     # So I make my own container... let me know if you know a better way
     """
-    def __init__(self, name="", title=""):
+    def __init__(self, name="", title="", parent = None):
         self.name = name
         self.title = title
+        self.plotter = parent
 
         self.data = None       # the array to be plotted
         self.ticks = {}        # tick marks for any axes if needed
@@ -439,9 +442,6 @@ class Frame(object):
         if self.projx is None: return
         if self.projy is None: return
         
-        clims = self.axesim.get_clim()        
-        self.slider_vmin.set_val(clims[0])
-        self.slider_vmax.set_val(clims[1])
 
     def set_ticks(self, limits = None ):
         
@@ -493,13 +493,6 @@ class Frame(object):
         - threshold management
         - display mode management
         """
-        print "Debugging"
-        print "    ", image.min(), image.max()
-        print "    ", self.vmin, self.vmax
-        print "    "
-        print "    "
-        print "    "
-
         self.orglims = image.min(), image.max()
 
         if ( self.vmin is None) and (self.vmin is not None ):
@@ -564,10 +557,6 @@ class Frame(object):
         # colb is the colorbar object
 
 
-        slider_vmin_ax = divider.append_axes("bottom",size="2%",pad=0.45)
-        #slider_vmin_ax.patch.set_facecolor('blue')
-        slider_vmax_ax = divider.append_axes("bottom",size="2%",pad=0.05)
-
 
         # show the active region for thresholding
         if self.threshold and self.threshold.area is not None:
@@ -578,24 +567,30 @@ class Frame(object):
             self.axes.add_patch(self.thr_rect)
             print "Plotting the red rectangle in area ", self.threshold.area
 
-        clim = self.colb.get_clim()
-        edges = self.orglims
 
-        # slider?!
-        self.slider_vmin = Slider(slider_vmin_ax, 'Min', edges[0], edges[1],
-                                  valinit=clim[0],
-                                  facecolor='white', edgecolor='red', lw=2.5)
-        self.slider_vmax = Slider(slider_vmax_ax,'Max', edges[0], edges[1],
-                                  valinit=clim[1], slidermin=self.slider_vmin,
-                                  facecolor='white',edgecolor='red',lw=2.5)
+        if self.plotter.display_mode == 2: # only if Interactive
+            slider_vmin_ax = divider.append_axes("bottom",size="2%",pad=0.45)
+            #slider_vmin_ax.patch.set_facecolor('blue')
+            slider_vmax_ax = divider.append_axes("bottom",size="2%",pad=0.05)
+
+            clim = self.colb.get_clim()
+            edges = self.orglims
+
+            # slider?!
+            self.slider_vmin = Slider(slider_vmin_ax, 'min value', edges[0], edges[1],
+                                      valinit=clim[0],
+                                      facecolor='red', edgecolor='black')
+            self.slider_vmax = Slider(slider_vmax_ax,'max value', edges[0], edges[1],
+                                      valinit=clim[1], slidermin=self.slider_vmin,
+                                      facecolor='red',edgecolor='black')
         
-        def update(val):            
-            self.axesim.set_clim(self.slider_vmin.val, self.slider_vmax.val)
-            self.update_axes()
-            plt.draw()
+            def update(val):            
+                self.axesim.set_clim(self.slider_vmin.val, self.slider_vmax.val)
+                self.update_axes()
+                plt.draw()
             
-        self.slider_vmin.on_changed(update)        
-        self.slider_vmax.on_changed(update)
+            self.slider_vmin.on_changed(update)        
+            self.slider_vmax.on_changed(update)
         
 
 
@@ -666,7 +661,7 @@ class Plotter(object):
         if name in self.frames:
             aframe = self.frames[name]
         else :
-            self.frames[name] = Frame(name)
+            self.frames[name] = Frame(name, parent=self)
             aframe = self.frames[name]
 
         # copy any threshold as default
@@ -990,8 +985,10 @@ class Plotter(object):
                     elif event.button == 3 :
                         aplot.vmax = value
                         print "maximum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
-                
+
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
+                    aplot.slider_vmin.set_val(aplot.vmin)
+                    aplot.slider_vmax.set_val(aplot.vmax)
                     aplot.update_axes()
                     plt.draw()
 
