@@ -58,7 +58,7 @@ class dump_acqiris (object) :
     #-------------------
     def beginCalibCycle( self, evt, env ) :
         self.source = env.configSource("DetInfo(:Acqiris)") # returns PSEvt::Source
-        config = env.configStore().get("Psana::Acqiris::Config", self.source)
+        config = env.configStore().getByType("Psana::Acqiris::Config", self.source)
         if not config:
             return
         
@@ -87,12 +87,12 @@ class dump_acqiris (object) :
             print "bandwidth=", v.bandwidth()
 
     def event( self, evt, env ) :
-        acqData = evt.get("Psana::Acqiris::DataDesc", self.source)
+        acqData = evt.getBySource("Psana::Acqiris::DataDesc", self.source)
         if not acqData:
             return
 
         # find matching config object
-        acqConfig = env.configStore().get("Psana::Acqiris::Config", self.source)
+        acqConfig = env.configStore().getByType("Psana::Acqiris::Config", self.source)
 
         # loop over channels
         nchan = acqData.data_shape()[0];

@@ -72,7 +72,7 @@ class dump_cspad ( object ) :
     def beginCalibCycle( self, evt, env ) :
 
         self.source = env.configSource("DetInfo(:Cspad)") # returns PSEvt::Source
-        config = env.configStore().get("Psana::CsPad::Config", self.source)
+        config = env.configStore().getByType("Psana::CsPad::Config", self.source)
         if not config:
             return
         
@@ -98,7 +98,7 @@ class dump_cspad ( object ) :
 
     def event( self, evt, env ) :
 
-        evt_data = evt.get("Psana::CsPad::Data", self.source)
+        evt_data = evt.getBySource("Psana::CsPad::Data", self.source)
         quads = evt_data.quads
         if not quads :
             return
