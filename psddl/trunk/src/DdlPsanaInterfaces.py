@@ -228,8 +228,14 @@ class DdlPsanaInterfaces ( object ) :
             print >> self.inc, '    std::string getTypeName() {'
             print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
             print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& src) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(src)));')(locals())
+            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(key, foundSrc)));')(locals())
+            print >> self.inc, '    }'
+            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(src, key, foundSrc)));')(locals())
+            print >> self.inc, '    }'
+            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(source, key, foundSrc)));')(locals())
             print >> self.inc, '    }'
             print >> self.inc, '  };'
         elif type_name.find('ConfigV') == 0:
