@@ -5,6 +5,7 @@
 #include "PSEnv/Env.h"
 #include "PSEvt/Event.h"
 #include "PSEvt/EventId.h"
+#include "PSEvt/ProxyDictI.h"
 #include "ConfigSvc/ConfigSvc.h"
 #include "psddl_pypsana/PyWrapper.h"
 #include "python/Python.h"
@@ -38,6 +39,7 @@ using std::list;
 
 using PSEnv::Env;
 using PSEnv::EnvObjectStore;
+using PSEnv::EpicsStore;
 using PSEvt::Event;
 using PSEvt::EventKey;
 using PSEvt::Source;
@@ -81,10 +83,10 @@ namespace Psana {
     EnvObjectStoreWrapper(EnvObjectStore& store) : _store(store) {}
     // template <typename T> void putProxy(const boost::shared_ptr<PSEvt::Proxy<T> >& proxy, const Pds::Src& source);
     // template <typename T> void put(const boost::shared_ptr<T>& data, const Pds::Src& source);
-    EnvObjectStore::GetResultProxy get1(const Src& src) { return _store.get(src); }
-    EnvObjectStore::GetResultProxy get2(const Source& source, Src* foundSrc = 0) { return _store.get(source, foundSrc); }
+    EnvObjectStore::GetResultProxy getBySrc(const Src& src) { return _store.get(src); }
+    EnvObjectStore::GetResultProxy getBySource(const Source& source, Src* foundSrc = 0) { return _store.get(source, foundSrc); }
 
-    object get(const string& typeNameGeneric, const Source& source) {
+    object getByType(const string& typeNameGeneric, const Source& source) {
       string typeName = getTypeNameWithHighestVersion<EnvGetter>(envGetter_map, typeNameGeneric);
       if (typeName == "") {
         return object(none);
@@ -117,6 +119,15 @@ namespace Psana {
     RootHistoManager::RootHMgr& rhmgr() { return _env.rhmgr(); }
     PSHist::HManager& hmgr() { return _env.hmgr(); }
     Env& getEnv() { return _env; };
+
+    void printAllKeys() {
+      EnvObjectStore& store = _env.configStore();
+      std::list<EventKey> keys = store.keys(); // , Source());
+      std::list<EventKey>::iterator it;
+      for (it = keys.begin(); it != keys.end(); it++) {
+        cout << "THIS is an ENV key: " << *it << endl;
+      }
+    }
 
     const char* configStr(const string& parameter) {
       ConfigSvc::ConfigSvc cfg;
@@ -163,13 +174,46 @@ namespace Psana {
     return object(Event_Class(evt));
   }
 
-  object getFromEvent(Event& evt, const string& typeNameGeneric, Source& src) {
+  boost::shared_ptr<string> get_Event(Event& evt, const std::string& key) {
+    return boost::shared_ptr<string>(evt.get(key));
+  }
+
+  void printAllKeys(Event& evt) {
+    Event::GetResultProxy proxy = evt.get();
+    std::list<EventKey> keys;
+    proxy.m_dict->keys(keys, Source());
+    std::list<EventKey>::iterator it;
+    for (it = keys.begin(); it != keys.end(); it++) {
+      cout << "THIS is a key: " << *it << endl;
+    }
+  }
+
+  object getBySourceAndKey_Event(Event& evt, const string& typeNameGeneric, Source& source, const std::string& key) {
+    printAllKeys(evt);
     string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
     if (typeName == "") {
       return object(none);
     }
     EvtGetter *g = evtGetter_map[typeName];
-    return g->get(evt, src);
+    return g->get(evt, source, key);
+  }
+
+  object getBySrcAndKey_Event(Event& evt, const string& typeNameGeneric, Src& src, const std::string& key) {
+    printAllKeys(evt);
+    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
+    if (typeName == "") {
+      return object(none);
+    }
+    EvtGetter *g = evtGetter_map[typeName];
+    return g->get(evt, src, key);
+  }
+
+  object getBySource_Event(Event& evt, const string& typeNameGeneric, Source& source) {
+    return getBySourceAndKey_Event(evt, typeNameGeneric, source, string());
+  }
+
+  object getBySrc_Event(Event& evt, const string& typeNameGeneric, Src& src) {
+    return getBySrcAndKey_Event(evt, typeNameGeneric, src, string());
   }
 
   PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data) {
@@ -201,9 +245,9 @@ namespace Psana {
       ;
 
     class_<EnvObjectStoreWrapper>("PSEnv::EnvObjectStore", init<EnvObjectStore&>())
-      .def("get1", &EnvObjectStoreWrapper::get1)
-      .def("get2", &EnvObjectStoreWrapper::get2)
-      .def("get", &EnvObjectStoreWrapper::get)
+      .def("getBySrc", &EnvObjectStoreWrapper::getBySrc)
+      .def("getBySource", &EnvObjectStoreWrapper::getBySource)
+      .def("getByType", &EnvObjectStoreWrapper::getByType)
       .def("keys", &EnvObjectStoreWrapper::keys)
       ;
 
@@ -216,7 +260,12 @@ namespace Psana {
 
     Event_Class =
       class_<Event>("PSEvt::Event", init<Event&>())
-      .def("get", &getFromEvent)
+      .def("get", &get_Event)
+      .def("getBySource", &getBySource_Event)
+      .def("getBySourceAndKey", &getBySourceAndKey_Event)
+      .def("getBySrcAndKey", &getBySrcAndKey_Event)
+      .def("getBySrc", &getBySrc_Event)
+      .def("printAllKeys", &printAllKeys)
       ;
 
     EnvWrapper_Class =
@@ -234,6 +283,7 @@ namespace Psana {
       .def("configSource", &EnvWrapper::configSource)
       .def("configStr", &EnvWrapper::configStr)
       .def("configStr2", &EnvWrapper::configStr2)
+      .def("printAllKeys", &EnvWrapper::printAllKeys)
       ;
 
     CreateWrappers::createWrappers();

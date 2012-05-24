@@ -627,8 +627,14 @@ public:
     std::string getTypeName() {
       return "Psana::EvrData::DataV3";
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& src) {
-      return boost::python::api::object(DataV3_Wrapper(evt.get(src)));
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataV3_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataV3_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataV3_Wrapper(evt.get(source, key, foundSrc)));
     }
   };
 } // namespace EvrData

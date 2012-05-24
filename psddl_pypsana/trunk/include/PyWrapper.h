@@ -13,7 +13,9 @@ namespace Psana {
   class EvtGetter {
   public:
     virtual std::string getTypeName() = 0;
-    virtual boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& src) = 0;
+    virtual boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
+    virtual boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
+    virtual boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
     virtual ~EvtGetter() {}
   };
 

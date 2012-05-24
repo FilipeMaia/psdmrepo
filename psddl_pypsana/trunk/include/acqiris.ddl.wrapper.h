@@ -520,8 +520,14 @@ public:
     std::string getTypeName() {
       return "Psana::Acqiris::DataDescV1Elem";
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& src) {
-      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(src)));
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(source, key, foundSrc)));
     }
   };
 
@@ -530,8 +536,14 @@ public:
     std::string getTypeName() {
       return "Psana::Acqiris::DataDescV1";
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& src) {
-      return boost::python::api::object(DataDescV1_Wrapper(evt.get(src)));
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(DataDescV1_Wrapper(evt.get(source, key, foundSrc)));
     }
   };
 } // namespace Acqiris
