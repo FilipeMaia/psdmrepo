@@ -371,6 +371,19 @@ Start with selecting data of interest to you from list on the left and general r
         divider = ". . . "*30
         self.help_layout.addWidget(QtGui.QLabel(divider))
         
+        # Load config file
+        self.conf_layout = QtGui.QHBoxLayout()
+        self.conf_label = QtGui.QLabel("Use existing configuration file: ")
+        self.conf_widget = QtGui.QLineEdit('')
+        self.conf_okBtn = QtGui.QPushButton("OK") 
+        self.connect(self.conf_widget, QtCore.SIGNAL('returnPressed()'), self.use_configfile )
+        self.connect(self.conf_okBtn, QtCore.SIGNAL('clicked()'), self.use_configfile )
+        self.conf_layout.addWidget(self.conf_label)
+        self.conf_layout.addWidget(self.conf_widget)
+        self.conf_layout.addWidget(self.conf_okBtn)
+        self.help_layout.addLayout(self.conf_layout, QtCore.Qt.AlignRight)
+
+
         # Global Display mode
         self.dmode_layout = QtGui.QHBoxLayout()
 
@@ -723,6 +736,7 @@ Start with selecting data of interest to you from list on the left and general r
         call the appropriate function based on the
         checkbox name/label
         """        
+        print self.sender()
         # clear title 
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.setDisabled(True)
@@ -763,7 +777,7 @@ Start with selecting data of interest to you from list on the left and general r
                 if n in tmpoptions :
                     oldvalue = tmpoptions[n]
                     if oldvalue!=v:   # avoid duplicates
-                        tmpoptions[n] = oldvalue+v
+                        tmpoptions[n] = oldvalue+" "+v
                 else :
                     tmpoptions[n] = v
 
@@ -1070,24 +1084,55 @@ Start with selecting data of interest to you from list on the left and general r
         self.configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
 
         self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.conf_widget.setText(self.configfile)
 
         f = open(self.configfile,'w')
         f.write(self.configuration)
         f.close()
 
-        print "----------------------------------------"
-        print "Configuration file (%s): " % self.configfile
-        print "----------------------------------------"
-        print self.configuration
-        print "----------------------------------------"
-
-        self.print_configuration
+        self.print_configuration()
         
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
-
         self.pyana_button.setEnabled(True)
 
+
+    def use_configfile(self, cfile = None):
+        print "Hallo?"
+
+        if cfile is not None:
+            self.configfile = cfile
+        else: 
+            self.configfile = self.conf_widget.text()
+
+        print "# ", self.configfile
+        f = open(self.configfile,'r')
+        self.configuration = f.read()
+        f.close()
+
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_text.setText(self.configuration)
+        self.print_configuration()
+
+        # update checkboxes?
+        lines = self.configuration.split('\n')
+        sources = []
+        for line in lines:
+            if line.find('source')>=0:
+                n,v = line.split('=')
+                sources.extend( filter(None, v.split(' ')))
+        print "sources : ", sources
+        print "checkboxes: ", self.checkboxes
+        for ch in self.checkboxes:
+            print " - ", ch.text()
+            if ch.text() in sources:
+                ch.setCheckState(QtCore.Qt.Checked)
+
+        self.config_button.setDisabled(True)
+        self.econfig_button.setEnabled(True)
+        self.pyana_button.setEnabled(True)
+
+ 
 
     def edit_configfile(self):
         # pop up emacs window to edit the config file as needed:
@@ -1103,28 +1148,13 @@ Start with selecting data of interest to you from list on the left and general r
             print "set the EDITOR variable in your shell environment."
             proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
 
-            # communicate with the process, makes everything wait for editor to finish
-            stdout_value = proc_emacs.communicate()[0]
+        # communicate with the process, makes everything wait for editor to finish
+        stdout_value = proc_emacs.communicate()[0]
 
 
         #proc_emacs = MyThread("emacs %s" % self.configfile) 
         #proc_emacs.start()
-        
-        f = open(self.configfile,'r')
-        self.configuration = f.read()
-        f.close()
-
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
-        self.pyana_config_text.setText(self.configuration)
-
-        print "----------------------------------------"
-        print "Configuration file (%s): " % self.configfile
-        print "----------------------------------------"
-        print self.configuration
-        print "----------------------------------------"
-
-        self.print_configuration
-        print "Done"
+        self.use_configfile()
 
  
     def pyana_runstring(self):

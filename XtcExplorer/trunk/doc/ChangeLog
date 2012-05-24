@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-24 ofte                   rev 3628
+        - Added the ability to read from config file. Still a problem remains, so not tag of this yet. 
+	
 2012-May-23 ofte V00-01-29          rev 3622
         - GUI: Autoscan, now also for "add" (textfield)
 	- Image vrange sliders improved, and only used in Interactive mode
