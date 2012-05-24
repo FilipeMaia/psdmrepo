@@ -29,7 +29,7 @@ __version__ = "$Revision: 1095 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys
-#import logging
+import logging
 
 #-----------------------------
 # Imports for other modules --
@@ -37,7 +37,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pypdsdata import xtc
+#from pypdsdata import xtc
 
 from utilities import PyanaOptions
 from utilities import ScanData
@@ -56,41 +56,14 @@ from utilities import ScanData
 class psana_scan (object) :
     """Class whose instance will be used as a user analysis module. """
 
-    def logging_info(s):
-        print "INFO: %s" % s
-
-    def logging_warning(s):
-        print "WARNING: %s" % s
-
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self,
-                   controlpv = None,
-                   input_epics = None,
-                   input_scalars = None,
-                   #plot_every_n = None,
-                   fignum = "1" ) :
-        """Class constructor. The parameters to the constructor are passed
-        from pyana configuration file. If parameters do not have default 
-        values  here then the must be defined in pyana.cfg. All parameters 
-        are passed as strings, convert to correct type before use.
-
-        @param controlpv        Name(s) of control PVs to use
-                                if none given, use whatever we find in the event. 
-        @param input_epics      Name(s) of other scalars to correlate in scan
-        @param input_scalars    Name(s) of other scalars to correlate in scan
-        #@param plot_every_n     Frequency for plotting. If n=0, no plots till the end
-        @param fignum           Matplotlib figure number
-
-        opt = PyanaOptions()
-        self.controlpv = opt.getOptStrings(controlpv)
-        self.input_epics = opt.getOptStrings(input_epics)
-        self.input_scalars = opt.getOptStrings(input_scalars)
-        #self.plot_every_n = opt.getOptInteger(plot_every_n)
-        self.mpl_num = opt.getOptInteger(fignum)
-        """
-
+    def __init__ ( self, source="", **kwargs ) :
+        self.m_src = source
+        print source
+        print type(source)
+        print kwargs
 
     #-------------------
     #  Public methods --
@@ -105,26 +78,25 @@ class psana_scan (object) :
         @param env    environment object
         """
 
-        m_src = env.configStr2("source", "ProcInfo()");
-        print "m_src=", m_src
-        m_src = env.configSource("ProcInfo()");
-        print "m_src=", m_src
-        self.input_epics = env.configStr("input_epics")
-        print "self.input_epics =", self.input_epics
+        """
+        XXX
+        XXX -> need to move to __init__
+        XXX
+        @param controlpv        Name(s) of control PVs to use
+                                if none given, use whatever we find in the event. 
+        @param input_epics      Name(s) of other scalars to correlate in scan
+        @param input_scalars    Name(s) of other scalars to correlate in scan
+        @param fignum           Matplotlib figure number
+        """
         self.controlpv = env.configStr("controlpv")
-        print "self.controlpv =", self.controlpv
         self.input_epics = env.configStr("input_epics")
-        print "self.input_epics =", self.input_epics
         self.input_scalars = env.configStr("input_scalars")
+        self.fignum = env.configStr2("fignum", "1")
+
+        print "self.controlpv =", self.controlpv
+        print "self.input_epics =", self.input_epics
         print "self.input_scalars =", self.input_scalars
-
-        self.input_scalars = env.configStr("input_scalarsX")
-        print "self.input_scalarsX =", self.input_scalars
-
-        self.mpl_num = env.configStr("fignum")
-        print "self.mpl_num =", self.mpl_num
-
-
+        print "self.fignum =", self.fignum
 
         # data counters
         self.n_runs =  0 # number of runs in this job             
@@ -150,6 +122,9 @@ class psana_scan (object) :
         self.ccls_ctrl = {}   # to hold ControlPV names and values
         self.ccls_scalars = {} # to hold epics and other scalar mean and std
 
+        evt.printAllKeys()
+        eventId = evt.get("PSEvt::EventId");
+        print "eventId=", eventId
         #print "evt.get(run)=", evt.get('run')
         #print "Processing run number ", evt.run()
         print "INFO: psana_scan.beginrun() called (%d)"%self.n_runs
@@ -175,7 +150,7 @@ class psana_scan (object) :
         # Id_ControlConfig is found in control.ddl.h Psana::ControlData::ConfigV1
         #
         self.source = env.configSource("ProcInfo()")
-        ctrl_config = env.configStore().get("Psana::ControlData::Config", self.source)
+        ctrl_config = env.configStore().getByType("Psana::ControlData::Config", self.source)
         if not ctrl_config:
             return
         print "ctrl_config=", ctrl_config
@@ -206,7 +181,7 @@ class psana_scan (object) :
         #    return
 
         # Use environment object to access EPICS data
-        for epv_name in self.input_epics :
+        if False: #for epv_name in self.input_epics :
 
             # at first event, make a list for each scalar, to store event data
             if epv_name not in self.evts_scalars.keys() :
@@ -270,14 +245,14 @@ class psana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
 
-    def endCalibCycle( self, env ) :
+    def endCalibCycle( self, evt, env ) :
         """This optional method is called if present at the end of the 
         calibration cycle.
         
         @param env    environment object
         """
         print "End calibcycle %d had %d events " % (self.n_ccls, self.n_shots)
-        logging_info( "psana_scan.endcalibcycle() called" )
+        print "psana_scan.endcalibcycle() called" 
         
         self.ccls_nevts.append(self.n_shots)
 
@@ -293,13 +268,13 @@ class psana_scan (object) :
             self.ccls_scalars[name].append( np.array([mean,std]) )
 
 
-    def endRun( self, env ) :
+    def endRun( self, evt, env ) :
         """This optional method is called if present at the end of the run.
         This is where we draw plots: One window showing several plots
         
         @param env    environment object
         """
-        logging_info( "psana_scan.endrun() called" )
+        print "psana_scan.endrun() called" 
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
 
@@ -309,10 +284,9 @@ class psana_scan (object) :
         
         @param env    environment object
         """
-        logging_info( "psana_scan.endjob() called" )
         print "End job had %d runs " % (self.n_runs)
 
-        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
+        self.make_plots(fignum=self.fignum, suptitle="Scan (%d calib cycles, %d shots each)" \
                         %(self.n_ccls,self.n_shots))
         
         

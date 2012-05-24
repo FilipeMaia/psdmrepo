@@ -69,9 +69,10 @@ class psana_plotter (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self,
-                   display_mode = "Interactive",
-                   ipython         = "False"):
+    def __init__ ( self, source = "", display_mode = 0, ipython = "False"):
+
+
+
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
@@ -148,17 +149,22 @@ class psana_plotter (object) :
         """
         self.n_shots += 1
 
+        evt.printAllKeys()
+        env.printAllKeys()
+
         # only call the plt.draw / plt.show is there's actually
         # something new to show, since it's slow. 
         show_event = evt.get('show_event')
-        if show_event and env.subprocess()<1 :
+        print "show_event=", show_event
+        #if show_event and env.subprocess()<1 :
+        if True:
 
             self.make_plots(evt)
 
         #print "Waiting...."
         #time.sleep(4)
 
-    def endCalibCycle( self, env ) :
+    def endCalibCycle( self, evt, env ) :
         """This optional method is called if present at the end of the 
         calibration cycle.
         
@@ -167,7 +173,7 @@ class psana_plotter (object) :
         
         logging.info( "psana_plotter.endcalibcycle() called" )
 
-    def endRun( self, env ) :
+    def endRun( self, evt, env ) :
         """This optional method is called if present at the end of the run.
         
         @param env    environment object
