@@ -65,6 +65,9 @@ public:
   virtual boost::shared_ptr<const std::string>
     get(const std::string& section, const std::string& param) const;
 
+  // Get a list of all parameters, or an empty list if the section is not found.
+  virtual std::list<std::string> getKeys(const std::string& section) const;
+
   // get the value of a single parameter as sequence, returns zero pointer
   // if parameter is not there
   virtual boost::shared_ptr<const std::list<std::string> > 

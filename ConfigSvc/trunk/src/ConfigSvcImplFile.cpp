@@ -90,6 +90,19 @@ ConfigSvcImplFile::get(const std::string& section,
   return pitr->second;
 }
 
+// Get a list of all parameters, or an empty list if the section is not found.
+std::list<std::string>
+ConfigSvcImplFile::getKeys(const std::string& section) const 
+{
+  std::list<std::string> list;
+  SectionMap::const_iterator sitr = m_config.find(section);
+  if ( sitr == m_config.end() ) return list;
+  ParamMap map = sitr->second;
+  for (ParamMap::iterator it = map.begin(); it != map.end(); it++) {
+    list.push_back((*it).first);
+  }
+  return list;
+}
 
 // get the value of a single parameter as sequence, will throw ExceptionMissing
 // if parameter is not there
