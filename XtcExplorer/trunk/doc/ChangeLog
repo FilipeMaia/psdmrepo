@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-25 ofte V00-01-30         rev 3638
+	- Smoothed out some problems with loading configuration file. Works OK now, 
+	  remaining limitations will not be dealt with until GUI configuration 
+	  has been improved substantially. 
+	
 2012-May-24 ofte                   rev 3628
         - Added the ability to read from config file. Still a problem remains, so not tag of this yet. 
 	

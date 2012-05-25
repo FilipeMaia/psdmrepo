@@ -736,7 +736,21 @@ Start with selecting data of interest to you from list on the left and general r
         call the appropriate function based on the
         checkbox name/label
         """        
-        print self.sender()
+        if self.configfile is not None:
+            # if a config file is already in use, pop up a warning that it will be replaced. 
+            warning_text = """You are currently using a saved file (%s).
+New checkboxe changes will NOT be merged with this file.
+A new config file with default settings will be generated.
+Do you want to proceed?
+ """ % self.configfile
+
+            reply = QtGui.QMessageBox.question(self,'Alert', warning_text, 
+                                               QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            if reply == QtGui.QMessageBox.No:
+                self.sender().setChecked(False)
+                return
+            
+            
         # clear title 
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.setDisabled(True)
@@ -1098,35 +1112,47 @@ Start with selecting data of interest to you from list on the left and general r
 
 
     def use_configfile(self, cfile = None):
-        print "Hallo?"
-
+        """ Read existing config file, update checkboxes
+        """
         if cfile is not None:
             self.configfile = cfile
         else: 
-            self.configfile = self.conf_widget.text()
+            cfile = self.conf_widget.text()
+            
+        print "# ", cfile
+        f = open(cfile,'r')
+        tmp_configuration = f.read()
+        f.close()
 
-        print "# ", self.configfile
-        f = open(self.configfile,'r')
+        # update checkboxes?
+        lines = tmp_configuration.split('\n')
+        sources = []
+        for line in lines:
+            if line.find('source')>=0:
+                n,v = line.split('=')
+                sources.extend( filter(None, v.split(' ')))
+            elif line.find('do_ebeam = True'):
+                sources.extend('EBeam')
+            elif line.find('do_gasdetector = True'):
+                sources.extend('FEEGasDetector')
+            elif line.find('do_phasecavity = True'):
+                sources.extend('PhaseCavity')
+
+        for ch in self.checkboxes:
+            if ch.text() in sources:
+                ch.setChecked(True)
+            else :
+                ch.setChecked(False)
+                
+        # Then use the unchanged text from the file
+        self.configfile = cfile
+        f = open(cfile,'r')
         self.configuration = f.read()
         f.close()
 
         self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
         self.pyana_config_text.setText(self.configuration)
         self.print_configuration()
-
-        # update checkboxes?
-        lines = self.configuration.split('\n')
-        sources = []
-        for line in lines:
-            if line.find('source')>=0:
-                n,v = line.split('=')
-                sources.extend( filter(None, v.split(' ')))
-        print "sources : ", sources
-        print "checkboxes: ", self.checkboxes
-        for ch in self.checkboxes:
-            print " - ", ch.text()
-            if ch.text() in sources:
-                ch.setCheckState(QtCore.Qt.Checked)
 
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
@@ -1154,7 +1180,20 @@ Start with selecting data of interest to you from list on the left and general r
 
         #proc_emacs = MyThread("emacs %s" % self.configfile) 
         #proc_emacs.start()
-        self.use_configfile()
+
+        # update text in GUI too
+        f = open(self.configfile,'r')
+        self.configuration = f.read()
+        f.close()
+
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_text.setText(self.configuration)
+        self.print_configuration()
+
+        self.config_button.setDisabled(True)
+        self.econfig_button.setEnabled(True)
+        self.pyana_button.setEnabled(True)
+        
 
  
     def pyana_runstring(self):
