@@ -197,31 +197,29 @@ ConfigSvcImplFile::readStream(istream& in, const string& name)
       continue;
     }
     
-    int fchar = line.find_first_not_of(" \t") ;
-    if ( line[fchar] == '[' ) {
-      // must be section name, whole string ends with ']' and we take 
-      // everything between as section name
-      string::size_type lchar = line.find_last_not_of(" \t\r") ;
-      if ( lchar == string::npos or line[lchar] != ']' ) {
-        throw ExceptionSyntax(name, nlines, "illegal section name format");
+    if (line[0] == '[' ) {
+      if (line[line.size() - 1] != ']') {
+        // must be section name, whole string ends with ']' and we take 
+        // everything between as section name
+        throw ExceptionSyntax(name, nlines, "illegal section name format (missing ']')");
       }
 
       // don't need to keep whitespace
-      section = trim(line);
-      m_config[section];
+      section = trim(line.substr(1, line.size() - 2));
+      m_config[section]; // create map entry
       
-      //cout << "line " << nlines << ": section [" << section << "]\n" ;
+      cout << "line " << nlines << ": section [" << section << "]\n" ;
       line.clear();
       continue;
     }
-    
+
     // we get an option line, check that section name is defined
     if ( section.empty() ) {
       throw ExceptionSyntax(name, nlines, "parameter outside of section");
     }
     
     // must be option name followed by equal sign
-    string::size_type eqpos = line.find( "=", fchar ) ;
+    string::size_type eqpos = line.find("=") ;
     if ( eqpos == string::npos ) {
       throw ExceptionSyntax(name, nlines, "equal sign missing after option name");
     }
@@ -236,6 +234,7 @@ ConfigSvcImplFile::readStream(istream& in, const string& name)
 
     // set the option
     m_config[section][optname] = boost::shared_ptr<string>(new string(optval));
+    cout << "m_config[" << section << "][" << optname << "] = boost::shared_ptr<string>(new string(" << optval << "))" << endl;
     //cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
 
     line.clear();
