@@ -149,7 +149,7 @@ public:
     if (not pstr.get()) throw ExceptionMissing(section, param);
     return *pstr;
   }
-  
+
   // get the value of a single parameter, use default if not there
   template <typename T>
   ResultDef<T> get(const std::string& section, const std::string& param, const T& def) const
@@ -186,6 +186,18 @@ public:
   void put(const std::string& section, const std::string& param, const std::string& value)
   {
     impl().put(section, param, value);
+  }
+
+  // get a list of all parameters, or an empty list if the section is not found
+  std::list<std::string> getKeys(const std::string& section) const
+  {
+    return impl().getKeys(section);
+  }
+
+  // get a list of all sections
+  std::list<std::string> getSections() const
+  {
+    return impl().getSections();
   }
 
 protected:
