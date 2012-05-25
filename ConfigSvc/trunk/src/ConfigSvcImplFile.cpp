@@ -208,7 +208,7 @@ ConfigSvcImplFile::readStream(istream& in, const string& name)
       section = trim(line.substr(1, line.size() - 2));
       m_config[section]; // create map entry
       
-      cout << "line " << nlines << ": section [" << section << "]\n" ;
+      //cout << "line " << nlines << ": section [" << section << "]\n" ;
       line.clear();
       continue;
     }
