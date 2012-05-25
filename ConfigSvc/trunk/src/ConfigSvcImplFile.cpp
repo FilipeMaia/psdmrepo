@@ -169,8 +169,8 @@ ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
   while ( std::getline ( in, curline ) ) {
     nlines ++ ;
 
-    // skip comments
-    std::string::size_type fchar = curline.find_first_not_of(" \t") ;
+    // skip blank lines and comments
+    std::string::size_type fchar = curline.find_first_not_of(" \t\r\n") ;
     if ( fchar == std::string::npos ) {
       // empty line
       //std::cout << "line " << nlines << ": empty\n" ;
