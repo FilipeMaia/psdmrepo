@@ -116,6 +116,9 @@ function p_appl_projects() {
                     button().
                     button(this.can_create_projects()?'enable':'disable').
                     click(function() { that.clone_project(pidx); });
+				$('#proj-history-'+pidx ).
+                    button().
+                    click(function() { that.show_project_history(pidx); });
 				$('#proj-add-'+pidx ).
                     button().
                     button(this.can_manage_project(pidx)?'enable':'disable').
@@ -137,8 +140,9 @@ function p_appl_projects() {
 '          <tr>'+
 '            <td><b>Owner: </b></td>'+
 '            <td><select name="owner" style="padding:1px;" '+(global_current_user.is_administrator?'':' disabled="disabled"')+'>';
-        for( var i in global_users ) {
-            var user = global_users[i];
+        var users = global_get_projmanagers();
+        for( var i in users ) {
+            var user = users[i];
             html +=
 '                  <option '+(proj.owner==user?'selected="selected"':'')+'>'+user+'</option>';
         }
@@ -148,11 +152,11 @@ function p_appl_projects() {
 '            <td><input type="text" size="36" name="title" value="'+proj.title+'" style="padding:1px;"></td>'+
 '            <td></td>'+
 '            <td><b>Due by: </b></td>'+
-'            <td><input type="text" size="6" name="due" value="'+proj.due+'" style="padding:1px;"></td>'+
+'            <td><input type="text" size="10" name="due" value="'+proj.due+'" style="padding:1px;"></td>'+
 '          </tr>'+
 '          <tr>'+
 '            <td><b>Descr: </b></td>'+
-'            <td colspan="6"><textarea cols=60 rows=4 name="description" style="padding:4px;" title="Here be the project description">'+proj.description+'</textarea></td>'+
+'            <td colspan="6"><textarea cols=64 rows=4 name="description" style="padding:4px;" title="Here be the project description">'+proj.description+'</textarea></td>'+
 '          </tr>'+
 '        </tbody></table>';
         edit_dialog(
@@ -553,42 +557,44 @@ function p_appl_projects() {
         this.set_project2clone(this.project[pidx].title);
         global_switch_context('projects','create');
     };
+    this.show_project_history = function(pidx) {
+        var params = {id:this.project[pidx].id};
+        var jqXHR = $.get('../neocaptar/project_history.php',params,function(data) {
+            if(data.status != 'success') { report_error(data.message, null); return; }
+            that.show_history('Project History',data.event);
+        },
+        'JSON').error(function () {
+            report_error('failed to obtain the project history because of: '+jqXHR.statusText, null);
+            return;
+        });
+    }
 	this.show_cable_history = function(pidx,cidx) {
         var params = {id:this.project[pidx].cable[cidx].id};
         var jqXHR = $.get('../neocaptar/cable_history.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
-            var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr">time</td>'+
-'    <td nowrap="nowrap" class="table_hdr">user</td>'+
-'    <td nowrap="nowrap" class="table_hdr">event</td>'+
-'    <td nowrap="nowrap" class="table_hdr">comments</td>'+
-'  </tr>';
-            for( var i in data.event) {
-                var event = data.event[i];
-                html +=
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_cell table_cell_left "  >'+event.event_time+'</td>'+
-'    <td nowrap="nowrap" class="table_cell "                  >'+event.event_uid+'</td>'+
-'    <td nowrap="nowrap" class="table_cell "                  >'+event.event+'</td>'+
-'    <td nowrap="nowrap" class="table_cell table_cell_right " >';
-                for( var j in event.comments ) {
-                    html +=
-'      <div>'+event.comments[j]+'</div>'
-                }
-                html +=
-'</td>'+
-'  </tr>';
-            }
-            html +=
-'</tbody></table>';
-            report_info('Cable History',html);
+            that.show_history('Cable History',data.event);
         },
         'JSON').error(function () {
             report_error('failed to obtain the cable history because of: '+jqXHR.statusText, null);
             return;
         });
+    };
+	this.show_history = function(title,events) {
+        var rows = [];
+        for( var i in events) {
+            var event = events[i];
+            var comments = '';
+            for( var j in event.comments ) comments += '<div>'+event.comments[j]+'</div>';
+            rows.push( [event.event_time, event.event_uid, event.event, comments] );
+        }
+        report_info_table(
+            title,
+            [ { name: 'time'  },
+              { name: 'user'  },
+              { name: 'event' },
+              { name: 'comments', sorted: false }],
+            rows
+        );
     };
 	this.clone_cable = function(pidx,cidx) {
 		var proj  = this.project[pidx];
@@ -1482,6 +1488,7 @@ function p_appl_projects() {
 			break;
 		}
 	};
+    
     function toggle_cable_editor(pidx,cidx,on) {
         if(on) {
             $('#proj-con-'+pidx          ).removeClass('proj-vis').addClass('proj-hdn');
@@ -1887,6 +1894,7 @@ required_field_html+' required feild';
 '        <button id="proj-edit-'+idx+'" title="edit attributes of the project">edit project attributes</button>'+
 '        <button id="proj-delete-'+idx+'" title="delete the project and all associated cables from the database">delete project</button>'+
 '        <button id="proj-clone-'+idx+'" title="clone the whole project and all associated cables and create a new project with a temporary name (which can be changed later)">clone project</button>'+
+'        <button id="proj-history-'+idx+'" title="show major events in the project history">show project history</button>'+
 '      </div>'+
 '      <div style="margin-top:5px; ">'+
 '        <button id="proj-add-'+idx+'" title="add new cable to the project. Thsi will open cable editor dialog.">add cable</button>'+

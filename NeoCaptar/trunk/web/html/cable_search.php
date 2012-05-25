@@ -104,7 +104,7 @@ function export_cables2excel($cables,$path,$user) {
     foreach( $cables as $cable ) {
 
         $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$cable->status());
-        $objPHPExcel->getActiveSheet()->setCellValue('B'.$row,$cable->job());
+        $objPHPExcel->getActiveSheet()->setCellValue('B'.$row,$cable->project()->job());
         $objPHPExcel->getActiveSheet()->setCellValue('C'.$row,$cable->cable());
         $objPHPExcel->getActiveSheet()->setCellValue('D'.$row,$cable->device());
         $objPHPExcel->getActiveSheet()->setCellValue('E'.$row,$cable->func());
@@ -174,6 +174,10 @@ try {
     $dict_routing_id   = NeoCaptarUtils::get_param_GET('dict_routing_id',  false);
     $dict_instr_id     = NeoCaptarUtils::get_param_GET('dict_instr_id',    false);
 
+    $dict_device_location_id  = NeoCaptarUtils::get_param_GET('dict_device_location_id', false);
+    $dict_device_region_id    = NeoCaptarUtils::get_param_GET('dict_device_region_id',   false);
+    $dict_device_component_id = NeoCaptarUtils::get_param_GET('dict_device_component_id',false);
+
     // Search option II: true multi-parametric search
     //
     // Parameters for a complex pattern-based search based on partial
@@ -213,56 +217,38 @@ try {
         NeoCaptarUtils::report_error("format '{$format}' is either not supported or not implemented");
 
     $cables = array();
+
     if(!is_null($id)) {
+
         $cable = $neocaptar->find_cable_by_id($id);
+        if( is_null($cable)) NeoCaptarUtils::report_error("cable not found for cable id: {$id}");
         array_push($cables, $cable);
 
     } else if( !is_null($project_id)) {
+
         $project = $neocaptar->find_project_by_id($project_id);
         if( is_null($project)) NeoCaptarUtils::report_error("project not found for id: {$project_id}");
-
         $cables = $project->cables();
 
     } else if(!is_null($cablenumber)) {
+
         $cable = $neocaptar->find_cable_by_cablenumber($cablenumber);
         if( is_null($cable)) NeoCaptarUtils::report_error("cable not found for cable number: {$cablenumber}");
-
         array_push($cables,$cable);
 
-    } else if(!is_null($prefix)) {
-        $cables = $neocaptar->find_cables_by_prefix($prefix);
-
-    } else if(!is_null($jobnumber)) {
-        $cables = $neocaptar->find_cables_by_jobnumber($jobnumber);
-
-    } else if(!is_null($dict_cable_id)) {
-        $cables = $neocaptar->find_cables_by_dict_cable_id($dict_cable_id);
-
-    } else if(!is_null($dict_connector_id)) {
-        $cables = $neocaptar->find_cables_by_dict_connector_id($dict_connector_id);
-
-    } else if(!is_null($dict_pinlist_id)) {
-
-        $cables = $neocaptar->find_cables_by_dict_pinlist_id($dict_pinlist_id);
-
-    } else if(!is_null($dict_location_id)) {
-
-        $cables = $neocaptar->find_cables_by_dict_location_id($dict_location_id);
-
-    } else if(!is_null($dict_rack_id)) {
-
-        $cables = $neocaptar->find_cables_by_dict_rack_id($dict_rack_id);
-        
-    } else if(!is_null($dict_routing_id)) {
-
-        $cables = $neocaptar->find_cables_by_dict_routing_id($dict_routing_id);
-
-    } else if(!is_null($dict_instr_id)) {
-
-        $cables = $neocaptar->find_cables_by_dict_instr_id($dict_instr_id);
-
-    } else {
-        $cables = $neocaptar->search_cables($partial_search_params);
+    } else if(!is_null($prefix))                   { $cables = $neocaptar->find_cables_by_prefix                  ($prefix);
+    } else if(!is_null($jobnumber))                { $cables = $neocaptar->find_cables_by_jobnumber               ($jobnumber);
+    } else if(!is_null($dict_cable_id))            { $cables = $neocaptar->find_cables_by_dict_cable_id           ($dict_cable_id);
+    } else if(!is_null($dict_connector_id))        { $cables = $neocaptar->find_cables_by_dict_connector_id       ($dict_connector_id);
+    } else if(!is_null($dict_pinlist_id))          { $cables = $neocaptar->find_cables_by_dict_pinlist_id         ($dict_pinlist_id);
+    } else if(!is_null($dict_location_id))         { $cables = $neocaptar->find_cables_by_dict_location_id        ($dict_location_id);
+    } else if(!is_null($dict_rack_id))             { $cables = $neocaptar->find_cables_by_dict_rack_id            ($dict_rack_id);
+    } else if(!is_null($dict_routing_id))          { $cables = $neocaptar->find_cables_by_dict_routing_id         ($dict_routing_id);
+    } else if(!is_null($dict_instr_id))            { $cables = $neocaptar->find_cables_by_dict_instr_id           ($dict_instr_id);
+    } else if(!is_null($dict_device_location_id))  { $cables = $neocaptar->find_cables_by_dict_device_location_id ($dict_device_location_id);
+    } else if(!is_null($dict_device_region_id))    { $cables = $neocaptar->find_cables_by_dict_device_region_id   ($dict_device_region_id);
+    } else if(!is_null($dict_device_component_id)) { $cables = $neocaptar->find_cables_by_dict_device_component_id($dict_device_component_id);
+    } else                                         { $cables = $neocaptar->search_cables                          ($partial_search_params);
     }
 
     if( $format ) {

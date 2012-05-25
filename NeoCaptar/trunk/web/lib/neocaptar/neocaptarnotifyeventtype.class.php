@@ -37,11 +37,14 @@ class NeoCaptarNotifyEventType {
     public function name()        { return $this->attr['name']; }
     public function scope()       { return $this->attr['scope']; }
     public function description() { return $this->attr['description']; }
-
-    /* Helper functions
-     */
-    public function is_administrator() { return 'ADMINISTRATOR' == $this->recipient_role(); }
-    public function is_projmanager  () { return 'PROJMANAGER'   == $this->recipient_role(); }
-    public function is_other        () { return 'OTHER'         == $this->recipient_role(); }
+    
+    public function recipient_role_name() {
+        switch($this->recipient()) {
+            case 'ADMINISTRATOR': return 'Administrator';
+            case 'PROJMANAGER':   return 'Project Manager';
+            case 'OTHER':         return 'Other User';
+        }
+        return 'Unknown';
+    }
 }
 ?>

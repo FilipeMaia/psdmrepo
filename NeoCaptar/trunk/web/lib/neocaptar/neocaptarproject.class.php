@@ -104,6 +104,30 @@ class NeoCaptarProject {
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
+    public function history() {
+        $list = array();
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.project_history WHERE project_id={$this->id()} ORDER BY event_time");
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ )
+            array_push(
+                $list,
+                new NeoCaptarProjectEvent(
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+        return $list;
+    }
+    public function history_last_entry() {
+        $list = array();
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.project_history WHERE project_id={$this->id()} ORDER BY event_time DESC LIMIT 1");
+        $nrows = mysql_numrows($result);
+        if( !$nrows ) return null;
+        if( 1 != $nrows )
+            throw new NeoCaptarException(__METHOD__, "database schema problem");
+        return new NeoCaptarProjectEvent(
+            $this->connection,
+            $this,
+            mysql_fetch_array($result, MYSQL_ASSOC));
+    }
 
     /*
      * ======================
@@ -116,7 +140,8 @@ class NeoCaptarProject {
         $new_cable = $this->find_cable_by_('id IN (SELECT LAST_INSERT_ID())');
         if( is_null($new_cable)) return null;
         $comments = array();
-        $this->neocaptar->add_cable_event($new_cable,'Created',$comments);
+        $this->neocaptar->add_project_event($this, 'Add Cable', $new_cable->dump2array());
+        $this->neocaptar->add_cable_event ($new_cable,'Created',$comments);
         return $new_cable;
     }
     public function clone_cable($c) {
@@ -165,12 +190,23 @@ class NeoCaptarProject {
         $this->connection->query($sql);
         $new_cable = $this->find_cable_by_('id IN (SELECT LAST_INSERT_ID())');
         if( is_null($new_cable)) return null;
-        $comments = array();
-        array_push($comments,"Cloned from project: {$c->project()->title()}");
-        foreach( $new_cable->attr as $property => $new_value ) {
-            array_push($comments, "{$property}: {$new_value}");
-        }
-        $this->neocaptar->add_cable_event($new_cable,'Created',$comments);
+
+        $this->neocaptar->add_project_event(
+            $this,
+            'Add Cable',
+            array(
+                "Cloned from cable id: {$c->id()} from project: {$c->project()->title()}",
+                "See details in the cable history"
+            )
+        );
+        $this->neocaptar->add_cable_event(
+            $new_cable,
+            'Created',
+            array_merge(
+                array("Cloned cable id: {$c->id()} from project: {$c->project()->title()}"),
+                $new_cable->dump2array()
+            )
+        );
         return $new_cable;
     }
     public function update_cable($cable,$params) {
@@ -204,6 +240,14 @@ class NeoCaptarProject {
         $new_cable = $this->find_cable_by_id($cable->id());  // fetch the updated object
         if( is_null($new_cable)) return null;
 
+        $this->neocaptar->add_project_event(
+            $this,
+            'Modified Cable',
+            array(
+                "Cable id: {$new_cable->id()}",
+                "See details in the cable history"
+            )
+        );
         $comments = array();
         foreach( $new_cable->attr as $property => $new_value ) {
             $old_value = $cable->attr[$property];

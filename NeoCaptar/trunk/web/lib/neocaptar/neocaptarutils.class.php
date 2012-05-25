@@ -271,13 +271,15 @@ class NeoCaptarUtils {
             array_push(
                 $pending,
                 array(
-                    'id'              => $entry->id(),
-                    'event_type_id'   => $entry->event_type()->id(),
-                    'event_type_name' => $entry->event_type()->name(),
-                    'event_time'      => $entry->event_time()->toStringShort(),
-                    'event_time_64'   => $entry->event_time()->to64(),
-                    'originator_uid'  => $entry->originator_uid(),
-                    'recipient_uid'   => $entry->recipient_uid()
+                    'id'                     => $entry->id(),
+                    'event_type_id'          => $entry->event_type()->id(),
+                    'event_type_name'        => $entry->event_type()->name(),
+                    'event_type_description' => $entry->event_type()->description(),
+                    'event_time'             => $entry->event_time()->toStringShort(),
+                    'event_time_64'          => $entry->event_time()->to64(),
+                    'originator_uid'         => $entry->originator_uid(),
+                    'recipient_uid'          => $entry->recipient_uid(),
+                    'recipient_role'         => $entry->event_type()->recipient_role_name()
                 )
             );
         }

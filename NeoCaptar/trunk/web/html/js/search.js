@@ -122,6 +122,21 @@ function p_appl_search() {
         that.search_cables_reset();
         this.search_cables_impl({dict_instr_id:id});
     };
+    this.search_cables_by_dict_device_location_id = function(id) {
+        this.init();
+        that.search_cables_reset();
+        this.search_cables_impl({dict_device_location_id:id});
+    };
+    this.search_cables_by_dict_device_region_id = function(id) {
+        this.init();
+        that.search_cables_reset();
+        this.search_cables_impl({dict_device_region_id:id});
+    };
+    this.search_cables_by_dict_device_component_id = function(id) {
+        this.init();
+        that.search_cables_reset();
+        this.search_cables_impl({dict_device_component_id:id});
+    };
 
     /* ----------------------------------------
      *   Internal methods and data structures

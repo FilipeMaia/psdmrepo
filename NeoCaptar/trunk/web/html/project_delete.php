@@ -34,7 +34,6 @@ try {
 	$project = $neocaptar->find_project_by_id( $project_id);
 	if( is_null( $project )) NeoCaptarUtils::report_error("no project exists for id: {$project_id}");
 
-    $neocaptar->add_notification_event4project('on_project_delete', $project_id);
     $neocaptar->delete_project_by_id( $project_id);
 
     $neocaptar->commit();

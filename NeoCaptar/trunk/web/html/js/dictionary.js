@@ -73,6 +73,10 @@ function p_appl_dictionary() {
 
         this.save_instr    (cable.origin.instr);
 		this.save_instr    (cable.destination.instr);
+        
+        this.save_device_location (cable.device_location);
+        this.save_device_region   (cable.device_location, cable.device_region);
+        this.save_device_component(cable.device_location, cable.device_region, cable.device_component);
     };
 
     // -----------------------------
@@ -1015,7 +1019,7 @@ function p_appl_dictionary() {
 		var component_name = input.val();
 		if( this.device_component_is_not_known(this.selected_device_location, this.selected_device_region, component_name)) {
 			input.val('');
-			this.save_device_component(this.selected_device_location, this.selected_device_region, component_name,'');
+			this.save_device_component(this.selected_device_location, this.selected_device_region, component_name);
 		}
 	};
 	this.save_device_location = function(location_name) {

@@ -541,7 +541,17 @@ function report_info( title, msg ) {
 		title: title
 	});
 }
-
+function report_info_table( title, hdr, rows ) {
+    var table = new Table('infodialogs', hdr, rows);
+    table.display();
+	$('#infodialogs').dialog({
+        width: 720,
+        height: 800,
+		resizable: true,
+		modal: true,
+		title: title
+	});
+}
 function report_action( title, msg ) {
 	return $('#infodialogs').
         html(msg).
@@ -561,6 +571,7 @@ function edit_dialog( title, msg, on_save, on_cancel ) {
 	$('#editdialogs').html(msg);
 	$('#editdialogs').dialog({
 		resizable: true,
+        width: 640,
 		modal: true,
 		buttons: {
 			Save: function() {
@@ -586,11 +597,18 @@ var global_current_user = {
     can_manage_projects: <?php echo $neocaptar->can_manage_projects()?'1':'0'; ?>
 };
 var global_users = [];
+var global_projmanagers = [];
 <?php
     foreach( $neocaptar->users() as $user ) {
         echo "global_users.push('{$user->uid()}');\n";
+        if( $user->is_administrator() || $user->is_projmanager()) echo "global_projmanagers.push('{$user->uid()}');\n";
     }
 ?>
+function global_get_projmanagers() {
+    var projmanagers = admin.projmanagers();
+    if(projmanagers) return projmanagers;
+    return global_projmanagers;
+}
 var applications = {
 	'p-appl-projects'   : projects,
 	'p-appl-dictionary' : dict,
@@ -727,6 +745,7 @@ $(function() {
     // Make sure the dictionaries are loaded
     //
     dict.init();
+    admin.init();
 
 	// Finally, activate the selected application.
 	//

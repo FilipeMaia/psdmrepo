@@ -487,6 +487,31 @@ function p_appl_admin() {
     this.access_create_projmanager   = function(uid) { this.access_create_user(uid,'PROJMANAGER'); };
     this.access_create_other         = function(uid) { this.access_create_user(uid,'OTHER'); };
  
+    this.projmanagers = function() {
+
+        // Return an array of user accounts who are allowed to manage
+        // projects. This will include dedicated project managers as
+        // as well as administrators.
+        //
+        // Fall back to a static array of 'global_users' if no users have been
+        // dynamically loaded so far.
+        //
+        if( this.access ) {
+            var result = [];
+            var users = $.merge(
+                $.merge(
+                    [],
+                    this.access.ADMINISTRATOR
+                ),
+                this.access.PROJMANAGER );
+            for( var i in users ) {
+                var user = users[i];
+                result.push(user.uid);
+            }
+            return result;
+        }
+        return global_users;
+    };
     this.access_display_users = function(id,users) {
         var rows = [];
         for( var i in users ) {
@@ -661,6 +686,7 @@ function p_appl_admin() {
             { name:   'event' },
             { name:   'originator' },
             { name:   'recipient' },
+            { name:   'recipient_role' },
             { name:   'ACTIONS',
               sorted: false,
               type:   { after_sort: function() { $('.admin-notifications-pending-tools').button(); }}}
@@ -670,9 +696,10 @@ function p_appl_admin() {
             var entry = this.notify_pending[i];
             rows.push([
                 entry.event_time,
-                entry.event_type_name,
+                entry.event_type_description,
                 entry.originator_uid,
                 entry.recipient_uid,
+                entry.recipient_role,
                 this.can_manage_access() ?
                     Button_HTML('submit', {
                         name:    'submit_'+i,
@@ -741,7 +768,7 @@ function p_appl_admin() {
     };
     this.notify_pending_submit = function(idx) {
         var params = { action: 'submit' };
-        if( idx !== undefined ) params.id = this.notify_pending[idx].id;
+        if( idx != undefined ) params.id = this.notify_pending[idx].id;
         this.notify_action(
             '../neocaptar/notify_queue.php',
             params
@@ -749,7 +776,7 @@ function p_appl_admin() {
     };
     this.notify_pending_delete = function(idx) {
         var params = { action: 'delete' };
-        if( idx !== undefined ) params.id = this.notify_pending[idx].id;
+        if( idx != undefined ) params.id = this.notify_pending[idx].id;
         this.notify_action(
             '../neocaptar/notify_queue.php',
             params

@@ -23,7 +23,7 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
 
-    $action  = NeoCaptarUtils::get_param_GET('action');
+    $action  = strtolower(trim(NeoCaptarUtils::get_param_GET('action')));
     $id      = NeoCaptarUtils::get_param_GET('id', false, false);
 
 	$authdb = AuthDB::instance();
@@ -32,10 +32,21 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-    if( is_null($id)) {
-        NeoCaptarUtils::report_error('operation is not implemented for action: '.$action);
+    if(is_null($id)) {
+        foreach($neocaptar->notify_queue() as $entry) {
+            $id = $entry->id();
+            switch($action) {
+                case 'submit': $neocaptar->submit_notification_event($id); break;
+                case 'delete': $neocaptar->delete_notification_event($id); break;
+                default:       NeoCaptarUtils::report_error('operation is not implemented for action: '.$action.' and id: '.$id);
+            }
+        }
     } else {
-        NeoCaptarUtils::report_error('operation is not implemented for action: '.$action.' and id: '.$id);
+        switch($action) {
+            case 'submit': $neocaptar->submit_notification_event($id); break;
+            case 'delete': $neocaptar->delete_notification_event($id); break;
+            default:       NeoCaptarUtils::report_error('operation is not implemented for action: '.$action.' and id: '.$id);
+        }
     }
     $notificatons2return = NeoCaptarUtils::notifications2array($neocaptar);
 

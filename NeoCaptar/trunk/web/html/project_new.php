@@ -62,8 +62,6 @@ try {
     }
     $project_as_array = NeoCaptarUtils::project2array($project);
 
-    $neocaptar->add_notification_event4project('on_project_create', $project->id());
-
 	$neocaptar->commit();
 	$authdb->commit();
 

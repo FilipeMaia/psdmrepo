@@ -529,14 +529,14 @@ class NeoCaptar {
     }
     public function find_cables_by_dict_cable_id($dict_cable_id) {
         $dict_cable = $this->find_dict_cable_by_id($dict_cable_id);
-        if( is_null($dict_cable)) return $list;
+        if( is_null($dict_cable)) return array();
         $cable_type_escaped = $this->connection->escape_string(trim($dict_cable->name()));
         return $this->find_cables_by_(
             "cable_type='{$cable_type_escaped}'");
     }
     public function find_cables_by_dict_connector_id($dict_connector_id) {
         $dict_connector = $this->find_dict_connector_by_id($dict_connector_id);
-        if( is_null($dict_connector)) return $list;
+        if( is_null($dict_connector)) return array();
         $cable_type_escaped     = $this->connection->escape_string(trim($dict_connector->cable()->name()));
         $connector_type_escaped = $this->connection->escape_string(trim($dict_connector->name()));
         return $this->find_cables_by_(
@@ -546,7 +546,7 @@ class NeoCaptar {
     }
     public function find_cables_by_dict_pinlist_id($dict_pinlist_id) {
         $dict_pinlist = $this->find_dict_pinlist_by_id($dict_pinlist_id);
-        if( is_null($dict_pinlist)) return $list;
+        if( is_null($dict_pinlist)) return array();
         $cable_type_escaped     = $this->connection->escape_string(trim($dict_pinlist->connector()->cable()->name()));
         $connector_type_escaped = $this->connection->escape_string(trim($dict_pinlist->connector()->name()));
         $pinlist_escaped        = $this->connection->escape_string(trim($dict_pinlist->name()));
@@ -558,14 +558,14 @@ class NeoCaptar {
     }
     public function find_cables_by_dict_location_id($dict_location_id) {
         $dict_location = $this->find_dict_location_by_id($dict_location_id);
-        if( is_null($dict_location)) return $list;
+        if( is_null($dict_location)) return array();
         $location_escaped = $this->connection->escape_string(trim($dict_location->name()));
         return $this->find_cables_by_(
             "origin_loc='{$location_escaped}' OR destination_loc='{$location_escaped}'");
     }
     public function find_cables_by_dict_rack_id($dict_rack_id) {
         $dict_rack = $this->find_dict_rack_by_id($dict_rack_id);
-        if( is_null($dict_rack)) return $list;
+        if( is_null($dict_rack)) return array();
         $location_escaped = $this->connection->escape_string(trim($dict_rack->location()->name()));
         $rack_escaped     = $this->connection->escape_string(trim($dict_rack->name()));
         return $this->find_cables_by_(
@@ -574,18 +574,44 @@ class NeoCaptar {
     }
     public function find_cables_by_dict_routing_id($dict_routing_id) {
         $dict_routing = $this->find_dict_routing_by_id($dict_routing_id);
-        if( is_null($dict_routing)) return $list;
+        if( is_null($dict_routing)) return array();
         $routing_escaped = $this->connection->escape_string(trim($dict_routing->name()));
         return $this->find_cables_by_(
             "routing='{$routing_escaped}'");
     }
     public function find_cables_by_dict_instr_id($dict_instr_id) {
         $dict_instr = $this->find_dict_instr_by_id($dict_instr_id);
-        if( is_null($dict_instr)) return $list;
+        if( is_null($dict_instr)) return array();
         $instr_escaped = $this->connection->escape_string(trim($dict_instr->name()));
         return $this->find_cables_by_(
             "origin_instr='{$instr_escaped}' OR destination_instr='{$instr_escaped}'");
     }
+
+    public function find_cables_by_dict_device_location_id($dict_device_location_id) {
+        $dict_device_location = $this->find_dict_device_location_by_id($dict_device_location_id);
+        if( is_null($dict_device_location)) return array();
+        $dict_device_location_escaped = $this->connection->escape_string(trim($dict_device_location->name()));
+        return $this->find_cables_by_(
+            "device_location='{$dict_device_location_escaped}'");
+    }
+    public function find_cables_by_dict_device_region_id($dict_device_region_id) {
+        $dict_device_region = $this->find_dict_device_region_by_id($dict_device_region_id);
+        if( is_null($dict_device_region)) return array();
+        $dict_device_location_escaped = $this->connection->escape_string(trim($dict_device_region->location()->name()));
+        $dict_device_region_escaped   = $this->connection->escape_string(trim($dict_device_region->name()));
+        return $this->find_cables_by_(
+            "device_location='{$dict_device_location_escaped}' AND device_region='{$dict_device_region_escaped}'");
+    }
+    public function find_cables_by_dict_device_component_id($dict_device_component_id) {
+        $dict_device_component = $this->find_dict_device_component_by_id($dict_device_component_id);
+        if( is_null($dict_device_component)) return array();
+        $dict_device_location_escaped  = $this->connection->escape_string(trim($dict_device_component->region()->location()->name()));
+        $dict_device_region_escaped    = $this->connection->escape_string(trim($dict_device_component->region()->name()));
+        $dict_device_component_escaped = $this->connection->escape_string(trim($dict_device_component->name()));
+        return $this->find_cables_by_(
+            "device_location='{$dict_device_location_escaped}' AND device_region='{$dict_device_region_escaped}' AND device_component='{$dict_device_component_escaped}'");
+    }
+
     public function cablenumber_allocations() {
         $list = array();
         $this->update_cablenumber_allocations();
@@ -882,30 +908,6 @@ class NeoCaptar {
         }
         return $dictionary;
     }
-    public function notify_event_name2description($name) {
-
-        // TODO: re-implement this method to read descriptions from
-        // a special database table which wouln't be bopund to
-        // specific recipients.
-        //
-        $name_escaped = $this->connection->escape_string(trim($name));
-        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_event_type WHERE name='{$name_escaped}'");
-        $nrows = mysql_numrows( $result );
-
-        // If no description found then return teh name itself.
-        // This will be taken care of later.
-        //
-        if( $nrows == 0 ) return $name;
-
-        // Pick the first description. Don't care about others.
-        //
-        $event_type = new NeoCaptarNotifyEventType(
-            $this->connection,
-            $this,
-            mysql_fetch_array( $result, MYSQL_ASSOC ));
-
-        return $event_type->description();
-    }
     public function notifications($uid=null) {
         $list = array();
         $uid_condition = is_null($uid) ? '' : "WHERE uid='{$this->connection->escape_string(trim($uid))}'";
@@ -949,6 +951,21 @@ class NeoCaptar {
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
+    }
+    public function find_notify_queue_entry_by_id($id) {
+        return $this->find_notify_queue_entry_by_("id={$id}");
+    }
+    public function find_notify_queue_entry_by_($condition) {
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.notify_queue WHERE {$condition}");
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows != 1 )
+            throw new NeoCaptarException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+        return new NeoCaptarNotifyQueuedEntry(
+            $this->connection,
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
 
     /**
@@ -1244,35 +1261,15 @@ class NeoCaptar {
         $jobnumber = $this->allocate_jobnumber($project);
         $this->connection->query ("UPDATE {$this->connection->database}.project SET job='{$jobnumber}' WHERE id={$project->id()}");
 
-        $owner_gecos = $this->find_user_by_uid($project->owner())->name();
-        $due_str     = $project->due_time()->toStringDay();
-        $project_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/neocaptar?app=projects:search&project_id='.$project->id();
-
-        // Notify administrators on the new project
-        //
-        $body = <<<HERE
-Title:  "{$project->title()}"
-Owner:  {$project->owner()} ({$owner_gecos})
-Due by: {$due_str}
-URL:    {$project_url}
-
-{$project->description()}
-
-_________________________________________________________
-The message was sent by the automated notification system
-because your accont was registered as an administrator in
-the PCDS Cable Management Sefvice (Neo-CAPTAR). Please,
-contact PCDS Computing Management directly if you think
-this was done my mistake.
-HERE;
-        foreach( $this->users() as $user)
-            if( $user->is_administrator())
-                NeoCaptar::notify( "{$user->uid()}@slac.stanford.edu", "New Project Registered in Neo-CAPTAR", $body );
+        $this->add_project_event($project, 'Created', array('Empty project created'));
+        $this->add_notification_event4project('on_project_create', $project);
 
         return $project;
-
     }
     public function  update_project($id, $owner, $title, $description, $due_time) {
+
+        $project_old = $this->find_project_by_id($id);
+
         $owner_escaped = $this->connection->escape_string( trim( $owner ));
         if($owner_escaped == '') throw new NeoCaptarException( __METHOD__, "illegal owner. A valid non-empty string is expected." );
 
@@ -1284,9 +1281,31 @@ HERE;
         $sql = "UPDATE {$this->connection->database}.project SET owner='{$owner_escaped}',title='{$title_escaped}',description='{$description_escaped}',due_time={$due_time->to64()} WHERE id={$id}";
         $this->connection->query($sql);
 
-        return $this->find_project_by_id($id);
+        $project_new = $this->find_project_by_id($id);
+
+        $comments = array();
+        if( $project_old->owner() != $project_new->owner()) {
+            array_push($comments, "Owner: '{$project_old->owner()}' -> '{$project_new->owner()}'");
+            $this->add_notification_event4project('on_project_deassign', $project_old);
+            $this->add_notification_event4project('on_project_assign',   $project_new);
+        }
+        if( $project_old->title() != $project_new->title()) {
+            array_push($comments, "Ttile: '{$project_old->title()}' -> '{$project_new->title()}'");
+        }
+        if( $project_old->description() != $project_new->description()) {
+            array_push($comments, "Description: '{$project_old->description()}' -> '{$project_new->description()}'");
+        }
+        if( $project_old->due_time()->to64() != $project_new->due_time()->to64()) {
+            array_push($comments, "Due time: '{$project_old->due_time()->toStringShort()}' -> '{$project_new->due_time()->toStringShort()}'");
+        }
+        $this->add_project_event($project_new, 'Updated', $comments);
+
+        return $project_new;
     }
-    public function delete_project_by_id( $id ) {
+    public function delete_project_by_id($id) {
+        $project = $this->find_project_by_id($id);
+        if( is_null($project)) return;
+        $this->add_notification_event4project('on_project_delete', $project);
     	$this->delete_project_by_( "id={$id}" );
     }
     private function delete_project_by_( $condition ) {
@@ -1294,6 +1313,9 @@ HERE;
     }
 
     public function delete_cable_by_id( $id ) {
+        $cable = $this->find_cable_by_id($id);
+        if( is_null($cable)) return;
+        $this->add_project_event($cable->project(), 'Delete Cable', $cable->dump2array());
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.cable WHERE id={$id}" );
     }
 
@@ -1472,19 +1494,26 @@ HERE;
     public function un_damage_cable    ($cable) { return $this->change_cable_status($cable,'Commissioned'); }
     public function un_retire_cable    ($cable) { return $this->change_cable_status($cable,'Damaged');      }
 
-    private function add_event($scope, $scope_id, $event, $comments) {
-        $table      = "{$scope}_history";
+    private function add_event_impl($scope, $scope_id, $event, $comments) {
         $event_time = LusiTime::now()->to64();
         $event_uid  = $this->connection->escape_string(trim( AuthDB::instance()->authName()));
         $event      = $this->connection->escape_string($event);
-        $this->connection->query("INSERT INTO {$this->connection->database}.{$table} VALUES(NULL,{$scope_id},{$event_time},'{$event_uid}','{$event}')");
+        $table      = $scope ? "{$scope}_history" : "history";
+        if( $scope ) $this->connection->query("INSERT INTO {$this->connection->database}.{$table} VALUES(NULL,{$scope_id},{$event_time},'{$event_uid}','{$event}')");
+        else         $this->connection->query("INSERT INTO {$this->connection->database}.{$table} VALUES(NULL,            {$event_time},'{$event_uid}','{$event}')");
         $attr = mysql_fetch_array( $this->connection->query("SELECT LAST_INSERT_ID() AS `id`"), MYSQL_ASSOC );
         $event_id = $attr['id'];
         foreach( $comments as $comment )
             $this->connection->query("INSERT INTO {$this->connection->database}.{$table}_comments VALUES({$event_id},'{$this->connection->escape_string($comment)}')");
     }
+    public function add_event($event, $comments) {
+        $this->add_event_impl(null, null, $event, $comments);
+    }
     public function add_cable_event($cable, $event, $comments) {
-        $this->add_event('cable', $cable->id(), $event, $comments);
+        $this->add_event_impl('cable', $cable->id(), $event, $comments);
+    }
+    public function add_project_event($project, $event, $comments) {
+        $this->add_event_impl('project', $project->id(), $event, $comments);
     }
     public function add_user($uid, $name, $role) {
         $uid_escaped = $this->connection->escape_string(trim($uid));
@@ -1526,17 +1555,43 @@ HERE;
         $policy_escaped    = $this->connection->escape_string(trim($policy));
         $this->connection->query("UPDATE {$this->connection->database}.notify_schedule SET mode='{$policy_escaped}' WHERE recipient='{$recipient_escaped}'");
     }
-
-    public function add_notification_event4project($event_name, $project_id) {
+    public function delete_notification_event($id) {
+        $this->connection->query("DELETE FROM {$this->connection->database}.notify_queue WHERE id={$id}");
+    }
+    public function submit_notification_event($id) {
+        $entry = $this->find_notify_queue_entry_by_id($id);
+        if( is_null($entry)) return;
+        switch($entry->event_type()->scope()) {
+            case 'CABLE':
+                break;
+            case 'PROJECT':
+                $project_id       = 0;
+                $project_title    = '<unknown>';
+                $project_owner    = '<unknown>';
+                $project_due_time = '<unknown>';
+                $extra = $entry->extra();
+                if( !is_null($extra)) {
+                    $project_id       = $extra['project_id'];
+                    $project_title    = $extra['project_title'];
+                    $project_owner    = $extra['project_owner_uid'];
+                    $project_due_time = $extra['project_due_time']->toStringDay();
+                }
+                $this->notify4project (
+                    $entry->recipient_uid(),
+                    $entry->event_type()->description(),
+                    $project_id, $project_title, $project_owner, $project_due_time,
+                    $entry->originator_uid(),
+                    $entry->event_time());
+                break;
+        }
+        $this->delete_notification_event($id);
+    }
+    public function add_notification_event4project($event_name, $project) {
 
         $event_name = trim($event_name);
         $event_time = LusiTime::now();
 
         $originator_uid = trim(AuthDB::instance()->authName());
-
-        $project = $this->find_project_by_id($project_id);
-        if( is_null($project))
-            throw new NeoCaptarException( __METHOD__, "invalid project identifier passed into the method." );
 
         // Look for who might be interested in the event
         //
@@ -1552,8 +1607,7 @@ HERE;
             //
             $event_type = $notify->event_type();
 
-            if( !(( $event_type->scope() == 'PROJECT' ) &&
-                  (( $event_type->name() == $event_name ) || ( $event_type->name() == 'on_any' )))) continue;
+            if( !(( $event_type->scope() == 'PROJECT' ) && ( $event_type->name() == $event_name ))) continue;
 
             // Skip project managers who aren't supposed to be interested in someone
             // else's projects.
@@ -1561,36 +1615,28 @@ HERE;
             $recipient_uid  = $notify->uid();
             $recipient_type = $event_type->recipient();
 
-            if(( $recipient_type == 'PROJMANAGER' ) &&
-               ( $project->owner() != $recipient_uid )) continue;
+            if(( $recipient_type == 'PROJMANAGER' ) && ( $project->owner() != $recipient_uid )) continue;
 
-            $recipients[$recipient_uid] = $event_type;
+            array_push(
+                $recipients,
+                array(
+                    'recipient_uid' => $recipient_uid,
+                    'event_type'    => $event_type
+                )
+            );
         }
 
         // Evaluate each recipient to see if an instant event notification
         // has to be sent now, or it has to be placed into the wait queue.
         //
         $schedule = $this->notify_schedule();
-        $event_type_description = $this->notify_event_name2description($event_name);
 
-        foreach( $recipients as $recipient => $event_type ) {
+        foreach( $recipients as $entry ) {
+            $recipient_uid = $entry['recipient_uid'];
+            $event_type    = $entry['event_type'];
             switch($schedule[$event_type->recipient()]) {
-                case 'INSTANT':
-                    $this->notify4project_instant (
-                        $recipient,
-                        $event_type_description,
-                        $project,
-                        $originator_uid,
-                        $event_time );
-                    break;
-                case 'DELAYED':
-                    $this->notify4project_instant (
-                        $recipient,
-                        $event_type_description,
-                        $project,
-                        $originator_uid,
-                        $event_time );
-                    break;
+                case 'INSTANT': $this->notify4project_instant( $recipient_uid, $event_type->description(), $project, $originator_uid, $event_time ); break;
+                case 'DELAYED': $this->notify4project_delayed( $recipient_uid, $event_type->id(),          $project, $originator_uid, $event_time ); break;
             }
         }
     }
@@ -1601,21 +1647,71 @@ HERE;
         $originator_uid,
         $event_time ) {
 
+        $this->notify4project (
+            $recipient_uid,
+            $event_type_description,
+            $project->id(), $project->title(), $project->owner(), $project->due_time()->toStringDay(),
+            $originator_uid,
+            $event_time );
+    }
+    private function notify4project_delayed (
+        $recipient_uid,
+        $event_type_id,
+        $project,
+        $originator_uid,
+        $event_time ) {
+
+        $recipient_uid_escaped  = $this->connection->escape_string(trim($recipient_uid));
+        $originator_uid_escaped = $this->connection->escape_string(trim($originator_uid));
+
+        /* TODO: Store this in the database table.
+         */
+        $project_title_escaped = $this->connection->escape_string( trim( $project->title()));
+        $project_owner_escaped = $this->connection->escape_string( trim( $project->owner()));
+
+        $this->connection->query(
+            "INSERT INTO {$this->connection->database}.notify_queue".
+            " VALUES(NULL,{$event_type_id},{$event_time->to64()},'{$originator_uid_escaped}','{$recipient_uid_escaped}')"
+        );
+        $entry = $this->find_notify_queue_entry_by_('id IN (SELECT LAST_INSERT_ID())');
+        $this->connection->query(
+            "INSERT INTO {$this->connection->database}.notify_queue_project".
+            " VALUES({$entry->id()},{$project->id()},'{$project_title_escaped}','{$project_owner_escaped}',{$project->due_time()->to64()})"
+        );
+    }
+    private function notify4project (
+        $recipient_uid,
+        $event_type_description,
+        $project_id, $project_title, $project_owner, $project_due_time,
+        $originator_uid,
+        $event_time ) {
+
+        $project_owner_name = '';
+        $user = $this->find_user_by_uid($project_owner);
+        if( !is_null($user)) $project_owner_name = "({$user->name()})";
+
+        $originator_name = '';
+        $user = $this->find_user_by_uid($originator_uid);
+        if( !is_null($user)) $originator_name = "({$user->name()})";
+
+        // TODO: Change recipient e-mail to the real guy!
+        //
         $address = 'gapon@slac.stanford.edu';
         $subject = 'Project Notification';
         $body =<<<HERE
 This is an automated notification message on the following event:
         
-  {$event_type_description}
+  '{$event_type_description}'
 
-Project title: {$project->title()}
-Project owner: {$project->owner()}
+Project title: {$project_title}
+Project owner: {$project_owner} {$project_owner_name}
+Project due:   {$project_due_time}
 
 Project URL (if the project is still available):
 
-  https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=projects:search&project_id={$project->id()}
+  https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=projects:search&project_id={$project_id}
 
-The change was made by user:       {$originator_uid}
+The change was made by user:       {$originator_uid} {$originator_name}
 The time when the change was made: {$event_time->toStringShort()}
 
 
@@ -1629,7 +1725,7 @@ The time when the change was made: {$event_time->toStringShort()}
     **********************************************************************************
 
 HERE;
-        $this->notify( $address, $subject, $body );
+        NeoCaptar::notify( $address, $subject, $body );
     }
 }
 

@@ -76,6 +76,48 @@ class NeoCaptarCable {
 	public function destination_pinlist () { return $this->attr['destination_pinlist' ]; }
 	public function destination_instr   () { return $this->attr['destination_instr'   ]; }
 
+    public function dump2array() {
+        return array(
+
+            "id: {$this->id()}",
+            "status: {$this->status()}",
+            "cable #: {$this->cable()}",
+            "device: {$this->device()}",
+            "func: {$this->func()}",
+            "length: {$this->length()}",
+            "cable_type: {$this->cable_type()}",
+            "routing: {$this->routing()}",
+
+            "origin_name: {$this->origin_name()}",
+            "origin_loc: {$this->origin_loc()}",
+            "origin_rack: {$this->origin_rack()}",
+            "origin_ele: {$this->origin_ele()}",
+            "origin_side: {$this->origin_side()}",
+            "origin_slot: {$this->origin_slot()}",
+            "origin_station: {$this->origin_station()}",
+            "origin_conntype: {$this->origin_conntype()}",
+            "origin_pinlist: {$this->origin_pinlist()}",
+            "origin_instr: {$this->origin_instr()}",
+
+            "destination_name: {$this->destination_name()}",
+            "destination_loc: {$this->destination_loc()}",
+            "destination_rack: {$this->destination_rack()}",
+            "destination_ele: {$this->destination_ele()}",
+            "destination_side: {$this->destination_side()}",
+            "destination_slot: {$this->destination_slot()}",
+            "destination_station: {$this->destination_station()}",
+            "destination_conn: {$this->destination_conn()}",
+            "destination_conntype: {$this->destination_conntype()}",
+            "destination_pinlist: {$this->destination_pinlist()}",
+            "destination_instr: {$this->destination_instr()}"
+        );
+    }
+
+    /*
+     * =================================
+     *   INFORMATION REQUEST OPERATION
+     * =================================
+     */
     public function history() {
         $list = array();
         $result = $this->connection->query("SELECT * FROM {$this->connection->database}.cable_history WHERE cable_id={$this->id()} ORDER BY event_time");

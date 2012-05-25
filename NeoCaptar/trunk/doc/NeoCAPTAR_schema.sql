@@ -316,6 +316,85 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLE_HISTORY_COMMENTS` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Table `NEOCAPTAR`.`PROJECT_HISTORY`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `NEOCAPTAR`.`PROJECT_HISTORY` ;
+
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`PROJECT_HISTORY` (
+
+  `id`         INT             NOT NULL AUTO_INCREMENT ,
+
+  `project_id` INT             NOT NULL ,
+  `event_time` BIGINT UNSIGNED NOT NULL ,
+  `event_uid`  VARCHAR(32)     NOT NULL ,
+  `event`      TEXT            NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  CONSTRAINT `PROJECT_HISTORY_FK_1`
+    FOREIGN KEY (`project_id` )
+    REFERENCES `NEOCAPTAR`.`PROJECT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `NEOCAPTAR`.`PROJECT_HISTORY_COMMENTS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `NEOCAPTAR`.`PROJECT_HISTORY_COMMENTS` ;
+
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`PROJECT_HISTORY_COMMENTS` (
+
+  `project_history_id` INT  NOT NULL ,
+  `comment`            TEXT NOT NULL ,
+
+  CONSTRAINT `PROJECT_HISTORY_COMMENTS_FK_1`
+    FOREIGN KEY (`project_history_id` )
+    REFERENCES `NEOCAPTAR`.`PROJECT_HISTORY` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `NEOCAPTAR`.`HISTORY`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `NEOCAPTAR`.`HISTORY` ;
+
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`HISTORY` (
+
+  `id`         INT             NOT NULL AUTO_INCREMENT ,
+
+  `event_time` BIGINT UNSIGNED NOT NULL ,
+  `event_uid`  VARCHAR(32)     NOT NULL ,
+  `event`      TEXT            NOT NULL ,
+
+  PRIMARY KEY (`id`)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `NEOCAPTAR`.`HISTORY_COMMENTS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `NEOCAPTAR`.`HISTORY_COMMENTS` ;
+
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`HISTORY_COMMENTS` (
+
+  `history_id` INT  NOT NULL ,
+  `comment`    TEXT NOT NULL ,
+
+  CONSTRAINT `HISTORY_COMMENTS_FK_1`
+    FOREIGN KEY (`history_id` )
+    REFERENCES `NEOCAPTAR`.`HISTORY` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `NEOCAPTAR`.`CABLENUMBER`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER` ;
@@ -441,7 +520,6 @@ ENGINE = InnoDB;
 
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'ADMINISTRATOR','on_project_create',  'PROJECT','New project created');
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'ADMINISTRATOR','on_project_assign',  'PROJECT','Project assigned to a different owner');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'ADMINISTRATOR','on_project_deassign','PROJECT','Project assigned to a different owner');
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'ADMINISTRATOR','on_project_delete',  'PROJECT','Project deleted');
 
 
@@ -549,18 +627,18 @@ DROP TABLE IF EXISTS `NEOCAPTAR`.`NOTIFY_QUEUE_PROJECT` ;
 
 CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`NOTIFY_QUEUE_PROJECT` (
 
-    `notify_queue_id` INT NOT NULL ,
-    `project_id`      INT NOT NULL ,
+    `notify_queue_id` INT  NOT NULL ,
+
+    `project_id`        INT             NULL ,  -- NOTE: this isn't a foreign key because
+                                                -- we want this entry to stay in the table even
+                                                -- when the project gets deleted.
+    `project_title`     TEXT            NULL ,
+    `project_owner_uid` VARCHAR(32)     NULL ,
+    `project_due_time`  BIGINT UNSIGNED NULL ,
 
   CONSTRAINT `NOTIFY_QUEUE_PROJECT_FK_1`
     FOREIGN KEY (`notify_queue_id` )
     REFERENCES `NEOCAPTAR`.`NOTIFY_QUEUE` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE ,
-
-  CONSTRAINT `NOTIFY_QUEUE_PROJECT_FK_2`
-    FOREIGN KEY (`project_id` )
-    REFERENCES `NEOCAPTAR`.`PROJECT` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE )
 
@@ -575,17 +653,14 @@ DROP TABLE IF EXISTS `NEOCAPTAR`.`NOTIFY_QUEUE_CABLE` ;
 CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`NOTIFY_QUEUE_CABLE` (
 
     `notify_queue_id` INT NOT NULL ,
-    `cable_id`        INT NOT NULL ,
+    `cable_id`        INT     NULL ,  -- NOTE: this isn't a foreign key because
+                                      -- we want this entry to stay in the table even
+                                      -- when the cable gets deleted.
+    `cable_info`      TEXT    NULL ,
 
   CONSTRAINT `NOTIFY_QUEUE_CABLE_FK_1`
     FOREIGN KEY (`notify_queue_id` )
     REFERENCES `NEOCAPTAR`.`NOTIFY_QUEUE` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE ,
-
-  CONSTRAINT `NOTIFY_QUEUE_CABLE_FK_2`
-    FOREIGN KEY (`cable_id` )
-    REFERENCES `NEOCAPTAR`.`CABLE` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE )
 
