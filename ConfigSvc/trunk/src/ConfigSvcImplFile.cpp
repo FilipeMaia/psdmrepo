@@ -22,6 +22,8 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 
+using namespace std;
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -46,14 +48,14 @@ ConfigSvcImplFile::ConfigSvcImplFile ()
 {
 }
 
-ConfigSvcImplFile::ConfigSvcImplFile (const std::string& file)
+ConfigSvcImplFile::ConfigSvcImplFile (const string& file)
   : ConfigSvcImplI()
   , m_config()
 {
   // copied from AppUtils/AppCmdLine.cpp
   
   // open the file
-  std::ifstream istream ( file.c_str() ) ;
+  ifstream istream ( file.c_str() ) ;
   if ( not istream ) {
     // failed to open file
     throw ExceptionFileMissing ( file ) ;
@@ -62,7 +64,7 @@ ConfigSvcImplFile::ConfigSvcImplFile (const std::string& file)
   readStream( istream, file );
 }
 
-ConfigSvcImplFile::ConfigSvcImplFile (std::istream& stream, const std::string& file)
+ConfigSvcImplFile::ConfigSvcImplFile (istream& stream, const string& file)
   : ConfigSvcImplI()
   , m_config()
 {
@@ -79,22 +81,22 @@ ConfigSvcImplFile::~ConfigSvcImplFile ()
 
 // get the value of a single parameter, will throw ExceptionMissing 
 // if parameter is not there
-boost::shared_ptr<const std::string>
-ConfigSvcImplFile::get(const std::string& section, 
-                       const std::string& param) const
+boost::shared_ptr<const string>
+ConfigSvcImplFile::get(const string& section, 
+                       const string& param) const
 {
   SectionMap::const_iterator sitr = m_config.find(section);
-  if ( sitr == m_config.end() ) return boost::shared_ptr<const std::string>();
+  if ( sitr == m_config.end() ) return boost::shared_ptr<const string>();
   ParamMap::const_iterator pitr = sitr->second.find(param);
-  if ( pitr == sitr->second.end() ) return boost::shared_ptr<const std::string>();
+  if ( pitr == sitr->second.end() ) return boost::shared_ptr<const string>();
   return pitr->second;
 }
 
 // get a list of all sections
-std::list<std::string>
+list<string>
 ConfigSvcImplFile::getSections() const 
 {
-  std::list<std::string> list;
+  list<string> list;
   SectionMap::const_iterator sitr;
   for (sitr = m_config.begin(); sitr != m_config.end(); sitr++) {
     list.push_back((*sitr).first);
@@ -103,10 +105,10 @@ ConfigSvcImplFile::getSections() const
 }
 
 // get a list of all parameters, or an empty list if the section is not found
-std::list<std::string>
-ConfigSvcImplFile::getKeys(const std::string& section) const 
+list<string>
+ConfigSvcImplFile::getKeys(const string& section) const 
 {
-  std::list<std::string> list;
+  list<string> list;
   SectionMap::const_iterator sitr = m_config.find(section);
   if (sitr != m_config.end()) {
     ParamMap map = sitr->second;
@@ -119,9 +121,9 @@ ConfigSvcImplFile::getKeys(const std::string& section) const
 
 // get the value of a single parameter as sequence, will throw ExceptionMissing
 // if parameter is not there
-boost::shared_ptr<const std::list<std::string> >
-ConfigSvcImplFile::getList(const std::string& section,
-                           const std::string& param) const
+boost::shared_ptr<const list<string> >
+ConfigSvcImplFile::getList(const string& section,
+                           const string& param) const
 {
   // first look into the lists map
   ParamListMap& plmap = m_lists[section];
@@ -130,88 +132,85 @@ ConfigSvcImplFile::getList(const std::string& section,
 
   // look into parameter map
   SectionMap::const_iterator sitr = m_config.find(section);
-  if ( sitr == m_config.end() ) return boost::shared_ptr<const std::list<std::string> >();
+  if ( sitr == m_config.end() ) return boost::shared_ptr<const list<string> >();
   ParamMap::const_iterator pitr = sitr->second.find(param);
-  if ( pitr == sitr->second.end() ) return boost::shared_ptr<const std::list<std::string> >();
-  boost::shared_ptr<const std::string> line = pitr->second;
+  if ( pitr == sitr->second.end() ) return boost::shared_ptr<const list<string> >();
+  boost::shared_ptr<const string> line = pitr->second;
   
   // convert and add to the list map
-  boost::shared_ptr<std::list<std::string> > list (new std::list<std::string>());
-  plmap[param] = list;
+  boost::shared_ptr<list<string> > l (new list<string>());
+  plmap[param] = l;
   if (not line->empty()) {
-    boost::split (*list, *line, boost::is_any_of(" \t"), boost::token_compress_on);
+    boost::split (*l, *line, boost::is_any_of(" \t"), boost::token_compress_on);
   }
-  return list;
+  return l;
 }
 
 // set the value of the parameter, if parameter already exists it will be replaced
 void 
-ConfigSvcImplFile::put(const std::string& section, 
-                       const std::string& param, 
-                       const std::string& value)
+ConfigSvcImplFile::put(const string& section, 
+                       const string& param, 
+                       const string& value)
 {
   // remove cached list value if any
   m_lists[section].erase(param);
   
   // add to map
-  m_config[section][param].reset(new std::string(value));
+  m_config[section][param].reset(new string(value));
+}
+
+static string
+trim(const string &s)
+{
+  size_t start = s.find_first_not_of(" \t\r\n");
+  if (start == string::npos) {
+    return "";
+  }
+  size_t end = s.find_last_not_of(" \t\r\n");
+  return s.substr(start, end - start + 1);
 }
 
 // read input file from stream
 void 
-ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
+ConfigSvcImplFile::readStream(istream& in, const string& name)
 {
   // read all the lines from the file
-  std::string line ;
-  std::string curline ;
-  std::string section ;
+  string line ;
+  string curline ;
+  string section ;
   unsigned int nlines = 0 ;
-  while ( std::getline ( in, curline ) ) {
+  while ( getline ( in, curline ) ) {
     nlines ++ ;
+    curline = trim(curline);
 
-    // skip blank lines and comments
-    std::string::size_type fchar = curline.find_first_not_of(" \t\r\n") ;
-    if ( fchar == std::string::npos ) {
-      // empty line
-      //std::cout << "line " << nlines << ": empty\n" ;
-      curline.clear();
-    } else if ( curline[fchar] == '#' ) {
-      // comment
-      //std::cout << "line " << nlines << ": comment\n" ;
+    // skip empty lines and comments
+    if (curline == "" || curline[0] == '#') {
       continue;
     }
 
     line += curline;
     
-    // skip empty lines
-    if (line.empty()) {
-      //std::cout << "line " << nlines << ": empty\n" ;
-      continue;
-    }
-    
     if (line[line.size()-1] == '\\') {
       // continuation, read next line and add to current one
-      line.erase(line.size()-1);
-      //std::cout << "line " << nlines << ": continuation \"" << line << "\"\n" ;      
+      line.erase(line.size()-1); // remove the continuation character
+      //cout << "line " << nlines << ": continuation \"" << line << "\"\n" ;      
       continue;
     }
     
-    fchar = line.find_first_not_of(" \t") ;
+    int fchar = line.find_first_not_of(" \t") ;
     if ( line[fchar] == '[' ) {
       // must be section name, whole string ends with ']' and we take 
       // everything between as section name
-      std::string::size_type lchar = line.find_last_not_of(" \t\r") ;
-      if ( lchar == std::string::npos or line[lchar] != ']' ) {
+      string::size_type lchar = line.find_last_not_of(" \t\r") ;
+      if ( lchar == string::npos or line[lchar] != ']' ) {
         throw ExceptionSyntax(name, nlines, "illegal section name format");
       }
 
       // don't need to keep whitespace
-      fchar = line.find_first_not_of(" \t", fchar+1) ;
-      lchar = line.find_last_not_of(" \t", lchar-1) ;
-      section = line.substr( fchar, lchar-fchar+1 );
+      section = trim(line);
       m_config[section];
       
-      //std::cout << "line " << nlines << ": section [" << section << "]\n" ;
+      //cout << "line " << nlines << ": section [" << section << "]\n" ;
       line.clear();
       continue;
     }
@@ -222,37 +221,22 @@ ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
     }
     
     // must be option name followed by equal sign
-    std::string::size_type eqpos = line.find( "=", fchar ) ;
-    if ( eqpos == std::string::npos ) {
+    string::size_type eqpos = line.find( "=", fchar ) ;
+    if ( eqpos == string::npos ) {
       throw ExceptionSyntax(name, nlines, "equal sign missing after option name");
     }
-    if ( eqpos == fchar ) {
+    string optname(trim(line.substr(0, eqpos)));
+    if (optname == "") {
       throw ExceptionSyntax(name, nlines, "option name is missing");
     }
-    
-    std::string::size_type optend = line.find_last_not_of( " \t", eqpos-1 ) ;
-    std::string optname ( line, fchar, optend-fchar+1 ) ;
-
-    //std::cout << "line " << nlines << ": option '" << optname << "'\n" ;
-
-    // get option value
-    std::string optval ;
-    std::string::size_type pos1 = line.find_first_not_of(" \t",eqpos+1) ;
-    //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
-    if ( pos1 != std::string::npos ) {
-      std::string::size_type pos2 = line.find_last_not_of( " \t" ) ;
-      //std::cout << "line " << nlines << ": pos2 = " << pos2 << "\n" ;
-      if ( pos2 != std::string::npos ) {
-        optval = std::string ( line, pos1, pos2-pos1+1 ) ;
-      } else {
-        optval = std::string ( line, pos1 ) ;
-      }
-      //std::cout << "line " << nlines << ": value '" << optval << "'\n" ;
+    string optval(trim(line.substr(eqpos + 1).c_str()));
+    if (optval == "") {
+      throw ExceptionSyntax(name, nlines, "option value is missing");
     }
 
     // set the option
-    m_config[section][optname] = boost::shared_ptr<std::string>(new std::string(optval));
-    //std::cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
+    m_config[section][optname] = boost::shared_ptr<string>(new string(optval));
+    //cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
 
     line.clear();
   }
