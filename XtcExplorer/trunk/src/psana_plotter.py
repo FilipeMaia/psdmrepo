@@ -149,9 +149,6 @@ class psana_plotter (object) :
         """
         self.n_shots += 1
 
-        evt.printAllKeys()
-        env.printAllKeys()
-
         # only call the plt.draw / plt.show is there's actually
         # something new to show, since it's slow. 
         show_event = evt.get('show_event')
