@@ -234,7 +234,6 @@ ConfigSvcImplFile::readStream(istream& in, const string& name)
 
     // set the option
     m_config[section][optname] = boost::shared_ptr<string>(new string(optval));
-    cout << "m_config[" << section << "][" << optname << "] = boost::shared_ptr<string>(new string(" << optval << "))" << endl;
     //cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
 
     line.clear();
