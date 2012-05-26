@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_psana/camera.ddl.h"
+#include "camera.ddl.h"
 namespace Psana {
 namespace Opal1k {
 
@@ -44,6 +44,7 @@ public:
     HVFlip,
   };
   virtual ~ConfigV1();
+  bool operator==(const ConfigV1 &t) const { return this == &t; }
   /** offset/pedestal setting for camera (before gain) */
   virtual uint16_t black_level() const = 0;
   /** camera gain setting in percentile [100-3200] = [1x-32x] */

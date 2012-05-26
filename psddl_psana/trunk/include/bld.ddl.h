@@ -6,10 +6,10 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_psana/camera.ddl.h"
-#include "psddl_psana/ipimb.ddl.h"
-#include "psddl_psana/lusi.ddl.h"
-#include "psddl_psana/pulnix.ddl.h"
+#include "camera.ddl.h"
+#include "ipimb.ddl.h"
+#include "lusi.ddl.h"
+#include "pulnix.ddl.h"
 namespace Psana {
 namespace Bld {
 
@@ -29,6 +29,7 @@ public:
     : _f_11_ENRC(arg__f_11_ENRC), _f_12_ENRC(arg__f_12_ENRC), _f_21_ENRC(arg__f_21_ENRC), _f_22_ENRC(arg__f_22_ENRC)
   {
   }
+  bool operator==(const BldDataFEEGasDetEnergy &t) const { return this == &t; }
   /** Value of GDET:FEE1:11:ENRC, in mJ. */
   double f_11_ENRC() const { return _f_11_ENRC; }
   /** Value of GDET:FEE1:12:ENRC, in mJ. */
@@ -61,6 +62,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY)
   {
   }
+  bool operator==(const BldDataEBeamV0 &t) const { return this == &t; }
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -102,6 +104,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2)
   {
   }
+  bool operator==(const BldDataEBeamV1 &t) const { return this == &t; }
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -146,6 +149,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2)
   {
   }
+  bool operator==(const BldDataEBeamV2 &t) const { return this == &t; }
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -193,6 +197,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1)
   {
   }
+  bool operator==(const BldDataEBeamV3 &t) const { return this == &t; }
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -247,6 +252,7 @@ public:
     : _fFitTime1(arg__fFitTime1), _fFitTime2(arg__fFitTime2), _fCharge1(arg__fCharge1), _fCharge2(arg__fCharge2)
   {
   }
+  bool operator==(const BldDataPhaseCavity &t) const { return this == &t; }
   /** UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double fitTime1() const { return _fFitTime1; }
   /** UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
@@ -276,6 +282,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_SharedIpimb /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 0 /**< XTC type version number */ };
   virtual ~BldDataIpimbV0();
+  bool operator==(const BldDataIpimbV0 &t) const { return this == &t; }
   virtual const Ipimb::DataV1& ipimbData() const = 0;
   virtual const Ipimb::ConfigV1& ipimbConfig() const = 0;
   virtual const Lusi::IpmFexV1& ipmFexData() const = 0;
@@ -293,6 +300,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_SharedIpimb /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~BldDataIpimbV1();
+  bool operator==(const BldDataIpimbV1 &t) const { return this == &t; }
   virtual const Ipimb::DataV2& ipimbData() const = 0;
   virtual const Ipimb::ConfigV2& ipimbConfig() const = 0;
   virtual const Lusi::IpmFexV1& ipmFexData() const = 0;
@@ -310,6 +318,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_SharedPim /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~BldDataPimV1();
+  bool operator==(const BldDataPimV1 &t) const { return this == &t; }
   virtual const Pulnix::TM6740ConfigV2& camConfig() const = 0;
   virtual const Lusi::PimImageConfigV1& pimConfig() const = 0;
   virtual const Camera::FrameV1& frame() const = 0;
