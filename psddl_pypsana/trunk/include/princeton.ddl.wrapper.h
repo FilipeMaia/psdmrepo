@@ -157,8 +157,14 @@ private:
 
   class ConfigV1_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::Princeton::ConfigV1";
+    }
+    int getTypeId() {
+      return ConfigV1::TypeId;
+    }
+    int getVersion() {
+      return ConfigV1::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
@@ -167,8 +173,14 @@ private:
 
   class ConfigV2_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::Princeton::ConfigV2";
+    }
+    int getTypeId() {
+      return ConfigV2::TypeId;
+    }
+    int getVersion() {
+      return ConfigV2::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
@@ -177,8 +189,14 @@ private:
 
   class ConfigV3_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::Princeton::ConfigV3";
+    }
+    int getTypeId() {
+      return ConfigV3::TypeId;
+    }
+    int getVersion() {
+      return ConfigV3::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV3_Wrapper(store.get(src, 0)));

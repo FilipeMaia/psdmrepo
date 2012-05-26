@@ -323,7 +323,7 @@ public:
 
   class ConfigV1QuadReg_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::ConfigV1QuadReg";
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
@@ -333,8 +333,14 @@ public:
 
   class ConfigV1_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::ConfigV1";
+    }
+    int getTypeId() {
+      return ConfigV1::TypeId;
+    }
+    int getVersion() {
+      return ConfigV1::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
@@ -343,8 +349,14 @@ public:
 
   class ConfigV2_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::ConfigV2";
+    }
+    int getTypeId() {
+      return ConfigV2::TypeId;
+    }
+    int getVersion() {
+      return ConfigV2::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
@@ -353,8 +365,14 @@ public:
 
   class ConfigV3_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::ConfigV3";
+    }
+    int getTypeId() {
+      return ConfigV3::TypeId;
+    }
+    int getVersion() {
+      return ConfigV3::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV3_Wrapper(store.get(src, 0)));
@@ -363,8 +381,14 @@ public:
 
   class DataV1_EvtGetter : public Psana::EvtGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::DataV1";
+    }
+    int getTypeId() {
+      return DataV1::TypeId;
+    }
+    int getVersion() {
+      return DataV1::Version;
     }
     boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
       return boost::python::api::object(DataV1_Wrapper(evt.get(key, foundSrc)));
@@ -379,8 +403,14 @@ public:
 
   class DataV2_EvtGetter : public Psana::EvtGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::CsPad::DataV2";
+    }
+    int getTypeId() {
+      return DataV2::TypeId;
+    }
+    int getVersion() {
+      return DataV2::Version;
     }
     boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
       return boost::python::api::object(DataV2_Wrapper(evt.get(key, foundSrc)));

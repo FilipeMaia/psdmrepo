@@ -60,9 +60,14 @@ namespace Psana {
   static boost::shared_ptr<char> none((char *)0);
   static object Event_Class;
   static object EnvWrapper_Class;
+  static map<string, EvtGetter*> evtGetter_map;
+  static map<string, EnvGetter*> envGetter_map;
 
   template<class T>
-  string getTypeNameWithHighestVersion(std::map<string, T*> map, string typeNameGeneric) {
+  string getTypeNameWithHighestVersion(map<string, T*> map, string typeNameGeneric) {
+    if (map.count(typeNameGeneric)) {
+      return typeNameGeneric;
+    }
     string typeName = "";
     char v[256];
     for (int version = 1; true; version++) {
@@ -98,7 +103,7 @@ namespace Psana {
       return object(none);
     }
 
-    std::list<EventKey> keys(const Source& source = Source()) const { return _store.keys(); }
+    list<EventKey> keys(const Source& source = Source()) const { return _store.keys(); }
   };
 
   class EnvWrapper {
@@ -122,10 +127,20 @@ namespace Psana {
 
     void printAllKeys() {
       EnvObjectStore& store = _env.configStore();
-      std::list<EventKey> keys = store.keys(); // , Source());
-      std::list<EventKey>::iterator it;
+      list<EventKey> keys = store.keys(); // , Source());
+      list<EventKey>::iterator it;
       for (it = keys.begin(); it != keys.end(); it++) {
         cout << "THIS is an ENV key: " << *it << endl;
+      }
+    }
+
+    void printConfigKeys() {
+      ConfigSvc::ConfigSvc cfg;
+      list<string> keys = cfg.getKeys(_name);
+      list<string>::iterator it;
+      cout << "!!! keys.size() = " << keys.size() << " for " << _name << endl;
+      for (it = keys.begin(); it != keys.end(); it++) {
+        cout << "THIS is an ConfigSvc key: " << *it << endl;
       }
     }
 
@@ -162,6 +177,25 @@ namespace Psana {
         return Source(_default);
       }
     }
+
+    object getConfigByType(const char* typeNameGeneric, const char* detectorSourceName) {
+      const Source detectorSource(detectorSourceName);
+      string typeName = getTypeNameWithHighestVersion<EnvGetter>(envGetter_map, typeNameGeneric);
+      if (typeName == "") {
+        return object(none);
+      }
+      EnvGetter *getter = envGetter_map[typeName];
+      if (getter) {
+        return getter->get(_env.configStore(), detectorSource);
+      }
+      return object(none);
+    }
+
+    object getConfig(int typeId, const char* detectorSourceName) {
+      char name[64];
+      sprintf(name, "@EnvType_%d_", typeId);
+      return getConfigByType(name, detectorSourceName);
+    }
   };
 
   object getEnvWrapper(Env& env, const string& name, const string& className) {
@@ -174,22 +208,27 @@ namespace Psana {
     return object(Event_Class(evt));
   }
 
-  boost::shared_ptr<string> get_Event(Event& evt, const std::string& key) {
+  boost::shared_ptr<string> get_Event(Event& evt, const string& key) {
     return boost::shared_ptr<string>(evt.get(key));
   }
 
-  void printAllKeys(Event& evt) {
+  void printAllKeys_Event(Event& evt) {
     Event::GetResultProxy proxy = evt.get();
-    std::list<EventKey> keys;
+    list<EventKey> keys;
     proxy.m_dict->keys(keys, Source());
-    std::list<EventKey>::iterator it;
+    list<EventKey>::iterator it;
     for (it = keys.begin(); it != keys.end(); it++) {
       cout << "THIS is a key: " << *it << endl;
     }
   }
 
-  object getBySourceAndKey_Event(Event& evt, const string& typeNameGeneric, Source& source, const std::string& key) {
-    printAllKeys(evt);
+  int run_Event(Event& evt) {
+    const boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+    return eventId->run();
+  }
+
+#if 0
+  object getBySourceAndKey_Event(Event& evt, const string& typeNameGeneric, Source& source, const string& key) {
     string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
     if (typeName == "") {
       return object(none);
@@ -197,24 +236,61 @@ namespace Psana {
     EvtGetter *g = evtGetter_map[typeName];
     return g->get(evt, source, key);
   }
+#endif
 
-  object getBySrcAndKey_Event(Event& evt, const string& typeNameGeneric, Src& src, const std::string& key) {
-    printAllKeys(evt);
+  object getByType_Event(Event& evt, const string& typeNameGeneric, const string& detectorSourceName) {
+    if (typeNameGeneric == "PSEvt::EventId") {
+      const boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+      return object(eventId);
+    }
+
+    printAllKeys_Event(evt);
+    Source detectorSource;
+    if (detectorSourceName == "") {
+      detectorSource = Source();
+    } else {
+      detectorSource = Source(detectorSourceName);
+    }
     string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
     if (typeName == "") {
       return object(none);
     }
     EvtGetter *g = evtGetter_map[typeName];
+    return g->get(evt, detectorSource, string());
+  }
+
+  object getByType1_Event(Event& evt, const string& typeName) {
+    printAllKeys_Event(evt);
+
+    //Event::GetResultProxy proxy = evt.get();
+    //boost::shared_ptr<ProxyDictI> dict = proxy.m_dict;
+
+    //boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key, m_foundSrc);
+    //return boost::static_pointer_cast<T>(vptr);
+
+    return object(none); // @@@
+  }
+
+#if 0
+  // Src is a module type aka fullName
+  object getBySrcAndKey_Event(Event& evt, const string& typeNameGeneric, Src& src, const string& key) {
+    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
+    if (typeName == "") {
+      return object(none);
+    }
+
+    // @@@
+    // bool exists = evt.exists
+
+    EvtGetter *g = evtGetter_map[typeName];
     return g->get(evt, src, key);
   }
 
-  object getBySource_Event(Event& evt, const string& typeNameGeneric, Source& source) {
-    return getBySourceAndKey_Event(evt, typeNameGeneric, source, string());
-  }
-
+  // Src is a module type aka fullName
   object getBySrc_Event(Event& evt, const string& typeNameGeneric, Src& src) {
     return getBySrcAndKey_Event(evt, typeNameGeneric, src, string());
   }
+#endif
 
   PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data) {
     npy_intp dims[ndim];
@@ -261,11 +337,13 @@ namespace Psana {
     Event_Class =
       class_<Event>("PSEvt::Event", init<Event&>())
       .def("get", &get_Event)
-      .def("getBySource", &getBySource_Event)
-      .def("getBySourceAndKey", &getBySourceAndKey_Event)
-      .def("getBySrcAndKey", &getBySrcAndKey_Event)
-      .def("getBySrc", &getBySrc_Event)
-      .def("printAllKeys", &printAllKeys)
+      .def("getByType", &getByType_Event)
+      .def("getByType1", &getByType1_Event)
+      //.def("getBySourceAndKey", &getBySourceAndKey_Event)
+      //.def("getBySrcAndKey", &getBySrcAndKey_Event)
+      //.def("getBySrc", &getBySrc_Event)
+      .def("printAllKeys", &printAllKeys_Event)
+      .def("run", &run_Event)
       ;
 
     EnvWrapper_Class =
@@ -284,6 +362,9 @@ namespace Psana {
       .def("configStr", &EnvWrapper::configStr)
       .def("configStr2", &EnvWrapper::configStr2)
       .def("printAllKeys", &EnvWrapper::printAllKeys)
+      .def("printConfigKeys", &EnvWrapper::printConfigKeys)
+      .def("getConfigByType", &EnvWrapper::getConfigByType)
+      .def("getConfig", &EnvWrapper::getConfig)
       ;
 
     CreateWrappers::createWrappers();
@@ -291,8 +372,27 @@ namespace Psana {
     createWrappersDone = true;
   }
 
-  map<string, EvtGetter*> evtGetter_map;
-  map<string, EnvGetter*> envGetter_map;
+  void addEnvGetter(EnvGetter* getter) {
+    envGetter_map[getter->getTypeName()] = getter;
+    printf("~~~ adding %s\n", getter->getTypeName());
+    if (getter->getTypeId() != -1) {
+      char name[64];
+      sprintf(name, "@EnvType_%d_V%d", getter->getTypeId(), getter->getVersion());
+      envGetter_map[name] = getter;
+      printf("~~~ adding %s\n", name);
+    }
+  }
+
+  void addEvtGetter(EvtGetter* getter) {
+    evtGetter_map[getter->getTypeName()] = getter;
+    printf("~~~ adding %s\n", getter->getTypeName());
+    if (getter->getTypeId() != -1) {
+      char name[64];
+      sprintf(name, "@EvtType_%d_V%d", getter->getTypeId(), getter->getVersion());
+      evtGetter_map[name] = getter;
+      printf("~~~ adding %s\n", name);
+    }
+  }
 
   static set<string> class_set;
 

@@ -820,8 +820,14 @@ public:
 
   class ConfigV1_EnvGetter : public Psana::EnvGetter {
   public:
-    std::string getTypeName() {
+    const char* getTypeName() {
       return "Psana::Epics::ConfigV1";
+    }
+    int getTypeId() {
+      return ConfigV1::TypeId;
+    }
+    int getVersion() {
+      return ConfigV1::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
       return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));

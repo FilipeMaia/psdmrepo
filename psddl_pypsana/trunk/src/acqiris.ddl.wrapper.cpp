@@ -20,8 +20,8 @@ void createWrappers() {
 
   _CLASS(Psana::Acqiris::VertV1, return_value_policy<copy_const_reference>());
   _CLASS(Psana::Acqiris::VertV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(Psana::Acqiris::VertV1);
-  std_vector_class_(Psana::Acqiris::VertV1_Wrapper);
+  std_vector_class_(VertV1);
+  std_vector_class_(VertV1_Wrapper);
 #undef _CLASS
 
 

@@ -12,7 +12,9 @@
 namespace Psana {
   class EvtGetter {
   public:
-    virtual std::string getTypeName() = 0;
+    virtual const char* getTypeName() = 0;
+    virtual int getTypeId() { return -1; }
+    virtual int getVersion() { return 0; }
     virtual boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
     virtual boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
     virtual boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
@@ -21,13 +23,15 @@ namespace Psana {
 
   class EnvGetter {
   public:
-    virtual std::string getTypeName() = 0;
+    virtual const char* getTypeName() = 0;
+    virtual int getTypeId() { return -1; }
+    virtual int getVersion() { return -1; }
     virtual boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) = 0;
     virtual ~EnvGetter() {}
   };
 
-  extern std::map<std::string, EvtGetter*> evtGetter_map;
-  extern std::map<std::string, EnvGetter*> envGetter_map;
+  extern void addEnvGetter(EnvGetter* getter);
+  extern void addEvtGetter(EvtGetter* getter);
 
   extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);
   extern void createWrappers();
@@ -49,7 +53,7 @@ associate_PyArrayType(double, PyArray_CDOUBLE);
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return Psana::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
 #define VEC_CONVERT(value, ctype) const ndarray<ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
-#define EVT_GETTER(x) {Psana::EvtGetter *g = new x ## _EvtGetter(); Psana::evtGetter_map[g->getTypeName()] = g;}
-#define ENV_GETTER(x) {Psana::EnvGetter *g = new x ## _EnvGetter(); Psana::envGetter_map[g->getTypeName()] = g;}
+#define EVT_GETTER(x) {Psana::EvtGetter *g = new x ## _EvtGetter(); addEvtGetter(g);}
+#define ENV_GETTER(x) {Psana::EnvGetter *g = new x ## _EnvGetter(); addEnvGetter(g);}
 
 #endif // PSANA_PYWRAPPER_H
