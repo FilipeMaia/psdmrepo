@@ -1,13 +1,13 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: dump_simple.py 2622 2011-11-11 14:35:00Z salnikov@SLAC.STANFORD.EDU $
+#  $Id: dump_acqiris.py 2622 2011-11-11 14:35:00Z salnikov@SLAC.STANFORD.EDU $
 #
 # Description:
-#  Class dump_acqiris
+#  Pyana user analysis module dump_princeton...
 #
 #------------------------------------------------------------------------
 
-"""Example module for accessing Acqiris data.
+"""Example module for accessing SharedIpimb data.
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -32,14 +32,13 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from pypdsdata import xtc
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 
 # local definitions usually start with _
-
-import numpy
 
 #---------------------
 #  Class definition --
@@ -51,48 +50,62 @@ class dump_acqiris (object) :
     #  Constructor --
     #----------------
     def __init__ ( self, source="" ) :
+        """Class constructor takes the name of the data source.
+
+        @param source   data source
+        """
+        
         self.m_src = source
 
     #-------------------
     #  Public methods --
     #-------------------
-    def beginCalibCycle( self, evt, env ) :
-        self.source = env.configSource("DetInfo(:Acqiris)") # returns PSEvt::Source
-        config = env.configStore().getByType("Psana::Acqiris::Config", self.source)
-        if not config:
-            return
+    def beginjob( self, evt, env ) :
         
-        print "%s: %s" % (config.__class__.__name__, self.m_src)
+        print "self.m_src=", self.m_src
+        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
+        if config:
+        
+            print "%s: %s" % (config.__class__.__name__, self.m_src)
             
-        print "  nbrBanks =", config.nbrBanks(),
-        print "channelMask =", config.channelMask(),
-        print "nbrChannels =", config.nbrChannels(),
-        print "nbrConvertersPerChannel =", config.nbrConvertersPerChannel()
+            print "  nbrBanks =", config.nbrBanks(),
+            print "channelMask =", config.channelMask(),
+            print "nbrChannels =", config.nbrChannels(),
+            print "nbrConvertersPerChannel =", config.nbrConvertersPerChannel()
      
-        h = config.horiz()
-        print "  horiz: sampInterval =", h.sampInterval(),
-        print "delayTime =", h.delayTime(),
-        print "nbrSegments =", h.nbrSegments(),
-        print "nbrSamples =", h.nbrSamples()
+            h = config.horiz()
+            print "  horiz: sampInterval =", h.sampInterval(),
+            print "delayTime =", h.delayTime(),
+            print "nbrSegments =", h.nbrSegments(),
+            print "nbrSamples =", h.nbrSamples()
 
-        nch = config.nbrChannels()
-        vert = config.vert()
-        for ch in range(nch):
-            v = vert[ch]
-            print "  vert(%d):" % ch,
-            print "fullScale =", v.fullScale()
-            print "slope =", v.slope()
-            print "offset =", v.offset()
-            print "coupling =", v.coupling()
-            print "bandwidth=", v.bandwidth()
+            nch = config.nbrChannels()
+            vert = config.vert()
+            for ch in range(nch):
+                v = vert[ch]
+                print "  vert(%d):" % ch,
+                print "fullScale =", v.fullScale()
+                print "slope =", v.slope()
+                print "offset =", v.offset()
+                print "coupling =", v.coupling()
+                print "bandwidth=", v.bandwidth()
 
     def event( self, evt, env ) :
-        acqData = evt.getBySource("Psana::Acqiris::DataDesc", self.source)
+        """This method is called for every L1Accept transition.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        print "hi"
+        print "self.m_src=", self.m_src           # e.g. '|Acqiris'
+        print "self.m_fullName=", self.m_fullName # e.g. 'psana_examples.dump_acqiris'
+        acqData = evt.getByType("Psana::Acqiris::DataDesc", self.m_src)
         if not acqData:
             return
 
         # find matching config object
-        acqConfig = env.configStore().getByType("Psana::Acqiris::Config", self.source)
+        acqConfig = env.getConfigByType("Psana::Acqiris::Config", self.m_src)
 
         # loop over channels
         nchan = acqData.data_shape()[0];

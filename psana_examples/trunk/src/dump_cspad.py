@@ -39,6 +39,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from pypdsdata.xtc import *
 
 #----------------------------------
 # Local non-exported definitions --
@@ -69,10 +70,9 @@ class dump_cspad ( object ) :
     #  Public methods --
     #-------------------
 
-    def beginCalibCycle( self, evt, env ) :
+    def beginjob( self, evt, env ) :
 
-        self.source = env.configSource("DetInfo(:Cspad)") # returns PSEvt::Source
-        config = env.configStore().getByType("Psana::CsPad::Config", self.source)
+        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
         if not config:
             return
         
@@ -90,13 +90,27 @@ class dump_cspad ( object ) :
         print "  quadMask =", config.quadMask();
         print "  numAsicsRead =", config.numAsicsRead();
         print "  numQuads =", config.numQuads();
-        if hasattr(config, "roiMask"):
+        try:
+            # older versions may not have all methods
             print "  roiMask       : [%s]" % ', '.join([hex(config.roiMask(q)) for q in range(4)])
-        if hasattr(config, "numAsicsStored"):
             print "  numAsicsStored: %s" % str(map(config.numAsicsStored, range(4)))
+        except:
+            pass
+        try:
+            print "  sections      : %s" % str(map(config.sections, range(4)))
+        except:
+            pass
 
 
     def event( self, evt, env ) :
+
+        quads = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
+        if not quads :
+            return
+
+        # dump information about quadrants
+        print "dump_cspad: %s: %s" % (quads[0].__class__.__name__, self.m_src)
+        print "  Number of quadrants: %d" % len(quads)
 
         evt_data = evt.getBySource("Psana::CsPad::Data", self.source)
         quads = evt_data.quads
