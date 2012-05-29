@@ -324,6 +324,7 @@ class ImageData( BaseData ):
         self.image = None      # the image
         self.average = None    # the average collected so far
         self.maximum = None    # the max projection of images collected so far
+        self.vrange = None     # value range of image (tuple of (min,max))
         self.counter = 0       # nEvents in average
         self.dark = None       # the dark that was subtracted
         self.avgdark = None    # the average of accumulated darks

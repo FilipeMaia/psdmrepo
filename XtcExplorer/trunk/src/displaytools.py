@@ -334,6 +334,8 @@ class DataDisplay(object):
                 self.image_disp.add_frame("frame%d"%i,
                                           "%s image from shot #%d" % (image_data.name,self.event_number),
                                           (image_data.image,))
+                #self.image_disp.frames["frame%d"%i].vmin = image_data.vrange[0]
+                #self.image_disp.frames["frame%d"%i].vmax = image_data.vrange[1]
                 if image_data.showProj: self.image_disp.frames["frame%d"%i].showProj = True
 
             if image_data.average is not None:

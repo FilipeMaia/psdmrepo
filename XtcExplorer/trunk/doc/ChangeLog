@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-May-29 ofte                   rev 3647
+       - added run number to the output file name (image)
+       - small bug fixes
+	
 2012-May-25 ofte V00-01-30         rev 3638
 	- Smoothed out some problems with loading configuration file. Works OK now, 
 	  remaining limitations will not be dealt with until GUI configuration 

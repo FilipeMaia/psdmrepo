@@ -115,6 +115,7 @@ class  pyana_image ( object ) :
         # to keep track
         self.n_shots = None
         self.n_saved = 0
+        self.run = None
         self.initlists()
         
         self.apply_dictionary = { 'rotate': alg.rotate,
@@ -189,6 +190,7 @@ class  pyana_image ( object ) :
 
         self.n_shots = 0
         self.n_accum = 0
+        self.run = evt.run()
 
         self.data = {}
         for source in self.sources:
@@ -368,7 +370,8 @@ class  pyana_image ( object ) :
             # ----------- Event Image -----------
             if "image" in self.quantities:
                 self.data[addr].image   = image            
-
+                self.data[addr].vrange = (self.plot_vmin,self.plot_vmax)
+                
             if "projections" in self.quantities:
                 self.data[addr].showProj = True
                 
@@ -589,7 +592,7 @@ class  pyana_image ( object ) :
         for name,title,array in image_list :
             
             fname = filename.split('.')
-            label = name #address.replace("|","_").strip()
+            label = "%s_r%03d"%(name,self.run) #address.replace("|","_").strip()
             
             thename = ''
             for i in range (len(fname)-1):
