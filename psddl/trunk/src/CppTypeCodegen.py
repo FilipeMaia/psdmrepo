@@ -186,6 +186,7 @@ class CppTypeCodegen ( object ) :
                 print >>self._inc, T("  virtual ~$name();")[self._type]
                 print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
 
+        # XXX pypsana support XXX
         # generate an operator== method (required for boost::python::vector_indexing_suite)
         print >>self._inc, T("  bool operator==(const $name &t) const { return this == &t; }")(locals())
 
