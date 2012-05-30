@@ -426,7 +426,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             print "No such file. Please select instrument and experiment"
             return
 
-        if len(files) > 0 :
+        if files:
             self.clear_file_list()
             for file in files:
                 self.add_file( str(file) )
@@ -435,7 +435,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             print "No files found"
             return
 
-        self.scan_files_quick()
+        if files :
+            self.scan_files_quick()
                 
         
     def add_file(self, filename):
@@ -468,7 +469,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         for file in selectedfiles :
             self.add_file( str(file) )
 
-        self.scan_files_quick()
+        if selectedfiles :
+            self.scan_files_quick()
 
     def add_file_from_lineedit(self):
         """Add a file from lineedit
@@ -478,7 +480,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         filename = str(self.lineedit.text())
         self.add_file(filename)
 
-        self.scan_files_quick()
+        if self.filenames :
+            self.scan_files_quick()
         
     def clear_file_list(self):
         """Empty the file list

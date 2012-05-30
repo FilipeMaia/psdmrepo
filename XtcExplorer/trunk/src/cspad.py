@@ -51,8 +51,8 @@ class CsPad( object ):
     def cspad2x2_alignment(self, path = None, file=None):
         print "No alignment of 2x2 currently"
         return
-
-    def cspae_alignment(self, path = None, file=None):
+    
+    def cspad_alignment(self, path = None, file=None):
         """Alignment calibrations as defined for psana.
         Read in these standard parameter files. Alternative
         path/file can be given by arguments
