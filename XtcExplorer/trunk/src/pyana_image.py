@@ -183,6 +183,9 @@ class  pyana_image ( object ) :
             self.n_dark[addr] = 0
 
 
+    def beginrun( self, evt, env ):
+        self.n_shots = 0
+        self.run = evt.run()
 
 
     def beginjob ( self, evt, env ) : 
@@ -190,7 +193,6 @@ class  pyana_image ( object ) :
 
         self.n_shots = 0
         self.n_accum = 0
-        self.run = evt.run()
 
         self.data = {}
         for source in self.sources:
@@ -572,7 +574,7 @@ class  pyana_image ( object ) :
         for addr in self.sources:
             # collect averages
             if 'average' in self.quantities:
-                print "saving average from ", self.n_good[addr], " events. "
+                #print "saving average from ", self.n_good[addr], " events. "
                 self.data[addr].counter = self.n_good[addr]
                 self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
 

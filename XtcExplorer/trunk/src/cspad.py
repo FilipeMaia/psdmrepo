@@ -35,8 +35,12 @@ class CsPad( object ):
         # the 90-degree rotation of the sections). This improves
         # the image visually, but requires interpolation, 
         # and makes the display rather slow... 
-        
-        self.read_alignment(path)
+
+        print "Sections ", sections, len(sections)
+        if len(sections)>2 :
+            self.cspad_alignment(path)
+        else :
+            self.cspad2x2_alignment(path)
         
         self.x_coordinates = None
         self.y_coordinates = None
@@ -44,7 +48,11 @@ class CsPad( object ):
         #self.make_coordinate_map()
 
 
-    def read_alignment(self, path = None, file=None):
+    def cspad2x2_alignment(self, path = None, file=None):
+        print "No alignment of 2x2 currently"
+        return
+
+    def cspae_alignment(self, path = None, file=None):
         """Alignment calibrations as defined for psana.
         Read in these standard parameter files. Alternative
         path/file can be given by arguments
