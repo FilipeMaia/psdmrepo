@@ -1,9 +1,9 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: DdlPyanaInterfaces.py 3643 2012-05-26 04:23:12Z jbarrera@SLAC.STANFORD.EDU $
+#  $Id: DdlPythonInterfaces.py 3643 2012-05-26 04:23:12Z jbarrera@SLAC.STANFORD.EDU $
 #
 # Description:
-#  Module DdlPyanaInterfaces...
+#  Module DdlPythonInterfaces...
 #
 #------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: DdlPyanaInterfaces.py 3643 2012-05-26 04:23:12Z jbarrera@SLAC.STANFORD.EDU $
+@version $Id: DdlPythonInterfaces.py 3643 2012-05-26 04:23:12Z jbarrera@SLAC.STANFORD.EDU $
 
 @author Andrei Salnikov
 """
@@ -42,7 +42,7 @@ import string
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from psddl.PyanaCodegen import PyanaCodegen
+from psddl.PythonCodegen import PythonCodegen
 from psddl.Package import Package
 from psddl.Type import Type
 from psddl.Template import Template as T
@@ -58,7 +58,7 @@ from psddl.Template import Template as T
 #---------------------
 #  Class definition --
 #---------------------
-class DdlPyanaInterfaces ( object ) :
+class DdlPythonInterfaces ( object ) :
 
     #----------------
     #  Constructor --
@@ -105,21 +105,21 @@ class DdlPyanaInterfaces ( object ) :
         # add necessary includes to include file
         print >>self.inc, msg
         print >>self.inc, "#include <vector>"
-        print >>self.inc, "#include \"ndarray/ndarray.h\""
-        print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
+        print >>self.inc, "#include <ndarray/ndarray.h>"
+        print >>self.inc, "#include <pdsdata/xtc/TypeId.hh>"
         if self.pywrapper:
-            print >>self.inc, "#include \"psddl_pypsana/DdlWrapper.h\""
+            print >>self.inc, "#include <psddl_python/DdlWrapper.h>"
 
         # add necessary includes to source file
         print >>self.cpp, msg
         print >>self.cpp, "#include <cstddef>"
         if self.pywrapper:
             inc_psana = "psddl_psana/" + string.replace(inc_base, ".wrapper", "")
-            inc_pypsana = "psddl_pypsana/" + inc_base
-            print >>self.cpp, "#include \"%s\" // inc_psana" % inc_psana
-            print >>self.cpp, "#include \"%s\" // inc_pypsana" % inc_pypsana
+            inc_python = "psddl_python/" + inc_base
+            print >>self.cpp, "#include <%s> // inc_psana" % inc_psana
+            print >>self.cpp, "#include <%s> // inc_python" % inc_python
         else:
-            print >>self.cpp, "#include \"psddl_psana/%s\"" % inc
+            print >>self.cpp, "#include <psddl_psana/%s>" % inc
 
         # headers for other included packages
         for use in model.use:
@@ -130,7 +130,7 @@ class DdlPyanaInterfaces ( object ) :
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
-                print >>self.inc, "#include \"%s\"" % header
+                print >>self.inc, "#include <%s> // other included packages" % header
 
         if self.top_pkg : 
             print >>self.inc, T("namespace $top_pkg {")[self]
@@ -194,7 +194,8 @@ class DdlPyanaInterfaces ( object ) :
 
         if self.pywrapper:
             # end createWrappers()
-            print >>self.cpp, "}"
+            print >>self.cpp, ""
+            print >>self.cpp, "} // createWrappers()"
             # now create EventGetter and EnvironmentGetter classes
             for ns in pkg.namespaces() :
                 if isinstance(ns, Type) :
@@ -216,7 +217,7 @@ class DdlPyanaInterfaces ( object ) :
 
         # type is abstract by default but can be reset with tag "value-type"
         abstract = not type.value_type
-        codegen = PyanaCodegen(self.inc, self.cpp, type, abstract, namespace_prefix)
+        codegen = PythonCodegen(self.inc, self.cpp, type, abstract, namespace_prefix)
         codegen.codegen()
 
     def _parseType2(self, type, namespace_prefix = ""):

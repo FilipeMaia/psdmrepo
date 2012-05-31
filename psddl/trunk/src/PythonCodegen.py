@@ -1,9 +1,9 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: PyanaCodegen.py 3615 2012-05-22 17:50:05Z jbarrera@SLAC.STANFORD.EDU $
+#  $Id: PythonCodegen.py 3615 2012-05-22 17:50:05Z jbarrera@SLAC.STANFORD.EDU $
 #
 # Description:
-#  Module PyanaCodegen...
+#  Module PythonCodegen...
 #
 #------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: PyanaCodegen.py 3615 2012-05-22 17:50:05Z jbarrera@SLAC.STANFORD.EDU $
+@version $Id: PythonCodegen.py 3615 2012-05-22 17:50:05Z jbarrera@SLAC.STANFORD.EDU $
 
 @author Andrei Salnikov
 """
@@ -88,7 +88,7 @@ def _dimexpr(dims):
 #---------------------
 #  Class definition --
 #---------------------
-class PyanaCodegen ( object ) :
+class PythonCodegen ( object ) :
 
     #----------------
     #  Constructor --
@@ -109,7 +109,7 @@ class PyanaCodegen ( object ) :
 
     def codegen(self):
 
-        logging.debug("PyanaCodegen.codegen: type=%s", repr(self._type))
+        logging.debug("PythonCodegen.codegen: type=%s", repr(self._type))
 
         # class-level comment
         print >>self._inc, T("\n/** @class $name\n\n  $comment\n*/\n")[self._type]
