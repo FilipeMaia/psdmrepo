@@ -172,7 +172,7 @@ class PyanaCodegen ( object ) :
 
             print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
             print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
-            print >>self._cpp, T("\n#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\\")(locals())
+            print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
 
         else:
             if not self._abs:
@@ -217,10 +217,8 @@ class PyanaCodegen ( object ) :
                 print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
             print >>self._cpp, T('  std_vector_class_($name);')(locals())
             print >>self._cpp, '#undef _CLASS';
-            if name.find('DataV') == 0 or name.find('DataDescV') == 0:
-                print >>self._cpp, T('  EVT_GETTER($wrapped);')(locals())
-            elif name.find('ConfigV') == 0:
-                print >>self._cpp, T('  ENV_GETTER($wrapped);')(locals())
+            if name.find('DataV') == 0 or name.find('DataDescV') == 0 or name.find('ConfigV') == 0:
+                print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
             print >>self._cpp, ""
 
         # close pragma pack

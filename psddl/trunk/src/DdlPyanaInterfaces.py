@@ -108,7 +108,7 @@ class DdlPyanaInterfaces ( object ) :
         print >>self.inc, "#include \"ndarray/ndarray.h\""
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         if self.pywrapper:
-            print >>self.inc, "#include \"psddl_pypsana/PyWrapper.h\""
+            print >>self.inc, "#include \"psddl_pypsana/DdlWrapper.h\""
 
         # add necessary includes to source file
         print >>self.cpp, msg
@@ -223,7 +223,7 @@ class DdlPyanaInterfaces ( object ) :
         type_name = type.name
         if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
             print >>self.inc, ''
-            print >> self.inc, T('  class ${type_name}_EvtGetter : public Psana::EvtGetter {')(locals())
+            print >> self.inc, T('  class ${type_name}_Getter : public Psana::EvtGetter {')(locals())
             print >> self.inc, '  public:'
             print >> self.inc, '    const char* getTypeName() {'
             print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
@@ -248,7 +248,7 @@ class DdlPyanaInterfaces ( object ) :
             print >> self.inc, '  };'
         elif type_name.find('ConfigV') == 0:
             print >>self.inc, ''
-            print >> self.inc, T('  class ${type_name}_EnvGetter : public Psana::EnvGetter {')(locals())
+            print >> self.inc, T('  class ${type_name}_Getter : public Psana::EnvGetter {')(locals())
             print >> self.inc, '  public:'
             print >> self.inc, '    const char* getTypeName() {'
             print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
