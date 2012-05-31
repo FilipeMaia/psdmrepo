@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <psddl_psana/lusi.ddl.h> // inc_psana
-#include <psddl_pyana/lusi.ddl.wrapper.h> // inc_pyana
+#include <psddl_python/lusi.ddl.wrapper.h> // inc_pyana
 namespace Psana {
 namespace Lusi {
 using namespace boost::python;

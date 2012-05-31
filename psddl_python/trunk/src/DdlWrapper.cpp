@@ -1,4 +1,4 @@
-#include <psddl_pyana/DdlWrapper.h>
+#include <psddl_python/DdlWrapper.h>
 
 using boost::python::numeric::array;
 

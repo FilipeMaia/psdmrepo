@@ -3,7 +3,7 @@
 
 #include <string>
 #include <boost/python/class.hpp>
-#include <psddl_pyana/GenericGetter.h>
+#include <psddl_python/GenericGetter.h>
 #include <PSEvt/Event.h>
 
 namespace Psana {

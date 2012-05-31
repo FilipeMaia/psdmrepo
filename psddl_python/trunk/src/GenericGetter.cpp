@@ -1,6 +1,6 @@
 #include <string>
 #include <map>
-#include <psddl_pyana/GenericGetter.h>
+#include <psddl_python/GenericGetter.h>
 
 using std::string;
 using std::map;

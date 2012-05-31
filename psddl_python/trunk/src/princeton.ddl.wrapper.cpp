@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <psddl_psana/princeton.ddl.h> // inc_psana
-#include <psddl_pyana/princeton.ddl.wrapper.h> // inc_pyana
+#include <psddl_python/princeton.ddl.wrapper.h> // inc_pyana
 namespace Psana {
 namespace Princeton {
 using namespace boost::python;

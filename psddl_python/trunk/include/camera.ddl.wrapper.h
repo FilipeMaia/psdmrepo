@@ -6,7 +6,7 @@
 #include <vector>
 #include <ndarray/ndarray.h>
 #include <pdsdata/xtc/TypeId.hh>
-#include <psddl_pyana/DdlWrapper.h>
+#include <psddl_python/DdlWrapper.h>
 namespace Psana {
 namespace Camera {
 

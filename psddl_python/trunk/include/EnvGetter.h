@@ -2,7 +2,7 @@
 #define PSANA_ENVGETTER_H 1
 
 #include <boost/python/class.hpp>
-#include <psddl_pyana/GenericGetter.h>
+#include <psddl_python/GenericGetter.h>
 #include <PSEnv/Env.h>
 
 namespace Psana {
