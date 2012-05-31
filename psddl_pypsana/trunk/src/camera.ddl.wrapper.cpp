@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/camera.ddl.h" // inc_psana
-#include "psddl_pypsana/camera.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/camera.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Camera {
 using namespace boost::python;

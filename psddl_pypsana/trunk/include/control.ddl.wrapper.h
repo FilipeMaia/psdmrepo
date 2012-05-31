@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/DdlWrapper.h"
+#include "psddl_pyana/DdlWrapper.h"
 #include "pdsdata/xtc/ClockTime.hh"
 namespace Psana {
 namespace ControlData {

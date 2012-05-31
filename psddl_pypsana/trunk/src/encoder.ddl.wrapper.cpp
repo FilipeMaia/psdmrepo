@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/encoder.ddl.h" // inc_psana
-#include "psddl_pypsana/encoder.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/encoder.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Encoder {
 using namespace boost::python;

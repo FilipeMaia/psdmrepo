@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/ipimb.ddl.h" // inc_psana
-#include "psddl_pypsana/ipimb.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/ipimb.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Ipimb {
 using namespace boost::python;

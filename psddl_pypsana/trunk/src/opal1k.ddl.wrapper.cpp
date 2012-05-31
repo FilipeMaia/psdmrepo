@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/opal1k.ddl.h" // inc_psana
-#include "psddl_pypsana/opal1k.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/opal1k.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Opal1k {
 using namespace boost::python;

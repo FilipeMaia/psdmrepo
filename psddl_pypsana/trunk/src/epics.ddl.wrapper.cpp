@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/epics.ddl.h" // inc_psana
-#include "psddl_pypsana/epics.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/epics.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Epics {
 using namespace boost::python;

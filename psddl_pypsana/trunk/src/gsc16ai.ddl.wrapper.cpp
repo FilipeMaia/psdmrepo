@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/gsc16ai.ddl.h" // inc_psana
-#include "psddl_pypsana/gsc16ai.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/gsc16ai.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Gsc16ai {
 using namespace boost::python;

@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/timepix.ddl.h" // inc_psana
-#include "psddl_pypsana/timepix.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/timepix.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace Timepix {
 using namespace boost::python;

@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/evr.ddl.h" // inc_psana
-#include "psddl_pypsana/evr.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/evr.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace EvrData {
 using namespace boost::python;

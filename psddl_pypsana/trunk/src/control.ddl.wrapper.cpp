@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/control.ddl.h" // inc_psana
-#include "psddl_pypsana/control.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/control.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace ControlData {
 using namespace boost::python;

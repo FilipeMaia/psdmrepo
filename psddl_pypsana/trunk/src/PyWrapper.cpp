@@ -23,7 +23,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include <psddl_pypsana/PyWrapper.h>
+#include <psddl_pyana/PyWrapper.h>
 
 //-----------------
 // C/C++ Headers --
@@ -48,7 +48,7 @@
 #include "PSEvt/EventId.h"
 #include "PSEvt/ProxyDictI.h"
 #include "ConfigSvc/ConfigSvc.h"
-#include <psddl_pypsana/GenericGetter.h>
+#include <psddl_pyana/GenericGetter.h>
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

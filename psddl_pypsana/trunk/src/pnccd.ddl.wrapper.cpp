@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/pnccd.ddl.h" // inc_psana
-#include "psddl_pypsana/pnccd.ddl.wrapper.h" // inc_pypsana
+#include "psddl_pyana/pnccd.ddl.wrapper.h" // inc_pypsana
 namespace Psana {
 namespace PNCCD {
 using namespace boost::python;
