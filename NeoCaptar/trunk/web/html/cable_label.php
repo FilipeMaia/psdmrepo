@@ -26,8 +26,9 @@ function report_error($msg) {
 }
 function label($pdf, $cable, $now, $src2dst=true) {
 
-    $font_size = 8;
+    $font_size = 7;
     $angle = 0;
+    $max_length = 18;
 
     // Visible areas:
     //
@@ -48,29 +49,29 @@ function label($pdf, $cable, $now, $src2dst=true) {
 
     $pdf->selectFont( './fonts/Courier-Bold.afm' );
 
-    $pdf->addText  (    25, 29, $font_size, $cable->cable(),            $angle);
-    $pdf->addText  (145+25, 29, $font_size, $cable->cable(),            $angle);
+    $pdf->addText  (    25, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->addText  (145+25, 29, $font_size, $cable->cable(),                                    $angle);
 
-    $pdf->addText  (     8, 22, $font_size, "to:", $angle);
-    $pdf->addText  (    25, 22, $font_size, $cable->destination_name(), $angle);
+    $pdf->addText  (     8, 22, $font_size, "to:",                                              $angle);
+    $pdf->addText  (    25, 22, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
 
-    $pdf->addText  (145+ 8, 22, $font_size, "to:", $angle);
-    $pdf->addText  (145+25, 22, $font_size, $cable->origin_name(),      $angle);
+    $pdf->addText  (145+ 8, 22, $font_size, "to:",                                              $angle);
+    $pdf->addText  (145+25, 22, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
 
-    $pdf->addText  (     8, 16, $font_size, "fr:",                      $angle);
-    $pdf->addText  (    25, 16, $font_size, $cable->origin_name(),      $angle);
+    $pdf->addText  (     8, 16, $font_size, "fr:",                                              $angle);
+    $pdf->addText  (    25, 16, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
 
-    $pdf->addText  (145+ 8, 16, $font_size, "to:",                      $angle);
-    $pdf->addText  (145+25, 16, $font_size, $cable->destination_name(), $angle);
+    $pdf->addText  (145+ 8, 16, $font_size, "fr:",                                              $angle);
+    $pdf->addText  (145+25, 16, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
 
-    $pdf->addText  (     8,  9, $font_size, "fn:",                      $angle);
-    $pdf->addText  (    25,  9, $font_size, $cable->func(),             $angle);
+    $pdf->addText  (     8,  9, $font_size, "fn:",                                              $angle);
+    $pdf->addText  (    25,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
 
-    $pdf->addText  (145+ 8,  9, $font_size, "fn:",                      $angle);
-    $pdf->addText  (145+25,  9, $font_size, $cable->func(),             $angle);
+    $pdf->addText  (145+ 8,  9, $font_size, "fn:",                                              $angle);
+    $pdf->addText  (145+25,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
 
-    $pdf->addText  (    25,  2, $font_size,       $cable->device(),     $angle);
-    $pdf->addText  (145+25,  2, $font_size,       $cable->device(),     $angle);
+    $pdf->addText  (    25,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
+    $pdf->addText  (145+25,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
 
 //    $pdf->addText  (    25, 28, $font_size, $cable->cable(),            $angle);
 //    $pdf->addText  (145+25, 28, $font_size, $cable->cable(),            $angle);

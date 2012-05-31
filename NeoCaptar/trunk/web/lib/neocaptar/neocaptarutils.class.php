@@ -268,20 +268,29 @@ class NeoCaptarUtils {
 
         $pending = array();
         foreach( $neocaptar->notify_queue() as $entry ) {
-            array_push(
-                $pending,
-                array(
-                    'id'                     => $entry->id(),
-                    'event_type_id'          => $entry->event_type()->id(),
-                    'event_type_name'        => $entry->event_type()->name(),
-                    'event_type_description' => $entry->event_type()->description(),
-                    'event_time'             => $entry->event_time()->toStringShort(),
-                    'event_time_64'          => $entry->event_time()->to64(),
-                    'originator_uid'         => $entry->originator_uid(),
-                    'recipient_uid'          => $entry->recipient_uid(),
-                    'recipient_role'         => $entry->event_type()->recipient_role_name()
-                )
+            $event_type = $entry->event_type();
+            $event = array(
+                'id'                     => $entry->id(),
+                'event_type_id'          => $event_type->id(),
+                'event_type_name'        => $event_type->name(),
+                'event_type_description' => $event_type->description(),
+                'event_time'             => $entry->event_time()->toStringShort(),
+                'event_time_64'          => $entry->event_time()->to64(),
+                'originator_uid'         => $entry->originator_uid(),
+                'recipient_uid'          => $entry->recipient_uid(),
+                'recipient_role'         => $event_type->recipient_role_name(),
+                'scope'                  => $event_type->scope()
             );
+            $extra = $entry->extra();
+            switch($event_type->scope()) {
+                case 'PROJECT':
+                    $event['project_id'] = is_null($extra) ? '0' : $extra['project_id'];
+                    break;
+                case 'CABLE':
+                    $event['cable_id'] =  is_null($extra) ? '0' : $extra['cable_id'];
+                    break;
+            }
+            array_push($pending, $event);
         }
         return array(
             'access'      => $access2array,

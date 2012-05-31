@@ -238,7 +238,8 @@ function p_appl_admin() {
         var c = this.cablenumber[cnidx];
         var elem = $('#admin-cablenumbers-cablenumbers');
         elem.find('div[name="range_'+cnidx+'"]').html(
-            '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" /><input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
+            '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" />'+
+            '<input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
         );
         if(c.prefix == '')
             elem.find('div[name="prefix_'+cnidx+'"]').html(
@@ -258,7 +259,7 @@ function p_appl_admin() {
         }
         var params = { id: c.id, first:first, last:last };
         if(c.prefix == '') {
-            var prefix = elem.find('div[name="range_'+cnidx+'"]').find('input[name="prefix"]').val();
+            var prefix = elem.find('div[name="prefix_'+cnidx+'"]').find('input[name="prefix"]').val();
             if( prefix != '' ) params.prefix = prefix;
         }
         var jqXHR = $.get('../neocaptar/cablenumber_save.php',params,function(data) {
@@ -694,6 +695,22 @@ function p_appl_admin() {
         var rows = [];
         for( var i in this.notify_pending ) {
             var entry = this.notify_pending[i];
+            var find_button = '';
+            if(( entry.scope == 'CABLE' ) && ( entry.event_type_name != 'on_cable_delete')) {
+                find_button = Button_HTML('find cable', {
+                        name:    'find_'+i,
+                        classes: 'admin-notifications-pending-tools',
+                        onclick: "global_search_cable_by_id('"+entry.cable_id+"')",
+                        title:   'display this cable if it is still available'
+                    });
+            } else if(( entry.scope == 'PROJECT' ) && ( entry.event_type_name != 'on_project_delete')) {
+                find_button = Button_HTML('find project', {
+                        name:    'find_'+i,
+                        classes: 'admin-notifications-pending-tools',
+                        onclick: "global_search_project_by_id('"+entry.project_id+"')",
+                        title:   'display this project if it is still available'
+                    });
+            }
             rows.push([
                 entry.event_time,
                 entry.event_type_description,
@@ -712,7 +729,8 @@ function p_appl_admin() {
                         classes: 'admin-notifications-pending-tools',
                         onclick: "admin.notify_pending_delete('"+i+"')",
                         title:   'delete this entry from the queue'
-                    }) : ''
+                    })+' '+
+                    find_button : ''
                 ]);
         }
         var table = new Table('admin-notifications-pending', hdr, rows );

@@ -400,16 +400,14 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER` ;
 
 CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER` (
-
   `id`       INT          NOT NULL AUTO_INCREMENT ,
   `location` VARCHAR(32)  NOT NULL ,
   `prefix`   VARCHAR(2)   NOT NULL ,
   `first`    INT UNSIGNED NOT NULL ,
   `last`     INT UNSIGNED NOT NULL ,
-
   PRIMARY KEY (`id`) ,
-  UNIQUE KEY `location` (`location`))
-
+  UNIQUE KEY `location` (`location`) ,
+  UNIQUE KEY `prefix`   (`prefix`))
 ENGINE = InnoDB;
 
 

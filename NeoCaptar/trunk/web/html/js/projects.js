@@ -371,7 +371,7 @@ function p_appl_projects() {
 '    <td nowrap="nowrap" class="table_hdr">conn #</td>'+
 '    <td nowrap="nowrap" class="table_hdr">station</td>'+
 '    <td nowrap="nowrap" class="table_hdr">contype</td>'+
-'    <td nowrap="nowrap" class="table_hdr">pinlist</td>'+
+'    <td nowrap="nowrap" class="table_hdr">pinlist / drawing</td>'+
 '    <td nowrap="nowrap" class="table_hdr">instr</td>' : '';
         html += cols2display.modified ?
 '    <td nowrap="nowrap" class="table_hdr">modified</td>'+
@@ -1060,7 +1060,7 @@ function p_appl_projects() {
 						if( pinlist == cable.origin.pinlist ) html += ' selected="selected"';
 						html += ' value="'+pinlist+'">'+pinlist+'</option>';
 					}
-					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist for the given connector type" >New...</option>'
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing) for the given connector type" >New...</option>'
 					html += '</select>';
 					base.html(html);
 					base.find('select').change(function() {
@@ -1320,7 +1320,7 @@ function p_appl_projects() {
 						if( pinlist == cable.destination.pinlist ) html += ' selected="selected"';
 						html += ' value="'+pinlist+'">'+pinlist+'</option>';
 					}
-					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist for the given connector type" >New...</option>'
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing) for the given connector type" >New...</option>'
 					html += '</select>';
 					base.html(html);
 					base.find('select').change(function() {
@@ -1552,7 +1552,7 @@ function p_appl_projects() {
 '        <td class="table_cell table_cell_right">                               <div class="origin_name"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Location'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="origin_loc"></div></td></tr>'+
-'    <tr><td class="table_cell table_cell_left">Rack</td>'+
+'    <tr><td class="table_cell table_cell_left">Rack / Equipment</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="origin_rack"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Elevation</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="origin_ele"></div></td></tr>'+
@@ -1566,7 +1566,7 @@ function p_appl_projects() {
 '        <td class="table_cell table_cell_right">                               <div class="origin_station"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Connector Type'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="origin_conntype"></div></td></tr>'+
-'    <tr><td class="table_cell table_cell_left">Pinlist'+required_field_html+'</td>'+
+'    <tr><td class="table_cell table_cell_left">Pinlist / Drawing'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="origin_pinlist"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left  table_cell_bottom">Instruction</td>'+
 '        <td class="table_cell table_cell_right table_cell_bottom">             <div class="origin_instr"></div></td></tr>'+
@@ -1578,7 +1578,7 @@ function p_appl_projects() {
 '        <td class="table_cell table_cell_right">                               <div class="destination_name"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Location'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="destination_loc"></div></td></tr>'+
-'    <tr><td class="table_cell table_cell_left">Rack</td>'+
+'    <tr><td class="table_cell table_cell_left">Rack / Equipment</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="destination_rack"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Elevation</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="destination_ele"></div></td></tr>'+
@@ -1592,7 +1592,7 @@ function p_appl_projects() {
 '        <td class="table_cell table_cell_right">                               <div class="destination_station"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left">Connector Type'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="destination_conntype"</div></td></tr>'+
-'    <tr><td class="table_cell table_cell_left">Pinlist'+required_field_html+'</td>'+
+'    <tr><td class="table_cell table_cell_left">Pinlist / Drawing'+required_field_html+'</td>'+
 '        <td class="table_cell table_cell_right">                               <div class="destination_pinlist"></div></td></tr>'+
 '    <tr><td class="table_cell table_cell_left  table_cell_bottom">Instruction</td>'+
 '        <td class="table_cell table_cell_right table_cell_bottom">             <div class="destination_instr"></div></td></tr>'+

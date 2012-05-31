@@ -1316,6 +1316,7 @@ class NeoCaptar {
         $cable = $this->find_cable_by_id($id);
         if( is_null($cable)) return;
         $this->add_project_event($cable->project(), 'Delete Cable', $cable->dump2array());
+        $this->add_notification_event4cable('on_cable_delete', $new_cable,  $cable->dump2array());
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.cable WHERE id={$id}" );
     }
 
@@ -1472,15 +1473,37 @@ class NeoCaptar {
 
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='{$cablenumber}' WHERE id={$cable->id()}");
 
+        $this->add_notification_event4cable('on_register', $cable, '');
         return $this->change_cable_status($cable,'Registered');
     }
-    public function label_cable     ($cable) { return $this->change_cable_status($cable,'Labeled');      }
-    public function fabricate_cable ($cable) { return $this->change_cable_status($cable,'Fabrication');  }
-    public function ready_cable     ($cable) { return $this->change_cable_status($cable,'Ready');        }
-    public function install_cable   ($cable) { return $this->change_cable_status($cable,'Installed');    }
-    public function commission_cable($cable) { return $this->change_cable_status($cable,'Commissioned'); }
-    public function damage_cable    ($cable) { return $this->change_cable_status($cable,'Damaged');      }
-    public function retire_cable    ($cable) { return $this->change_cable_status($cable,'Retired');      }
+    public function label_cable($cable) {
+        $this->add_notification_event4cable('on_label', $cable, '');
+        return $this->change_cable_status($cable,'Labeled');
+    }
+    public function fabricate_cable($cable) {
+        $this->add_notification_event4cable('on_fabrication', $cable, '');
+        return $this->change_cable_status($cable,'Fabrication');
+    }
+    public function ready_cable($cable) {
+        $this->add_notification_event4cable('on_ready', $cable, '');
+        return $this->change_cable_status($cable,'Ready');
+    }
+    public function install_cable($cable) {
+        $this->add_notification_event4cable('on_install', $cable, '');
+        return $this->change_cable_status($cable,'Installed');
+    }
+    public function commission_cable($cable) {
+        $this->add_notification_event4cable('on_commission', $cable, '');
+        return $this->change_cable_status($cable,'Commissioned');
+    }
+    public function damage_cable($cable) {
+        $this->add_notification_event4cable('on_damage', $cable, '');
+        return $this->change_cable_status($cable,'Damaged');
+    }
+    public function retire_cable($cable) {
+        $this->add_notification_event4cable('on_retire', $cable, '');
+        return $this->change_cable_status($cable,'Retired');
+    }
 
     public function un_register_cable($cable) {
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='' WHERE id={$cable->id()}");
@@ -1563,6 +1586,24 @@ class NeoCaptar {
         if( is_null($entry)) return;
         switch($entry->event_type()->scope()) {
             case 'CABLE':
+                $cable_id      = 0;
+                $cable_info    = '';
+                $project_title = '<unknown>';
+                $project_owner = '<unknown>';
+                $extra = $entry->extra();
+                if( !is_null($extra)) {
+                    $cable_id      = $extra['cable_id'];
+                    $cable_info    = $extra['cable_info'];
+                    $project_title = $extra['project_title'];
+                    $project_owner = $extra['project_owner_uid'];
+                }
+                $this->notify4cable (
+                    $entry->recipient_uid(),
+                    $entry->event_type()->description(),
+                    $cable_id, $cable_info,
+                    $project_title, $project_owner,
+                    $entry->originator_uid(),
+                    $entry->event_time());
                 break;
             case 'PROJECT':
                 $project_id       = 0;
@@ -1697,7 +1738,7 @@ class NeoCaptar {
         // TODO: Change recipient e-mail to the real guy!
         //
         $address = 'gapon@slac.stanford.edu';
-        $subject = 'Project Notification';
+        $subject = 'Project Event Notification';
         $body =<<<HERE
 This is an automated notification message on the following event:
         
@@ -1714,6 +1755,158 @@ Project URL (if the project is still available):
 The change was made by user:       {$originator_uid} {$originator_name}
 The time when the change was made: {$event_time->toStringShort()}
 
+
+    **********************************************************************************
+    * The message was sent by the automated notification system because your account *
+    * was subscribed to recieve notifications on certain cable management events.    *
+    * You can manage your subscriptions using the following URL:                     *
+    *                                                                                *
+    *   https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=admin:notifications  *
+    *                                                                                *
+    **********************************************************************************
+
+HERE;
+        NeoCaptar::notify( $address, $subject, $body );
+    }
+
+    public function add_notification_event4cable($event_name, $cable, $cable_info) {
+
+        $event_name = trim($event_name);
+        $event_time = LusiTime::now();
+
+        $originator_uid = trim(AuthDB::instance()->authName());
+
+        // Look for who might be interested in the event
+        //
+        $recipients = array();
+        foreach( $this->notifications() as $notify ) {
+
+            // Skip notifications which aren't enabled regardless of what
+            // they're abou.
+            //
+            if( !$notify->enabled()) continue;
+
+            // Skip unrelated notifications
+            //
+            $event_type = $notify->event_type();
+
+            if( !(( $event_type->scope() == 'CABLE' ) && ( $event_type->name() == $event_name ))) continue;
+
+            // Skip project managers who aren't supposed to be interested in someone
+            // else's projects.
+            //
+            $recipient_uid  = $notify->uid();
+            $recipient_type = $event_type->recipient();
+
+            if(( $recipient_type == 'PROJMANAGER' ) && ( $cable->project()->owner() != $recipient_uid )) continue;
+
+            array_push(
+                $recipients,
+                array(
+                    'recipient_uid' => $recipient_uid,
+                    'event_type'    => $event_type
+                )
+            );
+        }
+
+        // Evaluate each recipient to see if an instant event notification
+        // has to be sent now, or it has to be placed into the wait queue.
+        //
+        $schedule = $this->notify_schedule();
+
+        foreach( $recipients as $entry ) {
+            $recipient_uid = $entry['recipient_uid'];
+            $event_type    = $entry['event_type'];
+            switch($schedule[$event_type->recipient()]) {
+                case 'INSTANT': $this->notify4cable_instant( $recipient_uid, $event_type->description(), $cable, $cable_info, $originator_uid, $event_time ); break;
+                case 'DELAYED': $this->notify4cable_delayed( $recipient_uid, $event_type->id(),          $cable, $cable_info, $originator_uid, $event_time ); break;
+            }
+        }
+    }
+    private function notify4cable_instant (
+        $recipient_uid,
+        $event_type_description,
+        $cable, $cable_info,
+        $originator_uid,
+        $event_time ) {
+
+        $this->notify4cable (
+            $recipient_uid,
+            $event_type_description,
+            $cable->id(), $cable_info,
+            $cable->project()->title(), $cable->project()->owner(),
+            $originator_uid,
+            $event_time );
+    }
+    private function notify4cable_delayed (
+        $recipient_uid,
+        $event_type_id,
+        $cable, $cable_info,
+        $originator_uid,
+        $event_time ) {
+
+        $recipient_uid_escaped  = $this->connection->escape_string(trim($recipient_uid));
+        $originator_uid_escaped = $this->connection->escape_string(trim($originator_uid));
+
+        /* TODO: Store this in the database table.
+         */
+        $cable_info_escaped    = $this->connection->escape_string( trim( $cable_info));
+        $project_title_escaped = $this->connection->escape_string( trim( $cable->project()->title()));
+        $project_owner_escaped = $this->connection->escape_string( trim( $cable->project()->owner()));
+
+        $this->connection->query(
+            "INSERT INTO {$this->connection->database}.notify_queue".
+            " VALUES(NULL,{$event_type_id},{$event_time->to64()},'{$originator_uid_escaped}','{$recipient_uid_escaped}')"
+        );
+        $entry = $this->find_notify_queue_entry_by_('id IN (SELECT LAST_INSERT_ID())');
+        $this->connection->query(
+            "INSERT INTO {$this->connection->database}.notify_queue_cable".
+            " VALUES({$entry->id()},{$cable->id()},'{$cable_info_escaped}','{$project_title_escaped}','{$project_owner_escaped}')"
+        );
+    }
+    private function notify4cable (
+        $recipient_uid,
+        $event_type_description,
+        $cable_id, $cable_info,
+        $project_title, $project_owner,
+        $originator_uid,
+        $event_time ) {
+
+        $project_owner_name = '';
+        $user = $this->find_user_by_uid($project_owner);
+        if( !is_null($user)) $project_owner_name = "({$user->name()})";
+
+        $originator_name = '';
+        $user = $this->find_user_by_uid($originator_uid);
+        if( !is_null($user)) $originator_name = "({$user->name()})";
+
+        $cable_info_option = '';
+        if( $cable_info ) $cable_info_option =<<<HERE
+Addition information on the cable event (if any):
+
+{$cable_info}
+HERE;
+
+        // TODO: Change recipient e-mail to the real guy!
+        //
+        $address = 'gapon@slac.stanford.edu';
+        $subject = 'Cable Event Notification';
+        $body =<<<HERE
+This is an automated notification message on the following event:
+        
+  '{$event_type_description}'
+  
+Project title: {$project_title}
+Project owner: {$project_owner} {$project_owner_name}
+
+Cable URL (if the cable is still available):
+
+  https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=search:cables&cable_id={$cable_id}
+
+The change was made by user:       {$originator_uid} {$originator_name}
+The time when the change was made: {$event_time->toStringShort()}
+
+{$cable_info_option}
 
     **********************************************************************************
     * The message was sent by the automated notification system because your account *

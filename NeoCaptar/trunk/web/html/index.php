@@ -133,21 +133,6 @@ a:hover, a.link:hover {
   border-left: 1px solid #a0a0a0;
   border-right: 1px solid #a0a0a0;
 }
-#p-bottom {
-  z-index: 100;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 20px;
-  width: 100%;
-  background-color: #a0a0a0;
-  border-top: 1px solid #c0c0c0;
-}
-#p-status {
-  padding: 2px;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
-}
 #p-center {
   position: relative;
   top:130px;
@@ -315,9 +300,14 @@ div.v-item:hover {
  * ------------------------------------------------
  */
 function resize() {
+	$('#p-left').height($(window).height()-125-5);
+	$('#p-splitter').height($(window).height()-125-5);
+	$('#p-center').height($(window).height()-125-5);
+    /*
 	$('#p-left').height($(window).height()-125-20);
 	$('#p-splitter').height($(window).height()-125-20);
 	$('#p-center').height($(window).height()-125-20);
+    */
 }
 
 /* Get mouse position relative to the document.
@@ -1029,12 +1019,6 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
 
 <div id="p-splitter"></div>
 
-<div id="p-bottom">
-  <div id="p-status">
-    <center>- status bar to be here at some point -</center>
-  </div>
-</div>
-
 <div id="p-center">
   <div id="application-workarea">
 
@@ -1049,7 +1033,7 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
             -->
           <tr>
             <td><b>Project title:</b></td>
-            <td><input type="text" size=6 name="title" title="put in a text to match then press RETURN to search" /></td>
+            <td><input type="text" size=32 name="title" title="put in a text to match then press RETURN to search" /></td>
             <td></td>
             <td><b>Owner:</b></td>
             <td><select name="owner" style="padding:1px;">

@@ -139,9 +139,10 @@ class NeoCaptarProject {
         $this->connection->query($sql);
         $new_cable = $this->find_cable_by_('id IN (SELECT LAST_INSERT_ID())');
         if( is_null($new_cable)) return null;
-        $comments = array();
+
         $this->neocaptar->add_project_event($this, 'Add Cable', $new_cable->dump2array());
-        $this->neocaptar->add_cable_event ($new_cable,'Created',$comments);
+        $this->neocaptar->add_cable_event ($new_cable,'Created',array());
+        $this->neocaptar->add_notification_event4cable('on_cable_create', $new_cable, '');
         return $new_cable;
     }
     public function clone_cable($c) {
@@ -207,6 +208,7 @@ class NeoCaptarProject {
                 $new_cable->dump2array()
             )
         );
+        $this->neocaptar->add_notification_event4cable('on_cable_create', $new_cable, '');
         return $new_cable;
     }
     public function update_cable($cable,$params) {
@@ -257,6 +259,7 @@ class NeoCaptarProject {
         }
         if( !count($comments )) array_push($comments,'no changes to the cable were made');
         $this->neocaptar->add_cable_event($new_cable,'Modified', $comments);
+        $this->neocaptar->add_notification_event4cable('on_cable_edit', $new_cable, '');
         return $new_cable;
     }
     public function delete_cable_by_id( $id ) {
