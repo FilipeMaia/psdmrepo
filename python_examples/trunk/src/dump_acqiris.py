@@ -80,7 +80,7 @@ class dump_acqiris (object) :
 
             nch = config.nbrChannels()
             for ch in range(nch):
-                v = config.vert(ch)
+                v = config.vert()[ch]
                 print "  vert(%d):" % ch,
                 print "fullScale =", v.fullScale(),
                 print "slope =", v.slope(),
@@ -96,15 +96,17 @@ class dump_acqiris (object) :
         @param env    environment object
         """
 
-        acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
+        acqData = evt.getByType("Psana::Acqiris::DataDesc", self.m_src)
 
-        for chan, elem in enumerate(acqData):
+        nchan = acqData.data_shape()[0];
+        for chan in range(nchan):
+            elem = acqData.data(chan)
 
             print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
             print "  nbrSegments =", elem.nbrSegments()
             print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
-            print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
-            wf = elem.waveform()
+            print "  timestamps =", [elem.timestamp()[seg].pos() for seg in range(elem.nbrSegments())]
+            wf = elem.waveforms()
             print "  waveform [len=%d] = %s" % (len(wf), wf)
 
 

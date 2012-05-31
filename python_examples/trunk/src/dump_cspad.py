@@ -96,7 +96,10 @@ class dump_cspad ( object ) :
             print "  numAsicsStored: %s" % str(map(config.numAsicsStored, range(4)))
         except:
             pass
-        print "  sections      : %s" % str(map(config.sections, range(4)))
+        try:
+            print "  sections      : %s" % str(map(config.sections, range(4)))
+        except:
+            pass
 
 
     def event( self, evt, env ) :
@@ -108,7 +111,18 @@ class dump_cspad ( object ) :
         # dump information about quadrants
         print "dump_cspad: %s: %s" % (quads[0].__class__.__name__, self.m_src)
         print "  Number of quadrants: %d" % len(quads)
-        for q in quads:
+
+        evt_data = evt.getBySource("Psana::CsPad::Data", self.source)
+        quads = evt_data.quads
+        if not quads :
+            return
+
+        # dump information about quadrants
+        nQuads = evt_data.quads_shape()[0]
+        print "dump_cspad: %s: %s" % (quads(0).__class__.__name__, self.m_src)
+        print "  Number of quadrants: %d" % nQuads
+        for i in range(nQuads):
+            q = quads(i)
             
             print "  Quadrant %d" % q.quad()
             print "    virtual_channel: %s" % q.virtual_channel()
@@ -120,14 +134,8 @@ class dump_cspad ( object ) :
             print "    ticks: %s" % q.ticks()
             print "    fiducials: %s" % q.fiducials()
             print "    frame_type: %s" % q.frame_type()
-            print "    sb_temp: %s" % map(q.sb_temp, range(4))
+            print "    sb_temp: %s", str(q.sb_temp())
 
             # image data as 3-dimentional array
             data = q.data()
             print "    Data shape: %s" % str(data.shape)
-            
-        
-    def endjob( self, env ) :
-        pass
-
-        
