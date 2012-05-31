@@ -10,17 +10,17 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("numLinks", &n::numLinks)\
     .def("payloadSizePerLink", &n::payloadSizePerLink)\
 
   _CLASS(Psana::PNCCD::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("numLinks", &n::numLinks)\
     .def("payloadSizePerLink", &n::payloadSizePerLink)\
     .def("numChannels", &n::numChannels)\
@@ -37,10 +37,10 @@ void createWrappers() {
   _CLASS(Psana::PNCCD::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("specialWord", &n::specialWord)\
     .def("frameNumber", &n::frameNumber)\
     .def("timeStampHi", &n::timeStampHi)\

@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 #include "pdsdata/xtc/ClockTime.hh"
 namespace Psana {
 namespace ControlData {
@@ -97,7 +97,7 @@ public:
   std::vector<ControlData::PVMonitor> pvMonitors() const { VEC_CONVERT(o->pvMonitors(), ControlData::PVMonitor); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::ControlData::ConfigV1";

@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pulse", &n::pulse)\
     .def("_input_control_value", &n::_input_control_value)\
     .def("bf_trigger", &n::bf_trigger)\
@@ -36,7 +36,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pulseId", &n::pulseId)\
     .def("polarity", &n::polarity)\
     .def("prescale", &n::prescale)\
@@ -51,7 +51,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("code", &n::code)\
     .def("_u16MaskEventAttr_value", &n::_u16MaskEventAttr_value)\
     .def("isReadout", &n::isReadout)\
@@ -68,7 +68,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("code", &n::code)\
     .def("_u16MaskEventAttr_value", &n::_u16MaskEventAttr_value)\
     .def("isReadout", &n::isReadout)\
@@ -87,7 +87,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("code", &n::code)\
     .def("isReadout", &n::isReadout)\
     .def("isTerminator", &n::isTerminator)\
@@ -108,7 +108,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("value", &n::value)\
     .def("source", &n::source)\
     .def("source_id", &n::source_id)\
@@ -123,7 +123,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("value", &n::value)\
     .def("source", &n::source)\
     .def("source_id", &n::source_id)\
@@ -139,7 +139,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
     .def("pulses", &n::pulses)\
@@ -148,10 +148,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("opcode", &n::opcode)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
@@ -163,10 +163,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("neventcodes", &n::neventcodes)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
@@ -177,10 +177,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV3);
+  ADD_GETTER(ConfigV3);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("neventcodes", &n::neventcodes)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
@@ -191,10 +191,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV4_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV4);
+  ADD_GETTER(ConfigV4);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("delay", &n::delay)\
     .def("eventcode", &n::eventcode)\
     .def("_sizeof", &n::_sizeof)\
@@ -206,7 +206,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("sync_source", &n::sync_source)\
     .def("beam_source", &n::beam_source)\
     .def("length", &n::length)\
@@ -218,7 +218,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("neventcodes", &n::neventcodes)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
@@ -230,10 +230,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV5_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV5_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV5);
+  ADD_GETTER(ConfigV5);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("neventcodes", &n::neventcodes)\
     .def("npulses", &n::npulses)\
     .def("noutputs", &n::noutputs)\
@@ -245,10 +245,10 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV6_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV6_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV6);
+  ADD_GETTER(ConfigV6);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("timestampHigh", &n::timestampHigh)\
     .def("timestampLow", &n::timestampLow)\
     .def("eventCode", &n::eventCode)\
@@ -261,17 +261,17 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("numFifoEvents", &n::numFifoEvents)\
     .def("fifoEvents", &n::fifoEvents)\
 
   _CLASS(Psana::EvrData::DataV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV3_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV3);
+  ADD_GETTER(DataV3);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("name", &n::name)\
     .def("ninfo", &n::ninfo)\
     .def("infos", &n::infos)\
@@ -285,7 +285,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("nchannels", &n::nchannels)\
     .def("channels", &n::channels)\
     .def("conn", &n::conn)\

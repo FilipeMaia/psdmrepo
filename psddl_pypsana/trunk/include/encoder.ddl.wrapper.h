@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace Encoder {
 
@@ -126,7 +126,7 @@ public:
   std::vector<uint32_t> encoder_count() const { VEC_CONVERT(o->encoder_count(), uint32_t); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Encoder::ConfigV1";
@@ -142,7 +142,7 @@ public:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Encoder::ConfigV2";
@@ -158,7 +158,7 @@ public:
     }
   };
 
-  class DataV1_EvtGetter : public Psana::EvtGetter {
+  class DataV1_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Encoder::DataV1";
@@ -180,7 +180,7 @@ public:
     }
   };
 
-  class DataV2_EvtGetter : public Psana::EvtGetter {
+  class DataV2_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Encoder::DataV2";

@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace Princeton {
 
@@ -155,7 +155,7 @@ private:
   float	_fTemperature;
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Princeton::ConfigV1";
@@ -171,7 +171,7 @@ private:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Princeton::ConfigV2";
@@ -187,7 +187,7 @@ private:
     }
   };
 
-  class ConfigV3_EnvGetter : public Psana::EnvGetter {
+  class ConfigV3_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Princeton::ConfigV3";

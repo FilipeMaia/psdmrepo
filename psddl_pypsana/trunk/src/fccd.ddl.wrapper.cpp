@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("width", &n::width)\
     .def("height", &n::height)\
@@ -22,7 +22,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("ccdEnable", &n::ccdEnable)\
     .def("focusMode", &n::focusMode)\

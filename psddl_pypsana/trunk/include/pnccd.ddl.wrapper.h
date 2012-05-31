@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace PNCCD {
 
@@ -85,7 +85,7 @@ public:
   std::vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV1";
@@ -101,7 +101,7 @@ public:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV2";

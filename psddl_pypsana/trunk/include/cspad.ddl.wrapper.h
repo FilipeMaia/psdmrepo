@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace CsPad {
 
@@ -321,7 +321,7 @@ public:
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };
 
-  class ConfigV1QuadReg_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV1QuadReg";
@@ -331,7 +331,7 @@ public:
     }
   };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV1";
@@ -347,7 +347,7 @@ public:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV2";
@@ -363,7 +363,7 @@ public:
     }
   };
 
-  class ConfigV3_EnvGetter : public Psana::EnvGetter {
+  class ConfigV3_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV3";
@@ -379,7 +379,7 @@ public:
     }
   };
 
-  class DataV1_EvtGetter : public Psana::EvtGetter {
+  class DataV1_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::DataV1";
@@ -401,7 +401,7 @@ public:
     }
   };
 
-  class DataV2_EvtGetter : public Psana::EvtGetter {
+  class DataV2_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad::DataV2";

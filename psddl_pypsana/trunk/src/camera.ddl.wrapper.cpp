@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("column", &n::column)\
     .def("row", &n::row)\
     .def("_sizeof", &n::_sizeof)\
@@ -22,14 +22,14 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
 
   _CLASS(Psana::Camera::FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFccdConfigV1_Wrapper);
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("forwarding", &n::forwarding)\
     .def("forward_prescale", &n::forward_prescale)\
     .def("processing", &n::processing)\
@@ -44,7 +44,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("depth", &n::depth)\
@@ -58,7 +58,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("integral", &n::integral)\
     .def("xmean", &n::xmean)\
     .def("ymean", &n::ymean)\

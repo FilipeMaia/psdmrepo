@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("sec", &n::sec)\
     .def("nsec", &n::nsec)\
     .def("_sizeof", &n::_sizeof)\
@@ -22,7 +22,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -35,7 +35,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -48,7 +48,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -61,7 +61,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -74,7 +74,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -87,7 +87,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -100,7 +100,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("stamp", &n::stamp, policy)\
@@ -113,7 +113,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("_sizeof", &n::_sizeof)\
@@ -125,7 +125,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -147,7 +147,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("precision", &n::precision)\
@@ -170,7 +170,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("no_str", &n::no_str)\
@@ -185,7 +185,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -207,7 +207,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("units", &n::units)\
@@ -229,7 +229,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("status", &n::status)\
     .def("severity", &n::severity)\
     .def("precision", &n::precision)\
@@ -252,7 +252,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pvId", &n::pvId)\
     .def("dbrType", &n::dbrType)\
     .def("numElements", &n::numElements)\
@@ -267,7 +267,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pvName", &n::pvName)\
     .def("pvName_shape", &n::pvName_shape)\
 
@@ -276,7 +276,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("stamp", &n::stamp)\
 
   _CLASS(Psana::Epics::EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
@@ -284,7 +284,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -295,7 +295,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -305,7 +305,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -315,7 +315,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -325,7 +325,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -335,7 +335,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -345,7 +345,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -355,7 +355,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -366,7 +366,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -376,7 +376,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -386,7 +386,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -396,7 +396,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -406,7 +406,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -416,7 +416,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("dbr", &n::dbr, policy)\
     .def("data", &n::data)\
     .def("value", &n::value)\
@@ -426,7 +426,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pvId", &n::pvId)\
     .def("description", &n::description)\
     .def("interval", &n::interval)\
@@ -436,7 +436,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("numPv", &n::numPv)\
     .def("pvControls", &n::pvControls, policy)\
     .def("pvControls_shape", &n::pvControls_shape)\
@@ -444,7 +444,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 }
 } // namespace Epics

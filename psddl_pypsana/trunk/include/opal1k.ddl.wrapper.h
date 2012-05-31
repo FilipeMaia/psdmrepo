@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 #include "psddl_psana/camera.ddl.h"
 namespace Psana {
 namespace Opal1k {
@@ -67,7 +67,7 @@ public:
   uint32_t output_resolution_bits() const { return o->output_resolution_bits(); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Opal1k::ConfigV1";

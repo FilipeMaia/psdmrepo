@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace CsPad2x2 {
 
@@ -179,7 +179,7 @@ public:
   float common_mode(uint32_t section) const { return o->common_mode(section); }
 };
 
-  class ConfigV1QuadReg_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad2x2::ConfigV1QuadReg";
@@ -189,7 +189,7 @@ public:
     }
   };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::CsPad2x2::ConfigV1";

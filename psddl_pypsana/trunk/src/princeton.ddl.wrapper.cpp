@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -30,10 +30,10 @@ void createWrappers() {
   _CLASS(Psana::Princeton::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -54,10 +54,10 @@ void createWrappers() {
   _CLASS(Psana::Princeton::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -78,10 +78,10 @@ void createWrappers() {
   _CLASS(Psana::Princeton::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV3);
+  ADD_GETTER(ConfigV3);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shotIdStart", &n::shotIdStart)\
     .def("readoutTime", &n::readoutTime)\
     .def("data", &n::data)\
@@ -91,7 +91,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("temperature", &n::temperature)\
     .def("_sizeof", &n::_sizeof)\
 

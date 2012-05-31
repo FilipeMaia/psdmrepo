@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("black_level", &n::black_level)\
     .def("gain_percent", &n::gain_percent)\
     .def("output_resolution", &n::output_resolution)\
@@ -28,7 +28,7 @@ void createWrappers() {
   _CLASS(Psana::Opal1k::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 }
 } // namespace Opal1k

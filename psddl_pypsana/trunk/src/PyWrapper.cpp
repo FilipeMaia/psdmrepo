@@ -1,14 +1,33 @@
-#define AAA 1
+////////////////////////////////////////////////////////////////////////////////
+//
+// TO DO:
+//
+// Python wrappers should use attributes instead of functions
+// e.g. ConfigV1.pvControls[i] instead of ConfigV1.pvControls()[i]
+//
+//
+////////////////////////////////////////////////////////////////////////////////
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Class PyWrapper
+//
+// Author List:
+//   Joseph S. Barrera III
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
 #include <psddl_pypsana/PyWrapper.h>
-#include "MsgLogger/MsgLogger.h"
-#include "PSEnv/Env.h"
-#include "PSEvt/Event.h"
-#include "PSEvt/EventId.h"
-#include "PSEvt/ProxyDictI.h"
-#include "ConfigSvc/ConfigSvc.h"
-#include "psddl_pypsana/PyWrapper.h"
-#include "python/Python.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/python/class.hpp>
 #include <boost/python/copy_const_reference.hpp>
 #include <boost/python/def.hpp>
@@ -17,9 +36,23 @@
 #include <numpy/arrayobject.h>
 #include <string>
 #include <set>
+#include "python/Python.h"
 
-#include "psddl_psana/acqiris.ddl.h"
-#include "psddl_pypsana/acqiris.ddl.wrapper.h"
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "MsgLogger/MsgLogger.h"
+#include "PSEnv/Env.h"
+#include "PSEnv/EpicsStore.h"
+#include "PSEvt/Event.h"
+#include "PSEvt/EventId.h"
+#include "PSEvt/ProxyDictI.h"
+#include "ConfigSvc/ConfigSvc.h"
+#include <psddl_pypsana/GenericGetter.h>
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
 
 using boost::python::api::object;
 using boost::python::class_;
@@ -47,7 +80,19 @@ using Pds::Src;
 
 typedef boost::shared_ptr<PyObject> PyObjPtr;
 
+
+
+
+
 namespace Psana {
+
+  static EvtGetter* getEvtGetterByType(const string& typeName) {
+    return (EvtGetter*) GenericGetter::getGetterByType(typeName.c_str());
+  }
+
+  static EnvGetter* getEnvGetterByType(const string& typeName) {
+    return (EnvGetter*) GenericGetter::getGetterByType(typeName.c_str());
+  }
 
   namespace CreateWrappers {
     extern void createWrappers();
@@ -60,25 +105,6 @@ namespace Psana {
   static boost::shared_ptr<char> none((char *)0);
   static object Event_Class;
   static object EnvWrapper_Class;
-  static map<string, EvtGetter*> evtGetter_map;
-  static map<string, EnvGetter*> envGetter_map;
-
-  template<class T>
-  string getTypeNameWithHighestVersion(map<string, T*> map, string typeNameGeneric) {
-    if (map.count(typeNameGeneric)) {
-      return typeNameGeneric;
-    }
-    string typeName = "";
-    char v[256];
-    for (int version = 1; true; version++) {
-      sprintf(v, "V%d", version);
-      string test = typeNameGeneric + v;
-      if (! map.count(test)) {
-        return typeName;
-      }
-      typeName = test;
-    }
-  }
 
   // Need wrapper because EnvObjectStore is boost::noncopyable
   class EnvObjectStoreWrapper {
@@ -91,12 +117,8 @@ namespace Psana {
     EnvObjectStore::GetResultProxy getBySrc(const Src& src) { return _store.get(src); }
     EnvObjectStore::GetResultProxy getBySource(const Source& source, Src* foundSrc = 0) { return _store.get(source, foundSrc); }
 
-    object getByType(const string& typeNameGeneric, const Source& source) {
-      string typeName = getTypeNameWithHighestVersion<EnvGetter>(envGetter_map, typeNameGeneric);
-      if (typeName == "") {
-        return object(none);
-      }
-      EnvGetter *getter = envGetter_map[typeName];
+    object getByType(const string& typeName, const Source& source) {
+      EnvGetter *getter = getEnvGetterByType(typeName);
       if (getter) {
         return getter->get(_store, source);
       }
@@ -178,23 +200,23 @@ namespace Psana {
       }
     }
 
-    object getConfigByType(const char* typeNameGeneric, const char* detectorSourceName) {
+    object getConfigByType(const char* typeName, const char* detectorSourceName) {
       const Source detectorSource(detectorSourceName);
-      string typeName = getTypeNameWithHighestVersion<EnvGetter>(envGetter_map, typeNameGeneric);
-      if (typeName == "") {
-        return object(none);
-      }
-      EnvGetter *getter = envGetter_map[typeName];
+      EnvGetter *getter = getEnvGetterByType(typeName);
       if (getter) {
         return getter->get(_env.configStore(), detectorSource);
       }
       return object(none);
     }
 
-    object getConfig(int typeId, const char* detectorSourceName) {
+    object getConfig2(int typeId, const char* detectorSourceName) {
       char name[64];
       sprintf(name, "@EnvType_%d_", typeId);
       return getConfigByType(name, detectorSourceName);
+    }
+
+    object getConfig1(int typeId) {
+      return getConfig2(typeId, "ProcInfo()");
     }
   };
 
@@ -229,7 +251,7 @@ namespace Psana {
 
 #if 0
   object getBySourceAndKey_Event(Event& evt, const string& typeNameGeneric, Source& source, const string& key) {
-    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
+    string typeName = getTypeNameWithHighestVersion("Evt", typeNameGeneric);
     if (typeName == "") {
       return object(none);
     }
@@ -238,8 +260,8 @@ namespace Psana {
   }
 #endif
 
-  object getByType_Event(Event& evt, const string& typeNameGeneric, const string& detectorSourceName) {
-    if (typeNameGeneric == "PSEvt::EventId") {
+  object getByType_Event(Event& evt, const string& typeName, const string& detectorSourceName) {
+    if (typeName == "PSEvt::EventId") {
       const boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
       return object(eventId);
     }
@@ -251,12 +273,11 @@ namespace Psana {
     } else {
       detectorSource = Source(detectorSourceName);
     }
-    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
-    if (typeName == "") {
-      return object(none);
+    EvtGetter *getter = getEvtGetterByType(typeName);
+    if (getter) {
+      return getter->get(evt, detectorSource, string());
     }
-    EvtGetter *g = evtGetter_map[typeName];
-    return g->get(evt, detectorSource, string());
+    return object(none);
   }
 
   object getByType1_Event(Event& evt, const string& typeName) {
@@ -274,7 +295,7 @@ namespace Psana {
 #if 0
   // Src is a module type aka fullName
   object getBySrcAndKey_Event(Event& evt, const string& typeNameGeneric, Src& src, const string& key) {
-    string typeName = getTypeNameWithHighestVersion<EvtGetter>(evtGetter_map, typeNameGeneric);
+    string typeName = getTypeNameWithHighestVersion("Evt", typeNameGeneric);
     if (typeName == "") {
       return object(none);
     }
@@ -292,15 +313,13 @@ namespace Psana {
   }
 #endif
 
-  PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data) {
-    npy_intp dims[ndim];
-    for (unsigned i = 0; i < ndim; i++) {
-      dims[i] = shape[i];
-    }
-    return PyArray_SimpleNewFromData(ndim, dims, ptype, data);
-  }
-
   static bool createWrappersDone = false;
+
+#if 111
+#define std_vector_class_(T)\
+  boost::python::class_<vector<T> >("std::vector<" #T ">")        \
+    .def(boost::python::vector_indexing_suite<std::vector<T> >())
+#endif
 
   void createWrappers()
   {
@@ -317,17 +336,14 @@ namespace Psana {
     std_vector_class_(unsigned);
     std_vector_class_(unsigned short);
 
-    class_<EnvObjectStore::GetResultProxy>("PSEnv::EnvObjectStore::GetResultProxy", no_init)
+    class_<PSEnv::EnvObjectStore::GetResultProxy>("PSEnv::EnvObjectStore::GetResultProxy", no_init)
       ;
 
-    class_<EnvObjectStoreWrapper>("PSEnv::EnvObjectStore", init<EnvObjectStore&>())
-      .def("getBySrc", &EnvObjectStoreWrapper::getBySrc)
-      .def("getBySource", &EnvObjectStoreWrapper::getBySource)
-      .def("getByType", &EnvObjectStoreWrapper::getByType)
-      .def("keys", &EnvObjectStoreWrapper::keys)
+    class_<PSEnv::EpicsStore, boost::noncopyable>("PSEnv::EpicsStore", no_init)
+      .def("value", &EpicsStore::value)
       ;
 
-    class_<Source>("PSEvt::Source", no_init)
+    class_<PSEvt::Source>("PSEvt::Source", no_init)
       .def("match", &Source::match)
       .def("isNoSource", &Source::isNoSource)
       .def("isExact", &Source::isExact)
@@ -335,7 +351,7 @@ namespace Psana {
       ;
 
     Event_Class =
-      class_<Event>("PSEvt::Event", init<Event&>())
+      class_<PSEvt::Event>("PSEvt::Event", init<Event&>())
       .def("get", &get_Event)
       .def("getByType", &getByType_Event)
       .def("getByType1", &getByType1_Event)
@@ -344,6 +360,13 @@ namespace Psana {
       //.def("getBySrc", &getBySrc_Event)
       .def("printAllKeys", &printAllKeys_Event)
       .def("run", &run_Event)
+      ;
+
+    class_<EnvObjectStoreWrapper>("PSEnv::EnvObjectStore", init<EnvObjectStore&>())
+      .def("getBySrc", &EnvObjectStoreWrapper::getBySrc)
+      .def("getBySource", &EnvObjectStoreWrapper::getBySource)
+      .def("getByType", &EnvObjectStoreWrapper::getByType)
+      .def("keys", &EnvObjectStoreWrapper::keys)
       ;
 
     EnvWrapper_Class =
@@ -364,49 +387,13 @@ namespace Psana {
       .def("printAllKeys", &EnvWrapper::printAllKeys)
       .def("printConfigKeys", &EnvWrapper::printConfigKeys)
       .def("getConfigByType", &EnvWrapper::getConfigByType)
-      .def("getConfig", &EnvWrapper::getConfig)
+      .def("getConfig", &EnvWrapper::getConfig1)
+      .def("getConfig", &EnvWrapper::getConfig2)
       ;
 
     CreateWrappers::createWrappers();
 
     createWrappersDone = true;
-  }
-
-  void addEnvGetter(EnvGetter* getter) {
-    envGetter_map[getter->getTypeName()] = getter;
-    printf("~~~ adding %s\n", getter->getTypeName());
-    if (getter->getTypeId() != -1) {
-      char name[64];
-      sprintf(name, "@EnvType_%d_V%d", getter->getTypeId(), getter->getVersion());
-      envGetter_map[name] = getter;
-      printf("~~~ adding %s\n", name);
-    }
-  }
-
-  void addEvtGetter(EvtGetter* getter) {
-    evtGetter_map[getter->getTypeName()] = getter;
-    printf("~~~ adding %s\n", getter->getTypeName());
-    if (getter->getTypeId() != -1) {
-      char name[64];
-      sprintf(name, "@EvtType_%d_V%d", getter->getTypeId(), getter->getVersion());
-      evtGetter_map[name] = getter;
-      printf("~~~ adding %s\n", name);
-    }
-  }
-
-  static set<string> class_set;
-
-  bool class_needed(const char* _ctype) {
-#if 1
-    return true;
-#else
-    const string ctype(_ctype);
-    if (class_set.count(ctype) == 0) {
-      class_set.insert(ctype); // assume that it will be added by the caller
-      return true;
-    }
-    return false;
-#endif
   }
 
   // call specific method

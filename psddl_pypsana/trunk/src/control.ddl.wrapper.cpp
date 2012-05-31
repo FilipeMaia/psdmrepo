@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("name", &n::name)\
     .def("index", &n::index)\
     .def("value", &n::value)\
@@ -24,7 +24,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("name", &n::name)\
     .def("index", &n::index)\
     .def("loValue", &n::loValue)\
@@ -39,7 +39,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("events", &n::events)\
     .def("uses_duration", &n::uses_duration)\
     .def("uses_events", &n::uses_events)\
@@ -52,7 +52,7 @@ void createWrappers() {
   _CLASS(Psana::ControlData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 }
 } // namespace ControlData

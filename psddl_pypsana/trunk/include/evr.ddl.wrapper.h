@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 #include "pdsdata/xtc/DetInfo.hh"
 namespace Psana {
 namespace EvrData {
@@ -562,7 +562,7 @@ public:
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV1";
@@ -578,7 +578,7 @@ public:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV2";
@@ -594,7 +594,7 @@ public:
     }
   };
 
-  class ConfigV3_EnvGetter : public Psana::EnvGetter {
+  class ConfigV3_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV3";
@@ -610,7 +610,7 @@ public:
     }
   };
 
-  class ConfigV4_EnvGetter : public Psana::EnvGetter {
+  class ConfigV4_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV4";
@@ -626,7 +626,7 @@ public:
     }
   };
 
-  class ConfigV5_EnvGetter : public Psana::EnvGetter {
+  class ConfigV5_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV5";
@@ -642,7 +642,7 @@ public:
     }
   };
 
-  class ConfigV6_EnvGetter : public Psana::EnvGetter {
+  class ConfigV6_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV6";
@@ -658,7 +658,7 @@ public:
     }
   };
 
-  class DataV3_EvtGetter : public Psana::EvtGetter {
+  class DataV3_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::EvrData::DataV3";

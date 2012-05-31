@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("voltageRange", &n::voltageRange)\
     .def("firstChan", &n::firstChan)\
     .def("lastChan", &n::lastChan)\
@@ -25,17 +25,17 @@ void createWrappers() {
   _CLASS(Psana::Gsc16ai::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("channelValue", &n::channelValue)\
 
   _CLASS(Psana::Gsc16ai::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 }
 } // namespace Gsc16ai

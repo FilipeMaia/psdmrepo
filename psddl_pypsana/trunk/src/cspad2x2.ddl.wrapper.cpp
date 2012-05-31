@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pots", &n::pots)\
 
   _CLASS(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
@@ -18,7 +18,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shiftTest", &n::shiftTest)\
     .def("version", &n::version)\
 
@@ -27,7 +27,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("adcThreshold", &n::adcThreshold)\
     .def("pixelCountThreshold", &n::pixelCountThreshold)\
 
@@ -36,7 +36,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gainMap", &n::gainMap)\
 
   _CLASS(Psana::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, return_value_policy<return_by_value>());
@@ -44,7 +44,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shiftSelect", &n::shiftSelect)\
     .def("edgeSelect", &n::edgeSelect)\
     .def("readClkSet", &n::readClkSet)\
@@ -73,10 +73,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1QuadReg);
+  ADD_GETTER(ConfigV1QuadReg);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("protectionThreshold", &n::protectionThreshold, policy)\
     .def("protectionEnable", &n::protectionEnable)\
@@ -94,10 +94,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("virtual_channel", &n::virtual_channel)\
     .def("lane", &n::lane)\
     .def("tid", &n::tid)\

@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace Ipimb {
 
@@ -162,7 +162,7 @@ public:
   float channel3psVolts() const { return o->channel3psVolts(); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Ipimb::ConfigV1";
@@ -178,7 +178,7 @@ public:
     }
   };
 
-  class ConfigV2_EnvGetter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Ipimb::ConfigV2";
@@ -194,7 +194,7 @@ public:
     }
   };
 
-  class DataV1_EvtGetter : public Psana::EvtGetter {
+  class DataV1_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Ipimb::DataV1";
@@ -216,7 +216,7 @@ public:
     }
   };
 
-  class DataV2_EvtGetter : public Psana::EvtGetter {
+  class DataV2_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Ipimb::DataV2";

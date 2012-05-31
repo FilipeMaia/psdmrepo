@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace Acqiris {
 
@@ -505,7 +505,7 @@ public:
   std::vector<Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Acqiris::TdcDataV1_Item); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Acqiris::ConfigV1";
@@ -521,7 +521,7 @@ public:
     }
   };
 
-  class DataDescV1Elem_EvtGetter : public Psana::EvtGetter {
+  class DataDescV1Elem_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Acqiris::DataDescV1Elem";
@@ -540,7 +540,7 @@ public:
     }
   };
 
-  class DataDescV1_EvtGetter : public Psana::EvtGetter {
+  class DataDescV1_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Acqiris::DataDescV1";

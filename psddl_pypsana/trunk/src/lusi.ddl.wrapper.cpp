@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("base", &n::base)\
     .def("scale", &n::scale)\
     .def("_sizeof", &n::_sizeof)\
@@ -22,7 +22,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("base", &n::base)\
     .def("scale", &n::scale)\
     .def("_sizeof", &n::_sizeof)\
@@ -34,7 +34,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("value", &n::value)\
     .def("_sizeof", &n::_sizeof)\
 
@@ -45,7 +45,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("diode", &n::diode)\
     .def("xscale", &n::xscale)\
     .def("yscale", &n::yscale)\
@@ -55,7 +55,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("diode", &n::diode)\
     .def("xscale", &n::xscale)\
     .def("yscale", &n::yscale)\
@@ -65,7 +65,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("channel", &n::channel)\
     .def("sum", &n::sum)\
     .def("xpos", &n::xpos)\
@@ -79,7 +79,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("xscale", &n::xscale)\
     .def("yscale", &n::yscale)\
     .def("_sizeof", &n::_sizeof)\

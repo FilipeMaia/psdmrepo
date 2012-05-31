@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pots", &n::pots)\
 
   _CLASS(Psana::CsPad::CsPadDigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
@@ -18,7 +18,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shiftTest", &n::shiftTest)\
     .def("version", &n::version)\
 
@@ -27,7 +27,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("adcThreshold", &n::adcThreshold)\
     .def("pixelCountThreshold", &n::pixelCountThreshold)\
 
@@ -36,7 +36,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gainMap", &n::gainMap)\
 
   _CLASS(Psana::CsPad::CsPadGainMapCfg_Wrapper, return_value_policy<return_by_value>());
@@ -44,7 +44,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shiftSelect", &n::shiftSelect)\
     .def("edgeSelect", &n::edgeSelect)\
     .def("readClkSet", &n::readClkSet)\
@@ -64,10 +64,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1QuadReg);
+  ADD_GETTER(ConfigV1QuadReg);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("runDelay", &n::runDelay)\
     .def("eventCode", &n::eventCode)\
@@ -88,10 +88,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("runDelay", &n::runDelay)\
     .def("eventCode", &n::eventCode)\
@@ -114,10 +114,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("runDelay", &n::runDelay)\
     .def("eventCode", &n::eventCode)\
@@ -143,10 +143,10 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV3);
+  ADD_GETTER(ConfigV3);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("virtual_channel", &n::virtual_channel)\
     .def("lane", &n::lane)\
     .def("tid", &n::tid)\
@@ -167,17 +167,17 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("quads", &n::quads, policy)\
     .def("quads_shape", &n::quads_shape)\
 
   _CLASS(Psana::CsPad::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("virtual_channel", &n::virtual_channel)\
     .def("lane", &n::lane)\
     .def("tid", &n::tid)\
@@ -198,14 +198,14 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("quads", &n::quads, policy)\
     .def("quads_shape", &n::quads_shape)\
 
   _CLASS(Psana::CsPad::DataV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV2);
+  ADD_GETTER(DataV2);
 
 }
 } // namespace CsPad

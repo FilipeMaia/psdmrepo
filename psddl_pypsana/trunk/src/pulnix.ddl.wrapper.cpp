@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref", &n::vref)\
@@ -27,7 +27,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref_a", &n::vref_a)\

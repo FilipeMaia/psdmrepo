@@ -6,7 +6,7 @@
 #include <vector>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
-#include "psddl_pypsana/PyWrapper.h"
+#include "psddl_pypsana/DdlWrapper.h"
 namespace Psana {
 namespace Gsc16ai {
 
@@ -83,7 +83,7 @@ public:
   std::vector<uint16_t> channelValue() const { VEC_CONVERT(o->channelValue(), uint16_t); }
 };
 
-  class ConfigV1_EnvGetter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const char* getTypeName() {
       return "Psana::Gsc16ai::ConfigV1";
@@ -99,7 +99,7 @@ public:
     }
   };
 
-  class DataV1_EvtGetter : public Psana::EvtGetter {
+  class DataV1_Getter : public Psana::EvtGetter {
   public:
     const char* getTypeName() {
       return "Psana::Gsc16ai::DataV1";

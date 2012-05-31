@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("fullScale", &n::fullScale)\
     .def("offset", &n::offset)\
     .def("coupling", &n::coupling)\
@@ -25,7 +25,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("sampInterval", &n::sampInterval)\
     .def("delayTime", &n::delayTime)\
     .def("nbrSamples", &n::nbrSamples)\
@@ -39,7 +39,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("coupling", &n::coupling)\
     .def("input", &n::input)\
     .def("slope", &n::slope)\
@@ -53,7 +53,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("nbrConvertersPerChannel", &n::nbrConvertersPerChannel)\
     .def("channelMask", &n::channelMask)\
     .def("nbrBanks", &n::nbrBanks)\
@@ -65,10 +65,10 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pos", &n::pos)\
     .def("timeStampLo", &n::timeStampLo)\
     .def("timeStampHi", &n::timeStampHi)\
@@ -82,7 +82,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("nbrSamplesInSeg", &n::nbrSamplesInSeg)\
     .def("indexFirstPoint", &n::indexFirstPoint)\
     .def("nbrSegments", &n::nbrSegments)\
@@ -92,20 +92,20 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1Elem_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataDescV1Elem);
+  ADD_GETTER(DataDescV1Elem);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("data", &n::data, policy)\
     .def("data_shape", &n::data_shape)\
 
   _CLASS(Psana::Acqiris::DataDescV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataDescV1);
+  ADD_GETTER(DataDescV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("_channel_int", &n::_channel_int)\
     .def("_mode_int", &n::_mode_int)\
     .def("slope", &n::slope)\
@@ -121,7 +121,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("channel_int", &n::channel_int)\
     .def("signal_int", &n::signal_int)\
     .def("qualifier_int", &n::qualifier_int)\
@@ -137,7 +137,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("signal_int", &n::signal_int)\
     .def("qualifier_int", &n::qualifier_int)\
     .def("channel", &n::channel)\
@@ -152,7 +152,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("channels", &n::channels)\
     .def("auxio", &n::auxio)\
     .def("veto", &n::veto, policy)\
@@ -162,7 +162,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("value", &n::value)\
     .def("bf_val_", &n::bf_val_)\
     .def("source", &n::source)\
@@ -176,7 +176,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("nhits", &n::nhits)\
     .def("overflow", &n::overflow)\
     .def("_sizeof", &n::_sizeof)\
@@ -188,7 +188,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("ticks", &n::ticks)\
     .def("overflow", &n::overflow)\
     .def("time", &n::time)\
@@ -201,7 +201,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("type", &n::type)\
     .def("_sizeof", &n::_sizeof)\
 
@@ -212,7 +212,7 @@ void createWrappers() {
 #undef _CLASS
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("data", &n::data)\
 
   _CLASS(Psana::Acqiris::TdcDataV1_Wrapper, return_value_policy<return_by_value>());

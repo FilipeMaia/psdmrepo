@@ -10,7 +10,7 @@ using namespace boost::python;
 
 void createWrappers() {
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("readoutSpeed", &n::readoutSpeed)\
     .def("triggerMode", &n::triggerMode)\
     .def("shutterTimeout", &n::shutterTimeout)\
@@ -74,10 +74,10 @@ void createWrappers() {
   _CLASS(Psana::Timepix::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("readoutSpeed", &n::readoutSpeed)\
     .def("triggerMode", &n::triggerMode)\
     .def("timepixSpeed", &n::timepixSpeed)\
@@ -154,10 +154,10 @@ void createWrappers() {
   _CLASS(Psana::Timepix::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ENV_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("frameCounter", &n::frameCounter)\
     .def("lostRows", &n::lostRows)\
@@ -170,10 +170,10 @@ void createWrappers() {
   _CLASS(Psana::Timepix::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
-#define _CLASS(n, policy) if (Psana::class_needed(#n)) class_<n>(#n, no_init)\
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("timestamp", &n::timestamp)\
@@ -186,7 +186,7 @@ void createWrappers() {
   _CLASS(Psana::Timepix::DataV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  EVT_GETTER(DataV2);
+  ADD_GETTER(DataV2);
 
 }
 } // namespace Timepix
