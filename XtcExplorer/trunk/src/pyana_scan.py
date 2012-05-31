@@ -255,6 +255,9 @@ class pyana_scan (object) :
 
             self.ccls_scalars[name].append( np.array([mean,std]) )
 
+        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
+                        %(self.n_ccls,self.n_shots))
+        
 
     def endrun( self, env ) :
         """This optional method is called if present at the end of the run.
@@ -283,6 +286,7 @@ class pyana_scan (object) :
         for pv,data in self.data_scan.iteritems():
             self.data.append( data )
         evt.put( self.data, "data_scan")
+        plt.show()
 
     def make_plots(self, fignum=1, suptitle=""):
 
