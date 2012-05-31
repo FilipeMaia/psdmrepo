@@ -3,7 +3,7 @@
 #  $Id: template!pyana-module!py 1095 2010-07-07 23:01:23Z salnikov $
 #
 # Description:
-#  Pyana user analysis module psana_scan...
+#  Pyana user analysis module pyana_scan...
 #
 #------------------------------------------------------------------------
 
@@ -77,13 +77,13 @@ class psana_scan (object) :
         #@param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param fignum           Matplotlib figure number
         """
-        logging.getLogger().setLevel(logging.INFO)
         opt = PyanaOptions()
         self.controlpv = opt.getOptStrings(controlpv)
         self.input_epics = opt.getOptStrings(input_epics)
         self.input_scalars = opt.getOptStrings(input_scalars)
         #self.plot_every_n = opt.getOptInteger(plot_every_n)
-        self.mpl_num = opt.getOptInteger(fignum)        
+        self.mpl_num = opt.getOptInteger(fignum)
+        
 
     #-------------------
     #  Public methods --
@@ -98,8 +98,8 @@ class psana_scan (object) :
         @param env    environment object
         """
 
-        print "m_fullName=", self.m_fullName
-        print "m_className=", self.m_className
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info("m_fullName='%s' m_className='%s'" % (self.m_fullName, self.m_className))
 
         # data counters
         self.n_runs =  0 # number of runs in this job             
@@ -143,46 +143,13 @@ class psana_scan (object) :
         self.evts_scalars = {}
         print "Begin calibcycle ", self.n_ccls
 
-        ctrl_config = env.getConfigByType("Psana::ControlData::Config", "")
-        if not ctrl_config:
-            print "ctrl_config not found"
-            sys.exit(0)
-            return
-        print "ctrl_config=", ctrl_config
-
         # control.ConfigV1 element
-        env.printAllKeys()
-        print "xtc.TypeId.Type.Id_ControlConfig=", xtc.TypeId.Type.Id_ControlConfig
-        ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig, "ProcInfo()")
-
+        ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
 
         nControls = ctrl_config.npvControls()
         for ic in range (0, nControls ):
             #
-            cpv = ctrl_config.pvControl(ic)
-            name = cpv.name()
-            value = cpv.value()
-            
-            if name not in self.ccls_ctrl.keys() :
-                self.ccls_ctrl[name] = []
-
-            # store the value
-            self.ccls_ctrl[name].append(value)
-
-        #ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
-        #
-        # Id_ControlConfig is found in control.ddl.h Psana::ControlData::ConfigV1
-        #
-        self.source = env.configSource("ProcInfo()")
-        ctrl_config = env.getConfigByType("Psana::ControlData::Config", "")
-        if not ctrl_config:
-            return
-        print "ctrl_config=", ctrl_config
-
-        nControls = ctrl_config.npvControls()
-        for ic in range (0, nControls ):
-            #
-            cpv = ctrl_config.pvControl(ic)
+            cpv = ctrl_config.pvControls()[ic]
             name = cpv.name()
             value = cpv.value()
             
@@ -199,13 +166,14 @@ class psana_scan (object) :
         @param env    environment object
         """
         self.n_shots += 1
-        print "INFO: psana_scan.event() called (%d)" % self.n_shots
+        logging.info( "pyana_scan.event() called (%d)"%self.n_shots )
 
-        #if evt.get('skip_event'):
-        #    return
+        if evt.get('skip_event'):
+            logging.info( "skip_event true..." )
+            return
 
         # Use environment object to access EPICS data
-        if False: #for epv_name in self.input_epics :
+        for epv_name in self.input_epics :
 
             # at first event, make a list for each scalar, to store event data
             if epv_name not in self.evts_scalars.keys() :
@@ -213,11 +181,14 @@ class psana_scan (object) :
                 self.evts_scalars[epv_name] = []
 
             # store the value
-            epv = env.epicsStore().value(epv_name)
-            if not epv:
-                logging_warning('EPICS PV %s does not exist', epv_name)
-            else :
-                self.evts_scalars[epv_name].append(epv.value)
+            try:
+                epv = env.epicsStore().value(epv_name)
+                if not epv:
+                    logging.warning('EPICS PV %s does not exist', epv_name)
+                else :
+                    self.evts_scalars[epv_name].append(epv.value)
+            except:
+                logging.warning('EPICS PV %s could not be fetched', epv_name)
 
         # Other scalars in the event
         for scalar in self.input_scalars :
@@ -276,7 +247,7 @@ class psana_scan (object) :
         @param env    environment object
         """
         print "End calibcycle %d had %d events " % (self.n_ccls, self.n_shots)
-        print "psana_scan.endcalibcycle() called" 
+        logging.info( "pyana_scan.endcalibcycle() called" )
         
         self.ccls_nevts.append(self.n_shots)
 
@@ -298,7 +269,7 @@ class psana_scan (object) :
         
         @param env    environment object
         """
-        print "psana_scan.endrun() called" 
+        logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
 
@@ -308,9 +279,10 @@ class psana_scan (object) :
         
         @param env    environment object
         """
+        logging.info( "pyana_scan.endjob() called" )
         print "End job had %d runs " % (self.n_runs)
 
-        self.make_plots(fignum=self.fignum, suptitle="Scan (%d calib cycles, %d shots each)" \
+        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
                         %(self.n_ccls,self.n_shots))
         
         
