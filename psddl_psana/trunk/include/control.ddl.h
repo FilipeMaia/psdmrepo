@@ -29,7 +29,6 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
-  bool operator==(const PVControl &t) const { return this == &t; }
   /** Name of the control. */
   const char* name() const { return _name; }
   /** Index of the control PV (for arrays) or NoArray. */
@@ -65,7 +64,6 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
-  bool operator==(const PVMonitor &t) const { return this == &t; }
   /** Name of the control. */
   const char* name() const { return _name; }
   /** Index of the control PV (for arrays) or NoArray. */
@@ -96,7 +94,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
-  bool operator==(const ConfigV1 &t) const { return this == &t; }
   /** Maximum number of events per scan. */
   virtual uint32_t events() const = 0;
   /** returns true if the configuration uses duration control. */

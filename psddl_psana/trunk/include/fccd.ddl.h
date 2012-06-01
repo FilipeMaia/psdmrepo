@@ -31,7 +31,6 @@ public:
     Output_Pattern4 = 4,
   };
   virtual ~FccdConfigV1();
-  bool operator==(const FccdConfigV1 &t) const { return this == &t; }
   virtual uint16_t outputMode() const = 0;
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
@@ -67,7 +66,6 @@ public:
     Test_Pattern4 = 4,
   };
   virtual ~FccdConfigV2();
-  bool operator==(const FccdConfigV2 &t) const { return this == &t; }
   virtual uint16_t outputMode() const = 0;
   virtual uint8_t ccdEnable() const = 0;
   virtual uint8_t focusMode() const = 0;

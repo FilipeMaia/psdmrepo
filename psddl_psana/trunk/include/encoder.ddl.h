@@ -34,7 +34,6 @@ public:
     QUAD_END,
   };
   virtual ~ConfigV1();
-  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint32_t chan_num() const = 0;
   virtual uint32_t count_mode() const = 0;
   virtual uint32_t quadrature_mode() const = 0;
@@ -68,7 +67,6 @@ public:
     QUAD_END,
   };
   virtual ~ConfigV2();
-  bool operator==(const ConfigV2 &t) const { return this == &t; }
   virtual uint32_t chan_mask() const = 0;
   virtual uint32_t count_mode() const = 0;
   virtual uint32_t quadrature_mode() const = 0;
@@ -88,7 +86,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~DataV1();
-  bool operator==(const DataV1 &t) const { return this == &t; }
   virtual uint32_t timestamp() const = 0;
   virtual uint32_t encoder_count() const = 0;
 };
@@ -105,7 +102,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { NEncoders = 3 /**< Number of encoders. */ };
   virtual ~DataV2();
-  bool operator==(const DataV2 &t) const { return this == &t; }
   virtual uint32_t timestamp() const = 0;
   virtual ndarray<uint32_t, 1> encoder_count() const = 0;
 };

@@ -43,7 +43,6 @@ public:
     DataFormat_OffsetBinary,
   };
   virtual ~ConfigV1();
-  bool operator==(const ConfigV1 &t) const { return this == &t; }
   virtual uint16_t voltageRange() const = 0;
   virtual uint16_t firstChan() const = 0;
   virtual uint16_t lastChan() const = 0;
@@ -68,7 +67,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~DataV1();
-  bool operator==(const DataV1 &t) const { return this == &t; }
   virtual ndarray<uint16_t, 1> timestamp() const = 0;
   virtual ndarray<uint16_t, 1> channelValue() const = 0;
 };

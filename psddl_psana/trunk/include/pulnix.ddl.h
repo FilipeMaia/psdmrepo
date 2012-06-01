@@ -35,7 +35,6 @@ public:
     Linear,
   };
   virtual ~TM6740ConfigV1();
-  bool operator==(const TM6740ConfigV1 &t) const { return this == &t; }
   virtual uint16_t gain_a() const = 0;
   virtual uint16_t gain_b() const = 0;
   virtual uint16_t vref() const = 0;
@@ -75,7 +74,6 @@ public:
     Linear,
   };
   virtual ~TM6740ConfigV2();
-  bool operator==(const TM6740ConfigV2 &t) const { return this == &t; }
   virtual uint16_t gain_a() const = 0;
   virtual uint16_t gain_b() const = 0;
   virtual uint16_t vref_a() const = 0;

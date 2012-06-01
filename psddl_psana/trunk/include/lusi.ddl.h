@@ -29,7 +29,6 @@ public:
     std::copy(arg__base, arg__base+(3), _base);
     std::copy(arg__scale, arg__scale+(3), _scale);
   }
-  bool operator==(const DiodeFexConfigV1 &t) const { return this == &t; }
   ndarray<float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
   ndarray<float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
   static uint32_t _sizeof()  { return (0+(4*(NRANGES)))+(4*(NRANGES)); }
@@ -59,7 +58,6 @@ public:
     std::copy(arg__base, arg__base+(16), _base);
     std::copy(arg__scale, arg__scale+(16), _scale);
   }
-  bool operator==(const DiodeFexConfigV2 &t) const { return this == &t; }
   ndarray<float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
   ndarray<float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
   static uint32_t _sizeof()  { return (0+(4*(NRANGES)))+(4*(NRANGES)); }
@@ -84,7 +82,6 @@ public:
     : _value(arg__value)
   {
   }
-  bool operator==(const DiodeFexV1 &t) const { return this == &t; }
   float value() const { return _value; }
   static uint32_t _sizeof()  { return 4; }
 private:
@@ -104,7 +101,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
   virtual ~IpmFexConfigV1();
-  bool operator==(const IpmFexConfigV1 &t) const { return this == &t; }
   virtual ndarray<Lusi::DiodeFexConfigV1, 1> diode() const = 0;
   virtual float xscale() const = 0;
   virtual float yscale() const = 0;
@@ -122,7 +118,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
   virtual ~IpmFexConfigV2();
-  bool operator==(const IpmFexConfigV2 &t) const { return this == &t; }
   virtual ndarray<Lusi::DiodeFexConfigV2, 1> diode() const = 0;
   virtual float xscale() const = 0;
   virtual float yscale() const = 0;
@@ -145,7 +140,6 @@ public:
   {
     std::copy(arg__channel, arg__channel+(4), _channel);
   }
-  bool operator==(const IpmFexV1 &t) const { return this == &t; }
   ndarray<float, 1> channel() const { return make_ndarray(&_channel[0], NCHANNELS); }
   float sum() const { return _sum; }
   float xpos() const { return _xpos; }
@@ -174,7 +168,6 @@ public:
     : _xscale(arg__xscale), _yscale(arg__yscale)
   {
   }
-  bool operator==(const PimImageConfigV1 &t) const { return this == &t; }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
   static uint32_t _sizeof()  { return 8; }

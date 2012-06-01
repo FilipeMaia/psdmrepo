@@ -20,7 +20,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
-  bool operator==(const ConfigV1 &t) const { return this == &t; }
   /** Number of links in the pnCCD. */
   virtual uint32_t numLinks() const = 0;
   /** Size of the payload in bytes for single link */
@@ -38,7 +37,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   virtual ~ConfigV2();
-  bool operator==(const ConfigV2 &t) const { return this == &t; }
   /** Number of links in the pnCCD. */
   virtual uint32_t numLinks() const = 0;
   /** Size of the payload in bytes for single link */
@@ -78,7 +76,6 @@ public:
   enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~FrameV1();
-  bool operator==(const FrameV1 &t) const { return this == &t; }
   /** Special values */
   virtual uint32_t specialWord() const = 0;
   /** Frame number */
