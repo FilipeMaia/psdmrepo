@@ -65,6 +65,7 @@ _options = {
     'skip-events': ( 'skip_events',int),
     'skip-epics' : ( 'skip_epics', _str2bool),
     'modules'    : ( 'module',     lambda x : x.split()),
+    'files'      : ( '',           lambda x : x.split()),
     'job-name'   : ( 'job_name',   _unity),
     'num-cpu'    : ( 'num_cpu',    int),
     'dg-ref'     : ( 'dg_ref',     _str2bool),
@@ -160,18 +161,23 @@ class config ( object ) :
     def files( self ):
         """ Returns the list of input file names """
         # get file names
+        files = self.getJobConfig('files')
         file_list = self.getJobConfig('file-list')
-        if not self._args and not file_list :
+        if not self._args and not file_list and not files:
             self._parser.error("at least one file name or a file list required")
         if self._args and file_list :
             self._parser.error("file list cannot be used with the file names")
-        if file_list :
+        if files and file_list :
+            self._parser.error("file list cannot be used with the file names")
+        if self._args:
+            names = self._args
+        elif files:
+            names = files
+        elif file_list :
             # read file names from file
             names = file(file_list).readlines()
             names = [ n.strip() for n in names ]
             names = [ n for n in names if n ]
-        else :
-            names = self._args
         return names
 
     def getJobConfig( self, option, default=None ):

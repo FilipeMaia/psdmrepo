@@ -170,6 +170,9 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
     ru2 = getrusage(RUSAGE_SELF)
     _rusage( "proc-%s time" % id, ru1, ru2 )
 
+#
+# Main() for pyana, takes the standard command-line arguments list
+#
 def _pyana ( argv ) :
 
     ru1 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
