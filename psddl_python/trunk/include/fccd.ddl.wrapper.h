@@ -38,7 +38,6 @@ public:
   };
   FccdConfigV1_Wrapper(boost::shared_ptr<FccdConfigV1> obj) : _o(obj), o(_o.get()) {}
   FccdConfigV1_Wrapper(FccdConfigV1* obj) : o(obj) {}
-  bool operator==(const FccdConfigV1_Wrapper &t) const { return this == &t; }
   uint16_t outputMode() const { return o->outputMode(); }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
@@ -77,7 +76,6 @@ public:
   };
   FccdConfigV2_Wrapper(boost::shared_ptr<FccdConfigV2> obj) : _o(obj), o(_o.get()) {}
   FccdConfigV2_Wrapper(FccdConfigV2* obj) : o(obj) {}
-  bool operator==(const FccdConfigV2_Wrapper &t) const { return this == &t; }
   uint16_t outputMode() const { return o->outputMode(); }
   uint8_t ccdEnable() const { return o->ccdEnable(); }
   uint8_t focusMode() const { return o->focusMode(); }

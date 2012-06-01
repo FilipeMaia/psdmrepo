@@ -27,7 +27,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
-  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t numLinks() const { return o->numLinks(); }
   uint32_t payloadSizePerLink() const { return o->payloadSizePerLink(); }
 };
@@ -46,7 +45,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
-  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t numLinks() const { return o->numLinks(); }
   uint32_t payloadSizePerLink() const { return o->payloadSizePerLink(); }
   uint32_t numChannels() const { return o->numChannels(); }
@@ -77,7 +75,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   FrameV1_Wrapper(boost::shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
   FrameV1_Wrapper(FrameV1* obj) : o(obj) {}
-  bool operator==(const FrameV1_Wrapper &t) const { return this == &t; }
   uint32_t specialWord() const { return o->specialWord(); }
   uint32_t frameNumber() const { return o->frameNumber(); }
   uint32_t timeStampHi() const { return o->timeStampHi(); }

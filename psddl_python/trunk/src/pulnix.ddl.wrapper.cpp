@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <psddl_psana/pulnix.ddl.h> // inc_psana
-#include <psddl_python/pulnix.ddl.wrapper.h> // inc_pyana
+#include <psddl_python/pulnix.ddl.wrapper.h> // inc_python
 namespace Psana {
 namespace Pulnix {
 using namespace boost::python;

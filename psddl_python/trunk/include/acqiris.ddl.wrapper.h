@@ -44,7 +44,6 @@ public:
   };
   VertV1_Wrapper(boost::shared_ptr<VertV1> obj) : _o(obj), o(_o.get()) {}
   VertV1_Wrapper(VertV1* obj) : o(obj) {}
-  bool operator==(const VertV1_Wrapper &t) const { return this == &t; }
   double fullScale() const { return o->fullScale(); }
   double offset() const { return o->offset(); }
   uint32_t coupling() const { return o->coupling(); }
@@ -73,7 +72,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   HorizV1_Wrapper(boost::shared_ptr<HorizV1> obj) : _o(obj), o(_o.get()) {}
   HorizV1_Wrapper(HorizV1* obj) : o(obj) {}
-  bool operator==(const HorizV1_Wrapper &t) const { return this == &t; }
   double sampInterval() const { return o->sampInterval(); }
   double delayTime() const { return o->delayTime(); }
   uint32_t nbrSamples() const { return o->nbrSamples(); }
@@ -124,7 +122,6 @@ public:
   };
   TrigV1_Wrapper(boost::shared_ptr<TrigV1> obj) : _o(obj), o(_o.get()) {}
   TrigV1_Wrapper(TrigV1* obj) : o(obj) {}
-  bool operator==(const TrigV1_Wrapper &t) const { return this == &t; }
   uint32_t coupling() const { return o->coupling(); }
   uint32_t input() const { return o->input(); }
   uint32_t slope() const { return o->slope(); }
@@ -153,7 +150,6 @@ public:
   enum { MaxChan = 20 /**< Maximum number of the configured channels. */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
-  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t nbrConvertersPerChannel() const { return o->nbrConvertersPerChannel(); }
   uint32_t channelMask() const { return o->channelMask(); }
   uint32_t nbrBanks() const { return o->nbrBanks(); }
@@ -177,7 +173,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   TimestampV1_Wrapper(boost::shared_ptr<TimestampV1> obj) : _o(obj), o(_o.get()) {}
   TimestampV1_Wrapper(TimestampV1* obj) : o(obj) {}
-  bool operator==(const TimestampV1_Wrapper &t) const { return this == &t; }
   double pos() const { return o->pos(); }
   uint32_t timeStampLo() const { return o->timeStampLo(); }
   uint32_t timeStampHi() const { return o->timeStampHi(); }
@@ -207,7 +202,6 @@ public:
   enum { _extraSize = 32 };
   DataDescV1Elem_Wrapper(boost::shared_ptr<DataDescV1Elem> obj) : _o(obj), o(_o.get()) {}
   DataDescV1Elem_Wrapper(DataDescV1Elem* obj) : o(obj) {}
-  bool operator==(const DataDescV1Elem_Wrapper &t) const { return this == &t; }
   uint32_t nbrSamplesInSeg() const { return o->nbrSamplesInSeg(); }
   uint32_t indexFirstPoint() const { return o->indexFirstPoint(); }
   uint32_t nbrSegments() const { return o->nbrSegments(); }
@@ -230,7 +224,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataDescV1_Wrapper(boost::shared_ptr<DataDescV1> obj) : _o(obj), o(_o.get()) {}
   DataDescV1_Wrapper(DataDescV1* obj) : o(obj) {}
-  bool operator==(const DataDescV1_Wrapper &t) const { return this == &t; }
   const DataDescV1Elem_Wrapper data(uint32_t i0) const { return DataDescV1Elem_Wrapper((DataDescV1Elem*) &o->data(i0)); }
   std::vector<int> data_shape() const { return o->data_shape(); }
 };
@@ -268,7 +261,6 @@ public:
   };
   TdcChannel_Wrapper(boost::shared_ptr<TdcChannel> obj) : _o(obj), o(_o.get()) {}
   TdcChannel_Wrapper(TdcChannel* obj) : o(obj) {}
-  bool operator==(const TdcChannel_Wrapper &t) const { return this == &t; }
   uint32_t _channel_int() const { return o->_channel_int(); }
   uint32_t _mode_int() const { return o->_mode_int(); }
   Acqiris::TdcChannel::Slope slope() const { return o->slope(); }
@@ -311,7 +303,6 @@ public:
   };
   TdcAuxIO_Wrapper(boost::shared_ptr<TdcAuxIO> obj) : _o(obj), o(_o.get()) {}
   TdcAuxIO_Wrapper(TdcAuxIO* obj) : o(obj) {}
-  bool operator==(const TdcAuxIO_Wrapper &t) const { return this == &t; }
   uint32_t channel_int() const { return o->channel_int(); }
   uint32_t signal_int() const { return o->signal_int(); }
   uint32_t qualifier_int() const { return o->qualifier_int(); }
@@ -352,7 +343,6 @@ public:
   };
   TdcVetoIO_Wrapper(boost::shared_ptr<TdcVetoIO> obj) : _o(obj), o(_o.get()) {}
   TdcVetoIO_Wrapper(TdcVetoIO* obj) : o(obj) {}
-  bool operator==(const TdcVetoIO_Wrapper &t) const { return this == &t; }
   uint32_t signal_int() const { return o->signal_int(); }
   uint32_t qualifier_int() const { return o->qualifier_int(); }
   Acqiris::TdcVetoIO::Channel channel() const { return o->channel(); }
@@ -382,7 +372,6 @@ public:
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
   TdcConfigV1_Wrapper(boost::shared_ptr<TdcConfigV1> obj) : _o(obj), o(_o.get()) {}
   TdcConfigV1_Wrapper(TdcConfigV1* obj) : o(obj) {}
-  bool operator==(const TdcConfigV1_Wrapper &t) const { return this == &t; }
   std::vector<Acqiris::TdcChannel> channels() const { VEC_CONVERT(o->channels(), Acqiris::TdcChannel); }
   std::vector<Acqiris::TdcAuxIO> auxio() const { VEC_CONVERT(o->auxio(), Acqiris::TdcAuxIO); }
   const TdcVetoIO_Wrapper veto() const { return TdcVetoIO_Wrapper((TdcVetoIO*) &o->veto()); }
@@ -413,7 +402,6 @@ public:
   };
   TdcDataV1_Item_Wrapper(boost::shared_ptr<TdcDataV1_Item> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1_Item_Wrapper(TdcDataV1_Item* obj) : o(obj) {}
-  bool operator==(const TdcDataV1_Item_Wrapper &t) const { return this == &t; }
   uint32_t value() const { return o->value(); }
   uint32_t bf_val_() const { return o->bf_val_(); }
   Acqiris::TdcDataV1_Item::Source source() const { return o->source(); }
@@ -436,7 +424,6 @@ class TdcDataV1Common_Wrapper {
 public:
   TdcDataV1Common_Wrapper(boost::shared_ptr<TdcDataV1Common> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Common_Wrapper(TdcDataV1Common* obj) : o(obj) {}
-  bool operator==(const TdcDataV1Common_Wrapper &t) const { return this == &t; }
   uint32_t nhits() const { return o->nhits(); }
   uint8_t overflow() const { return o->overflow(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -454,7 +441,6 @@ class TdcDataV1Channel_Wrapper {
 public:
   TdcDataV1Channel_Wrapper(boost::shared_ptr<TdcDataV1Channel> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Channel_Wrapper(TdcDataV1Channel* obj) : o(obj) {}
-  bool operator==(const TdcDataV1Channel_Wrapper &t) const { return this == &t; }
   uint32_t ticks() const { return o->ticks(); }
   uint8_t overflow() const { return o->overflow(); }
   double time() const { return o->time(); }
@@ -481,7 +467,6 @@ public:
   };
   TdcDataV1Marker_Wrapper(boost::shared_ptr<TdcDataV1Marker> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Marker_Wrapper(TdcDataV1Marker* obj) : o(obj) {}
-  bool operator==(const TdcDataV1Marker_Wrapper &t) const { return this == &t; }
   Acqiris::TdcDataV1Marker::Type type() const { return o->type(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
@@ -501,7 +486,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   TdcDataV1_Wrapper(boost::shared_ptr<TdcDataV1> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1_Wrapper(TdcDataV1* obj) : o(obj) {}
-  bool operator==(const TdcDataV1_Wrapper &t) const { return this == &t; }
   std::vector<Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Acqiris::TdcDataV1_Item); }
 };
 

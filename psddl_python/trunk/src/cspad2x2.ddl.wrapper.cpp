@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <psddl_psana/cspad2x2.ddl.h> // inc_psana
-#include <psddl_python/cspad2x2.ddl.wrapper.h> // inc_pyana
+#include <psddl_python/cspad2x2.ddl.wrapper.h> // inc_python
 namespace Psana {
 namespace CsPad2x2 {
 using namespace boost::python;

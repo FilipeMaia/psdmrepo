@@ -25,7 +25,6 @@ class CsPadDigitalPotsCfg_Wrapper {
 public:
   CsPadDigitalPotsCfg_Wrapper(boost::shared_ptr<CsPadDigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadDigitalPotsCfg_Wrapper(CsPadDigitalPotsCfg* obj) : o(obj) {}
-  bool operator==(const CsPadDigitalPotsCfg_Wrapper &t) const { return this == &t; }
   std::vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
 };
 
@@ -41,7 +40,6 @@ class CsPadReadOnlyCfg_Wrapper {
 public:
   CsPadReadOnlyCfg_Wrapper(boost::shared_ptr<CsPadReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadReadOnlyCfg_Wrapper(CsPadReadOnlyCfg* obj) : o(obj) {}
-  bool operator==(const CsPadReadOnlyCfg_Wrapper &t) const { return this == &t; }
   uint32_t shiftTest() const { return o->shiftTest(); }
   uint32_t version() const { return o->version(); }
 };
@@ -58,7 +56,6 @@ class ProtectionSystemThreshold_Wrapper {
 public:
   ProtectionSystemThreshold_Wrapper(boost::shared_ptr<ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
   ProtectionSystemThreshold_Wrapper(ProtectionSystemThreshold* obj) : o(obj) {}
-  bool operator==(const ProtectionSystemThreshold_Wrapper &t) const { return this == &t; }
   uint32_t adcThreshold() const { return o->adcThreshold(); }
   uint32_t pixelCountThreshold() const { return o->pixelCountThreshold(); }
 };
@@ -75,7 +72,6 @@ class CsPadGainMapCfg_Wrapper {
 public:
   CsPadGainMapCfg_Wrapper(boost::shared_ptr<CsPadGainMapCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadGainMapCfg_Wrapper(CsPadGainMapCfg* obj) : o(obj) {}
-  bool operator==(const CsPadGainMapCfg_Wrapper &t) const { return this == &t; }
   PyObject* gainMap() const { ND_CONVERT(o->gainMap(), uint16_t, 2); }
 };
 
@@ -91,7 +87,6 @@ class ConfigV1QuadReg_Wrapper {
 public:
   ConfigV1QuadReg_Wrapper(boost::shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV1QuadReg_Wrapper(ConfigV1QuadReg* obj) : o(obj) {}
-  bool operator==(const ConfigV1QuadReg_Wrapper &t) const { return this == &t; }
   std::vector<uint32_t> shiftSelect() const { VEC_CONVERT(o->shiftSelect(), uint32_t); }
   std::vector<uint32_t> edgeSelect() const { VEC_CONVERT(o->edgeSelect(), uint32_t); }
   uint32_t readClkSet() const { return o->readClkSet(); }
@@ -123,7 +118,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
-  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -156,7 +150,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
-  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -191,7 +184,6 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
-  bool operator==(const ConfigV3_Wrapper &t) const { return this == &t; }
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   uint32_t runDelay() const { return o->runDelay(); }
   uint32_t eventCode() const { return o->eventCode(); }
@@ -230,7 +222,6 @@ public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   ElementV1_Wrapper(boost::shared_ptr<ElementV1> obj) : _o(obj), o(_o.get()) {}
   ElementV1_Wrapper(ElementV1* obj) : o(obj) {}
-  bool operator==(const ElementV1_Wrapper &t) const { return this == &t; }
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
   uint32_t tid() const { return o->tid(); }
@@ -263,7 +254,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
   const ElementV1_Wrapper quads(uint32_t i0) const { return ElementV1_Wrapper((ElementV1*) &o->quads(i0)); }
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };
@@ -283,7 +273,6 @@ public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
   ElementV2_Wrapper(boost::shared_ptr<ElementV2> obj) : _o(obj), o(_o.get()) {}
   ElementV2_Wrapper(ElementV2* obj) : o(obj) {}
-  bool operator==(const ElementV2_Wrapper &t) const { return this == &t; }
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
   uint32_t tid() const { return o->tid(); }
@@ -316,7 +305,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
-  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
   const ElementV2_Wrapper quads(uint32_t i0) const { return ElementV2_Wrapper((ElementV2*) &o->quads(i0)); }
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };

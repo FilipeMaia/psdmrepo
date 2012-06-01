@@ -37,7 +37,6 @@ public:
   };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
-  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV1::TriggerMode triggerMode() const { return o->triggerMode(); }
   int32_t shutterTimeout() const { return o->shutterTimeout(); }
@@ -125,7 +124,6 @@ public:
   };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
-  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV2::TriggerMode triggerMode() const { return o->triggerMode(); }
   int32_t timepixSpeed() const { return o->timepixSpeed(); }
@@ -219,7 +217,6 @@ public:
   enum { MaxPixelValue = 11810 };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
   uint32_t timestamp() const { return o->timestamp(); }
   uint16_t frameCounter() const { return o->frameCounter(); }
   uint16_t lostRows() const { return o->lostRows(); }
@@ -246,7 +243,6 @@ public:
   enum { MaxPixelValue = 11810 };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
-  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
   uint16_t width() const { return o->width(); }
   uint16_t height() const { return o->height(); }
   uint32_t timestamp() const { return o->timestamp(); }

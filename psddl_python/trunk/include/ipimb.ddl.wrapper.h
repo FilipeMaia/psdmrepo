@@ -32,7 +32,6 @@ public:
   };
   ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
-  bool operator==(const ConfigV1_Wrapper &t) const { return this == &t; }
   uint64_t triggerCounter() const { return o->triggerCounter(); }
   uint64_t serialID() const { return o->serialID(); }
   uint16_t chargeAmpRange() const { return o->chargeAmpRange(); }
@@ -73,7 +72,6 @@ public:
   };
   ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
-  bool operator==(const ConfigV2_Wrapper &t) const { return this == &t; }
   uint64_t triggerCounter() const { return o->triggerCounter(); }
   uint64_t serialID() const { return o->serialID(); }
   uint16_t chargeAmpRange() const { return o->chargeAmpRange(); }
@@ -106,7 +104,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  bool operator==(const DataV1_Wrapper &t) const { return this == &t; }
   uint64_t triggerCounter() const { return o->triggerCounter(); }
   uint16_t config0() const { return o->config0(); }
   uint16_t config1() const { return o->config1(); }
@@ -138,7 +135,6 @@ public:
   enum { ipimbAdcSteps = 65536 };
   DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
-  bool operator==(const DataV2_Wrapper &t) const { return this == &t; }
   uint64_t triggerCounter() const { return o->triggerCounter(); }
   uint16_t config0() const { return o->config0(); }
   uint16_t config1() const { return o->config1(); }

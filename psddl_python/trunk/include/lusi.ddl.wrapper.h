@@ -29,7 +29,6 @@ public:
   enum { NRANGES = 3 };
   DiodeFexConfigV1_Wrapper(boost::shared_ptr<DiodeFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV1_Wrapper(DiodeFexConfigV1* obj) : o(obj) {}
-  bool operator==(const DiodeFexConfigV1_Wrapper &t) const { return this == &t; }
   std::vector<float> base() const { VEC_CONVERT(o->base(), float); }
   std::vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -55,7 +54,6 @@ public:
   enum { NRANGES = 16 };
   DiodeFexConfigV2_Wrapper(boost::shared_ptr<DiodeFexConfigV2> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV2_Wrapper(DiodeFexConfigV2* obj) : o(obj) {}
-  bool operator==(const DiodeFexConfigV2_Wrapper &t) const { return this == &t; }
   std::vector<float> base() const { VEC_CONVERT(o->base(), float); }
   std::vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -80,7 +78,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   DiodeFexV1_Wrapper(boost::shared_ptr<DiodeFexV1> obj) : _o(obj), o(_o.get()) {}
   DiodeFexV1_Wrapper(DiodeFexV1* obj) : o(obj) {}
-  bool operator==(const DiodeFexV1_Wrapper &t) const { return this == &t; }
   float value() const { return o->value(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 private:
@@ -103,7 +100,6 @@ public:
   enum { NCHANNELS = 4 };
   IpmFexConfigV1_Wrapper(boost::shared_ptr<IpmFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   IpmFexConfigV1_Wrapper(IpmFexConfigV1* obj) : o(obj) {}
-  bool operator==(const IpmFexConfigV1_Wrapper &t) const { return this == &t; }
   std::vector<Lusi::DiodeFexConfigV1> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV1); }
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
@@ -124,7 +120,6 @@ public:
   enum { NCHANNELS = 4 };
   IpmFexConfigV2_Wrapper(boost::shared_ptr<IpmFexConfigV2> obj) : _o(obj), o(_o.get()) {}
   IpmFexConfigV2_Wrapper(IpmFexConfigV2* obj) : o(obj) {}
-  bool operator==(const IpmFexConfigV2_Wrapper &t) const { return this == &t; }
   std::vector<Lusi::DiodeFexConfigV2> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV2); }
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
@@ -146,7 +141,6 @@ public:
   enum { NCHANNELS = 4 };
   IpmFexV1_Wrapper(boost::shared_ptr<IpmFexV1> obj) : _o(obj), o(_o.get()) {}
   IpmFexV1_Wrapper(IpmFexV1* obj) : o(obj) {}
-  bool operator==(const IpmFexV1_Wrapper &t) const { return this == &t; }
   std::vector<float> channel() const { VEC_CONVERT(o->channel(), float); }
   float sum() const { return o->sum(); }
   float xpos() const { return o->xpos(); }
@@ -175,7 +169,6 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   PimImageConfigV1_Wrapper(boost::shared_ptr<PimImageConfigV1> obj) : _o(obj), o(_o.get()) {}
   PimImageConfigV1_Wrapper(PimImageConfigV1* obj) : o(obj) {}
-  bool operator==(const PimImageConfigV1_Wrapper &t) const { return this == &t; }
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
   uint32_t _sizeof() const { return o->_sizeof(); }

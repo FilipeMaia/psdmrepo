@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <psddl_psana/acqiris.ddl.h> // inc_psana
-#include <psddl_python/acqiris.ddl.wrapper.h> // inc_pyana
+#include <psddl_python/acqiris.ddl.wrapper.h> // inc_python
 namespace Psana {
 namespace Acqiris {
 using namespace boost::python;
