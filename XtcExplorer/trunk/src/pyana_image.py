@@ -56,6 +56,8 @@ class  pyana_image ( object ) :
                    fignum = "1",
                    # data/calibration path (needed for CsPad)
                    calib_path = None,
+                   cmmode_thr = 30,
+                   cmmode_mode = "asic", 
                    small_tilt = False ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
@@ -126,6 +128,8 @@ class  pyana_image ( object ) :
         
         self.cspad = {}
         self.small_tilt = opt.getOptBoolean(small_tilt)
+        self.cmmode_mode = cmmode_mode
+        self.cmmode_thr = opt.getOptFloat(cmmode_thr)
 
         self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
                              'Cspad'     : TypeId.Type.Id_CspadConfig ,
@@ -223,8 +227,11 @@ class  pyana_image ( object ) :
                 quads = range(4)
                 sections = map(self.config.sections, quads)
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
+                self.cspad[addr].cmmode_mode = self.cmmode_mode
+                self.cspad[addr].cmmode_thr = self.cmmode_thr
                 if self.small_tilt :
                     self.cspad[addr].small_angle_tilt = True
+                
 
                 try:
                     self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )

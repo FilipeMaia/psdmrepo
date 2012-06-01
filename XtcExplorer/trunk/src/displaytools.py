@@ -438,10 +438,6 @@ class Frame(object):
         itsme +="\n projy = %s " % self.projy
         print itsme
 
-    def update_axes(self):
-        if self.projx is None: return
-        if self.projy is None: return
-        
 
     def set_ticks(self, limits = None ):
         
@@ -548,7 +544,6 @@ class Frame(object):
             self.projy.set_ylim( start_y+vdim, start_y)
 
             self.set_ticks()
-            self.update_axes()
             
 
         #cax = divider.append_axes("right",size="5%", pad=0.05)
@@ -586,7 +581,6 @@ class Frame(object):
         
             def update(val):            
                 self.axesim.set_clim(self.slider_vmin.val, self.slider_vmax.val)
-                self.update_axes()
                 plt.draw()
             
             self.slider_vmin.on_changed(update)        
@@ -987,9 +981,11 @@ class Plotter(object):
                         print "maximum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
 
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
-                    aplot.slider_vmin.set_val(aplot.vmin)
-                    aplot.slider_vmax.set_val(aplot.vmax)
-                    aplot.update_axes()
+                    try:
+                        aplot.slider_vmin.set_val(aplot.vmin)
+                        aplot.slider_vmax.set_val(aplot.vmax)
+                    except:
+                        pass
                     plt.draw()
 
                 
@@ -1149,7 +1145,6 @@ class Plotter(object):
             aplot.projy.set_ylim( start_y+vdim, start_y)
 
             aplot.set_ticks()
-            aplot.update_axes()
             
 
         cax = divider.append_axes("right",size="5%", pad=0.05)

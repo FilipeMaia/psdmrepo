@@ -814,7 +814,7 @@ Do you want to proceed?
             self.configuration += module
             self.configuration += "]"
             #if len( options_for_mod[ count_m ] )>0 :
-            for options in options_for_mod[ count_m ] :
+            for options in sorted(options_for_mod[ count_m ]) :
                 self.configuration += options
             count_m +=1
             
@@ -854,9 +854,10 @@ Do you want to proceed?
         #      1) scan
         #      2) all-in-one analysis 
 
+        boxlabel = str(box.text())
 
         # --- --- --- Scan --- --- ---
-        if str(box.text()).find("ControlPV:")>=0 :
+        if boxlabel.find("ControlPV:")>=0 :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_scan")
             except ValueError :
@@ -865,7 +866,7 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_scan at ", index
-            pvname = str(box.text()).split("PV: ")[1]
+            pvname = boxlabel.split("PV: ")[1]
             options_for_mod[index].append("\ncontrolpv = %s" % pvname)
             options_for_mod[index].append("\ninput_epics = ")
             options_for_mod[index].append("\ninput_scalars = ")
@@ -876,9 +877,9 @@ Do you want to proceed?
 
 
         # --- --- --- BLD --- --- ---
-        if ( str(box.text()).find("EBeam")>=0 or 
-             str(box.text()).find("FEEGasDetEnergy")>=0 or
-             str(box.text()).find("PhaseCavity")>=0 ):
+        if ( boxlabel.find("EBeam")>=0 or 
+             boxlabel.find("FEEGasDetEnergy")>=0 or
+             boxlabel.find("PhaseCavity")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_bld")
             except ValueError :
@@ -890,20 +891,20 @@ Do you want to proceed?
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            if str(box.text()).find("EBeam")>=0 :
+            if boxlabel.find("EBeam")>=0 :
                 options_for_mod[index].append("\ndo_ebeam = True")
-            if str(box.text()).find("FEEGasDetEnergy")>=0 :
+            if boxlabel.find("FEEGasDetEnergy")>=0 :
                 options_for_mod[index].append("\ndo_gasdetector = True")
-            if str(box.text()).find("PhaseCavity")>=0 :
+            if boxlabel.find("PhaseCavity")>=0 :
                 options_for_mod[index].append("\ndo_phasecavity = True")
             return
             
         # --- --- --- Waveform --- --- ---
-        if ( str(box.text()).find("Acq")>=0  
-             or str(box.text()).find("ETof")>=0
-             or str(box.text()).find("ITof")>=0
-             or str(box.text()).find("Mbes")>=0
-             #or str(box.text()).find("Camp")>=0
+        if ( boxlabel.find("Acq")>=0  
+             or boxlabel.find("ETof")>=0
+             or boxlabel.find("ITof")>=0
+             or boxlabel.find("Mbes")>=0
+             #or boxlabel.find("Camp")>=0
              ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_waveform")
@@ -913,8 +914,8 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_waveform at ", index
-            #address = str(box.text()).split(":")[1].strip()
-            address = str(box.text()).strip()
+            #address = boxlabel.split(":")[1].strip()
+            address = boxlabel.strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
@@ -923,11 +924,11 @@ Do you want to proceed?
             return
                     
         # --- --- --- Ipimb --- --- ---
-        if ( str(box.text()).find("IPM")>=0 or
-             str(box.text()).find("DIO")>=0 or
-             str(box.text()).find("LAS-EM")>=0 or
-             str(box.text()).find("TCTR")>=0 or             
-             str(box.text()).find("Ipimb")>=0 ) :
+        if ( boxlabel.find("IPM")>=0 or
+             boxlabel.find("DIO")>=0 or
+             boxlabel.find("LAS-EM")>=0 or
+             boxlabel.find("TCTR")>=0 or             
+             boxlabel.find("Ipimb")>=0 ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_ipimb")
             except ValueError :
@@ -936,8 +937,8 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_ipimb at ", index
-            #address = str(box.text()).split(": ")[1].strip()
-            address = str(box.text()).strip()
+            #address = boxlabel.split(": ")[1].strip()
+            address = boxlabel.strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nquantities = fex:channels fex:sum")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -946,15 +947,15 @@ Do you want to proceed?
             return
                     
         # --- --- --- All images --- --- ---
-        if ( str(box.text()).find("YAG")>=0 
-             or  str(box.text()).find("TM6740")>=0 
-             or str(box.text()).find("Opal")>=0 
-             or str(box.text()).find("Fccd")>=0 
-             or str(box.text()).find("Princeton")>=0
-             or str(box.text()).find("pnCCD")>=0 
-             or str(box.text()).find("Cspad")>=0
-             or str(box.text()).find("Timepix")>=0 
-             or str(box.text()).find("Fli")>=0 ):
+        if ( boxlabel.find("YAG")>=0 
+             or  boxlabel.find("TM6740")>=0 
+             or boxlabel.find("Opal")>=0 
+             or boxlabel.find("Fccd")>=0 
+             or boxlabel.find("Princeton")>=0
+             or boxlabel.find("pnCCD")>=0 
+             or boxlabel.find("Cspad")>=0
+             or boxlabel.find("Timepix")>=0 
+             or boxlabel.find("Fli")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
@@ -963,8 +964,8 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_image at ", index
-            #address = str(box.text()).split(": ")[1].strip()
-            address = str(box.text()).strip()
+            #address = boxlabel.split(": ")[1].strip()
+            address = boxlabel.strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\ninputdark = ")
             options_for_mod[index].append("\n;threshold = lower=0 upper=1200 roi=(x1:x2,y1:y2) type=maximum")
@@ -976,6 +977,9 @@ Do you want to proceed?
             #options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
             options_for_mod[index].append("\noutputfile = ")
             options_for_mod[index].append("\nmax_save = 0   ; max event images to save" )
+
+            options_for_mod[index].append("\ncmmode_mode = asic");
+            options_for_mod[index].append("\ncmmode_thr = 30"); 
             options_for_mod[index].append("\nsmall_tilt = False");
             try:
                 calibpath = '/'.join( self.filenames[0].split('/')[0:6]) + "/calib/*/" +\
@@ -987,7 +991,7 @@ Do you want to proceed?
             return
 
 #        # --- --- --- CsPad --- --- ---
-#        if (str(box.text()).find("Cspad")>=0 ):
+#        if (boxlabel.find("Cspad")>=0 ):
 #            try :
 #                index = modules_to_run.index("XtcExplorer.pyana_cspad")
 #            except ValueError :
@@ -1000,8 +1004,8 @@ Do you want to proceed?
 #            exp = fname.split('/')[5]
 #            rnr = fname.split('/')[7].split('-')[1]
 #            dfile = "cspad_%s_%s.npy"%(exp,rnr) 
-#            #address = str(box.text()).split(":")[1].strip()
-#            address = str(box.text()).strip()
+#            #address = boxlabel.split(":")[1].strip()
+#            address = boxlabel.strip()
 #            options_for_mod[index].append("\nsource = %s" % address)
 #            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
 #            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
@@ -1014,7 +1018,7 @@ Do you want to proceed?
 #            return
 
         # --- --- --- Encoder --- --- ---
-        if str(box.text()).find("Encoder")>=0 :
+        if boxlabel.find("Encoder")>=0 :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_encoder")
             except ValueError :
@@ -1023,8 +1027,8 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_encoder at ", index 
-            #address = str(box.text()).split(": ")[1].strip()
-            address = str(box.text()).strip()
+            #address = boxlabel.split(": ")[1].strip()
+            address = boxlabel.strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n )
@@ -1032,10 +1036,10 @@ Do you want to proceed?
             return
         
         # --- --- --- Epics --- --- ---
-        if str(box.text()).find("Epics Process Variables")>=0 :
+        if boxlabel.find("Epics Process Variables")>=0 :
             return
 
-        if str(box.text()).find("EpicsPV:")>=0 :
+        if boxlabel.find("EpicsPV:")>=0 :
 
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_epics")
@@ -1045,7 +1049,7 @@ Do you want to proceed?
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_epics at ", index
-            pvname = str(box.text()).split("PV:  ")[1]
+            pvname = boxlabel.split("PV:  ")[1]
             options_for_mod[index].append("\npv_names = %s" % pvname)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n )

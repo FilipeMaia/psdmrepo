@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-June-1 ofte V00-01-31          rev 3691
+       - commonmodes asic-by-asic. 
+	
 2012-May-30 ofte                   rev 3650
        - reset event counter at beginning of run
 	

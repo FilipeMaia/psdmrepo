@@ -30,6 +30,10 @@ class CsPad( object ):
         self.image = None 
         # one 1800x1800 image ready for display
 
+        # common mode corrections:
+        self.cmmode_mode = "asic"
+        self.cmmode_thr = 30
+
         self.small_angle_tilt = False
         # apply additional small-angle tilt (in addition to
         # the 90-degree rotation of the sections). This improves
@@ -255,7 +259,8 @@ class CsPad( object ):
         # pedestal subtraction here
         if self.pedestals is not None:
             self.pixels = self.pixels - self.pedestals
-            self.subtract_commonmode()
+            if self.cmmode_mode is not None: 
+                self.subtract_commonmode()
             
         self.make_image( self.pixels )
         return self.image
@@ -318,19 +323,56 @@ class CsPad( object ):
             pass
 
 
-    def subtract_commonmode( self, threshold=30 ):
+    def subtract_commonmode( self ):
         if self.pedestals is None:
             print "No pedestals defined, cannot do common mode"
             return
-        
-        array = self.pixels.reshape(32,185*388)
-        cmode = np.average(array, axis=1)#.reshape(4,8)
-        for i in xrange(32):
-            array[i] = array[i]-cmode[i]
-        self.pixels = array.reshape(4,8,185,388)
-        print "Common modes have been subtracted: ", cmode
-        return
+
+        array_sections = self.pixels.reshape(4*8,185,388)
+        warray = None
+
+        if self.cmmode_mode=="asic":
+            # compute one common mode per asic
+
+            # split each section (185x388) into two asics (185x194)
+            array_asics = array_sections.reshape(4*8,185,2,194)
+
+            for a in xrange(0,2):
+                asic = array_asics[:,:,a,:].reshape( 4*8, 185*194 )
                 
+                # array of weights
+                if self.cmmode_thr is not None:
+                    warray = (asic<self.cmmode_thr).astype(int)
+            
+                # compute common modes
+                cmode = np.average( asic, axis=1, weights=warray )
+        
+                for i in xrange(32):
+                    asic[i] = asic[i] - cmode[i] 
+
+                array_asics[:,:,a,:] = asic.reshape(4*8,185,194)
+
+            self.pixels = array_asics.reshape(4,8,185,388)
+         
+        elif self.cmmode_mode=="section":
+            # compute one common mode per section: 
+        
+            array = self.pixels.reshape(32,185*388)
+
+            # array of weights
+            if self.cmmode_thr is not None: 
+                warray = (array<self.cm_thr).astype(int)
+
+            cmode = np.average(array, axis=1, weights=warray)
+            for i in xrange(32):
+                array[i] = array[i]-cmode[i]
+            self.pixels = array.reshape(4,8,185,388)
+
+        else: 
+            print "Cannot determine common mode based on %s. "
+            print "Please set cspad.cmmode_mode to either 'asic' or 'section'"
+           
+        
                 
     def save_pixels(self, pixelsfile ):
         """ save image as a pixel array with the same 
