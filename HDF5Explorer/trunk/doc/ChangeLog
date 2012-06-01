@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-14
+2012-06-01 Mikhail S. Dubrovin
+M       src/GlobalMethods.py
+    if   name3[0:8]  == 'CsPad2x2' and name1 == 'data'           : return True <- ADDED LINE
+    elif name3[0:18] == 'CsPad::MiniElement' and name1 == 'data' : return True
+
 Tag: V00-00-13
 2012-03-09 Mikhail S. Dubrovin
 - ConfigCSpad.py - steadly remove access to old hardwired constants.

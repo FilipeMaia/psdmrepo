@@ -154,8 +154,9 @@ def CSpadMiniElementIsInTheName(dsname):
     path1,name1 = os.path.split(str(dsname))
     path2,name2 = os.path.split(str(path1))
     path3,name3 = os.path.split(str(path2))
-    if name3[0:18] == 'CsPad::MiniElement' and name1 == 'data' : return True
-    else                                                       : return False
+    if   name3[0:8]  == 'CsPad2x2' and name1 == 'data'           : return True
+    elif name3[0:18] == 'CsPad::MiniElement' and name1 == 'data' : return True
+    else                                                         : return False
 
 #----------------------------------
 
