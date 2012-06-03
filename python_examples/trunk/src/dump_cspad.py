@@ -104,6 +104,7 @@ class dump_cspad ( object ) :
 
     def event( self, evt, env ) :
 
+        """
         quads = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
         if not quads :
             return
@@ -111,8 +112,9 @@ class dump_cspad ( object ) :
         # dump information about quadrants
         print "dump_cspad: %s: %s" % (quads[0].__class__.__name__, self.m_src)
         print "  Number of quadrants: %d" % len(quads)
+        """
 
-        evt_data = evt.getBySource("Psana::CsPad::Data", self.source)
+        evt_data = evt.getByType("Psana::CsPad::Data", self.m_src)
         quads = evt_data.quads
         if not quads :
             return

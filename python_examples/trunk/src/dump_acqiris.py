@@ -96,6 +96,7 @@ class dump_acqiris (object) :
         @param env    environment object
         """
 
+        print "... self.m_src=", self.m_src
         acqData = evt.getByType("Psana::Acqiris::DataDesc", self.m_src)
 
         nchan = acqData.data_shape()[0];
