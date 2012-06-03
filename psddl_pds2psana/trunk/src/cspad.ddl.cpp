@@ -109,6 +109,54 @@ const Psana::CsPad::CsPadReadOnlyCfg& ConfigV1QuadReg::ro() const { return _read
 const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV1QuadReg::dp() const { return _digitalPots; }
 
 const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg::gm() const { return _gainMap; }
+ConfigV2QuadReg::ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::CsPad::ConfigV2QuadReg()
+  , m_xtcObj(xtcPtr)
+  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad::CsPadReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
+  , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
+{
+}
+ConfigV2QuadReg::~ConfigV2QuadReg()
+{
+}
+
+
+ndarray<uint32_t, 1> ConfigV2QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
+
+ndarray<uint32_t, 1> ConfigV2QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
+
+uint32_t ConfigV2QuadReg::readClkSet() const { return m_xtcObj->readClkSet(); }
+
+uint32_t ConfigV2QuadReg::readClkHold() const { return m_xtcObj->readClkHold(); }
+
+uint32_t ConfigV2QuadReg::dataMode() const { return m_xtcObj->dataMode(); }
+
+uint32_t ConfigV2QuadReg::prstSel() const { return m_xtcObj->prstSel(); }
+
+uint32_t ConfigV2QuadReg::acqDelay() const { return m_xtcObj->acqDelay(); }
+
+uint32_t ConfigV2QuadReg::intTime() const { return m_xtcObj->intTime(); }
+
+uint32_t ConfigV2QuadReg::digDelay() const { return m_xtcObj->digDelay(); }
+
+uint32_t ConfigV2QuadReg::ampIdle() const { return m_xtcObj->ampIdle(); }
+
+uint32_t ConfigV2QuadReg::injTotal() const { return m_xtcObj->injTotal(); }
+
+uint32_t ConfigV2QuadReg::rowColShiftPer() const { return m_xtcObj->rowColShiftPer(); }
+
+uint32_t ConfigV2QuadReg::ampReset() const { return m_xtcObj->ampReset(); }
+
+uint32_t ConfigV2QuadReg::digCount() const { return m_xtcObj->digCount(); }
+
+uint32_t ConfigV2QuadReg::digPeriod() const { return m_xtcObj->digPeriod(); }
+
+const Psana::CsPad::CsPadReadOnlyCfg& ConfigV2QuadReg::ro() const { return _readOnly; }
+
+const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV2QuadReg::dp() const { return _digitalPots; }
+
+const Psana::CsPad::CsPadGainMapCfg& ConfigV2QuadReg::gm() const { return _gainMap; }
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1()
   , m_xtcObj(xtcPtr)
@@ -306,6 +354,87 @@ std::vector<int> ConfigV3::quads_shape() const
   return shape;
 }
 
+ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::CsPad::ConfigV4()
+  , m_xtcObj(xtcPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->protectionThresholds_shape();
+    _protectionThresholds.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ProtectionSystemThreshold& d = xtcPtr->protectionThresholds(i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ProtectionSystemThreshold> dPtr(m_xtcObj, &d);
+      _protectionThresholds.push_back(psddl_pds2psana::CsPad::ProtectionSystemThreshold(dPtr));
+    }
+  }
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape();
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ConfigV2QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ConfigV2QuadReg> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ConfigV2QuadReg(dPtr));
+    }
+  }
+}
+ConfigV4::~ConfigV4()
+{
+}
+
+
+uint32_t ConfigV4::concentratorVersion() const { return m_xtcObj->concentratorVersion(); }
+
+uint32_t ConfigV4::runDelay() const { return m_xtcObj->runDelay(); }
+
+uint32_t ConfigV4::eventCode() const { return m_xtcObj->eventCode(); }
+
+const Psana::CsPad::ProtectionSystemThreshold& ConfigV4::protectionThresholds(uint32_t i0) const { return _protectionThresholds[i0]; }
+
+uint32_t ConfigV4::protectionEnable() const { return m_xtcObj->protectionEnable(); }
+
+uint32_t ConfigV4::inactiveRunMode() const { return m_xtcObj->inactiveRunMode(); }
+
+uint32_t ConfigV4::activeRunMode() const { return m_xtcObj->activeRunMode(); }
+
+uint32_t ConfigV4::tdi() const { return m_xtcObj->tdi(); }
+
+uint32_t ConfigV4::payloadSize() const { return m_xtcObj->payloadSize(); }
+
+uint32_t ConfigV4::badAsicMask0() const { return m_xtcObj->badAsicMask0(); }
+
+uint32_t ConfigV4::badAsicMask1() const { return m_xtcObj->badAsicMask1(); }
+
+uint32_t ConfigV4::asicMask() const { return m_xtcObj->asicMask(); }
+
+uint32_t ConfigV4::quadMask() const { return m_xtcObj->quadMask(); }
+
+const Psana::CsPad::ConfigV2QuadReg& ConfigV4::quads(uint32_t i0) const { return _quads[i0]; }
+
+uint32_t ConfigV4::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
+
+uint32_t ConfigV4::roiMask(uint32_t iq) const { return m_xtcObj->roiMask(iq); }
+
+uint32_t ConfigV4::numAsicsStored(uint32_t iq) const { return m_xtcObj->numAsicsStored(iq); }
+
+uint32_t ConfigV4::numQuads() const { return m_xtcObj->numQuads(); }
+
+uint32_t ConfigV4::numSect() const { return m_xtcObj->numSect(); }
+std::vector<int> ConfigV4::protectionThresholds_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_protectionThresholds.size());
+  return shape;
+}
+
+std::vector<int> ConfigV4::quads_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_quads.size());
+  return shape;
+}
+
 ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV1>& cfgPtr)
   : Psana::CsPad::ElementV1()
   , m_xtcObj(xtcPtr)
@@ -316,6 +445,18 @@ ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost
   : Psana::CsPad::ElementV1()
   , m_xtcObj(xtcPtr)
   , m_cfgPtr1(cfgPtr)
+{
+}
+ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV3>& cfgPtr)
+  : Psana::CsPad::ElementV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr2(cfgPtr)
+{
+}
+ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV4>& cfgPtr)
+  : Psana::CsPad::ElementV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr3(cfgPtr)
 {
 }
 ElementV1::~ElementV1()
@@ -348,6 +489,8 @@ uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 ndarray<int16_t, 3> ElementV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
+  if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
+  if (m_cfgPtr3.get()) return m_xtcObj->data(*m_cfgPtr3);
   throw std::runtime_error("ElementV1::data: config object pointer is zero");
 }
 
@@ -355,6 +498,8 @@ ndarray<int16_t, 3> ElementV1::data() const {
 uint32_t ElementV1::sectionMask() const {
   if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->sectionMask(*m_cfgPtr1);
+  if (m_cfgPtr2.get()) return m_xtcObj->sectionMask(*m_cfgPtr2);
+  if (m_cfgPtr3.get()) return m_xtcObj->sectionMask(*m_cfgPtr3);
   throw std::runtime_error("ElementV1::sectionMask: config object pointer is zero");
 }
 
@@ -379,6 +524,36 @@ DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shar
   : Psana::CsPad::DataV1()
   , m_xtcObj(xtcPtr)
   , m_cfgPtr1(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV1(dPtr, cfgPtr));
+    }
+  }
+}
+DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV3>& cfgPtr)
+  : Psana::CsPad::DataV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr2(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV1(dPtr, cfgPtr));
+    }
+  }
+}
+DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV4>& cfgPtr)
+  : Psana::CsPad::DataV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr3(cfgPtr)
 {
   {
     const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
@@ -416,6 +591,12 @@ ElementV2::ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost
   , m_cfgPtr1(cfgPtr)
 {
 }
+ElementV2::ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV4>& cfgPtr)
+  : Psana::CsPad::ElementV2()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr2(cfgPtr)
+{
+}
 ElementV2::~ElementV2()
 {
 }
@@ -446,6 +627,7 @@ uint32_t ElementV2::frame_type() const { return m_xtcObj->frame_type(); }
 ndarray<int16_t, 3> ElementV2::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
+  if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
   throw std::runtime_error("ElementV2::data: config object pointer is zero");
 }
 
@@ -453,6 +635,7 @@ ndarray<int16_t, 3> ElementV2::data() const {
 uint32_t ElementV2::sectionMask() const {
   if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->sectionMask(*m_cfgPtr1);
+  if (m_cfgPtr2.get()) return m_xtcObj->sectionMask(*m_cfgPtr2);
   throw std::runtime_error("ElementV2::sectionMask: config object pointer is zero");
 }
 
@@ -477,6 +660,21 @@ DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shar
   : Psana::CsPad::DataV2()
   , m_xtcObj(xtcPtr)
   , m_cfgPtr1(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV2& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV2> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV2(dPtr, cfgPtr));
+    }
+  }
+}
+DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV4>& cfgPtr)
+  : Psana::CsPad::DataV2()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr2(cfgPtr)
 {
   {
     const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);

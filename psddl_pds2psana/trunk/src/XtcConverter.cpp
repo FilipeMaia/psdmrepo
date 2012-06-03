@@ -169,6 +169,17 @@ namespace {
     return false;
   }
 
+  template<typename FinalType, typename XtcConfigType1, typename XtcConfigType2, typename XtcConfigType3, typename XtcConfigType4>
+  bool
+  storeDataProxyCfg4(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
+  {
+    if (storeDataProxyCfg<FinalType, XtcConfigType1>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType2>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType3>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType4>(xtc, evt, cfgStore)) return true;
+    return false;
+  }
+
   template<typename PsanaType, typename XtcType>
   void 
   storeValueType(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt)
@@ -327,8 +338,10 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 1) ::storeValueType<Psana::Princeton::InfoV1, PsddlPds::Princeton::InfoV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_CspadElement:
-    if (version == 1) ::storeDataProxyCfg2<CsPadDataOrdered<CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
-    if (version == 2) ::storeDataProxyCfg2<CsPadDataOrdered<CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg4<CsPadDataOrdered<CsPad::DataV1, Psana::CsPad::ElementV1>, 
+            PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3, PsddlPds::CsPad::ConfigV4>(xtc, evt, cfgStore);
+    if (version == 2) ::storeDataProxyCfg3<CsPadDataOrdered<CsPad::DataV2, Psana::CsPad::ElementV2>, 
+            PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3, PsddlPds::CsPad::ConfigV4>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_CspadConfig:
     break;
@@ -501,6 +514,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 1) ::storeCfgObject<CsPad::ConfigV1>(xtc, cfgStore);
     if (version == 2) ::storeCfgObject<CsPad::ConfigV2>(xtc, cfgStore);
     if (version == 3) ::storeCfgObject<CsPad::ConfigV3>(xtc, cfgStore);
+    if (version == 4) ::storeCfgObject<CsPad::ConfigV4>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_IpmFexConfig:
     if (version == 1) ::storeCfgObject<Lusi::IpmFexConfigV1>(xtc, cfgStore);
