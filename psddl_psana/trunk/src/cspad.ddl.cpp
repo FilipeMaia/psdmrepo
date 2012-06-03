@@ -21,6 +21,9 @@ CsPadGainMapCfg::~CsPadGainMapCfg() {}
 ConfigV1QuadReg::~ConfigV1QuadReg() {}
 
 
+ConfigV2QuadReg::~ConfigV2QuadReg() {}
+
+
 ConfigV1::~ConfigV1() {}
 
 
@@ -28,6 +31,9 @@ ConfigV2::~ConfigV2() {}
 
 
 ConfigV3::~ConfigV3() {}
+
+
+ConfigV4::~ConfigV4() {}
 
 
 ElementV1::~ElementV1() {}

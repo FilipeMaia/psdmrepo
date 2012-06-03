@@ -137,6 +137,37 @@ public:
   virtual const CsPad::CsPadGainMapCfg& gm() const = 0;
 };
 
+/** @class ConfigV2QuadReg
+
+  Configuration data for single quadrant.
+*/
+
+
+class ConfigV2QuadReg {
+public:
+  virtual ~ConfigV2QuadReg();
+  virtual ndarray<uint32_t, 1> shiftSelect() const = 0;
+  virtual ndarray<uint32_t, 1> edgeSelect() const = 0;
+  virtual uint32_t readClkSet() const = 0;
+  virtual uint32_t readClkHold() const = 0;
+  virtual uint32_t dataMode() const = 0;
+  virtual uint32_t prstSel() const = 0;
+  virtual uint32_t acqDelay() const = 0;
+  virtual uint32_t intTime() const = 0;
+  virtual uint32_t digDelay() const = 0;
+  virtual uint32_t ampIdle() const = 0;
+  virtual uint32_t injTotal() const = 0;
+  virtual uint32_t rowColShiftPer() const = 0;
+  virtual uint32_t ampReset() const = 0;
+  virtual uint32_t digCount() const = 0;
+  virtual uint32_t digPeriod() const = 0;
+  /** read-only configuration */
+  virtual const CsPad::CsPadReadOnlyCfg& ro() const = 0;
+  virtual const CsPad::CsPadDigitalPotsCfg& dp() const = 0;
+  /** Gain map. */
+  virtual const CsPad::CsPadGainMapCfg& gm() const = 0;
+};
+
 /** @class ConfigV1
 
   Configuration data for complete CsPad device.
@@ -243,6 +274,46 @@ public:
   virtual std::vector<int> quads_shape() const = 0;
 };
 
+/** @class ConfigV4
+
+  Configuration data for complete CsPad device.
+*/
+
+
+class ConfigV4 {
+public:
+  enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 4 /**< XTC type version number */ };
+  virtual ~ConfigV4();
+  virtual uint32_t concentratorVersion() const = 0;
+  virtual uint32_t runDelay() const = 0;
+  virtual uint32_t eventCode() const = 0;
+  virtual const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const = 0;
+  virtual uint32_t protectionEnable() const = 0;
+  virtual uint32_t inactiveRunMode() const = 0;
+  virtual uint32_t activeRunMode() const = 0;
+  virtual uint32_t tdi() const = 0;
+  virtual uint32_t payloadSize() const = 0;
+  virtual uint32_t badAsicMask0() const = 0;
+  virtual uint32_t badAsicMask1() const = 0;
+  virtual uint32_t asicMask() const = 0;
+  virtual uint32_t quadMask() const = 0;
+  virtual const CsPad::ConfigV2QuadReg& quads(uint32_t i0) const = 0;
+  virtual uint32_t numAsicsRead() const = 0;
+  /** ROI mask for given quadrant */
+  virtual uint32_t roiMask(uint32_t iq) const = 0;
+  /** Number of ASICs in given quadrant */
+  virtual uint32_t numAsicsStored(uint32_t iq) const = 0;
+  /** Total number of quadrants in setup */
+  virtual uint32_t numQuads() const = 0;
+  /** Total number of sections (2x1) in all quadrants */
+  virtual uint32_t numSect() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
+  virtual std::vector<int> protectionThresholds_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
+  virtual std::vector<int> quads_shape() const = 0;
+};
+
 /** @class ElementV1
 
   CsPad data from single CsPad quadrant.
@@ -250,6 +321,8 @@ public:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
+class ConfigV4;
 
 class ElementV1 {
 public:
@@ -286,6 +359,8 @@ public:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
+class ConfigV4;
 
 class DataV1 {
 public:
@@ -306,6 +381,7 @@ public:
 
 class ConfigV2;
 class ConfigV3;
+class ConfigV4;
 
 class ElementV2 {
 public:
@@ -341,6 +417,7 @@ public:
 
 class ConfigV2;
 class ConfigV3;
+class ConfigV4;
 
 class DataV2 {
 public:
