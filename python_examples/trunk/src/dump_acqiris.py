@@ -62,6 +62,12 @@ class dump_acqiris (object) :
     #-------------------
     def beginjob( self, evt, env ) :
         
+        #print evt.getAllKeys()
+
+        cppTypeName = evt.getCppTypeNameForPythonTypeId(xtc.TypeId.Type.Id_AcqConfig);
+        print "xtc.TypeId.Type.Id_AcqConfig ->", cppTypeName
+#        sys.exit(0)
+
         config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
         if config:
         
