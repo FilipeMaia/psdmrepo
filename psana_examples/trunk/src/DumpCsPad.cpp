@@ -158,6 +158,44 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
     }
     
   }
+
+  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_src);
+  if (config4.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "CsPad::ConfigV4:";
+      str << "\n  concentratorVersion = " << config4->concentratorVersion();
+      str << "\n  runDelay = " << config4->runDelay();
+      str << "\n  eventCode = " << config4->eventCode();
+      str << "\n  protectionEnable = " << config4->protectionEnable();
+      str << "\n  protectionThresholds:";
+      for (unsigned i = 0; i < config4->numQuads(); ++ i) {
+        str << "\n    adcThreshold=" << config4->protectionThresholds(i).adcThreshold()
+            << " pixelCountThreshold=" << config4->protectionThresholds(i).pixelCountThreshold();
+      }
+      str << "\n  inactiveRunMode = " << config4->inactiveRunMode();
+      str << "\n  activeRunMode = " << config4->activeRunMode();
+      str << "\n  tdi = " << config4->tdi();
+      str << "\n  payloadSize = " << config4->payloadSize();
+      str << "\n  badAsicMask0 = " << config4->badAsicMask0();
+      str << "\n  badAsicMask1 = " << config4->badAsicMask1();
+      str << "\n  asicMask = " << config4->asicMask();
+      str << "\n  quadMask = " << config4->quadMask();
+      str << "\n  numAsicsRead = " << config4->numAsicsRead();
+      str << "\n  numQuads = " << config4->numQuads();
+      str << "\n  numSect = " << config4->numSect();
+      str << "\n  roiMask =";
+      for (unsigned i = 0; i < config4->numQuads(); ++ i) {
+        str.setf(std::ios::showbase);
+        str << ' ' << std::hex << config4->roiMask(i) << std::dec;
+      }
+      str << "\n  numAsicsStored =";
+      for (unsigned i = 0; i < config4->numQuads(); ++ i) {
+        str << ' ' << config4->numAsicsStored(i);
+      }
+    }
+    
+  }
 }
 
 // Method which is called with event data

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-08
+2012-06-03 Andy Salnikov
+- added code to dump new type CsPad::ConfigV4
+
 Tag: V00-02-07
 2012-05-11 Andy Salnikov
 - added code to dump new type Princeton::ConfigV3
