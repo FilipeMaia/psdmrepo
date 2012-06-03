@@ -44,6 +44,7 @@
 #include "H5DataTypes/CsPadConfigV1.h"
 #include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/CsPadConfigV3.h"
+#include "H5DataTypes/CsPadConfigV4.h"
 #include "H5DataTypes/EncoderConfigV1.h"
 #include "H5DataTypes/EncoderConfigV2.h"
 #include "H5DataTypes/EncoderDataV1.h"
@@ -376,6 +377,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV3> ( "CsPad::ConfigV3" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV4> ( "CsPad::ConfigV4" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 4).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::Gsc16aiConfigV1> ( "Gsc16ai::ConfigV1" ) ) ;
