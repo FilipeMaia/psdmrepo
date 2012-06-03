@@ -86,11 +86,53 @@ ConfigV3::quads_shape() const {
   return shape;
 }
 uint32_t
+ConfigV4::numAsicsRead() const {
+  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+}
+uint32_t
+ConfigV4::roiMask(uint32_t iq) const {
+  return (this->_roiMask >> (8*iq)) & 0xff;
+}
+uint32_t
+ConfigV4::numAsicsStored(uint32_t iq) const {
+  return __builtin_popcount(this->roiMask(iq))*2;
+}
+uint32_t
+ConfigV4::numQuads() const {
+  return __builtin_popcount(this->_quadMask);
+}
+uint32_t
+ConfigV4::numSect() const {
+  return __builtin_popcount(this->_roiMask);
+}
+std::vector<int>
+ConfigV4::protectionThresholds_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(MaxQuadsPerSensor);
+  return shape;
+}
+std::vector<int>
+ConfigV4::quads_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(MaxQuadsPerSensor);
+  return shape;
+}
+uint32_t
 ElementV1::sectionMask(const CsPad::ConfigV1& cfg) const {
   return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
 }
 uint32_t
 ElementV1::sectionMask(const CsPad::ConfigV2& cfg) const {
+  return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
+}
+uint32_t
+ElementV1::sectionMask(const CsPad::ConfigV3& cfg) const {
+  return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
+}
+uint32_t
+ElementV1::sectionMask(const CsPad::ConfigV4& cfg) const {
   return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
 }
 float
@@ -111,12 +153,30 @@ DataV1::quads_shape(const CsPad::ConfigV2& cfg) const {
   shape.push_back(cfg.numQuads());
   return shape;
 }
+std::vector<int>
+DataV1::quads_shape(const CsPad::ConfigV3& cfg) const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
+std::vector<int>
+DataV1::quads_shape(const CsPad::ConfigV4& cfg) const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
 uint32_t
 ElementV2::sectionMask(const CsPad::ConfigV2& cfg) const {
   return cfg.roiMask(this->quad());
 }
 uint32_t
 ElementV2::sectionMask(const CsPad::ConfigV3& cfg) const {
+  return cfg.roiMask(this->quad());
+}
+uint32_t
+ElementV2::sectionMask(const CsPad::ConfigV4& cfg) const {
   return cfg.roiMask(this->quad());
 }
 float
@@ -132,6 +192,13 @@ DataV2::quads_shape(const CsPad::ConfigV2& cfg) const {
 }
 std::vector<int>
 DataV2::quads_shape(const CsPad::ConfigV3& cfg) const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
+std::vector<int>
+DataV2::quads_shape(const CsPad::ConfigV4& cfg) const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(cfg.numQuads());
