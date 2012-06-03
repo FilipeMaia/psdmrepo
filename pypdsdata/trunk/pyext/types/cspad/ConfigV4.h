@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_CSPAD_CONFIGV1QUADREG_H
-#define PYPDSDATA_CSPAD_CONFIGV1QUADREG_H
+#ifndef PYPDSDATA_CSPAD_CONFIGV4_H
+#define PYPDSDATA_CSPAD_CONFIGV4_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ConfigV1QuadReg.
+//	Class ConfigV4.
 //
 //------------------------------------------------------------------------
 
@@ -22,15 +22,15 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad/ConfigV1QuadReg.hh"
+#include "pdsdata/cspad/ConfigV4.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
 
-//              ---------------------
-//              -- Class Interface --
-//              ---------------------
+//		---------------------
+// 		-- Class Interface --
+//		---------------------
 
 namespace pypdsdata {
 namespace CsPad {
@@ -46,10 +46,10 @@ namespace CsPad {
  *  @author Andrei Salnikov
  */
 
-class ConfigV1QuadReg : public PdsDataType<ConfigV1QuadReg, Pds::CsPad::ConfigV1QuadReg> {
+class ConfigV4 : public PdsDataType<ConfigV4, Pds::CsPad::ConfigV4> {
 public:
 
-  typedef PdsDataType<ConfigV1QuadReg, Pds::CsPad::ConfigV1QuadReg> BaseType;
+  typedef PdsDataType<ConfigV4, Pds::CsPad::ConfigV4> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -59,4 +59,4 @@ public:
 } // namespace CsPad
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_CSPAD_CONFIGV1QUADREG_H
+#endif // PYPDSDATA_CSPAD_CONFIGV4_H

@@ -78,7 +78,9 @@
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV1QuadReg.h"
 #include "types/cspad/ConfigV2.h"
+#include "types/cspad/ConfigV2QuadReg.h"
 #include "types/cspad/ConfigV3.h"
+#include "types/cspad/ConfigV4.h"
 #include "types/cspad/CsPadDigitalPotsCfg.h"
 #include "types/cspad/CsPadGainMapCfg.h"
 #include "types/cspad/CsPadProtectionSystemThreshold.h"
@@ -271,7 +273,9 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::CsPad::ConfigV1::initType( module );
   pypdsdata::CsPad::ConfigV1QuadReg::initType( module );
   pypdsdata::CsPad::ConfigV2::initType( module );
+  pypdsdata::CsPad::ConfigV2QuadReg::initType( module );
   pypdsdata::CsPad::ConfigV3::initType( module );
+  pypdsdata::CsPad::ConfigV4::initType( module );
   pypdsdata::CsPad::CsPadDigitalPotsCfg::initType( module );
   pypdsdata::CsPad::CsPadGainMapCfg::initType( module );
   pypdsdata::CsPad::CsPadProtectionSystemThreshold::initType( module );

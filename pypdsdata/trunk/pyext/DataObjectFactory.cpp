@@ -48,6 +48,7 @@
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV2.h"
 #include "types/cspad/ConfigV3.h"
+#include "types/cspad/ConfigV4.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
 
@@ -309,6 +310,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV2, 2>(xtc, parent);
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV3, 3>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::ConfigV4, 4>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpmFexConfig :
