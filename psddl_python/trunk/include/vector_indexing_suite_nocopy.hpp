@@ -3,8 +3,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef VECTOR_INDEXING_SUITE_JDG20036_HPP
-# define VECTOR_INDEXING_SUITE_JDG20036_HPP
+#ifndef VECTOR_INDEXING_SUITE_NOCOPY_HPP
+# define VECTOR_INDEXING_SUITE_NOCOPY_HPP
 
 # include <boost/python/suite/indexing/indexing_suite.hpp>
 # include <boost/python/suite/indexing/container_utils.hpp>
@@ -14,17 +14,17 @@ namespace boost { namespace python {
             
     // Forward declaration
     template <class Container, bool NoProxy, class DerivedPolicies>
-    class vector_indexing_suite;
+    class vector_indexing_suite_nocopy;
     
     namespace detail
     {
         template <class Container, bool NoProxy>
         class final_vector_derived_policies 
-            : public vector_indexing_suite<Container, 
+            : public vector_indexing_suite_nocopy<Container, 
                 NoProxy, final_vector_derived_policies<Container, NoProxy> > {};
     }
 
-    // The vector_indexing_suite class is a predefined indexing_suite derived 
+    // The vector_indexing_suite_nocopy class is a predefined indexing_suite derived 
     // class for wrapping std::vector (and std::vector like) classes. It provides
     // all the policies required by the indexing_suite (see indexing_suite).
     // Example usage:
@@ -34,7 +34,7 @@ namespace boost { namespace python {
     //  ...
     //
     //      class_<std::vector<X> >("XVec")
-    //          .def(vector_indexing_suite<std::vector<X> >())
+    //          .def(vector_indexing_suite_nocopy<std::vector<X> >())
     //      ;
     //
     // By default indexed elements are returned by proxy. This can be
@@ -45,7 +45,7 @@ namespace boost { namespace python {
         bool NoProxy = false,
         class DerivedPolicies 
             = detail::final_vector_derived_policies<Container, NoProxy> >
-    class vector_indexing_suite 
+    class vector_indexing_suite_nocopy 
         : public indexing_suite<Container, DerivedPolicies, NoProxy>
     {
     public:
@@ -242,4 +242,4 @@ namespace boost { namespace python {
        
 }} // namespace boost::python 
 
-#endif // VECTOR_INDEXING_SUITE_JDG20036_HPP
+#endif // VECTOR_INDEXING_SUITE_NOCOPY_HPP

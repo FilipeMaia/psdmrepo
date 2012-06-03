@@ -6,7 +6,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>
-#include <psddl_python/vector_indexing_suite.hpp>
+#include <psddl_python/vector_indexing_suite_nocopy.hpp>
 #include <numpy/arrayobject.h>
 
 namespace Psana {
@@ -15,7 +15,7 @@ namespace Psana {
 
 #define std_vector_class_(T)\
   boost::python::class_<vector<T> >("std::vector<" #T ">")\
-    .def(vector_indexing_suite<std::vector<T> >())
+    .def(vector_indexing_suite_nocopy<std::vector<T> >())
 
 #define associate_PyArrayType(ctype, ptype) const int PyArray_ ## ctype = ptype
 associate_PyArrayType(int8_t, PyArray_BYTE);

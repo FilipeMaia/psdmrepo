@@ -13,7 +13,10 @@ namespace Psana {
     virtual ~GenericGetter() {}
     template<class T> 
     static T* getGetterByType(const char* typeName);
+#if 1
     static GenericGetter* getGetterByType(const char* typeName);
+#endif
+    static GenericGetter* getGetterById(int typeId);
     static void addGetter(GenericGetter* getter);
   };
 

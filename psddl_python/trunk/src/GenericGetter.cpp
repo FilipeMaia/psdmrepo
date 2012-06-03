@@ -25,6 +25,7 @@ static string getTypeNameWithHighestVersion(const string& typeNameGeneric) {
   }
 }
 
+#if 1
 GenericGetter* GenericGetter::getGetterByType(const char* typeNameGeneric) {
   string typeName = getTypeNameWithHighestVersion(string(typeNameGeneric));
   if (typeName == "") {
@@ -32,6 +33,7 @@ GenericGetter* GenericGetter::getGetterByType(const char* typeNameGeneric) {
   }
   return getter_map[typeName];
 }
+#endif
 
 void GenericGetter::addGetter(GenericGetter* getter) {
   getter_map[getter->getTypeName()] = getter;
@@ -40,13 +42,16 @@ void GenericGetter::addGetter(GenericGetter* getter) {
     char name[64];
     sprintf(name, "@EnvType_%d_V%d", getter->getTypeId(), getter->getVersion());
     getter_map[name] = getter;
-    printf("~~~ adding %s\n", name);
+    //printf("~~~ adding %s\n", name);
   }
 }
 
-template<class T> T* GenericGetter::getGetterByType(const char* typeName) {
-  printf("~~~ looking for %s\n", typeName);
-  GenericGetter* getter = GenericGetter::getGetterByType(typeName);
+template<class T> T* GenericGetter::getGetterByType(const char* typeNameGeneric) {
+  string typeName = getTypeNameWithHighestVersion(string(typeNameGeneric));
+  if (typeName == "") {
+    return NULL;
+  }
+  GenericGetter* getter = getter_map[typeName];
   if (getter->getGetterTypeInfo() != typeid(T)) {
     return NULL;
   }
