@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2012-06-04 Andy Salnikov
+- undo part of V00-05-00 commit, python modules are copied to
+  arch/ instead of build/
+
 Tag: V00-06-01
 2012-05-22 Andy Salnikov
 - standardExternalPackage: not all variables were expanded correctly
