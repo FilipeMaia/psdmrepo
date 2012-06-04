@@ -125,7 +125,7 @@ def buildEnv () :
                 )
 
     # location of the tools
-    toolpath = [ pjoin(r, "build", sit_arch, "SConsTools/python/SConsTools/tools") for r in all_sit_repos ]
+    toolpath = [ pjoin(r, "arch", sit_arch, "python/SConsTools/tools") for r in all_sit_repos ]
     env.Replace(TOOLPATH=toolpath)
 
     # extend environment with tools
