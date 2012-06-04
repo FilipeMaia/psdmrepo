@@ -38,6 +38,7 @@ from PyQt4 import QtGui, QtCore
 from XtcScanner import XtcScanner
 
 from gui_pyana_control import XtcPyanaControl
+import AppUtils.AppDataPath as apputils
 
 import matplotlib
 #from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -47,7 +48,6 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 
-import AppUtils.AppDataPath as apputils
 
 import webbrowser
 #----------------------------------
@@ -93,8 +93,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
-        self.lclsLogo =  apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
         self.setWindowTitle("LCLS Xtc Explorer")
+
+        self.lclsLogo =  apputils.AppDataPath('XtcExplorer/icons/lclsLogo.gif')
         self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path() ))
 
         self.directory = "/reg/d/psdm/"
@@ -111,7 +112,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
         self.create_main_frame()
         print "Welcome to Xtc Explorer!"
-        self.update_currentfiles()
 
     def create_main_frame(self):
 
@@ -134,92 +134,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.help_menu.addAction('&Documentation',self.documentation)
         self.help_menu.addAction('&About',self.about)
 
-        self.fileinfo = QtGui.QLabel(self)
-        self.fileinfo.setMinimumWidth(130)
-
-        # ---- Select section -------
-
-        # Instrument
-        self.comboBoxIns = QtGui.QComboBox()
-        self.comboBoxIns.setMinimumWidth(160)
-        self.comboBoxIns.clear() 
-        self.comboBoxIns.addItem("Select instrument")
-        self.comboBoxIns.addItem("AMO")
-        self.comboBoxIns.addItem("SXR")
-        self.comboBoxIns.addItem("XPP")
-        self.comboBoxIns.addItem("CXI")
-        self.comboBoxIns.addItem("XCS")
-        self.comboBoxIns.addItem("MEC")
-
-        # Experiment
-        self.comboBoxExp = QtGui.QComboBox()
-        self.comboBoxExp.setMinimumWidth(160)
-        self.comboBoxExp.hide()
-
-        # Run number
-        self.labelRun = QtGui.QLabel("Run number: ")
-        self.lineEditRun = QtGui.QLineEdit("")
-        self.lineEditRun.setMinimumWidth(40)
-        self.lineEditRun.setMaximumWidth(80)
-        self.okButtonRun = QtGui.QPushButton("&Load")
-        self.labelRun.hide()
-        self.lineEditRun.hide()
-        self.okButtonRun.hide()
-
-        self.connect(self.comboBoxIns, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_instrument )
-        self.connect(self.comboBoxExp, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_experiment )
-
-        if self.instrument is not None:
-            index = self.comboBoxIns.findText( self.instrument )
-            self.comboBoxIns.setCurrentIndex(index)
-
-        # if already set, update the scroll-down menu
-        if self.experiment is not None:
-            index = self.comboBoxExp.findText(self.experiment)
-            self.comboBoxExp.setCurrentIndex(index)
-
-        
-
-        #self.comboBoxExp.clear()
-        #self.comboBoxExp.addItem("Select experiment")
-
-
-        self.connect(self.lineEditRun, QtCore.SIGNAL('returnPressed()'), self.set_runnumber )
-        self.connect(self.okButtonRun, QtCore.SIGNAL('clicked()'), self.set_runnumber )
-
-
-
-
-        self.labelOr = QtGui.QLabel("Or: ")
-                
-
-        #self.dmode_menu.addItem("Interactive")
-        #self.dmode_menu.setCurrentIndex(1) # SlideShow
-
-        # --- File section ---
-
-        # Label showing currently selected files
-        self.currentfiles = QtGui.QLabel(self)
-
-        # Button: open file browser
-        self.fbrowser_button = QtGui.QPushButton("&File Browser...")
-        self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.file_browser )
-        self.fbrowser_button.setMaximumWidth(100)
-
-        # Button: clear file list
-        self.fclear_button = QtGui.QPushButton("&Clear File List")
-        self.connect(self.fclear_button, QtCore.SIGNAL('clicked()'), self.clear_file_list )
-        self.fclear_button.setMaximumWidth(100)
-
-        # Line edit: enter file name
-        self.lineedit = QtGui.QLineEdit("")
-        self.lineedit.setMinimumWidth(200)
-        self.connect(self.lineedit, QtCore.SIGNAL('returnPressed()'), self.add_file_from_lineedit )
-
-        # Button: add file from line edit
-        self.addfile_button = QtGui.QPushButton("&Add")
-        self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.add_file_from_lineedit )
-             
         ## --- Scan section --- 
         #self.scan_button = QtGui.QPushButton("&Scan File(s)")
         #self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
@@ -246,6 +160,88 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         #self.qscan_edit_btn = QtGui.QPushButton("Change") 
         #self.qscan_edit_btn.setMaximumWidth(70)
         #self.connect(self.qscan_edit_btn, QtCore.SIGNAL('clicked()'), self.change_nev_qscan )
+
+
+        # --- File section ---
+        self.fileinfo = QtGui.QLabel(self)
+        self.fileinfo.setMinimumWidth(130)
+
+        # Label showing currently selected files
+        self.currentfiles = QtGui.QLabel(self)
+        self.update_currentfiles()
+
+        # Button: open file browser
+        self.fbrowser_button = QtGui.QPushButton("&File Browser...")
+        self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.file_browser )
+        self.fbrowser_button.setMaximumWidth(100)
+
+        # Button: clear file list
+        self.fclear_button = QtGui.QPushButton("&Clear File List")
+        self.connect(self.fclear_button, QtCore.SIGNAL('clicked()'), self.clear_file_list )
+        self.fclear_button.setMaximumWidth(100)
+
+        # Line edit: enter file name
+        self.lineedit = QtGui.QLineEdit("")
+        self.lineedit.setMinimumWidth(200)
+        self.connect(self.lineedit, QtCore.SIGNAL('returnPressed()'), self.add_file_from_lineedit )
+
+        # Button: add file from line edit
+        self.addfile_button = QtGui.QPushButton("&Add")
+        self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.add_file_from_lineedit )
+             
+        # ---- Select section -------
+
+        # Instrument
+        self.comboBoxIns = QtGui.QComboBox()
+        self.comboBoxIns.setMinimumWidth(160)
+        self.comboBoxIns.clear() 
+
+        # Experiment
+        self.comboBoxExp = QtGui.QComboBox()
+        self.comboBoxExp.setMinimumWidth(160)
+        self.comboBoxExp.hide()
+
+        # Run number
+        self.labelRun = QtGui.QLabel("Run number: ")
+        self.labelRun.hide()
+
+        self.lineEditRun = QtGui.QLineEdit("")
+        self.lineEditRun.setMinimumWidth(40)
+        self.lineEditRun.setMaximumWidth(80)
+        self.connect(self.lineEditRun, QtCore.SIGNAL('returnPressed()'), self.set_runnumber )
+        self.lineEditRun.hide()
+
+        self.okButtonRun = QtGui.QPushButton("&Load")
+        self.connect(self.okButtonRun, QtCore.SIGNAL('clicked()'), self.set_runnumber )
+        self.okButtonRun.hide()
+
+        self.comboBoxIns.addItem("Select instrument")
+        self.comboBoxIns.addItem("AMO")
+        self.comboBoxIns.addItem("SXR")
+        self.comboBoxIns.addItem("XPP")
+        self.comboBoxIns.addItem("CXI")
+        self.comboBoxIns.addItem("XCS")
+        self.comboBoxIns.addItem("MEC")
+
+        if self.instrument is not None:
+            index = self.comboBoxIns.findText( self.instrument )
+            self.comboBoxIns.setCurrentIndex(index)
+
+        # if already set, update the scroll-down menu
+        if self.experiment is not None:
+            index = self.comboBoxExp.findText(self.experiment)
+            self.comboBoxExp.setCurrentIndex(index)
+
+        self.connect(self.comboBoxIns, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_instrument )
+        self.connect(self.comboBoxIns, QtCore.SIGNAL('activated(const QString&)'), self.set_instrument_act )
+        self.connect(self.comboBoxExp, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_experiment )
+        self.connect(self.comboBoxExp, QtCore.SIGNAL('activated(const QString&)'), self.set_experiment_act )
+        
+        #self.comboBoxExp.clear()
+        #self.comboBoxExp.addItem("Select experiment")
+
+        self.labelOr = QtGui.QLabel("Or: ")
+
 
         # ---- Test section -------
         
@@ -378,7 +374,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #  Private methods --
     #--------------------
     
-    def set_instrument(self): 
+    def set_instrument_act(self, value): 
+        print "Calling Set instrument - activated " , value
+
+    def set_instrument(self, value): 
         print "Calling set_instrument"
         self.comboBoxExp.clear()
         self.comboBoxExp.addItem("Select experiment")
@@ -400,7 +399,11 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         for fname in dirList:
             self.comboBoxExp.addItem(fname)
 
-    def set_experiment(self):
+    def set_experiment_act(self, value):
+        print "Calling set_experiment_activated", value
+
+
+    def set_experiment(self, value):
         print "Calling set_experiment"
         self.experiment = self.comboBoxExp.currentText()
         print self.experiment
@@ -489,7 +492,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         for file in selectedfiles :
             self.add_file( str(file) )
 
+        if selectedfiles :  
+            self.scan_files_quick()
 
+            
     def add_file_from_lineedit(self):
         """Add a file from lineedit
         
@@ -497,6 +503,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         """
         filename = str(self.lineedit.text())
         self.add_file(filename)
+
+        if self.filenames :  
+            self.scan_files_quick()
 
         
     def clear_file_list(self):
@@ -517,11 +526,13 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     def update_currentfiles(self):
         """Update text describing the list of current files
         """
-        print "Calling update_currentfiles"
         # number of files
         nfiles = len(self.filenames)
         status = "Currently selected:  %d file(s)  " % nfiles
-        
+
+        if nfiles > 0: 
+            self.extract_experiment_info()
+
         # total file size
         self.filesize = 0.0
         for filename in self.filenames :
@@ -529,32 +540,32 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             
         filesizetxt = ""
         scantext = "Scan all events"
-        if nfiles > 0 :
-            filesize = self.filesize/1024
-            if filesize < 1024 :
-                filesizetxt = "%.1fk" % (filesize)
-            elif filesize < 1024**2 :
-                filesizetxt = "%.1fM" % (filesize/1024)
-            elif filesize < 1024**3 :
-                filesizetxt = "%.1fG" % (filesize/1024**2)
-            elif filesize < 1024**4 :
-                filesizetxt = "%.1fT" % (filesize/1024**3)
-            else :
-                filesizetxt = "Big! "
 
-            ## if files, enable the buttons
-            #if self.qscan_button :
-            #    self.qscan_button.setEnabled(True)
-            #if self.scan_button and self.scan_label :
-            #    # automatically enable full scan if smaller than 1.2G
-            #    if self.filesize < 1.2*1024**3 :
-            #        scantext = "Scan all events (%s)"%filesizetxt
-            #        self.scan_button.setEnabled(True)
-            #        self.scan_enable_button.setText("Disable full scan")
-            #    else :
-            #        scantext = "Scan all events (%s!)"%filesizetxt
-            #        self.scan_button.setDisabled(True)
-            #        self.scan_enable_button.setText("Enable full scan")
+        filesize = self.filesize/1024
+        if filesize < 1024 :
+            filesizetxt = "%.1fk" % (filesize)
+        elif filesize < 1024**2 :
+            filesizetxt = "%.1fM" % (filesize/1024)
+        elif filesize < 1024**3 :
+            filesizetxt = "%.1fG" % (filesize/1024**2)
+        elif filesize < 1024**4 :
+            filesizetxt = "%.1fT" % (filesize/1024**3)
+        else :
+            filesizetxt = "Big! "
+
+        # if files, enable the buttons
+        #if self.qscan_button :
+        #    self.qscan_button.setEnabled(True)
+        #if self.scan_button and self.scan_label :
+        #    # automatically enable full scan if smaller than 1.2G
+        #    if self.filesize < 1.2*1024**3 :
+        #        scantext = "Scan all events (%s)"%filesizetxt
+        #        self.scan_button.setEnabled(True)
+        #        self.scan_enable_button.setText("Disable full scan")
+        #    else :
+        #        scantext = "Scan all events (%s!)"%filesizetxt
+        #        self.scan_button.setDisabled(True)
+        #        self.scan_enable_button.setText("Enable full scan")
 
         status+="\t %s \n" % filesizetxt
         for filename in self.filenames :
@@ -562,23 +573,42 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             status+=addline
 
         self.currentfiles.setText(status)
+        #self.scan_label.setText(scantext)
         self.fileinfo.setText("")
-        #if self.scan_label:
-        #    self.scan_label.setText(scantext)
+            
+    def extract_experiment_info(self):
+        dirname, filename = os.path.split( self.filenames[-1] )
+        # guess instrument, experiment, runnumber 
+        self.expnumber = int(filename.split('-')[0].strip('e'))
+        self.runnumber = int(filename.split('-')[1].strip('r'))
 
+        parts = set(dirname.split('/'))
+        instr = ['amo','sxr','xpp','cxi','xcs','mec']
+        #l = [ x for x in parts if x in   instr]
+        for i in parts.intersection( instr ):
+            self.instrument = i.upper()
+            
+        candidates = [x for x in parts if len(x)==8 ]
+        for c in candidates:
+            self.experiment = c
+            self.instrument = c[:3].upper()
 
-    #def change_nev_qscan(self):
-    #    self.nev_qscan = int(self.qscan_edit.text())
-    #    self.qscan_label.setText("Scan the first %d events   "%self.nev_qscan)
+        # update the select buttons for Instrument and Experiment
+        try:
+            self.comboBoxIns.setCurrentIndex(self.comboBoxIns.findText( self.instrument ))
+            self.comboBoxExp.setCurrentIndex(self.comboBoxExp.findText( self.experiment ))
+            self.lineEditRun.setText("%d"%self.runnumber)
+        except: 
+            print "Failed to determine instrument, experiment or run number from the path (%s)."
+
+        print "Filenames:          ", self.filenames
+        print "Directory:          ", self.directory
+        print "Experiment number:  ", self.expnumber
+        print "Experiment name:    ", self.experiment
+        print "Instrument:         ", self.instrument
+        print "Run number:         ", self.runnumber        
+            
         
-    #def scan_enable(self) :
-    #    if self.scan_button :
-    #        if self.scan_button.isEnabled() :
-    #            self.scan_button.setDisabled(True)
-    #            self.scan_enable_button.setText("Enable full scan")
-    #        else :
-    #            self.scan_button.setEnabled(True)
-    #            self.scan_enable_button.setText("Disable full scan")
 
 
     def scan_files(self, quick=False):
@@ -607,7 +637,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         #if self.scan_button.isEnabled():
         #    self.scan_enable()
             
-        fileinfo_text = "The scan found: \n     %d calib cycles (scan steps) "\
+        fileinfo_text = "A first inspection of the first file(s) found: \n     %d calib cycles (scan steps) "\
                         "for a total of %d L1Accepts (shots)"\
                         % (self.scanner.ncalib, sum(self.scanner.nevents) )
         if len(self.scanner.nevents) > 1 :
@@ -616,6 +646,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             fileinfo_text = self.pyanactrl.settings.add_linebreaks(fileinfo_text,width=70)
         
         self.fileinfo.setText(fileinfo_text)
+
 
     def scan_files_quick(self):
         """Quick scan of xtc files

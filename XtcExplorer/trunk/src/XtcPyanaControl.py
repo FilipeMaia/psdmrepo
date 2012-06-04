@@ -803,6 +803,12 @@ Do you want to proceed?
             options_for_mod[m] = newoptions
 
         self.configuration = "[pyana]"
+        self.configuration += "\nfiles = "
+        for i, fname in enumerate(self.filenames):
+            if i > 0: 
+                self.configuration += "\n\t"
+            self.configuration += fname
+
         self.configuration += "\nmodules ="
         for module in modules_to_run :
             self.configuration += " "
@@ -1217,8 +1223,10 @@ Do you want to proceed?
             lpoptions.append(str(self.skip_n))
         lpoptions.append("-c")
         lpoptions.append("%s" % self.configfile)
-        for file in self.filenames :
-            lpoptions.append(file)
+
+        # put this into the config file instead... (6/4/2012)
+        #for file in self.filenames :
+        #    lpoptions.append(file)
 
         runstring = ' '.join(lpoptions)
         return runstring

@@ -95,6 +95,9 @@ def main( argv ) :
     for file in files :
 	explorer.add_file(file)
 
+    if files :
+        explorer.scan_files_quick()
+
     explorer.show()
     sys.exit(app.exec_())
 

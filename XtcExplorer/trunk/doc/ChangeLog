@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-June-4 ofte                   rev 3736
+	- moved 'files' from command line to configuration file (requires release > 0.5.3 or pyana V00-00-50) 
+	- updated the gui_explorer_main with some improvements that were already implemented for XtcExplorerMain.
+	
 2012-June-1 ofte V00-01-31          rev 3691
        - commonmodes asic-by-asic. 
 	
