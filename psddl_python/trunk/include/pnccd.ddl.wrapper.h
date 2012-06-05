@@ -84,6 +84,9 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::PNCCD::ConfigV1);
+    }
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV1";
     }
@@ -94,12 +97,19 @@ public:
       return ConfigV1::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV1_Wrapper(result));
     }
   };
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::PNCCD::ConfigV2);
+    }
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV2";
     }
@@ -110,7 +120,11 @@ public:
       return ConfigV2::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV2> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV2_Wrapper(result));
     }
   };
 } // namespace PNCCD

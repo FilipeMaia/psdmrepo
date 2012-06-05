@@ -68,6 +68,32 @@ void createWrappers() {
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("shiftSelect", &n::shiftSelect)\
+    .def("edgeSelect", &n::edgeSelect)\
+    .def("readClkSet", &n::readClkSet)\
+    .def("readClkHold", &n::readClkHold)\
+    .def("dataMode", &n::dataMode)\
+    .def("prstSel", &n::prstSel)\
+    .def("acqDelay", &n::acqDelay)\
+    .def("intTime", &n::intTime)\
+    .def("digDelay", &n::digDelay)\
+    .def("ampIdle", &n::ampIdle)\
+    .def("injTotal", &n::injTotal)\
+    .def("rowColShiftPer", &n::rowColShiftPer)\
+    .def("ampReset", &n::ampReset)\
+    .def("digCount", &n::digCount)\
+    .def("digPeriod", &n::digPeriod)\
+    .def("ro", &n::ro, policy)\
+    .def("dp", &n::dp, policy)\
+    .def("gm", &n::gm, policy)\
+
+  _CLASS(Psana::CsPad::ConfigV2QuadReg_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2QuadReg_Wrapper);
+#undef _CLASS
+  ADD_GETTER(ConfigV2QuadReg);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("runDelay", &n::runDelay)\
     .def("eventCode", &n::eventCode)\
@@ -144,6 +170,35 @@ void createWrappers() {
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
   ADD_GETTER(ConfigV3);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("concentratorVersion", &n::concentratorVersion)\
+    .def("runDelay", &n::runDelay)\
+    .def("eventCode", &n::eventCode)\
+    .def("protectionThresholds", &n::protectionThresholds, policy)\
+    .def("protectionEnable", &n::protectionEnable)\
+    .def("inactiveRunMode", &n::inactiveRunMode)\
+    .def("activeRunMode", &n::activeRunMode)\
+    .def("tdi", &n::tdi)\
+    .def("payloadSize", &n::payloadSize)\
+    .def("badAsicMask0", &n::badAsicMask0)\
+    .def("badAsicMask1", &n::badAsicMask1)\
+    .def("asicMask", &n::asicMask)\
+    .def("quadMask", &n::quadMask)\
+    .def("quads", &n::quads, policy)\
+    .def("numAsicsRead", &n::numAsicsRead)\
+    .def("roiMask", &n::roiMask)\
+    .def("numAsicsStored", &n::numAsicsStored)\
+    .def("numQuads", &n::numQuads)\
+    .def("numSect", &n::numSect)\
+    .def("protectionThresholds_shape", &n::protectionThresholds_shape)\
+    .def("quads_shape", &n::quads_shape)\
+
+  _CLASS(Psana::CsPad::ConfigV4_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV4_Wrapper);
+#undef _CLASS
+  ADD_GETTER(ConfigV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

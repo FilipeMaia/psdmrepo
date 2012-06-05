@@ -104,6 +104,38 @@ public:
   const CsPadGainMapCfg_Wrapper gm() const { return CsPadGainMapCfg_Wrapper((CsPadGainMapCfg*) &o->gm()); }
 };
 
+/** @class ConfigV2QuadReg
+
+  Configuration data for single quadrant.
+*/
+
+
+class ConfigV2QuadReg_Wrapper {
+  boost::shared_ptr<ConfigV2QuadReg> _o;
+  ConfigV2QuadReg* o;
+public:
+  ConfigV2QuadReg_Wrapper(boost::shared_ptr<ConfigV2QuadReg> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2QuadReg_Wrapper(ConfigV2QuadReg* obj) : o(obj) {}
+  std::vector<uint32_t> shiftSelect() const { VEC_CONVERT(o->shiftSelect(), uint32_t); }
+  std::vector<uint32_t> edgeSelect() const { VEC_CONVERT(o->edgeSelect(), uint32_t); }
+  uint32_t readClkSet() const { return o->readClkSet(); }
+  uint32_t readClkHold() const { return o->readClkHold(); }
+  uint32_t dataMode() const { return o->dataMode(); }
+  uint32_t prstSel() const { return o->prstSel(); }
+  uint32_t acqDelay() const { return o->acqDelay(); }
+  uint32_t intTime() const { return o->intTime(); }
+  uint32_t digDelay() const { return o->digDelay(); }
+  uint32_t ampIdle() const { return o->ampIdle(); }
+  uint32_t injTotal() const { return o->injTotal(); }
+  uint32_t rowColShiftPer() const { return o->rowColShiftPer(); }
+  uint32_t ampReset() const { return o->ampReset(); }
+  uint32_t digCount() const { return o->digCount(); }
+  uint32_t digPeriod() const { return o->digPeriod(); }
+  const CsPadReadOnlyCfg_Wrapper ro() const { return CsPadReadOnlyCfg_Wrapper((CsPadReadOnlyCfg*) &o->ro()); }
+  const CsPadDigitalPotsCfg_Wrapper dp() const { return CsPadDigitalPotsCfg_Wrapper((CsPadDigitalPotsCfg*) &o->dp()); }
+  const CsPadGainMapCfg_Wrapper gm() const { return CsPadGainMapCfg_Wrapper((CsPadGainMapCfg*) &o->gm()); }
+};
+
 /** @class ConfigV1
 
   Configuration data for complete CsPad device.
@@ -207,6 +239,43 @@ public:
   std::vector<int> quads_shape() const { return o->quads_shape(); }
 };
 
+/** @class ConfigV4
+
+  Configuration data for complete CsPad device.
+*/
+
+
+class ConfigV4_Wrapper {
+  boost::shared_ptr<ConfigV4> _o;
+  ConfigV4* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 4 /**< XTC type version number */ };
+  ConfigV4_Wrapper(boost::shared_ptr<ConfigV4> obj) : _o(obj), o(_o.get()) {}
+  ConfigV4_Wrapper(ConfigV4* obj) : o(obj) {}
+  uint32_t concentratorVersion() const { return o->concentratorVersion(); }
+  uint32_t runDelay() const { return o->runDelay(); }
+  uint32_t eventCode() const { return o->eventCode(); }
+  const ProtectionSystemThreshold_Wrapper protectionThresholds(uint32_t i0) const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThresholds(i0)); }
+  uint32_t protectionEnable() const { return o->protectionEnable(); }
+  uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
+  uint32_t activeRunMode() const { return o->activeRunMode(); }
+  uint32_t tdi() const { return o->tdi(); }
+  uint32_t payloadSize() const { return o->payloadSize(); }
+  uint32_t badAsicMask0() const { return o->badAsicMask0(); }
+  uint32_t badAsicMask1() const { return o->badAsicMask1(); }
+  uint32_t asicMask() const { return o->asicMask(); }
+  uint32_t quadMask() const { return o->quadMask(); }
+  const ConfigV2QuadReg_Wrapper quads(uint32_t i0) const { return ConfigV2QuadReg_Wrapper((ConfigV2QuadReg*) &o->quads(i0)); }
+  uint32_t numAsicsRead() const { return o->numAsicsRead(); }
+  uint32_t roiMask(uint32_t iq) const { return o->roiMask(iq); }
+  uint32_t numAsicsStored(uint32_t iq) const { return o->numAsicsStored(iq); }
+  uint32_t numQuads() const { return o->numQuads(); }
+  uint32_t numSect() const { return o->numSect(); }
+  std::vector<int> protectionThresholds_shape() const { return o->protectionThresholds_shape(); }
+  std::vector<int> quads_shape() const { return o->quads_shape(); }
+};
+
 /** @class ElementV1
 
   CsPad data from single CsPad quadrant.
@@ -214,6 +283,8 @@ public:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
+class ConfigV4;
 
 class ElementV1_Wrapper {
   boost::shared_ptr<ElementV1> _o;
@@ -245,6 +316,8 @@ public:
 
 class ConfigV1;
 class ConfigV2;
+class ConfigV3;
+class ConfigV4;
 
 class DataV1_Wrapper {
   boost::shared_ptr<DataV1> _o;
@@ -265,6 +338,7 @@ public:
 
 class ConfigV2;
 class ConfigV3;
+class ConfigV4;
 
 class ElementV2_Wrapper {
   boost::shared_ptr<ElementV2> _o;
@@ -296,6 +370,7 @@ public:
 
 class ConfigV2;
 class ConfigV3;
+class ConfigV4;
 
 class DataV2_Wrapper {
   boost::shared_ptr<DataV2> _o;
@@ -311,16 +386,43 @@ public:
 
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV1QuadReg);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV1QuadReg";
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1QuadReg_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV1QuadReg> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV1QuadReg_Wrapper(result));
+    }
+  };
+
+  class ConfigV2QuadReg_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV2QuadReg);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad::ConfigV2QuadReg";
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      boost::shared_ptr<ConfigV2QuadReg> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV2QuadReg_Wrapper(result));
     }
   };
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV1);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV1";
     }
@@ -331,12 +433,19 @@ public:
       return ConfigV1::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV1_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV1_Wrapper(result));
     }
   };
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV2);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV2";
     }
@@ -347,12 +456,19 @@ public:
       return ConfigV2::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV2_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV2> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV2_Wrapper(result));
     }
   };
 
   class ConfigV3_Getter : public Psana::EnvGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV3);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::ConfigV3";
     }
@@ -363,12 +479,42 @@ public:
       return ConfigV3::Version;
     }
     boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
-      return boost::python::api::object(ConfigV3_Wrapper(store.get(src, 0)));
+      boost::shared_ptr<ConfigV3> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV3_Wrapper(result));
+    }
+  };
+
+  class ConfigV4_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ConfigV4);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad::ConfigV4";
+    }
+    int getTypeId() {
+      return ConfigV4::TypeId;
+    }
+    int getVersion() {
+      return ConfigV4::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+      boost::shared_ptr<ConfigV4> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(ConfigV4_Wrapper(result));
     }
   };
 
   class DataV1_Getter : public Psana::EvtGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::DataV1);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::DataV1";
     }
@@ -391,6 +537,9 @@ public:
 
   class DataV2_Getter : public Psana::EvtGetter {
   public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::DataV2);
+    }
     const char* getTypeName() {
       return "Psana::CsPad::DataV2";
     }

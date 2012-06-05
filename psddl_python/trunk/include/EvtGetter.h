@@ -7,12 +7,17 @@
 #include <PSEvt/Event.h>
 
 namespace Psana {
+  using boost::python::api::object;
+  using std::string;
+  using PSEvt::Event;
+  using PSEvt::Source;
+  using Pds::Src;
+
   class EvtGetter : public GenericGetter {
   public:
-    virtual const std::type_info& getGetterTypeInfo() { return typeid(EvtGetter); }
-    virtual boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
-    virtual boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
-    virtual boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) = 0;
+    virtual object get(Event& evt, const string& key=string(), Src* foundSrc=0) = 0;
+    virtual object get(Event& evt, Src& src, const string& key=string(), Src* foundSrc=0) = 0;
+    virtual object get(Event& evt, PSEvt::Source& source, const string& key=string(), Src* foundSrc=0) = 0;
   };
 }
 

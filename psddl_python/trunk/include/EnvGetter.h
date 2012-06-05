@@ -1,16 +1,16 @@
 #ifndef PSANA_ENVGETTER_H
-#define PSANA_ENVGETTER_H 1
+#define PSANA_ENVGETTER_H
 
-#include <boost/python/class.hpp>
 #include <psddl_python/GenericGetter.h>
 #include <PSEnv/Env.h>
 
 namespace Psana {
+  using PSEnv::EnvObjectStore;
+  using PSEvt::Source;
+
   class EnvGetter : public GenericGetter {
   public:
-    virtual const std::type_info& getGetterTypeInfo() { return typeid(EnvGetter); }
-    virtual boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) = 0;
+    virtual object get(EnvObjectStore& store, const Source& src) = 0;
   };
 }
-
 #endif // PSANA_ENVGETTER_H
