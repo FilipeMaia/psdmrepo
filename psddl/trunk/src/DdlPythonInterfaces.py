@@ -222,35 +222,18 @@ class DdlPythonInterfaces ( object ) :
 
     def _parseType2(self, type, namespace_prefix = ""):
         type_name = type.name
+        getter_class = None
         if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
-            print >>self.inc, ''
-            print >> self.inc, T('  class ${type_name}_Getter : public Psana::EvtGetter {')(locals())
-            print >> self.inc, '  public:'
-            print >> self.inc, '    const char* getTypeName() {'
-            print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
-            print >> self.inc, '    }'
-            if type.type_id is not None:
-                print >> self.inc, '    int getTypeId() {'
-                print >> self.inc, T('      return ${type_name}::TypeId;')(locals())
-                print >> self.inc, '    }'
-            if type.version is not None:
-                print >> self.inc, '    int getVersion() {'
-                print >> self.inc, T('      return ${type_name}::Version;')(locals())
-                print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(key, foundSrc)));')(locals())
-            print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(src, key, foundSrc)));')(locals())
-            print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(source, key, foundSrc)));')(locals())
-            print >> self.inc, '    }'
-            print >> self.inc, '  };'
+            getter_class = "Psana::EvtGetter"
         elif type_name.find('ConfigV') == 0:
+            getter_class = "Psana::EnvGetter"
+        if getter_class:
             print >>self.inc, ''
-            print >> self.inc, T('  class ${type_name}_Getter : public Psana::EnvGetter {')(locals())
+            print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
             print >> self.inc, '  public:'
+            print >> self.inc, '    const std::type_info& getTypeInfo() {'
+            print >> self.inc, T('      return typeid(${namespace_prefix}${type_name});')(locals())
+            print >> self.inc, '    }'
             print >> self.inc, '    const char* getTypeName() {'
             print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
             print >> self.inc, '    }'
@@ -262,9 +245,24 @@ class DdlPythonInterfaces ( object ) :
                 print >> self.inc, '    int getVersion() {'
                 print >> self.inc, T('      return ${type_name}::Version;')(locals())
                 print >> self.inc, '    }'
-            print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {'
-            print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(store.get(src, 0)));')(locals())
-            print >> self.inc, '    }'
+            if getter_class == "Psana::EvtGetter":
+                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(key, foundSrc)));')(locals())
+                print >> self.inc, '    }'
+                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(src, key, foundSrc)));')(locals())
+                print >> self.inc, '    }'
+                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
+                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(source, key, foundSrc)));')(locals())
+                print >> self.inc, '    }'
+            elif getter_class == "Psana::EnvGetter":
+                print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {'
+                print >> self.inc, T('      boost::shared_ptr<${type_name}> result = store.get(src, 0);')(locals())
+                print >> self.inc, '      if (! result.get()) {'
+                print >> self.inc, '        return boost::python::api::object();'
+                print >> self.inc, '      }'
+                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(result));')(locals())
+                print >> self.inc, '    }'
             print >> self.inc, '  };'
 
     def _genConst(self, const):
