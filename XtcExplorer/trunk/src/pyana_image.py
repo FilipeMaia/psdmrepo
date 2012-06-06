@@ -214,7 +214,8 @@ class  pyana_image ( object ) :
 
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
-            self.config = env.getConfig( self.configtypes[device], addr )
+            address = addr.split('|')[0]
+            self.config = env.getConfig( self.configtypes[device], address )
             if not self.config:
                 print '*** %s config object is missing ***'%addr
                 return
