@@ -212,10 +212,17 @@ class  psana_image ( object ) :
             print "addr =", addr
             device = addr.split('|')[1].split('-')[0]
             print "device =", device
-            self.config = env.getConfig( self.configtypes[device], addr )
+            address = addr.split('|')[0]
+            print "address =", address
+
+            self.config = env.getConfig( self.configtypes[device], address )
+            #self.config = env.getConfig( self.configtypes[device], "CxiDg4-0" )
+
             if not self.config:
                 print '*** %s config object is missing ***'%addr
-                return
+                sys.exit(1)
+            else:
+                print '*** %s config object found!'%addr
 
             if addr.find('Cspad2x2')>=0:
                 sections = self.config.sections()

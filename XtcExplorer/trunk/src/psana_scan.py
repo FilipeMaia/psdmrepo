@@ -144,7 +144,12 @@ class psana_scan (object) :
         print "Begin calibcycle ", self.n_ccls
 
         # control.ConfigV1 element
-        ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        print "Looking for xtc.TypeId.Type.Id_ControlConfig"
+        #ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        ctrl_config = env.get("Psana::ControlData::ConfigV1");
+
+        print "type(ctrl_config)=", type(ctrl_config)
+        print "ctrl_config=", ctrl_config
 
         nControls = ctrl_config.npvControls()
         for ic in range (0, nControls ):
@@ -181,14 +186,21 @@ class psana_scan (object) :
                 self.evts_scalars[epv_name] = []
 
             # store the value
-            try:
-                epv = env.epicsStore().value(epv_name)
+            print "epv_name=", epv_name
+            epv = env.epicsStore().value(epv_name, 0)
+            #try:
+            if True:
+                epv = env.epicsStore().value(epv_name, 0)
                 if not epv:
                     logging.warning('EPICS PV %s does not exist', epv_name)
                 else :
-                    self.evts_scalars[epv_name].append(epv.value)
+                    s = epv.doubleValue()
+                    print "epv.doubleValue() =", s
+                    self.evts_scalars[epv_name].append(epv.doubleValue())
+            """
             except:
                 logging.warning('EPICS PV %s could not be fetched', epv_name)
+            """
 
         # Other scalars in the event
         for scalar in self.input_scalars :
