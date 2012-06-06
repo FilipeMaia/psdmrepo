@@ -503,7 +503,7 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -556,6 +556,130 @@ public:
     }
     boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
       return boost::python::api::object(DataDescV1_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class TdcConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcConfigV1";
+    }
+    int getTypeId() {
+      return TdcConfigV1::TypeId;
+    }
+    int getVersion() {
+      return TdcConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<TdcConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(TdcConfigV1_Wrapper(result));
+    }
+  };
+
+  class TdcDataV1_Item_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcDataV1_Item);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcDataV1_Item";
+    }
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class TdcDataV1Common_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcDataV1Common);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcDataV1Common";
+    }
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class TdcDataV1Channel_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcDataV1Channel);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcDataV1Channel";
+    }
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class TdcDataV1Marker_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcDataV1Marker);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcDataV1Marker";
+    }
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class TdcDataV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Acqiris::TdcDataV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Acqiris::TdcDataV1";
+    }
+    int getTypeId() {
+      return TdcDataV1::TypeId;
+    }
+    int getVersion() {
+      return TdcDataV1::Version;
+    }
+    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(src, key, foundSrc)));
+    }
+    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(source, key, foundSrc)));
     }
   };
 } // namespace Acqiris

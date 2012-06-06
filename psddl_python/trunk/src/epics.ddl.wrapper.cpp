@@ -434,6 +434,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::PvConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(PvConfigV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(PvConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

@@ -543,6 +543,23 @@ public:
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
 };
 
+  class PulseConfigV3_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::EvrData::PulseConfigV3);
+    }
+    const char* getTypeName() {
+      return "Psana::EvrData::PulseConfigV3";
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<PulseConfigV3> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(PulseConfigV3_Wrapper(result));
+    }
+  };
+
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -557,7 +574,7 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -580,7 +597,7 @@ public:
     int getVersion() {
       return ConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV2> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -603,7 +620,7 @@ public:
     int getVersion() {
       return ConfigV3::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV3> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -626,12 +643,29 @@ public:
     int getVersion() {
       return ConfigV4::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV4> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
       }
       return boost::python::api::object(ConfigV4_Wrapper(result));
+    }
+  };
+
+  class SequencerConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::EvrData::SequencerConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::EvrData::SequencerConfigV1";
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<SequencerConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(SequencerConfigV1_Wrapper(result));
     }
   };
 
@@ -649,7 +683,7 @@ public:
     int getVersion() {
       return ConfigV5::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV5> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -672,7 +706,7 @@ public:
     int getVersion() {
       return ConfigV6::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV6> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();
@@ -703,6 +737,29 @@ public:
     }
     boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
       return boost::python::api::object(DataV3_Wrapper(evt.get(source, key, foundSrc)));
+    }
+  };
+
+  class IOConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::EvrData::IOConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::EvrData::IOConfigV1";
+    }
+    int getTypeId() {
+      return IOConfigV1::TypeId;
+    }
+    int getVersion() {
+      return IOConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<IOConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(IOConfigV1_Wrapper(result));
     }
   };
 } // namespace EvrData

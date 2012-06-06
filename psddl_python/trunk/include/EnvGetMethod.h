@@ -12,10 +12,11 @@ namespace Psana {
   private:
     EnvObjectStore& m_store;
     const Source& m_src;
+    Pds::Src* m_foundSrc;
   public:
-    EnvGetMethod(EnvObjectStore& store, const Source& src) : m_store(store), m_src(src) {}
+    EnvGetMethod(EnvObjectStore& store, const Source& src, Pds::Src* foundSrc) : m_store(store), m_src(src), m_foundSrc(foundSrc) {}
     object get(GenericGetter* getter) {
-      return ((EnvGetter*) getter)->get(m_store, m_src);
+      return ((EnvGetter*) getter)->get(m_store, m_src, m_foundSrc);
     }
   };
 }

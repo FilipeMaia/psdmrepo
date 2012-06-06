@@ -128,6 +128,52 @@ public:
   double minor_axis_width() const { return o->minor_axis_width(); }
   double major_axis_tilt() const { return o->major_axis_tilt(); }
 };
+
+  class FrameFccdConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Camera::FrameFccdConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Camera::FrameFccdConfigV1";
+    }
+    int getTypeId() {
+      return FrameFccdConfigV1::TypeId;
+    }
+    int getVersion() {
+      return FrameFccdConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<FrameFccdConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(FrameFccdConfigV1_Wrapper(result));
+    }
+  };
+
+  class FrameFexConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Camera::FrameFexConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Camera::FrameFexConfigV1";
+    }
+    int getTypeId() {
+      return FrameFexConfigV1::TypeId;
+    }
+    int getVersion() {
+      return FrameFexConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<FrameFexConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(FrameFexConfigV1_Wrapper(result));
+    }
+  };
 } // namespace Camera
 } // namespace Psana
 #endif // PSANA_CAMERA_DDL_WRAPPER_H

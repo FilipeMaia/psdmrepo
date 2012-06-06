@@ -177,6 +177,121 @@ private:
   float	_yscale;
 };
 #pragma pack(pop)
+
+  class DiodeFexConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::DiodeFexConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::DiodeFexConfigV1";
+    }
+    int getTypeId() {
+      return DiodeFexConfigV1::TypeId;
+    }
+    int getVersion() {
+      return DiodeFexConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<DiodeFexConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(DiodeFexConfigV1_Wrapper(result));
+    }
+  };
+
+  class DiodeFexConfigV2_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::DiodeFexConfigV2);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::DiodeFexConfigV2";
+    }
+    int getTypeId() {
+      return DiodeFexConfigV2::TypeId;
+    }
+    int getVersion() {
+      return DiodeFexConfigV2::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<DiodeFexConfigV2> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(DiodeFexConfigV2_Wrapper(result));
+    }
+  };
+
+  class IpmFexConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::IpmFexConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::IpmFexConfigV1";
+    }
+    int getTypeId() {
+      return IpmFexConfigV1::TypeId;
+    }
+    int getVersion() {
+      return IpmFexConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<IpmFexConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(IpmFexConfigV1_Wrapper(result));
+    }
+  };
+
+  class IpmFexConfigV2_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::IpmFexConfigV2);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::IpmFexConfigV2";
+    }
+    int getTypeId() {
+      return IpmFexConfigV2::TypeId;
+    }
+    int getVersion() {
+      return IpmFexConfigV2::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<IpmFexConfigV2> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(IpmFexConfigV2_Wrapper(result));
+    }
+  };
+
+  class PimImageConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::PimImageConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::PimImageConfigV1";
+    }
+    int getTypeId() {
+      return PimImageConfigV1::TypeId;
+    }
+    int getVersion() {
+      return PimImageConfigV1::Version;
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<PimImageConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(PimImageConfigV1_Wrapper(result));
+    }
+  };
 } // namespace Lusi
 } // namespace Psana
 #endif // PSANA_LUSI_DDL_WRAPPER_H

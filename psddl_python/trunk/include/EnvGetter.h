@@ -10,7 +10,7 @@ namespace Psana {
 
   class EnvGetter : public GenericGetter {
   public:
-    virtual object get(EnvObjectStore& store, const Source& src) = 0;
+    virtual object get(EnvObjectStore& store, const Source& src, Pds::Src* foundSrc=0) = 0;
   };
 }
 #endif // PSANA_ENVGETTER_H

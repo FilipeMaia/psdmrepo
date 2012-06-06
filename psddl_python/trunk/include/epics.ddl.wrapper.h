@@ -784,6 +784,23 @@ public:
   std::vector<int> pvControls_shape() const { return o->pvControls_shape(); }
 };
 
+  class PvConfigV1_Getter : public Psana::EnvGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Epics::PvConfigV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Epics::PvConfigV1";
+    }
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+      boost::shared_ptr<PvConfigV1> result = store.get(src, 0);
+      if (! result.get()) {
+        return boost::python::api::object();
+      }
+      return boost::python::api::object(PvConfigV1_Wrapper(result));
+    }
+  };
+
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -798,7 +815,7 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {
+    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
       if (! result.get()) {
         return boost::python::api::object();

@@ -49,6 +49,7 @@ void createWrappers() {
   std_vector_class_(PulseConfigV3);
   std_vector_class_(PulseConfigV3_Wrapper);
 #undef _CLASS
+  ADD_GETTER(PulseConfigV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -216,6 +217,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::SequencerConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(SequencerConfigV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(SequencerConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -293,6 +295,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::IOConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IOConfigV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(IOConfigV1);
 
 
 } // createWrappers()
