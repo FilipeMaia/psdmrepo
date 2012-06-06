@@ -33,6 +33,7 @@ import os
 import numpy              as np
 
 import CalibPars          as calp
+import CalibParsEvaluated as cpe
 import CSPadConfigPars    as ccp
 import CSPadImageProducer as cip
 
@@ -123,9 +124,6 @@ def main_example_xpp() :
     cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True) #, mirror=True)
     arr = cspadimg.getCSPadImage( ds1ev ) # This works faster
 
-    #arr = arr_raw = cspadimg.getImageArrayForCSPadElement(ds1ev)
-    #arr = np.rot90(arr_raw,2) # index for N*90 degree rotation
-
     print 'Plot CSPad image'
     AmpRange = (1600,2500)
     gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
@@ -137,8 +135,51 @@ def main_example_xpp() :
 
 #----------------------------------------------
 
-if __name__ == "__main__" :
+def example_of_image_built_from_pix_coordinate_array_shaped_as_data() :
+    """Some CSPAD segments may be missing in the dataset
+    """
+    
+    fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5',  628
+    dsname        = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    path_calib    = '/reg/d/psdm/CXI/cxi80410/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
+    Range         = (1000,3500)
+ 
+    calp.calibpars.setCalibParsForPath (run=runnum, path=path_calib)
+    #cpe.cpeval.printCalibParsEvaluated('center_global')
+    cpe.cpeval.evaluateCSPadPixCoordinatesShapedAsData(fname,dsname,rotation=0)
+    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event=0 ) # returns array with shape=(29, 185, 388)
 
+    arr = cpe.cpeval.getTestImageShapedAsData(ds1ev)
+    gg.plotImage(arr,range=Range,figsize=(11.6,10))
+    gg.move(200,100)
+    gg.show()
+
+#----------------------------------------------
+
+def example_of_image_built_from_pix_coordinate_array_for_entire_cspad() :
+    """All CSPAD segments are assumed to be presented in this dataset 
+    """
+
+    fname, runnum = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5', 1437
+    dsname        = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
+    path_calib    = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0'
+    Range         = (1700,2000)
+    
+    calp.calibpars.setCalibParsForPath (run=runnum, path=path_calib)
+    #cpe.cpeval.printCalibParsEvaluated ('center_global')
+    cpe.cpeval.evaluateCSPadPixCoordinates (rotation=0)
+    ds1ev = hm.getOneCSPadEventForTest (fname, dsname, event=0) # returns array with shape=(32, 185, 388)
+
+    arr = cpe.cpeval.getTestImageForEntireArray(ds1ev)
+    gg.plotImage(arr,range=Range,figsize=(11.6,10))
+    gg.move(200,100)
+    gg.show()
+
+#----------------------------------------------
+
+if __name__ == "__main__" :
+    #example_of_image_built_from_pix_coordinate_array_shaped_as_data()
+    #example_of_image_built_from_pix_coordinate_array_for_entire_cspad()
     #main_example_cxi()
     main_example_xpp()
     sys.exit ( 'End of test.' )

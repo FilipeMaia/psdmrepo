@@ -31,13 +31,13 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 import math
-#from PyQt4 import QtGui, QtCore
 import numpy as np
 import CalibPars        as calp
 import CalibParsDefault as cpdef
 import CSPadConfigPars  as ccp
 
 import GlobalGraphics   as gg # For test purpose in main only
+import HDF5Methods      as hm # For test purpose in main only
 
 #---------------------
 #  Class definition --
@@ -54,7 +54,7 @@ class CalibParsEvaluated (object) :
         
         self.list_of_eval_types =[  'center_global'
                                    ,'rotation_index'
-                                   ]
+                                 ]
         self.mode = 'DEFAULT'
 
         self.setCalibParsEvaluatedFromDefault()
@@ -79,12 +79,13 @@ class CalibParsEvaluated (object) :
 #---------------------
 
     def setCalibParsEvaluated (self) :
-        #print 'Set the calibration parameters evaluated'
+        print 'Set the calibration parameters evaluated'
 
         self.mode = 'EVALUATED'
 
         # For now the only type of evaluated parameters is the 'center_global'
-        self.evalpars['center_global'] = self.evaluateCSPadCenterGlobal()
+        self.evalpars['center_global'] = self.evaluateCSPadCenterGlobal() # np.array()
+        #self.printCalibParsEvaluated ('center_global') 
 
         self.evaluateCSPadGeometry()
 
@@ -345,16 +346,16 @@ class CalibParsEvaluated (object) :
 
 
         X, Y = np.meshgrid(lenCoords_um, widCoords_um)
-        print 'lenCoords_um.shape=', lenCoords_um.shape
-        print 'X.shape=', X.shape
-        print 'Y.shape=', Y.shape
+        #print 'lenCoords_um.shape=', lenCoords_um.shape
+        #print 'X.shape=', X.shape
+        #print 'Y.shape=', Y.shape
 
         self.pix_global_x = np.zeros((nquads,nsects,185,388), dtype=np.float32)
         self.pix_global_y = np.zeros((nquads,nsects,185,388), dtype=np.float32)
         
         for quad in range(nquads) :
             for sect in range(nsects) :
-                angle     = dPhi[quad][sect] + 90*segmRotInd[quad][sect] + 90
+                angle     = -(dPhi[quad][sect] + 90*segmRotInd[quad][sect] + 90)
                 angle_rad = math.radians(angle)                
                 S,C = math.sin(angle_rad), math.cos(angle_rad)
                 Xrot, Yrot = self.rotation(X, Y, C, S)
@@ -378,6 +379,48 @@ class CalibParsEvaluated (object) :
 
 #---------------------
 
+    def evaluateCSPadPixCoordinatesShapedAsData(self, fname, dsname, rotation=0) :
+
+        print 'Evaluate pix coordinates for fname:', fname
+
+        self.evaluateCSPadPixCoordinates (rotation)
+
+        ccp.cspadconfig.setCSPadConfiguration(fname, dsname, event=0)
+        quadNumsInEvent  = ccp.cspadconfig.quadNumsInEvent
+        indPairsInQuads  = ccp.cspadconfig.indPairsInQuads
+        nquads           = ccp.cspadconfig.nquads
+        nsects           = ccp.cspadconfig.nsects
+        #ccp.cspadconfig.printCSPadConfigPars()
+
+        nsects_in_data = max(indPairsInQuads.flatten()) + 1
+        self.pix_global_shaped_as_data_x = np.zeros((nsects_in_data,185,388), dtype=np.float32)
+        self.pix_global_shaped_as_data_y = np.zeros((nsects_in_data,185,388), dtype=np.float32)
+        
+        for iq in range(len(quadNumsInEvent)) :
+            quad = int(quadNumsInEvent[iq]) # uint8 -> int
+            for segm in range(8): # loop over ind = 0,1,2,...,7
+                ind_segm_in_arr = indPairsInQuads[quad][segm]
+                if ind_segm_in_arr == -1 : continue
+
+                self.pix_global_shaped_as_data_x[ind_segm_in_arr][:] = self.pix_global_x[quad][segm][:]
+                self.pix_global_shaped_as_data_y[ind_segm_in_arr][:] = self.pix_global_y[quad][segm][:]
+
+        print 'self.pix_global_shaped_as_data_x.shape =', self.pix_global_shaped_as_data_x.shape       
+        print 'evaluateCSPadPixCoordinatesShapedAsData: done'
+
+#---------------------
+
+    def getCSPadPixCoordinatesShapedAsData_um (self) :
+        return self.pix_global_shaped_as_data_x, self.pix_global_shaped_as_data_y
+
+#---------------------
+
+    def getCSPadPixCoordinatesShapedAsData_pix (self) :
+        pixSize = ccp.cspadconfig.pixSize
+        return self.pix_global_shaped_as_data_x / pixSize, self.pix_global_shaped_as_data_y / pixSize
+
+#---------------------
+
     def printCSPadPixCoordinates (self) :
 
         print 'self.pix_global_x =\n', self.pix_global_x
@@ -397,16 +440,18 @@ class CalibParsEvaluated (object) :
 
 #---------------------
 
-    def getTestImage(self) :
+    def getTestImageForEntireArray(self,ds1ev) :
         """WERY SLOW METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """        
-        xpix, ypix =  cpeval.getCSPadPixCoordinates_pix ()
+        xpix, ypix = cpeval.getCSPadPixCoordinates_pix ()
         
-        dimX,dimY = 1750, 1750
+        #dimX,dimY = 1750, 1750
+        dimX,dimY = self.detDimX, self.detDimY
         img_arr = np.zeros((dimX+1,dimY+1), dtype=np.float32)
         
         for quad in range(4) :
             for sect in range(8) :
+                segm = quad*8+sect
                 for row in range(185) :
                     for col in range(388) :
 
@@ -418,7 +463,40 @@ class CalibParsEvaluated (object) :
                         if x>dimX : x=dimX
                         if y>dimY : y=dimY
 
-                        img_arr[x][y] = 1
+                        img_arr[x][y] = ds1ev[segm][row][col]
+
+        return img_arr
+
+#---------------------
+
+    def getTestImageShapedAsData(self,ds1ev) :
+        """WERY SLOW METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        """        
+        xpix, ypix = cpeval.getCSPadPixCoordinatesShapedAsData_pix ()
+
+        print 'Data       array shape = ', ds1ev.shape
+        print 'Coordinate array shape = ',  xpix.shape
+        
+        dimX,dimY = self.detDimX, self.detDimY
+
+        img_arr = np.zeros((dimX+1,dimY+1), dtype=np.float32)
+
+        nsect_in_arr = xpix.shape[0] 
+        print 'nsect_in_arr =', nsect_in_arr
+
+        for sect in range(nsect_in_arr) :
+            for row in range(185) :
+                for col in range(388) :
+
+                    x = int( xpix[sect][row][col] )
+                    y = int( ypix[sect][row][col] )
+
+                    if x<0    : x=0
+                    if y<0    : y=0
+                    if x>dimX : x=dimX
+                    if y>dimY : y=dimY
+
+                    img_arr[x][y] = ds1ev[sect][row][col]
 
         return img_arr
 
@@ -433,14 +511,14 @@ class CalibParsEvaluated (object) :
 
         print 'wid2x1, len2x1, pixSize, pixSizeWide =', wid2x1, len2x1, pixSize, pixSizeWide
 
-        widOffset = -(184/2)*pixSize
+        widOffset = (184/2)*pixSize
         lenOffset = pixSizeWide + 0.5*pixSize
 
         lenCoords  = np.zeros((len2x1), dtype=np.float32)
         widCoords  = np.zeros((wid2x1), dtype=np.float32)
 
         for i in range(wid2x1) :
-            widCoords[i] = i*pixSize + widOffset
+            widCoords[i] = -i*pixSize + widOffset
 
         for i in range(0,193) :
             dl = lenOffset + i*pixSize
@@ -516,37 +594,20 @@ cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
 # In case someone decides to run this module --
 #----------------------------------------------
 
-def main() :
+def main_test() :
 
-    ##cpeval.printCalibParsEvaluated()
-    #cpeval.printListOfEvaluatedTypes()
-    #cpeval.printCalibParsEvaluated('center_global')
-    #cpeval.printCalibParsEvaluated('rotation_index')
+    cpeval.printCalibParsEvaluated()
+    cpeval.printListOfEvaluatedTypes()
+    cpeval.printCalibParsEvaluated('center_global')
+    cpeval.printCalibParsEvaluated('rotation_index')
 
-    #calp.calibpars.setCalibPars(10, '/reg/d/psdm/CXI/cxi35711/calib', 'CsPad::CalibV1', 'CxiDs1.0:Cspad.0')
-
-    #path_calib = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0'            # 2012-03-23 check    
-    path_calib = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
-    calp.calibpars.setCalibParsForPath (run=10, path=path_calib )
-
-
-    cpeval.evaluateCSPadPixCoordinates (rotation=0)
-    #xpix, ypix = cpeval.getCSPadPixCoordinates_pix ()
-    arr = cpeval.getTestImage()
-    gg.plotImage(arr,range=(-1,2),figsize=(11.6,10))
-    gg.move(200,100)
-    gg.show()
-
-    #print calp.calibpars.getCalibPars('center')
-
-    #calp.calibpars.printCalibPars() # prints the calib pars from files, if found
-    #print 'center_global =\n', cpeval.getCalibParsEvaluated('center_global')
-
-    print 'End of test'
+    print calp.calibpars.getCalibPars('center')
+    calp.calibpars.printCalibPars() # prints the calib pars from files, if found
+    print 'center_global =\n', cpeval.getCalibParsEvaluated('center_global')
 
 if __name__ == "__main__" :
 
-    main()
+    main_test()
     sys.exit ( 'End of job' )
 
 #----------------------------------------------

@@ -133,6 +133,7 @@ class CalibPars (object) :
 
         #=================================
         cpe.cpeval.setCalibParsEvaluated()
+        #cpe.cpeval.printCalibParsEvaluated ('center_global') 
         #=================================
 
 #---------------------

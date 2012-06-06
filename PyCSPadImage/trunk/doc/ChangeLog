@@ -12,6 +12,17 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-06-05 Mikhail S. Dubrovin
+Tag: V00-00-05
+- Add evaluation of the pixel coordinate arrays for 
+  entire cspad shape=(4,8,185,388), 
+  and for data-driven shape=(Nseg,185,388)
+- Add respective examples:
+M       src/CalibParsEvaluated.py
+M       src/Examples.py
+M       src/CalibPars.py
+
+#---------------------
 2012-05-08 Mikhail S. Dubrovin
 Tag: V00-00-04
 	
