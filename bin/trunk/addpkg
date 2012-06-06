@@ -18,6 +18,7 @@ Usage: `basename $0` [options] [package-name [package-tag]]
     -x          export instead of checkout
     -q          quiet operation
     -f {file|-} read the list of tags from file or standard input
+    -u          checkout from user repository (\$SIT_SVN_USER)
 
   Checks out the packages from repository, the tag can be either a real 
 tag in repository or "HEAD" for main trunk. If tag is missing then the
@@ -112,15 +113,17 @@ link_scons="no"
 tag_file=""
 export="checkout"
 quiet=""
+repo="SIT_SVN"
 
 # get the options
-while getopts hdcxqf: c ; do
+while getopts hdcxquf: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     c) mode="cvs" ;;
     x) export="export" ;;
     q) quiet="-q" ;;
+    u) repo="SIT_SVN_USER" ;;
     f) tag_file="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
@@ -148,12 +151,11 @@ else
   exit 2
 fi
 
-svnroot="$SIT_SVN"
+eval svnroot="\$$repo"
 if [ -z "$svnroot" ] ; then
-  echo "SIT_SVN environment variable is not defined"
+  echo "$repo environment variable is not defined"
   exit 2
 fi
-
 svncmd=psvn
 
 if [ "$tag_file" = '-' ] ; then
