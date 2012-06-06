@@ -34,6 +34,7 @@ import os
 import logging
 import types
 import string
+import re
 
 #---------------------------------
 #  Imports of base class module --
@@ -223,9 +224,11 @@ class DdlPythonInterfaces ( object ) :
     def _parseType2(self, type, namespace_prefix = ""):
         type_name = type.name
         getter_class = None
-        if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
+        #if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
+        if re.match(r'.*(Data|DataDesc)V[1-9][0-9]*', type_name):
             getter_class = "Psana::EvtGetter"
-        elif type_name.find('ConfigV') == 0:
+        #elif type_name.find('ConfigV') == 0:
+        elif re.match(r'.*(Config)V[1-9][0-9]*', type_name):
             getter_class = "Psana::EnvGetter"
         if getter_class:
             print >>self.inc, ''
@@ -256,7 +259,7 @@ class DdlPythonInterfaces ( object ) :
                 print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(source, key, foundSrc)));')(locals())
                 print >> self.inc, '    }'
             elif getter_class == "Psana::EnvGetter":
-                print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src) {'
+                print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {'
                 print >> self.inc, T('      boost::shared_ptr<${type_name}> result = store.get(src, 0);')(locals())
                 print >> self.inc, '      if (! result.get()) {'
                 print >> self.inc, '        return boost::python::api::object();'
