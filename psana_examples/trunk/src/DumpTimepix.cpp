@@ -222,6 +222,12 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
 void 
 DumpTimepix::event(Event& evt, Env& env)
 {
+
+  // ==============================================================
+  //  Psana transparently replaces Timepix::DataV1 objects with
+  //  Timepix::DataV2, so the code for Timepix::DataV1 is not likely
+  //  to be executed at all.
+  // ==============================================================
   shared_ptr<Psana::Timepix::DataV1> data1 = evt.get(m_src);
   if (data1.get()) {
     WithMsgLog(name(), info, str) {
