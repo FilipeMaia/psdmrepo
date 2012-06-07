@@ -114,7 +114,7 @@ class dump_cspad ( object ) :
         print "  Number of quadrants: %d" % len(quads)
         """
 
-        evt_data = evt.getByType("Psana::CsPad::Data", self.m_src)
+        evt_data = evt.get("Psana::CsPad::Data", env.Source(self.m_src))
         quads = evt_data.quads
         if not quads :
             return

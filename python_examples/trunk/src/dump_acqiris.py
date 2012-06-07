@@ -50,11 +50,6 @@ class dump_acqiris (object) :
     #  Constructor --
     #----------------
     def __init__ ( self, source="" ) :
-        """Class constructor takes the name of the data source.
-
-        @param source   data source
-        """
-        
         self.m_src = source
 
     #-------------------
@@ -62,13 +57,13 @@ class dump_acqiris (object) :
     #-------------------
     def beginjob( self, evt, env ) :
         
-        #print evt.getAllKeys()
+        src = env.configStr("source", "DetInfo(:Acqiris)")
+        print 'env.configStr("source", "DetInfo(:Acqiris)") ->', src
 
-        cppTypeName = evt.getCppTypeNameForPythonTypeId(xtc.TypeId.Type.Id_AcqConfig);
-        print "xtc.TypeId.Type.Id_AcqConfig ->", cppTypeName
-#        sys.exit(0)
-
-        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
+        foundSrc_list = []
+        config = env.configStore().get("Psana::Acqiris::ConfigV1", env.Source(src), foundSrc_list);
+        foundSrc = foundSrc_list[0]
+        print "foundSrc: log()=%x, phy()=%x" % (foundSrc.log(), foundSrc.phy())
         if config:
         
             print "%s: %s" % (config.__class__.__name__, self.m_src)
@@ -103,7 +98,7 @@ class dump_acqiris (object) :
         """
 
         print "... self.m_src=", self.m_src
-        acqData = evt.getByType("Psana::Acqiris::DataDesc", self.m_src)
+        acqData = evt.get("Psana::Acqiris::DataDesc", env.Source(self.m_src))
 
         nchan = acqData.data_shape()[0];
         for chan in range(nchan):
