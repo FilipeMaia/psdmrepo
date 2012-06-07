@@ -2,6 +2,7 @@
 #define PSANA_EVTGETMETHOD_H
 
 #include <psddl_python/GenericGetter.h>
+#include <psddl_python/EvtGetter.h>
 #include <PSEvt/Event.h>
 
 namespace Psana {
