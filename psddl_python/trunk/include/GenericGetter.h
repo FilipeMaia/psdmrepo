@@ -23,6 +23,7 @@ namespace Psana {
     static object get(int typeId, GetMethod* getMethod);
     static object get(string& typeName, GetMethod* getMethod);
     static void addGetter(GenericGetter* getter);
+    static string getTypeNameForId(int typeId);
   };
 
 }

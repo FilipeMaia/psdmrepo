@@ -17,6 +17,10 @@ namespace Psana {
   static map<int, string> pythonTypeIdMap; // map Python type id to versionless type name
   static map<string, string> pythonTypeNameMap; // map Python type name to versionless type name
 
+  string GenericGetter::getTypeNameForId(int typeId) {
+    return "";
+  }
+
   void printTables() {
     printf("*** typeNameMap:\n");
     map<string, GenericGetter*>::const_iterator it;
