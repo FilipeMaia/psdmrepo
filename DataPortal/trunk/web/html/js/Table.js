@@ -52,7 +52,7 @@ function define_class(constructor, base, statics, methods ) {
 /**
  * The Table class:
  * 
- *   Table(id,coldef,data,text_when_empty)
+ *   Table(id,coldef,data,text_when_empty,default_sort_column)
  * 
  * The class is designed to simplify creating dynamic tables
  * at a location specified by HTML container 'id'. Table configuration
@@ -148,10 +148,11 @@ function define_class(constructor, base, statics, methods ) {
  *    
  *    Where the default is 'true'.
  *
- * Other parameters:
+ * Other parameters/options:
  *
- *   'data'            - data array to be preloaded when creating the table
- *   'text_when_empty' - HTML text to show when no data are loaded
+ *   'data'                - data array to be preloaded when creating the table
+ *   'text_when_empty'     - HTML text to show when no data are loaded
+ *   'default_sort_column' - an optional column number by which to sort (default: 0)
  */
 
 function TableCellType() {}
@@ -163,7 +164,8 @@ define_class( TableCellType, null, {}, {
         var b_ = ''+b;
         return ( a_ < b_ ) ? -1 : (( b_ < a_ ) ? 1 : 0 ); },
     compare_values: function(a,b) { return this.compare_strings(a,b); },
-    after_sort    : function() {}}
+    after_sort    : function() {},
+    select_action : function(a) {alert(a);}}
 );
 
 function TableCellType_Number() { TableCellType.call(this); }
@@ -187,7 +189,7 @@ define_class( TableCellType_TextURL, TableCellType, {}, {
 );
 
 
-function Table(id,coldef,data,text_when_empty) {
+function Table(id,coldef,data,options) {
 
     /** 
      * Constructor
@@ -201,20 +203,24 @@ function Table(id,coldef,data,text_when_empty) {
     // Optional parameters
 
     this.data            = data ? data : [];
-    this.text_when_empty = text_when_empty ? text_when_empty : Table.Status.Empty;
+    this.options         = options ? options : {};
+    this.text_when_empty = this.options.text_when_empty ? this.options.text_when_empty : Table.Status.Empty;
 
 
     // Sort configuration
 
     this.sorted = {
-        column:  0,     // the number of a column by which rows are sorted
-        forward: true   // sort direction
+        column:  this.options.default_sort_column ? this.options.default_sort_column : 0,   // the number of a column by which rows are sorted
+        forward: true                                                                       // sort direction
     };
+    this.selected_col = this.options.selected_col ? this.options.selected_col : 0;
+    this.selected_row = data ? data[0] : null;
 
     this.header = {
         size: {cols: 0, rows: 0},
         types: [],
-        sorted: []
+        sorted: [],
+        selectable: []
     };
     this.header.size  = this.header_size(this.coldef);
 
@@ -222,6 +228,7 @@ function Table(id,coldef,data,text_when_empty) {
         this.coldef,
         this.header.types,
         this.header.sorted,
+        this.header.selectable,
         0
     );
     this.header.types  = bottom_columns.types;
@@ -249,6 +256,11 @@ define_class( Table, null, {
             return type.compare_values(a[column], b[column] );
         }},
 
+    sort_func4cells: function(type) {
+        this.compare = function(a,b) {
+            return type.compare_values(a, b);
+        }},
+
     sort_sign_classes_if: function(condition,forward) {
         return condition ? ['ui-icon',(forward ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-n')] : []; }
 
@@ -262,6 +274,10 @@ define_class( Table, null, {
         return this.header.size.cols;
     },
 
+    selected_object: function() {
+        return this.selected_row ? this.selected_row[this.selected_col] : null;
+    },
+
     sort_data: function() {
         var column = this.sorted.column;
         if( !this.header.sorted[column] ) return;
@@ -272,9 +288,22 @@ define_class( Table, null, {
 
     load: function(data) {
         this.data = data ? data : [];
+        this.selected_row = data ? data[0] : null;
         this.display();
     },
 
+    select: function(col, obj) {
+        if(( col < 0 ) || ( col >= this.cols()) || ( col != this.selected_col )) return;
+        var bound_sort_func4cells = new Table.sort_func4cells(this.header.types[col]);
+        for( var i in this.data ) {
+            var row = this.data[i];
+            if( !bound_sort_func4cells.compare(row[col], obj)) {
+                this.selected_row = row;
+                this.display();
+                return;
+            }
+        }
+    },
     display: function() {
 
         /**
@@ -313,7 +342,15 @@ define_class( Table, null, {
                     var classes = ' table_cell table_bottom';
                     if( j == 0 ) classes += ' table_cell_left';
                     if( j == row.length - 1 ) classes += ' table_cell_right';
-                    html += '<td class="'+classes+'">'+this.header.types[j].to_string(row[j])+'</td>';
+                    var selector = '';
+                    if( this.header.selectable[j] ) {
+                        classes += ' table_cell_selectable';
+                        if( row == this.selected_row ) {
+                            classes += ' table_cell_selectable_selected';
+                        }
+                        selector = ' id="'+j+' '+i+'"';
+                    }
+                    html += '<td class="'+classes+'" '+selector+'>'+this.header.types[j].to_string(row[j])+'</td>';
                 }
                 html += '</tr>';
             }
@@ -337,6 +374,15 @@ define_class( Table, null, {
         for( var i in this.header.types ) {
             this.header.types[i].after_sort(); 
         }
+        $('#'+this.id).find('.table_cell_selectable').click(function() {
+            var addr = this.id.split(' ');
+            var col_idx = addr[0];
+            var row_idx = addr[1];
+            that.selected_row  = that.data[row_idx];
+            that.header.types[col_idx].select_action(that.data[row_idx][col_idx]);
+            $('#'+that.id).find('.table_cell_selectable_selected').removeClass('table_cell_selectable_selected');
+            $(this).addClass('table_cell_selectable_selected');
+        });
     },
 
     erase: function(text_when_empty) {
@@ -354,7 +400,7 @@ define_class( Table, null, {
             colspan = child.cols;   // columns for children
         }
 
-        // Drowing is only done if we're at the right level
+        // Drawing is only done if we're at the right level
 
         if( level == level2drows ) {
             var align = colspan > 1 ? 'align="center"' : '';
@@ -373,7 +419,7 @@ define_class( Table, null, {
                 '<div style="float:left;">'+col.name+'</div><div style="float:left;">'+sort_sign+'</div><div style="clear:both;"></div></td>';
         }
 
-        // And to optimize things we stop walking the header when teh level drops
+        // And to optimize things we stop walking the header when the level drops
         // below the level where we're supposed to drow things.
 
         if(( level2drows > level ) && col.coldef ) {
@@ -412,7 +458,7 @@ define_class( Table, null, {
         return {rows: rows2return, cols: cols2return};
     },
 
-    column_types: function(coldef, types, sorted, next_column_number) {
+    column_types: function(coldef, types, sorted, selectable, next_column_number) {
 
         /**
          * Traverse colum definition and return types for the bottom-most
@@ -422,9 +468,10 @@ define_class( Table, null, {
         for( var i in coldef ) {
             var col = coldef[i];
             if( col.coldef ) {
-                var child          = this.column_types(col.coldef, types, sorted, next_column_number);
+                var child          = this.column_types(col.coldef, types, sorted, selectable, next_column_number);
                 types              = child.types;
                 sorted             = child.sorted;
+                selectable         = child.selectable;
                 next_column_number = child.next_column_number;
             } else {
                 if(col.type) {
@@ -438,13 +485,15 @@ define_class( Table, null, {
                 } else {
                     types.push(Table.Types.Text);
                 }
-                sorted.push(col.sorted !== undefined ? col.sorted : true);
+                sorted.push    (col.sorted     !== undefined ? col.sorted     : true);
+                selectable.push(col.selectable !== undefined ? col.selectable : false );
                 col.number = next_column_number++;
             }
         }
         return {
             types:              types,
             sorted:             sorted,
+            selectable:         selectable,
             next_column_number: next_column_number
         };
     }}
@@ -453,13 +502,19 @@ define_class( Table, null, {
 function Attributes_HTML(attr) {
     var html = '';
     if(attr) {
+        if(attr.id)       html += ' id="'+attr.id+'"';
         if(attr.classes)  html += ' class="'+attr.classes+'"';
         if(attr.name)     html += ' name="'+attr.name+'"';
+        if(attr.value)    html += ' value="'+attr.value+'"';
         if(attr.title)    html += ' title="'+attr.title+'"';
         if(attr.disabled) html += ' disabled="disabled"';
         if(attr.checked)  html += ' checked="checked"';
         if(attr.onclick)  html += ' onclick="'+attr.onclick+'"';
     }
+    return html;
+}
+function TextInput_HTML(attr) {
+    var html = '<input type="text"'+Attributes_HTML(attr)+'/>';
     return html;
 }
 function Checkbox_HTML(attr) {
