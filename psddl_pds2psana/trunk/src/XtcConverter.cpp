@@ -48,6 +48,7 @@
 #include "psddl_pds2psana/princeton.ddl.h"
 #include "psddl_pds2psana/pulnix.ddl.h"
 #include "psddl_pds2psana/timepix.ddl.h"
+#include "psddl_pds2psana/TimepixDataV1ToV2.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -394,7 +395,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_TimepixConfig:
     break;
   case Pds::TypeId::Id_TimepixData:
-    if (version == 1) ::storeDataProxy<Timepix::DataV1>(xtc, evt);
+    if (version == 1) ::storeDataProxy<TimepixDataV1ToV2>(xtc, evt);
     if (version == 2) ::storeDataProxy<Timepix::DataV2>(xtc, evt);
     break;
   case Pds::TypeId::Id_CspadCompressedElement:
