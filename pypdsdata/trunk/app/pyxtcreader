@@ -93,7 +93,7 @@ def main( argv ) :
     for dg in xtciter :
 
         if verbose > 1 :
-            print "file: %s, pos: %d, run: %s" % (xtciter.fileName(), xtciter.fpos(), xtciter.run()) 
+            print "file: %s, pos: %d, run: %s" % (xtciter.fileName(), xtciter.fpos(), xtciter.fileName().run()) 
 
         seq = dg.seq
         clock = seq.clock()

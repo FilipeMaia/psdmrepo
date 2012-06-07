@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-66
+2012-06-05 Andy Salnikov
+- small fix to pyxtcreader, it crashed with -vv option when trying to 
+  access run number frin the iterator
+
 Tag: V00-00-65
 2012-06-03 Andy Salnikov
 - upgrade to pdsdata V03-07-07
