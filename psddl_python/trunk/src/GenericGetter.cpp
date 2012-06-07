@@ -15,13 +15,8 @@ namespace Psana {
   static map<string, int> versionMaxMap; // map versionless type name to maxium version
   static map<string, GenericGetter*> typeNameMap; // map C++ type name (version NOT removed) to getter
   static map<int, string> pythonTypeIdMap; // map Python type id to versionless type name
-  static map<string, string> pythonTypeNameMap; // map Python type name to versionless type name
 
-  string GenericGetter::getTypeNameForId(int typeId) {
-    return "";
-  }
-
-  void printTables() {
+  static void printTables() {
     printf("*** typeNameMap:\n");
     map<string, GenericGetter*>::const_iterator it;
     for (it = typeNameMap.begin(); it != typeNameMap.end(); it++) {
@@ -39,7 +34,6 @@ namespace Psana {
     }
 
     printf("*** versionMinMap:\n");
-    vit;
     for (vit = versionMinMap.begin(); vit != versionMinMap.end(); vit++) {
       string typeName = vit->first;
       int minVersion = vit->second;
@@ -51,7 +45,7 @@ namespace Psana {
   void GenericGetter::addGetter(GenericGetter* getter) {
     string typeName(getter->getTypeName());
     typeNameMap[typeName] = getter;
-    printf("adding '%s' -> %p\n", typeName.c_str(), getter);
+    //printf("adding '%s' -> %p\n", typeName.c_str(), getter);
 
     string sTypeName;
     const int version = getter->getVersion();
@@ -65,12 +59,9 @@ namespace Psana {
 
     const int typeId = getter->getTypeId();
     if (typeId != -1) {
-      const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
       pythonTypeIdMap[typeId] = typeName;
-      //printf("adding xtc.TypeId.Type.Id_%s (%d)\n", pythonTypeName.c_str(), typeId);
-
-      pythonTypeNameMap[pythonTypeName] = typeName;
-      //printf("adding '%s'\n", pythonTypeName.c_str());
+      const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
+      printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
     }
 
     if (version > 0) {
@@ -89,12 +80,23 @@ namespace Psana {
     printf("!!! getGetterByTypeId(%d)...\n", typeId);
     if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
       printTables();
-      printf("getGetterByTypeId(%d): not found\n", typeId);
+      printf("GenericGetter::get(%d): not found\n", typeId);
       return object();
     }
     string& typeName = pythonTypeIdMap[typeId];
     printf("getter->getTypeName()='%s'\n", typeName.c_str());
     return get(typeName, getMethod);
+  }
+
+  string GenericGetter::getTypeNameForId(int typeId) {
+    if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
+      printf("!!! could NOT find type name for %d\n", typeId);
+      return "";
+    } else {
+      string typeName = pythonTypeIdMap[typeId];
+      printf("!!! found type name %s for %d\n", typeName.c_str(), typeId);
+      return typeName;
+    }
   }
 
   static string addVersion(string& typeName, int version) {
@@ -104,6 +106,10 @@ namespace Psana {
   }
 
   object GenericGetter::get(string& typeName, GetMethod* getMethod) {
+    if (typeName == "") {
+      printf("GenericGetter:get(): no typeName!\n");
+      return object();
+    }
     int maxVersion = versionMaxMap[typeName];
     if (maxVersion == 0) {
       // This is not a versioned type name.
@@ -115,34 +121,25 @@ namespace Psana {
         printf("Found class '%s': %p\n", typeName.c_str(), getter);
         return getMethod->get(getter);
       }
-      // If typeName is a python type name, then try again with the corresponding C++ type.
-      if (pythonTypeNameMap.find(typeName) != pythonTypeNameMap.end()) {
-        string& cppTypeName = pythonTypeNameMap[typeName];
-        printf("Trying class '%s' for Python type '%s'.\n", cppTypeName.c_str(), typeName.c_str());
-        return get(cppTypeName, getMethod);
-      }
       // No getter could be found.
       printTables();
-      printf("Could not find C++ class or Python type for '%s'.\n", typeName.c_str());
+      printf("Could not find class '%s'.\n", typeName.c_str());
       return object();
     } else {
       // This is a versioned type name.
       const int minVersion = versionMinMap[typeName];
-#if 1
       if (minVersion == maxVersion) {
+        // No need to iterate, as there is only possible versioned type name.
         string versionedTypeName = addVersion(typeName, minVersion);
         return get(versionedTypeName, getMethod);
       }
-#endif
       if (minVersion != maxVersion) {
-        printf("Trying classes '%sV%d' through '%sV%d'...\n", typeName.c_str(), minVersion, typeName.c_str(), maxVersion);
+        printf("Trying classes '%s' through '%s'.\n",
+               addVersion(typeName, minVersion).c_str(),
+               addVersion(typeName, maxVersion).c_str());
       }
       for (int version = maxVersion; version >= minVersion; version--) {
-#if 0
-        sprintf(versionedTypeName, "%sV%d", typeName.c_str(), version);
-#else
         string versionedTypeName = addVersion(typeName, version);
-#endif
         printf("Trying class '%s'...\n", versionedTypeName.c_str());
         if (typeNameMap.find(versionedTypeName) != typeNameMap.end()) {
           GenericGetter* getter = typeNameMap[versionedTypeName];
@@ -159,7 +156,9 @@ namespace Psana {
         }
       }
       printTables();
-      printf("None of '%sV%d' through '%sV%d' worked.\n", typeName.c_str(), minVersion, typeName.c_str(), maxVersion);
+      printf("None of '%s' through '%s' could be found.\n", 
+             addVersion(typeName, minVersion).c_str(),
+             addVersion(typeName, maxVersion).c_str());
       return object();
     }
   }
