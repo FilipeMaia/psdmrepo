@@ -33,6 +33,11 @@
 
 namespace {
 
+  // "destructor" for copied data
+  void buf_dealloc(Pds::Timepix::DataV2* data) {
+    delete [] (char*)data;
+  }
+
   // methods
   FUN0_WRAPPER(pypdsdata::Timepix::DataV2, timestamp)
   FUN0_WRAPPER(pypdsdata::Timepix::DataV2, frameCounter)
@@ -86,6 +91,37 @@ pypdsdata::Timepix::DataV2::initType( PyObject* module )
 
   BaseType::initType( "DataV2", module );
 }
+
+// Very special "constructor" from XTC, it can handle both DataV1 container and DataV2.
+// For DataV1 it creates new DataV2 object which shuffles the data from DataV1.
+pypdsdata::Timepix::DataV2*
+pypdsdata::Timepix::DataV2::PyObject_FromXtc(const Pds::Xtc& xtc, PyObject* parent, destructor dtor)
+{
+  if (xtc.contains.version() == 1) {
+
+    // get V1 object
+    Pds::Timepix::DataV1& data1 = *static_cast<Pds::Timepix::DataV1*>((void*)xtc.payload());
+
+    // allocate space for V2 object
+    unsigned objSize = sizeof(Pds::Timepix::DataV2) + data1.data_size();
+    char* buf = new char[objSize];
+
+    // copy/shuffle data
+    Pds::Timepix::DataV2* data2 = new (buf) Pds::Timepix::DataV2(data1);
+
+    return PyObject_FromPds(data2, 0, objSize, ::buf_dealloc);
+
+  } else  if (xtc.contains.version() == 2) {
+
+    // regular stuff, no copy needed
+    return PyObject_FromPds(static_cast<Pds::Timepix::DataV2*>((void*)xtc.payload()), parent, xtc.sizeofPayload(), dtor);
+
+  } else {
+    return 0;
+  }
+
+}
+
 
 namespace {
 

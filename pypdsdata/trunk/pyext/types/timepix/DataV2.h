@@ -54,6 +54,10 @@ public:
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
+  // Very special "constructor" from XTC, it can handle both DataV1 container and DataV2.
+  // For DataV1 it creates new DataV2 object which shuffles the data from DataV1.
+  static DataV2* PyObject_FromXtc( const Pds::Xtc& xtc, PyObject* parent, destructor dtor=0 );
+
 };
 
 } // namespace Timepix

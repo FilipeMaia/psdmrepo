@@ -392,7 +392,9 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break ;
 
   case Pds::TypeId::Id_TimepixData :
-    if ( not obj ) obj = xtc2obj<Timepix::DataV1, 1>(xtc, parent);
+    // very special conversion for V1, Timepix::DataV2 knows how to handle
+    // both V1 and V2
+    if ( not obj ) obj = xtc2obj<Timepix::DataV2, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Timepix::DataV2, 2>(xtc, parent);
     break ;
 

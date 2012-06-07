@@ -6,8 +6,13 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-67
+2012-06-07 Andy Salnikov
+- shuffle Timepix::DataV1 before it goes to user, see
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/157
+
 Tag: V00-00-66
-2012-06-05 Andy Salnikov
+2012-06-06 Andy Salnikov
 - small fix to pyxtcreader, it crashed with -vv option when trying to 
   access run number frin the iterator
 
