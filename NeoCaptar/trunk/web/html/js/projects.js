@@ -252,7 +252,7 @@ function p_appl_projects() {
         html += cols2display.func ?
 '  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="func"           >&nbsp;'+c.func           +'</div></td>' : '';
         html +=
-'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="cable_type"     >&nbsp;'+c.cable_type     +'</div></td>';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="cable_type"     >&nbsp;'+dict.cable2url(c.cable_type)+'</div></td>';
         html += cols2display.length ?
 '  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="length"         >&nbsp;'+c.length         +'</div></td>' : '';
         html += cols2display.routing ?
@@ -267,8 +267,8 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_slot"    >&nbsp;'+c.origin.slot    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conn"    >&nbsp;'+c.origin.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+c.origin.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.origin.conntype,c.origin.pinlist)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+dict.connector2url(c.origin.conntype)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.origin.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
         html += cols2display.modified ?
 '  <td nowrap="nowrap" class="table_cell table_cell_bottom                 "><div class="modified"       >&nbsp;'+c.modified.time  +'</div></td>'+
@@ -314,8 +314,8 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_slot"    >&nbsp;'+c.destination.slot    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conn"    >&nbsp;'+c.destination.conn    +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conntype">&nbsp;'+c.destination.conntype+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.cable_type,c.destination.conntype,c.destination.pinlist)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conntype">&nbsp;'+dict.connector2url(c.destination.conntype)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_pinlist" >&nbsp;'+dict.pinlist2url(c.destination.pinlist)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
         html += cols2display.modified ?
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom                  ">&nbsp;</td>'+
@@ -852,12 +852,12 @@ function p_appl_projects() {
 			break;
 
         case 'device_counter':
-			base.html('<input type="text" value="'+cable.device_counter+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.device_counter+'" size="4" '+is_disabled_attr+' />');
             cable.read_device_counter = read_input;
 			break;
 
         case 'device_suffix':
-			base.html('<input type="text" value="'+cable.device_suffix+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.device_suffix+'" size="4" '+is_disabled_attr+' />');
             cable.read_device_suffix = read_input;
 			break;
 
@@ -870,24 +870,22 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
 				cable.read_cable_type = read_input;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				base.html('<input type="text" value="'+cable.cable_type+'" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="'+cable.cable_type+'" size="8" '+is_disabled_attr+' />');
 				cable.read_cable_type = read_input;
 
 			} else {
 
 				html = '<select '+is_disabled_attr+' >';
-				if( cable.cable_type == '' ) {
-					for( var t in dict.cables()) {
-						html += '<option';
-						if( t == cable.cable_type ) html += ' selected="selected"';
-						html += ' value="'+t+'">'+t+'</option>';
-					}
-				} else {
+				if( cable.cable_type == '' )
+					for( var t in dict.cables())
+						html += '<option value="'+t+'">'+t+'</option>';
+
+				else {
 
 					if( dict.cable_is_not_known( cable.cable_type )) {
 
@@ -911,12 +909,10 @@ function p_appl_projects() {
 					if( $(this).val() == '' ) {
 						that.cable_property_edit(pidx,cidx,prop,true,false);
 						that.cable_property_edit(pidx,cidx,'origin_conntype',true,false);
-						that.cable_property_edit(pidx,cidx,'origin_pinlist',true,false);
 						that.cable_property_edit(pidx,cidx,'destination_conntype',true,false);
 						that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
 					} else {
 						that.cable_property_edit(pidx,cidx,'origin_conntype',false,false);
-						that.cable_property_edit(pidx,cidx,'origin_pinlist',false,false);
 						that.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
 						that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
 					}
@@ -926,7 +922,7 @@ function p_appl_projects() {
 			break;
 
 		case 'length':
-            base.html('<input type="text" value="'+cable.length+ '" size="1" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.length+ '" size="5" '+is_disabled_attr+' />');
             cable.read_length = read_input;
 			break;
 
@@ -934,27 +930,28 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				// Start with empty
-				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="16" '+is_disabled_attr+' />');
 				cable.read_routing = read_input;
 
 			} else {
 
-				// Finally, we suggest options found in the dictionary. If the input entry already
-				// has someting non-empty(!) which isn't known to the dictionary then we should
-				// add this as as the first option. If it's selected then it woudl be automatically
-				// added to the dictionary.
-				//
 				html = '<select '+is_disabled_attr+' >';
-
-				if( dict.routing_is_not_known( cable.routing ))
-					html += '<option  selected="selected" value="'+cable.routing+'">'+cable.routing+'</option>';
-				for( var routing in dict.routings()) {
-					html += '<option';
-					if( routing == cable.routing ) html += ' selected="selected"';
-					html += ' value="'+routing+'">'+routing+'</option>';
-				}
+                if(cable.routing == '')
+                    for( var routing in dict.routings())
+                        html += '<option value="'+routing+'">'+routing+'</option>';
+                else {
+                    if( dict.routing_is_not_known(cable.routing)) {
+                        html += '<option value="'+cable.routing+'">'+cable.routing+'</option>';
+                        for( var routing in dict.routings())
+                            html += '<option value="'+routing+'">'+routing+'</option>';
+                    } else {
+                        for( var routing in dict.routings()) {
+                            html += '<option';
+                            if( routing == cable.routing ) html += ' selected="selected"';
+                            html += ' value="'+routing+'">'+routing+'</option>';
+                        }
+                    }
+                }
 				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new routing" >New...</option>'
 				html += '</select>';
 				base.html(html);
@@ -976,45 +973,54 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
 				cable.origin.read_conntype = read_input;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				base.html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
 				cable.origin.read_conntype = read_input;
 
 			} else {
 
 				if(	dict.cable_is_not_known( cable.read_cable_type())) {
 
-					base.html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
+					base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
 					cable.origin.read_conntype = read_input;
 
 				} else {
 
 					if( dict.connector_dict_is_empty( cable.read_cable_type())) {
 
-						base.html('<input type="text" value="'+cable.origin.conntype+'" size="4" '+is_disabled_attr+' />');
+						base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
 						cable.origin.read_conntype = read_input;
 
 					} else {
 
 						html = '<select '+is_disabled_attr+' >';
-						for( var t in dict.connectors( cable.read_cable_type())) {
-							html += '<option';
-							if( t == cable.origin.conntype ) html += ' selected="selected"';
-							html += ' value="'+t+'">'+t+'</option>';
-						}
-						if(this.can_define_new_types()) html += '<option value=""  style="color:maroon;" title="register new connector type for the given cable type" >New...</option>'
+                        if( cable.origin.conntype == '' )
+                            for( var t in dict.connectors( cable.read_cable_type()))
+                                html += '<option value="'+t+'">'+t+'</option>';
+
+                        else {
+                            if(dict.connector_is_not_known( cable.read_cable_type(), cable.origin.conntype)) {
+                                html += '<option selected="selected" value="'+cable.origin.conntype+'">'+cable.origin.conntype+'</option>';
+                                for( var t in dict.connectors( cable.read_cable_type()))
+                                    html += '<option value="'+t+'">'+t+'</option>';
+                            } else {
+                                for( var t in dict.connectors( cable.read_cable_type())) {
+                                    html += '<option';
+                                    if( t == cable.origin.conntype ) html += ' selected="selected"';
+                                    html += ' value="'+t+'">'+t+'</option>';
+                                }
+                            }
+                        }
+						if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new connector type for the given cable type" >New...</option>'
 						html += '</select>';
 						base.html(html);
 						base.find('select').change(function() {
 							if( $(this).val() == '' ) {
 								that.cable_property_edit(pidx,cidx,prop,true,false);
-								that.cable_property_edit(pidx,cidx,'origin_pinlist',true,false);
-							} else {
-								that.cable_property_edit(pidx,cidx,'origin_pinlist',false,false);
 							}
 						});
 						cable.origin.read_conntype = read_select;
@@ -1027,40 +1033,36 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
-				cable.origin.read_pinlist = read_input;
-
-			} else if( dict.cable_dict_is_empty()) {
-
-				base.html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
-				cable.origin.read_pinlist = read_input;
-
-			} else if( dict.cable_is_not_known( cable.read_cable_type())) {
-
-				base.html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
-				cable.origin.read_pinlist = read_input;
-
-			} else if( dict.connector_is_not_known( cable.read_cable_type(), cable.origin.read_conntype())) {
-
-				base.html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
 				cable.origin.read_pinlist = read_input;
 
 			} else {
 
-				if( dict.pinlist_dict_is_empty( cable.read_cable_type(), cable.origin.read_conntype())) {
+				if( dict.pinlist_dict_is_empty()) {
 
-					base.html('<input type="text" value="'+cable.origin.pinlist+'" size="4" '+is_disabled_attr+' />');
+					base.html('<input type="text" value="'+cable.origin.pinlist+'" size="8" '+is_disabled_attr+' />');
 					cable.origin.read_pinlist = read_input;
 
 				} else {
 
 					html = '<select '+is_disabled_attr+' >';
-					for( var pinlist in dict.pinlists( cable.read_cable_type(), cable.origin.read_conntype())) {
-						html += '<option';
-						if( pinlist == cable.origin.pinlist ) html += ' selected="selected"';
-						html += ' value="'+pinlist+'">'+pinlist+'</option>';
-					}
-					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing) for the given connector type" >New...</option>'
+                    if(cable.origin.pinlist == '')
+                        for( var pinlist in dict.pinlists())
+                            html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                    else {
+                        if( dict.pinlist_is_not_known(cable.origin.pinlist)) {
+                            html += '<option value="'+cable.origin.pinlist+'">'+cable.origin.pinlist+'</option>';
+                            for( var pinlist in dict.pinlists())
+                                html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                        } else {
+                            for( var pinlist in dict.pinlists()) {
+                                html += '<option';
+                                if( pinlist == cable.origin.pinlist ) html += ' selected="selected"';
+                                html += ' value="'+pinlist+'">'+pinlist+'</option>';
+                            }
+                        }
+                    }
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing)" >New...</option>'
 					html += '</select>';
 					base.html(html);
 					base.find('select').change(function() {
@@ -1077,27 +1079,28 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				// Start with empty
-				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_loc = read_input;
 
 			} else {
 
-				// Finally, we suggest options found in the dictionary. If the input entry already
-				// has someting non-empty(!) which isn't known to the dictionary then we should
-				// add this as as the first option. If it's selected then it woudl be automatically
-				// added to the dictionary.
-				//
 				html = '<select '+is_disabled_attr+' >';
-
-				if( dict.location_is_not_known( cable.origin.loc ))
-					html += '<option  selected="selected" value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
-				for( var loc in dict.locations()) {
-					html += '<option';
-					if( loc == cable.origin.loc ) html += ' selected="selected"';
-					html += ' value="'+loc+'">'+loc+'</option>';
-				}
+                if(cable.origin.loc == '')
+                    for( var loc in dict.locations())
+                        html += '<option value="'+loc+'">'+loc+'</option>';
+                else {
+                    if( dict.location_is_not_known(cable.origin.loc)) {
+                        html += '<option value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
+                        for( var loc in dict.locations())
+                            html += '<option value="'+loc+'">'+loc+'</option>';
+                    } else {
+                        for( var loc in dict.locations()) {
+                            html += '<option';
+                            if( loc == cable.origin.loc ) html += ' selected="selected"';
+                            html += ' value="'+loc+'">'+loc+'</option>';
+                        }
+                    }
+                }
 				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new location" >New...</option>'
 				html += '</select>';
 				base.html(html);
@@ -1119,7 +1122,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input;
 
 			} else if( dict.location_is_not_known( cable.origin.read_loc())) {
@@ -1128,7 +1131,7 @@ function p_appl_projects() {
 				// a choice of a rack because the current location is also not known to
 				// the dictionary.
 				//
-				base.html('<input type="text" value="'+cable.origin.rack+'" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="'+cable.origin.rack+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input;
 
 			} else {
@@ -1166,27 +1169,27 @@ function p_appl_projects() {
 			break;
 
         case 'origin_ele':
-			base.html('<input type="text" value="'+cable.origin.ele+'" size="1" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.ele+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_ele = read_input;
 			break;
 
         case 'origin_side':
-			base.html('<input type="text" value="'+cable.origin.side+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.side+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_side = read_input;
 			break;
 
         case 'origin_slot':
-			base.html('<input type="text" value="'+cable.origin.slot+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.slot+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_slot = read_input;
 			break;
 
         case 'origin_conn':
-			base.html('<input type="text" value="'+cable.origin.conn+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.conn+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_conn = read_input;
 			break;
 
         case 'origin_station':
-			base.html('<input type="text" value="'+cable.origin.station+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.station+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_station = read_input;
 			break;
 
@@ -1194,27 +1197,28 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				// Start with empty
-				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="2" '+is_disabled_attr+' />');
 				cable.origin.read_instr = read_input;
 
 			} else {
 
-				// Finally, we suggest options found in the dictionary. If the input entry already
-				// has someting non-empty(!) which isn't known to the dictionary then we should
-				// add this as as the first option. If it's selected then it woudl be automatically
-				// added to the dictionary.
-				//
 				html = '<select '+is_disabled_attr+'>';
-
-				if( dict.instr_is_not_known( cable.origin.instr ))
-					html += '<option  selected="selected" value="'+cable.origin.instr+'">'+cable.origin.instr+'</option>';
-				for( var instr in dict.instrs()) {
-					html += '<option';
-					if( instr == cable.origin.instr ) html += ' selected="selected"';
-					html += ' value="'+instr+'">'+instr+'</option>';
-				}
+                if(cable.origin.instr == '')
+                    for( var instr in dict.instrs())
+                        html += '<option value="'+instr+'">'+instr+'</option>';
+                else {
+                    if( dict.instr_is_not_known(cable.origin.instr)) {
+                        html += '<option value="'+cable.origin.instr+'">'+cable.origin.instr+'</option>';
+                        for( var instr in dict.instrs())
+                            html += '<option value="'+instr+'">'+instr+'</option>';
+                    } else {
+                        for( var instr in dict.instrs()) {
+                            html += '<option';
+                            if( instr == cable.origin.instr ) html += ' selected="selected"';
+                            html += ' value="'+instr+'">'+instr+'</option>';
+                        }
+                    }
+                }
 				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new instr" >New...</option>'
 				html += '</select>';
 				base.html(html);
@@ -1236,45 +1240,54 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
 				cable.destination.read_conntype = read_input;
 
 			} else if( dict.cable_dict_is_empty()) {
 
-				base.html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="'+cable.destination.conntype+'" size="8" '+is_disabled_attr+' />');
 				cable.destination.read_conntype = read_input;
 
 			} else {
 
 				if(	dict.cable_is_not_known( cable.read_cable_type())) {
 
-					base.html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
+					base.html('<input type="text" value="'+cable.destination.conntype+'" size="8" '+is_disabled_attr+' />');
 					cable.destination.read_conntype = read_input;
 
 				} else {
 
 					if( dict.connector_dict_is_empty( cable.read_cable_type())) {
 
-						base.html('<input type="text" value="'+cable.destination.conntype+'" size="4" '+is_disabled_attr+' />');
+						base.html('<input type="text" value="'+cable.destination.conntype+'" size="8" '+is_disabled_attr+' />');
 						cable.destination.read_conntype = read_input;
 
 					} else {
-						html = '<select '+is_disabled_attr+'>';
 
-						for( var t in dict.connectors( cable.read_cable_type())) {
-							html += '<option';
-							if( t == cable.destination.conntype ) html += ' selected="selected"';
-							html += ' value="'+t+'">'+t+'</option>';
-						}
+						html = '<select '+is_disabled_attr+' >';
+                        if( cable.destination.conntype == '' )
+                            for( var t in dict.connectors( cable.read_cable_type()))
+                                html += '<option value="'+t+'">'+t+'</option>';
+
+                        else {
+                            if(dict.connector_is_not_known( cable.read_cable_type(), cable.destination.conntype)) {
+                                html += '<option selected="selected" value="'+cable.destination.conntype+'">'+cable.destination.conntype+'</option>';
+                                for( var t in dict.connectors( cable.read_cable_type()))
+                                    html += '<option value="'+t+'">'+t+'</option>';
+                            } else {
+                                for( var t in dict.connectors( cable.read_cable_type())) {
+                                    html += '<option';
+                                    if( t == cable.destination.conntype ) html += ' selected="selected"';
+                                    html += ' value="'+t+'">'+t+'</option>';
+                                }
+                            }
+                        }
 						if(this.can_define_new_types()) html += '<option value=""  style="color:maroon;" title="register new connector type for the given cable type" >New...</option>'
 						html += '</select>';
 						base.html(html);
 						base.find('select').change(function() {
 							if( $(this).val() == '' ) {
 								that.cable_property_edit(pidx,cidx,prop,true,false);
-								that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
-							} else {
-								that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
 							}
 						});
 						cable.destination.read_conntype = read_select;
@@ -1287,40 +1300,36 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
-				cable.destination.read_pinlist = read_input;
-
-			} else if( dict.cable_dict_is_empty()) {
-
-				base.html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
-				cable.destination.read_pinlist = read_input;
-
-			} else if( dict.cable_is_not_known( cable.read_cable_type())) {
-
-				base.html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
-				cable.destination.read_pinlist = read_input;
-
-			} else if( dict.connector_is_not_known( cable.read_cable_type(), cable.destination.read_conntype())) {
-
-				base.html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
 				cable.destination.read_pinlist = read_input;
 
 			} else {
 
-				if( dict.pinlist_dict_is_empty( cable.read_cable_type(), cable.destination.read_conntype())) {
+				if( dict.pinlist_dict_is_empty()) {
 
-					base.html('<input type="text" value="'+cable.destination.pinlist+'" size="4" '+is_disabled_attr+' />');
+					base.html('<input type="text" value="'+cable.destination.pinlist+'" size="8" '+is_disabled_attr+' />');
 					cable.destination.read_pinlist = read_input;
 
 				} else {
 
 					html = '<select '+is_disabled_attr+'>';
-					for( var pinlist in dict.pinlists( cable.read_cable_type(), cable.destination.read_conntype())) {
-						html += '<option';
-						if( pinlist == cable.destination.pinlist ) html += ' selected="selected"';
-						html += ' value="'+pinlist+'">'+pinlist+'</option>';
-					}
-					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing) for the given connector type" >New...</option>'
+                    if(cable.destination.pinlist == '')
+                        for( var pinlist in dict.pinlists())
+                            html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                    else {
+                        if( dict.pinlist_is_not_known(cable.destination.pinlist)) {
+                            html += '<option value="'+cable.destination.pinlist+'">'+cable.destination.pinlist+'</option>';
+                            for( var pinlist in dict.pinlists())
+                                html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                        } else {
+                            for( var pinlist in dict.pinlists()) {
+                                html += '<option';
+                                if( pinlist == cable.destination.pinlist ) html += ' selected="selected"';
+                                html += ' value="'+pinlist+'">'+pinlist+'</option>';
+                            }
+                        }
+                    }
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing)" >New...</option>'
 					html += '</select>';
 					base.html(html);
 					base.find('select').change(function() {
@@ -1337,27 +1346,28 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				// Start with empty
-				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' /> ');
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' /> ');
 				cable.destination.read_loc = read_input;
 
 			} else {
 
-				// Finally, we suggest options found in the dictionary. If the input entry already
-				// has someting non-empty(!) which isn't known to the dictionary then we should
-				// add this as as the first option. If it's selected then it woudl be automatically
-				// added to the dictionary.
-				//
 				html = '<select '+is_disabled_attr+'>';
-
-				if( dict.location_is_not_known( cable.destination.loc ))
-					html += '<option  selected="selected" value="'+cable.destination.loc+'">'+cable.destination.loc+'</option>';
-				for( var loc in dict.locations()) {
-					html += '<option';
-					if( loc == cable.destination.loc ) html += ' selected="selected"';
-					html += ' value="'+loc+'">'+loc+'</option>';
-				}
+                if(cable.destination.loc == '')
+                    for( var loc in dict.locations())
+                        html += '<option value="'+loc+'">'+loc+'</option>';
+                else {
+                    if( dict.location_is_not_known(cable.destination.loc)) {
+                        html += '<option value="'+cable.destination.loc+'">'+cable.destination.loc+'</option>';
+                        for( var loc in dict.locations())
+                            html += '<option value="'+loc+'">'+loc+'</option>';
+                    } else {
+                        for( var loc in dict.locations()) {
+                            html += '<option';
+                            if( loc == cable.destination.loc ) html += ' selected="selected"';
+                            html += ' value="'+loc+'">'+loc+'</option>';
+                        }
+                    }
+                }
 				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new location" >New...</option>'
 				html += '</select>';
 				base.html(html);
@@ -1379,7 +1389,7 @@ function p_appl_projects() {
 
 				// Start with empty
 				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input;
 
 			} else if( dict.location_is_not_known( cable.destination.read_loc())) {
@@ -1388,7 +1398,7 @@ function p_appl_projects() {
 				// a choice of a rack because the current location is also not known to
 				// the dictionary.
 				//
-				base.html('<input type="text" value="'+cable.destination.rack+'" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="'+cable.destination.rack+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input;
 
 			} else {
@@ -1426,27 +1436,27 @@ function p_appl_projects() {
 			break;
 
         case 'destination_ele':
-			base.html('<input type="text" value="'+cable.destination.ele+'" size="1" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.ele+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_ele = read_input;
 			break;
 
         case 'destination_side':
-			base.html('<input type="text" value="'+cable.destination.side+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.side+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_side = read_input;
 			break;
 
         case 'destination_slot':
-			base.html('<input type="text" value="'+cable.destination.slot+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.slot+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_slot = read_input;
 			break;
 
         case 'destination_conn':
-			base.html('<input type="text" value="'+cable.destination.conn+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.conn+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_conn = read_input;
 			break;
 
         case 'destination_station':
-			base.html('<input type="text" value="'+cable.destination.station+'" size="2" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.station+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_station = read_input;
 			break;
 
@@ -1454,27 +1464,28 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				// Start with empty
-				//
-				base.html('<input type="text" value="" size="1" '+is_disabled_attr+' />');
+				base.html('<input type="text" value="" size="2" '+is_disabled_attr+' />');
 				cable.destination.read_instr = read_input;
 
 			} else {
 
-				// Finally, we suggest options found in the dictionary. If the input entry already
-				// has someting non-empty(!) which isn't known to the dictionary then we should
-				// add this as as the first option. If it's selected then it woudl be automatically
-				// added to the dictionary.
-				//
 				html = '<select '+is_disabled_attr+' >';
-
-				if( dict.instr_is_not_known( cable.destination.instr ))
-					html += '<option  selected="selected" value="'+cable.destination.instr+'">'+cable.destination.instr+'</option>';
-				for( var instr in dict.instrs()) {
-					html += '<option';
-					if( instr == cable.destination.instr ) html += ' selected="selected"';
-					html += ' value="'+instr+'">'+instr+'</option>';
-				}
+                if(cable.destination.instr == '')
+                    for( var instr in dict.instrs())
+                        html += '<option value="'+instr+'">'+instr+'</option>';
+                else {
+                    if( dict.instr_is_not_known(cable.destination.instr)) {
+                        html += '<option value="'+cable.destination.instr+'">'+cable.destination.instr+'</option>';
+                        for( var instr in dict.instrs())
+                            html += '<option value="'+instr+'">'+instr+'</option>';
+                    } else {
+                        for( var instr in dict.instrs()) {
+                            html += '<option';
+                            if( instr == cable.destination.instr ) html += ' selected="selected"';
+                            html += ' value="'+instr+'">'+instr+'</option>';
+                        }
+                    }
+                }
 				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new instr" >New...</option>'
 				html += '</select>';
 				base.html(html);
@@ -1744,7 +1755,7 @@ required_field_html+' required feild';
         $(base_1+'cable'     ).html('&nbsp;'+cable.cable);
         $(base_1+'device'    ).html('&nbsp;'+cable.device);
         $(base_1+'func'      ).html('&nbsp;'+cable.func);
-        $(base_1+'cable_type').html('&nbsp;'+cable.cable_type);
+        $(base_1+'cable_type').html('&nbsp;'+dict.cable2url(cable.cable_type));
         $(base_1+'length'    ).html('&nbsp;'+cable.length);
         $(base_1+'routing'   ).html('&nbsp;'+cable.routing);
 
@@ -1756,8 +1767,8 @@ required_field_html+' required feild';
         $(base_1+'origin_slot'    ).html('&nbsp;'+cable.origin.slot);
         $(base_1+'origin_conn'    ).html('&nbsp;'+cable.origin.conn);
         $(base_1+'origin_station' ).html('&nbsp;'+cable.origin.station);
-        $(base_1+'origin_conntype').html('&nbsp;'+cable.origin.conntype);
-        $(base_1+'origin_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.cable_type,cable.origin.conntype,cable.origin.pinlist));
+        $(base_1+'origin_conntype').html('&nbsp;'+dict.connector2url(cable.origin.conntype));
+        $(base_1+'origin_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.origin.pinlist));
         $(base_1+'origin_instr'   ).html('&nbsp;'+cable.origin.instr);
 
         var base_2 = '#proj-cable-'+pidx+'-'+cidx+'-2 td div.';
@@ -1770,8 +1781,8 @@ required_field_html+' required feild';
         $(base_2+'destination_slot'    ).html('&nbsp;'+cable.destination.slot);
         $(base_2+'destination_conn'    ).html('&nbsp;'+cable.destination.conn);
         $(base_2+'destination_station' ).html('&nbsp;'+cable.destination.station);
-        $(base_2+'destination_conntype').html('&nbsp;'+cable.destination.conntype);
-        $(base_2+'destination_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.cable_type,cable.destination.conntype,cable.destination.pinlist));
+        $(base_2+'destination_conntype').html('&nbsp;'+dict.connector2url(cable.destination.conntype));
+        $(base_2+'destination_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.destination.pinlist));
         $(base_2+'destination_instr'   ).html('&nbsp;'+cable.destination.instr);
 
         $(base_1+'modified'            ).html('&nbsp;'+cable.modified.time);

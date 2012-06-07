@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This service will return a dictionary of known instrs.
+ * This service will return a dictionary of known cable and connector types.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
@@ -10,6 +10,7 @@ require_once( 'neocaptar/neocaptar.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
+use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
 use NeoCaptar\NeoCaptar;
@@ -27,12 +28,12 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$instrs = NeoCaptarUtils::dict_instrs2array($neocaptar);
+	$types = NeoCaptarUtils::dict_types2array($neocaptar);
 
 	$authdb->commit();
 	$neocaptar->commit();
 
-    NeoCaptarUtils::report_success( array( 'instr' => $instrs ));
+    NeoCaptarUtils::report_success( array( 'type' => $types ));
 
 } catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }

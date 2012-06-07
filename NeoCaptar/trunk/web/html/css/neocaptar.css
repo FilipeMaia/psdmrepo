@@ -257,6 +257,20 @@ td.dict-table-entry-nonselectable {
   font-weight: bold;
 }
 
+div.dict-entry-selectable {
+  cursor: pointer;
+  font-weight: bold;
+}
+div.dict-entry-selectable:hover {
+  background-color:#A6C9E2;
+}
+div.dict-entry-selectable-selected {
+  background-color:#b9dcf5;
+}
+div.dict-entry-nonselectable {
+  font-weight: bold;
+}
+
 .dict-table-entry-attr {
   padding:2px 0px 2px 0px;
 }

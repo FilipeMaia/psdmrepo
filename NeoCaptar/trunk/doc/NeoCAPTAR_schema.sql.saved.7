@@ -485,21 +485,14 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATION` (
 
   `cablenumber_id`   INT             NOT NULL ,
   `cablenumber`      INT UNSIGNED    NOT NULL ,
-  `cable_id`         INT             NOT NULL ,
   `allocated_time`   BIGINT UNSIGNED NOT NULL ,
   `allocated_by_uid` VARCHAR(32)     NOT NULL ,
 
-  UNIQUE KEY `cablenumber_id` (`cablenumber_id`,`cablenumber`,`cable_id`) ,
+  UNIQUE KEY `cablenumber_id` (`cablenumber_id`,`cablenumber`) ,
 
   CONSTRAINT `CABLENUMBER_ALLOCATION_FK_1`
     FOREIGN KEY (`cablenumber_id` )
     REFERENCES `NEOCAPTAR`.`CABLENUMBER` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE ,
-
-  CONSTRAINT `CABLENUMBER_ALLOCATION_FK_2`
-    FOREIGN KEY (`cable_id` )
-    REFERENCES `NEOCAPTAR`.`CABLE` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE
 )

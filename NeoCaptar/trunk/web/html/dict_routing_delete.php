@@ -2,7 +2,7 @@
 
 /**
  * This service will delete the specified item routing from the dictionary
- * and return an empty dictionary.
+ * and return the updated dictionary.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'neocaptar/neocaptar.inc.php' );
@@ -23,21 +23,23 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
 
-    $id    = NeoCaptarUtils::get_param_GET('id');
-    $scope = NeoCaptarUtils::get_param_GET('scope');
-    if( $scope != 'routing' )
-        NeoCaptarUtils::report_error(($scope==''?'empty':'illegal').' value of the scope parameter found in the request');
+    $id = NeoCaptarUtils::get_param_GET('id');
 
     $authdb = AuthDB::instance();
 	$authdb->begin();
 
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
-	$neocaptar->delete_dict_routing_by_id( $id );
+
+    if( !is_null( $neocaptar->find_dict_routing_by_id( $id )))
+    	$neocaptar->delete_dict_routing_by_id( $id );
+
+    $routings = NeoCaptarUtils::dict_routings2array($neocaptar);
+
 	$authdb->commit();
 	$neocaptar->commit();
 
-    NeoCaptarUtils::report_success();
+    NeoCaptarUtils::report_success(array('routing' => $routings));
 
 } catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }

@@ -961,6 +961,11 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
         <div style="float:left;" >Types</div>
         <div style="clear:both;"></div>
       </div>
+      <div class="v-item" id="pinlists">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Pinlists (drawings)</div>
+        <div style="clear:both;"></div>
+      </div>
       <div class="v-item" id="locations">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div style="float:left;" >Locations</div>
@@ -1149,52 +1154,93 @@ HERE;
 
     <div id="dictionary-types" class="application-workarea hidden">
       <div><button id="dictionary-types-reload" title="reload the dictionary from the database">Reload</button></div>
-      <div style="float:left;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top: 4px; ">Add new cable type:</div>
-          <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(up to 8 chars)</div>
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
+        <p>Cable and connector types can be grouped together as a matrix representing
+        so called <b>"N-to-M bidirectional association"</b>. On one hand, a cable type may be
+        associated with one or many different connector types. On the other hand, one connector type may be used in association with
+        one or many different cable types. To facilitate viewing and managing relationships between cable and connector types
+        this page provides two views onto the associations each from a different prospective.
+        The <b>Cable Type View</b> shows which connector types "make sense" for a given cable type. The other view (the <b>Connector Type View</b>)
+        shows which cable types are "suitable" for the given connector type.
+        New types can be added/removed through either view. Once a new type is added at one view an opposite view would be automatically updated.
+        </p>
+      </div>
+
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+		  <li><a href="#cables2connectors">Cable Type View</a></li>
+		  <li><a href="#connectors2cables">Connector Type View</a></li>
+	    </ul>
+
+        <div id="cables2connectors" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="float:left;">
+            <div style="margin-top:20px;">
+              <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
+              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
+              <div style="clear:both; "></div>
+            </div>
+            <div id="dictionary-types-cables"></div>
+          </div>
+          <div style="float:left; margin-left:20px;">
+            <div style="margin-top:20px;">
+              <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
+              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
+              <div style="clear:both; "></div>
+            </div>
+            <div id="dictionary-types-connectors"></div>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+      
+        <div id="connectors2cables" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
+          <div style="float:left;">
+            <div style="margin-top:20px;">
+              <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
+              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
+              <div style="clear:both; "></div>
+            </div>
+            <div id="dictionary-types-connectors-reverse"></div>
+          </div>
+          <div style="float:left; margin-left:20px;">
+            <div style="margin-top:20px;">
+              <div style="float:left;"><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
+              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
+              <div style="clear:both; "></div>
+            </div>
+            <div id="dictionary-types-cables-reverse"></div>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="dictionary-pinlists" class="application-workarea hidden">
+      <div><button id="dictionary-pinlists-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="12" name="pinlist2add" title="fill in new pin list type (limit 16 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new pinlist here</div>
           <div style="clear:both; "></div>
         </div>
-        <div id="dictionary-types-cables"></div>
+        <div id="dictionary-pinlists-pinlists"></div>
       </div>
-      <div style="float:left; margin-left:20px;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top:4px; ">Add new connector type:</div>
-          <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(up to 7 chars)</div>
-          <div style="clear:both; "></div>
-        </div>
-        <div id="dictionary-types-connectors"></div>
-      </div>
-      <div style="float:left; margin-left:20px;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top:4px; ">Add pin list:</div>
-          <div style="float:left; "><input type="text" size="12" name="pinlist2add" title="fill in new pin list type, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(up to 16 chars)</div>
-          <div style="clear:both; "></div>
-        </div>
-        <div id="dictionary-types-pinlists"></div>
-      </div>
-      <div style="clear:both;"></div>
     </div>
 
     <div id="dictionary-locations" class="application-workarea hidden">
       <div><button id="dictionary-locations-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top: 4px; ">Add new location:</div>
-          <div style="float:left; "><input type="text" size="12" name="location2add" title="fill in new location name, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(upto 6 chars)</div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="12" name="location2add" title="fill in new location name (limit 6 characters), then press RETURN to save" /></div>
+              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new location here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-locations-locations"></div>
       </div>
       <div style="float:left; margin-left:20px;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top:4px; ">Add new rack:</div>
-          <div style="float:left; "><input type="text" size="12" name="rack2add" title="fill in new rack name, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(up to 6 chars)</div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="12" name="rack2add" title="fill in new rack name (limit 6 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new rack here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-locations-racks"></div>
@@ -1204,10 +1250,9 @@ HERE;
 
     <div id="dictionary-routings" class="application-workarea hidden">
       <div><button id="dictionary-routings-reload" title="reload the dictionary from the database">Reload</button></div>
-      <div style="margin-top:20px; margin-bottom:10px;">
-        <div style="float:left; padding-top:4px; ">Add new routing:</div>
-        <div style="float:left; "><input type="text" size="32" name="routing2add" title="fill in new routing name, press RETURN to save" /></div>
-        <div style="float:left; padding-top:4px; "> (up to 50 chars)</div>
+      <div style="margin-top:20px;">
+        <div style="float:left; "><input type="text" size="32" name="routing2add" title="fill in new routing name (limit 50 characters), then press RETURN to save" /></div>
+        <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new routing here</div>
         <div style="clear:both; "></div>
       </div>
       <div id="dictionary-routings-routings"></div>
@@ -1216,28 +1261,25 @@ HERE;
     <div id="dictionary-devices" class="application-workarea hidden">
       <div><button id="dictionary-devices-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top: 4px; ">Add new location of instruments (LLL):</div>
-          <div style="float:left; "><input type="text" size="3" name="device_location2add" title="fill in new location (LLL), press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; ">(3 chars)</div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="3" name="device_location2add" title="fill in new location (exactly 3 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new location of instruments (LLL) here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-devices-locations"></div>
       </div>
       <div style="float:left; margin-left:20px;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top:4px; ">Add new region (RRR):</div>
-          <div style="float:left; "><input type="text" size="3" name="device_region2add" title="fill in new region, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(3 chars)</div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="3" name="device_region2add" title="fill in new region (exactly 3 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new region (RRR) here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-devices-regions"></div>
       </div>
       <div style="float:left; margin-left:20px;">
-        <div style="margin-top:20px; margin-bottom:10px;">
-          <div style="float:left; padding-top:4px; ">Add new component (CCC):</div>
-          <div style="float:left; "><input type="text" size="3" name="device_component2add" title="fill in new component, press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; ">(3 chars)</div>
+        <div style="margin-top:20px;">
+          <div style="float:left; "><input type="text" size="3" name="device_component2add" title="fill in new component(exactly 3 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new component (CCC) here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-devices-components"></div>
@@ -1247,10 +1289,9 @@ HERE;
 
     <div id="dictionary-instrs" class="application-workarea hidden">
       <div><button id="dictionary-instrs-reload" title="reload the dictionary from the database">Reload</button></div>
-      <div style="margin-top:20px; margin-bottom:10px;">
-        <div style="float:left; padding-top: 4px; ">Add new instruction:</div>
-        <div style="float:left; "><input type="text" size="1" name="instr2add" title="fill in new instr name, press RETURN to save" /></div>
-        <div style="float:left; padding-top: 4px; "> (up to 3 digits)</div>
+      <div style="margin-top:20px;">
+        <div style="float:left; "><input type="text" size="1" name="instr2add" title="fill in new instr name (limit 3 digits), then press RETURN to save" /></div>
+        <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new instruction here</div>
         <div style="clear:both; "></div>
       </div>
       <div id="dictionary-instrs-instrs"></div>

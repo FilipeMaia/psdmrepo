@@ -30,25 +30,7 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$locations = array();
-	foreach( $neocaptar->dict_locations() as $location ) {
-
-		$racks = array();
-		foreach( $location->racks() as $rack ) {
-
-			$racks[$rack->name()] = array(
-				'id'           => $rack->id(),
-				'created_time' => $rack->created_time()->toStringShort(),
-				'created_uid'  => $rack->created_uid()
-			);
-		}
-		$locations[$location->name()] = array(
-			'id'           => $location->id(),
-			'created_time' => $location->created_time()->toStringShort(),
-			'created_uid'  => $location->created_uid(),
-			'rack'         => $racks
-		);
-	}
+	$locations = NeoCaptarUtils::dict_locations2array($neocaptar);
 
 	$authdb->commit();
 	$neocaptar->commit();

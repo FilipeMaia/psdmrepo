@@ -29,34 +29,7 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$locations = array();
-	foreach( $neocaptar->dict_device_locations() as $location ) {
-
-		$regions = array();
-		foreach( $location->regions() as $region ) {
-
-			$components = array();
-			foreach( $region->components() as $component ) {
-				$components[$component->name()] = array(
-					'id'            => $component->id(),
-					'created_time'  => $component->created_time()->toStringShort(),
-					'created_uid'   => $component->created_uid()
-				);
-			}
-			$regions[$region->name()] = array(
-				'id'           => $region->id(),
-				'created_time' => $region->created_time()->toStringShort(),
-				'created_uid'  => $region->created_uid(),
-				'component'    => $components
-			);
-		}
-		$locations[$location->name()] = array(
-			'id'           => $location->id(),
-			'created_time' => $location->created_time()->toStringShort(),
-			'created_uid'  => $location->created_uid(),
-			'region'       => $regions
-		);
-	}
+	$locations = NeoCaptarUtils::dict_devices2array($neocaptar);
 
 	$authdb->commit();
 	$neocaptar->commit();

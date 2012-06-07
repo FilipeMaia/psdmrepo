@@ -65,6 +65,19 @@ tr.table_row:hover {
   background-color:#f8f8f8;
 }
 */
+td.table_cell_selectable {
+  cursor: pointer;
+  font-weight: bold;
+}
+td.table_cell_selectable:hover {
+  background-color:#A6C9E2;
+}
+td.table_cell_selectable_selected {
+  background-color:#b9dcf5;
+}
+td.table_cell_nonselectable {
+  font-weight: bold;
+}
 
 /* ------------------------
  * Compact borderless table

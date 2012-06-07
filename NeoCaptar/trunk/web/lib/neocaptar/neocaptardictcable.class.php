@@ -37,6 +37,7 @@ class NeoCaptarDictCable {
     public function neocaptar    () { return $this->neocaptar; }
     public function id           () { return $this->attr['id']; }
     public function name         () { return $this->attr['name']; }
+    public function documentation() { return $this->attr['documentation']; }
     public function created_time () { return LusiTime::from64( $this->attr['created_time'] ); }
     public function created_uid  () { return $this->attr['created_uid']; }
 
@@ -47,7 +48,9 @@ class NeoCaptarDictCable {
      */
     public function connectors() {
         $list = array();
-        $sql = "SELECT * FROM {$this->connection->database}.dict_connector WHERE cable_id={$this->id()} ORDER BY name";
+        $sql = "SELECT dict_connector.* FROM {$this->connection->database}.dict_connector, {$this->connection->database}.dict_cable_connector_link ".
+                " WHERE dict_connector.id=dict_cable_connector_link.connector_id  AND dict_cable_connector_link.cable_id={$this->id()}".
+                " ORDER BY dict_connector.name";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -55,73 +58,33 @@ class NeoCaptarDictCable {
                 $list,
                 new NeoCaptarDictConnector (
                     $this->connection,
-                    $this,
+                    $this->neocaptar(),
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
     }
-    public function find_connector_by_name( $name ) {
-    	$name_escaped = $this->connection->escape_string( trim( $name ));
-    	if( $name_escaped == '' )
-    		throw new NeoCaptarException (
-    			__METHOD__, "illegal connector type name. A valid non-empty string is expected." );
-        return $this->find_connector_by_( "name='{$name_escaped}'" );
-    }
-    public function find_connector_by_id( $id ) {
-    	return $his->neocaptar()->find_dict_connector_by_id( $id );
-    }
-    private function find_connector_by_( $condition ) {
-        $sql = "SELECT * FROM {$this->connection->database}.dict_connector WHERE cable_id={$this->id()} AND {$condition}";
+    public function is_linked($connector_id) {
+        $sql = "SELECT * FROM {$this->connection->database}.dict_cable_connector_link WHERE cable_id={$this->id()} AND connector_id={$connector_id}";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
-        if( $nrows == 0 ) return null;
-        if( $nrows != 1 )
-        	throw new NeoCaptarException (
-        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-        return new NeoCaptarDictConnector (
-        	$this->connection,
-            $this,
-            mysql_fetch_array( $result, MYSQL_ASSOC ));
+        return $nrows != 0;
     }
-    
-    /*
-     * ======================
-     *   DATABASE MODIFIERS
-     * ======================
-     */
-    public function add_connector( $name, $created, $uid ) {
-    	$name_escaped = $this->connection->escape_string( trim( $name ));
-    	if( $name_escaped == '' )
-    		throw new NeoCaptarException (
-    			__METHOD__, "illegal connector type name. A valid non-empty string is expected." );
-    	$uid_escaped = $this->connection->escape_string( trim( $uid ));
-    	if( $uid_escaped == '' )
-    		throw new NeoCaptarException (
-    			__METHOD__, "illegal UID. A valid non-empty string is expected." );
 
-    	// Note that the code below will intercept an attempt to create duplicate
-    	// connector name. If a conflict will be detected then the code will return null
-    	// to indicate a proble. Then it's up to the caller how to deal with this
-    	// situation. Usually, a solution is to commit the current transaction,
-    	// start another one and make a read attempt for the desired connector within
-    	// that (new) transaction.
-    	//
-    	try {
-    		$this->connection->query (
-    			"INSERT INTO {$this->connection->database}.dict_connector VALUES(NULL,{$this->id()},'{$name_escaped}',{$created->to64()},'{$uid_escaped}')"
-    		);
-    	} catch( NeoCaptarException $e ) {
-    		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
-    		throw $e;
-    	}
-    	return $this->find_connector_by_( "id IN (SELECT LAST_INSERT_ID())" );
+    /*
+     * ====================================
+     *   DATABASE MODIFICATION OPERATIONS
+     * ====================================
+     */
+    public function update($documentation) {
+        $documentation_escaped = $this->connection->escape_string(trim($documentation));
+        $this->connection->query("UPDATE {$this->connection->database}.dict_cable SET documentation='{$documentation_escaped}' WHERE id={$this->id()}");
+        $this->attr['documentation'] = $documentation;
     }
-    public function delete_connector_by_name( $name ) {
-    	$name_escaped = $this->connection->escape_string( trim( $name ));
-    	if( $name_escaped == '' )
-    		throw new NeoCaptarException (
-    			__METHOD__, "illegal connector type name. A valid non-empty string is expected." );
-    	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_connector WHERE cable_id={$this->id()} AND name='{$name_escaped}'" );
+    public function link($connector_id) {
+        $this->connection->query("INSERT INTO {$this->connection->database}.dict_cable_connector_link VALUES ({$this->id()},{$connector_id})" );
     }
-    public function delete_connector_by_id( $id ) { $this->neocaptar()->delete_dict_connector_by_id( $id ); }
+    public function unlink($connector_id) {
+        $sql = "DELETE FROM {$this->connection->database}.dict_cable_connector_link WHERE cable_id={$this->id()} AND connector_id={$connector_id}";
+        $this->connection->query ( $sql );
+   }
 }
 ?>

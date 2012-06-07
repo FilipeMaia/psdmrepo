@@ -14,6 +14,181 @@ use LusiTime\LusiTime;
  * @author gapon
  */
 class NeoCaptarUtils {
+
+    /**
+     * Return an array representation a dictionary of cables and connectors. The array is
+     * suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar 
+     */
+    public static function dict_types2array($neocaptar) {
+        $types = array(
+            'cable'     => array(),
+            'connector' => array()
+        );
+        foreach( $neocaptar->dict_cables() as $cable ) {
+
+            $connectors = array();
+            foreach( $cable->connectors() as $connector ) {
+                $connectors[$connector->name()] = array(
+                    'id'            => $connector->id(),
+                    'documentation' => $connector->documentation(),
+                    'created_time'  => $connector->created_time()->toStringShort(),
+                    'created_uid'   => $connector->created_uid()
+                );
+            }
+            $types['cable'][$cable->name()] = array(
+                'id'            => $cable->id(),
+                'documentation' => $cable->documentation(),
+                'created_time'  => $cable->created_time()->toStringShort(),
+                'created_uid'   => $cable->created_uid(),
+                'connector'     => $connectors
+            );
+        }
+        foreach( $neocaptar->dict_connectors() as $connector ) {
+
+            $cables = array();
+            foreach( $connector->cables() as $cable ) {
+                $cables[$cable->name()] = array(
+                    'id'            => $cable->id(),
+                    'documentation' => $cable->documentation(),
+                    'created_time'  => $cable->created_time()->toStringShort(),
+                    'created_uid'   => $cable->created_uid()
+                );
+            }
+            $types['connector'][$connector->name()] = array(
+                'id'            => $connector->id(),
+                'documentation' => $connector->documentation(),
+                'created_time'  => $connector->created_time()->toStringShort(),
+                'created_uid'   => $connector->created_uid(),
+                'cable'         => $cables
+            );
+        }
+        return $types;
+    }
+
+    /**
+     * Return an array representation a dictionary of pinlists. The array is
+     * suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar 
+     */
+    public static function dict_pinlists2array($neocaptar) {
+        $pinlists = array();
+        foreach( $neocaptar->dict_pinlists() as $pinlist ) {
+            $pinlists[$pinlist->name()] = array(
+                'id'            => $pinlist->id(),
+                'documentation' => $pinlist->documentation(),
+                'created_time'  => $pinlist->created_time()->toStringShort(),
+                'created_uid'   => $pinlist->created_uid()
+            );
+        }
+        return $pinlists;
+    }
+
+    /**
+     * Return an array representation a dictionary of locations. The array is
+     * suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar 
+     */
+    public static function dict_locations2array($neocaptar) {
+        $locations = array();
+        foreach( $neocaptar->dict_locations() as $location ) {
+
+            $racks = array();
+            foreach( $location->racks() as $rack ) {
+
+                $racks[$rack->name()] = array(
+                    'id'           => $rack->id(),
+                    'created_time' => $rack->created_time()->toStringShort(),
+                    'created_uid'  => $rack->created_uid()
+                );
+            }
+            $locations[$location->name()] = array(
+                'id'           => $location->id(),
+                'created_time' => $location->created_time()->toStringShort(),
+                'created_uid'  => $location->created_uid(),
+                'rack'         => $racks
+            );
+        }
+        return $locations;
+    }
+
+    /**
+     * Return an array representation a dictionary of device name components.
+     * The array is suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar
+     */
+    public static function dict_devices2array($neocaptar) {
+        $locations = array();
+        foreach( $neocaptar->dict_device_locations() as $location ) {
+
+            $regions = array();
+            foreach( $location->regions() as $region ) {
+
+                $components = array();
+                foreach( $region->components() as $component ) {
+                    $components[$component->name()] = array(
+                        'id'            => $component->id(),
+                        'created_time'  => $component->created_time()->toStringShort(),
+                        'created_uid'   => $component->created_uid()
+                    );
+                }
+                $regions[$region->name()] = array(
+                    'id'           => $region->id(),
+                    'created_time' => $region->created_time()->toStringShort(),
+                    'created_uid'  => $region->created_uid(),
+                    'component'    => $components
+                );
+            }
+            $locations[$location->name()] = array(
+                'id'           => $location->id(),
+                'created_time' => $location->created_time()->toStringShort(),
+                'created_uid'  => $location->created_uid(),
+                'region'       => $regions
+            );
+        }
+        return $locations;
+    }
+
+    /**
+     * Return an array representation a dictionary of routings. The array is
+     * suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar 
+     */
+    public static function dict_routings2array($neocaptar) {
+        $routings = array();
+        foreach( $neocaptar->dict_routings() as $routing ) {
+            $routings[$routing->name()] = array(
+                'id'           => $routing->id(),
+                'created_time' => $routing->created_time()->toStringShort(),
+                'created_uid'  => $routing->created_uid()
+            );
+        }
+        return $routings;
+    }
+
+    /**
+     * Return an array representation a dictionary of instructions. The array is
+     * suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar 
+     */
+    public static function dict_instrs2array($neocaptar) {
+        $instrs = array();
+        foreach( $neocaptar->dict_instrs() as $instr ) {
+            $instrs[$instr->name()] = array(
+                'id'           => $instr->id(),
+                'created_time' => $instr->created_time()->toStringShort(),
+                'created_uid'  => $instr->created_uid()
+            );
+        }
+        return $instrs;
+    }
+
     /**
      * Return an array representation of a project. The array is suitable for
      * exporting by Web services.
@@ -132,19 +307,22 @@ class NeoCaptarUtils {
      * @return array 
      */
     public static function cablenumber2array($c) {
+        $recent = $c->recent_allocation();
         return array (
-            'id'                     => $c->id(),
-            'location'               => $c->location(),
-            'prefix'                 => $c->prefix(),
-            'first'                  => $c->first(),
-            'last'                   => $c->last(),
-            'num_in_use'             => $c->num_in_use(),
-            'num_available'          => $c->num_available(),
-            'next_available'         => is_null($c->next_available        ()) ? '' : $c->next_available        (),
-            'recently_allocated'     => is_null($c->recently_allocated    ()) ? '' : $c->recently_allocated    (),
-            'recently_allocated_name'=> is_null($c->recently_allocated    ()) ? '' : sprintf("%2s%05d",$c->prefix(),$c->recently_allocated()),
-            'recent_allocation_time' => is_null($c->recent_allocation_time()) ? '' : $c->recent_allocation_time()->toStringShort(),
-            'recent_allocation_uid'  => is_null($c->recent_allocation_uid ()) ? '' : $c->recent_allocation_uid ()
+            'id'             => $c->id(),
+            'location'       => $c->location(),
+            'prefix'         => $c->prefix(),
+            'first'          => $c->first(),
+            'last'           => $c->last(),
+            'num_in_use'     => $c->num_in_use(),
+            'num_available'  => $c->num_available(),
+            'next_available' => is_null($c->next_available()) ? '' : $c->next_available(),
+
+            'recently_allocated'          => is_null($recent) ? '' : $recent['cablenumber'],
+            'recently_allocated_name'     => is_null($recent) ? '' : sprintf("%2s%05d",$c->prefix(),$recent['cablenumber']),
+            'recent_allocation_time'      => is_null($recent) ? '' : $recent['allocated_time']->toStringShort(),
+            'recent_allocation_uid'       => is_null($recent) ? '' : $recent['allocated_by_uid'],
+            'recently_allocated_cable_id' => is_null($recent) ? '' : $recent['cable_id']
         );
     }
 

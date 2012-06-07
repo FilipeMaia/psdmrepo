@@ -23,7 +23,7 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
 
-    $routing_name = NeoCaptarUtils::get_param_GET('routing');
+    $name = NeoCaptarUtils::get_param_GET('name');
 
 	$created_time = LusiTime::now();
 
@@ -44,24 +44,18 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$routing = $neocaptar->find_dict_routing_by_name( $routing_name );
+	$routing = $neocaptar->find_dict_routing_by_name( $name );
 	if( is_null( $routing )) {
-		$routing = $neocaptar->add_dict_routing( $routing_name, $created_time, $created_uid );
+		$routing = $neocaptar->add_dict_routing( $name, $created_time, $created_uid );
 		if( is_null( $routing )) {
 			$neocaptar->commit();
 			$neocaptar->begin();
-			$routing = $neocaptar->find_dict_routing_by_name( $routing_name );
+			$routing = $neocaptar->find_dict_routing_by_name( $name );
 			if( is_null( $routing )) NeoCaptarUtils::report_error('failed to find or create the specified routing');
 		}
 	}
 
-	$routings = array(
-		$routing->name() => array(
-			'id'           => $routing->id(),
-			'created_time' => $routing->created_time()->toStringShort(),
-			'created_uid'  => $routing->created_uid()
-		)
-	);
+	$routings = NeoCaptarUtils::dict_routings2array($neocaptar);
 
 	$neocaptar->commit();
 

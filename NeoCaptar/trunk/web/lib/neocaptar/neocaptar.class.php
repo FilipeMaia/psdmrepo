@@ -131,35 +131,83 @@ class NeoCaptar {
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
+
+    public function dict_connectors() {
+        $list = array();
+        $sql = "SELECT * FROM {$this->connection->database}.dict_connector ORDER BY name";
+        $result = $this->connection->query ( $sql );
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new NeoCaptarDictConnector (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
     public function find_dict_connector_by_id( $id ) {
-        $sql = "SELECT * FROM {$this->connection->database}.dict_connector WHERE id={$id}";
+    	return $this->find_dict_connector_by_( "id={$id}");
+    }
+    public function find_dict_connector_by_name( $name ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal connector type name. A valid non-empty string is expected." );
+    	return $this->find_dict_connector_by_( "name='{$name_escaped}'");
+    }
+    private function find_dict_connector_by_( $condition ) {
+        $sql = "SELECT * FROM {$this->connection->database}.dict_connector WHERE {$condition} ORDER BY name";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
         	throw new NeoCaptarException (
         		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-        $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
         return new NeoCaptarDictConnector (
         	$this->connection,
-            $this->find_dict_cable_by_id( $attr['cable_id'] ),
-            $attr );
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
+    }
+
+    public function dict_pinlists() {
+        $list = array();
+        $sql = "SELECT * FROM {$this->connection->database}.dict_pinlist ORDER BY name";
+        $result = $this->connection->query ( $sql );
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new NeoCaptarDictPinlist (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+        return $list;
+    }
+    public function find_dict_pinlist_by_name( $name ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal pinlist type name. A valid non-empty string is expected." );
+        return $this->find_dict_pinlist_by_( "name='{$name_escaped}'" );
     }
     public function find_dict_pinlist_by_id( $id ) {
-        $sql = "SELECT * FROM {$this->connection->database}.dict_pinlist WHERE id={$id}";
+    	return $this->find_dict_pinlist_by_( "id={$id}" );
+    }
+    private function find_dict_pinlist_by_( $condition ) {
+        $sql = "SELECT * FROM {$this->connection->database}.dict_pinlist WHERE {$condition}";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
         	throw new NeoCaptarException (
         		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-		$attr = mysql_fetch_array( $result, MYSQL_ASSOC );
         return new NeoCaptarDictPinlist (
         	$this->connection,
-            $this->find_dict_connector_by_id( $attr['connector_id'] ),
-            $attr );
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
-
 
     public function dict_locations() {
         $list = array();
@@ -547,14 +595,9 @@ class NeoCaptar {
     public function find_cables_by_dict_pinlist_id($dict_pinlist_id) {
         $dict_pinlist = $this->find_dict_pinlist_by_id($dict_pinlist_id);
         if( is_null($dict_pinlist)) return array();
-        $cable_type_escaped     = $this->connection->escape_string(trim($dict_pinlist->connector()->cable()->name()));
-        $connector_type_escaped = $this->connection->escape_string(trim($dict_pinlist->connector()->name()));
-        $pinlist_escaped        = $this->connection->escape_string(trim($dict_pinlist->name()));
+        $pinlist_escaped = $this->connection->escape_string(trim($dict_pinlist->name()));
         return $this->find_cables_by_(
-            "cable_type='{$cable_type_escaped}' AND ".
-            "((origin_conntype='{$connector_type_escaped}' AND origin_pinlist='{$pinlist_escaped}') OR ".
-            " (destination_conntype='{$connector_type_escaped}' AND destination_pinlist='{$pinlist_escaped}')".
-            ")");
+            "origin_pinlist='{$pinlist_escaped}' OR destination_pinlist='{$pinlist_escaped}'");
     }
     public function find_cables_by_dict_location_id($dict_location_id) {
         $dict_location = $this->find_dict_location_by_id($dict_location_id);
@@ -624,58 +667,9 @@ class NeoCaptar {
                 new NeoCaptarCableNumberAlloc (
                     $this->connection,
                     $this,
-                    $attr,
-                    $this->cablenumber_total_allocated($attr['location']),
-                    $this->cablenumber_last_allocation($attr['location'])));
+                    $attr));
         }
         return $list;
-    }
-
-    /**
-     * Look for cable numbers within  allowed range for the specified location only.
-     *
-     * @param string $location
-     * @return int 
-     */
-    public function cablenumber_total_allocated($location) {
-        $location_escaped = $this->connection->escape_string(trim($location));
-        if( $location_escaped == '' )
-            throw new NeoCaptarException (
-                __METHOD__, "empty string passed where a valid location name was expected." );
-        $table_c  = "{$this->connection->database}.cablenumber `c`";
-        $table_ca = "{$this->connection->database}.cablenumber_allocation `ca`";
-        $sql      = "SELECT COUNT(*) AS `total` FROM {$table_c}, {$table_ca} WHERE c.location='{$location_escaped}' AND ca.cablenumber_id=c.id AND c.first <= ca.cablenumber AND ca.cablenumber <= c.last";
-        $result   = $this->connection->query($sql);
-        $nrows = mysql_numrows( $result );
-        if( $nrows == 0 ) return 0;
-        if( $nrows != 1 )
-            throw new NeoCaptarException (
-                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-        $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
-        return $attr['total'];
-    }
-
-    /**
-     * Look for cable numbers within allowed range for the specified location only.
-     *
-     * @param string $location
-     * @return array (keys: 'cablenumber','allocated_time','allocated_by_uid') 
-     */
-    private function cablenumber_last_allocation($location) {
-        $location_escaped = $this->connection->escape_string(trim($location));
-        if( $location_escaped == '' )
-            throw new NeoCaptarException (
-                __METHOD__, "empty string passed where a valid location name was expected." );
-        $table_c  = "{$this->connection->database}.cablenumber `c`";
-        $table_ca = "{$this->connection->database}.cablenumber_allocation `ca`";
-        $sql      = "SELECT ca.cablenumber,ca.allocated_time,ca.allocated_by_uid FROM {$table_c}, {$table_ca} WHERE c.location='{$location_escaped}' AND ca.cablenumber_id=c.id AND c.first <= ca.cablenumber AND ca.cablenumber <= c.last ORDER BY cablenumber DESC LIMIT 1";
-        $result   = $this->connection->query($sql);
-        $nrows = mysql_numrows( $result );
-        if( $nrows == 0 ) return null;
-        if( $nrows != 1 )
-            throw new NeoCaptarException (
-                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-        return mysql_fetch_array( $result, MYSQL_ASSOC );
     }
     public function find_cablenumber_allocation_by_id($id) {
         if( intval($id) == 0 ) throw new NeoCaptarException(__METHOD__,"illegal identifier");
@@ -698,9 +692,7 @@ class NeoCaptar {
         return new NeoCaptarCableNumberAlloc (
             $this->connection,
             $this,
-            $attr,
-            $this->cablenumber_total_allocated($attr['location']),
-            $this->cablenumber_last_allocation($attr['location']));
+            $attr);
     }
 
     public function jobnumber_allocations() {
@@ -1002,11 +994,12 @@ class NeoCaptar {
      *   DATABASE MODIFIERS
      * ======================
      */
-    public function add_dict_cable( $name, $created, $uid ) {
+    public function add_dict_cable( $name, $documentation, $created, $uid ) {
     	$name_escaped = $this->connection->escape_string( trim( $name ));
     	if( $name_escaped == '' )
     		throw new NeoCaptarException (
     			__METHOD__, "illegal cable type name. A valid non-empty string is expected." );
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
     	$uid_escaped = $this->connection->escape_string( trim( $uid ));
     	if( $uid_escaped == '' )
     		throw new NeoCaptarException (
@@ -1021,7 +1014,7 @@ class NeoCaptar {
     	//
     	try {
 	    	$this->connection->query (
-    			"INSERT INTO {$this->connection->database}.dict_cable VALUES(NULL,'{$name_escaped}',{$created->to64()},'{$uid_escaped}')"
+    			"INSERT INTO {$this->connection->database}.dict_cable VALUES(NULL,'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}')"
     		);
     	} catch( NeoCaptarException $e ) {
     		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
@@ -1042,8 +1035,90 @@ class NeoCaptar {
     private function delete_dict_cable_by_( $condition ) {
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_cable WHERE {$condition}" );
     }
+
+    public function add_dict_connector( $name, $documentation, $created, $uid ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal connetor type name. A valid non-empty string is expected." );
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
+    	$uid_escaped = $this->connection->escape_string( trim( $uid ));
+    	if( $uid_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal UID. A valid non-empty string is expected." );
+
+    	// Note that the code below will intercept an attempt to create duplicate
+    	// connector name. If a conflict will be detected then the code will return null
+    	// to indicate a proble. Then it's up to the caller how to deal with this
+    	// situation. Usually, a solution is to commit the current transaction,
+    	// start another one and make a read attempt for the desired connetor within
+    	// that (new) transaction.
+    	//
+    	try {
+	    	$this->connection->query (
+    			"INSERT INTO {$this->connection->database}.dict_connector VALUES(NULL,'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}')"
+    		);
+    	} catch( NeoCaptarException $e ) {
+    		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
+    		throw $e;
+    	}
+	    return $this->find_dict_connector_by_( "id IN (SELECT LAST_INSERT_ID())" );
+    }
     public function delete_dict_connector_by_id( $id ) {
-    	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_connector WHERE id={$id}" );
+    	$this->delete_dict_connector_by_( "id={$id}" );
+    }
+    public function delete_dict_connector_by_name( $name ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal connector type name. A valid non-empty string is expected." );
+    	$this->delete_dict_connector_by_( "name='{$name_escaped}'" );
+    }
+    private function delete_dict_connector_by_( $condition ) {
+    	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_connector WHERE {$condition}" );
+    }
+
+    public function add_dict_pinlist( $name, $documentation, $created, $uid ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal pinlist type name. A valid non-empty string is expected." );
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
+    	$uid_escaped = $this->connection->escape_string( trim( $uid ));
+    	if( $uid_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal UID. A valid non-empty string is expected." );
+
+    	// Note that the code below will intercept an attempt to create duplicate
+    	// pinlist name. If a conflict will be detected then the code will return null
+    	// to indicate a proble. Then it's up to the caller how to deal with this
+    	// situation. Usually, a solution is to commit the current transaction,
+    	// start another one and make a read attempt for the desired pinlist within
+    	// that (new) transaction.
+    	//
+    	try {
+    		$this->connection->query (
+    			"INSERT INTO {$this->connection->database}.dict_pinlist VALUES(NULL,'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}')"
+    		);
+    	} catch( NeoCaptarException $e ) {
+    		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;
+    		throw $e;
+    	}
+    	return $this->find_dict_pinlist_by_( "id IN (SELECT LAST_INSERT_ID())" );
+    }
+    public function update_dict_pinlist( $pinlist_id, $documentation ) {
+    	$documentation_escaped = $this->connection->escape_string( trim( $documentation ));
+   		$this->connection->query (
+   			"UPDATE {$this->connection->database}.dict_pinlist SET documentation='{$documentation_escaped}' WHERE id={$pinlist_id}"
+   		);
+        return $this->find_dict_pinlist_by_id($pinlist_id);
+    }
+    public function delete_dict_pinlist_by_name( $name ) {
+    	$name_escaped = $this->connection->escape_string( trim( $name ));
+    	if( $name_escaped == '' )
+    		throw new NeoCaptarException (
+    			__METHOD__, "illegal pinlist type name. A valid non-empty string is expected." );
+    	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_pinlist WHERE name='{$name_escaped}'" );
     }
     public function delete_dict_pinlist_by_id( $id ) {
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_pinlist WHERE id={$id}" );
@@ -1136,13 +1211,11 @@ class NeoCaptar {
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_routing WHERE {$condition}" );
     }
 
-
-
     public function add_dict_device_location( $name, $created, $uid ) {
     	$name_escaped = $this->connection->escape_string( trim( $name ));
     	if( $name_escaped == '' )
     		throw new NeoCaptarException (
-    			__METHOD__, "illegal cable type name. A valid non-empty string is expected." );
+    			__METHOD__, "illegal device location name. A valid non-empty string is expected." );
     	$uid_escaped = $this->connection->escape_string( trim( $uid ));
     	if( $uid_escaped == '' )
     		throw new NeoCaptarException (
@@ -1316,7 +1389,7 @@ class NeoCaptar {
         $cable = $this->find_cable_by_id($id);
         if( is_null($cable)) return;
         $this->add_project_event($cable->project(), 'Delete Cable', $cable->dump2array());
-        $this->add_notification_event4cable('on_cable_delete', $new_cable,  $cable->dump2array());
+        $this->add_notification_event4cable('on_cable_delete', $cable,  $cable->dump2array());
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.cable WHERE id={$id}" );
     }
 
@@ -1353,20 +1426,15 @@ class NeoCaptar {
         $this->connection->query("UPDATE {$this->connection->database}.cablenumber SET {$what2update} WHERE id={$c->id()}");
         return $this->find_cablenumber_allocation_by_id($c->id());
     }
-    public function allocate_cablenumber($location) {
+    public function allocate_cablenumber($location, $cable_id) {
         $ca = $this->find_cablenumber_allocation_by_location($location);
         if(is_null($ca))
             throw new NeoCaptarException(__METHOD__,"cable location '{$location}' is either empty or not configured to be associated with cable numbers");
         if(strlen($ca->prefix()) != 2)
             throw new NeoCaptarException(__METHOD__,"cable number prefix is not set for location: {$location}");
 
-        $cablenumber = $ca->next_available();
-        if(!$cablenumber) return null;
-
-        $allocation_time_64       = LusiTime::now()->to64();
-        $allocated_by_uid_escaped = $this->connection->escape_string( trim( AuthDB::instance()->authName()));
-
-        $this->connection->query("INSERT {$this->connection->database}.cablenumber_allocation VALUES ({$ca->id()},{$cablenumber},{$allocation_time_64},'{$allocated_by_uid_escaped}')");
+        $cablenumber = $ca->allocate($cable_id);
+        if( is_null($cablenumber)) return null;
 
         return sprintf("%2s%05d",$ca->prefix(),$cablenumber);
     }
@@ -1467,7 +1535,7 @@ class NeoCaptar {
         if(is_null($cable))
             throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
 
-        $cablenumber = $this->allocate_cablenumber($cable->origin_loc());
+        $cablenumber = $this->allocate_cablenumber($cable->origin_loc(), $cable->id());
         if( is_null($cablenumber))
             throw new NeoCaptarException(__METHOD__, "failed to allocate a cable number");
 

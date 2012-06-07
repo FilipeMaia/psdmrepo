@@ -28,14 +28,7 @@ try {
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
 
-	$routings = array();
-	foreach( $neocaptar->dict_routings() as $routing ) {
-		$routings[$routing->name()] = array(
-			'id'           => $routing->id(),
-			'created_time' => $routing->created_time()->toStringShort(),
-			'created_uid'  => $routing->created_uid()
-		);
-	}
+	$routings = NeoCaptarUtils::dict_routings2array($neocaptar);
 
 	$authdb->commit();
 	$neocaptar->commit();

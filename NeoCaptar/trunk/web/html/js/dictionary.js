@@ -49,6 +49,7 @@ function p_appl_dictionary() {
 		if( this.initialized ) return;
 		this.initialized = true;
 		this.init_cables();
+		this.init_pinlists();
 		this.init_locations();
         this.init_routings();
         this.init_devices();
@@ -58,14 +59,22 @@ function p_appl_dictionary() {
         return global_current_user.is_administrator;
     };
     this.update = function(cable) {
-		this.save_cable    (cable.cable_type);
-        this.save_connector(cable.cable_type, cable.origin.conntype);
-        this.save_connector(cable.cable_type, cable.destination.conntype);
-		this.save_pinlist  (cable.cable_type, cable.origin.conntype,      cable.origin.pinlist, '');
-		this.save_pinlist  (cable.cable_type, cable.destination.conntype, cable.destination.pinlist, '');
+		this.save_cable    (cable.cable_type, '', cable.origin.conntype);
+		this.save_cable    (cable.cable_type, '', cable.destination.conntype);
+
+        // TODO: These two calls may not be needed because the previous two
+        // are supposed to create new connectors (if needed) and establish
+        // proper associatosn with the cable type.
+        //
+        this.save_connector(cable.origin.conntype, '',      cable.cable_type);
+        this.save_connector(cable.destination.conntype, '', cable.cable_type);
+
+        this.save_pinlist  (cable.origin.pinlist, '');
+		this.save_pinlist  (cable.destination.pinlist, '');
 
         this.save_location (cable.origin.loc);
         this.save_location (cable.destination.loc);
+
         this.save_rack     (cable.origin.loc,      cable.origin.rack);
 		this.save_rack     (cable.destination.loc, cable.destination.rack);
 
@@ -73,27 +82,36 @@ function p_appl_dictionary() {
 
         this.save_instr    (cable.origin.instr);
 		this.save_instr    (cable.destination.instr);
-        
+
         this.save_device_location (cable.device_location);
         this.save_device_region   (cable.device_location, cable.device_region);
         this.save_device_component(cable.device_location, cable.device_region, cable.device_component);
     };
-
-    // -----------------------------
-    // CABLES, CONNECTORS & PINLISTS
-    // -----------------------------
-
-	this.selected_cable = null;
-	this.selected_connector = null;
-	this.cable = {};
-	this.get_cable = function() {
+    this.web_service_GET = function(url, params, data_handler) {
 		this.init();
-		return this.cable;
+		var jqXHR = $.get(url,params,function(data) {
+			var result = eval(data);
+			if(result.status != 'success') { report_error(result.message, null); return; }
+            data_handler(result);
+		},
+		'JSON').error(function () {
+            report_error('update failed because of: '+jqXHR.statusText);
+		}); };
+    
+    // ---------------------
+    // CABLES and CONNECTORS
+    // ---------------------
+
+	this.type = {};
+
+	this.cables = function() {
+		this.init();
+		return this.type.cable;
 	};
-	this.cable_dict_is_empty = function() {
+    this.cable_dict_is_empty = function() {
 		for( var cable in this.cables()) return false;
 		return true;
-	}
+	};
 	this.cable_is_not_known = function(cable) {
 		return this.cable_dict_is_empty() || ( cable == null ) || ( typeof this.cables()[cable] === 'undefined' );
 	};
@@ -104,447 +122,671 @@ function p_appl_dictionary() {
 	this.connector_is_not_known = function(cable,connector) {
 		return this.cable_is_not_known(cable) || ( connector == null ) || ( typeof this.connectors(cable)[connector] === 'undefined' );
 	};
-	this.pinlist_dict_is_empty = function(cable,connector) {
-		for( var pinlist in this.pinlists(cable, connector)) return false;
-		return true;
-	};
-	this.pinlist_is_not_known = function(cable,connector,pinlist) {
-		return this.connector_is_not_known(cable,connector) || ( pinlist == null ) || ( typeof this.pinlists(cable,connector)[pinlist] === 'undefined' );
-	};
-	this.cables = function() {
-		return this.get_cable();
-	};
 	this.connectors = function(cable) {
 		if( this.cable_is_not_known(cable)) return {};
 		return this.cables()[cable]['connector'];
 	};
-	this.pinlists = function(cable,connector) {
-		if( this.connector_is_not_known(cable,connector)) return {};
-		return this.connectors(cable)[connector]['pinlist'];
+
+    this.connectors_reverse = function() {
+		this.init();
+		return this.type.connector;
 	};
+    this.connector_dict_is_empty_reverse = function() {
+		for( var connector in this.connectors_reverse()) return false;
+		return true;
+	};
+	this.connector_is_not_known_reverse = function(connector) {
+		return this.connector_dict_is_empty_reverse() || ( connector == null ) || ( typeof this.connectors_reverse()[connector] === 'undefined' );
+	};
+	this.cables_reverse = function(connector) {
+		if( this.connector_is_not_known_reverse(connector)) return {};
+		return this.connectors_reverse()[connector]['cable'];
+	};
+
 	this.init_cables = function() {
-		$('#dictionary-types').find('input[name="cable2add"]').
+        $('#dictionary-types').find('#tabs').tabs();
+		$('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]').
             keyup(function(e) {
         		if( $(this).val() == '' ) { return; }
             	if( e.keyCode == 13     ) { that.new_cable(); return; }
                 $(this).val(global_truncate_cable($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types').find('input[name="connector2add"]').
+		$('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]').
             keyup(function(e) {
     			if( $(this).val() == '' ) { return; }
         		if( e.keyCode == 13     ) { that.new_connector(); return; }
                 $(this).val(global_truncate_connector($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types').find('input[name="pinlist2add"]').
-    		keyup(function(e) {
+		$('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]').
+            keyup(function(e) {
         		if( $(this).val() == '' ) { return; }
-            	if( e.keyCode == 13     ) {	that.new_pinlist(); return;	}
-                $(this).val(global_truncate_pinlist($(this).val()));
+            	if( e.keyCode == 13     ) { that.new_connector_reverse(); return; }
+                $(this).val(global_truncate_connector($(this).val()));
+            }).
+            attr('disabled','disabled');
+		$('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]').
+            keyup(function(e) {
+    			if( $(this).val() == '' ) { return; }
+        		if( e.keyCode == 13     ) { that.new_cable_reverse(); return; }
+                $(this).val(global_truncate_cable($(this).val()));
             }).
             attr('disabled','disabled');
 		$('#dictionary-types-reload').
             button().
-    		click(function() { that.load_cables(); });
-		this.load_cables();
+    		click(function() { that.load_types(); });
+		this.load_types();
 	};
-	this.new_cable = function() {
-		var input = $('#dictionary-types').find('input[name="cable2add"]');
-		var cable_name = input.val();
-		if( this.cable_is_not_known(cable_name)) {
-			input.val('');
-			this.selected_cable = cable_name;
-			this.selected_connector = null;
-			this.save_cable(this.selected_cable);
-		}
-	};
-	this.new_connector = function() {
-		var input = $('#dictionary-types').find('input[name="connector2add"]');
-		var connector_name = input.val();
-		if( this.connector_is_not_known(this.selected_cable, connector_name)) {
-			input.val('');
-			this.selected_connector = connector_name;
-			this.save_connector(this.selected_cable, this.selected_connector);
-		}
-	};
-	this.new_pinlist = function() {
-		var input = $('#dictionary-types').find('input[name="pinlist2add"]');
-		var pinlist_name = input.val();
-		if( this.pinlist_is_not_known(this.selected_cable, this.selected_connector, pinlist_name)) {
-			input.val('');
-			this.save_pinlist(this.selected_cable, this.selected_connector, pinlist_name,'');
-		}
-	};
-	this.save_cable = function(cable_name) {
-		this.init();
+    this.cables_select_tab = function(name) {
+        var elem = $('#dictionary-types').find('#tabs');
+        var selected = elem.tabs('option','selected');
+        var required = name == 'cables2connectors' ? 0 : 1;
+        if( required != selected )
+            elem.tabs('select', required);
+    };
+
+    this.new_cable = function() {
+		var input = $('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]');
+		this.save_cable(input.val(),'','');
+        input.val(''); };
+
+    this.new_connector = function() {
+		var input = $('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]');
+        this.save_connector(input.val(), '', this.table_cables.selected_object());
+        input.val(''); };
+
+	this.new_connector_reverse = function() {
+		var input = $('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]');
+		this.save_connector(input.val(), '', '');
+		input.val(''); };
+
+	this.new_cable_reverse = function() {
+		var input = $('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]');
+		this.save_cable(input.val(), '', this.table_connectors_reverse.selected_object());
+		input.val(''); };
+
+	this.save_cable = function(cable_name, cable_documentation, connector_name) {
 		if( cable_name == '' ) return;
-		if( this.cable_is_not_known(cable_name)) {
-			this.cables()[cable_name] = {id:0, created_time:'', created_uid:'', connector:{}};
-			if( this.selected_cable == null ) {
-				this.selected_cable = cable_name;
-				this.selected_connector = null;
-			}
-			$('#dictionary-types-info').html('Saving...');
-			var params = {cable:cable_name};
-			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				$('#dictionary-types-info').html('&nbsp;');
-				that.cables()[cable_name] = result.cable[cable_name];
-				that.display_cables();
-			},
-			'JSON').error(function () {
-				$('#dictionary-types-info').html('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.save_connector = function(cable_name, connector_name) {
-		this.init();
-		if(( cable_name == '' ) || ( connector_name == '' )) return;
-		if( this.connector_is_not_known(cable_name, connector_name)) {
-			this.connectors(cable_name)[connector_name] = {id:0, created_time:'', created_uid:'', pinlist:{}};
-			if( this.selected_cable == null ) {
-				this.selected_cable = cable_name;
-				this.selected_connector = connector_name;
-			} else {
-				if(( this.selected_cable == cable_name ) && ( this.selected_connector == null ))  {
-					this.selected_connector = connector_name;
-				}
-			}
-			$('#dictionary-types-info').html('Saving...');
-			var params = {cable:cable_name, connector:connector_name};
-			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				$('#dictionary-types-info').html('&nbsp;');
-				that.cables()[cable_name] = result.cable[cable_name];
-				that.display_cables();
-			},
-			'JSON').error(function () {
-				$('#dictionary-types-info').html('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.save_pinlist = function(cable_name, connector_name, pinlist_name, pinlist_documentation) {
-		this.init();
-		if(( cable_name == '' ) || ( connector_name == '' ) || ( pinlist_name == '' )) return;
-		if( this.pinlist_is_not_known(cable_name, connector_name, pinlist_name)) {
-			this.pinlists(cable_name, connector_name)[pinlist_name] = {id:0, created_time:'', created_uid:''};
-			if( this.selected_cable == null ) {
-				this.selected_cable = cable_name;
-				this.selected_connector = connector_name;
-			} else {
-				if(( this.selected_cable == cable_name ) && ( this.selected_connector == null ))  {
-					this.selected_connector = connector_name;
-				}
-			}
-			$('#dictionary-types-info').html('Saving...');
-			var params = {cable:cable_name, connector:connector_name, pinlist:pinlist_name, pinlist_documentation:pinlist_documentation};
-			var jqXHR = $.get('../neocaptar/dict_cable_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				$('#dictionary-types-info').html('&nbsp;');
-				that.cables()[cable_name] = result.cable[cable_name];
-				that.display_cables();
-			},
-			'JSON').error(function () {
-				$('#dictionary-types-info').html('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.update_pinlist = function(cable_name, connector_name, pinlist_name, pinlist_documentation) {
-		this.init();
-        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-		$('#dictionary-types-info').html('Updating...');
-		var params = {id:pinlist.id, documentation:pinlist_documentation};
-		var jqXHR = $.get('../neocaptar/dict_pinlist_update.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			$('#dictionary-types-info').html('&nbsp;');
-			that.cables()[cable_name] = result.cable[cable_name];
-			that.display_cables();
-		},
-		'JSON').error(function () {
-			$('#dictionary-types-info').html('update failed because of: '+jqXHR.statusText);
-		});
-	};
-	this.delete_element = function(element,id) {
-		this.init();
-		$('#dictionary-types-info').html('Deleting '+element+'...');
-		var params = {scope:element, id:id};
-		var jqXHR = $.get('../neocaptar/dict_cable_delete.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			$('#dictionary-types-info').html('&nbsp;');
-			that.load_cables();
-		},
-		'JSON').error(function () {
-			$('#dictionary-types-info').html('deletion failed because of: '+jqXHR.statusText);
-		});
-	};
-	this.load_cables = function() {
-		var params = {};
-		var jqXHR = $.get('../neocaptar/dict_cable_get.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			$('#dictionary-types-info').html('&nbsp;');
-			that.cable = result.cable;
-			if( that.cable_is_not_known(that.selected_cable)) {
-				that.selected_cable     = null;
-				that.selected_connector = null;
-			} else if( that.connector_is_not_known(that.selected_cable, that.selected_connector)) {
-				that.selected_connector = null;
-			}
-			that.display_cables();
-		},
-		'JSON').error(function () {
-			$('#dictionary-types-info').html('loading failed because of: '+jqXHR.statusText);
-		});
-	};
-    this.cable2html = function(cable_name,is_selected_cable) {
-        var cable = this.cables()[cable_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-cable-delete" name="'+cable.id+'" title="delete this cable from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_cable?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_cable('+"'"+cable_name+"'"+')" >'+cable_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+cable.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+cable.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-cable-search" name="'+cable.id+'" title="search all uses of this cable type">search</button>'+
-'  </td>'+
-'</tr>';
+        var params = { cable_name: cable_name, cable_documentation: cable_documentation };
+        if((connector_name != null) && (connector_name != '')) params.connector_name = connector_name;
+        this.type_action('../neocaptar/dict_cable_new.php', params); };
+
+	this.save_connector = function(connector_name, connector_documentation, cable_name) {
+		if( connector_name == '' ) return;
+        var params = { connector_name: connector_name, connector_documentation: connector_documentation };
+        if((cable_name != null) && (cable_name != '')) params.cable_name = cable_name;
+        this.type_action('../neocaptar/dict_connector_new.php', params); };
+
+	this.delete_cable = function(id) {
+        this.type_action('../neocaptar/dict_cable_delete.php', { id: id });	};
+
+	this.delete_connector = function(id) {
+        this.type_action('../neocaptar/dict_connector_delete.php', { id: id }); };
+
+	this.load_types = function() {
+        this.type_action('../neocaptar/dict_types_get.php', {}); };
+
+    this.save_cable_documentation = function(id,documentation) {
+        this.type_action('../neocaptar/dict_cable_update.php', { id: id, documentation: documentation }); };
+
+    this.save_connector_documentation = function(id,documentation) {
+        this.type_action('../neocaptar/dict_connector_update.php', { id: id, documentation: documentation }); };
+
+    this.type_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.type = result.type;
+            that.display_types();
+        }
+        this.web_service_GET(url, params, handle_data_and_display);
+    };
+
+
+    this.cable2url = function(name) {
+        if(this.cable_is_not_known(name)) return name;
+        var html = '<a href="'+this.cables()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
         return html;
     };
-    this.connector2html = function(cable_name,connector_name,is_selected_connector) {
-        var connector = this.connectors(cable_name)[connector_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-connector-delete" name="'+connector.id+'" title="delete this connector from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_connector?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_connector('+"'"+connector_name+"'"+')" >'+connector_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+connector.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+connector.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-connector-search" name="'+connector.id+'" title="search all uses of this connector type">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-    this.pinlist2url = function(cable,connector,pinlist_name) {
-        if(this.pinlist_is_not_known(cable,connector,pinlist_name)) return pinlist_name;
-        var pinlist_documentation = this.pinlists(cable,connector)[pinlist_name].documentation;
-        var html = '<a href="'+pinlist_documentation+'" target="_blank" title="click the link to get the external documentation">'+pinlist_name+'</a>';
+    this.connector2url = function(name) {
+        if(this.connector_is_not_known_reverse(name)) return name;
+        var html = '<a href="'+this.connectors_reverse()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
         return html;
     };
 
-    this.pinlist2html = function(cable_name,connector_name,pinlist_name) {
-        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-        var params = "'"+cable_name+"','"+connector_name+"','"+pinlist_name+"'";
-        var html = 
-'<tr id="dict-pinlist-url-'+pinlist.id+'" >'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-pinlist-delete" name="'+pinlist.id+'" title="delete this pinlist from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell "><a href="'+pinlist.documentation+'" target="_blank" title="click the link to get the external documentation">'+pinlist_name+'</a></td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+
-'    <input type="text" name="url" style="display:none;"></input>'+
-'    <button class="dict-table-pinlist-edit"   onclick="dict.edit_pinlist_url('+params+')"        title="edit URL for the pinlist">edit</button>'+
-'    <button class="dict-table-pinlist-save"   onclick="dict.edit_pinlist_url_save('+params+')"   title="edit URL for the pinlist">save</button>'+
-'    <button class="dict-table-pinlist-cancel" onclick="dict.edit_pinlist_url_cancel('+params+')" title="edit URL for the pinlist">cancel</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+pinlist.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+pinlist.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-pinlist-search" name="'+pinlist.id+'" title="search all uses of this pinlist">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
+    this.display_types = function() {
+        this.display_cables();
+        this.display_connectors_reverse();
     };
-	this.display_cables = function() {
-		var html_cables =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >cable type</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		var html_connectors = 
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >connector type</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		var html_pinlists = 
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >pin list type</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >documentation (URL)</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		for( var cable_name in this.cables()) {
-			if( this.selected_cable == null ) {
-				this.selected_cable = cable_name;
-				this.selected_connector = null;
-			}
-			var is_selected_cable = this.selected_cable === cable_name;
-			html_cables += this.cable2html(cable_name,is_selected_cable);
-			if( is_selected_cable ) {
-				for( var connector_name in this.connectors(cable_name)) {
-					if( this.selected_connector == null ) {
-						this.selected_connector = connector_name;
-					}
-					var is_selected_connector = this.selected_connector === connector_name;
-					html_connectors += this.connector2html(cable_name,connector_name,is_selected_connector);
-					if( is_selected_connector ) {
-						for( var pinlist_name in this.pinlists(cable_name, connector_name)) {
-							html_pinlists += this.pinlist2html(cable_name,connector_name,pinlist_name);
-						}
-					}
-				}
-			}
-		}
-        html_cables +=
-'</tbody></table>';
-        html_connectors +=
-'</tbody></table>';
-        html_pinlists +=
-'</tbody></table>';
-        $('#dictionary-types-cables'    ).html(html_cables);
-		$('#dictionary-types-connectors').html(html_connectors);
-		$('#dictionary-types-pinlists'  ).html(html_pinlists);
 
-		$('.dict-table-cable-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-                var cable_id = this.name;
-                ask_yes_no(
-                    'Data Deletion Warning',
-                    'You are about to delete the cable type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_element('cable',cable_id); },
-                    null
+
+    this.table_cables     = null;
+    this.table_connectors = null;
+
+	this.display_cables = function(selected_cable_name) {
+
+        var tab = 'cables2connectors';
+        if( selected_cable_name !== undefined ) this.cables_select_tab(tab);
+
+        var elem = $('#dictionary-types-cables');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-cable-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the cable?',
+                                    function() { that.delete_cable(id); },
+                                    null
+                                ); }); }}},
+            {   name:       'cable type',
+                selectable: true,
+                type:       {
+                    select_action : function(cable_name) {
+                        that.display_connectors( cable_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-cable-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_cable_id(id);
+                            }); }}},
+            {   name: 'DOCUMENTATION LINK', sorted: false,
+                type: {
+                    after_sort: function() {
+                        elem.find('.cable-documentation-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_cable_documentation(id, elem.find('#cable-documentation-'+id).val());
+                            }); }}}
+            ];
+
+        var rows = [];
+
+        for( var cable_name in this.cables()) {
+            var cable = this.cables()[cable_name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    cable.id,
+                            classes: 'dict-table-cable-delete',
+                            title:   'delete this cable from the dictionary' }) : ' ',
+
+                    cable_name,
+
+                    cable.created_time,
+                    cable.created_uid,
+
+                    Button_HTML('search', {
+                        name:    cable.id,
+                        classes: 'dict-table-cable-search',
+                        title:   'search all uses of this cable' }),
+
+                    TextInput_HTML({
+                        id:    'cable-documentation-'+cable.id,
+                        value: cable.documentation })+(
+                    this.can_manage() ?
+                        Button_HTML('save', {
+                            name:    cable.id,
+                            classes: 'cable-documentation-save',
+                            title:   'edit documentation URL for the cable' }) : ' ' )
+                ]
+            );
+        }
+        this.table_cables = new Table('dictionary-types-cables',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_cables.display();
+        if( selected_cable_name !== undefined )
+            this.table_cables.select(1, selected_cable_name);
+
+        this.display_connectors( this.table_cables.selected_object());
+
+        if(this.can_manage())
+    		$('#dictionary-types').find('#'+tab).find('input[name="cable2add"]' ).removeAttr('disabled');
+	};
+
+	this.display_connectors = function(cable_name) {
+
+        var tab = 'cables2connectors';
+
+        var elem = $('#dictionary-types-connectors');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-connector-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the connector?',
+                                    function() { that.delete_connector(id); },
+                                    null
+                                ); }); }}},
+            {   name:       'connector type',
+                selectable: true,
+                type:       {
+                    select_action : function(connector_name) {
+                        that.display_connectors_reverse(connector_name); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-connector-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_connector_id(id);
+                            }); }}},
+            {   name: 'DOCUMENTATION LINK', sorted: false,
+                type: {
+                    after_sort: function() {
+                        elem.find('.connector-documentation-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_connector_documentation(id, elem.find('#connector-documentation-'+id).val());
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        if( cable_name != null ) {
+            for( var connector_name in this.connectors(cable_name)) {
+                var connector = this.connectors(cable_name)[connector_name];
+                rows.push(
+                    [   this.can_manage() ?
+                            Button_HTML('X', {
+                                name:    connector.id,
+                                classes: 'dict-table-connector-delete',
+                                title:   'delete this connector from the dictionary' }) : ' ',
+
+                        connector_name,
+
+                        connector.created_time,
+                        connector.created_uid,
+
+                        Button_HTML('search', {
+                            name:    connector.id,
+                            classes: 'dict-table-connector-search',
+                            title:   'search all uses of this connector' }),
+
+                    TextInput_HTML({
+                        id:    'connector-documentation-'+connector.id,
+                        value: connector.documentation })+(
+                    this.can_manage() ?
+                        Button_HTML('save', {
+                            name:    connector.id,
+                            classes: 'connector-documentation-save',
+                            title:   'edit documentation URL for the connector' }) : ' ' )
+                    ]
                 );
-            });
-		$('.dict-table-cable-search').
-            button().
-            click(function() {
-    			var cable_id = this.name;
-                global_search_cables_by_dict_cable_id(cable_id);
-            });
-		$('.dict-table-connector-search').
-            button().
-            click(function() {
-    			var connector_id = this.name;
-                global_search_cables_by_dict_connector_id(connector_id);
-            });
-		$('.dict-table-pinlist-search').
-            button().
-            click(function() {
-    			var pinlist_id = this.name;
-                global_search_cables_by_dict_pinlist_id(pinlist_id);
-            });
-		$('.dict-table-connector-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var connector_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the connector type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_element('connector',connector_id); },
-                    null
-                );
-            });
-		$('.dict-table-pinlist-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var pinlist_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the pinlist type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_element('pinlist',pinlist_id); },
-                    null
-                );
-    		});
-		$('.dict-table-pinlist-edit').
-            button().
-            button(this.can_manage()?'enable':'disable');
-		$('.dict-table-pinlist-save').
-            button().
-            button('disable');
-		$('.dict-table-pinlist-cancel').
-            button().
-            button('disable');
+            }
+        }
+        this.table_connectors = new Table('dictionary-types-connectors', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_connectors.display();
+
         if(this.can_manage()) {
-    		                                      $('#dictionary-types').find('input[name="cable2add"]'    ).removeAttr('disabled');
-        	if( this.selected_cable     == null ) $('#dictionary-types').find('input[name="connector2add"]').attr      ('disabled','disabled');
-            else                                  $('#dictionary-types').find('input[name="connector2add"]').removeAttr('disabled');
-            if( this.selected_connector == null ) $('#dictionary-types').find('input[name="pinlist2add"]'  ).attr      ('disabled','disabled');
-            else                                  $('#dictionary-types').find('input[name="pinlist2add"]'  ).removeAttr('disabled');
+            var input = $('#dictionary-types').find('#'+tab).find('input[name="connector2add"]');
+        	if( cable_name == null ) input.attr('disabled','disabled');
+            else                     input.removeAttr('disabled');
         }
 	};
-    this.edit_pinlist_url = function(cable_name,connector_name,pinlist_name) {
-        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-        var elem = $('#dict-pinlist-url-'+pinlist.id);
-        elem.find('input[name="url"]').
-            css('display','block').
-            val(pinlist.documentation);
-        elem.find('button.dict-table-pinlist-edit').button('disable');
-        elem.find('button.dict-table-pinlist-save').button('enable');
-        elem.find('button.dict-table-pinlist-cancel').button('enable');
-    };
-    this.edit_pinlist_url_save = function(cable_name,connector_name,pinlist_name) {
-        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-        var elem = $('#dict-pinlist-url-'+pinlist.id);
-        var pinlist_documentation = elem.find('input[name="url"]').
-            css('display','none').
-            val();
-        elem.find('button.dict-table-pinlist-edit').button('enable');
-        elem.find('button.dict-table-pinlist-save').button('disable');
-        elem.find('button.dict-table-pinlist-cancel').button('disable');
-        this.update_pinlist(cable_name, connector_name, pinlist_name, pinlist_documentation);
-    };
-    this.edit_pinlist_url_cancel = function(cable_name,connector_name,pinlist_name) {
-        var pinlist = this.pinlists(cable_name,connector_name)[pinlist_name];
-        var elem = $('#dict-pinlist-url-'+pinlist.id);
-        elem.find('input[name="url"]').
-            css('display','none');
-        elem.find('button.dict-table-pinlist-edit').button('enable');
-        elem.find('button.dict-table-pinlist-save').button('disable');
-        elem.find('button.dict-table-pinlist-cancel').button('disable');
-    };
-	this.select_cable = function(cable) {
-		if( this.selected_cable != cable ) {
-			this.selected_cable     = cable;
-			this.selected_connector = null;
-			this.display_cables();
-		}
+
+    this.table_connectors_reverse = null;
+    this.table_cables_reverse     = null;
+
+	this.display_connectors_reverse = function(selected_connector_name) {
+
+        var tab = 'connectors2cables';
+        if( selected_connector_name !== undefined ) this.cables_select_tab(tab);
+
+        var elem = $('#dictionary-types-connectors-reverse');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-connector-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the connector?',
+                                    function() { that.delete_connector(id); },
+                                    null
+                                ); }); }}},
+            {   name:       'connector type',
+                selectable: true,
+                type:       {
+                    select_action : function(connector_name) {
+                        that.display_cables_reverse( connector_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-connector-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_connector_id(id);
+                            }); }}},
+            {   name: 'DOCUMENTATION LINK', sorted: false,
+                type: {
+                    after_sort: function() {
+                        elem.find('.connector-documentation-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_connector_documentation(id, elem.find('#connector-documentation-'+id).val());
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        for( var connector_name in this.connectors_reverse()) {
+            var connector = this.connectors_reverse()[connector_name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    connector.id,
+                            classes: 'dict-table-connector-delete',
+                            title:   'delete this connector from the dictionary' }) : ' ',
+
+                    connector_name,
+
+                    connector.created_time,
+                    connector.created_uid,
+
+                    Button_HTML('search', {
+                        name:    connector.id,
+                        classes: 'dict-table-connector-search',
+                        title:   'search all uses of this connector' }),
+
+                    TextInput_HTML({
+                        id:    'connector-documentation-'+connector.id,
+                        value: connector.documentation })+(
+                    this.can_manage() ?
+                        Button_HTML('save', {
+                            name:    connector.id,
+                            classes: 'connector-documentation-save',
+                            title:   'edit documentation URL for the connector' }) : ' ' )
+                ]
+            );
+        }
+        this.table_connectors_reverse = new Table('dictionary-types-connectors-reverse', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_connectors_reverse.display();
+        if( selected_connector_name !== undefined )
+            this.table_connectors_reverse.select(1,selected_connector_name);
+
+        this.display_cables_reverse( this.table_connectors_reverse.selected_object());
+
+        if(this.can_manage())
+    		$('#dictionary-types').find('#'+tab).find('input[name="connector2add"]' ).removeAttr('disabled');
 	};
-	this.select_connector = function(connector) {
-		if( this.selected_connector != connector ) {
-			this.selected_connector = connector;
-			this.display_cables();
-		}
+
+	this.display_cables_reverse = function(connector_name) {
+
+        var tab = 'connectors2cables';
+
+        var elem = $('#dictionary-types-cables-reverse');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-cable-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the cable?',
+                                    function() { that.delete_cable(id); },
+                                    null
+                                ); }); }}},
+            {   name:       'cable type',
+                selectable: true,
+                type:       {
+                    select_action : function(selected_cable_name) {
+                        that.display_cables( selected_cable_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-cable-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_cable_id(id);
+                            }); }}},
+            {   name: 'DOCUMENTATION LINK', sorted: false,
+                type: {
+                    after_sort: function() {
+                        elem.find('.cable-documentation-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_cable_documentation(id, elem.find('#cable-documentation-'+id).val());
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        if( connector_name != null ) {
+            for( var cable_name in this.cables_reverse(connector_name)) {
+                var cable = this.cables_reverse(connector_name)[cable_name];
+                rows.push(
+                    [   this.can_manage() ?
+                            Button_HTML('X', {
+                                name:    cable.id,
+                                classes: 'dict-table-cable-delete',
+                                title:   'delete this cable from the dictionary' }) : ' ',
+
+                        cable_name,
+
+                        cable.created_time,
+                        cable.created_uid,
+
+                        Button_HTML('search', {
+                            name:    cable.id,
+                            classes: 'dict-table-cable-search',
+                            title:   'search all uses of this cable' }),
+
+                    TextInput_HTML({
+                        id:    'cable-documentation-'+cable.id,
+                        value: cable.documentation })+(
+                    this.can_manage() ?
+                        Button_HTML('save', {
+                            name:    cable.id,
+                            classes: 'cable-documentation-save',
+                            title:   'edit documentation URL for the cable' }) : ' ' )
+                    ]
+                );
+            }
+        }
+        this.table_cables_reverse = new Table('dictionary-types-cables-reverse',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_cables_reverse.display();
+
+        if(this.can_manage()) {
+            var input = $('#dictionary-types').find('#'+tab).find('input[name="cable2add"]');
+        	if( connector_name == null ) input.attr('disabled','disabled');
+            else                         input.removeAttr('disabled');
+        }
+	};
+
+    // -------------------
+    // PINLISTS (DRAWINGS)
+    // -------------------
+
+	this.pinlist = {};
+	this.get_pinlist = function() {
+		this.init();
+		return this.pinlist;
+	};
+	this.pinlist_dict_is_empty = function() {
+		for( var pinlist in this.pinlists()) return false;
+		return true;
+	}
+	this.pinlist_is_not_known = function(pinlist) {
+		return this.pinlist_dict_is_empty() || ( pinlist == null ) || ( typeof this.pinlists()[pinlist] === 'undefined' );
+	};
+	this.pinlists = function() {
+		return this.get_pinlist();
+	};
+	this.init_pinlists = function() {
+		$('#dictionary-pinlists').
+            find('input[name="pinlist2add"]').
+            keyup(function(e) {
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_pinlist(); return; }
+                $(this).val(global_truncate_pinlist($(this).val()));
+            }).
+            attr('disabled','disabled');
+		$('#dictionary-pinlists-reload').
+            button().
+            click(function() { that.load_pinlists(); });
+		this.load_pinlists();
+	};
+	this.new_pinlist = function() {
+        var input = $('#dictionary-pinlists').find('input[name="pinlist2add"]');
+        var pinlist_name = input.val();
+        this.save_pinlist(pinlist_name,'');
+        input.val('');
+	};
+
+	this.save_pinlist = function(name,documentation) {
+		if( name == '' ) return;
+		this.pinlist_action('../neocaptar/dict_pinlist_new.php', { name: name, documentation: documentation },
+            function(result) {that.pinlist[name] = result.pinlist[name]; }); };
+
+	this.delete_pinlist = function(id) {
+		this.pinlist_action('../neocaptar/dict_pinlist_delete.php', { id: id }); };
+
+	this.load_pinlists = function() {
+		this.pinlist_action('../neocaptar/dict_pinlist_get.php', {}); };
+
+    this.save_pinlist_documentation = function(id,documentation) {
+		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, documentation: documentation }); };
+
+    this.pinlist_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.pinlist = result.pinlist;
+            that.display_pinlists();
+        }
+        this.web_service_GET(url, params, handle_data_and_display);
+    };
+
+    this.pinlist2url = function(name) {
+        if(this.pinlist_is_not_known(name)) return name;
+        var html = '<a href="'+this.pinlists()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
+        return html;
+    };
+	this.display_pinlists = function() {
+        var elem_pinlists = $('#dictionary-pinlists-pinlists');
+        var hdr = [
+            {   name:   'DELETE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem_pinlists.find('.dict-table-pinlist-delete').
+                            button().
+                            click(function() {
+                                var pinlist_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the pinlist?',
+                                    function() { that.delete_pinlist(pinlist_id); },
+                                    null
+                                ); }); }}},
+            {   name:   'pinlists' },
+            {   name:   'created' },
+            {   name:   'by user' },
+            {   name:   'USAGE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem_pinlists.find('.dict-table-pinlist-search').
+                            button().
+                            click(function() {
+                                var pinlist_id = this.name;
+                                global_search_cables_by_dict_pinlist_id(pinlist_id);
+                            }); }}},
+            {   name: 'DOCUMENTATION LINK', sorted: false,
+                type: {
+                    after_sort: function() {
+                        elem_pinlists.find('.pinlist-documentation-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_pinlist_documentation(id, elem_pinlists.find('#pinlist-documentation-'+id).val());
+                            }); }}}
+        ];
+        var rows = [];
+		for( var name in this.pinlists()) {
+            var pinlist = this.pinlists()[name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    pinlist.id,
+                            classes: 'dict-table-pinlist-delete',
+                            title:   'delete this pinlist from the dictionary' }) : ' ',
+
+                    name,
+                    pinlist.created_time,
+                    pinlist.created_uid,
+
+                    Button_HTML('search', {
+                        name:    pinlist.id,
+                        classes: 'dict-table-pinlist-search',
+                        title:   'search all uses of this pinlist' }),
+
+                    TextInput_HTML({
+                        id:    'pinlist-documentation-'+pinlist.id,
+                        value: pinlist.documentation })+(
+                    this.can_manage() ?
+                        Button_HTML('save', {
+                            name:    pinlist.id,
+                            classes: 'pinlist-documentation-save',
+                            title:   'edit documentation URL for the pinlist' }) : ' ' )
+                ]
+            );
+        }
+        var table = new Table('dictionary-pinlists-pinlists', hdr, rows, {default_sort_column: 1});
+        table.display();
+
+        if(this.can_manage())
+            $('#dictionary-pinlists').find('input[name="pinlist2add"]').removeAttr('disabled');
 	};
 
     // -----------------
     // LOCATIONS & RACKS
     // -----------------
 
-	this.selected_location = null;
 	this.location = {};
 	this.get_location = function() {
 		this.init();
@@ -591,202 +833,180 @@ function p_appl_dictionary() {
             click(function() { that.load_locations(); });
 		this.load_locations();
 	};
-	this.new_location = function() {
-		var input = $('#dictionary-locations').find('input[name="location2add"]');
-		var location_name = input.val();
-		if( this.location_is_not_known(location_name)) {
-			input.val('');
-			this.selected_location = location_name;
-			this.save_location(this.selected_location);
-		}
-	};
-	this.new_rack = function() {
-		var input = $('#dictionary-locations').find('input[name="rack2add"]');
-		var rack_name = input.val();
-		if( this.rack_is_not_known(this.selected_location, rack_name)) {
-			input.val('');
-			this.save_rack(this.selected_location, rack_name);
-		}
-	};
-	this.save_location = function(location_name) {
-		this.init();
-		if( location_name == '' ) return;
-		if( this.location_is_not_known(location_name)) {
-			this.locations()[location_name] = {id:0, created_time:'', created_uid:'', rack:{}};
-			if( this.selected_location == null ) {
-				this.selected_location = location_name;
-			}
-			var params = {location:location_name};
-			var jqXHR = $.get('../neocaptar/dict_location_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.locations()[location_name] = result.location[location_name];
-				that.display_locations();
-			},
-			'JSON').error(function () {
-				report_error('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.save_rack = function(location_name, rack_name) {
-		this.init();
-		if(( location_name == '' ) || ( rack_name == '' )) return;
-		if( this.rack_is_not_known(location_name, rack_name)) {
-			this.racks(location_name)[rack_name] = {id:0, created_time:'', created_uid:''};
-			if( this.selected_location == null ) {
-				this.selected_location = location_name;
-			}
-			var params = {location:location_name, rack:rack_name};
-			var jqXHR = $.get('../neocaptar/dict_location_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.locations()[location_name] = result.location[location_name];
-				that.display_locations();
-			},
-			'JSON').error(function () {
-				report_error('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.delete_location_element = function(element,id) {
-		this.init();
-		var params = {scope:element, id:id};
-		var jqXHR = $.get('../neocaptar/dict_location_delete.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.load_locations();
-		},
-		'JSON').error(function () {
-			report_error('deletion failed because of: '+jqXHR.statusText);
-		});
-	};
-	this.load_locations = function() {
-		var params = {};
-		var jqXHR = $.get('../neocaptar/dict_location_get.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.location = result.location;
-			if( that.location_is_not_known(that.selected_location)) {
-				that.selected_location = null;
-			}
-			that.display_locations();
-		},
-		'JSON').error(function () {
-			report_error('loading failed because of: '+jqXHR.statusText);
-		});
-	};
-    this.location2html = function(location_name,is_selected_location) {
-        var location = this.locations()[location_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-location-delete" name="'+location.id+'" title="delete this location from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_location?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_location('+"'"+location_name+"'"+')" >'+location_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+location.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+location.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-location-search" name="'+location.id+'" title="search all uses of this location">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-    this.rack2html = function(location_name,rack_name) {
-        var rack = this.racks(location_name)[rack_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-rack-delete" name="'+rack.id+'" title="delete this rack from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-nonselectable" >'+rack_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+rack.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+rack.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-rack-search" name="'+rack.id+'" title="search all uses of this rack">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-	this.display_locations = function() {
-		var html_locations =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >locations</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-        var html_racks =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >racks</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		for( var location_name in this.locations()) {
-			if( this.selected_location == null ) { this.selected_location = location_name; }
-			var is_selected_location = this.selected_location === location_name;
-			if( is_selected_location )
-				for( var rack_name in this.racks(location_name)) html_racks += this.rack2html(location_name,rack_name);
-			html_locations += this.location2html(location_name,is_selected_location);
-		}
-        html_locations +=
-'</tbody></table>';
-        html_racks +=
-'</tbody></table>';
-		$('#dictionary-locations-locations').html(html_locations);
-		$('#dictionary-locations-racks'    ).html(html_racks);
 
-		$('.dict-table-location-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var location_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the location entry and all information associated with it. Are you sure?',
-                    function() { that.delete_location_element('location',location_id); },
-                    null
-                );
-            });
-		$('.dict-table-location-search').
-            button().
-            click(function() {
-    			var location_id = this.name;
-                global_search_cables_by_dict_location_id(location_id);
-            });
-		$('.dict-table-rack-search').
-            button().
-            click(function() {
-    			var rack_id = this.name;
-                global_search_cables_by_dict_rack_id(rack_id);
-            });
-		$('.dict-table-rack-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var rack_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the rack entry and all information associated with it. Are you sure?',
-                    function() { that.delete_location_element('rack',rack_id); },
-                    null
-                );
-            });
-        if(this.can_manage()) {
-                                                     $('#dictionary-locations').find('input[name="location2add"]').removeAttr('disabled');
-    		if( this.selected_location     == null ) $('#dictionary-locations').find('input[name="rack2add"]'    ).attr      ('disabled','disabled');
-            else                                     $('#dictionary-locations').find('input[name="rack2add"]'    ).removeAttr('disabled');
+	this.new_location = function() {
+        var input = $('#dictionary-locations').find('input[name="location2add"]');
+        this.save_location(input.val());
+        input.val(''); };
+
+    this.new_rack = function() {
+        var input = $('#dictionary-locations').find('input[name="rack2add"]');
+        this.save_rack(this.table_locations.selected_object(), input.val());
+        input.val(''); };
+
+	this.save_location = function(location_name) {
+		if( location_name == '' ) return;
+        this.location_action('../neocaptar/dict_location_new.php', {location:location_name}); };
+
+	this.save_rack = function(location_name, rack_name) {
+		if(( location_name == '' ) || ( rack_name == '' )) return;
+        this.location_action('../neocaptar/dict_location_new.php', {location:location_name, rack:rack_name}); };
+
+	this.delete_location_element = function(element,id) {
+        this.location_action('../neocaptar/dict_location_delete.php', {scope:element, id:id}); };
+
+	this.load_locations = function() {
+        this.location_action('../neocaptar/dict_location_get.php', {}); };
+
+    this.location_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.location = result.location;
+            that.display_locations();
         }
+        this.web_service_GET(url, params, handle_data_and_display);
+    };
+
+    this.table_locations = null;
+    this.table_racks     = null;
+
+	this.display_locations = function() {
+
+        var elem = $('#dictionary-locations-locations');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-location-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the location?',
+                                    function() { that.delete_location_element('location',id); },
+                                    null
+                                ); }); }}},
+            {   name:       'location',
+                selectable: true,
+                type:       {
+                    select_action : function(location_name) {
+                        that.display_racks( location_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-location-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_location_id(id);
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        for( var location_name in this.locations()) {
+            var location = this.locations()[location_name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    location.id,
+                            classes: 'dict-table-location-delete',
+                            title:   'delete this location from the dictionary' }) : ' ',
+
+                    location_name,
+
+                    location.created_time,
+                    location.created_uid,
+
+                    Button_HTML('search', {
+                        name:    location.id,
+                        classes: 'dict-table-location-search',
+                        title:   'search all uses of this location' })
+                ]
+            );
+        }
+        this.table_locations = new Table('dictionary-locations-locations',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_locations.display();
+
+        this.display_racks( this.table_locations.selected_object());
+
+        if(this.can_manage())
+    		$('#dictionary-locations').find('input[name="location2add"]' ).removeAttr('disabled');
 	};
-	this.select_location = function(location) {
-		if( this.selected_location != location ) {
-			this.selected_location = location;
-			this.display_locations();
-		}
+
+	this.display_racks = function(location_name) {
+
+        var elem = $('#dictionary-locations-racks');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-rack-delete').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the rack?',
+                                    function() { that.delete_location_element('rack',id); },
+                                    null
+                                ); }); }}},
+            {   name:       'rack' },
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-rack-search').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                global_search_cables_by_dict_rack_id(id);
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        if( location_name != null ) {
+            for( var rack_name in this.racks(location_name)) {
+                var rack = this.racks(location_name)[rack_name];
+                rows.push(
+                    [   this.can_manage() ?
+                            Button_HTML('X', {
+                                name:    rack.id,
+                                classes: 'dict-table-rack-delete',
+                                title:   'delete this rack from the dictionary' }) : ' ',
+
+                        rack_name,
+
+                        rack.created_time,
+                        rack.created_uid,
+
+                        Button_HTML('search', {
+                            name:    rack.id,
+                            classes: 'dict-table-rack-search',
+                            title:   'search all uses of this rack' })
+                    ]
+                );
+            }
+        }
+        this.table_racks = new Table('dictionary-locations-racks', hdr, rows, {default_sort_column: 1});
+        this.table_racks.display();
+
+        if(this.can_manage()) {
+            var input = $('#dictionary-locations').find('input[name="rack2add"]');
+        	if( location_name == null ) input.attr('disabled','disabled');
+            else                        input.removeAttr('disabled');
+        }
 	};
 
     // --------
@@ -824,104 +1044,85 @@ function p_appl_dictionary() {
 	};
 	this.new_routing = function() {
 		var input = $('#dictionary-routings').find('input[name="routing2add"]');
-		var routing_name = input.val();
-		if( this.routing_is_not_known(routing_name)) {
-			input.val('');
-			this.save_routing(routing_name);
-		}
-	};
-	this.save_routing = function(routing_name) {
-		this.init();
-		if( routing_name == '' ) return;
-		if( this.routing_is_not_known(routing_name)) {
-			this.routings()[routing_name] = {id:0, created_time:'', created_uid:''};
-			var params = {routing:routing_name};
-			var jqXHR = $.get('../neocaptar/dict_routing_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.routings()[routing_name] = result.routing[routing_name];
-				that.display_routings();
-			},
-			'JSON').error(function () {
-				report_error('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
-	this.delete_routing_element = function(element,id) {
-		this.init();
-		var params = {scope:element, id:id};
-		var jqXHR = $.get('../neocaptar/dict_routing_delete.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.load_routings();
-		},
-		'JSON').error(function () {
-			report_error('deletion failed because of: '+jqXHR.statusText);
-		});
-	};
+		this.save_routing(input.val());
+		input.val(''); };
+
+	this.save_routing = function(name) {
+        if( name == '' ) return;
+        this.routing_action('../neocaptar/dict_routing_new.php', { name: name }); };
+
+	this.delete_routing = function(id) {
+        this.routing_action('../neocaptar/dict_routing_delete.php', { id: id }); };
+
 	this.load_routings = function() {
-		var params = {};
-		var jqXHR = $.get('../neocaptar/dict_routing_get.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.routing = result.routing;
-			that.display_routings();
-		},
-		'JSON').error(function () {
-			report_error('loading failed because of: '+jqXHR.statusText);
-		});
-	};
-    this.routing2html = function(routing_name) {
-        var routing = this.routings()[routing_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-routing-delete" name="'+routing.id+'" title="delete this routing from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable onclick="dict.select_routing('+"'"+routing_name+"'"+')">'+routing_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+routing.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+routing.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-routing-search" name="'+routing.id+'" title="search all uses of this routing">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-	this.display_routings = function() {
-        var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >routings</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		for( var routing_name in this.routings()) html += this.routing2html(routing_name);
-        html +=
-'</tbody></table>';
-		$('#dictionary-routings-routings').html(html);
-		$('.dict-table-routing-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var routing_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the routing entry and all information associated with it. Are you sure?',
-                    function() { that.delete_routing_element('routing',routing_id); },
-                    null
-                );
-            });
-		$('.dict-table-routing-search').
-            button().
-            click(function() {
-    			var routing_id = this.name;
-                global_search_cables_by_dict_routing_id(routing_id);
-            });
-        if(this.can_manage()) {
-            $('#dictionary-routings').find('input[name="routing2add"]').removeAttr('disabled');
+        this.routing_action('../neocaptar/dict_routing_get.php', {}); };
+
+    this.routing_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.routing = result.routing;
+            that.display_routings();
         }
+        this.web_service_GET(url, params, handle_data_and_display);
+    };
+
+	this.display_routings = function() {
+       var elem = $('#dictionary-routings-routings');
+        var hdr = [
+            {   name:   'DELETE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-routing-delete').
+                            button().
+                            click(function() {
+                                var routing_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the routing?',
+                                    function() { that.delete_routing(routing_id); },
+                                    null
+                                ); }); }}},
+            {   name:   'routings' },
+            {   name:   'created' },
+            {   name:   'by user' },
+            {   name:   'USAGE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-routing-search').
+                            button().
+                            click(function() {
+                                var routing_id = this.name;
+                                global_search_cables_by_dict_routing_id(routing_id);
+                            }); }}}
+        ];
+        var rows = [];
+		for( var name in this.routings()) {
+            var routing = this.routings()[name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    routing.id,
+                            classes: 'dict-table-routing-delete',
+                            title:   'delete this routing from the dictionary' }) : ' ',
+
+                    name,
+                    routing.created_time,
+                    routing.created_uid,
+
+                    Button_HTML('search', {
+                        name:    routing.id,
+                        classes: 'dict-table-routing-search',
+                        title:   'search all uses of this routing' })
+                ]
+            );
+        }
+        var table = new Table('dictionary-routings-routings', hdr, rows, {default_sort_column: 1});
+        table.display();
+
+        if(this.can_manage())
+            $('#dictionary-routings').find('input[name="routing2add"]').removeAttr('disabled');
 	};
 
 
@@ -929,8 +1130,6 @@ function p_appl_dictionary() {
     // DEVICE NAME: LOCATIONS, REGIONS, COMPONENTS
     // -------------------------------------------
 
-	this.selected_device_location = null;
-	this.selected_device_region = null;
 	this.device_location = {};
 	this.get_device_location = function() {
 		this.init();
@@ -997,338 +1196,274 @@ function p_appl_dictionary() {
 	};
 	this.new_device_location = function() {
 		var input = $('#dictionary-devices').find('input[name="device_location2add"]');
-		var location_name = input.val();
-		if( this.device_location_is_not_known(location_name)) {
-			input.val('');
-			this.selected_device_location = location_name;
-			this.selected_device_region = null;
-			this.save_device_location(this.selected_device_location);
-		}
+        var device_location =  input.val();
+        if( device_location == null ) return;
+		this.save_device_location(device_location);
+		input.val('');
 	};
 	this.new_device_region = function() {
 		var input = $('#dictionary-devices').find('input[name="device_region2add"]');
-		var region_name = input.val();
-		if( this.device_region_is_not_known(this.selected_device_location, region_name)) {
-			input.val('');
-			this.selected_device_region = region_name;
-			this.save_device_region(this.selected_device_location, this.selected_device_region);
-		}
+        var device_location =  this.table_device_locations.selected_object();
+        if( device_location == null ) return;
+        var device_region   =  input.val();
+        if( device_region   == '' ) return;
+        this.save_device_region(device_location, device_region);
+        input.val('');
 	};
 	this.new_device_component = function() {
 		var input = $('#dictionary-devices').find('input[name="device_component2add"]');
-		var component_name = input.val();
-		if( this.device_component_is_not_known(this.selected_device_location, this.selected_device_region, component_name)) {
-			input.val('');
-			this.save_device_component(this.selected_device_location, this.selected_device_region, component_name);
-		}
+        var device_location =  this.table_device_locations.selected_object();
+        if( device_location == null ) return;
+        var device_region   =  this.table_device_regions.selected_object();
+        if( device_region   == null ) return;
+		var component_name  =  input.val();
+        this.save_device_component(device_location, device_region, component_name);
+        input.val('');
 	};
 	this.save_device_location = function(location_name) {
-		this.init();
 		if( location_name == '' ) return;
-		if( this.device_location_is_not_known(location_name)) {
-			this.device_locations()[location_name] = {id:0, created_time:'', created_uid:'', device_region:{}};
-			if( this.selected_device_location == null ) {
-				this.selected_device_location = location_name;
-				this.selected_device_region = null;
-			}
-			var params = {location:location_name};
-			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.device_locations()[location_name] = result.location[location_name];
-				that.display_device_locations();
-			},
-			'JSON').error(function () {
-                report_error('failed to contact the Web service to save device location in a dictionary of device names');
-			});
-		}
-	};
+        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name}); };
+
 	this.save_device_region = function(location_name, region_name) {
-		this.init();
 		if(( location_name == '' ) || ( region_name == '' )) return;
-		if( this.device_region_is_not_known(location_name, region_name)) {
-			this.device_regions(location_name)[region_name] = {id:0, created_time:'', created_uid:'', device_component:{}};
-			if( this.selected_device_location == null ) {
-				this.selected_device_location = location_name;
-				this.selected_device_region = region_name;
-			} else {
-				if(( this.selected_device_location == location_name ) && ( this.selected_device_region == null ))  {
-					this.selected_device_region = region_name;
-				}
-			}
-			var params = {location:location_name, region:region_name};
-			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.device_locations()[location_name] = result.location[location_name];
-				that.display_device_locations();
-			},
-			'JSON').error(function () {
-                report_error('failed to contact the Web service to save device region in a dictionary of device names');
-			});
-		}
-	};
+        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name, region:region_name}); };
+
 	this.save_device_component = function(location_name, region_name, component_name) {
-		this.init();
 		if(( location_name == '' ) || ( region_name == '' ) || ( component_name == '' )) return;
-		if( this.device_component_is_not_known(location_name, region_name, component_name)) {
-			this.device_components(location_name, region_name)[component_name] = {id:0, created_time:'', created_uid:''};
-			if( this.selected_device_location == null ) {
-				this.selected_device_location = location_name;
-				this.selected_device_region = region_name;
-			} else {
-				if(( this.selected_device_location == location_name ) && ( this.selected_device_region == null ))  {
-					this.selected_device_region = region_name;
-				}
-			}
-			var params = {location:location_name, region:region_name, component:component_name};
-			var jqXHR = $.get('../neocaptar/dict_device_location_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.device_locations()[location_name] = result.location[location_name];
-				that.display_device_locations();
-			},
-			'JSON').error(function () {
-                report_error('failed to contact the Web service to save device region in a dictionary of device names');
-			});
-		}
-	};
+        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name, region:region_name, component:component_name}); };
+
 	this.delete_device_element = function(element,id) {
-		this.init();
-		var params = {scope:element, id:id};
-		var jqXHR = $.get('../neocaptar/dict_device_location_delete.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.load_device_locations();
-		},
-		'JSON').error(function () {
-			report_error('failed to contact the Web service to delete '+element+' from a dictionary of device names');
-		});
-	};
+        this.device_action('../neocaptar/dict_device_location_delete.php', {scope:element, id:id}); };
+
 	this.load_device_locations = function() {
-		var params = {};
-		var jqXHR = $.get('../neocaptar/dict_device_location_get.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.device_location = result.location;
-			if( that.device_location_is_not_known(that.selected_device_location)) {
-				that.selected_device_location = null;
-				that.selected_device_region   = null;
-			} else if( that.device_region_is_not_known(that.selected_device_location, that.selected_device_region)) {
-				that.selected_device_region = null;
-			}
-			that.display_device_locations();
-		},
-		'JSON').error(function () {
-			report_error('failed to contact the Web service to load a dictionary of device names');
-		});
-	};
-    this.device_location2html = function(location_name,is_selected_device_location) {
-        var device_location = this.device_locations()[location_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-device-location-delete" name="'+device_location.id+'" title="delete this device_location from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_device_location?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_device_location('+"'"+location_name+"'"+')" >'+location_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_location.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_location.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-device-location-search" name="'+device_location.id+'" title="search all uses of this device_location type">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-    this.device_region2html = function(location_name,region_name,is_selected_device_region) {
-        var device_region = this.device_regions(location_name)[region_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-device-region-delete" name="'+device_region.id+'" title="delete this device_region from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable '+(is_selected_device_region?'dict-table-entry-selectable-selected ':'')+'" onclick="dict.select_device_region('+"'"+region_name+"'"+')" >'+region_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_region.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_region.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-device-region-search" name="'+device_region.id+'" title="search all uses of this device_region type">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
-    this.device_component2url = function(device_location,device_region,component_name) {
-        if(this.device_component_is_not_known(device_location,device_region,component_name)) return component_name;
-        var device_component_documentation = this.device_components(device_location,device_region)[component_name].documentation;
-        var html = '<a href="'+device_component_documentation+'" target="_blank" title="click the link to get the external documentation">'+component_name+'</a>';
-        return html;
+        this.device_action('../neocaptar/dict_device_location_get.php', {}); };
+
+    this.device_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.device_location = result.location;
+            that.display_device_locations();
+        }
+        this.web_service_GET(url, params, handle_data_and_display);
     };
 
-    this.device_component2html = function(location_name,region_name,component_name) {
-        var device_component = this.device_components(location_name,region_name)[component_name];
-        var params = "'"+location_name+"','"+region_name+"','"+component_name+"'";
-        var html = 
-'<tr id="dict-device-component-url-'+device_component.id+'" >'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-device-component-delete" name="'+device_component.id+'" title="delete this device_component from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell ">'+component_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_component.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+device_component.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-device-component-search" name="'+device_component.id+'" title="search all uses of this device_component">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
-    };
+    this.table_device_locations  = null;
+    this.table_device_regions    = null;
+    this.table_device_components = null;
+
 	this.display_device_locations = function() {
-		var html_device_locations =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >device location</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		var html_device_regions = 
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >device region</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		var html_device_components = 
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >device component type</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >creator</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		for( var location_name in this.device_locations()) {
-			if( this.selected_device_location == null ) {
-				this.selected_device_location = location_name;
-				this.selected_device_region = null;
-			}
-			var is_selected_device_location = this.selected_device_location === location_name;
-			html_device_locations += this.device_location2html(location_name,is_selected_device_location);
-			if( is_selected_device_location ) {
-				for( var region_name in this.device_regions(location_name)) {
-					if( this.selected_device_region == null ) {
-						this.selected_device_region = region_name;
-					}
-					var is_selected_device_region = this.selected_device_region === region_name;
-					html_device_regions += this.device_region2html(location_name,region_name,is_selected_device_region);
-					if( is_selected_device_region ) {
-						for( var component_name in this.device_components(location_name, region_name)) {
-							html_device_components += this.device_component2html(location_name,region_name,component_name);
-						}
-					}
-				}
-			}
-		}
-        html_device_locations +=
-'</tbody></table>';
-        html_device_regions +=
-'</tbody></table>';
-        html_device_components +=
-'</tbody></table>';
-        $('#dictionary-devices-locations' ).html(html_device_locations);
-		$('#dictionary-devices-regions'   ).html(html_device_regions);
-		$('#dictionary-devices-components').html(html_device_components);
 
-		$('.dict-table-device-location-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-                var device_location_id = this.name;
-                ask_yes_no(
-                    'Data Deletion Warning',
-                    'You are about to delete the device_location type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_device_element('location',device_location_id); },
-                    null
+        var elem = $('#dictionary-devices-locations');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-location-delete').
+                            button().
+                            click(function() {
+                                var device_location_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the location?',
+                                    function() { that.delete_device_element('location',device_location_id); },
+                                    null
+                                ); }); }}},
+            {   name:       'device location',
+                selectable: true,
+                type:       {
+                    select_action : function(location_name) {
+                        that.display_device_regions( location_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-location-search').
+                            button().
+                            click(function() {
+                                var device_location_id = this.name;
+                                global_search_cables_by_dict_device_location_id(device_location_id);
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        for( var location_name in this.device_locations()) {
+            var device_location = this.device_locations()[location_name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    device_location.id,
+                            classes: 'dict-table-device-location-delete',
+                            title:   'delete this location from the dictionary' }) : ' ',
+
+                    location_name,
+
+                    device_location.created_time,
+                    device_location.created_uid,
+
+                    Button_HTML('search', {
+                        name:    device_location.id,
+                        classes: 'dict-table-device-location-search',
+                        title:   'search all uses of this location' })
+                ]
+            );
+        }
+        this.table_device_locations = new Table('dictionary-devices-locations',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_device_locations.display();
+
+        this.display_device_regions( this.table_device_locations.selected_object());
+
+        if(this.can_manage())
+    		$('#dictionary-devices').find('input[name="device_location2add"]' ).removeAttr('disabled');
+	};
+
+	this.display_device_regions = function(location_name) {
+
+        var elem = $('#dictionary-devices-regions');
+
+        var hdr = [
+            {   name:       'DELETE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-region-delete').
+                            button().
+                            click(function() {
+                                var device_region_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the region?',
+                                    function() { that.delete_device_element('region',device_region_id); },
+                                    null
+                                ); }); }}},
+            {   name:       'device region',
+                selectable: true,
+                type:       {
+                    select_action : function(region_name) {
+                        that.display_device_components( location_name, region_name ); }}},
+            {   name:       'created' },
+            {   name:       'by user' },
+            {   name:       'USAGE',
+                sorted:     false,
+                type:       {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-region-search').
+                            button().
+                            click(function() {
+                                var device_region_id = this.name;
+                                global_search_cables_by_dict_device_region_id(device_region_id);
+                            }); }}}
+        ];
+
+        var rows = [];
+
+        if( location_name != null ) {
+            for( var region_name in this.device_regions(location_name)) {
+                var device_region = this.device_regions(location_name)[region_name];
+                rows.push(
+                    [   this.can_manage() ?
+                            Button_HTML('X', {
+                                name:    device_region.id,
+                                classes: 'dict-table-device-region-delete',
+                                title:   'delete this region from the dictionary' }) : ' ',
+
+                        region_name,
+
+                        device_region.created_time,
+                        device_region.created_uid,
+
+                        Button_HTML('search', {
+                            name:    device_region.id,
+                            classes: 'dict-table-device-region-search',
+                            title:   'search all uses of this region' })
+                    ]
                 );
-            });
-		$('.dict-table-device-location-search').
-            button().
-            click(function() {
-    			var device_location_id = this.name;
-                global_search_cables_by_dict_device_location_id(device_location_id);
-            });
-		$('.dict-table-device-region-search').
-            button().
-            click(function() {
-    			var device_region_id = this.name;
-                global_search_cables_by_dict_device_region_id(device_region_id);
-            });
-		$('.dict-table-device-component-search').
-            button().
-            click(function() {
-    			var device_component_id = this.name;
-                global_search_cables_by_dict_device_component_id(device_component_id);
-            });
-		$('.dict-table-device-region-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var device_region_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the device_region type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_device_element('region',device_region_id); },
-                    null
-                );
-            });
-		$('.dict-table-device-component-delete').
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var device_component_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the device_component type entry and all information associated with it. Are you sure?',
-                    function() { that.delete_device_element('component',device_component_id); },
-                    null
-                );
-    		});
-		$('.dict-table-device-component-edit').
-            button().
-            button(this.can_manage()?'enable':'disable');
-		$('.dict-table-device-component-save').
-            button().
-            button('disable');
-		$('.dict-table-device-component-cancel').
-            button().
-            button('disable');
+            }
+        }
+        this.table_device_regions = new Table('dictionary-devices-regions', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_device_regions.display();
+
+        this.display_device_components(location_name, this.table_device_regions.selected_object());
+
         if(this.can_manage()) {
-    		                                            $('#dictionary-devices').find('input[name="device_location2add"]' ).removeAttr('disabled');
-        	if( this.selected_device_location == null ) $('#dictionary-devices').find('input[name="device_region2add"]'   ).attr      ('disabled','disabled');
-            else                                        $('#dictionary-devices').find('input[name="device_region2add"]'   ).removeAttr('disabled');
-            if( this.selected_device_region   == null ) $('#dictionary-devices').find('input[name="device_component2add"]').attr      ('disabled','disabled');
-            else                                        $('#dictionary-devices').find('input[name="device_component2add"]').removeAttr('disabled');
+            var input = $('#dictionary-devices').find('input[name="device_region2add"]');
+        	if( location_name == null ) input.attr('disabled','disabled');
+            else                        input.removeAttr('disabled');
         }
 	};
-	this.select_device_location = function(device_location) {
-		if( this.selected_device_location != device_location ) {
-			this.selected_device_location = device_location;
-			this.selected_device_region   = null;
-			this.display_device_locations();
-		}
-	};
-	this.select_device_region = function(device_region) {
-		if( this.selected_device_region != device_region ) {
-			this.selected_device_region = device_region;
-			this.display_device_locations();
-		}
-	};
 
+	this.display_device_components = function(location_name, region_name) {
 
+        var elem = $('#dictionary-devices-components');
 
+        var hdr = [
+            {   name:   'DELETE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-component-delete').
+                            button().
+                            click(function() {
+                                var device_component_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the component?',
+                                    function() { that.delete_device_element('component',device_component_id); },
+                                    null
+                                ); }); }}},
+            {   name:   'device component' },
+            {   name:   'created' },
+            {   name:   'by user' },
+            {   name:   'USAGE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-device-component-search').
+                            button().
+                            click(function() {
+                                var device_component_id = this.name;
+                                global_search_cables_by_dict_device_component_id(device_component_id);
+                            }); }}}
+        ];
 
+        var rows = [];
 
+        if(( location_name != null ) && ( region_name != null )) {
+            for( var component_name in this.device_components(location_name, region_name)) {
+                var device_component = this.device_components(location_name, region_name)[component_name];
+                rows.push(
+                    [   this.can_manage() ?
+                            Button_HTML('X', {
+                                name:    device_component.id,
+                                classes: 'dict-table-device-component-delete',
+                                title:   'delete this component from the dictionary' }) : ' ',
 
+                        component_name,
+
+                        device_component.created_time,
+                        device_component.created_uid,
+
+                        Button_HTML('search', {
+                            name:    device_component.id,
+                            classes: 'dict-table-device-component-search',
+                            title:   'search all uses of this component' })
+                    ]
+                );
+            }
+        }
+        this.table_device_components = new Table('dictionary-devices-components', hdr, rows, {default_sort_column: 1});
+        this.table_device_components.display();
+
+        if(this.can_manage()) {
+            var input = $('#dictionary-devices').find('input[name="device_component2add"]');
+            if(( location_name == null ) || ( region_name == null )) input.attr('disabled','disabled');
+            else                                                     input.removeAttr('disabled');
+        }
+    };
 
     // ------------
     // INSTRUCTIONS
@@ -1364,110 +1499,90 @@ function p_appl_dictionary() {
 		this.load_instrs();
 	};
 	this.new_instr = function() {
-		var input = $('#dictionary-instrs').find('input[name="instr2add"]');
-		var instr_name = input.val();
-		if( this.instr_is_not_known(instr_name)) {
-			input.val('');
-			this.save_instr(instr_name);
-		}
+        var input = $('#dictionary-instrs').find('input[name="instr2add"]');
+        this.save_instr(input.val());
+        input.val('');
 	};
 	this.save_instr = function(instr_name) {
-		this.init();
 		if( instr_name == '' ) return;
-		if( this.instr_is_not_known(instr_name)) {
-			this.instrs()[instr_name] = {id:0, created_time:'', created_uid:''};
-			var params = {instr:instr_name};
-			var jqXHR = $.get('../neocaptar/dict_instr_new.php',params,function(data) {
-				var result = eval(data);
-				if(result.status != 'success') { report_error(result.message, null); return; }
-				that.instrs()[instr_name] = result.instr[instr_name];
-				that.display_instrs();
-			},
-			'JSON').error(function () {
-				report_error('saving failed because of: '+jqXHR.statusText);
-			});
-		}
-	};
+        this.instr_action('../neocaptar/dict_instr_new.php',{instr:instr_name}); };
+
 	this.delete_instr_element = function(element,id) {
-		this.init();
-		var params = {scope:element, id:id};
-		var jqXHR = $.get('../neocaptar/dict_instr_delete.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.load_instrs();
-		},
-		'JSON').error(function () {
-			report_error('deletion failed because of: '+jqXHR.statusText);
-		});
-	};
+        this.instr_action('../neocaptar/dict_instr_delete.php',{scope:element, id:id}); };
+
 	this.load_instrs = function() {
-		var params = {};
-		var jqXHR = $.get('../neocaptar/dict_instr_get.php',params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
-			that.instr = result.instr;
-			that.display_instrs();
-		},
-		'JSON').error(function () {
-			report_error('loading failed because of: '+jqXHR.statusText);
-		});
-	};
-    this.instr2html = function(instr_name) {
-        var instr = this.instrs()[instr_name];
-        var html =
-'<tr>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_left " >'+
-'    <button class="dict-table-instr-delete" name="'+instr.id+'" title="delete this instr from the dictionary">X</button>'+
-'  </td>'+
-'  <td nowrap="nowrap" class="table_cell dict-table-entry-selectable onclick="dict.select_instr('+"'"+instr_name+"'"+')">'+instr_name+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+instr.created_time+'</td>'+
-'  <td nowrap="nowrap" class="table_cell " >'+instr.created_uid+'</td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_right " >'+
-'    <button class="dict-table-instr-search" name="'+instr.id+'" title="search all uses of this instr">search</button>'+
-'  </td>'+
-'</tr>';
-        return html;
+        this.instr_action('../neocaptar/dict_instr_get.php',{}); };
+
+    this.instr_action = function(url, params, data_handler) {
+        function handle_data_and_display(result) {
+            if(data_handler) data_handler(result);
+            else             that.instr = result.instr;
+            that.display_instrs();
+        }
+        this.web_service_GET(url, params, handle_data_and_display);
     };
 	this.display_instrs = function() {
-        var html =
-'<table><tbody>'+
-'  <tr>'+
-'    <td nowrap="nowrap" class="table_hdr " ></td>'+
-'    <td nowrap="nowrap" class="table_hdr " >instruction</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >added</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >by</td>'+
-'    <td nowrap="nowrap" class="table_hdr " >usage</td>'+
-'  </tr>';
-		for(var instr_name in this.instrs()) html += this.instr2html(instr_name);
-        html +=
-'</tbody></table>';
-		$('#dictionary-instrs-instrs').html(html);
-		$('.dict-table-instr-delete' ).
-            button().
-            button(this.can_manage()?'enable':'disable').
-            click(function() {
-    			var instr_id = this.name;
-        		ask_yes_no(
-            		'Data Deletion Warning',
-                	'You are about to delete the instr entry and all information associated with it. Are you sure?',
-                    function() { that.delete_instr_element('instr',instr_id); },
-                    null
-                );
-		});
-		$('.dict-table-instr-search').
-            button().
-            click(function() {
-    			var instr_id = this.name;
-                global_search_cables_by_dict_instr_id(instr_id);
-            });
-        if(this.can_manage()) {
-            $('#dictionary-instrs').find('input[name="instr2add"]').removeAttr('disabled');
+        var elem = $('#dictionary-instrs-instrs');
+        var hdr = [
+            {   name:   'DELETE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-instr-delete').
+                            button().
+                            click(function() {
+                                var instr_id = this.name;
+                                ask_yes_no(
+                                    'Data Deletion Warning',
+                                    'Are you sure you want to delete the instruction?',
+                                    function() { that.delete_instr_element('instr',instr_id); },
+                                    null
+                                ); }); }}},
+            {   name:   'instructions' },
+            {   name:   'created' },
+            {   name:   'by user' },
+            {   name:   'USAGE',
+                sorted: false,
+                type:   {
+                    after_sort: function() {
+                        elem.find('.dict-table-instr-search').
+                            button().
+                            click(function() {
+                                var instr_id = this.name;
+                                global_search_cables_by_dict_instr_id(instr_id);
+                            }); }}}
+        ];
+        var rows = [];
+		for( var name in this.instrs()) {
+            var instr = this.instrs()[name];
+            rows.push(
+                [   this.can_manage() ?
+                        Button_HTML('X', {
+                            name:    instr.id,
+                            classes: 'dict-table-instr-delete',
+                            title:   'delete this instruction from the dictionary' }) : ' ',
+
+                    name,
+                    instr.created_time,
+                    instr.created_uid,
+
+                    Button_HTML('search', {
+                        name:    instr.id,
+                        classes: 'dict-table-instr-search',
+                        title:   'search all uses of this instructions' })
+                ]
+            );
         }
+        var table = new Table('dictionary-instrs-instrs', hdr, rows, {default_sort_column: 1});
+        table.display();
+
+        if(this.can_manage())
+            $('#dictionary-instrs').find('input[name="instr2add"]').removeAttr('disabled');
 	};
-
-
-
 
 	return this;
 }
 var dict = new p_appl_dictionary();
+
+
+

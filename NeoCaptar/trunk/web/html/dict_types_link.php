@@ -1,8 +1,9 @@
 <?php
 
 /**
- * This service will delete the specified item instr from the dictionary
- * and return an empty dictionary.
+ * This service will establish an association (if none exists yet) between the specified
+ * cable and a connector and return an updated dictionary of all known cable and
+ * connector types.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
@@ -24,27 +25,26 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
 
-    $scope = NeoCaptarUtils::get_param_GET('scope');
-    $id    = NeoCaptarUtils::get_param_GET('id');
+    $cable_id     = NeoCaptarUtils::get_param_GET('cable_id');
+    $connector_id = NeoCaptarUtils::get_param_GET('connector_id');
 
-    if( $scope != 'instr' )
-        NeoCaptarUtils::report_error(($scope==''?'empty':'illegal').' value of the scope parameter found in the request');
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $neocaptar = NeoCaptar::instance();
+    $neocaptar->begin();
 
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
+    $cable     = $neocaptar->find_dict_cable_by_id( $cable_id );
+    $connector = $neocaptar->find_dict_cable_by_id( $connector_id );
+    if( !is_null( $cable) && !is_null($connector))
+        $cable->link( $connector->id());
 
-	$neocaptar->delete_dict_instr_by_id( $id );
+    $types = NeoCaptarUtils::dict_types2array($neocaptar);
 
-	$instrs = NeoCaptarUtils::dict_instrs2array($neocaptar);
-
+    $authdb->commit();
     $neocaptar->commit();
 
-	$authdb->commit();
-
-    NeoCaptarUtils::report_success( array( 'instr' => $instrs ));
+    NeoCaptarUtils::report_success( array( 'type' => $types ));
 
 } catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
