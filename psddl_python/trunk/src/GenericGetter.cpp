@@ -61,7 +61,7 @@ namespace Psana {
     if (typeId != -1) {
       pythonTypeIdMap[typeId] = typeName;
       const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
-      printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
+      //printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
     }
 
     if (version > 0) {
@@ -77,7 +77,6 @@ namespace Psana {
   }
 
   object GenericGetter::get(int typeId, GetMethod* getMethod) {
-    printf("!!! getGetterByTypeId(%d)...\n", typeId);
     if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
       printTables();
       printf("GenericGetter::get(%d): not found\n", typeId);
@@ -93,9 +92,7 @@ namespace Psana {
       printf("!!! could NOT find type name for %d\n", typeId);
       return "";
     } else {
-      string typeName = pythonTypeIdMap[typeId];
-      printf("!!! found type name %s for %d\n", typeName.c_str(), typeId);
-      return typeName;
+      return pythonTypeIdMap[typeId];
     }
   }
 
@@ -114,11 +111,11 @@ namespace Psana {
     if (maxVersion == 0) {
       // This is not a versioned type name.
       // First, try typeName as a C++ type.
-      printf("Looking for class '%s'.\n", typeName.c_str());
+      //printf("Looking for class '%s'.\n", typeName.c_str());
       if (typeNameMap.find(typeName) != typeNameMap.end()) {
         GenericGetter* getter = typeNameMap[typeName];
         assert(getter != NULL);
-        printf("Found class '%s': %p\n", typeName.c_str(), getter);
+        //printf("Found class '%s': %p\n", typeName.c_str(), getter);
         return getMethod->get(getter);
       }
       // No getter could be found.
