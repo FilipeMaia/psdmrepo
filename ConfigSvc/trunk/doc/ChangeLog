@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: ?
+2012-06-08 Joseph Barrera
+- Allow options to have empty string as value, e.g. {inputdark =} and {outputfile =}
+
 Tag: V00-00-08
 2012-04-18 Andy Salnikov
 - adding docstrings to all Python classes/methods
