@@ -228,9 +228,6 @@ ConfigSvcImplFile::readStream(istream& in, const string& name)
       throw ExceptionSyntax(name, nlines, "option name is missing");
     }
     string optval(trim(line.substr(eqpos + 1).c_str()));
-    if (optval == "") {
-      throw ExceptionSyntax(name, nlines, "option value is missing");
-    }
 
     // set the option
     m_config[section][optname] = boost::shared_ptr<string>(new string(optval));
