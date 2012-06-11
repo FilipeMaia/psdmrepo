@@ -30,7 +30,7 @@ classes() {
 
 # print the list of functions in given package
 functions() {
-    python -c "import $1 as m; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type(len) and v.__module__ == m.__name__]);" |\
+    python -c "import $1 as m; print ' '.join([k for k, v in m.__dict__.items() if type(v) in [type(len), type(lambda x:x)] and v.__module__ == m.__name__]);" |\
         tr ' ' '\n' | grep -v '^_' | sort
 }
 
