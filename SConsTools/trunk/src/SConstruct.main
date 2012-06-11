@@ -180,6 +180,15 @@ pkg_list = env.PackageList(['SConsTools.pkg_list'], [])
 env.AlwaysBuild(pkg_list)
 #env.Alias('SConsTools.pkg_list', pkg_list)
 
+env.Command(['package-dependencies'], [], PrintDependencies([env['PKG_TREE_BASE'], env['PKG_TREE']]))
+env.Command(['package-dependencies-reverse'], [], PrintDependencies([env['PKG_TREE_BASE'], env['PKG_TREE']], True))
+env.Command(['package-dependencies-base'], [], PrintDependencies([env['PKG_TREE_BASE']]))
+env.Command(['package-dependencies-local'], [], PrintDependencies([env['PKG_TREE']]))
+env.AlwaysBuild('package-dependencies')
+env.AlwaysBuild('package-dependencies-base')
+env.AlwaysBuild('package-dependencies-local')
+env.AlwaysBuild('package-dependencies-reverse')
+
 #
 # Additional targets for documentation generation
 #

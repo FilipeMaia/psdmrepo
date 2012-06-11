@@ -292,3 +292,29 @@ def adjustPkgDeps():
             # 
             if bin.env['LIBS'] : 
                 bin.implicit = None
+
+
+class PrintDependencies(object):
+    
+    def __init__(self, trees, reverse=False):
+        """Constructor takes the list of trees"""
+        self.tree = {}
+        for tree in trees:
+            self.tree.update(tree)
+        self.reverse = reverse
+    
+    def __call__(self, *args, **kw):
+
+        deptree = {}
+        if self.reverse:
+            for pkg in self.tree.keys():
+                for dep in self.tree[pkg].get('DEPS', []):
+                    deptree.setdefault(dep, []).append(pkg)
+        else:
+            for pkg in self.tree.keys():
+                deps = self.tree[pkg].get('DEPS', [])
+                deptree[pkg] = deps
+                
+        for pkg in sorted(deptree.keys()):
+            deps = sorted(deptree[pkg])
+            print pkg, "->", ' '.join(deps)

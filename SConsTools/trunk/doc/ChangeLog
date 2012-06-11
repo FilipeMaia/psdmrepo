@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-03
+2012-06-11 Andy Salnikov
+- added targets:
+		  package-dependencies
+		  package-dependencies-base
+		  package-dependencies-local
+		  package-dependencies-reverse  
+  which print package dependencies
+
 Tag: V00-06-02
 2012-06-04 Andy Salnikov
 - undo part of V00-05-00 commit, python modules are copied to
