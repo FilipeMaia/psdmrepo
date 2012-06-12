@@ -128,7 +128,7 @@ class pyana_epics (object) :
         self.epics_data = {}
         for pv_name in self.pv_names :
 
-            if self.compat.psana:
+            if self.psana:
                 pv = env.epicsStore().value( pv_name, 0 )
             else:
                 pv = env.epicsStore().value( pv_name )
