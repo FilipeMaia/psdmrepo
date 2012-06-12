@@ -134,8 +134,11 @@ class DdlPythonInterfaces ( object ) :
                 print >>self.inc, "#include <%s> // other included packages" % header
 
         if self.top_pkg : 
-            print >>self.inc, T("namespace $top_pkg {")[self]
             print >>self.cpp, T("namespace $top_pkg {")[self]
+            print >>self.inc, T("namespace $top_pkg {")[self]
+            print >>self.inc, "  using boost::python::api::object;"
+            print >>self.inc, "  using boost::shared_ptr;"
+            print >>self.inc, "  using std::vector;"
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -249,22 +252,22 @@ class DdlPythonInterfaces ( object ) :
                 print >> self.inc, T('      return ${type_name}::Version;')(locals())
                 print >> self.inc, '    }'
             if getter_class == "Psana::EvtGetter":
-                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(key, foundSrc)));')(locals())
+                print >> self.inc, T('    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
+                print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(key, foundSrc);')(locals())
+                print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
                 print >> self.inc, '    }'
-                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(src, key, foundSrc)));')(locals())
+                print >> self.inc, T('    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
+                print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(src, key, foundSrc);')(locals())
+                print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
                 print >> self.inc, '    }'
-                print >> self.inc, '    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {'
-                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(evt.get(source, key, foundSrc)));')(locals())
+                print >> self.inc, T('    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
+                print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(source, key, foundSrc);')(locals())
+                print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
                 print >> self.inc, '    }'
             elif getter_class == "Psana::EnvGetter":
-                print >> self.inc, '    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {'
-                print >> self.inc, T('      boost::shared_ptr<${type_name}> result = store.get(src, 0);')(locals())
-                print >> self.inc, '      if (! result.get()) {'
-                print >> self.inc, '        return boost::python::api::object();'
-                print >> self.inc, '      }'
-                print >> self.inc, T('      return boost::python::api::object(${type_name}_Wrapper(result));')(locals())
+                print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {')(locals())
+                print >> self.inc, T('      boost::shared_ptr<$type_name> result = store.get(src, 0);')(locals())
+                print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
                 print >> self.inc, '    }'
             print >> self.inc, '  };'
 

@@ -140,7 +140,7 @@ class PythonCodegen ( object ) :
 
         if self._pywrapper:
             # shared_ptr and C++ pointer to wrapped object
-            print >>self._inc, T("  boost::shared_ptr<$wrapped> _o;")(wrapped = wrapped)
+            print >>self._inc, T("  shared_ptr<$wrapped> _o;")(wrapped = wrapped)
             print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
 
         # enums for version and typeId
@@ -166,12 +166,12 @@ class PythonCodegen ( object ) :
         if self._pywrapper:
             # constructor
             access = self._access("public", access)
-            #print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
+            #print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
             #print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
             #print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
 
 
-            print >>self._inc, T("  $name(boost::shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
+            print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
             print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
             print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
 
@@ -498,8 +498,8 @@ class PythonCodegen ( object ) :
                 ndim = int(ctype_ndim[index + 2:])
                 if ndim == 1 or "::" in ctype:
                     if ndim > 1:
-                        print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional std::vector<%s> instead" % (ctype, ndim, ctype)
-                    print >>self._inc, T("  std::vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
+                        print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional vector<%s> instead" % (ctype, ndim, ctype)
+                    print >>self._inc, T("  vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
                 else:
                     print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
             elif "&" in rettype and "::" in rettype:
@@ -688,7 +688,7 @@ class PythonCodegen ( object ) :
 
         shape = [str(s or -1) for s in attr.shape.dims]
 
-        body = "std::vector<int> shape;" 
+        body = "vector<int> shape;" 
         body += T("\n  shape.reserve($size);")(size=len(shape))
         for s in shape:
             body += T("\n  shape.push_back($dim);")(dim=s)
@@ -705,7 +705,7 @@ class PythonCodegen ( object ) :
             cargs = []
             if cfg: cargs = [('cfg', cfg)]
 
-            self._genMethodBody(attr.shape_method, "std::vector<int>", body, cargs, inline=False, doc=doc)
+            self._genMethodBody(attr.shape_method, "vector<int>", body, cargs, inline=False, doc=doc)
 
 
 
