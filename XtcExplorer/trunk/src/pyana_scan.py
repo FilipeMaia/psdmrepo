@@ -40,6 +40,7 @@ import matplotlib.pyplot as plt
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
+from utilities import PyanaCompat
 from utilities import ScanData
 
 
@@ -90,6 +91,7 @@ class pyana_scan (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
+        self.psana = PyanaCompat(env).psana
         """This method is called at an xtc Configure transition
         Assume only one Configure per job.
         Typically you should process only one run per job. 
@@ -141,12 +143,18 @@ class pyana_scan (object) :
         print "Begin calibcycle ", self.n_ccls
 
         # control.ConfigV1 element
-        ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        if self.psana:
+            ctrl_config = env.get("Psana::ControlData::ConfigV1");
+        else:
+            ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
 
         nControls = ctrl_config.npvControls()
         for ic in range (0, nControls ):
             #
-            cpv = ctrl_config.pvControl(ic)
+            if self.psana:
+                cpv = ctrl_config.pvControls()[ic]
+            else:
+                cpv = ctrl_config.pvControl(ic)
             name = cpv.name()
             value = cpv.value()
             
@@ -177,11 +185,17 @@ class pyana_scan (object) :
                 self.evts_scalars[epv_name] = []
 
             # store the value
-            epv = env.epicsStore().value(epv_name)
+            if self.psana:
+                epv = env.epicsStore().value(epv_name, 0)
+            else:
+                epv = env.epicsStore().value(epv_name)
             if not epv:
                 logging.warning('EPICS PV %s does not exist', epv_name)
             else :
-                self.evts_scalars[epv_name].append(epv.value)
+                if self.psana:
+                    self.evts_scalars[epv_name].append(epv.doubleValue())
+                else:
+                    self.evts_scalars[epv_name].append(epv.value)
 
         # Other scalars in the event
         for scalar in self.input_scalars :
