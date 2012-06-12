@@ -255,7 +255,8 @@ class  pyana_image ( object ) :
 
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
-            frame = evt.get( self.datatypes[device], addr )
+            address = addr.split('|')[0]
+            frame = evt.get( self.datatypes[device], address )
             if frame is None:
                 print "No frame from ", addr
                 return
