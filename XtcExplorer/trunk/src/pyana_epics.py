@@ -41,6 +41,7 @@ from pypdsdata import xtc
 from pypdsdata import epics
 
 from utilities import PyanaOptions
+from utilities import PyanaCompat
 from utilities import EpicsData
 
 
@@ -111,6 +112,7 @@ class pyana_epics (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
+        self.psana = PyanaCompat(env).psana
         """
         @param evt    event data object
         @param env    environment object
@@ -126,7 +128,10 @@ class pyana_epics (object) :
         self.epics_data = {}
         for pv_name in self.pv_names :
 
-            pv = env.epicsStore().value( pv_name )
+            if self.compat.psana:
+                pv = env.epicsStore().value( pv_name, 0 )
+            else:
+                pv = env.epicsStore().value( pv_name )
             if not pv:
                 logging.warning('EPICS PV %s does not exist', pv_name)
             else :
