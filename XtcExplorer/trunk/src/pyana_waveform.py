@@ -39,6 +39,7 @@ import numpy as np
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
+from utilities import PyanaCompat
 from utilities import WaveformData
 
 
@@ -114,6 +115,9 @@ class pyana_waveform (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
+        #logging.getLogger().setLevel(logging.DEBUG)
+        self.psana = PyanaCompat(env).psana
+
         """This method is called once at the beginning of the job.
         It will also be called in any Xtc Configure transition, if 
         configurations have changed since last it was run.
@@ -133,7 +137,13 @@ class pyana_waveform (object) :
 
         self.data = {}
         for source in self.sources:
-            cfg = env.getAcqConfig(source)
+            if self.psana:
+                detsrc = source.split('|')[0].split('-')[0]
+                if detsrc == "AmoGasdet":
+                    detsrc = "AmoGD"
+                cfg = env.configStore().get("Psana::Acqiris::ConfigV1", env.Source(detsrc))
+            else:
+                cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
 
             nch = cfg.nbrChannels() 
             nsmp = cfg.horiz().nbrSamples()
@@ -197,18 +207,44 @@ class pyana_waveform (object) :
 
         for label in self.src_ch :
 
+            # label is e.g. 'AmoGasdet-0|Acqiris-0 Ch0' or 'Camp-0|Acqiris-0 Ch19'
             parts = label.split(' Ch')
-            source = parts[0]
-            channel = int(parts[1])
-            
-            acqData = evt.getAcqValue( source, channel, env)
-            if acqData :
+            source = parts[0]       # e.g. 'AmoGasdet-0|Acqiris-0' or 'Camp-0|Acqiris-0'
+            channel = int(parts[1]) # e.g. 0 or 19
 
+            if self.psana:
+                detsrc = source.split('|')[0].split('-')[0]
+                if detsrc == "AmoGasdet":
+                    detsrc = "AmoGD"
+                acqData = evt.get("Psana::Acqiris::DataDesc", env.Source(detsrc)) # PSana::Acqiris::DataDescV1_Wrapper
+            else:
+                acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
+
+            if acqData :
                 if self.ts[label] is None:
-                    self.ts[label] = acqData.timestamps() * 1.0e9 # nano-seconds
+                    if self.psana:
+                        elem = acqData.data(channel) # this is a DataDescElem
+                        print "*** elem.nbrSamplesInSeg()=", elem.nbrSamplesInSeg() # e.g. 1000
+                        print "*** elem.indexFirstPoint()=", elem.indexFirstPoint() # e.g. 0
+                        print "*** elem.nbrSegments()=", elem.nbrSegments()         # e.g. 1
+                        timestamp = elem.timestamp() # this is an ndarray with only one element per segment
+                        print "*** elem.timestamp=", timestamp
+                        print "*** len(elem.timestamp)=", len(timestamp)
+                        print "*** elem.nbrSegments()=", elem.nbrSegments()
+                        timestamps = [ timestamp[i].pos() * 1.0e9 for i in range(elem.nbrSegments()) ]  # nano-seconds
+                        self.ts[label] = timestamps
+                        print "self.ts[", label, "] = ", self.ts[label]
+                    else:
+                        print type(acqData) # pypdsdata.acqiris.DataDescV1
+                        print type(acqData.timestamps())
+                        self.ts[label] = acqData.timestamps() * 1.0e9 # nano-seconds
 
                 # a waveform
-                awf = acqData.waveform() 
+                if self.psana:
+                    elem = acqData.data(channel) # this is a DataDescElem
+                    awf = elem.waveforms()[0]
+                else:
+                    awf = acqData.waveform()
                 
                 self.ctr[label]+=1
                 
