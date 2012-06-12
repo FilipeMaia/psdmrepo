@@ -86,11 +86,17 @@ def main( argv ) :
         runnr = argv.pop(index)
         runnr = argv.pop(index)       	
 
+    psana = False
+    if '--psana' in argv :
+	index = argv.index('--psana')
+	psana = True
+	argv.pop(index)
+
     # optional argument(s): input xtc-file(s)
     files = argv[1:]
 
     app = QtGui.QApplication(sys.argv)
-    explorer = XtcExplorerMain(instrument,experiment,runnr)
+    explorer = XtcExplorerMain(psana,instrument,experiment,runnr)
 
     for file in files :
 	explorer.add_file(file)
