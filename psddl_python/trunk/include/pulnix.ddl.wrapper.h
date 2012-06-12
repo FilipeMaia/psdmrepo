@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Pulnix {
 
 extern void createWrappers();
@@ -20,7 +23,7 @@ extern void createWrappers();
 
 
 class TM6740ConfigV1_Wrapper {
-  boost::shared_ptr<TM6740ConfigV1> _o;
+  shared_ptr<TM6740ConfigV1> _o;
   TM6740ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -40,7 +43,7 @@ public:
     Gamma,
     Linear,
   };
-  TM6740ConfigV1_Wrapper(boost::shared_ptr<TM6740ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  TM6740ConfigV1_Wrapper(shared_ptr<TM6740ConfigV1> obj) : _o(obj), o(_o.get()) {}
   TM6740ConfigV1_Wrapper(TM6740ConfigV1* obj) : o(obj) {}
   uint16_t gain_a() const { return o->gain_a(); }
   uint16_t gain_b() const { return o->gain_b(); }
@@ -61,7 +64,7 @@ public:
 
 
 class TM6740ConfigV2_Wrapper {
-  boost::shared_ptr<TM6740ConfigV2> _o;
+  shared_ptr<TM6740ConfigV2> _o;
   TM6740ConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -81,7 +84,7 @@ public:
     Gamma,
     Linear,
   };
-  TM6740ConfigV2_Wrapper(boost::shared_ptr<TM6740ConfigV2> obj) : _o(obj), o(_o.get()) {}
+  TM6740ConfigV2_Wrapper(shared_ptr<TM6740ConfigV2> obj) : _o(obj), o(_o.get()) {}
   TM6740ConfigV2_Wrapper(TM6740ConfigV2* obj) : o(obj) {}
   uint16_t gain_a() const { return o->gain_a(); }
   uint16_t gain_b() const { return o->gain_b(); }
@@ -109,12 +112,9 @@ public:
     int getVersion() {
       return TM6740ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<TM6740ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(TM6740ConfigV1_Wrapper(result));
+      return result.get() ? object(TM6740ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -132,12 +132,9 @@ public:
     int getVersion() {
       return TM6740ConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<TM6740ConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(TM6740ConfigV2_Wrapper(result));
+      return result.get() ? object(TM6740ConfigV2_Wrapper(result)) : object();
     }
   };
 } // namespace Pulnix

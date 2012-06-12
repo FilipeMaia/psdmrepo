@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Lusi {
 
 extern void createWrappers();
@@ -21,16 +24,16 @@ extern void createWrappers();
 #pragma pack(push,4)
 
 class DiodeFexConfigV1_Wrapper {
-  boost::shared_ptr<DiodeFexConfigV1> _o;
+  shared_ptr<DiodeFexConfigV1> _o;
   DiodeFexConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_DiodeFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NRANGES = 3 };
-  DiodeFexConfigV1_Wrapper(boost::shared_ptr<DiodeFexConfigV1> obj) : _o(obj), o(_o.get()) {}
+  DiodeFexConfigV1_Wrapper(shared_ptr<DiodeFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV1_Wrapper(DiodeFexConfigV1* obj) : o(obj) {}
-  std::vector<float> base() const { VEC_CONVERT(o->base(), float); }
-  std::vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
+  vector<float> base() const { VEC_CONVERT(o->base(), float); }
+  vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 private:
   float	_base[NRANGES];
@@ -46,16 +49,16 @@ private:
 #pragma pack(push,4)
 
 class DiodeFexConfigV2_Wrapper {
-  boost::shared_ptr<DiodeFexConfigV2> _o;
+  shared_ptr<DiodeFexConfigV2> _o;
   DiodeFexConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_DiodeFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NRANGES = 16 };
-  DiodeFexConfigV2_Wrapper(boost::shared_ptr<DiodeFexConfigV2> obj) : _o(obj), o(_o.get()) {}
+  DiodeFexConfigV2_Wrapper(shared_ptr<DiodeFexConfigV2> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV2_Wrapper(DiodeFexConfigV2* obj) : o(obj) {}
-  std::vector<float> base() const { VEC_CONVERT(o->base(), float); }
-  std::vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
+  vector<float> base() const { VEC_CONVERT(o->base(), float); }
+  vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 private:
   float	_base[NRANGES];
@@ -71,12 +74,12 @@ private:
 #pragma pack(push,4)
 
 class DiodeFexV1_Wrapper {
-  boost::shared_ptr<DiodeFexV1> _o;
+  shared_ptr<DiodeFexV1> _o;
   DiodeFexV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_DiodeFex /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  DiodeFexV1_Wrapper(boost::shared_ptr<DiodeFexV1> obj) : _o(obj), o(_o.get()) {}
+  DiodeFexV1_Wrapper(shared_ptr<DiodeFexV1> obj) : _o(obj), o(_o.get()) {}
   DiodeFexV1_Wrapper(DiodeFexV1* obj) : o(obj) {}
   float value() const { return o->value(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -92,15 +95,15 @@ private:
 
 
 class IpmFexConfigV1_Wrapper {
-  boost::shared_ptr<IpmFexConfigV1> _o;
+  shared_ptr<IpmFexConfigV1> _o;
   IpmFexConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
-  IpmFexConfigV1_Wrapper(boost::shared_ptr<IpmFexConfigV1> obj) : _o(obj), o(_o.get()) {}
+  IpmFexConfigV1_Wrapper(shared_ptr<IpmFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   IpmFexConfigV1_Wrapper(IpmFexConfigV1* obj) : o(obj) {}
-  std::vector<Lusi::DiodeFexConfigV1> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV1); }
+  vector<Lusi::DiodeFexConfigV1> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV1); }
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
 };
@@ -112,15 +115,15 @@ public:
 
 
 class IpmFexConfigV2_Wrapper {
-  boost::shared_ptr<IpmFexConfigV2> _o;
+  shared_ptr<IpmFexConfigV2> _o;
   IpmFexConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
-  IpmFexConfigV2_Wrapper(boost::shared_ptr<IpmFexConfigV2> obj) : _o(obj), o(_o.get()) {}
+  IpmFexConfigV2_Wrapper(shared_ptr<IpmFexConfigV2> obj) : _o(obj), o(_o.get()) {}
   IpmFexConfigV2_Wrapper(IpmFexConfigV2* obj) : o(obj) {}
-  std::vector<Lusi::DiodeFexConfigV2> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV2); }
+  vector<Lusi::DiodeFexConfigV2> diode() const { VEC_CONVERT(o->diode(), Lusi::DiodeFexConfigV2); }
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
 };
@@ -133,15 +136,15 @@ public:
 #pragma pack(push,4)
 
 class IpmFexV1_Wrapper {
-  boost::shared_ptr<IpmFexV1> _o;
+  shared_ptr<IpmFexV1> _o;
   IpmFexV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_IpmFex /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
-  IpmFexV1_Wrapper(boost::shared_ptr<IpmFexV1> obj) : _o(obj), o(_o.get()) {}
+  IpmFexV1_Wrapper(shared_ptr<IpmFexV1> obj) : _o(obj), o(_o.get()) {}
   IpmFexV1_Wrapper(IpmFexV1* obj) : o(obj) {}
-  std::vector<float> channel() const { VEC_CONVERT(o->channel(), float); }
+  vector<float> channel() const { VEC_CONVERT(o->channel(), float); }
   float sum() const { return o->sum(); }
   float xpos() const { return o->xpos(); }
   float ypos() const { return o->ypos(); }
@@ -162,12 +165,12 @@ private:
 #pragma pack(push,4)
 
 class PimImageConfigV1_Wrapper {
-  boost::shared_ptr<PimImageConfigV1> _o;
+  shared_ptr<PimImageConfigV1> _o;
   PimImageConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PimImageConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  PimImageConfigV1_Wrapper(boost::shared_ptr<PimImageConfigV1> obj) : _o(obj), o(_o.get()) {}
+  PimImageConfigV1_Wrapper(shared_ptr<PimImageConfigV1> obj) : _o(obj), o(_o.get()) {}
   PimImageConfigV1_Wrapper(PimImageConfigV1* obj) : o(obj) {}
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
@@ -192,12 +195,9 @@ private:
     int getVersion() {
       return DiodeFexConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<DiodeFexConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(DiodeFexConfigV1_Wrapper(result));
+      return result.get() ? object(DiodeFexConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -215,12 +215,9 @@ private:
     int getVersion() {
       return DiodeFexConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<DiodeFexConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(DiodeFexConfigV2_Wrapper(result));
+      return result.get() ? object(DiodeFexConfigV2_Wrapper(result)) : object();
     }
   };
 
@@ -238,12 +235,9 @@ private:
     int getVersion() {
       return IpmFexConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<IpmFexConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(IpmFexConfigV1_Wrapper(result));
+      return result.get() ? object(IpmFexConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -261,12 +255,9 @@ private:
     int getVersion() {
       return IpmFexConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<IpmFexConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(IpmFexConfigV2_Wrapper(result));
+      return result.get() ? object(IpmFexConfigV2_Wrapper(result)) : object();
     }
   };
 
@@ -284,12 +275,9 @@ private:
     int getVersion() {
       return PimImageConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<PimImageConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(PimImageConfigV1_Wrapper(result));
+      return result.get() ? object(PimImageConfigV1_Wrapper(result)) : object();
     }
   };
 } // namespace Lusi

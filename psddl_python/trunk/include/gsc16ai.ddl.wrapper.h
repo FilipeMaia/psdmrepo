@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Gsc16ai {
 
 extern void createWrappers();
@@ -20,7 +23,7 @@ extern void createWrappers();
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -48,7 +51,7 @@ public:
     DataFormat_TwosComplement = 0,
     DataFormat_OffsetBinary,
   };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   uint16_t voltageRange() const { return o->voltageRange(); }
   uint16_t firstChan() const { return o->firstChan(); }
@@ -70,15 +73,15 @@ public:
 class ConfigV1;
 
 class DataV1_Wrapper {
-  boost::shared_ptr<DataV1> _o;
+  shared_ptr<DataV1> _o;
   DataV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
+  DataV1_Wrapper(shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  std::vector<uint16_t> timestamp() const { VEC_CONVERT(o->timestamp(), uint16_t); }
-  std::vector<uint16_t> channelValue() const { VEC_CONVERT(o->channelValue(), uint16_t); }
+  vector<uint16_t> timestamp() const { VEC_CONVERT(o->timestamp(), uint16_t); }
+  vector<uint16_t> channelValue() const { VEC_CONVERT(o->channelValue(), uint16_t); }
 };
 
   class ConfigV1_Getter : public Psana::EnvGetter {
@@ -95,12 +98,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -118,14 +118,17 @@ public:
     int getVersion() {
       return DataV1::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 } // namespace Gsc16ai

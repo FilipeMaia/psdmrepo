@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Acqiris {
 
 extern void createWrappers();
@@ -21,7 +24,7 @@ extern void createWrappers();
 #pragma pack(push,4)
 
 class VertV1_Wrapper {
-  boost::shared_ptr<VertV1> _o;
+  shared_ptr<VertV1> _o;
   VertV1* o;
 public:
   enum { Version = 1 /**< XTC type version number */ };
@@ -42,7 +45,7 @@ public:
     MHz20,
     MHz35,
   };
-  VertV1_Wrapper(boost::shared_ptr<VertV1> obj) : _o(obj), o(_o.get()) {}
+  VertV1_Wrapper(shared_ptr<VertV1> obj) : _o(obj), o(_o.get()) {}
   VertV1_Wrapper(VertV1* obj) : o(obj) {}
   double fullScale() const { return o->fullScale(); }
   double offset() const { return o->offset(); }
@@ -66,11 +69,11 @@ private:
 #pragma pack(push,4)
 
 class HorizV1_Wrapper {
-  boost::shared_ptr<HorizV1> _o;
+  shared_ptr<HorizV1> _o;
   HorizV1* o;
 public:
   enum { Version = 1 /**< XTC type version number */ };
-  HorizV1_Wrapper(boost::shared_ptr<HorizV1> obj) : _o(obj), o(_o.get()) {}
+  HorizV1_Wrapper(shared_ptr<HorizV1> obj) : _o(obj), o(_o.get()) {}
   HorizV1_Wrapper(HorizV1* obj) : o(obj) {}
   double sampInterval() const { return o->sampInterval(); }
   double delayTime() const { return o->delayTime(); }
@@ -93,7 +96,7 @@ private:
 #pragma pack(push,4)
 
 class TrigV1_Wrapper {
-  boost::shared_ptr<TrigV1> _o;
+  shared_ptr<TrigV1> _o;
   TrigV1* o;
 public:
   enum { Version = 1 /**< XTC type version number */ };
@@ -120,7 +123,7 @@ public:
     HFDivide,
     SpikeStretcher,
   };
-  TrigV1_Wrapper(boost::shared_ptr<TrigV1> obj) : _o(obj), o(_o.get()) {}
+  TrigV1_Wrapper(shared_ptr<TrigV1> obj) : _o(obj), o(_o.get()) {}
   TrigV1_Wrapper(TrigV1* obj) : o(obj) {}
   uint32_t coupling() const { return o->coupling(); }
   uint32_t input() const { return o->input(); }
@@ -142,20 +145,20 @@ private:
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { MaxChan = 20 /**< Maximum number of the configured channels. */ };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   uint32_t nbrConvertersPerChannel() const { return o->nbrConvertersPerChannel(); }
   uint32_t channelMask() const { return o->channelMask(); }
   uint32_t nbrBanks() const { return o->nbrBanks(); }
   const TrigV1_Wrapper trig() const { return TrigV1_Wrapper((TrigV1*) &o->trig()); }
   const HorizV1_Wrapper horiz() const { return HorizV1_Wrapper((HorizV1*) &o->horiz()); }
-  std::vector<Acqiris::VertV1> vert() const { VEC_CONVERT(o->vert(), Acqiris::VertV1); }
+  vector<Acqiris::VertV1> vert() const { VEC_CONVERT(o->vert(), Acqiris::VertV1); }
   uint32_t nbrChannels() const { return o->nbrChannels(); }
 };
 
@@ -167,11 +170,11 @@ public:
 #pragma pack(push,4)
 
 class TimestampV1_Wrapper {
-  boost::shared_ptr<TimestampV1> _o;
+  shared_ptr<TimestampV1> _o;
   TimestampV1* o;
 public:
   enum { Version = 1 /**< XTC type version number */ };
-  TimestampV1_Wrapper(boost::shared_ptr<TimestampV1> obj) : _o(obj), o(_o.get()) {}
+  TimestampV1_Wrapper(shared_ptr<TimestampV1> obj) : _o(obj), o(_o.get()) {}
   TimestampV1_Wrapper(TimestampV1* obj) : o(obj) {}
   double pos() const { return o->pos(); }
   uint32_t timeStampLo() const { return o->timeStampLo(); }
@@ -193,19 +196,19 @@ private:
 class ConfigV1;
 
 class DataDescV1Elem_Wrapper {
-  boost::shared_ptr<DataDescV1Elem> _o;
+  shared_ptr<DataDescV1Elem> _o;
   DataDescV1Elem* o;
 public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { NumberOfBits = 10 };
   enum { BitShift = 6 };
   enum { _extraSize = 32 };
-  DataDescV1Elem_Wrapper(boost::shared_ptr<DataDescV1Elem> obj) : _o(obj), o(_o.get()) {}
+  DataDescV1Elem_Wrapper(shared_ptr<DataDescV1Elem> obj) : _o(obj), o(_o.get()) {}
   DataDescV1Elem_Wrapper(DataDescV1Elem* obj) : o(obj) {}
   uint32_t nbrSamplesInSeg() const { return o->nbrSamplesInSeg(); }
   uint32_t indexFirstPoint() const { return o->indexFirstPoint(); }
   uint32_t nbrSegments() const { return o->nbrSegments(); }
-  std::vector<Acqiris::TimestampV1> timestamp() const { VEC_CONVERT(o->timestamp(), Acqiris::TimestampV1); }
+  vector<Acqiris::TimestampV1> timestamp() const { VEC_CONVERT(o->timestamp(), Acqiris::TimestampV1); }
   PyObject* waveforms() const { ND_CONVERT(o->waveforms(), int16_t, 2); }
 };
 
@@ -217,15 +220,15 @@ public:
 class ConfigV1;
 
 class DataDescV1_Wrapper {
-  boost::shared_ptr<DataDescV1> _o;
+  shared_ptr<DataDescV1> _o;
   DataDescV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqWaveform /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  DataDescV1_Wrapper(boost::shared_ptr<DataDescV1> obj) : _o(obj), o(_o.get()) {}
+  DataDescV1_Wrapper(shared_ptr<DataDescV1> obj) : _o(obj), o(_o.get()) {}
   DataDescV1_Wrapper(DataDescV1* obj) : o(obj) {}
   const DataDescV1Elem_Wrapper data(uint32_t i0) const { return DataDescV1Elem_Wrapper((DataDescV1Elem*) &o->data(i0)); }
-  std::vector<int> data_shape() const { return o->data_shape(); }
+  vector<int> data_shape() const { return o->data_shape(); }
 };
 
 /** @class TdcChannel
@@ -236,7 +239,7 @@ public:
 #pragma pack(push,4)
 
 class TdcChannel_Wrapper {
-  boost::shared_ptr<TdcChannel> _o;
+  shared_ptr<TdcChannel> _o;
   TdcChannel* o;
 public:
 
@@ -259,7 +262,7 @@ public:
     Positive,
     Negative,
   };
-  TdcChannel_Wrapper(boost::shared_ptr<TdcChannel> obj) : _o(obj), o(_o.get()) {}
+  TdcChannel_Wrapper(shared_ptr<TdcChannel> obj) : _o(obj), o(_o.get()) {}
   TdcChannel_Wrapper(TdcChannel* obj) : o(obj) {}
   uint32_t _channel_int() const { return o->_channel_int(); }
   uint32_t _mode_int() const { return o->_mode_int(); }
@@ -284,7 +287,7 @@ private:
 #pragma pack(push,4)
 
 class TdcAuxIO_Wrapper {
-  boost::shared_ptr<TdcAuxIO> _o;
+  shared_ptr<TdcAuxIO> _o;
   TdcAuxIO* o;
 public:
   enum Channel {
@@ -301,7 +304,7 @@ public:
     ZHigh = 0,
     Z50 = 1,
   };
-  TdcAuxIO_Wrapper(boost::shared_ptr<TdcAuxIO> obj) : _o(obj), o(_o.get()) {}
+  TdcAuxIO_Wrapper(shared_ptr<TdcAuxIO> obj) : _o(obj), o(_o.get()) {}
   TdcAuxIO_Wrapper(TdcAuxIO* obj) : o(obj) {}
   uint32_t channel_int() const { return o->channel_int(); }
   uint32_t signal_int() const { return o->signal_int(); }
@@ -325,7 +328,7 @@ private:
 #pragma pack(push,4)
 
 class TdcVetoIO_Wrapper {
-  boost::shared_ptr<TdcVetoIO> _o;
+  shared_ptr<TdcVetoIO> _o;
   TdcVetoIO* o;
 public:
   enum Channel {
@@ -341,7 +344,7 @@ public:
     ZHigh = 0,
     Z50 = 1,
   };
-  TdcVetoIO_Wrapper(boost::shared_ptr<TdcVetoIO> obj) : _o(obj), o(_o.get()) {}
+  TdcVetoIO_Wrapper(shared_ptr<TdcVetoIO> obj) : _o(obj), o(_o.get()) {}
   TdcVetoIO_Wrapper(TdcVetoIO* obj) : o(obj) {}
   uint32_t signal_int() const { return o->signal_int(); }
   uint32_t qualifier_int() const { return o->qualifier_int(); }
@@ -363,17 +366,17 @@ private:
 
 
 class TdcConfigV1_Wrapper {
-  boost::shared_ptr<TdcConfigV1> _o;
+  shared_ptr<TdcConfigV1> _o;
   TdcConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NChannels = 8 /**< Total number of channel configurations. */ };
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
-  TdcConfigV1_Wrapper(boost::shared_ptr<TdcConfigV1> obj) : _o(obj), o(_o.get()) {}
+  TdcConfigV1_Wrapper(shared_ptr<TdcConfigV1> obj) : _o(obj), o(_o.get()) {}
   TdcConfigV1_Wrapper(TdcConfigV1* obj) : o(obj) {}
-  std::vector<Acqiris::TdcChannel> channels() const { VEC_CONVERT(o->channels(), Acqiris::TdcChannel); }
-  std::vector<Acqiris::TdcAuxIO> auxio() const { VEC_CONVERT(o->auxio(), Acqiris::TdcAuxIO); }
+  vector<Acqiris::TdcChannel> channels() const { VEC_CONVERT(o->channels(), Acqiris::TdcChannel); }
+  vector<Acqiris::TdcAuxIO> auxio() const { VEC_CONVERT(o->auxio(), Acqiris::TdcAuxIO); }
   const TdcVetoIO_Wrapper veto() const { return TdcVetoIO_Wrapper((TdcVetoIO*) &o->veto()); }
 };
 
@@ -384,7 +387,7 @@ public:
 
 
 class TdcDataV1_Item_Wrapper {
-  boost::shared_ptr<TdcDataV1_Item> _o;
+  shared_ptr<TdcDataV1_Item> _o;
   TdcDataV1_Item* o;
 public:
 
@@ -400,7 +403,7 @@ public:
     Chan6,
     AuxIO,
   };
-  TdcDataV1_Item_Wrapper(boost::shared_ptr<TdcDataV1_Item> obj) : _o(obj), o(_o.get()) {}
+  TdcDataV1_Item_Wrapper(shared_ptr<TdcDataV1_Item> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1_Item_Wrapper(TdcDataV1_Item* obj) : o(obj) {}
   uint32_t value() const { return o->value(); }
   uint32_t bf_val_() const { return o->bf_val_(); }
@@ -419,10 +422,10 @@ private:
 
 
 class TdcDataV1Common_Wrapper {
-  boost::shared_ptr<TdcDataV1Common> _o;
+  shared_ptr<TdcDataV1Common> _o;
   TdcDataV1Common* o;
 public:
-  TdcDataV1Common_Wrapper(boost::shared_ptr<TdcDataV1Common> obj) : _o(obj), o(_o.get()) {}
+  TdcDataV1Common_Wrapper(shared_ptr<TdcDataV1Common> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Common_Wrapper(TdcDataV1Common* obj) : o(obj) {}
   uint32_t nhits() const { return o->nhits(); }
   uint8_t overflow() const { return o->overflow(); }
@@ -436,10 +439,10 @@ public:
 
 
 class TdcDataV1Channel_Wrapper {
-  boost::shared_ptr<TdcDataV1Channel> _o;
+  shared_ptr<TdcDataV1Channel> _o;
   TdcDataV1Channel* o;
 public:
-  TdcDataV1Channel_Wrapper(boost::shared_ptr<TdcDataV1Channel> obj) : _o(obj), o(_o.get()) {}
+  TdcDataV1Channel_Wrapper(shared_ptr<TdcDataV1Channel> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Channel_Wrapper(TdcDataV1Channel* obj) : o(obj) {}
   uint32_t ticks() const { return o->ticks(); }
   uint8_t overflow() const { return o->overflow(); }
@@ -454,7 +457,7 @@ public:
 
 
 class TdcDataV1Marker_Wrapper {
-  boost::shared_ptr<TdcDataV1Marker> _o;
+  shared_ptr<TdcDataV1Marker> _o;
   TdcDataV1Marker* o;
 public:
 
@@ -465,7 +468,7 @@ public:
     MemFullSwitch = 2,
     AuxIOMarker = 16,
   };
-  TdcDataV1Marker_Wrapper(boost::shared_ptr<TdcDataV1Marker> obj) : _o(obj), o(_o.get()) {}
+  TdcDataV1Marker_Wrapper(shared_ptr<TdcDataV1Marker> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1Marker_Wrapper(TdcDataV1Marker* obj) : o(obj) {}
   Acqiris::TdcDataV1Marker::Type type() const { return o->type(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -479,14 +482,14 @@ public:
 
 
 class TdcDataV1_Wrapper {
-  boost::shared_ptr<TdcDataV1> _o;
+  shared_ptr<TdcDataV1> _o;
   TdcDataV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  TdcDataV1_Wrapper(boost::shared_ptr<TdcDataV1> obj) : _o(obj), o(_o.get()) {}
+  TdcDataV1_Wrapper(shared_ptr<TdcDataV1> obj) : _o(obj), o(_o.get()) {}
   TdcDataV1_Wrapper(TdcDataV1* obj) : o(obj) {}
-  std::vector<Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Acqiris::TdcDataV1_Item); }
+  vector<Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Acqiris::TdcDataV1_Item); }
 };
 
   class ConfigV1_Getter : public Psana::EnvGetter {
@@ -503,12 +506,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -523,14 +523,17 @@ public:
     int getVersion() {
       return DataDescV1Elem::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1Elem> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1Elem> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1Elem_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1Elem> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
     }
   };
 
@@ -548,14 +551,17 @@ public:
     int getVersion() {
       return DataDescV1::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataDescV1_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataDescV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
   };
 
@@ -573,12 +579,9 @@ public:
     int getVersion() {
       return TdcConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<TdcConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(TdcConfigV1_Wrapper(result));
+      return result.get() ? object(TdcConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -590,14 +593,17 @@ public:
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1_Item";
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1_Item> result = evt.get(key, foundSrc);
+      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1_Item> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Item_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1_Item> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
     }
   };
 
@@ -609,14 +615,17 @@ public:
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Common";
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Common> result = evt.get(key, foundSrc);
+      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Common> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Common_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Common> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
     }
   };
 
@@ -628,14 +637,17 @@ public:
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Channel";
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Channel> result = evt.get(key, foundSrc);
+      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Channel> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Channel_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Channel> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
     }
   };
 
@@ -647,14 +659,17 @@ public:
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Marker";
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Marker> result = evt.get(key, foundSrc);
+      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Marker> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1Marker_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1Marker> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
     }
   };
 
@@ -672,14 +687,17 @@ public:
     int getVersion() {
       return TdcDataV1::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(TdcDataV1_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TdcDataV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
     }
   };
 } // namespace Acqiris

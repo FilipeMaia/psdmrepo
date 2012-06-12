@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace FCCD {
 
 extern void createWrappers();
@@ -20,7 +23,7 @@ extern void createWrappers();
 
 
 class FccdConfigV1_Wrapper {
-  boost::shared_ptr<FccdConfigV1> _o;
+  shared_ptr<FccdConfigV1> _o;
   FccdConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_FccdConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -36,7 +39,7 @@ public:
     Output_FIFO = 0,
     Output_Pattern4 = 4,
   };
-  FccdConfigV1_Wrapper(boost::shared_ptr<FccdConfigV1> obj) : _o(obj), o(_o.get()) {}
+  FccdConfigV1_Wrapper(shared_ptr<FccdConfigV1> obj) : _o(obj), o(_o.get()) {}
   FccdConfigV1_Wrapper(FccdConfigV1* obj) : o(obj) {}
   uint16_t outputMode() const { return o->outputMode(); }
   uint32_t width() const { return o->width(); }
@@ -52,7 +55,7 @@ public:
 
 
 class FccdConfigV2_Wrapper {
-  boost::shared_ptr<FccdConfigV2> _o;
+  shared_ptr<FccdConfigV2> _o;
   FccdConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_FccdConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -74,14 +77,14 @@ public:
     Test_Pattern3 = 3,
     Test_Pattern4 = 4,
   };
-  FccdConfigV2_Wrapper(boost::shared_ptr<FccdConfigV2> obj) : _o(obj), o(_o.get()) {}
+  FccdConfigV2_Wrapper(shared_ptr<FccdConfigV2> obj) : _o(obj), o(_o.get()) {}
   FccdConfigV2_Wrapper(FccdConfigV2* obj) : o(obj) {}
   uint16_t outputMode() const { return o->outputMode(); }
   uint8_t ccdEnable() const { return o->ccdEnable(); }
   uint8_t focusMode() const { return o->focusMode(); }
   uint32_t exposureTime() const { return o->exposureTime(); }
-  std::vector<float> dacVoltages() const { VEC_CONVERT(o->dacVoltages(), float); }
-  std::vector<uint16_t> waveforms() const { VEC_CONVERT(o->waveforms(), uint16_t); }
+  vector<float> dacVoltages() const { VEC_CONVERT(o->dacVoltages(), float); }
+  vector<uint16_t> waveforms() const { VEC_CONVERT(o->waveforms(), uint16_t); }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t trimmedWidth() const { return o->trimmedWidth(); }
@@ -102,12 +105,9 @@ public:
     int getVersion() {
       return FccdConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<FccdConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(FccdConfigV1_Wrapper(result));
+      return result.get() ? object(FccdConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -125,12 +125,9 @@ public:
     int getVersion() {
       return FccdConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<FccdConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(FccdConfigV2_Wrapper(result));
+      return result.get() ? object(FccdConfigV2_Wrapper(result)) : object();
     }
   };
 } // namespace FCCD

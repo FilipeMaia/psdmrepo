@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Epics {
 
 extern void createWrappers();
@@ -21,10 +24,10 @@ extern void createWrappers();
 
 
 class epicsTimeStamp_Wrapper {
-  boost::shared_ptr<epicsTimeStamp> _o;
+  shared_ptr<epicsTimeStamp> _o;
   epicsTimeStamp* o;
 public:
-  epicsTimeStamp_Wrapper(boost::shared_ptr<epicsTimeStamp> obj) : _o(obj), o(_o.get()) {}
+  epicsTimeStamp_Wrapper(shared_ptr<epicsTimeStamp> obj) : _o(obj), o(_o.get()) {}
   epicsTimeStamp_Wrapper(epicsTimeStamp* obj) : o(obj) {}
   uint32_t sec() const { return o->sec(); }
   uint32_t nsec() const { return o->nsec(); }
@@ -41,11 +44,11 @@ private:
 
 
 class dbr_time_string_Wrapper {
-  boost::shared_ptr<dbr_time_string> _o;
+  shared_ptr<dbr_time_string> _o;
   dbr_time_string* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_STRING };
-  dbr_time_string_Wrapper(boost::shared_ptr<dbr_time_string> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_string_Wrapper(shared_ptr<dbr_time_string> obj) : _o(obj), o(_o.get()) {}
   dbr_time_string_Wrapper(dbr_time_string* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -64,11 +67,11 @@ private:
 
 
 class dbr_time_short_Wrapper {
-  boost::shared_ptr<dbr_time_short> _o;
+  shared_ptr<dbr_time_short> _o;
   dbr_time_short* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_SHORT };
-  dbr_time_short_Wrapper(boost::shared_ptr<dbr_time_short> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_short_Wrapper(shared_ptr<dbr_time_short> obj) : _o(obj), o(_o.get()) {}
   dbr_time_short_Wrapper(dbr_time_short* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -88,11 +91,11 @@ private:
 
 
 class dbr_time_float_Wrapper {
-  boost::shared_ptr<dbr_time_float> _o;
+  shared_ptr<dbr_time_float> _o;
   dbr_time_float* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_FLOAT };
-  dbr_time_float_Wrapper(boost::shared_ptr<dbr_time_float> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_float_Wrapper(shared_ptr<dbr_time_float> obj) : _o(obj), o(_o.get()) {}
   dbr_time_float_Wrapper(dbr_time_float* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -111,11 +114,11 @@ private:
 
 
 class dbr_time_enum_Wrapper {
-  boost::shared_ptr<dbr_time_enum> _o;
+  shared_ptr<dbr_time_enum> _o;
   dbr_time_enum* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_ENUM };
-  dbr_time_enum_Wrapper(boost::shared_ptr<dbr_time_enum> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_enum_Wrapper(shared_ptr<dbr_time_enum> obj) : _o(obj), o(_o.get()) {}
   dbr_time_enum_Wrapper(dbr_time_enum* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -135,11 +138,11 @@ private:
 
 
 class dbr_time_char_Wrapper {
-  boost::shared_ptr<dbr_time_char> _o;
+  shared_ptr<dbr_time_char> _o;
   dbr_time_char* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_CHAR };
-  dbr_time_char_Wrapper(boost::shared_ptr<dbr_time_char> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_char_Wrapper(shared_ptr<dbr_time_char> obj) : _o(obj), o(_o.get()) {}
   dbr_time_char_Wrapper(dbr_time_char* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -160,11 +163,11 @@ private:
 
 
 class dbr_time_long_Wrapper {
-  boost::shared_ptr<dbr_time_long> _o;
+  shared_ptr<dbr_time_long> _o;
   dbr_time_long* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_LONG };
-  dbr_time_long_Wrapper(boost::shared_ptr<dbr_time_long> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_long_Wrapper(shared_ptr<dbr_time_long> obj) : _o(obj), o(_o.get()) {}
   dbr_time_long_Wrapper(dbr_time_long* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -183,11 +186,11 @@ private:
 
 
 class dbr_time_double_Wrapper {
-  boost::shared_ptr<dbr_time_double> _o;
+  shared_ptr<dbr_time_double> _o;
   dbr_time_double* o;
 public:
   enum { DBR_TYPE_ID = DBR_TIME_DOUBLE };
-  dbr_time_double_Wrapper(boost::shared_ptr<dbr_time_double> obj) : _o(obj), o(_o.get()) {}
+  dbr_time_double_Wrapper(shared_ptr<dbr_time_double> obj) : _o(obj), o(_o.get()) {}
   dbr_time_double_Wrapper(dbr_time_double* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -207,11 +210,11 @@ private:
 
 
 class dbr_sts_string_Wrapper {
-  boost::shared_ptr<dbr_sts_string> _o;
+  shared_ptr<dbr_sts_string> _o;
   dbr_sts_string* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_STRING };
-  dbr_sts_string_Wrapper(boost::shared_ptr<dbr_sts_string> obj) : _o(obj), o(_o.get()) {}
+  dbr_sts_string_Wrapper(shared_ptr<dbr_sts_string> obj) : _o(obj), o(_o.get()) {}
   dbr_sts_string_Wrapper(dbr_sts_string* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -228,11 +231,11 @@ private:
 
 
 class dbr_ctrl_short_Wrapper {
-  boost::shared_ptr<dbr_ctrl_short> _o;
+  shared_ptr<dbr_ctrl_short> _o;
   dbr_ctrl_short* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_SHORT };
-  dbr_ctrl_short_Wrapper(boost::shared_ptr<dbr_ctrl_short> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_short_Wrapper(shared_ptr<dbr_ctrl_short> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_short_Wrapper(dbr_ctrl_short* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -246,7 +249,7 @@ public:
   int16_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
   int16_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> units_shape() const { return o->units_shape(); }
+  vector<int> units_shape() const { return o->units_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -268,11 +271,11 @@ private:
 
 
 class dbr_ctrl_float_Wrapper {
-  boost::shared_ptr<dbr_ctrl_float> _o;
+  shared_ptr<dbr_ctrl_float> _o;
   dbr_ctrl_float* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_FLOAT };
-  dbr_ctrl_float_Wrapper(boost::shared_ptr<dbr_ctrl_float> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_float_Wrapper(shared_ptr<dbr_ctrl_float> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_float_Wrapper(dbr_ctrl_float* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -287,7 +290,7 @@ public:
   float upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
   float lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> units_shape() const { return o->units_shape(); }
+  vector<int> units_shape() const { return o->units_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -311,18 +314,18 @@ private:
 
 
 class dbr_ctrl_enum_Wrapper {
-  boost::shared_ptr<dbr_ctrl_enum> _o;
+  shared_ptr<dbr_ctrl_enum> _o;
   dbr_ctrl_enum* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_ENUM };
-  dbr_ctrl_enum_Wrapper(boost::shared_ptr<dbr_ctrl_enum> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_enum_Wrapper(shared_ptr<dbr_ctrl_enum> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_enum_Wrapper(dbr_ctrl_enum* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
   int16_t no_str() const { return o->no_str(); }
   const char* strings(uint32_t i0) const { return o->strings(i0); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> strings_shape() const { return o->strings_shape(); }
+  vector<int> strings_shape() const { return o->strings_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -337,11 +340,11 @@ private:
 
 
 class dbr_ctrl_char_Wrapper {
-  boost::shared_ptr<dbr_ctrl_char> _o;
+  shared_ptr<dbr_ctrl_char> _o;
   dbr_ctrl_char* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_CHAR };
-  dbr_ctrl_char_Wrapper(boost::shared_ptr<dbr_ctrl_char> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_char_Wrapper(shared_ptr<dbr_ctrl_char> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_char_Wrapper(dbr_ctrl_char* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -355,7 +358,7 @@ public:
   uint8_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
   uint8_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> units_shape() const { return o->units_shape(); }
+  vector<int> units_shape() const { return o->units_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -378,11 +381,11 @@ private:
 
 
 class dbr_ctrl_long_Wrapper {
-  boost::shared_ptr<dbr_ctrl_long> _o;
+  shared_ptr<dbr_ctrl_long> _o;
   dbr_ctrl_long* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_LONG };
-  dbr_ctrl_long_Wrapper(boost::shared_ptr<dbr_ctrl_long> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_long_Wrapper(shared_ptr<dbr_ctrl_long> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_long_Wrapper(dbr_ctrl_long* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -396,7 +399,7 @@ public:
   int32_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
   int32_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> units_shape() const { return o->units_shape(); }
+  vector<int> units_shape() const { return o->units_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -418,11 +421,11 @@ private:
 
 
 class dbr_ctrl_double_Wrapper {
-  boost::shared_ptr<dbr_ctrl_double> _o;
+  shared_ptr<dbr_ctrl_double> _o;
   dbr_ctrl_double* o;
 public:
   enum { DBR_TYPE_ID = DBR_CTRL_DOUBLE };
-  dbr_ctrl_double_Wrapper(boost::shared_ptr<dbr_ctrl_double> obj) : _o(obj), o(_o.get()) {}
+  dbr_ctrl_double_Wrapper(shared_ptr<dbr_ctrl_double> obj) : _o(obj), o(_o.get()) {}
   dbr_ctrl_double_Wrapper(dbr_ctrl_double* obj) : o(obj) {}
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
@@ -437,7 +440,7 @@ public:
   double upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
   double lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> units_shape() const { return o->units_shape(); }
+  vector<int> units_shape() const { return o->units_shape(); }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -461,10 +464,10 @@ private:
 
 
 class EpicsPvHeader_Wrapper {
-  boost::shared_ptr<EpicsPvHeader> _o;
+  shared_ptr<EpicsPvHeader> _o;
   EpicsPvHeader* o;
 public:
-  EpicsPvHeader_Wrapper(boost::shared_ptr<EpicsPvHeader> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvHeader_Wrapper(shared_ptr<EpicsPvHeader> obj) : _o(obj), o(_o.get()) {}
   EpicsPvHeader_Wrapper(EpicsPvHeader* obj) : o(obj) {}
   int16_t pvId() const { return o->pvId(); }
   int16_t dbrType() const { return o->dbrType(); }
@@ -483,13 +486,13 @@ public:
 
 
 class EpicsPvCtrlHeader_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlHeader> _o;
+  shared_ptr<EpicsPvCtrlHeader> _o;
   EpicsPvCtrlHeader* o;
 public:
-  EpicsPvCtrlHeader_Wrapper(boost::shared_ptr<EpicsPvCtrlHeader> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlHeader_Wrapper(shared_ptr<EpicsPvCtrlHeader> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlHeader_Wrapper(EpicsPvCtrlHeader* obj) : o(obj) {}
   const char* pvName() const { return o->pvName(); }
-  std::vector<int> pvName_shape() const { return o->pvName_shape(); }
+  vector<int> pvName_shape() const { return o->pvName_shape(); }
 };
 
 /** @class EpicsPvTimeHeader
@@ -499,10 +502,10 @@ public:
 
 
 class EpicsPvTimeHeader_Wrapper {
-  boost::shared_ptr<EpicsPvTimeHeader> _o;
+  shared_ptr<EpicsPvTimeHeader> _o;
   EpicsPvTimeHeader* o;
 public:
-  EpicsPvTimeHeader_Wrapper(boost::shared_ptr<EpicsPvTimeHeader> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeHeader_Wrapper(shared_ptr<EpicsPvTimeHeader> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeHeader_Wrapper(EpicsPvTimeHeader* obj) : o(obj) {}
   Epics::epicsTimeStamp stamp() const { return o->stamp(); }
 };
@@ -514,15 +517,15 @@ public:
 
 
 class EpicsPvCtrlString_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlString> _o;
+  shared_ptr<EpicsPvCtrlString> _o;
   EpicsPvCtrlString* o;
 public:
-  EpicsPvCtrlString_Wrapper(boost::shared_ptr<EpicsPvCtrlString> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlString_Wrapper(shared_ptr<EpicsPvCtrlString> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlString_Wrapper(EpicsPvCtrlString* obj) : o(obj) {}
   const dbr_sts_string_Wrapper dbr() const { return dbr_sts_string_Wrapper((dbr_sts_string*) &o->dbr()); }
   const char* data(uint32_t i0) const { return o->data(i0); }
   const char* value(uint32_t i) const { return o->value(i); }
-  std::vector<int> data_shape() const { return o->data_shape(); }
+  vector<int> data_shape() const { return o->data_shape(); }
 };
 
 /** @class EpicsPvCtrlShort
@@ -532,13 +535,13 @@ public:
 
 
 class EpicsPvCtrlShort_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlShort> _o;
+  shared_ptr<EpicsPvCtrlShort> _o;
   EpicsPvCtrlShort* o;
 public:
-  EpicsPvCtrlShort_Wrapper(boost::shared_ptr<EpicsPvCtrlShort> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlShort_Wrapper(shared_ptr<EpicsPvCtrlShort> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlShort_Wrapper(EpicsPvCtrlShort* obj) : o(obj) {}
   const dbr_ctrl_short_Wrapper dbr() const { return dbr_ctrl_short_Wrapper((dbr_ctrl_short*) &o->dbr()); }
-  std::vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
+  vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
   int16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -549,13 +552,13 @@ public:
 
 
 class EpicsPvCtrlFloat_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlFloat> _o;
+  shared_ptr<EpicsPvCtrlFloat> _o;
   EpicsPvCtrlFloat* o;
 public:
-  EpicsPvCtrlFloat_Wrapper(boost::shared_ptr<EpicsPvCtrlFloat> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlFloat_Wrapper(shared_ptr<EpicsPvCtrlFloat> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlFloat_Wrapper(EpicsPvCtrlFloat* obj) : o(obj) {}
   const dbr_ctrl_float_Wrapper dbr() const { return dbr_ctrl_float_Wrapper((dbr_ctrl_float*) &o->dbr()); }
-  std::vector<float> data() const { VEC_CONVERT(o->data(), float); }
+  vector<float> data() const { VEC_CONVERT(o->data(), float); }
   float value(uint32_t i) const { return o->value(i); }
 };
 
@@ -566,13 +569,13 @@ public:
 
 
 class EpicsPvCtrlEnum_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlEnum> _o;
+  shared_ptr<EpicsPvCtrlEnum> _o;
   EpicsPvCtrlEnum* o;
 public:
-  EpicsPvCtrlEnum_Wrapper(boost::shared_ptr<EpicsPvCtrlEnum> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlEnum_Wrapper(shared_ptr<EpicsPvCtrlEnum> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlEnum_Wrapper(EpicsPvCtrlEnum* obj) : o(obj) {}
   const dbr_ctrl_enum_Wrapper dbr() const { return dbr_ctrl_enum_Wrapper((dbr_ctrl_enum*) &o->dbr()); }
-  std::vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
+  vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
   uint16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -583,13 +586,13 @@ public:
 
 
 class EpicsPvCtrlChar_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlChar> _o;
+  shared_ptr<EpicsPvCtrlChar> _o;
   EpicsPvCtrlChar* o;
 public:
-  EpicsPvCtrlChar_Wrapper(boost::shared_ptr<EpicsPvCtrlChar> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlChar_Wrapper(shared_ptr<EpicsPvCtrlChar> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlChar_Wrapper(EpicsPvCtrlChar* obj) : o(obj) {}
   const dbr_ctrl_char_Wrapper dbr() const { return dbr_ctrl_char_Wrapper((dbr_ctrl_char*) &o->dbr()); }
-  std::vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
+  vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
   uint8_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -600,13 +603,13 @@ public:
 
 
 class EpicsPvCtrlLong_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlLong> _o;
+  shared_ptr<EpicsPvCtrlLong> _o;
   EpicsPvCtrlLong* o;
 public:
-  EpicsPvCtrlLong_Wrapper(boost::shared_ptr<EpicsPvCtrlLong> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlLong_Wrapper(shared_ptr<EpicsPvCtrlLong> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlLong_Wrapper(EpicsPvCtrlLong* obj) : o(obj) {}
   const dbr_ctrl_long_Wrapper dbr() const { return dbr_ctrl_long_Wrapper((dbr_ctrl_long*) &o->dbr()); }
-  std::vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
+  vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -617,13 +620,13 @@ public:
 
 
 class EpicsPvCtrlDouble_Wrapper {
-  boost::shared_ptr<EpicsPvCtrlDouble> _o;
+  shared_ptr<EpicsPvCtrlDouble> _o;
   EpicsPvCtrlDouble* o;
 public:
-  EpicsPvCtrlDouble_Wrapper(boost::shared_ptr<EpicsPvCtrlDouble> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvCtrlDouble_Wrapper(shared_ptr<EpicsPvCtrlDouble> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlDouble_Wrapper(EpicsPvCtrlDouble* obj) : o(obj) {}
   const dbr_ctrl_double_Wrapper dbr() const { return dbr_ctrl_double_Wrapper((dbr_ctrl_double*) &o->dbr()); }
-  std::vector<double> data() const { VEC_CONVERT(o->data(), double); }
+  vector<double> data() const { VEC_CONVERT(o->data(), double); }
   double value(uint32_t i) const { return o->value(i); }
 };
 
@@ -634,15 +637,15 @@ public:
 
 
 class EpicsPvTimeString_Wrapper {
-  boost::shared_ptr<EpicsPvTimeString> _o;
+  shared_ptr<EpicsPvTimeString> _o;
   EpicsPvTimeString* o;
 public:
-  EpicsPvTimeString_Wrapper(boost::shared_ptr<EpicsPvTimeString> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeString_Wrapper(shared_ptr<EpicsPvTimeString> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeString_Wrapper(EpicsPvTimeString* obj) : o(obj) {}
   const dbr_time_string_Wrapper dbr() const { return dbr_time_string_Wrapper((dbr_time_string*) &o->dbr()); }
   const char* data(uint32_t i0) const { return o->data(i0); }
   const char* value(uint32_t i) const { return o->value(i); }
-  std::vector<int> data_shape() const { return o->data_shape(); }
+  vector<int> data_shape() const { return o->data_shape(); }
 };
 
 /** @class EpicsPvTimeShort
@@ -652,13 +655,13 @@ public:
 
 
 class EpicsPvTimeShort_Wrapper {
-  boost::shared_ptr<EpicsPvTimeShort> _o;
+  shared_ptr<EpicsPvTimeShort> _o;
   EpicsPvTimeShort* o;
 public:
-  EpicsPvTimeShort_Wrapper(boost::shared_ptr<EpicsPvTimeShort> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeShort_Wrapper(shared_ptr<EpicsPvTimeShort> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeShort_Wrapper(EpicsPvTimeShort* obj) : o(obj) {}
   const dbr_time_short_Wrapper dbr() const { return dbr_time_short_Wrapper((dbr_time_short*) &o->dbr()); }
-  std::vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
+  vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
   int16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -669,13 +672,13 @@ public:
 
 
 class EpicsPvTimeFloat_Wrapper {
-  boost::shared_ptr<EpicsPvTimeFloat> _o;
+  shared_ptr<EpicsPvTimeFloat> _o;
   EpicsPvTimeFloat* o;
 public:
-  EpicsPvTimeFloat_Wrapper(boost::shared_ptr<EpicsPvTimeFloat> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeFloat_Wrapper(shared_ptr<EpicsPvTimeFloat> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeFloat_Wrapper(EpicsPvTimeFloat* obj) : o(obj) {}
   const dbr_time_float_Wrapper dbr() const { return dbr_time_float_Wrapper((dbr_time_float*) &o->dbr()); }
-  std::vector<float> data() const { VEC_CONVERT(o->data(), float); }
+  vector<float> data() const { VEC_CONVERT(o->data(), float); }
   float value(uint32_t i) const { return o->value(i); }
 };
 
@@ -686,13 +689,13 @@ public:
 
 
 class EpicsPvTimeEnum_Wrapper {
-  boost::shared_ptr<EpicsPvTimeEnum> _o;
+  shared_ptr<EpicsPvTimeEnum> _o;
   EpicsPvTimeEnum* o;
 public:
-  EpicsPvTimeEnum_Wrapper(boost::shared_ptr<EpicsPvTimeEnum> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeEnum_Wrapper(shared_ptr<EpicsPvTimeEnum> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeEnum_Wrapper(EpicsPvTimeEnum* obj) : o(obj) {}
   const dbr_time_enum_Wrapper dbr() const { return dbr_time_enum_Wrapper((dbr_time_enum*) &o->dbr()); }
-  std::vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
+  vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
   uint16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -703,13 +706,13 @@ public:
 
 
 class EpicsPvTimeChar_Wrapper {
-  boost::shared_ptr<EpicsPvTimeChar> _o;
+  shared_ptr<EpicsPvTimeChar> _o;
   EpicsPvTimeChar* o;
 public:
-  EpicsPvTimeChar_Wrapper(boost::shared_ptr<EpicsPvTimeChar> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeChar_Wrapper(shared_ptr<EpicsPvTimeChar> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeChar_Wrapper(EpicsPvTimeChar* obj) : o(obj) {}
   const dbr_time_char_Wrapper dbr() const { return dbr_time_char_Wrapper((dbr_time_char*) &o->dbr()); }
-  std::vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
+  vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
   uint8_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -720,13 +723,13 @@ public:
 
 
 class EpicsPvTimeLong_Wrapper {
-  boost::shared_ptr<EpicsPvTimeLong> _o;
+  shared_ptr<EpicsPvTimeLong> _o;
   EpicsPvTimeLong* o;
 public:
-  EpicsPvTimeLong_Wrapper(boost::shared_ptr<EpicsPvTimeLong> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeLong_Wrapper(shared_ptr<EpicsPvTimeLong> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeLong_Wrapper(EpicsPvTimeLong* obj) : o(obj) {}
   const dbr_time_long_Wrapper dbr() const { return dbr_time_long_Wrapper((dbr_time_long*) &o->dbr()); }
-  std::vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
+  vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -737,13 +740,13 @@ public:
 
 
 class EpicsPvTimeDouble_Wrapper {
-  boost::shared_ptr<EpicsPvTimeDouble> _o;
+  shared_ptr<EpicsPvTimeDouble> _o;
   EpicsPvTimeDouble* o;
 public:
-  EpicsPvTimeDouble_Wrapper(boost::shared_ptr<EpicsPvTimeDouble> obj) : _o(obj), o(_o.get()) {}
+  EpicsPvTimeDouble_Wrapper(shared_ptr<EpicsPvTimeDouble> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeDouble_Wrapper(EpicsPvTimeDouble* obj) : o(obj) {}
   const dbr_time_double_Wrapper dbr() const { return dbr_time_double_Wrapper((dbr_time_double*) &o->dbr()); }
-  std::vector<double> data() const { VEC_CONVERT(o->data(), double); }
+  vector<double> data() const { VEC_CONVERT(o->data(), double); }
   double value(uint32_t i) const { return o->value(i); }
 };
 
@@ -754,11 +757,11 @@ public:
 
 
 class PvConfigV1_Wrapper {
-  boost::shared_ptr<PvConfigV1> _o;
+  shared_ptr<PvConfigV1> _o;
   PvConfigV1* o;
 public:
   enum { iMaxPvDescLength = 64 };
-  PvConfigV1_Wrapper(boost::shared_ptr<PvConfigV1> obj) : _o(obj), o(_o.get()) {}
+  PvConfigV1_Wrapper(shared_ptr<PvConfigV1> obj) : _o(obj), o(_o.get()) {}
   PvConfigV1_Wrapper(PvConfigV1* obj) : o(obj) {}
   int16_t pvId() const { return o->pvId(); }
   const char* description() const { return o->description(); }
@@ -772,16 +775,16 @@ public:
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   int32_t numPv() const { return o->numPv(); }
   const PvConfigV1_Wrapper pvControls(uint32_t i0) const { return PvConfigV1_Wrapper((PvConfigV1*) &o->pvControls(i0)); }
-  std::vector<int> pvControls_shape() const { return o->pvControls_shape(); }
+  vector<int> pvControls_shape() const { return o->pvControls_shape(); }
 };
 
   class PvConfigV1_Getter : public Psana::EnvGetter {
@@ -792,12 +795,9 @@ public:
     const char* getTypeName() {
       return "Psana::Epics::PvConfigV1";
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<PvConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(PvConfigV1_Wrapper(result));
+      return result.get() ? object(PvConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -815,12 +815,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 } // namespace Epics

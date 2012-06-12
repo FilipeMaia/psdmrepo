@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace CsPad2x2 {
 
 extern void createWrappers();
@@ -20,12 +23,12 @@ extern void createWrappers();
 
 
 class CsPad2x2DigitalPotsCfg_Wrapper {
-  boost::shared_ptr<CsPad2x2DigitalPotsCfg> _o;
+  shared_ptr<CsPad2x2DigitalPotsCfg> _o;
   CsPad2x2DigitalPotsCfg* o;
 public:
-  CsPad2x2DigitalPotsCfg_Wrapper(boost::shared_ptr<CsPad2x2DigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
+  CsPad2x2DigitalPotsCfg_Wrapper(shared_ptr<CsPad2x2DigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2DigitalPotsCfg_Wrapper(CsPad2x2DigitalPotsCfg* obj) : o(obj) {}
-  std::vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
+  vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
 };
 
 /** @class CsPad2x2ReadOnlyCfg
@@ -35,10 +38,10 @@ public:
 
 
 class CsPad2x2ReadOnlyCfg_Wrapper {
-  boost::shared_ptr<CsPad2x2ReadOnlyCfg> _o;
+  shared_ptr<CsPad2x2ReadOnlyCfg> _o;
   CsPad2x2ReadOnlyCfg* o;
 public:
-  CsPad2x2ReadOnlyCfg_Wrapper(boost::shared_ptr<CsPad2x2ReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
+  CsPad2x2ReadOnlyCfg_Wrapper(shared_ptr<CsPad2x2ReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2ReadOnlyCfg_Wrapper(CsPad2x2ReadOnlyCfg* obj) : o(obj) {}
   uint32_t shiftTest() const { return o->shiftTest(); }
   uint32_t version() const { return o->version(); }
@@ -51,10 +54,10 @@ public:
 
 
 class ProtectionSystemThreshold_Wrapper {
-  boost::shared_ptr<ProtectionSystemThreshold> _o;
+  shared_ptr<ProtectionSystemThreshold> _o;
   ProtectionSystemThreshold* o;
 public:
-  ProtectionSystemThreshold_Wrapper(boost::shared_ptr<ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
+  ProtectionSystemThreshold_Wrapper(shared_ptr<ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
   ProtectionSystemThreshold_Wrapper(ProtectionSystemThreshold* obj) : o(obj) {}
   uint32_t adcThreshold() const { return o->adcThreshold(); }
   uint32_t pixelCountThreshold() const { return o->pixelCountThreshold(); }
@@ -67,10 +70,10 @@ public:
 
 
 class CsPad2x2GainMapCfg_Wrapper {
-  boost::shared_ptr<CsPad2x2GainMapCfg> _o;
+  shared_ptr<CsPad2x2GainMapCfg> _o;
   CsPad2x2GainMapCfg* o;
 public:
-  CsPad2x2GainMapCfg_Wrapper(boost::shared_ptr<CsPad2x2GainMapCfg> obj) : _o(obj), o(_o.get()) {}
+  CsPad2x2GainMapCfg_Wrapper(shared_ptr<CsPad2x2GainMapCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2GainMapCfg_Wrapper(CsPad2x2GainMapCfg* obj) : o(obj) {}
   PyObject* gainMap() const { ND_CONVERT(o->gainMap(), uint16_t, 2); }
 };
@@ -82,10 +85,10 @@ public:
 
 
 class ConfigV1QuadReg_Wrapper {
-  boost::shared_ptr<ConfigV1QuadReg> _o;
+  shared_ptr<ConfigV1QuadReg> _o;
   ConfigV1QuadReg* o;
 public:
-  ConfigV1QuadReg_Wrapper(boost::shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1QuadReg_Wrapper(shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV1QuadReg_Wrapper(ConfigV1QuadReg* obj) : o(obj) {}
   uint32_t shiftSelect() const { return o->shiftSelect(); }
   uint32_t edgeSelect() const { return o->edgeSelect(); }
@@ -120,12 +123,12 @@ public:
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   uint32_t concentratorVersion() const { return o->concentratorVersion(); }
   const ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper((ProtectionSystemThreshold*) &o->protectionThreshold()); }
@@ -149,13 +152,13 @@ public:
 
 
 class ElementV1_Wrapper {
-  boost::shared_ptr<ElementV1> _o;
+  shared_ptr<ElementV1> _o;
   ElementV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
-  ElementV1_Wrapper(boost::shared_ptr<ElementV1> obj) : _o(obj), o(_o.get()) {}
+  ElementV1_Wrapper(shared_ptr<ElementV1> obj) : _o(obj), o(_o.get()) {}
   ElementV1_Wrapper(ElementV1* obj) : o(obj) {}
   uint32_t virtual_channel() const { return o->virtual_channel(); }
   uint32_t lane() const { return o->lane(); }
@@ -166,7 +169,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  std::vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
+  vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   float common_mode(uint32_t section) const { return o->common_mode(section); }
@@ -180,12 +183,9 @@ public:
     const char* getTypeName() {
       return "Psana::CsPad2x2::ConfigV1QuadReg";
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1QuadReg> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1QuadReg_Wrapper(result));
+      return result.get() ? object(ConfigV1QuadReg_Wrapper(result)) : object();
     }
   };
 
@@ -203,12 +203,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 } // namespace CsPad2x2

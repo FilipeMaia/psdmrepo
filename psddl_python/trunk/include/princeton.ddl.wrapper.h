@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Princeton {
 
 extern void createWrappers();
@@ -20,12 +23,12 @@ extern void createWrappers();
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
@@ -51,12 +54,12 @@ public:
 
 
 class ConfigV2_Wrapper {
-  boost::shared_ptr<ConfigV2> _o;
+  shared_ptr<ConfigV2> _o;
   ConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
-  ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2_Wrapper(shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
@@ -83,12 +86,12 @@ public:
 
 
 class ConfigV3_Wrapper {
-  boost::shared_ptr<ConfigV3> _o;
+  shared_ptr<ConfigV3> _o;
   ConfigV3* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
-  ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
+  ConfigV3_Wrapper(shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
@@ -118,12 +121,12 @@ class ConfigV2;
 class ConfigV3;
 
 class FrameV1_Wrapper {
-  boost::shared_ptr<FrameV1> _o;
+  shared_ptr<FrameV1> _o;
   FrameV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  FrameV1_Wrapper(boost::shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
+  FrameV1_Wrapper(shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
   FrameV1_Wrapper(FrameV1* obj) : o(obj) {}
   uint32_t shotIdStart() const { return o->shotIdStart(); }
   float readoutTime() const { return o->readoutTime(); }
@@ -137,12 +140,12 @@ public:
 
 
 class InfoV1_Wrapper {
-  boost::shared_ptr<InfoV1> _o;
+  shared_ptr<InfoV1> _o;
   InfoV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonInfo /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  InfoV1_Wrapper(boost::shared_ptr<InfoV1> obj) : _o(obj), o(_o.get()) {}
+  InfoV1_Wrapper(shared_ptr<InfoV1> obj) : _o(obj), o(_o.get()) {}
   InfoV1_Wrapper(InfoV1* obj) : o(obj) {}
   float temperature() const { return o->temperature(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
@@ -164,12 +167,9 @@ private:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -187,12 +187,9 @@ private:
     int getVersion() {
       return ConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV2_Wrapper(result));
+      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
@@ -210,12 +207,9 @@ private:
     int getVersion() {
       return ConfigV3::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV3> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV3_Wrapper(result));
+      return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 } // namespace Princeton

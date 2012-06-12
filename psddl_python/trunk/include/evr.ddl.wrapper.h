@@ -9,6 +9,9 @@
 #include <psddl_python/DdlWrapper.h>
 #include <pdsdata/xtc/DetInfo.hh> // other included packages
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace EvrData {
 
 extern void createWrappers();
@@ -21,7 +24,7 @@ extern void createWrappers();
 
 
 class PulseConfig_Wrapper {
-  boost::shared_ptr<PulseConfig> _o;
+  shared_ptr<PulseConfig> _o;
   PulseConfig* o;
 public:
   enum { Trigger_Shift = 0 };
@@ -31,7 +34,7 @@ public:
   enum { Map_Set_Ena_Shift = 1 };
   enum { Map_Reset_Ena_Shift = 2 };
   enum { Map_Trigger_Ena_Shift = 3 };
-  PulseConfig_Wrapper(boost::shared_ptr<PulseConfig> obj) : _o(obj), o(_o.get()) {}
+  PulseConfig_Wrapper(shared_ptr<PulseConfig> obj) : _o(obj), o(_o.get()) {}
   PulseConfig_Wrapper(PulseConfig* obj) : o(obj) {}
   uint32_t pulse() const { return o->pulse(); }
   uint32_t _input_control_value() const { return o->_input_control_value(); }
@@ -67,10 +70,10 @@ private:
 #pragma pack(push,4)
 
 class PulseConfigV3_Wrapper {
-  boost::shared_ptr<PulseConfigV3> _o;
+  shared_ptr<PulseConfigV3> _o;
   PulseConfigV3* o;
 public:
-  PulseConfigV3_Wrapper(boost::shared_ptr<PulseConfigV3> obj) : _o(obj), o(_o.get()) {}
+  PulseConfigV3_Wrapper(shared_ptr<PulseConfigV3> obj) : _o(obj), o(_o.get()) {}
   PulseConfigV3_Wrapper(PulseConfigV3* obj) : o(obj) {}
   uint16_t pulseId() const { return o->pulseId(); }
   uint16_t polarity() const { return o->polarity(); }
@@ -95,10 +98,10 @@ private:
 #pragma pack(push,4)
 
 class EventCodeV3_Wrapper {
-  boost::shared_ptr<EventCodeV3> _o;
+  shared_ptr<EventCodeV3> _o;
   EventCodeV3* o;
 public:
-  EventCodeV3_Wrapper(boost::shared_ptr<EventCodeV3> obj) : _o(obj), o(_o.get()) {}
+  EventCodeV3_Wrapper(shared_ptr<EventCodeV3> obj) : _o(obj), o(_o.get()) {}
   EventCodeV3_Wrapper(EventCodeV3* obj) : o(obj) {}
   uint16_t code() const { return o->code(); }
   uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
@@ -125,10 +128,10 @@ private:
 #pragma pack(push,4)
 
 class EventCodeV4_Wrapper {
-  boost::shared_ptr<EventCodeV4> _o;
+  shared_ptr<EventCodeV4> _o;
   EventCodeV4* o;
 public:
-  EventCodeV4_Wrapper(boost::shared_ptr<EventCodeV4> obj) : _o(obj), o(_o.get()) {}
+  EventCodeV4_Wrapper(shared_ptr<EventCodeV4> obj) : _o(obj), o(_o.get()) {}
   EventCodeV4_Wrapper(EventCodeV4* obj) : o(obj) {}
   uint16_t code() const { return o->code(); }
   uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
@@ -159,11 +162,11 @@ private:
 #pragma pack(push,4)
 
 class EventCodeV5_Wrapper {
-  boost::shared_ptr<EventCodeV5> _o;
+  shared_ptr<EventCodeV5> _o;
   EventCodeV5* o;
 public:
   enum { DescSize = 16 };
-  EventCodeV5_Wrapper(boost::shared_ptr<EventCodeV5> obj) : _o(obj), o(_o.get()) {}
+  EventCodeV5_Wrapper(shared_ptr<EventCodeV5> obj) : _o(obj), o(_o.get()) {}
   EventCodeV5_Wrapper(EventCodeV5* obj) : o(obj) {}
   uint16_t code() const { return o->code(); }
   uint8_t isReadout() const { return o->isReadout(); }
@@ -176,7 +179,7 @@ public:
   uint32_t maskClear() const { return o->maskClear(); }
   const char* desc() const { return o->desc(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> desc_shape() const { return o->desc_shape(); }
+  vector<int> desc_shape() const { return o->desc_shape(); }
 private:
   uint16_t	_u16Code;
   uint16_t	_u16MaskEventAttr;
@@ -196,7 +199,7 @@ private:
 
 
 class OutputMap_Wrapper {
-  boost::shared_ptr<OutputMap> _o;
+  shared_ptr<OutputMap> _o;
   OutputMap* o;
 public:
   enum Source {
@@ -210,7 +213,7 @@ public:
     FrontPanel,
     UnivIO,
   };
-  OutputMap_Wrapper(boost::shared_ptr<OutputMap> obj) : _o(obj), o(_o.get()) {}
+  OutputMap_Wrapper(shared_ptr<OutputMap> obj) : _o(obj), o(_o.get()) {}
   OutputMap_Wrapper(OutputMap* obj) : o(obj) {}
   uint32_t value() const { return o->value(); }
   EvrData::OutputMap::Source source() const { return o->source(); }
@@ -229,7 +232,7 @@ private:
 
 
 class OutputMapV2_Wrapper {
-  boost::shared_ptr<OutputMapV2> _o;
+  shared_ptr<OutputMapV2> _o;
   OutputMapV2* o;
 public:
   enum Source {
@@ -243,7 +246,7 @@ public:
     FrontPanel,
     UnivIO,
   };
-  OutputMapV2_Wrapper(boost::shared_ptr<OutputMapV2> obj) : _o(obj), o(_o.get()) {}
+  OutputMapV2_Wrapper(shared_ptr<OutputMapV2> obj) : _o(obj), o(_o.get()) {}
   OutputMapV2_Wrapper(OutputMapV2* obj) : o(obj) {}
   uint32_t value() const { return o->value(); }
   EvrData::OutputMapV2::Source source() const { return o->source(); }
@@ -263,17 +266,17 @@ private:
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
-  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
+  vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class ConfigV2
@@ -283,7 +286,7 @@ public:
 
 
 class ConfigV2_Wrapper {
-  boost::shared_ptr<ConfigV2> _o;
+  shared_ptr<ConfigV2> _o;
   ConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -306,13 +309,13 @@ public:
     Off,
     On,
   };
-  ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2_Wrapper(shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
   uint32_t opcode() const { return o->opcode(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
-  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  vector<EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfig); }
+  vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
   EvrData::ConfigV2::BeamCode beam() const { return o->beam(); }
   EvrData::ConfigV2::RateCode rate() const { return o->rate(); }
 };
@@ -324,19 +327,19 @@ public:
 
 
 class ConfigV3_Wrapper {
-  boost::shared_ptr<ConfigV3> _o;
+  shared_ptr<ConfigV3> _o;
   ConfigV3* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
-  ConfigV3_Wrapper(boost::shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
+  ConfigV3_Wrapper(shared_ptr<ConfigV3> obj) : _o(obj), o(_o.get()) {}
   ConfigV3_Wrapper(ConfigV3* obj) : o(obj) {}
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::EventCodeV3> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV3); }
-  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
-  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  vector<EvrData::EventCodeV3> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV3); }
+  vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class ConfigV4
@@ -346,19 +349,19 @@ public:
 
 
 class ConfigV4_Wrapper {
-  boost::shared_ptr<ConfigV4> _o;
+  shared_ptr<ConfigV4> _o;
   ConfigV4* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 4 /**< XTC type version number */ };
-  ConfigV4_Wrapper(boost::shared_ptr<ConfigV4> obj) : _o(obj), o(_o.get()) {}
+  ConfigV4_Wrapper(shared_ptr<ConfigV4> obj) : _o(obj), o(_o.get()) {}
   ConfigV4_Wrapper(ConfigV4* obj) : o(obj) {}
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::EventCodeV4> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV4); }
-  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
-  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  vector<EvrData::EventCodeV4> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV4); }
+  vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
 };
 
 /** @class SequencerEntry
@@ -368,10 +371,10 @@ public:
 
 
 class SequencerEntry_Wrapper {
-  boost::shared_ptr<SequencerEntry> _o;
+  shared_ptr<SequencerEntry> _o;
   SequencerEntry* o;
 public:
-  SequencerEntry_Wrapper(boost::shared_ptr<SequencerEntry> obj) : _o(obj), o(_o.get()) {}
+  SequencerEntry_Wrapper(shared_ptr<SequencerEntry> obj) : _o(obj), o(_o.get()) {}
   SequencerEntry_Wrapper(SequencerEntry* obj) : o(obj) {}
   uint32_t delay() const { return o->delay(); }
   uint32_t eventcode() const { return o->eventcode(); }
@@ -387,7 +390,7 @@ private:
 
 
 class SequencerConfigV1_Wrapper {
-  boost::shared_ptr<SequencerConfigV1> _o;
+  shared_ptr<SequencerConfigV1> _o;
   SequencerConfigV1* o;
 public:
   enum Source {
@@ -400,13 +403,13 @@ public:
     r0_5Hz,
     Disable,
   };
-  SequencerConfigV1_Wrapper(boost::shared_ptr<SequencerConfigV1> obj) : _o(obj), o(_o.get()) {}
+  SequencerConfigV1_Wrapper(shared_ptr<SequencerConfigV1> obj) : _o(obj), o(_o.get()) {}
   SequencerConfigV1_Wrapper(SequencerConfigV1* obj) : o(obj) {}
   EvrData::SequencerConfigV1::Source sync_source() const { return o->sync_source(); }
   EvrData::SequencerConfigV1::Source beam_source() const { return o->beam_source(); }
   uint32_t length() const { return o->length(); }
   uint32_t cycles() const { return o->cycles(); }
-  std::vector<EvrData::SequencerEntry> entries() const { VEC_CONVERT(o->entries(), EvrData::SequencerEntry); }
+  vector<EvrData::SequencerEntry> entries() const { VEC_CONVERT(o->entries(), EvrData::SequencerEntry); }
 };
 
 /** @class ConfigV5
@@ -416,21 +419,21 @@ public:
 
 
 class ConfigV5_Wrapper {
-  boost::shared_ptr<ConfigV5> _o;
+  shared_ptr<ConfigV5> _o;
   ConfigV5* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
   enum { MaxPulses = 32 };
   enum { EvrOutputs = 10 };
-  ConfigV5_Wrapper(boost::shared_ptr<ConfigV5> obj) : _o(obj), o(_o.get()) {}
+  ConfigV5_Wrapper(shared_ptr<ConfigV5> obj) : _o(obj), o(_o.get()) {}
   ConfigV5_Wrapper(ConfigV5* obj) : o(obj) {}
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
-  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
-  std::vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
+  vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
+  vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  vector<EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMap); }
   const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); }
 };
 
@@ -441,21 +444,21 @@ public:
 
 
 class ConfigV6_Wrapper {
-  boost::shared_ptr<ConfigV6> _o;
+  shared_ptr<ConfigV6> _o;
   ConfigV6* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 6 /**< XTC type version number */ };
   enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
   enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
-  ConfigV6_Wrapper(boost::shared_ptr<ConfigV6> obj) : _o(obj), o(_o.get()) {}
+  ConfigV6_Wrapper(shared_ptr<ConfigV6> obj) : _o(obj), o(_o.get()) {}
   ConfigV6_Wrapper(ConfigV6* obj) : o(obj) {}
   uint32_t neventcodes() const { return o->neventcodes(); }
   uint32_t npulses() const { return o->npulses(); }
   uint32_t noutputs() const { return o->noutputs(); }
-  std::vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
-  std::vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
-  std::vector<EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMapV2); }
+  vector<EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), EvrData::EventCodeV5); }
+  vector<EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), EvrData::PulseConfigV3); }
+  vector<EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), EvrData::OutputMapV2); }
   const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper((SequencerConfigV1*) &o->seq_config()); }
 };
 
@@ -466,10 +469,10 @@ public:
 
 
 class FIFOEvent_Wrapper {
-  boost::shared_ptr<FIFOEvent> _o;
+  shared_ptr<FIFOEvent> _o;
   FIFOEvent* o;
 public:
-  FIFOEvent_Wrapper(boost::shared_ptr<FIFOEvent> obj) : _o(obj), o(_o.get()) {}
+  FIFOEvent_Wrapper(shared_ptr<FIFOEvent> obj) : _o(obj), o(_o.get()) {}
   FIFOEvent_Wrapper(FIFOEvent* obj) : o(obj) {}
   uint32_t timestampHigh() const { return o->timestampHigh(); }
   uint32_t timestampLow() const { return o->timestampLow(); }
@@ -488,15 +491,15 @@ private:
 
 
 class DataV3_Wrapper {
-  boost::shared_ptr<DataV3> _o;
+  shared_ptr<DataV3> _o;
   DataV3* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
-  DataV3_Wrapper(boost::shared_ptr<DataV3> obj) : _o(obj), o(_o.get()) {}
+  DataV3_Wrapper(shared_ptr<DataV3> obj) : _o(obj), o(_o.get()) {}
   DataV3_Wrapper(DataV3* obj) : o(obj) {}
   uint32_t numFifoEvents() const { return o->numFifoEvents(); }
-  std::vector<EvrData::FIFOEvent> fifoEvents() const { VEC_CONVERT(o->fifoEvents(), EvrData::FIFOEvent); }
+  vector<EvrData::FIFOEvent> fifoEvents() const { VEC_CONVERT(o->fifoEvents(), EvrData::FIFOEvent); }
 };
 
 /** @class IOChannel
@@ -506,18 +509,18 @@ public:
 
 
 class IOChannel_Wrapper {
-  boost::shared_ptr<IOChannel> _o;
+  shared_ptr<IOChannel> _o;
   IOChannel* o;
 public:
   enum { NameLength = 12 };
   enum { MaxInfos = 8 };
-  IOChannel_Wrapper(boost::shared_ptr<IOChannel> obj) : _o(obj), o(_o.get()) {}
+  IOChannel_Wrapper(shared_ptr<IOChannel> obj) : _o(obj), o(_o.get()) {}
   IOChannel_Wrapper(IOChannel* obj) : o(obj) {}
   const char* name() const { return o->name(); }
   uint32_t ninfo() const { return o->ninfo(); }
-  std::vector<Pds::DetInfo> infos() const { VEC_CONVERT(o->infos(), Pds::DetInfo); }
+  vector<Pds::DetInfo> infos() const { VEC_CONVERT(o->infos(), Pds::DetInfo); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-  std::vector<int> name_shape() const { return o->name_shape(); }
+  vector<int> name_shape() const { return o->name_shape(); }
 private:
   char	_name[NameLength];
   uint32_t	_ninfo;
@@ -531,15 +534,15 @@ private:
 
 
 class IOConfigV1_Wrapper {
-  boost::shared_ptr<IOConfigV1> _o;
+  shared_ptr<IOConfigV1> _o;
   IOConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  IOConfigV1_Wrapper(boost::shared_ptr<IOConfigV1> obj) : _o(obj), o(_o.get()) {}
+  IOConfigV1_Wrapper(shared_ptr<IOConfigV1> obj) : _o(obj), o(_o.get()) {}
   IOConfigV1_Wrapper(IOConfigV1* obj) : o(obj) {}
   uint16_t nchannels() const { return o->nchannels(); }
-  std::vector<EvrData::IOChannel> channels() const { VEC_CONVERT(o->channels(), EvrData::IOChannel); }
+  vector<EvrData::IOChannel> channels() const { VEC_CONVERT(o->channels(), EvrData::IOChannel); }
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
 };
 
@@ -551,12 +554,9 @@ public:
     const char* getTypeName() {
       return "Psana::EvrData::PulseConfigV3";
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<PulseConfigV3> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(PulseConfigV3_Wrapper(result));
+      return result.get() ? object(PulseConfigV3_Wrapper(result)) : object();
     }
   };
 
@@ -574,12 +574,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -597,12 +594,9 @@ public:
     int getVersion() {
       return ConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV2_Wrapper(result));
+      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
@@ -620,12 +614,9 @@ public:
     int getVersion() {
       return ConfigV3::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV3> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV3_Wrapper(result));
+      return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
@@ -643,12 +634,9 @@ public:
     int getVersion() {
       return ConfigV4::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV4> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV4_Wrapper(result));
+      return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
@@ -660,12 +648,9 @@ public:
     const char* getTypeName() {
       return "Psana::EvrData::SequencerConfigV1";
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<SequencerConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(SequencerConfigV1_Wrapper(result));
+      return result.get() ? object(SequencerConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -683,12 +668,9 @@ public:
     int getVersion() {
       return ConfigV5::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV5> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV5_Wrapper(result));
+      return result.get() ? object(ConfigV5_Wrapper(result)) : object();
     }
   };
 
@@ -706,12 +688,9 @@ public:
     int getVersion() {
       return ConfigV6::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV6> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV6_Wrapper(result));
+      return result.get() ? object(ConfigV6_Wrapper(result)) : object();
     }
   };
 
@@ -729,14 +708,17 @@ public:
     int getVersion() {
       return DataV3::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV3_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV3> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataV3_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV3_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV3> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataV3_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV3_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV3> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataV3_Wrapper(result)) : object();
     }
   };
 
@@ -754,12 +736,9 @@ public:
     int getVersion() {
       return IOConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<IOConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(IOConfigV1_Wrapper(result));
+      return result.get() ? object(IOConfigV1_Wrapper(result)) : object();
     }
   };
 } // namespace EvrData

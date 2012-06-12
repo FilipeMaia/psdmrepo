@@ -8,6 +8,9 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 namespace Psana {
+  using boost::python::api::object;
+  using boost::shared_ptr;
+  using std::vector;
 namespace Timepix {
 
 extern void createWrappers();
@@ -20,7 +23,7 @@ extern void createWrappers();
 
 
 class ConfigV1_Wrapper {
-  boost::shared_ptr<ConfigV1> _o;
+  shared_ptr<ConfigV1> _o;
   ConfigV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -35,7 +38,7 @@ public:
     TriggerMode_ExtNeg = 1,
     TriggerMode_Soft = 2,
   };
-  ConfigV1_Wrapper(boost::shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
+  ConfigV1_Wrapper(shared_ptr<ConfigV1> obj) : _o(obj), o(_o.get()) {}
   ConfigV1_Wrapper(ConfigV1* obj) : o(obj) {}
   Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV1::TriggerMode triggerMode() const { return o->triggerMode(); }
@@ -105,7 +108,7 @@ public:
 
 
 class ConfigV2_Wrapper {
-  boost::shared_ptr<ConfigV2> _o;
+  shared_ptr<ConfigV2> _o;
   ConfigV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixConfig /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -122,7 +125,7 @@ public:
     TriggerMode_ExtNeg = 1,
     TriggerMode_Soft = 2,
   };
-  ConfigV2_Wrapper(boost::shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2_Wrapper(shared_ptr<ConfigV2> obj) : _o(obj), o(_o.get()) {}
   ConfigV2_Wrapper(ConfigV2* obj) : o(obj) {}
   Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
   Timepix::ConfigV2::TriggerMode triggerMode() const { return o->triggerMode(); }
@@ -186,7 +189,7 @@ public:
   int32_t driverVersion() const { return o->driverVersion(); }
   uint32_t firmwareVersion() const { return o->firmwareVersion(); }
   uint32_t pixelThreshSize() const { return o->pixelThreshSize(); }
-  std::vector<uint8_t> pixelThresh() const { VEC_CONVERT(o->pixelThresh(), uint8_t); }
+  vector<uint8_t> pixelThresh() const { VEC_CONVERT(o->pixelThresh(), uint8_t); }
   const char* chip0Name() const { return o->chip0Name(); }
   const char* chip1Name() const { return o->chip1Name(); }
   const char* chip2Name() const { return o->chip2Name(); }
@@ -205,7 +208,7 @@ public:
 
 
 class DataV1_Wrapper {
-  boost::shared_ptr<DataV1> _o;
+  shared_ptr<DataV1> _o;
   DataV1* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
@@ -215,7 +218,7 @@ public:
   enum { Depth = 14 };
   enum { DepthBytes = 2 };
   enum { MaxPixelValue = 11810 };
-  DataV1_Wrapper(boost::shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
+  DataV1_Wrapper(shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
   uint32_t timestamp() const { return o->timestamp(); }
   uint16_t frameCounter() const { return o->frameCounter(); }
@@ -234,14 +237,14 @@ public:
 
 
 class DataV2_Wrapper {
-  boost::shared_ptr<DataV2> _o;
+  shared_ptr<DataV2> _o;
   DataV2* o;
 public:
   enum { TypeId = Pds::TypeId::Id_TimepixData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { Depth = 14 };
   enum { MaxPixelValue = 11810 };
-  DataV2_Wrapper(boost::shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
+  DataV2_Wrapper(shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
   uint16_t width() const { return o->width(); }
   uint16_t height() const { return o->height(); }
@@ -267,12 +270,9 @@ public:
     int getVersion() {
       return ConfigV1::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV1> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV1_Wrapper(result));
+      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
@@ -290,12 +290,9 @@ public:
     int getVersion() {
       return ConfigV2::Version;
     }
-    boost::python::api::object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<ConfigV2> result = store.get(src, 0);
-      if (! result.get()) {
-        return boost::python::api::object();
-      }
-      return boost::python::api::object(ConfigV2_Wrapper(result));
+      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
@@ -313,14 +310,17 @@ public:
     int getVersion() {
       return DataV1::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV1_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 
@@ -338,14 +338,17 @@ public:
     int getVersion() {
       return DataV2::Version;
     }
-    boost::python::api::object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV2_Wrapper(evt.get(key, foundSrc)));
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV2> result = evt.get(key, foundSrc);
+      return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV2_Wrapper(evt.get(src, key, foundSrc)));
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV2> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
-    boost::python::api::object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      return boost::python::api::object(DataV2_Wrapper(evt.get(source, key, foundSrc)));
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DataV2> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
   };
 } // namespace Timepix
