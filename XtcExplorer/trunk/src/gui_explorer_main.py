@@ -79,12 +79,13 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, instrument=None, experiment=None, runnr=None ) :
+    def __init__ ( self, psana=False, instrument=None, experiment=None, runnr=None ) :
         """Constructor.
 
         Description
         """
-        print "gui_explorer_main"
+        self.psana = psana
+        print "gui_explorer_main (psana=%s)" % self.psana
         QtGui.QMainWindow.__init__(self)
 
         QtCore.pyqtRemoveInputHook()

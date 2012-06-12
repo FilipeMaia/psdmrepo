@@ -136,12 +136,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     #----------------
     def __init__ (self,
                   data,
+                  psana = False,
                   parent = None) :
         """Constructor.
         
         @param data    object that holds information about the data
         @param parent  parent widget, if any
         """
+        self.psana = psana
         QtGui.QWidget.__init__(self, parent)
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -802,16 +804,25 @@ Do you want to proceed?
 
             options_for_mod[m] = newoptions
 
-        self.configuration = "[pyana]"
+        if self.psana:
+            self.configuration = "[psana]"
+        else:
+            self.configuration = "[pyana]"
         self.configuration += "\nfiles = "
         for i, fname in enumerate(self.filenames):
             if i > 0: 
-                self.configuration += "\n\t"
+                if self.psana:
+                    self.configuration += " \\\n\t"
+                else:
+                    self.configuration += "\n\t"
             self.configuration += fname
 
         self.configuration += "\nmodules ="
         for module in modules_to_run :
-            self.configuration += " "
+            if self.psana:
+                self.configuration += " py:"
+            else:
+                self.configuration += " "
             self.configuration += module
 
         count_m = 0
@@ -1209,7 +1220,10 @@ Do you want to proceed?
     def pyana_runstring(self):
         # Make a command sequence 
         lpoptions = []
-        lpoptions.append("pyana")
+        if self.psana:
+            lpoptions.append("psana")
+        else:
+            lpoptions.append("pyana")
         #if self.verbose is not None:
         #    lpoptions.append("-v")
         if self.num_cpu > 1 :

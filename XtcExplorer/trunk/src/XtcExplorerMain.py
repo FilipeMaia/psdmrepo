@@ -77,12 +77,13 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, instrument=None ) :
+    def __init__ ( self, psana=False, instrument=None ) :
         """Constructor.
 
         Description
         """
         print "XtcExplorerMain"
+        self.psana = psana
         QtGui.QMainWindow.__init__(self)
 
         QtCore.pyqtRemoveInputHook()
@@ -621,7 +622,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.pyanactrl.close()
             self.pyanactrl = None
             
-        self.pyanactrl = XtcPyanaControl(self.scanner)
+        self.pyanactrl = XtcPyanaControl(self.scanner, self.psana)
         #if self.scan_button.isEnabled():
         #    self.scan_enable()
             
