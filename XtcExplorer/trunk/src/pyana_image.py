@@ -412,7 +412,7 @@ class  pyana_image ( object ) :
                     try:
                         self.sum_dark_images[addr] += image
                     except TypeError:
-                        self.sum_dark_images[addr] = np.array(image,dtype=image.dtype)
+                        self.sum_dark_images[addr] = np.array(image,dtype='int64')
                     # collect dark
                     self.data[addr].ndark = self.n_dark[addr]
                     self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
@@ -427,7 +427,7 @@ class  pyana_image ( object ) :
                     try:
                         self.sum_good_images[addr] += image
                     except TypeError:
-                        self.sum_good_images[addr] = np.array(image,dtype=image.dtype)
+                        self.sum_good_images[addr] = np.array(image,dtype='int64')                        
 
                 if "maximum" in self.quantities:
                     try:
@@ -441,7 +441,8 @@ class  pyana_image ( object ) :
 
         # make plot? if so, pass this info to the event. 
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
-            # update averages 
+
+            # update averages / info for the event
             self.update()
             
             # flag for pyana_plotter
@@ -451,6 +452,10 @@ class  pyana_image ( object ) :
             data_images = []
             for source in self.sources :
                 data_images.append( self.data[source] )
+
+            print data_images
+            print self.data.items()
+            
             # give the list to the event object
             evt.put( data_images, 'data_images' )
                                                             
@@ -499,6 +504,10 @@ class  pyana_image ( object ) :
         if (env.subprocess()>0):
             return
 
+
+        # update averages / info for the event
+        self.update()
+
         # flag for pyana_plotter
         evt.put(True, 'show_event')
             
@@ -511,7 +520,7 @@ class  pyana_image ( object ) :
             
 
         if (self.output_file is not None):
-            self.update()
+
             images_for_saving = []
             for addr in self.sources:
                 print "Adding to list: ", addr, dir(self.data[addr])
@@ -532,66 +541,6 @@ class  pyana_image ( object ) :
 
         return
 
-        nsrc = 0
-        for addr in self.sources:
-            
-            nsrc += 1
-
-            # keep a list of images 
-            event_display_images = []
-
-            print "# Signal images from %s = %d "% (addr, self.n_good[addr])
-            print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
-
-            average_image = None
-            if self.n_good[addr] > 0 :
-                name = "AvgHit_"+addr
-                title = "Average of %d hits"%self.n_good[addr]
-                print "adding", title
-                average_image = np.float_(self.sum_good_images[addr])/self.n_good[addr]
-                event_display_images.append( (name, title, average_image ) )
-
-                name = "MaxHit_"+addr
-                title = "Maximum projection of %d hits"%self.n_good[addr]
-                print "adding", title
-                event_display_images.append( (name,title,self.max_good_images[addr]) )
-
-                # and max minus average
-                name = "MaxOverAvg_"+addr
-                title = "Max normalized to average "
-                max_over_avg = np.float_(self.max_good_images[addr]) / average_image
-                print "adding", title
-                event_display_images.append( (name, title, max_over_avg) )
-
-            rejected_image = None
-            if self.n_dark[addr] > 0 :
-                name = "AvgDark_"+addr
-                title = "Average of %d darks"%self.n_dark[addr]
-                
-                rejected_image = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
-                event_display_images.append( (name, title, rejected_image ) )
-            
-            if len(event_display_images) == 0:
-                print "That shouldn't be possible"
-                return
-            
-            
-
-        # -----------------------------------
-        # Saving the final average to file(s)
-        # -----------------------------------
-        if (self.output_file is not None):
-
-            self.save_images( self.output_file, event_display_images )
-
-
-        # convert dict to a list:
-        data_image = []
-        for source in self.sources :
-            data_image.append( self.data[source] )
-        # give the list to the event object
-        evt.put( data_image, 'data_images' )
-            
 
 
 
