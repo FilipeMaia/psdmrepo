@@ -144,6 +144,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         @param parent  parent widget, if any
         """
         self.psana = psana
+        if self.psana:
+            self.pxana = "psana"
+        else:
+            self.pxana = "pyana"
         QtGui.QWidget.__init__(self, parent)
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -260,18 +264,18 @@ Start with selecting data of interest to you from list on the left and general r
     def layout_runcontrol(self):
 
         # Run pyana button
-        self.pyana_button = QtGui.QPushButton("&Run pyana")
+        self.pyana_button = QtGui.QPushButton("&Run " + self.pxana)
         self.pyana_button.setMaximumWidth(120)
         self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
 
         # Suspend pyana button
-        self.susp_button = QtGui.QPushButton("&Suspend pyana")
+        self.susp_button = QtGui.QPushButton("&Suspend " + self.pxana)
         self.susp_button.setCheckable(True) # Toggle two states: suspend / resume
         self.susp_button.setMaximumWidth(120)
         self.connect(self.susp_button, QtCore.SIGNAL('clicked()'), self.suspend_pyana )
 
         # Quit pyana button
-        self.quit_button = QtGui.QPushButton("&Quit pyana")
+        self.quit_button = QtGui.QPushButton("&Quit " + self.pxana)
         self.quit_button.setMaximumWidth(120)
         self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
 
@@ -551,7 +555,7 @@ Start with selecting data of interest to you from list on the left and general r
         pyana_layout = QtGui.QVBoxLayout(pyana_widget)
         
         pyana_widget.setLayout(pyana_layout)
-        self.pyana_config_label = QtGui.QLabel("Current pyana configuration:")
+        self.pyana_config_label = QtGui.QLabel("Current " + self.pxana + " configuration:")
         
         # scroll area for the configuration file text
         scrollArea = QtGui.QScrollArea()
@@ -612,7 +616,7 @@ Start with selecting data of interest to you from list on the left and general r
             self.plotn_change()
             self.plotn_enter.setText("")
             
-        print "Configure pyana by selecting from the detector list"
+        print "Configure " + self.pxana + " by selecting from the detector list"
 
     def setup_gui_checkboxes(self) :
         """Draw a group of checkboxes to the GUI
@@ -760,7 +764,7 @@ Do you want to proceed?
         if self.quit_button is not None: self.quit_button.setDisabled(True)
         if self.susp_button is not None: self.susp_button.setDisabled(True)
 
-        self.pyana_config_label.setText("Current pyana configuration:")
+        self.pyana_config_label.setText("Current %s configuration:" % (self.pxana))
 
         modules_to_run = []
         options_for_mod = []
@@ -804,10 +808,7 @@ Do you want to proceed?
 
             options_for_mod[m] = newoptions
 
-        if self.psana:
-            self.configuration = "[psana]"
-        else:
-            self.configuration = "[pyana]"
+        self.configuration = "[" + self.pxana + "]"
         self.configuration += "\nfiles = "
         for i, fname in enumerate(self.filenames):
             if i > 0: 
@@ -985,15 +986,15 @@ Do you want to proceed?
             address = boxlabel.strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\ninputdark = ")
-            options_for_mod[index].append("\n;threshold = lower=0 upper=1200 roi=(x1:x2,y1:y2) type=maximum")
-            options_for_mod[index].append("\n;algorithms = rotate shift")
-            options_for_mod[index].append("\nquantities = image average ; dark maximum")
+            options_for_mod[index].append("\n#threshold = lower=0 upper=1200 roi=(x1:x2,y1:y2) type=maximum")
+            options_for_mod[index].append("\n#algorithms = rotate shift")
+            options_for_mod[index].append("\nquantities = image average\n# ... dark maximum")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             #options_for_mod[index].append("\nshow_projections = 0 ; 0:none, 1:average, 2:maxima")
             options_for_mod[index].append("\noutputfile = ")
-            options_for_mod[index].append("\nmax_save = 0   ; max event images to save" )
+            options_for_mod[index].append("\nmax_save = 0\n# ... max event images to save" )
 
             options_for_mod[index].append("\ncmmode_mode = asic");
             options_for_mod[index].append("\ncmmode_thr = 30"); 
@@ -1116,9 +1117,9 @@ Do you want to proceed?
         """Write the configuration text to a file. Filename is generated randomly
         """
 
-        self.configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
+        self.configfile = "xb_%s_%d.cfg" % (self.pxana, random.randint(1000,9999))
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_label.setText("Current %s configuration: (%s)" % (self.pxana, self.configfile))
         self.conf_widget.setText(self.configfile)
 
         f = open(self.configfile,'w')
@@ -1171,7 +1172,7 @@ Do you want to proceed?
         self.configuration = f.read()
         f.close()
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_label.setText("Current %s configuration: (%s)" % (self.pxana, self.configfile))
         self.pyana_config_text.setText(self.configuration)
         self.print_configuration()
 
@@ -1207,7 +1208,7 @@ Do you want to proceed?
         self.configuration = f.read()
         f.close()
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_label.setText("Current %s configuration: (%s)" % (self.pxana, self.configfile))
         self.pyana_config_text.setText(self.configuration)
         self.print_configuration()
 
