@@ -29,6 +29,7 @@ from cspad     import CsPad
 
 from utilities import Threshold
 from utilities import PyanaOptions
+from utilities import PyanaCompat
 from utilities import ImageData
 
 import algorithms as alg
@@ -193,6 +194,7 @@ class  pyana_image ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        self.psana = PyanaCompat(env).psana
         logging.info( "pyana_image.beginjob()" )
 
         self.n_shots = 0
@@ -221,7 +223,14 @@ class  pyana_image ( object ) :
                 return
 
             if addr.find('Cspad2x2')>=0:
-                sections = self.config.sections()
+                if self.psana:
+                    roimask = self.config.roiMask();
+                    sections = []
+                    for section in range(2):
+                        if (roimask & 1 << section):
+                            sections.append(section)
+                else:
+                    sections = self.config.sections()
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
                 
             elif addr.find('Cspad')>=0:
@@ -256,7 +265,16 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             address = addr.split('|')[0]
-            frame = evt.get( self.datatypes[device], address )
+            detsrc = address.split('-')[0]
+            if self.psana:
+                if device == 'Cspad2x2':
+                    className = 'Psana::CsPad2x2::Element'
+                else:
+                    print "**************************************** Unrecognized device", device
+                    return
+                frame = evt.get( className, env.Source(detsrc) )
+            else:
+                frame = evt.get( self.datatypes[device], detsrc )
             if frame is None:
                 print "No frame from ", addr
                 return
@@ -433,8 +451,8 @@ class  pyana_image ( object ) :
             data_images = []
             for source in self.sources :
                 data_images.append( self.data[source] )
-                # give the list to the event object
-                evt.put( data_images, 'data_images' )
+            # give the list to the event object
+            evt.put( data_images, 'data_images' )
                                                             
 
         # -----------------------------------
@@ -488,8 +506,8 @@ class  pyana_image ( object ) :
         data_image = []
         for source in self.sources :
             data_image.append( self.data[source] )
-            # give the list to the event object
-            evt.put( data_image, 'data_images' )
+        # give the list to the event object
+        evt.put( data_image, 'data_images' )
             
 
         if (self.output_file is not None):
@@ -571,8 +589,8 @@ class  pyana_image ( object ) :
         data_image = []
         for source in self.sources :
             data_image.append( self.data[source] )
-            # give the list to the event object
-            evt.put( data_image, 'data_images' )
+        # give the list to the event object
+        evt.put( data_image, 'data_images' )
             
 
 
