@@ -141,10 +141,14 @@ class pyana_epics (object) :
                 #      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
                 #       pv.status, pv.severity, pv.values)
                 
-                message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
-                          %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
-
-                message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
+                if self.psana:
+                    message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
+                              %(pv_name,pv.pvId(), pv.dbrType(), pv.precision(), pv.units())
+                    message += "   Status = %d , Severity = %d \n"%(pv.status(), pv.severity())
+                else:
+                    message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
+                              %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
+                    message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
                 try:
                     message += "(%s), (%s)\n" \
                                %(epics.epicsAlarmConditionStrings[pv.status],
