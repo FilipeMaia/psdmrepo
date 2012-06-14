@@ -187,6 +187,16 @@ class  pyana_image ( object ) :
             self.n_good[addr] = 0
             self.n_dark[addr] = 0
 
+    def load_dark(self,filename):
+        fname = filename.split('.')
+        if fname[-1] == "txt" :  # Ascii
+            image = np.loadtxt(filename)
+        elif fname[-1] == 'npy' : # NumPy binary
+            image = np.load(filename)
+        else :
+            return None
+
+        return image
 
     def beginrun( self, evt, env ):
         self.n_shots = 0
@@ -205,11 +215,7 @@ class  pyana_image ( object ) :
             self.data[source] = ImageData(source)
 
 	## load dark image from file
-        self.dark_image = None
-	try:
-            self.dark_image = np.load(self.darkfile)
-	except:
-            print "No dark image in file ", self.darkfile
+        self.dark_image = self.load_dark(self.darkfile)
 
         calibfinder = CalibFileFinder(env.calibDir(),"CsPad::CalibV1")
         for addr in self.sources :
