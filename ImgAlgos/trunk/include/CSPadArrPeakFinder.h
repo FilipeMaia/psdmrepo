@@ -25,6 +25,7 @@
 //-------------------------------
 #include "psddl_psana/cspad.ddl.h"
 #include "ImgAlgos/CSPadMaskV1.h"
+#include "ImgAlgos/TimeInterval.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -118,6 +119,8 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
+    void procData(Event& evt);
+    void fillOutputArr(unsigned quad, int16_t* newdata);
     void collectStatInQuad(unsigned quad, const int16_t* data);
     void collectStatInSect(unsigned quad, unsigned sect, const int16_t* sectData);
     void findPeaksInSect(unsigned quad, unsigned sect);
@@ -129,7 +132,7 @@ protected:
     void maskUpdateControl();
     void setSelectionMode();
     bool eventSelector();
-
+    void printEventSelectionPars(Event& evt, bool isSelected);
     void evaluateVectorOfIndexesForMedian();
     void printMatrixOfIndexesForMedian();
     void printVectorOfIndexesForMedian();
@@ -148,19 +151,24 @@ protected:
     void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
     void getMaskFromFile();
-    void printMaskStatistics();
+    void printInitialMaskStatistics();
 
     std::string strEventCounter();
     std::string strTimeStamp(Event& evt);
     std::string strRunNumber(Event& evt);
-    void doOperationsForSelectedEvents(Event& evt);
+    void doOperationsForSelectedEvent(Event& evt);
     void savePeaksInEvent(Event& evt);
+    void savePeaksInFile(std::string& fname, std::vector<Peak> peaks);
+    void printSelectionStatistics();
+    void printSelectionStatisticsByCounter();
+    void printJobSummary();
 
 private:
   //Source         m_src;             // Data source set from config file
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
   std::string    m_key;             // string with key name
+  std::string    m_key_signal_out;  // string with key for signal cspad array (background subtracted by median algorithm) 
   std::string    m_key_peaks_out;   // string with key for found peaks in selected events
   std::string    m_maskFile_inp;    // [in]  file with mask 
   std::string    m_maskFile_out;    // [out] file with mask 
@@ -186,8 +194,9 @@ private:
   unsigned       m_out_file_bits;     // Yes/No bits to control output files
   unsigned       m_print_bits;   
   unsigned long  m_count;             // number of events from the beginning of job
-  unsigned long  m_count_mask_update; // number of events from the beginning of job
-  unsigned long  m_count_mask_accum;  // number of events from the beginning of job
+  unsigned long  m_count_selected;    // number of selected events from the beginning of job
+  unsigned long  m_count_mask_update; // number of events from the last mask update
+  unsigned long  m_count_mask_accum;  // number of events from the beginning of the mask statistics accumulation
 
   unsigned       m_segMask         [MaxQuads];  // segment masks per quadrant
   unsigned       m_stat            [MaxQuads][MaxSectors][NumColumns][NumRows];
@@ -195,6 +204,8 @@ private:
   float          m_frac_noisy_evts [MaxQuads][MaxSectors][NumColumns][NumRows];
   int16_t        m_signal          [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_proc_status     [MaxQuads][MaxSectors][NumColumns][NumRows];
+
+  float          m_common_mode[MaxSectors];
 
   ImgAlgos::CSPadMaskV1 *m_mask_initial;
 
@@ -213,7 +224,7 @@ private:
   unsigned  m_quad;
   unsigned  m_sect;
   double    m_event_amp_tot;
-
+  TimeInterval *m_time;
 };
 
 } // namespace ImgAlgos

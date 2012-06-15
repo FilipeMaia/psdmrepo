@@ -10,7 +10,21 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+	
+Tag: V00-00-05
+2012-06-15 Mikhail S. Dubrovin
+- finalizing all modules for CSPadArrPeakFinder
+A       include/CSPadArrSaveInFile.h
+M       include/TimeInterval.h
+M       include/CSPadMaskApply.h
+M       include/CSPadArrPeakFinder.h
+A       src/CSPadArrSaveInFile.cpp
+M       src/TimeInterval.cpp
+M       src/CSPadMaskApply.cpp
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
 
+	
 Tag: V00-00-04
 2012-05-11 Mikhail S. Dubrovin
 - modified modules:

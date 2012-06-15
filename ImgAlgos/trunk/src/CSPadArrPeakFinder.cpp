@@ -32,6 +32,8 @@
 //#include "psddl_psana/acqiris.ddl.h"
 
 #include "PSEvt/EventId.h"
+#include "cspad_mod/DataT.h"
+#include "cspad_mod/ElementT.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -57,6 +59,7 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
+  , m_key_signal_out()  
   , m_key_peaks_out()  
   , m_maskFile_inp()
   , m_maskFile_out()
@@ -77,44 +80,47 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   , m_out_file_bits()
   , m_print_bits()
   , m_count(0)
+  , m_count_selected(0)
   , m_count_mask_update(0)
   , m_count_mask_accum(0)
 {
   // get the values from configuration or use defaults
   m_str_src           = configStr("source",     "DetInfo(:Cspad)");
   m_key               = configStr("key",        "");                 //"calibrated"
+  m_key_signal_out    = configStr("key_signal_out", "");
   m_key_peaks_out     = configStr("key_peaks_out", "peaks");
   m_maskFile_inp      = configStr("hot_pix_mask_inp_file", "cspad-pix-mask-in.dat");
   m_maskFile_out      = configStr("hot_pix_mask_out_file", "cspad-pix-mask-out.dat");
   m_fracFile_out      = configStr("frac_noisy_evts_file",  "cspad-pix-frac-out.dat");
   m_evtFile_out       = configStr("evt_file_out",          "./cspad-ev-");
-  m_rmin              = config   ("rmin",              3);
-  m_dr                = config   ("dr",                1);
-  m_SoNThr            = config   ("SoNThr",            3);
-  m_frac_noisy_imgs   = config   ("frac_noisy_imgs", 0.1); 
+  m_rmin              = config   ("rmin",                    3 );
+  m_dr                = config   ("dr",                      1 );
+  m_SoNThr            = config   ("SoNThr",                  3 );
+  m_frac_noisy_imgs   = config   ("frac_noisy_imgs",       0.1 ); 
 
-  m_peak_npix_min     = config   ("peak_npix_min",         4);
-  m_peak_npix_max     = config   ("peak_npix_max",        25);
-  m_peak_amp_tot_thr  = config   ("peak_amp_tot_thr",   100.);
+  m_peak_npix_min     = config   ("peak_npix_min",           4 );
+  m_peak_npix_max     = config   ("peak_npix_max",          25 );
+  m_peak_amp_tot_thr  = config   ("peak_amp_tot_thr",      100.);
 
-  m_event_npeak_min   = config   ("event_npeak_min",      10);
-  m_event_amp_tot_thr = config   ("event_amp_tot_thr", 1000.);
+  m_event_npeak_min   = config   ("event_npeak_min",        10 );
+  m_event_amp_tot_thr = config   ("event_amp_tot_thr",    1000.);
 
-  m_nevents_mask_update= config   ("nevents_mask_update",   100);
-  m_nevents_mask_accum = config   ("nevents_mask_accum",     50);
+  m_nevents_mask_update= config   ("nevents_mask_update",  100 );
+  m_nevents_mask_accum = config   ("nevents_mask_accum",    50 );
 
   m_sel_mode_str      = configStr("selection_mode", "SELECTION_ON");
-  m_out_file_bits     = config   ("out_file_bits",         0); 
-  m_print_bits        = config   ("print_bits",            0);
+  m_out_file_bits     = config   ("out_file_bits",           0 ); 
+  m_print_bits        = config   ("print_bits",              0 );
 
   // initialize arrays
   std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
+  std::fill_n(&m_common_mode[0], int(MaxSectors), float(0));
 
   setSelectionMode(); // m_sel_mode_str -> enum m_sel_mode 
   resetStatArrays();
   resetSignalArrays();
   getMaskFromFile(); // load the initial hot-pixel mask from file or default 
-  if( m_print_bits & 1 ) printMaskStatistics();
+  if( m_print_bits & 2 ) printInitialMaskStatistics();
 }
 
 //--------------
@@ -133,6 +139,7 @@ CSPadArrPeakFinder::printInputParameters()
     log << "\n Input parameters:"
         << "\n source                : " << m_str_src
         << "\n key                   : " << m_key      
+        << "\n m_key_signal_out      : " << m_key_signal_out
         << "\n m_key_peaks_out       : " << m_key_peaks_out 
         << "\n m_maskFile_inp        : " << m_maskFile_inp    
         << "\n m_maskFile_out        : " << m_maskFile_out    
@@ -155,12 +162,12 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n print_bits            : " << m_print_bits
         << "\n";     
 
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
-        << "\n";
+    //log << "\n MaxQuads   : " << MaxQuads    
+    //    << "\n MaxSectors : " << MaxSectors  
+    //    << "\n NumColumns : " << NumColumns  
+    //    << "\n NumRows    : " << NumRows     
+    //    << "\n SectorSize : " << SectorSize  
+    //    << "\n";
   }
 }
 
@@ -174,6 +181,7 @@ CSPadArrPeakFinder::beginJob(Event& evt, Env& env)
   if( m_print_bits & 64 ) printVectorOfIndexesForMedian();
   if( m_print_bits & 64 ) printMatrixOfIndexesForMedian();
 
+  m_time = new TimeInterval();
 }
 
 /// Method which is called at the beginning of the run
@@ -248,47 +256,25 @@ CSPadArrPeakFinder::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadArrPeakFinder::event(Event& evt, Env& env)
 {
+  m_time -> startTimeOnce();
+
   maskUpdateControl();
-
   resetForEventProcessing();
+  if( m_print_bits & 512 ) printSelectionStatisticsByCounter();
 
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_key, &m_src);
-  if (data1.get()) {
+  procData(evt);
 
-    ++ m_count;
-    //setCollectionMode();
-    
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
+  bool isSelected = eventSelector();
 
-      const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
-      collectStatInQuad(quad.quad(), data.data());
-    }    
-  }
-  
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_key, &m_src);
-  if (data2.get()) {
-
-    ++ m_count;
-    //setCollectionMode();
-    
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-      
-      const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
-      collectStatInQuad(quad.quad(), data.data());
-    } 
-  }
-
+  if( m_print_bits &   4 ) printEventSelectionPars(evt, isSelected);
   if( m_print_bits &  32 ) printTimeStamp(evt);
   if( m_print_bits & 128 ) printVectorOfPeaks();
 
-  if (m_sel_mode == SELECTION_ON  && !eventSelector()) {skip(); return;}
-  if (m_sel_mode == SELECTION_INV &&  eventSelector()) {skip(); return;}
+  if (m_sel_mode == SELECTION_ON  && !isSelected) {skip(); return;}
+  if (m_sel_mode == SELECTION_INV &&  isSelected) {skip(); return;}
 
-  doOperationsForSelectedEvents(evt);
+  ++ m_count_selected;
+  doOperationsForSelectedEvent(evt);
 
   if (m_sel_mode == SELECTION_OFF) return;
 }
@@ -312,6 +298,8 @@ CSPadArrPeakFinder::endJob(Event& evt, Env& env)
 {
   if( m_out_file_bits & 1 ) saveCSPadArrayInFile<int16_t>( m_maskFile_out, m_mask );
   if( m_out_file_bits & 2 ) saveCSPadArrayInFile<float>  ( m_fracFile_out, m_frac_noisy_evts );
+  //if( m_print_bits & 1024 ) 
+  printJobSummary();  
 }
 
 //--------------------
@@ -354,8 +342,6 @@ CSPadArrPeakFinder::maskUpdateControl()
 void 
 CSPadArrPeakFinder::procStatArrays()
 {
-  if( m_print_bits & 4 ) MsgLog(name(), info, "Process statistics for collected total " << m_count_mask_accum << " events");
-
   unsigned long  npix_noisy = 0;
   unsigned long  npix_total = 0;
   
@@ -390,7 +376,13 @@ CSPadArrPeakFinder::procStatArrays()
         }
       }
     }
-    cout << "Nnoisy, Ntotal, Nnoisy/Ntotal pixels =" << npix_noisy << " " << npix_total  << " " << double(npix_noisy)/npix_total << endl;
+
+    float fraction = (npix_total>0) ? float(npix_noisy)/npix_total : 0;
+    if( m_print_bits & 2 ) MsgLog(name(), info, 
+                                     "  Collected events for mask update = " << m_count_mask_accum 
+                                  << "  Statistics: Nnoisy = " << npix_noisy
+				  << "  Ntotal = " << npix_total
+                                  << "  Nnoisy/Ntotal pixels = " << fraction );
 }
 
 //--------------------
@@ -426,6 +418,88 @@ CSPadArrPeakFinder::resetSignalArrays()
 {
   std::fill_n(&m_signal     [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
   std::fill_n(&m_proc_status[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
+}
+
+//--------------------
+// Process data in the event()
+
+void 
+CSPadArrPeakFinder::procData(Event& evt)
+{
+  bool fillArr = m_key_signal_out != "";
+
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_key, &m_src);
+  if (data1.get()) {
+
+    ++ m_count;
+    //setCollectionMode();
+    shared_ptr<cspad_mod::DataV1> newobj(new cspad_mod::DataV1());
+    
+    int nQuads = data1->quads_shape()[0];
+    for (int iq = 0; iq != nQuads; ++ iq) {
+
+      const CsPad::ElementV1& quad = data1->quads(iq);
+      const ndarray<int16_t, 3>& data = quad.data();
+
+      collectStatInQuad(quad.quad(), data.data());
+
+      if(fillArr) {
+         int16_t* newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
+         fillOutputArr(quad.quad(),newdata);
+         newobj->append(new cspad_mod::ElementV1(quad, newdata, m_common_mode));
+       }
+     }    
+     if(fillArr) evt.put<Psana::CsPad::DataV1>(newobj, m_src, m_key_signal_out); // put newobj in event 
+  }
+  
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_key, &m_src);
+  if (data2.get()) {
+
+    ++ m_count;
+    //setCollectionMode();
+    shared_ptr<cspad_mod::DataV2> newobj(new cspad_mod::DataV2());
+    
+    int nQuads = data2->quads_shape()[0];
+    for (int iq = 0; iq != nQuads; ++ iq) {
+      
+      const CsPad::ElementV2& quad = data2->quads(iq);
+      const ndarray<int16_t, 3>& data = quad.data();
+
+      collectStatInQuad(quad.quad(), data.data());
+
+      if(fillArr) {
+        int16_t* newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
+        fillOutputArr(quad.quad(),newdata);
+        newobj->append(new cspad_mod::ElementV2(quad, newdata, m_common_mode));  
+      }
+    } 
+    if(fillArr) evt.put<Psana::CsPad::DataV2>(newobj, m_src, m_key_signal_out); // put newobj in event 
+   }
+}
+
+//--------------------
+/// 
+void 
+CSPadArrPeakFinder::fillOutputArr(unsigned quad, int16_t* newdata)
+{
+  //cout << "fillOutputArr for quad=" << quad << endl;
+
+  int ind_in_arr = 0;
+  for (int sect = 0; sect < MaxSectors; ++ sect) {
+    if (m_segMask[quad] & (1 << sect)) {
+     
+      // beginning of the segment data
+      const int16_t* sectData = &m_signal[quad][sect][0][0];
+      int16_t*       newData  = newdata  + ind_in_arr*SectorSize;
+
+      // Copy regular array m_signal[MaxQuads][MaxSectors][NumColumns][NumRows] to data-style array. 
+      for (int i = 0; i < SectorSize; ++ i) {
+
+        newData[i] = sectData[i];
+      }                
+      ++ind_in_arr;
+    }
+  }  
 }
 
 //--------------------
@@ -583,8 +657,8 @@ CSPadArrPeakFinder::printVectorOfPeaks()
   int i=0;
   for( vector<Peak>::const_iterator p  = v_peaks.begin();
                                     p != v_peaks.end(); p++ ) {
-
-    cout  << "  peak:"      << ++i 
+    MsgLog(name(), info, 
+             "  peak:"      << ++i 
           << "  quad="      << p->quad
           << "  sect="      << p->sect
           << "  col="       << p->col
@@ -594,7 +668,7 @@ CSPadArrPeakFinder::printVectorOfPeaks()
           << "  ampmax="    << p->ampmax
           << "  sigma_col=" << p->sigma_col
           << "  sigma_row=" << p->sigma_row
-          << endl;
+	   );
   }
 }
 
@@ -603,9 +677,9 @@ CSPadArrPeakFinder::printVectorOfPeaks()
 bool
 CSPadArrPeakFinder::eventSelector() {
 
+  m_event_amp_tot = 0;
   if (v_peaks.size() < m_event_npeak_min) return false;
 
-  m_event_amp_tot = 0;
   for( vector<Peak>::const_iterator p  = v_peaks.begin();
                                     p != v_peaks.end(); p++ ) {
     m_event_amp_tot += p->amptot;
@@ -616,6 +690,23 @@ CSPadArrPeakFinder::eventSelector() {
   return true;
 }
 
+//--------------------
+/// Print parameters used in the event selection
+void 
+CSPadArrPeakFinder::printEventSelectionPars(Event& evt, bool isSelected)
+{
+    MsgLog(name(), info, 
+	   //"  Run="         << strRunNumber(evt) 
+              "  Event="       << strEventCounter()  
+           << "  "             << strTimeStamp(evt)
+           << "  mode="        << m_sel_mode_str  
+           << "  N peaks/min=" << v_peaks.size()
+           << " / "            << m_event_npeak_min
+           << "  A tot/thr="   << m_event_amp_tot
+           << " / "            << m_event_amp_tot_thr
+           << "  isSelected="  << isSelected  
+	   );
+}
 
 //--------------------
 /// Evaluate vector of indexes for mediane algorithm
@@ -763,7 +854,7 @@ CSPadArrPeakFinder::getMaskFromFile()
 //--------------------
 
 void 
-CSPadArrPeakFinder::printMaskStatistics()
+CSPadArrPeakFinder::printInitialMaskStatistics()
 {
   m_mask_initial -> printMaskStatistics(); 
 }
@@ -813,16 +904,18 @@ CSPadArrPeakFinder::strRunNumber(Event& evt)
 //--------------------
 
 void 
-CSPadArrPeakFinder::doOperationsForSelectedEvents(Event& evt)
+CSPadArrPeakFinder::doOperationsForSelectedEvent(Event& evt)
 {
-
   // Define the file name
   std::string fname = m_evtFile_out 
                     + strEventCounter() 
                     + "-" + strRunNumber(evt) 
-                    + "-" + strTimeStamp(evt) + ".txt";
+                    + "-" + strTimeStamp(evt);
+  std::string fname_arr   =  fname + ".txt";
+  std::string fname_peaks =  fname + "-peaks.txt";
 
-  if( m_out_file_bits & 4 ) saveCSPadArrayInFile<int16_t>  (fname, m_signal);
+  if( m_out_file_bits & 4 ) saveCSPadArrayInFile<int16_t> (fname_arr, m_signal);
+  if( m_out_file_bits & 8 ) savePeaksInFile (fname_peaks, v_peaks);
 
   savePeaksInEvent(evt);
   //saveSignalArrInEvent(evt); // not implemented yet
@@ -857,10 +950,93 @@ CSPadArrPeakFinder::saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][Max
 //--------------------
 // Save vector of peaks in the event
 void 
+CSPadArrPeakFinder::savePeaksInFile (std::string& fname, std::vector<Peak> peaks)
+{
+  ofstream file; 
+  file.open(fname.c_str(),ios_base::out);
+
+  int i=0;
+  for( vector<Peak>::const_iterator itv  = peaks.begin();
+                                    itv != peaks.end(); itv++ ) {
+
+    if( m_print_bits & 256 ) 
+      MsgLog( name(), info, "  peak:"      << ++i
+	                 << "  quad="      << itv->quad     
+                         << "  segm="      << itv->sect     
+                         << "  col="       << itv->col
+                         << "  row="       << itv->row
+                         << "  npix="      << itv->npix
+                         << "  sigma_col=" << itv->sigma_col
+                         << "  sigma_row=" << itv->sigma_row
+                         << "  ampmax="    << itv->ampmax
+                         << "  amptot="    << itv->amptot )
+
+    file << itv->quad      << "  "
+         << itv->sect      << "  "
+         << itv->col       << "  "
+         << itv->row       << "  "
+         << itv->npix      << "  "      
+         << itv->sigma_col << "  "
+         << itv->sigma_row << "  "
+         << itv->ampmax    << "  "
+         << itv->amptot    << endl; 
+  }
+
+  file.close();
+}
+
+//--------------------
+// Save vector of peaks in the event
+void 
 CSPadArrPeakFinder::savePeaksInEvent(Event& evt)
 {
   shared_ptr< std::vector<Peak> >  sppeaks( new std::vector<Peak>(v_peaks) );
   if( v_peaks.size() > 0 ) evt.put(sppeaks, m_src, m_key_peaks_out);
+}
+
+
+//--------------------
+// Print current selection statistics
+void 
+CSPadArrPeakFinder::printSelectionStatisticsByCounter() // Event& evt)
+{
+    if (  m_count < 5 
+      || (m_count < 50   && m_count % 10   == 0)
+      || (m_count < 500  && m_count % 100  == 0)
+      || (m_count % 1000 == 0)
+	) printSelectionStatistics();
+}
+
+
+//--------------------
+// Print current selection statistics
+void 
+CSPadArrPeakFinder::printSelectionStatistics() // Event& evt)
+{
+  float fraction = (m_count > 0) ? 100.*float(m_count_selected) / m_count : 0;
+  double dt = m_time -> getCurrentTimeInterval();
+  float rate = (dt > 0) ? float(m_count) / dt : 0;
+
+  std::stringstream sc; sc.setf(ios_base::fixed); sc.width(7);  sc.fill(' '); sc << m_count;
+  std::stringstream sh; sh.setf(ios_base::fixed); sh.width(7);  sh.fill(' '); sh << m_count_selected;
+  std::stringstream sf; sf.setf(ios_base::fixed); sf.width(6);  sf.fill(' '); sf.precision(2); sf << fraction;
+  std::stringstream st; st.setf(ios_base::fixed); st.width(11); st.fill(' '); st.precision(3); st << dt;
+  std::stringstream sr; sr.setf(ios_base::fixed); sr.width(6);  sr.fill(' '); sr.precision(3); sr << rate;
+  std::string s = "  NFrames: " + sc.str()
+	        + "  NHits: "   + sh.str() + " ("  + sf.str() + "%)" 
+	        + "  Time:"     + st.str() + " sec (" + sr.str() + " fps)";
+
+  MsgLog( name(), info, s );
+}
+
+//--------------------
+// Print current selection statistics
+void 
+CSPadArrPeakFinder::printJobSummary()
+{
+  MsgLog( name(), info, "===== JOB SUMMARY =====" );  
+  printSelectionStatistics();
+  m_time -> stopTime(m_count);
 }
 
 //--------------------

@@ -1,22 +1,18 @@
-#ifndef IMGALGOS_CSPADMASKAPPLY_H
-#define IMGALGOS_CSPADMASKAPPLY_H
+#ifndef IMGALGOS_CSPADARRSAVEINFILE_H
+#define IMGALGOS_CSPADARRSAVEINFILE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CSPadMaskApply.
+//	Class CSPadArrSaveInFile.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-//#include <iostream>
-//#include <string>
-//#include <vector>
-//#include <fstream>  // open, close etc.
 
 //----------------------
 // Base Class Headers --
@@ -26,8 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h" // for Psana::CsPad::MaxQuadsPerSensor etc.
-#include "ImgAlgos/CSPadMaskV1.h"
+#include "psddl_psana/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -54,7 +49,7 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CSPadMaskApply : public Module {
+class CSPadArrSaveInFile : public Module {
 public:
 
     enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
@@ -63,11 +58,11 @@ public:
     enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
     enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
   
-   // Default constructor
-  CSPadMaskApply (const std::string& name) ;
+  // Default constructor
+  CSPadArrSaveInFile (const std::string& name) ;
 
   // Destructor
-  virtual ~CSPadMaskApply () ;
+  virtual ~CSPadArrSaveInFile () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -92,36 +87,33 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
+
+  void procQuad(unsigned quad, const int16_t* data);
   void printInputParameters();
   void printEventId(Event& evt);
-  std::string stringTimeStamp(Event& evt);
-  void printMaskArray();
-  void getMaskArray();
-  void applyMask(Event& evt);
-  void processQuad(unsigned quad, const int16_t* data, int16_t* corrdata);
+  void printTimeStamp(Event& evt);
+  std::string strEventCounter();
+  std::string strTimeStamp(Event& evt);
+  std::string strRunNumber(Event& evt);
+  std::string strTimeDependentFileName(Event& evt);
+  void saveInFile(Event& evt); 
+  template <typename T>
+  void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
+
 
 private:
-
-  // Data members, this is for example purposes only
-  
-  //Source m_src;         // Data source set from config file
-
+  //Source         m_src;             // Data source set from config file
   Pds::Src       m_src;             // source address of the data object
   std::string    m_str_src;         // string with source name
-  std::string    m_inkey;
-  std::string    m_outkey;
-  std::string    m_fname;
-  int16_t        m_masked_amp;
-  unsigned       m_mask_control_bits;   
+  std::string    m_key;             // string with key name
+  std::string    m_outFile;
   unsigned       m_print_bits;   
- 
-  long m_count;
+  unsigned long  m_count;  // number of events from the beginning of job
 
   unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
-  float          m_common_mode[MaxSectors];
-  ImgAlgos::CSPadMaskV1 *m_mask;
+  int16_t        m_arr    [MaxQuads][MaxSectors][NumColumns][NumRows];  // array for all cspad pixels
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CSPADMASKAPPLY_H
+#endif // IMGALGOS_CSPADARRSAVEINFILE_H

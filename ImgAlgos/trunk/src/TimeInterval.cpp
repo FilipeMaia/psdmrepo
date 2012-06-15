@@ -87,4 +87,15 @@ TimeInterval::stopTime(long nevents)
 
 //--------------------
 
+/// Get current time interval since start
+double
+TimeInterval::getCurrentTimeInterval()
+{
+  m_status = clock_gettime( CLOCK_REALTIME, &m_stop ); // Get LOCAL time
+  double dt = m_stop.tv_sec - m_start.tv_sec + 1e-9*(m_stop.tv_nsec - m_start.tv_nsec);
+  return dt;
+}
+
+//--------------------
+
 } // namespace ImgAlgos

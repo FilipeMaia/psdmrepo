@@ -128,17 +128,18 @@ void CSPadMaskV1::printMaskStatistics()
 
   mask_t* p = &m_mask[0][0][0][0];
 
-  int counter0=0;
-  int counter1=0;
+  int Nof0=0;
+  int Nof1=0;
 
   for (int i = 0; i < SIZE_OF_ARRAY; ++ i) {
-      if (p[i] == 0) counter0++;
-      if (p[i] == 1) counter1++;
+      if (p[i] == 0) Nof0++;
+      if (p[i] == 1) Nof1++;
   }
 
-  MsgLog(":printMaskStatistics()",  info, "Mask statistics: number of 0: " << counter0 
-                                       << " number of 1: " << counter1
-                                       << " total number of elements: " << SIZE_OF_ARRAY);
+  MsgLog(":printMaskStatistics()",  info, "Mask statistics: Nof0: " << Nof0 
+                                       << " Nof1: " << Nof1
+                                       << " Ntot: " << SIZE_OF_ARRAY
+	                               << " Nof0 / Ntot = " << float(Nof0)/SIZE_OF_ARRAY );
 }
 
 //----------------

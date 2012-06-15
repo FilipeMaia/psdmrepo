@@ -55,16 +55,18 @@ CSPadMaskApply::CSPadMaskApply (const std::string& name)
   , m_outkey()
   , m_fname()
   , m_masked_amp()
+  , m_mask_control_bits()
   , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src     = configStr("source",     "DetInfo(:Cspad)");
-  m_inkey       = configStr("inkey",      "");
-  m_outkey      = configStr("outkey",     "mask_applyed");
-  m_fname       = configStr("mask_fname", "cspad_mask.dat");
-  m_masked_amp  = config   ("masked_amp", 0);
-  m_print_bits  = config   ("print_bits", 0);
+  m_str_src            = configStr("source",     "DetInfo(:Cspad)");
+  m_inkey              = configStr("inkey",      "");
+  m_outkey             = configStr("outkey",     "mask_applyed");
+  m_fname              = configStr("mask_fname", "cspad_mask.dat");
+  m_masked_amp         = config   ("masked_amp", 0);
+  m_mask_control_bits  = config   ("mask_control_bits", 1);
+  m_print_bits         = config   ("print_bits", 0);
 
   std::fill_n(&m_common_mode[0], int(MaxSectors), float(0));
 }
@@ -184,20 +186,21 @@ CSPadMaskApply::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << m_str_src
-        << "\n inkey      : " << m_inkey      
-        << "\n outkey     : " << m_outkey      
-        << "\n fname      : " << m_fname    
-        << "\n masked_amp : " << m_masked_amp
-        << "\n print_bits : " << m_print_bits
+        << "\n source            : " << m_str_src
+        << "\n inkey             : " << m_inkey      
+        << "\n outkey            : " << m_outkey      
+        << "\n fname             : " << m_fname    
+        << "\n masked_amp        : " << m_masked_amp
+        << "\n mask_control_bits : " << m_mask_control_bits
+        << "\n print_bits        : " << m_print_bits
         << "\n";     
 
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
-        << "\n";
+    //log << "\n MaxQuads          : " << MaxQuads    
+    //    << "\n MaxSectors        : " << MaxSectors  
+    //    << "\n NumColumns        : " << NumColumns  
+    //    << "\n NumRows           : " << NumRows     
+    //    << "\n SectorSize        : " << SectorSize  
+    //    << "\n";
   }
 }
 
@@ -302,6 +305,8 @@ CSPadMaskApply::processQuad(unsigned quad, const int16_t* data, int16_t* corrdat
 {
   //cout << "processQuad =" << quad << endl;
 
+  //if( m_mask_control_bits == 0 ) { corrdata = data; return; }
+
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
     if (m_segMask[quad] & (1 << sect)) {
@@ -311,11 +316,51 @@ CSPadMaskApply::processQuad(unsigned quad, const int16_t* data, int16_t* corrdat
       int16_t*       corrData = corrdata + ind_in_arr*SectorSize;
       uint16_t*      sectMask = m_mask->getMask(quad,sect);
 
-      // Apply mask
-      for (int i = 0; i < SectorSize; ++ i) {
+      if( m_mask_control_bits & 1 ) { 
+        // Apply mask from file
+        for (int i = 0; i < SectorSize; ++ i) {
+          corrData[i] = (sectMask[i] != 0) ? sectData[i] : m_masked_amp;
+        }                
+      } else {      
+        // DO NOT apply mask from file
+        for (int i = 0; i < SectorSize; ++ i) {
+          corrData[i] = sectData[i];
+        }                
+      }
 
-        corrData[i] = (sectMask[i] != 0) ? sectData[i] : m_masked_amp;
-      }                
+
+      if( m_mask_control_bits & 2 ) { 
+        // Mask 2 long edges of 2x1
+        int c0 = 0; 
+        int cN = NumColumns-1; 
+        for (int r = 0; r < NumRows; r++ ) { // NumRows = 388
+          corrData[c0*NumRows + r] = m_masked_amp;
+          corrData[cN*NumRows + r] = m_masked_amp;
+        }
+      }
+
+        
+      if( m_mask_control_bits & 4 ) { 
+        // Mask 2 short edges of 2x1
+        int r0 = 0; 
+        int rN = NumRows-1; 
+        for (int c = 0; c < NumColumns; c++ ) { // NumColumns = 185
+  	  corrData[c*NumRows + r0] = m_masked_amp;
+  	  corrData[c*NumRows + rN] = m_masked_amp;
+        }
+      }
+
+        
+      if( m_mask_control_bits & 8 ) { 
+        // Mask 2 raws in the middle of 2x1 with wide pixels
+        int rHL = 388/2-1; 
+        int rHU = 388/2; 
+        for (int c = 0; c < NumColumns; c++ ) { // NumColumns = 185
+          corrData[c*NumRows + rHL] = m_masked_amp;
+          corrData[c*NumRows + rHU] = m_masked_amp;
+        }
+      }
+
       ++ind_in_arr;
     }
   }  

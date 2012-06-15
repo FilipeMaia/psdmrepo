@@ -69,7 +69,8 @@ public:
 
   void startTimeOnce();
   void startTime();
-  void stopTime(long nevents=0);
+  void stopTime(long nevents=1);
+  double getCurrentTimeInterval();
 
 protected:
 
