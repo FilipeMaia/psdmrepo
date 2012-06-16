@@ -175,31 +175,6 @@ public:
   float common_mode(uint32_t section) const { return o->common_mode(section); }
 };
 
-  class ElementV1_Getter : public Psana::EvtGetter {
-  public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::ElementV1);
-    }
-    const char* getTypeName() {
-      return "Psana::CsPad2x2::ElementV1";
-    }
-    int getVersion() {
-      return ElementV1::Version;
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(ElementV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(ElementV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV1> result = evt.get(source, key, foundSrc);
-      return result.get() ? object(ElementV1_Wrapper(result)) : object();
-    }
-  };
-
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -233,6 +208,32 @@ public:
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
+
+  class ElementV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad2x2::ElementV1);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad2x2::ElementV1";
+    }
+    int getVersion() {
+      return ElementV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+  };
+
 } // namespace CsPad2x2
 } // namespace Psana
 #endif // PSANA_CSPAD2X2_DDL_WRAPPER_H
