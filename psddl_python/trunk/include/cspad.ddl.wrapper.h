@@ -495,6 +495,28 @@ public:
     }
   };
 
+  class ElementV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ElementV1);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad::ElementV1";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(ElementV1_Wrapper(result)) : object();
+    }
+  };
+
   class DataV1_Getter : public Psana::EvtGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -520,6 +542,28 @@ public:
     object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
       shared_ptr<DataV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
+    }
+  };
+
+  class ElementV2_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad::ElementV2);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad::ElementV2";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV2> result = evt.get(key, foundSrc);
+      return result.get() ? object(ElementV2_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV2> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(ElementV2_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ElementV2> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(ElementV2_Wrapper(result)) : object();
     }
   };
 

@@ -90,7 +90,7 @@ public:
   uint32_t events() const { return o->events(); }
   uint8_t uses_duration() const { return o->uses_duration(); }
   uint8_t uses_events() const { return o->uses_events(); }
-  const Pds::ClockTime duration() const { return o->duration(); }
+  const Pds::ClockTime& duration() const { return o->duration(); }
   uint32_t npvControls() const { return o->npvControls(); }
   uint32_t npvMonitors() const { return o->npvMonitors(); }
   vector<ControlData::PVControl> pvControls() const { VEC_CONVERT(o->pvControls(), ControlData::PVControl); }

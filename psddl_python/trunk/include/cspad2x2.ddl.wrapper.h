@@ -217,6 +217,9 @@ public:
     const char* getTypeName() {
       return "Psana::CsPad2x2::ElementV1";
     }
+    int getTypeId() {
+      return ElementV1::TypeId;
+    }
     int getVersion() {
       return ElementV1::Version;
     }
@@ -233,7 +236,6 @@ public:
       return result.get() ? object(ElementV1_Wrapper(result)) : object();
     }
   };
-
 } // namespace CsPad2x2
 } // namespace Psana
 #endif // PSANA_CSPAD2X2_DDL_WRAPPER_H

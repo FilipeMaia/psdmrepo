@@ -218,6 +218,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ElementV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ElementV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(ElementV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -249,6 +250,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ElementV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ElementV2_Wrapper);
 #undef _CLASS
+  ADD_GETTER(ElementV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
