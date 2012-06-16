@@ -216,7 +216,7 @@ class PythonCodegen ( object ) :
                 print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
             print >>self._cpp, T('  std_vector_class_($name);')(locals())
             print >>self._cpp, '#undef _CLASS';
-            if re.match(r'.*(Data|DataDesc|Config)V[1-9][0-9]*_Wrapper', name):
+            if re.match(r'.*(Data|DataDesc|Config|Element)V[1-9][0-9]*_Wrapper', name):
                 print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
             print >>self._cpp, ""
 
