@@ -94,7 +94,7 @@ class PythonCodegen ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, inc, cpp, type, abstract=False, namespace_prefix="" ) :
+    def __init__ ( self, inc, cpp, type, abstract=False, namespace_prefix="", pkg_name = "" ) :
 
         # define instance variables
         self._inc = inc
@@ -103,6 +103,7 @@ class PythonCodegen ( object ) :
         self._abs = abstract
         self._pywrapper = True
         self._namespace_prefix = namespace_prefix
+        self._pkg_name = pkg_name
 
     #-------------------
     #  Public methods --
@@ -503,13 +504,19 @@ class PythonCodegen ( object ) :
                 else:
                     print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
             elif "&" in rettype and "::" in rettype:
-                type = rettype.replace("&", "").replace("const ", "")
-                index = type.find("::")
-                if index != -1:
-                    type = type[2+index:] # remove "Namespace::"
-                wrappertype = type + "_Wrapper"
-                print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
-                policy = ", policy"
+                if (self._pkg_name + "::") in rettype:
+                    type = rettype.replace("&", "");
+                    type = type.replace("const ", "")
+                    index = type.find("::")
+                    if index != -1:
+                        type = type[2+index:] # remove "Namespace::"
+                    wrappertype = type + "_Wrapper"
+                    print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
+                    policy = ", policy"
+                else:
+                    type = rettype
+                    print >>self._inc, T("  $type $methname($argsspec) const { return o->$methname($args); }")(locals())
+                    policy = ", policy"
             else:
                 print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
 

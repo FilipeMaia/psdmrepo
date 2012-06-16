@@ -131,7 +131,7 @@ class DdlPythonInterfaces ( object ) :
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
-                print >>self.inc, "#include <%s> // other included packages" % header
+                print >>self.inc, "#include <psddl_psana/%s> // other included packages" % header
 
         if self.top_pkg : 
             print >>self.cpp, T("namespace $top_pkg {")[self]
@@ -194,7 +194,7 @@ class DdlPythonInterfaces ( object ) :
                     namespace_prefix = pkg.name + "::"
                     if self.top_pkg : 
                         namespace_prefix = self.top_pkg + "::" + namespace_prefix
-                    self._parseType(type = ns, namespace_prefix = namespace_prefix)
+                    self._parseType(type = ns, namespace_prefix = namespace_prefix, pkg_name = pkg.name)
 
         if self.pywrapper:
             # end createWrappers()
@@ -206,13 +206,13 @@ class DdlPythonInterfaces ( object ) :
                     namespace_prefix = pkg.name + "::"
                     if self.top_pkg : 
                         namespace_prefix = self.top_pkg + "::" + namespace_prefix
-                    self._parseType2(type = ns, namespace_prefix = namespace_prefix)
+                    self._parseType2(type = ns, namespace_prefix = namespace_prefix, pkg_name = pkg.name)
 
         # close namespaces
         print >>self.inc, T("} // namespace $name")[pkg]
         print >>self.cpp, T("} // namespace $name")[pkg]
 
-    def _parseType(self, type, namespace_prefix = ""):
+    def _parseType(self, type, namespace_prefix = "", pkg_name = ""):
 
         logging.debug("_parseType: type=%s", repr(type))
 
@@ -221,10 +221,10 @@ class DdlPythonInterfaces ( object ) :
 
         # type is abstract by default but can be reset with tag "value-type"
         abstract = not type.value_type
-        codegen = PythonCodegen(self.inc, self.cpp, type, abstract, namespace_prefix)
+        codegen = PythonCodegen(self.inc, self.cpp, type, abstract, namespace_prefix, pkg_name)
         codegen.codegen()
 
-    def _parseType2(self, type, namespace_prefix = ""):
+    def _parseType2(self, type, namespace_prefix = "", pkg_name = ""):
         type_name = type.name
         getter_class = None
         #if type_name.find('DataV') == 0 or type_name.find('DataDescV') == 0:
@@ -233,6 +233,9 @@ class DdlPythonInterfaces ( object ) :
         #elif type_name.find('ConfigV') == 0:
         elif re.match(r'.*(Config)V[1-9][0-9]*', type_name):
             getter_class = "Psana::EnvGetter"
+        elif re.match(r'.*(Element)V[1-9][0-9]*', type_name) and pkg_name == "CsPad2x2":
+            print "???? ", pkg_name
+            getter_class = "Psana::EvtGetter"
         if getter_class:
             print >>self.inc, ''
             print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
