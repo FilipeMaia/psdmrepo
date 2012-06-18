@@ -208,10 +208,8 @@ class DdlPythonInterfaces ( object ) :
         # skip included types
         if type.included : return
 
-        # type is abstract by default but can be reset with tag "value-type"
-        abstract = not type.value_type
-        codegen = PythonCodegen(self.inc, self.cpp, type, abstract, namespace_prefix, pkg_name)
-        codegen.codegen()
+        codegen = PythonCodegen(self.inc, self.cpp)
+        codegen.codegen(type, namespace_prefix, pkg_name)
 
     def _parseType2(self, type, namespace_prefix = "", pkg_name = ""):
         type_name = type.name

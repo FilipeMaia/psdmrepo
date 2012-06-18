@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Calss responsible for C++ code generation for Type object 
+"""Class responsible for C++ code generation for Type object 
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -92,88 +92,93 @@ class PythonCodegen ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, inc, cpp, type, abstract=False, namespace_prefix="", pkg_name = "" ) :
+    def __init__ ( self, inc, cpp ):
 
         # define instance variables
-        self._inc = inc
-        self._cpp = cpp
-        self._type = type
-        self._abs = abstract
-        self._namespace_prefix = namespace_prefix
-        self._pkg_name = pkg_name
+        self.inc = inc
+        self.cpp = cpp
 
     #-------------------
     #  Public methods --
     #-------------------
 
-    def codegen(self):
+    def codegen(self, type, namespace_prefix, pkg_name):
+        # type is abstract by default but can be reset with tag "value-type"
+        abstract = not type.value_type
 
-        logging.debug("PythonCodegen.codegen: type=%s", repr(self._type))
+        self._type = type
+        self._namespace_prefix = namespace_prefix
+        self._pkg_name = pkg_name
+
+        print "$$$ namespace_prefix=", namespace_prefix
+        print "$$$ pkg_name=", pkg_name
+
+        logging.debug("PythonCodegen.codegen: type=%s", repr(type))
 
         # declare config classes if needed
-        for cfg in self._type.xtcConfig:
-            print >>self._inc, T("class $name;")[cfg]
+        for cfg in type.xtcConfig:
+            print >>self.inc, T("class $name;")[cfg]
 
         # base class
         base = ""
 
         # this class (class being generated)
-        wrapped = self._type.name
+        wrapped = type.name
         name = wrapped + "_Wrapper"
 
         # start class declaration
-        print >>self._inc, T("\nclass $name$base {")(name = name, base = base)
+        print >>self.inc, T("\nclass $name$base {")(name = name, base = base)
         access = "private"
 
         # shared_ptr and C++ pointer to wrapped object
-        print >>self._inc, T("  shared_ptr<$wrapped> _o;")(wrapped = wrapped)
-        print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
+        print >>self.inc, T("  shared_ptr<$wrapped> _o;")(wrapped = wrapped)
+        print >>self.inc, T("  $wrapped* o;")(wrapped = wrapped)
 
         # enums for version and typeId
         access = self._access("public", access)
-        if self._type.type_id is not None: 
-            print >>self._inc, T("  enum { TypeId = Pds::TypeId::$type_id };")(type_id=self._type.type_id)
-        if self._type.version is not None: 
-            print >>self._inc, T("  enum { Version = $version };")(version=self._type.version)
+        if type.type_id is not None: 
+            print >>self.inc, T("  enum { TypeId = Pds::TypeId::$type_id };")(type_id=type.type_id)
+        if type.version is not None: 
+            print >>self.inc, T("  enum { Version = $version };")(version=type.version)
 
         # constructor
         access = self._access("public", access)
-        print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
-        print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
-        print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
+        print >>self.inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
+        print >>self.inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
+        print >>self.cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
 
         # generate methods (for public methods and abstract class methods only)
-        for meth in self._type.methods(): 
+        for meth in type.methods(): 
             access = self._access("public", access)
-            if not self._abs or meth.access == "public": self._genMethod(meth)
+            if not abstract or meth.access == "public": self._genMethod(meth, type, abstract)
 
         # generate _shape() methods for array attributes
-        for attr in self._type.attributes() :
+        for attr in type.attributes() :
             access = self._access("public", access)
-            self._genAttrShapeDecl(attr)
+            self._genAttrShapeDecl(type, attr)
 
         # close class declaration
-        print >>self._inc, "};"
+        print >>self.inc, "};"
         prefix = self._namespace_prefix
 
         # export classes to Python via boost _class
-        print >>self._cpp, ""
-        if not self._abs:
-            print >>self._cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
-        print >>self._cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
-        if not self._abs:
-            print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
-        print >>self._cpp, T('  std_vector_class_($name);')(locals())
-        print >>self._cpp, '#undef _CLASS';
+        print >>self.cpp, ""
+        if not abstract:
+            print >>self.cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
+        print >>self.cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
+        if not abstract:
+            print >>self.cpp, T('  std_vector_class_($wrapped);')(locals())
+        print >>self.cpp, T('  std_vector_class_($name);')(locals())
+        print >>self.cpp, '#undef _CLASS';
 
         # define Getter clases for some types
         if re.match(r'.*(Data|DataDesc|Config|Element)V[1-9][0-9]*_Wrapper', name):
-            print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
-        print >>self._cpp, ""
+            print >>self.cpp, T('  ADD_GETTER($wrapped);')(locals())
+        print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
         if newaccess != oldaccess:
-            print >>self._inc, newaccess+":"
+            print >>self.inc, newaccess+":"
         return newaccess
         
     def _genAttrDecl(self, attr):
@@ -196,10 +201,10 @@ class PythonCodegen ( object ) :
             else :
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
                 decl = T("  //$type\t$name$shape;")(type=_typename(attr.type), name=attr.name, shape=dim)
-        print >>self._inc, decl
+        print >>self.inc, decl
 
 
-    def _genMethod(self, meth):
+    def _genMethod(self, meth, type, abstract):
         """Generate method declaration and definition"""
 
         logging.debug("_genMethod: meth: %s", meth)
@@ -221,7 +226,7 @@ class PythonCodegen ( object ) :
                 
                 # char array is actually a string
                 rettype = "const char*"
-                args = _dimargs(attr.shape.dims[:-1], self._type)
+                args = _dimargs(attr.shape.dims[:-1], type)
                 
             elif attr.type.value_type :
                 
@@ -232,19 +237,19 @@ class PythonCodegen ( object ) :
 
                 # array of any other types
                 rettype = _typedecl(attr.type)
-                args = _dimargs(attr.shape.dims, self._type)
+                args = _dimargs(attr.shape.dims, type)
 
             # guess if we need to pass cfg object to method
             cfgNeeded = False
 
             configs = [None]
-            if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
+            if cfgNeeded and not abstract: configs = attr.parent.xtcConfig
             for cfg in configs:
 
                 cargs = []
                 if cfg: cargs = [('cfg', cfg)]
 
-                self._genMethodBody(meth.name, rettype, cargs + args)
+                self._genMethodBody(type, meth.name, rettype, cargs + args)
 
         elif meth.bitfield:
 
@@ -256,43 +261,43 @@ class PythonCodegen ( object ) :
             expr = _interpolate(expr, meth.parent)
 
             configs = [None]
-            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
+            if cfgNeeded and not abstract: configs = meth.parent.xtcConfig
             for cfg in configs:
 
                 args = []
                 if cfg: args = [('cfg', cfg)]
 
-                self._genMethodBody(meth.name, _typename(meth.type), args=[])
+                self._genMethodBody(type, meth.name, _typename(meth.type), args=[])
 
         else:
 
             # explicitly declared method with optional expression
             
-            if meth.name == "_sizeof" and self._abs : return
+            if meth.name == "_sizeof" and abstract : return
             
             # if no type given then it does not return anything
-            type = meth.type
-            if type is None:
-                type = "void"
+            method_type = meth.type
+            if method_type is None:
+                method_type = "void"
             else:
-                type = _typename(type)
+                method_type = _typename(method_type)
                 if meth.rank > 0:
-                    type = "ndarray<%s, %d>" % (type, meth.rank)
+                    method_type = "ndarray<%s, %d>" % (method_type, meth.rank)
 
             # config objects may be needed 
             cfgNeeded = False
 
             configs = [None]
-            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
+            if cfgNeeded and not abstract: configs = meth.parent.xtcConfig
             for cfg in configs:
 
                 args = []
                 if cfg: args = [('cfg', cfg)]
                 args += meth.args
 
-                self._genMethodBody(meth.name, type, args)
+                self._genMethodBody(type, meth.name, method_type, args)
 
-    def _genMethodBody(self, methname, rettype, args=[]):
+    def _genMethodBody(self, type, method_name, rettype, args=[]):
         """ Generate method, both declaration and definition, given the body of the method"""
 
         # make argument list
@@ -312,35 +317,33 @@ class PythonCodegen ( object ) :
             if ndim == 1 or "::" in ctype:
                 if ndim > 1:
                     print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional vector<%s> instead" % (ctype, ndim, ctype)
-                print >>self._inc, T("  vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
+                print >>self.inc, T("  vector<$ctype> $method_name($argsspec) const { VEC_CONVERT(o->$method_name($args), $ctype); }")(locals())
             else:
-                print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
+                print >>self.inc, T("  PyObject* $method_name($argsspec) const { ND_CONVERT(o->$method_name($args), $ctype, $ndim); }")(locals())
         elif "&" in rettype and "::" in rettype:
             if (self._pkg_name + "::") in rettype:
-                type = rettype.replace("&", "");
-                type = type.replace("const ", "")
-                index = type.find("::")
+                method_type = rettype.replace("&", "").replace("const ", "")
+                index = method_type.find("::")
                 if index != -1:
-                    type = type[2+index:] # remove "Namespace::"
-                wrappertype = type + "_Wrapper"
-                print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
+                    method_type = method_type[2+index:] # remove "Namespace::"
+                wrappertype = method_type + "_Wrapper"
+                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(($method_type*) &o->$method_name($args)); }")(locals())
                 policy = ", policy"
             else:
-                type = rettype
-                print >>self._inc, T("  $type $methname($argsspec) const { return o->$methname($args); }")(locals())
+                method_type = rettype
+                print >>self.inc, T("  $method_type $method_name($argsspec) const { return o->$method_name($args); }")(locals())
                 policy = ", policy"
         else:
-            print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
+            print >>self.inc, T("  $rettype $method_name($argsspec) const { return o->$method_name($args); }")(locals())
 
-        print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
+        print >>self.cpp, T("    .def(\"$method_name\", &n::$method_name$policy)\\")(method_name=method_name, classname=type.name, policy=policy)
         """
-        if "_shape" in methname:
-            methname = methname.replace("_shape", "_size")
-            print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
+        if "_shape" in method_name:
+            method_name = method_name.replace("_shape", "_size")
+            print >>self.cpp, T("    .def(\"$method_name\", &n::$method_name$policy)\\")(method_name=method_name, classname=type.name, policy=policy)
         """
 
-    def _genAttrShapeDecl(self, attr):
-
+    def _genAttrShapeDecl(self, type, attr):
         if not attr.shape_method: return None
         if not attr.accessor: return None
         
@@ -360,19 +363,19 @@ class PythonCodegen ( object ) :
                 print "Cannot generate '%s' method: shape has 2 dimensions and second is not a max string size" % shape_method
                 sys.exit(1)
 
-        self._genMethodBody(attr.shape_method, "vector<int>")
+        self._genMethodBody(type, attr.shape_method, "vector<int>")
 
         # now generate _size() method if applicable.
 
         shape_method = attr.shape_method
         size_method = shape_method.replace("_shape", "_size")
 
-        #print >> self._inc, T("  int ${size_method}() const { return ${shape_method}()[0]; }")(locals())
+        #print >> self.inc, T("  int ${size_method}() const { return ${shape_method}()[0]; }")(locals())
 
-        methname = attr.accessor.name
-        #print >> self._inc, T("  list $methname() { list l; const int n = ${methname}_size(); for (int i = 0; i < n; i++) l.append(o->${methname}(i)); return l; }")(locals())
+        method_name = attr.accessor.name
+        #print >> self.inc, T("  list $method_name() { list l; const int n = ${method_name}_size(); for (int i = 0; i < n; i++) l.append(o->${method_name}(i)); return l; }")(locals())
 
-        return methname
+        return method_name
 
 #
 #  In case someone decides to run this module
