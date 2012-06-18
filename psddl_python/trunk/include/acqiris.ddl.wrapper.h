@@ -53,11 +53,6 @@ public:
   uint32_t bandwidth() const { return o->bandwidth(); }
   double slope() const { return o->slope(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  double	_fullScale;	/**< Full vertical scale. */
-  double	_offset;	/**< Offset value. */
-  uint32_t	_coupling;	/**< Coupling mode. */
-  uint32_t	_bandwidth;	/**< Bandwidth enumeration. */
 };
 #pragma pack(pop)
 
@@ -80,11 +75,6 @@ public:
   uint32_t nbrSamples() const { return o->nbrSamples(); }
   uint32_t nbrSegments() const { return o->nbrSegments(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  double	_sampInterval;	/**< Interval for single sample. */
-  double	_delayTime;	/**< Delay time. */
-  uint32_t	_nbrSamples;	/**< Number of samples. */
-  uint32_t	_nbrSegments;	/**< Number of segments. */
 };
 #pragma pack(pop)
 
@@ -130,11 +120,6 @@ public:
   uint32_t slope() const { return o->slope(); }
   double level() const { return o->level(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_coupling;
-  uint32_t	_input;	/**< Trigger source */
-  uint32_t	_slope;	/**< Triggering slope. */
-  double	_level;	/**< Trigger level. */
 };
 #pragma pack(pop)
 
@@ -181,10 +166,6 @@ public:
   uint32_t timeStampHi() const { return o->timeStampHi(); }
   uint64_t value() const { return o->value(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  double	_horPos;
-  uint32_t	_timeStampLo;
-  uint32_t	_timeStampHi;
 };
 #pragma pack(pop)
 
@@ -271,11 +252,6 @@ public:
   double level() const { return o->level(); }
   Acqiris::TdcChannel::Channel channel() const { return o->channel(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
-  uint32_t	_mode;	/**< Bitfield value, should not be used directly. Use mode() and slope()
-                in the client code. */
-  double	_level;
 };
 #pragma pack(pop)
 
@@ -313,10 +289,6 @@ public:
   Acqiris::TdcAuxIO::Mode mode() const { return o->mode(); }
   Acqiris::TdcAuxIO::Termination term() const { return o->term(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
-  uint32_t	_signal;	/**< Mode as integer number, clients should use mode() method instead. */
-  uint32_t	_qualifier;	/**< Termination as integer number, clients should use term() method instead. */
 };
 #pragma pack(pop)
 
@@ -352,10 +324,6 @@ public:
   Acqiris::TdcVetoIO::Mode mode() const { return o->mode(); }
   Acqiris::TdcVetoIO::Termination term() const { return o->term(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
-  uint32_t	_signal;	/**< Mode as integer number, clients should use mode() method instead. */
-  uint32_t	_qualifier;	/**< Termination as integer number, clients should use term() method instead. */
 };
 #pragma pack(pop)
 
@@ -410,9 +378,6 @@ public:
   Acqiris::TdcDataV1_Item::Source source() const { return o->source(); }
   uint8_t bf_ofv_() const { return o->bf_ofv_(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_value;	/**< Value as integer number whiis composed of several bit fields. Do not use value directly,
-                instead cast this object to one of the actual types and use corresponding methods. */
 };
 
 /** @class TdcDataV1Common

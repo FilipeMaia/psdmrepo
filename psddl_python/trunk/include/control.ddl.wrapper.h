@@ -37,10 +37,6 @@ public:
   double value() const { return o->value(); }
   uint8_t array() const { return o->array(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  char	_name[32];	/**< Name of the control. */
-  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
-  double	_value;	/**< Value for this control. */
 };
 #pragma pack(pop)
 
@@ -65,11 +61,6 @@ public:
   double hiValue() const { return o->hiValue(); }
   uint8_t array() const { return o->array(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  char	_name[32];	/**< Name of the control. */
-  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
-  double	_loValue;	/**< Lowest value for this monitor. */
-  double	_hiValue;	/**< Highest value for this monitor. */
 };
 #pragma pack(pop)
 

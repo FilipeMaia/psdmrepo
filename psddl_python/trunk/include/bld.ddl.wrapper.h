@@ -41,11 +41,6 @@ public:
   double f_21_ENRC() const { return o->f_21_ENRC(); }
   double f_22_ENRC() const { return o->f_22_ENRC(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  double	_f_11_ENRC;	/**< Value of GDET:FEE1:11:ENRC, in mJ. */
-  double	_f_12_ENRC;	/**< Value of GDET:FEE1:12:ENRC, in mJ. */
-  double	_f_21_ENRC;	/**< Value of GDET:FEE1:21:ENRC, in mJ. */
-  double	_f_22_ENRC;	/**< Value of GDET:FEE1:22:ENRC, in mJ. */
 };
 #pragma pack(pop)
 
@@ -72,14 +67,6 @@ public:
   double ebeamLTUAngX() const { return o->ebeamLTUAngX(); }
   double ebeamLTUAngY() const { return o->ebeamLTUAngY(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_uDamageMask;	/**< Damage mask. */
-  double	_fEbeamCharge;	/**< Beam charge in nC. */
-  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
-  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
-  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
 };
 #pragma pack(pop)
 
@@ -107,15 +94,6 @@ public:
   double ebeamLTUAngY() const { return o->ebeamLTUAngY(); }
   double ebeamPkCurrBC2() const { return o->ebeamPkCurrBC2(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_uDamageMask;	/**< Damage mask. */
-  double	_fEbeamCharge;	/**< Beam charge in nC. */
-  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
-  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
-  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
-  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
 };
 #pragma pack(pop)
 
@@ -144,16 +122,6 @@ public:
   double ebeamPkCurrBC2() const { return o->ebeamPkCurrBC2(); }
   double ebeamEnergyBC2() const { return o->ebeamEnergyBC2(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_uDamageMask;	/**< Damage mask. */
-  double	_fEbeamCharge;	/**< Beam charge in nC. */
-  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
-  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
-  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
-  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
-  double	_fEbeamEnergyBC2;	/**< Beam energy in MeV. */
 };
 #pragma pack(pop)
 
@@ -184,18 +152,6 @@ public:
   double ebeamPkCurrBC1() const { return o->ebeamPkCurrBC1(); }
   double ebeamEnergyBC1() const { return o->ebeamEnergyBC1(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_uDamageMask;	/**< Damage mask. */
-  double	_fEbeamCharge;	/**< Beam charge in nC. */
-  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
-  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
-  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
-  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
-  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
-  double	_fEbeamEnergyBC2;	/**< Beam position in mm (related to beam energy). */
-  double	_fEbeamPkCurrBC1;	/**< Beam current in Amps. */
-  double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
 };
 #pragma pack(pop)
 
@@ -220,11 +176,6 @@ public:
   double charge1() const { return o->charge1(); }
   double charge2() const { return o->charge2(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  double	_fFitTime1;	/**< UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
-  double	_fFitTime2;	/**< UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
-  double	_fCharge1;	/**< UND:R02:IOC:16:BAT:Charge1 value in pico-columbs. */
-  double	_fCharge2;	/**< UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
 };
 #pragma pack(pop)
 

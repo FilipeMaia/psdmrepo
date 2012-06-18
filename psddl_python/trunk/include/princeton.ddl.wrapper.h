@@ -149,8 +149,6 @@ public:
   InfoV1_Wrapper(InfoV1* obj) : o(obj) {}
   float temperature() const { return o->temperature(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_fTemperature;
 };
 
   class ConfigV1_Getter : public Psana::EnvGetter {

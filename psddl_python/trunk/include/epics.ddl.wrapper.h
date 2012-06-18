@@ -32,9 +32,6 @@ public:
   uint32_t sec() const { return o->sec(); }
   uint32_t nsec() const { return o->nsec(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_secPastEpoch;	/**< Seconds since Jan 1, 1990 00:00 UTC */
-  uint32_t	_nsec;	/**< Nanoseconds within second. */
 };
 
 /** @class dbr_time_string
@@ -54,10 +51,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
 };
 
 /** @class dbr_time_short
@@ -77,11 +70,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
-  int16_t	RISC_pad;
 };
 
 /** @class dbr_time_float
@@ -101,10 +89,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
 };
 
 /** @class dbr_time_enum
@@ -124,11 +108,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
-  int16_t	RISC_pad;
 };
 
 /** @class dbr_time_char
@@ -148,12 +127,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
-  int16_t	RISC_pad0;
-  uint8_t	RISC_pad1;
 };
 
 /** @class dbr_time_long
@@ -173,10 +146,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
 };
 
 /** @class dbr_time_double
@@ -196,11 +165,6 @@ public:
   int16_t severity() const { return o->severity(); }
   const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper((epicsTimeStamp*) &o->stamp()); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  Epics::epicsTimeStamp	_stamp;
-  int32_t	RISC_pad;
 };
 
 /** @class dbr_sts_string
@@ -219,9 +183,6 @@ public:
   int16_t status() const { return o->status(); }
   int16_t severity() const { return o->severity(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
 };
 
 /** @class dbr_ctrl_short
@@ -250,18 +211,6 @@ public:
   int16_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> units_shape() const { return o->units_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  char	_units[MAX_UNITS_SIZE];
-  int16_t	_upper_disp_limit;
-  int16_t	_lower_disp_limit;
-  int16_t	_upper_alarm_limit;
-  int16_t	_upper_warning_limit;
-  int16_t	_lower_warning_limit;
-  int16_t	_lower_alarm_limit;
-  int16_t	_upper_ctrl_limit;
-  int16_t	_lower_ctrl_limit;
 };
 
 /** @class dbr_ctrl_float
@@ -291,20 +240,6 @@ public:
   float lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> units_shape() const { return o->units_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  int16_t	_precision;
-  int16_t	RISC_pad;
-  char	_units[MAX_UNITS_SIZE];
-  float	_upper_disp_limit;
-  float	_lower_disp_limit;
-  float	_upper_alarm_limit;
-  float	_upper_warning_limit;
-  float	_lower_warning_limit;
-  float	_lower_alarm_limit;
-  float	_upper_ctrl_limit;
-  float	_lower_ctrl_limit;
 };
 
 /** @class dbr_ctrl_enum
@@ -326,11 +261,6 @@ public:
   const char* strings(uint32_t i0) const { return o->strings(i0); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> strings_shape() const { return o->strings_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  int16_t	_no_str;
-  char	_strs[MAX_ENUM_STATES][MAX_ENUM_STRING_SIZE];
 };
 
 /** @class dbr_ctrl_char
@@ -359,19 +289,6 @@ public:
   uint8_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> units_shape() const { return o->units_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  char	_units[MAX_UNITS_SIZE];
-  uint8_t	_upper_disp_limit;
-  uint8_t	_lower_disp_limit;
-  uint8_t	_upper_alarm_limit;
-  uint8_t	_upper_warning_limit;
-  uint8_t	_lower_warning_limit;
-  uint8_t	_lower_alarm_limit;
-  uint8_t	_upper_ctrl_limit;
-  uint8_t	_lower_ctrl_limit;
-  uint8_t	RISC_pad;
 };
 
 /** @class dbr_ctrl_long
@@ -400,18 +317,6 @@ public:
   int32_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> units_shape() const { return o->units_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  char	_units[MAX_UNITS_SIZE];
-  int32_t	_upper_disp_limit;
-  int32_t	_lower_disp_limit;
-  int32_t	_upper_alarm_limit;
-  int32_t	_upper_warning_limit;
-  int32_t	_lower_warning_limit;
-  int32_t	_lower_alarm_limit;
-  int32_t	_upper_ctrl_limit;
-  int32_t	_lower_ctrl_limit;
 };
 
 /** @class dbr_ctrl_double
@@ -441,20 +346,6 @@ public:
   double lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> units_shape() const { return o->units_shape(); }
-private:
-  int16_t	_status;
-  int16_t	_severity;
-  int16_t	_precision;
-  int16_t	RISC_pad0;
-  char	_units[MAX_UNITS_SIZE];
-  double	_upper_disp_limit;
-  double	_lower_disp_limit;
-  double	_upper_alarm_limit;
-  double	_upper_warning_limit;
-  double	_lower_warning_limit;
-  double	_lower_alarm_limit;
-  double	_upper_ctrl_limit;
-  double	_lower_ctrl_limit;
 };
 
 /** @class EpicsPvHeader

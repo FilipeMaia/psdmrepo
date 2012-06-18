@@ -53,13 +53,6 @@ public:
   int16_t set() const { return o->set(); }
   int16_t clear() const { return o->clear(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_pulse;	/**< internal pulse generation channel */
-  uint32_t	_input_control;	/**< Pulse input control */
-  uint32_t	_output_control;	/**< Pulse output control */
-  uint32_t	_prescale;	/**< pulse event prescale */
-  uint32_t	_delay;	/**< delay in 119MHz clks */
-  uint32_t	_width;	/**< width in 119MHz clks */
 };
 
 /** @class PulseConfigV3
@@ -81,12 +74,6 @@ public:
   uint32_t delay() const { return o->delay(); }
   uint32_t width() const { return o->width(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint16_t	_u16PulseId;
-  uint16_t	_u16Polarity;	/**< 0 -> positive polarity , 1 -> negative polarity */
-  uint32_t	_u32Prescale;	/**< Clock divider */
-  uint32_t	_u32Delay;	/**< Delay in 119MHz clks */
-  uint32_t	_u32Width;	/**< Width in 119MHz clks */
 };
 #pragma pack(pop)
 
@@ -111,12 +98,6 @@ public:
   uint32_t maskSet() const { return o->maskSet(); }
   uint32_t maskClear() const { return o->maskClear(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint16_t	_u16Code;
-  uint16_t	_u16MaskEventAttr;
-  uint32_t	_u32MaskTrigger;
-  uint32_t	_u32MaskSet;
-  uint32_t	_u32MaskClear;
 };
 #pragma pack(pop)
 
@@ -143,14 +124,6 @@ public:
   uint32_t maskSet() const { return o->maskSet(); }
   uint32_t maskClear() const { return o->maskClear(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint16_t	_u16Code;
-  uint16_t	_u16MaskEventAttr;
-  uint32_t	_u32ReportDelay;
-  uint32_t	_u32ReportWidth;
-  uint32_t	_u32MaskTrigger;
-  uint32_t	_u32MaskSet;
-  uint32_t	_u32MaskClear;
 };
 #pragma pack(pop)
 
@@ -180,15 +153,6 @@ public:
   const char* desc() const { return o->desc(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> desc_shape() const { return o->desc_shape(); }
-private:
-  uint16_t	_u16Code;
-  uint16_t	_u16MaskEventAttr;
-  uint32_t	_u32ReportDelay;
-  uint32_t	_u32ReportWidth;
-  uint32_t	_u32MaskTrigger;
-  uint32_t	_u32MaskSet;
-  uint32_t	_u32MaskClear;
-  char	_desc[DescSize];
 };
 #pragma pack(pop)
 
@@ -221,8 +185,6 @@ public:
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
   uint8_t conn_id() const { return o->conn_id(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_v;
 };
 
 /** @class OutputMapV2
@@ -255,8 +217,6 @@ public:
   uint8_t conn_id() const { return o->conn_id(); }
   uint8_t module() const { return o->module(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_v;
 };
 
 /** @class ConfigV1
@@ -379,8 +339,6 @@ public:
   uint32_t delay() const { return o->delay(); }
   uint32_t eventcode() const { return o->eventcode(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_value;
 };
 
 /** @class SequencerConfigV1
@@ -478,10 +436,6 @@ public:
   uint32_t timestampLow() const { return o->timestampLow(); }
   uint32_t eventCode() const { return o->eventCode(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint32_t	_timestampHigh;
-  uint32_t	_timestampLow;
-  uint32_t	_eventCode;
 };
 
 /** @class DataV3
@@ -521,10 +475,6 @@ public:
   vector<Pds::DetInfo> infos() const { VEC_CONVERT(o->infos(), Pds::DetInfo); }
   uint32_t _sizeof() const { return o->_sizeof(); }
   vector<int> name_shape() const { return o->name_shape(); }
-private:
-  char	_name[NameLength];
-  uint32_t	_ninfo;
-  Pds::DetInfo	_info[MaxInfos];
 };
 
 /** @class IOConfigV1

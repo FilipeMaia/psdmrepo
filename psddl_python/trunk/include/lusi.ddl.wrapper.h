@@ -35,9 +35,6 @@ public:
   vector<float> base() const { VEC_CONVERT(o->base(), float); }
   vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_base[NRANGES];
-  float	_scale[NRANGES];
 };
 #pragma pack(pop)
 
@@ -60,9 +57,6 @@ public:
   vector<float> base() const { VEC_CONVERT(o->base(), float); }
   vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_base[NRANGES];
-  float	_scale[NRANGES];
 };
 #pragma pack(pop)
 
@@ -83,8 +77,6 @@ public:
   DiodeFexV1_Wrapper(DiodeFexV1* obj) : o(obj) {}
   float value() const { return o->value(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_value;
 };
 #pragma pack(pop)
 
@@ -149,11 +141,6 @@ public:
   float xpos() const { return o->xpos(); }
   float ypos() const { return o->ypos(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_channel[NCHANNELS];
-  float	_sum;
-  float	_xpos;
-  float	_ypos;
 };
 #pragma pack(pop)
 
@@ -175,9 +162,6 @@ public:
   float xscale() const { return o->xscale(); }
   float yscale() const { return o->yscale(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  float	_xscale;
-  float	_yscale;
 };
 #pragma pack(pop)
 

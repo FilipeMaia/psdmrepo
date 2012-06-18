@@ -31,9 +31,6 @@ public:
   uint16_t column() const { return o->column(); }
   uint16_t row() const { return o->row(); }
   uint32_t _sizeof() const { return o->_sizeof(); }
-private:
-  uint16_t	_column;	/**< Column index (x value). */
-  uint16_t	_row;	/**< Row index (y value). */
 };
 
 /** @class FrameFccdConfigV1
