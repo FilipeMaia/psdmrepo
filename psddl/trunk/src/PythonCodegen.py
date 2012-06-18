@@ -110,17 +110,9 @@ class PythonCodegen ( object ) :
 
         logging.debug("PythonCodegen.codegen: type=%s", repr(self._type))
 
-        # class-level comment
-        print >>self._inc, T("\n/** @class $name\n\n  $comment\n*/\n")[self._type]
-
         # declare config classes if needed
         for cfg in self._type.xtcConfig:
             print >>self._inc, T("class $name;")[cfg]
-
-        # for non-abstract types C++ may need pack pragma
-        needPragmaPack = not self._abs and self._type.pack
-        if needPragmaPack : 
-            print >>self._inc, T("#pragma pack(push,$pack)")[self._type]
 
         # base class
         base = ""
@@ -140,21 +132,9 @@ class PythonCodegen ( object ) :
         # enums for version and typeId
         access = self._access("public", access)
         if self._type.type_id is not None: 
-            doc = '/**< XTC type ID value (from Pds::TypeId class) */'
-            print >>self._inc, T("  enum { TypeId = Pds::TypeId::$type_id $doc };")(type_id=self._type.type_id, doc=doc)
+            print >>self._inc, T("  enum { TypeId = Pds::TypeId::$type_id };")(type_id=self._type.type_id)
         if self._type.version is not None: 
-            doc = '/**< XTC type version number */'
-            print >>self._inc, T("  enum { Version = $version $doc };")(version=self._type.version, doc=doc)
-
-        # enums for constants
-        access = self._access("public", access)
-        for const in self._type.constants() :
-            self._genConst(const)
-
-        # regular enums
-        access = self._access("public", access)
-        for enum in self._type.enums() :
-            self._genEnum(enum)
+            print >>self._inc, T("  enum { Version = $version };")(version=self._type.version)
 
         # constructor
         access = self._access("public", access)
@@ -191,33 +171,11 @@ class PythonCodegen ( object ) :
             print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
         print >>self._cpp, ""
 
-        # close pragma pack
-        if needPragmaPack : 
-            print >>self._inc, "#pragma pack(pop)"
-
     def _access(self, newaccess, oldaccess):
         if newaccess != oldaccess:
             print >>self._inc, newaccess+":"
         return newaccess
         
-    def _genConst(self, const):
-        
-        doc = ""
-        if const.comment: doc = T("/**< $comment */ ")[const]
-        print >>self._inc, T("  enum { $name = $value $doc};")(name=const.name, value=const.value, doc=doc)
-
-    def _genEnum(self, enum):
-        
-        if enum.comment: print >>self._inc, T("\n  /** $comment */")[enum]
-        print >>self._inc, T("  enum $name {")(name = enum.name or "")
-        for const in enum.constants() :
-            val = ""
-            if const.value is not None : val = " = " + const.value
-            doc = ""
-            if const.comment: doc = T(' /**< $comment */')[const]
-            print >>self._inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
-        print >>self._inc, "  };"
-
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
         
