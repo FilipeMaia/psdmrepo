@@ -51,14 +51,12 @@ from psddl.Template import Template as T
 #----------------------------------
 
 def _interpolate(expr, typeobj):
-    
     expr = expr.replace('{xtc-config}', 'cfg')
     expr = expr.replace('{type}.', typeobj.name+"::")
     expr = expr.replace('{self}.', "this->")
     return expr
 
 def _typename(type):
-    
     return type.fullName('C++')
 
 def _typedecl(type):
@@ -101,7 +99,6 @@ class PythonCodegen ( object ) :
         self._cpp = cpp
         self._type = type
         self._abs = abstract
-        self._pywrapper = True
         self._namespace_prefix = namespace_prefix
         self._pkg_name = pkg_name
 
@@ -127,22 +124,18 @@ class PythonCodegen ( object ) :
 
         # base class
         base = ""
-        if self._type.base and not self._pywrapper : base = T(": public $name")[self._type.base]
 
         # this class (class being generated)
-        name = self._type.name
-        if self._pywrapper:
-            wrapped = name
-            name = wrapped + "_Wrapper"
+        wrapped = self._type.name
+        name = wrapped + "_Wrapper"
 
         # start class declaration
         print >>self._inc, T("\nclass $name$base {")(name = name, base = base)
         access = "private"
 
-        if self._pywrapper:
-            # shared_ptr and C++ pointer to wrapped object
-            print >>self._inc, T("  shared_ptr<$wrapped> _o;")(wrapped = wrapped)
-            print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
+        # shared_ptr and C++ pointer to wrapped object
+        print >>self._inc, T("  shared_ptr<$wrapped> _o;")(wrapped = wrapped)
+        print >>self._inc, T("  $wrapped* o;")(wrapped = wrapped)
 
         # enums for version and typeId
         access = self._access("public", access)
@@ -163,32 +156,13 @@ class PythonCodegen ( object ) :
         for enum in self._type.enums() :
             self._genEnum(enum)
 
-        # constructors and destructors
-        if self._pywrapper:
-            # constructor
-            access = self._access("public", access)
-            #print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(name = name, wrapped = wrapped)
-            #print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(name = name, wrapped = wrapped)
-            #print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(\"${prefix}${wrapped}\", no_init)\\")(prefix = self._namespace_prefix, wrapped = wrapped)
+        # constructor
+        access = self._access("public", access)
+        print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
+        print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
+        print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
 
-
-            print >>self._inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
-            print >>self._inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
-            print >>self._cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
-
-        else:
-            if not self._abs:
-                # constructor, all should be declared explicitly
-                for ctor in self._type.ctors :
-                    access = self._access(ctor.access, access)
-                    self._genCtor(ctor)
-            if self._abs:
-                # need virtual destructor
-                access = self._access("public", access)
-                print >>self._inc, T("  virtual ~$name();")[self._type]
-                print >>self._cpp, T("\n$name::~$name() {}\n")[self._type]
-
-        # generate methods (for interfaces public methods only)
+        # generate methods (for public methods and abstract class methods only)
         for meth in self._type.methods(): 
             access = self._access("public", access)
             if not self._abs or meth.access == "public": self._genMethod(meth)
@@ -206,19 +180,22 @@ class PythonCodegen ( object ) :
 
         # close class declaration
         print >>self._inc, "};"
-        if self._pywrapper:
-            prefix = self._namespace_prefix
-            print >>self._cpp, ""
-            if not self._abs:
-                print >>self._cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
-            print >>self._cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
-            if not self._abs:
-                print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
-            print >>self._cpp, T('  std_vector_class_($name);')(locals())
-            print >>self._cpp, '#undef _CLASS';
-            if re.match(r'.*(Data|DataDesc|Config|Element)V[1-9][0-9]*_Wrapper', name):
-                print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
-            print >>self._cpp, ""
+        prefix = self._namespace_prefix
+
+        # export classes to Python via boost _class
+        print >>self._cpp, ""
+        if not self._abs:
+            print >>self._cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
+        print >>self._cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
+        if not self._abs:
+            print >>self._cpp, T('  std_vector_class_($wrapped);')(locals())
+        print >>self._cpp, T('  std_vector_class_($name);')(locals())
+        print >>self._cpp, '#undef _CLASS';
+
+        # define Getter clases for some types
+        if re.match(r'.*(Data|DataDesc|Config|Element)V[1-9][0-9]*_Wrapper', name):
+            print >>self._cpp, T('  ADD_GETTER($wrapped);')(locals())
+        print >>self._cpp, ""
 
         # close pragma pack
         if needPragmaPack : 
@@ -287,32 +264,26 @@ class PythonCodegen ( object ) :
                 # attribute is a regular non-array object, 
                 # return value or reference depending on what type it is
                 rettype = _typedecl(attr.type)
-                body = self._bodyNonArray(attr)
 
             elif attr.type.name == 'char':
                 
                 # char array is actually a string
                 rettype = "const char*"
                 args = _dimargs(attr.shape.dims[:-1], self._type)
-                body = self._bodyCharArrray(attr)
                 
             elif attr.type.value_type :
                 
                 # return ndarray
                 rettype = "ndarray<%s, %d>" % (_typename(attr.type), len(attr.shape.dims))
-                body = self._bodyNDArrray(attr)
 
             else:
 
                 # array of any other types
                 rettype = _typedecl(attr.type)
                 args = _dimargs(attr.shape.dims, self._type)
-                body = self._bodyAnyArrray(attr)
-
 
             # guess if we need to pass cfg object to method
-            cfgNeeded = body.find('{xtc-config}') >= 0
-            body = _interpolate(body, self._type)
+            cfgNeeded = False
 
             configs = [None]
             if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
@@ -321,7 +292,7 @@ class PythonCodegen ( object ) :
                 cargs = []
                 if cfg: cargs = [('cfg', cfg)]
 
-                self._genMethodBody(meth.name, rettype, body, cargs + args, inline=True, doc=attr.comment)
+                self._genMethodBody(meth.name, rettype, cargs + args)
 
         elif meth.bitfield:
 
@@ -339,7 +310,7 @@ class PythonCodegen ( object ) :
                 args = []
                 if cfg: args = [('cfg', cfg)]
 
-                self._genMethodExpr(meth.name, _typename(meth.type), expr, args, inline=True, doc=meth.comment)
+                self._genMethodBody(meth.name, _typename(meth.type), args=[])
 
         else:
 
@@ -356,25 +327,9 @@ class PythonCodegen ( object ) :
                 if meth.rank > 0:
                     type = "ndarray<%s, %d>" % (type, meth.rank)
 
-            # make method body
-            body = meth.code.get("C++")
-            if not body : body = meth.code.get("Any")
-            if not body :
-                expr = meth.expr.get("C++")
-                if not expr : expr = meth.expr.get("Any")
-                if expr:
-                    body = expr
-                    if type: body = "return %s;" % expr
-                
             # config objects may be needed 
             cfgNeeded = False
-            if body: 
-                cfgNeeded = body.find('{xtc-config}') >= 0
-                body = _interpolate(body, meth.parent)
 
-            # default is not inline, can change with a tag
-            inline = 'inline' in meth.tags
-            
             configs = [None]
             if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
             for cfg in configs:
@@ -383,338 +338,75 @@ class PythonCodegen ( object ) :
                 if cfg: args = [('cfg', cfg)]
                 args += meth.args
 
-                self._genMethodBody(meth.name, type, body, args, inline, static=meth.static, doc=meth.comment)
+                self._genMethodBody(meth.name, type, args)
 
-
-    def _bodyNonArray(self, attr):
-        """Makes method body for methods returning non-array attribute values"""
-
-        if attr.isfixed():
-
-            return T("return $name;")[attr]
-        
-        else:
-            
-            body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  return *(const $type*)(((const char*)this)+offset);")(type=_typename(attr.type))
-            return body
-
-    def _bodyCharArrray(self, attr):
-        """Makes method body for methods returning char*"""
-
-        if attr.isfixed():
-
-            return T("return $name$dimexpr;")(name=attr.name, dimexpr=_dimexpr(attr.shape.dims[:-1]))
-        
-        else:
-            
-            body = T("typedef char atype$dims;")(dims=_dims(attr.shape.dims[1:]))
-            body += T("\n  ptrdiff_t offset=$offset;")[attr]
-            body += "\n  const atype* pchar = (const atype*)(((const char*)this)+offset);"
-            body += T("\n  return pchar$dimexpr;")(dimexpr=_dimexpr(attr.shape.dims[:-1]))
-            return body
-
-    def _bodyNDArrray(self, attr):
-        """Makes method body for methods returning ndarray"""
-
-        shape = ', '.join([str(s or 0) for s in attr.shape.dims])
-        if attr.isfixed():
-
-            idx0 = "[0]" * len(attr.shape.dims)
-            return T("return make_ndarray(&$name$idx, $shape);")(name=attr.name, idx=idx0, shape=shape)
-
-        else:
-            
-            body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  $type* data = ($type*)(((const char*)this)+offset);")(type=_typename(attr.type))
-            body += T("\n  return make_ndarray(data, $shape);")(shape=shape)
-            return body
-
-    def _bodyAnyArrray(self, attr):
-        """Makes method body for methods returning ndarray"""
-
-        shape = ', '.join([str(s or 0) for s in attr.shape.dims])
-        if attr.isfixed():
-
-            return T("return $name$dimexpr;")(name=attr.name, dimexpr=_dimexpr(attr.shape.dims))
-
-        elif attr.type.variable:
-            
-            # _sizeof may need config
-            sizeofCfg = ''
-            if str(attr.type.size).find('{xtc-config}') >= 0: 
-                sizeofCfg = '{xtc-config}'
-                
-            typename = _typename(attr.type)
-            body = T("const char* memptr = ((const char*)this)+$offset;")[attr]
-            body += "\n  for (uint32_t i=0; i != i0; ++ i) {"
-            body += T("\n    memptr += ((const $typename*)memptr)->_sizeof($sizeofCfg);")(locals())
-            body += "\n  }"
-            body += T("\n  return *(const $typename*)(memptr);")(locals())
-            return body
-
-        else:
-            
-            idxexpr = ExprVal('i0', self._type)
-            for i in range(1,len(attr.shape.dims)):
-                idxexpr = idxexpr*attr.shape.dims[i] + ExprVal('i%d'%i, self._type)
-                
-            # _sizeof may need config
-            sizeofCfg = ''
-            if str(attr.type.size).find('{xtc-config}') >= 0: 
-                sizeofCfg = '{xtc-config}'
-
-            typename = _typename(attr.type)
-            body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  const $typename* memptr = (const $typename*)(((const char*)this)+offset);")(locals())
-            body += T("\n  size_t memsize = memptr->_sizeof($sizeofCfg);")(locals())
-            body += T("\n  return *(const $typename*)((const char*)memptr + ($idxexpr)*memsize);")(locals())
-            return body
-
-
-    def _genMethodExpr(self, methname, rettype, expr, args=[], inline=False, static=False, doc=None):
-        """ Generate method, both declaration and definition, given the expression that it returns"""
-
-        body = expr
-        if body and rettype != 'void': body = T("return $expr;")(locals())
-        self._genMethodBody(methname, rettype, body, args=args, inline=inline, static=static, doc=doc)
-        
-    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
+    def _genMethodBody(self, methname, rettype, args=[]):
         """ Generate method, both declaration and definition, given the body of the method"""
-        
+
         # make argument list
         argsspec = ', '.join([_argdecl(*arg) for arg in args])
 
-        if self._pywrapper:
-            policy = ""
-            args = ', '.join([_argdecl2(*arg) for arg in args])
-            index = rettype.find("ndarray<")
-            if index == 0:
-                ctype_ndim = rettype[8:]
-                index = ctype_ndim.rfind(">")
+        policy = ""
+        args = ', '.join([_argdecl2(*arg) for arg in args])
+        index = rettype.find("ndarray<")
+        if index == 0:
+            ctype_ndim = rettype[8:]
+            index = ctype_ndim.rfind(">")
+            if index != -1:
+                ctype_ndim = ctype_ndim[:index]
+            index = ctype_ndim.find(", ")
+            ctype = ctype_ndim[:index]
+            ndim = int(ctype_ndim[index + 2:])
+            if ndim == 1 or "::" in ctype:
+                if ndim > 1:
+                    print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional vector<%s> instead" % (ctype, ndim, ctype)
+                print >>self._inc, T("  vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
+            else:
+                print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
+        elif "&" in rettype and "::" in rettype:
+            if (self._pkg_name + "::") in rettype:
+                type = rettype.replace("&", "");
+                type = type.replace("const ", "")
+                index = type.find("::")
                 if index != -1:
-                    ctype_ndim = ctype_ndim[:index]
-                index = ctype_ndim.find(", ")
-                ctype = ctype_ndim[:index]
-                ndim = int(ctype_ndim[index + 2:])
-                if ndim == 1 or "::" in ctype:
-                    if ndim > 1:
-                        print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional vector<%s> instead" % (ctype, ndim, ctype)
-                    print >>self._inc, T("  vector<$ctype> $methname($argsspec) const { VEC_CONVERT(o->$methname($args), $ctype); }")(locals())
-                else:
-                    print >>self._inc, T("  PyObject* $methname($argsspec) const { ND_CONVERT(o->$methname($args), $ctype, $ndim); }")(locals())
-            elif "&" in rettype and "::" in rettype:
-                if (self._pkg_name + "::") in rettype:
-                    type = rettype.replace("&", "");
-                    type = type.replace("const ", "")
-                    index = type.find("::")
-                    if index != -1:
-                        type = type[2+index:] # remove "Namespace::"
-                    wrappertype = type + "_Wrapper"
-                    print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
-                    policy = ", policy"
-                else:
-                    type = rettype
-                    print >>self._inc, T("  $type $methname($argsspec) const { return o->$methname($args); }")(locals())
-                    policy = ", policy"
+                    type = type[2+index:] # remove "Namespace::"
+                wrappertype = type + "_Wrapper"
+                print >>self._inc, T("  const $wrappertype $methname($argsspec) const { return $wrappertype(($type*) &o->$methname($args)); }")(locals())
+                policy = ", policy"
             else:
-                print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
-
-            print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
-            return
-
-        if static:
-            static = "static "
-            const = ""
+                type = rettype
+                print >>self._inc, T("  $type $methname($argsspec) const { return o->$methname($args); }")(locals())
+                policy = ", policy"
         else:
-            static = ""
-            const = "const"
-        
+            print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
 
-        if doc: print >>self._inc, T('  /** $doc */')(locals())
-
-        if self._abs and not static:
-            
-            # abstract method declaration, body is not needed
-            print >>self._inc, T("  virtual $rettype $methname($argsspec) const = 0;")(locals())
-
-        elif not body:
-
-            # declaration only, implementation provided somewhere else
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-
-        elif inline:
-            
-            # inline method
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const { $body }")(locals())
-        
-        else:
-            
-            # out-of-line method
-            classname = self._type.name
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-            print >>self._cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
-
-
-
-    def _genCtor(self, ctor):
-
-        # find attribute for a given name
-        def name2attr(name):
-            
-            if not name: return None
-            
-            # try argument name
-            attr = self._type.localName(name)
-            if isinstance(attr, Attribute): return attr
-            
-            # look for bitfield names also
-            for attr in self._type.attributes():
-                for bf in attr.bitfields:
-                    if bf.name == name: return bf
-                    
-            raise ValueError('No attrubute or bitfield with name %s defined in type %s' % (name, self._type.name))
-            
-        args = ctor.args
-        if not args :
-            
-            if 'auto' in ctor.tags:
-                # make one argument per type attribute
-                for attr in self._type.attributes():
-                    if attr.bitfields:
-                        for bf in attr.bitfields:
-                            if bf.accessor:
-                                name = "arg_bf_"+bf.name
-                                type = bf.type
-                                dest = bf
-                                args.append((name, type, dest))
-                    else:
-                        name = "arg_"+attr.name
-                        type = attr.type
-                        dest = attr
-                        args.append((name, type, dest))
-        
-        else:
-            
-            # convert destination names to attribute objects
-            args = [(name, type, name2attr(dest)) for name, type, dest in args]
-
-        # map attributes to arguments
-        attr2arg = {}
-        for name, type, dest in args:
-            attr2arg[dest] = name
-
-        # argument list for declaration
-        arglist = []
-        for argname, argtype, attr in args:
-            if not argtype: argtype = attr.type
-            tname = _typename(argtype)
-            if isinstance(attr,Attribute) and attr.shape:
-                tname = "const "+tname+'*'
-            elif not attr.type.basic : 
-                tname = "const "+tname+'&'
-            arglist.append(tname+' '+argname)
-        arglist = ", ".join(arglist)
-
-        # initialization list
-        initlist = []
-        for attr in self._type.attributes():
-            arg = attr2arg.get(attr,"")
-            if attr.shape:
-                init = ''
-            elif arg :
-                init = arg
-            elif attr.bitfields:
-                # there may be arguments initializing individual bitfields
-                bfinit = []
-                for bf in attr.bitfields:
-                    bfarg = attr2arg.get(bf)
-                    if bfarg: bfinit.append(bf.assignExpr(bfarg))
-                init = '|'.join(bfinit)
-            elif attr.name in ctor.attr_init:
-                init = ctor.attr_init[attr.name]
-            else:
-                init = ""
-            if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
-
-        # do we need generate definition too?
-        if 'c++-definition' in ctor.tags:
-            genDef = True
-        elif 'no-c++-definition' in ctor.tags:
-            genDef = False
-        else:
-            # generate definition only if all destinations are known
-            genDef = None not in [dest for name, type, dest in args]
-
-        if not genDef:
-            
-            # simply a declaration
-            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
-
-        elif 'inline' in ctor.tags:
-            
-            # inline the definition
-            print >>self._inc, T("  $name($args)")(name=self._type.name, args=arglist)
-            if initlist: print >>self._inc, "    :", ', '.join(initlist)
-            print >>self._inc, "  {"
-            for attr in self._type.attributes():
-                arg = attr2arg.get(attr,"")
-                if attr.shape and arg:
-                    size = attr.shape.size()
-                    first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, T("    std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
-            print >>self._inc, "  }"
-
-        else:
-            
-            # out-line the definition
-            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
-
-            print >>self._cpp, T("$name::$name($args)")(name=self._type.name, args=arglist)
-            if initlist: print >>self._cpp, "    :", ', '.join(initlist)
-            print >>self._cpp, "{"
-            for attr in self._type.attributes():
-                arg = attr2arg.get(attr,"")
-                if attr.shape and arg:
-                    size = attr.shape.size()
-                    first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, T("  std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
-            print >>self._cpp, "}"
-
+        print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
 
     def _genAttrShapeDecl(self, attr):
 
-        if not attr.shape_method: return 
-        if not attr.accessor: return
-        
-        doc = "Method which returns the shape (dimensions) of the data returned by %s() method." % \
-                attr.accessor.name
+        if not attr.shape_method: return False
+        if not attr.accessor: return False
         
         # value-type arrays return ndarrays which do not need shape method
-        if attr.type.value_type and attr.type.name != 'char': return
+        if attr.type.value_type and attr.type.name != 'char': return False
 
-        shape = [str(s or -1) for s in attr.shape.dims]
+        shape = [str(s or "???") for s in attr.shape.dims]
+        if len(shape) > 2:
+            print "Error: shape has more than 2 elements: ", shape
+            sys.exit(1)
+        if len(shape) < 1:
+            print "Error: shape has no elements! ", shape
+            sys.exit(1)
+        if len(shape) == 2:
+            shape1 = shape[1].strip()
+            if not (shape1 == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', shape1)):
+                print "Error: shape has 2 elements and second is not MAX_???_STRING_SIZE: '%s'" % shape1
+                sys.exit(1)
+            print "shape=", len(shape), shape
 
-        body = "vector<int> shape;" 
-        body += T("\n  shape.reserve($size);")(size=len(shape))
-        for s in shape:
-            body += T("\n  shape.push_back($dim);")(dim=s)
-        body += "\n  return shape;"
-
-        # guess if we need to pass cfg object to method
-        cfgNeeded = body.find('{xtc-config}') >= 0
-        body = _interpolate(body, self._type)
-
-        configs = [None]
-        if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
-        for cfg in configs:
-
-            cargs = []
-            if cfg: cargs = [('cfg', cfg)]
-
-            self._genMethodBody(attr.shape_method, "vector<int>", body, cargs, inline=False, doc=doc)
-
-
+        print "// ZZZ shape=", shape
+        print attr.shape_method
+        self._genMethodBody(attr.shape_method, "vector<int>")
 
 #
 #  In case someone decides to run this module
