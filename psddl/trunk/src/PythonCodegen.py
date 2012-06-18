@@ -333,32 +333,46 @@ class PythonCodegen ( object ) :
             print >>self._inc, T("  $rettype $methname($argsspec) const { return o->$methname($args); }")(locals())
 
         print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
+        """
+        if "_shape" in methname:
+            methname = methname.replace("_shape", "_size")
+            print >>self._cpp, T("    .def(\"$methname\", &n::$methname$policy)\\")(methname=methname, classname=self._type.name, policy=policy)
+        """
 
     def _genAttrShapeDecl(self, attr):
 
-        if not attr.shape_method: return False
-        if not attr.accessor: return False
+        if not attr.shape_method: return None
+        if not attr.accessor: return None
         
         # value-type arrays return ndarrays which do not need shape method
-        if attr.type.value_type and attr.type.name != 'char': return False
+        if attr.type.value_type and attr.type.name != 'char': return None
 
-        shape = [str(s or "???") for s in attr.shape.dims]
-        if len(shape) > 2:
-            print "Error: shape has more than 2 elements: ", shape
+        dimensions = [str(s or "") for s in attr.shape.dims]
+        if len(dimensions) < 1:
+            print "Error: cannot generate '%s' method: shape has no dimensions!" % shape_method
             sys.exit(1)
-        if len(shape) < 1:
-            print "Error: shape has no elements! ", shape
+        if len(dimensions) > 2:
+            print "Error: cannot generate '%s' method: shape has more than 2 dimensions." % shape_method
             sys.exit(1)
-        if len(shape) == 2:
-            shape1 = shape[1].strip()
-            if not (shape1 == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', shape1)):
-                print "Error: shape has 2 elements and second is not MAX_???_STRING_SIZE: '%s'" % shape1
+        if len(dimensions) == 2:
+            dimensions1 = dimensions[1].strip()
+            if not (dimensions1 == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', dimensions1)):
+                print "Cannot generate '%s' method: shape has 2 dimensions and second is not a max string size" % shape_method
                 sys.exit(1)
-            print "shape=", len(shape), shape
 
-        print "// ZZZ shape=", shape
-        print attr.shape_method
         self._genMethodBody(attr.shape_method, "vector<int>")
+
+        # now generate _size() method if applicable.
+
+        shape_method = attr.shape_method
+        size_method = shape_method.replace("_shape", "_size")
+
+        #print >> self._inc, T("  int ${size_method}() const { return ${shape_method}()[0]; }")(locals())
+
+        methname = attr.accessor.name
+        #print >> self._inc, T("  list $methname() { list l; const int n = ${methname}_size(); for (int i = 0; i < n; i++) l.append(o->${methname}(i)); return l; }")(locals())
+
+        return methname
 
 #
 #  In case someone decides to run this module
