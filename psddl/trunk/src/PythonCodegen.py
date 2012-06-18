@@ -172,12 +172,6 @@ class PythonCodegen ( object ) :
             access = self._access("public", access)
             self._genAttrShapeDecl(attr)
 
-        if not self._abs:
-            # data members
-            for attr in self._type.attributes() :
-                access = self._access("private", access)
-                self._genAttrDecl(attr)
-
         # close class declaration
         print >>self._inc, "};"
         prefix = self._namespace_prefix
