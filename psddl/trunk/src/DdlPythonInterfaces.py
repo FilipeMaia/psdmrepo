@@ -534,6 +534,17 @@ class DdlPythonInterfaces ( object ) :
         # value-type arrays return ndarrays which do not need shape method
         if attr.type.value_type and attr.type.name != 'char': return None
 
+        dimensions = []
+        for dim in attr.shape.dims:
+            try:
+                if ('{xtc-config}' in dim) or ('{self}' in dim):
+                    dimensions.append(dim)
+                    print "--------- ", dimensions, attr.accessor.name
+            except:
+                continue
+
+
+        """
         dimensions = [str(s or "") for s in attr.shape.dims]
         if len(dimensions) < 1:
             print "Error: cannot generate '%s' method: shape has no dimensions!" % shape_method
@@ -542,22 +553,24 @@ class DdlPythonInterfaces ( object ) :
             print "Error: cannot generate '%s' method: shape has more than 2 dimensions." % shape_method
             sys.exit(1)
         if len(dimensions) == 2:
-            dimensions1 = dimensions[1].strip()
-            if not (dimensions1 == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', dimensions1)):
+            second_dimension = dimensions[1].strip()
+            if not (second_dimension == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', second_dimension)):
                 print "Cannot generate '%s' method: shape has 2 dimensions and second is not a max string size" % shape_method
                 sys.exit(1)
-
+        """
+            
         self._genMethodBody(type, attr.shape_method, "vector<int>")
 
-        # now generate _size() method if applicable.
+        if len(dimensions) == 0:
+            return None
+        if len(dimensions) > 2:
+            print "Error: cannot generate '%s' method: shape has more than 2 dimensions." % shape_method
+            sys.exit(1)
 
+        # now generate data_list() method if applicable.
         shape_method = attr.shape_method
-        size_method = shape_method.replace("_shape", "_size")
-
-        #print >> self.inc, T("  int ${size_method}() const { return ${shape_method}()[0]; }")(locals())
-
         method_name = attr.accessor.name
-        #print >> self.inc, T("  list $method_name() { list l; const int n = ${method_name}_size(); for (int i = 0; i < n; i++) l.append(o->${method_name}(i)); return l; }")(locals())
+        print >> self.inc, T("  boost::python::list ${method_name}_list() { boost::python::list l; const int n = ${shape_method}()[0]; for (int i = 0; i < n; i++) l.append(${method_name}(i)); return l; }")(locals())
 
         return method_name
 #
