@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -68,10 +69,11 @@ XtcDgIterator::~XtcDgIterator ()
 Dgram::ptr
 XtcDgIterator::next()
 {
-  Pds::Dgram* dg = (Pds::Dgram*)new char[m_maxDgramSize];
+  Pds::Dgram header;
+  const size_t headerSize = sizeof(Pds::Dgram);
 
   // read header
-  if ( fread(dg, sizeof(Pds::Dgram), 1, m_file) != 1 ) {
+  if ( fread(&header, headerSize, 1, m_file) != 1 ) {
     if ( feof(m_file) ) {
       return Dgram::ptr();
     } else {
@@ -79,11 +81,14 @@ XtcDgIterator::next()
     }
   }
 
-  // check payload size
-  size_t payloadSize = dg->xtc.sizeofPayload();
-  if ((payloadSize+sizeof(dg))>m_maxDgramSize) {
-    throw XTCSizeLimitException(m_path, payloadSize+sizeof(dg), m_maxDgramSize);
+  // check payload size, protection against corrupted headers
+  size_t payloadSize = header.xtc.sizeofPayload();
+  if (payloadSize > (m_maxDgramSize-headerSize)) {
+    throw XTCSizeLimitException(m_path, payloadSize+headerSize, m_maxDgramSize);
   }
+
+  Pds::Dgram* dg = (Pds::Dgram*)new char[payloadSize+headerSize];
+  std::copy((const char*)&header, ((const char*)&header)+headerSize, (char*)dg);
 
   // read rest of the data
   if ( payloadSize ) {

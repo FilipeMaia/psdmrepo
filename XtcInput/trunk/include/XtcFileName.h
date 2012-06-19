@@ -57,6 +57,9 @@ public:
   // Construct from a full path name
   explicit XtcFileName( const std::string& path ) ;
 
+  // Construct from dir name, experiment id, run number, stream and chunk
+  XtcFileName(const std::string& dir, unsigned expNum, unsigned run, unsigned stream, unsigned chunk) ;
+
   // Destructor
   ~XtcFileName () {}
 

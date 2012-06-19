@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2012-06-19 Andy Salnikov
+- XtcFileName gets a constructor which takes experiemnt id, run number,
+  stream and chunk numbers
+- added also unit tests for the above constructor
+- XtcDgIterator::next allocates minimum necessary space for datagram,
+  not maximum allowed size
+
 Tag: V00-02-01
 2012-03-05 Andy Salnikov
 - adding XtcFilter classes to filter datagram contents, right now only

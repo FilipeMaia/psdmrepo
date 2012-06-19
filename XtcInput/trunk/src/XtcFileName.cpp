@@ -20,6 +20,7 @@
 //-----------------
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -114,6 +115,20 @@ XtcFileName::XtcFileName ( const std::string& path )
   m_chunk = chunk ;
 }
 
+// Construct from dir name, experiment id, run number, stream and chunk
+XtcFileName::XtcFileName(const std::string& dir, unsigned expNum, unsigned run, unsigned stream, unsigned chunk)
+  : m_path()
+  , m_expNum(expNum)
+  , m_run(run)
+  , m_stream(stream)
+  , m_chunk(chunk)
+{
+  m_path = dir;
+  if (not m_path.empty() and m_path[m_path.size()-1] != '/') m_path += "/";
+  char buf[64];
+  snprintf(buf, sizeof buf, "e%u-r%04u-s%02u-c%02u.xtc", expNum, run, stream, chunk);
+  m_path += buf;
+}
 
 // get base name
 std::string
