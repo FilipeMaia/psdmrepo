@@ -261,6 +261,7 @@ public:
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
   const ElementV1_Wrapper quads(uint32_t i0) const { return ElementV1_Wrapper((ElementV1*) &o->quads(i0)); }
   vector<int> quads_shape() const { return o->quads_shape(); }
+  boost::python::list quads_list() { boost::python::list l; const int n = quads_shape()[0]; for (int i = 0; i < n; i++) l.append(quads(i)); return l; }
 };
 class ConfigV2;
 class ConfigV3;
@@ -301,6 +302,7 @@ public:
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
   const ElementV2_Wrapper quads(uint32_t i0) const { return ElementV2_Wrapper((ElementV2*) &o->quads(i0)); }
   vector<int> quads_shape() const { return o->quads_shape(); }
+  boost::python::list quads_list() { boost::python::list l; const int n = quads_shape()[0]; for (int i = 0; i < n; i++) l.append(quads(i)); return l; }
 };
 
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {

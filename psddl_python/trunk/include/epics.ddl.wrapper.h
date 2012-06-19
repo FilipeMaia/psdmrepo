@@ -290,6 +290,7 @@ public:
   const char* data(uint32_t i0) const { return o->data(i0); }
   const char* value(uint32_t i) const { return o->value(i); }
   vector<int> data_shape() const { return o->data_shape(); }
+  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class EpicsPvCtrlShort_Wrapper {
@@ -368,6 +369,7 @@ public:
   const char* data(uint32_t i0) const { return o->data(i0); }
   const char* value(uint32_t i) const { return o->value(i); }
   vector<int> data_shape() const { return o->data_shape(); }
+  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class EpicsPvTimeShort_Wrapper {
@@ -458,6 +460,7 @@ public:
   int32_t numPv() const { return o->numPv(); }
   const PvConfigV1_Wrapper pvControls(uint32_t i0) const { return PvConfigV1_Wrapper((PvConfigV1*) &o->pvControls(i0)); }
   vector<int> pvControls_shape() const { return o->pvControls_shape(); }
+  boost::python::list pvControls_list() { boost::python::list l; const int n = pvControls_shape()[0]; for (int i = 0; i < n; i++) l.append(pvControls(i)); return l; }
 };
 
   class PvConfigV1_Getter : public Psana::EnvGetter {

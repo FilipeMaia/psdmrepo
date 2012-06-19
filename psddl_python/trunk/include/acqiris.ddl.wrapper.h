@@ -118,6 +118,7 @@ public:
   DataDescV1_Wrapper(DataDescV1* obj) : o(obj) {}
   const DataDescV1Elem_Wrapper data(uint32_t i0) const { return DataDescV1Elem_Wrapper((DataDescV1Elem*) &o->data(i0)); }
   vector<int> data_shape() const { return o->data_shape(); }
+  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class TdcChannel_Wrapper {

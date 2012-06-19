@@ -97,6 +97,7 @@ void createWrappers() {
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("data", &n::data, policy)\
     .def("data_shape", &n::data_shape)\
+    .def("data_list", &n::data_list)\
 
   _CLASS(Psana::Acqiris::DataDescV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1_Wrapper);
