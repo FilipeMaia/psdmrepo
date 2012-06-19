@@ -91,6 +91,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1Elem_Wrapper);
 #undef _CLASS
+  ADD_GETTER(DataDescV1Elem);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -173,6 +174,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1_Item);
   std_vector_class_(TdcDataV1_Item_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcDataV1_Item);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -185,6 +187,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Common);
   std_vector_class_(TdcDataV1Common_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcDataV1Common);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -198,6 +201,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Channel);
   std_vector_class_(TdcDataV1Channel_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcDataV1Channel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -209,6 +213,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Marker);
   std_vector_class_(TdcDataV1Marker_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcDataV1Marker);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

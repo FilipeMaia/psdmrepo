@@ -63,6 +63,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
+  ADD_GETTER(ConfigV1QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -88,6 +89,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2QuadReg_Wrapper);
 #undef _CLASS
+  ADD_GETTER(ConfigV2QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
