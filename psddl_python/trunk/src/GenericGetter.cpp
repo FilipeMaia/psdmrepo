@@ -60,8 +60,8 @@ namespace Psana {
     const int typeId = getter->getTypeId();
     if (typeId != -1) {
       pythonTypeIdMap[typeId] = typeName;
-      const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
-      printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
+      //const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
+      //printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
     }
 
     if (version > 0) {
