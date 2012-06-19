@@ -297,7 +297,7 @@ class DdlPythonInterfaces ( object ) :
         self._pkg_name = self.pkg.name
 
         logging.debug("codegen: type=%s", repr(type))
-        print "codegen: type=%s" % repr(type)
+        #print "codegen: type=%s" % repr(type)
 
         # declare config classes if needed
         for cfg in type.xtcConfig:
@@ -332,9 +332,9 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
 
         # generate methods (for public methods and abstract class methods only)
-        for meth in type.methods(): 
+        for method in type.methods(): 
             access = self._access("public", access)
-            if not abstract or meth.access == "public": self._genMethod(meth, type)
+            if not abstract or method.access == "public": self._genMethod(type, method)
 
         # generate _shape() methods for array attributes
         for attr in type.attributes() :
@@ -355,8 +355,7 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, T('  std_vector_class_($name);')(locals())
         print >>self.cpp, '#undef _CLASS';
 
-        # define Getter clases for some types
-        if re.match(r'.*(Data|DataDesc|Config|Element)V[1-9][0-9]*_Wrapper', name):
+        if self._getGetterClassForType(type):
             print >>self.cpp, T('  ADD_GETTER($wrapped);')(locals())
         print >>self.cpp, ""
 
@@ -388,16 +387,16 @@ class DdlPythonInterfaces ( object ) :
         print >>self.inc, decl
 
 
-    def _genMethod(self, meth, type):
+    def _genMethod(self, type, method):
         """Generate method declaration and definition"""
 
-        logging.debug("_genMethod: meth: %s", meth)
+        logging.debug("_genMethod: method: %s", method)
         
-        if meth.attribute:
+        if method.attribute:
             
             # generate access method for a named attribute
             
-            attr = meth.attribute
+            attr = method.attribute
             args = []
                         
             if not attr.shape:
@@ -433,54 +432,54 @@ class DdlPythonInterfaces ( object ) :
                 cargs = []
                 if cfg: cargs = [('cfg', cfg)]
 
-                self._genMethodBody(type, meth.name, rettype, cargs + args)
+                self._genMethodBody(type, method.name, rettype, cargs + args)
 
-        elif meth.bitfield:
+        elif method.bitfield:
 
             # generate access method for bitfield
 
-            bf = meth.bitfield
+            bf = method.bitfield
             expr = bf.expr()
             cfgNeeded = expr.find('{xtc-config}') >= 0
-            expr = _interpolate(expr, meth.parent)
+            expr = _interpolate(expr, method.parent)
 
             configs = [None]
-            if cfgNeeded and not abstract: configs = meth.parent.xtcConfig
+            if cfgNeeded and not abstract: configs = method.parent.xtcConfig
             for cfg in configs:
 
                 args = []
                 if cfg: args = [('cfg', cfg)]
 
-                self._genMethodBody(type, meth.name, _typename(meth.type), args=[])
+                self._genMethodBody(type, method.name, _typename(method.type), args=[])
 
         else:
 
             # explicitly declared method with optional expression
             
             abstract = not type.value_type
-            if meth.name == "_sizeof" and abstract : return
+            if method.name == "_sizeof" and abstract : return
             
             # if no type given then it does not return anything
-            method_type = meth.type
+            method_type = method.type
             if method_type is None:
                 method_type = "void"
             else:
                 method_type = _typename(method_type)
-                if meth.rank > 0:
-                    method_type = "ndarray<%s, %d>" % (method_type, meth.rank)
+                if method.rank > 0:
+                    method_type = "ndarray<%s, %d>" % (method_type, method.rank)
 
             # config objects may be needed 
             cfgNeeded = False
 
             configs = [None]
-            if cfgNeeded and not abstract: configs = meth.parent.xtcConfig
+            if cfgNeeded and not abstract: configs = method.parent.xtcConfig
             for cfg in configs:
 
                 args = []
                 if cfg: args = [('cfg', cfg)]
-                args += meth.args
+                args += method.args
 
-                self._genMethodBody(type, meth.name, method_type, args)
+                self._genMethodBody(type, method.name, method_type, args)
 
     def _genMethodBody(self, type, method_name, rettype, args=[]):
         """ Generate method, both declaration and definition, given the body of the method"""
