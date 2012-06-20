@@ -150,6 +150,34 @@ public:
     }
   };
 
+  class DiodeFexV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::DiodeFexV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::DiodeFexV1";
+    }
+    int getTypeId() {
+      return DiodeFexV1::TypeId;
+    }
+    int getVersion() {
+      return DiodeFexV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DiodeFexV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(DiodeFexV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DiodeFexV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(DiodeFexV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<DiodeFexV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(DiodeFexV1_Wrapper(result)) : object();
+    }
+  };
+
   class IpmFexConfigV1_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -187,6 +215,34 @@ public:
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<IpmFexConfigV2> result = store.get(src, 0);
       return result.get() ? object(IpmFexConfigV2_Wrapper(result)) : object();
+    }
+  };
+
+  class IpmFexV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Lusi::IpmFexV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Lusi::IpmFexV1";
+    }
+    int getTypeId() {
+      return IpmFexV1::TypeId;
+    }
+    int getVersion() {
+      return IpmFexV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<IpmFexV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(IpmFexV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<IpmFexV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(IpmFexV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<IpmFexV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(IpmFexV1_Wrapper(result)) : object();
     }
   };
 

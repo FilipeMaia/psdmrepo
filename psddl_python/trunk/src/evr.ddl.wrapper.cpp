@@ -33,6 +33,7 @@ void createWrappers() {
   std_vector_class_(PulseConfig);
   std_vector_class_(PulseConfig_Wrapper);
 #undef _CLASS
+  ADD_GETTER(PulseConfig);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -66,6 +67,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV3);
   std_vector_class_(EventCodeV3_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EventCodeV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -85,6 +87,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV4);
   std_vector_class_(EventCodeV4_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EventCodeV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -106,6 +109,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV5);
   std_vector_class_(EventCodeV5_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EventCodeV5);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -121,6 +125,7 @@ void createWrappers() {
   std_vector_class_(OutputMap);
   std_vector_class_(OutputMap_Wrapper);
 #undef _CLASS
+  ADD_GETTER(OutputMap);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -137,6 +142,7 @@ void createWrappers() {
   std_vector_class_(OutputMapV2);
   std_vector_class_(OutputMapV2_Wrapper);
 #undef _CLASS
+  ADD_GETTER(OutputMapV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -204,6 +210,7 @@ void createWrappers() {
   std_vector_class_(SequencerEntry);
   std_vector_class_(SequencerEntry_Wrapper);
 #undef _CLASS
+  ADD_GETTER(SequencerEntry);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -260,6 +267,7 @@ void createWrappers() {
   std_vector_class_(FIFOEvent);
   std_vector_class_(FIFOEvent_Wrapper);
 #undef _CLASS
+  ADD_GETTER(FIFOEvent);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -284,6 +292,7 @@ void createWrappers() {
   std_vector_class_(IOChannel);
   std_vector_class_(IOChannel_Wrapper);
 #undef _CLASS
+  ADD_GETTER(IOChannel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

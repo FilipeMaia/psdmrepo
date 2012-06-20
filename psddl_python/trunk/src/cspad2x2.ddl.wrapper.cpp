@@ -15,6 +15,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2DigitalPotsCfg_Wrapper);
 #undef _CLASS
+  ADD_GETTER(CsPad2x2DigitalPotsCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -24,6 +25,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2ReadOnlyCfg_Wrapper);
 #undef _CLASS
+  ADD_GETTER(CsPad2x2ReadOnlyCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -33,6 +35,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ProtectionSystemThreshold_Wrapper);
 #undef _CLASS
+  ADD_GETTER(ProtectionSystemThreshold);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -41,6 +44,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2GainMapCfg_Wrapper);
 #undef _CLASS
+  ADD_GETTER(CsPad2x2GainMapCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

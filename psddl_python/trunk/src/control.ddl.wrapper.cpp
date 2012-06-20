@@ -21,6 +21,7 @@ void createWrappers() {
   std_vector_class_(PVControl);
   std_vector_class_(PVControl_Wrapper);
 #undef _CLASS
+  ADD_GETTER(PVControl);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -36,6 +37,7 @@ void createWrappers() {
   std_vector_class_(PVMonitor);
   std_vector_class_(PVMonitor_Wrapper);
 #undef _CLASS
+  ADD_GETTER(PVMonitor);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

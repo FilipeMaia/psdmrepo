@@ -108,6 +108,34 @@ public:
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
+
+  class FrameV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::PNCCD::FrameV1);
+    }
+    const char* getTypeName() {
+      return "Psana::PNCCD::FrameV1";
+    }
+    int getTypeId() {
+      return FrameV1::TypeId;
+    }
+    int getVersion() {
+      return FrameV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+  };
 } // namespace PNCCD
 } // namespace Psana
 #endif // PSANA_PNCCD_DDL_WRAPPER_H

@@ -134,6 +134,94 @@ public:
   float common_mode(uint32_t section) const { return o->common_mode(section); }
 };
 
+  class CsPad2x2DigitalPotsCfg_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad2x2::CsPad2x2DigitalPotsCfg";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2DigitalPotsCfg> result = evt.get(key, foundSrc);
+      return result.get() ? object(CsPad2x2DigitalPotsCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2DigitalPotsCfg> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(CsPad2x2DigitalPotsCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2DigitalPotsCfg> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(CsPad2x2DigitalPotsCfg_Wrapper(result)) : object();
+    }
+  };
+
+  class CsPad2x2ReadOnlyCfg_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad2x2::CsPad2x2ReadOnlyCfg";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2ReadOnlyCfg> result = evt.get(key, foundSrc);
+      return result.get() ? object(CsPad2x2ReadOnlyCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2ReadOnlyCfg> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(CsPad2x2ReadOnlyCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2ReadOnlyCfg> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(CsPad2x2ReadOnlyCfg_Wrapper(result)) : object();
+    }
+  };
+
+  class ProtectionSystemThreshold_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad2x2::ProtectionSystemThreshold);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad2x2::ProtectionSystemThreshold";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ProtectionSystemThreshold> result = evt.get(key, foundSrc);
+      return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ProtectionSystemThreshold> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<ProtectionSystemThreshold> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
+    }
+  };
+
+  class CsPad2x2GainMapCfg_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg);
+    }
+    const char* getTypeName() {
+      return "Psana::CsPad2x2::CsPad2x2GainMapCfg";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2GainMapCfg> result = evt.get(key, foundSrc);
+      return result.get() ? object(CsPad2x2GainMapCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2GainMapCfg> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(CsPad2x2GainMapCfg_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<CsPad2x2GainMapCfg> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(CsPad2x2GainMapCfg_Wrapper(result)) : object();
+    }
+  };
+
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {

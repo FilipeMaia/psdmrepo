@@ -90,6 +90,28 @@ public:
   double major_axis_tilt() const { return o->major_axis_tilt(); }
 };
 
+  class FrameCoord_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Camera::FrameCoord);
+    }
+    const char* getTypeName() {
+      return "Psana::Camera::FrameCoord";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameCoord> result = evt.get(key, foundSrc);
+      return result.get() ? object(FrameCoord_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameCoord> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(FrameCoord_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameCoord> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FrameCoord_Wrapper(result)) : object();
+    }
+  };
+
   class FrameFccdConfigV1_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {
@@ -127,6 +149,62 @@ public:
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
       boost::shared_ptr<FrameFexConfigV1> result = store.get(src, 0);
       return result.get() ? object(FrameFexConfigV1_Wrapper(result)) : object();
+    }
+  };
+
+  class FrameV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Camera::FrameV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Camera::FrameV1";
+    }
+    int getTypeId() {
+      return FrameV1::TypeId;
+    }
+    int getVersion() {
+      return FrameV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+  };
+
+  class TwoDGaussianV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Camera::TwoDGaussianV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Camera::TwoDGaussianV1";
+    }
+    int getTypeId() {
+      return TwoDGaussianV1::TypeId;
+    }
+    int getVersion() {
+      return TwoDGaussianV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TwoDGaussianV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TwoDGaussianV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<TwoDGaussianV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();
     }
   };
 } // namespace Camera

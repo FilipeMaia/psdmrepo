@@ -44,6 +44,7 @@ void createWrappers() {
   std_vector_class_(DiodeFexV1);
   std_vector_class_(DiodeFexV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(DiodeFexV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -80,6 +81,7 @@ void createWrappers() {
   std_vector_class_(IpmFexV1);
   std_vector_class_(IpmFexV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(IpmFexV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

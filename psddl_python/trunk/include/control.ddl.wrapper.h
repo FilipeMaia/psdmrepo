@@ -64,6 +64,50 @@ public:
   vector<ControlData::PVMonitor> pvMonitors() const { VEC_CONVERT(o->pvMonitors(), ControlData::PVMonitor); }
 };
 
+  class PVControl_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::ControlData::PVControl);
+    }
+    const char* getTypeName() {
+      return "Psana::ControlData::PVControl";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVControl> result = evt.get(key, foundSrc);
+      return result.get() ? object(PVControl_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVControl> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(PVControl_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVControl> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(PVControl_Wrapper(result)) : object();
+    }
+  };
+
+  class PVMonitor_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::ControlData::PVMonitor);
+    }
+    const char* getTypeName() {
+      return "Psana::ControlData::PVMonitor";
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVMonitor> result = evt.get(key, foundSrc);
+      return result.get() ? object(PVMonitor_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVMonitor> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(PVMonitor_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<PVMonitor> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(PVMonitor_Wrapper(result)) : object();
+    }
+  };
+
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
     const std::type_info& getTypeInfo() {

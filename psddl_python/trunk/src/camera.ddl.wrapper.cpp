@@ -19,6 +19,7 @@ void createWrappers() {
   std_vector_class_(FrameCoord);
   std_vector_class_(FrameCoord_Wrapper);
 #undef _CLASS
+  ADD_GETTER(FrameCoord);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -57,6 +58,7 @@ void createWrappers() {
   _CLASS(Psana::Camera::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(FrameV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -70,6 +72,7 @@ void createWrappers() {
   _CLASS(Psana::Camera::TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TwoDGaussianV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TwoDGaussianV1);
 
 
 } // createWrappers()

@@ -49,6 +49,7 @@ void createWrappers() {
   _CLASS(Psana::PNCCD::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(FrameV1);
 
 
 } // createWrappers()

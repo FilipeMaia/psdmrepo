@@ -182,6 +182,62 @@ public:
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
+
+  class FrameV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Princeton::FrameV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Princeton::FrameV1";
+    }
+    int getTypeId() {
+      return FrameV1::TypeId;
+    }
+    int getVersion() {
+      return FrameV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<FrameV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+  };
+
+  class InfoV1_Getter : public Psana::EvtGetter {
+  public:
+    const std::type_info& getTypeInfo() {
+      return typeid(Psana::Princeton::InfoV1);
+    }
+    const char* getTypeName() {
+      return "Psana::Princeton::InfoV1";
+    }
+    int getTypeId() {
+      return InfoV1::TypeId;
+    }
+    int getVersion() {
+      return InfoV1::Version;
+    }
+    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<InfoV1> result = evt.get(key, foundSrc);
+      return result.get() ? object(InfoV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<InfoV1> result = evt.get(src, key, foundSrc);
+      return result.get() ? object(InfoV1_Wrapper(result)) : object();
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+      shared_ptr<InfoV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(InfoV1_Wrapper(result)) : object();
+    }
+  };
 } // namespace Princeton
 } // namespace Psana
 #endif // PSANA_PRINCETON_DDL_WRAPPER_H

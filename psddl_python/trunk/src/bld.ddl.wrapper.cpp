@@ -21,6 +21,7 @@ void createWrappers() {
   std_vector_class_(BldDataFEEGasDetEnergy);
   std_vector_class_(BldDataFEEGasDetEnergy_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataFEEGasDetEnergy);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -38,6 +39,7 @@ void createWrappers() {
   std_vector_class_(BldDataEBeamV0);
   std_vector_class_(BldDataEBeamV0_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataEBeamV0);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -56,6 +58,7 @@ void createWrappers() {
   std_vector_class_(BldDataEBeamV1);
   std_vector_class_(BldDataEBeamV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataEBeamV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -75,6 +78,7 @@ void createWrappers() {
   std_vector_class_(BldDataEBeamV2);
   std_vector_class_(BldDataEBeamV2_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataEBeamV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -96,6 +100,7 @@ void createWrappers() {
   std_vector_class_(BldDataEBeamV3);
   std_vector_class_(BldDataEBeamV3_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataEBeamV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -110,6 +115,7 @@ void createWrappers() {
   std_vector_class_(BldDataPhaseCavity);
   std_vector_class_(BldDataPhaseCavity_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataPhaseCavity);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -120,6 +126,7 @@ void createWrappers() {
   _CLASS(Psana::Bld::BldDataIpimbV0_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataIpimbV0_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataIpimbV0);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -130,6 +137,7 @@ void createWrappers() {
   _CLASS(Psana::Bld::BldDataIpimbV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataIpimbV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataIpimbV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -140,6 +148,7 @@ void createWrappers() {
   _CLASS(Psana::Bld::BldDataPimV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataPimV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(BldDataPimV1);
 
 
 } // createWrappers()

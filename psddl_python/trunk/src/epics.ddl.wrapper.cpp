@@ -19,6 +19,7 @@ void createWrappers() {
   std_vector_class_(epicsTimeStamp);
   std_vector_class_(epicsTimeStamp_Wrapper);
 #undef _CLASS
+  ADD_GETTER(epicsTimeStamp);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -32,6 +33,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_string);
   std_vector_class_(dbr_time_string_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_string);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -45,6 +47,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_short);
   std_vector_class_(dbr_time_short_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_short);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -58,6 +61,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_float);
   std_vector_class_(dbr_time_float_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_float);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -71,6 +75,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_enum);
   std_vector_class_(dbr_time_enum_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_enum);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -84,6 +89,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_char);
   std_vector_class_(dbr_time_char_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_char);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -97,6 +103,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_long);
   std_vector_class_(dbr_time_long_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_long);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -110,6 +117,7 @@ void createWrappers() {
   std_vector_class_(dbr_time_double);
   std_vector_class_(dbr_time_double_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_time_double);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -122,6 +130,7 @@ void createWrappers() {
   std_vector_class_(dbr_sts_string);
   std_vector_class_(dbr_sts_string_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_sts_string);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -144,6 +153,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_short);
   std_vector_class_(dbr_ctrl_short_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_short);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -167,6 +177,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_float);
   std_vector_class_(dbr_ctrl_float_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_float);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -182,6 +193,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_enum);
   std_vector_class_(dbr_ctrl_enum_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_enum);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -204,6 +216,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_char);
   std_vector_class_(dbr_ctrl_char_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_char);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -226,6 +239,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_long);
   std_vector_class_(dbr_ctrl_long_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_long);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -249,6 +263,7 @@ void createWrappers() {
   std_vector_class_(dbr_ctrl_double);
   std_vector_class_(dbr_ctrl_double_Wrapper);
 #undef _CLASS
+  ADD_GETTER(dbr_ctrl_double);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -264,6 +279,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvHeader_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvHeader);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -273,6 +289,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlHeader_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlHeader);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -281,6 +298,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeHeader_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeHeader);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -288,10 +306,12 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
     .def("data_shape", &n::data_shape)\
+    .def("data_list", &n::data_list)\
 
   _CLASS(Psana::Epics::EpicsPvCtrlString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlString_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlString);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -302,6 +322,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlShort_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlShort);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -312,6 +333,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlFloat_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlFloat);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -322,6 +344,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlEnum_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlEnum);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -332,6 +355,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlChar_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlChar);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -342,6 +366,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlLong_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlLong);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -352,6 +377,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvCtrlDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlDouble_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvCtrlDouble);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -359,10 +385,12 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
     .def("data_shape", &n::data_shape)\
+    .def("data_list", &n::data_list)\
 
   _CLASS(Psana::Epics::EpicsPvTimeString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeString_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeString);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -373,6 +401,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeShort_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeShort);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -383,6 +412,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeFloat_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeFloat);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -393,6 +423,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeEnum_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeEnum);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -403,6 +434,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeChar_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeChar);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -413,6 +445,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeLong_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeLong);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -423,6 +456,7 @@ void createWrappers() {
   _CLASS(Psana::Epics::EpicsPvTimeDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeDouble_Wrapper);
 #undef _CLASS
+  ADD_GETTER(EpicsPvTimeDouble);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -440,6 +474,7 @@ void createWrappers() {
     .def("numPv", &n::numPv)\
     .def("pvControls", &n::pvControls, policy)\
     .def("pvControls_shape", &n::pvControls_shape)\
+    .def("pvControls_list", &n::pvControls_list)\
 
   _CLASS(Psana::Epics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);

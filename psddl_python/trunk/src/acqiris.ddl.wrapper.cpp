@@ -22,6 +22,7 @@ void createWrappers() {
   std_vector_class_(VertV1);
   std_vector_class_(VertV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(VertV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -36,6 +37,7 @@ void createWrappers() {
   std_vector_class_(HorizV1);
   std_vector_class_(HorizV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(HorizV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -50,6 +52,7 @@ void createWrappers() {
   std_vector_class_(TrigV1);
   std_vector_class_(TrigV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TrigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -79,6 +82,7 @@ void createWrappers() {
   std_vector_class_(TimestampV1);
   std_vector_class_(TimestampV1_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TimestampV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -119,6 +123,7 @@ void createWrappers() {
   std_vector_class_(TdcChannel);
   std_vector_class_(TdcChannel_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcChannel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -135,6 +140,7 @@ void createWrappers() {
   std_vector_class_(TdcAuxIO);
   std_vector_class_(TdcAuxIO_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcAuxIO);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -150,6 +156,7 @@ void createWrappers() {
   std_vector_class_(TdcVetoIO);
   std_vector_class_(TdcVetoIO_Wrapper);
 #undef _CLASS
+  ADD_GETTER(TdcVetoIO);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

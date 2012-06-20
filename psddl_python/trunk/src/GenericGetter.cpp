@@ -60,8 +60,7 @@ namespace Psana {
     const int typeId = getter->getTypeId();
     if (typeId != -1) {
       pythonTypeIdMap[typeId] = typeName;
-      //const string& pythonTypeName = Pds::TypeId::name(Pds::TypeId::Type(typeId));
-      //printf("adding xtc.TypeId.Type.Id_%s (%d) -> %s\n", pythonTypeName.c_str(), typeId, typeName.c_str());
+      printf("adding %s (%d) -> %s\n", getTypeNameForId(typeId).c_str(), typeId, typeName.c_str());
     }
 
     if (version > 0) {
@@ -78,8 +77,11 @@ namespace Psana {
 
   object GenericGetter::get(int typeId, GetMethod* getMethod) {
     if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
-      printTables();
-      printf("GenericGetter::get(%d): not found\n", typeId);
+      //printTables();
+#if 1
+      printf("GenericGetter::get(%d -> %s): not found\n", typeId, getTypeNameForId(typeId).c_str());
+#endif
+      PyErr_Print();
       return object();
     }
     string& typeName = pythonTypeIdMap[typeId];
@@ -88,12 +90,7 @@ namespace Psana {
   }
 
   string GenericGetter::getTypeNameForId(int typeId) {
-    if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
-      printf("!!! could NOT find type name for %d\n", typeId);
-      return "";
-    } else {
-      return pythonTypeIdMap[typeId];
-    }
+    return string("xtc.TypeId.Type.Id_") + Pds::TypeId::name(Pds::TypeId::Type(typeId));
   }
 
   static string addVersion(string& typeName, int version) {
@@ -105,6 +102,7 @@ namespace Psana {
   object GenericGetter::get(string& typeName, GetMethod* getMethod) {
     if (typeName == "") {
       printf("GenericGetter:get(): no typeName!\n");
+      PyErr_Print();
       return object();
     }
     int maxVersion = versionMaxMap[typeName];
@@ -119,8 +117,11 @@ namespace Psana {
         return getMethod->get(getter);
       }
       // No getter could be found.
-      printTables();
-      printf("Could not find class '%s'.\n", typeName.c_str());
+      //printTables();
+      char buf[1024];
+      sprintf(buf, "Could not find class '%s'.\n", typeName.c_str());
+      PyErr_SetString(PyExc_LookupError, buf);
+      PyErr_Print();
       return object();
     } else {
       // This is a versioned type name.
@@ -135,6 +136,7 @@ namespace Psana {
                addVersion(typeName, minVersion).c_str(),
                addVersion(typeName, maxVersion).c_str());
       }
+      int testCount = 0;
       for (int version = maxVersion; version >= minVersion; version--) {
         string versionedTypeName = addVersion(typeName, version);
         printf("Trying class '%s'...\n", versionedTypeName.c_str());
@@ -148,14 +150,23 @@ namespace Psana {
             return result;
           }
           printf("get() failed for class '%s'.\n", versionedTypeName.c_str());
+          testCount++;
         } else {
           printf("Class '%s' was not found.\n", versionedTypeName.c_str());
         }
       }
-      printTables();
-      printf("None of '%s' through '%s' could be found.\n", 
-             addVersion(typeName, minVersion).c_str(),
-             addVersion(typeName, maxVersion).c_str());
+      char buf[1024];
+      if (testCount == 0) {
+        sprintf(buf, "None of '%s' through '%s' could be found.\n", 
+               addVersion(typeName, minVersion).c_str(),
+               addVersion(typeName, maxVersion).c_str());
+      } else {
+        sprintf(buf, "None of '%s' through '%s' worked.\n", 
+               addVersion(typeName, minVersion).c_str(),
+               addVersion(typeName, maxVersion).c_str());
+      }
+      PyErr_SetString(PyExc_LookupError, buf);
+      PyErr_Print();
       return object();
     }
   }
