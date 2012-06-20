@@ -16,7 +16,7 @@ part of it, please give an appropriate acknowledgment.
 
 @version $Id: DdlPythonInterfaces.py 3643 2012-05-26 04:23:12Z jbarrera@SLAC.STANFORD.EDU $
 
-@author Andrei Salnikov
+@author Andrei Salnikov, Joseph S. Barrera III
 """
 
 
@@ -239,12 +239,13 @@ class DdlPythonInterfaces ( object ) :
         self.codegen(type)
 
     def _getGetterClassForType(self, type):
-        if re.match(r'.*(Data|DataDesc|Element)V[1-9][0-9]*', type.name):
+        if re.match(r'.*(Data|DataDesc|Element)[A-Za-z]*V[1-9][0-9]*', type.name):
             return "Psana::EvtGetter"
-        elif re.match(r'.*(Config)V[1-9][0-9]*', type.name):
+        elif re.match(r'.*(Config)[A-Za-z]*V[1-9][0-9]*', type.name):
             return "Psana::EnvGetter"
         else:
-            return None
+            # Guess what type of Getter to use
+            return "Psana::EvtGetter";
 
     def _createGetterClass(self, type):
         getter_class = self._getGetterClassForType(type)
@@ -339,7 +340,7 @@ class DdlPythonInterfaces ( object ) :
         # generate _shape() methods for array attributes
         for attr in type.attributes() :
             access = self._access("public", access)
-            self._genAttrShapeDecl(type, attr)
+            self._genAttrShapeAndListDecl(type, attr)
 
         # close class declaration
         print >>self.inc, "};"
@@ -521,48 +522,26 @@ class DdlPythonInterfaces ( object ) :
             print >>self.inc, T("  $rettype $method_name($argsspec) const { return o->$method_name($args); }")(locals())
 
         print >>self.cpp, T("    .def(\"$method_name\", &n::$method_name$policy)\\")(method_name=method_name, classname=type.name, policy=policy)
-        """
-        if "_shape" in method_name:
-            method_name = method_name.replace("_shape", "_size")
-            print >>self.cpp, T("    .def(\"$method_name\", &n::$method_name$policy)\\")(method_name=method_name, classname=type.name, policy=policy)
-        """
 
-    def _genAttrShapeDecl(self, type, attr):
-        if not attr.shape_method: return None
-        if not attr.accessor: return None
+    def isString(self, o):
+        return type(o) == type("")
+
+    def _genAttrShapeAndListDecl(self, type, attr):
+        if not attr.shape_method: return
+        if not attr.accessor: return
         
         # value-type arrays return ndarrays which do not need shape method
-        if attr.type.value_type and attr.type.name != 'char': return None
+        if attr.type.value_type and attr.type.name != 'char': return
 
         dimensions = []
         for dim in attr.shape.dims:
-            try:
-                if ('{xtc-config}' in dim) or ('{self}' in dim):
-                    dimensions.append(dim)
-                    print "--------- ", dimensions, attr.accessor.name
-            except:
-                continue
+            if self.isString(dim) and (('{xtc-config}' in dim) or ('{self}' in dim)):
+                dimensions.append(dim)
 
-
-        """
-        dimensions = [str(s or "") for s in attr.shape.dims]
-        if len(dimensions) < 1:
-            print "Error: cannot generate '%s' method: shape has no dimensions!" % shape_method
-            sys.exit(1)
-        if len(dimensions) > 2:
-            print "Error: cannot generate '%s' method: shape has more than 2 dimensions." % shape_method
-            sys.exit(1)
-        if len(dimensions) == 2:
-            second_dimension = dimensions[1].strip()
-            if not (second_dimension == 'MAX_STRING_SIZE' or re.match(r'MAX_[A-Z]+_STRING_SIZE', second_dimension)):
-                print "Cannot generate '%s' method: shape has 2 dimensions and second is not a max string size" % shape_method
-                sys.exit(1)
-        """
-            
         self._genMethodBody(type, attr.shape_method, "vector<int>")
 
         if len(dimensions) == 0:
-            return None
+            return
         if len(dimensions) > 2:
             print "Error: cannot generate '%s' method: shape has more than 2 dimensions." % shape_method
             sys.exit(1)
@@ -570,9 +549,10 @@ class DdlPythonInterfaces ( object ) :
         # now generate data_list() method if applicable.
         shape_method = attr.shape_method
         method_name = attr.accessor.name
-        print >> self.inc, T("  boost::python::list ${method_name}_list() { boost::python::list l; const int n = ${shape_method}()[0]; for (int i = 0; i < n; i++) l.append(${method_name}(i)); return l; }")(locals())
+        list_method_name = method_name + "_list"
+        print >> self.inc, T("  boost::python::list ${list_method_name}() { boost::python::list l; const int n = ${shape_method}()[0]; for (int i = 0; i < n; i++) l.append(${method_name}(i)); return l; }")(locals())
+        print >>self.cpp, T("    .def(\"$list_method_name\", &n::$list_method_name)\\")(locals())
 
-        return method_name
 #
 #  In case someone decides to run this module
 #
