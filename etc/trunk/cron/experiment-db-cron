@@ -1,6 +1,6 @@
 #!/bin/sh
 
-db=/reg/g/psdm/data/psana/experiment-db.dat
+db=/reg/g/psdm/data/ExpNameDb/experiment-db.dat
 tmpdb=$db.tmp
 
 q="select e.id, i.name, e.name from experiment e, instrument i where e.instr_id = i.id and INSTR(e.name, ' ') = 0 order by e.id;"
