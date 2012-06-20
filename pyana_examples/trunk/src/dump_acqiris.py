@@ -63,9 +63,9 @@ class dump_acqiris (object) :
     def beginjob( self, evt, env ) :
         try:
             env.assert_psana()
-            self.isPyana = False
+            self.psana = True
         except:
-            self.isPyana = True
+            self.psana = False
         
         config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
         if config:
@@ -85,10 +85,10 @@ class dump_acqiris (object) :
 
             nch = config.nbrChannels()
             for ch in range(nch):
-                if self.isPyana:
-                    v = config.vert(ch)
-                else:
+                if self.psana:
                     v = config.vert()[ch]
+                else:
+                    v = config.vert(ch)
                 print "  vert(%d):" % ch,
                 print "fullScale =", v.fullScale(),
                 print "slope =", v.slope(),
@@ -104,31 +104,25 @@ class dump_acqiris (object) :
         @param env    environment object
         """
 
-        print "... self.m_src=", self.m_src
-
-        acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
-        if self.isPyana:
-            print acqData
-            for foo in acqData:
-                print foo
-            sys.exit(1)
-            for chan, elem in enumerate(acqData):
-                print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
-                print "  nbrSegments =", elem.nbrSegments()
-                print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
-                print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
-                wf = elem.waveform()
-                print "  waveform [len=%d] = %s" % (len(wf), wf)
+        if self.psana:
+            acqData = evt.get("Psana::Acqiris::DataDesc", self.m_src).data_list()
         else:
-            nchan = acqData.data_shape()[0];
-            for chan in range(nchan):
-                elem = acqData.data(chan)
-                print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
-                print "  nbrSegments =", elem.nbrSegments()
-                print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
-                print "  timestamps =", [elem.timestamp()[seg].pos() for seg in range(elem.nbrSegments())]
-                wf = elem.waveforms()
-                print "  waveform [len=%d] = %s" % (len(wf), wf)
+            acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
+
+        for chan, elem in enumerate(acqData):
+
+            print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
+            print "  nbrSegments =", elem.nbrSegments()
+            print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
+            if self.psana:
+                print "  timestamps =", [[elem.timestamp()[seg].pos(), elem.timestamp()[seg].timeStampHi()] for seg in range(elem.nbrSegments())]
+            else:
+                print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
+            if self.psana:
+                wf = elem.waveforms()[0] / 655360.0
+            else:
+                wf = elem.waveform()
+            print "  waveform [len=%d] = %s" % (len(wf), wf)
 
 
     def endjob( self, evt, env ) :
