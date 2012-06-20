@@ -19,6 +19,10 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -48,11 +52,11 @@ namespace XtcInput {
 //----------------
 XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize)
   : m_path(path)
-  , m_file(0)
+  , m_fd(-1)
   , m_maxDgramSize(maxDgramSize)
 {
-  m_file = fopen( m_path.c_str(), "rb" );
-  if ( ! m_file ) {
+  m_fd = open( m_path.c_str(), O_RDONLY|O_LARGEFILE);
+  if (m_fd < 0) {
     MsgLog( logger, error, "failed to open input XTC file: " << m_path ) ;
     throw FileOpenException(m_path) ;
   }
@@ -63,7 +67,7 @@ XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize)
 //--------------
 XtcDgIterator::~XtcDgIterator ()
 {
-  fclose( m_file );
+  if (m_fd >= 0) close(m_fd);
 }
 
 Dgram::ptr
@@ -73,11 +77,19 @@ XtcDgIterator::next()
   const size_t headerSize = sizeof(Pds::Dgram);
 
   // read header
-  if ( fread(&header, headerSize, 1, m_file) != 1 ) {
-    if ( feof(m_file) ) {
+  size_t left = headerSize;
+  while (left > 0) {
+    ssize_t nread = read(m_fd, ((char*)&header)+headerSize-left, left);
+    if (nread == 0) {
+      if (left != headerSize) {
+        MsgLog(logger, error, "EOF while reading datagram header from file: " << m_path);
+      }
       return Dgram::ptr();
+    } else if (nread < 0) {
+      if (errno == EINTR) continue;
+      throw XTCReadException(m_path);
     } else {
-      throw XTCReadException( m_path );
+      left -= nread;
     }
   }
 
@@ -91,14 +103,17 @@ XtcDgIterator::next()
   std::copy((const char*)&header, ((const char*)&header)+headerSize, (char*)dg);
 
   // read rest of the data
-  if ( payloadSize ) {
-    if ( fread(dg->xtc.payload(), payloadSize, 1, m_file) != 1 ) {
-      if ( feof(m_file) ) {
-        MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_path);
-        return Dgram::ptr();
-      } else {
-        throw XTCReadException(m_path);
-      }
+  left = payloadSize;
+  while (left > 0) {
+    ssize_t nread = read(m_fd, dg->xtc.payload()+payloadSize-left, left);
+    if (nread == 0) {
+      MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_path);
+      return Dgram::ptr();
+    } else if (nread < 0) {
+      if (errno == EINTR) continue;
+      throw XTCReadException(m_path);
+    } else {
+      left -= nread;
     }
   }
 

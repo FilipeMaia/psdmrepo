@@ -14,7 +14,6 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <cstdio>
 #include <boost/utility.hpp>
 
 //----------------------
@@ -68,7 +67,7 @@ private:
 
   // Data members
   std::string m_path;
-  FILE* m_file;
+  int m_fd;
   size_t m_maxDgramSize ;
 
 };
