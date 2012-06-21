@@ -67,7 +67,10 @@ class dump_acqiris (object) :
         except:
             self.psana = False
         
-        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
+        if self.psana:
+            config = env.configStore().get("Psana::Acqiris::Config", self.m_src)
+        else:
+            config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
         if config:
         
             print "%s: %s" % (config.__class__.__name__, self.m_src)
@@ -123,6 +126,7 @@ class dump_acqiris (object) :
             else:
                 wf = elem.waveform()
             print "  waveform [len=%d] = %s" % (len(wf), wf)
+
 
 
     def endjob( self, evt, env ) :
