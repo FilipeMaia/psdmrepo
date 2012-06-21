@@ -256,16 +256,9 @@ class DdlPythonInterfaces ( object ) :
         print >>self.inc, ''
         print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
         print >> self.inc, '  public:'
-        print >> self.inc, '    const std::type_info& getTypeInfo() {'
-        print >> self.inc, T('      return typeid(${namespace_prefix}${type_name});')(locals())
-        print >> self.inc, '    }'
         print >> self.inc, '    const char* getTypeName() {'
         print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
         print >> self.inc, '    }'
-        if type.type_id is not None:
-            print >> self.inc, '    int getTypeId() {'
-            print >> self.inc, T('      return ${type_name}::TypeId;')(locals())
-            print >> self.inc, '    }'
         if type.version is not None:
             print >> self.inc, '    int getVersion() {'
             print >> self.inc, T('      return ${type_name}::Version;')(locals())
