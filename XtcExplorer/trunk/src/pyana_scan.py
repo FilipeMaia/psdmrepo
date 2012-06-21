@@ -40,7 +40,6 @@ import matplotlib.pyplot as plt
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
-from utilities import PyanaCompat
 from utilities import ScanData
 
 
@@ -91,7 +90,11 @@ class pyana_scan (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        self.psana = PyanaCompat(env).psana
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         """This method is called at an xtc Configure transition
         Assume only one Configure per job.
         Typically you should process only one run per job. 

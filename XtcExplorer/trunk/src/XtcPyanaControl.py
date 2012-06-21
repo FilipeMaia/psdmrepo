@@ -146,18 +146,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.psana = psana
         if self.psana:
             self.pxana = "psana"
+            self.Pxana = "Psana"
         else:
             self.pxana = "pyana"
+            self.Pxana = "Pyana"
         QtGui.QWidget.__init__(self, parent)
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
             
         self.lclsLogo = apputils.AppDataPath("XtcExplorer/icons/lclsLogo.gif")
-        self.setWindowTitle('Pyana Control Center')
+        self.setWindowTitle(self.Pxana + ' Control Center')
         self.setWindowIcon(QtGui.QIcon(self.lclsLogo.path()))
 
-        print "XtcPyanaControl printing data ", data
+        print "Xtc" + self.Pxana + "Control printing data ", data
             
         # container for information about the data
         self.filenames = data.files
@@ -578,7 +580,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.econfig_button.setDisabled(True)
         pyana_layout.addLayout(pyana_button_layout)
         
-        self.config_tabs.addTab(pyana_widget,"Pyana Configuration")
+        self.config_tabs.addTab(pyana_widget, self.Pxana + " Configuration")
         
         self.config_tabs.tabBar().show()
         self.pyana_widget = pyana_widget
@@ -1262,8 +1264,8 @@ Do you want to proceed?
         #dialog.setMinimumWidth(1500)
 
         text, ok = dialog.getText(self,
-                                  'Pyana options',
-                                  'Run pyana with the following command (edit as needed and click OK):',
+                                  self.Pxana + ' options',
+                                  'Run ' + self.pxana + ' with the following command (edit as needed and click OK):',
                                   QtGui.QLineEdit.Normal,
                                   text=runstring)
 

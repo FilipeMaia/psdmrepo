@@ -29,7 +29,6 @@ from cspad     import CsPad
 
 from utilities import Threshold
 from utilities import PyanaOptions
-from utilities import PyanaCompat
 from utilities import ImageData
 
 import algorithms as alg
@@ -132,32 +131,6 @@ class  pyana_image ( object ) :
         self.cmmode_mode = cmmode_mode
         self.cmmode_thr = opt.getOptFloat(cmmode_thr)
 
-        self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
-                             'Cspad'     : TypeId.Type.Id_CspadConfig ,
-                             'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
-                             'Opal2000'  : TypeId.Type.Id_Opal1kConfig,
-                             'Opal4000'  : TypeId.Type.Id_Opal1kConfig,
-                             'TM6740'    : TypeId.Type.Id_TM6740Config,
-                             'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
-                             'Princeton' : TypeId.Type.Id_PrincetonConfig,
-                             'Fccd'      : TypeId.Type.Id_FccdConfig,
-                             'PIM'       : TypeId.Type.Id_PimImageConfig,
-                             'Timepix'   : TypeId.Type.Id_TimepixConfig,
-                             'Fli'       : TypeId.Type.Id_FliConfig
-                             }
-
-        self.datatypes = {'Cspad2x2'      : TypeId.Type.Id_Cspad2x2Element, 
-                          'Cspad'         : TypeId.Type.Id_CspadElement,
-                          'TM6740'        : TypeId.Type.Id_Frame,
-                          'Opal1000'      : TypeId.Type.Id_Frame,
-                          'Opal2000'      : TypeId.Type.Id_Frame,
-                          'Opal4000'      : TypeId.Type.Id_Frame,
-                          'Fccd'          : TypeId.Type.Id_Frame,
-                          'pnCCD'         : TypeId.Type.Id_pnCCDframe,
-                          'Princeton'     : TypeId.Type.Id_PrincetonFrame,
-                          'Timepix'       : TypeId.Type.Id_TimepixData,
-                          'Fli'           : TypeId.Type.Id_FliFrame
-                          }
     def initlists(self):
         self.accu_start = 0
         # averages
@@ -204,8 +177,67 @@ class  pyana_image ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        self.psana = PyanaCompat(env).psana
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         logging.info( "pyana_image.beginjob()" )
+
+        if self.psana:
+            self.configtypes = { 'Cspad2x2'  : "Psana::CsPad2x2::Config",
+                                 'Cspad'     : "Psana::CsPad::Config",
+                                 'Opal1000'  : "Psana::Opal1k::Config",
+                                 'Opal2000'  : "Psana::Opal1k::Config",
+                                 'Opal4000'  : "Psana::Opal1k::Config",
+                                 'TM6740'    : "Psana::Pulnix::TM6740Config",
+                                 'pnCCD'     : "Psana::PNCCD::Config",
+                                 'Princeton' : "Psana::Princeton::Config",
+                                 'Fccd'      : "Psana::FCCD::FccdConfig",
+                                 'PIM'       : "Psana::Lusi::PimImageConfig",
+                                 'Timepix'   : "Psana::Timepix::Config",
+                                 'Fli'       : "Psana::Fli::Config"
+                                 }
+
+            self.datatypes = {'Cspad2x2'      : "Psana::CsPad2x2::Element",
+                              'Cspad'         : "Psana::CsPad::Data",
+                              'TM6740'        : "Psana::Camera::Frame",
+                              'Opal1000'      : "Psana::Camera::Frame",
+                              'Opal2000'      : "Psana::Camera::Frame",
+                              'Opal4000'      : "Psana::Camera::Frame",
+                              'Fccd'          : "Psana::Camera::Frame",
+                              'pnCCD'         : "Psana::PNCCD::Frame",
+                              'Princeton'     : "Psana::Princeton::Frame",
+                              'Timepix'       : "Psana::Timepix::Data",
+                              'Fli'           : "Psana::Fli::Frame"
+                              }
+        else:
+            self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
+                                 'Cspad'     : TypeId.Type.Id_CspadConfig ,
+                                 'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
+                                 'Opal2000'  : TypeId.Type.Id_Opal1kConfig,
+                                 'Opal4000'  : TypeId.Type.Id_Opal1kConfig,
+                                 'TM6740'    : TypeId.Type.Id_TM6740Config,
+                                 'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
+                                 'Princeton' : TypeId.Type.Id_PrincetonConfig,
+                                 'Fccd'      : TypeId.Type.Id_FccdConfig,
+                                 'PIM'       : TypeId.Type.Id_PimImageConfig,
+                                 'Timepix'   : TypeId.Type.Id_TimepixConfig,
+                                 'Fli'       : TypeId.Type.Id_FliConfig
+                                 }
+
+            self.datatypes = {'Cspad2x2'      : TypeId.Type.Id_Cspad2x2Element, 
+                              'Cspad'         : TypeId.Type.Id_CspadElement,
+                              'TM6740'        : TypeId.Type.Id_Frame,
+                              'Opal1000'      : TypeId.Type.Id_Frame,
+                              'Opal2000'      : TypeId.Type.Id_Frame,
+                              'Opal4000'      : TypeId.Type.Id_Frame,
+                              'Fccd'          : TypeId.Type.Id_Frame,
+                              'pnCCD'         : TypeId.Type.Id_pnCCDframe,
+                              'Princeton'     : TypeId.Type.Id_PrincetonFrame,
+                              'Timepix'       : TypeId.Type.Id_TimepixData,
+                              'Fli'           : TypeId.Type.Id_FliFrame
+                              }
 
         self.n_shots = 0
         self.n_accum = 0
@@ -223,7 +255,10 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             address = addr.split('|')[0]
-            self.config = env.getConfig( self.configtypes[device], address )
+            if self.psana:
+                self.config = env.configStore().get(self.configtypes[device], address )
+            else:
+                self.config = env.getConfig(self.configtypes[device], address )
             if not self.config:
                 print '*** %s config object is missing ***'%addr
                 return
@@ -278,7 +313,7 @@ class  pyana_image ( object ) :
                 else:
                     print "**************************************** Unrecognized device", device
                     return
-                frame = evt.get( className, env.Source(detsrc) )
+                frame = evt.get( className, detsrc )
             else:
                 frame = evt.get( self.datatypes[device], detsrc )
             if frame is None:

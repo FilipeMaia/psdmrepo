@@ -39,7 +39,6 @@ import numpy as np
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
-from utilities import PyanaCompat
 from utilities import WaveformData
 
 
@@ -116,7 +115,11 @@ class pyana_waveform (object) :
 
     def beginjob( self, evt, env ) :
         #logging.getLogger().setLevel(logging.DEBUG)
-        self.psana = PyanaCompat(env).psana
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
 
         """This method is called once at the beginning of the job.
         It will also be called in any Xtc Configure transition, if 
@@ -141,7 +144,7 @@ class pyana_waveform (object) :
                 detsrc = source.split('|')[0].split('-')[0]
                 if detsrc == "AmoGasdet":
                     detsrc = "AmoGD"
-                cfg = env.configStore().get("Psana::Acqiris::ConfigV1", env.Source(detsrc))
+                cfg = env.configStore().get("Psana::Acqiris::ConfigV1", detsrc)
             else:
                 cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
 
@@ -216,7 +219,7 @@ class pyana_waveform (object) :
                 detsrc = source.split('|')[0].split('-')[0]
                 if detsrc == "AmoGasdet":
                     detsrc = "AmoGD"
-                acqData = evt.get("Psana::Acqiris::DataDesc", env.Source(detsrc)) # PSana::Acqiris::DataDescV1_Wrapper
+                acqData = evt.get("Psana::Acqiris::DataDesc", detsrc)
             else:
                 acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
 
@@ -235,8 +238,6 @@ class pyana_waveform (object) :
                         self.ts[label] = timestamps
                         print "self.ts[", label, "] = ", self.ts[label]
                     else:
-                        print type(acqData) # pypdsdata.acqiris.DataDescV1
-                        print type(acqData.timestamps())
                         self.ts[label] = acqData.timestamps() * 1.0e9 # nano-seconds
 
                 # a waveform

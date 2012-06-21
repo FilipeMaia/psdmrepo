@@ -101,6 +101,11 @@ class  pyana_bld ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         logging.info("pyana_bld.beginjob() called, process %d"%env.subprocess())
 
         self.n_shots = 0
@@ -119,7 +124,8 @@ class  pyana_bld ( object ) :
         do_plot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
 
         # Event timestamp
-        self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
+        if not self.psana:
+            self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
 
         ## Evr (Event receiver data)
         #evrdata = evt.getEvrData("NoDetector-0|Evr-0")

@@ -404,32 +404,3 @@ class Threshold( object ) :
             self.region = [ int(roi[0][0]), int(roi[0][1]), int(roi[1][0]), int(roi[1][1]) ]
             print " region = %s"% self.region,
         print
-
-#-----------------------------------------
-# PyanaCompat
-#-----------------------------------------
-
-class PyanaCompat(object):
-    def __init__( self, env):
-        try:
-            env.assert_psana()
-            self.psana = True
-            self.env = env
-        except:
-            self.psana = False
-
-    def psana(self):
-        return self.psana
-
-    def Source(self, t):
-        if self.psana:
-            return t
-        else:
-            return self.env.Source(t)
-
-    def Type(self, t):
-        if self.psana:
-            return t
-        else:
-            env = self.env
-            return env.Type(t)

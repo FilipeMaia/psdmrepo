@@ -92,6 +92,11 @@ class  pyana_ipimb ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         self.n_shots = 0
         self.accu_start = 0
         
@@ -101,7 +106,10 @@ class  pyana_ipimb ( object ) :
             self.data[source] = IpimbData( source ) 
 
             # just for information:
-            config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
+            if self.psana:
+                config = env.configStore().get( "Psana::Ipimb::Config" , source )
+            else:
+                config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
             if config is not None:
                 print "IPIMB %s configuration info: "%source
                 print "   Trigger counter:     0x%lx" % config.triggerCounter()
@@ -159,14 +167,21 @@ class  pyana_ipimb ( object ) :
             # -------------------------------------------
 
             # try Shared IPIMB first
-            ipm = evt.get(TypeId.Type.Id_SharedIpimb, source )
+            if self.psana:
+                ipm = evt.get("Psana::Bld::BldDataIpimb", source )
+            else:
+                ipm = evt.get(TypeId.Type.Id_SharedIpimb, source )
             if ipm is not None:
                 ipm_raw = ipm.ipimbData
                 ipm_fex = ipm.ipmFexData
             else: 
                 # try to get the other data types for IPIMBs 
-                ipm_raw = evt.get(TypeId.Type.Id_IpimbData, source )
-                ipm_fex = evt.get(TypeId.Type.Id_IpmFex, source )
+                if self.psana:
+                    ipm_raw = evt.get("Psana::Ipimb::Data", source )
+                    ipm_fex = evt.get("Psana::Lusi::IpmFex", source )
+                else:
+                    ipm_raw = evt.get(TypeId.Type.Id_IpimbData, source )
+                    ipm_fex = evt.get(TypeId.Type.Id_IpmFex, source )
 
             # --------------------------------------------------------------
             # filter???

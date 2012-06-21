@@ -41,7 +41,6 @@ from pypdsdata import xtc
 from pypdsdata import epics
 
 from utilities import PyanaOptions
-from utilities import PyanaCompat
 from utilities import EpicsData
 
 
@@ -112,7 +111,11 @@ class pyana_epics (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        self.psana = PyanaCompat(env).psana
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         """
         @param evt    event data object
         @param env    environment object
@@ -128,10 +131,7 @@ class pyana_epics (object) :
         self.epics_data = {}
         for pv_name in self.pv_names :
 
-            if self.psana:
-                pv = env.epicsStore().value( pv_name, 0 )
-            else:
-                pv = env.epicsStore().value( pv_name )
+            pv = env.epicsStore().value( pv_name )
             if not pv:
                 logging.warning('EPICS PV %s does not exist', pv_name)
             else :
@@ -146,6 +146,11 @@ class pyana_epics (object) :
                               %(pv_name,pv.pvId(), pv.dbrType(), pv.precision(), pv.units())
                     message += "   Status = %d , Severity = %d \n"%(pv.status(), pv.severity())
                 else:
+                    print "pv_name=", pv_name
+                    print "pv.iPvId=", pv.iPvId
+                    print "pv.iDbrType=", pv.iDbrType
+                    print "pv.precision=", pv.precision
+                    print "pv.units=", pv.units
                     message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
                               %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
                     message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
