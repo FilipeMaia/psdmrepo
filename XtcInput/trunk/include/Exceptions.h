@@ -83,11 +83,12 @@ public:
 
 };
 
-class XTCEOFException : public Exception {
+class XTCLiveTimeout : public Exception {
 public:
 
-    XTCEOFException(const std::string& fileName)
-    : Exception( "XTCEOFException", "EOF while reading datagram payload in file "+fileName ) {}
+  XTCLiveTimeout(const std::string& fileName, int timeout)
+    : Exception( "XTCLiveTimeout", "Timeout (" + boost::lexical_cast<std::string>(timeout) +
+        "seconds) while reading live data from file "+fileName) {}
 
 };
 

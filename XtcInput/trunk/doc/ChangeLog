@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2012-06-21 Andy Salnikov
+- implementing live mode for XtcDgIterator
+- new test app test/XtcDgIteratorTest.cpp
+
 Tag: V00-03-00
 2012-06-20 Andy Salnikov
 - updated XtcDgIterator to use unbuffered IO, first step to support
