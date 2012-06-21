@@ -14,7 +14,6 @@ namespace Psana {
   static map<string, int> versionMinMap; // map versionless type name to minimum version
   static map<string, int> versionMaxMap; // map versionless type name to maxium version
   static map<string, GenericGetter*> typeNameMap; // map C++ type name (version NOT removed) to getter
-  static map<int, string> pythonTypeIdMap; // map Python type id to versionless type name
 
   static void printTables() {
     printf("*** typeNameMap:\n");
@@ -57,12 +56,6 @@ namespace Psana {
       typeName = sTypeName.substr(0, vpos).c_str(); // remove version part from typename
     }
 
-    const int typeId = getter->getTypeId();
-    if (typeId != -1) {
-      pythonTypeIdMap[typeId] = typeName;
-      printf("adding %s (%d) -> %s\n", getTypeNameForId(typeId).c_str(), typeId, typeName.c_str());
-    }
-
     if (version > 0) {
       int min = versionMinMap[typeName];
       if (min == 0 || min > version) {
@@ -73,24 +66,6 @@ namespace Psana {
         versionMaxMap[typeName] = version;
       }
     }
-  }
-
-  object GenericGetter::get(int typeId, GetMethod* getMethod) {
-    if (pythonTypeIdMap.find(typeId) == pythonTypeIdMap.end()) {
-      //printTables();
-#if 1
-      printf("GenericGetter::get(%d -> %s): not found\n", typeId, getTypeNameForId(typeId).c_str());
-#endif
-      PyErr_Print();
-      return object();
-    }
-    string& typeName = pythonTypeIdMap[typeId];
-    printf("getter->getTypeName()='%s'\n", typeName.c_str());
-    return get(typeName, getMethod);
-  }
-
-  string GenericGetter::getTypeNameForId(int typeId) {
-    return string("xtc.TypeId.Type.Id_") + Pds::TypeId::name(Pds::TypeId::Type(typeId));
   }
 
   static string addVersion(string& typeName, int version) {

@@ -53,14 +53,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Gsc16ai::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Gsc16ai::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -73,14 +67,8 @@ public:
 
   class DataV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Gsc16ai::DataV1);
-    }
     const char* getTypeName() {
       return "Psana::Gsc16ai::DataV1";
-    }
-    int getTypeId() {
-      return DataV1::TypeId;
     }
     int getVersion() {
       return DataV1::Version;

@@ -465,9 +465,6 @@ public:
 
   class epicsTimeStamp_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::epicsTimeStamp);
-    }
     const char* getTypeName() {
       return "Psana::Epics::epicsTimeStamp";
     }
@@ -487,9 +484,6 @@ public:
 
   class dbr_time_string_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_string);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_string";
     }
@@ -509,9 +503,6 @@ public:
 
   class dbr_time_short_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_short);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_short";
     }
@@ -531,9 +522,6 @@ public:
 
   class dbr_time_float_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_float);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_float";
     }
@@ -553,9 +541,6 @@ public:
 
   class dbr_time_enum_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_enum);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_enum";
     }
@@ -575,9 +560,6 @@ public:
 
   class dbr_time_char_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_char);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_char";
     }
@@ -597,9 +579,6 @@ public:
 
   class dbr_time_long_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_long);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_long";
     }
@@ -619,9 +598,6 @@ public:
 
   class dbr_time_double_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_time_double);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_time_double";
     }
@@ -641,9 +617,6 @@ public:
 
   class dbr_sts_string_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_sts_string);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_sts_string";
     }
@@ -663,9 +636,6 @@ public:
 
   class dbr_ctrl_short_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_short);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_short";
     }
@@ -685,9 +655,6 @@ public:
 
   class dbr_ctrl_float_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_float);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_float";
     }
@@ -707,9 +674,6 @@ public:
 
   class dbr_ctrl_enum_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_enum);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_enum";
     }
@@ -729,9 +693,6 @@ public:
 
   class dbr_ctrl_char_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_char);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_char";
     }
@@ -751,9 +712,6 @@ public:
 
   class dbr_ctrl_long_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_long);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_long";
     }
@@ -773,9 +731,6 @@ public:
 
   class dbr_ctrl_double_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::dbr_ctrl_double);
-    }
     const char* getTypeName() {
       return "Psana::Epics::dbr_ctrl_double";
     }
@@ -795,9 +750,6 @@ public:
 
   class EpicsPvHeader_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvHeader);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvHeader";
     }
@@ -817,9 +769,6 @@ public:
 
   class EpicsPvCtrlHeader_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlHeader);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlHeader";
     }
@@ -839,9 +788,6 @@ public:
 
   class EpicsPvTimeHeader_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeHeader);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeHeader";
     }
@@ -861,9 +807,6 @@ public:
 
   class EpicsPvCtrlString_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlString);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlString";
     }
@@ -883,9 +826,6 @@ public:
 
   class EpicsPvCtrlShort_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlShort);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlShort";
     }
@@ -905,9 +845,6 @@ public:
 
   class EpicsPvCtrlFloat_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlFloat);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlFloat";
     }
@@ -927,9 +864,6 @@ public:
 
   class EpicsPvCtrlEnum_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlEnum);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlEnum";
     }
@@ -949,9 +883,6 @@ public:
 
   class EpicsPvCtrlChar_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlChar);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlChar";
     }
@@ -971,9 +902,6 @@ public:
 
   class EpicsPvCtrlLong_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlLong);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlLong";
     }
@@ -993,9 +921,6 @@ public:
 
   class EpicsPvCtrlDouble_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvCtrlDouble);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvCtrlDouble";
     }
@@ -1015,9 +940,6 @@ public:
 
   class EpicsPvTimeString_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeString);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeString";
     }
@@ -1037,9 +959,6 @@ public:
 
   class EpicsPvTimeShort_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeShort);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeShort";
     }
@@ -1059,9 +978,6 @@ public:
 
   class EpicsPvTimeFloat_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeFloat);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeFloat";
     }
@@ -1081,9 +997,6 @@ public:
 
   class EpicsPvTimeEnum_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeEnum);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeEnum";
     }
@@ -1103,9 +1016,6 @@ public:
 
   class EpicsPvTimeChar_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeChar);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeChar";
     }
@@ -1125,9 +1035,6 @@ public:
 
   class EpicsPvTimeLong_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeLong);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeLong";
     }
@@ -1147,9 +1054,6 @@ public:
 
   class EpicsPvTimeDouble_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::EpicsPvTimeDouble);
-    }
     const char* getTypeName() {
       return "Psana::Epics::EpicsPvTimeDouble";
     }
@@ -1169,9 +1073,6 @@ public:
 
   class PvConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::PvConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Epics::PvConfigV1";
     }
@@ -1183,14 +1084,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Epics::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Epics::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;

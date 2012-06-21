@@ -92,9 +92,6 @@ public:
 
   class FrameCoord_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Camera::FrameCoord);
-    }
     const char* getTypeName() {
       return "Psana::Camera::FrameCoord";
     }
@@ -114,14 +111,8 @@ public:
 
   class FrameFccdConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Camera::FrameFccdConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Camera::FrameFccdConfigV1";
-    }
-    int getTypeId() {
-      return FrameFccdConfigV1::TypeId;
     }
     int getVersion() {
       return FrameFccdConfigV1::Version;
@@ -134,14 +125,8 @@ public:
 
   class FrameFexConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Camera::FrameFexConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Camera::FrameFexConfigV1";
-    }
-    int getTypeId() {
-      return FrameFexConfigV1::TypeId;
     }
     int getVersion() {
       return FrameFexConfigV1::Version;
@@ -154,14 +139,8 @@ public:
 
   class FrameV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Camera::FrameV1);
-    }
     const char* getTypeName() {
       return "Psana::Camera::FrameV1";
-    }
-    int getTypeId() {
-      return FrameV1::TypeId;
     }
     int getVersion() {
       return FrameV1::Version;
@@ -182,14 +161,8 @@ public:
 
   class TwoDGaussianV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Camera::TwoDGaussianV1);
-    }
     const char* getTypeName() {
       return "Psana::Camera::TwoDGaussianV1";
-    }
-    int getTypeId() {
-      return TwoDGaussianV1::TypeId;
     }
     int getVersion() {
       return TwoDGaussianV1::Version;

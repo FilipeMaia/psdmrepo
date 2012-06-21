@@ -66,9 +66,6 @@ public:
 
   class PVControl_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::ControlData::PVControl);
-    }
     const char* getTypeName() {
       return "Psana::ControlData::PVControl";
     }
@@ -88,9 +85,6 @@ public:
 
   class PVMonitor_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::ControlData::PVMonitor);
-    }
     const char* getTypeName() {
       return "Psana::ControlData::PVMonitor";
     }
@@ -110,14 +104,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::ControlData::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::ControlData::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;

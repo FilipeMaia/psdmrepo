@@ -71,14 +71,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::PNCCD::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -91,14 +85,8 @@ public:
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::PNCCD::ConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::PNCCD::ConfigV2";
-    }
-    int getTypeId() {
-      return ConfigV2::TypeId;
     }
     int getVersion() {
       return ConfigV2::Version;
@@ -111,14 +99,8 @@ public:
 
   class FrameV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::PNCCD::FrameV1);
-    }
     const char* getTypeName() {
       return "Psana::PNCCD::FrameV1";
-    }
-    int getTypeId() {
-      return FrameV1::TypeId;
     }
     int getVersion() {
       return FrameV1::Version;

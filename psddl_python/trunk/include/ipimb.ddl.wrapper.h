@@ -124,14 +124,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Ipimb::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Ipimb::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -144,14 +138,8 @@ public:
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Ipimb::ConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::Ipimb::ConfigV2";
-    }
-    int getTypeId() {
-      return ConfigV2::TypeId;
     }
     int getVersion() {
       return ConfigV2::Version;
@@ -164,14 +152,8 @@ public:
 
   class DataV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Ipimb::DataV1);
-    }
     const char* getTypeName() {
       return "Psana::Ipimb::DataV1";
-    }
-    int getTypeId() {
-      return DataV1::TypeId;
     }
     int getVersion() {
       return DataV1::Version;
@@ -192,14 +174,8 @@ public:
 
   class DataV2_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Ipimb::DataV2);
-    }
     const char* getTypeName() {
       return "Psana::Ipimb::DataV2";
-    }
-    int getTypeId() {
-      return DataV2::TypeId;
     }
     int getVersion() {
       return DataV2::Version;

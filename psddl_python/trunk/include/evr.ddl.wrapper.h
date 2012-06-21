@@ -314,9 +314,6 @@ public:
 
   class PulseConfig_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::PulseConfig);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::PulseConfig";
     }
@@ -336,9 +333,6 @@ public:
 
   class PulseConfigV3_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::PulseConfigV3);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::PulseConfigV3";
     }
@@ -350,9 +344,6 @@ public:
 
   class EventCodeV3_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::EventCodeV3);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::EventCodeV3";
     }
@@ -372,9 +363,6 @@ public:
 
   class EventCodeV4_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::EventCodeV4);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::EventCodeV4";
     }
@@ -394,9 +382,6 @@ public:
 
   class EventCodeV5_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::EventCodeV5);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::EventCodeV5";
     }
@@ -416,9 +401,6 @@ public:
 
   class OutputMap_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::OutputMap);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::OutputMap";
     }
@@ -438,9 +420,6 @@ public:
 
   class OutputMapV2_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::OutputMapV2);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::OutputMapV2";
     }
@@ -460,14 +439,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -480,14 +453,8 @@ public:
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV2";
-    }
-    int getTypeId() {
-      return ConfigV2::TypeId;
     }
     int getVersion() {
       return ConfigV2::Version;
@@ -500,14 +467,8 @@ public:
 
   class ConfigV3_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV3);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV3";
-    }
-    int getTypeId() {
-      return ConfigV3::TypeId;
     }
     int getVersion() {
       return ConfigV3::Version;
@@ -520,14 +481,8 @@ public:
 
   class ConfigV4_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV4);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV4";
-    }
-    int getTypeId() {
-      return ConfigV4::TypeId;
     }
     int getVersion() {
       return ConfigV4::Version;
@@ -540,9 +495,6 @@ public:
 
   class SequencerEntry_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::SequencerEntry);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::SequencerEntry";
     }
@@ -562,9 +514,6 @@ public:
 
   class SequencerConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::SequencerConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::SequencerConfigV1";
     }
@@ -576,14 +525,8 @@ public:
 
   class ConfigV5_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV5);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV5";
-    }
-    int getTypeId() {
-      return ConfigV5::TypeId;
     }
     int getVersion() {
       return ConfigV5::Version;
@@ -596,14 +539,8 @@ public:
 
   class ConfigV6_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::ConfigV6);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::ConfigV6";
-    }
-    int getTypeId() {
-      return ConfigV6::TypeId;
     }
     int getVersion() {
       return ConfigV6::Version;
@@ -616,9 +553,6 @@ public:
 
   class FIFOEvent_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::FIFOEvent);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::FIFOEvent";
     }
@@ -638,14 +572,8 @@ public:
 
   class DataV3_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::DataV3);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::DataV3";
-    }
-    int getTypeId() {
-      return DataV3::TypeId;
     }
     int getVersion() {
       return DataV3::Version;
@@ -666,9 +594,6 @@ public:
 
   class IOChannel_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::IOChannel);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::IOChannel";
     }
@@ -688,14 +613,8 @@ public:
 
   class IOConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::EvrData::IOConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::EvrData::IOConfigV1";
-    }
-    int getTypeId() {
-      return IOConfigV1::TypeId;
     }
     int getVersion() {
       return IOConfigV1::Version;

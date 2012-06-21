@@ -112,14 +112,8 @@ public:
 
   class DiodeFexConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::DiodeFexConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::DiodeFexConfigV1";
-    }
-    int getTypeId() {
-      return DiodeFexConfigV1::TypeId;
     }
     int getVersion() {
       return DiodeFexConfigV1::Version;
@@ -132,14 +126,8 @@ public:
 
   class DiodeFexConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::DiodeFexConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::DiodeFexConfigV2";
-    }
-    int getTypeId() {
-      return DiodeFexConfigV2::TypeId;
     }
     int getVersion() {
       return DiodeFexConfigV2::Version;
@@ -152,14 +140,8 @@ public:
 
   class DiodeFexV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::DiodeFexV1);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::DiodeFexV1";
-    }
-    int getTypeId() {
-      return DiodeFexV1::TypeId;
     }
     int getVersion() {
       return DiodeFexV1::Version;
@@ -180,14 +162,8 @@ public:
 
   class IpmFexConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::IpmFexConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::IpmFexConfigV1";
-    }
-    int getTypeId() {
-      return IpmFexConfigV1::TypeId;
     }
     int getVersion() {
       return IpmFexConfigV1::Version;
@@ -200,14 +176,8 @@ public:
 
   class IpmFexConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::IpmFexConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::IpmFexConfigV2";
-    }
-    int getTypeId() {
-      return IpmFexConfigV2::TypeId;
     }
     int getVersion() {
       return IpmFexConfigV2::Version;
@@ -220,14 +190,8 @@ public:
 
   class IpmFexV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::IpmFexV1);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::IpmFexV1";
-    }
-    int getTypeId() {
-      return IpmFexV1::TypeId;
     }
     int getVersion() {
       return IpmFexV1::Version;
@@ -248,14 +212,8 @@ public:
 
   class PimImageConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Lusi::PimImageConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Lusi::PimImageConfigV1";
-    }
-    int getTypeId() {
-      return PimImageConfigV1::TypeId;
     }
     int getVersion() {
       return PimImageConfigV1::Version;

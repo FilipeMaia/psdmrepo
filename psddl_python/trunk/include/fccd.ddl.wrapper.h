@@ -55,14 +55,8 @@ public:
 
   class FccdConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::FCCD::FccdConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::FCCD::FccdConfigV1";
-    }
-    int getTypeId() {
-      return FccdConfigV1::TypeId;
     }
     int getVersion() {
       return FccdConfigV1::Version;
@@ -75,14 +69,8 @@ public:
 
   class FccdConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::FCCD::FccdConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::FCCD::FccdConfigV2";
-    }
-    int getTypeId() {
-      return FccdConfigV2::TypeId;
     }
     int getVersion() {
       return FccdConfigV2::Version;

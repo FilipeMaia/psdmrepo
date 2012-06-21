@@ -136,9 +136,6 @@ public:
 
   class CsPad2x2DigitalPotsCfg_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::CsPad2x2DigitalPotsCfg";
     }
@@ -158,9 +155,6 @@ public:
 
   class CsPad2x2ReadOnlyCfg_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::CsPad2x2ReadOnlyCfg";
     }
@@ -180,9 +174,6 @@ public:
 
   class ProtectionSystemThreshold_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::ProtectionSystemThreshold);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::ProtectionSystemThreshold";
     }
@@ -202,9 +193,6 @@ public:
 
   class CsPad2x2GainMapCfg_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::CsPad2x2GainMapCfg";
     }
@@ -224,9 +212,6 @@ public:
 
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::ConfigV1QuadReg);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::ConfigV1QuadReg";
     }
@@ -238,14 +223,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -258,14 +237,8 @@ public:
 
   class ElementV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::CsPad2x2::ElementV1);
-    }
     const char* getTypeName() {
       return "Psana::CsPad2x2::ElementV1";
-    }
-    int getTypeId() {
-      return ElementV1::TypeId;
     }
     int getVersion() {
       return ElementV1::Version;

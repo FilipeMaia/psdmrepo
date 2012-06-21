@@ -172,14 +172,8 @@ public:
 
   class BldDataFEEGasDetEnergy_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataFEEGasDetEnergy);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataFEEGasDetEnergy";
-    }
-    int getTypeId() {
-      return BldDataFEEGasDetEnergy::TypeId;
     }
     int getVersion() {
       return BldDataFEEGasDetEnergy::Version;
@@ -200,14 +194,8 @@ public:
 
   class BldDataEBeamV0_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataEBeamV0);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataEBeamV0";
-    }
-    int getTypeId() {
-      return BldDataEBeamV0::TypeId;
     }
     int getVersion() {
       return BldDataEBeamV0::Version;
@@ -228,14 +216,8 @@ public:
 
   class BldDataEBeamV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataEBeamV1);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataEBeamV1";
-    }
-    int getTypeId() {
-      return BldDataEBeamV1::TypeId;
     }
     int getVersion() {
       return BldDataEBeamV1::Version;
@@ -256,14 +238,8 @@ public:
 
   class BldDataEBeamV2_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataEBeamV2);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataEBeamV2";
-    }
-    int getTypeId() {
-      return BldDataEBeamV2::TypeId;
     }
     int getVersion() {
       return BldDataEBeamV2::Version;
@@ -284,14 +260,8 @@ public:
 
   class BldDataEBeamV3_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataEBeamV3);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataEBeamV3";
-    }
-    int getTypeId() {
-      return BldDataEBeamV3::TypeId;
     }
     int getVersion() {
       return BldDataEBeamV3::Version;
@@ -312,14 +282,8 @@ public:
 
   class BldDataPhaseCavity_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataPhaseCavity);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataPhaseCavity";
-    }
-    int getTypeId() {
-      return BldDataPhaseCavity::TypeId;
     }
     int getVersion() {
       return BldDataPhaseCavity::Version;
@@ -340,14 +304,8 @@ public:
 
   class BldDataIpimbV0_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataIpimbV0);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataIpimbV0";
-    }
-    int getTypeId() {
-      return BldDataIpimbV0::TypeId;
     }
     int getVersion() {
       return BldDataIpimbV0::Version;
@@ -368,14 +326,8 @@ public:
 
   class BldDataIpimbV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataIpimbV1);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataIpimbV1";
-    }
-    int getTypeId() {
-      return BldDataIpimbV1::TypeId;
     }
     int getVersion() {
       return BldDataIpimbV1::Version;
@@ -396,14 +348,8 @@ public:
 
   class BldDataPimV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Bld::BldDataPimV1);
-    }
     const char* getTypeName() {
       return "Psana::Bld::BldDataPimV1";
-    }
-    int getTypeId() {
-      return BldDataPimV1::TypeId;
     }
     int getVersion() {
       return BldDataPimV1::Version;

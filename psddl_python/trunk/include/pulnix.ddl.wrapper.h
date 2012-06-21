@@ -60,14 +60,8 @@ public:
 
   class TM6740ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Pulnix::TM6740ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Pulnix::TM6740ConfigV1";
-    }
-    int getTypeId() {
-      return TM6740ConfigV1::TypeId;
     }
     int getVersion() {
       return TM6740ConfigV1::Version;
@@ -80,14 +74,8 @@ public:
 
   class TM6740ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Pulnix::TM6740ConfigV2);
-    }
     const char* getTypeName() {
       return "Psana::Pulnix::TM6740ConfigV2";
-    }
-    int getTypeId() {
-      return TM6740ConfigV2::TypeId;
     }
     int getVersion() {
       return TM6740ConfigV2::Version;

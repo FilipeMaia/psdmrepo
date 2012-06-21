@@ -237,9 +237,6 @@ public:
 
   class VertV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::VertV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::VertV1";
     }
@@ -262,9 +259,6 @@ public:
 
   class HorizV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::HorizV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::HorizV1";
     }
@@ -287,9 +281,6 @@ public:
 
   class TrigV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TrigV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TrigV1";
     }
@@ -312,14 +303,8 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::ConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::ConfigV1";
-    }
-    int getTypeId() {
-      return ConfigV1::TypeId;
     }
     int getVersion() {
       return ConfigV1::Version;
@@ -332,9 +317,6 @@ public:
 
   class TimestampV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TimestampV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TimestampV1";
     }
@@ -357,9 +339,6 @@ public:
 
   class DataDescV1Elem_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::DataDescV1Elem);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::DataDescV1Elem";
     }
@@ -382,14 +361,8 @@ public:
 
   class DataDescV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::DataDescV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::DataDescV1";
-    }
-    int getTypeId() {
-      return DataDescV1::TypeId;
     }
     int getVersion() {
       return DataDescV1::Version;
@@ -410,9 +383,6 @@ public:
 
   class TdcChannel_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcChannel);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcChannel";
     }
@@ -432,9 +402,6 @@ public:
 
   class TdcAuxIO_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcAuxIO);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcAuxIO";
     }
@@ -454,9 +421,6 @@ public:
 
   class TdcVetoIO_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcVetoIO);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcVetoIO";
     }
@@ -476,14 +440,8 @@ public:
 
   class TdcConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcConfigV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcConfigV1";
-    }
-    int getTypeId() {
-      return TdcConfigV1::TypeId;
     }
     int getVersion() {
       return TdcConfigV1::Version;
@@ -496,9 +454,6 @@ public:
 
   class TdcDataV1_Item_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcDataV1_Item);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1_Item";
     }
@@ -518,9 +473,6 @@ public:
 
   class TdcDataV1Common_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcDataV1Common);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Common";
     }
@@ -540,9 +492,6 @@ public:
 
   class TdcDataV1Channel_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcDataV1Channel);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Channel";
     }
@@ -562,9 +511,6 @@ public:
 
   class TdcDataV1Marker_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcDataV1Marker);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1Marker";
     }
@@ -584,14 +530,8 @@ public:
 
   class TdcDataV1_Getter : public Psana::EvtGetter {
   public:
-    const std::type_info& getTypeInfo() {
-      return typeid(Psana::Acqiris::TdcDataV1);
-    }
     const char* getTypeName() {
       return "Psana::Acqiris::TdcDataV1";
-    }
-    int getTypeId() {
-      return TdcDataV1::TypeId;
     }
     int getVersion() {
       return TdcDataV1::Version;
