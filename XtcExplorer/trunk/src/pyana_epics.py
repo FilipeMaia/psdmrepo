@@ -111,11 +111,6 @@ class pyana_epics (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
         """
         @param evt    event data object
         @param env    environment object
@@ -141,19 +136,10 @@ class pyana_epics (object) :
                 #      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
                 #       pv.status, pv.severity, pv.values)
                 
-                if self.psana:
-                    message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
-                              %(pv_name,pv.pvId(), pv.dbrType(), pv.precision(), pv.units())
-                    message += "   Status = %d , Severity = %d \n"%(pv.status(), pv.severity())
-                else:
-                    print "pv_name=", pv_name
-                    print "pv.iPvId=", pv.iPvId
-                    print "pv.iDbrType=", pv.iDbrType
-                    print "pv.precision=", pv.precision
-                    print "pv.units=", pv.units
-                    message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
-                              %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
-                    message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
+                message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
+                          %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
+
+                message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
                 try:
                     message += "(%s), (%s)\n" \
                                %(epics.epicsAlarmConditionStrings[pv.status],
