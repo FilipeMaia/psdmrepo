@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-10
+2012-06-22 Andy Salnikov
+- EvrData.EventCodeV5: one member method was incorrectly named
+
 Tag: V00-02-09
 2012-06-07 Andy Salnikov
 - DumpTimepix.cpp: add comment about Timepix::DataV1 class 

@@ -105,7 +105,7 @@ namespace {
     str << "\n  event code #" << i
         << ": code=" << ecfg.code()
         << " isReadout=" << int(ecfg.isReadout())
-        << " isTerminator=" << int(ecfg.isTerminator())
+        << " isCommand=" << int(ecfg.isCommand())
         << " isLatch=" << int(ecfg.isLatch())
         << " reportDelay=" << ecfg.reportDelay()
         << " reportWidth=" << ecfg.reportWidth()
