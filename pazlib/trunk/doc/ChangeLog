@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2012-06-22 Andy Salnikov
+- adding few files from which we can build tarball for distributing
+  pazlib outsize our standard release structure
+
 Tag: V00-00-05
 2011-11-07 Andy Salnikov
 - add libpthread to the link list

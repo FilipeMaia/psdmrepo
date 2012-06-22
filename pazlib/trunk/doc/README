@@ -11,9 +11,29 @@ Package author: Andy Salnikov
 Brief description:
 ==================
 
-Package which provides parallel implementation for the zlib method
+pazlib package provides parallel implementation for the zlib method
 compress2(). This package builds a library which exposes that single
-method. To use this library one needs to pre-load using the 
-standard LD_PRELOAD variable, something like:
+method. The library is meant as a drop-in replacement (or addition) 
+of the standard zlib library for existing applications that need 
+faster parallel compression. 
 
-LD_PRELOAD=libpazlib.so myapp ... 
+Note that only the applications that use compress2() method will be 
+able to utilize pazlib, there will be no difference for all other 
+clients of zlib library. Primary purpose of this project was to speed 
+up compression in HDF5 library and HDF5 uses compress2().
+
+Existing applications do not need to be re-compiled or re-linked to 
+utilize the library. Instead standard pre-load mechanism should be 
+used to "link" application with this library:
+
+LD_PRELOAD=libpazlib.so myapp args ...
+
+Alternatively if you have a choice the library can be linked to
+the applications, if you do it and also include zlib (-lz) into
+link make sure that -lz comes after -lpazlib.
+
+By default pazlib creates number of compressing threads equal to 
+the number of CPUs/cores on a machine. If you want to limit the
+resources used by pazlib (e.g. on a shared machine) you can do it
+by setting environment variable PAZLIB_MAX_THREADS to the desired 
+number of threads (it cannot be larger than number of cores).
