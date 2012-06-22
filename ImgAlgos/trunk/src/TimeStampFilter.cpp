@@ -224,8 +224,8 @@ TimeStampFilter::printTimeStamp()
 bool 
 TimeStampFilter::isSelected()
 {
-  if ( m_time <  *m_tmin  ) return false;
-  if ( m_time >= *m_tmax  ) return false;
+  if ( m_time < *m_tmin  ) return false;
+  if ( m_time > *m_tmax  ) return false;
 
   return true;
 }

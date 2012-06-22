@@ -162,12 +162,14 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n print_bits            : " << m_print_bits
         << "\n";     
 
-    //log << "\n MaxQuads   : " << MaxQuads    
-    //    << "\n MaxSectors : " << MaxSectors  
-    //    << "\n NumColumns : " << NumColumns  
-    //    << "\n NumRows    : " << NumRows     
-    //    << "\n SectorSize : " << SectorSize  
-    //    << "\n";
+    MsgLog(name(), debug, 
+           "\n MaxQuads   : "      << MaxQuads  
+        << "\n MaxSectors : "      << MaxSectors
+        << "\n NumColumns : "      << NumColumns
+        << "\n NumRows    : "      << NumRows   
+        << "\n SectorSize : "      << SectorSize
+        << "\n"
+	);
   }
 }
 
@@ -182,6 +184,8 @@ CSPadArrPeakFinder::beginJob(Event& evt, Env& env)
   if( m_print_bits & 64 ) printMatrixOfIndexesForMedian();
 
   m_time = new TimeInterval();
+
+  //omp_init_lock(m_lock); // initialization, The initial state is unlocked
 }
 
 /// Method which is called at the beginning of the run
@@ -198,19 +202,19 @@ CSPadArrPeakFinder::beginRun(Event& evt, Env& env)
   // need to know segment mask which is availabale in configuration only
   shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_str_src, &m_src);
   if (config1.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; }
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; makeVectorOfSectorAndIndexInArray(i); }
     ++ count;
   }
   
   shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_str_src, &m_src);
   if (config2.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); }
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
     ++ count;
   }
 
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
   if (config3.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); }
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
     ++ count;
   }
 
@@ -391,6 +395,14 @@ void
 CSPadArrPeakFinder::resetForEventProcessing()
 {
   v_peaks.clear(); // clear the vector of peaks
+
+  // Thread safe operation requires undependent data for sections
+  for (int q = 0; q < MaxQuads; ++ q) {
+    for (int s = 0; s < MaxSectors; ++ s) {
+      v_peaks_in_sect[q][s].clear();
+    }
+  }
+
   resetSignalArrays();
 }
 
@@ -436,6 +448,7 @@ CSPadArrPeakFinder::procData(Event& evt)
     shared_ptr<cspad_mod::DataV1> newobj(new cspad_mod::DataV1());
     
     int nQuads = data1->quads_shape()[0];
+
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq);
@@ -444,12 +457,13 @@ CSPadArrPeakFinder::procData(Event& evt)
       collectStatInQuad(quad.quad(), data.data());
 
       if(fillArr) {
-         int16_t* newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
-         fillOutputArr(quad.quad(),newdata);
-         newobj->append(new cspad_mod::ElementV1(quad, newdata, m_common_mode));
-       }
-     }    
-     if(fillArr) evt.put<Psana::CsPad::DataV1>(newobj, m_src, m_key_signal_out); // put newobj in event 
+        m_newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
+        fillOutputArr(quad.quad(),m_newdata);
+        newobj->append(new cspad_mod::ElementV1(quad, m_newdata, m_common_mode));
+        //delete [] m_newdata;
+      }
+    }    
+    if(fillArr) evt.put<Psana::CsPad::DataV1>(newobj, m_src, m_key_signal_out); // put newobj in event 
   }
   
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_key, &m_src);
@@ -460,6 +474,7 @@ CSPadArrPeakFinder::procData(Event& evt)
     shared_ptr<cspad_mod::DataV2> newobj(new cspad_mod::DataV2());
     
     int nQuads = data2->quads_shape()[0];
+
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq);
@@ -468,13 +483,14 @@ CSPadArrPeakFinder::procData(Event& evt)
       collectStatInQuad(quad.quad(), data.data());
 
       if(fillArr) {
-        int16_t* newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
-        fillOutputArr(quad.quad(),newdata);
-        newobj->append(new cspad_mod::ElementV2(quad, newdata, m_common_mode));  
+        m_newdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
+        fillOutputArr(quad.quad(),m_newdata);
+        newobj->append(new cspad_mod::ElementV2(quad, m_newdata, m_common_mode));  
+        //delete [] m_newdata;
       }
     } 
     if(fillArr) evt.put<Psana::CsPad::DataV2>(newobj, m_src, m_key_signal_out); // put newobj in event 
-   }
+  }
 }
 
 //--------------------
@@ -503,24 +519,76 @@ CSPadArrPeakFinder::fillOutputArr(unsigned quad, int16_t* newdata)
 }
 
 //--------------------
+/// We need in this stuff in order to isolate data for multithreading.
+void 
+CSPadArrPeakFinder::makeVectorOfSectorAndIndexInArray(unsigned quad)
+{
+  TwoIndexes sectAndIndexInArray;
+  v_sectAndIndexInArray[quad].clear();
+
+  MsgLog(name(), debug, "quad=" << quad);
+
+  int ind_in_arr = 0;
+  for (int sect = 0; sect < MaxSectors; ++ sect) {
+    if (m_segMask[quad] & (1 << sect)) {
+      sectAndIndexInArray.i = sect;
+      sectAndIndexInArray.j = ind_in_arr++;
+      v_sectAndIndexInArray[quad].push_back(sectAndIndexInArray);
+
+      MsgLog(name(), debug,  
+                 "     sectAndIndexInArray.i = " << sectAndIndexInArray.i
+              << "     sectAndIndexInArray.j = " << sectAndIndexInArray.j
+             );
+
+    }
+  }
+}
+
+//--------------------
 /// Collect statistics
 /// Loop over all 2x1 sections available in the event 
 void 
 CSPadArrPeakFinder::collectStatInQuad(unsigned quad, const int16_t* data)
 {
-  //cout << "collectStat for quad =" << quad << endl;
+  int v_size = v_sectAndIndexInArray[quad].size();
 
-  int ind_in_arr = 0;
-  for (unsigned sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[quad] & (1 << sect)) {
-     
+//======================
+//#pragma omp parallel for
+//======================
+
+  //for (int sect = 0; sect < MaxSectors; ++ sect) {
+  //  if (m_segMask[quad] & (1 << sect)) {
+
+  //for( vector<TwoIndexes>::const_iterator p  = v_sectAndIndexInArray[quad].begin();
+  //                                        p != v_sectAndIndexInArray[quad].end(); p++ ) {
+  //    int sect       = p->i;
+  //    int ind_in_arr = p->j;
+
+  for( int ivec=0; ivec < v_size; ++ivec ) { // #pragma does not understand vector's iterator...
+
+      int sect       = v_sectAndIndexInArray[quad][ivec].i;
+      int ind_in_arr = v_sectAndIndexInArray[quad][ivec].j;
       const int16_t* sectData = data + ind_in_arr*SectorSize;
 
       collectStatInSect(quad, sect, sectData);
-
       findPeaksInSect  (quad, sect);
+      //cout << "  quad=" << quad << "  sect=" << sect  << "  ind_in_arr=" << ind_in_arr << endl;
+  }
 
-      ++ind_in_arr;
+  // Outside the parallel threads:
+  makeUnitedPeakVector();
+}
+
+//--------------------
+void 
+CSPadArrPeakFinder::makeUnitedPeakVector()
+{
+  for (int q = 0; q < MaxQuads; ++ q) {
+    for (int s = 0; s < MaxSectors; ++ s) {
+      for( vector<Peak>::const_iterator p  = v_peaks_in_sect[q][s].begin();
+                                        p != v_peaks_in_sect[q][s].end(); p++ ) {
+        v_peaks.push_back(*p);
+      }
     }
   }
 }
@@ -565,29 +633,30 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
 void 
 CSPadArrPeakFinder::findPeaksInSect(unsigned quad, unsigned sect)
 {
-  m_quad = quad;
-  m_sect = sect;
+  //m_quad = quad;
+  //m_sect = sect;
   for (int ic = 0; ic != NumColumns; ++ ic) {
     for (int ir = 0; ir != NumRows; ++ ir) {
 
       if( m_proc_status[quad][sect][ic][ir] & 1 ) {
 
-	//cout << "Begin the new cluster, q,s,c,r=" << m_quad << " " << m_sect << " "  << ic << " " << ir << endl;
+	//cout << "Begin the new cluster, q,s,c,r=" << quad << " " << sect << " "  << ic << " " << ir << endl;
 
 	// Initialization of the peak parameters
-	m_peak_npix       = 0;
-	m_peak_amp_max    = 0;
-	m_peak_amp_tot    = 0;
-	m_peak_amp_x_col1 = 0;
-	m_peak_amp_x_col2 = 0;
-	m_peak_amp_x_row1 = 0;
-	m_peak_amp_x_row2 = 0;
+        PeakWork pw;
+	pw.peak_npix       = 0;
+	pw.peak_amp_max    = 0;
+	pw.peak_amp_tot    = 0;
+	pw.peak_amp_x_col1 = 0;
+	pw.peak_amp_x_col2 = 0;
+	pw.peak_amp_x_row1 = 0;
+	pw.peak_amp_x_row2 = 0;
 
 	// Begin to iterate over connected region
         // when it is done the connected region is formed
-        iterateOverConnectedPixels(ic,ir); 
+        iterateOverConnectedPixels(quad,sect,ic,ir,pw); 
 
-	if( peakSelector() ) savePeakInfo();
+	if( peakSelector(pw) ) savePeakInVector(quad,sect,pw);
       }
     }
   }
@@ -596,56 +665,60 @@ CSPadArrPeakFinder::findPeaksInSect(unsigned quad, unsigned sect)
 //--------------------
 // Flood-fill recursive iteration method in order to find the region of connected pixels
 void 
-CSPadArrPeakFinder::iterateOverConnectedPixels(int ic, int ir)
+CSPadArrPeakFinder::iterateOverConnectedPixels(int quad, int sect, int ic, int ir, PeakWork& pw)
 {
-  int16_t amp = m_signal[m_quad][m_sect][ic][ir];
+  int16_t amp = m_signal[quad][sect][ic][ir];
 
-  m_peak_npix       ++;
-  m_peak_amp_tot    +=  amp;
-  m_peak_amp_x_col1 += (amp*ic);
-  m_peak_amp_x_col2 += (amp*ic*ic);
-  m_peak_amp_x_row1 += (amp*ir);
-  m_peak_amp_x_row2 += (amp*ir*ir);
-  if (amp > m_peak_amp_max) m_peak_amp_max = amp;
+  pw.peak_npix       ++;
+  pw.peak_amp_tot    +=  amp;
+  pw.peak_amp_x_col1 += (amp*ic);
+  pw.peak_amp_x_col2 += (amp*ic*ic);
+  pw.peak_amp_x_row1 += (amp*ir);
+  pw.peak_amp_x_row2 += (amp*ir*ir);
 
-  m_proc_status[m_quad][m_sect][ic][ir] ^= 1; // set the 1st bit to zero.
+  if (amp > pw.peak_amp_max) pw.peak_amp_max = amp;
 
-  if(ir+1 < NumRows    && m_proc_status[m_quad][m_sect][ic][ir+1] & 1 ) iterateOverConnectedPixels(ic,   ir+1); 
-  if(ic+1 < NumColumns && m_proc_status[m_quad][m_sect][ic+1][ir] & 1 ) iterateOverConnectedPixels(ic+1, ir  ); 
-  if(ir-1 >=0          && m_proc_status[m_quad][m_sect][ic][ir-1] & 1 ) iterateOverConnectedPixels(ic,   ir-1); 
-  if(ic-1 >=0          && m_proc_status[m_quad][m_sect][ic-1][ir] & 1 ) iterateOverConnectedPixels(ic-1, ir  ); 
+  m_proc_status[quad][sect][ic][ir] ^= 1; // set the 1st bit to zero.
+
+  if(ir+1 < NumRows    && m_proc_status[quad][sect][ic][ir+1] & 1 ) iterateOverConnectedPixels(quad, sect, ic,   ir+1, pw); 
+  if(ic+1 < NumColumns && m_proc_status[quad][sect][ic+1][ir] & 1 ) iterateOverConnectedPixels(quad, sect, ic+1, ir  , pw); 
+  if(ir-1 >=0          && m_proc_status[quad][sect][ic][ir-1] & 1 ) iterateOverConnectedPixels(quad, sect, ic,   ir-1, pw); 
+  if(ic-1 >=0          && m_proc_status[quad][sect][ic-1][ir] & 1 ) iterateOverConnectedPixels(quad, sect, ic-1, ir  , pw); 
 }
 
 
 //--------------------
 // Check the peak quality and return true for good peak
 bool
-CSPadArrPeakFinder::peakSelector() {
+CSPadArrPeakFinder::peakSelector(PeakWork& pw) {
 
-  if (m_peak_npix < m_peak_npix_min)       return false;
-  if (m_peak_npix > m_peak_npix_max)       return false;
-  if (m_peak_amp_tot < m_peak_amp_tot_thr) return false;  
-  //if (m_peak_amp_max < m_peak_amp_max_thr) return false;
+  if (pw.peak_npix < m_peak_npix_min)       return false;
+  if (pw.peak_npix > m_peak_npix_max)       return false;
+  if (pw.peak_amp_tot < m_peak_amp_tot_thr) return false;  
+  //if (pw.peak_amp_max < m_peak_amp_max_thr) return false;
   return true;
 }
 
 //--------------------
 // Creates, fills, and saves the object of structure Peak. 
 void 
-CSPadArrPeakFinder::savePeakInfo() {
+CSPadArrPeakFinder::savePeakInVector(int quad, int sect, PeakWork& pw) {
   //MsgLog(name(), info, "Save peak info, npix =" << m_peak_npix << ", amp=" << m_peak_amp_tot;);
   Peak peak;
-  peak.quad      = m_quad;
-  peak.sect      = m_sect;
-  peak.col       = m_peak_amp_x_col1 / m_peak_amp_tot;
-  peak.row       = m_peak_amp_x_row1 / m_peak_amp_tot; 
-  peak.sigma_col = std::sqrt( m_peak_amp_x_col2/m_peak_amp_tot - peak.col*peak.col );
-  peak.sigma_row = std::sqrt( m_peak_amp_x_row2/m_peak_amp_tot - peak.row*peak.row );
-  peak.ampmax    = m_peak_amp_max;
-  peak.amptot    = m_peak_amp_tot;
-  peak.npix      = m_peak_npix;
+  peak.quad      = quad;
+  peak.sect      = sect;
+  peak.col       = pw.peak_amp_x_col1 / pw.peak_amp_tot;
+  peak.row       = pw.peak_amp_x_row1 / pw.peak_amp_tot; 
+  peak.sigma_col = std::sqrt( pw.peak_amp_x_col2/pw.peak_amp_tot - peak.col*peak.col );
+  peak.sigma_row = std::sqrt( pw.peak_amp_x_row2/pw.peak_amp_tot - peak.row*peak.row );
+  peak.ampmax    = pw.peak_amp_max;
+  peak.amptot    = pw.peak_amp_tot;
+  peak.npix      = pw.peak_npix;
 
-  v_peaks.push_back(peak);   
+  //omp_set_lock(m_lock);
+  //v_peaks.push_back(peak);   
+  //omp_unset_lock(m_lock);
+  v_peaks_in_sect[quad][sect].push_back(peak);   
 }
 
 //--------------------
@@ -918,7 +991,7 @@ CSPadArrPeakFinder::doOperationsForSelectedEvent(Event& evt)
   if( m_out_file_bits & 8 ) savePeaksInFile (fname_peaks, v_peaks);
 
   savePeaksInEvent(evt);
-  //saveSignalArrInEvent(evt); // not implemented yet
+  //saveSignalArrInEvent(evt); is implemented as a part of procData(...), because it needs in many calls...
 }
 
 //--------------------

@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <vector>
+//#include <omp.h>
 
 //----------------------
 // Base Class Headers --
@@ -65,17 +66,27 @@ struct MedianResult {
 };
 
 struct Peak{
-   double quad;
-   double sect; 
-   double col;
-   double row; 
-   double sigma_col;
-   double sigma_row;
-   double ampmax;
-   double amptot;
-   unsigned npix;
+  double quad;
+  double sect; 
+  double col;
+  double row; 
+  double sigma_col;
+  double sigma_row;
+  double ampmax;
+  double amptot;
+  unsigned npix;
 };
 
+// Stuff for the peak finding algorithm in thread-safe mode
+struct PeakWork{
+  unsigned  peak_npix;
+  double    peak_amp_tot;
+  double    peak_amp_max;
+  double    peak_amp_x_col1;
+  double    peak_amp_x_col2;
+  double    peak_amp_x_row1;
+  double    peak_amp_x_row2;
+};
 
 class CSPadArrPeakFinder : public Module {
 public:
@@ -121,13 +132,15 @@ public:
 protected:
     void procData(Event& evt);
     void fillOutputArr(unsigned quad, int16_t* newdata);
+    void makeVectorOfSectorAndIndexInArray(unsigned quad);
     void collectStatInQuad(unsigned quad, const int16_t* data);
     void collectStatInSect(unsigned quad, unsigned sect, const int16_t* sectData);
     void findPeaksInSect(unsigned quad, unsigned sect);
     MedianResult evaluateSoNForPixel(unsigned ic,unsigned ir,const int16_t* sectData);
-    void iterateOverConnectedPixels(int ic, int ir);
-    bool peakSelector();
-    void savePeakInfo();
+    void iterateOverConnectedPixels(int quad, int sect, int ic, int ir, PeakWork& pw);
+    bool peakSelector(PeakWork& pw);
+    void savePeakInVector(int quad, int sect, PeakWork& pw);
+    void makeUnitedPeakVector();
     void printVectorOfPeaks();
     void maskUpdateControl();
     void setSelectionMode();
@@ -205,26 +218,24 @@ private:
   int16_t        m_signal          [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_proc_status     [MaxQuads][MaxSectors][NumColumns][NumRows];
 
+  int16_t*       m_newdata;
+
   float          m_common_mode[MaxSectors];
 
   ImgAlgos::CSPadMaskV1 *m_mask_initial;
 
   std::vector<TwoIndexes> v_indForMediane;
 
-  // Stuff for the peak finding algorithm
-  unsigned  m_peak_npix;
-  double    m_peak_amp_tot;
-  double    m_peak_amp_max;
-  double    m_peak_amp_x_col1;
-  double    m_peak_amp_x_col2;
-  double    m_peak_amp_x_row1;
-  double    m_peak_amp_x_row2;
 
+  std::vector<TwoIndexes> v_sectAndIndexInArray[MaxQuads];
   std::vector<Peak> v_peaks;
-  unsigned  m_quad;
-  unsigned  m_sect;
+  std::vector<Peak> v_peaks_in_sect[MaxQuads][MaxSectors];
+  //unsigned  m_quad;
+  //unsigned  m_sect;
   double    m_event_amp_tot;
   TimeInterval *m_time;
+
+  //omp_lock_t *m_lock;
 };
 
 } // namespace ImgAlgos
