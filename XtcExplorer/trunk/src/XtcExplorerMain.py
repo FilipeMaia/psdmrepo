@@ -478,9 +478,21 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
         Add a file to list of files. Input from lineedit
         """
-        filename = str(self.lineedit.text())
-        self.add_file(filename)
+        filepath = str(self.lineedit.text()).strip()
+        dir, file = os.path.split( filepath )
+        
+        dirList=os.listdir(dir+"/")
+        found = False
+        for fname in fnmatch.filter(dirList,file):
+            fullpath = dir +"/"+ fname
+            if os.path.isfile(fullpath):                
+                self.add_file( fullpath )
+                found = True
 
+        if not found:
+            print "No files matching %s found"% filepath
+            return
+        
         if self.filenames :
             self.scan_files_quick()
         
