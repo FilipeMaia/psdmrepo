@@ -25,16 +25,16 @@ SOURCES = adler32.c pacompress.c
 # files that go into tar
 DISTFILES = LICENSE INSTALL Makefile ../doc/README ../doc/ChangeLog ../src/adler32.c ../src/pacompress.c
 
-.PHONY: tar $(PACKAGE).tag.gz all
+.PHONY: tar $(PACKAGE).tar.gz all
 
 all: libpazlib.so
 
 libpazlib.so: $(SOURCES)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@  $^ $(LOADLIBES) $(LDLIBS)
 
-tar: $(PACKAGE).tag.gz
+tar: $(PACKAGE).tar.gz
 
-$(PACKAGE).tag.gz: $(DISTFILES)
+$(PACKAGE).tar.gz: $(DISTFILES)
 	@tmpdir=/tmp/pazlib-$$$$/; mkdir -p $$tmpdir/$(PACKAGE); \
 	cp -p $^ $$tmpdir/$(PACKAGE); \
 	tar -c -C $$tmpdir -v -f $@ $(PACKAGE)
