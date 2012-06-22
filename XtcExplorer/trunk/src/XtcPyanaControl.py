@@ -1079,6 +1079,8 @@ Do you want to proceed?
         print "FIXME! %s requested, not implemented" % box.text() 
 
     def add_linebreaks(self, configtext, width=50):
+        if self.psana: # don't add linebreaks as they confuse the psana config parser
+            return configtext
         lines = configtext.split('\n')
         l = 0
         for line in lines :
