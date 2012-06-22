@@ -31,7 +31,7 @@ Psana::EvrData::EventCodeV4 pds_to_psana(PsddlPds::EvrData::EventCodeV4 pds)
 
 Psana::EvrData::EventCodeV5 pds_to_psana(PsddlPds::EvrData::EventCodeV5 pds)
 {
-  return Psana::EvrData::EventCodeV5(pds.code(), pds.isReadout(), pds.isTerminator(), pds.isLatch(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc());
+  return Psana::EvrData::EventCodeV5(pds.code(), pds.isReadout(), pds.isCommand(), pds.isLatch(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc());
 }
 
 Psana::EvrData::OutputMap::Source pds_to_psana(PsddlPds::EvrData::OutputMap::Source e)
