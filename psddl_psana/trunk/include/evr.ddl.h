@@ -182,14 +182,14 @@ public:
   EventCodeV5()
   {
   }
-  EventCodeV5(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV5(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isCommand, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isCommand & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
     std::copy(arg__desc, arg__desc+(16), _desc);
   }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
-  uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
+  uint8_t isCommand() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
   uint8_t isLatch() const { return uint8_t((this->_u16MaskEventAttr>>2) & 0x1); }
   uint32_t reportDelay() const { return _u32ReportDelay; }
   uint32_t reportWidth() const { return _u32ReportWidth; }
