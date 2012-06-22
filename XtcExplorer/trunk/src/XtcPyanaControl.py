@@ -990,7 +990,7 @@ Do you want to proceed?
             options_for_mod[index].append("\ninputdark = ")
             options_for_mod[index].append("\n#threshold = lower=0 upper=1200 roi=(x1:x2,y1:y2) type=maximum")
             options_for_mod[index].append("\n#algorithms = rotate shift")
-            options_for_mod[index].append("\nquantities = image average\n# ... dark maximum")
+            options_for_mod[index].append("\nquantities = image \n# ... average dark maximum")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))

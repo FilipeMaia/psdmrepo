@@ -127,11 +127,12 @@ class  pyana_bld ( object ) :
         if not self.psana:
             self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
 
-        ## Evr (Event receiver data)
-        #evrdata = evt.getEvrData("NoDetector-0|Evr-0")
-        #for i in range (evrdata.numFifoEvents()):
-        #    print "Event code: ", evrdata.fifoEvent(i).EventCode
-            
+#        # Evr (Event receiver data)
+#        evrdata = evt.getEvrData("NoDetector-0|Evr-0")
+#        ecodes = []
+#        for i in range (evrdata.numFifoEvents()):
+#            ecodes.append( evrdata.fifoEvent(i).EventCode )
+#        print "Event codes in shot #%d : %s "%(self.n_shots, str(ecodes))
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)

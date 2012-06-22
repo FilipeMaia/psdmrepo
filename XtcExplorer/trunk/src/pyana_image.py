@@ -94,7 +94,7 @@ class  pyana_image ( object ) :
 
         self.darkfile = opt.getOptString(inputdark)
         if self.darkfile is not None: print "Input dark image file: ", self.darkfile
-
+        
         self.algorithms = opt.getOptStrings(algorithms)
         print "Algorithms to apply: ", self.algorithms
 
@@ -161,6 +161,8 @@ class  pyana_image ( object ) :
             self.n_dark[addr] = 0
 
     def load_dark(self,filename):
+        if filename is None: return
+
         fname = filename.split('.')
         if fname[-1] == "txt" :  # Ascii
             image = np.loadtxt(filename)
