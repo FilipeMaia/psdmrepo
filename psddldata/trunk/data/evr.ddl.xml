@@ -209,7 +209,7 @@
 
             <attribute name="_u16MaskEventAttr" type="uint16_t">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
-                <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
+                <bitfield name="_bf_isCommand" size="1" type="uint8_t" accessor="isCommand"/>                
                 <bitfield name="_bf_isLatch" size="1" type="uint8_t" accessor="isLatch"/>                
             </attribute>
 
