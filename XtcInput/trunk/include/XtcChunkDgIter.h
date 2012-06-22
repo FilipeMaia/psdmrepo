@@ -1,12 +1,12 @@
-#ifndef XTCINPUT_XTCDGITERATOR_H
-#define XTCINPUT_XTCDGITERATOR_H
+#ifndef XTCINPUT_XTCCHUNKDGITER_H
+#define XTCINPUT_XTCCHUNKDGITER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class XtcDgIterator.
+//	Class XtcChunkDgIter.
 //
 //------------------------------------------------------------------------
 
@@ -36,20 +36,17 @@
 namespace XtcInput {
 
 /**
- *  Datagram iterator - reads datagrams from file, replacement for
- *  XtcFileIterator.
+ *  @brief Datagram iterator for datagrams in a single chunk file.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class XtcDgIterator : boost::noncopyable {
+class XtcChunkDgIter : boost::noncopyable {
 public:
 
   /**
@@ -70,13 +67,15 @@ public:
    *
    *  @throw FileOpenException Thrown in case file cannot be open.
    */
-  XtcDgIterator (const std::string& path, size_t maxDgramSize, unsigned liveTimeout = 0) ;
+  XtcChunkDgIter (const std::string& path, size_t maxDgramSize, unsigned liveTimeout = 0) ;
 
   // Destructor
-  ~XtcDgIterator () ;
+  ~XtcChunkDgIter () ;
 
   /**
-   *  Returns next datagram, zero on EOF, throws exceptions for errors
+   *  @brief Returns next datagram, zero on EOF, throws exceptions for errors
+   *
+   *  @return Shared pointer to datagram object
    *
    *  @throw XTCReadException Thrown for any read errors
    *  @throw XTCLiveTimeout Thrown for timeout during live data reading
@@ -95,14 +94,13 @@ protected:
 
 private:
 
-  // Data members
-  std::string m_path;
-  int m_fd;
-  size_t m_maxDgramSize ;
-  unsigned m_liveTimeout;
+  std::string m_path;      ///< Name of the chunk file
+  int m_fd;                ///< File descriptor of the open file
+  size_t m_maxDgramSize ;  ///< Maximum allowed datagram size
+  unsigned m_liveTimeout;  ///< timeout in seconds for reading live data files
 
 };
 
 } // namespace XtcInput
 
-#endif // XTCINPUT_XTCDGITERATOR_H
+#endif // XTCINPUT_XTCCHUNKDGITER_H

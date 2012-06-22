@@ -98,7 +98,7 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
       streamFiles.sort() ;
     }
     // create new stream
-    XtcDechunk* stream = new XtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
+    XtcStreamDgIter* stream = new XtcStreamDgIter( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
     Dgram dg(stream->next(), stream->chunkName());
     if (not dg.empty()) updateDgramTime( *dg.dg() );
@@ -113,7 +113,7 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
 //--------------
 XtcStreamMerger::~XtcStreamMerger ()
 {
-  for ( std::vector<XtcDechunk*>::const_iterator it = m_streams.begin() ; it != m_streams.end() ; ++ it ) {
+  for ( std::vector<XtcStreamDgIter*>::const_iterator it = m_streams.begin() ; it != m_streams.end() ; ++ it ) {
     delete *it ;
   }
 }

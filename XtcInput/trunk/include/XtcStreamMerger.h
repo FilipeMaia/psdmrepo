@@ -27,7 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/Dgram.h"
-#include "XtcInput/XtcDechunk.h"
+#include "XtcInput/XtcStreamDgIter.h"
 #include "XtcInput/XtcFileName.h"
 
 //------------------------------------
@@ -41,13 +41,13 @@
 namespace XtcInput {
 
 /**
+ *  @brief datagram iterator which merges data from several streams.
+ *
  *  Class responsible for merging of the datagrams from several
  *  XTC streams.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -57,11 +57,12 @@ namespace XtcInput {
 class XtcStreamMerger : boost::noncopyable {
 public:
 
-  /// Several merge modes supported:
-  ///   OneStream - all files come from one stream, chunked
-  ///   FilePerStream - single file per stream, no chunking
-  ///   FileName - streams and chunks are determined from file names
-  enum MergeMode { OneStream, NoChunking, FileName } ;
+  /// Merge modes supported by this iterator class
+  enum MergeMode {
+    OneStream,     ///< All files come from one stream, chunked
+    NoChunking,    ///< Single file per stream, no chunking
+    FileName       ///< streams and chunks are determined from file names
+  } ;
   
   /**
    *  @brief Make merge mode from string
@@ -71,7 +72,15 @@ public:
    */
   static MergeMode mergeMode(const std::string& str);
 
-  // Default constructor
+  /**
+   *  @brief Make iterator instance
+   *
+   *  @param[in]  files    List of input files
+   *  @param[in]  maxDgSize Maximum allowed datagram size
+   *  @param[in]  mode      Merge mode
+   *  @param[in]  skipDamaged If true then all damaged datagrams will be skipped
+   *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
+   */
   XtcStreamMerger ( const std::list<XtcFileName>& files,
                  size_t maxDgSize,
                  MergeMode mode,
@@ -82,10 +91,16 @@ public:
   ~XtcStreamMerger () ;
 
   /**
-   *  @brief Read next datagram
-   *  
-   *  Returns object with zero pointer after last file has been read,
+   *  @brief Return next datagram.
+   *
+   *  Read next datagram, return zero pointer after last file has been read,
    *  throws exception for errors.
+   *
+   *  @return Shared pointer to datagram object
+   *
+   *  @throw FileOpenException Thrown in case chunk file cannot be open.
+   *  @throw XTCReadException Thrown for any read errors
+   *  @throw XTCLiveTimeout Thrown for timeout during live data reading
    */
   Dgram next() ;
 
@@ -96,13 +111,12 @@ protected:
 
 private:
 
-  // Data members
-  std::vector<XtcDechunk*> m_streams ;
-  std::vector<Dgram> m_dgrams ;
-  MergeMode m_mode ;
-  int32_t m_l1OffsetSec ;
-  int32_t m_l1OffsetNsec ;
-  std::queue<Dgram> m_outputQueue;
+  std::vector<XtcStreamDgIter*> m_streams ;   ///< Set of datagram iterators for individual streams
+  std::vector<Dgram> m_dgrams ;               ///< Current datagram for each of the streams
+  MergeMode m_mode ;                          ///< Merge mode
+  int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
+  int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
+  std::queue<Dgram> m_outputQueue;            ///< Output queue for datagrams
 
 };
 

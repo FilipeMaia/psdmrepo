@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class XtcDgIterator...
+//	Class XtcChunkDgIter...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "XtcInput/XtcDgIterator.h"
+#include "XtcInput/XtcChunkDgIter.h"
 
 //-----------------
 // C/C++ Headers --
@@ -38,7 +38,7 @@
 
 namespace {
 
-  const char* logger = "XtcDgIterator";
+  const char* logger = "XtcChunkDgIter";
 
 }
 
@@ -52,7 +52,7 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize, unsigned liveTimeout)
+XtcChunkDgIter::XtcChunkDgIter (const std::string& path, size_t maxDgramSize, unsigned liveTimeout)
   : m_path(path)
   , m_fd(-1)
   , m_maxDgramSize(maxDgramSize)
@@ -68,13 +68,13 @@ XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize, unsi
 //--------------
 // Destructor --
 //--------------
-XtcDgIterator::~XtcDgIterator ()
+XtcChunkDgIter::~XtcChunkDgIter ()
 {
   if (m_fd >= 0) close(m_fd);
 }
 
 Dgram::ptr
-XtcDgIterator::next()
+XtcChunkDgIter::next()
 {
   Pds::Dgram header;
   const size_t headerSize = sizeof(Pds::Dgram);
@@ -124,7 +124,7 @@ XtcDgIterator::next()
 // then check that it is real EOF or wait (in live mode only)
 // Returns number of bytes read or negative number for errors.
 ssize_t
-XtcDgIterator::read(char* buf, size_t size)
+XtcChunkDgIter::read(char* buf, size_t size)
 {
   std::time_t t0 = m_liveTimeout ? std::time(0) : 0;
   size_t left = size;
@@ -165,7 +165,7 @@ XtcDgIterator::read(char* buf, size_t size)
 
 // check that we reached EOF while reading live data
 bool
-XtcDgIterator::eof()
+XtcChunkDgIter::eof()
 {
   // we are at EOF only when the file has been renamed to its final
   // name, but is still the same file (same inode) and it's size is

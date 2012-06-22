@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class XtcDechunk...
+//	Class XtcStreamDgIter...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "XtcInput/XtcDechunk.h"
+#include "XtcInput/XtcStreamDgIter.h"
 
 //-----------------
 // C/C++ Headers --
@@ -24,7 +24,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/Exceptions.h"
-#include "XtcInput/XtcDgIterator.h"
+#include "XtcInput/XtcChunkDgIter.h"
 #include "pdsdata/xtc/Xtc.hh"
 
 //-----------------------------------------------------------------------
@@ -33,7 +33,7 @@
 
 namespace {
 
-  const char* logger = "XtcDechunk" ;
+  const char* logger = "XtcStreamDgIter" ;
 
 }
 
@@ -46,7 +46,7 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcDechunk::XtcDechunk ( const std::list<XtcFileName>& files, size_t maxDgSize, bool skipDamaged )
+XtcStreamDgIter::XtcStreamDgIter ( const std::list<XtcFileName>& files, size_t maxDgSize, bool skipDamaged )
   : m_files(files)
   , m_maxDgSize(maxDgSize)
   , m_skipDamaged(skipDamaged)
@@ -60,7 +60,7 @@ XtcDechunk::XtcDechunk ( const std::list<XtcFileName>& files, size_t maxDgSize, 
 //--------------
 // Destructor --
 //--------------
-XtcDechunk::~XtcDechunk ()
+XtcStreamDgIter::~XtcStreamDgIter ()
 {
   delete m_dgiter ;
 }
@@ -68,7 +68,7 @@ XtcDechunk::~XtcDechunk ()
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
 Dgram::ptr
-XtcDechunk::next()
+XtcStreamDgIter::next()
 {
   Dgram::ptr dgram;
   while ( not dgram.get() ) {
@@ -79,7 +79,7 @@ XtcDechunk::next()
 
       // open next xtc file if there is none open
       MsgLog( logger, trace, "processing file: " << m_iter->path() ) ;
-      m_dgiter = new XtcDgIterator ( m_iter->path(), m_maxDgSize ) ;
+      m_dgiter = new XtcChunkDgIter ( m_iter->path(), m_maxDgSize ) ;
       m_count = 0 ;
     }
 
@@ -115,7 +115,7 @@ XtcDechunk::next()
 
 // get current file name
 XtcFileName
-XtcDechunk::chunkName() const
+XtcStreamDgIter::chunkName() const
 {
   if ( m_iter == m_files.end() ) return XtcFileName() ;
   return *m_iter ;
