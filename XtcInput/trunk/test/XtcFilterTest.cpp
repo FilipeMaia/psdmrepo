@@ -34,7 +34,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/XtcFilter.h"
 #include "XtcInput/XtcFilterTypeId.h"
-#include "XtcInput/XtcDgIterator.h"
+#include "XtcInput/XtcChunkDgIter.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -150,7 +150,7 @@ XtcFilterTest::runApp ()
   XtcFilter<XtcFilterTypeId> filter(XtcFilterTypeId(keep, discard), m_keepContOpt.value(), m_keepDgramOpt.value(), m_keepAnyOpt.value());
 
   const int DgSize = 16*1024*1024;
-  XtcDgIterator dgIter(m_inputArg.value(), DgSize);
+  XtcChunkDgIter dgIter(m_inputArg.value(), DgSize);
 
   Dgram::ptr dg = dgIter.next();
   char* buffer = new char[DgSize];

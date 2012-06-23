@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2012-06-22 Andy Salnikov
+- forgot to update tests to use new class names
+
 Tag: V00-04-00
 2012-06-22 Andy Salnikov
 - renamed XtcDgIterator class into XtcChunkDgIter, XtcDechunk into

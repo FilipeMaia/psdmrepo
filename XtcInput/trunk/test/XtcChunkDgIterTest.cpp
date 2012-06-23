@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class XtcDgIteratorTest...
+//	Class XtcChunkDgIterTest...
 //
 // Author List:
 //      Andy Salnikov
@@ -32,7 +32,7 @@
 #include "AppUtils/AppCmdArg.h"
 #include "AppUtils/AppCmdOpt.h"
 #include "MsgLogger/MsgLogger.h"
-#include "XtcInput/XtcDgIterator.h"
+#include "XtcInput/XtcChunkDgIter.h"
 #include "XtcInput/Exceptions.h"
 
 //-----------------------------------------------------------------------
@@ -48,14 +48,14 @@ namespace XtcInput {
 //
 //  Application class
 //
-class XtcDgIteratorTest : public AppUtils::AppBase {
+class XtcChunkDgIterTest : public AppUtils::AppBase {
 public:
 
   // Constructor
-  explicit XtcDgIteratorTest ( const std::string& appName ) ;
+  explicit XtcChunkDgIterTest ( const std::string& appName ) ;
 
   // destructor
-  ~XtcDgIteratorTest () ;
+  ~XtcChunkDgIterTest () ;
 
 protected :
 
@@ -89,7 +89,7 @@ private:
 //----------------
 // Constructors --
 //----------------
-XtcDgIteratorTest::XtcDgIteratorTest ( const std::string& appName )
+XtcChunkDgIterTest::XtcChunkDgIterTest ( const std::string& appName )
   : AppUtils::AppBase( appName )
   , m_timeoutOpt('t', "timeout", "number", "timeout in seconds, def: 10", 10)
   , m_pathArg("path", "test file name" )
@@ -101,7 +101,7 @@ XtcDgIteratorTest::XtcDgIteratorTest ( const std::string& appName )
 //--------------
 // Destructor --
 //--------------
-XtcDgIteratorTest::~XtcDgIteratorTest ()
+XtcChunkDgIterTest::~XtcChunkDgIterTest ()
 {
 }
 
@@ -109,7 +109,7 @@ XtcDgIteratorTest::~XtcDgIteratorTest ()
  *  Main method which runs the whole application
  */
 int
-XtcDgIteratorTest::runApp ()
+XtcChunkDgIterTest::runApp ()
 {
   test1();
   test2();
@@ -123,7 +123,7 @@ XtcDgIteratorTest::runApp ()
 }
 
 void
-XtcDgIteratorTest::test1()
+XtcChunkDgIterTest::test1()
 {
   // Simple test for non-live data reading,
   // write a bunch of datagrams and read them back,
@@ -134,7 +134,7 @@ XtcDgIteratorTest::test1()
   std::string fname = m_pathArg.value();
   writer1(5, fname);
 
-  XtcDgIterator iter(fname, 1024*1024, 0);
+  XtcChunkDgIter iter(fname, 1024*1024, 0);
   Dgram::ptr dg;
   dg = iter.next();
   if (not checkDg(dg, false, 100)) return;
@@ -153,7 +153,7 @@ XtcDgIteratorTest::test1()
 }
 
 void
-XtcDgIteratorTest::test2()
+XtcChunkDgIterTest::test2()
 {
   // Test for hang during live data reading,
   // write ".inprogress" file but do not rename it
@@ -164,7 +164,7 @@ XtcDgIteratorTest::test2()
   std::string fname = m_pathArg.value() + ".inprogress";
   writer1(5, fname);
 
-  XtcDgIterator iter(fname, 1024*1024, 3);
+  XtcChunkDgIter iter(fname, 1024*1024, 3);
   Dgram::ptr dg;
   dg = iter.next();
   if (not checkDg(dg, false, 100)) return;
@@ -186,7 +186,7 @@ XtcDgIteratorTest::test2()
 }
 
 void
-XtcDgIteratorTest::test3()
+XtcChunkDgIterTest::test3()
 {
   // Test for regular live data reading,
   // write ".inprogress" file in a separate thread
@@ -202,7 +202,7 @@ XtcDgIteratorTest::test3()
 
   sleep(1);
 
-  XtcDgIterator iter(fname, 1024*1024, 6);
+  XtcChunkDgIter iter(fname, 1024*1024, 6);
   Dgram::ptr dg;
   dg = iter.next();
   if (not checkDg(dg, false, 100)) return;
@@ -218,7 +218,7 @@ XtcDgIteratorTest::test3()
 }
 
 void
-XtcDgIteratorTest::test4()
+XtcChunkDgIterTest::test4()
 {
   // Test for regular live data reading,
   // write ".inprogress" file in a separate thread
@@ -235,7 +235,7 @@ XtcDgIteratorTest::test4()
 
   sleep(1);
 
-  XtcDgIterator iter(fname, 1024*1024, 5);
+  XtcChunkDgIter iter(fname, 1024*1024, 5);
   Dgram::ptr dg;
   dg = iter.next();
   if (not checkDg(dg, false, 100)) return;
@@ -251,7 +251,7 @@ XtcDgIteratorTest::test4()
 }
 
 void
-XtcDgIteratorTest::test5()
+XtcChunkDgIterTest::test5()
 {
   // Test for failed transfer,
   // write ".inprogress" file in a separate thread
@@ -266,7 +266,7 @@ XtcDgIteratorTest::test5()
 
   sleep(1);
 
-  XtcDgIterator iter(fname, 1024*1024, 5);
+  XtcChunkDgIter iter(fname, 1024*1024, 5);
   Dgram::ptr dg;
   dg = iter.next();
   if (not checkDg(dg, false, 100)) return;
@@ -285,7 +285,7 @@ XtcDgIteratorTest::test5()
 }
 
 bool
-XtcDgIteratorTest::checkDg(Dgram::ptr dg, bool empty, int payload)
+XtcChunkDgIterTest::checkDg(Dgram::ptr dg, bool empty, int payload)
 {
   if (not empty and not dg) {
     MsgLog("test1", error, "expected non-empty datagram, got empty");
@@ -305,7 +305,7 @@ XtcDgIteratorTest::checkDg(Dgram::ptr dg, bool empty, int payload)
 
 // function that will write a number of datagrams to output file
 void
-XtcDgIteratorTest::writer1(int ndg, std::string fileName)
+XtcChunkDgIterTest::writer1(int ndg, std::string fileName)
 {
   int fd = open(fileName);
   if (fd < 0) return;
@@ -322,7 +322,7 @@ XtcDgIteratorTest::writer1(int ndg, std::string fileName)
 
 // function that will write a number of datagrams to output file then renames it after timeout
 void
-XtcDgIteratorTest::writer2(int ndg, std::string fileName, std::string finalName, int timeout)
+XtcChunkDgIterTest::writer2(int ndg, std::string fileName, std::string finalName, int timeout)
 {
   writer1(ndg, fileName);
 
@@ -332,7 +332,7 @@ XtcDgIteratorTest::writer2(int ndg, std::string fileName, std::string finalName,
 
 // function that slowly writes a number of datagrams in "slow" mode
 void
-XtcDgIteratorTest::writer3(int ndg, std::string fileName, std::string finalName, int timeout)
+XtcChunkDgIterTest::writer3(int ndg, std::string fileName, std::string finalName, int timeout)
 {
   int fd = open(fileName);
   if (fd < 0) return;
@@ -362,7 +362,7 @@ XtcDgIteratorTest::writer3(int ndg, std::string fileName, std::string finalName,
 }
 
 int
-XtcDgIteratorTest::open(std::string fileName)
+XtcChunkDgIterTest::open(std::string fileName)
 {
   int fd = ::open(fileName.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_SYNC, 0660);
   if (fd < 0) {
@@ -372,7 +372,7 @@ XtcDgIteratorTest::open(std::string fileName)
 }
 
 Dgram::ptr
-XtcDgIteratorTest::makeDgram(size_t payloadSize)
+XtcChunkDgIterTest::makeDgram(size_t payloadSize)
 {
   char* buf = new char[sizeof(Pds::Dgram) + payloadSize];
   Pds::Dgram* dg = (Pds::Dgram*)buf;
@@ -392,4 +392,4 @@ XtcDgIteratorTest::makeDgram(size_t payloadSize)
 
 
 // this defines main()
-APPUTILS_MAIN(XtcInput::XtcDgIteratorTest)
+APPUTILS_MAIN(XtcInput::XtcChunkDgIterTest)
