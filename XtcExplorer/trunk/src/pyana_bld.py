@@ -136,17 +136,31 @@ class  pyana_bld ( object ) :
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
-            ebeam = evt.getEBeam()
+            print evt.keys()
+            if self.psana:
+                ebeam = evt.get("Psana::Bld::BldDataEBeam", "");
+            else:
+                ebeam = evt.getEBeam()
             self.hadEB = True
             if ebeam :
-                beamDmgM = ebeam.uDamageMask
-                beamChrg = ebeam.fEbeamCharge 
-                beamEnrg = ebeam.fEbeamL3Energy
-                beamPosX = ebeam.fEbeamLTUPosX
-                beamPosY = ebeam.fEbeamLTUPosY
-                beamAngX = ebeam.fEbeamLTUAngX
-                beamAngY = ebeam.fEbeamLTUAngY
-                #beamPkCr = ebeam.fEbeamPkCurrBC2
+                if self.psana:
+                    beamDmgM = ebeam.damageMask()
+                    beamChrg = ebeam.ebeamCharge()
+                    beamEnrg = ebeam.ebeamL3Energy()
+                    beamPosX = ebeam.ebeamLTUPosX()
+                    beamPosY = ebeam.ebeamLTUPosY()
+                    beamAngX = ebeam.ebeamLTUAngX()
+                    beamAngY = ebeam.ebeamLTUAngY()
+                    #beamPkCr = ebeam.ebeamPkCurrBC2()
+                else:
+                    beamDmgM = ebeam.uDamageMask
+                    beamChrg = ebeam.fEbeamCharge 
+                    beamEnrg = ebeam.fEbeamL3Energy
+                    beamPosX = ebeam.fEbeamLTUPosX
+                    beamPosY = ebeam.fEbeamLTUPosY
+                    beamAngX = ebeam.fEbeamLTUAngX
+                    beamAngY = ebeam.fEbeamLTUAngY
+                    #beamPkCr = ebeam.fEbeamPkCurrBC2
 
                 self.EB_energies.append(beamEnrg)
                 self.EB_positions.append( [beamPosX,beamPosY] )
