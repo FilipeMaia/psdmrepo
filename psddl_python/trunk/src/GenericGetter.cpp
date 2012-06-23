@@ -106,28 +106,23 @@ namespace Psana {
         string versionedTypeName = addVersion(typeName, minVersion);
         return get(versionedTypeName, getMethod);
       }
-      if (minVersion != maxVersion) {
-        printf("Trying classes '%s' through '%s'.\n",
-               addVersion(typeName, minVersion).c_str(),
-               addVersion(typeName, maxVersion).c_str());
-      }
       int testCount = 0;
       for (int version = maxVersion; version >= minVersion; version--) {
         string versionedTypeName = addVersion(typeName, version);
-        printf("Trying class '%s'...\n", versionedTypeName.c_str());
+        //printf("Trying class '%s'...\n", versionedTypeName.c_str());
         if (typeNameMap.find(versionedTypeName) != typeNameMap.end()) {
           GenericGetter* getter = typeNameMap[versionedTypeName];
           assert(getter != NULL);
-          printf("Found class '%s': %p\n", versionedTypeName.c_str(), getter);
+          //printf("Found class '%s': %p\n", versionedTypeName.c_str(), getter);
           object result = getMethod->get(getter);
           if (result != object()) {
-            printf("Returning result for class '%s'.\n", versionedTypeName.c_str());
+            //printf("Returning result for class '%s'.\n", versionedTypeName.c_str());
             return result;
           }
-          printf("get() failed for class '%s'.\n", versionedTypeName.c_str());
+          //printf("get() failed for class '%s'.\n", versionedTypeName.c_str());
           testCount++;
         } else {
-          printf("Class '%s' was not found.\n", versionedTypeName.c_str());
+          //printf("Class '%s' was not found.\n", versionedTypeName.c_str());
         }
       }
       char buf[1024];
@@ -136,7 +131,7 @@ namespace Psana {
                addVersion(typeName, minVersion).c_str(),
                addVersion(typeName, maxVersion).c_str());
       } else {
-        sprintf(buf, "None of '%s' through '%s' worked.\n", 
+        sprintf(buf, "None of '%s' through '%s' returned a value.\n", 
                addVersion(typeName, minVersion).c_str(),
                addVersion(typeName, maxVersion).c_str());
       }
