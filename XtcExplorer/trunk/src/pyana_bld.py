@@ -136,7 +136,6 @@ class  pyana_bld ( object ) :
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
-            print evt.keys()
             if self.psana:
                 ebeam = evt.get("Psana::Bld::BldDataEBeam", "");
             else:
