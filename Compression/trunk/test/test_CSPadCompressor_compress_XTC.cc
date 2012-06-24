@@ -6,7 +6,7 @@
 #include "Compression/CompressorMT.hh"
 #include "Compression/StreamCompressor.hh"
 
-#include "XtcInput/XtcDgIterator.h"
+#include "XtcInput/XtcChunkDgIter.h"
 
 using namespace Pds::Codec;
 
@@ -48,7 +48,7 @@ namespace {
                   bool         verbose )
         {
             const size_t maxDgramSize = 32*1024*1024;
-            XtcInput::XtcDgIterator itr( infilename, maxDgramSize );
+            XtcInput::XtcChunkDgIter itr( infilename, maxDgramSize );
 
             FILE* outfile = 0;
             if( outfilename ) {

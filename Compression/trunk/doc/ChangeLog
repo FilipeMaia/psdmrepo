@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2012-06-23 Andy Salnikov
+- updated test_CSPadCompressor_compress_XTC for changes in XtcInput package
+
 Tag: V00-00-06
 2011-11-15 Igor Gaponenko
 - fixed bugs in the MT wrapper
