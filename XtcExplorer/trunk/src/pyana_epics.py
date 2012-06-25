@@ -242,8 +242,8 @@ class pyana_epics (object) :
             nrows = 2
         if nplots > 4 :
             ncols = 3
-            nrows = nplots / ncols
-        
+            nrows = np.ceil( float(nplots) / ncols )
+            
         height=3.5
         if nrows * 3.5 > 12 : height = 12/nrows
         width=height*1.3
