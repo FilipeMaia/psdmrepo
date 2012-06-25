@@ -15,6 +15,9 @@
 //-----------------
 
 #include <time.h>
+//#include <iostream>  // for cout
+#include <string>
+using namespace std;
 
 //----------------------
 // Base Class Headers --
@@ -70,6 +73,8 @@ public:
   void startTimeOnce();
   void startTime();
   void stopTime(long nevents=1);
+  void printStartTime();
+  std::string strStartTime();
   double getCurrentTimeInterval();
 
 protected:

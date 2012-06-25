@@ -84,6 +84,7 @@ CSPadMaskApply::beginJob(Event& evt, Env& env)
 {
   getMaskArray();
   if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 4 ) printMaskStatistics();
   if( m_print_bits & 8 ) printMaskArray();
 }
 
@@ -114,6 +115,12 @@ CSPadMaskApply::beginRun(Event& evt, Env& env)
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
   if (config3.get()) {
     for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); }
+    ++ count;
+  }
+
+  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
+  if (config4.get()) {
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); }
     ++ count;
   }
 
@@ -194,14 +201,16 @@ CSPadMaskApply::printInputParameters()
         << "\n mask_control_bits : " << m_mask_control_bits
         << "\n print_bits        : " << m_print_bits
         << "\n";     
-
-    //log << "\n MaxQuads          : " << MaxQuads    
-    //    << "\n MaxSectors        : " << MaxSectors  
-    //    << "\n NumColumns        : " << NumColumns  
-    //    << "\n NumRows           : " << NumRows     
-    //    << "\n SectorSize        : " << SectorSize  
-    //    << "\n";
   }
+
+    MsgLog(name(), debug, 
+           "\n MaxQuads   : "      << MaxQuads  
+        << "\n MaxSectors : "      << MaxSectors
+        << "\n NumColumns : "      << NumColumns
+        << "\n NumRows    : "      << NumRows   
+        << "\n SectorSize : "      << SectorSize
+        << "\n"
+	);
 }
 
 //--------------------
@@ -242,6 +251,14 @@ void
 CSPadMaskApply::printMaskArray()
 {
   m_mask -> print(); 
+}
+
+//--------------------
+
+void 
+CSPadMaskApply::printMaskStatistics()
+{
+  m_mask -> printMaskStatistics(); 
 }
 
 //--------------------

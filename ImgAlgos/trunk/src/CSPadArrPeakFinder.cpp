@@ -89,7 +89,7 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   m_key               = configStr("key",        "");                 //"calibrated"
   m_key_signal_out    = configStr("key_signal_out", "");
   m_key_peaks_out     = configStr("key_peaks_out", "peaks");
-  m_maskFile_inp      = configStr("hot_pix_mask_inp_file", "cspad-pix-mask-in.dat");
+  m_maskFile_inp      = configStr("hot_pix_mask_inp_file", ""); // "cspad-pix-mask-in.dat"
   m_maskFile_out      = configStr("hot_pix_mask_out_file", "cspad-pix-mask-out.dat");
   m_fracFile_out      = configStr("frac_noisy_evts_file",  "cspad-pix-frac-out.dat");
   m_evtFile_out       = configStr("evt_file_out",          "./cspad-ev-");
@@ -218,6 +218,12 @@ CSPadArrPeakFinder::beginRun(Event& evt, Env& env)
     ++ count;
   }
 
+  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
+  if (config4.get()) {
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
+    ++ count;
+  }
+
   if (not count) {
     MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
     terminate();
@@ -321,8 +327,8 @@ CSPadArrPeakFinder::setSelectionMode()
 void 
 CSPadArrPeakFinder::maskUpdateControl()
 {
-  if ( ++m_count_mask_update <  m_nevents_mask_update ) return;
-  if (   m_count_mask_update == m_nevents_mask_update ) { 
+  if ( ++m_count_mask_update <  m_nevents_mask_update+1 ) return;
+  if (   m_count_mask_update == m_nevents_mask_update+1 ) { 
      // Initialization for the mask re-evaluation
 
      if( m_print_bits & 16 ) cout << "Event " << m_count << " Start to collect data for mask re-evaluation cycle\n";
@@ -369,6 +375,7 @@ CSPadArrPeakFinder::procStatArrays()
 	      }
 	      else
 	      {
+                m_mask[iq][is][ic][ir] = 0; 
                 npix_noisy ++;
 	      }
 	      
@@ -383,10 +390,11 @@ CSPadArrPeakFinder::procStatArrays()
 
     float fraction = (npix_total>0) ? float(npix_noisy)/npix_total : 0;
     if( m_print_bits & 2 ) MsgLog(name(), info, 
-                                     "  Collected events for mask update = " << m_count_mask_accum 
-                                  << "  Statistics: Nnoisy = " << npix_noisy
-				  << "  Ntotal = " << npix_total
-                                  << "  Nnoisy/Ntotal pixels = " << fraction );
+                                     "  Event:"                     << m_count
+                                  << "  Collected for mask update:" << m_count_mask_accum 
+                                  << "  Statistics: Nnoisy:"        << npix_noisy
+				  << "  Ntotal:"                    << npix_total
+                                  << "  Nnoisy/Ntotal pixels:"      << fraction );
 }
 
 //--------------------
@@ -553,7 +561,7 @@ CSPadArrPeakFinder::collectStatInQuad(unsigned quad, const int16_t* data)
   int v_size = v_sectAndIndexInArray[quad].size();
 
 //======================
-//#pragma omp parallel for
+#pragma omp parallel for
 //======================
 
   //for (int sect = 0; sect < MaxSectors; ++ sect) {

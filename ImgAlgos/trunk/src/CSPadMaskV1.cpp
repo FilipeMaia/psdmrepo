@@ -57,9 +57,11 @@ CSPadMaskV1::CSPadMaskV1( const std::string& fname )
 
   std::ifstream in(fname.c_str());
   if (not in.good()) {
-    const std::string msg = "Failed to open the mask file: "+fname;
+    const std::string msg = "Failed to open the mask file: "+fname+"\nWill use default mask of all units.";
     MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
+    //throw std::runtime_error(msg);
+    CSPadMaskV1 (1);
+    return;
   }
 
   // Read the entire file content in vector
@@ -136,7 +138,7 @@ void CSPadMaskV1::printMaskStatistics()
       if (p[i] == 1) Nof1++;
   }
 
-  MsgLog(":printMaskStatistics()",  info, "Mask statistics: Nof0: " << Nof0 
+  MsgLog("CSPadMaskV1::printMaskStatistics()",  info, "Mask statistics: Nof0: " << Nof0 
                                        << " Nof1: " << Nof1
                                        << " Ntot: " << SIZE_OF_ARRAY
 	                               << " Nof0 / Ntot = " << float(Nof0)/SIZE_OF_ARRAY );

@@ -1,22 +1,18 @@
-#ifndef IMGALGOS_CSPADMASKAPPLY_H
-#define IMGALGOS_CSPADMASKAPPLY_H
+#ifndef IMGALGOS_TAHOMETER_H
+#define IMGALGOS_TAHOMETER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CSPadMaskApply.
+//	Class Tahometer.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-//#include <iostream>
-//#include <string>
-//#include <vector>
-//#include <fstream>  // open, close etc.
 
 //----------------------
 // Base Class Headers --
@@ -26,8 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h" // for Psana::CsPad::MaxQuadsPerSensor etc.
-#include "ImgAlgos/CSPadMaskV1.h"
+#include "ImgAlgos/TimeInterval.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -54,20 +49,16 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CSPadMaskApply : public Module {
+class Tahometer : public Module {
 public:
 
-    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
-  
-   // Default constructor
-  CSPadMaskApply (const std::string& name) ;
+  typedef double amplitude_t; 
+
+  // Default constructor
+  Tahometer (const std::string& name) ;
 
   // Destructor
-  virtual ~CSPadMaskApply () ;
+  virtual ~Tahometer () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -92,37 +83,25 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-  void printInputParameters();
-  void printEventId(Event& evt);
-  std::string stringTimeStamp(Event& evt);
-  void printMaskArray();
-  void printMaskStatistics();
-  void getMaskArray();
-  void applyMask(Event& evt);
-  void processQuad(unsigned quad, const int16_t* data, int16_t* corrdata);
+  void     printInputParameters();
+  void     procEvent(Event& evt, Env& env);
+
+  void     printEventId(Event& evt);
+  string   stringTimeStamp(Event& evt);
+  string   stringEventN();
 
 private:
 
-  // Data members, this is for example purposes only
-  
-  //Source m_src;         // Data source set from config file
+  unsigned    m_print_bits;
 
-  Pds::Src       m_src;             // source address of the data object
-  std::string    m_str_src;         // string with source name
-  std::string    m_inkey;
-  std::string    m_outkey;
-  std::string    m_fname;
-  int16_t        m_masked_amp;
-  unsigned       m_mask_control_bits;   
-  unsigned       m_print_bits;   
- 
-  long m_count;
+  long        m_dn;
+  long        m_count_dn;
+  long        m_count;
 
-  unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
-  float          m_common_mode[MaxSectors];
-  ImgAlgos::CSPadMaskV1 *m_mask;
+  TimeInterval *m_time;
+  TimeInterval *m_time_dn;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CSPADMASKAPPLY_H
+#endif // IMGALGOS_TAHOMETER_H

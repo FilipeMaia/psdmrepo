@@ -125,6 +125,12 @@ CSPadArrAverage::beginRun(Event& evt, Env& env)
     ++ count;
   }
 
+  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
+  if (config4.get()) {
+    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); }
+    ++ count;
+  }
+
   if (not count) {
     MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
     terminate();

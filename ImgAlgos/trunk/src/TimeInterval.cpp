@@ -40,7 +40,7 @@ namespace ImgAlgos {
 TimeInterval::TimeInterval()
 {
   m_entrance_counter = 0;
-  //startTimeOnce();
+  startTime();
 }
 
 //--------------
@@ -51,7 +51,6 @@ TimeInterval::~TimeInterval()
 }
 
 //--------------------
-
 /// Store and prints time at start of the measured interval
 void 
 TimeInterval::startTimeOnce()
@@ -63,19 +62,14 @@ TimeInterval::startTimeOnce()
 }
 
 //--------------------
-
 /// Store and prints time at start of the measured interval
 void 
 TimeInterval::startTime()
 {
   m_status = clock_gettime( CLOCK_REALTIME, &m_start ); // Get LOCAL time
-  struct tm * timeinfo; timeinfo = localtime ( &m_start.tv_sec ); 
-  char c_time_buf[80]; strftime (c_time_buf, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
-  MsgLog("TimeInterval::startTime", info, "Start time: " << c_time_buf << " and " << m_start.tv_nsec << " nsec");
 }
 
 //--------------------
-
 /// Stop and prints time interval since start
 void 
 TimeInterval::stopTime(long nevents)
@@ -86,7 +80,27 @@ TimeInterval::stopTime(long nevents)
 }
 
 //--------------------
+/// Prints time at start of the measured interval
+void 
+TimeInterval::printStartTime()
+{
+  struct tm * timeinfo; timeinfo = localtime ( &m_start.tv_sec ); 
+  char c_time_buf[80]; strftime (c_time_buf, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
+  MsgLog("TimeInterval::startTime", info, "Start time: " << c_time_buf << " and " << m_start.tv_nsec << " nsec");
+}
 
+
+//--------------------
+/// Prints time at start of the measured interval
+std::string
+TimeInterval::strStartTime()
+{
+  struct tm * timeinfo; timeinfo = localtime ( &m_start.tv_sec ); 
+  char c_time_buf[80]; strftime (c_time_buf, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
+  return std::string(c_time_buf);
+}
+
+//--------------------
 /// Get current time interval since start
 double
 TimeInterval::getCurrentTimeInterval()
