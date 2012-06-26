@@ -91,9 +91,9 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="DataV1" version="1" type_id="Id_EncoderData">
+        <pstype name="DataV1" version="1" type_id="Id_EncoderData">
 		
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
@@ -101,15 +101,20 @@
             <attribute name="_encoder_count" type="uint32_t" accessor="encoder_count">
             </attribute>
 
+            <method name="value" type="int32_t">
+                Lower 24 bits of encoder_count as signed integer value.
+                <expr lang="C++" value="int({self}._encoder_count &lt;&lt; 8)/256;"/>
+            </method>
+
         </pstype>
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="DataV2" version="2" type_id="Id_EncoderData">
+        <pstype name="DataV2" version="2" type_id="Id_EncoderData">
 		
-		    <const name="NEncoders" value="3">
-		    Number of encoders.
-		    </const>
+            <const name="NEncoders" value="3">
+            Number of encoders.
+            </const>
 		
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
@@ -117,6 +122,12 @@
             <attribute name="_encoder_count" type="uint32_t" shape="NEncoders" 
                     accessor="encoder_count" shape_method="encoder_count_shape">
             </attribute>
+
+            <method name="value" type="int32_t">
+                Lower 24 bits of encoder_count as signed integer value.
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="int({self}._encoder_count[i] &lt;&lt; 8)/256;"/>
+            </method>
 
         </pstype>
         

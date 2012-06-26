@@ -11,9 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-05
+2012-06-26 Andy Salnikov
+- Encoder.DataV[12]: added value() method, like in pdsdata classes
+  but implemented slightly differently
+  
 Tag: V00-03-04
 2012-06-22 Andy Salnikov
-- EfrData.EventCodeV5: one member method was incorrectly named 
+- EvrData.EventCodeV5: one member method was incorrectly named 
   (isTerminator instead of isCommand)
   
 Tag: V00-03-03
