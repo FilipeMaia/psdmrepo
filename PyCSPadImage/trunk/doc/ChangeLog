@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-06-25 Mikhail S. Dubrovin
+Tag: V00-00-06
+- Add mirror reflection of pixel coordinates in 
+	evaluateCSPadPixCoordinates (self, rotation=0, mirror=False) and
+        evaluateCSPadPixCoordinatesShapedAsData(self, fname, dsname, rotation=0, mirror=False)
+M       src/CalibParsEvaluated.py
+
+#---------------------
 2012-06-05 Mikhail S. Dubrovin
 Tag: V00-00-05
 - Add evaluation of the pixel coordinate arrays for 

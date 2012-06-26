@@ -324,10 +324,10 @@ class CalibParsEvaluated (object) :
 
 #---------------------
 
-    def evaluateCSPadPixCoordinates (self, rotation=0) :
+    def evaluateCSPadPixCoordinates (self, rotation=0, mirror=False) :
 
         dPhi        = calp.calibpars.getCalibPars ('tilt')
-        detDimX, detDimY, segmX, segmY, segmRotInd = self.getCSPadGeometry (rotation)  
+        detDimX, detDimY, segmX, segmY, segmRotInd = self.getCSPadGeometry (rotation-1) # !!! -1 in order to be consistent with getCSPadGeometry
         nquads      = ccp.cspadconfig.nquads
         nsects      = ccp.cspadconfig.nsects
         pixSize     = ccp.cspadconfig.pixSize
@@ -336,8 +336,12 @@ class CalibParsEvaluated (object) :
         segmX_um = segmX*pixSize
         segmY_um = segmY*pixSize 
 
+        detDimX_um = detDimX*pixSize
+        detDimY_um = detDimY*pixSize
+
         print 'evaluateCSPadPixCoordinates (...):'
         print 'detDimX, detDimY =', detDimX, detDimY
+        print 'detDimX_um, detDimY_um =', detDimX_um, detDimY_um
         print 'nquads, nsects   =', nquads, nsects
 
         self.print2DNumpyArr(segmX_um,   title='Segment center X (um):')
@@ -363,8 +367,13 @@ class CalibParsEvaluated (object) :
                 xc = segmX_um[quad][sect]
                 yc = segmY_um[quad][sect]
 
-                self.pix_global_x[quad][sect][:] = Xrot + xc
-                self.pix_global_y[quad][sect][:] = Yrot + yc
+                if mirror :
+                    self.pix_global_x[quad][sect][:] =  Xrot + xc
+                    self.pix_global_y[quad][sect][:] =  Yrot + yc
+                else :
+                    self.pix_global_x[quad][sect][:] = -Xrot - xc + detDimX_um-1 # mirror wrt X
+                    self.pix_global_y[quad][sect][:] =  Yrot + yc
+                    #self.pix_global_y[quad][sect][:] = -Yrot - yc + detDimY_um # mirror wrt Y
 
 #---------------------
 
@@ -379,11 +388,11 @@ class CalibParsEvaluated (object) :
 
 #---------------------
 
-    def evaluateCSPadPixCoordinatesShapedAsData(self, fname, dsname, rotation=0) :
+    def evaluateCSPadPixCoordinatesShapedAsData(self, fname, dsname, rotation=0, mirror=False) :
 
         print 'Evaluate pix coordinates for fname:', fname
 
-        self.evaluateCSPadPixCoordinates (rotation)
+        self.evaluateCSPadPixCoordinates (rotation, mirror)
 
         ccp.cspadconfig.setCSPadConfiguration(fname, dsname, event=0)
         quadNumsInEvent  = ccp.cspadconfig.quadNumsInEvent
