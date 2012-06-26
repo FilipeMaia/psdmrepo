@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2012-06-26 Andy Salnikov
+- Encoder.DataV[12]: added value() method
+- regenerate whole thing from psddldata V00-03-05
+
 Tag: V00-03-05
 2012-06-22 Andy Salnikov
 - EvrData.EventCodeV5: one member method was incorrectly named
