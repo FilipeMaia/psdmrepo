@@ -102,6 +102,8 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   uint32_t timestamp() const { return _33mhz_timestamp; }
   uint32_t encoder_count() const { return _encoder_count; }
+  /** Lower 24 bits of encoder_count as signed integer value. */
+  int32_t value() const;
   static uint32_t _sizeof()  { return 8; }
 private:
   uint32_t	_33mhz_timestamp;
@@ -121,6 +123,8 @@ public:
   enum { NEncoders = 3 /**< Number of encoders. */ };
   uint32_t timestamp() const { return _33mhz_timestamp; }
   ndarray<uint32_t, 1> encoder_count() const { return make_ndarray(&_encoder_count[0], NEncoders); }
+  /** Lower 24 bits of encoder_count as signed integer value. */
+  int32_t value(uint32_t i) const;
   static uint32_t _sizeof()  { return 4+(4*(NEncoders)); }
 private:
   uint32_t	_33mhz_timestamp;
