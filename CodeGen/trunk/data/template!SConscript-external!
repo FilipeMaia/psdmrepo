@@ -25,11 +25,13 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #    PYDIRSEP - if present and evaluates to True installs python code to a 
 #               separate directory arch/$SIT_ARCH/python/<package>
 #    LIBDIR   - libraries directory, absolute or relative to PREFIX
-#    LINKLIBS - library names to link, or all libs if not present
+#    COPYLIBS - library names to copy
+#    LINKLIBS - library names to link, or all libs if LINKLIBS and COPYLIBS are empty
 #    BINDIR   - binaries directory, absolute or relative to PREFIX
-#    LINKBINS - binary names to link, or all libs if not present
+#    LINKBINS - binary names to link, or all binaries if not present
 #    PKGLIBS  - names of libraries that have to be linked for this package
 #    DEPS     - names of other packages that we depend upon
+#    PKGINFO  - package information, such as RPM package name
 
 
 # here is an example setting up a fictional package
@@ -37,7 +39,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "$package"
 pkg_ver = "0.0.1b"
 
-PREFIX  = os.path.join(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 INCDIR = "include"
 BINDIR = "bin"
 LIBDIR = "lib"

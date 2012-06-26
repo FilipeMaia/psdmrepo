@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2012-06-26 Andy Salnikov
+- replaced "SIT project" with "LCLS project" in python templates
+- updated SConscript templates
+
 Tag: V00-00-23
 2012-02-24 Andy Salnikov
 - updated templates, removed not-so-useful stuff from comments
