@@ -84,6 +84,8 @@ DataV1::~DataV1()
 uint32_t DataV1::timestamp() const { return m_xtcObj->timestamp(); }
 
 uint32_t DataV1::encoder_count() const { return m_xtcObj->encoder_count(); }
+
+int32_t DataV1::value() const { return m_xtcObj->value(); }
 DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Encoder::DataV2()
   , m_xtcObj(xtcPtr)
@@ -97,5 +99,7 @@ DataV2::~DataV2()
 uint32_t DataV2::timestamp() const { return m_xtcObj->timestamp(); }
 
 ndarray<uint32_t, 1> DataV2::encoder_count() const { return m_xtcObj->encoder_count(); }
+
+int32_t DataV2::value(uint32_t i) const { return m_xtcObj->value(i); }
 } // namespace Encoder
 } // namespace psddl_pds2psana

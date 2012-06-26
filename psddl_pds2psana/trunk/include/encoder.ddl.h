@@ -54,6 +54,7 @@ public:
   virtual ~DataV1();
   virtual uint32_t timestamp() const;
   virtual uint32_t encoder_count() const;
+  virtual int32_t value() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -68,6 +69,7 @@ public:
   virtual ~DataV2();
   virtual uint32_t timestamp() const;
   virtual ndarray<uint32_t, 1> encoder_count() const;
+  virtual int32_t value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
