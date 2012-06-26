@@ -1,0 +1,156 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddldata
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-03-05
+2012-06-26 Andy Salnikov
+- Encoder.DataV[12]: added value() method, like in pdsdata classes
+  but implemented slightly differently
+  
+Tag: V00-03-04
+2012-06-22 Andy Salnikov
+- EvrData.EventCodeV5: one member method was incorrectly named 
+  (isTerminator instead of isCommand)
+  
+Tag: V00-03-03
+2012-06-03 Andy Salnikov
+- upgrade to pdsdata V03-07-07
+- cspad adds new type ConfigV4
+
+Tag: V00-03-02
+2012-05-11 Andy Salnikov
+- upgrade to pdsdata V03-07-00
+- evr adds new type ConfigV6
+
+Tag: V00-03-01
+2012-05-03 Andy Salnikov
+- upgrade to pdsdata V03-06-00
+- new packages fli.ddl.xml, oceanoptics.ddl.xml
+- princeton adds new type ConfigV3
+
+Tag: V00-03-00
+2012-05-02 Andy Salnikov
+- all config types now have "config-type" tag
+- evr.ddl.xml: one field is split into bitfields, neded to generate 
+  constructor for HDF5 data  
+
+Tag: V00-02-04
+2012-05-01 Andy Salnikov
+- new class epics.ConfigV1
+
+Tag: V00-02-03
+2012-03-27 Andy Salnikov
+- upgrade to pdsdata V03-04-01
+- new class bld.BldDataEBeamV3
+
+Tag: V00-02-02
+2012-03-14 Andy Salnikov
+- upgrade to pdsdata V03-03-01A
+  - new class timepix.ConfigV2
+
+Tag: V00-02-01
+2012-02-17 Andy Salnikov
+- upgrade to pdsdata V03-02-12
+  - new class timepix.DataV2
+- added diodeGain(int) method (does not exist in pdsdata)
+  and gain enums to ipimb.ConfigV{1,2} classes
+
+Tag: V00-02-00
+2012-02-06 Andy Salnikov
+- added cspad2x2 package
+- moved cspad.MiniElementV1 to cspad2x2.ElementV1
+- added cspad2x2.ConfigV1
+
+Tag: V00-01-01
+2012-01-12 Andy Salnikov
+- adding timepix package
+- Princeton.FrameV1 data() method now return 2-dim array
+- Camera.FrameV1 now has two methods data8() and data16() that return
+  either 8-bit or 16-bit data
+
+Tag: V00-01-00
+2011-12-09 Andrei Salnikov
+- few small changes related to ndarray migration
+- evr.IOChannel is now value-type class
+
+Tag: V00-00-14
+2011-11-12 Andrei Salnikov
+- new class encoder.ConfigV2
+- new package gsc16ai with two classes ConfigV1 and DataV1
+
+Tag: V00-00-13
+2011-10-04 Andrei Salnikov
+- CsPad.Element image data type changed from uint16_t to int16_t,
+  calibration output which is essentially signed can reuse the same
+  definitions
+- methods common_mode(int) and sectionMask() added to CsPad.Element
+  classes, this is to simplify data handling and unify with 
+  calibrated data interface
+
+Tag: V00-00-12
+2011-09-12 Andrei Salnikov
+- adding CsPad.MiniElementV1 class
+
+Tag: V00-00-11
+2011-08-29 Andrei Salnikov
+- added Bld::BldDataPimV1 class
+
+Tag: V00-00-10
+2011-08-22 Andrei Salnikov
+- added Princeton::ConfigV2 class (part of pdsdata V02-13-03)
+
+Tag: V00-00-09
+2011-06-16 Andrei Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-08
+2011-04-26 Andrei Salnikov
+- modified acqiris.DataDescV1Elem so that waveform() method returns 
+  real poinyter to the beginning of the waveform data taking into 
+  account indexFirstPoint() offset.
+
+Tag: V00-00-07
+2011-04-07 Andrei Salnikov
+- added comments everywhere to generate docs for psana classes
+- some bitfields were missing in Control.ConfigV1
+
+Tag: V00-00-06
+2011-04-01 Andrei Salnikov
+- small fix in opal1k.ConfigV1 class
+
+Tag: V00-00-05
+2011-03-31 Andrei Salnikov
+- renamed "dimentions" attribute into "shape"
+- added "shape_method" attribute
+
+Tag: V00-00-04
+2011-03-28 Andrei Salnikov
+- few changes to epics classes:
+  - new intermediate type EpicsPvTimeHeader which is base for all *Time*
+    classes and has a single method stamp()
+  - EpicsPvHeader type has new methods isCtrl(), isTime(), status(), and
+    severity()
+  - precision() method was missing in floating point DBR classes
+
+Tag: V00-00-03
+2011-03-20 Andrei Salnikov
+- removed src and include directories
+- lots of changes in data models, added constructors, reworked epics stuff
+
+Tag: V00-00-02
+2011-01-06 Andrei Salnikov
+- removed C++ files that do not belong here
+
+Tag: V00-00-01
+2011-01-06 Andrei Salnikov
+- first import into repository
+- semi-functional descriptions of all types currently defined
