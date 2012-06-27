@@ -107,7 +107,7 @@ class  pyana_ipimb ( object ) :
 
             # just for information:
             if self.psana:
-                config = env.configStore().get( "Psana::Ipimb::Config" , source )
+                config = env.getConfig("Psana::Ipimb::Config", source)
             else:
                 config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
             if config is not None:
