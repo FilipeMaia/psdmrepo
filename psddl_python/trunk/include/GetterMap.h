@@ -3,12 +3,9 @@
 
 #include <string>
 #include <map>
-//#include <boost/python.hpp>
-//#include <boost/python/class.hpp>
 #include <psddl_python/Getter.h>
 
 namespace Psana {
-  //using boost::python::api::object;
   using std::map;
   using std::string;
 
@@ -27,7 +24,7 @@ namespace Psana {
     const char* getTemplate(const string& typeName, int* versionMin, int* versionMax);
   };
 
-  extern GetterMap envGetterMap;
+  extern GetterMap envObjectStoreGetterMap;
   extern GetterMap eventGetterMap;
 }
 
