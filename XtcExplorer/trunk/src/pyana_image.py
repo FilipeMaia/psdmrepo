@@ -257,10 +257,7 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             address = addr.split('|')[0]
-            if self.psana:
-                self.config = env.configStore().get(self.configtypes[device], address )
-            else:
-                self.config = env.getConfig(self.configtypes[device], address )
+            self.config = env.getConfig(self.configtypes[device], address )
             if not self.config:
                 print '*** %s config object is missing ***'%addr
                 return
@@ -309,15 +306,7 @@ class  pyana_image ( object ) :
             device = addr.split('|')[1].split('-')[0]
             address = addr.split('|')[0]
             detsrc = address.split('-')[0]
-            if self.psana:
-                if device == 'Cspad2x2':
-                    className = 'Psana::CsPad2x2::Element'
-                else:
-                    print "**************************************** Unrecognized device", device
-                    return
-                frame = evt.get( className, detsrc )
-            else:
-                frame = evt.get( self.datatypes[device], detsrc )
+            frame = evt.get( self.datatypes[device], detsrc )
             if frame is None:
                 print "No frame from ", addr
                 return
