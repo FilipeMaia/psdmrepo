@@ -67,12 +67,14 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   , m_evtFile_out()
   , m_rmin()
   , m_dr()
-  , m_SoNThr()
+  , m_SoNThr_noise()
+  , m_SoNThr_signal()
   , m_frac_noisy_imgs()
   , m_peak_npix_min()
   , m_peak_npix_max()
   , m_peak_amp_tot_thr()
   , m_event_npeak_min()
+  , m_event_npeak_max()
   , m_event_amp_tot_thr()
   , m_nevents_mask_update()
   , m_nevents_mask_accum()
@@ -95,17 +97,19 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   m_evtFile_out       = configStr("evt_file_out",          "./cspad-ev-");
   m_rmin              = config   ("rmin",                    3 );
   m_dr                = config   ("dr",                      1 );
-  m_SoNThr            = config   ("SoNThr",                  3 );
-  m_frac_noisy_imgs   = config   ("frac_noisy_imgs",       0.1 ); 
+  m_SoNThr_noise      = config   ("SoNThr_noise",            3 );
+  m_SoNThr_signal     = config   ("SoNThr_signal",          12 );
+  m_frac_noisy_imgs   = config   ("frac_noisy_imgs",       0.9 ); 
 
   m_peak_npix_min     = config   ("peak_npix_min",           4 );
   m_peak_npix_max     = config   ("peak_npix_max",          25 );
-  m_peak_amp_tot_thr  = config   ("peak_amp_tot_thr",      100.);
+  m_peak_amp_tot_thr  = config   ("peak_amp_tot_thr",        0.);
 
   m_event_npeak_min   = config   ("event_npeak_min",        10 );
-  m_event_amp_tot_thr = config   ("event_amp_tot_thr",    1000.);
+  m_event_npeak_max   = config   ("event_npeak_max",     10000 );
+  m_event_amp_tot_thr = config   ("event_amp_tot_thr",       0.);
 
-  m_nevents_mask_update= config   ("nevents_mask_update",  100 );
+  m_nevents_mask_update= config   ("nevents_mask_update",    0 );
   m_nevents_mask_accum = config   ("nevents_mask_accum",    50 );
 
   m_sel_mode_str      = configStr("selection_mode", "SELECTION_ON");
@@ -147,12 +151,14 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n m_evtFile_out         : " << m_evtFile_out  
         << "\n m_rmin                : " << m_rmin    
         << "\n m_dr                  : " << m_dr     
-        << "\n m_SoNThr              : " << m_SoNThr     
+        << "\n m_SoNThr_noise        : " << m_SoNThr_noise     
+        << "\n m_SoNThr_signal       : " << m_SoNThr_signal     
         << "\n m_frac_noisy_imgs     : " << m_frac_noisy_imgs    
         << "\n m_peak_npix_min       : " << m_peak_npix_min     
         << "\n m_peak_npix_max       : " << m_peak_npix_max     
         << "\n m_peak_amp_tot_thr    : " << m_peak_amp_tot_thr  
         << "\n m_event_npeak_min     : " << m_event_npeak_min   
+        << "\n m_event_npeak_max     : " << m_event_npeak_max   
         << "\n m_event_amp_tot_thr   : " << m_event_amp_tot_thr 
         << "\n m_nevents_mask_update : " << m_nevents_mask_update
         << "\n m_nevents_mask_accum  : " << m_nevents_mask_accum 
@@ -614,7 +620,7 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
       MedianResult median = evaluateSoNForPixel(ic,ir,sectData);
 
       // 2) Accumulate statistics of signal or noisy pixels
-      if ( abs( median.SoN ) > m_SoNThr ) m_stat[quad][sect][ic][ir] ++; 
+      if ( abs( median.SoN ) > m_SoNThr_noise ) m_stat[quad][sect][ic][ir] ++; 
 
       // 3) For masked array
       if (m_mask[quad][sect][ic][ir] != 0) {
@@ -624,7 +630,7 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
         //m_signal[quad][sect][ic][ir] = int16_t (median.avg); // for background - test only
 
         // 3b) Mark signal pixel for processing
-        m_proc_status[quad][sect][ic][ir] = ( median.SoN > m_SoNThr ) ? 255 : 0; 
+        m_proc_status[quad][sect][ic][ir] = ( median.SoN > m_SoNThr_signal ) ? 255 : 0; 
       }
       else
       {
@@ -702,7 +708,8 @@ CSPadArrPeakFinder::peakSelector(PeakWork& pw) {
 
   if (pw.peak_npix < m_peak_npix_min)       return false;
   if (pw.peak_npix > m_peak_npix_max)       return false;
-  if (pw.peak_amp_tot < m_peak_amp_tot_thr) return false;  
+
+  if(m_peak_amp_tot_thr > 1 && pw.peak_amp_tot < m_peak_amp_tot_thr) return false;   
   //if (pw.peak_amp_max < m_peak_amp_max_thr) return false;
   return true;
 }
@@ -758,15 +765,19 @@ CSPadArrPeakFinder::printVectorOfPeaks()
 bool
 CSPadArrPeakFinder::eventSelector() {
 
-  m_event_amp_tot = 0;
   if (v_peaks.size() < m_event_npeak_min) return false;
-
-  for( vector<Peak>::const_iterator p  = v_peaks.begin();
-                                    p != v_peaks.end(); p++ ) {
-    m_event_amp_tot += p->amptot;
+  if (v_peaks.size() > m_event_npeak_max) return false;
+  
+  // Threshold on total ADC amplitude of all peaks is applied if m_event_amp_tot_thr is set > 1
+ 
+  if ( m_event_amp_tot_thr > 1 ) {
+    m_event_amp_tot = 0;
+    for( vector<Peak>::const_iterator p  = v_peaks.begin();
+                                      p != v_peaks.end(); p++ ) {
+      m_event_amp_tot += p->amptot;
+    }
+    if (m_event_amp_tot < m_event_amp_tot_thr) return false;
   }
-
-  if (m_event_amp_tot < m_event_amp_tot_thr) return false;
 
   return true;
 }

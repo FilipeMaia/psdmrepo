@@ -177,27 +177,29 @@ protected:
     void printJobSummary();
 
 private:
-  //Source         m_src;             // Data source set from config file
-  Pds::Src       m_src;             // source address of the data object
-  std::string    m_str_src;         // string with source name
-  std::string    m_key;             // string with key name
-  std::string    m_key_signal_out;  // string with key for signal cspad array (background subtracted by median algorithm) 
-  std::string    m_key_peaks_out;   // string with key for found peaks in selected events
-  std::string    m_maskFile_inp;    // [in]  file with mask 
-  std::string    m_maskFile_out;    // [out] file with mask 
-  std::string    m_fracFile_out;    // [out] file with pixel status info: fraction of noisy images (events)
-  std::string    m_evtFile_out;     // [out] file name prefix for event array output
-  float          m_rmin;            // radial parameter of the area for median algorithm
-  float          m_dr;              // radial band width of the area for median algorithm 
-  float          m_SoNThr;          // S/N threshold for outlier pix finder
-  float          m_frac_noisy_imgs; // For hot-pixel mask definition
+  //Source         m_src;              // Data source set from config file
+  Pds::Src       m_src;              // source address of the data object
+  std::string    m_str_src;          // string with source name
+  std::string    m_key;              // string with key name
+  std::string    m_key_signal_out;   // string with key for signal cspad array (background subtracted by median algorithm) 
+  std::string    m_key_peaks_out;    // string with key for found peaks in selected events
+  std::string    m_maskFile_inp;     // [in]  file with mask 
+  std::string    m_maskFile_out;     // [out] file with mask 
+  std::string    m_fracFile_out;     // [out] file with pixel status info: fraction of noisy images (events)
+  std::string    m_evtFile_out;      // [out] file name prefix for event array output
+  float          m_rmin;             // radial parameter of the area for median algorithm   ~2-3
+  float          m_dr;               // radial band width of the area for median algorithm  ~1-2
+  float          m_SoNThr_noise;     // S/N threshold for noisy pixels  ~3
+  float          m_SoNThr_signal;    // S/N threshold for signal pixels ~12
+  float          m_frac_noisy_imgs;  // For hot-pixel mask definition
 
-  unsigned       m_peak_npix_min;    // Peak selection parameters
-  unsigned       m_peak_npix_max;    // 
+  unsigned       m_peak_npix_min;    // Peak selection parameters ~2-4
+  unsigned       m_peak_npix_max;    //                           ~20-25
   double         m_peak_amp_tot_thr; //
 
-  unsigned       m_event_npeak_min;  // Minimum number of peaks in the event for selector
-  double         m_event_amp_tot_thr;// Amplitude threshold on total signal amplitude in all peaks
+  unsigned       m_event_npeak_min;  // Minimum number of peaks in the event for selector ~10
+  unsigned       m_event_npeak_max;  // Minimum number of peaks in the event for selector ~10000
+  double         m_event_amp_tot_thr;// Amplitude threshold on total amplitude in all peaks. 0=off
 
   unsigned       m_nevents_mask_update;
   unsigned       m_nevents_mask_accum;

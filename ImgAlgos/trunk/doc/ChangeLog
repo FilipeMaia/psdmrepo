@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-06-27 Mikhail S. Dubrovin
+	- work on PeakFinder
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadArrPeakFinder.cpp
+	
 2012-06-25 Mikhail S. Dubrovin
 - work on PeakFinder
 M       include/TimeInterval.h
