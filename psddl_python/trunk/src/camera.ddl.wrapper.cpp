@@ -27,7 +27,7 @@ void createWrappers() {
   _CLASS(Psana::Camera::FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFccdConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(FrameFccdConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(FrameFccdConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -43,7 +43,7 @@ void createWrappers() {
   _CLASS(Psana::Camera::FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFexConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(FrameFexConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(FrameFexConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

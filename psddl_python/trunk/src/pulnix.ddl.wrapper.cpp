@@ -24,7 +24,7 @@ void createWrappers() {
   _CLASS(Psana::Pulnix::TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(TM6740ConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -42,7 +42,7 @@ void createWrappers() {
   _CLASS(Psana::Pulnix::TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(TM6740ConfigV2);
+  ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV2);
 
 
 } // createWrappers()

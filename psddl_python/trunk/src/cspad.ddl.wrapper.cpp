@@ -67,7 +67,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV1QuadReg);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -93,7 +93,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2QuadReg_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV2QuadReg);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -117,7 +117,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -143,7 +143,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV2);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -172,7 +172,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV3);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -201,7 +201,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV4_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV4);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\

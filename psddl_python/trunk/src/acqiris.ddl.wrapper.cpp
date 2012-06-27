@@ -67,7 +67,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(ConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -167,7 +167,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::TdcConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TdcConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_GETTER(TdcConfigV1);
+  ADD_ENV_OBJECT_STORE_GETTER(TdcConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
