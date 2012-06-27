@@ -74,12 +74,19 @@ struct Peak{
   double sigma_row;
   double ampmax;
   double amptot;
+  double bkgdtot;
+  double noise;
+  double SoN;
   unsigned npix;
 };
 
 // Stuff for the peak finding algorithm in thread-safe mode
 struct PeakWork{
   unsigned  peak_npix;
+  double    peak_SoN;
+  double    peak_bkgd_tot;
+  double    peak_noise2_tot;
+  double    peak_noise;
   double    peak_amp_tot;
   double    peak_amp_max;
   double    peak_amp_x_col1;
@@ -139,9 +146,11 @@ protected:
     MedianResult evaluateSoNForPixel(unsigned ic,unsigned ir,const int16_t* sectData);
     void iterateOverConnectedPixels(int quad, int sect, int ic, int ir, PeakWork& pw);
     bool peakSelector(PeakWork& pw);
+    void printPeakWork(PeakWork& pw);
     void savePeakInVector(int quad, int sect, PeakWork& pw);
     void makeUnitedPeakVector();
     void printVectorOfPeaks();
+    //void printPeak(int i, Peak* p);
     void maskUpdateControl();
     void setSelectionMode();
     bool eventSelector();
@@ -195,7 +204,8 @@ private:
 
   unsigned       m_peak_npix_min;    // Peak selection parameters ~2-4
   unsigned       m_peak_npix_max;    //                           ~20-25
-  double         m_peak_amp_tot_thr; //
+  double         m_peak_amp_tot_thr; // if >1 then ON, else OFF
+  double         m_peak_SoN_thr;     // Peak S/N threshold
 
   unsigned       m_event_npeak_min;  // Minimum number of peaks in the event for selector ~10
   unsigned       m_event_npeak_max;  // Minimum number of peaks in the event for selector ~10000
@@ -218,6 +228,8 @@ private:
   int16_t        m_mask            [MaxQuads][MaxSectors][NumColumns][NumRows];
   float          m_frac_noisy_evts [MaxQuads][MaxSectors][NumColumns][NumRows];
   int16_t        m_signal          [MaxQuads][MaxSectors][NumColumns][NumRows];
+  int16_t        m_bkgd            [MaxQuads][MaxSectors][NumColumns][NumRows];
+  double         m_noise           [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_proc_status     [MaxQuads][MaxSectors][NumColumns][NumRows];
 
   int16_t*       m_newdata;

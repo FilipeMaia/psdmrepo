@@ -73,6 +73,7 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   , m_peak_npix_min()
   , m_peak_npix_max()
   , m_peak_amp_tot_thr()
+  , m_peak_SoN_thr()
   , m_event_npeak_min()
   , m_event_npeak_max()
   , m_event_amp_tot_thr()
@@ -97,13 +98,14 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   m_evtFile_out       = configStr("evt_file_out",          "./cspad-ev-");
   m_rmin              = config   ("rmin",                    3 );
   m_dr                = config   ("dr",                      1 );
-  m_SoNThr_noise      = config   ("SoNThr_noise",            3 );
-  m_SoNThr_signal     = config   ("SoNThr_signal",          12 );
+  m_SoNThr_noise      = config   ("SoNThr_noise",            3 ); // for noisy pixel counting over frames in m_stat[q][s][r][c] -> mask
+  m_SoNThr_signal     = config   ("SoNThr_signal",           5 ); // for signal pixel selection in m_signal[q][s][r][c]
   m_frac_noisy_imgs   = config   ("frac_noisy_imgs",       0.9 ); 
 
   m_peak_npix_min     = config   ("peak_npix_min",           4 );
   m_peak_npix_max     = config   ("peak_npix_max",          25 );
   m_peak_amp_tot_thr  = config   ("peak_amp_tot_thr",        0.);
+  m_peak_SoN_thr      = config   ("peak_SoN_thr",            7.);
 
   m_event_npeak_min   = config   ("event_npeak_min",        10 );
   m_event_npeak_max   = config   ("event_npeak_max",     10000 );
@@ -157,6 +159,7 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n m_peak_npix_min       : " << m_peak_npix_min     
         << "\n m_peak_npix_max       : " << m_peak_npix_max     
         << "\n m_peak_amp_tot_thr    : " << m_peak_amp_tot_thr  
+        << "\n m_peak_SoN_thr        : " << m_peak_SoN_thr  
         << "\n m_event_npeak_min     : " << m_event_npeak_min   
         << "\n m_event_npeak_max     : " << m_event_npeak_max   
         << "\n m_event_amp_tot_thr   : " << m_event_amp_tot_thr 
@@ -280,6 +283,8 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
 
   procData(evt);
 
+  makeUnitedPeakVector();
+
   bool isSelected = eventSelector();
 
   if( m_print_bits &   4 ) printEventSelectionPars(evt, isSelected);
@@ -341,8 +346,6 @@ CSPadArrPeakFinder::maskUpdateControl()
      resetStatArrays();
      m_count_mask_accum = 0;
   }
-
-  //cout << "Event " << m_count << " is taken for mask re-evaluation\n";
 
   if ( ++m_count_mask_accum < m_nevents_mask_accum ) return;
      // Re-evaluate the mask and reset counter
@@ -443,6 +446,8 @@ void
 CSPadArrPeakFinder::resetSignalArrays()
 {
   std::fill_n(&m_signal     [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
+  std::fill_n(&m_bkgd       [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
+  std::fill_n(&m_noise      [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, double(0));
   std::fill_n(&m_proc_status[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0);
 }
 
@@ -520,6 +525,7 @@ CSPadArrPeakFinder::fillOutputArr(unsigned quad, int16_t* newdata)
      
       // beginning of the segment data
       const int16_t* sectData = &m_signal[quad][sect][0][0];
+      //const int16_t* sectData = &m_bkgd  [quad][sect][0][0]; // for test
       int16_t*       newData  = newdata  + ind_in_arr*SectorSize;
 
       // Copy regular array m_signal[MaxQuads][MaxSectors][NumColumns][NumRows] to data-style array. 
@@ -588,9 +594,6 @@ CSPadArrPeakFinder::collectStatInQuad(unsigned quad, const int16_t* data)
       findPeaksInSect  (quad, sect);
       //cout << "  quad=" << quad << "  sect=" << sect  << "  ind_in_arr=" << ind_in_arr << endl;
   }
-
-  // Outside the parallel threads:
-  makeUnitedPeakVector();
 }
 
 //--------------------
@@ -625,9 +628,10 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
       // 3) For masked array
       if (m_mask[quad][sect][ic][ir] != 0) {
 
-        // 3a) produce signal array
+        // 3a) produce signal/background/noise arrays
         m_signal[quad][sect][ic][ir] = int16_t (median.sig); // for signal
-        //m_signal[quad][sect][ic][ir] = int16_t (median.avg); // for background - test only
+        m_bkgd  [quad][sect][ic][ir] = int16_t (median.avg); // for background
+        m_noise [quad][sect][ic][ir] =          median.rms;  // for noise
 
         // 3b) Mark signal pixel for processing
         m_proc_status[quad][sect][ic][ir] = ( median.SoN > m_SoNThr_signal ) ? 255 : 0; 
@@ -635,6 +639,8 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
       else
       {
         m_signal     [quad][sect][ic][ir] = 0;
+        m_bkgd       [quad][sect][ic][ir] = 0;
+        m_noise      [quad][sect][ic][ir] = 0;
         m_proc_status[quad][sect][ic][ir] = 0;
       }
     }
@@ -659,8 +665,10 @@ CSPadArrPeakFinder::findPeaksInSect(unsigned quad, unsigned sect)
 	// Initialization of the peak parameters
         PeakWork pw;
 	pw.peak_npix       = 0;
-	pw.peak_amp_max    = 0;
+	pw.peak_bkgd_tot   = 0;
+	pw.peak_noise2_tot = 0;
 	pw.peak_amp_tot    = 0;
+	pw.peak_amp_max    = 0;
 	pw.peak_amp_x_col1 = 0;
 	pw.peak_amp_x_col2 = 0;
 	pw.peak_amp_x_row1 = 0;
@@ -682,8 +690,11 @@ void
 CSPadArrPeakFinder::iterateOverConnectedPixels(int quad, int sect, int ic, int ir, PeakWork& pw)
 {
   int16_t amp = m_signal[quad][sect][ic][ir];
+  double noise= m_noise [quad][sect][ic][ir];
 
   pw.peak_npix       ++;
+  pw.peak_bkgd_tot   +=  m_bkgd[quad][sect][ic][ir];
+  pw.peak_noise2_tot +=  noise*noise; // sum the pixel noise quadratically, as randomly fluctuating.
   pw.peak_amp_tot    +=  amp;
   pw.peak_amp_x_col1 += (amp*ic);
   pw.peak_amp_x_col2 += (amp*ic*ic);
@@ -711,7 +722,28 @@ CSPadArrPeakFinder::peakSelector(PeakWork& pw) {
 
   if(m_peak_amp_tot_thr > 1 && pw.peak_amp_tot < m_peak_amp_tot_thr) return false;   
   //if (pw.peak_amp_max < m_peak_amp_max_thr) return false;
+
+     pw.peak_noise = std::sqrt( pw.peak_noise2_tot / pw.peak_npix );
+     pw.peak_SoN = (pw.peak_noise > 0) ? pw.peak_amp_tot / pw.peak_noise : 0;
+  if(pw.peak_SoN < m_peak_SoN_thr) return false;   
+
+  //printPeakWork(pw);
+
   return true;
+}
+
+//--------------------
+// This is for test print only
+void 
+CSPadArrPeakFinder::printPeakWork(PeakWork& pw) {
+    MsgLog(name(), info, 
+             "Peak work struct:" 
+          << "  npix="    << pw.peak_npix
+          << "  bkgd="    << pw.peak_bkgd_tot
+          << "  noise="   << pw.peak_noise
+          << "  amp="     << pw.peak_amp_tot
+          << "  SoN="     << pw.peak_SoN
+	   );
 }
 
 //--------------------
@@ -728,6 +760,9 @@ CSPadArrPeakFinder::savePeakInVector(int quad, int sect, PeakWork& pw) {
   peak.sigma_row = std::sqrt( pw.peak_amp_x_row2/pw.peak_amp_tot - peak.row*peak.row );
   peak.ampmax    = pw.peak_amp_max;
   peak.amptot    = pw.peak_amp_tot;
+  peak.bkgdtot   = pw.peak_bkgd_tot;
+  peak.noise     = pw.peak_noise;
+  peak.SoN       = pw.peak_SoN;
   peak.npix      = pw.peak_npix;
 
   //omp_set_lock(m_lock);
@@ -745,6 +780,7 @@ CSPadArrPeakFinder::printVectorOfPeaks()
   int i=0;
   for( vector<Peak>::const_iterator p  = v_peaks.begin();
                                     p != v_peaks.end(); p++ ) {
+
     MsgLog(name(), info, 
              "  peak:"      << ++i 
           << "  quad="      << p->quad
@@ -752,7 +788,10 @@ CSPadArrPeakFinder::printVectorOfPeaks()
           << "  col="       << p->col
           << "  row="       << p->row
           << "  npix="      << p->npix 
+          << "  SoN="       << p->SoN
           << "  amptot="    << p->amptot
+          << "  noise="     << p->noise
+          << "  bkgdtot="   << p->bkgdtot
           << "  ampmax="    << p->ampmax
           << "  sigma_col=" << p->sigma_col
           << "  sigma_row=" << p->sigma_row
@@ -893,7 +932,7 @@ CSPadArrPeakFinder::evaluateSoNForPixel(unsigned col, unsigned row, const int16_
     res.avg = sum1/sum0;                                // Averaged background level
     res.rms = std::sqrt( sum2/sum0 - res.avg*res.avg ); // RMS os the background around peak
     res.sig = sectData[row + col*NumRows] - res.avg;    // Signal above the background
-    if (res.rms>0) res.SoN = res.sig/res.rms;        // S/N ratio
+    if (res.rms>0) res.SoN = res.sig/res.rms;           // S/N ratio
   }
 
   return res;
