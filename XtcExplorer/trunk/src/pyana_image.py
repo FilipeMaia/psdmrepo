@@ -325,6 +325,12 @@ class  pyana_image ( object ) :
             elif addr.find("Fli")>0:
                 image = frame.data(self.config)
 
+            elif addr.find("Fccd")>0 and self.psana:
+                if frame.depth() > 8:
+                    image = frame.data16()
+                else:
+                    image = frame.data8()
+
             else:
                 # all other cameras have simple arrays. 
                 image = frame.data()
