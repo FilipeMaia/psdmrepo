@@ -102,8 +102,24 @@ namespace {
 
   // Destructor function for Dgrams
   void dgramDtor(Pds::Dgram* dgram) {
-    delete[] (char*)(dgram);
+    PyMem_Free(dgram);
   }
+
+  // produce warning message using loggin.warning() method
+  void log_warn(const char* msg, const char* arg)
+  {
+    if (PyObject* logging = PyImport_ImportModule("logging")) {
+      if (PyObject* logfun = PyDict_GetItemString(PyModule_GetDict(logging), "warning")) {
+        PyObject* args = PyTuple_New(arg ? 2 : 1);
+        PyTuple_SET_ITEM(args, 0, PyString_FromString(msg));
+        if (arg) PyTuple_SET_ITEM(args, 1, PyString_FromString(arg));
+        PyObject_Call(logfun, args, 0);
+        Py_CLEAR(args);
+      }
+      Py_CLEAR(logging);
+    }
+  }
+
 }
 
 //              ----------------------------------------
@@ -195,44 +211,52 @@ PyObject* XtcFileIterator_next( PyObject* self )
 
   // read header
   Pds::Dgram header;
-  if ( fread(&header, sizeof(header), 1, file) != 1 ) {
+  const size_t headerSize = sizeof(header);
+  int nread = fread(&header, 1, headerSize, file);
+  if (nread == 0 and feof(file)) {
+    // EOF, signal end of iteration
+    PyErr_SetNone( PyExc_StopIteration );
+    return 0;
+  } else if (nread != int(headerSize)) {
+    PyObject* fnameObj = PyFile_Name( py_this->m_file );
     if ( feof(file) ) {
+      // generate error message (not an exception)
+      log_warn("EOF while reading Dgram header from file %s", PyString_AsString(fnameObj));
       // signal end of iteration
       PyErr_SetNone( PyExc_StopIteration );
-      return 0;
     } else {
       // something bad happened
-      PyObject* fnameObj = PyFile_Name( py_this->m_file );
       PyErr_SetFromErrnoWithFilename( PyExc_IOError, PyString_AsString(fnameObj) );
-      return 0;
     }
+    return 0;
   }
 
   // get the data size and allocate whole buffer
   size_t payloadSize = header.xtc.sizeofPayload();
-  size_t dgramSize = sizeof(header) + payloadSize;
-  char* buf ;
-  try {
-    buf = new char[dgramSize];
-  } catch ( ... ) {
+  size_t dgramSize = headerSize + payloadSize;
+  char* buf = (char*)PyMem_Malloc(dgramSize);
+  if (not buf) {
     PyErr_Format(PyExc_MemoryError, "Error: failed to allocate buffer memory");
     return 0;
   }
 
   // copy header into new buffer
-  std::copy( (char*)&header, ((char*)&header)+sizeof(header), buf );
+  std::copy( (char*)&header, ((char*)&header)+headerSize, buf );
 
-  // read rest of the data
+  // read rest of the data, if we hit EOF it means incomplete datagram,
+  // just ignore it and stop iteration
   if ( payloadSize ) {
-    if ( fread( buf+sizeof(header), payloadSize, 1, file ) != 1 ) {
+    if ( fread( buf+headerSize, payloadSize, 1, file ) != 1 ) {
       PyObject* fnameObj = PyFile_Name( py_this->m_file );
       if ( feof(file) ) {
-        PyErr_Format( PyExc_EOFError, "EOF while reading Dgram payload in file %s", PyString_AsString(fnameObj) ) ;
+        // generate message using logging.error
+        log_warn("EOF while reading Dgram payload from file %s", PyString_AsString(fnameObj));
+        PyErr_SetNone( PyExc_StopIteration );
       } else {
         PyErr_SetFromErrnoWithFilename( PyExc_IOError, PyString_AsString(fnameObj) );
       }
 
-      delete[] buf;
+      PyMem_Free(buf);
       return 0;
     }
   }

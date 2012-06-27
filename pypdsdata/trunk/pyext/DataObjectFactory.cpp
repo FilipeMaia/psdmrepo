@@ -125,16 +125,17 @@ namespace {
 
   // "destructor" for cloned xtc
   void buf_dealloc(Pds::Xtc* xtc) {
-    delete [] (char*)xtc;
+    PyMem_Free(xtc);
   }
 
-  // make a separate copy of the xtc object not sharing same buffer
+  // make a separate copy of the xtc object not sharing same buffer, return 0 if memory allocation fails
   pypdsdata::Xtc* cloneXtc( const Pds::Xtc& xtc )
   {
     size_t size = xtc.extent ;
-    char* newbuf = new char[size];
+    char* newbuf = (char*)PyMem_Malloc(size);
+    if (not newbuf) return 0;
     const char* oldbuf = (const char*)&xtc;
-    std::copy( oldbuf, oldbuf+size, newbuf);
+    std::copy(oldbuf, oldbuf+size, newbuf);
 
     return pypdsdata::Xtc::PyObject_FromPds( (Pds::Xtc*)newbuf, 0, size, ::buf_dealloc );
   }
@@ -163,7 +164,6 @@ PyObject*
 DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 {
   PyObject* obj = 0;
-  Xtc* clone = 0;
   switch ( xtc.contains.id() ) {
 
   case Pds::TypeId::Any :
@@ -227,9 +227,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
       // some strange kind of damage where Epics data has 0 size
       Py_RETURN_NONE;
     } else {
-      clone = ::cloneXtc( xtc );
-      obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
-      Py_CLEAR(clone);
+      if (Xtc* clone = ::cloneXtc(xtc)) {
+        obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
+        Py_CLEAR(clone);
+      } else {
+        PyErr_Format(PyExc_MemoryError, "Error: failed to allocate buffer memory for XTC clone");
+      }
     }
     break ;
 

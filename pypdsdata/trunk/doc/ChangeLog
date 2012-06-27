@@ -6,6 +6,13 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-68
+2012-06-27 Andy Salnikov
+- switch to Python memory allocation in extension module instead of
+  doing new/delete
+- do not generate exception when EOF is hit while reading datagram,
+  just ignore incomplete datagram (but print warning)
+
 Tag: V00-00-67
 2012-06-07 Andy Salnikov
 - shuffle Timepix::DataV1 before it goes to user, see
