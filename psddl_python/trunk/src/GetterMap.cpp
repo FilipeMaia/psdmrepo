@@ -3,7 +3,7 @@
 
 namespace Psana {
 
-  GetterMap envGetterMap("Psana::Env");
+  GetterMap envObjectStoreGetterMap("Psana::EnvObjectStore");
   GetterMap eventGetterMap("Psana::Event");
 
   void GetterMap::printTables() {
@@ -60,7 +60,7 @@ namespace Psana {
     string _template = prefix + "V%d" + suffix;
 
     typeName = prefix + suffix;
-    printf("%s::addGetter generated template '%s' from '%s'\n", m_className, _template.c_str(), typeName.c_str());
+    //printf("%s::addGetter generated template '%s' from '%s'\n", m_className, _template.c_str(), typeName.c_str());
     if (templateMap.find(typeName) == templateMap.end()) {
       templateMap[typeName] = _template;
       versionMin[typeName] = version;
