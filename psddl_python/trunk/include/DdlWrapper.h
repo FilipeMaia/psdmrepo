@@ -2,7 +2,7 @@
 #define PSANA_DDLWRAPPER_H 1
 
 #include "EventGetter.h"
-#include "EnvGetter.h"
+#include "EnvObjectStoreGetter.h"
 
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>
@@ -29,7 +29,7 @@ associate_PyArrayType(double, PyArray_CDOUBLE);
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return Psana::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
 #define VEC_CONVERT(value, ctype) const ndarray<ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
-#define ADD_ENV_GETTER(x) EnvGetter::addGetter(new x ## _Getter())
+#define ADD_ENV_OBJECT_STORE_GETTER(x) EnvObjectStoreGetter::addGetter(new x ## _Getter())
 #define ADD_EVENT_GETTER(x) EventGetter::addGetter(new x ## _Getter())
 
 #endif // PSANA_DDLWRAPPER_H
