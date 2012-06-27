@@ -53,10 +53,10 @@ public:
   uint32_t trimmedHeight() const { return o->trimmedHeight(); }
 };
 
-  class FccdConfigV1_Getter : public Psana::EnvGetter {
+  class FccdConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::FCCD::FccdConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return FccdConfigV1::Version;
     }
@@ -66,10 +66,10 @@ public:
     }
   };
 
-  class FccdConfigV2_Getter : public Psana::EnvGetter {
+  class FccdConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::FCCD::FccdConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return FccdConfigV2::Version;
     }

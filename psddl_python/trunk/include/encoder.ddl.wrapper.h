@@ -60,6 +60,7 @@ public:
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
   uint32_t timestamp() const { return o->timestamp(); }
   uint32_t encoder_count() const { return o->encoder_count(); }
+  int32_t value() const { return o->value(); }
 };
 
 class DataV2_Wrapper {
@@ -72,12 +73,13 @@ public:
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
   uint32_t timestamp() const { return o->timestamp(); }
   vector<uint32_t> encoder_count() const { VEC_CONVERT(o->encoder_count(), uint32_t); }
+  int32_t value(uint32_t i) const { return o->value(i); }
 };
 
-  class ConfigV1_Getter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Encoder::ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
@@ -87,10 +89,10 @@ public:
     }
   };
 
-  class ConfigV2_Getter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Encoder::ConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }

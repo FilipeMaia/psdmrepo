@@ -100,7 +100,7 @@ public:
   EventCodeV5_Wrapper(EventCodeV5* obj) : o(obj) {}
   uint16_t code() const { return o->code(); }
   uint8_t isReadout() const { return o->isReadout(); }
-  uint8_t isTerminator() const { return o->isTerminator(); }
+  uint8_t isCommand() const { return o->isCommand(); }
   uint8_t isLatch() const { return o->isLatch(); }
   uint32_t reportDelay() const { return o->reportDelay(); }
   uint32_t reportWidth() const { return o->reportWidth(); }
@@ -322,10 +322,10 @@ public:
     }
   };
 
-  class PulseConfigV3_Getter : public Psana::EnvGetter {
+  class PulseConfigV3_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::PulseConfigV3";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<PulseConfigV3> result = store.get(source, foundSrc);
       return result.get() ? object(PulseConfigV3_Wrapper(result)) : object();
@@ -382,10 +382,10 @@ public:
     }
   };
 
-  class ConfigV1_Getter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
@@ -395,10 +395,10 @@ public:
     }
   };
 
-  class ConfigV2_Getter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }
@@ -408,10 +408,10 @@ public:
     }
   };
 
-  class ConfigV3_Getter : public Psana::EnvGetter {
+  class ConfigV3_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV3";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV3::Version;
     }
@@ -421,10 +421,10 @@ public:
     }
   };
 
-  class ConfigV4_Getter : public Psana::EnvGetter {
+  class ConfigV4_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV4";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV4::Version;
     }
@@ -444,20 +444,20 @@ public:
     }
   };
 
-  class SequencerConfigV1_Getter : public Psana::EnvGetter {
+  class SequencerConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::SequencerConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<SequencerConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(SequencerConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV5_Getter : public Psana::EnvGetter {
+  class ConfigV5_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV5";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV5::Version;
     }
@@ -467,10 +467,10 @@ public:
     }
   };
 
-  class ConfigV6_Getter : public Psana::EnvGetter {
+  class ConfigV6_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::ConfigV6";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV6::Version;
     }
@@ -513,10 +513,10 @@ public:
     }
   };
 
-  class IOConfigV1_Getter : public Psana::EnvGetter {
+  class IOConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::EvrData::IOConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return IOConfigV1::Version;
     }

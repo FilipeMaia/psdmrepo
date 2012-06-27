@@ -110,10 +110,10 @@ public:
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 
-  class DiodeFexConfigV1_Getter : public Psana::EnvGetter {
+  class DiodeFexConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Lusi::DiodeFexConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return DiodeFexConfigV1::Version;
     }
@@ -123,10 +123,10 @@ public:
     }
   };
 
-  class DiodeFexConfigV2_Getter : public Psana::EnvGetter {
+  class DiodeFexConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Lusi::DiodeFexConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return DiodeFexConfigV2::Version;
     }
@@ -149,10 +149,10 @@ public:
     }
   };
 
-  class IpmFexConfigV1_Getter : public Psana::EnvGetter {
+  class IpmFexConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Lusi::IpmFexConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return IpmFexConfigV1::Version;
     }
@@ -162,10 +162,10 @@ public:
     }
   };
 
-  class IpmFexConfigV2_Getter : public Psana::EnvGetter {
+  class IpmFexConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Lusi::IpmFexConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return IpmFexConfigV2::Version;
     }
@@ -188,10 +188,10 @@ public:
     }
   };
 
-  class PimImageConfigV1_Getter : public Psana::EnvGetter {
+  class PimImageConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Lusi::PimImageConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return PimImageConfigV1::Version;
     }

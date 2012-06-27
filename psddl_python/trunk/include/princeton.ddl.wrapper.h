@@ -123,10 +123,10 @@ public:
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 
-  class ConfigV1_Getter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Princeton::ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
@@ -136,10 +136,10 @@ public:
     }
   };
 
-  class ConfigV2_Getter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Princeton::ConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }
@@ -149,10 +149,10 @@ public:
     }
   };
 
-  class ConfigV3_Getter : public Psana::EnvGetter {
+  class ConfigV3_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Princeton::ConfigV3";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV3::Version;
     }

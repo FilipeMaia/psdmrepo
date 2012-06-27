@@ -174,20 +174,20 @@ public:
     }
   };
 
-  class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
+  class ConfigV1QuadReg_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::CsPad2x2::ConfigV1QuadReg";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<ConfigV1QuadReg> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV1QuadReg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::CsPad2x2::ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }

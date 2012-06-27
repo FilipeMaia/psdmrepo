@@ -100,10 +100,10 @@ public:
     }
   };
 
-  class FrameFccdConfigV1_Getter : public Psana::EnvGetter {
+  class FrameFccdConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Camera::FrameFccdConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return FrameFccdConfigV1::Version;
     }
@@ -113,10 +113,10 @@ public:
     }
   };
 
-  class FrameFexConfigV1_Getter : public Psana::EnvGetter {
+  class FrameFexConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Camera::FrameFexConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return FrameFexConfigV1::Version;
     }

@@ -122,10 +122,10 @@ public:
   float channel3psVolts() const { return o->channel3psVolts(); }
 };
 
-  class ConfigV1_Getter : public Psana::EnvGetter {
+  class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Ipimb::ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
@@ -135,10 +135,10 @@ public:
     }
   };
 
-  class ConfigV2_Getter : public Psana::EnvGetter {
+  class ConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Ipimb::ConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }

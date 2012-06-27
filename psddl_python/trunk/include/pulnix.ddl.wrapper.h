@@ -58,10 +58,10 @@ public:
   uint8_t output_resolution_bits() const { return o->output_resolution_bits(); }
 };
 
-  class TM6740ConfigV1_Getter : public Psana::EnvGetter {
+  class TM6740ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV1";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return TM6740ConfigV1::Version;
     }
@@ -71,10 +71,10 @@ public:
     }
   };
 
-  class TM6740ConfigV2_Getter : public Psana::EnvGetter {
+  class TM6740ConfigV2_Getter : public Psana::EnvObjectStoreGetter {
   public:
   const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV2";}
-  const char* getGetterClassName() { return "Psana::EnvGetter";}
+  const char* getGetterClassName() { return "Psana::EnvObjectStoreGetter";}
     int getVersion() {
       return TM6740ConfigV2::Version;
     }
