@@ -106,16 +106,9 @@ class PyanaOptions( object ):
         """
         if options_string is None: return None
 
-        opt = self.getOptStrings(options_string)
-        N = len(opt)
-        if N is 1:
-            return int(opt)
-        if N > 1 :
-            items = []
-            for item in opt :
-                items.append( int(item) )
-            return items
-            
+        opt_strings = self.getOptStrings(options_string)
+        return [int(item) for item in opt_strings ]
+    
 
     def getOptInteger(self, options_string):
         """Return a single integer

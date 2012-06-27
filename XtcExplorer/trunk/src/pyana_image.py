@@ -480,22 +480,14 @@ class  pyana_image ( object ) :
         # make plot? if so, pass this info to the event. 
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
-            # update averages / info for the event
-            self.update()
-            
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            # convert dict to a list:
-            data_images = []
-            for source in self.sources :
-                data_images.append( self.data[source] )
-
-            print data_images
-            print self.data.items()
+            # update averages / info for the event
+            data_image = self.update_plot_data()
             
             # give the list to the event object
-            evt.put( data_images, 'data_images' )
+            evt.put( data_image, 'data_image' )
                                                             
 
         # -----------------------------------
@@ -504,25 +496,10 @@ class  pyana_image ( object ) :
         if (self.output_file is not None) and (self.n_saved < self.max_save) : 
             self.n_saved += 1
 
-            # update averages
-            self.update()
+            # update averages / info for the event
+            data_image = self.update_plot_data()
 
-            images_for_saving = []
-            for addr in self.sources:
-                if 'image' in self.quantities:
-                    images_for_saving.append( ('image', '%s ev %d'%(addr,self.n_shots), self.data[addr].image ))
-
-                if 'roi' in self.quantities:
-                    images_for_saving.append( ('roi', '%s ev %d'%(addr,self.n_shots), self.data[addr].roi ))
-
-                if 'average' in self.quantities:
-                    images_for_saving.append( ('average', '%s ev %d'%(addr,self.n_shots), self.data[addr].average ))
-                if 'darks' in self.quantities:
-                    images_for_saving.append( ('avgdark', '%s ev %d'%(addr,self.n_shots), self.data[addr].avgdark ))
-                if 'maximum' in self.quantities:
-                    images_for_saving.append( ('maximum', '%s ev %d'%(addr,self.n_shots), self.data[addr].maximum ))
-                
-            self.save_images( self.output_file, images_for_saving, self.n_shots )
+            self.save_images( self.output_file )
 
 
         # --------- Reset -------------
@@ -542,110 +519,103 @@ class  pyana_image ( object ) :
         if (env.subprocess()>0):
             return
 
-
-        # update averages / info for the event
-        self.update()
-
         # flag for pyana_plotter
         evt.put(True, 'show_event')
             
-        # convert dict to a list:
-        data_image = []
-        for source in self.sources :
-            data_image.append( self.data[source] )
+        # update averages / info for the event
+        data_image = self.update_plot_data()
+
         # give the list to the event object
-        evt.put( data_image, 'data_images' )
+        evt.put( data_image, 'data_image' )
             
-
-        if (self.output_file is not None):
-
-            images_for_saving = []
-            for addr in self.sources:
-                print "Adding to list: ", addr, dir(self.data[addr])
-                if 'image' in self.quantities:
-                    images_for_saving.append( ('image', '%s ev %d'%(addr,self.n_shots), self.data[addr].image ))
-
-                if 'roi' in self.quantities:
-                    images_for_saving.append( ('roi', '%s ev %d'%(addr,self.n_shots), self.data[addr].roi ))
-
-                if 'average' in self.quantities:
-                    images_for_saving.append( ('average', '%s ev %d'%(addr,self.n_shots), self.data[addr].average ))
-                if 'darks' in self.quantities:
-                    images_for_saving.append( ('avgdark', '%s ev %d'%(addr,self.n_shots), self.data[addr].avgdark ))
-                if 'maximum' in self.quantities:
-                    images_for_saving.append( ('maximum', '%s ev %d'%(addr,self.n_shots), self.data[addr].maximum ))
-                
-            self.save_images( self.output_file, images_for_saving)
-
+        if self.output_file is not None :
+            self.save_images( self.output_file, 'endjob' )
+        
         return
 
 
 
-
-    # ---------------------------------------------------------------------------------------
-    def update(self):
+    def update_plot_data(self):
         # Update data for storage and plotting
-        for addr in self.sources:
-            # collect averages
+        # convert lists to arrays and dict to a list:
+        data_image = []
+        for source in self.sources :
+            self.data[source].counter = self.n_good[source]
             if 'average' in self.quantities:
-                #print "saving average from ", self.n_good[addr], " events. "
-                self.data[addr].counter = self.n_good[addr]
-                self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
-
-            ## collect maximum
+                self.data[source].average = np.float_(self.sum_good_images[source])/self.n_good[source]
             if 'maximum' in self.quantities:
-                self.data[addr].counter = self.n_good[addr]
-                self.data[addr].maximum = self.max_good_images[addr]
-
-            ## collect avg darks
+                self.data[source].maximum = self.max_good_images[source]
             if 'darks' in self.quantities:
-                self.data[addr].ndark = self.n_dark[addr]
-                self.data[addr].avgdark = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
-                            
+                self.data[source].ndark   = self.n_dark[source]
+                self.data[source].avgdark = np.float_(self.sum_dark_images[source])/self.n_dark[source]
+            #
+            data_image.append( self.data[source] )
+        #
+        return data_image
 
-    def save_images(self, filename, image_list, event=None ):
 
-        for name,title,array in image_list :
+    def save_images(self, filenameproto, label=None ):
+        """ Save requested images to file """
+
+        # First, make a list
+        images_for_saving = []
+        for addr in self.sources:
+
+            if label is None: 
+                label = '%s shot%d'%(addr,self.n_shots)
+            else :
+                label = "%s %s"%(addr,label)
+                
+            if 'image' in self.quantities:
+                images_for_saving.append( ('image', label, self.data[addr].image ))    
+            if 'roi' in self.quantities:
+                images_for_saving.append( ('roi', label, self.data[addr].roi ))
+
+            if 'average' in self.quantities:
+                images_for_saving.append( ('average', label, self.data[addr].average ))
+            if 'darks' in self.quantities:
+                images_for_saving.append( ('avgdark', label, self.data[addr].avgdark ))
+            if 'maximum' in self.quantities:
+                images_for_saving.append( ('maximum', label, self.data[addr].maximum ))
+                
+
+        # For each item in the files, print to output
+        for name,title,array in images_for_saving:
             
-            fname = filename.split('.')
-            label = "%s_r%03d"%(name,self.run) #address.replace("|","_").strip()
+            fname = filenameproto.split('.')
+            device, lbl = label.split()
+            identifier = "%s_%s_r%04d_%s"%(name,
+                                           device.replace('|',':').replace('-','.'),
+                                           self.run, lbl) 
             
             thename = ''
             for i in range (len(fname)-1):
-                thename+="%s"%fname[i]
-                
-                thename+="_%s"%label
-
-                if event is not None:
-                    thename+="_ev%d"%event
-
+                thename+="%s"%fname[i] 
+                thename+="_%s"%identifier
                 thename+=".%s"%fname[-1]
-
                 print "Saving \"%s\" (%s) %s to file %s"% (name, title, array.shape, thename)
 
-                array = array.astype(self.output_format)
-                
+                array = array.astype(self.output_format)                
                 # output files... 
-                if fname[-1] == "txt" :  # Ascii
+
+                if fname[-1] == "txt" :    # Ascii
                     np.savetxt(thename, array, fmt="%d")
 
-                elif fname[-1] == "npy" : # Numpy binary 
+                elif fname[-1] == "npy" :  # Numpy binary 
                     np.save(thename, array)
 
-                elif fname[-1] == 'dat' : # Raw binary
-                    array.tofile(thename)
-                elif fname[-1] == 'bin' : # Raw binary
+                elif (fname[-1] == 'dat' or
+                      fname[-1] == 'bin') : # Raw binary
                     array.tofile(thename)
 
-                elif fname[-1] == "hdf5":
-                    #print "HDF5 not implemented yet"
+                elif fname[-1] == "hdf5":  # HDF5
                     import h5py
                     file_handle = h5py.File(thename, 'w')
                     group = file_handle.create_group("Data")
                     dataset = group.create_dataset(title,data=array)
                     file_handle.close()                    
 
-                elif fname[-1] == "mat":
+                elif fname[-1] == "mat":    # MATLAB file
                     import scipy.io
                     scipy.io.savemat(thename,{title:array})
 

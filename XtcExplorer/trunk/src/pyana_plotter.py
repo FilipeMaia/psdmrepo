@@ -70,8 +70,8 @@ class pyana_plotter (object) :
     #  Constructor --
     #----------------
     def __init__ ( self,
-                   display_mode = "Interactive",
-                   ipython         = "False"):
+                   display_mode = None,
+                   ipython      = "False"):
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
@@ -82,18 +82,22 @@ class pyana_plotter (object) :
         """
         self.n_shots = 0
 
-        self.display_mode = None
-        if display_mode == "NoDisplay" : self.display_mode = 0
-        if display_mode == "SlideShow" :   self.display_mode = 1
-        if display_mode == "Interactive" : self.display_mode = 2
-        if self.display_mode is None:
-            print "Unknown display mode %s, using NoDisplay (0)"%display_mode
-            self.display_mode = 0
-            
-        opt = PyanaOptions() # convert option string to appropriate type        
-        self.ipython      = opt.getOptBoolean(ipython)
+        # --- Display mode ---
+        # Use dictionary to interpret the display mode parameter.
+        dmode_dict = {"NoDisplay"  : 0,    "0" : 0,    None : 0,  # default
+                      "SlideShow"  : 1,    "1" : 1,
+                      "Interactive": 2,    "2" : 2
+                      }
+        # The local track-keeper parameter is an integer
+        self.display_mode = dmode_dict[ display_mode ]
 
+        # DataDisplay is an object defined in displaytools. Keeps track of everything.
         self.data_display = DataDisplay(self.display_mode)
+
+        # --- IPython ---
+        # Launch ipython after plot (boolean)
+        self.ipython = PyanaOptions().getOptBoolean(ipython)
+        
 
     #-------------------
     #  Public methods --
@@ -209,34 +213,34 @@ class pyana_plotter (object) :
 
         #
         # get pointer to the data from each of the modules
-        data_blds = evt.get('data_blds') 
-        if data_blds is not None:
-            self.data_display.show_bld(data_blds)
+        data_bld = evt.get('data_bld') 
+        if data_bld is not None:
+            self.data_display.show_bld(data_bld)
 
-        data_ipimbs = evt.get('data_ipimbs') 
-        if data_ipimbs is not None: 
-            self.data_display.show_ipimb(data_ipimbs)
+        data_ipimb = evt.get('data_ipimb') 
+        if data_ipimb is not None: 
+            self.data_display.show_ipimb(data_ipimb)
                 
-        data_images = evt.get('data_images') 
-        print "Data images: ", data_images
-        if data_images is not None:
-            self.data_display.show_image(data_images)
+        data_image = evt.get('data_image') 
+        print "Data images: ", data_image
+        if data_image is not None:
+            self.data_display.show_image(data_image)
 
         data_wf = evt.get('data_wf') 
         if data_wf is not None:
             self.data_display.show_wf(data_wf)
             
-        if self.ipython:
-            plt.draw()
-            self.launch_ipython(evt)
-
-
         if self.display_mode == 1:
             # SlideShow
             plt.draw()
 
+        if self.ipython:
+            plt.draw()
+            self.launch_ipython(evt)
+
         elif self.display_mode == 2:
             # Interactive
+            plt.ioff()
             plt.show()
 
 
@@ -244,9 +248,9 @@ class pyana_plotter (object) :
         """Launch an ipython session with access to data stored in the evt object
         """
         # get pointer to the data from each of the modules
-        data_ipimb = evt.get('data_ipimb')
-        if data_ipimb :  print "data_ipimb: ", data_ipimb
-        else :           del data_ipimb
+        data_ipimbs = evt.get('data_ipimb')
+        if data_ipimbs :  print "data_ipimb: ", data_ipimbs
+        else :           del data_ipimbs
         
         data_bld = evt.get('data_bld')
         if data_bld :   print "data_bld: ", data_bld
@@ -276,11 +280,11 @@ class pyana_plotter (object) :
         if data_cspad:  print "data_cspad: ", data_cspad
         else:           del data_cspad
         
-        ipshell = IPShellEmbed(argv=['-pi1','In \\# >> ','-po','Out \\#: '], 
+        ipshell = IPShellEmbed(argv=['','-pylab', '-pi1','In \\# >> ','-po','Out \\#: '], 
                                banner='--------- Dropping into iPython ---------',
                                exit_msg='--------- Leaving iPython -------------')
         
-        ipshell("Called from endjob. \nTry 'whos' to see the workspace. " \
-                "\nHit Ctrl-D to exit iPython and continue program.")
+        ipshell("\nType 'whos' to see the workspace. " \
+                "\nHit Ctrl-D to exit iPython and continue the analysis program.")
         
         

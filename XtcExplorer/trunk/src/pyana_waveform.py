@@ -59,6 +59,8 @@ class pyana_waveform (object) :
     #----------------
     def __init__ ( self, 
                    sources = None,
+                   channels = None,
+                   wf_window = None,
                    plot_every_n = None,
                    accumulate_n = "0",
                    fignum = "1",
@@ -69,6 +71,8 @@ class pyana_waveform (object) :
         are passed as strings, convert to correct type before use.
 
         @param sources         List of DetInfo addresses of Acqiris type
+        @param channels        List of channels (default: all)
+        @param wf_window       Waveform window (array units)
         @param plot_every_n    Frequency of plot updates
         @param accumulate_n    Accumulate all or reset the array every n shots
         @param fignum          Figure number for matplotlib
@@ -79,6 +83,11 @@ class pyana_waveform (object) :
         opt = PyanaOptions()
         self.sources = opt.getOptStrings( sources )
         self.quantities = opt.getOptString( quantities )
+        self.channels = opt.getOptIntegers( channels ) 
+
+        self.wf_window = None
+        if wf_window is not None:
+            self.wf_window = [int(time) for time in wf_window.split('-')]
 
         self.plot_every_n = opt.getOptInteger( plot_every_n )
         self.accumulate_n = opt.getOptInteger( accumulate_n )
@@ -152,23 +161,30 @@ class pyana_waveform (object) :
             nsmp = cfg.horiz().nbrSamples()
             unit = cfg.horiz().sampInterval() * 1.0e9 # nano-seconds
             span = nsmp * unit
-            print "%s has %d channels, wf window %.5f ns, %d samples"%(source,nch,span,nsmp)
+
+            if self.wf_window is None:
+                self.wf_window = [ 0, nsmp ]
+
+            print "\n%s has %d channels... "%(source, nch)
+            print "Window of %.5f ns, (%d samples, %d ns each)"%(span,nsmp,unit)
             
             for i in range (0, nch ):
+                if self.channels is not None and i not in self.channels : continue
                 label =  "%s Ch%s" % (source,i) 
                 self.src_ch.append(label)                    
 
                 self.data[label] = WaveformData( label )
-                
+
+                width = self.wf_window[1] - self.wf_window[0]
                 self.ctr[label] = 0
                 self.ts[label] = None
-                self.wf[label] = np.empty( nsmp, dtype='float64')
-                self.wf_accum[label] = np.empty( nsmp, dtype='float64')
-                self.wf2_accum[label] = np.empty( nsmp, dtype='float64')
+                self.wf[label] = np.empty( width, dtype='float64')
+                self.wf_accum[label] = np.empty( width, dtype='float64')
+                self.wf2_accum[label] = np.empty( width, dtype='float64')
                 
                 self.wf_stack[label] = None
                 if self.accumulate_n > 0 :
-                    self.wf_stack[label] = np.empty( (self.accumulate_n, nsmp), dtype='float64')
+                    self.wf_stack[label] = np.empty( (self.accumulate_n, width), dtype='float64')
                 else :
                     self.wf_stack[label] = []
                     
@@ -226,6 +242,7 @@ class pyana_waveform (object) :
             if acqData :
                 if self.ts[label] is None:
                     if self.psana:
+                        print "$@%!$#**#@ ... if you see a crash here, it's probably Ingrid's fault"
                         elem = acqData.data(channel) # this is a DataDescElem
                         print "*** elem.nbrSamplesInSeg()=", elem.nbrSamplesInSeg() # e.g. 1000
                         print "*** elem.indexFirstPoint()=", elem.indexFirstPoint() # e.g. 0
@@ -235,17 +252,18 @@ class pyana_waveform (object) :
                         print "*** len(elem.timestamp)=", len(timestamp)
                         print "*** elem.nbrSegments()=", elem.nbrSegments()
                         timestamps = [ timestamp[i].pos() * 1.0e9 for i in range(elem.nbrSegments()) ]  # nano-seconds
-                        self.ts[label] = timestamps
+                        self.ts[label] = timestamps[self.wf_window[0]:self.wf_window[1]]
                         print "self.ts[", label, "] = ", self.ts[label]
                     else:
-                        self.ts[label] = acqData.timestamps() * 1.0e9 # nano-seconds
+                        self.ts[label] = acqData.timestamps()[self.wf_window[0]:self.wf_window[1]] * 1.0e9
+                        # nano-seconds
 
                 # a waveform
                 if self.psana:
                     elem = acqData.data(channel) # this is a DataDescElem
-                    awf = elem.waveforms()[0]
+                    awf = elem.waveforms()[0][self.wf_window[0]:self.wf_window[1]]
                 else:
-                    awf = acqData.waveform()
+                    awf = acqData.waveform()[self.wf_window[0]:self.wf_window[1]]
                 
                 self.ctr[label]+=1
                 

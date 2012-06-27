@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-June-27 ofte
+	- waveforms channel number parameter
+	- waveforms window (region of interest)
+	- some tidying up of pyana_images
+	
 2012-June-22 ofte
 	- Small fixes. 
 	

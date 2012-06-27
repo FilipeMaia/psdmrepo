@@ -240,9 +240,9 @@ class  pyana_bld ( object ) :
 
             evt.put(True, 'show_event')
 
-            data_blds = self.update_plot_data()
+            data_bld = self.update_plot_data()
     
-            evt.put(data_blds, 'data_blds')
+            evt.put(data_bld, 'data_bld')
 
             
         # --------- Reset -------------
@@ -260,9 +260,9 @@ class  pyana_bld ( object ) :
         
         evt.put(True, 'show_event')
         
-        data_blds = self.update_plot_data()
+        data_bld = self.update_plot_data()
     
-        evt.put(data_blds, 'data_blds')
+        evt.put(data_bld, 'data_bld')
         # flag for pyana_plotter
         evt.put(True, 'show_event')
 
