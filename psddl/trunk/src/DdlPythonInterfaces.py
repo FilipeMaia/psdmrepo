@@ -240,12 +240,12 @@ class DdlPythonInterfaces ( object ) :
 
     def _getGetterClassForType(self, type):
         if re.match(r'.*(Data|DataDesc|Element)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "Psana::EvtGetter"
+            return "Psana::EventGetter"
         elif re.match(r'.*(Config)[A-Za-z]*V[1-9][0-9]*', type.name):
             return "Psana::EnvGetter"
         else:
             # Guess what type of Getter to use
-            return "Psana::EvtGetter";
+            return "Psana::EventGetter";
 
     def _createGetterClass(self, type):
         getter_class = self._getGetterClassForType(type)
@@ -256,29 +256,20 @@ class DdlPythonInterfaces ( object ) :
         print >>self.inc, ''
         print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
         print >> self.inc, '  public:'
-        print >> self.inc, '    const char* getTypeName() {'
-        print >> self.inc, T('      return "${namespace_prefix}${type_name}";')(locals())
-        print >> self.inc, '    }'
+        print >> self.inc, T('  const char* getTypeName() { return "${namespace_prefix}${type_name}";}')(locals())
+        print >> self.inc, T('  const char* getGetterClassName() { return "${getter_class}";}')(locals())
         if type.version is not None:
             print >> self.inc, '    int getVersion() {'
             print >> self.inc, T('      return ${type_name}::Version;')(locals())
             print >> self.inc, '    }'
-        if getter_class == "Psana::EvtGetter":
-            print >> self.inc, T('    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
-            print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(key, foundSrc);')(locals())
-            print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
-            print >> self.inc, '    }'
-            print >> self.inc, T('    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
-            print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(src, key, foundSrc);')(locals())
-            print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
-            print >> self.inc, '    }'
-            print >> self.inc, T('    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {')(locals())
+        if getter_class == "Psana::EventGetter":
+            print >> self.inc, T('    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {')(locals())
             print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(source, key, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
             print >> self.inc, '    }'
         elif getter_class == "Psana::EnvGetter":
-            print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {')(locals())
-            print >> self.inc, T('      boost::shared_ptr<$type_name> result = store.get(src, 0);')(locals())
+            print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {')(locals())
+            print >> self.inc, T('      boost::shared_ptr<$type_name> result = store.get(source, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
             print >> self.inc, '    }'
         print >> self.inc, '  };'
@@ -349,8 +340,11 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, T('  std_vector_class_($name);')(locals())
         print >>self.cpp, '#undef _CLASS';
 
-        if self._getGetterClassForType(type):
-            print >>self.cpp, T('  ADD_GETTER($wrapped);')(locals())
+        getter_class = self._getGetterClassForType(type)
+        if getter_class == "Psana::EventGetter":
+            print >>self.cpp, T('  ADD_EVENT_GETTER($wrapped);')(locals())
+        elif getter_class == "Psana::EnvGetter":
+            print >>self.cpp, T('  ADD_ENV_GETTER($wrapped);')(locals())
         print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
