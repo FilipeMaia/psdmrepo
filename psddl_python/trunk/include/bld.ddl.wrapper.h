@@ -170,199 +170,118 @@ public:
   const Camera::FrameV1& frame() const { return o->frame(); }
 };
 
-  class BldDataFEEGasDetEnergy_Getter : public Psana::EvtGetter {
+  class BldDataFEEGasDetEnergy_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataFEEGasDetEnergy";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataFEEGasDetEnergy";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataFEEGasDetEnergy::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataFEEGasDetEnergy> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataFEEGasDetEnergy_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataFEEGasDetEnergy> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataFEEGasDetEnergy_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataFEEGasDetEnergy> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataFEEGasDetEnergy_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV0_Getter : public Psana::EvtGetter {
+  class BldDataEBeamV0_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataEBeamV0";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV0";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataEBeamV0::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV0> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataEBeamV0_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV0> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataEBeamV0_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataEBeamV0> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataEBeamV0_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV1_Getter : public Psana::EvtGetter {
+  class BldDataEBeamV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataEBeamV1";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataEBeamV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataEBeamV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataEBeamV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataEBeamV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataEBeamV1_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV2_Getter : public Psana::EvtGetter {
+  class BldDataEBeamV2_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataEBeamV2";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV2";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataEBeamV2::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV2> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataEBeamV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV2> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataEBeamV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataEBeamV2> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataEBeamV2_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV3_Getter : public Psana::EvtGetter {
+  class BldDataEBeamV3_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataEBeamV3";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV3";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataEBeamV3::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV3> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataEBeamV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataEBeamV3> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataEBeamV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataEBeamV3> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataEBeamV3_Wrapper(result)) : object();
     }
   };
 
-  class BldDataPhaseCavity_Getter : public Psana::EvtGetter {
+  class BldDataPhaseCavity_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataPhaseCavity";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataPhaseCavity";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataPhaseCavity::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataPhaseCavity> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataPhaseCavity_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataPhaseCavity> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataPhaseCavity_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataPhaseCavity> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataPhaseCavity_Wrapper(result)) : object();
     }
   };
 
-  class BldDataIpimbV0_Getter : public Psana::EvtGetter {
+  class BldDataIpimbV0_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataIpimbV0";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataIpimbV0";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataIpimbV0::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataIpimbV0> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataIpimbV0_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataIpimbV0> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataIpimbV0_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataIpimbV0> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataIpimbV0_Wrapper(result)) : object();
     }
   };
 
-  class BldDataIpimbV1_Getter : public Psana::EvtGetter {
+  class BldDataIpimbV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataIpimbV1";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataIpimbV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataIpimbV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataIpimbV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataIpimbV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataIpimbV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataIpimbV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataIpimbV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataIpimbV1_Wrapper(result)) : object();
     }
   };
 
-  class BldDataPimV1_Getter : public Psana::EvtGetter {
+  class BldDataPimV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Bld::BldDataPimV1";
-    }
+  const char* getTypeName() { return "Psana::Bld::BldDataPimV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return BldDataPimV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataPimV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(BldDataPimV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<BldDataPimV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(BldDataPimV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<BldDataPimV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataPimV1_Wrapper(result)) : object();
     }

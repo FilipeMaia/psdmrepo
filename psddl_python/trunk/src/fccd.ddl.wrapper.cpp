@@ -19,7 +19,7 @@ void createWrappers() {
   _CLASS(Psana::FCCD::FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(FccdConfigV1);
+  ADD_ENV_GETTER(FccdConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -37,7 +37,7 @@ void createWrappers() {
   _CLASS(Psana::FCCD::FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(FccdConfigV2);
+  ADD_ENV_GETTER(FccdConfigV2);
 
 
 } // createWrappers()

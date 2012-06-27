@@ -33,7 +33,7 @@ void createWrappers() {
   std_vector_class_(PulseConfig);
   std_vector_class_(PulseConfig_Wrapper);
 #undef _CLASS
-  ADD_GETTER(PulseConfig);
+  ADD_EVENT_GETTER(PulseConfig);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -49,7 +49,7 @@ void createWrappers() {
   std_vector_class_(PulseConfigV3);
   std_vector_class_(PulseConfigV3_Wrapper);
 #undef _CLASS
-  ADD_GETTER(PulseConfigV3);
+  ADD_ENV_GETTER(PulseConfigV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -67,7 +67,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV3);
   std_vector_class_(EventCodeV3_Wrapper);
 #undef _CLASS
-  ADD_GETTER(EventCodeV3);
+  ADD_EVENT_GETTER(EventCodeV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -87,7 +87,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV4);
   std_vector_class_(EventCodeV4_Wrapper);
 #undef _CLASS
-  ADD_GETTER(EventCodeV4);
+  ADD_EVENT_GETTER(EventCodeV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -109,7 +109,7 @@ void createWrappers() {
   std_vector_class_(EventCodeV5);
   std_vector_class_(EventCodeV5_Wrapper);
 #undef _CLASS
-  ADD_GETTER(EventCodeV5);
+  ADD_EVENT_GETTER(EventCodeV5);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -125,7 +125,7 @@ void createWrappers() {
   std_vector_class_(OutputMap);
   std_vector_class_(OutputMap_Wrapper);
 #undef _CLASS
-  ADD_GETTER(OutputMap);
+  ADD_EVENT_GETTER(OutputMap);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -142,7 +142,7 @@ void createWrappers() {
   std_vector_class_(OutputMapV2);
   std_vector_class_(OutputMapV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(OutputMapV2);
+  ADD_EVENT_GETTER(OutputMapV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -154,7 +154,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV1);
+  ADD_ENV_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -169,7 +169,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV2);
+  ADD_ENV_GETTER(ConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -183,7 +183,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV3);
+  ADD_ENV_GETTER(ConfigV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -197,7 +197,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV4_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV4);
+  ADD_ENV_GETTER(ConfigV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -210,7 +210,7 @@ void createWrappers() {
   std_vector_class_(SequencerEntry);
   std_vector_class_(SequencerEntry_Wrapper);
 #undef _CLASS
-  ADD_GETTER(SequencerEntry);
+  ADD_EVENT_GETTER(SequencerEntry);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -223,7 +223,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::SequencerConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(SequencerConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(SequencerConfigV1);
+  ADD_ENV_GETTER(SequencerConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -238,7 +238,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV5_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV5_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV5);
+  ADD_ENV_GETTER(ConfigV5);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -253,7 +253,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::ConfigV6_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV6_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV6);
+  ADD_ENV_GETTER(ConfigV6);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -267,7 +267,7 @@ void createWrappers() {
   std_vector_class_(FIFOEvent);
   std_vector_class_(FIFOEvent_Wrapper);
 #undef _CLASS
-  ADD_GETTER(FIFOEvent);
+  ADD_EVENT_GETTER(FIFOEvent);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -277,7 +277,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::DataV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV3_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DataV3);
+  ADD_EVENT_GETTER(DataV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -292,7 +292,7 @@ void createWrappers() {
   std_vector_class_(IOChannel);
   std_vector_class_(IOChannel_Wrapper);
 #undef _CLASS
-  ADD_GETTER(IOChannel);
+  ADD_EVENT_GETTER(IOChannel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -303,7 +303,7 @@ void createWrappers() {
   _CLASS(Psana::EvrData::IOConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IOConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(IOConfigV1);
+  ADD_ENV_GETTER(IOConfigV1);
 
 
 } // createWrappers()

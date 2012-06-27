@@ -22,7 +22,7 @@ void createWrappers() {
   std_vector_class_(VertV1);
   std_vector_class_(VertV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(VertV1);
+  ADD_EVENT_GETTER(VertV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -37,7 +37,7 @@ void createWrappers() {
   std_vector_class_(HorizV1);
   std_vector_class_(HorizV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(HorizV1);
+  ADD_EVENT_GETTER(HorizV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -52,7 +52,7 @@ void createWrappers() {
   std_vector_class_(TrigV1);
   std_vector_class_(TrigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TrigV1);
+  ADD_EVENT_GETTER(TrigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -67,7 +67,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV1);
+  ADD_ENV_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -82,7 +82,7 @@ void createWrappers() {
   std_vector_class_(TimestampV1);
   std_vector_class_(TimestampV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TimestampV1);
+  ADD_EVENT_GETTER(TimestampV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -95,7 +95,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1Elem_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DataDescV1Elem);
+  ADD_EVENT_GETTER(DataDescV1Elem);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -106,7 +106,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::DataDescV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DataDescV1);
+  ADD_EVENT_GETTER(DataDescV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -123,7 +123,7 @@ void createWrappers() {
   std_vector_class_(TdcChannel);
   std_vector_class_(TdcChannel_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcChannel);
+  ADD_EVENT_GETTER(TdcChannel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -140,7 +140,7 @@ void createWrappers() {
   std_vector_class_(TdcAuxIO);
   std_vector_class_(TdcAuxIO_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcAuxIO);
+  ADD_EVENT_GETTER(TdcAuxIO);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -156,7 +156,7 @@ void createWrappers() {
   std_vector_class_(TdcVetoIO);
   std_vector_class_(TdcVetoIO_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcVetoIO);
+  ADD_EVENT_GETTER(TdcVetoIO);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -167,7 +167,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::TdcConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TdcConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcConfigV1);
+  ADD_ENV_GETTER(TdcConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -182,7 +182,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1_Item);
   std_vector_class_(TdcDataV1_Item_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcDataV1_Item);
+  ADD_EVENT_GETTER(TdcDataV1_Item);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -195,7 +195,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Common);
   std_vector_class_(TdcDataV1Common_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcDataV1Common);
+  ADD_EVENT_GETTER(TdcDataV1Common);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -209,7 +209,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Channel);
   std_vector_class_(TdcDataV1Channel_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcDataV1Channel);
+  ADD_EVENT_GETTER(TdcDataV1Channel);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -221,7 +221,7 @@ void createWrappers() {
   std_vector_class_(TdcDataV1Marker);
   std_vector_class_(TdcDataV1Marker_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcDataV1Marker);
+  ADD_EVENT_GETTER(TdcDataV1Marker);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -230,7 +230,7 @@ void createWrappers() {
   _CLASS(Psana::Acqiris::TdcDataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TdcDataV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(TdcDataV1);
+  ADD_EVENT_GETTER(TdcDataV1);
 
 
 } // createWrappers()

@@ -55,28 +55,26 @@ public:
 
   class FccdConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::FCCD::FccdConfigV1";
-    }
+  const char* getTypeName() { return "Psana::FCCD::FccdConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return FccdConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<FccdConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<FccdConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(FccdConfigV1_Wrapper(result)) : object();
     }
   };
 
   class FccdConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::FCCD::FccdConfigV2";
-    }
+  const char* getTypeName() { return "Psana::FCCD::FccdConfigV2";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return FccdConfigV2::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<FccdConfigV2> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<FccdConfigV2> result = store.get(source, foundSrc);
       return result.get() ? object(FccdConfigV2_Wrapper(result)) : object();
     }
   };

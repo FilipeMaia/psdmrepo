@@ -15,7 +15,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::CsPadDigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPadDigitalPotsCfg_Wrapper);
 #undef _CLASS
-  ADD_GETTER(CsPadDigitalPotsCfg);
+  ADD_EVENT_GETTER(CsPadDigitalPotsCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -25,7 +25,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::CsPadReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPadReadOnlyCfg_Wrapper);
 #undef _CLASS
-  ADD_GETTER(CsPadReadOnlyCfg);
+  ADD_EVENT_GETTER(CsPadReadOnlyCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -35,7 +35,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ProtectionSystemThreshold_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ProtectionSystemThreshold);
+  ADD_EVENT_GETTER(ProtectionSystemThreshold);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -44,7 +44,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::CsPadGainMapCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPadGainMapCfg_Wrapper);
 #undef _CLASS
-  ADD_GETTER(CsPadGainMapCfg);
+  ADD_EVENT_GETTER(CsPadGainMapCfg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -67,7 +67,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV1QuadReg);
+  ADD_ENV_GETTER(ConfigV1QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -93,7 +93,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2QuadReg_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV2QuadReg);
+  ADD_ENV_GETTER(ConfigV2QuadReg);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -117,7 +117,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV1);
+  ADD_ENV_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -143,7 +143,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV2);
+  ADD_ENV_GETTER(ConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -172,7 +172,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV3);
+  ADD_ENV_GETTER(ConfigV3);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -201,7 +201,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ConfigV4_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV4);
+  ADD_ENV_GETTER(ConfigV4);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -223,7 +223,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ElementV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ElementV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ElementV1);
+  ADD_EVENT_GETTER(ElementV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -234,7 +234,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DataV1);
+  ADD_EVENT_GETTER(DataV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -256,7 +256,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::ElementV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ElementV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ElementV2);
+  ADD_EVENT_GETTER(ElementV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -267,7 +267,7 @@ void createWrappers() {
   _CLASS(Psana::CsPad::DataV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DataV2);
+  ADD_EVENT_GETTER(DataV2);
 
 
 } // createWrappers()

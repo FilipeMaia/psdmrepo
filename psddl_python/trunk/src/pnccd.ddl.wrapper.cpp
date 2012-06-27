@@ -16,7 +16,7 @@ void createWrappers() {
   _CLASS(Psana::PNCCD::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV1);
+  ADD_ENV_GETTER(ConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -36,7 +36,7 @@ void createWrappers() {
   _CLASS(Psana::PNCCD::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(ConfigV2);
+  ADD_ENV_GETTER(ConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -49,7 +49,7 @@ void createWrappers() {
   _CLASS(Psana::PNCCD::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(FrameV1);
+  ADD_EVENT_GETTER(FrameV1);
 
 
 } // createWrappers()

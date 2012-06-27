@@ -60,28 +60,26 @@ public:
 
   class TM6740ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Pulnix::TM6740ConfigV1";
-    }
+  const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return TM6740ConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<TM6740ConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<TM6740ConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(TM6740ConfigV1_Wrapper(result)) : object();
     }
   };
 
   class TM6740ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Pulnix::TM6740ConfigV2";
-    }
+  const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV2";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return TM6740ConfigV2::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<TM6740ConfigV2> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<TM6740ConfigV2> result = store.get(source, foundSrc);
       return result.get() ? object(TM6740ConfigV2_Wrapper(result)) : object();
     }
   };

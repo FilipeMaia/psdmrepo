@@ -305,77 +305,41 @@ public:
   boost::python::list quads_list() { boost::python::list l; const int n = quads_shape()[0]; for (int i = 0; i < n; i++) l.append(quads(i)); return l; }
 };
 
-  class CsPadDigitalPotsCfg_Getter : public Psana::EvtGetter {
+  class CsPadDigitalPotsCfg_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::CsPadDigitalPotsCfg";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadDigitalPotsCfg> result = evt.get(key, foundSrc);
-      return result.get() ? object(CsPadDigitalPotsCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadDigitalPotsCfg> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(CsPadDigitalPotsCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::CsPadDigitalPotsCfg";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<CsPadDigitalPotsCfg> result = evt.get(source, key, foundSrc);
       return result.get() ? object(CsPadDigitalPotsCfg_Wrapper(result)) : object();
     }
   };
 
-  class CsPadReadOnlyCfg_Getter : public Psana::EvtGetter {
+  class CsPadReadOnlyCfg_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::CsPadReadOnlyCfg";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadReadOnlyCfg> result = evt.get(key, foundSrc);
-      return result.get() ? object(CsPadReadOnlyCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadReadOnlyCfg> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(CsPadReadOnlyCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::CsPadReadOnlyCfg";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<CsPadReadOnlyCfg> result = evt.get(source, key, foundSrc);
       return result.get() ? object(CsPadReadOnlyCfg_Wrapper(result)) : object();
     }
   };
 
-  class ProtectionSystemThreshold_Getter : public Psana::EvtGetter {
+  class ProtectionSystemThreshold_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ProtectionSystemThreshold";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ProtectionSystemThreshold> result = evt.get(key, foundSrc);
-      return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ProtectionSystemThreshold> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::ProtectionSystemThreshold";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<ProtectionSystemThreshold> result = evt.get(source, key, foundSrc);
       return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
     }
   };
 
-  class CsPadGainMapCfg_Getter : public Psana::EvtGetter {
+  class CsPadGainMapCfg_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::CsPadGainMapCfg";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadGainMapCfg> result = evt.get(key, foundSrc);
-      return result.get() ? object(CsPadGainMapCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<CsPadGainMapCfg> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(CsPadGainMapCfg_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::CsPadGainMapCfg";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<CsPadGainMapCfg> result = evt.get(source, key, foundSrc);
       return result.get() ? object(CsPadGainMapCfg_Wrapper(result)) : object();
     }
@@ -383,159 +347,117 @@ public:
 
   class ConfigV1QuadReg_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV1QuadReg";
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV1QuadReg> result = store.get(src, 0);
+  const char* getTypeName() { return "Psana::CsPad::ConfigV1QuadReg";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV1QuadReg> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV1QuadReg_Wrapper(result)) : object();
     }
   };
 
   class ConfigV2QuadReg_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV2QuadReg";
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV2QuadReg> result = store.get(src, 0);
+  const char* getTypeName() { return "Psana::CsPad::ConfigV2QuadReg";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV2QuadReg> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV2QuadReg_Wrapper(result)) : object();
     }
   };
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV1";
-    }
+  const char* getTypeName() { return "Psana::CsPad::ConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV2";
-    }
+  const char* getTypeName() { return "Psana::CsPad::ConfigV2";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV2> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV2> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
   class ConfigV3_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV3";
-    }
+  const char* getTypeName() { return "Psana::CsPad::ConfigV3";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV3::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV3> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV3> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
   class ConfigV4_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ConfigV4";
-    }
+  const char* getTypeName() { return "Psana::CsPad::ConfigV4";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV4::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV4> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV4> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class ElementV1_Getter : public Psana::EvtGetter {
+  class ElementV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ElementV1";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(ElementV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(ElementV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::ElementV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<ElementV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(ElementV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public Psana::EvtGetter {
+  class DataV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::DataV1";
-    }
+  const char* getTypeName() { return "Psana::CsPad::DataV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return DataV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<DataV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 
-  class ElementV2_Getter : public Psana::EvtGetter {
+  class ElementV2_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::ElementV2";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV2> result = evt.get(key, foundSrc);
-      return result.get() ? object(ElementV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<ElementV2> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(ElementV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::CsPad::ElementV2";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<ElementV2> result = evt.get(source, key, foundSrc);
       return result.get() ? object(ElementV2_Wrapper(result)) : object();
     }
   };
 
-  class DataV2_Getter : public Psana::EvtGetter {
+  class DataV2_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::CsPad::DataV2";
-    }
+  const char* getTypeName() { return "Psana::CsPad::DataV2";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return DataV2::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV2> result = evt.get(key, foundSrc);
-      return result.get() ? object(DataV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV2> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(DataV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<DataV2> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataV2_Wrapper(result)) : object();
     }

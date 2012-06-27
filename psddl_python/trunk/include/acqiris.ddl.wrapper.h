@@ -235,67 +235,40 @@ public:
   vector<Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Acqiris::TdcDataV1_Item); }
 };
 
-  class VertV1_Getter : public Psana::EvtGetter {
+  class VertV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::VertV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::VertV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return VertV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<VertV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(VertV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<VertV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(VertV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<VertV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(VertV1_Wrapper(result)) : object();
     }
   };
 
-  class HorizV1_Getter : public Psana::EvtGetter {
+  class HorizV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::HorizV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::HorizV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return HorizV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<HorizV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(HorizV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<HorizV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(HorizV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<HorizV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(HorizV1_Wrapper(result)) : object();
     }
   };
 
-  class TrigV1_Getter : public Psana::EvtGetter {
+  class TrigV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TrigV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::TrigV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return TrigV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TrigV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(TrigV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TrigV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TrigV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TrigV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TrigV1_Wrapper(result)) : object();
     }
@@ -303,136 +276,81 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::ConfigV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::ConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TimestampV1_Getter : public Psana::EvtGetter {
+  class TimestampV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TimestampV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::TimestampV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return TimestampV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TimestampV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(TimestampV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TimestampV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TimestampV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TimestampV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TimestampV1_Wrapper(result)) : object();
     }
   };
 
-  class DataDescV1Elem_Getter : public Psana::EvtGetter {
+  class DataDescV1Elem_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::DataDescV1Elem";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::DataDescV1Elem";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return DataDescV1Elem::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataDescV1Elem> result = evt.get(key, foundSrc);
-      return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataDescV1Elem> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<DataDescV1Elem> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
     }
   };
 
-  class DataDescV1_Getter : public Psana::EvtGetter {
+  class DataDescV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::DataDescV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::DataDescV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return DataDescV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataDescV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(DataDescV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataDescV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(DataDescV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<DataDescV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcChannel_Getter : public Psana::EvtGetter {
+  class TdcChannel_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcChannel";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcChannel> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcChannel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcChannel> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcChannel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcChannel";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcChannel> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcChannel_Wrapper(result)) : object();
     }
   };
 
-  class TdcAuxIO_Getter : public Psana::EvtGetter {
+  class TdcAuxIO_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcAuxIO";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcAuxIO> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcAuxIO_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcAuxIO> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcAuxIO_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcAuxIO";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcAuxIO> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcAuxIO_Wrapper(result)) : object();
     }
   };
 
-  class TdcVetoIO_Getter : public Psana::EvtGetter {
+  class TdcVetoIO_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcVetoIO";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcVetoIO> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcVetoIO_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcVetoIO> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcVetoIO_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcVetoIO";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcVetoIO> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcVetoIO_Wrapper(result)) : object();
     }
@@ -440,111 +358,65 @@ public:
 
   class TdcConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcConfigV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::TdcConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return TdcConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<TdcConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<TdcConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(TdcConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1_Item_Getter : public Psana::EvtGetter {
+  class TdcDataV1_Item_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcDataV1_Item";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1_Item> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1_Item> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1_Item";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcDataV1_Item> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Common_Getter : public Psana::EvtGetter {
+  class TdcDataV1Common_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcDataV1Common";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Common> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Common> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Common";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcDataV1Common> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Channel_Getter : public Psana::EvtGetter {
+  class TdcDataV1Channel_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcDataV1Channel";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Channel> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Channel> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Channel";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcDataV1Channel> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Marker_Getter : public Psana::EvtGetter {
+  class TdcDataV1Marker_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcDataV1Marker";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Marker> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1Marker> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Marker";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcDataV1Marker> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1_Getter : public Psana::EvtGetter {
+  class TdcDataV1_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::Acqiris::TdcDataV1";
-    }
+  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return TdcDataV1::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1> result = evt.get(key, foundSrc);
-      return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<TdcDataV1> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<TdcDataV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
     }

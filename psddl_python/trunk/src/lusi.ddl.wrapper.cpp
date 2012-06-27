@@ -19,7 +19,7 @@ void createWrappers() {
   std_vector_class_(DiodeFexConfigV1);
   std_vector_class_(DiodeFexConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DiodeFexConfigV1);
+  ADD_ENV_GETTER(DiodeFexConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -32,7 +32,7 @@ void createWrappers() {
   std_vector_class_(DiodeFexConfigV2);
   std_vector_class_(DiodeFexConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DiodeFexConfigV2);
+  ADD_ENV_GETTER(DiodeFexConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -44,7 +44,7 @@ void createWrappers() {
   std_vector_class_(DiodeFexV1);
   std_vector_class_(DiodeFexV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(DiodeFexV1);
+  ADD_EVENT_GETTER(DiodeFexV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -55,7 +55,7 @@ void createWrappers() {
   _CLASS(Psana::Lusi::IpmFexConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IpmFexConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(IpmFexConfigV1);
+  ADD_ENV_GETTER(IpmFexConfigV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -66,7 +66,7 @@ void createWrappers() {
   _CLASS(Psana::Lusi::IpmFexConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IpmFexConfigV2_Wrapper);
 #undef _CLASS
-  ADD_GETTER(IpmFexConfigV2);
+  ADD_ENV_GETTER(IpmFexConfigV2);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -81,7 +81,7 @@ void createWrappers() {
   std_vector_class_(IpmFexV1);
   std_vector_class_(IpmFexV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(IpmFexV1);
+  ADD_EVENT_GETTER(IpmFexV1);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
@@ -94,7 +94,7 @@ void createWrappers() {
   std_vector_class_(PimImageConfigV1);
   std_vector_class_(PimImageConfigV1_Wrapper);
 #undef _CLASS
-  ADD_GETTER(PimImageConfigV1);
+  ADD_ENV_GETTER(PimImageConfigV1);
 
 
 } // createWrappers()

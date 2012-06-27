@@ -312,20 +312,11 @@ public:
   EvrData::OutputMap::Conn conn() const { return o->conn(); }
 };
 
-  class PulseConfig_Getter : public Psana::EvtGetter {
+  class PulseConfig_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::PulseConfig";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<PulseConfig> result = evt.get(key, foundSrc);
-      return result.get() ? object(PulseConfig_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<PulseConfig> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(PulseConfig_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::PulseConfig";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<PulseConfig> result = evt.get(source, key, foundSrc);
       return result.get() ? object(PulseConfig_Wrapper(result)) : object();
     }
@@ -333,105 +324,59 @@ public:
 
   class PulseConfigV3_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::PulseConfigV3";
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<PulseConfigV3> result = store.get(src, 0);
+  const char* getTypeName() { return "Psana::EvrData::PulseConfigV3";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<PulseConfigV3> result = store.get(source, foundSrc);
       return result.get() ? object(PulseConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class EventCodeV3_Getter : public Psana::EvtGetter {
+  class EventCodeV3_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::EventCodeV3";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV3> result = evt.get(key, foundSrc);
-      return result.get() ? object(EventCodeV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV3> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(EventCodeV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::EventCodeV3";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<EventCodeV3> result = evt.get(source, key, foundSrc);
       return result.get() ? object(EventCodeV3_Wrapper(result)) : object();
     }
   };
 
-  class EventCodeV4_Getter : public Psana::EvtGetter {
+  class EventCodeV4_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::EventCodeV4";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV4> result = evt.get(key, foundSrc);
-      return result.get() ? object(EventCodeV4_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV4> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(EventCodeV4_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::EventCodeV4";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<EventCodeV4> result = evt.get(source, key, foundSrc);
       return result.get() ? object(EventCodeV4_Wrapper(result)) : object();
     }
   };
 
-  class EventCodeV5_Getter : public Psana::EvtGetter {
+  class EventCodeV5_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::EventCodeV5";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV5> result = evt.get(key, foundSrc);
-      return result.get() ? object(EventCodeV5_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<EventCodeV5> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(EventCodeV5_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::EventCodeV5";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<EventCodeV5> result = evt.get(source, key, foundSrc);
       return result.get() ? object(EventCodeV5_Wrapper(result)) : object();
     }
   };
 
-  class OutputMap_Getter : public Psana::EvtGetter {
+  class OutputMap_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::OutputMap";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<OutputMap> result = evt.get(key, foundSrc);
-      return result.get() ? object(OutputMap_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<OutputMap> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(OutputMap_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::OutputMap";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<OutputMap> result = evt.get(source, key, foundSrc);
       return result.get() ? object(OutputMap_Wrapper(result)) : object();
     }
   };
 
-  class OutputMapV2_Getter : public Psana::EvtGetter {
+  class OutputMapV2_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::OutputMapV2";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<OutputMapV2> result = evt.get(key, foundSrc);
-      return result.get() ? object(OutputMapV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<OutputMapV2> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(OutputMapV2_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::OutputMapV2";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<OutputMapV2> result = evt.get(source, key, foundSrc);
       return result.get() ? object(OutputMapV2_Wrapper(result)) : object();
     }
@@ -439,74 +384,61 @@ public:
 
   class ConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV1";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
   class ConfigV2_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV2";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV2";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV2::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV2> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV2> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
   class ConfigV3_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV3";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV3";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV3::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV3> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV3> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
   class ConfigV4_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV4";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV4";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV4::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV4> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV4> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class SequencerEntry_Getter : public Psana::EvtGetter {
+  class SequencerEntry_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::SequencerEntry";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<SequencerEntry> result = evt.get(key, foundSrc);
-      return result.get() ? object(SequencerEntry_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<SequencerEntry> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(SequencerEntry_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::SequencerEntry";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<SequencerEntry> result = evt.get(source, key, foundSrc);
       return result.get() ? object(SequencerEntry_Wrapper(result)) : object();
     }
@@ -514,98 +446,68 @@ public:
 
   class SequencerConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::SequencerConfigV1";
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<SequencerConfigV1> result = store.get(src, 0);
+  const char* getTypeName() { return "Psana::EvrData::SequencerConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<SequencerConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(SequencerConfigV1_Wrapper(result)) : object();
     }
   };
 
   class ConfigV5_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV5";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV5";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV5::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV5> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV5> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV5_Wrapper(result)) : object();
     }
   };
 
   class ConfigV6_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::ConfigV6";
-    }
+  const char* getTypeName() { return "Psana::EvrData::ConfigV6";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return ConfigV6::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<ConfigV6> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<ConfigV6> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV6_Wrapper(result)) : object();
     }
   };
 
-  class FIFOEvent_Getter : public Psana::EvtGetter {
+  class FIFOEvent_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::FIFOEvent";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<FIFOEvent> result = evt.get(key, foundSrc);
-      return result.get() ? object(FIFOEvent_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<FIFOEvent> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(FIFOEvent_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::FIFOEvent";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<FIFOEvent> result = evt.get(source, key, foundSrc);
       return result.get() ? object(FIFOEvent_Wrapper(result)) : object();
     }
   };
 
-  class DataV3_Getter : public Psana::EvtGetter {
+  class DataV3_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::DataV3";
-    }
+  const char* getTypeName() { return "Psana::EvrData::DataV3";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
     int getVersion() {
       return DataV3::Version;
     }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV3> result = evt.get(key, foundSrc);
-      return result.get() ? object(DataV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<DataV3> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(DataV3_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<DataV3> result = evt.get(source, key, foundSrc);
       return result.get() ? object(DataV3_Wrapper(result)) : object();
     }
   };
 
-  class IOChannel_Getter : public Psana::EvtGetter {
+  class IOChannel_Getter : public Psana::EventGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::IOChannel";
-    }
-    object get(PSEvt::Event& evt, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<IOChannel> result = evt.get(key, foundSrc);
-      return result.get() ? object(IOChannel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, Pds::Src& src, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
-      shared_ptr<IOChannel> result = evt.get(src, key, foundSrc);
-      return result.get() ? object(IOChannel_Wrapper(result)) : object();
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) {
+  const char* getTypeName() { return "Psana::EvrData::IOChannel";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<IOChannel> result = evt.get(source, key, foundSrc);
       return result.get() ? object(IOChannel_Wrapper(result)) : object();
     }
@@ -613,14 +515,13 @@ public:
 
   class IOConfigV1_Getter : public Psana::EnvGetter {
   public:
-    const char* getTypeName() {
-      return "Psana::EvrData::IOConfigV1";
-    }
+  const char* getTypeName() { return "Psana::EvrData::IOConfigV1";}
+  const char* getGetterClassName() { return "Psana::EnvGetter";}
     int getVersion() {
       return IOConfigV1::Version;
     }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& src, Pds::Src* foundSrc=0) {
-      boost::shared_ptr<IOConfigV1> result = store.get(src, 0);
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<IOConfigV1> result = store.get(source, foundSrc);
       return result.get() ? object(IOConfigV1_Wrapper(result)) : object();
     }
   };
