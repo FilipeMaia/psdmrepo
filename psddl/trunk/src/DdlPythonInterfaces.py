@@ -242,7 +242,7 @@ class DdlPythonInterfaces ( object ) :
         if re.match(r'.*(Data|DataDesc|Element)[A-Za-z]*V[1-9][0-9]*', type.name):
             return "Psana::EventGetter"
         elif re.match(r'.*(Config)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "Psana::EnvGetter"
+            return "Psana::EnvObjectStoreGetter"
         else:
             # Guess what type of Getter to use
             return "Psana::EventGetter";
@@ -267,7 +267,7 @@ class DdlPythonInterfaces ( object ) :
             print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(source, key, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
             print >> self.inc, '    }'
-        elif getter_class == "Psana::EnvGetter":
+        elif getter_class == "Psana::EnvObjectStoreGetter":
             print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {')(locals())
             print >> self.inc, T('      boost::shared_ptr<$type_name> result = store.get(source, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
@@ -343,8 +343,8 @@ class DdlPythonInterfaces ( object ) :
         getter_class = self._getGetterClassForType(type)
         if getter_class == "Psana::EventGetter":
             print >>self.cpp, T('  ADD_EVENT_GETTER($wrapped);')(locals())
-        elif getter_class == "Psana::EnvGetter":
-            print >>self.cpp, T('  ADD_ENV_GETTER($wrapped);')(locals())
+        elif getter_class == "Psana::EnvObjectStoreGetter":
+            print >>self.cpp, T('  ADD_ENV_OBJECT_STORE_GETTER($wrapped);')(locals())
         print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
