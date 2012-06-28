@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package NeoCaptar
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-04
+2012-06-27 Igor Gaponenko
+- before embarking on a big redesign of teh cable number generator
+
+Tag: V00-00-03
+2012-06-06 Igor Gaponenko
+- the first release which is ready to be for trial use in production
+
+Tag: V00-00-02
+2012-05-31 Igor Gaponenko
+- before major re-implementation of the cable/connector/pinlist dictionary
+
+Tag: V00-00-01
+2012-05-21 Igor Gaponenko
+- moved this project from DataPortal
