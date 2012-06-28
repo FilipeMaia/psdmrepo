@@ -49,8 +49,10 @@ namespace Psana {
     sprintf(vpart, "V%d", version);
     const size_t vpos = typeName.rfind(vpart);
     if (vpos == string::npos) {
-      fprintf(stderr, "%s::addGetter(%s): version is %d but no V%d found in class name\n",
-              m_className, typeName.c_str(), version, version);
+      if (version != 0) {
+        fprintf(stderr, "%s::addGetter(%s): version is %d but no V%d found in class name\n",
+                m_className, typeName.c_str(), version, version);
+      }
       return;
     }
     string prefix = typeName.substr(0, vpos).c_str();
