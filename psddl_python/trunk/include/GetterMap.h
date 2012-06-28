@@ -3,11 +3,13 @@
 
 #include <string>
 #include <map>
+#include <pdsdata/xtc/Src.hh>
 #include <psddl_python/Getter.h>
 
 namespace Psana {
   using std::map;
   using std::string;
+  using Pds::Src;
 
   class GetterMap {
   private:
