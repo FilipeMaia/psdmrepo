@@ -7,10 +7,8 @@
 
 namespace Psana {
   using boost::python::api::object;
-  using std::string;
   using PSEnv::EnvObjectStore;
   using PSEvt::Source;
-  using Pds::Src;
 
   class EnvObjectStoreGetter : public Getter {
   public:
