@@ -659,16 +659,7 @@ function p_appl_projects() {
 			},
 			null );
 	};
-    this.recalculate_origin_destination = function(loc,rack,ele,side,slot,conn) {
-        var s = loc;
-        if(rack) s += (s == '' ? '' : '-') + rack;
-        if(ele)  s += (s == '' ? '' : '-') + ele;
-        if(side) s += (s == '' ? '' : '-') + side;
-        if(slot) s += (s == '' ? '' : '-') + slot;
-        if(conn) s += (s == '' ? '' : '-') + conn;
-        return s;
-    };
-	this.cable_property_edit = function(pidx,cidx,prop,is_new,is_disabled,value) {
+	this.cable_property_edit = function(pidx,cidx,prop,is_new,is_disabled) {
 
         var cable  = this.project[pidx].cable[cidx];
         var is_disabled_attr = is_disabled ? 'disabled="disabled"' : '';
@@ -686,9 +677,9 @@ function p_appl_projects() {
 
 		case 'device':
 
-            // This field can't be edited directly. Instead it's composed
+            // Thsi field can't be edited directly. INstead it's composed
             // of its components which are edited via separate inputs (see below).
-            //
+            // 
             cable.read_device = function() {
                 var location  = global_truncate_device_location (cable.read_device_location ());
                 var region    = global_truncate_device_region   (cable.read_device_region   ());
@@ -706,75 +697,158 @@ function p_appl_projects() {
 
 		case 'device_location':
 
-            html = '<select '+is_disabled_attr+' >';
-            if( dict.device_location_is_not_known( cable.device_location ))
-                html += '<option selected="selected" value="'+cable.device_location+'">'+cable.device_location+'</option>';
-            for( var t in dict.device_locations())
-                html += '<option'+
-                        (t == cable.device_location ? ' selected="selected"' : '')+
-                        ' value="'+t+'">'+t+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                    that.cable_property_edit(pidx,cidx,'device_region',true,false);
-                    that.cable_property_edit(pidx,cidx,'device_component',true,false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'device_region',false,false);
-                    that.cable_property_edit(pidx,cidx,'device_component',false,false);
-                }
-            });
-            cable.read_device_location = read_select;
+			if( is_new ) {
+
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				cable.read_device_location = read_input;
+
+			} else if( dict.device_location_dict_is_empty()) {
+
+				base.html('<input type="text" value="'+cable.device_location+'" size="4" '+is_disabled_attr+' />');
+				cable.read_device_location = read_input;
+
+			} else {
+
+				html = '<select '+is_disabled_attr+' >';
+				if( cable.device_location == '' ) {
+					for( var t in dict.device_locations()) {
+						html += '<option';
+						if( t == cable.device_location ) html += ' selected="selected"';
+						html += ' value="'+t+'">'+t+'</option>';
+					}
+				} else {
+
+					if( dict.device_location_is_not_known( cable.device_location )) {
+
+						html += '<option selected="selected" value="'+cable.device_location+'">'+cable.device_location+'</option>';
+						for( var t in dict.device_locations())
+							html += '<option value="'+t+'">'+t+'</option>';
+
+					} else {
+
+						for( var t in dict.device_locations()) {
+							html += '<option';
+							if( t == cable.device_location ) html += ' selected="selected"';
+							html += ' value="'+t+'">'+t+'</option>';
+						}
+					}
+				}
+                if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new device location" >New...</option>'
+				html += '</select>';
+				base.html(html);
+				base.find('select').change(function() {
+					if( $(this).val() == '' ) {
+						that.cable_property_edit(pidx,cidx,prop,true,false);
+						that.cable_property_edit(pidx,cidx,'device_region',true,false);
+						that.cable_property_edit(pidx,cidx,'device_component',true,false);
+					} else {
+						that.cable_property_edit(pidx,cidx,'device_region',false,false);
+						that.cable_property_edit(pidx,cidx,'device_component',false,false);
+					}
+				});
+				cable.read_device_location = read_select;
+			}
 			break;
 
 		case 'device_region':
 
-            var location = cable.read_device_location();
+			if( is_new ) {
 
-            html = '<select '+is_disabled_attr+' >';
-            if(	dict.device_region_is_not_known( location,cable.device_region))
-                html += '<option selected="selected" value="'+cable.device_region+'">'+cable.device_region+'</option>';
-            if(	!dict.device_location_is_not_known( location ))
-                for( var t in dict.device_regions( location ))
-                    html += '<option'+
-                            (t == cable.device_region ? ' selected="selected"' : '')+
-                            ' value="'+t+'">'+t+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                    that.cable_property_edit(pidx,cidx,'device_component',true,false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'device_component',false,false);
-                }
-            });
-            cable.read_device_region = read_select;
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				cable.read_device_region = read_input;
+
+			} else if( dict.device_location_dict_is_empty()) {
+
+				base.html('<input type="text" value="'+cable.device_region+'" size="4" '+is_disabled_attr+' />');
+				cable.read_device_region = read_input;
+
+			} else {
+
+				if(	dict.device_location_is_not_known( cable.read_device_location())) {
+
+					base.html('<input type="text" value="'+cable.device_region+'" size="4" '+is_disabled_attr+' />');
+					cable.read_device_region = read_input;
+
+				} else {
+
+					if( dict.device_region_dict_is_empty( cable.read_device_location())) {
+
+						base.html('<input type="text" value="'+cable.device_region+'" size="4" '+is_disabled_attr+' />');
+						cable.read_device_region = read_input;
+
+					} else {
+
+						html = '<select '+is_disabled_attr+' >';
+						for( var t in dict.device_regions( cable.read_device_location())) {
+							html += '<option';
+							if( t == cable.device_region ) html += ' selected="selected"';
+							html += ' value="'+t+'">'+t+'</option>';
+						}
+						if(this.can_define_new_types()) html += '<option value=""  style="color:maroon;" title="register new device region for the given device location" >New...</option>'
+						html += '</select>';
+						base.html(html);
+						base.find('select').change(function() {
+							if( $(this).val() == '' ) {
+								that.cable_property_edit(pidx,cidx,prop,true,false);
+								that.cable_property_edit(pidx,cidx,'device_component',true,false);
+							} else {
+								that.cable_property_edit(pidx,cidx,'device_component',false,false);
+							}
+						});
+						cable.read_device_region = read_select;
+					}
+				}
+			}
             break;
 
 		case 'device_component':
 
-            var location = cable.read_device_location();
-            var region   = cable.read_device_region();
+			if( is_new ) {
 
-            html = '<select '+is_disabled_attr+' >';
-            if(	dict.device_component_is_not_known( location, region, cable.device_component ))
-                html += '<option selected="selected" value="'+cable.device_component+'">'+cable.device_component+'</option>';
-            if(	!dict.device_region_is_not_known( location, region ))
-                for( var t in dict.device_components( location, region ))
-                    html += '<option'+
-                            (t == cable.device_component ? ' selected="selected"' : '')+
-                            ' value="'+t+'">'+t+'</option>';
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				cable.read_device_component = read_input;
 
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '') {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                }
-            });
-            cable.read_device_component = read_select;
+			} else if( dict.device_location_dict_is_empty()) {
+
+				base.html('<input type="text" value="'+cable.device_component+'" size="4" '+is_disabled_attr+' />');
+				cable.read_device_component = read_input;
+
+			} else if( dict.device_location_is_not_known( cable.read_device_location())) {
+
+				base.html('<input type="text" value="'+cable.device_component+'" size="4" '+is_disabled_attr+' />');
+				cable.read_device_component = read_input;
+
+			} else if( dict.device_region_is_not_known( cable.read_device_location(), cable.read_device_region())) {
+
+				base.html('<input type="text" value="'+cable.device_component+'" size="4" '+is_disabled_attr+' />');
+				cable.read_device_component = read_input;
+
+			} else {
+
+				if( dict.device_component_dict_is_empty( cable.read_device_location(), cable.read_device_region())) {
+
+					base.html('<input type="text" value="'+cable.device_component+'" size="4" '+is_disabled_attr+' />');
+					cable.read_device_component = read_input;
+
+				} else {
+
+					html = '<select '+is_disabled_attr+' >';
+					for( var device_component in dict.device_components( cable.read_device_location(), cable.read_device_region())) {
+						html += '<option';
+						if( device_component == cable.device_component ) html += ' selected="selected"';
+						html += ' value="'+device_component+'">'+device_component+'</option>';
+					}
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new device component for the given device region" >New...</option>'
+					html += '</select>';
+					base.html(html);
+					base.find('select').change(function() {
+						if( $(this).val() == '') {
+							that.cable_property_edit(pidx,cidx,prop,true,false);
+						}
+					});
+					cable.read_device_component = read_select;
+				}
+			}
 			break;
 
         case 'device_counter':
@@ -794,29 +868,57 @@ function p_appl_projects() {
 
 		case 'cable_type':
 
-            html = '<select '+is_disabled_attr+' >';
-            if( dict.cable_is_not_known( cable.cable_type ))
-                html += '<option selected="selected" value="'+cable.cable_type+'">'+cable.cable_type+'</option>';
-			for( var t in dict.cables())
-                html += '<option'+
-                        (t == cable.cable_type ? ' selected="selected"' : '')+
-                        ' value="'+t+'">'+t+'</option>';
+			if( is_new ) {
+
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
+				cable.read_cable_type = read_input;
+
+			} else if( dict.cable_dict_is_empty()) {
+
+				base.html('<input type="text" value="'+cable.cable_type+'" size="8" '+is_disabled_attr+' />');
+				cable.read_cable_type = read_input;
+
+			} else {
+
+				html = '<select '+is_disabled_attr+' >';
+				if( cable.cable_type == '' )
+					for( var t in dict.cables())
 						html += '<option value="'+t+'">'+t+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',true,false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',true,false);
-                    that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',false,false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
-                    that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
-                }
-            });
-            cable.read_cable_type = read_select;
+
+				else {
+
+					if( dict.cable_is_not_known( cable.cable_type )) {
+
+						html += '<option selected="selected" value="'+cable.cable_type+'">'+cable.cable_type+'</option>';
+						for( var t in dict.cables())
+							html += '<option value="'+t+'">'+t+'</option>';
+
+					} else {
+
+						for( var t in dict.cables()) {
+							html += '<option';
+							if( t == cable.cable_type ) html += ' selected="selected"';
+							html += ' value="'+t+'">'+t+'</option>';
+						}
+					}
+				}
+                if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new cable type" >New...</option>'
+				html += '</select>';
+				base.html(html);
+				base.find('select').change(function() {
+					if( $(this).val() == '' ) {
+						that.cable_property_edit(pidx,cidx,prop,true,false);
+						that.cable_property_edit(pidx,cidx,'origin_conntype',true,false);
+						that.cable_property_edit(pidx,cidx,'destination_conntype',true,false);
+						that.cable_property_edit(pidx,cidx,'destination_pinlist',true,false);
+					} else {
+						that.cable_property_edit(pidx,cidx,'origin_conntype',false,false);
+						that.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
+						that.cable_property_edit(pidx,cidx,'destination_pinlist',false,false);
+					}
+				});
+				cable.read_cable_type = read_select;
+			}
 			break;
 
 		case 'length':
@@ -826,109 +928,216 @@ function p_appl_projects() {
 
 		case 'routing':
 
-            html = '<select '+is_disabled_attr+' >';
-            if( dict.routing_is_not_known(cable.routing))
-                html += '<option selected="selected" value="'+cable.routing+'">'+cable.routing+'</option>';
-            for( var routing in dict.routings())
-                html += '<option'+
-                        (routing == cable.routing ? ' selected="selected"' : '')+
-                        ' value="'+routing+'">'+routing+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
+			if( is_new ) {
+
+				base.html('<input type="text" value="" size="16" '+is_disabled_attr+' />');
+				cable.read_routing = read_input;
+
+			} else {
+
+				html = '<select '+is_disabled_attr+' >';
+                if(cable.routing == '')
+                    for( var routing in dict.routings())
+                        html += '<option value="'+routing+'">'+routing+'</option>';
+                else {
+                    if( dict.routing_is_not_known(cable.routing)) {
+                        html += '<option value="'+cable.routing+'">'+cable.routing+'</option>';
+                        for( var routing in dict.routings())
+                            html += '<option value="'+routing+'">'+routing+'</option>';
+                    } else {
+                        for( var routing in dict.routings()) {
+                            html += '<option';
+                            if( routing == cable.routing ) html += ' selected="selected"';
+                            html += ' value="'+routing+'">'+routing+'</option>';
+                        }
+                    }
                 }
-            });
-            cable.read_routing = read_select;
+				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new routing" >New...</option>'
+				html += '</select>';
+				base.html(html);
+				base.find('select').change(function() {
+					if( $(this).val() == '' ) {
+						that.cable_property_edit(pidx,cidx,prop,true,false);
+					}
+				});
+				cable.read_routing = read_select;
+			}
 			break;
 
 		case 'origin_name':
-            base.html('<input type="text" value="'+value+ '" size="20" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.origin.name+ '" size="16" '+is_disabled_attr+' />');
             cable.origin.read_name = read_input;
 			break;
 
 		case 'origin_conntype':
 
-            var cable_type = cable.read_cable_type();
+			if( is_new ) {
 
-            html = '<select '+is_disabled_attr+' >';
-            if(dict.connector_is_not_known( cable_type, cable.origin.conntype))
-                html += '<option selected="selected" value="'+cable.origin.conntype+'">'+cable.origin.conntype+'</option>';
-            if(	!dict.cable_is_not_known( cable_type ))
-                for( var t in dict.connectors( cable_type ))
-                    html += '<option'+
-                            (t == cable.origin.conntype ? ' selected="selected"' : '')+
-                            ' value="'+t+'">'+t+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                }
-            });
-            cable.origin.read_conntype = read_select;
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
+				cable.origin.read_conntype = read_input;
+
+			} else if( dict.cable_dict_is_empty()) {
+
+				base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
+				cable.origin.read_conntype = read_input;
+
+			} else {
+
+				if(	dict.cable_is_not_known( cable.read_cable_type())) {
+
+					base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
+					cable.origin.read_conntype = read_input;
+
+				} else {
+
+					if( dict.connector_dict_is_empty( cable.read_cable_type())) {
+
+						base.html('<input type="text" value="'+cable.origin.conntype+'" size="8" '+is_disabled_attr+' />');
+						cable.origin.read_conntype = read_input;
+
+					} else {
+
+						html = '<select '+is_disabled_attr+' >';
+                        if( cable.origin.conntype == '' )
+                            for( var t in dict.connectors( cable.read_cable_type()))
+                                html += '<option value="'+t+'">'+t+'</option>';
+
+                        else {
+                            if(dict.connector_is_not_known( cable.read_cable_type(), cable.origin.conntype)) {
+                                html += '<option selected="selected" value="'+cable.origin.conntype+'">'+cable.origin.conntype+'</option>';
+                                for( var t in dict.connectors( cable.read_cable_type()))
+                                    html += '<option value="'+t+'">'+t+'</option>';
+                            } else {
+                                for( var t in dict.connectors( cable.read_cable_type())) {
+                                    html += '<option';
+                                    if( t == cable.origin.conntype ) html += ' selected="selected"';
+                                    html += ' value="'+t+'">'+t+'</option>';
+                                }
+                            }
+                        }
+						if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new connector type for the given cable type" >New...</option>'
+						html += '</select>';
+						base.html(html);
+						base.find('select').change(function() {
+							if( $(this).val() == '' ) {
+								that.cable_property_edit(pidx,cidx,prop,true,false);
+							}
+						});
+						cable.origin.read_conntype = read_select;
+					}
+				}
+			}
 			break;
 
 		case 'origin_pinlist':
 
-            html = '<select '+is_disabled_attr+' >';
-            if( dict.pinlist_is_not_known(cable.origin.pinlist))
-                html += '<option selected="selected" value="'+cable.origin.pinlist+'">'+cable.origin.pinlist+'</option>';
-            for( var pinlist in dict.pinlists())
-                html += '<option'+
-                        (pinlist == cable.origin.pinlist ? ' selected="selected"' : '')+
-                        ' value="'+pinlist+'">'+pinlist+'</option>';
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '') {
-                    that.cable_property_edit(pidx,cidx,prop,true,false);
-                }
-                // TODO: There is only one pinlist per cable. Two pinlists is just
-                // an artifact of the earlier design. For now do the hard synchronization
-                // between the pinlists. This will be done correctly later.
-                //
-                cable.destination.pinlist = cable.origin.read_pinlist();
-                that.cable_property_edit(pidx,cidx,'destination_pinlist');
-            });
-            cable.origin.read_pinlist = read_select;
+			if( is_new ) {
 
+				base.html('<input type="text" value="" size="8" '+is_disabled_attr+' />');
+				cable.origin.read_pinlist = read_input;
+
+			} else {
+
+				if( dict.pinlist_dict_is_empty()) {
+
+					base.html('<input type="text" value="'+cable.origin.pinlist+'" size="8" '+is_disabled_attr+' />');
+					cable.origin.read_pinlist = read_input;
+
+				} else {
+
+					html = '<select '+is_disabled_attr+' >';
+                    if(cable.origin.pinlist == '')
+                        for( var pinlist in dict.pinlists())
+                            html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                    else {
+                        if( dict.pinlist_is_not_known(cable.origin.pinlist)) {
+                            html += '<option value="'+cable.origin.pinlist+'">'+cable.origin.pinlist+'</option>';
+                            for( var pinlist in dict.pinlists())
+                                html += '<option value="'+pinlist+'">'+pinlist+'</option>';
+                        } else {
+                            for( var pinlist in dict.pinlists()) {
+                                html += '<option';
+                                if( pinlist == cable.origin.pinlist ) html += ' selected="selected"';
+                                html += ' value="'+pinlist+'">'+pinlist+'</option>';
+                            }
+                        }
+                    }
+					if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new pinlist (drawing)" >New...</option>'
+					html += '</select>';
+					base.html(html);
+					base.find('select').change(function() {
+						if( $(this).val() == '') {
+							that.cable_property_edit(pidx,cidx,prop,true,false);
+						}
+                        // TODO: There is only one pinlist per cable. Two pinlists is just
+                        // an artifact of the earlier design. For now do the hard synchronization
+                        // between the pinlists. This will be done correctly later.
+                        //
+                        cable.destination.pinlist = cable.origin.read_pinlist();
+                        that.cable_property_edit(pidx,cidx,'destination_pinlist');
+					});
+					cable.origin.read_pinlist = read_select;
+				}
+			}
 			break;
 	
 		case 'origin_loc':
 
-            html = '<select class="origin_name_component" '+is_disabled_attr+' >';
-            if( dict.location_is_not_known(cable.origin.loc))
-                html += '<option  selected="selected" value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
-            for( var loc in dict.locations())
-                html += '<option'+
-                        (loc == cable.origin.loc ? ' selected="selected"' : '')+
-                        ' value="'+loc+'">'+loc+'</option>';
+			if( is_new ) {
 
-            html += '</select>';
-            base.html(html);
-            base.find('select').change(function() {
-                if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,prop, true,false);
-                    that.cable_property_edit(pidx,cidx,'origin_rack',true,false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'origin_rack',false,false);
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
+				cable.origin.read_loc = read_input;
+
+			} else {
+
+				html = '<select '+is_disabled_attr+' >';
+                if(cable.origin.loc == '')
+                    for( var loc in dict.locations())
+                        html += '<option value="'+loc+'">'+loc+'</option>';
+                else {
+                    if( dict.location_is_not_known(cable.origin.loc)) {
+                        html += '<option value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
+                        for( var loc in dict.locations())
+                            html += '<option value="'+loc+'">'+loc+'</option>';
+                    } else {
+                        for( var loc in dict.locations()) {
+                            html += '<option';
+                            if( loc == cable.origin.loc ) html += ' selected="selected"';
+                            html += ' value="'+loc+'">'+loc+'</option>';
+                        }
+                    }
                 }
-            });
-            cable.origin.read_loc = read_select;
+				if(this.can_define_new_types()) html += '<option value="" style="color:maroon;" title="register new location" >New...</option>'
+				html += '</select>';
+				base.html(html);
+				base.find('select').change(function() {
+					if( $(this).val() == '' ) {
+						that.cable_property_edit(pidx,cidx,prop, true,false);
+						that.cable_property_edit(pidx,cidx,'origin_rack',true,false);
+					} else {
+						that.cable_property_edit(pidx,cidx,'origin_rack',false,false);
+					}
+				});
+				cable.origin.read_loc = read_select;
+			}
 			break;
 
 		case 'origin_rack':
 
 			if( is_new ) {
 
-				base.html('<input class="origin_name_component" type="text" value="" size="4" '+is_disabled_attr+' />');
+				// Start with empty
+				//
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input;
 
 			} else if( dict.location_is_not_known( cable.origin.read_loc())) {
 
-				base.html('<input class="origin_name_component" type="text" value="'+cable.origin.rack+'" size="4" '+is_disabled_attr+' />');
+				// This might came from a pre-existing  database. So we have to respect
+				// a choice of a rack because the current location is also not known to
+				// the dictionary.
+				//
+				base.html('<input type="text" value="'+cable.origin.rack+'" size="4" '+is_disabled_attr+' />');
 				cable.origin.read_rack = read_input;
 
 			} else {
@@ -944,7 +1153,7 @@ function p_appl_projects() {
 				//                 the right source to get the location then the rack would be carried over
 				//                 as a legitimate option between locations.
 				//
-				html = '<select class="origin_name_component" '+is_disabled_attr+' >';
+				html = '<select '+is_disabled_attr+' >';
 
 				if(( cable.origin.rack != '' ) && dict.rack_is_not_known( cable.origin.loc, cable.origin.rack ))
 					html += '<option selected="selected" value="'+cable.origin.rack+'">'+cable.origin.rack+'</option>';
@@ -966,22 +1175,22 @@ function p_appl_projects() {
 			break;
 
         case 'origin_ele':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.ele+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.ele+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_ele = read_input;
 			break;
 
         case 'origin_side':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.side+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.side+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_side = read_input;
 			break;
 
         case 'origin_slot':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.slot+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.slot+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_slot = read_input;
 			break;
 
         case 'origin_conn':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.conn+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.origin.conn+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_conn = read_input;
 			break;
 
@@ -1029,7 +1238,7 @@ function p_appl_projects() {
 			break;
 
 		case 'destination_name':
-            base.html('<input type="text" value="'+value+ '" size="20" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.destination.name+ '" size="16" '+is_disabled_attr+' />');
             cable.destination.read_name = read_input;
 			break;
 
@@ -1149,12 +1358,12 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input class="destination_name_component" type="text" value="" size="4" '+is_disabled_attr+' /> ');
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' /> ');
 				cable.destination.read_loc = read_input;
 
 			} else {
 
-				html = '<select class="destination_name_component" '+is_disabled_attr+'>';
+				html = '<select '+is_disabled_attr+'>';
                 if(cable.destination.loc == '')
                     for( var loc in dict.locations())
                         html += '<option value="'+loc+'">'+loc+'</option>';
@@ -1190,12 +1399,18 @@ function p_appl_projects() {
 
 			if( is_new ) {
 
-				base.html('<input class="destination_name_component" type="text" value="" size="4" '+is_disabled_attr+' />');
+				// Start with empty
+				//
+				base.html('<input type="text" value="" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input;
 
 			} else if( dict.location_is_not_known( cable.destination.read_loc())) {
 
-				base.html('<input class="destination_name_component" type="text" value="'+cable.destination.rack+'" size="4" '+is_disabled_attr+' />');
+				// This might came from a pre-existing  database. So we have to respect
+				// a choice of a rack because the current location is also not known to
+				// the dictionary.
+				//
+				base.html('<input type="text" value="'+cable.destination.rack+'" size="4" '+is_disabled_attr+' />');
 				cable.destination.read_rack = read_input;
 
 			} else {
@@ -1211,7 +1426,7 @@ function p_appl_projects() {
 				//                 the right source to get the location then the rack would be carried over
 				//                 as a legitimate option between locations.
 				//
-				html = '<select class="destination_name_component" '+is_disabled_attr+'>';
+				html = '<select '+is_disabled_attr+'>';
 
 				if(( cable.destination.rack != '' ) && dict.rack_is_not_known( cable.destination.loc, cable.destination.rack ))
 					html += '<option selected="selected" value="'+cable.destination.rack+'">'+cable.destination.rack+'</option>';
@@ -1233,12 +1448,12 @@ function p_appl_projects() {
 			break;
 
         case 'destination_ele':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.ele+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.ele+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_ele = read_input;
 			break;
 
         case 'destination_side':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.side+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.side+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_side = read_input;
 			break;
 
@@ -1248,7 +1463,7 @@ function p_appl_projects() {
 			break;
 
         case 'destination_conn':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.conn+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input type="text" value="'+cable.destination.conn+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_conn = read_input;
 			break;
 
@@ -1295,26 +1510,6 @@ function p_appl_projects() {
 			}
 			break;
 		}
-		base.find('.origin_name_component').change(function() {
-            that.cable_property_edit(pidx,cidx,'origin_name',true,false,
-                that.recalculate_origin_destination(
-                    cable.origin.read_loc(),
-                    cable.origin.read_rack(),
-                    cable.origin.read_ele(),
-                    cable.origin.read_side(),
-                    cable.origin.read_slot(),
-                    cable.origin.read_conn()));
-        });
-		base.find('.destination_name_component').change(function() {
-            that.cable_property_edit(pidx,cidx,'destination_name',true,false,
-                that.recalculate_origin_destination(
-                    cable.destination.read_loc(),
-                    cable.destination.read_rack(),
-                    cable.destination.read_ele(),
-                    cable.destination.read_side(),
-                    cable.destination.read_slot(),
-                    cable.destination.read_conn()));
-        });
 	};
     
     function toggle_cable_editor(pidx,cidx,on) {
@@ -1449,29 +1644,25 @@ required_field_html+' required feild';
 		this.cable_property_edit(pidx,cidx,'length',              false,false);
 		this.cable_property_edit(pidx,cidx,'routing',             false,false);
 
-		this.cable_property_edit(pidx,cidx,'origin_name',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'),
-            that.recalculate_origin_destination(cable.origin.loc,cable.origin.rack,cable.origin.ele,cable.origin.side,cable.origin.slot,cable.origin.conn)
-        );
+		this.cable_property_edit(pidx,cidx,'origin_name',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
 		this.cable_property_edit(pidx,cidx,'origin_loc',          false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Registered'));
-		this.cable_property_edit(pidx,cidx,'origin_rack',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'origin_ele',          false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'origin_side',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'origin_slot',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'origin_conn',         false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
+		this.cable_property_edit(pidx,cidx,'origin_rack',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_ele',          false,false);
+		this.cable_property_edit(pidx,cidx,'origin_side',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_slot',         false,false);
+		this.cable_property_edit(pidx,cidx,'origin_conn',         false,false);
 		this.cable_property_edit(pidx,cidx,'origin_station',      false,false);
 		this.cable_property_edit(pidx,cidx,'origin_conntype',     false,false);
 		this.cable_property_edit(pidx,cidx,'origin_pinlist',      false,false);
 		this.cable_property_edit(pidx,cidx,'origin_instr',        false,false);
 
-		this.cable_property_edit(pidx,cidx,'destination_name',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'),
-            that.recalculate_origin_destination(cable.destination.loc,cable.destination.rack,cable.destination.ele,cable.destination.side,cable.destination.slot,cable.destination.conn)
-        );
+		this.cable_property_edit(pidx,cidx,'destination_name',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
 		this.cable_property_edit(pidx,cidx,'destination_loc',     false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Registered'));
-		this.cable_property_edit(pidx,cidx,'destination_rack',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'destination_ele',     false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'destination_side',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'destination_slot',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
-		this.cable_property_edit(pidx,cidx,'destination_conn',    false,global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled'));
+		this.cable_property_edit(pidx,cidx,'destination_rack',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_ele',     false,false);
+		this.cable_property_edit(pidx,cidx,'destination_side',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_slot',    false,false);
+		this.cable_property_edit(pidx,cidx,'destination_conn',    false,false);
 		this.cable_property_edit(pidx,cidx,'destination_station', false,false);
 		this.cable_property_edit(pidx,cidx,'destination_conntype',false,false);
 		this.cable_property_edit(pidx,cidx,'destination_pinlist', false,false);
@@ -1905,23 +2096,7 @@ required_field_html+' required feild';
         search_controls.find('select[name="owner"]').val(uid);
 		var params = {owner:uid};
 		this.search_impl(params);
-    };
-    this.search_projects_by_jobnumber = function(jobnumber) {
-        this.init();
-        this.search_reset();
-        var search_controls = $('#projects-search-controls');
-        search_controls.find('select[name="job"]').val(jobnumber);
-		var params = {job:jobnumber};
-		this.search_impl(params);
-    };
-    this.search_projects_by_jobnumber_prefix = function(prefix) {
-        this.init();
-        this.search_reset();
-        var search_controls = $('#projects-search-controls');
-        search_controls.find('select[name="prefix"]').val(prefix);
-		var params = {prefix:prefix};
-		this.search_impl(params);
-    };
+    }
 	this.search_reset = function() {
         var search_controls = $('#projects-search-controls');
         search_controls.find('input[name="title"]').val('');

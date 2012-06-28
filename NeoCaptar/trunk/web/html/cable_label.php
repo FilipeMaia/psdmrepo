@@ -26,10 +26,11 @@ function report_error($msg) {
 }
 function label($pdf, $cable, $now, $src2dst=true) {
 
-    $font_size = 7;
+    $font_size = 6;
     $angle = 0;
-    $max_length = 18;
-
+    $max_length = 23+7;
+    $first = 10;
+    $second = 20;
     // Visible areas:
     //
     //   Left label: x:10..110, y: 150..250
@@ -47,31 +48,52 @@ function label($pdf, $cable, $now, $src2dst=true) {
 //    $pdf->rectangle(145, 0,110,35);
 //    $pdf->rectangle(150, 5,100,25);
 
-    $pdf->selectFont( './fonts/Courier-Bold.afm' );
+    //$pdf->selectFont( './fonts/Courier.afm' );
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    38, 29, $font_size, 'R00',                                                   $angle);
+    //$pdf->addText  (    58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
+    $pdf->addText  (    53, 29, $font_size, $cable->origin_pinlist(),                                $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (145+ $first, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (145+38, 29, $font_size, 'R00',                                                   $angle);
+    //$pdf->addText  (145+58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
+    $pdf->addText  (145+53, 29, $font_size, $cable->destination_pinlist(),                           $angle);
 
-    $pdf->addText  (    25, 29, $font_size, $cable->cable(),                                    $angle);
-    $pdf->addText  (145+25, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 22, $font_size, "to:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second, 22, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
 
-    $pdf->addText  (     8, 22, $font_size, "to:",                                              $angle);
-    $pdf->addText  (    25, 22, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (145+ $first, 22, $font_size, "to:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (145+$second, 22, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
 
-    $pdf->addText  (145+ 8, 22, $font_size, "to:",                                              $angle);
-    $pdf->addText  (145+25, 22, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 16, $font_size, "fr:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second, 16, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
 
-    $pdf->addText  (     8, 16, $font_size, "fr:",                                              $angle);
-    $pdf->addText  (    25, 16, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (145+ $first, 16, $font_size, "fr:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (145+$second, 16, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
 
-    $pdf->addText  (145+ 8, 16, $font_size, "fr:",                                              $angle);
-    $pdf->addText  (145+25, 16, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first,  9, $font_size, "fn:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
 
-    $pdf->addText  (     8,  9, $font_size, "fn:",                                              $angle);
-    $pdf->addText  (    25,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (145+ $first,  9, $font_size, "fn:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (145+$second,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
 
-    $pdf->addText  (145+ 8,  9, $font_size, "fn:",                                              $angle);
-    $pdf->addText  (145+25,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
-
-    $pdf->addText  (    25,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
-    $pdf->addText  (145+25,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
+    $pdf->addText  (     $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
+    $pdf->addText  (145+ $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
 
 //    $pdf->addText  (    25, 28, $font_size, $cable->cable(),            $angle);
 //    $pdf->addText  (145+25, 28, $font_size, $cable->cable(),            $angle);

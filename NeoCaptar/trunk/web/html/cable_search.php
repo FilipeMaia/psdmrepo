@@ -28,6 +28,9 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 function export_cables2excel($cables,$path,$user) {
 
     require_once( 'PHPExcel.php' );
+  
+    $title = count($cables) ? $cables[0]->project()->title() : '';
+    $owner = count($cables) ? $cables[0]->project()->owner() : '';
 
     $objPHPExcel = new PHPExcel();
 
@@ -38,8 +41,8 @@ function export_cables2excel($cables,$path,$user) {
                                  ->setDescription("Test document for Office 2007 XLSX, generated from PCDS Neo-CAPTAR Database")
                                  ->setKeywords("office 2007 openxml neocaptar cable")
                                  ->setCategory("Cables");
-
     $objPHPExcel->setActiveSheetIndex(0);
+    $objPHPExcel->getActiveSheet()->getHeaderFooter()->setOddHeader('&14 &B'.$title.', &D &T');
 
     $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
     $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
@@ -59,32 +62,42 @@ function export_cables2excel($cables,$path,$user) {
     $objPHPExcel->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
     $objPHPExcel->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
 
+    function set_cell_borders($e,$c) {
+        $e->getActiveSheet()->getStyle($c)->applyFromArray( array(
+            'borders'  => array(
+                'top'  => array('style' => PHPExcel_Style_Border::BORDER_THIN),
+                'left' => array('style' => PHPExcel_Style_Border::BORDER_THIN))
+        ));
+    }
     function title2bold($title) {
         $objRichText = new PHPExcel_RichText();
         $objRichText->createTextRun($title)->getFont()->setBold(true);
         return $objRichText;
-    }
-    $objPHPExcel->getActiveSheet()->setCellValue('A3', title2bold('Status'));
-    $objPHPExcel->getActiveSheet()->setCellValue('B3', title2bold('Job #'));
-    $objPHPExcel->getActiveSheet()->setCellValue('C3', title2bold('Cable #'));
-    $objPHPExcel->getActiveSheet()->setCellValue('D3', title2bold('Device'));
-    $objPHPExcel->getActiveSheet()->setCellValue('E3', title2bold('Function'));
-    $objPHPExcel->getActiveSheet()->setCellValue('F3', title2bold('Cable Type'));
-    $objPHPExcel->getActiveSheet()->setCellValue('G3', title2bold('Length'));
-    $objPHPExcel->getActiveSheet()->setCellValue('H3', title2bold('Routing'));
-    $objPHPExcel->getActiveSheet()->setCellValue('I3', title2bold('Source/Destination'));
-    $objPHPExcel->getActiveSheet()->setCellValue('J3', title2bold('Loc.'));
-    $objPHPExcel->getActiveSheet()->setCellValue('K3', title2bold('Rack'));
-    $objPHPExcel->getActiveSheet()->setCellValue('L3', title2bold('Ele.'));
-    $objPHPExcel->getActiveSheet()->setCellValue('M3', title2bold('Side'));
-    $objPHPExcel->getActiveSheet()->setCellValue('N3', title2bold('Slot'));
-    $objPHPExcel->getActiveSheet()->setCellValue('O3', title2bold('Conn #'));
-    $objPHPExcel->getActiveSheet()->setCellValue('P3', title2bold('Station'));
-    $objPHPExcel->getActiveSheet()->setCellValue('Q3', title2bold('Con.Type'));
-    $objPHPExcel->getActiveSheet()->setCellValue('R3', title2bold('Pinlist'));
-    $objPHPExcel->getActiveSheet()->setCellValue('S3', title2bold('Instr.'));
+    }  
+    $row = 1;
+    $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, title2bold('Status'));
+    $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, title2bold('Job #'));
+    $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, title2bold('Cable #'));
+    $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, title2bold('Device'));
+    $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, title2bold('Function'));
+    $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, title2bold('Cable Type'));
+    $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, title2bold('Length'));
+    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, title2bold('Routing'));
+    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, title2bold('Source/Destination'));
+    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, title2bold('Loc.'));
+    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, title2bold('Rack'));
+    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, title2bold('Ele.'));
+    $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, title2bold('Side'));
+    $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, title2bold('Slot'));
+    $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, title2bold('Conn #'));
+    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, title2bold('Station'));
+    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, title2bold('Con.Type'));
+    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, title2bold('Pinlist'));
+    $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, title2bold('Instr.'));
+    foreach( array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') as $k=>$v )
+        set_cell_borders($objPHPExcel,$v.$row);
 
-    $objPHPExcel->getActiveSheet()->getStyle('A3:S3')->applyFromArray( array(
+    $objPHPExcel->getActiveSheet()->getStyle('A3:S'.$row)->applyFromArray( array(
         'font'      => array('bold'       => true),
         'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT),
         'borders'   => array('top'        => array('style' => PHPExcel_Style_Border::BORDER_THIN)),
@@ -95,13 +108,15 @@ function export_cables2excel($cables,$path,$user) {
 
     $objPHPExcel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1,3);
 
-
     function set_vertical_pair($e,$c,$v1,$v2) {
-        $e->getActiveSheet()->getCell($c)->setValue("{$v1}\n{$v2}");
+        $e->getActiveSheet()->getCell($c)->setValue(" {$v1} \n {$v2} ");
         $e->getActiveSheet()->getStyle($c)->getAlignment()->setWrapText(true);
     }
-    $row = 4;
+    $row = 2;
     foreach( $cables as $cable ) {
+
+        foreach( array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S') as $k=>$v )
+            set_cell_borders($objPHPExcel,$v.$row);
 
         $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$cable->status());
         $objPHPExcel->getActiveSheet()->setCellValue('B'.$row,$cable->project()->job());

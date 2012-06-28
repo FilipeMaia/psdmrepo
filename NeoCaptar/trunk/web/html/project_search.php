@@ -46,6 +46,12 @@ try {
     $owner = NeoCaptarUtils::get_param_GET('owner',$required,$allow_empty);
     if( $owner == '' ) $owner = null;
 
+    $job = NeoCaptarUtils::get_param_GET('job',$required,$allow_empty);
+    if( $job == '' ) $job = null;
+
+    $prefix = NeoCaptarUtils::get_param_GET('prefix',$required,$allow_empty);
+    if( $prefix == '' ) $prefix = null;
+
     $source_has_hours = false;
     $begin = NeoCaptarUtils::get_param_GET_time('begin',$required,$allow_empty,$source_has_hours);
     $end   = NeoCaptarUtils::get_param_GET_time('end',  $required,$allow_empty,$source_has_hours);
@@ -60,13 +66,20 @@ try {
 	$neocaptar->begin();
 
 	$project2array = array();
-    if( is_null($id)) {
-        foreach( $neocaptar->projects($title,$owner,$begin,$end) as $p )
-            array_push($project2array, NeoCaptarUtils::project2array($p));
-    } else {
+    if( !is_null($id)) {
         $project = $neocaptar->find_project_by_id($id);
         if(is_null($project)) NeoCaptarUtils::report_error('no project found for id: '.$id);
         array_push($project2array, NeoCaptarUtils::project2array($project));
+    } else if(!is_null($job)) {
+        $project = $neocaptar->find_project_by_jobnumber($job);
+        if(is_null($project)) NeoCaptarUtils::report_error('no project found for job number: '.$job);
+        array_push($project2array, NeoCaptarUtils::project2array($project));
+    } else if(!is_null($prefix)) {
+        foreach( $neocaptar->find_projects_by_jobnumber_prefix($prefix) as $p )
+            array_push($project2array, NeoCaptarUtils::project2array($p));
+    } else {
+        foreach( $neocaptar->projects($title,$owner,$begin,$end) as $p )
+            array_push($project2array, NeoCaptarUtils::project2array($p));
     }
 
 	$neocaptar->commit();

@@ -304,7 +304,7 @@ function p_appl_admin() {
         var html =
             name == '' ?
             '' :
-            '<a href="javascript:global_search_cables_by_jobnumber('+"'"+name+"'"+')">'+name+'</a>';
+            '<a href="javascript:global_search_projects_by_jobnumber('+"'"+name+"'"+')" title="find a project correponding to this number">'+name+'</a>';
         return html;
     };
     this.jobnumber2html = function(jnidx) {
@@ -385,7 +385,7 @@ function p_appl_admin() {
             click(function () {
                 var jnidx = this.name;
                 var jn = that.jobnumber[jnidx];
-                global_search_cables_by_jobnumber_prefix(jn.prefix);
+                global_search_projects_by_jobnumber_prefix(jn.prefix);
             });
     };
 	this.jobnumbers_update = function(jnidx) {

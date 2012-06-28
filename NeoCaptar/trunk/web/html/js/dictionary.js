@@ -56,7 +56,7 @@ function p_appl_dictionary() {
         this.init_instrs();
 	};
     this.can_manage = function() {
-        return global_current_user.is_administrator;
+        return global_current_user.is_administrator || global_current_user.can_manage_projects;
     };
     this.update = function(cable) {
 		this.save_cable    (cable.cable_type, '', cable.origin.conntype);

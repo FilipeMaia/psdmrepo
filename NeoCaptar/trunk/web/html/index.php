@@ -788,20 +788,22 @@ function global_switch_context(application_name, context_name) {
     return null;
 }
 function global_simple_search                     ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
-function global_search_cable_by_cablenumber       (cablenumber) { global_switch_context('search',  'cables').search_cable_by_cablenumber       (cablenumber); }
-function global_search_cable_by_id                (id)          { global_switch_context('search',  'cables').search_cable_by_id                (id); }
-function global_search_cables_by_prefix           (prefix)      { global_switch_context('search',  'cables').search_cables_by_prefix           (prefix); }
-function global_search_cables_by_jobnumber        (jobnumber)   { global_switch_context('search',  'cables').search_cables_by_jobnumber        (jobnumber); }
-function global_search_cables_by_jobnumber_prefix (prefix)      { global_switch_context('search',  'cables').search_cables_by_jobnumber_prefix (prefix); }
-function global_search_cables_by_dict_cable_id    (id)          { global_switch_context('search',  'cables').search_cables_by_dict_cable_id    (id); }
-function global_search_cables_by_dict_connector_id(id)          { global_switch_context('search',  'cables').search_cables_by_dict_connector_id(id); }
-function global_search_cables_by_dict_pinlist_id  (id)          { global_switch_context('search',  'cables').search_cables_by_dict_pinlist_id  (id); }
-function global_search_cables_by_dict_location_id (id)          { global_switch_context('search',  'cables').search_cables_by_dict_location_id (id); }
-function global_search_cables_by_dict_rack_id     (id)          { global_switch_context('search',  'cables').search_cables_by_dict_rack_id     (id); }
-function global_search_cables_by_dict_routing_id  (id)          { global_switch_context('search',  'cables').search_cables_by_dict_routing_id  (id); }
-function global_search_cables_by_dict_instr_id    (id)          { global_switch_context('search',  'cables').search_cables_by_dict_instr_id    (id); }
-function global_search_project_by_id              (id)          { global_switch_context('projects','search').search_project_by_id              (id); }
-function global_search_projects_by_owner          (uid)         { global_switch_context('projects','search').search_projects_by_owner          (uid); }
+function global_search_cable_by_cablenumber        (cablenumber) { global_switch_context('search',  'cables').search_cable_by_cablenumber        (cablenumber); }
+function global_search_cable_by_id                 (id)          { global_switch_context('search',  'cables').search_cable_by_id                 (id); }
+function global_search_cables_by_prefix            (prefix)      { global_switch_context('search',  'cables').search_cables_by_prefix            (prefix); }
+function global_search_cables_by_jobnumber         (jobnumber)   { global_switch_context('search',  'cables').search_cables_by_jobnumber         (jobnumber); }
+function global_search_cables_by_jobnumber_prefix  (prefix)      { global_switch_context('search',  'cables').search_cables_by_jobnumber_prefix  (prefix); }
+function global_search_cables_by_dict_cable_id     (id)          { global_switch_context('search',  'cables').search_cables_by_dict_cable_id     (id); }
+function global_search_cables_by_dict_connector_id (id)          { global_switch_context('search',  'cables').search_cables_by_dict_connector_id (id); }
+function global_search_cables_by_dict_pinlist_id   (id)          { global_switch_context('search',  'cables').search_cables_by_dict_pinlist_id   (id); }
+function global_search_cables_by_dict_location_id  (id)          { global_switch_context('search',  'cables').search_cables_by_dict_location_id  (id); }
+function global_search_cables_by_dict_rack_id      (id)          { global_switch_context('search',  'cables').search_cables_by_dict_rack_id      (id); }
+function global_search_cables_by_dict_routing_id   (id)          { global_switch_context('search',  'cables').search_cables_by_dict_routing_id   (id); }
+function global_search_cables_by_dict_instr_id     (id)          { global_switch_context('search',  'cables').search_cables_by_dict_instr_id     (id); }
+function global_search_project_by_id               (id)          { global_switch_context('projects','search').search_project_by_id               (id); }
+function global_search_projects_by_owner           (uid)         { global_switch_context('projects','search').search_projects_by_owner           (uid); }
+function global_search_projects_by_jobnumber       (jobnumber)   { global_switch_context('projects','search').search_projects_by_jobnumber       (jobnumber); }
+function global_search_projects_by_jobnumber_prefix(prefix)      { global_switch_context('projects','search').search_projects_by_jobnumber_prefix(prefix); }
 
 function global_search_cables_by_dict_device_location_id (id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_location_id (id); }
 function global_search_cables_by_dict_device_region_id   (id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_region_id   (id); }
@@ -850,7 +852,7 @@ function global_truncate_station  (str) { return str.substring(0, 6); }
 
 function global_truncate_device          (str) { return str.substring(0,18); }
 function global_truncate_device_location (str) { return str.substring(0, 3); }
-function global_truncate_device_region   (str) { return str.substring(0, 3); }
+function global_truncate_device_region   (str) { return str.substring(0, 4); }
 function global_truncate_device_component(str) { return str.substring(0, 3); }
 function global_truncate_device_counter  (str) { return str.substring(0, 2); }
 function global_truncate_device_suffix   (str) { return str.substring(0, 3); }
@@ -1270,8 +1272,8 @@ HERE;
       </div>
       <div style="float:left; margin-left:20px;">
         <div style="margin-top:20px;">
-          <div style="float:left; "><input type="text" size="3" name="device_region2add" title="fill in new region (exactly 3 characters), then press RETURN to save" /></div>
-          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new region (RRR) here</div>
+          <div style="float:left; "><input type="text" size="3" name="device_region2add" title="fill in new region (3 or 4 characters), then press RETURN to save" /></div>
+          <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new region (RRR or RRRR) here</div>
           <div style="clear:both; "></div>
         </div>
         <div id="dictionary-devices-regions"></div>

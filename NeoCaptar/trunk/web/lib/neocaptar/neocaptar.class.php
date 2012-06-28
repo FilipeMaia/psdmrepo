@@ -414,31 +414,34 @@ class NeoCaptar {
     }
 
     public function projects($title=null,$owner=null,$begin=null,$end=null) {
-        $extra_condition = '';
+        $condition = '';
         if(!is_null($title)) {
             $title_escaped = $this->connection->escape_string(trim($title));
-            if($extra_condition == '') $extra_condition .= ' WHERE ';
-            else                       $extra_condition .= ' AND ';
-            if($title_escaped   != '') $extra_condition .= " title LIKE '%{$title_escaped}%'";
+            if($title_escaped != '')
+                $condition .= ($condition == '' ? '' : ' AND ')." title LIKE '%{$title_escaped}%'";
         }
         if(!is_null($owner)) {
             $owner_escaped = $this->connection->escape_string(trim($owner));
-            if($extra_condition == '') $extra_condition .= ' WHERE ';
-            else                       $extra_condition .= ' AND ';
-            if( $owner_escaped != '' ) $extra_condition .= " owner='{$owner_escaped}'";
+            if( $owner_escaped != '' )
+                $condition .= ($condition == '' ? '' : ' AND ')." owner='{$owner_escaped}'";
         }
         if(!is_null($begin)) {
-            if($extra_condition == '') $extra_condition .= ' WHERE ';
-            else                       $extra_condition .= ' AND ';
-            $extra_condition .= " created_time >= {$begin->to64()}";
+            $condition .= ($condition == '' ? '' : ' AND ')." created_time >= {$begin->to64()}";
         }
         if(!is_null($end)) {
-            if($extra_condition == '') $extra_condition .= ' WHERE ';
-            else                       $extra_condition .= ' AND ';
-            $extra_condition .= " created_time < {$end->to64()}";
+            $condition .= ($condition == '' ? '' : ' AND ')." created_time < {$end->to64()}";
         }
+        return $this->find_projects_by_($condition);
+    }
+    public function find_projects_by_jobnumber_prefix( $prefix ) {
+    	$prefix_escaped = $this->connection->escape_string(trim($prefix));
+        return $this->find_projects_by_(
+            "job LIKE '%{$prefix_escaped}%'");
+    }
+    public function find_projects_by_( $condition='' ) {
+        $where_condition = $condition == '' ? '' : "WHERE {$condition}";
         $list = array();
-        $sql = "SELECT * FROM {$this->connection->database}.project {$extra_condition} ORDER BY title";
+        $sql = "SELECT * FROM {$this->connection->database}.project {$where_condition} ORDER BY title";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -474,7 +477,7 @@ class NeoCaptar {
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
         	throw new NeoCaptarException (
-        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt. Condition: '{$condition}'" );
         return new NeoCaptarProject (
         	$this->connection,
             $this,
