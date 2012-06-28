@@ -153,7 +153,7 @@ class pyana_waveform (object) :
                 detsrc = source.split('|')[0].split('-')[0]
                 if detsrc == "AmoGasdet":
                     detsrc = "AmoGD"
-                cfg = env.configStore().get("Psana::Acqiris::ConfigV1", detsrc)
+                cfg = env.getConfig("Psana::Acqiris::ConfigV1", detsrc)
             else:
                 cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
 
@@ -161,6 +161,7 @@ class pyana_waveform (object) :
             nsmp = cfg.horiz().nbrSamples()
             unit = cfg.horiz().sampInterval() * 1.0e9 # nano-seconds
             span = nsmp * unit
+            self.span = span
 
             if self.wf_window is None:
                 self.wf_window = [ 0, nsmp ]
@@ -242,21 +243,14 @@ class pyana_waveform (object) :
             if acqData :
                 if self.ts[label] is None:
                     if self.psana:
-                        print "$@%!$#**#@ ... if you see a crash here, it's probably Ingrid's fault"
-                        elem = acqData.data(channel) # this is a DataDescElem
-                        print "*** elem.nbrSamplesInSeg()=", elem.nbrSamplesInSeg() # e.g. 1000
-                        print "*** elem.indexFirstPoint()=", elem.indexFirstPoint() # e.g. 0
-                        print "*** elem.nbrSegments()=", elem.nbrSegments()         # e.g. 1
-                        timestamp = elem.timestamp() # this is an ndarray with only one element per segment
-                        print "*** elem.timestamp=", timestamp
-                        print "*** len(elem.timestamp)=", len(timestamp)
-                        print "*** elem.nbrSegments()=", elem.nbrSegments()
-                        timestamps = [ timestamp[i].pos() * 1.0e9 for i in range(elem.nbrSegments()) ]  # nano-seconds
-                        self.ts[label] = timestamps[self.wf_window[0]:self.wf_window[1]]
-                        print "self.ts[", label, "] = ", self.ts[label]
+                        nbrSamplesInSeg = acqData.data(channel).nbrSamplesInSeg()
+                        step = self.span / 1.0e5
+                        timestamps = [ i * step for i in range(nbrSamplesInSeg) ]
+                        self.ts[label] = np.array(timestamps)
                     else:
                         self.ts[label] = acqData.timestamps()[self.wf_window[0]:self.wf_window[1]] * 1.0e9
                         # nano-seconds
+                    #print self.ts[label]
 
                 # a waveform
                 if self.psana:
