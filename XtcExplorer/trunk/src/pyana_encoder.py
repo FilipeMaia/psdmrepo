@@ -66,6 +66,11 @@ class  pyana_encoder ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
         self.n_shots = 0
         self.accu_start = 0
         
@@ -73,7 +78,10 @@ class  pyana_encoder ( object ) :
         for source in self.sources :
             self.data[source] = EncoderData( source ) 
 
-            config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
+            if self.psana:
+                config = env.getConfig("Psana::Encoder::Config", source)
+            else:
+                config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
 
             message = "%s configuration (%s): \n"%(source, type(config).__name__ )
 
@@ -93,11 +101,18 @@ class  pyana_encoder ( object ) :
             except:
                 pass
 
-            message += "  Counter mode = %s \n"            % config._count_mode
-            message += "  Quadrature mode = %s \n"         % config._quadrature_mode
-            message += "  Trigger input number = %s \n"    % config._input_num
-            message += "  Trigger on Rising Edge? = %s \n" % config._input_rising 
-            message += "  Timestamp tics per sec = %s"     % config._ticks_per_sec           
+            if self.psana:
+                message += "  Counter mode = %s \n"            % config.count_mode()
+                message += "  Quadrature mode = %s \n"         % config.quadrature_mode()
+                message += "  Trigger input number = %s \n"    % config.input_num()
+                message += "  Trigger on Rising Edge? = %s \n" % config.input_rising ()
+                message += "  Timestamp tics per sec = %s"     % config.ticks_per_sec()
+            else:
+                message += "  Counter mode = %s \n"            % config._count_mode
+                message += "  Quadrature mode = %s \n"         % config._quadrature_mode
+                message += "  Trigger input number = %s \n"    % config._input_num
+                message += "  Trigger on Rising Edge? = %s \n" % config._input_rising 
+                message += "  Timestamp tics per sec = %s"     % config._ticks_per_sec           
             #logging.info(message)
             print message
 
@@ -113,18 +128,30 @@ class  pyana_encoder ( object ) :
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 
-            encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
+            if self.psana:
+                encoder = evt.get("Psana::Encoder::Data", source )
+            else:
+                encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
             if encoder:
-                if type(encoder).__name__ =='DataV1':
+                if 'DataV1' in type(encoder).__name__:
                     self.values[source].append( encoder.value() )
-                    self.counts[source].append( encoder._encoder_count )
-                if type(encoder).__name__ == 'DataV2':                    
+                    if self.psana:
+                        self.counts[source].append( encoder.encoder_count() )
+                    else:
+                        self.counts[source].append( encoder._encoder_count )
+                elif 'DataV2' in type(encoder).__name__:
                     self.values[source].append( encoder.value(self.channel[source]) )
-                    self.counts[source].append( encoder._encoder_count[self.channel[source]] )
+                    if self.psana:
+                        self.counts[source].append( encoder.encoder_count()[self.channel[source]] )
+                    else:
+                        self.counts[source].append( encoder._encoder_count[self.channel[source]] )
                 else:
                     print "Unknown type"
 
-                self.timestmps[source].append( encoder._33mhz_timestamp )
+                if self.psana:
+                    self.timestmps[source].append( encoder.timestamp() )
+                else:
+                    self.timestmps[source].append( encoder._33mhz_timestamp )
             else :
                 print "pyana_encoder: No EncoderData from %s found" % source
                 self.values[source].append( -1 )
