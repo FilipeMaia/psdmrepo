@@ -96,7 +96,7 @@ class CSPadConfigPars(object) :
         self.detDimX  = 1765  # Quad image X dimension 
         self.detDimY  = 1765  # Quad image Y dimension 
 
-        self.isCSPad2x2 = False # distinguish the CSPad2x2 (CSPadMiniElement) from regular CSPad (CSPadElement)
+        self.isCSPad2x2 = False # distinguish the CSPad2x2 (CSPad2x2Element) from regular CSPad (CSPadElement)
 
        #self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
        #self.dsnameCSpadV3Conf= "/Configure:0000/CsPad::ConfigV3/"                        #CxiDs1.0:Cspad.0/config - is added auto
@@ -157,8 +157,8 @@ class CSPadConfigPars(object) :
 
     def setCSPadConfiguration( self, fname, dsname, event=0 ):
         """Takes the CSPad configuration parameters from hdf5 file."""
-        if gm.CSpadMiniElementIsInTheName(dsname) :
-            print 'getCSpadConfiguration(...): This is a CSpadMiniElement. Special configuration is not required'
+        if gm.CSpad2x2ElementIsInTheName(dsname) :
+            print 'getCSpadConfiguration(...): This is a CSpad2x2Element. Special configuration is not required'
             self.isCSPad2x2 = True
             return
 
@@ -179,8 +179,8 @@ class CSPadConfigPars(object) :
 
     def setCSPadConfigurationFromOpenFile( self, h5file, dsname, event=0 ):
         """Takes the CSPad configuration parameters from open hdf5 file."""
-        if gm.CSpadMiniElementIsInTheName(dsname) :
-            print 'getCSpadConfiguration(...): This is a CSpadMiniElement. Special configuration is not required'
+        if gm.CSpad2x2ElementIsInTheName(dsname) :
+            print 'getCSpadConfiguration(...): This is a CSpad2x2Element. Special configuration is not required'
             self.isCSPad2x2 = True
             return
 

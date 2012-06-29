@@ -133,6 +133,41 @@ def main_example_xpp() :
     print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
     gg.show()
 
+
+#----------------------------------------------
+
+def main_example_CSpad2x2() :
+
+    print 'Start test in main_example_CSpad2x2()'
+
+    fname = '/reg/d/psdm/xpp/xppi0212/hdf5/xppi0212-r0046.h5'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.0/data'
+    event = 0
+
+    h5file = hm.hdf5mets.open_hdf5_file(fname)
+    #grp = hm.hdf5mets.get_dataset_from_hdf5_file('/')    
+    grp = hm.hdf5mets.get_dataset_from_hdf5_file('/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1')    
+    hm.print_hdf5_item_structure(grp)
+    arrevts = hm.hdf5mets.get_dataset_from_hdf5_file(dsname)
+    arr1ev = arrevts[event]
+    hm.hdf5mets.close_hdf5_file()
+
+    #print 'arr1ev=\n',       arr1ev
+    print 'arr1ev.shape=\n', arr1ev.shape
+    #arr = arr1ev[:,:,0]
+
+    cspadimg = cip.CSPadImageProducer()
+    arr = cspadimg.getImageArrayForCSpad2x2Element( arr1ev )
+
+    AmpRange = (0,1200)
+    gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
+    gg.move(300,100)
+
+    gg.plotSpectrum(arr,range=AmpRange)
+    gg.move(10,100)
+
+    gg.show()
+
 #----------------------------------------------
 
 def example_of_image_built_from_pix_coordinate_array_shaped_as_data() :
@@ -182,6 +217,7 @@ if __name__ == "__main__" :
     #example_of_image_built_from_pix_coordinate_array_for_entire_cspad()
     #main_example_cxi()
     main_example_xpp()
+    #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )
 
 #----------------------------------------------

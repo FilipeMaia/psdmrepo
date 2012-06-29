@@ -69,8 +69,8 @@ class CSPadImageProducer (object) :
     def getImageArrayForQuad( self, arr1ev, quadNum=None ):
         """Returns the image array for one quad"""
 
-        if ccp.cspadconfig.isCSPad2x2 : # For 2x2 Mini
-            return self.getImageArrayForCSPadMiniElement( arr1ev )
+        if ccp.cspadconfig.isCSPad2x2 : # For CSpad2x2
+            return self.getImageArrayForCSpad2x2Element( arr1ev )
 
         if quadNum == None :
             self.quad = ccp.cspadconfig.cspadQuad
@@ -209,8 +209,8 @@ class CSPadImageProducer (object) :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
-        if ccp.cspadconfig.isCSPad2x2 : # For 2x2 Mini
-            self.arr2dCSpad = self.getImageArrayForCSPadMiniElement( arr1ev )
+        if ccp.cspadconfig.isCSPad2x2 : # For CSpad2x2
+            self.arr2dCSpad = self.getImageArrayForCSpad2x2Element( arr1ev )
 
         else : # For regular CSPad detector
             self.arr2dCSpad = self.getImageArrayForCSPadElement( arr1ev )
@@ -224,7 +224,7 @@ class CSPadImageProducer (object) :
 
 #---------------------
 
-    def getImageArrayForMiniElementPair( self, arr1ev, pairNum=None ):
+    def getImageArrayForCSpad2x2ElementPair( self, arr1ev, pairNum=None ):
         """Returns the image array for pair of ASICs"""
         if pairNum == None :
             self.pair = ccp.cspadconfig.cspadPair
@@ -233,23 +233,23 @@ class CSPadImageProducer (object) :
 
         #arr2x1 = arr1ev[0:185,0:388,self.pair]
         arr2x1 = arr1ev[:,:,self.pair]
-        asics  = hsplit(arr2x1,2)
-        arrgap = zeros ((185,3), dtype=np.float32)
-        arr2d  = hstack((asics[0],arrgap,asics[1]))
+        asics  = np.hsplit(arr2x1,2)
+        arrgap = np.zeros ((185,3), dtype=np.float32)
+        arr2d  = np.hstack((asics[0],arrgap,asics[1]))
         return arr2d
 
 #---------------------
 
-    def getImageArrayForCSPadMiniElement( self, arr1ev ):
-        """Returns the image array for the CSpadMiniElement or CSpad2x2"""       
+    def getImageArrayForCSpad2x2Element( self, arr1ev ):
+        """Returns the image array for the CSpad2x2Element or CSpad2x2"""       
 
-        arr2x1Pair0 = self.getImageArrayForMiniElementPair(arr1ev,0)
-        arr2x1Pair1 = self.getImageArrayForMiniElementPair(arr1ev,1)
+        arr2x1Pair0 = self.getImageArrayForCSpad2x2ElementPair(arr1ev,0)
+        arr2x1Pair1 = self.getImageArrayForCSpad2x2ElementPair(arr1ev,1)
         wid2x1      = arr2x1Pair0.shape[0]
         len2x1      = arr2x1Pair0.shape[1]
 
-        arrgapV = zeros( (20,len2x1), dtype=np.float ) # dtype=np.int16 
-        arr2d   = vstack((arr2x1Pair0, arrgapV, arr2x1Pair1))
+        arrgapV = np.zeros( (20,len2x1), dtype=np.float ) # dtype=np.int16 
+        arr2d   = np.vstack((arr2x1Pair0, arrgapV, arr2x1Pair1))
 
         #print 'arr2d.shape=', arr2d.shape
         #print 'arr2d=',       arr2d

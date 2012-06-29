@@ -11,6 +11,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2012-06-29 Mikhail S. Dubrovin
+Tag: V00-00-07
+- Change names fro CSpad Mini -> 2x2
+- Add Example for CSpad2x1
+M       src/Examples.py
+M       src/CSPadImageProducer.py
+M       src/GlobalMethods.py
+M       src/CSPadConfigPars.py
+
 #---------------------
 2012-06-25 Mikhail S. Dubrovin
 Tag: V00-00-06
