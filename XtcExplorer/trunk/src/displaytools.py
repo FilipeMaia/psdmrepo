@@ -114,6 +114,20 @@ class DataDisplay(object):
 
         return
 
+    def gasdet_energies(self, gasdet, i):
+        try:
+            energies = gasdet.energies[:,i]
+        except:
+            if i == 0:
+                energies = [ x.f_11_ENRC() for x in gasdet.energies ]
+            elif i == 1:
+                energies = [ x.f_12_ENRC() for x in gasdet.energies ]
+            elif i == 2:
+                energies = [ x.f_21_ENRC() for x in gasdet.energies ]
+            elif i == 3:
+                energies = [ x.f_22_ENRC() for x in gasdet.energies ]
+        return energies
+
     def plot_gasdet(self,gasdet):
         print "Making plot of gasdet of length %d"%gasdet.shots.size
                 
@@ -125,25 +139,28 @@ class DataDisplay(object):
         
         # numpy array (4d)
         ax1 = fig.add_subplot(221)
-        n, bins, patches = plt.hist(gasdet.energies[:,0], 60,histtype='stepfilled')
+        n, bins, patches = plt.hist(self.gasdet_energies(gasdet, 0), 60, histtype='stepfilled')
         plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
         plt.title('Energy 11')
         plt.xlabel('Energy E[0]',horizontalalignment='left')
         
         ax2 = fig.add_subplot(222)
-        n, bins, patches = plt.hist(gasdet.energies[:,1], 60,histtype='stepfilled')
+        n, bins, patches = plt.hist(self.gasdet_energies(gasdet, 1), 60, histtype='stepfilled')
+        #n, bins, patches = plt.hist(gasdet.energies[:,1], 60,histtype='stepfilled')
         plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
         plt.title('Energy 12')
         plt.xlabel('Energy E[1]',horizontalalignment='left')
         
         ax3 = fig.add_subplot(223)
-        n, bins, patches = plt.hist(gasdet.energies[:,2], 60,histtype='stepfilled')
+        n, bins, patches = plt.hist(self.gasdet_energies(gasdet, 2), 60, histtype='stepfilled')
+        #n, bins, patches = plt.hist(gasdet.energies[:,2], 60,histtype='stepfilled')
         plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
         plt.title('Energy 21')
         plt.xlabel('Energy E[2]',horizontalalignment='left')
         
         ax4 = fig.add_subplot(224)
-        n, bins, patches = plt.hist(gasdet.energies[:,3], 60,histtype='stepfilled')
+        n, bins, patches = plt.hist(self.gasdet_energies(gasdet, 3), 60, histtype='stepfilled')
+        #n, bins, patches = plt.hist(gasdet.energies[:,3], 60,histtype='stepfilled')
         plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
         plt.title('Energy 22')
         plt.xlabel('Energy E[3]',horizontalalignment='left')
