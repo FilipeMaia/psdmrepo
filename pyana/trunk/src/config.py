@@ -197,6 +197,10 @@ class config ( object ) :
             try:
                 _log.debug("getJobConfig section=%s option=%s", section, option)
                 strval = self._config.get(section, option)
+                # remove psana-style continuation characters
+                strval = strval.replace("\\\n", " ")
+                if strval[len(strval) - 1] == "\\":
+                    strval = strval[:len(strval) - 1]
                 # convert it to correct type
                 return opt[1](strval)
             except ConfigParser.NoSectionError:
