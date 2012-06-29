@@ -174,7 +174,11 @@ class DataDisplay(object):
         fig.clf()
         fig.subplots_adjust(wspace=0.4, hspace=0.4)
         fig.suptitle("BldInfo:PhaseCavity data shot#%d"%self.event_number)
-        
+
+        # We need at least two shots for most of these subplots.
+        if pc.shots.size < 2:
+            return
+
         ax1 = fig.add_subplot(231)
         n, bins, patches = plt.hist(pc.time[0], 60,histtype='stepfilled')
         plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
