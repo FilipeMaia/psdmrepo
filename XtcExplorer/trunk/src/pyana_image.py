@@ -325,7 +325,7 @@ class  pyana_image ( object ) :
             elif addr.find("Fli")>0:
                 image = frame.data(self.config)
 
-            elif addr.find("Fccd")>0 and self.psana:
+            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "TM6740" in addr):
                 if frame.depth() > 8:
                     image = frame.data16()
                 else:
@@ -333,7 +333,11 @@ class  pyana_image ( object ) :
 
             else:
                 # all other cameras have simple arrays. 
-                image = frame.data()
+                try:
+                    image = frame.data()
+                except:
+                    print "\n*** Could not get frame.data() for", addr, "***\n"
+                    raise
 
             if image is None:
                 print "No frame image from ", addr, " in shot#", self.n_shots
