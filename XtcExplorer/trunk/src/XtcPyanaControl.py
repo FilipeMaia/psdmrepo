@@ -190,6 +190,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pyana_config_text = QtGui.QLabel(self);
         self.config_button = None
         self.econfig_button = None
+        self.psana_button = None
         self.pyana_button = None
         self.quit_button = None
         self.susp_button = None
@@ -265,8 +266,13 @@ Start with selecting data of interest to you from list on the left and general r
 
     def layout_runcontrol(self):
 
+        # Run psana button
+        self.psana_button = QtGui.QPushButton("&Run psana")
+        self.psana_button.setMaximumWidth(120)
+        self.connect(self.psana_button, QtCore.SIGNAL('clicked()'), self.run_psana)
+
         # Run pyana button
-        self.pyana_button = QtGui.QPushButton("&Run " + self.pxana)
+        self.pyana_button = QtGui.QPushButton("&Run pyana")
         self.pyana_button.setMaximumWidth(120)
         self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
 
@@ -289,6 +295,8 @@ Start with selecting data of interest to you from list on the left and general r
 
         pyana_button_line = QtGui.QHBoxLayout()
         pyana_button_line.addWidget( self.runstring_label )
+        if self.psana:
+            pyana_button_line.addWidget( self.psana_button )
         pyana_button_line.addWidget( self.pyana_button )
 
         pyana_qsusp_line = QtGui.QHBoxLayout()
@@ -303,6 +311,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.runcontrol.setAlignment( pyana_qsusp_line, QtCore.Qt.AlignRight )
 
         ## hide all first
+        self.psana_button.setDisabled(True)
         self.pyana_button.setDisabled(True)
         self.susp_button.setDisabled(True)
         self.quit_button.setDisabled(True)
@@ -747,7 +756,7 @@ Start with selecting data of interest to you from list on the left and general r
         if self.configfile is not None:
             # if a config file is already in use, pop up a warning that it will be replaced. 
             warning_text = """You are currently using a saved file (%s).
-New checkboxe changes will NOT be merged with this file.
+New checkbox changes will NOT be merged with this file.
 A new config file with default settings will be generated.
 Do you want to proceed?
  """ % self.configfile
@@ -762,6 +771,7 @@ Do you want to proceed?
         # clear title 
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.setDisabled(True)
+        if self.psana_button is not None: self.psana_button.setDisabled(True)
         if self.pyana_button is not None: self.pyana_button.setDisabled(True)
         if self.quit_button is not None: self.quit_button.setDisabled(True)
         if self.susp_button is not None: self.susp_button.setDisabled(True)
@@ -810,33 +820,41 @@ Do you want to proceed?
 
             options_for_mod[m] = newoptions
 
-        self.configuration = "[" + self.pxana + "]"
-        self.configuration += "\nfiles = "
-        for i, fname in enumerate(self.filenames):
-            if i > 0: 
-                if self.psana:
-                    self.configuration += " \\\n\t"
+        self.configuration = ""
+        if self.psana:
+            pxana_list = [ "pyana", "psana" ]
+        else:
+            pxana_list = [ "pyana" ]
+        for pxana in pxana_list:
+            self.configuration += "[" + pxana + "]"
+            self.configuration += "\nfiles = "
+            for i, fname in enumerate(self.filenames):
+                if i > 0: 
+                    if self.psana:
+                        self.configuration += " \\\n\t"
+                    else:
+                        self.configuration += "\n\t"
+                self.configuration += fname
+    
+            self.configuration += "\nmodules ="
+            for module in modules_to_run :
+                if pxana == "psana":
+                    self.configuration += " py:"
                 else:
-                    self.configuration += "\n\t"
-            self.configuration += fname
-
-        self.configuration += "\nmodules ="
-        for module in modules_to_run :
-            if self.psana:
-                self.configuration += " py:"
-            else:
-                self.configuration += " "
-            self.configuration += module
+                    self.configuration += " "
+                self.configuration += module
+            self.configuration += "\n\n"
 
         count_m = 0
         for module in modules_to_run :
-            self.configuration += "\n\n["
+            self.configuration += "["
             self.configuration += module
             self.configuration += "]"
             #if len( options_for_mod[ count_m ] )>0 :
             for options in sorted(options_for_mod[ count_m ]) :
                 self.configuration += options
             count_m +=1
+            self.configuration += "\n\n"
             
 
         # add linebreaks if needed
@@ -1134,6 +1152,7 @@ Do you want to proceed?
         
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
+        self.psana_button.setEnabled(True)
         self.pyana_button.setEnabled(True)
 
 
@@ -1182,6 +1201,7 @@ Do you want to proceed?
 
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
+        self.psana_button.setEnabled(True)
         self.pyana_button.setEnabled(True)
 
  
@@ -1218,17 +1238,15 @@ Do you want to proceed?
 
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
+        self.psana_button.setEnabled(True)
         self.pyana_button.setEnabled(True)
         
 
  
-    def pyana_runstring(self):
+    def pxana_runstring(self):
         # Make a command sequence 
         lpoptions = []
-        if self.psana:
-            lpoptions.append("psana")
-        else:
-            lpoptions.append("pyana")
+        lpoptions.append(self.pxana)
         #if self.verbose is not None:
         #    lpoptions.append("-v")
         if self.num_cpu > 1 :
@@ -1250,14 +1268,14 @@ Do you want to proceed?
         runstring = ' '.join(lpoptions)
         return runstring
 
-    def run_pyana(self):
-        """Run pyana
+    def run_pxana(self):
+        """Run pyana/psana
 
-        Open a dialog to allow chaging options to pyana. Wait for OK, then
-        run pyana with the needed modules and configurations as requested
+        Open a dialog to allow chaging options to pyana/psana. Wait for OK, then
+        run pyana/psana with the needed modules and configurations as requested
         based on the the checkboxes
         """
-        runstring = self.pyana_runstring()
+        runstring = self.pxana_runstring()
 
         lpoptions = runstring.split(' ')
 
@@ -1290,13 +1308,13 @@ Do you want to proceed?
         else :
             return
 
-        print "Calling pyana.... "
+        print "Calling %s.... " % self.pxana
         print "     ", ' '.join(lpoptions)
 
         if 1 :
             # calling a new process
             self.proc_pyana = myPopen(lpoptions) # this runs in separate thread.
-            self.proc_status.setText("pyana process %d is running "%self.proc_pyana.pid)
+            self.proc_status.setText("%s process %d is running " % (self.pxana, self.proc_pyana.pid))
             # this blocks: 
             #stdout_value = self.proc_pyana.communicate()[0]
             #print "Here's what the pyana process communicates: ",stdout_value
@@ -1323,12 +1341,23 @@ Do you want to proceed?
             self.proc_pyana.start()
             print "I'm back"
 
+        self.psana_button.setDisabled(True)
         self.pyana_button.setDisabled(True)
         self.susp_button.setEnabled(True)
         self.quit_button.setEnabled(True)
         self.susp_button.setDisabled(False)
         self.quit_button.setDisabled(False)
             
+
+    def run_psana(self):
+        self.pxana = "psana"
+        self.Pxana = "Psana"
+        self.run_pxana()
+
+    def run_pyana(self):
+        self.pxana = "pyana"
+        self.Pxana = "Pyana"
+        self.run_pxana()
 
     def quit_pyana(self) :
         """Kill the pyana process
@@ -1341,15 +1370,16 @@ Do you want to proceed?
             pid = self.proc_pyana.pid
             if status is None: 
                 self.proc_pyana.kill()
-                statustext = "pyana process %d has been killed"%pid
+                statustext = "%s process %d has been killed" % (self.pxana, pid)
             else :
-                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+                statustext = "%s process %d has finished (returncode %d)" % (self.pxana, pid, status)
         else :
-            print "No pyana process to stop"
+            print "No %s process to stop" % (self.pxana)
 
         self.proc_status.setText(statustext)
         self.quit_button.setDisabled(True)
         self.susp_button.setDisabled(True)
+        self.psana_button.setDisabled(False)
         self.pyana_button.setDisabled(False)
 
 #        # double check
@@ -1376,16 +1406,16 @@ Do you want to proceed?
             if status is None: 
                 if checked :
                     self.proc_pyana.suspend()
-                    statustext = "pyana process %d has been suspended"%pid
+                    statustext = "%s process %d has been suspended" % (self.pxana, pid)
                     buttontext = "Resume"
                 else :
                     self.proc_pyana.resume()
-                    statustext = "pyana process %d has been resumed"%pid 
+                    statustext = "%s process %d has been resumed" % (self.pxana, pid)
                     buttontext = "Suspend"                   
             else :
-                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+                statustext = "%s process %d has finished (returncode %d)" % (self.pxana, pid, status)
         else :
-            print "No pyana process to suspend or resume"
+            print "No %s process to suspend or resume" % (self.pxana)
 
         self.proc_status.setText(statustext)
         self.susp_button.setText(buttontext)
