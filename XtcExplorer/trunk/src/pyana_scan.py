@@ -147,7 +147,7 @@ class pyana_scan (object) :
 
         # control.ConfigV1 element
         if self.psana:
-            ctrl_config = env.get("Psana::ControlData::ConfigV1");
+            ctrl_config = env.getConfig("Psana::ControlData::ConfigV1", "");
         else:
             ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
 
