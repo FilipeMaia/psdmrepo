@@ -90,7 +90,7 @@ public:
   enum { Version = 1 };
   IpmFexV1_Wrapper(shared_ptr<IpmFexV1> obj) : _o(obj), o(_o.get()) {}
   IpmFexV1_Wrapper(IpmFexV1* obj) : o(obj) {}
-  vector<float> channel() const { VEC_CONVERT(o->channel(), float); }
+  PyObject* channel() const { ND_CONVERT(o->channel(), float, 1); }
   float sum() const { return o->sum(); }
   float xpos() const { return o->xpos(); }
   float ypos() const { return o->ypos(); }
