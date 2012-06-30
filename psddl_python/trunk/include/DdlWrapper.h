@@ -24,8 +24,8 @@ associate_PyArrayType(int16_t, PyArray_SHORT);
 associate_PyArrayType(uint16_t, PyArray_USHORT);
 associate_PyArrayType(int32_t, PyArray_INT);
 associate_PyArrayType(uint32_t, PyArray_UINT);
-associate_PyArrayType(float, PyArray_CFLOAT);
-associate_PyArrayType(double, PyArray_CDOUBLE);
+associate_PyArrayType(float, PyArray_FLOAT);
+associate_PyArrayType(double, PyArray_DOUBLE);
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return Psana::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
 #define VEC_CONVERT(value, ctype) const ndarray<ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
