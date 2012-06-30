@@ -178,7 +178,10 @@ class  pyana_bld ( object ) :
             
         if self.do_GasDet :
             # returns array of 4 numbers obtained from the bld.BldDataFEEGasDetEnergy object
-            fee_energy_array = evt.getFeeGasDet()
+            if self.psana:
+                fee_energy_array = evt.get("Psana::Bld::BldDataFEEGasDetEnergy", "");
+            else:
+                fee_energy_array = evt.getFeeGasDet()
 
             if fee_energy_array is None :
                 if self.n_shots < 2 :
@@ -193,12 +196,21 @@ class  pyana_bld ( object ) :
             
         if self.do_PC:
             # PhaseCavity object (of type bld.BldDataPhaseCavity)
-            pc = evt.getPhaseCavity()
+            if self.psana:
+                pc = evt.get("Psana::Bld::BldDataPhaseCavity", "");
+            else:
+                pc = evt.getPhaseCavity()
             if pc :
-                self.PC_ftime1.append( pc.fFitTime1 )
-                self.PC_ftime2.append( pc.fFitTime2 )
-                self.PC_fchrg1.append( pc.fCharge1 )
-                self.PC_fchrg2.append( pc.fCharge2 ) 
+                if self.psana:
+                    self.PC_ftime1.append( pc.fitTime1() )
+                    self.PC_ftime2.append( pc.fitTime2() )
+                    self.PC_fchrg1.append( pc.charge1() )
+                    self.PC_fchrg2.append( pc.charge2() )
+                else:
+                    self.PC_ftime1.append( pc.fFitTime1 )
+                    self.PC_ftime2.append( pc.fFitTime2 )
+                    self.PC_fchrg1.append( pc.fCharge1 )
+                    self.PC_fchrg2.append( pc.fCharge2 )
             else :
                 if self.n_shots < 2 :
                     print "No Phase Cavity data object found in shot#%d" % self.n_shots
