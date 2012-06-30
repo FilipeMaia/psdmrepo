@@ -233,14 +233,13 @@ class pyana_epics (object) :
         the figure each time. Therefore plotting is slow...
         """
         nplots = len(self.pv_names)
-        ncols = 1
-        nrows = 1
-        if nplots == 2: ncols = 2
-        if nplots == 3: ncols = 3
-        if nplots == 4:
+        if nplots < 4:
+            ncols = nplots
+            nrows = 1
+        elif nplots == 4:
             ncols = 2
             nrows = 2
-        if nplots > 4 :
+        else:
             ncols = 3
             nrows = np.ceil( float(nplots) / ncols )
             
@@ -252,6 +251,9 @@ class pyana_epics (object) :
         fig.clf()
         fig.subplots_adjust(wspace=0.45, hspace=0.45, top=0.85, bottom=0.15)
         fig.suptitle(title)
+
+        if self.n_shots < 2:
+            return
         # -------- End: move this to beginJob
             
         i = 0
