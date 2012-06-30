@@ -165,7 +165,7 @@ class DdlPythonInterfaces ( object ) :
                     print >>self.inc, "#include <%s>" % header
                 else:
                     print >>self.inc, "#include <psddl_psana/%s>" % header
-                    print "wrapper_header=", wrapper_header
+                    wrapper_header = header[:len(header)-1] + "wrapper.h"
                     print >>self.inc, "#include <psddl_python/%s>" % wrapper_header
 
         if self.top_pkg : 
