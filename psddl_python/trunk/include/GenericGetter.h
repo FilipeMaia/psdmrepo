@@ -24,7 +24,7 @@ namespace Psana {
     CLASS* getter = (CLASS*) MAP.getGetter(typeName);
     if (getter) {
       object result(getter->get(ARGS));
-      printGetResult(typeName.c_str(), typeName.c_str(), foundSrc);
+      //printGetResult(typeName.c_str(), typeName.c_str(), foundSrc);
       return result;
     }
     int versionMin, versionMax;
@@ -40,7 +40,7 @@ namespace Psana {
       if (getter) {
         object result(getter->get(ARGS));
         if (result != object()) {
-          printGetResult(typeName.c_str(), vTypeName, foundSrc);
+          //printGetResult(typeName.c_str(), vTypeName, foundSrc);
           return result;
         }
         //printf("%s: tried %s but it returned null\n", CLASS_NAME, vTypeName);
