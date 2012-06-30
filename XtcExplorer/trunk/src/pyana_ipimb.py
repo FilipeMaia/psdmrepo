@@ -194,14 +194,24 @@ class  pyana_ipimb ( object ) :
 
             # ----- raw data -------
             if ipm_raw is not None: 
-                self.raw_ch[source].append( [ipm_raw.channel0(),
-                                             ipm_raw.channel1(),
-                                             ipm_raw.channel2(),
-                                             ipm_raw.channel3()] )
-                self.raw_ch_volt[source].append( [ipm_raw.channel0Volts(),
-                                                  ipm_raw.channel1Volts(),
-                                                  ipm_raw.channel2Volts(),
-                                                  ipm_raw.channel3Volts()] )
+                if self.psana:
+                    self.raw_ch[source].append( [ipm_raw().channel0(),
+                                                 ipm_raw().channel1(),
+                                                 ipm_raw().channel2(),
+                                                 ipm_raw().channel3()] )
+                    self.raw_ch_volt[source].append( [ipm_raw().channel0Volts(),
+                                                      ipm_raw().channel1Volts(),
+                                                      ipm_raw().channel2Volts(),
+                                                      ipm_raw().channel3Volts()] )
+                else:
+                    self.raw_ch[source].append( [ipm_raw.channel0(),
+                                                 ipm_raw.channel1(),
+                                                 ipm_raw.channel2(),
+                                                 ipm_raw.channel3()] )
+                    self.raw_ch_volt[source].append( [ipm_raw.channel0Volts(),
+                                                      ipm_raw.channel1Volts(),
+                                                      ipm_raw.channel2Volts(),
+                                                      ipm_raw.channel3Volts()] )
             else :
                 #print "pyana_ipimb: no raw data from %s in event %d" % (source,self.n_shots)
                 self.raw_ch[source].append( [-1,-1,-1,-1] )
@@ -210,9 +220,14 @@ class  pyana_ipimb ( object ) :
 
             # ------ fex data -------
             if ipm_fex is not None: 
-                self.fex_sum[source].append( ipm_fex.sum )
-                self.fex_channels[source].append( ipm_fex.channel )
-                self.fex_position[source].append( [ipm_fex.xpos, ipm_fex.ypos] )
+                if self.psana:
+                    self.fex_sum[source].append( ipm_fex().sum() )
+                    self.fex_channels[source].append( ipm_fex().channel() )
+                    self.fex_position[source].append( [ipm_fex().xpos(), ipm_fex().ypos()] )
+                else:
+                    self.fex_sum[source].append( ipm_fex.sum )
+                    self.fex_channels[source].append( ipm_fex.channel )
+                    self.fex_position[source].append( [ipm_fex.xpos, ipm_fex.ypos] )
             else :
                 #print "pyana_ipimb: no fex data from %s in event %d" % (source,self.n_shots)
                 self.fex_sum[source].append( -1 )
