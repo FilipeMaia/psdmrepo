@@ -12,6 +12,8 @@
 #include <psddl_psana/ipimb.ddl.h> // other included packages
 #include <psddl_psana/lusi.ddl.h> // other included packages
 #include <psddl_psana/pulnix.ddl.h> // other included packages
+#include <psddl_python/ipimb.ddl.wrapper.h> // other included packages
+#include <psddl_python/lusi.ddl.wrapper.h> // other included packages
 namespace Psana {
 namespace Bld {
 
@@ -152,9 +154,9 @@ public:
   enum { Version = 1 };
   BldDataIpimbV1_Wrapper(shared_ptr<BldDataIpimbV1> obj) : _o(obj), o(_o.get()) {}
   BldDataIpimbV1_Wrapper(BldDataIpimbV1* obj) : o(obj) {}
-  const Ipimb::DataV2& ipimbData() const { return o->ipimbData(); }
+  const Ipimb::DataV2_Wrapper ipimbData() const { return Ipimb::DataV2_Wrapper((Ipimb::DataV2*)&o->ipimbData()); }
   const Ipimb::ConfigV2& ipimbConfig() const { return o->ipimbConfig(); }
-  const Lusi::IpmFexV1& ipmFexData() const { return o->ipmFexData(); }
+  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*)&o->ipmFexData()); }
 };
 
 class BldDataPimV1_Wrapper {
