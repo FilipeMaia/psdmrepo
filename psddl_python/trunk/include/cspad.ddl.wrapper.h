@@ -24,7 +24,7 @@ class CsPadDigitalPotsCfg_Wrapper {
 public:
   CsPadDigitalPotsCfg_Wrapper(shared_ptr<CsPadDigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPadDigitalPotsCfg_Wrapper(CsPadDigitalPotsCfg* obj) : o(obj) {}
-  vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
+  PyObject* pots() const { ND_CONVERT(o->pots(), uint8_t, 1); }
 };
 
 class CsPadReadOnlyCfg_Wrapper {
@@ -62,8 +62,8 @@ class ConfigV1QuadReg_Wrapper {
 public:
   ConfigV1QuadReg_Wrapper(shared_ptr<ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV1QuadReg_Wrapper(ConfigV1QuadReg* obj) : o(obj) {}
-  vector<uint32_t> shiftSelect() const { VEC_CONVERT(o->shiftSelect(), uint32_t); }
-  vector<uint32_t> edgeSelect() const { VEC_CONVERT(o->edgeSelect(), uint32_t); }
+  PyObject* shiftSelect() const { ND_CONVERT(o->shiftSelect(), uint32_t, 1); }
+  PyObject* edgeSelect() const { ND_CONVERT(o->edgeSelect(), uint32_t, 1); }
   uint32_t readClkSet() const { return o->readClkSet(); }
   uint32_t readClkHold() const { return o->readClkHold(); }
   uint32_t dataMode() const { return o->dataMode(); }
@@ -85,8 +85,8 @@ class ConfigV2QuadReg_Wrapper {
 public:
   ConfigV2QuadReg_Wrapper(shared_ptr<ConfigV2QuadReg> obj) : _o(obj), o(_o.get()) {}
   ConfigV2QuadReg_Wrapper(ConfigV2QuadReg* obj) : o(obj) {}
-  vector<uint32_t> shiftSelect() const { VEC_CONVERT(o->shiftSelect(), uint32_t); }
-  vector<uint32_t> edgeSelect() const { VEC_CONVERT(o->edgeSelect(), uint32_t); }
+  PyObject* shiftSelect() const { ND_CONVERT(o->shiftSelect(), uint32_t, 1); }
+  PyObject* edgeSelect() const { ND_CONVERT(o->edgeSelect(), uint32_t, 1); }
   uint32_t readClkSet() const { return o->readClkSet(); }
   uint32_t readClkHold() const { return o->readClkHold(); }
   uint32_t dataMode() const { return o->dataMode(); }
@@ -240,7 +240,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
+  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   uint32_t sectionMask() const { return o->sectionMask(); }
@@ -282,7 +282,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
+  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   uint32_t sectionMask() const { return o->sectionMask(); }

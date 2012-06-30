@@ -24,7 +24,7 @@ class CsPad2x2DigitalPotsCfg_Wrapper {
 public:
   CsPad2x2DigitalPotsCfg_Wrapper(shared_ptr<CsPad2x2DigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
   CsPad2x2DigitalPotsCfg_Wrapper(CsPad2x2DigitalPotsCfg* obj) : o(obj) {}
-  vector<uint8_t> pots() const { VEC_CONVERT(o->pots(), uint8_t); }
+  PyObject* pots() const { ND_CONVERT(o->pots(), uint8_t, 1); }
 };
 
 class CsPad2x2ReadOnlyCfg_Wrapper {
@@ -128,7 +128,7 @@ public:
   uint32_t seq_count() const { return o->seq_count(); }
   uint32_t ticks() const { return o->ticks(); }
   uint32_t fiducials() const { return o->fiducials(); }
-  vector<uint16_t> sb_temp() const { VEC_CONVERT(o->sb_temp(), uint16_t); }
+  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
   uint32_t frame_type() const { return o->frame_type(); }
   PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
   float common_mode(uint32_t section) const { return o->common_mode(section); }

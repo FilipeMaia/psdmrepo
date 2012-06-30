@@ -8,12 +8,14 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 
-#include <psddl_psana/camera.ddl.h> // other included packages
-#include <psddl_psana/ipimb.ddl.h> // other included packages
-#include <psddl_psana/lusi.ddl.h> // other included packages
-#include <psddl_psana/pulnix.ddl.h> // other included packages
-#include <psddl_python/ipimb.ddl.wrapper.h> // other included packages
-#include <psddl_python/lusi.ddl.wrapper.h> // other included packages
+#include <psddl_psana/camera.ddl.h>
+#include <psddl_python/camera.ddl.wrapper.h>
+#include <psddl_psana/ipimb.ddl.h>
+#include <psddl_python/ipimb.ddl.wrapper.h>
+#include <psddl_psana/lusi.ddl.h>
+#include <psddl_python/lusi.ddl.wrapper.h>
+#include <psddl_psana/pulnix.ddl.h>
+#include <psddl_python/pulnix.ddl.wrapper.h>
 namespace Psana {
 namespace Bld {
 

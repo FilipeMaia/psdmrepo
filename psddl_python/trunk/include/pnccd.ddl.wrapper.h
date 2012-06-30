@@ -66,7 +66,7 @@ public:
   uint32_t frameNumber() const { return o->frameNumber(); }
   uint32_t timeStampHi() const { return o->timeStampHi(); }
   uint32_t timeStampLo() const { return o->timeStampLo(); }
-  vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
 };
 
   class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {

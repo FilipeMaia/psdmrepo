@@ -72,7 +72,7 @@ public:
   DataV2_Wrapper(shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
   uint32_t timestamp() const { return o->timestamp(); }
-  vector<uint32_t> encoder_count() const { VEC_CONVERT(o->encoder_count(), uint32_t); }
+  PyObject* encoder_count() const { ND_CONVERT(o->encoder_count(), uint32_t, 1); }
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 

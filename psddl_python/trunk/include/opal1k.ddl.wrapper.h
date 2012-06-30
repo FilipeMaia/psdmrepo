@@ -8,7 +8,8 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 
-#include <psddl_psana/camera.ddl.h> // other included packages
+#include <psddl_psana/camera.ddl.h>
+#include <psddl_python/camera.ddl.wrapper.h>
 namespace Psana {
 namespace Opal1k {
 
@@ -36,7 +37,7 @@ public:
   uint8_t defect_pixel_correction_enabled() const { return o->defect_pixel_correction_enabled(); }
   uint8_t output_lookup_table_enabled() const { return o->output_lookup_table_enabled(); }
   uint32_t number_of_defect_pixels() const { return o->number_of_defect_pixels(); }
-  vector<uint16_t> output_lookup_table() const { VEC_CONVERT(o->output_lookup_table(), uint16_t); }
+  PyObject* output_lookup_table() const { ND_CONVERT(o->output_lookup_table(), uint16_t, 1); }
   vector<Camera::FrameCoord> defect_pixel_coordinates() const { VEC_CONVERT(o->defect_pixel_coordinates(), Camera::FrameCoord); }
   uint16_t output_offset() const { return o->output_offset(); }
   uint32_t output_resolution_bits() const { return o->output_resolution_bits(); }

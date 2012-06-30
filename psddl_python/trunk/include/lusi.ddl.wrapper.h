@@ -26,8 +26,8 @@ public:
   enum { Version = 1 };
   DiodeFexConfigV1_Wrapper(shared_ptr<DiodeFexConfigV1> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV1_Wrapper(DiodeFexConfigV1* obj) : o(obj) {}
-  vector<float> base() const { VEC_CONVERT(o->base(), float); }
-  vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
+  PyObject* base() const { ND_CONVERT(o->base(), float, 1); }
+  PyObject* scale() const { ND_CONVERT(o->scale(), float, 1); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 
@@ -39,8 +39,8 @@ public:
   enum { Version = 2 };
   DiodeFexConfigV2_Wrapper(shared_ptr<DiodeFexConfigV2> obj) : _o(obj), o(_o.get()) {}
   DiodeFexConfigV2_Wrapper(DiodeFexConfigV2* obj) : o(obj) {}
-  vector<float> base() const { VEC_CONVERT(o->base(), float); }
-  vector<float> scale() const { VEC_CONVERT(o->scale(), float); }
+  PyObject* base() const { ND_CONVERT(o->base(), float, 1); }
+  PyObject* scale() const { ND_CONVERT(o->scale(), float, 1); }
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 

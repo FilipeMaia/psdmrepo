@@ -300,7 +300,7 @@ public:
   EpicsPvCtrlShort_Wrapper(shared_ptr<EpicsPvCtrlShort> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlShort_Wrapper(EpicsPvCtrlShort* obj) : o(obj) {}
   const dbr_ctrl_short_Wrapper dbr() const { return dbr_ctrl_short_Wrapper((dbr_ctrl_short*) &o->dbr()); }
-  vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), int16_t, 1); }
   int16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -311,7 +311,7 @@ public:
   EpicsPvCtrlFloat_Wrapper(shared_ptr<EpicsPvCtrlFloat> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlFloat_Wrapper(EpicsPvCtrlFloat* obj) : o(obj) {}
   const dbr_ctrl_float_Wrapper dbr() const { return dbr_ctrl_float_Wrapper((dbr_ctrl_float*) &o->dbr()); }
-  vector<float> data() const { VEC_CONVERT(o->data(), float); }
+  PyObject* data() const { ND_CONVERT(o->data(), float, 1); }
   float value(uint32_t i) const { return o->value(i); }
 };
 
@@ -322,7 +322,7 @@ public:
   EpicsPvCtrlEnum_Wrapper(shared_ptr<EpicsPvCtrlEnum> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlEnum_Wrapper(EpicsPvCtrlEnum* obj) : o(obj) {}
   const dbr_ctrl_enum_Wrapper dbr() const { return dbr_ctrl_enum_Wrapper((dbr_ctrl_enum*) &o->dbr()); }
-  vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
   uint16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -333,7 +333,7 @@ public:
   EpicsPvCtrlChar_Wrapper(shared_ptr<EpicsPvCtrlChar> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlChar_Wrapper(EpicsPvCtrlChar* obj) : o(obj) {}
   const dbr_ctrl_char_Wrapper dbr() const { return dbr_ctrl_char_Wrapper((dbr_ctrl_char*) &o->dbr()); }
-  vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint8_t, 1); }
   uint8_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -344,7 +344,7 @@ public:
   EpicsPvCtrlLong_Wrapper(shared_ptr<EpicsPvCtrlLong> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlLong_Wrapper(EpicsPvCtrlLong* obj) : o(obj) {}
   const dbr_ctrl_long_Wrapper dbr() const { return dbr_ctrl_long_Wrapper((dbr_ctrl_long*) &o->dbr()); }
-  vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), int32_t, 1); }
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -355,7 +355,7 @@ public:
   EpicsPvCtrlDouble_Wrapper(shared_ptr<EpicsPvCtrlDouble> obj) : _o(obj), o(_o.get()) {}
   EpicsPvCtrlDouble_Wrapper(EpicsPvCtrlDouble* obj) : o(obj) {}
   const dbr_ctrl_double_Wrapper dbr() const { return dbr_ctrl_double_Wrapper((dbr_ctrl_double*) &o->dbr()); }
-  vector<double> data() const { VEC_CONVERT(o->data(), double); }
+  PyObject* data() const { ND_CONVERT(o->data(), double, 1); }
   double value(uint32_t i) const { return o->value(i); }
 };
 
@@ -379,7 +379,7 @@ public:
   EpicsPvTimeShort_Wrapper(shared_ptr<EpicsPvTimeShort> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeShort_Wrapper(EpicsPvTimeShort* obj) : o(obj) {}
   const dbr_time_short_Wrapper dbr() const { return dbr_time_short_Wrapper((dbr_time_short*) &o->dbr()); }
-  vector<int16_t> data() const { VEC_CONVERT(o->data(), int16_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), int16_t, 1); }
   int16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -390,7 +390,7 @@ public:
   EpicsPvTimeFloat_Wrapper(shared_ptr<EpicsPvTimeFloat> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeFloat_Wrapper(EpicsPvTimeFloat* obj) : o(obj) {}
   const dbr_time_float_Wrapper dbr() const { return dbr_time_float_Wrapper((dbr_time_float*) &o->dbr()); }
-  vector<float> data() const { VEC_CONVERT(o->data(), float); }
+  PyObject* data() const { ND_CONVERT(o->data(), float, 1); }
   float value(uint32_t i) const { return o->value(i); }
 };
 
@@ -401,7 +401,7 @@ public:
   EpicsPvTimeEnum_Wrapper(shared_ptr<EpicsPvTimeEnum> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeEnum_Wrapper(EpicsPvTimeEnum* obj) : o(obj) {}
   const dbr_time_enum_Wrapper dbr() const { return dbr_time_enum_Wrapper((dbr_time_enum*) &o->dbr()); }
-  vector<uint16_t> data() const { VEC_CONVERT(o->data(), uint16_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
   uint16_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -412,7 +412,7 @@ public:
   EpicsPvTimeChar_Wrapper(shared_ptr<EpicsPvTimeChar> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeChar_Wrapper(EpicsPvTimeChar* obj) : o(obj) {}
   const dbr_time_char_Wrapper dbr() const { return dbr_time_char_Wrapper((dbr_time_char*) &o->dbr()); }
-  vector<uint8_t> data() const { VEC_CONVERT(o->data(), uint8_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint8_t, 1); }
   uint8_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -423,7 +423,7 @@ public:
   EpicsPvTimeLong_Wrapper(shared_ptr<EpicsPvTimeLong> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeLong_Wrapper(EpicsPvTimeLong* obj) : o(obj) {}
   const dbr_time_long_Wrapper dbr() const { return dbr_time_long_Wrapper((dbr_time_long*) &o->dbr()); }
-  vector<int32_t> data() const { VEC_CONVERT(o->data(), int32_t); }
+  PyObject* data() const { ND_CONVERT(o->data(), int32_t, 1); }
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 
@@ -434,7 +434,7 @@ public:
   EpicsPvTimeDouble_Wrapper(shared_ptr<EpicsPvTimeDouble> obj) : _o(obj), o(_o.get()) {}
   EpicsPvTimeDouble_Wrapper(EpicsPvTimeDouble* obj) : o(obj) {}
   const dbr_time_double_Wrapper dbr() const { return dbr_time_double_Wrapper((dbr_time_double*) &o->dbr()); }
-  vector<double> data() const { VEC_CONVERT(o->data(), double); }
+  PyObject* data() const { ND_CONVERT(o->data(), double, 1); }
   double value(uint32_t i) const { return o->value(i); }
 };
 

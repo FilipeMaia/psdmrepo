@@ -45,8 +45,8 @@ public:
   uint8_t ccdEnable() const { return o->ccdEnable(); }
   uint8_t focusMode() const { return o->focusMode(); }
   uint32_t exposureTime() const { return o->exposureTime(); }
-  vector<float> dacVoltages() const { VEC_CONVERT(o->dacVoltages(), float); }
-  vector<uint16_t> waveforms() const { VEC_CONVERT(o->waveforms(), uint16_t); }
+  PyObject* dacVoltages() const { ND_CONVERT(o->dacVoltages(), float, 1); }
+  PyObject* waveforms() const { ND_CONVERT(o->waveforms(), uint16_t, 1); }
   uint32_t width() const { return o->width(); }
   uint32_t height() const { return o->height(); }
   uint32_t trimmedWidth() const { return o->trimmedWidth(); }

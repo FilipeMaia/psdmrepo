@@ -69,7 +69,7 @@ public:
   uint32_t height() const { return o->height(); }
   uint32_t depth() const { return o->depth(); }
   uint32_t offset() const { return o->offset(); }
-  vector<uint8_t> _int_pixel_data() const { VEC_CONVERT(o->_int_pixel_data(), uint8_t); }
+  PyObject* _int_pixel_data() const { ND_CONVERT(o->_int_pixel_data(), uint8_t, 1); }
   PyObject* data8() const { ND_CONVERT(o->data8(), uint8_t, 2); }
   PyObject* data16() const { ND_CONVERT(o->data16(), uint16_t, 2); }
 };

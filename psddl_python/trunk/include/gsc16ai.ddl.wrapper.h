@@ -47,8 +47,8 @@ public:
   enum { Version = 1 };
   DataV1_Wrapper(shared_ptr<DataV1> obj) : _o(obj), o(_o.get()) {}
   DataV1_Wrapper(DataV1* obj) : o(obj) {}
-  vector<uint16_t> timestamp() const { VEC_CONVERT(o->timestamp(), uint16_t); }
-  vector<uint16_t> channelValue() const { VEC_CONVERT(o->channelValue(), uint16_t); }
+  PyObject* timestamp() const { ND_CONVERT(o->timestamp(), uint16_t, 1); }
+  PyObject* channelValue() const { ND_CONVERT(o->channelValue(), uint16_t, 1); }
 };
 
   class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {

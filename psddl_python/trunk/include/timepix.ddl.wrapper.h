@@ -157,7 +157,7 @@ public:
   int32_t driverVersion() const { return o->driverVersion(); }
   uint32_t firmwareVersion() const { return o->firmwareVersion(); }
   uint32_t pixelThreshSize() const { return o->pixelThreshSize(); }
-  vector<uint8_t> pixelThresh() const { VEC_CONVERT(o->pixelThresh(), uint8_t); }
+  PyObject* pixelThresh() const { ND_CONVERT(o->pixelThresh(), uint8_t, 1); }
   const char* chip0Name() const { return o->chip0Name(); }
   const char* chip1Name() const { return o->chip1Name(); }
   const char* chip2Name() const { return o->chip2Name(); }

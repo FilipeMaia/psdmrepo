@@ -8,7 +8,7 @@
 #include <pdsdata/xtc/TypeId.hh>
 #include <psddl_python/DdlWrapper.h>
 
-#include <pdsdata/xtc/DetInfo.hh> // other included packages
+#include <pdsdata/xtc/DetInfo.hh>
 namespace Psana {
 namespace EvrData {
 
