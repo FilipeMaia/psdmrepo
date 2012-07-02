@@ -1,0 +1,81 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script xtcexplorer...
+#
+#------------------------------------------------------------------------
+
+"""Script to run the LCLS XtcExplorer
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Ingrid Ofte
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 0 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from PyQt4 import QtGui
+from XtcExplorer.XtcExplorerMain import XtcExplorerMain
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+def main(argv) :
+
+    psana = False
+    if '--psana' in argv :
+	index = argv.index('--psana')
+	psana = True
+	argv.pop(index)
+
+    # optional argument(s): input xtc-file(s)
+    files = argv[1:]
+
+    app = QtGui.QApplication(sys.argv)
+    explorer = XtcExplorerMain(psana)
+
+    for file in files :
+	explorer.add_file(file)
+
+    if files :
+        explorer.scan_files_quick()
+
+    explorer.show()
+    sys.exit(app.exec_())
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    sys.path.insert(0,".")
+    sys.exit(main(sys.argv))
