@@ -1,5 +1,5 @@
 // This is not a conventional include file, but rather a template
-// included by EventGetter.cpp and EnvObjectStore.cpp.
+// that is included by EventGetter.cpp and EnvObjectStore.cpp.
 
 #include <sstream>
 #include "PSEvt/EventKey.h" // operator<<(Pds::Src) defined here
@@ -28,9 +28,10 @@ namespace Psana {
       return result;
     }
     int versionMin, versionMax;
+    // A template is of the form PSana::Fli::FrameV1
     const char* _template = MAP.getTemplate(typeName, &versionMin, &versionMax);
     if (! _template) {
-      printf("%s: %s does not exist\n", CLASS_NAME, typeName.c_str());
+      printf("%s: no getter exists for class '%s'\n", CLASS_NAME, typeName.c_str());
       return object();
     }
     for (int version = versionMin; version <= versionMax; version++) {
@@ -45,10 +46,10 @@ namespace Psana {
         }
         //printf("%s: tried %s but it returned null\n", CLASS_NAME, vTypeName);
       } else {
-        printf("%s: %s does not exist\n", CLASS_NAME, vTypeName);
+        printf("%s: no getter exists for class '%s'\n", CLASS_NAME, typeName.c_str());
       }
     }
-    printf("%s: found no object for %s\n", CLASS_NAME, _template);
+    //printf("%s: no object found for %s\n", CLASS_NAME, _template);
     return object();
   }
 }
