@@ -112,6 +112,11 @@ class pyana_plotter (object) :
         @param env    environment object
         """
         self.starttime = time.time()
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
 
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called with displaymode %d"%self.display_mode )
@@ -195,7 +200,10 @@ class pyana_plotter (object) :
         show_event = evt.get('show_event')
         if show_event and env.subprocess()<1 :
 
-            self.make_plots(evt)
+            # XXX This is a hack to avoid crashes with fli data
+            if not self.psana:
+                self.make_plots(evt)
+            # XXX End hack 
 
             if self.display_mode > 0 :
                 print "Pyana will exit once you close all the MatPlotLib windows"            

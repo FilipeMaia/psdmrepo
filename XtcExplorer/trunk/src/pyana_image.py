@@ -291,6 +291,12 @@ class  pyana_image ( object ) :
                     
     # process event/shot data
     def event ( self, evt, env ) :
+        # XXX This is a hack to avoid crashes with fli data
+        if self.psana:
+            for source in self.sources :
+                self.data[source].image = None
+        # XXX End hack 
+
         logging.debug( "pyana_image.event()" )
 
         # this one counts every event
@@ -308,7 +314,8 @@ class  pyana_image ( object ) :
             detsrc = address.split('-')[0]
             frame = evt.get( self.datatypes[device], detsrc )
             if frame is None:
-                print "No frame from ", addr
+                if not self.psana:
+                    print "No frame from ", addr
                 return
             
             if addr.find("Cspad2x2")>0 :
@@ -323,7 +330,10 @@ class  pyana_image ( object ) :
                 image = self.cspad[addr].get_detector_image(quads)
 
             elif addr.find("Fli")>0:
-                image = frame.data(self.config)
+                if self.psana:
+                    image = frame.data()
+                else:
+                    image = frame.data(self.config)
 
             elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "TM6740" in addr):
                 if frame.depth() > 8:
