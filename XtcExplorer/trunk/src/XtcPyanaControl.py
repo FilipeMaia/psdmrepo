@@ -845,6 +845,11 @@ Do you want to proceed?
                 self.configuration += module
             self.configuration += "\n\n"
 
+        if self.psana:
+            # 32MB is the default limit but some datagrams are just a little bit bigger...
+            self.configuration += "[PSXtcInput.XtcInputModule]\n"
+            self.configuration += "dgSizeMB = 33\n\n"
+
         count_m = 0
         for module in modules_to_run :
             self.configuration += "["
