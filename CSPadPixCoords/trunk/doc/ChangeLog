@@ -10,6 +10,16 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+Tag: V00-02-05
+2012-07-02 Mikhail S. Dubrovin
+- Add modules for CSPad2x2 pixels and image
+A       include/CSPad2x2ImageProducer.h
+A       include/PixCoordsCSPad2x2.h
+A       include/SaveImageInFile.h
+A       src/PixCoordsCSPad2x2.cpp
+A       src/SaveImageInFile.cpp
+A       src/CSPad2x2ImageProducer.cpp
+M       src/PixCoords2x1.cpp - small 1um offset is added in order to get rid of empty pixel strips in image
 	
 Tag: V00-02-04
 2012-05-10 Mikhail S. Dubrovin

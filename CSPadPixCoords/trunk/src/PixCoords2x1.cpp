@@ -57,8 +57,8 @@ PixCoords2x1::PixCoords2x1 ()
   k_col_um_to_pix = PSCalib::CSPadCalibPars::getColUmToPix();
   k_ort_um_to_pix = PSCalib::CSPadCalibPars::getOrtUmToPix();
 
-  k_center_of_rows_um = 0.5 * (m_row_size_um * ((double)NRows2x1-3.0) + 2 * PSCalib::CSPadCalibPars::getGapRowSize_um());
-  k_center_of_cols_um = 0.5 *  m_col_size_um * ((double)NCols2x1-1.0);
+  k_center_of_rows_um = 0.5 * (m_row_size_um * ((double)NRows2x1-3.0) + 2 * m_gap_size_um) + 1; // Add artificial 1um offset
+  k_center_of_cols_um = 0.5 *  m_col_size_um * ((double)NCols2x1-1.0) + 1; // Add artificial 1um offset to remove strips in img...
 
   k_center_of_rows_pix = k_center_of_rows_um * k_row_um_to_pix;
   k_center_of_cols_pix = k_center_of_cols_um * k_col_um_to_pix;
