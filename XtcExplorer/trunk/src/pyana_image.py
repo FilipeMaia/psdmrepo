@@ -275,7 +275,17 @@ class  pyana_image ( object ) :
                 
             elif addr.find('Cspad')>=0:
                 quads = range(4)
-                sections = map(self.config.sections, quads)
+                if self.psana:
+                    sections = []
+                    for q in quads:
+                        roimask = self.config.roiMask(q);
+                        section = []
+                        for subsection in range(8):
+                            if (roimask & 1 << subsection):
+                                section.append(subsection)
+                        sections.append(section)
+                else:
+                    sections = map(self.config.sections, quads)
                 self.cspad[addr] = CsPad(sections, path=self.calib_path)
                 self.cspad[addr].cmmode_mode = self.cmmode_mode
                 self.cspad[addr].cmmode_thr = self.cmmode_thr
@@ -325,7 +335,10 @@ class  pyana_image ( object ) :
 
             elif addr.find("Cspad")>0 :
                 # in this case we need the specialized getter: 
-                quads = evt.getCsPadQuads(addr, env)
+                if self.psana:
+                    quads = frame.quads_list()
+                else:
+                    quads = evt.getCsPadQuads(addr, env)
                 # then call cspad library to assemble the image
                 image = self.cspad[addr].get_detector_image(quads)
 
