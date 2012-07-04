@@ -195,23 +195,18 @@ class  pyana_ipimb ( object ) :
             # ----- raw data -------
             if ipm_raw is not None: 
                 if self.psana:
-                    self.raw_ch[source].append( [ipm_raw().channel0(),
-                                                 ipm_raw().channel1(),
-                                                 ipm_raw().channel2(),
-                                                 ipm_raw().channel3()] )
-                    self.raw_ch_volt[source].append( [ipm_raw().channel0Volts(),
-                                                      ipm_raw().channel1Volts(),
-                                                      ipm_raw().channel2Volts(),
-                                                      ipm_raw().channel3Volts()] )
-                else:
-                    self.raw_ch[source].append( [ipm_raw.channel0(),
-                                                 ipm_raw.channel1(),
-                                                 ipm_raw.channel2(),
-                                                 ipm_raw.channel3()] )
-                    self.raw_ch_volt[source].append( [ipm_raw.channel0Volts(),
-                                                      ipm_raw.channel1Volts(),
-                                                      ipm_raw.channel2Volts(),
-                                                      ipm_raw.channel3Volts()] )
+                    try:
+                        ipm_raw = ipm_raw()
+                    except:
+                        pass
+                self.raw_ch[source].append( [ipm_raw.channel0(),
+                                             ipm_raw.channel1(),
+                                             ipm_raw.channel2(),
+                                             ipm_raw.channel3()] )
+                self.raw_ch_volt[source].append( [ipm_raw.channel0Volts(),
+                                                  ipm_raw.channel1Volts(),
+                                                  ipm_raw.channel2Volts(),
+                                                  ipm_raw.channel3Volts()] )
             else :
                 #print "pyana_ipimb: no raw data from %s in event %d" % (source,self.n_shots)
                 self.raw_ch[source].append( [-1,-1,-1,-1] )
