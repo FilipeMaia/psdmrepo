@@ -2,6 +2,31 @@
 # PyanaOptions
 #-----------------------------------------
 
+def ncol_nrow_from_nplots(nplots):
+    if nplots < 4:
+        # just a horizontal line of plots
+        ncol = nplots
+        nrow = 1
+    elif nplots == 4:
+        # 2+2 plots looks better than 3+1
+        ncol = 2
+        nrow = 2
+    else:
+        # limit the number of columns
+        ncol = min(self.maxcol, nplots)
+        # number of rows if all rows are filled
+        nrow = nplots / ncol
+        if (nplots % ncol) > 0:
+            # if rows are not all filled, add one for the unfilled row.
+            nrow += 1
+    # --- sanity check ---
+    max =  ncol * nrow
+    if nplots > max :
+        print "utitilities.py: Something wrong with ncol_nrow_from_nplots() computation"
+        print "                Not enough space for %d plots in %d x %d" % (nplots, ncol, nrow)
+        sys.exit(1)
+    return (ncol, nrow)
+
 class PyanaOptions( object ):
     """Class PyanaOptions
 
