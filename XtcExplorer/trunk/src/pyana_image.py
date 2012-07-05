@@ -301,12 +301,6 @@ class  pyana_image ( object ) :
                     
     # process event/shot data
     def event ( self, evt, env ) :
-        # XXX This is a hack to avoid crashes with fli data
-        if self.psana:
-            for source in self.sources :
-                self.data[source].image = None
-        # XXX End hack 
-
         logging.debug( "pyana_image.event()" )
 
         # this one counts every event
