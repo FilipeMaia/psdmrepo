@@ -18,6 +18,7 @@ import numpy as np
 from pypdsdata.xtc import TypeId
 from utilities import PyanaOptions
 from utilities import IpimbData
+import inspect
 
 # analysis class declaration
 class  pyana_ipimb ( object ) :
@@ -194,11 +195,8 @@ class  pyana_ipimb ( object ) :
 
             # ----- raw data -------
             if ipm_raw is not None: 
-                if self.psana:
-                    try:
-                        ipm_raw = ipm_raw()
-                    except:
-                        pass
+                if inspect.ismethod(ipm_raw):
+                    ipm_raw = ipm_raw()
                 self.raw_ch[source].append( [ipm_raw.channel0(),
                                              ipm_raw.channel1(),
                                              ipm_raw.channel2(),
@@ -216,9 +214,11 @@ class  pyana_ipimb ( object ) :
             # ------ fex data -------
             if ipm_fex is not None: 
                 if self.psana:
-                    self.fex_sum[source].append( ipm_fex().sum() )
-                    self.fex_channels[source].append( ipm_fex().channel() )
-                    self.fex_position[source].append( [ipm_fex().xpos(), ipm_fex().ypos()] )
+                    if inspect.ismethod(ipm_fex):
+                        ipm_fex = ipm_fex()
+                    self.fex_sum[source].append( ipm_fex.sum() )
+                    self.fex_channels[source].append( ipm_fex.channel() )
+                    self.fex_position[source].append( [ipm_fex.xpos(), ipm_fex.ypos()] )
                 else:
                     self.fex_sum[source].append( ipm_fex.sum )
                     self.fex_channels[source].append( ipm_fex.channel )
