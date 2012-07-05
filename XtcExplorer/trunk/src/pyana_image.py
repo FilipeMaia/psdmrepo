@@ -348,7 +348,7 @@ class  pyana_image ( object ) :
                 else:
                     image = frame.data(self.config)
 
-            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "TM6740" in addr):
+            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "Opal2000" in addr or "TM6740" in addr):
                 if frame.depth() > 8:
                     image = frame.data16()
                 else:
