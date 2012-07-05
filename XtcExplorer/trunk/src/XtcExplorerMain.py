@@ -218,11 +218,11 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.comboBoxIns.clear() 
         self.comboBoxIns.addItem("Instrument")
         self.comboBoxIns.addItem("AMO")
-        self.comboBoxIns.addItem("SXR")
-        self.comboBoxIns.addItem("XPP")
         self.comboBoxIns.addItem("CXI")
-        self.comboBoxIns.addItem("XCS")
         self.comboBoxIns.addItem("MEC")
+        self.comboBoxIns.addItem("SXR")
+        self.comboBoxIns.addItem("XCS")
+        self.comboBoxIns.addItem("XPP")
 
         if self.instrument:
             index = self.comboBoxIns.findText( self.instrument )
@@ -387,6 +387,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         # add subdirectories to experiment selector
         self.comboBoxExp.clear()
         self.comboBoxExp.addItem("Experiment")
+        dirList.sort()
         for fname in dirList:
             self.comboBoxExp.addItem(fname)
 
