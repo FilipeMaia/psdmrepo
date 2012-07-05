@@ -240,8 +240,14 @@ def adjustPkgDeps():
             deps = findAllDependencies ( lib )
             # self-dependencies are not needed here
             deps.discard(pkg)
+            
             # dirty hack
             if 'boost_python' in deps: env.Append(CPPPATH=env['PYTHON_INCDIR'])
+            
+            # another dirty hack, RdbMySQL package includes mysql heades but
+            # does not need mysql client library 
+            if pkg == "RdbMySQL": deps.discard("mysql")
+            
             trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
             setPkgDeps ( pkg, deps )
             
