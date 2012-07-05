@@ -200,10 +200,7 @@ class pyana_plotter (object) :
         show_event = evt.get('show_event')
         if show_event and env.subprocess()<1 :
 
-            # XXX This is a hack to avoid crashes with fli data
-            if not self.psana:
-                self.make_plots(evt)
-            # XXX End hack 
+            self.make_plots(evt)
 
             if self.display_mode > 0 :
                 print "Pyana will exit once you close all the MatPlotLib windows"            
