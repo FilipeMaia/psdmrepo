@@ -42,6 +42,7 @@ from pypdsdata import epics
 
 from utilities import PyanaOptions
 from utilities import EpicsData
+from utilities import ncol_nrow_from_nplots
 
 
 #----------------------------------
@@ -233,15 +234,9 @@ class pyana_epics (object) :
         the figure each time. Therefore plotting is slow...
         """
         nplots = len(self.pv_names)
-        if nplots < 4:
-            ncols = nplots
-            nrows = 1
-        elif nplots == 4:
-            ncols = 2
-            nrows = 2
-        else:
-            ncols = 3
-            nrows = np.ceil( float(nplots) / ncols )
+        if nplots == 0:
+            return
+        (ncols, nrows) = ncol_nrow_from_nplots(nplots)
             
         height=3.5
         if nrows * 3.5 > 12 : height = 12/nrows
