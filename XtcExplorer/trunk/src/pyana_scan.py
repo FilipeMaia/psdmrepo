@@ -213,21 +213,39 @@ class pyana_scan (object) :
             to edit this code.
             """
             if scalar.find("Ipimb")>=0 :
-                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
+                if self.psana:
+                    ipmFex = evt.get("Psana::Lusi::IpmFex", scalar )
+                else:
+                    ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
                 if ipmFex :
                     self.evts_scalars[scalar].append(ipmFex.sum)
                 #else:
                 #    self.evts_scalars[scalar].append(-99.0)
                     
             elif scalar.find("EBeam")>= 0 :
-                ebeam = evt.getEBeam()
+                if self.psana:
+                    ebeam = evt.get("Psana::Bld::BldDataEBeam", "");
+                else:
+                    ebeam = evt.getEBeam()
                 if ebeam:
-                    self.evts_scalars[scalar].append(ebeam.fEbeamL3Energy)
+                    if self.psana:
+                        self.evts_scalars[scalar].append(ebeam.ebeamL3Energy())
+                    else:
+                        self.evts_scalars[scalar].append(ebeam.fEbeamL3Energy)
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif scalar.find("FEEGasDetEnergy")>= 0 :
-                fee_energy_array = evt.getFeeGasDet()
+                if self.psana:
+                    energy = evt.get("Psana::Bld::BldDataFEEGasDetEnergy", "");
+                    fee_energy_array = []
+                    fee_energy_array.append(energy.f_11_ENRC())
+                    fee_energy_array.append(energy.f_12_ENRC())
+                    fee_energy_array.append(energy.f_21_ENRC())
+                    fee_energy_array.append(energy.f_22_ENRC())
+                else:
+                    fee_energy_array = evt.getFeeGasDet()
+
                 if fee_energy_array:
                     energy= (fee_energy_array[2]+fee_energy_array[3])/2.0 
                     self.evts_scalars[scalar].append( energy)
@@ -263,6 +281,11 @@ class pyana_scan (object) :
 
         # process the chunk of events collected in this scan cycle
         for name, list in self.evts_scalars.iteritems() :
+            if self.psana:
+                try:
+                    list = [f() for f in list]
+                except:
+                    pass
             arr = np.array(list)
             mean =  np.mean(arr)
             std = np.std(arr)
