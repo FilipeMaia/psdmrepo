@@ -41,7 +41,7 @@ from pypdsdata import xtc
 
 from utilities import PyanaOptions
 from utilities import ScanData
-
+from utilities import ncol_nrow_from_nplots
 
 #----------------------------------
 # Local non-exported definitions --
@@ -333,15 +333,9 @@ class pyana_scan (object) :
         nctrl = len(self.ccls_ctrl) 
         nsclr = len(self.ccls_scalars)
         nplots = nctrl + nctrl*nsclr
-        ncols = 1
-        nrows = 1
-        if nplots == 2: ncols = 2
-        if nplots == 3: ncols = 3
-        if nplots == 4: ncols = 2; nrows = 2
-        if nplots > 4:
-            ncols = 3
-            nrows = nplots / 3
-            if nplots%3 > 0 : nrows += 1
+        if nplots == 0:
+            return
+        (ncol, nrow) = ncol_nrow_from_nplots(nplots)
 
         height=4.2
         if (nrows * height) > 14 : height = 14/nrows
