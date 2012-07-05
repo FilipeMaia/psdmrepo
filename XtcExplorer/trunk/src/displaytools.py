@@ -6,6 +6,8 @@ import matplotlib.ticker as ticker
 from matplotlib.gridspec import GridSpec
 from matplotlib.widgets import Slider, SpanSelector
 from matplotlib.patches import Circle, Rectangle, Polygon
+from utilities import ncol_nrow_from_nplots
+
 class DataDisplay(object):
 
     def __init__(self, mode=0):
@@ -180,7 +182,7 @@ class DataDisplay(object):
         fig.suptitle("BldInfo:PhaseCavity data shot#%d"%self.event_number)
 
         # We need at least two shots for most of these subplots.
-        if pc.shots.size < 2:
+        if pc.shots.size < 2 or len(pc.time) < 2:
             return
 
         ax1 = fig.add_subplot(231)
@@ -696,6 +698,8 @@ class Plotter(object):
         """Draw all frames
         """
         nplots = len(self.frames)
+        if nplots == 0:
+            return
         self.fignum = fignum
 
         ncol = int(np.ceil( np.sqrt(nplots) ))
@@ -790,27 +794,13 @@ class Plotter(object):
         This clears and rebuilds the canvas, although
         if the figure was made earlier, some of it is recycled
         """
-        ncol = 1
-        nrow = 1
-        if nplots == 4:
-            ncol = 2
-            nrow = 2
-        elif nplots > 1 :
-            ncol = self.maxcol
-            if nplots<self.maxcol : ncol = nplots
-            nrow = int( nplots/ncol )
-            if (nplots%ncol) > 0 : nrow+=1
+        if nplots == 0:
+            return
+        (ncol, nrow) = ncol_nrow_from_nplots(nplots)
         
         #print "Figuresize: ", self.w*ncol,self.h*nrow
         #print "Figure conf: %d rows x %d cols" % ( nrow, ncol)
         
-        # --- sanity check ---
-        max =  ncol * nrow
-        if nplots > max :
-            print "utitilities.py: Something wrong with the subplot configuration"
-            print "                Not enough space for %d plots in %d x %d"%(nplots,ncol,nrow)
-
-
         self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
         self.fig.clf()
