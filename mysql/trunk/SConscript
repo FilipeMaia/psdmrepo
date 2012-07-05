@@ -12,6 +12,7 @@ Import('*')
 
 import os
 from os.path import join as pjoin
+import subprocess
 
 from SConsTools.standardExternalPackage import standardExternalPackage
 
@@ -53,3 +54,22 @@ PKGLIBS = "mysqlclient"
 LINKLIBS = "libmysqlclient.so*"
 
 standardExternalPackage ( 'mysql', **locals() )
+
+#
+# very special target which makes libmysql_soname.h header 
+#
+def make_libmysql_soname_header(env, target, source):
+    
+    subp = subprocess.Popen(["objdump", "-p", str(source[0])], stdout=subprocess.PIPE)
+    soname = "libmysqlclients.so"
+    for line in subp.stdout:
+        words = line.split()
+        if len(words) == 2 and words[0] == "SONAME":
+            soname = words[1]
+    trgt = open(str(target[0]), "w")
+    print >> trgt, 'const char* const libmysql_soname = "%s";' % soname
+    
+header = "#arch/$SIT_ARCH/geninc/mysql/libmysql_soname.h"
+lib = pjoin(PREFIX, LIBDIR, "libmysqlclient.so")
+target = env.Command(header, lib, make_libmysql_soname_header)
+env['ALL_TARGETS']['INCLUDES'].append(target)
