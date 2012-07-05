@@ -143,9 +143,9 @@ public:
   enum { Version = 0 };
   BldDataIpimbV0_Wrapper(shared_ptr<BldDataIpimbV0> obj) : _o(obj), o(_o.get()) {}
   BldDataIpimbV0_Wrapper(BldDataIpimbV0* obj) : o(obj) {}
-  const Ipimb::DataV1& ipimbData() const { return o->ipimbData(); }
+  const Ipimb::DataV1_Wrapper ipimbData() const { return Ipimb::DataV1_Wrapper((Ipimb::DataV1*)&o->ipimbData()); }
   const Ipimb::ConfigV1& ipimbConfig() const { return o->ipimbConfig(); }
-  const Lusi::IpmFexV1& ipmFexData() const { return o->ipmFexData(); }
+  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*)&o->ipmFexData()); }
 };
 
 class BldDataIpimbV1_Wrapper {
