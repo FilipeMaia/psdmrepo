@@ -136,8 +136,8 @@ class pyana_epics (object) :
                 #      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
                 #       pv.status, pv.severity, pv.values)
                 
-                message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
-                          %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
+                message = "%s (Id=%d, Type=%d, Precision=%s, Unit=%s )\n" \
+                          %(pv_name,pv.iPvId, pv.iDbrType, str(pv.precision), pv.units)
 
                 message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
                 try:
