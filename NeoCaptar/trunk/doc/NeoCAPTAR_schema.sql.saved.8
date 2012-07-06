@@ -458,84 +458,46 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `NEOCAPTAR`.`CABLENUMBER_PREFIX`
+-- Table `NEOCAPTAR`.`CABLENUMBER`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER_PREFIX` ;
+DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER` ;
 
-CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_PREFIX` (
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER` (
 
-  `id`     INT        NOT NULL AUTO_INCREMENT ,
-  `prefix` VARCHAR(2) NOT NULL ,
+  `id`       INT          NOT NULL AUTO_INCREMENT ,
+  `location` VARCHAR(32)  NOT NULL ,
+  `prefix`   VARCHAR(2)   NOT NULL ,
+  `first`    INT UNSIGNED NOT NULL ,
+  `last`     INT UNSIGNED NOT NULL ,
 
   PRIMARY KEY (`id`) ,
-  UNIQUE KEY `prefix` (`prefix`)
+  UNIQUE KEY `location` (`location`)
 )
 ENGINE = InnoDB;
 
--- -----------------------------------------------------
--- Table `NEOCAPTAR`.`CABLENUMBER_RANGE`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER_RANGE` ;
-
-CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_RANGE` (
-
-  `id`        INT          NOT NULL AUTO_INCREMENT ,
-  `prefix_id` INT          NOT NULL ,
-  `first`     INT UNSIGNED NOT NULL ,
-  `last`      INT UNSIGNED NOT NULL ,
-
-  PRIMARY KEY (`id`) ,
-
-  CONSTRAINT `CABLENUMBER_RANGE_FK_1`
-    FOREIGN KEY (`prefix_id` )
-    REFERENCES `NEOCAPTAR`.`CABLENUMBER_PREFIX` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `NEOCAPTAR`.`CABLENUMBER_LOCATION`
+-- Table `NEOCAPTAR`.`CABLENUMBER_ALLOCATION`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER_LOCATION` ;
+DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATION` ;
 
-CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_LOCATION` (
+CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATION` (
 
-  `prefix_id` INT         NOT NULL ,
-  `location`  VARCHAR(32) NOT NULL ,
-
-  UNIQUE KEY `location` (`location`) ,
-
-  CONSTRAINT `CABLENUMBER_LOCATION_FK_1`
-    FOREIGN KEY (`prefix_id` )
-    REFERENCES `NEOCAPTAR`.`CABLENUMBER_PREFIX` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `NEOCAPTAR`.`CABLENUMBER_ALLOCATED`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATED` ;
-
-CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATED` (
-
-  `range_id`         INT             NOT NULL ,
+  `cablenumber_id`   INT             NOT NULL ,
   `cablenumber`      INT UNSIGNED    NOT NULL ,
   `cable_id`         INT             NOT NULL ,
   `allocated_time`   BIGINT UNSIGNED NOT NULL ,
   `allocated_by_uid` VARCHAR(32)     NOT NULL ,
 
-  UNIQUE KEY `cablenumber` (`range_id`,`cablenumber`,`cable_id`) ,
+  UNIQUE KEY `cablenumber_id` (`cablenumber_id`,`cablenumber`,`cable_id`) ,
 
-  CONSTRAINT `CABLENUMBER_ALLOCATED_FK_1`
-    FOREIGN KEY (`range_id` )
-    REFERENCES `NEOCAPTAR`.`CABLENUMBER_RANGE` (`id` )
+  CONSTRAINT `CABLENUMBER_ALLOCATION_FK_1`
+    FOREIGN KEY (`cablenumber_id` )
+    REFERENCES `NEOCAPTAR`.`CABLENUMBER` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE ,
 
-  CONSTRAINT `CABLENUMBER_ALLOCATED_FK_2`
+  CONSTRAINT `CABLENUMBER_ALLOCATION_FK_2`
     FOREIGN KEY (`cable_id` )
     REFERENCES `NEOCAPTAR`.`CABLE` (`id` )
     ON DELETE CASCADE

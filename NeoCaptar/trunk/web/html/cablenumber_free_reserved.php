@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This service will return a list of cable number allocation.
+ * This service will locate and free reserved cable numbers return an updaed list
+ * of reserved cables.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'neocaptar/neocaptar.inc.php' );
@@ -27,7 +28,18 @@ try {
 
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
-    $prefix2array = NeoCaptarUtils::cablenumber_prefixes2array($neocaptar);
+
+    $prefixes = array();
+    foreach( $neocaptar->cablenumber_prefixes() as $p )
+        $prefixes[$p->name()] = $p;
+
+    $uid = AuthDB::instance()->authName();
+    foreach( $neocaptar->find_reserved_cables() as $prefix_name => $cables )
+        foreach( $cables as $cable )
+            $prefixes[$prefix_name]->free_cable($cable);
+
+    $prefix2array = NeoCaptarUtils::cablenumber_reserved2array($neocaptar);
+
 	$authdb->commit();
 	$neocaptar->commit();
 

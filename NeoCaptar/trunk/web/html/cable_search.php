@@ -176,18 +176,19 @@ try {
     // scanned below. Parameters (if specifid) are not allowed to have empty
     // values.
     //
-    $id                = NeoCaptarUtils::get_param_GET('id',               false);
-    $project_id        = NeoCaptarUtils::get_param_GET('project_id',       false);
-    $cablenumber       = NeoCaptarUtils::get_param_GET('cablenumber',      false);
-    $prefix            = NeoCaptarUtils::get_param_GET('prefix',           false);
-    $jobnumber         = NeoCaptarUtils::get_param_GET('jobnumber',        false);
-    $dict_cable_id     = NeoCaptarUtils::get_param_GET('dict_cable_id',    false);
-    $dict_connector_id = NeoCaptarUtils::get_param_GET('dict_connector_id',false);
-    $dict_pinlist_id   = NeoCaptarUtils::get_param_GET('dict_pinlist_id',  false);
-    $dict_location_id  = NeoCaptarUtils::get_param_GET('dict_location_id', false);
-    $dict_rack_id      = NeoCaptarUtils::get_param_GET('dict_rack_id',     false);
-    $dict_routing_id   = NeoCaptarUtils::get_param_GET('dict_routing_id',  false);
-    $dict_instr_id     = NeoCaptarUtils::get_param_GET('dict_instr_id',    false);
+    $id                   = NeoCaptarUtils::get_param_GET('id',                  false);
+    $project_id           = NeoCaptarUtils::get_param_GET('project_id',          false);
+    $cablenumber          = NeoCaptarUtils::get_param_GET('cablenumber',         false);
+    $prefix               = NeoCaptarUtils::get_param_GET('prefix',              false);
+    $cablenumber_range_id = NeoCaptarUtils::get_param_GET('cablenumber_range_id',false);
+    $jobnumber            = NeoCaptarUtils::get_param_GET('jobnumber',           false);
+    $dict_cable_id        = NeoCaptarUtils::get_param_GET('dict_cable_id',       false);
+    $dict_connector_id    = NeoCaptarUtils::get_param_GET('dict_connector_id',   false);
+    $dict_pinlist_id      = NeoCaptarUtils::get_param_GET('dict_pinlist_id',     false);
+    $dict_location_id     = NeoCaptarUtils::get_param_GET('dict_location_id',    false);
+    $dict_rack_id         = NeoCaptarUtils::get_param_GET('dict_rack_id',        false);
+    $dict_routing_id      = NeoCaptarUtils::get_param_GET('dict_routing_id',     false);
+    $dict_instr_id        = NeoCaptarUtils::get_param_GET('dict_instr_id',       false);
 
     $dict_device_location_id  = NeoCaptarUtils::get_param_GET('dict_device_location_id', false);
     $dict_device_region_id    = NeoCaptarUtils::get_param_GET('dict_device_region_id',   false);
@@ -202,15 +203,15 @@ try {
     //
     function force_empty($str) { return is_null($str) ? '' : $str; }
     $partial_search_params = array(
-        'cable'           => force_empty( NeoCaptarUtils::get_param_GET('partial_cable',          false,true)),
-        'job'             => force_empty( NeoCaptarUtils::get_param_GET('partial_job',            false,true)),
-        'cable_type'      => force_empty( NeoCaptarUtils::get_param_GET('partial_cable_type',     false,true)),
-        'routing'         => force_empty( NeoCaptarUtils::get_param_GET('partial_routing',        false,true)),
-        'device'          => force_empty( NeoCaptarUtils::get_param_GET('partial_device',         false,true)),
-        'func'            => force_empty( NeoCaptarUtils::get_param_GET('partial_func',           false,true)),
-        'origin_loc'      => force_empty( NeoCaptarUtils::get_param_GET('partial_origin_loc',     false,true)),
-        'destination_loc' => force_empty( NeoCaptarUtils::get_param_GET('partial_destination_loc',false,true)),
-        'partial_or'      => force_empty( NeoCaptarUtils::get_param_GET('partial_or',             false,true)),
+        'cable'            => force_empty( NeoCaptarUtils::get_param_GET('partial_cable',          false,true)),
+        'job'              => force_empty( NeoCaptarUtils::get_param_GET('partial_job',            false,true)),
+        'cable_type'       => force_empty( NeoCaptarUtils::get_param_GET('partial_cable_type',     false,true)),
+        'routing'          => force_empty( NeoCaptarUtils::get_param_GET('partial_routing',        false,true)),
+        'device'           => force_empty( NeoCaptarUtils::get_param_GET('partial_device',         false,true)),
+        'func'             => force_empty( NeoCaptarUtils::get_param_GET('partial_func',           false,true)),
+        'origin_name'      => force_empty( NeoCaptarUtils::get_param_GET('partial_origin_loc',     false,true)),
+        'destination_name' => force_empty( NeoCaptarUtils::get_param_GET('partial_destination_loc',false,true)),
+        'partial_or'       => force_empty( NeoCaptarUtils::get_param_GET('partial_or',             false,true)),
     );
 
     // Output format options:
@@ -252,6 +253,7 @@ try {
         array_push($cables,$cable);
 
     } else if(!is_null($prefix))                   { $cables = $neocaptar->find_cables_by_prefix                  ($prefix);
+    } else if(!is_null($cablenumber_range_id))     { $cables = $neocaptar->find_cables_by_cablenumber_range_id    ($cablenumber_range_id);
     } else if(!is_null($jobnumber))                { $cables = $neocaptar->find_cables_by_jobnumber               ($jobnumber);
     } else if(!is_null($dict_cable_id))            { $cables = $neocaptar->find_cables_by_dict_cable_id           ($dict_cable_id);
     } else if(!is_null($dict_connector_id))        { $cables = $neocaptar->find_cables_by_dict_connector_id       ($dict_connector_id);

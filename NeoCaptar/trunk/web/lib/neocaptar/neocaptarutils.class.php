@@ -325,7 +325,55 @@ class NeoCaptarUtils {
             'recently_allocated_cable_id' => is_null($recent) ? '' : $recent['cable_id']
         );
     }
+    /**
+     * Return an array representation of a cable number prefixes.
+     * The array is suitable for exporting by Web services.
+     *
+     * @param NeoCaptar $neocaptar
+     * @return array 
+     */
+    public static function cablenumber_prefixes2array($neocaptar) {
+        $result = array();
+        foreach( $neocaptar->cablenumber_prefixes() as $p )
+            array_push(
+                $result,
+                array (
+                    'name'     => $p->name(),
+                    'location' => $p->locations(),
+                    'range'    => $p->ranges()));
+        return $result;
+    }
 
+    /**
+     * Return an array representation of a cable number ranges associated
+     * with a prefix. The array is suitable for exporting by Web services.
+     *
+     * @param NeoCaptarCableNumberPrefix $prefix
+     * @return array
+     */
+    public static function cablenumber_ranges2array($prefix) {
+        return $prefix->ranges();
+    }
+
+    /**
+     * Return an array representing orphan cables.
+     *
+     * @param NeoCaptar $neocaptar
+     * @return type 
+     */
+    public static function cablenumber_orphant2array($neocaptar) {
+        return $neocaptar->find_orphant_cables();
+    }
+
+    /**
+     * Return an array representing reserved cables.
+     *
+     * @param NeoCaptar $neocaptar
+     * @return type 
+     */
+    public static function cablenumber_reserved2array($neocaptar) {
+        return $neocaptar->find_reserved_cables();
+    }
     /**
      * Return an array representation of a job number allocation. The array
      * is suitable for exporting by Web services.

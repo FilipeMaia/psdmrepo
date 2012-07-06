@@ -61,10 +61,10 @@ function p_appl_admin() {
 		if( this.initialized ) return;
 		this.initialized = true;
 
-		$('#admin-access-reload'       ).button().click(function() { that.access_load      (); });
-		$('#admin-notifications-reload').button().click(function() { that.notify_load      (); });
-		$('#admin-cablenumbers-reload' ).button().click(function() { that.cablenumbers_load(); });
-		$('#admin-jobnumbers-reload'   ).button().click(function() { that.jobnumbers_load  (); });
+		$('#admin-access-reload'       ).button().click(function() { that.access_load       (); });
+		$('#admin-notifications-reload').button().click(function() { that.notify_load(); });
+		$('#admin-cablenumbers-reload' ).button().click(function() { that.cablenumbers_load (); });
+		$('#admin-jobnumbers-reload'   ).button().click(function() { that.jobnumbers_load   (); });
 
         var administrator2add = $('#admin-access').find('input[name="administrator2add"]');
         administrator2add.
@@ -102,45 +102,11 @@ function p_appl_admin() {
                submit_pending.attr('disabled','disabled');
                delete_pending.attr('disabled','disabled');
         }
-		var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  ).button().button('disable');
-		var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  ).button().button('disable');
-		var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]').button().button('disable');
 
-		var cablenumbers_ranges_edit   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="edit"]'  ).button().button('disable');
-		var cablenumbers_ranges_save   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="save"]'  ).button().button('disable');
-		var cablenumbers_ranges_cancel = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="cancel"]').button().button('disable');
-
-        var cablenumbers_orphan_scan        = $('#admin-cablenumbers').find('#orphan' ).find('button[name="scan"]'       ).button().button('disable');
-		var cablenumbers_orphan_synchronize = $('#admin-cablenumbers').find('#orphan' ).find('button[name="synchronize"]').button().button('disable');
-
-        var cablenumbers_reserved_scan = $('#admin-cablenumbers').find('#reserved' ).find('button[name="scan"]').button().button('disable');
-		var cablenumbers_reserved_free = $('#admin-cablenumbers').find('#reserved' ).find('button[name="free"]').button().button('disable');
-
-        if( this.can_manage_access()) {
-
-            cablenumbers_prefixes_edit.button('enable');
-            cablenumbers_prefixes_edit.click  (function() { that.cablenumbers_prefixes_edit       (); });
-            cablenumbers_prefixes_save.click  (function() { that.cablenumbers_prefixes_edit_save  (); });
-            cablenumbers_prefixes_cancel.click(function() { that.cablenumbers_prefixes_edit_cancel(); });
-
-            cablenumbers_ranges_edit.click  (function() { that.cablenumbers_ranges_edit       (); });
-            cablenumbers_ranges_save.click  (function() { that.cablenumbers_ranges_edit_save  (); });
-            cablenumbers_ranges_cancel.click(function() { that.cablenumbers_ranges_edit_cancel(); });
-
-            cablenumbers_orphan_scan.button       ('enable');
-            cablenumbers_orphan_synchronize.button('enable');
-            cablenumbers_orphan_scan.click       (function() { that.cablenumbers_orphan_scan       (); });
-            cablenumbers_orphan_synchronize.click(function() { that.cablenumbers_orphan_synchronize(); });
-
-            cablenumbers_reserved_scan.button('enable');
-            cablenumbers_reserved_free.button('enable');
-            cablenumbers_reserved_scan.click(function() { that.cablenumbers_reserved_scan(); });
-            cablenumbers_reserved_free.click(function() { that.cablenumbers_reserved_free(); });
-        }
-        $('#admin-access'       ).find('#tabs').tabs();
+        $('#admin-access').find('#tabs').tabs();
         $('#admin-notifications').find('#tabs').tabs();
-        $('#admin-cablenumbers' ).find('#tabs').tabs();
-        $('#admin-jobnumbers'   ).find('#tabs').tabs();
+        $('#admin-cablenumbers').find('#tabs').tabs();
+        $('#admin-jobnumbers').find('#tabs').tabs();
 
 		this.access_load();
         this.notify_load();
@@ -164,347 +130,165 @@ function p_appl_admin() {
             '<a href="javascript:global_search_cable_by_cablenumber('+"'"+c.recently_allocated_name+"'"+')">'+c.recently_allocated_name+'</a>';
         return html;
     };
-    this.cablenumbers_prefixes_edit_tools = function(edit_mode) {
-		var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  );
-		var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  );
-		var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]');
-        if( !this.can_manage_access()) return;
-        cablenumbers_prefixes_edit.button  (edit_mode ? 'disable' : 'enable');
-        cablenumbers_prefixes_save.button  (edit_mode ? 'enable'  : 'disable');
-        cablenumbers_prefixes_cancel.button(edit_mode ? 'enable'  : 'disable');
-    };
-    this.cablenumber_prefixes_table = null;
-	this.cablenumber_prefixes_display = function(edit_mode) {
-        var rows = [];
-        for( var p in this.cablenumber_prefix ) {
-            var prefix = this.cablenumber_prefix[p];
-            var html = '';
-            for( var l in prefix.location )            html += '<div>'+prefix.location[l]+'</div>';
-            if( edit_mode && this.can_manage_access()) html += TextInput_HTML({ classes: 'location', name: prefix.name, value: '', size: 2 });
-            rows.push([ prefix.name, html ]);
-        }
-        if( edit_mode && this.can_manage_access())
-            rows.push([ TextInput_HTML({ classes: 'prefix', name: prefix.name, value: '', size: 2 }), '&nbsp;' ]);
+	this.cablenumbers_display = function() {
 
-        this.cablenumber_prefixes_table = new Table('admin-cablenumbers-prefixes-table', [
-            { name: 'prefix',
-              selectable: !edit_mode,
-              type: {
-                    select_action : function(prefix) { that.cablenumber_ranges_display(prefix,false); }}},
-            { name: 'location (LLL)', sorted: false } ],
-            rows,
-            { default_sort_column: 0,
-              selected_col: 0 }
-        );
-        this.cablenumber_prefixes_table.display();
-        this.cablenumbers_prefixes_edit_tools(edit_mode);
-        this.cablenumber_ranges_display(this.cablenumber_prefixes_table.selected_object(),false);
-    };
-    this.cablenumbers_prefixes_edit = function() {
-        this.cablenumber_prefixes_display(true);
-    };
-    this.cablenumbers_prefixes_edit_save = function() {
-        var params = {};
-        var new_prefix = $('#admin-cablenumbers-prefixes-table').find('.prefix').val();
-        if(new_prefix != '') params[new_prefix] = '';
-        var new_locations = $('#admin-cablenumbers-prefixes-table').find('.location');
-        for( var i=0; i < new_locations.length; i++) {
-            var value = new_locations[i].value;
-            if( value != '' )
-                params[new_locations[i].name] = value;
-        }
-        var jqXHR = $.get('../neocaptar/cablenumber_prefix_save.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumber_prefix = data.prefix;
-            that.cablenumber_prefixes_display(false);
-        },
-        'JSON').error(function () {
-            report_error('failed to load cable numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.cablenumbers_prefixes_edit_cancel = function() {
-        this.cablenumber_prefixes_display(false);
-    };
-    this.cablenumbers_ranges_edit_tools = function(edit_mode) {
-        var ranges_elem = $('#admin-cablenumbers').find('#ranges');
-		var cablenumbers_ranges_edit   = ranges_elem.find('button[name="edit"]'  );
-		var cablenumbers_ranges_save   = ranges_elem.find('button[name="save"]'  );
-		var cablenumbers_ranges_cancel = ranges_elem.find('button[name="cancel"]');
-        if( !this.can_manage_access()) return;
-        cablenumbers_ranges_edit.button  (edit_mode ? 'disable' : 'enable');
-        cablenumbers_ranges_save.button  (edit_mode ? 'enable'  : 'disable');
-        cablenumbers_ranges_cancel.button(edit_mode ? 'enable'  : 'disable');
-    };
-    function count_elements_in_array(obj) {
-        var size = 0;
-        for( var key in obj ) size++;
-        return size;
-    }
-    this.cablenumber_ranges_display = function(prefix_name,edit_mode) {
-        this.cablenumbers_ranges_edit_tools(edit_mode);
-        var ranges_elem = $('#admin-cablenumbers').find('#ranges');
         var rows = [];
-        for( var p in this.cablenumber_prefix ) {
-            var prefix = this.cablenumber_prefix[p];
-            if( prefix.name == prefix_name ) {
-                for( var r in prefix.range ) {
-                    var range = prefix.range[r];
-                    if( edit_mode && this.can_manage_access())
-                        rows.push([
-                            '',
-                            TextInput_HTML({ classes: 'first', name: ''+range.id, value: range.first, size: 6 }),
-                            TextInput_HTML({ classes: 'last',  name: ''+range.id, value: range.last,  size: 6 }),
-                            '',
-                            '',
-                            ''
-                        ]);
-                    else
-                        rows.push([
-                            this.can_manage_access() ?
-                                Button_HTML('X', {
-                                    name:    range.id,
-                                    value:   prefix_name,
-                                    classes: 'admin-cablenumbers-range-delete',
-                                    title:   'delete this range from the prefix' }) : ' ',
-                            range.first,
-                            range.last,
-                            range.last - range.first + 1,
-                            count_elements_in_array(range.available),
-                            Button_HTML('search', {
-                                    name:    range.id,
-                                    value:   prefix_name,
-                                    classes: 'admin-cablenumbers-range-search',
-                                    title:   'search all cables associated with this range and the prefix' })
-                        ]);
-                }
-            }
-        }
-        if( edit_mode && this.can_manage_access())
+        for( var cnidx in this.cablenumber ) {
+            var c = this.cablenumber[cnidx];
             rows.push([
-                '',
-                TextInput_HTML({ classes: 'first', name: '0', value: '0', size: 6 }),
-                TextInput_HTML({ classes: 'last',  name: '0', value: '0', size: 6 }),
-                '',
-                '',
-                ''
-            ]);
+                this.can_manage_access() ?
+                    Button_HTML('E', {
+                        name:    'edit_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.cablenumbers_edit('"+cnidx+"')",
+                        title:   'edit'
+                    })+' '+
+                    Button_HTML('save', {
+                        name:    'save_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.cablenumbers_edit_save('"+cnidx+"')",
+                        title:   'save changes to the database'
+                    })+' '+
+                    Button_HTML('cancel', {
+                        name:    'edit_cancel_'+cnidx,
+                        classes: 'admin-cablenumbers-tools',
+                        onclick: "admin.cablenumbers_edit_cancel('"+cnidx+"')",
+                        title:   'cancel editing and ignore any changes'
+                    }) : '',
 
-        var table = new Table('admin-cablenumbers-ranges-table', [
-            { name: 'DELETE', sorted: false,
-              type: { after_sort: function() {
-                            ranges_elem.find('.admin-cablenumbers-range-delete').
-                                button().
-                                click(function() {
-                                    var id = this.name;
-                                    var prefix_name = this.value;
-                                    that.cablenumbers_range_delete(id,prefix_name); });
-                            ranges_elem.find('.admin-cablenumbers-range-search').
-                                button().
-                                click(function() {
-                                    var id = this.name;
-                                    var prefix_name = this.value;
-                                    global_search_cables_by_cablenumber_range(id); });
-                      }}},
-            { name: 'first' },
-            { name: 'last' },
-            { name: '# total' },
-            { name: '# available' },
-            { name: 'in use', sorted: false }],
+                '<div name="location_'+cnidx+'">'+c.location          +'</div>',
+                '<div name="prefix_'  +cnidx+'">'+c.prefix            +'</div>',
+                '<div name="range_'   +cnidx+'">'+c.first+' - '+c.last+'</div>',
+
+                Button_HTML('search', {
+                    name:    cnidx,
+                    classes: 'admin-cablenumbers-search',
+                    title:   'search all cables using this range'
+                }),
+
+                '<div name="num_available_'          +cnidx+'">'+c.num_available            +'</div>',
+                '<div name="next_available_'         +cnidx+'">'+c.next_available           +'</div>',
+                '<div name="recently_allocated_name_'+cnidx+'">'+this.cable_name2html(cnidx)+'</div>',
+                '<div name="recent_allocation_time_' +cnidx+'">'+c.recent_allocation_time   +'</div>',
+                '<div name="recent_allocation_uid_'  +cnidx+'">'+c.recent_allocation_uid    +'</div>'
+            ]);
+        }
+        var table = new Table('admin-cablenumbers-cablenumbers', [
+            { name: 'TOOLS',                sorted: false },
+            { name: 'location',             sorted: false },
+            { name: 'prefix',               sorted: false },
+            { name: 'range',                sorted: false },
+            { name: 'in use',               sorted: false },
+            { name: '# available',          sorted: false },
+            { name: 'next',                 sorted: false },
+            { name: 'previously allocated', sorted: false },
+            { name: 'last allocation',      sorted: false },
+            { name: 'requested by',         sorted: false } ],
             rows
         );
         table.display();
+        for( var cnidx in this.cablenumber ) {
+			$('#admin-cablenumbers-cablenumbers').find('button.admin-cablenumbers-tools').button();
+            this.cablenumbers_update_tools(cnidx,false);
+        }
+        $('.admin-cablenumbers-search').
+            button().
+            click(function () {
+                var cnidx = this.name;
+                var cn = that.cablenumber[cnidx];
+                global_search_cables_by_prefix(cn.prefix);
+            });
     };
-    this.cablenumbers_ranges_edit = function() {
-        this.cablenumber_ranges_display(this.cablenumber_prefixes_table.selected_object(),true);
+	this.cablenumbers_update = function(cnidx) {
+        var c = this.cablenumber[cnidx];
+        var elem = $('#admin-cablenumbers-cablenumbers');
+        elem.find('div[name="prefix_'                 +cnidx+'"]').html(c.prefix);
+        elem.find('div[name="range_'                  +cnidx+'"]').html(c.first+' - '+c.last);
+        elem.find('div[name="num_available_'          +cnidx+'"]').html(c.num_available);
+        elem.find('div[name="next_available_'         +cnidx+'"]').html(c.next_available);
+        elem.find('div[name="recently_allocated_name_'+cnidx+'"]').html(this.cable_name2html(cnidx));
+        elem.find('div[name="recent_allocation_time_' +cnidx+'"]').html(c.recent_allocation_time);
+        elem.find('div[name="recent_allocation_uid_'  +cnidx+'"]').html(c.recent_allocation_uid);
+        this.cablenumbers_update_tools(cnidx,false);
     };
-    this.cablenumbers_range_delete = function(id,prefix_name) {
-        var params = { prefix:prefix_name, range_id:id };
-        var jqXHR = $.get('../neocaptar/cablenumber_range_delete.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            for( var p in  that.cablenumber_prefix ) {
-                var prefix = that.cablenumber_prefix[p];
-                if( prefix.name == prefix_name ) {
-                    that.cablenumber_prefix[p].range = data.range;
-                    that.cablenumber_ranges_display(prefix_name, false);
-                    break;
-                }
-            }
-        },
-        'JSON').error(function () {
-            report_error('failed to load cable number ranges info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.cablenumbers_ranges_edit_save = function() {
-        var prefix2save = this.cablenumber_prefixes_table.selected_object();
-        var params = {prefix:prefix2save,range:''};
-        var firsts = $('#admin-cablenumbers-ranges-table').find('.first');
-        var lasts  = $('#admin-cablenumbers-ranges-table').find('.last');
-        if(firsts.length != lasts.length) {
-            report_error('cablenumbers_ranges_edit_save: implementation error, please contact developers');
+    this.cablenumbers_update_tools = function(cnidx,editing) {
+        if(!this.can_manage_access()) {
+            this.cablenumbers_tools_disable(cnidx);
             return;
         }
-        for( var i=0; i < firsts.length; i++) {
-            var first = firsts[i];
-            var last  = lasts [i];
-            if( first.name != last.name) {
-                report_error('cablenumbers_ranges_edit_save: internal implementation error');
+        var elem = $('#admin-cablenumbers-cablenumbers');
+		if( editing ) {
+			elem.find('button[name="edit_'       +cnidx+'"]').button('disable');
+			elem.find('button[name="edit_save_'  +cnidx+'"]').button('enable' );
+			elem.find('button[name="edit_cancel_'+cnidx+'"]').button('enable' );
+			return;
+		}
+		elem.find('button[name="edit_'       +cnidx+'"]').button('enable' );
+		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
+    };
+    this.cablenumbers_tools_disable = function(cnidx) {
+        var elem = $('#admin-cablenumbers-cablenumbers');
+		elem.find('button[name="edit_'       +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_save_'  +cnidx+'"]').button('disable');
+		elem.find('button[name="edit_cancel_'+cnidx+'"]').button('disable');
+    };
+    this.cablenumbers_edit = function(cnidx) {
+        this.cablenumbers_update_tools(cnidx,true);
+        var c = this.cablenumber[cnidx];
+        var elem = $('#admin-cablenumbers-cablenumbers');
+        elem.find('div[name="range_'+cnidx+'"]').html(
+            '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" />'+
+            '<input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
+        );
+        if(c.prefix == '')
+            elem.find('div[name="prefix_'+cnidx+'"]').html(
+                '<input type="text" size=2 name="prefix" value="'+c.prefix+'" />'
+            );
+    };
+    this.cablenumbers_edit_save = function(cnidx) {
+        this.cablenumbers_tools_disable(cnidx);
+        var c     = this.cablenumber[cnidx];
+        var elem  = $('#admin-cablenumbers-cablenumbers');
+        var first = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="first"]' ).val());
+        var last  = parseInt(elem.find('div[name="range_'+cnidx+'"]').find('input[name="last"]'  ).val());
+        if( last <= first ) {
+            report_error('invalid range: last number must be strictly larger than the first one', null);
+            this.cablenumbers_update_tools(cnidx,true);
+            return;
+        }
+        var params = { id: c.id, first:first, last:last };
+        if(c.prefix == '') {
+            var prefix = elem.find('div[name="prefix_'+cnidx+'"]').find('input[name="prefix"]').val();
+            if( prefix != '' ) params.prefix = prefix;
+        }
+        var jqXHR = $.get('../neocaptar/cablenumber_save.php',params,function(data) {
+            if(data.status != 'success') {
+                report_error(data.message, null);
+                that.cablenumbers_update_tools(cnidx,true);
                 return;
             }
-            params.range += (params.range != '' ? ',' : '')+first.name+':'+first.value+':'+last.value;
-        }
-        var jqXHR = $.get('../neocaptar/cablenumber_range_save.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            for( var p in  that.cablenumber_prefix ) {
-                var prefix = that.cablenumber_prefix[p];
-                if( prefix.name == prefix2save ) {
-                    that.cablenumber_prefix[p].range = data.range;
-                    that.cablenumber_ranges_display(prefix2save, false);
-                    break;
-                }
-            }
+            that.cablenumber[cnidx] = data.cablenumber;
+            that.cablenumbers_update(cnidx);
         },
         'JSON').error(function () {
-            report_error('failed to load cable number ranges info because of: '+jqXHR.statusText, null);
+            report_error('failed to contact the Web service due to: '+jqXHR.statusText, null);
+            that.cablenumbers_update_tools(cnidx,true);
             return;
         });
     };
-    this.cablenumbers_ranges_edit_cancel = function() {
-        this.cablenumber_ranges_display(this.cablenumber_prefixes_table.selected_object(),false);
+    this.cablenumbers_edit_cancel = function(cnidx) {
+       this.cablenumbers_update(cnidx);
     };
-
 	this.cablenumbers_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/cablenumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumber_prefix = data.prefix;
-            that.cablenumber_prefixes_display(false);
+            that.cablenumber = data.cablenumber;
+            that.cablenumbers_display();
         },
         'JSON').error(function () {
             report_error('failed to load cable numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-
-    function cablenumbers_orphan2html(numbers) {
-        var html = '<div>';
-        var num = 0;
-        for( var n in numbers ) {
-            var number = numbers[n];
-            html += '<a class="link" style="margin-right:8px;" href="javascript:global_search_cable_by_cablenumber(\''+number.cablenumber+'\')">'+number.cablenumber+'</a>';
-            num = num + 1;
-            if( num >= 8 ) {
-                num = 0;
-                html += '</div><div>';
-            }
-        }
-        html += '</div>';
-        return html;
-    }
-
-    this.cablenumbers_orphan_prefix = null;
-    this.cablenumbers_orphan_table = null;
-
-    this.cablenumbers_orphan_display = function() {
-        var rows = [];
-        for( var prefix_name in this.cablenumbers_orphan_prefix ) {
-            var prefix = this.cablenumbers_orphan_prefix[prefix_name];
-            rows.push([
-                prefix_name,
-                cablenumbers_orphan2html(prefix.out_of_range ),
-                cablenumbers_orphan2html(prefix.in_range )
-            ]);
-        }
-        this.cablenumbers_orphan_table = new Table('admin-orphan-table', [
-            { name: 'prefix' },
-            { name: 'out of range numbers', sorted: false },
-            { name: 'numbers which can be synchronized', sorted: false } ],
-            rows
-        );
-        this.cablenumbers_orphan_table.display();
-    };
-    this.cablenumbers_orphan_scan = function() {
-        var params = {};
-        var jqXHR = $.get('../neocaptar/cablenumber_get_orphan.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumbers_orphan_prefix = data.prefix;
-            that.cablenumbers_orphan_display();
-        },
-        'JSON').error(function () {
-            report_error('failed to load orphan cable numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.cablenumbers_orphan_synchronize = function() {
-        var params = {};
-        var jqXHR = $.get('../neocaptar/cablenumber_sync_orphan.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumbers_orphan_prefix = data.prefix;
-            that.cablenumbers_orphan_display();
-        },
-        'JSON').error(function () {
-            report_error('failed to load orphan cable numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-
-    function cablenumbers_reserved2html(numbers) {
-        var html = '<div>';
-        var num = 0;
-        for( var n in numbers ) {
-            var number = numbers[n];
-            html += '<a class="link" style="margin-right:8px;" href="javascript:global_search_cable_by_id(\''+number.cable_id+'\')">'+number.cablenumber+'</a>';
-            num = num + 1;
-            if( num >= 8 ) {
-                num = 0;
-                html += '</div><div>';
-            }
-        }
-        html += '</div>';
-        return html;
-    }
-
-    this.cablenumbers_reserved_prefix = null;
-    this.cablenumbers_reserved_table = null;
-
-    this.cablenumbers_reserved_display = function() {
-        var rows = [];
-        for( var prefix_name in this.cablenumbers_reserved_prefix ) {
-            var prefix = this.cablenumbers_reserved_prefix[prefix_name];
-            rows.push([
-                prefix_name,
-                cablenumbers_reserved2html(prefix)
-            ]);
-        }
-        this.cablenumbers_reserved_table = new Table('admin-reserved-table', [
-            { name: 'prefix' },
-            { name: 'numbers which can be freed', sorted: false } ],
-            rows
-        );
-        this.cablenumbers_reserved_table.display();
-    };
-    this.cablenumbers_reserved_scan = function() {
-        var params = {};
-        var jqXHR = $.get('../neocaptar/cablenumber_get_reserved.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumbers_reserved_prefix = data.prefix;
-            that.cablenumbers_reserved_display();
-        },
-        'JSON').error(function () {
-            report_error('failed to load reserved cable numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.cablenumbers_reserved_free = function() {
-        var params = {};
-        var jqXHR = $.get('../neocaptar/cablenumber_free_reserved.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.cablenumbers_reserved_prefix = data.prefix;
-            that.cablenumbers_reserved_display();
-        },
-        'JSON').error(function () {
-            report_error('failed to load reserved cable numbers info because of: '+jqXHR.statusText, null);
             return;
         });
     };

@@ -27,11 +27,15 @@ try {
 
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
-    $prefix2array = NeoCaptarUtils::cablenumber_prefixes2array($neocaptar);
+
+    $cablenumbers_as_array = array();
+	foreach( $neocaptar->cablenumber_allocations() as $c )
+        array_push($cablenumbers_as_array, NeoCaptarUtils::cablenumber2array($c));
+
 	$authdb->commit();
 	$neocaptar->commit();
 
-    NeoCaptarUtils::report_success(array('prefix' => $prefix2array));
+    NeoCaptarUtils::report_success(array('cablenumber' => $cablenumbers_as_array));
 
 } catch( AuthDBException    $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
   catch( LusiTimeException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }

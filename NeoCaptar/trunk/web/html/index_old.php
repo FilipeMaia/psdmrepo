@@ -788,11 +788,10 @@ function global_switch_context(application_name, context_name) {
 	}
     return null;
 }
-function global_simple_search                      ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
+function global_simple_search                     ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
 function global_search_cable_by_cablenumber        (cablenumber) { global_switch_context('search',  'cables').search_cable_by_cablenumber        (cablenumber); }
 function global_search_cable_by_id                 (id)          { global_switch_context('search',  'cables').search_cable_by_id                 (id); }
 function global_search_cables_by_prefix            (prefix)      { global_switch_context('search',  'cables').search_cables_by_prefix            (prefix); }
-function global_search_cables_by_cablenumber_range (range_id)    { global_switch_context('search',  'cables').search_cables_by_cablenumber_range (range_id); }
 function global_search_cables_by_jobnumber         (jobnumber)   { global_switch_context('search',  'cables').search_cables_by_jobnumber         (jobnumber); }
 function global_search_cables_by_jobnumber_prefix  (prefix)      { global_switch_context('search',  'cables').search_cables_by_jobnumber_prefix  (prefix); }
 function global_search_cables_by_dict_cable_id     (id)          { global_switch_context('search',  'cables').search_cables_by_dict_cable_id     (id); }
@@ -933,7 +932,7 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
     <div id="p-context-header">
       <div id="p-context" style="float:left"></div>
       <div id="p-search" style="float:right">
-        quick search: <input type="text" id="p-search-text" value="" size=16 title="enter full or partial cable number, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
+        quick search: <input type="text" id="p-search-text" value="" size=16 title="enter text to search in the application, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
       </div>
       <div style="clear:both;"></div>
     </div>
@@ -1306,14 +1305,14 @@ HERE;
         <div style="float:left;">
           <form id="search-cables-form">
             <table style="font-size:95%;"><tbody>
-              <tr><td><b>Cable #</b>     </td><td><input type="text" name="cable"           size="6"  value="" title="full or partial cable number"    ></input></td>
-                  <td><b>Cable Type</b>  </td><td><input type="text" name="cable_type"      size="6"  value="" title="full or partial cable type"      ></input></td>
-                  <td><b>Device</b>      </td><td><input type="text" name="device"          size="12" value="" title="full or partial device name"     ></input></td>
-                  <td><b>Origin</b></td> <td><input type="text" name="origin_loc"           size="12" value="" title="full or partial origin name"     ></input></td></tr>
-              <tr><td><b>Job #</b>       </td><td><input type="text" name="job"             size="6"  value="" title="full or partial job number"      ></input></td>
-                  <td><b>Routing</b>     </td><td><input type="text" name="routing"         size="6"  value="" title="full or partial routing"         ></input></td>
-                  <td><b>Function</b>    </td><td><input type="text" name="func"            size="12" value="" title="full or partial function name"   ></input></td>
-                  <td><b>Destination</b> </td><td><input type="text" name="destination_loc" size="12" value="" title="full or partial destination name"></input></td></tr>
+              <tr><td><b>Cable #</b>    </td><td><input type="text" name="cable"           size="6"  value="" title="full or partial cable number"        ></input></td>
+                  <td><b>Cable Type</b> </td><td><input type="text" name="cable_type"      size="6"  value="" title="full or partial cable type"          ></input></td>
+                  <td><b>Device</b>     </td><td><input type="text" name="device"          size="12" value="" title="full or partial device name"         ></input></td>
+                  <td><b>Origin Loc.</b></td><td><input type="text" name="origin_loc"      size="3"  value="" title="full or partial origin location"     ></input></td></tr>
+              <tr><td><b>Job #</b>      </td><td><input type="text" name="job"             size="6"  value="" title="full or partial job number"          ></input></td>
+                  <td><b>Routing</b>    </td><td><input type="text" name="routing"         size="6"  value="" title="full or partial routing"             ></input></td>
+                  <td><b>Function</b>   </td><td><input type="text" name="func"            size="12" value="" title="full or partial function name"       ></input></td>
+                  <td><b>Dest. Loc.</b> </td><td><input type="text" name="destination_loc" size="3"  value="" title="full or partial destination location"></input></td></tr>
             </tbody></table>
           </form>
         </div>
@@ -1510,7 +1509,7 @@ HERE;
     <div id="admin-cablenumbers" class="application-workarea hidden">
       <div style="float:left;" ><button id="admin-cablenumbers-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both; "></div>
-      <div style="margin-top:20px; margin-bottom:20px; ">
+      <div style="margin-top:20px; margin-bottom:20px; width:720px;">
         <p>PCDS is allocated a set of "official" cable identifiers (so called "cable numbers") which are managed by
         this application. A particular cable number begins with a two-letter prefix corresponding to a building where
         the cable "originates" from and it's followed by 4 digits. A unique cable number is generated each time
@@ -1521,73 +1520,15 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#cablenumbers">Prefixes</a></li>
-		  <li><a href="#orphan">Orphan Numbers</a></li>
-		  <li><a href="#reserved">Reserved Numbers</a></li>
+		  <li><a href="#cablenumbers">Ranges</a></li>
 	    </ul>
 
         <div id="cablenumbers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>Each PCDS location (a building or an instrument) is associated with a set of cable numbers. The set represents
-               a family of cable numbers starting with so called 'prefix' (an upper case character string of the length of 2).
-               Multiple locations can share the same set (prefix). Each set is composed of one or many subranges of cable numbers.
-               Different prefixes have independent sets of numbers. Individual cable numbers are allocated from (any range) of a set
-               when a new cable is being registered in the database. This page is meant to be used by administrators to configure
-               the cable number generator.</p>
+          <div style="margin-bottom:10px; width:720px;">
+            <p>For each PCDS building there is a range of cable numbers. The range is configured below.
+            Only administrators of this application are allowed to modify the ranges.</p>
           </div>
-          <div id="prefixes" style="float:left; margin-right:20px;">
-            <div style="margin-bottom:10px;">
-              <button name="edit">Edit</button>
-              <button name="save">Save</button>
-              <button name="cancel">Cancel</button>
-            </div>
-            <div id="admin-cablenumbers-prefixes-table"></div>
-          </div>
-          <div id="ranges" style="float:left; margin-right:20px;">
-            <div style="margin-bottom:10px;">
-              <button name="edit">Edit</button>
-              <button name="save">Save</button>
-              <button name="cancel">Cancel</button>
-            </div>
-            <div id="admin-cablenumbers-ranges-table"></div>
-          </div>
-          <div style="clear:both;"></div>
-        </div>
-        <div id="orphan" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>This page is meant for discovering cable numbers which are in use but which are not yet associated with any
-               allocation range known to this application. The numbers will be grouped according to their prefixes
-               and potential eligibility to be synchronized with allocation ranges. Administrators of this applications
-               will be allowed to synchronize the later numbers with the managed allocation ranges.
-               Note that some cables which were imported into this database from the "big" CAPTOR may not be synchronized.</p>
-          </div>
-          <div style="margin-bottom:10px;">
-            <button name="scan">Scan</button>
-            <button name="synchronize">Synchronize</button>
-          </div>
-          <div id="admin-orphan-table"></div>
-        </div>
-        <div id="reserved" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>This page will display cable numbers which are reserved but not used for specific cables.
-               And here follows an explanation of what it means. When a user "registers" a cable
-               for the first time (either on purpose or by a mistake) the cable gets some number
-               from the allocation pool. This will establish a permanent database associated between a cable
-               and its number. "Unregistering" the cable won't break this association, hence next time a user
-               "Registers" the same cable the application will always use the previously allocated number.
-               This page is meant to monitor cable numbers (and also find the corresponding cables) which  
-               are found in this intermediate state (of reserved by not really used).
-               Administrators of this applications will also be allowed to clean the permanent associations
-               for those cable and cable number pairs. Another possibility is to delete the corresponding cables
-               from their projects if they are not needed. This will free cable numbers allocated for those
-               (deleted) cables.
-            </p>
-          </div>
-          <div style="margin-bottom:10px;">
-            <button name="scan">Scan</button>
-            <button name="free">Free</button>
-          </div>
-          <div id="admin-reserved-table"></div>
+          <div id="admin-cablenumbers-cablenumbers"></div>
         </div>
       </div>
     </div>

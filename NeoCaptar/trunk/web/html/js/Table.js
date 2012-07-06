@@ -506,7 +506,8 @@ function Attributes_HTML(attr) {
         if(attr.classes)  html += ' class="'+attr.classes+'"';
         if(attr.name)     html += ' name="'+attr.name+'"';
         if(attr.value)    html += ' value="'+attr.value+'"';
-        if(attr.title)    html += ' title="'+attr.title+'"';
+        if(attr.value)    html += ' value="'+attr.value+'"';
+        if(attr['size'])  html += ' size="'+attr['size']+'"';
         if(attr.disabled) html += ' disabled="disabled"';
         if(attr.checked)  html += ' checked="checked"';
         if(attr.onclick)  html += ' onclick="'+attr.onclick+'"';

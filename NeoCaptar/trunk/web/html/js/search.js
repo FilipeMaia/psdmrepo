@@ -75,6 +75,11 @@ function p_appl_search() {
         $('#search-cables-form').find('input[name="cable"]').val(prefix);
         this.search_cables_impl({prefix:prefix});
     };
+    this.search_cables_by_cablenumber_range = function(range_id) {
+        this.init();
+        that.search_cables_reset();
+        this.search_cables_impl({cablenumber_range_id:range_id});
+    };
     this.search_cables_by_jobnumber = function(jobnumber) {
         this.init();
         that.search_cables_reset();
@@ -386,14 +391,13 @@ function p_appl_search() {
     this.simple_search_impl = function(pattern) {
         this.search_cables_impl({
             partial_cable          : pattern,
-            partial_job            : pattern,
-            partial_cable_type     : pattern,
-            partial_routing        : pattern,
-            partial_device         : pattern,
-            partial_func           : pattern,
-            partial_origin_loc     : pattern,
-            partial_destination_loc: pattern,
-            partial_or             : ''
+            partial_job            : '',
+            partial_cable_type     : '',
+            partial_routing        : '',
+            partial_device         : '',
+            partial_func           : '',
+            partial_origin_loc     : '',
+            partial_destination_loc: ''
         });
     };
 	this.search_cables_impl = function(params) {

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This service will return a list of cable number allocation.
+ * This service will return a list of cable numbers which aren't associated
+ * with the cable number allocation ranges.
  */
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'neocaptar/neocaptar.inc.php' );
@@ -27,7 +28,7 @@ try {
 
 	$neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
-    $prefix2array = NeoCaptarUtils::cablenumber_prefixes2array($neocaptar);
+    $prefix2array = NeoCaptarUtils::cablenumber_orphant2array($neocaptar);
 	$authdb->commit();
 	$neocaptar->commit();
 

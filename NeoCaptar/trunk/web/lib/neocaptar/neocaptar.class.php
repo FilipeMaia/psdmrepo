@@ -507,22 +507,26 @@ class NeoCaptar {
      * @return type 
      */
     public function search_cables( $partial_search_params ) {
+        // NOTE: case-insensitive search in SQL queries
+        //
         $condition = null;
         $operator = array_key_exists('partial_or',$partial_search_params) ? ' OR ' : ' AND ';
         foreach( $partial_search_params as $p => $v ) {
             $p = trim($p);
-            if( $p == 'partial_or') continue;
+            if( $p == 'partial_or' ) continue;
+            if( $p == 'job') continue;
             $v = $this->connection->escape_string(trim($v));
             if(($p == '') || ($v == '')) continue;
             if( !is_null($condition)) $condition .= $operator;
-            $condition .= " {$p} LIKE '%{$v}%' COLLATE latin1_general_ci";  ## case-insensitive search
+            $condition .= " {$p} LIKE '%{$v}%' COLLATE latin1_general_ci";
         }
         if( is_null($condition))
             $condition = 'id is NOT NULL';
-            /*
-        	throw new NeoCaptarException (
-        		__METHOD__, "no search parameters provided" );
-             */
+        if( array_key_exists('job',$partial_search_params)) {
+            $v = $this->connection->escape_string(trim($partial_search_params['job']));
+            if( $v != '' )
+                $condition = "(({$condition}) AND project_id IN ( SELECT id FROM {$this->connection->database}.project WHERE job LIKE '%{$v}%' COLLATE latin1_general_ci ))";
+        }
         return $this->find_cables_by_($condition);
     }
     public function find_cables_by_($condition) {
@@ -549,6 +553,71 @@ class NeoCaptar {
         }
         return $list;
     }
+    public function find_orphant_cables() {
+        $result = array();
+        $prefix2range = array();
+        foreach( NeoCaptarUtils::cablenumber_prefixes2array($this) as $p ) {
+            $prefix_name = $p['name'];
+            $prefix = $this->find_cablenumber_prefix_by_name($prefix_name);
+            if( is_null($prefix))
+                throw new NeoCaptarException (
+        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+            $prefix2range[$prefix_name] = array(
+                'prefix' => $prefix,
+                'range'  => $p['range']
+            );
+        }
+        $cables = $this->find_cables_by_("cable != ''");
+        foreach( $cables as $c ) {
+
+            $cablenumber = $c->cable();
+            $prefix_name = strtoupper(substr($cablenumber,0,2));
+            $number      = intval(substr($cablenumber,2));
+            if( !array_key_exists($prefix_name, $result))
+                $result[$prefix_name] = array(
+                    'out_of_range' => array(),
+                    'in_range'     => array());
+
+            $range_id = null;
+            if( array_key_exists($prefix_name, $prefix2range)) {
+
+                if( !is_null($prefix2range[$prefix_name]['prefix']->find_cablenumber_for($c->id()))) continue;
+
+                foreach( $prefix2range[$prefix_name]['range'] as $range )
+                    if(($range['first'] <= $number) && ($number <= $range['last'])) {
+                        $range_id = $range['id'];
+                        break;
+                    }
+            }
+            array_push(
+                $result[$prefix_name][is_null($range_id) ? 'out_of_range' : 'in_range'],
+                 array(
+                    'cable_id'    => $c->id(),
+                    'cablenumber' => $cablenumber,
+                    'prefix'      => $prefix_name,
+                    'range_id'    => is_null($range_id) ? 0 : $range_id,
+                    'number'      => $number ));
+        }
+        return $result;
+    }
+    public function find_reserved_cables() {
+        $result = array();
+
+        $prefixes = array();
+        foreach( $this->cablenumber_prefixes() as $prefix )
+            $prefixes[$prefix->name()] = $prefix;
+
+        $cables = $this->find_cables_by_("cable = ''");
+        foreach( $cables as $cable ) {
+            foreach( $prefixes as $prefix_name => $prefix ) {
+                $cablenumber = $prefix->find_cablenumber_for($cable->id());
+                if( is_null($cablenumber)) continue;
+                if( !array_key_exists($prefix_name, $result)) $result[$prefix_name] = array();
+                array_push($result[$prefix_name], $cablenumber);
+            }
+        }
+        return $result;
+    }
     public function find_cable_by_cablenumber($cablenumber) {
     	$cablenumber_escaped = $this->connection->escape_string(trim($cablenumber));
     	if( $cablenumber_escaped == '' )
@@ -560,7 +629,7 @@ class NeoCaptar {
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
         	throw new NeoCaptarException (
-        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+        		__METHOD__, "inconsistent result returned by the query. Database may be corrupt. Query: {$sql}" );
         $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
         return new NeoCaptarCable (
         	$this->connection,
@@ -572,6 +641,15 @@ class NeoCaptar {
         return $this->find_cables_by_(
             "cable LIKE '{$prefix_escaped}%'");
 
+    }
+    public function find_cables_by_cablenumber_range_id($range_id) {
+        $prefix = $this->find_cablenumber_prefix_for_range_id($range_id);
+        if( is_null($prefix))
+            throw new NeoCaptarException (
+        		__METHOD__, "illegal cable number range identifier {$range_id}");
+    	$prefix_escaped = $this->connection->escape_string(trim($prefix->name()));
+        return $this->find_cables_by_(
+            "cable LIKE '{$prefix_escaped}%'");
     }
     public function find_cables_by_jobnumber( $jobnumber ) {
         $project = $this->find_project_by_jobnumber($jobnumber);
@@ -658,46 +736,90 @@ class NeoCaptar {
             "device_location='{$dict_device_location_escaped}' AND device_region='{$dict_device_region_escaped}' AND device_component='{$dict_device_component_escaped}'");
     }
 
-    public function cablenumber_allocations() {
+    
+    
+    
+//    public function cablenumber_allocations() {
+//        $list = array();
+//        $this->update_cablenumber_allocations();
+//        $sql = "SELECT * FROM {$this->connection->database}.cablenumber ORDER BY location";
+//        $result = $this->connection->query ( $sql );
+//        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+//            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+//            array_push (
+//                $list,
+//                new NeoCaptarCableNumberAlloc (
+//                    $this->connection,
+//                    $this,
+//                    $attr));
+//        }
+//        return $list;
+//    }
+//    public function find_cablenumber_allocation_by_id($id) {
+//        if( intval($id) == 0 ) throw new NeoCaptarException(__METHOD__,"illegal identifier");
+//        return $this->find_cablenumber_allocation_by_("id={$id}");
+//
+//    }
+//    public function find_cablenumber_allocation_by_location($location) {
+//    	$location_escaped = $this->connection->escape_string( trim($location));
+//    	if( $location_escaped == '' ) throw new NeoCaptarException(__METHOD__,"illegal location name");
+//        return $this->find_cablenumber_allocation_by_("location='{$location_escaped}'");
+//    }
+//    private function find_cablenumber_allocation_by_($condition) {
+//        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.cablenumber WHERE {$condition}");
+//        $nrows = mysql_numrows( $result );
+//        if( $nrows == 0 ) return null;
+//        if( $nrows != 1 )
+//            throw new NeoCaptarException (
+//                __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
+//        return new NeoCaptarCableNumberAlloc (
+//            $this->connection,
+//            $this,
+//            mysql_fetch_array( $result, MYSQL_ASSOC ));
+//    }
+
+    
+    
+    public function cablenumber_prefixes() {
         $list = array();
-        $this->update_cablenumber_allocations();
-        $sql = "SELECT * FROM {$this->connection->database}.cablenumber ORDER BY location";
+        $sql = "SELECT * FROM {$this->connection->database}.cablenumber_prefix ORDER BY prefix";
         $result = $this->connection->query ( $sql );
-        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
-            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ )
             array_push (
                 $list,
-                new NeoCaptarCableNumberAlloc (
+                new NeoCaptarCableNumberPrefix (
                     $this->connection,
                     $this,
-                    $attr));
-        }
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
     }
-    public function find_cablenumber_allocation_by_id($id) {
-        if( intval($id) == 0 ) throw new NeoCaptarException(__METHOD__,"illegal identifier");
-        return $this->find_cablenumber_allocation_by_("id={$id}");
-
+    public function find_cablenumber_prefix_by_name($name) {
+    	$name_escaped = $this->connection->escape_string(trim($name));
+    	if( $name_escaped == '' ) throw new NeoCaptarException(__METHOD__,"illegal prefix name");
+        return $this->find_cablenumber_prefix_by_("prefix='{$name_escaped}'");
     }
-    public function find_cablenumber_allocation_by_location($location) {
-    	$location_escaped = $this->connection->escape_string( trim($location));
-    	if( $location_escaped == '' ) throw new NeoCaptarException(__METHOD__,"illegal location name");
-        return $this->find_cablenumber_allocation_by_("location='{$location_escaped}'");
-    }
-    private function find_cablenumber_allocation_by_($condition) {
-        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.cablenumber WHERE {$condition}");
+    private function find_cablenumber_prefix_by_($condition) {
+        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.cablenumber_prefix WHERE {$condition}");
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
             throw new NeoCaptarException (
                 __METHOD__, "inconsistent result returned by the query. Database may be corrupt." );
-        $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
-        return new NeoCaptarCableNumberAlloc (
+        return new NeoCaptarCableNumberPrefix (
             $this->connection,
             $this,
-            $attr);
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
-
+    private function find_cablenumber_prefix_for_range_id($range_id) {
+        $range_id = intval($range_id);
+        foreach( $this->cablenumber_prefixes() as $prefix) {
+            foreach( $prefix->ranges() as $range ) {
+                if( $range['id'] == $range_id) return $prefix;
+            }
+        }
+        return null;
+    }
+    
     public function jobnumber_allocations() {
         $this->update_jobnumber_allocations();
         $list = array();
@@ -845,6 +967,10 @@ class NeoCaptar {
     public function current_user() {
         return $this->find_user_by_uid(AuthDB::instance()->authName());
     }
+    public function is_other() {
+        $user = $this->current_user();
+        return !is_null($user) && $user->is_other();
+    }
     public function is_administrator() {
         $user = $this->current_user();
         return !is_null($user) && $user->is_administrator();
@@ -963,14 +1089,19 @@ class NeoCaptar {
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
 
-    /**
-     * Scan cables to get all known origin locations and create a cable numbers
-     * allocation for each location not registered in the database
-     * table.
-     */
-    public function update_cablenumber_allocations() {
-        foreach( array_diff( $this->cable_origin_locations(), $this->cablenumber_locations()) as $location )
-            $this->add_cablenumber_allocation($location, '', 0, 0);
+//    /**
+//     * Scan cables to get all known origin locations and create a cable numbers
+//     * allocation for each location not registered in the database
+//     * table.
+//     */
+//    public function update_cablenumber_allocations() {
+//        foreach( array_diff( $this->cable_origin_locations(), $this->cablenumber_locations()) as $location )
+//            $this->add_cablenumber_allocation($location, '', 0, 0);
+//    }
+    public function add_cablenumber_prefix($name) {
+        $name_escaped = $this->connection->escape_string(trim($name));
+        $this->connection->query("INSERT {$this->connection->database}.cablenumber_prefix VALUES (NULL,'{$name_escaped}')");
+        return $this->find_cablenumber_prefix_by_("id in (SELECT LAST_INSERT_ID())");
     }
 
     /**
@@ -1396,52 +1527,59 @@ class NeoCaptar {
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.cable WHERE id={$id}" );
     }
 
-    public function add_cablenumber_allocation($location, $prefix, $first, $last) {
-        $location_escaped = $this->connection->escape_string( trim( $location ));
-        if($location_escaped == '')
-            throw new NeoCaptarException( __METHOD__, "illegal location. A valid non-empty string is expected." );
-
-        if(strlen($prefix) > 2)
-            throw new NeoCaptarException( __METHOD__, "illegal prefix. The string length must not exit exactly 2 symbols" );
-
-        if( intval($first) > intval($last))
-            throw new NeoCaptarException( __METHOD__, "invalid range of numbers. The last number must be strictly greater than the first one."); 
-
-        $this->connection->query("INSERT INTO {$this->connection->database}.cablenumber VALUES(NULL,'{$location_escaped}','{$prefix}',{$first},{$last})");
-        return $this->find_cablenumber_allocation_by_('id IN (SELECT LAST_INSERT_ID())');
+//    public function add_cablenumber_allocation($location, $prefix, $first, $last) {
+//        $location_escaped = $this->connection->escape_string( trim( $location ));
+//        if($location_escaped == '')
+//            throw new NeoCaptarException( __METHOD__, "illegal location. A valid non-empty string is expected." );
+//
+//        if(strlen($prefix) > 2)
+//            throw new NeoCaptarException( __METHOD__, "illegal prefix. The string length must not exit exactly 2 symbols" );
+//
+//        if( intval($first) > intval($last))
+//            throw new NeoCaptarException( __METHOD__, "invalid range of numbers. The last number must be strictly greater than the first one."); 
+//
+//        $this->connection->query("INSERT INTO {$this->connection->database}.cablenumber VALUES(NULL,'{$location_escaped}','{$prefix}',{$first},{$last})");
+//        return $this->find_cablenumber_allocation_by_('id IN (SELECT LAST_INSERT_ID())');
+//    }
+//    public function update_cablenumber($c,$first,$last,$prefix) {
+//        $what2update = '';
+//        if( !is_null($first)) {
+//            if( $what2update != '') $what2update .= ',';
+//            $what2update .= " first={$first}";
+//        }
+//        if( !is_null($last)) {
+//            if( $what2update != '') $what2update .= ',';
+//            $what2update .= " last={$last}";
+//        }
+//        if( !is_null($prefix)) {
+//            if( $what2update != '') $what2update .= ',';
+//            $prefix_escaped = $this->connection->escape_string(trim($prefix));
+//            $what2update .= " prefix='{$prefix_escaped}'";
+//        }
+//        if( $what2update == '') return $c;
+//        $this->connection->query("UPDATE {$this->connection->database}.cablenumber SET {$what2update} WHERE id={$c->id()}");
+//        return $this->find_cablenumber_allocation_by_id($c->id());
+//    }
+//    public function allocate_cablenumber($location, $cable_id) {
+//        $ca = $this->find_cablenumber_allocation_by_location($location);
+//        if(is_null($ca))
+//            throw new NeoCaptarException(__METHOD__,"cable location '{$location}' is either empty or not configured to be associated with cable numbers");
+//        if(strlen($ca->prefix()) != 2)
+//            throw new NeoCaptarException(__METHOD__,"cable number prefix is not set for location: {$location}");
+//
+//        $cablenumber = $ca->allocate($cable_id);
+//        if( is_null($cablenumber)) return null;
+//
+//        return sprintf("%2s%05d",$ca->prefix(),$cablenumber);
+//    }
+    
+    private function allocate_cablenumber($location, $cable_id) {
+        $location = trim($location);
+        foreach( $this->cablenumber_prefixes() as $prefix )
+            if( in_array($location, $prefix->locations()))
+                return $prefix->allocate_cable_number($cable_id,AuthDB::instance()->authName());
+        return null;
     }
-    public function update_cablenumber($c,$first,$last,$prefix) {
-        $what2update = '';
-        if( !is_null($first)) {
-            if( $what2update != '') $what2update .= ',';
-            $what2update .= " first={$first}";
-        }
-        if( !is_null($last)) {
-            if( $what2update != '') $what2update .= ',';
-            $what2update .= " last={$last}";
-        }
-        if( !is_null($prefix)) {
-            if( $what2update != '') $what2update .= ',';
-            $prefix_escaped = $this->connection->escape_string(trim($prefix));
-            $what2update .= " prefix='{$prefix_escaped}'";
-        }
-        if( $what2update == '') return $c;
-        $this->connection->query("UPDATE {$this->connection->database}.cablenumber SET {$what2update} WHERE id={$c->id()}");
-        return $this->find_cablenumber_allocation_by_id($c->id());
-    }
-    public function allocate_cablenumber($location, $cable_id) {
-        $ca = $this->find_cablenumber_allocation_by_location($location);
-        if(is_null($ca))
-            throw new NeoCaptarException(__METHOD__,"cable location '{$location}' is either empty or not configured to be associated with cable numbers");
-        if(strlen($ca->prefix()) != 2)
-            throw new NeoCaptarException(__METHOD__,"cable number prefix is not set for location: {$location}");
-
-        $cablenumber = $ca->allocate($cable_id);
-        if( is_null($cablenumber)) return null;
-
-        return sprintf("%2s%05d",$ca->prefix(),$cablenumber);
-    }
-
     public function add_jobnumber_allocation($owner, $prefix, $first, $last) {
         $owner_escaped = $this->connection->escape_string( trim( $owner ));
         if($owner_escaped == '')
@@ -1534,6 +1672,19 @@ class NeoCaptar {
         return $new_cable;
 
     }
+//    public function register_cable($cable) {
+//        if(is_null($cable))
+//            throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
+//
+//        $cablenumber = $this->allocate_cablenumber($cable->origin_loc(), $cable->id());
+//        if( is_null($cablenumber))
+//            throw new NeoCaptarException(__METHOD__, "failed to allocate a cable number");
+//
+//        $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='{$cablenumber}' WHERE id={$cable->id()}");
+//
+//        $this->add_notification_event4cable('on_register', $cable, '');
+//        return $this->change_cable_status($cable,'Registered');
+//    }
     public function register_cable($cable) {
         if(is_null($cable))
             throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
@@ -1547,6 +1698,7 @@ class NeoCaptar {
         $this->add_notification_event4cable('on_register', $cable, '');
         return $this->change_cable_status($cable,'Registered');
     }
+
     public function label_cable($cable) {
         $this->add_notification_event4cable('on_label', $cable, '');
         return $this->change_cable_status($cable,'Labeled');
@@ -1806,9 +1958,7 @@ class NeoCaptar {
         $user = $this->find_user_by_uid($originator_uid);
         if( !is_null($user)) $originator_name = "({$user->name()})";
 
-        // TODO: Change recipient e-mail to the real guy!
-        //
-        $address = 'gapon@slac.stanford.edu';
+        $address = "{$recipient_uid}@slac.stanford.edu";
         $subject = 'Project Event Notification';
         $body =<<<HERE
 This is an automated notification message on the following event:
@@ -1958,9 +2108,7 @@ Addition information on the cable event (if any):
 {$cable_info}
 HERE;
 
-        // TODO: Change recipient e-mail to the real guy!
-        //
-        $address = 'gapon@slac.stanford.edu';
+        $address = "{$recipient_uid}@slac.stanford.edu";
         $subject = 'Cable Event Notification';
         $body =<<<HERE
 This is an automated notification message on the following event:
