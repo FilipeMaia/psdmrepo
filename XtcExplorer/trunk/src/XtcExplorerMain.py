@@ -388,6 +388,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.comboBoxExp.clear()
         self.comboBoxExp.addItem("Experiment")
         dirList.sort()
+        dirList.reverse()
         for fname in dirList:
             self.comboBoxExp.addItem(fname)
 
