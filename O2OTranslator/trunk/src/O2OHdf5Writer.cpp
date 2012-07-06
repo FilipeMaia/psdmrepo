@@ -82,6 +82,7 @@
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
+#include "H5DataTypes/QuartzConfigV1.h"
 #include "H5DataTypes/TimepixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV2.h"
 #include "LusiTime/Time.h"
@@ -405,6 +406,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::FliConfigV1> ( "Fli::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_FliConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::QuartzConfigV1> ( "Quartz::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_QuartzConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter object for CsPad calibration data

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-06
+2012-07-06 Andy Salnikov
+- upgrading to pdsdata V03-07-10
+- new type QuartzConvigV1
+- changed default max datagram size to 128MB
+
 Tag: V00-18-05
 2012-06-03 Andy Salnikov
 - upgrading to pdsdata V03-07-07
