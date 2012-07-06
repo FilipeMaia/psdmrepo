@@ -253,9 +253,15 @@ class pyana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif scalar.find("PhaseCavity")>= 0 :
-                pc = evt.getPhaseCavity()
+                if self.psana:
+                    pc = evt.get("Psana::Bld::BldDataPhaseCavity", "");
+                else:
+                    pc = evt.getPhaseCavity()
                 if pc:
-                    val = (pc.fCharge1 - pc.fCharge2) / (pc.fFitTime1 - pc.fFitTime2)
+                    if self.psana:
+                        val = (pc.charge1() - pc.charge2()) / (pc.fitTime1() - pc.fitTime2())
+                    else:
+                        val = (pc.fCharge1 - pc.fCharge2) / (pc.fFitTime1 - pc.fFitTime2)
                     self.evts_scalars[scalar].append( val )
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
