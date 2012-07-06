@@ -178,7 +178,6 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { ipimbAdcRange = 5 };
   enum { ipimbAdcSteps = 65536 };
-  uint64_t triggerCounter() const { return _triggerCounter; }
   uint16_t config0() const { return _config0; }
   uint16_t config1() const { return _config1; }
   uint16_t config2() const { return _config2; }
@@ -215,6 +214,8 @@ public:
   float channel2psVolts() const;
   /** Value of of channel3ps() converted to Volts. */
   float channel3psVolts() const;
+  /** Trigger counter value. */
+  uint64_t triggerCounter() const { return (((_triggerCounter >> 48) & 0x000000000000ffffLL) |              ((_triggerCounter >> 16) & 0x00000000ffff0000LL) |              ((_triggerCounter << 16) & 0x0000ffff00000000LL) |              ((_triggerCounter << 48) & 0xffff000000000000LL)); }
   static uint32_t _sizeof()  { return 32; }
 private:
   uint64_t	_triggerCounter;

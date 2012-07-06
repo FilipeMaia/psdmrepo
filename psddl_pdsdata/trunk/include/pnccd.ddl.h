@@ -80,13 +80,88 @@ private:
 
 /** @class FrameV1
 
-  pnCCD configuration class FrameV1
+  pnCCD class FrameV1, this is a class which is defined by origianl pdsdata package.
 */
 
 class ConfigV1;
 class ConfigV2;
 
 class FrameV1 {
+public:
+  /** Special values */
+  uint32_t specialWord() const { return _specialWord; }
+  /** Frame number */
+  uint32_t frameNumber() const { return _frameNumber; }
+  /** Most significant part of timestamp */
+  uint32_t timeStampHi() const { return _timeStampHi; }
+  /** Least significant part of timestamp */
+  uint32_t timeStampLo() const { return _timeStampLo; }
+  /** Frame data */
+  ndarray<uint16_t, 1> _data(const PNCCD::ConfigV1& cfg) const { ptrdiff_t offset=16;
+  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
+  /** Frame data */
+  ndarray<uint16_t, 1> _data(const PNCCD::ConfigV2& cfg) const { ptrdiff_t offset=16;
+  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
+  ndarray<uint16_t, 2> data(const PNCCD::ConfigV1& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
+  ndarray<uint16_t, 2> data(const PNCCD::ConfigV2& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
+  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
+  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
+private:
+  uint32_t	_specialWord;	/**< Special values */
+  uint32_t	_frameNumber;	/**< Frame number */
+  uint32_t	_timeStampHi;	/**< Most significant part of timestamp */
+  uint32_t	_timeStampLo;	/**< Least significant part of timestamp */
+  //uint16_t	__data[(cfg.payloadSizePerLink()-16)/2];
+};
+
+/** @class FramesV1
+
+  pnCCD class FramesV1 which is a collection of FrameV1 objects, number of 
+            frames in collection is determined by numLinks() method (which should return 4 
+            in most cases). This class does not exist in original pdsdata, has been 
+            introduced to psana to help in organizing 4 small pnCCD frames together.
+*/
+
+class ConfigV1;
+class ConfigV2;
+
+class FramesV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  /** Number of frames is determined by numLinks() method. */
+  const PNCCD::FrameV1& frame(const PNCCD::ConfigV1& cfg, uint32_t i0) const { ptrdiff_t offset=0;
+  const PNCCD::FrameV1* memptr = (const PNCCD::FrameV1*)(((const char*)this)+offset);
+  size_t memsize = memptr->_sizeof(cfg);
+  return *(const PNCCD::FrameV1*)((const char*)memptr + (i0)*memsize); }
+  /** Number of frames is determined by numLinks() method. */
+  const PNCCD::FrameV1& frame(const PNCCD::ConfigV2& cfg, uint32_t i0) const { ptrdiff_t offset=0;
+  const PNCCD::FrameV1* memptr = (const PNCCD::FrameV1*)(((const char*)this)+offset);
+  size_t memsize = memptr->_sizeof(cfg);
+  return *(const PNCCD::FrameV1*)((const char*)memptr + (i0)*memsize); }
+  uint32_t numLinks(const PNCCD::ConfigV1& cfg) const { return cfg.numLinks(); }
+  uint32_t numLinks(const PNCCD::ConfigV2& cfg) const { return cfg.numLinks(); }
+  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return 0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())); }
+  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return 0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())); }
+  /** Method which returns the shape (dimensions) of the data returned by frame() method. */
+  std::vector<int> frame_shape(const PNCCD::ConfigV1& cfg) const;
+  /** Method which returns the shape (dimensions) of the data returned by frame() method. */
+  std::vector<int> frame_shape(const PNCCD::ConfigV2& cfg) const;
+private:
+  //PNCCD::FrameV1	_frames[cfg.numLinks()];
+};
+
+/** @class FullFrameV1
+
+  This is a "synthetic" pnCCD frame which is four original 512x512 frames
+            glued together. This class does not exist in original pdsdata, it has been 
+            introduced to psana to simplify access to full frame data in the user code.
+*/
+
+
+class FullFrameV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
@@ -98,22 +173,15 @@ public:
   uint32_t timeStampHi() const { return _timeStampHi; }
   /** Least significant part of timestamp */
   uint32_t timeStampLo() const { return _timeStampLo; }
-  /** Frame data */
-  ndarray<uint16_t, 1> data(const PNCCD::ConfigV1& cfg) const { ptrdiff_t offset=16;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
-  return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
-  /** Frame data */
-  ndarray<uint16_t, 1> data(const PNCCD::ConfigV2& cfg) const { ptrdiff_t offset=16;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
-  return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
-  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
-  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
+  /** Full frame data, image size is 1024x1024. */
+  ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], 1024, 1024); }
+  static uint32_t _sizeof()  { return 16+(2*(1024)*(1024)); }
 private:
   uint32_t	_specialWord;	/**< Special values */
   uint32_t	_frameNumber;	/**< Frame number */
   uint32_t	_timeStampHi;	/**< Most significant part of timestamp */
   uint32_t	_timeStampLo;	/**< Least significant part of timestamp */
-  //uint16_t	__data[(cfg.payloadSizePerLink()-16)/2];
+  uint16_t	_data[1024][1024];	/**< Full frame data, image size is 1024x1024. */
 };
 } // namespace PNCCD
 } // namespace PsddlPds
