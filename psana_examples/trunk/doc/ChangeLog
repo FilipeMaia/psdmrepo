@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-11
+2012-07-06 Andy Salnikov
+- add new module DumpQuartz
+- change DumpPnccd to dump FullFrameV1 class
+
 Tag: V00-02-10
 2012-06-22 Andy Salnikov
 - EvrData.EventCodeV5: one member method was incorrectly named

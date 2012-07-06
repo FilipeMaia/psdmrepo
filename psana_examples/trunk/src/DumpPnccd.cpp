@@ -96,23 +96,57 @@ DumpPnccd::beginCalibCycle(Event& evt, Env& env)
 void 
 DumpPnccd::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::PNCCD::FrameV1> frame = evt.get(m_src);
-  if (frame.get()) {
+  // First dump raw frames as they come out of device
+  shared_ptr<Psana::PNCCD::FramesV1> data = evt.get(m_src);
+  if (data) {
     WithMsgLog(name(), info, str) {
-      str << "PNCCD::FrameV1:";
-      str << "\n  specialWord = " << frame->specialWord();
-      str << "\n  frameNumber = " << frame->frameNumber();
-      str << "\n  timeStampHi = " << frame->timeStampHi();
-      str << "\n  timeStampLo = " << frame->timeStampLo();
 
-      const ndarray<uint16_t, 1> data = frame->data();
-      str << "\n  data =";
+      str << "PNCCD::FramesV1:";
+
+      for (unsigned i = 0 ; i != data->numLinks(); ++ i) {
+
+        const Psana::PNCCD::FrameV1& frame = data->frame(i);
+
+        str << "\n  Frame #" << i;
+
+        str << "\n    specialWord = " << frame.specialWord();
+        str << "\n    frameNumber = " << frame.frameNumber();
+        str << "\n    timeStampHi = " << frame.timeStampHi();
+        str << "\n    timeStampLo = " << frame.timeStampLo();
+
+        const ndarray<uint16_t, 2> data = frame.data();
+        str << "\n    frame size = " << data.shape()[0] << 'x' << data.shape()[1];
+        str << "\n    data =";
+        for (int i = 0; i < 10; ++ i) {
+          str << " " << data[0][i];
+        }
+        str << " ...";
+      }
+    }
+  }
+
+  // Next dump combined full frame
+  shared_ptr<Psana::PNCCD::FullFrameV1> frame = evt.get(m_src);
+  if (frame) {
+    WithMsgLog(name(), info, str) {
+
+      str << "PNCCD::FullFrameV1:";
+      str << "\n    specialWord = " << frame->specialWord();
+      str << "\n    frameNumber = " << frame->frameNumber();
+      str << "\n    timeStampHi = " << frame->timeStampHi();
+      str << "\n    timeStampLo = " << frame->timeStampLo();
+
+      const ndarray<uint16_t, 2> data = frame->data();
+      str << "\n    frame size = " << data.shape()[0] << 'x' << data.shape()[1];
+      str << "\n    data =";
       for (int i = 0; i < 10; ++ i) {
-        str << " " << data[i];
+        str << " " << data[0][i];
       }
       str << " ...";
     }
+
   }
+
 }
 
 } // namespace psana_examples
