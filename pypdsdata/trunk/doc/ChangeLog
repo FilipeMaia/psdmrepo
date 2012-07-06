@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-69
+2012-07-06 Andy Salnikov
+- upgrade to pdsdata V03-07-10
+- new sub-package quartz
+
 Tag: V00-00-68
 2012-06-27 Andy Salnikov
 - switch to Python memory allocation in extension module instead of

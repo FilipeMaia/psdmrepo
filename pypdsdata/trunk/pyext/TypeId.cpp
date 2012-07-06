@@ -91,6 +91,7 @@ namespace {
       { "Id_EpicsConfig",     Pds::TypeId::Id_EpicsConfig },
       { "Id_FliConfig",       Pds::TypeId::Id_FliConfig },
       { "Id_FliFrame",        Pds::TypeId::Id_FliFrame },
+      { "Id_QuartzConfig",    Pds::TypeId::Id_QuartzConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

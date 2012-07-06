@@ -139,6 +139,7 @@ namespace {
       { "Opal1600",  Pds::DetInfo::Opal1600 },
       { "Opal8000",  Pds::DetInfo::Opal8000 },
       { "Fli",       Pds::DetInfo::Fli },
+      { "Quartz4A150", Pds::DetInfo::Quartz4A150 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

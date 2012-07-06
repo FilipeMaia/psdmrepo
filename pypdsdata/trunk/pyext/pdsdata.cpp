@@ -163,6 +163,8 @@
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
 
+#include "types/quartz/ConfigV1.h"
+
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
 #include "types/timepix/DataV1.h"
@@ -401,6 +403,11 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Pulnix::TM6740ConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pulnix", module );
+
+  module = Py_InitModule3( "_pdsdata.quartz", 0, "The Python wrapper module for pdsdata/quartz" );
+  pypdsdata::Quartz::ConfigV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "quartz", module );
 
   module = Py_InitModule3( "_pdsdata.timepix", 0, "The Python wrapper module for pdsdata/timepix" );
   pypdsdata::Timepix::ConfigV1::initType( module );

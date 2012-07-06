@@ -112,6 +112,8 @@
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
 
+#include "types/quartz/ConfigV1.h"
+
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
 #include "types/timepix/DataV1.h"
@@ -422,6 +424,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_FliFrame :
     if ( not obj ) obj = xtc2obj<Fli::FrameV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_QuartzConfig :
+    if ( not obj ) obj = xtc2obj<Quartz::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :
