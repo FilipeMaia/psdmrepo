@@ -224,7 +224,7 @@
             <const name="ipimbAdcRange" value="5"/>
             <const name="ipimbAdcSteps" value="65536"/>
         
-            <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
+            <attribute name="_triggerCounter" type="uint64_t">
             </attribute>
 
             <attribute name="_config0" type="uint16_t" accessor="config0">
@@ -311,6 +311,16 @@
                 <expr lang="C++" value="float({self}._channel3ps)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
             </method>
             
+            <method name="triggerCounter" type="uint64_t">
+                Trigger counter value.
+                <tag name="inline" />
+                <expr lang="C++"
+                    value="(((_triggerCounter &gt;&gt; 48) &amp; 0x000000000000ffffLL) | 
+            ((_triggerCounter &gt;&gt; 16) &amp; 0x00000000ffff0000LL) | 
+            ((_triggerCounter &lt;&lt; 16) &amp; 0x0000ffff00000000LL) | 
+            ((_triggerCounter &lt;&lt; 48) &amp; 0xffff000000000000LL))" />
+            </method>
+
         </pstype>
         
         

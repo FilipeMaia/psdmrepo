@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2012-07-06 Andy Salnikov
+- new package quartz with single class ConfigV1 similar to opal1k.ConfigV1
+- pnccd.FrameV1 is now contained in pnccd.FramesV1
+- new class (not in XTC/pdsdata) pnccd.FullFrameV1 containing 1024x1024 image
+
 Tag: V00-03-05
 2012-06-26 Andy Salnikov
 - Encoder.DataV[12]: added value() method, like in pdsdata classes
