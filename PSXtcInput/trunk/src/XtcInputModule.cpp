@@ -134,7 +134,7 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   }
   
   // start reader thread
-  unsigned dgSizeMB = config("dgSizeMB", 32);
+  unsigned dgSizeMB = config("dgSizeMB", 128);
   double l1offset = config("l1offset", 0.0);
   XtcStreamMerger::MergeMode merge = XtcStreamMerger::mergeMode(configStr("mergeMode", "FileName"));
   m_readerThread.reset( new boost::thread( DgramReader ( 
