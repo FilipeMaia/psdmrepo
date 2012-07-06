@@ -19,7 +19,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-pdsdata_ver = "3.7.7"
+pdsdata_ver = "3.7.10"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "pdsdata", pdsdata_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
@@ -28,7 +28,7 @@ PKGLIBS = """
 acqdata bld camdata controldata cspad2x2data cspaddata encoderdata epics
 evrdata fccddata fexampdata flidata gsc16aidata indexdata ipimbdata lusidata
 oceanopticsdata opal1kdata phasicsdata pnccddata princetondata pulnixdata
-timepixdata xampsdata xtcdata
+quartzdata timepixdata xampsdata xtcdata
 """
 
 standardExternalPackage('pdsdata', **locals())
