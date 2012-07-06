@@ -129,7 +129,6 @@ public:
   enum { ipimbAdcRange = 5 };
   enum { ipimbAdcSteps = 65536 };
   virtual ~DataV2();
-  virtual uint64_t triggerCounter() const = 0;
   virtual uint16_t config0() const = 0;
   virtual uint16_t config1() const = 0;
   virtual uint16_t config2() const = 0;
@@ -166,6 +165,8 @@ public:
   virtual float channel2psVolts() const = 0;
   /** Value of of channel3ps() converted to Volts. */
   virtual float channel3psVolts() const = 0;
+  /** Trigger counter value. */
+  virtual uint64_t triggerCounter() const = 0;
 };
 } // namespace Ipimb
 } // namespace Psana

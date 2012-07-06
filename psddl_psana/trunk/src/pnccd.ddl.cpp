@@ -14,5 +14,11 @@ ConfigV2::~ConfigV2() {}
 
 FrameV1::~FrameV1() {}
 
+
+FramesV1::~FramesV1() {}
+
+
+FullFrameV1::~FullFrameV1() {}
+
 } // namespace PNCCD
 } // namespace Psana
