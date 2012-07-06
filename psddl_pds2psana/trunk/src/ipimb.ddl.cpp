@@ -142,8 +142,6 @@ DataV2::~DataV2()
 }
 
 
-uint64_t DataV2::triggerCounter() const { return m_xtcObj->triggerCounter(); }
-
 uint16_t DataV2::config0() const { return m_xtcObj->config0(); }
 
 uint16_t DataV2::config1() const { return m_xtcObj->config1(); }
@@ -183,5 +181,7 @@ float DataV2::channel1psVolts() const { return m_xtcObj->channel1psVolts(); }
 float DataV2::channel2psVolts() const { return m_xtcObj->channel2psVolts(); }
 
 float DataV2::channel3psVolts() const { return m_xtcObj->channel3psVolts(); }
+
+uint64_t DataV2::triggerCounter() const { return m_xtcObj->triggerCounter(); }
 } // namespace Ipimb
 } // namespace psddl_pds2psana

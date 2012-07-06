@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-07
+2012-07-06 Andy Salnikov
+- upgrading to pdsdata V03-07-10
+- regenerate whole thing from psddldata V00-03-06
+- special proxy class for pnccd.FullFrameV1 type
+
 Tag: V00-04-06
 2012-06-26 Andy Salnikov
 - Encoder.DataV[12]: added value() method

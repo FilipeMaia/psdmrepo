@@ -95,7 +95,6 @@ public:
   typedef Psana::Ipimb::DataV2 PsanaType;
   DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV2();
-  virtual uint64_t triggerCounter() const;
   virtual uint16_t config0() const;
   virtual uint16_t config1() const;
   virtual uint16_t config2() const;
@@ -116,6 +115,7 @@ public:
   virtual float channel1psVolts() const;
   virtual float channel2psVolts() const;
   virtual float channel3psVolts() const;
+  virtual uint64_t triggerCounter() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

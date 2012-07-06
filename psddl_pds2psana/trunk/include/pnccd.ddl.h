@@ -59,12 +59,49 @@ public:
   virtual uint32_t frameNumber() const;
   virtual uint32_t timeStampHi() const;
   virtual uint32_t timeStampLo() const;
-  virtual ndarray<uint16_t, 1> data() const;
+  virtual ndarray<uint16_t, 1> _data() const;
+  virtual ndarray<uint16_t, 2> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1> m_cfgPtr0;
   boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2> m_cfgPtr1;
+};
+
+
+class FramesV1 : public Psana::PNCCD::FramesV1 {
+public:
+  typedef PsddlPds::PNCCD::FramesV1 XtcType;
+  typedef Psana::PNCCD::FramesV1 PsanaType;
+  FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr);
+  FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr);
+  virtual ~FramesV1();
+  virtual const Psana::PNCCD::FrameV1& frame(uint32_t i0) const;
+  virtual uint32_t numLinks() const;
+  virtual std::vector<int> frame_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1> m_cfgPtr0;
+  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2> m_cfgPtr1;
+  std::vector< psddl_pds2psana::PNCCD::FrameV1 > _frames;
+};
+
+
+class FullFrameV1 : public Psana::PNCCD::FullFrameV1 {
+public:
+  typedef PsddlPds::PNCCD::FullFrameV1 XtcType;
+  typedef Psana::PNCCD::FullFrameV1 PsanaType;
+  FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~FullFrameV1();
+  virtual uint32_t specialWord() const;
+  virtual uint32_t frameNumber() const;
+  virtual uint32_t timeStampHi() const;
+  virtual uint32_t timeStampLo() const;
+  virtual ndarray<uint16_t, 2> data() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
 } // namespace PNCCD

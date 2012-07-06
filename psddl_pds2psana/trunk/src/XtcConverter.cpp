@@ -45,8 +45,10 @@
 #include "psddl_pds2psana/oceanoptics.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/pnccd.ddl.h"
+#include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
 #include "psddl_pds2psana/princeton.ddl.h"
 #include "psddl_pds2psana/pulnix.ddl.h"
+#include "psddl_pds2psana/quartz.ddl.h"
 #include "psddl_pds2psana/timepix.ddl.h"
 #include "psddl_pds2psana/TimepixDataV1ToV2.h"
 
@@ -76,7 +78,7 @@ namespace {
     cfgStore.put(xptr, xtc->src);
     
     // create and store psana object in config store
-    boost::shared_ptr<PsanaType> obj(new FinalType(xptr));
+    boost::shared_ptr<PsanaType> obj = boost::make_shared<FinalType>(xptr);
     cfgStore.put(obj, xtc->src);
   }
   
@@ -291,7 +293,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_ControlConfig:
     break;
   case Pds::TypeId::Id_pnCCDframe:
-    if (version == 1) ::storeDataProxyCfg2<PNCCD::FrameV1, PsddlPds::PNCCD::ConfigV1, PsddlPds::PNCCD::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg2<PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV1, PsddlPds::PNCCD::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 1) evt.putProxy<Psana::PNCCD::FullFrameV1>(boost::make_shared<PnccdFullFrameV1Proxy>(), xtc->src);
     break;
   case Pds::TypeId::Id_pnCCDconfig:
     break;
@@ -411,6 +414,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_FliFrame:
     if (version == 1) ::storeDataProxyCfg<Fli::FrameV1, PsddlPds::Fli::ConfigV1>(xtc, evt, cfgStore);
+    break;
+  case Pds::TypeId::Id_QuartzConfig:
     break;
   case Pds::TypeId::NumberOf:
     break;
@@ -583,6 +588,9 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 1) ::storeCfgObject<Fli::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_FliFrame:
+    break;
+  case Pds::TypeId::Id_QuartzConfig:
+    if (version == 1) ::storeCfgObject<Quartz::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::NumberOf:
     break;
