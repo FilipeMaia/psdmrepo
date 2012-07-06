@@ -435,14 +435,17 @@ initName2Det()
   name2det["amoIMS"] = Pds::DetInfo::AmoIms;
   name2det["AmoPem"] = Pds::DetInfo::AmoGasdet;
   name2det["amoGD"] = Pds::DetInfo::AmoGasdet;
+  name2det["AmoGasdet"] = Pds::DetInfo::AmoGasdet;
   name2det["AmoETof"] = Pds::DetInfo::AmoETof;
   name2det["amoETOF"] = Pds::DetInfo::AmoETof;
   name2det["AmoITof"] = Pds::DetInfo::AmoITof;
   name2det["amoITOF"] = Pds::DetInfo::AmoITof;
   name2det["AmoMbs"] = Pds::DetInfo::AmoMbes;
   name2det["amoMBES"] = Pds::DetInfo::AmoMbes;
+  name2det["AmoMbes"] = Pds::DetInfo::AmoMbes;
   name2det["AmoIis"] = Pds::DetInfo::AmoVmi;
   name2det["amoVMI"] = Pds::DetInfo::AmoVmi;
+  name2det["AmoVMI"] = Pds::DetInfo::AmoVmi;
   name2det["AmoBps"] = Pds::DetInfo::AmoBps;
   name2det["amoBPS"] = Pds::DetInfo::AmoBps;
   name2det["epicsArch"] = Pds::DetInfo::EpicsArch;
