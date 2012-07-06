@@ -300,32 +300,6 @@ class NeoCaptarUtils {
     }
 
     /**
-     * Return an array representation of a cable number allocation. The array
-     * is suitable for exporting by Web services.
-     *
-     * @param NeoCaptarCableNumberAlloc $c
-     * @return array 
-     */
-    public static function cablenumber2array($c) {
-        $recent = $c->recent_allocation();
-        return array (
-            'id'             => $c->id(),
-            'location'       => $c->location(),
-            'prefix'         => $c->prefix(),
-            'first'          => $c->first(),
-            'last'           => $c->last(),
-            'num_in_use'     => $c->num_in_use(),
-            'num_available'  => $c->num_available(),
-            'next_available' => is_null($c->next_available()) ? '' : $c->next_available(),
-
-            'recently_allocated'          => is_null($recent) ? '' : $recent['cablenumber'],
-            'recently_allocated_name'     => is_null($recent) ? '' : sprintf("%2s%05d",$c->prefix(),$recent['cablenumber']),
-            'recent_allocation_time'      => is_null($recent) ? '' : $recent['allocated_time']->toStringShort(),
-            'recent_allocation_uid'       => is_null($recent) ? '' : $recent['allocated_by_uid'],
-            'recently_allocated_cable_id' => is_null($recent) ? '' : $recent['cable_id']
-        );
-    }
-    /**
      * Return an array representation of a cable number prefixes.
      * The array is suitable for exporting by Web services.
      *

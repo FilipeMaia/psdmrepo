@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2012-07-05 Igor Gaponenko
+- clean version of the previously commited code free from the old stuff
+
 Tag: V00-01-00
 2012-07-05 Igor Gaponenko
 - major redesign of the cable number generator
