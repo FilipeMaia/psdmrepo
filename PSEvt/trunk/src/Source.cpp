@@ -446,6 +446,7 @@ initName2Det()
   name2det["AmoIis"] = Pds::DetInfo::AmoVmi;
   name2det["amoVMI"] = Pds::DetInfo::AmoVmi;
   name2det["AmoVMI"] = Pds::DetInfo::AmoVmi;
+  name2det["AmoVmi"] = Pds::DetInfo::AmoVmi;
   name2det["AmoBps"] = Pds::DetInfo::AmoBps;
   name2det["amoBPS"] = Pds::DetInfo::AmoBps;
   name2det["epicsArch"] = Pds::DetInfo::EpicsArch;
