@@ -192,6 +192,7 @@ class  pyana_image ( object ) :
                                  'Opal1000'  : "Psana::Opal1k::Config",
                                  'Opal2000'  : "Psana::Opal1k::Config",
                                  'Opal4000'  : "Psana::Opal1k::Config",
+                                 'Opal8000'  : "Psana::Opal1k::Config",
                                  'TM6740'    : "Psana::Pulnix::TM6740Config",
                                  'pnCCD'     : "Psana::PNCCD::Config",
                                  'Princeton' : "Psana::Princeton::Config",
@@ -207,6 +208,7 @@ class  pyana_image ( object ) :
                               'Opal1000'      : "Psana::Camera::Frame",
                               'Opal2000'      : "Psana::Camera::Frame",
                               'Opal4000'      : "Psana::Camera::Frame",
+                              'Opal8000'      : "Psana::Camera::Frame",
                               'Fccd'          : "Psana::Camera::Frame",
                               'pnCCD'         : "Psana::PNCCD::Frame",
                               'Princeton'     : "Psana::Princeton::Frame",
@@ -219,6 +221,7 @@ class  pyana_image ( object ) :
                                  'Opal1000'  : TypeId.Type.Id_Opal1kConfig,
                                  'Opal2000'  : TypeId.Type.Id_Opal1kConfig,
                                  'Opal4000'  : TypeId.Type.Id_Opal1kConfig,
+                                 'Opal8000'  : TypeId.Type.Id_Opal1kConfig,
                                  'TM6740'    : TypeId.Type.Id_TM6740Config,
                                  'pnCCD'     : TypeId.Type.Id_pnCCDconfig,
                                  'Princeton' : TypeId.Type.Id_PrincetonConfig,
@@ -234,6 +237,7 @@ class  pyana_image ( object ) :
                               'Opal1000'      : TypeId.Type.Id_Frame,
                               'Opal2000'      : TypeId.Type.Id_Frame,
                               'Opal4000'      : TypeId.Type.Id_Frame,
+                              'Opal8000'      : TypeId.Type.Id_Frame,
                               'Fccd'          : TypeId.Type.Id_Frame,
                               'pnCCD'         : TypeId.Type.Id_pnCCDframe,
                               'Princeton'     : TypeId.Type.Id_PrincetonFrame,
@@ -257,7 +261,8 @@ class  pyana_image ( object ) :
             # pick out the device name from the address
             device = addr.split('|')[1].split('-')[0]
             address = addr.split('|')[0]
-            self.config = env.getConfig(self.configtypes[device], address )
+            detsrc = address.split('-')[0]
+            self.config = env.getConfig(self.configtypes[device], detsrc )
             if not self.config:
                 print '*** %s config object is missing ***'%addr
                 return
@@ -342,7 +347,7 @@ class  pyana_image ( object ) :
                 else:
                     image = frame.data(self.config)
 
-            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "Opal2000" in addr or "TM6740" in addr):
+            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "Opal2000" in addr or "Opal8000" in addr or "TM6740" in addr):
                 if frame.depth() > 8:
                     image = frame.data16()
                 else:
