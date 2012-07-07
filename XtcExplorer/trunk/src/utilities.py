@@ -12,8 +12,8 @@ def ncol_nrow_from_nplots(nplots):
         ncol = 2
         nrow = 2
     else:
-        # limit the number of columns
-        ncol = min(self.maxcol, nplots)
+        # limit the number of columns to 3
+        ncol = min(3, nplots)
         # number of rows if all rows are filled
         nrow = nplots / ncol
         if (nplots % ncol) > 0:
