@@ -1,0 +1,30 @@
+#!/bin/sh
+
+echo "Number of input parameter(s) = $#"
+
+#sinkdir="figs-2012-06-15-cxi49012-filter"
+sinkdir="figs-2012-06-27-cxi49012-filter"
+exp_run="cxi49012-r0150"
+evt="ev00001"
+beg_name="cspad"
+add_name="selected"
+ext="png"
+
+par1=$1
+echo $sinkdir_def
+echo $par1
+
+fnames="arr"
+fnames="$fnames spe"
+fnames="$fnames img"
+fnames="$fnames img-hr"
+
+for i in $fnames
+do
+  infile="$beg_name-$i.$ext"
+  outfile="$beg_name-$exp_run-$add_name-$i-$par1.$ext"
+  echo "mv $infile  $sinkdir/$outfile"
+        mv $infile  $sinkdir/$outfile
+done
+
+
