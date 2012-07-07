@@ -281,10 +281,25 @@ class pyana_epics (object) :
             ymin = np.amin( values_array )
             span = ymax - ymin
 
-            (n,bins,patches) = plt.hist(shots_array[:nbins],
-                                        weights=values_array,
-                                        bins=shots_array,
-                                        histtype='step')
+            try:
+                (n,bins,patches) = plt.hist(shots_array[:nbins],
+                                            weights=values_array,
+                                            bins=shots_array,
+                                            histtype='step')
+            except Exception, err:
+                if str(err) == "zero-size array to ufunc.reduce without identity":
+                    # For some reason, hist() removes all 0 values,
+                    # but if all the values are zero, this results
+                    # in an empty array and thus the error above.
+                    # So add a tiny number to each value and try again.
+                    values_array += 1e-20
+                    (n,bins,patches) = plt.hist(shots_array[:nbins],
+                                                weights=values_array,
+                                                bins=shots_array,
+                                                histtype='step')
+                else:
+                    raise
+
             plt.xlim(shots_array[0],shots_array[-1])
             if span > 0:
                 plt.ylim(ymin-0.3*span,ymax+0.3*span)
