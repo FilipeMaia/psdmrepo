@@ -66,8 +66,8 @@ struct MedianResult {
 };
 
 struct Peak{
-  double quad;
-  double sect; 
+  int    quad;
+  int    sect; 
   double col;
   double row; 
   double sigma_col;

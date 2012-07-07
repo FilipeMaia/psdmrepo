@@ -11,6 +11,26 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2012-07-06 Mikhail S. Dubrovin
+- add PnccdImageProducer which adds pnccd image in the event
+- add CSPadArrPeakAnalysis which accumulates ntuple and histograms for peaks 
+  and saves them in root file
+A       include/PnccdImageProducer.h
+A       include/CSPadArrPeakAnalysis.h
+M       include/CSPadArrPeakFinder.h
+A       src/PnccdImageProducer.cpp
+A       src/CSPadArrPeakAnalysis.cpp
+M       src/CSPadArrPeakFinder.cpp
+  add renew auxiliary scripts:
+A       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotHDF5Dataset.py
+M       data/PlotCSPadArrayFromFile.py
+A       data/proc.C
+M       data/PlotCameraImageFromFile.py
+A       data/PlotCSPadArrayAndPeaksFromFile.py
+	
 2012-06-27 Mikhail S. Dubrovin
 	- work on PeakFinder
 M       include/CSPadArrPeakFinder.h

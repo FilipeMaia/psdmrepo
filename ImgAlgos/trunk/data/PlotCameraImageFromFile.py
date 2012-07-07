@@ -10,7 +10,7 @@ import h5py
 # Define graphical methods
 
 def plot_image (arr, range=None, zrange=None) :    # range = (left, right, low, high), zrange=(zmin,zmax)
-    fig = plt.figure(num=1, figsize=(12,12), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    fig = plt.figure(num=1, figsize=(12,12), dpi=80, facecolor='w', edgecolor='w',frameon=True)
     fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
     figAxes = fig.add_subplot(111)
     imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto',extent=range)

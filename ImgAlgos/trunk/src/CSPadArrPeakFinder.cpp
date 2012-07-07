@@ -170,8 +170,9 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n m_out_file_bits       : " << m_out_file_bits 
         << "\n print_bits            : " << m_print_bits
         << "\n";     
+  }
 
-    MsgLog(name(), debug, 
+  MsgLog(name(), debug, 
            "\n MaxQuads   : "      << MaxQuads  
         << "\n MaxSectors : "      << MaxSectors
         << "\n NumColumns : "      << NumColumns
@@ -179,7 +180,6 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n SectorSize : "      << SectorSize
         << "\n"
 	);
-  }
 }
 
 /// Method which is called once at the beginning of the job
@@ -284,6 +284,8 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
   procData(evt);
 
   makeUnitedPeakVector();
+
+  savePeaksInEvent(evt);
 
   bool isSelected = eventSelector();
 
@@ -1047,9 +1049,6 @@ CSPadArrPeakFinder::doOperationsForSelectedEvent(Event& evt)
 
   if( m_out_file_bits & 4 ) saveCSPadArrayInFile<int16_t> (fname_arr, m_signal);
   if( m_out_file_bits & 8 ) savePeaksInFile (fname_peaks, v_peaks);
-
-  savePeaksInEvent(evt);
-  //saveSignalArrInEvent(evt); is implemented as a part of procData(...), because it needs in many calls...
 }
 
 //--------------------

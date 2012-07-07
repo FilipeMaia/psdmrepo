@@ -36,6 +36,15 @@ def get_dataset_from_hdf5(fname,dsname,event=0) :
     file    = h5py.File(fname, 'r')
     dataset = np.array(file[dsname])
     #evdata  = dataset[event]
+
+    fiducial = file['/LCLS/fiducial'].value
+    print '/LCLS/fiducial'        , fiducial, hex(int(fiducial))
+    print '/LCLS/eventTime'       , file['/LCLS/eventTime'       ].value
+    print '/LCLS/eventTimeString' , file['/LCLS/eventTimeString' ].value
+    print '/LCLS/machineTime'     , file['/LCLS/machineTime'     ].value
+    print '/LCLS/phaseCavityTime1', file['/LCLS/phaseCavityTime1'].value
+    print '/LCLS/phaseCavityTime2', file['/LCLS/phaseCavityTime2'].value
+
     file.close()
     #return evdata 
     return dataset 

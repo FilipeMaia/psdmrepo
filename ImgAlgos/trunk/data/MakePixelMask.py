@@ -21,7 +21,7 @@ def get_input_parameters() :
     for par in sys.argv : print par
 
     if nargs == 1 : print 'Will use all default parameters\n',\
-                    'Expected command: ' + sys.argv[0] + ' <infname> <Amin> <Amax>' 
+                    'Expected command: ' + sys.argv[0] + ' <infname> <threshold> <outfname>' 
 
     if nargs  > 1 : infname   = sys.argv[1]
     else          : infname   = infname_def
@@ -79,10 +79,46 @@ def evaluate_mask_array(arr,threshold=30) :
 
 #--------------------
 
+def mask_rect(arr, quad, sect, row0=10, rowN=185, col0=0, colN=388) :
+    print 'mask_rect : arr.shape=', arr.shape 
+
+    shape2d = (5920, 388)
+    shape4d = (4, 8, 185, 388)
+
+    if arr.shape != shape2d :
+        print 'mask_rect : UNEXPECTED SHAPE OF THE INPUT MASK ARRAY =', arr.shape
+        return arr
+
+    arr.shape = shape4d
+
+    print 'Mask rect in quad, sect=', quad, ', ', sect, 'for rows:', row0, rowN, 'and cols:', col0, colN
+
+    rect = np.zeros( (rowN-row0,colN-col0), dtype=np.int16 )
+    arr[quad,sect,row0:rowN,col0:colN] = rect
+
+    arr.shape = shape2d
+
+    return arr
+
+#--------------------
+
 def do_main() :
     infname, threshold, outfname = get_input_parameters()
+
+    #1. Generate transparent mask of units
+    arr_mask = np.ones( (5920, 388), dtype=np.int16 )
+
+    #2. Mask high background regions
     arr      = get_array_from_file(infname)
     arr_mask = evaluate_mask_array(arr,threshold)
+
+    #3. Mask two deffective rectangular regions    
+    arr_mask = mask_rect(arr_mask, 0, 6, row0=115, rowN=175, col0=260, colN=384)    
+    arr_mask = mask_rect(arr_mask, 1, 2, row0=0, rowN=100, col0=0, colN=50)    
+
+    #4. Mask central beam-region 
+    #for quad in range(4) : arr_mask = mask_rect(arr_mask, quad, 1, row0=80, rowN=185, col0=0, colN=140)    
+
     save_array_in_file(arr_mask,outfname)
 
 #--------------------

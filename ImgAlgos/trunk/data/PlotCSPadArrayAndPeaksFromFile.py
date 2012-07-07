@@ -3,6 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches # for patches.Circle
 import sys
 
 # FOR ALIGNED CSPAD IMAGE:
@@ -11,13 +12,22 @@ from PyCSPadImage import CalibParsEvaluated as cpe
 from PyCSPadImage import CSPadImageProducer as cip
 
 #--------------------
+
+class Storage :
+    def __init__(self) :
+        print 'Storage object is created'
+
+    def printStorage(self) :
+        print 'Object of class Storage'
+
+#--------------------
 # Define graphical methods
 
-def plot_image (arr, range=None, zrange=None, title='',figsize=(12,12), dpi=80) :    # range = (left, right, low, high), zrange=(zmin,zmax)
+def plot_image (arr, range=None, zrange=None, title='',figsize=(12,12), dpi=80, store=None) :
     fig = plt.figure(figsize=figsize, dpi=dpi, facecolor='w',edgecolor='w',frameon=True)
     fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
-    figAxes = fig.add_subplot(111)
-    imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto',extent=range)
+    store.figAxes = figAxes = fig.add_subplot(111)
+    store.imAxes  = imAxes  = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto',extent=range)
     #imAxes.set_clim(1300,2000)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
     colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
@@ -28,14 +38,64 @@ def plot_histogram(arr,range=(0,500),figsize=(5,5)) :
     plt.hist(arr.flatten(), bins=100, range=range)
     #fig.canvas.manager.window.move(500,10)
 
-def saveHRImageInFile(arr, ampRange=None, fname='cspad-arr-hr.png', figsize=(12,12), dpi=300) :
+def saveHRImageInFile(arr, ampRange=None, fname='cspad-arr-hr.png', figsize=(12,12), dpi=300, store=None) :
     print 'SAVE HIGH RESOLUTION IMAGE IN FILE', fname
-    plot_image(arr, zrange=ampRange, figsize=figsize, dpi=dpi)
+    plot_image(arr, zrange=ampRange, figsize=figsize, dpi=dpi, store=store)
     title = ''
     for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
     plt.title(title,color='b',fontsize=20)
     plt.savefig(fname,dpi=dpi)
     #plt.imsave('test.png', format='png',dpi=300)
+
+def plot_peaks_for_arr (arr_peaks, store=None, color='w') :  
+    axes = store.figAxes
+    #ampmax = np.average(arr_peaks,axis=0)[8]
+    ampmax = np.max(arr_peaks,axis=0)[8]
+    print 'ampmax=', ampmax
+
+    # arr_peaks : 0  0  26.7143  381.881  5  0.672354  0.570576  152  371
+    for peak in arr_peaks :
+        q, s, r, c, npix, sig_r, sig_c, amp_max, amp_tot = peak
+        #print 'q, s, r, c, npix, amp_tot =',q, s, r, c, npix, amp_tot
+        x=q*388 + c
+        y=s*185 + r
+        xy0 = (x,y)
+        #r0  = 10*amp_tot/ampave
+        r0  = 4+4*amp_tot/ampmax
+        circ = patches.Circle(xy0, radius=r0, linewidth=2, color=color, fill=False)
+        axes.add_artist(circ)
+
+def plot_peaks_for_img (arr_peaks, store=None, color='w') :  
+    axes = store.figAxes
+    #ampave = np.average(arr_peaks,axis=0)[8]
+    ampmax = np.max(arr_peaks,axis=0)[8]
+    #print 'ampmax=', ampmax
+
+    xpix, ypix = cpe.cpeval.getCSPadPixCoordinates_pix()
+
+    #print " xpix:\n", xpix
+    print " xpix.shape:\n", xpix.shape
+
+    # arr_peaks : 0  0  26.7143  381.881  5  0.672354  0.570576  152  371
+    for peak in arr_peaks :
+        q, s, r, c, npix, sig_r, sig_c, amp_max, amp_tot = peak
+        #print 'q, s, r, c, npix, amp_tot=',q, s, r, c, npix, amp_tot
+        #x=q*388 + c
+        #y=s*185 + r
+        x=xpix[q,s,int(r),int(c)]
+        y=ypix[q,s,int(r),int(c)]
+        #print 'q, s, r, c, npix, amp_tot=',q, s, r, c, npix, amp_tot, ' x,y=',x,y        
+        xy0 = (x,y)
+        r0  = 4+4*amp_tot/ampmax
+        circ = patches.Circle(xy0, radius=r0, linewidth=2, color=color, fill=False)
+        axes.add_artist(circ)
+
+def print_peaks (arr_peaks) :  
+    # arr_peaks : 0  0  26.7143  381.881  5  0.672354  0.570576  152  371
+    for peak in arr_peaks :
+        q, s, r, c, npix, sig_r, sig_c, amp_max, amp_tot = peak
+        print 'q, s, r, c, npix, amp_max, amp_tot, sig_r, sig_c =',\
+               q, s, r, c, npix, amp_max, amp_tot, sig_r, sig_c
 
 #--------------------
 
@@ -52,9 +112,7 @@ def getCSPadArrayWithGap(arr, gap=3) :
     return arr_with_gap
 
 
-def getCSPadSegments2D(arr) :
-    gap   = 3
-    space = 10
+def getCSPadSegments2D(arr, gap=3, space=10) :
     arr_all = getCSPadArrayWithGap(arr, gap)
     arr_all.shape = (4,8*185,388+gap) # Reshape for quad index
     arr_sp = np.zeros( (8*185,space), dtype=np.int16 )
@@ -79,8 +137,7 @@ def getQuad2D(arr_all,quad=0) :
     return  arr_quad_img
 
 
-def getQuadImage(arr,quad=0) :
-    gap=3
+def getQuadImage(arr, quad=0, gap=3) :
     arr_all       = getCSPadArrayWithGap(arr, gap)
     arr_all.shape = (4,8,185,388+gap) # Reshape for quad and segment indexes
     print 'arr_all.shape =', arr_all.shape
@@ -88,8 +145,7 @@ def getQuadImage(arr,quad=0) :
 
 #--------------------
 
-def getCSPadImage(arr) :
-    gap=3
+def getCSPadImage(arr, gap=3) :
     arr_all       = getCSPadArrayWithGap(arr, gap)
     arr_all.shape = (4,8,185,388+gap) # Reshape for quad and segment indexes
     #arr_cspad_img = np.zeros( (1765,1765), dtype=np.float32 )
@@ -164,17 +220,17 @@ def get_array_from_file(fname) :
     print 'get_array_from_file:', fname
     return np.loadtxt(fname, dtype=np.float32)
 
-
 #--------------------
 
 def getCSPadImageAligned(arr_raw, path_calib, runnum) :
 
     #print 'Load calibration parameters from', path_calib 
     calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
+    cpe.cpeval.evaluateCSPadPixCoordinates (rotation=1) #, mirror=True) # for pixel coordinates
     cpe.cpeval.printCalibParsEvaluatedAll() 
 
     #print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer(rotation=1, tiltIsOn=True)#, mirror=True)
+    cspadimg = cip.CSPadImageProducer(rotation=1, tiltIsOn=True) #, mirror=True)
     return cspadimg.getCSPadImage( arr_raw )
 
 #--------------------
@@ -192,7 +248,7 @@ def get_input_parameters() :
 
     nargs = len(sys.argv)
     print 'sys.argv[0]: ', sys.argv[0]
-    print 'nargs: ', nargs
+    print 'N arguments: ', nargs
 
     if nargs == 1 :
         print 'Will use all default parameters\n',\
@@ -214,8 +270,8 @@ def get_input_parameters() :
 
     ampRange = (Amin, Amax)
 
-    print 'Input file name  :', fname
-    print 'ampRange         :', ampRange
+    print 'Input file name:', fname
+    print 'ampRange       :', ampRange
  
     return fname,ampRange 
 
@@ -225,35 +281,39 @@ def do_main() :
 
     fname, ampRange = get_input_parameters()
 
+    # Get peaks form file
+    splitfname, splitfext = fname.rsplit('.',1)
+    fname_peaks = splitfname + '-peaks.' + splitfext
+    print 'Peaks file name:', fname_peaks
+    arr_peaks = np.loadtxt(fname_peaks, dtype=np.double)
+    #print 'Array of peaks:\n', arr_peaks
+
+    s = Storage()
+
     arr_raw = get_array_from_file(fname)
     print 'arr_raw.shape=\n', arr_raw.shape
     #print 'arr_raw=\n', arr_raw
 
-    arr_segs = getCSPadSegments2D(arr_raw)
-    print 'arr_segs.shape=\n', arr_segs.shape
+    arr_segs = getCSPadSegments2D(arr_raw, gap=0, space=0)
     
-    #arr = getCSPadImage(arr_raw) # GET IMAGE WITHOUT ALIGNMENT !!!
-    #arr = getQuadImage(arr_raw,quad=1)
-
     #------------------------------------- New stuff
     runnum = 150
     path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
     arr = getCSPadImageAligned(arr_raw, path_calib, runnum)
-    #------------------------------------- New stuff
+    #------------------------------------- 
+    #arr = getCSPadImage(arr_raw)
+    #arr = getQuadImage(arr_raw,quad=1)
 
     # Plot 1
-    plot_image(arr_segs, zrange=ampRange)
+    plot_image(arr_segs, zrange=ampRange, store=s)
     title = ''
     for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
     plt.title(title,color='b',fontsize=20)
     plt.get_current_fig_manager().window.move(10,10)
+
+    plot_peaks_for_arr(arr_peaks, store=s)
+    #print_peaks(arr_peaks)
     plt.savefig('cspad-arr.png')
-
-
-    # Plot 2
-    plot_image(arr, zrange=ampRange)
-    plt.get_current_fig_manager().window.move(450,10)
-    plt.savefig('cspad-img.png')
 
 
     # Plot 3
@@ -261,10 +321,19 @@ def do_main() :
     plt.get_current_fig_manager().window.move(950,10)
     plt.savefig('cspad-spe.png')
 
+    #plt.show()
+    #sys.exit('Test exit A')
+
+    # Plot 2
+    plot_image(arr, zrange=ampRange, store=s)
+    plt.get_current_fig_manager().window.move(450,10)
+    plot_peaks_for_img(arr_peaks, store=s)
+    plt.savefig('cspad-img.png')
+
     plt.show()
 
     #saveHRImageInFile(arr_segs,ampRange,fname='cspad-arr-hr.png') 
-    saveHRImageInFile(arr,ampRange,fname='cspad-img-hr.png') 
+    #saveHRImageInFile(arr,ampRange,fname='cspad-img-hr.png', store=s) 
 
 
 #--------------------
