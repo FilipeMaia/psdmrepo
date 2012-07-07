@@ -94,6 +94,7 @@ public:
   std::string strRunNumber(Event& evt);
   std::string strEventCounter();
   void saveImageInFile(Event& evt);
+  void printInputParameters();
 
 private:
 
@@ -106,8 +107,8 @@ private:
   unsigned    m_eventSave;   // event number starting from 1 to be saved in file
   bool        m_saveAll;     // should be true to save all events in files
   std::string m_fname;       // common part of the file name
+  unsigned    m_print_bits;
   long        m_count;
-
 };
 
 } // namespace CSPadPixCoords

@@ -10,6 +10,14 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-02-06
+2012-07-06 Mikhail S. Dubrovin
+- Add print_bits
+- Saving image for uint16_t : ndarray<uint16_t,2>
+M       CSPadPixCoords/include/SaveImageInFile.h
+M       CSPadPixCoords/src/SaveImageInFile.cpp
+
 Tag: V00-02-05
 2012-07-02 Mikhail S. Dubrovin
 - Add modules for CSPad2x2 pixels and image

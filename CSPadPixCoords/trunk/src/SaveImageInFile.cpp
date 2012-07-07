@@ -55,6 +55,7 @@ SaveImageInFile::SaveImageInFile (const std::string& name)
   , m_eventSave()
   , m_saveAll()
   , m_fname()
+  , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
@@ -63,8 +64,8 @@ SaveImageInFile::SaveImageInFile (const std::string& name)
   m_eventSave     = config   ("eventSave", 0);
   m_saveAll       = config   ("saveAll",   false);
   m_fname         = configStr("fname",    "cspad-image");
+  m_print_bits    = config   ("print_bits",0);
 }
-
 
 //--------------
 // Destructor --
@@ -76,10 +77,13 @@ SaveImageInFile::~SaveImageInFile ()
 
 //--------------------
 
+//--------------------
+
 /// Method which is called once at the beginning of the job
 void 
 SaveImageInFile::beginJob(Event& evt, Env& env)
 {
+  if( m_print_bits & 1 ) printInputParameters();
 }
 
 //--------------------
@@ -194,19 +198,44 @@ SaveImageInFile::saveImageInFile(Event& evt)
 
   shared_ptr< CSPadPixCoords::Image2D<double> > img2d = evt.get(m_str_src, m_key, &m_src);
   if (img2d.get()) {
-    MsgLog(name(), info, "::saveImageInFile(...): Get image as Image2D<double> from event and save it in file");
+    if( m_print_bits & 2 )MsgLog(name(), info, "::saveImageInFile(...): Get image as Image2D<double> from event and save it in file");
     img2d -> saveImageInFile(fname,0);
   } // if (img2d.get())
 
 
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
-    MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<double,2> from event and save it in file");
+    if( m_print_bits & 2 ) MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<double,2> from event and save it in file");
     CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);
     img2d -> saveImageInFile(fname,0);
-  } // if (img2d.get())
+  } // if (img.get())
+
+
+  shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
+  if (img_u16.get()) {
+    if( m_print_bits & 2 ) MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<uint16_t,2> from event and save it in file");
+    CSPadPixCoords::Image2D<uint16_t> *img2d = new CSPadPixCoords::Image2D<uint16_t>(img_u16->data(),img_u16->shape()[0],img_u16->shape()[1]);
+    img2d -> saveImageInFile(fname,0);
+  } // if (img_u16.get())
 }
 
+//--------------------
+/// Print input parameters
+void 
+SaveImageInFile::printInputParameters()
+{
+  WithMsgLog(name(), info, log) {
+    log << "\nInput parameters:"
+        << "\nsource       : "     << m_str_src
+        << "\nkey          : "     << m_key      
+        << "\neventSave    : "     << m_eventSave
+        << "\nsaveAll      : "     << m_saveAll
+        << "\nfname        : "     << m_fname
+        << "\nm_print_bits : "     << m_print_bits;
+  }
+}
+
+//--------------------
 //--------------------
 
 } // namespace CSPadPixCoords
