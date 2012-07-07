@@ -151,8 +151,6 @@ class pyana_waveform (object) :
         for source in self.sources:
             if self.psana:
                 detsrc = source.split('|')[0].split('-')[0]
-                if detsrc == "AmoGasdet":
-                    detsrc = "AmoGD"
                 cfg = env.getConfig("Psana::Acqiris::ConfigV1", detsrc)
             else:
                 cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
@@ -234,8 +232,6 @@ class pyana_waveform (object) :
 
             if self.psana:
                 detsrc = source.split('|')[0].split('-')[0]
-                if detsrc == "AmoGasdet":
-                    detsrc = "AmoGD"
                 acqData = evt.get("Psana::Acqiris::DataDesc", detsrc)
             else:
                 acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
