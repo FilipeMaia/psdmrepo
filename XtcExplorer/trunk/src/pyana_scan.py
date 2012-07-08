@@ -195,10 +195,7 @@ class pyana_scan (object) :
             if not epv:
                 logging.warning('EPICS PV %s does not exist', epv_name)
             else :
-                if self.psana:
-                    self.evts_scalars[epv_name].append(epv.doubleValue())
-                else:
-                    self.evts_scalars[epv_name].append(epv.value)
+                self.evts_scalars[epv_name].append(epv.value)
 
         # Other scalars in the event
         for scalar in self.input_scalars :
@@ -238,11 +235,14 @@ class pyana_scan (object) :
             elif scalar.find("FEEGasDetEnergy")>= 0 :
                 if self.psana:
                     energy = evt.get("Psana::Bld::BldDataFEEGasDetEnergy", "");
-                    fee_energy_array = []
-                    fee_energy_array.append(energy.f_11_ENRC())
-                    fee_energy_array.append(energy.f_12_ENRC())
-                    fee_energy_array.append(energy.f_21_ENRC())
-                    fee_energy_array.append(energy.f_22_ENRC())
+                    if energy:
+                        fee_energy_array = []
+                        fee_energy_array.append(energy.f_11_ENRC())
+                        fee_energy_array.append(energy.f_12_ENRC())
+                        fee_energy_array.append(energy.f_21_ENRC())
+                        fee_energy_array.append(energy.f_22_ENRC())
+                    else:
+                        fee_energy_array = None
                 else:
                     fee_energy_array = evt.getFeeGasDet()
 
@@ -267,9 +267,15 @@ class pyana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif ( scalar.find("IPM")>= 0 or scalar.find("DIO")>= 0 ):
-                ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar )
+                if self.psana:
+                    ipm = evt.get("Psana::Bld::BldDataIpimb", scalar )
+                else:
+                    ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar )
                 if ipm:
-                    self.evts_scalars[scalar].append( ipm.ipmFexData.sum )
+                    if self.psana:
+                        self.evts_scalars[scalar].append( ipm.ipmFexData().sum )
+                    else:
+                        self.evts_scalars[scalar].append( ipm.ipmFexData.sum )
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
