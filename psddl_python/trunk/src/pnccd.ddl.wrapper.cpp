@@ -44,12 +44,38 @@ void createWrappers() {
     .def("frameNumber", &n::frameNumber)\
     .def("timeStampHi", &n::timeStampHi)\
     .def("timeStampLo", &n::timeStampLo)\
+    .def("_data", &n::_data)\
     .def("data", &n::data)\
 
   _CLASS(Psana::PNCCD::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FrameV1);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("frame", &n::frame, policy)\
+    .def("numLinks", &n::numLinks)\
+    .def("frame_shape", &n::frame_shape)\
+    .def("frame_list", &n::frame_list)\
+
+  _CLASS(Psana::PNCCD::FramesV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FramesV1_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(FramesV1);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("specialWord", &n::specialWord)\
+    .def("frameNumber", &n::frameNumber)\
+    .def("timeStampHi", &n::timeStampHi)\
+    .def("timeStampLo", &n::timeStampLo)\
+    .def("data", &n::data)\
+
+  _CLASS(Psana::PNCCD::FullFrameV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(FullFrameV1_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(FullFrameV1);
 
 
 } // createWrappers()

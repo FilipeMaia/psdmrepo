@@ -99,7 +99,6 @@ public:
   enum { Version = 2 };
   DataV2_Wrapper(shared_ptr<DataV2> obj) : _o(obj), o(_o.get()) {}
   DataV2_Wrapper(DataV2* obj) : o(obj) {}
-  uint64_t triggerCounter() const { return o->triggerCounter(); }
   uint16_t config0() const { return o->config0(); }
   uint16_t config1() const { return o->config1(); }
   uint16_t config2() const { return o->config2(); }
@@ -120,6 +119,7 @@ public:
   float channel1psVolts() const { return o->channel1psVolts(); }
   float channel2psVolts() const { return o->channel2psVolts(); }
   float channel3psVolts() const { return o->channel3psVolts(); }
+  uint64_t triggerCounter() const { return o->triggerCounter(); }
 };
 
   class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {

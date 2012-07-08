@@ -77,7 +77,6 @@ void createWrappers() {
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
-    .def("triggerCounter", &n::triggerCounter)\
     .def("config0", &n::config0)\
     .def("config1", &n::config1)\
     .def("config2", &n::config2)\
@@ -98,6 +97,7 @@ void createWrappers() {
     .def("channel1psVolts", &n::channel1psVolts)\
     .def("channel2psVolts", &n::channel2psVolts)\
     .def("channel3psVolts", &n::channel3psVolts)\
+    .def("triggerCounter", &n::triggerCounter)\
 
   _CLASS(Psana::Ipimb::DataV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);

@@ -58,15 +58,45 @@ class FrameV1_Wrapper {
   shared_ptr<FrameV1> _o;
   FrameV1* o;
 public:
-  enum { TypeId = Pds::TypeId::Id_pnCCDframe };
-  enum { Version = 1 };
   FrameV1_Wrapper(shared_ptr<FrameV1> obj) : _o(obj), o(_o.get()) {}
   FrameV1_Wrapper(FrameV1* obj) : o(obj) {}
   uint32_t specialWord() const { return o->specialWord(); }
   uint32_t frameNumber() const { return o->frameNumber(); }
   uint32_t timeStampHi() const { return o->timeStampHi(); }
   uint32_t timeStampLo() const { return o->timeStampLo(); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
+  PyObject* _data() const { ND_CONVERT(o->_data(), uint16_t, 1); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
+};
+class ConfigV1;
+class ConfigV2;
+
+class FramesV1_Wrapper {
+  shared_ptr<FramesV1> _o;
+  FramesV1* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_pnCCDframe };
+  enum { Version = 1 };
+  FramesV1_Wrapper(shared_ptr<FramesV1> obj) : _o(obj), o(_o.get()) {}
+  FramesV1_Wrapper(FramesV1* obj) : o(obj) {}
+  const FrameV1_Wrapper frame(uint32_t i0) const { return FrameV1_Wrapper((FrameV1*) &o->frame(i0)); }
+  uint32_t numLinks() const { return o->numLinks(); }
+  vector<int> frame_shape() const { return o->frame_shape(); }
+  boost::python::list frame_list() { boost::python::list l; const int n = frame_shape()[0]; for (int i = 0; i < n; i++) l.append(frame(i)); return l; }
+};
+
+class FullFrameV1_Wrapper {
+  shared_ptr<FullFrameV1> _o;
+  FullFrameV1* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_pnCCDframe };
+  enum { Version = 1 };
+  FullFrameV1_Wrapper(shared_ptr<FullFrameV1> obj) : _o(obj), o(_o.get()) {}
+  FullFrameV1_Wrapper(FullFrameV1* obj) : o(obj) {}
+  uint32_t specialWord() const { return o->specialWord(); }
+  uint32_t frameNumber() const { return o->frameNumber(); }
+  uint32_t timeStampHi() const { return o->timeStampHi(); }
+  uint32_t timeStampLo() const { return o->timeStampLo(); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
 };
 
   class ConfigV1_Getter : public Psana::EnvObjectStoreGetter {
@@ -99,12 +129,35 @@ public:
   public:
   const char* getTypeName() { return "Psana::PNCCD::FrameV1";}
   const char* getGetterClassName() { return "Psana::EventGetter";}
-    int getVersion() {
-      return FrameV1::Version;
-    }
     object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<FrameV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+  };
+
+  class FramesV1_Getter : public Psana::EventGetter {
+  public:
+  const char* getTypeName() { return "Psana::PNCCD::FramesV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    int getVersion() {
+      return FramesV1::Version;
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
+      shared_ptr<FramesV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FramesV1_Wrapper(result)) : object();
+    }
+  };
+
+  class FullFrameV1_Getter : public Psana::EventGetter {
+  public:
+  const char* getTypeName() { return "Psana::PNCCD::FullFrameV1";}
+  const char* getGetterClassName() { return "Psana::EventGetter";}
+    int getVersion() {
+      return FullFrameV1::Version;
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
+      shared_ptr<FullFrameV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(FullFrameV1_Wrapper(result)) : object();
     }
   };
 } // namespace PNCCD
