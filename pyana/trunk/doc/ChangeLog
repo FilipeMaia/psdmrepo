@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-51
+2012-07-08 Joseph Barrera
+- add code to understand psana-style '\' continuation characters in config file.
+
 Tag: V00-00-50
 2012-06-01 Andy Salnikov
 - added "files" option to the config file
