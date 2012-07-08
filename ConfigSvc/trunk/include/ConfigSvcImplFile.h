@@ -78,9 +78,6 @@ public:
   // get a list of all parameters, or an empty list if the section is not found
   virtual std::list<std::string> getKeys(const std::string& section) const;
 
-  // get a list of all sections
-  virtual std::list<std::string> getSections() const;
-
 protected:
 
   // read input file from stream

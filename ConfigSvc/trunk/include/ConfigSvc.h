@@ -194,12 +194,6 @@ public:
     return impl().getKeys(section);
   }
 
-  // get a list of all sections
-  std::list<std::string> getSections() const
-  {
-    return impl().getSections();
-  }
-
 protected:
 
 private:

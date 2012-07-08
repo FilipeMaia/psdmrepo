@@ -11,9 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: ?
+Tag: V00-00-09
 2012-06-08 Joseph Barrera
-- Allow options to have empty string as value, e.g. {inputdark =} and {outputfile =}
+- allow options to have empty string as value, e.g. {inputdark =} and {outputfile =}
+- add getKeys() method to ConfigSvc
 
 Tag: V00-00-08
 2012-04-18 Andy Salnikov

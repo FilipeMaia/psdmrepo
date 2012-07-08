@@ -92,18 +92,6 @@ ConfigSvcImplFile::get(const string& section,
   return pitr->second;
 }
 
-// get a list of all sections
-list<string>
-ConfigSvcImplFile::getSections() const 
-{
-  list<string> list;
-  SectionMap::const_iterator sitr;
-  for (sitr = m_config.begin(); sitr != m_config.end(); sitr++) {
-    list.push_back((*sitr).first);
-  }
-  return list;
-}
-
 // get a list of all parameters, or an empty list if the section is not found
 list<string>
 ConfigSvcImplFile::getKeys(const string& section) const 
