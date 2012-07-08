@@ -102,11 +102,7 @@ class DdlPsanaInterfaces ( object ) :
         print >>self.inc, "#include \"ndarray/ndarray.h\""
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
-
-        # XXX python support XXX
-        # add "psddl_psana/" to include path so that include of this file from psddl_python works
-        #print >>self.cpp, "#include \"%s\"" % inc
-        print >>self.cpp, "#include \"psddl_psana/%s\"" % inc
+        print >>self.cpp, "#include \"%s\"" % inc
 
         # headers for other included packages
         for use in model.use:
