@@ -341,7 +341,7 @@ class pyana_scan (object) :
         nplots = nctrl + nctrl*nsclr
         if nplots == 0:
             return
-        (ncol, nrow) = ncol_nrow_from_nplots(nplots)
+        (ncols, nrows) = ncol_nrow_from_nplots(nplots)
 
         height=4.2
         if (nrows * height) > 14 : height = 14/nrows
