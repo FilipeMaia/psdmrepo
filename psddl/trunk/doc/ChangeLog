@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2012-07-08 Joseph S. Barrera III
+- Added psana python support in new file DdlPythonInterfaces.py.
+- Removed psana python support from DdlPsanaInterfaces.py and CppTypeCodegen.py.
+
 Tag: V00-02-03
 2012-05-07 Andy Salnikov
 - fix for missing include file causing psddlc crash with incorrect
