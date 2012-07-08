@@ -1,0 +1,9 @@
+#!/bin/sh
+
+for f in  psddldata/data/*.ddl.xml ; do
+  module=`basename $f .ddl.xml`
+  if [ "$module" == "xtc" ] ; then
+      continue
+  fi
+  psddlc -b python -I data -I psddl_psana --t Psana -e psddl_python/include/$module.ddl.wrapper.h -o psddl_python/src/$module.ddl.wrapper.cpp psddldata/data/$module.ddl.xml
+done
