@@ -11,8 +11,7 @@ Package author: Joseph S. Barrera
 Brief description:
 ==================
 
-Add here a brief description of the package main purpose, one or two
-sentences is probably enough.
+Source and header files generated from psddldata for psana Python support.
 
 Detailed description:
 =====================
