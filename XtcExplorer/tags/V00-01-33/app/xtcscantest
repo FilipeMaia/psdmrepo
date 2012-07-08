@@ -1,0 +1,64 @@
+#!/usr/bin/python
+
+from os import system
+from sys import stdout
+from glob import glob
+from sets import Set
+from pypdsdata import io
+from pypdsdata.xtc import *
+from pypdsdata.epics import *
+
+class XtcSearcher ( object ) :
+    all_contents = Set()
+    new_contents = Set()
+
+    def __init__(self):
+        pass
+
+    def scan(self, xtc) :
+        if xtc.damage.hasDamage(Damage.Value.IncompleteContribution) :
+            return
+        if xtc.contains.id() == TypeId.Type.Id_Xtc :
+            for x in xtc:
+                self.scan(x)
+        else:
+            contents = str(xtc.contains)
+            if contents not in self.all_contents:
+                self.all_contents.add(contents)
+                self.new_contents.add(contents)
+
+    def search(self, pattern, i, max_datagrams):
+        self.new_contents.clear()
+        pattern = pattern % i
+        files = glob(pattern)
+        if files == []:
+            return
+
+        xtciter = io.XtcMergeIterator(files, 0);
+        for count, dg in enumerate(xtciter):
+            if count > max_datagrams:
+                break
+            self.scan(dg.xtc)
+
+        if len(self.new_contents) > 0:
+            print "#------------------------------------------------------------"
+            for content in self.new_contents:
+                print "#", content
+            system("xtcexplorer --psana " + pattern)
+            stdout.flush()
+
+def main():
+    exps = [ "mec", "xcs", "cxi", "sxr", "xpp", "amo" ]
+    main = XtcSearcher()
+    for exp in exps:
+        dir_pattern = "/reg/d/ana02/%s/%s*/xtc" % (exp, exp)
+        dirs = glob(dir_pattern)
+        for dir in dirs:
+            print "# searching %s..." % dir
+            stdout.flush()
+            file_pattern = dir + "/e*-r%04d-s??-c??.xtc"
+            for i in range(1, 9999, 7):
+                main.search(file_pattern, i, 5)
+
+if __name__ == "__main__" :
+    main()
