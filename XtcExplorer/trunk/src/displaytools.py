@@ -387,7 +387,7 @@ class DataDisplay(object):
 
             self.image_disp.title = "Cameras shot#%d"%self.event_number
 
-            print "Number of images in event ", self.event_number, ": ", len(self.image_disp.frames)
+            print "Number of %s images in event %d is %d" % (image_data.name, self.event_number, len(self.image_disp.frames))
             
         newmode = self.image_disp.plot_all_frames(fignum=100,ordered=True)
         return newmode
