@@ -173,6 +173,23 @@ class  pyana_image ( object ) :
 
         return image
 
+    def parse_address(self, env, addr):
+        if '|' in addr:
+            device = addr.split('|')[1].split('-')[0]
+            address = addr.split('|')[0]
+            detsrc = address.split('-')[0]
+            return (device, detsrc)
+
+        if "-YAG-" in addr:
+            return("TM6740", addr)
+
+        print "Invalid device name", addr
+        keys = env.configStore().keys()
+        for k in keys:
+            if addr in str(k):
+                print "    possible match:", k
+        return (None, None)
+
     def beginrun( self, evt, env ):
         self.n_shots = 0
         self.run = evt.run()
@@ -259,13 +276,18 @@ class  pyana_image ( object ) :
         for addr in self.sources :
 
             # pick out the device name from the address
-            device = addr.split('|')[1].split('-')[0]
-            address = addr.split('|')[0]
-            detsrc = address.split('-')[0]
-            self.config = env.getConfig(self.configtypes[device], detsrc )
+            (device, detsrc) = self.parse_address(env, addr)
+            if not device:
+                continue
+            try:
+                configType = self.configtypes[device]
+            except:
+                print "no configType found for device '%s'" % device
+                continue
+            self.config = env.getConfig(configType, detsrc )
             if not self.config:
-                print '*** %s config object is missing ***'%addr
-                return
+                print "*** getConfig(configType='%s', detsrc='%s') failed (addr='%s')" % (configType, detsrc, addr)
+                continue
 
             if addr.find('Cspad2x2')>=0:
                 if self.psana:
@@ -318,14 +340,14 @@ class  pyana_image ( object ) :
             image = None
 
             # pick out the device name from the address
-            device = addr.split('|')[1].split('-')[0]
-            address = addr.split('|')[0]
-            detsrc = address.split('-')[0]
+            (device, detsrc) = self.parse_address(env, addr)
+            if not device:
+                continue
             frame = evt.get( self.datatypes[device], detsrc )
             if frame is None:
                 if not self.psana:
                     print "No frame from ", addr
-                return
+                continue
             
             if addr.find("Cspad2x2")>0 :
                 # in this case 'frame' is the MiniElement
@@ -347,7 +369,7 @@ class  pyana_image ( object ) :
                 else:
                     image = frame.data(self.config)
 
-            elif self.psana and ("Fccd" in addr or "Opal1000" in addr or "Opal2000" in addr or "Opal8000" in addr or "TM6740" in addr):
+            elif self.psana and ("Fccd" in addr or "Opal" in addr or "TM6740" in addr or "-YAG-" in addr):
                 if frame.depth() > 8:
                     image = frame.data16()
                 else:
