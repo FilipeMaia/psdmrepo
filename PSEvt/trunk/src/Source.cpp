@@ -21,6 +21,7 @@
 #include <vector>
 #include <cassert>
 #include <map>
+#include <iostream>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -31,6 +32,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/Exceptions.h"
+#include "PSEvt/EventKey.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -200,6 +202,12 @@ Source::isExact() const
 
   }
 
+}
+
+std::ostream&
+operator<<(std::ostream& out, const Source& src)
+{
+  return ::operator<<(out, src.src());
 }
 
 } // namespace PSEvt

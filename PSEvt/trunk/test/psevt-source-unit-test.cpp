@@ -10,6 +10,7 @@
 //---------------
 // C++ Headers --
 //---------------
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -19,6 +20,7 @@
 
 using namespace PSEvt;
 using namespace Pds;
+using namespace boost;
 
 #define BOOST_TEST_MODULE psevt-source-unit-test
 #include <boost/test/included/unit_test.hpp>
@@ -434,6 +436,40 @@ BOOST_AUTO_TEST_CASE( test_str_invalid )
   BOOST_CHECK_THROW(Source("ProcInfo(1.1.1.1.1)"), ExceptionSourceFormat);
   BOOST_CHECK_THROW(Source("ProcInfo(1024.1.1.1)"), ExceptionSourceFormat);
   BOOST_CHECK_THROW(Source("ProcInfo(psimport.slac.stanford.edu)"), ExceptionSourceFormat);
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_format )
+{
+  Source src;
+  src = Source("DetInfo(NoDetector.*:NoDevice.0)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(NoDetector.*:NoDevice.0)");
+  src = Source("DetInfo(:NoDevice)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.*:NoDevice.*)");
+  src = Source("DetInfo(NoDetector)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(NoDetector.*:*.*)");
+  src = Source("DetInfo(NoDetector.0:*.0)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(NoDetector.0:*.0)");
+  src = Source("DetInfo(NoDetector.0:*.*)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(NoDetector.0:*.*)");
+  src = Source("DetInfo(*.0:*.*)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.0:*.*)");
+  src = Source("DetInfo(NoDetector.*:*.*)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(NoDetector.*:*.*)");
+  src = Source("DetInfo(*.55:NoDevice.0)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.55:NoDevice.0)");
+  src = Source("DetInfo(*.1:NoDevice.2)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.1:NoDevice.2)");
+  src = Source("DetInfo(*.*:*.254)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.*:*.254)");
+  src = Source("DetInfo(*.*:*.255)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "DetInfo(*.*:*.*)");
+
+  src = Source("BldInfo(EBeam)");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "BldInfo(EBeam)");
+  src = Source("BldInfo()");
+  BOOST_CHECK_EQUAL(lexical_cast<std::string>(src), "BldInfo()");
 }
 
 // ==============================================================

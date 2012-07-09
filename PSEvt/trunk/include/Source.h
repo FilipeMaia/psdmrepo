@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
@@ -148,6 +149,10 @@ private:
   Pds::Src m_src;
   
 };
+
+/// Helper operator to format Source to a standard stream
+std::ostream&
+operator<<(std::ostream& out, const Source& src);
 
 } // namespace PSEvt
 

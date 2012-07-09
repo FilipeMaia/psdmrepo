@@ -45,17 +45,38 @@ namespace {
 
   void printDetInfo(std::ostream& str, const Pds::DetInfo& src)
   {
-    str << "DetInfo("
-        << Pds::DetInfo::name(src.detector()) 
-        << '.' << src.detId() 
-        << ':' << Pds::DetInfo::name(src.device()) 
-        << '.' << src.devId() 
-        << ')';
+    str << "DetInfo(";
+    if (src.detector() == 0xff) {
+      str << '*';
+    } else {
+      str << Pds::DetInfo::name(src.detector());
+    }
+    str << '.';
+    if (src.detId() == 0xff) {
+      str << '*';
+    } else {
+      str << src.detId();
+    }
+    str << ':';
+    if (src.device() == 0xff) {
+      str << '*';
+    } else {
+      str << Pds::DetInfo::name(src.device());
+    }
+    str << '.';
+    if (src.devId() == 0xff) {
+      str << '*';
+    } else {
+      str << src.devId();
+    }
+    str << ')';
   }
 
   void printBldInfo(std::ostream& str, const Pds::BldInfo& src)
   {
-    str << "BldInfo(" << Pds::BldInfo::name(src) << ')';
+    str << "BldInfo(";
+    if (unsigned(src.type()) != 0xffffffff) str << Pds::BldInfo::name(src);
+    str << ')';
   }
 
   void printProcInfo(std::ostream& str, const Pds::ProcInfo& src)
