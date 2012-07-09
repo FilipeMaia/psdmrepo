@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-48
+2012-07-08 Igor Gaponenko
+- extended MySQL schema to support Fast Feed Back (FFB) data recording
+
 Tag: V00-00-47
 2012-07-08 Igor Gaponenko
 - extended support for the data migration
