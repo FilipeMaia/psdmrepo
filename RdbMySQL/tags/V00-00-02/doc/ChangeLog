@@ -1,0 +1,22 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RdbMySQL
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2012-07-09 Andy Salnikov
+- add constructor to Conn class which takes ODBC-like connection string
+
+Tag: V00-00-01
+2012-06-18 Andy Salnikov
+- first import of package into SVN
+- this is mostly babar code with small modifications to add namespaces
+  and use our own error reporting
