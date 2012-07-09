@@ -935,6 +935,10 @@ class NeoCaptar {
         $user = $this->current_user();
         return !is_null($user) && ($user->is_administrator() || $user->is_projmanager());
     }
+    public function has_dict_priv() {
+        $user = $this->current_user();
+        return !is_null($user) && $user->has_dict_priv();
+    }
 
     public function notify_event_types($recipient=null) {
         $list = array();
@@ -1574,19 +1578,6 @@ class NeoCaptar {
         return $new_cable;
 
     }
-//    public function register_cable($cable) {
-//        if(is_null($cable))
-//            throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
-//
-//        $cablenumber = $this->allocate_cablenumber($cable->origin_loc(), $cable->id());
-//        if( is_null($cablenumber))
-//            throw new NeoCaptarException(__METHOD__, "failed to allocate a cable number");
-//
-//        $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='{$cablenumber}' WHERE id={$cable->id()}");
-//
-//        $this->add_notification_event4cable('on_register', $cable, '');
-//        return $this->change_cable_status($cable,'Registered');
-//    }
     public function register_cable($cable) {
         if(is_null($cable))
             throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
@@ -1597,51 +1588,87 @@ class NeoCaptar {
 
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='{$cablenumber}' WHERE id={$cable->id()}");
 
-        $this->add_notification_event4cable('on_register', $cable, '');
-        return $this->change_cable_status($cable,'Registered');
+        $new_cable = $this->change_cable_status($cable,'Registered');
+        $this->add_notification_event4cable('on_register', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
 
     public function label_cable($cable) {
-        $this->add_notification_event4cable('on_label', $cable, '');
-        return $this->change_cable_status($cable,'Labeled');
+        $new_cable = $this->change_cable_status($cable,'Labeled');
+        $this->add_notification_event4cable('on_label', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function fabricate_cable($cable) {
-        $this->add_notification_event4cable('on_fabrication', $cable, '');
-        return $this->change_cable_status($cable,'Fabrication');
+        $new_cable = $this->change_cable_status($cable,'Fabrication');
+        $this->add_notification_event4cable('on_fabrication', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function ready_cable($cable) {
-        $this->add_notification_event4cable('on_ready', $cable, '');
-        return $this->change_cable_status($cable,'Ready');
+        $new_cable = $this->change_cable_status($cable,'Ready');
+        $this->add_notification_event4cable('on_ready', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function install_cable($cable) {
-        $this->add_notification_event4cable('on_install', $cable, '');
-        return $this->change_cable_status($cable,'Installed');
+        $new_cable = $this->change_cable_status($cable,'Installed');
+        $this->add_notification_event4cable('on_install', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function commission_cable($cable) {
-        $this->add_notification_event4cable('on_commission', $cable, '');
-        return $this->change_cable_status($cable,'Commissioned');
+        $new_cable = $this->change_cable_status($cable,'Commissioned');
+        $this->add_notification_event4cable('on_commission', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function damage_cable($cable) {
-        $this->add_notification_event4cable('on_damage', $cable, '');
-        return $this->change_cable_status($cable,'Damaged');
+        $new_cable = $this->change_cable_status($cable,'Damaged');
+        $this->add_notification_event4cable('on_damage', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
     public function retire_cable($cable) {
-        $this->add_notification_event4cable('on_retire', $cable, '');
-        return $this->change_cable_status($cable,'Retired');
+        $new_cable = $this->change_cable_status($cable,'Retired');
+        $this->add_notification_event4cable('on_retire', $cable, "Cable number: {$new_cable->cable()}");
+        return $new_cable;
     }
-
     public function un_register_cable($cable) {
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='' WHERE id={$cable->id()}");
-        return $this->change_cable_status($cable,'Planned');
+        $new_cable = $this->change_cable_status($cable,'Planned');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
     }
-    public function un_label_cable     ($cable) { return $this->change_cable_status($cable,'Registered');   }
-    public function un_fabricate_cable ($cable) { return $this->change_cable_status($cable,'Labeled');      }
-    public function un_ready_cable     ($cable) { return $this->change_cable_status($cable,'Fabrication');  }
-    public function un_install_cable   ($cable) { return $this->change_cable_status($cable,'Ready');        }
-    public function un_commission_cable($cable) { return $this->change_cable_status($cable,'Installed');    }
-    public function un_damage_cable    ($cable) { return $this->change_cable_status($cable,'Commissioned'); }
-    public function un_retire_cable    ($cable) { return $this->change_cable_status($cable,'Damaged');      }
-
+    public function un_label_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Registered');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_fabricate_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Labeled');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_ready_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Fabrication');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_install_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Ready');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_commission_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Installed');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_damage_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Commissioned');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
+    public function un_retire_cable($cable) {
+        $new_cable = $this->change_cable_status($cable,'Damaged');
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        return $new_cable;
+    }
     private function add_event_impl($scope, $scope_id, $event, $comments) {
         $event_time = LusiTime::now()->to64();
         $event_uid  = $this->connection->escape_string(trim( AuthDB::instance()->authName()));
@@ -2003,13 +2030,6 @@ HERE;
         $user = $this->find_user_by_uid($originator_uid);
         if( !is_null($user)) $originator_name = "({$user->name()})";
 
-        $cable_info_option = '';
-        if( $cable_info ) $cable_info_option =<<<HERE
-Addition information on the cable event (if any):
-
-{$cable_info}
-HERE;
-
         $address = "{$recipient_uid}@slac.stanford.edu";
         $subject = 'Cable Event Notification';
         $body =<<<HERE
@@ -2020,14 +2040,12 @@ This is an automated notification message on the following event:
 Project title: {$project_title}
 Project owner: {$project_owner} {$project_owner_name}
 
-Cable URL (if the cable is still available):
-
-  https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=search:cables&cable_id={$cable_id}
+{$cable_info}
+Cable URL:    https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=search:cables&cable_id={$cable_id}
 
 The change was made by user:       {$originator_uid} {$originator_name}
 The time when the change was made: {$event_time->toStringShort()}
 
-{$cable_info_option}
 
     **********************************************************************************
     * The message was sent by the automated notification system because your account *

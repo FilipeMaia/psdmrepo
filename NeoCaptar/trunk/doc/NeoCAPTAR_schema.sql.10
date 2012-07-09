@@ -616,26 +616,6 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`USER` (
 )
 ENGINE = InnoDB;
 
--- -----------------------------------------------------
--- Table `NEOCAPTAR`.`USER_PRIV`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `NEOCAPTAR`.`USER_PRIV` ;
-
-CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`USER_PRIV` (
-
-  `uid`  VARCHAR(32)      NOT NULL ,
-
-  `dict_priv` ENUM('YES','NO') NOT NULL ,
-
-  CONSTRAINT `USER_PRIV_FK_1`
-    FOREIGN KEY (`uid` )
-    REFERENCES `NEOCAPTAR`.`USER` (`uid` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
-
-
 
 -- -----------------------------------------------------
 -- Table `NEOCAPTAR`.`NOTIFY_EVENT_TYPE`
@@ -668,28 +648,26 @@ INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_proj
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_project_deassign','PROJECT','My project assigned to someone else');
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_project_delete',  'PROJECT','My project deleted');
 
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_create',        'CABLE',  'New cable added to my project');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_delete',        'CABLE',  'Cable deleted');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_edit',          'CABLE',  'Cable edited');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_register',            'CABLE',  'Cable registered with an official #');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_label',               'CABLE',  'Cable label finalized and locked');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_fabrication',         'CABLE',  'Cable fabrication requested');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_ready',               'CABLE',  'Cable is ready to be installed');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_install',             'CABLE',  'Cable is installed');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_commission',          'CABLE',  'Cable is commissioned');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_damage',              'CABLE',  'Cable is damaged');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_retire',              'CABLE',  'Cable is retired');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_state_reversed','CABLE',  'Cable state reversed to the previous state');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_create',    'CABLE',  'New cable added to my project');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_delete',    'CABLE',  'Cable deleted');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_cable_edit',      'CABLE',  'Cable edited');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_register',        'CABLE',  'Cable registered with an official #');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_label',           'CABLE',  'Cable label finalized and locked');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_fabrication',     'CABLE',  'Cable fabrication requested');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_ready',           'CABLE',  'Cable is ready to be installed');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_install',         'CABLE',  'Cable is installed');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_commission',      'CABLE',  'Cable is commissioned');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_damage',          'CABLE',  'Cable is damaged');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'PROJMANAGER',  'on_retire',          'CABLE',  'Cable is retired');
 
 INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_project_create',  'PROJECT','New project created');
 
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_fabrication',         'CABLE',  'Cable fabrication ordered');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_ready',               'CABLE',  'Cable is ready to be installed');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_install',             'CABLE',  'Cable is installed');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_commission',          'CABLE',  'Cable is commissioned');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_damage',              'CABLE',  'Cable is damaged');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_retire',              'CABLE',  'Cable is retired');
-INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_cable_state_reversed','CABLE',  'Cable state reversed to the previous state');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_fabrication',     'CABLE',  'Cable fabrication ordered');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_ready',           'CABLE',  'Cable is ready to be installed');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_install',         'CABLE',  'Cable is installed');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_commission',      'CABLE',  'Cable is commissioned');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_damage',          'CABLE',  'Cable is damaged');
+INSERT INTO `NEOCAPTAR`.`NOTIFY_EVENT_TYPE` VALUES(NULL,'OTHER',        'on_retire',          'CABLE',  'Cable is retired');
 
 
 

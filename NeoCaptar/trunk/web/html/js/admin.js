@@ -729,37 +729,50 @@ function p_appl_admin() {
         }
         return global_users;
     };
-    this.access_display_users = function(id,users) {
+    this.access_display_users = function(id,users,is_administrator,can_manage_projects) {
         var rows = [];
         for( var i in users ) {
             var a = users[i];
-            rows.push([
-                this.can_manage_access() ? 
-                    Button_HTML('delete', {
-                        name:    'delete',
-                        onclick: "admin.access_delete_user('"+a.uid+"')",
-                        title:   'delete this user from the list'
-                    }) : '',
+            var row = [];
+            if(this.can_manage_access()) row.push(
+                Button_HTML('X', {
+                    name:    'delete',
+                    onclick: "admin.access_delete_user('"+a.uid+"')",
+                    title:   'delete this user from the list' }));
+            row.push(
                 a.uid,
-                a.name,
+                a.name);
+            if(can_manage_projects && !is_administrator) row.push(
+                this.can_manage_access()
+                    ? Checkbox_HTML({
+                        name:    'dict_priv',
+                        onclick: "admin.access_toggle_priv('"+a.uid+"','dict_priv')",
+                        title:   'togle the dictionary privilege',
+                        checked: a.privilege.dict_priv ? 'checked' : '' })
+                    : ( a.privilege.dict_priv ? 'Yes' : 'No' ));
+            row.push(
                 a.added_time,
-                a.last_active_time,
+                a.last_active_time);
+
+            if(can_manage_projects) row.push(
                 Button_HTML('search', {
                     name:    'projects',
                     onclick: "global_search_projects_by_owner('"+a.uid+"')",
-                    title:   'search projects owned by this user'
-                })
-            ]);            
+                    title:   'search projects owned by this user' }));
+
+            rows.push(row);
         }
-        var table = new Table(id, [
-            { name: '',            sorted: false },
-            { name: 'UID',         sorted: false },
-            { name: 'user',        sorted: false },
-            { name: 'added',       sorted: false },
-            { name: 'last active', sorted: false },
-            { name: 'projects',    sorted: false } ],
-            rows );
-            table.display();
+        var hdr = [];
+        if(this.can_manage_access()) hdr.push(                  { name: 'DELETE',               sorted: false });
+        hdr.push(                                               { name: 'UID',                  sorted: false },
+                                                                { name: 'user',                 sorted: false });
+        if(can_manage_projects && !is_administrator) hdr.push(  { name: 'dictionary privilege', sorted: false });
+        hdr.push(                                               { name: 'added',                sorted: false },
+                                                                { name: 'last active',          sorted: false });
+        if(can_manage_projects) hdr.push(                       { name: 'PROJECTS',             sorted: false });
+
+        var table = new Table(id, hdr, rows);
+        table.display();
 
         var elem = $('#'+id);
 
@@ -768,9 +781,9 @@ function p_appl_admin() {
     };
 
     this.access_display = function() {
-        this.access_display_users('admin-access-ADMINISTRATOR', this.access.ADMINISTRATOR);
-        this.access_display_users('admin-access-PROJMANAGER',   this.access.PROJMANAGER);
-        this.access_display_users('admin-access-OTHER',         this.access.OTHER);
+        this.access_display_users('admin-access-ADMINISTRATOR', this.access.ADMINISTRATOR, true, true);
+        this.access_display_users('admin-access-PROJMANAGER',   this.access.PROJMANAGER,   false, true);
+        this.access_display_users('admin-access-OTHER',         this.access.OTHER,         false, false);
     };
 
     this.access_load = function() {
@@ -813,6 +826,18 @@ function p_appl_admin() {
             return;
         });
     };
+    this.access_toggle_priv = function(uid,name) {
+        var params = {uid:uid, name:name};
+        var jqXHR = $.get('../neocaptar/access_toggle_priv.php',params,function(data) {
+            if(data.status != 'success') { report_error(data.message, null); return; }
+            that.access = data.access;
+            that.access_display();
+            that.notify_load();
+        },
+        'JSON').error(function () {
+            report_error('failed to togle the privilege state because of: '+jqXHR.statusText, null);
+            return;
+        });    };
 
 
     /* -----------------

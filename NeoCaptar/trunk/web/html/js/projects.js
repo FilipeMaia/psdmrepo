@@ -1060,7 +1060,7 @@ function p_appl_projects() {
 			break;
 
         case 'destination_slot':
-			base.html('<input type="text" value="'+cable.destination.slot+'" size="4" '+is_disabled_attr+' />');
+			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.slot+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_slot = read_input;
 			break;
 

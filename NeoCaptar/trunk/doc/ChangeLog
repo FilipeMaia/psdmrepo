@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2012-07-08 Igor Gaponenko
+- allowed dictionary access to project manager. Privileges are granted on
+individual basis by administrators.
+
 Tag: V00-01-01
 2012-07-05 Igor Gaponenko
 - clean version of the previously commited code free from the old stuff

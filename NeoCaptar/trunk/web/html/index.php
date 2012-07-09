@@ -157,6 +157,7 @@ a:hover, a.link:hover {
   padding-left: 10px;
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 12px;
+  font-weight: bold;
 }
 #p-search {
   padding-top: 2px;
@@ -454,7 +455,7 @@ function set_current_tab( tab ) {
 }
 
 function set_context(app) {
-	var ctx = app.full_name+' &gt;';
+	var ctx = app.full_name+' :';
 	if(app.context) ctx += ' '+app.context;
 	$('#p-context').html(ctx);
 }
@@ -585,7 +586,8 @@ var global_current_user = {
     uid:                '<?php echo $authdb->authName(); ?>',
     is_other:            <?php echo $neocaptar->is_other()?'1':'0'; ?>,
     is_administrator:    <?php echo $neocaptar->is_administrator()?'1':'0'; ?>,
-    can_manage_projects: <?php echo $neocaptar->can_manage_projects()?'1':'0'; ?>
+    can_manage_projects: <?php echo $neocaptar->can_manage_projects()?'1':'0'; ?>,
+    has_dict_priv:       <?php echo $neocaptar->has_dict_priv()?'1':'0'; ?>
 };
 var global_users = [];
 var global_projmanagers = [];

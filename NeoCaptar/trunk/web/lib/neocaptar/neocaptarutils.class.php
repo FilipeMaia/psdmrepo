@@ -411,7 +411,10 @@ class NeoCaptarUtils {
                     'name'              => $u->name(),
                     'added_time'        => $u->added_time()->toStringShort(),
                     'added_uid'         => $u->added_uid(),
-                    'last_active_time'  => $u->last_active_time() == '' ? '' : $u->last_active_time()->toStringShort()
+                    'last_active_time'  => $u->last_active_time() == '' ? '' : $u->last_active_time()->toStringShort(),
+                    'privilege'         => array(
+                        'dict_priv'     => $u->has_dict_priv() ? 1 : 0
+                    )
                 )
             );
         }
