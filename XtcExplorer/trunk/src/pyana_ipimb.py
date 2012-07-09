@@ -103,7 +103,6 @@ class  pyana_ipimb ( object ) :
         
         self.data = {}
         for source in self.sources :
-            print source
             self.data[source] = IpimbData( source ) 
 
             # just for information:
