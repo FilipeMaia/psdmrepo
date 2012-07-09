@@ -453,8 +453,9 @@ public:
                                  int stream,
                                  int chunk,
                                  const std::string& host,
-                                 const std::string& dirpath) throw (WrongParams,
-                                                                    DatabaseError) ;
+                                 const std::string& dirpath,
+                                 const std::string& scope=std::string()) throw (WrongParams,
+                                                                                DatabaseError) ;
 
    /**
       * Create a new attribute of a run (integer value)

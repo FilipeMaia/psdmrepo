@@ -836,8 +836,9 @@ ConnectionImpl::reportOpenFile (int exper_id,
                                 int stream,
                                 int chunk,
                                 const std::string& host,
-                                const std::string& dirpath) throw (WrongParams,
-                                                                   DatabaseError)
+                                const std::string& dirpath,
+                                const std::string& scope) throw (WrongParams,
+                                                                 DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
@@ -866,9 +867,10 @@ ConnectionImpl::reportOpenFile (int exper_id,
     // Now proceed with the new file registration
     //
 
-    /* The operation requires the following table:
+    /* The operation requires the following table (note that table name may
+     * be longer in case if non-empty <scope> is specified):
 
-       CREATE TABLE `file` (
+       CREATE TABLE `file[_<scope>]` (
          `exper_id` int(11) NOT NULL,
          `run`      int(11) NOT NULL,
          `stream`   int(11) NOT NULL,
@@ -884,7 +886,7 @@ ConnectionImpl::reportOpenFile (int exper_id,
     */
 
     std::ostringstream sql;
-    sql << "INSERT INTO file VALUES("
+    sql << "INSERT INTO file" << (scope.empty() ? "" : "_" + scope) << " VALUES("
         << exper_id << ","
         << run      << ","
         << stream   << ","
@@ -893,6 +895,10 @@ ConnectionImpl::reportOpenFile (int exper_id,
         << this->escape_string (m_regdb_mysql, host)    << "','"
         << this->escape_string (m_regdb_mysql, dirpath) << "')";
 
+    /*
+    std::cout << "DEBUG: ConnectionImpl::reportOpenFile: sql=" << sql.str() << std::endl;
+    return;
+    */
     this->simpleQuery (m_regdb_mysql, sql.str());
 }
 

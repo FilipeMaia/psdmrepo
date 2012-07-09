@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-14
+2012-07-08
+- extended the open file reporting interface (for DAQ) by an optional
+parameter to report a scope of the report. This is meant to support
+a non-production stream of data of the Fast Feed Back monitoring system.
+
 Tag: V00-02-13
 2012-05-21
 - attaching/dettaching messages to/from runs

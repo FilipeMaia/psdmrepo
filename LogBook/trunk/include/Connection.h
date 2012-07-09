@@ -659,6 +659,8 @@ public:
       *   host:    host name where the file is available
       *   dirpath: full directory path to where the file can be accessed from
       *            the above specified host
+      *   scope:   a scope in which the files are reported. The default (empty)
+      *            value means the main data collection activity.
       *
       * EXCEPTIONS:
       *
@@ -673,8 +675,9 @@ public:
                                  int stream,
                                  int chunk,
                                  const std::string& host,
-                                 const std::string& dirpath) throw (WrongParams,
-                                                                    DatabaseError) = 0 ;
+                                 const std::string& dirpath,
+                                 const std::string& scope=std::string()) throw (WrongParams,
+                                                                                DatabaseError) = 0 ;
 
     /**
       * Create a new attribute of a run (integer value)
