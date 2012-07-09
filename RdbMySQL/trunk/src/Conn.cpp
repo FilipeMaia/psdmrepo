@@ -25,6 +25,9 @@
 // C++ Headers --
 //---------------
 #include <string>
+#include <vector>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <mysql/mysql.h>
 
 //-------------------------------
@@ -81,6 +84,68 @@ Conn::Conn ( const std::string& host,
     _client = new ClientDynamic() ;
   }
 }
+
+/**
+ *  @brief Constructor takes connection string.
+ *
+ *  Format of the connection string:
+ *  "Server=hostname;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;".
+ *  Any part of the connection string can be omitted.
+ *
+ *  @param connStr  ODBC-like connection string
+ *  @param client   if non-zero pointer is passed it will be used instead default
+ *                  client instance, will be deleted in destructor
+ */
+Conn::Conn( const std::string& connStr, Client* client )
+  : _host()
+  , _user()
+  , _passwd()
+  , _db()
+  , _port()
+  , _socket()
+  , _client_flag(0)
+  , _mysql(0)
+  , _client(client)
+{
+  std::vector<std::string> parts;
+  parts.reserve(10);
+  boost::split(parts, connStr, boost::is_any_of(";"), boost::token_compress_on);
+  for (std::vector<std::string>::const_iterator it = parts.begin(); it != parts.end(); ++ it) {
+
+    std::string part = *it;
+    boost::trim(part);
+    if (part.empty()) continue;
+
+    std::string::size_type p = part.find('=');
+    if (p == std::string::npos) {
+      MsgLog(logger, warning, "Conn -- connection string has missing = : " << connStr);
+      continue;
+    }
+
+    std::string key(part, 0, p);
+    boost::to_lower(key);
+
+    const std::string val(part, p+1);
+
+    if (key == "server") {
+      _host = val;
+    } else if (key == "port") {
+      _port = boost::lexical_cast<unsigned>(val);
+    } else if (key == "database") {
+      _db = val;
+    } else if (key == "uid") {
+      _user = val;
+    } else if (key == "pwd") {
+      _passwd = val;
+    }
+
+  }
+
+  if ( ! _client ) {
+    _client = new ClientDynamic() ;
+  }
+}
+
 
 // Destructor
 Conn::~Conn ()

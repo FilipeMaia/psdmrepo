@@ -76,7 +76,9 @@ public:
    *  @param db       database name, if not empty then set default database name
    *  @param port     remote port number to connect to, if 0 then default value is used
    *  @param socket   socket name for local connections
-   *  @param client_flag bit mask with varius flags, see mysql_real_connect description
+   *  @param client_flag bit mask with various flags, see mysql_real_connect description
+   *  @param client   if non-zero pointer is passed it will be used instead default
+   *                  client instance, will be deleted in destructor
    */
   Conn( const std::string& host,
 		const std::string& user, 
@@ -86,6 +88,19 @@ public:
 		const std::string& socket = std::string(),
 		unsigned long client_flag = 0,
 		Client* client = 0 ) ;
+
+  /**
+   *  @brief Constructor takes connection string.
+   *
+   *  Format of the connection string:
+   *  "Server=hostname;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;".
+   *  Any part of the connection string can be omitted.
+   *
+   *  @param connStr  ODBC-like connection string
+   *  @param client   if non-zero pointer is passed it will be used instead default
+   *                  client instance, will be deleted in destructor
+   */
+  Conn( const std::string& connStr, Client* client = 0 ) ;
 
   /// Destructor, closes connection if it was not closed yet
   ~Conn () ;
@@ -130,11 +145,11 @@ private:
   // Friends
 
   // Data members
-  const std::string _host ;
-  const std::string _user ;
-  const std::string _passwd ;
-  const std::string _db ;
-  const unsigned int _port ;
+  std::string _host ;
+  std::string _user ;
+  std::string _passwd ;
+  std::string _db ;
+  unsigned int _port ;
   const std::string _socket ;
   const unsigned long _client_flag ;
   st_mysql* _mysql ;
