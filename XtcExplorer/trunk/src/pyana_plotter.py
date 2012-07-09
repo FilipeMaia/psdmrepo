@@ -227,7 +227,7 @@ class pyana_plotter (object) :
             self.data_display.show_ipimb(data_ipimb)
                 
         data_image = evt.get('data_image') 
-        print "Data images: ", data_image
+        print "Data images: ", [d.name for d in data_image]
         if data_image is not None:
             self.data_display.show_image(data_image)
 
