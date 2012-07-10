@@ -59,6 +59,7 @@ class pyana_waveform (object) :
     #----------------
     def __init__ ( self, 
                    sources = None,
+                   source = None,
                    channels = None,
                    wf_window = None,
                    plot_every_n = None,
@@ -70,6 +71,7 @@ class pyana_waveform (object) :
         values  here then the must be defined in pyana.cfg. All parameters 
         are passed as strings, convert to correct type before use.
 
+        @param source          Single DetInfo addresse of Acqiris type
         @param sources         List of DetInfo addresses of Acqiris type
         @param channels        List of channels (default: all)
         @param wf_window       Waveform window (array units)
@@ -78,10 +80,14 @@ class pyana_waveform (object) :
         @param fignum          Figure number for matplotlib
         @param quantities      string containing quantities to plot
         """
-
+        
         # initialize data
         opt = PyanaOptions()
-        self.sources = opt.getOptStrings( sources )
+
+        # Load source address(es) of the data we want to read
+        # for backward compatibility, allow list of sources
+        self.sources = opt.getOptStrings( source or sources )
+
         self.quantities = opt.getOptString( quantities )
         self.channels = opt.getOptIntegers( channels ) 
 
@@ -217,6 +223,7 @@ class pyana_waveform (object) :
         """
         logging.info( "pyana_waveform.event() called ")
         self.n_shots+=1
+
         
         if evt.get('skip_event') :
             return
@@ -294,7 +301,13 @@ class pyana_waveform (object) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
 
+            # update plot data (returns a list)
             wfd = self.update_plot_data()
+            
+            # put this list into the event, but if there's one there already, append to it.
+            wfd_old = evt.get('data_wf')
+            if wfd_old is not None:
+                wfd.extend( wfd_old )
             evt.put(wfd, 'data_wf')
             
         if  ( self.accumulate_n != 0 and (self.n_shots%self.accumulate_n)==0 ):
@@ -332,10 +345,15 @@ class pyana_waveform (object) :
 
         # flag for pyana_plotter
         evt.put(True, 'show_event')
-        
+
+        # update plot data
         wfd = self.update_plot_data()
+
+        # put this list into the event, but if there's one there already, append to it.
+        wfd_old = evt.get('data_wf')
+        if wfd_old is not None:
+            wfd.extend( wfd_old )
         evt.put(wfd, 'data_wf')
-            
 
 
 

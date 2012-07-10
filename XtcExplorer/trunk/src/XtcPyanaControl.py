@@ -950,10 +950,10 @@ Do you want to proceed?
              #or boxlabel.find("Camp")>=0
              ) :
             try :
-                index = modules_to_run.index("XtcExplorer.pyana_waveform")
+                index = modules_to_run.index("XtcExplorer.pyana_waveform:%s"%boxlabel)
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcExplorer.pyana_waveform")
+                modules_to_run.append("XtcExplorer.pyana_waveform:%s"%boxlabel)
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_waveform at ", index
