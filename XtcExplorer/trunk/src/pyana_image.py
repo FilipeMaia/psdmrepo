@@ -184,10 +184,11 @@ class  pyana_image ( object ) :
             return("TM6740", addr)
 
         print "Invalid device name", addr
-        keys = env.configStore().keys()
-        for k in keys:
-            if addr in str(k):
-                print "    possible match:", k
+        if self.psana:
+            keys = env.configStore().keys()
+            for k in keys:
+                if addr in str(k):
+                    print "    possible match:", k
         return (None, None)
 
     def beginrun( self, evt, env ):
@@ -287,6 +288,11 @@ class  pyana_image ( object ) :
             self.config = env.getConfig(configType, detsrc )
             if not self.config:
                 print "*** getConfig(configType='%s', detsrc='%s') failed (addr='%s')" % (configType, detsrc, addr)
+                if self.psana:
+                    keys = env.configStore().keys()
+                    for k in keys:
+                        if detsrc in str(k):
+                            print "*** possible match:", k
                 continue
 
             if addr.find('Cspad2x2')>=0:
@@ -352,10 +358,16 @@ class  pyana_image ( object ) :
             if addr.find("Cspad2x2")>0 :
                 # in this case 'frame' is the MiniElement
                 # call cspad library to assemble the image
+                if not addr in self.cspad:
+                    print "No Cspad2x2 entry found for %s" % addr
+                    continue
                 image = self.cspad[addr].get_mini_image(frame)
 
             elif addr.find("Cspad")>0 :
                 # in this case we need the specialized getter: 
+                if not addr in self.cspad:
+                    print "No Cspad entry found for %s" % addr
+                    continue
                 if self.psana:
                     quads = frame.quads_list()
                 else:
