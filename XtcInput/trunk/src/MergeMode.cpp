@@ -39,11 +39,11 @@ namespace XtcInput {
 MergeMode 
 mergeMode(const std::string& str)
 {
-  if (str == "MergeFileName") {
+  if (str == "MergeFileName" or str == "FileName") {
     return MergeFileName;
-  } else if (str == "MergeOneStream") {
+  } else if (str == "MergeOneStream" or str == "OneStream") {
     return MergeOneStream;
-  } else if (str == "MergeNoChunking") {
+  } else if (str == "MergeNoChunking" or str == "NoChunking") {
     return MergeNoChunking;
   } else {
     throw InvalidMergeMode(str);

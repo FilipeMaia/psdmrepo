@@ -13,6 +13,10 @@ reverse time order.
 
 Tag: V00-05-00
 2012-07-09 Andy Salnikov
+- mergeMode() method also accepts "old" enum names
+
+Tag: V00-05-00
+2012-07-09 Andy Salnikov
 - a bit of redesign, split iterators into iterators over datagrams
   and iterators over files
 - iteration over files has two implementation, first is based on static 
