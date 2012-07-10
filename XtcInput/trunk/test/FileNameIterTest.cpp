@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( test_stream_1 )
   };
   const int num_names = sizeof names / sizeof names[0];
 
-  StreamFileIterList iter(&names[0], &names[num_names], FileName);
+  StreamFileIterList iter(&names[0], &names[num_names], MergeFileName);
 
   boost::shared_ptr<ChunkFileIterI> chunkIter;
   XtcFileName name;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_stream_2 )
   };
   const unsigned num_names = sizeof names / sizeof names[0];
 
-  StreamFileIterList iter(&names[0], &names[num_names], OneStream);
+  StreamFileIterList iter(&names[0], &names[num_names], MergeOneStream);
 
   boost::shared_ptr<ChunkFileIterI> chunkIter;
   XtcFileName name;
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( test_stream_3 )
   };
   const unsigned num_names = sizeof names / sizeof names[0];
 
-  StreamFileIterList iter(&names[0], &names[num_names], NoChunking);
+  StreamFileIterList iter(&names[0], &names[num_names], MergeNoChunking);
 
   boost::shared_ptr<ChunkFileIterI> chunkIter;
   XtcFileName name;
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( test_run_1 )
   };
   const int num_names = sizeof names / sizeof names[0];
 
-  RunFileIterList iter(&names[0], &names[num_names], FileName);
+  RunFileIterList iter(&names[0], &names[num_names], MergeFileName);
 
   boost::shared_ptr<StreamFileIterI> streamIter;
   boost::shared_ptr<ChunkFileIterI> chunkIter;
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_run_2 )
   };
   const unsigned num_names = sizeof names / sizeof names[0];
 
-  RunFileIterList iter(&names[0], &names[num_names], OneStream);
+  RunFileIterList iter(&names[0], &names[num_names], MergeOneStream);
 
   boost::shared_ptr<StreamFileIterI> streamIter;
   boost::shared_ptr<ChunkFileIterI> chunkIter;
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE( test_run_3 )
   };
   const unsigned num_names = sizeof names / sizeof names[0];
 
-  RunFileIterList iter(&names[0], &names[num_names], NoChunking);
+  RunFileIterList iter(&names[0], &names[num_names], MergeNoChunking);
 
   boost::shared_ptr<StreamFileIterI> streamIter;
   boost::shared_ptr<ChunkFileIterI> chunkIter;
