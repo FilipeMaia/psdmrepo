@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <list>
+#include <boost/make_shared.hpp>
+#include <boost/thread/thread.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -26,8 +28,11 @@
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "pdsdata/xtc/XtcIterator.hh"
 #include "pdsdata/xtc/XtcFileIterator.hh"
+#include "XtcInput/RunFileIterList.h"
+#include "XtcInput/DgramQueue.h"
+#include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
-#include "XtcInput/XtcStreamMerger.h"
+#include "XtcInput/MergeMode.h"
 
 //
 //  XTC iterator class which dumps XTC-level info
@@ -111,7 +116,7 @@ private:
   // more command line options and arguments
   AppCmdOptBool               m_skipDamaged ;
   AppCmdOpt<double>           m_l1offset ;
-  AppCmdOptNamedValue<XtcInput::XtcStreamMerger::MergeMode> m_mergeMode ;
+  AppCmdOptNamedValue<XtcInput::MergeMode> m_mergeMode ;
   AppCmdArgList<std::string>  m_inputFiles ;
 
 };
@@ -123,15 +128,15 @@ O2O_Scanner::O2O_Scanner ( const std::string& appName )
   : AppBase( appName )
   , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::XtcStreamMerger::FileName )
+  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::MergeFileName )
   , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
 {
   addOption( m_skipDamaged ) ;
   addOption( m_l1offset ) ;
   addOption( m_mergeMode ) ;
-  m_mergeMode.add ( "one-stream", XtcInput::XtcStreamMerger::OneStream ) ;
-  m_mergeMode.add ( "no-chunking", XtcInput::XtcStreamMerger::NoChunking ) ;
-  m_mergeMode.add ( "file-name", XtcInput::XtcStreamMerger::FileName ) ;
+  m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;
+  m_mergeMode.add ( "no-chunking", XtcInput::MergeNoChunking ) ;
+  m_mergeMode.add ( "file-name", XtcInput::MergeFileName ) ;
   addArgument( m_inputFiles ) ;
 }
 
@@ -158,10 +163,17 @@ O2O_Scanner::runApp ()
     return 2 ;
   }
 
-  XtcInput::XtcStreamMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value(), m_l1offset.value());
+  // make datagram queue
+  XtcInput::DgramQueue dgqueue( 1 ) ;
+
+  // start datagram reading thread
+  boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, 128*1024*1024,
+          m_mergeMode.value(), false, m_l1offset.value() ) ) ;
+
+  // loop until there are events
   while ( true ) {
     
-    XtcInput::Dgram dg = iter.next();
+    XtcInput::Dgram dg = dgqueue.pop();
     if (dg.empty()) break;
     
     const Pds::Sequence& seq = dg.dg()->seq ;
@@ -178,6 +190,10 @@ O2O_Scanner::runApp ()
     myLevelIter iter(&(dg.dg()->xtc));
     iter.iterate();
   }
+
+  // stop reader thread if it is still running
+  readerThread.interrupt();
+  readerThread.join();
 
   return 0;
 }

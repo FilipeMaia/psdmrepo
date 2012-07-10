@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-07
+2012-07-09 Andy Salnikov
+- XtcInput::MergeMode moved to a separate file, update dependencies
+- o2o-scanner.cpp: use separate thread to read the data
+- terminate XTC reader thread after done reading data
+
 Tag: V00-18-06
 2012-07-06 Andy Salnikov
 - upgrading to pdsdata V03-07-10

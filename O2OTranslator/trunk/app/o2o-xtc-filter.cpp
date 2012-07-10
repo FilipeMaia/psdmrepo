@@ -92,7 +92,7 @@ O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
   : AppUtils::AppBase( appName )
   , m_calibIndexOpt( 'c', "calib-index", "number", "select event from given calib cycle, def: -1", -1 )
   , m_eventIndexOpt( 'e', "event-index", "number", "select event with given index, more than one possible" )
-  , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
+  , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 128M", 128*1048576ULL )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
   , m_outputName ( "output-xtc", "the name of the output XTC file" )
@@ -136,7 +136,7 @@ O2O_XTC_Filter::runApp ()
     files.push_back ( XtcInput::XtcFileName(*it) ) ;
   }
   boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, m_dgramsize.value(),
-      XtcInput::XtcStreamMerger::FileName, false, 0 ) ) ;
+      XtcInput::MergeFileName, false, 0 ) ) ;
 
   // seen transitions
   Pds::ClockTime transitions[Pds::TransitionId::NumberOf];
@@ -205,6 +205,10 @@ O2O_XTC_Filter::runApp ()
   }
 
   fclose(outstr);
+
+  // stop reader thread if it is still running
+  readerThread.interrupt();
+  readerThread.join();
 
   // return 0 on success, other values for error (like main())
   return 0 ;

@@ -48,7 +48,7 @@
 #include "XtcInput/DgramQueue.h"
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
-#include "XtcInput/XtcStreamMerger.h"
+#include "XtcInput/MergeMode.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -93,7 +93,7 @@ private:
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<double>           m_l1offset ;
-  AppCmdOptNamedValue<XtcInput::XtcStreamMerger::MergeMode> m_mergeMode ;
+  AppCmdOptNamedValue<XtcInput::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
@@ -120,7 +120,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
-                  XtcInput::XtcStreamMerger::FileName )
+                  XtcInput::MergeFileName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
@@ -141,9 +141,9 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_instrument ) ;
   addOption( m_l1offset ) ;
   addOption( m_mergeMode ) ;
-  m_mergeMode.add ( "one-stream", XtcInput::XtcStreamMerger::OneStream ) ;
-  m_mergeMode.add ( "no-chunking", XtcInput::XtcStreamMerger::NoChunking ) ;
-  m_mergeMode.add ( "file-name", XtcInput::XtcStreamMerger::FileName ) ;
+  m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;
+  m_mergeMode.add ( "no-chunking", XtcInput::MergeNoChunking ) ;
+  m_mergeMode.add ( "file-name", XtcInput::MergeFileName ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
@@ -310,6 +310,10 @@ O2O_Translate::runApp ()
         << "\n    user time: " << (u.ru_utime.tv_sec + u.ru_utime.tv_usec/1e6)
         << "\n    sys time : " << (u.ru_stime.tv_sec + u.ru_stime.tv_usec/1e6) ;
   }
+
+  // stop reader thread if it is still running
+  readerThread.interrupt();
+  readerThread.join();
 
   return 0 ;
 
