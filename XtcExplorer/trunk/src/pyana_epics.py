@@ -30,6 +30,7 @@ __version__ = "$Revision: 1095 $"
 #--------------------------------
 import sys
 import logging
+import time
 
 #-----------------------------
 # Imports for other modules --
@@ -185,10 +186,14 @@ class pyana_epics (object) :
                 logging.warning('EPICS PV %s does not exist', pv_name)
             else:
                 # only add to list if it changed since last event
-                if pv.value != self.prev_val[pv_name] :
-                    self.prev_val[pv_name] = pv.value
-
-                    self.pv_value[pv_name].append( pv.value )
+                try:
+                    pv_value = float(pv.value)
+                except ValueError:
+                    # Try parsing value as a date, e.g. '07/01/2011 05:20:31'
+                    pv_value = time.mktime(time.strptime(pv.value, "%m/%d/%Y %H:%M:%S"))
+                if pv_value != self.prev_val[pv_name] :
+                    self.prev_val[pv_name] = pv_value
+                    self.pv_value[pv_name].append( pv_value )
                     self.pv_shots[pv_name].append( self.n_shots )
                     self.pv_status[pv_name].append( pv.status )
                     self.pv_severity[pv_name].append( pv.severity )
