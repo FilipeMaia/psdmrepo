@@ -11,7 +11,7 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-05-00
+Tag: V00-05-01
 2012-07-09 Andy Salnikov
 - mergeMode() method also accepts "old" enum names
 
