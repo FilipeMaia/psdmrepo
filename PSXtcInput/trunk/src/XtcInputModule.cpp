@@ -34,7 +34,7 @@
 #include "XtcInput/XtcFileName.h"
 #include "XtcInput/XtcIterator.h"
 #include "XtcInput/XtcIterator.h"
-#include "XtcInput/XtcStreamMerger.h"
+#include "XtcInput/MergeMode.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -136,7 +136,7 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   // start reader thread
   unsigned dgSizeMB = config("dgSizeMB", 128);
   double l1offset = config("l1offset", 0.0);
-  XtcStreamMerger::MergeMode merge = XtcStreamMerger::mergeMode(configStr("mergeMode", "FileName"));
+  MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
   m_readerThread.reset( new boost::thread( DgramReader ( 
       files, *m_dgQueue, dgSizeMB*1048576, merge, false, l1offset) ) );
   

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2012-07-09 Andy Salnikov
+- MergeMode moved to a separate file, update dependencies
+
 Tag: V00-04-01
 2012-07-06 Andy Salnikov
 - changed default max datagram size to 128MB
