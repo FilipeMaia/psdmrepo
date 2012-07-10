@@ -11,7 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-July-2 jbarrera   V00-01-33
+2012-July-10 jbarrera   V00-01-34
+	- more psana fixes
+
+2012-July-8 jbarrera   V00-01-33
 	- various psana fixes
 	- added xtcscantest
 
