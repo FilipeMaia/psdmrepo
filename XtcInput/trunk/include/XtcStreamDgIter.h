@@ -17,6 +17,7 @@
 #include <list>
 #include <cstdio>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -25,6 +26,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "XtcInput/ChunkFileIterI.h"
 #include "XtcInput/Dgram.h"
 #include "XtcInput/XtcFileName.h"
 
@@ -66,7 +68,7 @@ public:
    *  @param[in]  maxDgSize Maximum allowed datagram size
    *  @param[in]  skipDamaged If true then all damaged datagrams will be skipped
    */
-  XtcStreamDgIter ( const std::list<XtcFileName>& files, size_t maxDgSize, bool skipDamaged ) ;
+  XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize, bool skipDamaged);
 
   // Destructor
   ~XtcStreamDgIter () ;
@@ -92,11 +94,11 @@ protected:
 
 private:
 
-  std::list<XtcFileName> m_files ;      ///< List of input files, ordered by chunk number
+  boost::shared_ptr<ChunkFileIterI> m_chunkIter;  ///< Iterator over chunk file names
   size_t m_maxDgSize ;                  ///< Maximum allowed datagram size
   bool m_skipDamaged ;                  ///< If true then skip damaged datagrams altogether
-  std::list<XtcFileName>::const_iterator m_iter ;  ///< Iterator inside m_files list
-  XtcChunkDgIter* m_dgiter ;            ///< Datagram iterator for current chunk
+  XtcFileName m_file;                   ///< Name of the current chunk
+  boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk
 
 };

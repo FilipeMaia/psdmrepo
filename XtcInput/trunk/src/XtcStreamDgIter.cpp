@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/make_shared.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -46,15 +47,14 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamDgIter::XtcStreamDgIter ( const std::list<XtcFileName>& files, size_t maxDgSize, bool skipDamaged )
-  : m_files(files)
+XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize, bool skipDamaged )
+  : m_chunkIter(chunkIter)
   , m_maxDgSize(maxDgSize)
   , m_skipDamaged(skipDamaged)
-  , m_iter()
-  , m_dgiter(0)
+  , m_file()
+  , m_dgiter()
   , m_count(0)
 {
-  m_iter = m_files.begin();
 }
 
 //--------------
@@ -62,7 +62,6 @@ XtcStreamDgIter::XtcStreamDgIter ( const std::list<XtcFileName>& files, size_t m
 //--------------
 XtcStreamDgIter::~XtcStreamDgIter ()
 {
-  delete m_dgiter ;
 }
 
 // read next datagram, return zero pointer after last file has been read,
@@ -71,15 +70,19 @@ Dgram::ptr
 XtcStreamDgIter::next()
 {
   Dgram::ptr dgram;
-  while ( not dgram.get() ) {
+  while (not dgram) {
 
-    if ( not m_dgiter ) {
+    if (not m_dgiter) {
 
-      if ( m_iter == m_files.end() ) break ;
+      // get next file name
+      m_file = m_chunkIter->next();
+
+      // if no more file then stop
+      if (m_file.path().empty()) break ;
 
       // open next xtc file if there is none open
-      MsgLog( logger, trace, "processing file: " << m_iter->path() ) ;
-      m_dgiter = new XtcChunkDgIter ( m_iter->path(), m_maxDgSize ) ;
+      MsgLog(logger, trace, "processing file: " << m_file) ;
+      m_dgiter = boost::make_shared<XtcChunkDgIter>(m_file.path(), m_maxDgSize, m_chunkIter->liveTimeout());
       m_count = 0 ;
     }
 
@@ -89,10 +92,7 @@ XtcStreamDgIter::next()
 
     // if failed to read go to next file
     if ( not dgram.get() ) {
-      delete m_dgiter ;
-      m_dgiter = 0 ;
-
-      ++ m_iter ;
+      m_dgiter.reset();
     } else if ( m_skipDamaged ) {
 
       // get rid of damaged datagrams
@@ -102,7 +102,7 @@ XtcStreamDgIter::next()
             << " level: " << int(xtc.src.level()) << '#' << Pds::Level::name(xtc.src.level())
             << " type: " << int(xtc.contains.id()) << '#' << Pds::TypeId::name(xtc.contains.id())
             << "/V" << xtc.contains.version()
-            << "\n    Skipping damaged event -- file: " << m_iter->path() << " event: " << m_count ) ;
+            << "\n    Skipping damaged event -- file: " << m_file << " event: " << m_count ) ;
         dgram.reset();
       }
 
@@ -117,8 +117,7 @@ XtcStreamDgIter::next()
 XtcFileName
 XtcStreamDgIter::chunkName() const
 {
-  if ( m_iter == m_files.end() ) return XtcFileName() ;
-  return *m_iter ;
+  return m_file ;
 }
 
 } // namespace XtcInput

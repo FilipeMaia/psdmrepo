@@ -20,11 +20,13 @@
 //-----------------
 #include <map>
 #include <iomanip>
+#include <boost/make_shared.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "XtcInput/ChunkFileIterList.h"
 #include "XtcInput/Exceptions.h"
 #include "pdsdata/xtc/TransitionId.hh"
 
@@ -47,61 +49,28 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
-                             size_t maxDgSize,
-                             MergeMode mode,
-                             bool skipDamaged,
-                             double l1OffsetSec )
+XtcStreamMerger::XtcStreamMerger ( const boost::shared_ptr<StreamFileIterI>& streamIter,
+        size_t maxDgSize, bool skipDamaged, double l1OffsetSec )
   : m_streams()
   , m_dgrams()
-  , m_mode(mode)
   , m_l1OffsetSec(int(l1OffsetSec))
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_outputQueue()
 {
-  // check that we have at least one input stream
-  if ( files.empty() ) {
-    throw XtcInput::ArgumentException( "XtcStreamMerger: file list is empty" ) ;
-  }
-
-  typedef std::map< unsigned, std::list<XtcFileName> > StreamMap ;
-  StreamMap streamMap ;
-
-  // separate files from different streams
-  unsigned stream = 0 ;
-  for ( std::list<XtcFileName>::const_iterator it = files.begin() ; it != files.end() ; ++ it ) {
-    if ( mode == FileName ) {
-      stream = it->stream() ;
-    } else if ( mode == NoChunking ) {
-      stream ++ ;
-    }
-    streamMap[stream].push_back( *it );
-    MsgLog( logger, trace, "XtcStreamMerger -- file: " << it->path() << " stream: " << stream ) ;
-  }
 
   // create all streams
-  m_streams.reserve( streamMap.size() ) ;
-  m_dgrams.reserve( streamMap.size() ) ;
-  for ( StreamMap::const_iterator it = streamMap.begin() ; it != streamMap.end() ; ++ it ) {
+  while (true) {
+    const boost::shared_ptr<ChunkFileIterI>& chunkFileIter = streamIter->next();
+    if (not chunkFileIter) break;
 
-    std::list<XtcFileName> streamFiles = it->second ;
+    MsgLog(logger, trace, "XtcStreamMerger -- stream: " << streamIter->stream());
 
-    WithMsgLog( logger, trace, out ) {
-      out << "XtcStreamMerger -- stream: " << it->first ;
-      for ( std::list<XtcFileName>::const_iterator it = streamFiles.begin() ; it != streamFiles.end() ; ++ it ) {
-        out << "\n             " << it->path() ;
-      }
-    }
-
-    if ( mode == FileName ) {
-      // order according to chunk number
-      streamFiles.sort() ;
-    }
     // create new stream
-    XtcStreamDgIter* stream = new XtcStreamDgIter( streamFiles, maxDgSize, skipDamaged ) ;
-    m_streams.push_back( stream ) ;
+    const boost::shared_ptr<XtcStreamDgIter>& stream = 
+        boost::make_shared<XtcStreamDgIter>(chunkFileIter, maxDgSize, skipDamaged ) ;
+    m_streams.push_back(stream) ;
     Dgram dg(stream->next(), stream->chunkName());
-    if (not dg.empty()) updateDgramTime( *dg.dg() );
+    if (not dg.empty()) updateDgramTime(*dg.dg());
     m_dgrams.push_back( dg ) ;
 
   }
@@ -113,27 +82,8 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
 //--------------
 XtcStreamMerger::~XtcStreamMerger ()
 {
-  for ( std::vector<XtcStreamDgIter*>::const_iterator it = m_streams.begin() ; it != m_streams.end() ; ++ it ) {
-    delete *it ;
-  }
 }
 
-
-/// Make merge mode from string
-XtcStreamMerger::MergeMode 
-XtcStreamMerger::mergeMode(const std::string& str)
-{
-  if (str == "FileName") {
-    return FileName;
-  } else if (str == "OneStream") {
-    return OneStream;
-  } else if (str == "NoChunking") {
-    return NoChunking;
-  } else {
-    throw InvalidMergeMode(str);
-  }
-
-}
 
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
@@ -221,24 +171,6 @@ XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const
     // an assignment operator
     dgram.seq = Pds::Sequence(newTime, dgram.seq.stamp());
   }
-}
-
-std::ostream&
-operator<<(std::ostream& out, XtcStreamMerger::MergeMode mode)
-{
-  const char* str = "*ERROR*";
-  switch(mode) {
-  case XtcStreamMerger::OneStream:
-    str = "OneStream";
-    break;
-  case XtcStreamMerger::NoChunking:
-    str = "NoChunking";
-    break;
-  case XtcStreamMerger::FileName:
-    str = "FileName";
-    break;
-  }
-  return out << str;
 }
 
 } // namespace XtcInput

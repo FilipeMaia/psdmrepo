@@ -23,8 +23,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "XtcInput/MergeMode.h"
 #include "XtcInput/XtcFileName.h"
-#include "XtcInput/XtcStreamMerger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -58,7 +58,7 @@ public:
   DgramReader ( const FileList& files,
                 DgramQueue& queue,
                 size_t maxDgSize,
-                XtcStreamMerger::MergeMode mode,
+                MergeMode mode,
                 bool skipDamaged,
                 double l1OffsetSec = 0 ) ;
 
@@ -76,7 +76,7 @@ private:
   FileList m_files ;
   DgramQueue& m_queue ;
   size_t m_maxDgSize ;
-  XtcStreamMerger::MergeMode m_mode ;
+  MergeMode m_mode ;
   bool m_skipDamaged ;
   double m_l1OffsetSec ;
 

@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2012-07-09 Andy Salnikov
+- a bit of redesign, split iterators into iterators over datagrams
+  and iterators over files
+- iteration over files has two implementation, first is based on static 
+  list of input files as before, second uses database as the source of 
+  live data; second implementation is not tested yet
+
 Tag: V00-04-01
 2012-06-22 Andy Salnikov
 - forgot to update tests to use new class names

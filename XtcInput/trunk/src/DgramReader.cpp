@@ -19,13 +19,16 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <boost/make_shared.hpp>
+#include <boost/thread/thread.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/DgramQueue.h"
-#include "XtcInput/XtcStreamMerger.h"
+#include "XtcInput/RunFileIterList.h"
+#include "XtcInput/XtcMergeIterator.h"
 #include "pdsdata/xtc/Dgram.hh"
 
 //-----------------------------------------------------------------------
@@ -44,7 +47,7 @@ namespace XtcInput {
 DgramReader::DgramReader ( const FileList& files,
                            DgramQueue& queue,
                            size_t maxDgSize,
-                           XtcStreamMerger::MergeMode mode,
+                           MergeMode mode,
                            bool skipDamaged,
                            double l1OffsetSec )
   : m_files( files )
@@ -66,34 +69,38 @@ DgramReader::~DgramReader ()
 // this is the "run" method used by the Boost.thread
 void
 DgramReader::operator() ()
-{
-  try {
+try {
 
-    XtcStreamMerger iter(m_files, m_maxDgSize, m_mode, m_skipDamaged, m_l1OffsetSec);
-    Dgram dg;
-    while ( true ) {
-      
-      dg = iter.next();
-      
-      // stop if no datagram
-      if (dg.empty()) break;
+  boost::shared_ptr<RunFileIterI> fileIter =
+      boost::make_shared<RunFileIterList>(m_files.begin(), m_files.end(), m_mode);
+  XtcMergeIterator iter(fileIter, m_maxDgSize, m_skipDamaged, m_l1OffsetSec);
+  Dgram dg;
+  while ( not boost::this_thread::interruption_requested() ) {
 
-      // move it to the queue
-      m_queue.push ( dg ) ;
+    dg = iter.next();
 
-    }
+    // stop if no datagram
+    if (dg.empty()) break;
 
-    // tell all we are done
-    m_queue.push ( Dgram() ) ;
-
-  } catch ( std::exception& e ) {
-
-    MsgLogRoot( error, "exception caught while reading datagram: " << e.what() ) ;
-
-    // TODO: there is no way yet to stop gracefully, will just abort
-    throw;
+    // move it to the queue
+    m_queue.push ( dg ) ;
 
   }
+
+  // tell all we are done
+  m_queue.push ( Dgram() ) ;
+
+} catch (const boost::thread_interrupted& ex) {
+
+  // we just stop happily
+  m_queue.push ( Dgram() ) ;
+
+} catch ( std::exception& e ) {
+
+  MsgLogRoot( error, "exception caught while reading datagram: " << e.what() ) ;
+  // TODO: there is no way yet to stop gracefully, will just abort
+  throw;
+
 }
 
 
