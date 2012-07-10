@@ -399,6 +399,9 @@ class  pyana_image ( object ) :
                 print "No frame image from ", addr, " in shot#", self.n_shots
                 continue
 
+            # save original reference so we can tell whether we really need to make a copy later on.
+            original_image_reference = image
+
             # image is a numpy array (pixels)
             if addr.find("Fccd")>0:
                 # convert to 16-bit integer
@@ -409,10 +412,6 @@ class  pyana_image ( object ) :
             dim = np.shape( image )
             if len( dim )!= 2 :
                 print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
-
-            # make a copy so we don't segfault
-            if self.psana:
-                image = image + 0.0
 
             # ---------------------------------------------------------------------------------------
             # Subtract dark image
@@ -499,6 +498,9 @@ class  pyana_image ( object ) :
 
             # ----------- Event Image -----------
             if "image" in self.quantities:
+                if self.psana and (image is original_image_reference):
+                    # make a copy so we don't segfault if underlying data is deallocated
+                    image = image + 0.0
                 self.data[addr].image   = image            
                 self.data[addr].vrange = (self.plot_vmin,self.plot_vmax)
                 
