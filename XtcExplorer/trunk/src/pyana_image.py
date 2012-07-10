@@ -410,6 +410,9 @@ class  pyana_image ( object ) :
             if len( dim )!= 2 :
                 print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
 
+            # make a copy so we don't segfault
+            if self.psana:
+                image = image + 0.0
 
             # ---------------------------------------------------------------------------------------
             # Subtract dark image
