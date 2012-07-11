@@ -38,6 +38,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pypdsdata import xtc
+from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import ScanData
@@ -147,7 +148,7 @@ class pyana_scan (object) :
 
         # control.ConfigV1 element
         if self.psana:
-            ctrl_config = env.getConfig("Psana::ControlData::ConfigV1", "");
+            ctrl_config = env.getConfig(ControlData.ConfigV1, "");
         else:
             ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
 
@@ -211,7 +212,7 @@ class pyana_scan (object) :
             """
             if scalar.find("Ipimb")>=0 :
                 if self.psana:
-                    ipmFex = evt.get("Psana::Lusi::IpmFex", scalar )
+                    ipmFex = evt.get(Lusi.IpmFex, scalar )
                 else:
                     ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
                 if ipmFex :
@@ -221,7 +222,7 @@ class pyana_scan (object) :
                     
             elif scalar.find("EBeam")>= 0 :
                 if self.psana:
-                    ebeam = evt.get("Psana::Bld::BldDataEBeam", "");
+                    ebeam = evt.get(Bld.BldDataEBeam, "");
                 else:
                     ebeam = evt.getEBeam()
                 if ebeam:
@@ -234,7 +235,7 @@ class pyana_scan (object) :
 
             elif scalar.find("FEEGasDetEnergy")>= 0 :
                 if self.psana:
-                    energy = evt.get("Psana::Bld::BldDataFEEGasDetEnergy", "");
+                    energy = evt.get(Bld.BldDataFEEGasDetEnergy, "");
                     if energy:
                         fee_energy_array = []
                         fee_energy_array.append(energy.f_11_ENRC())
@@ -254,7 +255,7 @@ class pyana_scan (object) :
 
             elif scalar.find("PhaseCavity")>= 0 :
                 if self.psana:
-                    pc = evt.get("Psana::Bld::BldDataPhaseCavity", "");
+                    pc = evt.get(Bld.BldDataPhaseCavity, "");
                 else:
                     pc = evt.getPhaseCavity()
                 if pc:
@@ -268,7 +269,7 @@ class pyana_scan (object) :
 
             elif ( scalar.find("IPM")>= 0 or scalar.find("DIO")>= 0 ):
                 if self.psana:
-                    ipm = evt.get("Psana::Bld::BldDataIpimb", scalar )
+                    ipm = evt.get(Bld.BldDataIpimb, scalar )
                 else:
                     ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar )
                 if ipm:

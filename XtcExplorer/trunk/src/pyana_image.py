@@ -20,12 +20,14 @@ import numpy as np
 # Imports for other modules --
 #-----------------------------
 from pypdsdata.xtc import TypeId
+from psddl_python.devicetypes import *
 from pyana.calib import CalibFileFinder
 
 #-----------------------------
 # Imports for local modules --
 #-----------------------------
-from cspad     import CsPad
+#from cspad     import CsPad
+import cspad
 
 from utilities import Threshold
 from utilities import PyanaOptions
@@ -205,33 +207,33 @@ class  pyana_image ( object ) :
         logging.info( "pyana_image.beginjob()" )
 
         if self.psana:
-            self.configtypes = { 'Cspad2x2'  : "Psana::CsPad2x2::Config",
-                                 'Cspad'     : "Psana::CsPad::Config",
-                                 'Opal1000'  : "Psana::Opal1k::Config",
-                                 'Opal2000'  : "Psana::Opal1k::Config",
-                                 'Opal4000'  : "Psana::Opal1k::Config",
-                                 'Opal8000'  : "Psana::Opal1k::Config",
-                                 'TM6740'    : "Psana::Pulnix::TM6740Config",
-                                 'pnCCD'     : "Psana::PNCCD::Config",
-                                 'Princeton' : "Psana::Princeton::Config",
-                                 'Fccd'      : "Psana::FCCD::FccdConfig",
-                                 'PIM'       : "Psana::Lusi::PimImageConfig",
-                                 'Timepix'   : "Psana::Timepix::Config",
-                                 'Fli'       : "Psana::Fli::Config"
+            self.configtypes = { 'Cspad2x2'  : CsPad2x2.Config,
+                                 'Cspad'     : CsPad.Config,
+                                 'Opal1000'  : Opal1k.Config,
+                                 'Opal2000'  : Opal1k.Config,
+                                 'Opal4000'  : Opal1k.Config,
+                                 'Opal8000'  : Opal1k.Config,
+                                 'TM6740'    : Pulnix.TM6740Config,
+                                 'pnCCD'     : PNCCD.Config,
+                                 'Princeton' : Princeton.Config,
+                                 'Fccd'      : FCCD.FccdConfig,
+                                 'PIM'       : Lusi.PimImageConfig,
+                                 'Timepix'   : Timepix.Config,
+                                 'Fli'       : Fli.Config
                                  }
 
-            self.datatypes = {'Cspad2x2'      : "Psana::CsPad2x2::Element",
-                              'Cspad'         : "Psana::CsPad::Data",
-                              'TM6740'        : "Psana::Camera::Frame",
-                              'Opal1000'      : "Psana::Camera::Frame",
-                              'Opal2000'      : "Psana::Camera::Frame",
-                              'Opal4000'      : "Psana::Camera::Frame",
-                              'Opal8000'      : "Psana::Camera::Frame",
-                              'Fccd'          : "Psana::Camera::Frame",
-                              'pnCCD'         : "Psana::PNCCD::Frame",
-                              'Princeton'     : "Psana::Princeton::Frame",
-                              'Timepix'       : "Psana::Timepix::Data",
-                              'Fli'           : "Psana::Fli::Frame"
+            self.datatypes = {'Cspad2x2'      : CsPad2x2.Element,
+                              'Cspad'         : CsPad.Data,
+                              'TM6740'        : Camera.Frame,
+                              'Opal1000'      : Camera.Frame,
+                              'Opal2000'      : Camera.Frame,
+                              'Opal4000'      : Camera.Frame,
+                              'Opal8000'      : Camera.Frame,
+                              'Fccd'          : Camera.Frame,
+                              'pnCCD'         : PNCCD.Frame,
+                              'Princeton'     : Princeton.Frame,
+                              'Timepix'       : Timepix.Data,
+                              'Fli'           : Fli.Frame
                               }
         else:
             self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
@@ -304,7 +306,7 @@ class  pyana_image ( object ) :
                             sections.append(section)
                 else:
                     sections = self.config.sections()
-                self.cspad[addr] = CsPad(sections, path=self.calib_path)
+                self.cspad[addr] = cspad.CsPad(sections, path=self.calib_path)
                 
             elif addr.find('Cspad')>=0:
                 quads = range(4)
@@ -319,7 +321,7 @@ class  pyana_image ( object ) :
                         sections.append(section)
                 else:
                     sections = map(self.config.sections, quads)
-                self.cspad[addr] = CsPad(sections, path=self.calib_path)
+                self.cspad[addr] = cspad.CsPad(sections, path=self.calib_path)
                 self.cspad[addr].cmmode_mode = self.cmmode_mode
                 self.cspad[addr].cmmode_thr = self.cmmode_thr
                 if self.small_tilt :

@@ -6,8 +6,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from   pypdsdata import xtc
-from   pypdsdata import encoder
+from pypdsdata import encoder
+from pypdsdata import xtc
+from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import EncoderData
@@ -79,7 +80,7 @@ class  pyana_encoder ( object ) :
             self.data[source] = EncoderData( source ) 
 
             if self.psana:
-                config = env.getConfig("Psana::Encoder::Config", source)
+                config = env.getConfig(Encoder.Config, source)
             else:
                 config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
 
@@ -129,7 +130,7 @@ class  pyana_encoder ( object ) :
         for source in self.sources :
 
             if self.psana:
-                encoder = evt.get("Psana::Encoder::Data", source )
+                encoder = evt.get(Encoder.Data, source )
             else:
                 encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
             if encoder:

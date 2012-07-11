@@ -6,9 +6,11 @@
 import numpy as np
 import logging
 
+from pypdsdata import xtc
+from psddl_python.devicetypes import *
+
 from utilities import PyanaOptions 
 from utilities import BldData
-from pypdsdata import xtc
 
 
 # analysis class declaration
@@ -137,7 +139,7 @@ class  pyana_bld ( object ) :
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
             if self.psana:
-                ebeam = evt.get("Psana::Bld::BldDataEBeam", "");
+                ebeam = evt.get(Bld.BldDataEBeam, "");
             else:
                 ebeam = evt.getEBeam()
             self.hadEB = True
@@ -179,7 +181,7 @@ class  pyana_bld ( object ) :
         if self.do_GasDet :
             # returns array of 4 numbers obtained from the bld.BldDataFEEGasDetEnergy object
             if self.psana:
-                fee_energy_array = evt.get("Psana::Bld::BldDataFEEGasDetEnergy", "");
+                fee_energy_array = evt.get(Bld.BldDataFEEGasDetEnergy, "");
             else:
                 fee_energy_array = evt.getFeeGasDet()
 
@@ -197,7 +199,7 @@ class  pyana_bld ( object ) :
         if self.do_PC:
             # PhaseCavity object (of type bld.BldDataPhaseCavity)
             if self.psana:
-                pc = evt.get("Psana::Bld::BldDataPhaseCavity", "");
+                pc = evt.get(Bld.BldDataPhaseCavity, "");
             else:
                 pc = evt.getPhaseCavity()
             if pc :
