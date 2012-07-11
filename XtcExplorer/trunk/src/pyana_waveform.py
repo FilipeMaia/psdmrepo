@@ -246,9 +246,17 @@ class pyana_waveform (object) :
             if acqData :
                 if self.ts[label] is None:
                     if self.psana:
-                        nbrSamplesInSeg = acqData.data(channel).nbrSamplesInSeg()
+                        num_timestamps = self.wf_window[1] - self.wf_window[0]
+                        """
+                        for i, d in  enumerate(acqData.data_list()):
+                            print "    ", i, d.timestamp()[0].pos()
+                            print "    ", i, d.timestamp()[0].timeStampLo()
+                            print "    ", i, d.timestamp()[0].timeStampHi()
+                            print "    ", i, d.timestamp()[0].value()
+                        """
+                        # XXX this step size does not always agree with pyana
                         step = self.span / 1.0e5
-                        timestamps = [ i * step for i in range(nbrSamplesInSeg) ]
+                        timestamps = [ i * step for i in range(num_timestamps) ]
                         self.ts[label] = np.array(timestamps)
                     else:
                         self.ts[label] = acqData.timestamps()[self.wf_window[0]:self.wf_window[1]] * 1.0e9
