@@ -339,7 +339,7 @@ class XtcScanner ( object ) :
 
                 elif xtc.contains.id() == TypeId.Type.Id_pnCCDconfig :
                     data = xtc.payload()
-                    # Psana::PNCCD::ConfigV1 has neither numRows() nor numChannels()
+                    # PNCCD.ConfigV1 has neither numRows() nor numChannels()
                     if not "V1" in str(type(data)):
                         worthknowing = "%dx%d" % (data.numRows(),data.numChannels())
 
