@@ -838,10 +838,7 @@ Do you want to proceed?
     
             self.configuration += "\nmodules ="
             for module in modules_to_run :
-                if pxana == "psana":
-                    self.configuration += " py:"
-                else:
-                    self.configuration += " "
+                self.configuration += " "
                 self.configuration += module
             self.configuration += "\n\n"
 
