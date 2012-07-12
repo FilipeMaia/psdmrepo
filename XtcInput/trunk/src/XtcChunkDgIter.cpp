@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <boost/filesystem.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -35,6 +36,8 @@
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace fs = boost::filesystem;
 
 namespace {
 
@@ -58,11 +61,29 @@ XtcChunkDgIter::XtcChunkDgIter (const std::string& path, size_t maxDgramSize, un
   , m_maxDgramSize(maxDgramSize)
   , m_liveTimeout(liveTimeout)
 {
-  m_fd = open( m_path.c_str(), O_RDONLY|O_LARGEFILE);
+  fs::path fpath = m_path;
+  m_fd = open(fpath.string().c_str(), O_RDONLY|O_LARGEFILE);
   if (m_fd < 0) {
-    MsgLog( logger, error, "failed to open input XTC file: " << m_path ) ;
-    throw FileOpenException(m_path) ;
+    // try to open after dropping inprogress extension
+    if (fpath.extension() == ".inprogress") {
+      fpath.replace_extension();
+      m_fd = open(fpath.string().c_str(), O_RDONLY|O_LARGEFILE);
+      if (m_fd >= 0) m_path = fpath.string();
+    }
   }
+
+  if (m_fd < 0) {
+    MsgLog( logger, error, "failed to open input XTC file: " << m_path );
+    throw FileOpenException(ERR_LOC, m_path) ;
+  } else {
+    MsgLog( logger, trace, "opened input XTC file: " << m_path );
+  }
+
+  // if reading closed file timeout must be set to 0
+  if (fpath.extension() != ".inprogress") {
+    m_liveTimeout = 0;
+  }
+
 }
 
 //--------------
@@ -85,7 +106,7 @@ XtcChunkDgIter::next()
   if (nread == 0) {
     return Dgram::ptr();
   } else if (nread < 0) {
-    throw XTCReadException(m_path);
+    throw XTCReadException(ERR_LOC, m_path);
   } else if (nread != ssize_t(headerSize)) {
     MsgLog(logger, error, "EOF while reading datagram header from file: " << m_path);
     return Dgram::ptr();
@@ -101,7 +122,7 @@ XtcChunkDgIter::next()
   uint32_t payloadSize = header.xtc.sizeofPayload();
   MsgLog(logger, debug, "payload size = " << payloadSize);
   if (payloadSize > (m_maxDgramSize-headerSize)) {
-    throw XTCSizeLimitException(m_path, payloadSize+headerSize, m_maxDgramSize);
+    throw XTCSizeLimitException(ERR_LOC, m_path, payloadSize+headerSize, m_maxDgramSize);
   }
 
   Pds::Dgram* dg = (Pds::Dgram*)new char[payloadSize+headerSize];
@@ -111,7 +132,7 @@ XtcChunkDgIter::next()
   MsgLog(logger, debug, "reading payload, size = " << payloadSize);
   nread = this-> read(dg->xtc.payload(), payloadSize);
   if (nread < 0) {
-    throw XTCReadException(m_path);
+    throw XTCReadException(ERR_LOC, m_path);
   } else if (nread != ssize_t(payloadSize)) {
     MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_path);
     return Dgram::ptr();
@@ -136,7 +157,7 @@ XtcChunkDgIter::read(char* buf, size_t size)
       if (t0 and (time(0) - t0) > m_liveTimeout) {
         // in live mode we reached timeout
         MsgLog(logger, debug, "Timed out while waiting for data in live mode for file: " << m_path);
-        throw XTCLiveTimeout(m_path, m_liveTimeout);
+        throw XTCLiveTimeout(ERR_LOC, m_path, m_liveTimeout);
       } else if (t0) {
         // in live mode check if we hit real EOF
         if (this->eof()) {

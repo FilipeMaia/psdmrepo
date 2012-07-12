@@ -18,11 +18,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include "MsgLogger/MsgLogger.h"
+#include <boost/filesystem.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "MsgLogger/MsgLogger.h"
 #include "RdbMySQL/Query.h"
 #include "RdbMySQL/Result.h"
 #include "RdbMySQL/Row.h"
@@ -31,6 +32,8 @@
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace fs = boost::filesystem;
 
 namespace {
 
@@ -47,12 +50,10 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-LiveFilesDB::LiveFilesDB (const std::string& connStr, const std::string& table,
-    const std::string& dssDir, const std::string& anaDir)
+LiveFilesDB::LiveFilesDB (const std::string& connStr, const std::string& table, const std::string& dir)
   : m_conn(connStr)
   , m_table(table)
-  , m_dssDir(dssDir)
-  , m_anaDir(anaDir)
+  , m_dir(dir)
 {
 }
 
@@ -90,21 +91,20 @@ LiveFilesDB::files(unsigned expId, unsigned run)
     const RdbMySQL::Row& row = iter.row();
 
     unsigned stream = 0, chunk = 0;
-    std::string dirpath;
+    std::string dssPath;
     row.at(0, stream);
     row.at(1, chunk);
-    row.at(2, dirpath);
+    row.at(2, dssPath);
 
-    if (dirpath.empty()) {
-      XtcFileName fname("", expId, run, stream, chunk);
+    if (dssPath.empty()) {
+      XtcFileName fname(m_dir, expId, run, stream, chunk);
       MsgLog(logger, debug, "LiveFilesDB::files - found file " << fname.path());
       result.push_back(fname);
     } else{
       // replace DSS directory name with exported directory
-      if (dirpath.compare(0, m_dssDir.size(), m_dssDir) == 0) {
-        dirpath.replace(0, m_dssDir.size(), m_anaDir);
-      }
-      XtcFileName fname(dirpath);
+      fs::path path(m_dir);
+      path /= fs::path(dssPath).filename();
+      XtcFileName fname(path.string());
       MsgLog(logger, debug, "LiveFilesDB::files - found file " << fname.path());
       result.push_back(fname);
     }

@@ -49,8 +49,8 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamMerger::XtcStreamMerger ( const boost::shared_ptr<StreamFileIterI>& streamIter,
-        size_t maxDgSize, bool skipDamaged, double l1OffsetSec )
+XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
+        size_t maxDgSize, double l1OffsetSec)
   : m_streams()
   , m_dgrams()
   , m_l1OffsetSec(int(l1OffsetSec))
@@ -67,7 +67,7 @@ XtcStreamMerger::XtcStreamMerger ( const boost::shared_ptr<StreamFileIterI>& str
 
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
-        boost::make_shared<XtcStreamDgIter>(chunkFileIter, maxDgSize, skipDamaged ) ;
+        boost::make_shared<XtcStreamDgIter>(chunkFileIter, maxDgSize) ;
     m_streams.push_back(stream) ;
     Dgram dg(stream->next(), stream->chunkName());
     if (not dg.empty()) updateDgramTime(*dg.dg());

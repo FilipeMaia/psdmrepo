@@ -46,7 +46,7 @@ mergeMode(const std::string& str)
   } else if (str == "MergeNoChunking" or str == "NoChunking") {
     return MergeNoChunking;
   } else {
-    throw InvalidMergeMode(str);
+    throw InvalidMergeMode(ERR_LOC, str);
   }
 
 }

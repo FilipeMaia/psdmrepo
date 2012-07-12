@@ -73,6 +73,8 @@ StreamFileIterLive::~StreamFileIterLive ()
 boost::shared_ptr<ChunkFileIterI>
 StreamFileIterLive::next()
 {
+  boost::shared_ptr<ChunkFileIterI> next;
+
   if (not m_initialized) {
 
     // first time around get the list of streams from database
@@ -80,6 +82,10 @@ StreamFileIterLive::next()
     m_initialized = true;
 
     std::vector<XtcFileName> files = m_filesdb->files(m_expNum, m_run);
+    if (files.empty()) {
+      MsgLog(logger, error, "No files in database for run #" << m_run);
+      return next;
+    }
 
     if (not files.empty()) {
 
@@ -88,15 +94,26 @@ StreamFileIterLive::next()
       bool found = false;
       while (not found) {
         for (std::vector<XtcFileName>::const_iterator it = files.begin(); it != files.end(); ++ it) {
-          if (access(it->path().c_str(), R_OK) == 0) {
-            MsgLog(logger, debug, "Found file on disk: " << it->path());
+
+          const std::string path = it->path();
+          const std::string inprog_path = path + ".inprogress";
+
+          if (access(inprog_path.c_str(), R_OK) == 0) {
+            MsgLog(logger, debug, "Found file on disk: " << inprog_path);
+            found = true;
+            break;
+          } else if (access(path.c_str(), R_OK) == 0) {
+            MsgLog(logger, debug, "Found file on disk: " << path);
             found = true;
             break;
           }
         }
         if (std::time(0) > t0 + m_liveTimeout) break;
         // sleep for one second and repeat
-        if (not found) sleep(1);
+        if (not found) {
+          MsgLog(logger, debug, "Wait 1 sec for files to appear on disk");
+          sleep(1);
+        }
       }
 
       if (found) {
@@ -110,7 +127,7 @@ StreamFileIterLive::next()
         }
 
       } else {
-        MsgLog(logger, debug, "No files appeared on disk after timeout");
+        MsgLog(logger, error, "No files appeared on disk after timeout");
       }
 
     }
@@ -118,7 +135,6 @@ StreamFileIterLive::next()
   }
 
 
-  boost::shared_ptr<ChunkFileIterI> next;
   if (not m_streams.empty()) {
     Streams::iterator s = m_streams.begin();
     m_stream = *s;

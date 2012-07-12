@@ -61,6 +61,9 @@ public:
   // Destructor
   ~XtcFileName () {}
 
+  // returns true if file name is not defined
+  bool empty() const { return m_path.empty(); }
+
   // get full name
   const std::string& path() const { return m_path ; }
 

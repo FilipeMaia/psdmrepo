@@ -60,11 +60,9 @@ public:
    *
    *  @param[in] connStr  Connection string.
    *  @param[in] table    Table name
-   *  @param[in] dssDir   Directory name on DSS nodes
-   *  @param[in] anaDir   Directory name on analysis nodes
+   *  @param[in] dir      Directory to look for live files
    */
-  LiveFilesDB(const std::string& connStr, const std::string& table,
-      const std::string& dssDir, const std::string& anaDir);
+  LiveFilesDB(const std::string& connStr, const std::string& table, const std::string& dir);
 
   // Destructor
   ~LiveFilesDB () ;
@@ -83,8 +81,7 @@ private:
 
   RdbMySQL::Conn m_conn;      ///< Connection to mysql database
   const std::string m_table;  ///< Name of the table containing file list
-  const std::string m_dssDir; ///< Directory name on DSS nodes
-  const std::string m_anaDir; ///< Directory name on analysis nodes
+  const std::string m_dir;    ///< Directory to look for live files
 
 };
 

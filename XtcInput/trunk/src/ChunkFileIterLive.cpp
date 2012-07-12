@@ -84,28 +84,40 @@ ChunkFileIterLive::next()
     }
   }
 
-  if (not fname.path().empty()) {
+  if (not fname.empty()) {
 
     MsgLog(logger, debug, "Found file in database: " << fname.path());
 
+    const std::string path = fname.path();
+    const std::string inprog_path = path + ".inprogress";
+
+    fname = XtcFileName();
+
     // wait until at appears on disk
     std::time_t t0 = std::time(0);
-    bool found = false;
-    while (not found) {
-      if (access(fname.path().c_str(), R_OK) == 0) {
+    while (true) {
+
+      // check .inprogress file first, regular after
+      if (access(inprog_path.c_str(), R_OK) == 0) {
+        fname = XtcFileName(inprog_path);
+      } else if (access(path.c_str(), R_OK) == 0) {
+        fname = XtcFileName(path);
+      }
+      if (not fname.empty()) {
         MsgLog(logger, debug, "Found file on disk: " << fname.path());
-        found = true;
         break;
       }
       if (std::time(0) > t0 + m_liveTimeout) break;
       // sleep for one second and repeat
-      if (not found) sleep(1);
+      if (fname.empty()) {
+        MsgLog(logger, debug, "Wait 1 sec for file to appear on disk: " << path);
+        sleep(1);
+      }
     }
 
     // still not found?
-    if (not found) {
-      MsgLog(logger, warning, "File " << fname.path() << " did not appear on disk after timeout");
-      fname = XtcFileName();
+    if (fname.empty()) {
+      MsgLog(logger, error, "File " << fname.path() << " did not appear on disk after timeout");
     }
 
   }

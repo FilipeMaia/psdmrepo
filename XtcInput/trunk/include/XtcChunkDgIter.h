@@ -52,12 +52,12 @@ public:
   /**
    *  @build Create iterator instance
    *
-   *  Constructor for iterator which reads datagrams from single XTC file. File must
-   *  exist when iterator is instantiated otherwise exception will be thrown. If
-   *  live timeout is non-zero then it assumes that file can grow while we are
-   *  reading it. It also assumes specific file naming convention, that is live
-   *  files have name `dir/basename.ext.extlive` (typically `extlive` is "inprogrees")
-   *  and when file is closed it is renamed into `dir/basename.ext`.
+   *  Constructor for iterator which reads datagrams from single XTC file.
+   *  It tries to open specified path first, if it fails and path has
+   *  extension ".inprogress" then it removes extension and tries to
+   *  open file again. If that fails the exception will be thrown.
+   *  If file has an extension ".inprogress" and live timeout is non-zero
+   *  then it assumes that file can grow while we are reading it.
    *
    *  @param[in]  path         Path name for XTC file
    *  @param[in]  maxDgramSize Maximum datagram size, if datagram in file exceeds this size
@@ -74,6 +74,12 @@ public:
 
   /**
    *  @brief Returns next datagram, zero on EOF, throws exceptions for errors
+   *
+   *  If reading ".inprogress" file stops at EOF and there is no
+   *  new data for "live timeout" seconds then XTCLiveTimeout exception
+   *  is generated.
+   *  File is assumed to be closed and does not grow any more when
+   *  it is renamed and ".inprogess" extension is dropped.
    *
    *  @return Shared pointer to datagram object
    *

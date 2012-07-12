@@ -47,10 +47,9 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize, bool skipDamaged )
+XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize)
   : m_chunkIter(chunkIter)
   , m_maxDgSize(maxDgSize)
-  , m_skipDamaged(skipDamaged)
   , m_file()
   , m_dgiter()
   , m_count(0)
@@ -93,19 +92,6 @@ XtcStreamDgIter::next()
     // if failed to read go to next file
     if ( not dgram.get() ) {
       m_dgiter.reset();
-    } else if ( m_skipDamaged ) {
-
-      // get rid of damaged datagrams
-      const Pds::Xtc& xtc = dgram->xtc ;
-      if ( xtc.damage.value() ) {
-        MsgLog( logger, warning, "XTC damage: " << std::hex << xtc.damage.value() << std::dec
-            << " level: " << int(xtc.src.level()) << '#' << Pds::Level::name(xtc.src.level())
-            << " type: " << int(xtc.contains.id()) << '#' << Pds::TypeId::name(xtc.contains.id())
-            << "/V" << xtc.contains.version()
-            << "\n    Skipping damaged event -- file: " << m_file << " event: " << m_count ) ;
-        dgram.reset();
-      }
-
     }
 
   }

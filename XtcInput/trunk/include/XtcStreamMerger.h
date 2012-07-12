@@ -63,11 +63,10 @@ public:
    *  @param[in]  streamIter  Iterator for input files
    *  @param[in]  maxDgSize Maximum allowed datagram size
    *  @param[in]  mode      Merge mode
-   *  @param[in]  skipDamaged If true then all damaged datagrams will be skipped
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-      size_t maxDgSize, bool skipDamaged, double l1OffsetSec = 0 ) ;
+      size_t maxDgSize, double l1OffsetSec = 0 ) ;
 
   // Destructor
   ~XtcStreamMerger () ;

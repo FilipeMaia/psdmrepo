@@ -14,7 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <list>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -24,7 +24,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/MergeMode.h"
-#include "XtcInput/XtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -52,15 +51,22 @@ class DgramQueue ;
 class DgramReader {
 public:
 
-  typedef std::list<XtcFileName> FileList ;
+  typedef std::vector<std::string> FileList ;
 
   // Default constructor
-  DgramReader ( const FileList& files,
-                DgramQueue& queue,
-                size_t maxDgSize,
-                MergeMode mode,
-                bool skipDamaged,
-                double l1OffsetSec = 0 ) ;
+  template <typename Iter>
+  DgramReader(Iter begin, Iter end, DgramQueue& queue, size_t maxDgSize, MergeMode mode,
+      const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
+      double l1OffsetSec = 0 )
+    : m_files(begin, end)
+    , m_queue( queue )
+    , m_maxDgSize( maxDgSize )
+    , m_mode( mode )
+    , m_liveDbConn(liveDbConn)
+    , m_liveTable(liveTable)
+    , m_liveTimeout(liveTimeout)
+    , m_l1OffsetSec(l1OffsetSec)
+  {}
 
   // Destructor
   ~DgramReader () ;
@@ -77,7 +83,9 @@ private:
   DgramQueue& m_queue ;
   size_t m_maxDgSize ;
   MergeMode m_mode ;
-  bool m_skipDamaged ;
+  std::string m_liveDbConn;
+  std::string m_liveTable;
+  unsigned m_liveTimeout;
   double m_l1OffsetSec ;
 
 };

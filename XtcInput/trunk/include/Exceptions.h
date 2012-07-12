@@ -20,7 +20,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include <stdexcept>
+#include "ErrSvc/Issue.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -47,19 +47,19 @@
 
 namespace XtcInput {
 
-class Exception : public std::runtime_error {
+class Exception : public ErrSvc::Issue {
 public:
 
   // Constructor
-  Exception ( const std::string& className, const std::string& what ) ;
+  Exception(const ErrSvc::Context& ctx, const std::string& className, const std::string& what);
 
 };
 
 class ErrnoException : public Exception {
 public:
 
-    ErrnoException(const std::string& className, const std::string& what)
-    : Exception( className, what + ": " + strerror(errno) ) {}
+    ErrnoException(const ErrSvc::Context& ctx, const std::string& className, const std::string& what)
+    : Exception(ctx, className, what + ": " + strerror(errno)) {}
 
 };
 
@@ -68,41 +68,41 @@ public:
 class ArgumentException : public Exception {
 public:
 
-  ArgumentException( const std::string& msg )
-    : Exception( "ArgumentException", msg ) {}
+  ArgumentException(const ErrSvc::Context& ctx, const std::string& msg)
+    : Exception(ctx, "ArgumentException", msg) {}
 
 };
 
 class FileOpenException : public ErrnoException {
 public:
 
-  FileOpenException( const std::string& fileName )
-    : ErrnoException( "FileOpenException", "failed to open file "+fileName ) {}
+  FileOpenException(const ErrSvc::Context& ctx, const std::string& fileName)
+    : ErrnoException(ctx, "FileOpenException", "failed to open file "+fileName) {}
 
 };
 
 class XTCLiveTimeout : public Exception {
 public:
 
-  XTCLiveTimeout(const std::string& fileName, int timeout)
-    : Exception( "XTCLiveTimeout", "Timeout (" + boost::lexical_cast<std::string>(timeout) +
-        "seconds) while reading live data from file "+fileName) {}
+  XTCLiveTimeout(const ErrSvc::Context& ctx, const std::string& fileName, int timeout)
+    : Exception(ctx, "XTCLiveTimeout", "Timeout (" + boost::lexical_cast<std::string>(timeout) +
+        " seconds) while reading live data from file "+fileName) {}
 
 };
 
 class XTCReadException : public ErrnoException {
 public:
 
-  XTCReadException(const std::string& fileName)
-    : ErrnoException( "XTCReadException", "failed to read XTC file "+fileName ) {}
+  XTCReadException(const ErrSvc::Context& ctx, const std::string& fileName)
+    : ErrnoException(ctx, "XTCReadException", "failed to read XTC file "+fileName ) {}
 
 };
 
 class XTCSizeLimitException : public Exception {
 public:
 
-    XTCSizeLimitException(const std::string& fileName, size_t dgSize, size_t maxSize)
-    : Exception( "XTCSizeLimitException", "datagram too large reading XTC file "+fileName+
+    XTCSizeLimitException(const ErrSvc::Context& ctx, const std::string& fileName, size_t dgSize, size_t maxSize)
+    : Exception(ctx, "XTCSizeLimitException", "datagram too large reading XTC file "+fileName+
             ": datagram size="+boost::lexical_cast<std::string>(dgSize) +
             ", max size="+boost::lexical_cast<std::string>(maxSize) ) {}
 
@@ -112,8 +112,8 @@ public:
 class XTCGenException : public Exception {
 public:
 
-  XTCGenException( const std::string& msg )
-    : Exception( "XTCGenException", msg ) {}
+  XTCGenException(const ErrSvc::Context& ctx, const std::string& msg)
+    : Exception(ctx, "XTCGenException", msg ) {}
 
 };
 
@@ -121,8 +121,35 @@ public:
 class InvalidMergeMode : public Exception {
 public:
 
-  InvalidMergeMode( const std::string& str )
-    : Exception( "InvalidMergeMode", "invalid merge mode string: " + str ) {}
+  InvalidMergeMode(const ErrSvc::Context& ctx, const std::string& str)
+    : Exception(ctx, "InvalidMergeMode", "invalid merge mode string: " + str ) {}
+
+};
+
+/// Error generated when dataset directory is not found
+class DatasetSpecError : public Exception {
+public:
+
+  DatasetSpecError(const ErrSvc::Context& ctx, const std::string& str)
+    : Exception(ctx, "DatasetSpecError", "invalid dataset specification: " + str) {}
+
+};
+
+/// Error generated when dataset directory is not found
+class DatasetDirError : public Exception {
+public:
+
+  DatasetDirError(const ErrSvc::Context& ctx, const std::string& str)
+    : Exception(ctx, "DatasetDirError", "dataset directory is missing: " + str) {}
+
+};
+
+/// Error generated when multiple live directories are specified
+class LiveDirError : public Exception {
+public:
+
+  LiveDirError(const ErrSvc::Context& ctx)
+    : Exception(ctx, "LiveDirError", "only one live data directory is supported") {}
 
 };
 

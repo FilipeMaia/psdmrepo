@@ -65,17 +65,17 @@ public:
    *  @param[in] liveTimeout Specifies timeout in second when reading live data
    *  @param[in] dbConnStr Database connection string
    *  @param[in] table     Database table name
+   *  @param[in] dir       Directory to look for live files
    */
   template <typename Iter>
   RunFileIterLive (Iter begin, Iter end, unsigned expNum, unsigned liveTimeout,
-      const std::string& dbConnStr, const std::string& table,
-      const std::string& dssDir, const std::string& anaDir)
+      const std::string& dbConnStr, const std::string& table, const std::string& dir)
     : RunFileIterI()
     , m_runs(begin, end)
     , m_expNum(expNum)
     , m_liveTimeout(liveTimeout)
     , m_run(0)
-    , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dssDir, anaDir))
+    , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dir))
   {
   }
 
