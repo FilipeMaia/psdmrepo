@@ -124,21 +124,20 @@ XtcInputModule::beginJob(Event& evt, Env& env)
     throw EmptyFileList(ERR_LOC);
   }
   
-  std::list<XtcInput::XtcFileName> files ;
-  for (std::list<std::string>::const_iterator i = fileNames.begin(); i != fileNames.end(); ++i) {
-    files.push_back( XtcInput::XtcFileName(*i) ) ;
-  }
   WithMsgLog(name(), debug, str) {
     str << "Input files: ";
-    std::copy(files.begin(), files.end(), std::ostream_iterator<XtcInput::XtcFileName>(str, " "));
+    std::copy(fileNames.begin(), fileNames.end(), std::ostream_iterator<std::string>(str, " "));
   }
   
   // start reader thread
-  unsigned dgSizeMB = config("dgSizeMB", 128);
+  unsigned dgSizeMB = config("dgSizeMB", 128U);
+  std::string liveDbConn = configStr("liveDbConn", "");
+  std::string liveTable = configStr("liveTable", "file");
+  unsigned liveTimeout = config("liveTimeout", 120U);
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
-  m_readerThread.reset( new boost::thread( DgramReader ( 
-      files, *m_dgQueue, dgSizeMB*1048576, merge, false, l1offset) ) );
+  m_readerThread.reset( new boost::thread( DgramReader ( fileNames.begin(), fileNames.end(), 
+      *m_dgQueue, dgSizeMB*1048576, merge, liveDbConn, liveTable, liveTimeout, l1offset) ) );
   
   // try to read first event and see if it is a Configure transition
   XtcInput::Dgram dg(m_dgQueue->pop());
