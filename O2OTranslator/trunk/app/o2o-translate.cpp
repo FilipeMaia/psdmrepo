@@ -102,6 +102,9 @@ private:
   AppCmdOpt<std::string>      m_runType ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
   AppCmdOptSize               m_splitSize ;
+  AppCmdOpt<std::string>      m_liveDbConn;
+  AppCmdOpt<std::string>      m_liveTable;
+  AppCmdOpt<unsigned>         m_liveTimeout;
   AppCmdArgList<std::string>  m_eventData ;
 };
 
@@ -129,6 +132,9 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
   , m_splitSize  ( 'z', "split-size",   "size",     "max. size of output files. def: 10G", 10*1073741824ULL )
+  , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
+  , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
+  , m_liveTimeout(      "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
   , m_eventData  ( "event-file",   "file name(s) with XTC event data" )
 {
   setOptionsFile( m_optionsFile ) ;
@@ -154,6 +160,9 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
   addOption( m_splitMode ) ;
   addOption( m_splitSize ) ;
+  addOption( m_liveDbConn ) ;
+  addOption( m_liveTable ) ;
+  addOption( m_liveTimeout ) ;
   addArgument( m_eventData ) ;
 }
 
@@ -216,12 +225,9 @@ O2O_Translate::runApp ()
   XtcInput::DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
   // start datagram reading thread
-  std::list<XtcInput::XtcFileName> files ;
-  for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
-    files.push_back ( XtcInput::XtcFileName(*it) ) ;
-  }
-  boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, m_dgramsize.value(),
-          m_mergeMode.value(), false, m_l1offset.value() ) ) ;
+  boost::thread readerThread( XtcInput::DgramReader ( m_eventData.begin(), m_eventData.end(), 
+      dgqueue, m_dgramsize.value(), m_mergeMode.value(), m_liveDbConn.value(), m_liveTable.value(),
+      m_liveTimeout.value(), m_l1offset.value() ) ) ;
 
   uint64_t count = 0 ;
 

@@ -117,6 +117,9 @@ private:
   AppCmdOptBool               m_skipDamaged ;
   AppCmdOpt<double>           m_l1offset ;
   AppCmdOptNamedValue<XtcInput::MergeMode> m_mergeMode ;
+  AppCmdOpt<std::string>      m_liveDbConn;
+  AppCmdOpt<std::string>      m_liveTable;
+  AppCmdOpt<unsigned>         m_liveTimeout;
   AppCmdArgList<std::string>  m_inputFiles ;
 
 };
@@ -129,6 +132,9 @@ O2O_Scanner::O2O_Scanner ( const std::string& appName )
   , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::MergeFileName )
+  , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
+  , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
+  , m_liveTimeout(      "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
   , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
 {
   addOption( m_skipDamaged ) ;
@@ -137,6 +143,9 @@ O2O_Scanner::O2O_Scanner ( const std::string& appName )
   m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;
   m_mergeMode.add ( "no-chunking", XtcInput::MergeNoChunking ) ;
   m_mergeMode.add ( "file-name", XtcInput::MergeFileName ) ;
+  addOption( m_liveDbConn ) ;
+  addOption( m_liveTable ) ;
+  addOption( m_liveTimeout ) ;
   addArgument( m_inputFiles ) ;
 }
 
@@ -153,12 +162,7 @@ O2O_Scanner::~O2O_Scanner ()
 int
 O2O_Scanner::runApp ()
 {
-  std::list<XtcInput::XtcFileName> files ;
-  for (AppCmdArgList<std::string>::const_iterator i = m_inputFiles.begin(); i!=m_inputFiles.end(); ++i) {
-    files.push_back( XtcInput::XtcFileName(*i) ) ;
-  }
-
-  if (files.empty()) {
+  if (m_inputFiles.empty()) {
     MsgLogRoot(error, "no input data files specified" ) ;
     return 2 ;
   }
@@ -167,8 +171,8 @@ O2O_Scanner::runApp ()
   XtcInput::DgramQueue dgqueue( 1 ) ;
 
   // start datagram reading thread
-  boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, 128*1024*1024,
-          m_mergeMode.value(), false, m_l1offset.value() ) ) ;
+  boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue, 128*1024*1024,
+          m_mergeMode.value(), m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), m_l1offset.value() ) ) ;
 
   // loop until there are events
   while ( true ) {

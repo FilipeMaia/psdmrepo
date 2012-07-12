@@ -77,6 +77,9 @@ private:
   AppCmdOptList<int>          m_eventIndexOpt ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOpt<unsigned int>     m_dgramQSize ;
+  AppCmdOpt<std::string>      m_liveDbConn;
+  AppCmdOpt<std::string>      m_liveTable;
+  AppCmdOpt<unsigned>         m_liveTimeout;
   AppCmdArgList<std::string>  m_inputFiles ;
   AppCmdArg<std::string>      m_outputName ;
 
@@ -94,6 +97,9 @@ O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
   , m_eventIndexOpt( 'e', "event-index", "number", "select event with given index, more than one possible" )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 128M", 128*1048576ULL )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
+  , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
+  , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
+  , m_liveTimeout(      "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
   , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
   , m_outputName ( "output-xtc", "the name of the output XTC file" )
 {
@@ -101,6 +107,9 @@ O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
   addOption( m_eventIndexOpt ) ;
   addOption( m_dgramsize ) ;
   addOption( m_dgramQSize ) ;
+  addOption( m_liveDbConn ) ;
+  addOption( m_liveTable ) ;
+  addOption( m_liveTimeout ) ;
   addArgument( m_inputFiles ) ;
   addArgument( m_outputName ) ;
 }
@@ -131,12 +140,8 @@ O2O_XTC_Filter::runApp ()
   XtcInput::DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
   // start datagram reading thread
-  std::list<XtcInput::XtcFileName> files ;
-  for ( AppCmdArgList<std::string>::const_iterator it = m_inputFiles.begin() ; it != m_inputFiles.end() ; ++ it ) {
-    files.push_back ( XtcInput::XtcFileName(*it) ) ;
-  }
-  boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, m_dgramsize.value(),
-      XtcInput::MergeFileName, false, 0 ) ) ;
+  boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue,
+      m_dgramsize.value(), XtcInput::MergeFileName, m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), 0 ) ) ;
 
   // seen transitions
   Pds::ClockTime transitions[Pds::TransitionId::NumberOf];
