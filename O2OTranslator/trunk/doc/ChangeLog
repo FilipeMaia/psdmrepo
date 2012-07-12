@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-09
+2012-07-12 Andy Salnikov
+- factor-out code that instantiates all converters out of O2OHdf5Writer 
+  class and into new O2OCvtFactory utility class.
+
 Tag: V00-18-08
 2012-07-12 Andy Salnikov
 - DgramReader constructor changed, updating dependencies
