@@ -92,8 +92,7 @@ protected:
 private:
 
   unsigned m_chunkSizeMB;   ///< Maximum chunk size in MB
-  //std::string m_nameFmt;    ///< Format as for boost::format, %1 is expNum, %2 is run, %3 is stream, %4 is chunk
-  std::string m_nameFmt;    ///< Format as for boost::format, %1 is expNum, %2 is run
+  std::string m_nameFmt;    ///< Format as for boost::format, %1 is expNum, %2 is run, %3 is stream, %4 is chunk
   std::string m_dirName;    ///< Directory where to store output
   bool m_keepEpics;         ///< Keep EPICS data in datagrams which are otherwise discarded
   int m_expNum;             ///< Experiment number
