@@ -25,7 +25,7 @@
   TString ftype("png"); // png, pdf, eps, gif, svg
   TString fname("histos");
 
-  c1 = new TCanvas("c1","",0,0,500,500);
+  c1 = new TCanvas("c1","",0,0,600,800);
   c1->Divide(2,3);
 
   c1->cd(1); hNpeaks->Draw();
@@ -38,7 +38,7 @@
   gPad -> Update();
   c1->Print(fname+"_p1."+ftype);
 
-  c2 = new TCanvas("c2","",500,0,500,500);
+  c2 = new TCanvas("c2","",600,0,600,800);
   c2->Divide(2,3);
 
   c2->cd(1); peakTuple->Draw("quad>>hQuad");

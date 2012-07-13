@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2012-07-12 Mikhail S. Dubrovin
+- fix error in hot-pixel mask defenition when the file name is omited in parameters
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       data/proc.C
+
 Tag: V00-00-07
 2012-07-06 Mikhail S. Dubrovin
 - add PnccdImageProducer which adds pnccd image in the event

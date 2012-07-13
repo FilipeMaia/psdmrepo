@@ -161,10 +161,9 @@ protected:
 
     void printInputParameters();
     void printEventId(Event& evt);
-    void printTimeStamp(Event& evt);
+    void printTimeStamp(Event& evt, std::string comment="");
 
     void resetForEventProcessing();
-    void resetMaskOfNoisyPix();
     void resetStatArrays();
     void resetSignalArrays();
 

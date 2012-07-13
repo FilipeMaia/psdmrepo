@@ -52,7 +52,7 @@ CSPadMaskV1::CSPadMaskV1 (mask_t value)
 
 CSPadMaskV1::CSPadMaskV1( const std::string& fname )
 {
-  MsgLog(":print()",  info, "Read mask from file: " << fname.c_str() );
+  MsgLog("CSPadMaskV1:",  info, "Read mask from file: " << fname.c_str() );
   // Open file
 
   std::ifstream in(fname.c_str());
@@ -83,13 +83,13 @@ CSPadMaskV1::CSPadMaskV1( const std::string& fname )
 
 void CSPadMaskV1::fillArrFromVector( const std::vector<mask_t> v_parameters )
 {
-  cout << "\nCSPadMaskV1:\n";
+  //cout << "\nCSPadMaskV1:\n";
     if (v_parameters.size() != SIZE_OF_ARRAY) {
-        WithMsgLog("CSPadMaskV1", error, str) {
-        str << "Expected number of parameters is " << SIZE_OF_ARRAY ;
-        str << ", read from file " << v_parameters.size() ;
-        str << ": check the file.\n" ;
-        }       
+        MsgLog("CSPadMaskV1", error, 
+        "Expected number of parameters is " << SIZE_OF_ARRAY 
+        << ", read from file " << v_parameters.size()
+        << ": check the file."
+	)
         const std::string msg = "The data size available in file for CSPad mask is wrong.";
         MsgLogRoot(error, msg);
         throw std::runtime_error(msg);
@@ -105,7 +105,7 @@ void CSPadMaskV1::fillArrFromVector( const std::vector<mask_t> v_parameters )
 
 void CSPadMaskV1::print()
 {
-  MsgLog(":print()",  info, "Print part of the data for test purpose only.");
+  MsgLog("CSPadMaskV1::print()",  info, "Print part of the data for test purpose only.");
     for (int iq = 0; iq != Quads; ++ iq) {
       cout << "Quad: " << iq << "\n"; 
       for (int is = 0; is != Sectors; ++ is) {

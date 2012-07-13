@@ -298,6 +298,7 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
 
   ++ m_count_selected;
   doOperationsForSelectedEvent(evt);
+  if( m_print_bits & 1024 ) printTimeStamp(evt,std::string(" selected"));
 
   if (m_sel_mode == SELECTION_OFF) return;
 }
@@ -432,14 +433,6 @@ CSPadArrPeakFinder::resetStatArrays()
 {
   std::fill_n(&m_stat           [0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0 );
   std::fill_n(&m_frac_noisy_evts[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
-}
-
-//--------------------
-/// Reset the dynamic mask of noisy pixels 
-void
-CSPadArrPeakFinder::resetMaskOfNoisyPix()
-{
-  std::fill_n(&m_mask[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 1);
 }
 
 //--------------------
@@ -954,14 +947,15 @@ CSPadArrPeakFinder::printEventId(Event& evt)
 //--------------------
 
 void 
-CSPadArrPeakFinder::printTimeStamp(Event& evt)
+CSPadArrPeakFinder::printTimeStamp(Event& evt, std::string comment)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
 
     MsgLog( name(), info, " Run="   <<  eventId->run()
                        << " Event=" <<  m_count 
-                       << " Time="  <<  eventId->time() );
+                       << " Time="  <<  eventId->time()
+	               << comment.c_str() );
   }
 }
 
@@ -970,17 +964,18 @@ CSPadArrPeakFinder::printTimeStamp(Event& evt)
 void
 CSPadArrPeakFinder::getMaskFromFile()
 {
-  if (m_maskFile_inp.c_str() != "") {
+  if (m_maskFile_inp != std::string("")) {
+     MsgLog( name(), info, " Use initial hot pixel mask from file:" << m_maskFile_inp.c_str() ); 
      m_mask_initial = new ImgAlgos::CSPadMaskV1(m_maskFile_inp);
-
      CSPadMaskV1::mask_t* mask_initial = m_mask_initial->getMask();
      int16_t* mask = &m_mask[0][0][0][0];
      for (int i=0; i<SIZE_OF_ARRAY; i++) mask[i] = mask_initial[i];
   }
   else
   {
+     MsgLog( name(), info, " Use default initial hot pixel mask made of units." ); 
      m_mask_initial = new ImgAlgos::CSPadMaskV1(1);
-     resetMaskOfNoisyPix();
+     std::fill_n(&m_mask[0][0][0][0], (int)SIZE_OF_ARRAY, 1);
   }
 }
 
