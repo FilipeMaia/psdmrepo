@@ -23,9 +23,19 @@ header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
 try {
+    // Mandatory parameter
+    //
+    $id = NeoCaptarUtils::get_param_GET('id');
 
-    $id            = NeoCaptarUtils::get_param_GET('id');
-    $documentation = NeoCaptarUtils::get_param_GET('documentation',true,true);
+    // Optional parameters
+    //
+    $required    = false;
+    $allow_empty = true;
+
+    $documentation              = NeoCaptarUtils::get_param_GET('documentation',         $required, $allow_empty);
+    $cable_type_name            = NeoCaptarUtils::get_param_GET('cable',                 $required, $allow_empty);
+    $origin_connector_name      = NeoCaptarUtils::get_param_GET('origin_connector',      $required, $allow_empty);
+    $destination_connector_name = NeoCaptarUtils::get_param_GET('destination_connector', $required, $allow_empty);
 
 	// Check for proper authorization and get the current UID
 	//
@@ -36,9 +46,42 @@ try {
 	$neocaptar->begin();
 
     $pinlist = $neocaptar->find_dict_pinlist_by_id($id);
-    if( !is_null( $pinlist ))
-        $pinlist->update($documentation);
-
+    if( !is_null( $pinlist )) {
+        if( !is_null($documentation)) {
+            $documentation = trim($documentation);
+            $pinlist->update_documentation($documentation);
+        }
+        if( !is_null($cable_type_name)) {
+            $cable_type_name = trim($cable_type_name);
+            if( $cable_type_name == '' ) {
+                $pinlist->update_cable();
+            } else {
+                $cable = $neocaptar->find_dict_cable_by_name($cable_type_name);
+                if( is_null($cable)) NeoCaptarUtils::report_error("no such cable type: '{$cable_type_name}'");
+                $pinlist->update_cable($cable->id());
+            }
+        }
+        if( !is_null($origin_connector_name)) {
+            $origin_connector_name = trim($origin_connector_name);
+            if( $origin_connector_name == '' ) {
+                $pinlist->update_origin_connector();
+            } else {
+                $connector = $neocaptar->find_dict_connector_by_name($origin_connector_name);
+                if( is_null($connector)) NeoCaptarUtils::report_error("no such connector: '{$origin_connector_name}'");
+                $pinlist->update_origin_connector($connector->id());
+            }
+        }
+        if( !is_null($destination_connector_name)) {
+            $destination_connector_name = trim($destination_connector_name);
+            if( $destination_connector_name == '' ) {
+                $pinlist->update_destination_connector();
+            } else {
+                $connector = $neocaptar->find_dict_connector_by_name($destination_connector_name);
+                if( is_null($connector)) NeoCaptarUtils::report_error("no such connector: '{$destination_connector_name}'");
+                $pinlist->update_destination_connector($connector->id());
+            }
+        }
+    }
     $pinlists = NeoCaptarUtils::dict_pinlists2array($neocaptar);
 
 	$authdb->commit();

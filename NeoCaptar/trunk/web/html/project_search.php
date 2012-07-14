@@ -46,6 +46,9 @@ try {
     $owner = NeoCaptarUtils::get_param_GET('owner',$required,$allow_empty);
     if( $owner == '' ) $owner = null;
 
+    $coowner = NeoCaptarUtils::get_param_GET('coowner',$required,$allow_empty);
+    if( $coowner == '' ) $coowner = null;
+
     $job = NeoCaptarUtils::get_param_GET('job',$required,$allow_empty);
     if( $job == '' ) $job = null;
 
@@ -76,6 +79,9 @@ try {
         array_push($project2array, NeoCaptarUtils::project2array($project));
     } else if(!is_null($prefix)) {
         foreach( $neocaptar->find_projects_by_jobnumber_prefix($prefix) as $p )
+            array_push($project2array, NeoCaptarUtils::project2array($p));
+    } else if(!is_null($coowner)) {
+        foreach( $neocaptar->projects_by_coowner($coowner) as $p )
             array_push($project2array, NeoCaptarUtils::project2array($p));
     } else {
         foreach( $neocaptar->projects($title,$owner,$begin,$end) as $p )

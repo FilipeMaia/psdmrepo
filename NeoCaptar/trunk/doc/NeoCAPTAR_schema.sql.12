@@ -86,31 +86,9 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`DICT_PINLIST` (
   `created_time`  BIGINT UNSIGNED NOT NULL ,
   `created_uid`   VARCHAR(32)     NOT NULL ,
 
-  `cable_id`                 INT NULL ,
-  `origin_connector_id`      INT NULL ,
-  `destination_connector_id` INT NULL ,
-
   PRIMARY KEY (`id`) ,
 
-  UNIQUE KEY `name` (`name`) ,
-
-  CONSTRAINT `DICT_DICT_PINLIST_FK_1`
-    FOREIGN KEY (`cable_id` )
-    REFERENCES `NEOCAPTAR`.`DICT_CABLE` (`id` )
-    ON DELETE SET NULL
-    ON UPDATE SET NULL ,
-
-  CONSTRAINT `DICT_DICT_PINLIST_FK_2`
-    FOREIGN KEY (`origin_connector_id` )
-    REFERENCES `NEOCAPTAR`.`DICT_CONNECTOR` (`id` )
-    ON DELETE SET NULL
-    ON UPDATE SET NULL ,
-
-  CONSTRAINT `DICT_DICT_PINLIST_FK_3`
-    FOREIGN KEY (`destination_connector_id` )
-    REFERENCES `NEOCAPTAR`.`DICT_CONNECTOR` (`id` )
-    ON DELETE SET NULL
-    ON UPDATE SET NULL
+  UNIQUE KEY `name` (`name`)
 )
 ENGINE = InnoDB;
 
@@ -342,7 +320,7 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLE` (
 
   `device`               VARCHAR(255) NOT NULL ,
   `device_location`      VARCHAR(3)   NOT NULL ,
-  `device_region`        VARCHAR(4)   NOT NULL ,
+  `device_region`        VARCHAR(3)   NOT NULL ,
   `device_component`     VARCHAR(3)   NOT NULL ,
   `device_counter`       VARCHAR(2)   NOT NULL ,
   `device_suffix`        VARCHAR(3)   NOT NULL ,

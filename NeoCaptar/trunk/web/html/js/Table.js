@@ -526,3 +526,13 @@ function Button_HTML(name,attr) {
     var html = '<button '+Attributes_HTML(attr)+'>'+name+'</button>';
     return html;
 }
+function Select_HTML(options, selected, attr) {
+    var html = '<select '+Attributes_HTML(attr)+'>';
+    for( var i in options ) {
+        var opt = options[i];
+        var selected_opt = opt == selected ? ' selected="selected" ' : '';
+        html += '<option name="'+opt+'" '+selected_opt+'>'+opt+'</option>';
+    }
+    html += '</select>';
+    return html;
+}

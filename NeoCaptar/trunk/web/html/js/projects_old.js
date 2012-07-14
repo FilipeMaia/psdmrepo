@@ -794,36 +794,19 @@ function p_appl_projects() {
 
 		case 'cable_type':
 
-            var cable_type                 = cable.read_cable_type           !== undefined ? cable.read_cable_type          () : cable.cable_type;
-            var cable_origin_conntype      = cable.origin.read_conntype      !== undefined ? cable.origin.read_conntype     () : cable.origin.conntype;
-            var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
-
-            if( value !== undefined ) cable_type = value;
-
-            var connectors = ((cable_origin_conntype == '') && (cable_destination_conntype == ''))
-                ? dict.cables()
-                : dict.cables_reverse(cable_origin_conntype != '' ? cable_origin_conntype : cable_destination_conntype);
-
             html = '<select '+is_disabled_attr+' >';
-            if( cable_type == '' ) {
-                html += '<option selected="selected" value="'+cable_type+'">'+cable_type+'</option>';
-                for( var t in connectors )
-                    html += '<option value="'+t+'">'+t+'</option>';
-            } else {
-                if( cable_type != '' )
-                    html += '<option value=""></option>';
-                if( dict.cable_is_not_known( cable_type ))
-                    html += '<option selected="selected" value="'+cable_type+'">'+cable_type+'</option>';
-                for( var t in connectors )
-                    html += '<option'+
-                            (t == cable_type ? ' selected="selected"' : '')+
-                            ' value="'+t+'">'+t+'</option>';
-            }
+            if( dict.cable_is_not_known( cable.cable_type ))
+                html += '<option selected="selected" value="'+cable.cable_type+'">'+cable.cable_type+'</option>';
+			for( var t in dict.cables())
+                html += '<option'+
+                        (t == cable.cable_type ? ' selected="selected"' : '')+
+                        ' value="'+t+'">'+t+'</option>';
+						html += '<option value="'+t+'">'+t+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
                 if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,'cable_type',false);
+                    that.cable_property_edit(pidx,cidx,prop,false);
                     that.cable_property_edit(pidx,cidx,'origin_conntype',false);
                     that.cable_property_edit(pidx,cidx,'destination_conntype',false);
                 } else {
@@ -846,14 +829,8 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                var pinlist_name = $(this).val();
-                if((pinlist_name != '') && !dict.pinlist_is_not_known(pinlist_name)) {
-                    var pinlist = dict.pinlists()[pinlist_name];
-                    if(pinlist.cable != '') {
-                        that.cable_property_edit(pidx,cidx,'cable_type',false, pinlist.cable);
-                        if(pinlist.origin_connector      != '') that.cable_property_edit(pidx, cidx, 'origin_conntype',      false, pinlist.origin_connector);
-                        if(pinlist.destination_connector != '') that.cable_property_edit(pidx, cidx, 'destination_conntype', false, pinlist.destination_connector);
-                    }
+                if( $(this).val() == '') {
+                    that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.origin.read_pinlist = read_select;
@@ -891,43 +868,26 @@ function p_appl_projects() {
 
 		case 'origin_conntype':
 
-            var cable_type            = cable.read_cable_type      !== undefined ? cable.read_cable_type     () : cable.cable_type;
-            var cable_origin_conntype = cable.origin.read_conntype !== undefined ? cable.origin.read_conntype() : cable.origin.conntype;
-
-            if( value !== undefined ) cable_origin_conntype = value;
-
-            var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
+            var cable_type = cable.read_cable_type();
 
             html = '<select '+is_disabled_attr+' >';
-            if( cable_origin_conntype == '' ) {
-                html += '<option selected="selected" value=""></option>';
-                for( var t in connectors)
-                    html += '<option value="'+t+'">'+t+'</option>';
-            } else {
-                html += '<option value=""></option>';
-                if(dict.connector_is_not_known_reverse(cable_origin_conntype))
-                    html += '<option selected="selected" value="'+cable_origin_conntype+'">'+cable_origin_conntype+'</option>';
-                for( var t in connectors )
+            if(dict.connector_is_not_known( cable_type, cable.origin.conntype))
+                html += '<option selected="selected" value="'+cable.origin.conntype+'">'+cable.origin.conntype+'</option>';
+            if(	!dict.cable_is_not_known( cable_type ))
+                for( var t in dict.connectors( cable_type ))
                     html += '<option'+
-                            (t == cable_origin_conntype ? ' selected="selected"' : '')+
+                            (t == cable.origin.conntype ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
-            }
             html += '</select>';
-            base.html(html);            
+            base.html(html);
             base.find('select').change(function() {
                 if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,'cable_type',false);
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'cable_type',false);
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',false);
+                    that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.origin.read_conntype = read_select;
 			break;
-
+	
 		case 'origin_loc':
 
             html = '<select class="origin_name_component" '+is_disabled_attr+' >';
@@ -1024,41 +984,24 @@ function p_appl_projects() {
 
 		case 'destination_conntype':
 
-            var cable_type                 = cable.read_cable_type           !== undefined ? cable.read_cable_type          () : cable.cable_type;
-            var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
-
-            if( value !== undefined ) cable_destination_conntype = value;
-
-            var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
+            var cable_type = cable.read_cable_type();
 
             html = '<select '+is_disabled_attr+' >';
-            if( cable_destination_conntype == '' ) {
-                html += '<option selected="selected" value=""></option>';
-                for( var t in connectors)
-                    html += '<option value="'+t+'">'+t+'</option>';
-            } else {
-                html += '<option value=""></option>';
-                if(dict.connector_is_not_known_reverse(cable_destination_conntype))
-                    html += '<option selected="selected" value="'+cable_destination_conntype+'">'+cable_destination_conntype+'</option>';
-                for( var t in connectors )
+            if(dict.connector_is_not_known( cable_type, cable.destination.conntype))
+                html += '<option selected="selected" value="'+cable.destination.conntype+'">'+cable.destination.conntype+'</option>';
+            if(	!dict.cable_is_not_known( cable_type ))
+                for( var t in dict.connectors( cable_type ))
                     html += '<option'+
-                            (t == cable_destination_conntype ? ' selected="selected"' : '')+
+                            (t == cable.destination.conntype ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
-            }
             html += '</select>';
-            base.html(html);            
+            base.html(html);
             base.find('select').change(function() {
                 if( $(this).val() == '' ) {
-                    that.cable_property_edit(pidx,cidx,'cable_type',false);
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',false);
-                } else {
-                    that.cable_property_edit(pidx,cidx,'cable_type',false);
-                    that.cable_property_edit(pidx,cidx,'origin_conntype',false);
-                    that.cable_property_edit(pidx,cidx,'destination_conntype',false);
+                    that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
-            cable.destination.read_conntype = read_select;
+			cable.destination.read_conntype = read_select;
 			break;
 
 		case 'destination_loc':
@@ -1186,19 +1129,13 @@ function p_appl_projects() {
         var required_field_html = '<span style="color:red; font-size:110%; font-weight:bold;"> * </span>';
         var html =
 '<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #c0c0c0;">'+
-'<div style="float:left; margin-bottom: 20px; margin-right: 40px; color: #900; width: 820px;">'+
+'<div style="float:left; margin-bottom: 20px; margin-right: 40px; color: #900; width: 640px;">'+
 '  Please, note that choices for some cable parameters found on this page are loaded from a dictionary.'+
 '  Regular users of this software are not allowed to modify the dictionary neither assign arbitrary values'+
 '  to those parameters. This has been done to enforce the corresponding SLAC CAPTOR and PCDS naming convention for cables'+
 '  Please, contact administrators of the Cable Management Software'+
 '  to request dictionary extensions if you feel the dictionary is not complete, or if you need'+
-'  any non-standard names. Consider the following tips:'+
-'  <ul>'+
-'    <li>if you know the pinlist you need then start from it. This will preset cable type and connectors on both ends</li>'+
-'    <li>if you know the cable type then start from it. This will limit choices of connectors on both ends</li>'+
-'    <li>if you know the connector (and any end) then start from it. This will limit choices of cable types</li>'+
-'    <li>you may always reset to the initial state by selecting empty cable and connectors at both ends</li>'+
-'  </ul>'+
+'  any non-standard names.'+
 '</div>'+
 '<div style="float:left; padding-top: 20px;">'+
 '  <button name="save">Save</button>'+

@@ -433,6 +433,13 @@ class NeoCaptar {
         }
         return $this->find_projects_by_($condition);
     }
+    public function projects_by_coowner($uid) {
+        $uid_escaped = $this->connection->escape_string(trim($uid));
+        $condition = $uid_escaped == ''
+            ? ''
+            : "id IN (SELECT project_id FROM {$this->connection->database}.project_shared_access WHERE uid='{$uid_escaped}')";
+        return $this->find_projects_by_($condition);
+    }
     public function find_projects_by_jobnumber_prefix( $prefix ) {
     	$prefix_escaped = $this->connection->escape_string(trim($prefix));
         return $this->find_projects_by_(
@@ -1163,7 +1170,7 @@ class NeoCaptar {
     	$this->connection->query ( "DELETE FROM {$this->connection->database}.dict_connector WHERE {$condition}" );
     }
 
-    public function add_dict_pinlist( $name, $documentation, $created, $uid ) {
+    public function add_dict_pinlist( $name, $documentation, $created, $uid, $cable_id=null, $origin_connector_id=null, $destination_connector_id=null ) {
     	$name_escaped = $this->connection->escape_string( trim( $name ));
     	if( $name_escaped == '' )
     		throw new NeoCaptarException (
@@ -1174,6 +1181,10 @@ class NeoCaptar {
     		throw new NeoCaptarException (
     			__METHOD__, "illegal UID. A valid non-empty string is expected." );
 
+        $cable_id_opt                 = is_null($cable_id)                 ? 'NULL' : intval($cable_id);
+        $origin_connector_id_opt      = is_null($origin_connector_id)      ? 'NULL' : intval($origin_connector_id);
+        $destination_connector_id_opt = is_null($destination_connector_id) ? 'NULL' : intval($destination_connector_id);
+
     	// Note that the code below will intercept an attempt to create duplicate
     	// pinlist name. If a conflict will be detected then the code will return null
     	// to indicate a proble. Then it's up to the caller how to deal with this
@@ -1183,7 +1194,7 @@ class NeoCaptar {
     	//
     	try {
     		$this->connection->query (
-    			"INSERT INTO {$this->connection->database}.dict_pinlist VALUES(NULL,'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}')"
+    			"INSERT INTO {$this->connection->database}.dict_pinlist VALUES(NULL,'{$name_escaped}','{$documentation_escaped}',{$created->to64()},'{$uid_escaped}',{$cable_id_opt},{$origin_connector_id_opt},{$destination_connector_id_opt})"
     		);
     	} catch( NeoCaptarException $e ) {
     		if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) return null;

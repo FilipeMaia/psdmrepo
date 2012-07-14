@@ -692,15 +692,6 @@ function p_appl_dictionary() {
     this.save_pinlist_documentation = function(id,documentation) {
 		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, documentation: documentation }); };
 
-    this.save_pinlist_cable = function(id,cable) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, cable: cable }); };
-
-    this.save_pinlist_origin_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, origin_connector: connector }); };
-
-    this.save_pinlist_destination_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, destination_connector: connector }); };
-
     this.pinlist_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
             if(data_handler) data_handler(result);
@@ -750,51 +741,14 @@ function p_appl_dictionary() {
                     after_sort: function() {
                         elem_pinlists.find('.pinlist-documentation-save').
                             button().
-                            click(function() {this
+                            click(function() {
                                 var id = this.name;
                                 that.save_pinlist_documentation(id, elem_pinlists.find('#pinlist-documentation-'+id).val());
-                            }); }}},
-            {   name: 'cable type',
-                sorted: false,
-                type: {
-                    after_sort: function() {
-                        elem_pinlists.find('.pinlist-cable').change(function() {
-                            var pinlist_id = this.name;
-                            var cable = this.value;
-                            that.save_pinlist_cable(pinlist_id, cable);
-                        });
-                    }}},
-            {   name: 'origin conn',
-                sorted: false,
-                type: {
-                    after_sort: function() {
-                        elem_pinlists.find('.pinlist-origin-connector').change(function() {
-                            var pinlist_id = this.name;
-                            var connector = this.value;
-                            that.save_pinlist_origin_connector(pinlist_id, connector);
-                        });
-                    }}},
-            {   name: 'destination conn',
-                sorted: false,
-                type: {
-                    after_sort: function() {
-                        elem_pinlists.find('.pinlist-destination-connector').change(function() {
-                            var pinlist_id = this.name;
-                            var connector = this.value;
-                            that.save_pinlist_destination_connector(pinlist_id, connector);
-                        });
-                    }}}
+                            }); }}}
         ];
-
-        var cables = [''];
-        for( var cable in this.cables()) cables.push(cable);
-
         var rows = [];
 		for( var name in this.pinlists()) {
             var pinlist = this.pinlists()[name];
-            var connectors = [''];
-            for( var connector in this.connectors(pinlist.cable)) connectors.push(connector);
-
             rows.push(
                 [   this.can_manage() ?
                         Button_HTML('X', {
@@ -818,26 +772,7 @@ function p_appl_dictionary() {
                         Button_HTML('save', {
                             name:    pinlist.id,
                             classes: 'pinlist-documentation-save',
-                            title:   'edit documentation URL for the pinlist' }) : ' ' ),
-
-                    this.can_manage() ?
-                        Select_HTML(cables, pinlist.cable, {
-                            name:    pinlist.id,
-                            classes: 'pinlist-cable',
-                            title:   'define a cable type for the pinlist' }) : pinlist.cable,
-
-                    this.can_manage() ?
-                        Select_HTML(connectors, pinlist.origin_connector, {
-                            name:    pinlist.id,
-                            classes: 'pinlist-origin-connector',
-                            title:   'define a connector type at cable origin for the pinlist' }) : pinlist.origin_connector,
-
-                    this.can_manage() ?
-                        Select_HTML(connectors, pinlist.destination_connector, {
-                            name:    pinlist.id,
-                            classes: 'pinlist-destination-connector',
-                            title:   'define  a connector type at cable destination for the pinlist' }) : pinlist.destination_connector
-
+                            title:   'edit documentation URL for the pinlist' }) : ' ' )
                 ]
             );
         }

@@ -141,7 +141,7 @@ try {
         $project = $neocaptar->find_project_by_id($project_id);
         if(is_null($project)) report_error('no project exists for id: '.$project_id);
         foreach($project->cables() as $cable) {
-            if( $cable->status() != 'Planned') array_push($cables, $cable);
+            if(( $cable->status() != 'Planned' ) && ( $cable->status() != 'Registered' )) array_push($cables, $cable);
         }
     }
 

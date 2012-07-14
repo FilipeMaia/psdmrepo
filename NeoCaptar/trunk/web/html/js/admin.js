@@ -142,19 +142,41 @@ function p_appl_admin() {
         $('#admin-cablenumbers' ).find('#tabs').tabs();
         $('#admin-jobnumbers'   ).find('#tabs').tabs();
 
-		this.access_load();
-        this.notify_load();
-		this.cablenumbers_load();
-		this.jobnumbers_load();
+//        this.access_load();
+//        this.notify_load();
+//        this.cablenumbers_load();
+//        this.jobnumbers_load();
+//        this.reload_timer_restart();
+        this.reload_timer_event();
 	};
     this.can_manage_access = function() { return global_current_user.is_administrator; };
     this.can_manage_notify = this.can_manage_access;
+
+    this.reload_timer = null;
+    this.reload_timer_restart = function() {
+        this.reload_timer = window.setTimeout('admin.reload_timer_event()', 60000 );
+    };
+    this.reload_timer_event = function() {
+        if( !this.jobnumber_editing() && !this.cablenumber_editing()) {
+    		this.access_load();
+            this.notify_load();
+            this.cablenumbers_load();
+            this.jobnumbers_load();
+        }
+        this.reload_timer_restart();
+    };
 
     /* -----------------
      *   Cable numbers
      * -----------------
      */
     this.cablenumber = null;
+
+    this.cablenumber_prefix_editing = false;
+    this.cablenumber_ranges_editing = false;
+    this.cablenumber_editing = function() {
+        return this.cablenumber_prefix_editing || this.cablenumber_ranges_editing;
+    };
 
     this.cable_name2html = function(cnidx) {
         var c = this.cablenumber[cnidx];
@@ -175,6 +197,7 @@ function p_appl_admin() {
     };
     this.cablenumber_prefixes_table = null;
 	this.cablenumber_prefixes_display = function(edit_mode) {
+        this.cablenumber_prefix_editing = edit_mode;
         var rows = [];
         for( var p in this.cablenumber_prefix ) {
             var prefix = this.cablenumber_prefix[p];
@@ -242,6 +265,7 @@ function p_appl_admin() {
         return size;
     }
     this.cablenumber_ranges_display = function(prefix_name,edit_mode) {
+        this.cablenumber_ranges_editing = edit_mode;
         this.cablenumbers_ranges_edit_tools(edit_mode);
         var ranges_elem = $('#admin-cablenumbers').find('#ranges');
         var rows = [];
@@ -516,6 +540,13 @@ function p_appl_admin() {
     this.jobnumber            = null;
     this.jobnumber_allocation = null;
 
+    this.jobnumber_editing = function() {
+        if( !this.jobnumber ) return false;
+        var result = false;
+        for( var i in this.jobnumber ) result = result || this.jobnumber[i].editing;
+        return result;
+    };
+
     this.job_name2html = function(name) {
         var html =
             name == '' ?
@@ -606,6 +637,7 @@ function p_appl_admin() {
     };
 	this.jobnumbers_update = function(jnidx) {
         var j = this.jobnumber[jnidx];
+        j.editing = false;
         $('#admin-jobnumbers-'+jnidx+' .prefix'                 ).html('&nbsp;'+j.prefix);
         $('#admin-jobnumbers-'+jnidx+' .range'                  ).html('&nbsp;'+j.first+' - '+j.last);
         $('#admin-jobnumbers-'+jnidx+' .num_in_use'             ).html('&nbsp;'+j.num_in_use);
@@ -639,6 +671,7 @@ function p_appl_admin() {
     this.jobnumbers_edit = function(jnidx) {
         this.jobnumbers_update_tools(jnidx,true);
         var c = this.jobnumber[jnidx];
+        c.editing = true;
         $('#admin-jobnumbers-'+jnidx+' .range').html(
             '<input type="text" size=2 style="text-align:right" name="first" value="'+c.first+'" /><input type="text" size=2 style="text-align:right" name="last" value="'+c.last+'" />'
         );
@@ -704,7 +737,7 @@ function p_appl_admin() {
     this.access_create_projmanager   = function(uid) { this.access_create_user(uid,'PROJMANAGER'); };
     this.access_create_other         = function(uid) { this.access_create_user(uid,'OTHER'); };
  
-    this.projmanagers = function() {
+    this.projmanagers = function(managers_only) {
 
         // Return an array of user accounts who are allowed to manage
         // projects. This will include dedicated project managers as
@@ -715,12 +748,19 @@ function p_appl_admin() {
         //
         if( this.access ) {
             var result = [];
-            var users = $.merge(
-                $.merge(
+            var users = undefined;
+            if(managers_only)
+                users = $.merge(
                     [],
-                    this.access.ADMINISTRATOR
-                ),
-                this.access.PROJMANAGER );
+                    this.access.PROJMANAGER
+                );
+            else
+                users = $.merge(
+                    $.merge(
+                        [],
+                        this.access.ADMINISTRATOR
+                    ),
+                    this.access.PROJMANAGER );
             for( var i in users ) {
                 var user = users[i];
                 result.push(user.uid);
@@ -759,6 +799,11 @@ function p_appl_admin() {
                     name:    'projects',
                     onclick: "global_search_projects_by_owner('"+a.uid+"')",
                     title:   'search projects owned by this user' }));
+            if(can_manage_projects && !is_administrator) row.push(
+                Button_HTML('search', {
+                    name:    'projects',
+                    onclick: "global_search_projects_coowned_by('"+a.uid+"')",
+                    title:   'search projects co-managed with other users' }));
 
             rows.push(row);
         }
@@ -769,7 +814,8 @@ function p_appl_admin() {
         if(can_manage_projects && !is_administrator) hdr.push(  { name: 'dictionary privilege', sorted: false });
         hdr.push(                                               { name: 'added',                sorted: false },
                                                                 { name: 'last active',          sorted: false });
-        if(can_manage_projects) hdr.push(                       { name: 'PROJECTS',             sorted: false });
+        if(can_manage_projects) hdr.push(                       { name: 'OWN PROJECTS',         sorted: false });
+        if(can_manage_projects && !is_administrator) hdr.push(  { name: 'CO-MANAGED PROJECTS',  sorted: false });
 
         var table = new Table(id, hdr, rows);
         table.display();

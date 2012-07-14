@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2012-07-13 Igor Gaponenko
+- extended a dictionary of pinlists by adding an optional association with cable type,
+and connectors at both ends
+- fixed a bug in the schema for device_region to allow up to 4 characters (it was 3)
+- more flexibility in the cable interface to allow starting from connectors (in the
+previous version one had to choose a cable first)
+
 Tag: V00-01-02
 2012-07-08 Igor Gaponenko
 - allowed dictionary access to project manager. Privileges are granted on

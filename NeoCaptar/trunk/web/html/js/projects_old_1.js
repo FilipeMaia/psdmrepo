@@ -798,8 +798,6 @@ function p_appl_projects() {
             var cable_origin_conntype      = cable.origin.read_conntype      !== undefined ? cable.origin.read_conntype     () : cable.origin.conntype;
             var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
 
-            if( value !== undefined ) cable_type = value;
-
             var connectors = ((cable_origin_conntype == '') && (cable_destination_conntype == ''))
                 ? dict.cables()
                 : dict.cables_reverse(cable_origin_conntype != '' ? cable_origin_conntype : cable_destination_conntype);
@@ -846,14 +844,8 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                var pinlist_name = $(this).val();
-                if((pinlist_name != '') && !dict.pinlist_is_not_known(pinlist_name)) {
-                    var pinlist = dict.pinlists()[pinlist_name];
-                    if(pinlist.cable != '') {
-                        that.cable_property_edit(pidx,cidx,'cable_type',false, pinlist.cable);
-                        if(pinlist.origin_connector      != '') that.cable_property_edit(pidx, cidx, 'origin_conntype',      false, pinlist.origin_connector);
-                        if(pinlist.destination_connector != '') that.cable_property_edit(pidx, cidx, 'destination_conntype', false, pinlist.destination_connector);
-                    }
+                if( $(this).val() == '') {
+                    that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.origin.read_pinlist = read_select;
@@ -893,8 +885,6 @@ function p_appl_projects() {
 
             var cable_type            = cable.read_cable_type      !== undefined ? cable.read_cable_type     () : cable.cable_type;
             var cable_origin_conntype = cable.origin.read_conntype !== undefined ? cable.origin.read_conntype() : cable.origin.conntype;
-
-            if( value !== undefined ) cable_origin_conntype = value;
 
             var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
 
@@ -1026,8 +1016,6 @@ function p_appl_projects() {
 
             var cable_type                 = cable.read_cable_type           !== undefined ? cable.read_cable_type          () : cable.cable_type;
             var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
-
-            if( value !== undefined ) cable_destination_conntype = value;
 
             var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
 
@@ -1186,19 +1174,13 @@ function p_appl_projects() {
         var required_field_html = '<span style="color:red; font-size:110%; font-weight:bold;"> * </span>';
         var html =
 '<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #c0c0c0;">'+
-'<div style="float:left; margin-bottom: 20px; margin-right: 40px; color: #900; width: 820px;">'+
+'<div style="float:left; margin-bottom: 20px; margin-right: 40px; color: #900; width: 640px;">'+
 '  Please, note that choices for some cable parameters found on this page are loaded from a dictionary.'+
 '  Regular users of this software are not allowed to modify the dictionary neither assign arbitrary values'+
 '  to those parameters. This has been done to enforce the corresponding SLAC CAPTOR and PCDS naming convention for cables'+
 '  Please, contact administrators of the Cable Management Software'+
 '  to request dictionary extensions if you feel the dictionary is not complete, or if you need'+
-'  any non-standard names. Consider the following tips:'+
-'  <ul>'+
-'    <li>if you know the pinlist you need then start from it. This will preset cable type and connectors on both ends</li>'+
-'    <li>if you know the cable type then start from it. This will limit choices of connectors on both ends</li>'+
-'    <li>if you know the connector (and any end) then start from it. This will limit choices of cable types</li>'+
-'    <li>you may always reset to the initial state by selecting empty cable and connectors at both ends</li>'+
-'  </ul>'+
+'  any non-standard names.'+
 '</div>'+
 '<div style="float:left; padding-top: 20px;">'+
 '  <button name="save">Save</button>'+

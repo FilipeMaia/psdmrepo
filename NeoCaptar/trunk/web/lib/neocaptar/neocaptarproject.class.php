@@ -128,6 +128,16 @@ class NeoCaptarProject {
             $this,
             mysql_fetch_array($result, MYSQL_ASSOC));
     }
+    public function comanagers() {
+        $list = array();
+        $sql = "SELECT uid FROM {$this->connection->database}.project_shared_access WHERE project_id={$this->id()} ORDER BY uid";
+        $result = $this->connection->query( $sql );
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            array_push($list, $attr['uid']);
+        }
+        return $list;
+    }
 
     /*
      * ======================
@@ -264,6 +274,14 @@ class NeoCaptarProject {
     }
     public function delete_cable_by_id( $id ) {
     	return $this->neocaptar()->delete_cable_by_id( $id );
+    }
+    public function add_comanager($uid) {
+        $uid_escaped = $this->connection->escape_string( trim( $uid ));
+        $this->connection->query("INSERT INTO {$this->connection->database}.project_shared_access VALUES({$this->id()},'{$uid_escaped}')");
+    }
+    public function remove_comanager($uid) {
+        $uid_escaped = $this->connection->escape_string( trim( $uid ));
+        $this->connection->query("DELETE FROM {$this->connection->database}.project_shared_access WHERE project_id={$this->id()} and uid='{$uid_escaped}'");
     }
 }
 ?>
