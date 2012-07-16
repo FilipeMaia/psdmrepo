@@ -1,0 +1,118 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package XtcInput
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-06-01
+2012-07-15 Andy Salnikov
+- generate exception when expected live files are not there
+
+Tag: V00-06-00
+2012-07-12 Andy Salnikov
+- live reading implementation more or less complete, simple tests run OK
+
+Tag: V00-05-02
+2012-07-10 Andy Salnikov
+- forgot to update unit test for new MergeMode enums
+
+Tag: V00-05-01
+2012-07-09 Andy Salnikov
+- mergeMode() method also accepts "old" enum names
+
+Tag: V00-05-00
+2012-07-09 Andy Salnikov
+- a bit of redesign, split iterators into iterators over datagrams
+  and iterators over files
+- iteration over files has two implementation, first is based on static 
+  list of input files as before, second uses database as the source of 
+  live data; second implementation is not tested yet
+
+Tag: V00-04-01
+2012-06-22 Andy Salnikov
+- forgot to update tests to use new class names
+
+Tag: V00-04-00
+2012-06-22 Andy Salnikov
+- renamed XtcDgIterator class into XtcChunkDgIter, XtcDechunk into
+  XtcStreamDgIter
+- updated comments in few places
+
+Tag: V00-03-01
+2012-06-21 Andy Salnikov
+- implementing live mode for XtcDgIterator
+- new test app test/XtcDgIteratorTest.cpp
+
+Tag: V00-03-00
+2012-06-20 Andy Salnikov
+- updated XtcDgIterator to use unbuffered IO, first step to support
+  reading live data
+
+Tag: V00-02-02
+2012-06-19 Andy Salnikov
+- XtcFileName gets a constructor which takes experiemnt id, run number,
+  stream and chunk numbers
+- added also unit tests for the above constructor
+- XtcDgIterator::next allocates minimum necessary space for datagram,
+  not maximum allowed size
+
+Tag: V00-02-01
+2012-03-05 Andy Salnikov
+- adding XtcFilter classes to filter datagram contents, right now only
+  one filtering option exists (XtcFilterTypeId class) based on TypeId
+
+Tag: V00-02-00
+2012-01-27 Andy Salnikov
+- improved handling of out-of-order transitions
+
+Tag: V00-01-02
+2011-04-01 Andy Salnikov
+- change logging level for few messages
+
+Tag: V00-01-01
+2011-03-31 Andy Salnikov
+- XtcStreamMerger::next - last change introduced a bug, fixed now
+- XtcIterator.cpp: trying to find a workaround for some weird cases 
+  with CsPad::ElementV2 reading when nested XTC object indicated larger
+  data size than its containing XTC container.
+
+Tag: V00-01-00
+2011-03-29 Andy Salnikov
+- add support for extracting run number from datagrams stored in a queue
+- Dgram is now a class instead of namespace, instances contain pointer 
+  to Pds::Dgram and XtcFileName.
+- XtcStreamMerge::next() returns Dgram object
+- DgramQueue class stores Dgram objects
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- fix compilation issue after merge with V00-00-03
+
+Tag: V00-00-04
+2011-03-20 Andy Salnikov
+- added smart pointer typedef for datagram class and couple of utility
+  methods to manage datagram memory.
+- changed all users of datagram class to use smart pointer class instead
+  of bare pointer
+
+Tag: V00-00-03
+2011-02-16 Andy Salnikov
+- stop throwing exceptions at premature EOF, printing error message is 
+  sufficient.
+
+Tag: V00-00-02
+2011-01-26 Andy Salnikov
+- returned XtcIterator back to translator package
+- XtcIterator class is now a simple tree-traversal iterator which 
+  returns one XTC object at a time
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- Moved some common classes for XTC reading here from O2OTranslator
