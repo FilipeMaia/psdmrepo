@@ -2,7 +2,7 @@
 #
 # $Id$
 
-pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana"
+pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana psana/doc/mainpage.dox-main"
 pack_psana_mod="CSPadPixCoords PSCalib ImgPixSpectra cspad_mod psana_examples"
 
 usage() {
@@ -12,6 +12,7 @@ usage() {
   echo "    -h        print this message"
   echo "    -d        debug (turn on -x shell option)"
   echo "    -m mode   use predefined mode"
+  echo "    -p name   set project name"
   echo
   echo "Predefined modes:"
   echo "   psana (default)"
@@ -22,13 +23,15 @@ usage() {
 
 # default values for options
 mode="psana"
+project=""
 
 # get the options
-while getopts hdm: c ; do
+while getopts hdm:p: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     m) mode="$OPTARG" ;;
+    p) project="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
 done
@@ -45,23 +48,22 @@ shift
 # optional package names
 if [ $# -ne 0 ] ; then
   packages="$@"
-  mode="unknown"
 else
   case $mode in
-    psana) packages="$pack_psana" ;;
-    psana-modules) packages="$pack_psana_mod" ;;
+    psana) packages="$pack_psana"; project="Psana" ;;
+    psana-modules) packages="$pack_psana_mod"; project="Psana modules" ;;
     \?) usage ; exit 2 ;;
   esac
 fi
 
-# filter non-existing packages
+# filter non-existing packages/files
 allpackages="$packages"
 packages=
 for pkg in $allpackages; do
-  if [ -d $pkg ] ; then
+  if [ -e $pkg ] ; then
     packages="$packages $pkg"
   else
-    echo "Package $pkg does not exist, skipping."
+    echo "Package or file $pkg does not exist, skipping."
   fi
 done
 
@@ -70,7 +72,7 @@ mkdir -p "$output" 2>/dev/null
 
 # run doxygen
 doxygen - << EOD 
-PROJECT_NAME           = $mode
+PROJECT_NAME           = $project
 OUTPUT_DIRECTORY       = $output
 CREATE_SUBDIRS         = NO
 DETAILS_AT_TOP         = NO

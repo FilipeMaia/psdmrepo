@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2012-07-16 Andy Salnikov
+- add -p option to doxy-driver to specify project name
+- add doc/mainpage.dox-main which is a main page for the whole shebang
+
 Tag: V00-00-12
 2012-06-11 Andy Salnikov
 - updated pydoc-driver to include pure python functions in the docs
