@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "XtcInput/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -118,6 +119,7 @@ ChunkFileIterLive::next()
     // still not found?
     if (fname.empty()) {
       MsgLog(logger, error, "File " << fname.path() << " did not appear on disk after timeout");
+      throw XTCLiveTimeout(ERR_LOC, fname.path(), m_liveTimeout);
     }
 
   }

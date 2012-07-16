@@ -26,6 +26,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/ChunkFileIterLive.h"
+#include "XtcInput/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -128,6 +129,7 @@ StreamFileIterLive::next()
 
       } else {
         MsgLog(logger, error, "No files appeared on disk after timeout");
+        throw XTCLiveTimeout(ERR_LOC, files[0].path(), m_liveTimeout);
       }
 
     }

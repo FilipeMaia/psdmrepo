@@ -156,7 +156,7 @@ XtcChunkDgIter::read(char* buf, size_t size)
       // EOF
       if (t0 and (time(0) - t0) > m_liveTimeout) {
         // in live mode we reached timeout
-        MsgLog(logger, debug, "Timed out while waiting for data in live mode for file: " << m_path);
+        MsgLog(logger, error, "Timed out while waiting for data in live mode for file: " << m_path);
         throw XTCLiveTimeout(ERR_LOC, m_path, m_liveTimeout);
       } else if (t0) {
         // in live mode check if we hit real EOF
