@@ -193,11 +193,12 @@ env.AlwaysBuild('package-dependencies-reverse')
 # Additional targets for documentation generation
 #
 docTargets = []
+if 'doctools' in packages:
+    docTargets.append(env.Command('doc/doxy-all/html/index.html', env.Dir('doctools'), "doxy-driver -p 'PSDM Software' doc/doxy-all/ doctools/doc/mainpage.dox-main " +' '.join(packages)))
 if 'psddl' in packages:
     docTargets.append(env.Command('doc/psddl_psana/index.html', env.Dir('psddl'), "ddl_psanadoc doc/psddl_psana/"))
 if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
-if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
 if 'pyana' in packages:
     docTargets.append(env.Command('doc/pyana-ref/html/index.html', env.Dir('pyana'), "pydoc-driver -p pyana -Q doc/pyana-ref/html pyana _pdsdata pypdsdata"))
