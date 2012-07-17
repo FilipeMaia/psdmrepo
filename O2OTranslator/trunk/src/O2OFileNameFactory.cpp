@@ -69,7 +69,7 @@ O2OFileNameFactory::addKeyword ( const std::string& key, const std::string& valu
 
 /// generate full path name
 std::string
-O2OFileNameFactory::makePath ( unsigned int seq ) const
+O2OFileNameFactory::makePath(int seq) const
 {
   std::string result = m_fileNameTemplate ;
 
@@ -96,102 +96,52 @@ O2OFileNameFactory::makePath ( unsigned int seq ) const
     // find the value for this key
     std::string value ;
     if ( key.size() > 2 and key[0] == 's' ) {
-      // test for 'seq#'
-      if ( key == "seq" ) {
-        value = seq2value( seq, 0 ) ;
-      } else if ( key == "seq2" ) {
-        value = seq2value( seq, 2 ) ;
-      } else if ( key == "seq3" ) {
-        value = seq2value( seq, 3 ) ;
-      } else if ( key == "seq4" ) {
-        value = seq2value( seq, 4 ) ;
-      } else if ( key == "seq5" ) {
-        value = seq2value( seq, 5 ) ;
-      } else if ( key == "seq6" ) {
-        value = seq2value( seq, 6 ) ;
-      } else if ( key == "seq7" ) {
-        value = seq2value( seq, 7 ) ;
-      } else if ( key == "seq8" ) {
-        value = seq2value( seq, 8 ) ;
-      } else if ( key == "seq9" ) {
-        value = seq2value( seq, 9 ) ;
-      } else if ( key == "seq10" ) {
-        value = seq2value( seq, 10 ) ;
-      }
-    }
-
-    if ( value.empty() ) {
-      // find it in the map
-      Key2Value::const_iterator it = m_key2value.find ( key ) ;
-      if ( it != m_key2value.end() ) value = it->second ;
-    }
-
-    if ( not value.empty() ) {
-      // we have a value to substitute
-      result.replace ( pos, pos2-pos+1, value ) ;
-    } else {
-      // leave it as it is, move to the next
-      pos = pos2+1 ;
-    }
-
-  }
-
-  return result ;
-}
-
-/// generate hdf5-family path name, with <seq> replaced with %d
-std::string
-O2OFileNameFactory::makeH5Path ( bool split ) const
-{
-  // in no-split mode, just return first file name
-  if ( not split ) return makePath( 1 );
-
-  std::string result = m_fileNameTemplate ;
-
-  std::string::size_type pos = 0 ;
-  // find first '{'
-  while ( ( pos = result.find( '{', pos ) ) != std::string::npos ) {
-
-    // find matching '}'
-    std::string::size_type pos2 = result.find( '}', pos ) ;
-    if ( pos2 == std::string::npos ) {
-      // no closing braces left, nothing left to do
-      break ;
-    }
-
-    // get the keyword
-    std::string key ( result, pos+1, pos2-pos-1 ) ;
-
-    if ( key.empty() ) {
-      // empty key - just remove braces and continue
-      key.erase ( pos, pos2-pos+1 ) ;
-      continue ;
-    }
-
-    // find the value for this key
-    std::string value ;
-    if ( key.size() > 2 and key[0] == 's' ) {
-      // test for 'seq#'
-      if ( key == "seq" ) {
-        value = "%d" ;
-      } else if ( key == "seq2" ) {
-        value = "%02d" ;
-      } else if ( key == "seq3" ) {
-        value = "%03d" ;
-      } else if ( key == "seq4" ) {
-        value = "%04d" ;
-      } else if ( key == "seq5" ) {
-        value = "%05d" ;
-      } else if ( key == "seq6" ) {
-        value = "%06d" ;
-      } else if ( key == "seq7" ) {
-        value = "%07d" ;
-      } else if ( key == "seq8" ) {
-        value = "%08d" ;
-      } else if ( key == "seq9" ) {
-        value = "%09d" ;
-      } else if ( key == "seq10" ) {
-        value = "%010d" ;
+      if (seq < 0) {
+        // test for 'seq#'
+        if ( key == "seq" ) {
+          value = "%d" ;
+        } else if ( key == "seq2" ) {
+          value = "%02d" ;
+        } else if ( key == "seq3" ) {
+          value = "%03d" ;
+        } else if ( key == "seq4" ) {
+          value = "%04d" ;
+        } else if ( key == "seq5" ) {
+          value = "%05d" ;
+        } else if ( key == "seq6" ) {
+          value = "%06d" ;
+        } else if ( key == "seq7" ) {
+          value = "%07d" ;
+        } else if ( key == "seq8" ) {
+          value = "%08d" ;
+        } else if ( key == "seq9" ) {
+          value = "%09d" ;
+        } else if ( key == "seq10" ) {
+          value = "%010d" ;
+        }
+      } else {
+        // test for 'seq#'
+        if ( key == "seq" ) {
+          value = seq2value( seq, 0 ) ;
+        } else if ( key == "seq2" ) {
+          value = seq2value( seq, 2 ) ;
+        } else if ( key == "seq3" ) {
+          value = seq2value( seq, 3 ) ;
+        } else if ( key == "seq4" ) {
+          value = seq2value( seq, 4 ) ;
+        } else if ( key == "seq5" ) {
+          value = seq2value( seq, 5 ) ;
+        } else if ( key == "seq6" ) {
+          value = seq2value( seq, 6 ) ;
+        } else if ( key == "seq7" ) {
+          value = seq2value( seq, 7 ) ;
+        } else if ( key == "seq8" ) {
+          value = seq2value( seq, 8 ) ;
+        } else if ( key == "seq9" ) {
+          value = seq2value( seq, 9 ) ;
+        } else if ( key == "seq10" ) {
+          value = seq2value( seq, 10 ) ;
+        }
       }
     }
 

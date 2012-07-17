@@ -46,7 +46,7 @@ namespace O2OTranslator {
 /**
  *  @ingroup O2OTranslator
  *
- *  @briefUtility class which instantiates converters for all known data types.
+ *  @brief Utility class which instantiates converters for all known data types.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.

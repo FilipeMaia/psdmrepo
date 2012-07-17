@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: andy-20120717
+2012-07-17 Andy Salnikov
+- preparing for scan-based splitting, some minor refactoring
+
 Tag: V00-18-09
 2012-07-12 Andy Salnikov
 - factor-out code that instantiates all converters out of O2OHdf5Writer 

@@ -158,6 +158,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
   m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
+  m_splitMode.add ( "scan", O2OHdf5Writer::SplitScan ) ;
   addOption( m_splitMode ) ;
   addOption( m_splitSize ) ;
   addOption( m_liveDbConn ) ;
@@ -276,7 +277,7 @@ O2O_Translate::runApp ()
               O2OXtcIterator iter( &(dgptr->xtc), scanner, true );
               iter.iterate();
             }
-            // on second iteration normal dataObejct() method is called for this scanner
+            // on second iteration normal dataObject() method is called for this scanner
             O2OXtcIterator iter( &(dgptr->xtc), scanner );
             iter.iterate();
           }    

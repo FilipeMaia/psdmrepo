@@ -65,10 +65,10 @@ class O2OMetaData ;
 class O2OHdf5Writer : public O2OXtcScannerI {
 public:
 
-  enum SplitMode { NoSplit, Family } ;
+  enum SplitMode { NoSplit, Family, SplitScan } ;
 
   // current XTC state
-  enum State { Undefined, Mapped, Configured, Running, CalibCycle,
+  enum State { Undefined, Configured, Running, CalibCycle,
                NumberOfStates } ;
 
   // Default constructor
@@ -107,6 +107,8 @@ protected:
   void openGroup ( const Pds::Dgram& dgram, State state ) ;
   void closeGroup ( const Pds::Dgram& dgram, State state ) ;
 
+  void openFile();
+
 private:
 
   typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
@@ -116,14 +118,18 @@ private:
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
+  bool m_overwrite ;
+  SplitMode m_split;
+  hsize_t m_splitSize;
+  int m_compression ;
+  bool m_extGroups ;
+  const O2OMetaData& m_metadata ;
+
   hdf5pp::File m_file ;
   std::stack<State> m_state ;
   std::stack<hdf5pp::Group> m_groups ;
   H5DataTypes::XtcClockTime m_eventTime ;
   CvtMap m_cvtMap ;
-  int m_compression ;
-  bool m_extGroups ;
-  const O2OMetaData& m_metadata ;
   StateCounters m_stateCounters ;
   Pds::TransitionId::Value m_transition;
   ConfigObjectStore m_configStore;

@@ -51,8 +51,6 @@ namespace {
     switch ( state ) {
       case O2OHdf5Writer::Undefined :
         return "Undefined" ;
-      case O2OHdf5Writer::Mapped :
-        return "Mapped" ;
       case O2OHdf5Writer::Configured :
         return "Configured" ;
       case O2OHdf5Writer::Running :
@@ -95,14 +93,17 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                const O2OMetaData& metadata )
   : O2OXtcScannerI()
   , m_nameFactory( nameFactory )
+  , m_overwrite(overwrite)
+  , m_split(split)
+  , m_splitSize(splitSize)
+  , m_compression(compression)
+  , m_extGroups(extGroups)
+  , m_metadata(metadata)
   , m_file()
   , m_state()
   , m_groups()
   , m_eventTime()
   , m_cvtMap()
-  , m_compression(compression)
-  , m_extGroups(extGroups)
-  , m_metadata(metadata)
   , m_stateCounters()
   , m_transition(Pds::TransitionId::Unknown)
   , m_configStore()
@@ -112,62 +113,14 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   std::fill_n(m_stateCounters, int(NumberOfStates), 0U);
   std::fill_n(m_transClock, int(Pds::TransitionId::NumberOf), LusiTime::Time(0,0));
     
-  std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
-  MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
-
-  // Disable printing of error messages
-  //stat = H5Eset_auto2( H5E_DEFAULT, 0, 0 ) ;
-
-  // we want to create new file
-  hdf5pp::PListFileAccess fapl ;
-  if ( split == Family ) {
-    // use FAMILY driver
-    fapl.set_family_driver ( splitSize, hdf5pp::PListFileAccess() ) ;
-  }
-
-  // change the size of the B-Tree for chunked datasets
-  hdf5pp::PListFileCreate fcpl;
-  fcpl.set_istore_k(2); 
-  fcpl.set_sym_k(2, 2); 
-  
-  hdf5pp::File::CreateMode mode = overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
-  m_file = hdf5pp::File::create ( fileTempl, mode, fcpl, fapl ) ;
-
-  // add UUID to the file attributes
-  uuid_t uuid ;
-  uuid_generate( uuid );
-  char uuid_buf[64] ;
-  uuid_unparse ( uuid, uuid_buf ) ;
-  m_file.createAttr<const char*> ("UUID").store ( uuid_buf ) ;
-
-  // add some metadata to the top group
-  LusiTime::Time ctime = LusiTime::Time::now() ;
-  m_file.createAttr<const char*> ("origin").store ( "translator" ) ;
-  m_file.createAttr<const char*> ("created").store ( ctime.toString().c_str() ) ;
-
-  m_file.createAttr<uint32_t> ("runNumber").store ( m_metadata.runNumber() ) ;
-  m_file.createAttr<const char*> ("runType").store ( m_metadata.runType().c_str() ) ;
-  m_file.createAttr<const char*> ("experiment").store ( m_metadata.experiment().c_str() ) ;
-
   // we are in bad state, this state should never be popped
   m_state.push(Undefined) ;
 
-  // store top group
-  m_groups.push ( m_file.openGroup("/") ) ;
-
-  typedef O2OMetaData::const_iterator MDIter ;
-  for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
-    try {
-      m_file.createAttr<const char*> (it->first).store ( it->second.c_str() ) ;
-    } catch ( std::exception& e ) {
-      // this is not fatal, just print error message and continue
-      MsgLog( logger, error, "failed to store metadata: " << e.what()
-          << "\n\tkey='" << it->first << "', value='" << it->second << "'" ) ;
-    }
-  }
-
   // instantiate all converters
   O2OCvtFactory::makeConverters(m_cvtMap, m_configStore, m_calibStore, m_metadata, m_compression);
+
+  // open new file
+  openFile();
 }
 
 //--------------
@@ -200,33 +153,10 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
   bool skip = false;
   switch ( m_transition ) {
 
-    case Pds::TransitionId::Map :
-
-      if ( t != m_transClock[m_transition] ) {
-        // close all states
-        this->closeGroup( dgram, CalibCycle ) ;
-        this->closeGroup( dgram, Running ) ;
-        this->closeGroup( dgram, Configured ) ;
-        this->closeGroup( dgram, Mapped ) ;
-        this->openGroup( dgram, Mapped ) ;
-      }
-      break ;
-
-    case Pds::TransitionId::Unmap :
-
-      if ( t != m_transClock[m_transition] ) {
-        // close all states
-        this->closeGroup( dgram, CalibCycle ) ;
-        this->closeGroup( dgram, Running ) ;
-        this->closeGroup( dgram, Configured ) ;
-        this->closeGroup( dgram, Mapped ) ;
-      }
-      break ;
-
     case Pds::TransitionId::Configure :
 
       if ( t != m_transClock[m_transition] ) {
-        // close all states up to Mapped
+        // close all states up to Undefined
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
         this->closeGroup( dgram, Configured ) ;
@@ -241,7 +171,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
         this->closeGroup( dgram, Configured ) ;
-        this->closeGroup( dgram, Mapped ) ;
       }
       break ;
 
@@ -299,6 +228,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
     case Pds::TransitionId::Disable :
     case Pds::TransitionId::Unknown :
     case Pds::TransitionId::Reset :
+    case Pds::TransitionId::Map :
+    case Pds::TransitionId::Unmap :
     case Pds::TransitionId::NumberOf :
 
       break ;
@@ -328,8 +259,6 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   // reset counter for sub-states, note there are no breaks
   switch( state ) {
   case Undefined:
-    m_stateCounters[Mapped] = 0;
-  case Mapped:
     m_stateCounters[Configured] = 0;
   case Configured:
     m_stateCounters[Running] = 0;
@@ -353,7 +282,7 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   // store transition time as couple of attributes to this new group
   ::storeClock ( group, dgram.seq.clock(), "start" ) ;
 
-  // switch to mapped state
+  // switch to new state
   m_state.push(state) ;
   m_groups.push( group ) ;
 
@@ -448,9 +377,6 @@ O2OHdf5Writer::groupName( State state, unsigned counter ) const
 {
   const char* prefix = "Undefined" ;
   switch ( state ) {
-    case O2OHdf5Writer::Mapped :
-      prefix = "Map" ;
-      break ;
     case O2OHdf5Writer::Configured :
       prefix = "Configure" ;
       break ;
@@ -476,6 +402,62 @@ O2OHdf5Writer::groupName( State state, unsigned counter ) const
   } else {
     return prefix;
   }
+}
+
+void
+O2OHdf5Writer::openFile()
+{
+  std::string fileTempl = m_nameFactory.makePath ( m_split == Family ? -1 : 1 ) ;
+  MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
+
+  // Disable printing of error messages
+  //stat = H5Eset_auto2( H5E_DEFAULT, 0, 0 ) ;
+
+  // we want to create new file
+  hdf5pp::PListFileAccess fapl ;
+  if ( m_split == Family ) {
+    // use FAMILY driver
+    fapl.set_family_driver ( m_splitSize, hdf5pp::PListFileAccess() ) ;
+  }
+
+  // change the size of the B-Tree for chunked datasets
+  hdf5pp::PListFileCreate fcpl;
+  fcpl.set_istore_k(2);
+  fcpl.set_sym_k(2, 2);
+
+  hdf5pp::File::CreateMode mode = m_overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
+  m_file = hdf5pp::File::create ( fileTempl, mode, fcpl, fapl ) ;
+
+  // add UUID to the file attributes
+  uuid_t uuid ;
+  uuid_generate( uuid );
+  char uuid_buf[64] ;
+  uuid_unparse ( uuid, uuid_buf ) ;
+  m_file.createAttr<const char*> ("UUID").store ( uuid_buf ) ;
+
+  // add some metadata to the top group
+  LusiTime::Time ctime = LusiTime::Time::now() ;
+  m_file.createAttr<const char*> ("origin").store ( "translator" ) ;
+  m_file.createAttr<const char*> ("created").store ( ctime.toString().c_str() ) ;
+
+  m_file.createAttr<uint32_t> ("runNumber").store ( m_metadata.runNumber() ) ;
+  m_file.createAttr<const char*> ("runType").store ( m_metadata.runType().c_str() ) ;
+  m_file.createAttr<const char*> ("experiment").store ( m_metadata.experiment().c_str() ) ;
+
+  // store top group
+  m_groups.push ( m_file.openGroup("/") ) ;
+
+  typedef O2OMetaData::const_iterator MDIter ;
+  for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
+    try {
+      m_file.createAttr<const char*> (it->first).store ( it->second.c_str() ) ;
+    } catch ( std::exception& e ) {
+      // this is not fatal, just print error message and continue
+      MsgLog( logger, error, "failed to store metadata: " << e.what()
+          << "\n\tkey='" << it->first << "', value='" << it->second << "'" ) ;
+    }
+  }
+
 }
 
 } // namespace O2OTranslator
