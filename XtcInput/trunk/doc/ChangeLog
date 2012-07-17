@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2012-07-17 Andy Salnikov
+- fix a comment
+
 Tag: V00-06-01
 2012-07-15 Andy Salnikov
 - generate exception when expected live files are not there

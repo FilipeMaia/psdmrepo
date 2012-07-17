@@ -40,7 +40,7 @@ namespace XtcInput {
 /**
  *  @ingroup XtcInput
  *
- *  @briefInterface for class providing a sequence of file names.
+ *  @brief Interface for class providing a sequence of file names.
  *
  *  Instances of this interface will provide a sequence of file names
  *  belonging to individual streams.
