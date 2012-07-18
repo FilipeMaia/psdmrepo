@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# ic-auto-translate This shell script takes care of starting and stopping
+#                the ic-auto-translate
+#
+# chkconfig: 345 90 10
+# description:  Interface controller for PSDM/LCLS
+# processname: ic-auto-translate
+# config: 
+# pidfile: /var/run/ic-controller/ic-auto-translate.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+
+prog=ic-auto-translate
+pidfile=/var/run/ic-controller/ic-auto-translate.pid
+piddir=$(dirname $pidfile)
+CMDPATH=/reg/g/psdm/etc/ic-auto-translate-runner
+
+RETVAL=0
+
+# create run directory if not there
+test -d ${piddir} || mkdir ${piddir} && chown psdatmgr ${piddir}
+
+start() {
+    echo -n "Starting ${prog}: "
+    pid=`cat "${pidfile}" 2>/dev/null`
+    if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+        failure "already running, pid=$pid"
+    else
+        runuser -g ps-data -s /bin/bash psdatmgr -c "${CMDPATH} -p ${pidfile}" && success || failure
+    fi
+    RETVAL=$?
+}
+
+stop() {
+    echo -n "Shutting down ${prog}: "
+    pid=`cat "${pidfile}" 2>/dev/null`
+    if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+        kill "${pid}" && success || failure
+        rm "${pidfile}"
+    else
+        failure "not running"
+    fi
+    RETVAL=$?
+}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        sleep 3
+        start
+        ;;
+  status)
+        status -p "${pidfile}" ic-auto-translate
+        RETVAL=$?
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit $RETVAL
