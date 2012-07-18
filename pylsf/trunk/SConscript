@@ -22,7 +22,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "pylsf"
 pkg_ver = "20110926"
 
-PREFIX  = pjoin('SIT_EXTERNAL_SW', pkg, pkg_ver)
+PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages")
 LIBDIR = "/afs/slac/package/lsf/curr/lib"
 COPYLIBS = "liblsf.so libbat.so"
