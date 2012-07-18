@@ -96,7 +96,7 @@ O2OFileNameFactory::makePath(int seq) const
     // find the value for this key
     std::string value ;
     if ( key.size() > 2 and key[0] == 's' ) {
-      if (seq < 0) {
+      if (seq == Family) {
         // test for 'seq#'
         if ( key == "seq" ) {
           value = "%d" ;
@@ -118,6 +118,29 @@ O2OFileNameFactory::makePath(int seq) const
           value = "%09d" ;
         } else if ( key == "seq10" ) {
           value = "%010d" ;
+        }
+      } else if (seq == FamilyPattern) {
+        // test for 'seq#'
+        if ( key == "seq" ) {
+          value = "[0-9]+" ;
+        } else if ( key == "seq2" ) {
+          value = "[0-9]{2}" ;
+        } else if ( key == "seq3" ) {
+          value = "[0-9]{3}" ;
+        } else if ( key == "seq4" ) {
+          value = "[0-9]{4}" ;
+        } else if ( key == "seq5" ) {
+          value = "[0-9]{5}" ;
+        } else if ( key == "seq6" ) {
+          value = "[0-9]{6}" ;
+        } else if ( key == "seq7" ) {
+          value = "[0-9]{7}" ;
+        } else if ( key == "seq8" ) {
+          value = "[0-9]{8}" ;
+        } else if ( key == "seq9" ) {
+          value = "[0-9]{9}" ;
+        } else if ( key == "seq10" ) {
+          value = "[0-9]{10}" ;
         }
       } else {
         // test for 'seq#'

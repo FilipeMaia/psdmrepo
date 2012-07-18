@@ -44,7 +44,9 @@ BOOST_AUTO_TEST_CASE( test_1 )
   BOOST_CHECK_EQUAL ( path, "A/B/{c/d}-56-56-0000000056.ext" ) ;
   path = f->makePath ( 123456789 ) ;
   BOOST_CHECK_EQUAL ( path, "A/B/{c/d}-123456789-123456789-0123456789.ext" ) ;
-  path = f->makePath ( -1 ) ;
+  path = f->makePath ( O2OFileNameFactory::Family ) ;
   BOOST_CHECK_EQUAL ( path, "A/B/{c/d}-%d-%02d-%010d.ext" ) ;
+  path = f->makePath ( O2OFileNameFactory::FamilyPattern ) ;
+  BOOST_CHECK_EQUAL ( path, "A/B/{c/d}-[0-9]+-[0-9]{2}-[0-9]{10}.ext" ) ;
 }
 

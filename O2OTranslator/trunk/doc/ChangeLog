@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-18-10
+2012-07-18 Andy Salnikov
+- next step in scan-based splitting, implement moving (renaming) of the
+  produced HDF5 files in translator itself, right after any HDF5 is closed.
+
 Tag: andy-20120717
 2012-07-17 Andy Salnikov
 - preparing for scan-based splitting, some minor refactoring

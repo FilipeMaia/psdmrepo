@@ -71,14 +71,26 @@ public:
   enum State { Undefined, Configured, Running, CalibCycle,
                NumberOfStates } ;
 
-  // Default constructor
+  /**
+   *  @brief Make writer instance
+   *  
+   *  @param[in] nameFactory  Instance of the factory class which creates output file names
+   *  @param[in] overwrite    If true then allow overwriting of the outpur files
+   *  @param[in] spit         Output file splitting mode
+   *  @param[in] splitSize    Size of the files at which to split
+   *  @param[in] compression  Compression level, give negative number to disable compression
+   *  @param[in] extGroups    If true generate extended group names with :NNNN suffix 
+   *  @param[in] metadata     Object which keeps metadata (run number, experiment name, etc.)
+   *  @param[in] finalDir     If non-empty then move files to this directory after closing
+   */
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                   bool overwrite,
                   SplitMode split,
                   hsize_t splitSize,
                   int compression,
                   bool extGroups,
-                  const O2OMetaData& metadata ) ;
+                  const O2OMetaData& metadata,
+                  const std::string& finalDir) ;
 
   // Destructor
   virtual ~O2OHdf5Writer () ;
@@ -107,7 +119,11 @@ protected:
   void openGroup ( const Pds::Dgram& dgram, State state ) ;
   void closeGroup ( const Pds::Dgram& dgram, State state ) ;
 
+  // open new file
   void openFile();
+  
+  // close file/move to the final dir
+  void closeFile();
 
 private:
 
@@ -124,6 +140,7 @@ private:
   int m_compression ;
   bool m_extGroups ;
   const O2OMetaData& m_metadata ;
+  const std::string m_finalDir;
 
   hdf5pp::File m_file ;
   std::stack<State> m_state ;

@@ -60,6 +60,12 @@ namespace O2OTranslator {
 class O2OFileNameFactory : boost::noncopyable {
 public:
 
+  /// Enum with special values of the sequence numbers passed to makePath() method
+  enum { 
+    Family = -1,    ///< This number is used to generate names for Family HDF5 driver 
+    FamilyPattern = -2    ///< This number is used to generate regexp patterns matching Family file names
+  };
+  
   // Constructor
   O2OFileNameFactory ( const std::string& fileNameTemplate ) ;
 

@@ -20,6 +20,8 @@
 //-----------------
 #include <algorithm>
 #include <string>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 #include <uuid/uuid.h>
 
 //-------------------------------
@@ -41,6 +43,7 @@
 //-----------------------------------------------------------------------
 
 using namespace O2OTranslator ;
+namespace fs = boost::filesystem;
 
 namespace {
 
@@ -90,7 +93,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                hsize_t splitSize,
                                int compression,
                                bool extGroups,
-                               const O2OMetaData& metadata )
+                               const O2OMetaData& metadata,
+                               const std::string& finalDir )
   : O2OXtcScannerI()
   , m_nameFactory( nameFactory )
   , m_overwrite(overwrite)
@@ -99,6 +103,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_compression(compression)
   , m_extGroups(extGroups)
   , m_metadata(metadata)
+  , m_finalDir(finalDir)
   , m_file()
   , m_state()
   , m_groups()
@@ -131,7 +136,7 @@ O2OHdf5Writer::~O2OHdf5Writer ()
   MsgLog( logger, debug, "O2OHdf5Writer - close output file" ) ;
 
   m_cvtMap.clear() ;
-  m_file.close() ;
+  closeFile();
 }
 
 // signal start/end of the event (datagram)
@@ -407,7 +412,7 @@ O2OHdf5Writer::groupName( State state, unsigned counter ) const
 void
 O2OHdf5Writer::openFile()
 {
-  std::string fileTempl = m_nameFactory.makePath ( m_split == Family ? -1 : 1 ) ;
+  std::string fileTempl = m_nameFactory.makePath ( m_split == Family ? O2OFileNameFactory::Family : 1 ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
 
   // Disable printing of error messages
@@ -458,6 +463,58 @@ O2OHdf5Writer::openFile()
     }
   }
 
+}
+
+// close file/move to the final dir
+void 
+O2OHdf5Writer::closeFile()
+{
+  m_file.close();
+  
+  if (not m_finalDir.empty()) {
+    // also move the file to the final destination directory
+    if (m_split == Family) {
+      
+      // Family driver could have produced several files, find and move all of them  
+      
+      const std::string srcPattern = m_nameFactory.makePath(O2OFileNameFactory::FamilyPattern);
+      fs::path srcDir = fs::path(srcPattern).parent_path();
+      boost::regex pathRe(srcPattern);
+      
+      // iterate over files in a directory
+      MsgLog(logger, info, "moving files from directory " << srcDir);
+      for (fs::directory_iterator it(srcDir); it != fs::directory_iterator(); ++ it) {
+
+        const fs::path src = it->path();
+        if (boost::regex_match(src.string(), pathRe)) {
+
+          fs::path basename = src.filename();
+          fs::path dst = fs::path(m_finalDir) / basename;
+          boost::system::error_code ec;
+          MsgLog(logger, info, "renaming file " << src << " to " << dst);
+          fs::rename(src, dst, ec);
+          if (ec) {
+            MsgLog( logger, error, "failed to rename file '" << src << "' to '" << dst << "': " << ec.message());
+          }
+
+        }
+      }
+      
+    } else {
+      
+      // there should be just one file
+      fs::path src = m_nameFactory.makePath(1);
+      fs::path basename = src.filename();
+      fs::path dst = fs::path(m_finalDir) / basename;
+      boost::system::error_code ec;
+      MsgLog(logger, info, "renaming file " << src << " to " << dst);
+      fs::rename(src, dst, ec);
+      if (ec) {
+        MsgLog( logger, error, "failed to rename file '" << src << "' to '" << dst << "': " << ec.message());
+      }
+
+    }
+  }
 }
 
 } // namespace O2OTranslator
