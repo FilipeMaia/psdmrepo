@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-14
+2012-07-17 Andy Salnikov
+- adding support for live data translation
+
 Tag: V01-00-13
 2012-04-27 Andy Salnikov
 - make active experiment optional when selecting datasets from database,

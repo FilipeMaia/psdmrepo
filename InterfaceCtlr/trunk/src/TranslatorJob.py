@@ -533,6 +533,7 @@ class TranslatorJob(object) :
         subs = None        
         if interpolate : 
             subs = {"experiment": self._fs.experiment, 
+                    "experimentId": self._fs.experimentId, 
                     "instrument": self._fs.instrument,
                     "instrument_lower": self._fs.instrument.lower(),
                     "run_type": self._fs.run_type, 

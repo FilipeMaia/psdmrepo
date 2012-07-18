@@ -307,36 +307,46 @@ class Controller ( AppBase ) :
     # =========================================================
     
     def __find_files( self, fs ) :
-        
+
         instr = fs.instrument
         exper = fs.experiment
         
-        xtc_root = self._config.get( 'xtc-location-root', instr, exper )
-        if not xtc_root :
-            self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
-            return []
-        xtc_name_pattern = self._config.get( 'xtc-name-pattern', instr, exper )
-        if not xtc_name_pattern :
-            self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
-            return []
-
-        # interpolate with the fileset parameters
-        xtc_root = xtc_root % fs.__dict__
-
-        # look into this directory and all its subdirectories (1 level only)
-        files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
-        subdirs = [ f for f in files if os.path.isdir(f) ]
-
-        # find all files matching a pattern
-        pattern = xtc_name_pattern % fs.__dict__
-        files = []
-        for sdir in [xtc_root]+subdirs :
-
+        if self._config.get('live-mode', instr, exper, 0):
             
-            flist = fnmatch.filter ( os.listdir(sdir), pattern )
-            files += [os.path.join(sdir,f) for f in flist]
+            #in live mode use dataset name as input to translator
 
-        return files
+            ds = self._config.get('dataset', instr, exper, "exp=%(experiment)s:run=%(run_number)d:live", fs.__dict__)
+
+            return [ds]
+            
+        else:
+            
+            xtc_root = self._config.get( 'xtc-location-root', instr, exper )
+            if not xtc_root :
+                self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
+                return []
+            xtc_name_pattern = self._config.get( 'xtc-name-pattern', instr, exper )
+            if not xtc_name_pattern :
+                self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
+                return []
+    
+            # interpolate with the fileset parameters
+            xtc_root = xtc_root % fs.__dict__
+    
+            # look into this directory and all its subdirectories (1 level only)
+            files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
+            subdirs = [ f for f in files if os.path.isdir(f) ]
+    
+            # find all files matching a pattern
+            pattern = xtc_name_pattern % fs.__dict__
+            files = []
+            for sdir in [xtc_root]+subdirs :
+    
+                
+                flist = fnmatch.filter ( os.listdir(sdir), pattern )
+                files += [os.path.join(sdir,f) for f in flist]
+    
+            return files
 
 # ==============================================
 # Run application when imported as a main module

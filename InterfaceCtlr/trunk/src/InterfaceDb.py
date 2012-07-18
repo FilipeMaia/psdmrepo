@@ -46,10 +46,13 @@ import MySQLdb
 #-----------------------------
 from LusiTime.Time import Time
 from InterfaceCtlr.Config import Config
+from ExpNameDb.ExpNameDatabase import ExpNameDatabase
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+_expNameDb = ExpNameDatabase()
 
 class DBConnectionError(StandardError):
     """This exception is thrown when there is a problem with database connection.
@@ -161,6 +164,10 @@ class Fileset(object):
         self.experiment = experiment
         self.instrument = instrument
         self.instrument_lower = instrument.lower()
+        try:
+            self.experimentId = _expNameDb.getID(instrument, experiment)
+        except:
+            self.experimentId = 0            
         self.run_type = run_type
         self.run_number = run_number
         self.status = status
