@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-15
+2012-07-18 Andy Salnikov
+- make loop delay configurable parameter
+
 Tag: V01-00-14
 2012-07-17 Andy Salnikov
 - adding support for live data translation

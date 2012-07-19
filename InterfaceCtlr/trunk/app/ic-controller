@@ -169,6 +169,11 @@ class Controller ( AppBase ) :
                 
                 activeOnly = self._config.get('active-exp-only', default=False)
 
+                # get loop delay from configuraiton, limit its range
+                loopDelay = self._config.get('loop-delay', default=20)
+                if loopDelay < 1: loopDelay = 1
+                if loopDelay > 180: loopDelay = 180
+
                 # get the list of filesets being translated
                 filesets = self._db.get_filesets(('PENDING', 'RUN', 'SUSPENDED'), self._controller.instruments, activeOnly)
                 for fs in filesets:
@@ -211,10 +216,10 @@ class Controller ( AppBase ) :
                 
                 # We want to limit job submission rate to 1Hz, so if there are jobs to 
                 # submit then submit the first one (with the highest priority) and
-                # sleep for 1 second, otherwise sleep for 20 seconds and retry.
-                # also do not submit more than 20 jobs at once
-                timeout = 20
-                for fs in filesets[:20]:
+                # sleep for 1 second, otherwise sleep for loopDelay seconds and retry.
+                # also do not submit more than loopDelay jobs at once
+                timeout = loopDelay
+                for fs in filesets[:loopDelay]:
                     
                     # must have some files associated
                     if not fs.xtc_files :
