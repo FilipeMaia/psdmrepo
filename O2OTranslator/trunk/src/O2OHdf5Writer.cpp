@@ -20,6 +20,7 @@
 //-----------------
 #include <algorithm>
 #include <string>
+#include <map>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <uuid/uuid.h>
@@ -472,7 +473,10 @@ O2OHdf5Writer::closeFile()
   m_file.close();
   
   if (not m_finalDir.empty()) {
+    
     // also move the file to the final destination directory
+    std::map<fs::path, fs::path> moveMap;
+    
     if (m_split == Family) {
       
       // Family driver could have produced several files, find and move all of them  
@@ -487,16 +491,8 @@ O2OHdf5Writer::closeFile()
 
         const fs::path src = it->path();
         if (boost::regex_match(src.string(), pathRe)) {
-
-          fs::path basename = src.filename();
-          fs::path dst = fs::path(m_finalDir) / basename;
-          boost::system::error_code ec;
-          MsgLog(logger, info, "renaming file " << src << " to " << dst);
-          fs::rename(src, dst, ec);
-          if (ec) {
-            MsgLog( logger, error, "failed to rename file '" << src << "' to '" << dst << "': " << ec.message());
-          }
-
+          fs::path dst = fs::path(m_finalDir) / src.filename();
+          moveMap[src] = dst;
         }
       }
       
@@ -505,16 +501,33 @@ O2OHdf5Writer::closeFile()
       // there should be just one file
       fs::path src = m_nameFactory.makePath(1);
       fs::path basename = src.filename();
-      fs::path dst = fs::path(m_finalDir) / basename;
-      boost::system::error_code ec;
-      MsgLog(logger, info, "renaming file " << src << " to " << dst);
-      fs::rename(src, dst, ec);
-      if (ec) {
-        MsgLog( logger, error, "failed to rename file '" << src << "' to '" << dst << "': " << ec.message());
-      }
-
+      fs::path dst = fs::path(m_finalDir) / src.filename();
+      moveMap[src] = dst;
+      
     }
+    
+    // check that none of the outpout files exists
+    for (std::map<fs::path, fs::path>::const_iterator it = moveMap.begin(); it != moveMap.end(); ++ it) {
+      if (fs::exists(it->second)) {
+        MsgLog( logger, error, "cannot move file " << it->first << ", destination already exists: " << it->second);
+        // reset whole thing
+        moveMap.clear();
+        break;
+      }
+    }
+    
+    // if anything left in the map move that
+    for (std::map<fs::path, fs::path>::const_iterator it = moveMap.begin(); it != moveMap.end(); ++ it) {
+      boost::system::error_code ec;
+      MsgLog(logger, info, "renaming file " << it->first << " to " << it->second);
+      fs::rename(it->first, it->second, ec);
+      if (ec) {
+        MsgLog( logger, error, "failed to rename file '" << it->first << "' to '" << it->second << "': " << ec.message());
+      }
+    }
+    
   }
+
 }
 
 } // namespace O2OTranslator
