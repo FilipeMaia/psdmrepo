@@ -115,11 +115,13 @@ class TranslatorJob(object) :
 
         if translator is None:
             self._id = None
-            self._outputDir = self._get_config('output-dir-tmp', _defOutputDirTmp, True)
+            self._outputDir = self._get_config('output-dir', _defOutputDir, True)
+            self._outputDirTmp = self._get_config('output-dir-tmp', _defOutputDirTmp, True)
             self._job = self._startJob()
         else:
             self._id = translator.id
-            self._outputDir = translator.outputDir
+            self._outputDir = self._get_config('output-dir', _defOutputDir, True)
+            self._outputDirTmp = translator.outputDir
             self._job = LSF.Job(translator.jobid)
 
         self._status = None  # None means running, 0 - finished OK; non-zero - error
@@ -134,14 +136,14 @@ class TranslatorJob(object) :
 
         # output directory must be empty or non-existent
         try:
-            self.__make_hdf5_dir(self._outputDir)
+            self.__make_hdf5_dir(self._outputDirTmp)
         except Exception, exc:
-            self.error("[%s] Failed to make temporary directory %s: %s", self._name, self._outputDir, exc )
+            self.error("[%s] Failed to make temporary directory %s: %s", self._name, self._outputDirTmp, exc )
             self._update_fs_status('FAIL_MKDIR')
             return None
 
         # build command line for running translator
-        cmd = self.__build_translate_cmd(self._fs, self._outputDir)
+        cmd = self.__build_translate_cmd(self._fs, self._outputDir, self._outputDirTmp)
 
         # start translator
         logdir = self._get_config('log-dir', _defLogDir, True)
@@ -152,13 +154,13 @@ class TranslatorJob(object) :
             self._update_fs_status('FAIL')
             return None            
         
-        self._id = self._db.new_translator(self._fs.id, logname, job.jobid(), self._outputDir)
+        self._id = self._db.new_translator(self._fs.id, logname, job.jobid(), self._outputDirTmp)
         
         # tell everybody we are taking care of this fileset
         self._update_fs_status('PENDING')
         
         self.info ("[%s] Started translator #%d (%s) with cmd %s", self._name, self._id, job, ' '.join(cmd) )
-        self.info ("[%s] output directory %s", self._name, self._outputDir )
+        self.info ("[%s] output directory %s", self._name, self._outputDirTmp )
         self.info ("[%s] Log file is in %s", self._name, logname )
         
         return job
@@ -242,8 +244,10 @@ class TranslatorJob(object) :
         self.info ("[%s] translator #%d finished (%s) retcode=%s", self._name, self._id, self._job, exitCode)
         
         # get the size of resulting files
-        output_size = self.__dir_size(self._outputDir)
-        self.info ("[%s] translator #%d produced %d bytes of data", self._name, self._id, output_size)
+        output_size = 0
+        if not self._get_config('self-move', 0):
+            output_size = self.__dir_size(self._outputDirTmp)
+            self.info ("[%s] translator #%d produced %d bytes of data", self._name, self._id, output_size)
 
         # store statistics
         self._db.update_translator(self._id, exitCode, output_size)
@@ -256,8 +260,7 @@ class TranslatorJob(object) :
         else:
             
             # copy resulting files to final destination
-            h5dirname = self._get_config('output-dir', _defOutputDir, True)
-            returncode = self.__store_hdf5(self._fs, self._outputDir, h5dirname)
+            returncode = self.__store_hdf5(self._fs, self._outputDirTmp, self._outputDir)
             self._db.update_irods_status (self._id, returncode)
             if returncode != 0:
                 self._update_fs_status('FAIL_COPY')
@@ -270,7 +273,7 @@ class TranslatorJob(object) :
     # Build a list that has the command to execute the translator
     # ===========================================================
 
-    def __build_translate_cmd ( self, fs, outputDir ) :
+    def __build_translate_cmd ( self, fs, outputDir, outputDirTmp ) :
 
         """Build the arg list to pass to the translator from the files in fileset
         and the translate_uri destination for the translator output"""
@@ -278,10 +281,21 @@ class TranslatorJob(object) :
         cmd_list = []
         cmd_list.append("o2o-translate")
 
-        #
         # Destination dir for translated file
-        cmd_list.append("--output-dir")
-        cmd_list.append(outputDir)
+        if self._get_config('self-move', 0):
+            cmd_list.append("--output-dir")
+            cmd_list.append(outputDir)
+            cmd_list.append("--tmp-dir")
+            cmd_list.append(outputDirTmp)
+        else:
+            cmd_list.append("--output-dir")
+            cmd_list.append(outputDirTmp)
+
+        # extension for backup files
+        backup_ext = self._get_config("hdf-backup-suffix", "", True)
+        if backup_ext:
+            cmd_list.append("--h5-backup-ext")
+            cmd_list.append(backup_ext)
 
         #
         # experiment, run number, filename
@@ -361,6 +375,17 @@ class TranslatorJob(object) :
         if not os.path.exists(tmpdirname):
             self.error("store_hdf5: temporary directory %s does not exist", tmpdirname)
             return 2
+
+        # in self-move mode files should have been moved already, so only try to remove temporary directory 
+        if self._get_config('self-move', 0):
+            try :
+                self.debug("removing temp dir %s", tmpdirname)
+                os.rmdir( tmpdirname )
+                return 0
+            except Exception, e :
+                # if it fails means that translator failed to move some files, report this as an error
+                self.error("store_hdf5: failed to remove directory %s: %s", tmpdirname, str(e) )
+                return 2
         
         # first move tmpdir as a whole to the final directory
         tmpdirfinal = os.path.join(dirname, _basename(tmpdirname))
