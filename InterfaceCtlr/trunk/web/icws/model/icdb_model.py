@@ -270,7 +270,7 @@ class IcdbModel ( InterfaceDb ) :
 
         # select translator info
         q = """SELECT fs.id, DATE_FORMAT(tr.started, GET_FORMAT(DATETIME,'ISO')) started, 
-            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log 
+            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log, IFNULL(tr.jobid,0) jobid
             FROM fileset fs, translator_process tr 
             WHERE fs.id=tr.fk_fileset AND fs.instrument = %s AND fs.experiment = %s"""
         cursor.execute(q, (instrument, experiment))
@@ -283,6 +283,7 @@ class IcdbModel ( InterfaceDb ) :
                 d['log'] = row['log']
                 d['started'] = row['started']
                 d['stopped'] = row['stopped']
+                d['jobid'] = row['jobid']
 
         return res.values()
 
