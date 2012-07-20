@@ -20,7 +20,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include <stdexcept>
+#include "ErrSvc/Issue.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -49,19 +49,19 @@
 
 namespace O2OTranslator {
 
-class O2OException : public std::runtime_error {
+class O2OException : public ErrSvc::Issue {
 public:
 
   // Constructor
-  O2OException ( const std::string& className, const std::string& what ) ;
+  O2OException ( const ErrSvc::Context& ctx, const std::string& className, const std::string& what ) ;
 
 };
 
 class O2OXTCSizeException : public O2OException {
 public:
 
-  O2OXTCSizeException( const std::string& type, size_t expectedSize, size_t xtcSize )
-    : O2OException( "O2OXTCSizeException", type + ": XTC size=" +
+  O2OXTCSizeException( const ErrSvc::Context& ctx, const std::string& type, size_t expectedSize, size_t xtcSize )
+    : O2OException( ctx, "O2OXTCSizeException", type + ": XTC size=" +
         boost::lexical_cast<std::string>(xtcSize) +
         ", expected size=" + boost::lexical_cast<std::string>(expectedSize) ) {}
 
@@ -71,8 +71,8 @@ public:
 class O2OXTCGenException : public O2OException {
 public:
 
-  O2OXTCGenException( const std::string& msg )
-    : O2OException( "O2OXTCGenException", msg ) {}
+  O2OXTCGenException( const ErrSvc::Context& ctx, const std::string& msg )
+    : O2OException( ctx, "O2OXTCGenException", msg ) {}
 
 };
 

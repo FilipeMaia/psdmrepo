@@ -97,6 +97,7 @@ private:
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_tmpDir ;
+  AppCmdOpt<std::string>      m_backupExt ;
   AppCmdOpt<std::string>      m_outputName ;
   AppCmdOptBool               m_overwrite ;
   AppCmdOpt<unsigned long>    m_runNumber ;
@@ -128,6 +129,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_tmpDir     ( 'D', "tmp-dir",      "path",     "directory to write temporary HDF5 files, def: ''", "" )
+  , m_backupExt  (      "h5-backup-ext","string",   "extension to use for HDF5 backup, def: ''", "" )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
@@ -155,6 +157,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
   addOption( m_tmpDir ) ;
+  addOption( m_backupExt ) ;
   addOption( m_outputName ) ;
   addOption( m_overwrite ) ;
   addOption( m_runNumber ) ;
@@ -220,7 +223,8 @@ O2O_Translate::runApp ()
   scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
                                   m_compression.value(), m_extGroups.value(),
-                                  metadata, m_tmpDir.value().empty() ? m_tmpDir.value() : outputDir ) ) ;
+                                  metadata, m_tmpDir.value().empty() ? m_tmpDir.value() : outputDir,
+                                  m_backupExt.value() ) ) ;
 
   // instantiate metadata scanner
   scanners.push_back ( new MetaDataScanner( metadata ) ) ;

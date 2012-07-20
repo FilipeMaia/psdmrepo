@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-19-01
+2012-07-20 Andy Salnikov
+- support backing up of existing files when renaming
+
 Tag: V00-19-00
 2012-07-20 Andy Salnikov
 - implemented scan-based splitting of output files

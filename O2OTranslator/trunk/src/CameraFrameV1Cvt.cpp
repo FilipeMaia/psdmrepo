@@ -76,7 +76,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const H5DataTypes::XtcClockTime& time )
 {
   if ( sizeof data + data.data_size() != size ) {
-    throw O2OXTCSizeException ( "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
+    throw O2OXTCSizeException ( ERR_LOC, "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
   }
 
   if ( not m_dataCont ) {

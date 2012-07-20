@@ -90,7 +90,7 @@ protected:
   {
     // check data size
     if ( H5Type::xtcSize(data) != size ) {
-      throw O2OXTCSizeException ( Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
+      throw O2OXTCSizeException ( ERR_LOC, Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
     }
     
     m_dataCont->container( group )->append ( H5Type(data) ) ;

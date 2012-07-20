@@ -36,8 +36,8 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-O2OException::O2OException (const std::string& className, const std::string& what)
-  : std::runtime_error( className+": "+what)
+O2OException::O2OException (const ErrSvc::Context& ctx, const std::string& className, const std::string& what)
+  : ErrSvc::Issue( ctx, className+": "+what)
 {
 }
 

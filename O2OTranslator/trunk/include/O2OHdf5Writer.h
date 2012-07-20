@@ -83,6 +83,7 @@ public:
    *  @param[in] extGroups    If true generate extended group names with :NNNN suffix 
    *  @param[in] metadata     Object which keeps metadata (run number, experiment name, etc.)
    *  @param[in] finalDir     If non-empty then move files to this directory after closing
+   *  @param[in] backupExt    If non empty then used as backup extension for existing files
    */
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                   bool overwrite,
@@ -91,7 +92,8 @@ public:
                   int compression,
                   bool extGroups,
                   const O2OMetaData& metadata,
-                  const std::string& finalDir) ;
+                  const std::string& finalDir,
+                  const std::string& backupExt) ;
 
   // Destructor
   virtual ~O2OHdf5Writer () ;
@@ -143,6 +145,7 @@ private:
   bool m_extGroups ;
   const O2OMetaData& m_metadata ;
   const std::string m_finalDir;
+  const std::string m_backupExt;
 
   hdf5pp::File m_file ;
   std::stack<State> m_state ;

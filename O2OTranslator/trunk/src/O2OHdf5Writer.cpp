@@ -96,7 +96,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                int compression,
                                bool extGroups,
                                const O2OMetaData& metadata,
-                               const std::string& finalDir )
+                               const std::string& finalDir,
+                               const std::string& backupExt )
   : O2OXtcScannerI()
   , m_nameFactory(nameFactory)
   , m_overwrite(overwrite)
@@ -106,6 +107,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_extGroups(extGroups)
   , m_metadata(metadata)
   , m_finalDir(finalDir)
+  , m_backupExt(backupExt)
   , m_file()
   , m_state()
   , m_groups()
@@ -548,8 +550,19 @@ O2OHdf5Writer::closeFile()
       
     }
     
-    // check that none of the outpout files exists
+    // check if the output files exists, try to backup them if m_backupExt is set
     for (std::map<fs::path, fs::path>::const_iterator it = moveMap.begin(); it != moveMap.end(); ++ it) {
+      // try to backup existing file
+      if (not m_backupExt.empty() and fs::exists(it->second)) {
+        fs::path backup = it->second.string() + m_backupExt;
+        MsgLog(logger, info, "backing up file " << it->second << " to " << backup);
+        boost::system::error_code ec;
+        fs::rename(it->second, backup, ec);
+        if (ec) {
+          MsgLog( logger, error, "failed to backup file '" << it->second << "' to '" << backup << "': " << ec.message());
+        }
+      }
+      // check again
       if (fs::exists(it->second)) {
         MsgLog( logger, error, "cannot move file " << it->first << ", destination already exists: " << it->second);
         // reset whole thing
@@ -560,8 +573,8 @@ O2OHdf5Writer::closeFile()
     
     // if anything left in the map move that
     for (std::map<fs::path, fs::path>::const_iterator it = moveMap.begin(); it != moveMap.end(); ++ it) {
-      boost::system::error_code ec;
       MsgLog(logger, info, "renaming file " << it->first << " to " << it->second);
+      boost::system::error_code ec;
       fs::rename(it->first, it->second, ec);
       if (ec) {
         MsgLog( logger, error, "failed to rename file '" << it->first << "' to '" << it->second << "': " << ec.message());

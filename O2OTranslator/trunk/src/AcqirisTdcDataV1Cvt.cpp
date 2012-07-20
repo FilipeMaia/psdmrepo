@@ -72,7 +72,7 @@ AcqirisTdcDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                             const H5DataTypes::XtcClockTime& time )
 {
   if ( size % H5Type::xtcSize(data) != 0 ) {
-    throw O2OXTCSizeException ( "Acqiris::TdcDataV1", H5Type::xtcSize(data), size ) ;
+    throw O2OXTCSizeException ( ERR_LOC, "Acqiris::TdcDataV1", H5Type::xtcSize(data), size ) ;
   }
 
   size_t count = size / H5Type::xtcSize(data);

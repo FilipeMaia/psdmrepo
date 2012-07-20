@@ -81,7 +81,7 @@ public:
         MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << m_typeGroupName << ", expected size " <<H5Type::xtcSize(data)) ;
         return;
       }
-      throw O2OXTCSizeException ( m_typeGroupName, H5Type::xtcSize(data), size ) ;
+      throw O2OXTCSizeException ( ERR_LOC, m_typeGroupName, H5Type::xtcSize(data), size ) ;
     }
     
     // get the name of the group for this object

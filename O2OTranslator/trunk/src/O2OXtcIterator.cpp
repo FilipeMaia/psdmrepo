@@ -69,7 +69,7 @@ O2OXtcIterator::process(Xtc* xtc)
     MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
         << " level: " << int(level) << '#' << Pds::Level::name(level)
         << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
-    throw O2OXTCGenException("negative payload size") ;
+    throw O2OXTCGenException(ERR_LOC, "negative payload size") ;
   }
 
   m_src.push( xtc->src ) ;

@@ -115,7 +115,7 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // check total size
   if ( data.totalSize(hconfig) * nChan != size ) {
-    throw O2OXTCSizeException ( "AcqirisDataDescV1", data.totalSize(hconfig) * nChan, size ) ;
+    throw O2OXTCSizeException ( ERR_LOC, "AcqirisDataDescV1", data.totalSize(hconfig) * nChan, size ) ;
   }
 
   // allocate data
@@ -132,13 +132,13 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       std::ostringstream msg ;
       msg << "Acqiris::DataDescV1 - number of samples in data object ("
           << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")" ;
-      throw O2OXTCGenException ( msg.str() ) ;
+      throw O2OXTCGenException ( ERR_LOC, msg.str() ) ;
     }
     if ( dd->nbrSegments() != nSeg ) {
       std::ostringstream msg ;
       msg << "Acqiris::DataDescV1 - number of segments in data object ("
           << dd->nbrSegments() << ") different from config object (" << nSeg << ")" ;
-      throw O2OXTCGenException ( msg.str() ) ;
+      throw O2OXTCGenException ( ERR_LOC, msg.str() ) ;
     }
 
     for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
