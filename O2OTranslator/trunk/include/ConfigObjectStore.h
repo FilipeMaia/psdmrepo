@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <map>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -48,8 +49,19 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class ConfigObjectStore  {
+class ConfigObjectStore {
 public:
+
+  typedef std::pair<Pds::TypeId, Pds::Src> key_type;
+  // comparison operator for map keys
+  struct key_compare {
+    bool operator()(const key_type& lhs, const key_type& rhs) const;
+  };
+  typedef std::multimap<key_type, std::vector<char>, key_compare> ConfigMap;
+  typedef ConfigMap::value_type value_type;
+  typedef ConfigMap::const_iterator const_iterator;
+  typedef ConfigMap::iterator iterator;
+  
 
   // Default constructor
   ConfigObjectStore () ;
@@ -58,34 +70,31 @@ public:
   ~ConfigObjectStore () ;
 
   // store new config object
-  void store(const Pds::TypeId& typeId, const Pds::Src& src, const void* data, uint32_t size);
+  void store(const Pds::TypeId& typeId, const Pds::Src& src, const std::vector<char>& data);
 
-  // find stored config object
+  // find stored config object, return nullptr if not found
   template <typename T>
   const T* find(const Pds::TypeId& typeId, const Pds::Src& src) const {
     return static_cast<const T*>(_find(typeId, src));
   }
 
+  // returns iterators for begin/end of object set
+  const_iterator begin() const { return m_config.begin(); }
+  const_iterator end() const { return m_config.end(); }
+
+  // reset all contents
+  void clear() { return m_config.clear(); }
+  
 protected:
 
-  // find new config object
+  // find existing config object, return nullptr if not there
   const void* _find(const Pds::TypeId& typeId, const Pds::Src& src) const;
 
 private:
 
-  typedef std::pair<Pds::TypeId, Pds::Src> ConfigKey;
-  // comparison operator for map keys
-  struct _KeyCmp {
-    bool operator()( const ConfigKey& lhs, const ConfigKey& rhs ) const ;
-  };
-  typedef std::map<ConfigKey, const void*, _KeyCmp> ConfigMap ;
 
   // Data members
   ConfigMap m_config ;
-
-  // Copy constructor and assignment are disabled by default
-  ConfigObjectStore ( const ConfigObjectStore& ) ;
-  ConfigObjectStore& operator = ( const ConfigObjectStore& ) ;
 
 };
 

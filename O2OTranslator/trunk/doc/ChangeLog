@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-19-00
+2012-07-20 Andy Salnikov
+- implemented scan-based splitting of output files
+- --split-mode=family renamed to --split-mode=size
+- ConfigObjectStore implementation changed to accept multiple objects 
+  with the same Src, it uses multimap internally; in addition data is 
+  stored as vector<char> instead of char* so we know the size of the data
+- converters map is now fully encapsulated inside O2OCvtFactory class
+
 Tag: V00-18-11
 2012-07-18 Andy Salnikov
 - when renaming files check existing file names, if present then do not

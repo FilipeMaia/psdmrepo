@@ -46,7 +46,7 @@ namespace O2OTranslator {
 /**
  *  @ingroup O2OTranslator
  *
- *  @brief Utility class which instantiates converters for all known data types.
+ *  @brief Class which instantiates converters for all known data types.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -61,13 +61,27 @@ public:
 
   typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
   typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
+  typedef CvtMap::iterator iterator ;
+  typedef CvtMap::const_iterator const_iterator ;
 
   /**
-   *  @brief Method which instantiates converters for all known data types
+   *  @brief Constructor instantiates converters for all known data types
    */
-  static void makeConverters(CvtMap& cvtMap, ConfigObjectStore& configStore, CalibObjectStore& calibStore,
+  O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& calibStore,
       const O2OMetaData& metadata, int compression);
 
+  iterator begin() { return m_cvtMap.begin(); }
+  iterator end() { return m_cvtMap.end(); }
+  const_iterator begin() const { return m_cvtMap.begin(); }
+  const_iterator end() const { return m_cvtMap.end(); }
+
+  iterator find(const Pds::TypeId& typeId) { return m_cvtMap.find(typeId.value()); }
+  const_iterator find(const Pds::TypeId& typeId) const { return m_cvtMap.find(typeId.value()); }
+
+private:
+  
+  CvtMap m_cvtMap ;
+  
 };
 
 } // namespace O2OTranslator

@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <uuid/uuid.h>
@@ -30,7 +31,6 @@
 //-------------------------------
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
-#include "O2OTranslator/O2OCvtFactory.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
@@ -51,20 +51,21 @@ namespace {
   const char* logger = "HDF5Writer" ;
 
   // printable state name
-  const char* stateName ( O2OHdf5Writer::State state ) {
+  std::ostream& operator<<(std::ostream& out, O2OHdf5Writer::State state ) {
+    const char* name = "*ERROR*" ;
     switch ( state ) {
       case O2OHdf5Writer::Undefined :
-        return "Undefined" ;
+        name = "Undefined" ;
       case O2OHdf5Writer::Configured :
-        return "Configured" ;
+        name = "Configured" ;
       case O2OHdf5Writer::Running :
-        return "Running" ;
+        name = "Running" ;
       case O2OHdf5Writer::CalibCycle :
-        return "CalibCycle" ;
+        name = "CalibCycle" ;
       case O2OHdf5Writer::NumberOfStates :
         break ;
     }
-    return "*ERROR*" ;
+    return out << name;
   }
 
   // store time as attributes to the group
@@ -97,7 +98,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                const O2OMetaData& metadata,
                                const std::string& finalDir )
   : O2OXtcScannerI()
-  , m_nameFactory( nameFactory )
+  , m_nameFactory(nameFactory)
   , m_overwrite(overwrite)
   , m_split(split)
   , m_splitSize(splitSize)
@@ -109,24 +110,22 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_state()
   , m_groups()
   , m_eventTime()
-  , m_cvtMap()
   , m_stateCounters()
   , m_transition(Pds::TransitionId::Unknown)
+  , m_configStore0()
   , m_configStore()
   , m_calibStore()
+  , m_cvtFactory(m_configStore, m_calibStore, m_metadata, m_compression)
   , m_transClock()
+  , m_reopen(true)
+  , m_serialScan(0)
+  , m_scanAtOpen(0)
 {
   std::fill_n(m_stateCounters, int(NumberOfStates), 0U);
   std::fill_n(m_transClock, int(Pds::TransitionId::NumberOf), LusiTime::Time(0,0));
     
   // we are in bad state, this state should never be popped
   m_state.push(Undefined) ;
-
-  // instantiate all converters
-  O2OCvtFactory::makeConverters(m_cvtMap, m_configStore, m_calibStore, m_metadata, m_compression);
-
-  // open new file
-  openFile();
 }
 
 //--------------
@@ -135,8 +134,6 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 O2OHdf5Writer::~O2OHdf5Writer ()
 {
   MsgLog( logger, debug, "O2OHdf5Writer - close output file" ) ;
-
-  m_cvtMap.clear() ;
   closeFile();
 }
 
@@ -166,7 +163,15 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
         this->closeGroup( dgram, Configured ) ;
+        if (m_reopen) {
+          closeFile();
+          openFile();
+          m_reopen = false;
+        }
         this->openGroup( dgram, Configured ) ;
+                
+        // reset content of the special configuration store
+        m_configStore0.clear();
       }
       break ;
 
@@ -186,6 +191,14 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         // close all states up to Configured
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
+        if (m_reopen) {
+          this->closeGroup( dgram, Configured, false ) ;
+          closeFile();
+          openFile();
+          this->openGroup( dgram, Configured ) ;
+          storeConfig0();
+          m_reopen = false;
+        }
         this->openGroup( dgram, Running ) ;
       }
       break ;
@@ -204,6 +217,16 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       if ( t != m_transClock[m_transition] ) {
         // close all states up to Running
         this->closeGroup( dgram, CalibCycle ) ;
+        if (m_reopen) {
+          this->closeGroup( dgram, Running, false ) ;
+          this->closeGroup( dgram, Configured, false ) ;
+          closeFile();
+          openFile();
+          this->openGroup( dgram, Configured ) ;
+          storeConfig0();
+          this->openGroup( dgram, Running ) ;
+          m_reopen = false;
+        }
         this->openGroup( dgram, CalibCycle ) ;
       }
       break ;
@@ -213,6 +236,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       if ( t != m_transClock[m_transition] ) {
         // close all states up to Running
         this->closeGroup( dgram, CalibCycle ) ;
+        m_reopen = m_split == SplitScan;
+        ++ m_serialScan;
       }
 
       break ;
@@ -244,7 +269,7 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
   // store the time of the transition
   m_transClock[m_transition] = t;
   
-  MsgLog( logger, debug, "O2OHdf5Writer -- now in the state " << ::stateName(m_state.top()) ) ;
+  MsgLog(logger, debug, "O2OHdf5Writer -- now in the state " << m_state.top()) ;
   
   return not skip;
 }
@@ -256,27 +281,10 @@ O2OHdf5Writer::eventEnd ( const Pds::Dgram& dgram )
 
 
 void
-O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
+O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state)
 {
-  // get the counter for this state
-  unsigned counter = m_stateCounters[state] ;
-  ++ m_stateCounters[state] ;
-
-  // reset counter for sub-states, note there are no breaks
-  switch( state ) {
-  case Undefined:
-    m_stateCounters[Configured] = 0;
-  case Configured:
-    m_stateCounters[Running] = 0;
-  case Running:
-    m_stateCounters[CalibCycle] = 0;
-  case CalibCycle:
-  case NumberOfStates:
-    break;
-  }
-
   // create group
-  const std::string& name = groupName ( state, counter ) ;
+  const std::string& name = groupName ( state, m_stateCounters[state] ) ;
   MsgLog( logger, debug, "HDF5Writer -- creating group " << name ) ;
   hdf5pp::Group group;
   if (m_groups.top().hasChild(name)) {
@@ -293,21 +301,39 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   m_groups.push( group ) ;
 
   // notify all converters
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+  for ( O2OCvtFactory::iterator it = m_cvtFactory.begin() ; it != m_cvtFactory.end() ; ++ it ) {
     it->second->openGroup( group ) ;
   }
 }
 
 void
-O2OHdf5Writer::closeGroup ( const Pds::Dgram& dgram, State state )
+O2OHdf5Writer::closeGroup ( const Pds::Dgram& dgram, State state, bool updateCounters )
 {
   if ( m_state.top() != state ) return ;
+
+  if (updateCounters) {
+    ++ m_stateCounters[state] ;
+  
+    // reset counter for sub-states, note there are no breaks
+    switch( state ) {
+    case Undefined:
+      m_stateCounters[Configured] = 0;
+    case Configured:
+      m_stateCounters[Running] = 0;
+    case Running:
+      m_stateCounters[CalibCycle] = 0;
+    case CalibCycle:
+    case NumberOfStates:
+      break;
+    }
+  }
+  
 
   // store transition time as couple of attributes to this new group
   ::storeClock ( m_groups.top(), dgram.seq.clock(), "end" ) ;
 
   // notify all converters
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+  for ( O2OCvtFactory::iterator it = m_cvtFactory.begin() ; it != m_cvtFactory.end() ; ++ it ) {
     it->second->closeGroup( m_groups.top() ) ;
   }
 
@@ -334,45 +360,55 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object in configure or begincalibcycle transitions
 void
-O2OHdf5Writer::configObject(const void* data, size_t size,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // for Configure and BeginCalibCycle transitions store config objects at Source level
-  MsgLog( logger, debug, "O2OHdf5Writer: store config object "
-      << src.top()
+  MsgLog( logger, debug, "O2OHdf5Writer: store config object " << src.top()
       << " name=" <<  Pds::TypeId::name(typeId.id())
       << " version=" <<  typeId.version() ) ;
-  m_configStore.store(typeId, src.top(), data, size);
+  std::vector<char> vdata((const char*)data, ((const char*)data)+size);
+  m_configStore.store(typeId, src.top(), vdata);
+  if (m_transition == Pds::TransitionId::Configure) {
+    // update also special config store
+    m_configStore0.store(typeId, src.top(), vdata);
+  }
+}
+
+// store all configuration object from special store to a file
+void
+O2OHdf5Writer::storeConfig0() 
+{
+  for (ConfigObjectStore::const_iterator it = m_configStore0.begin(); it != m_configStore0.end(); ++ it) {
+    
+    const Pds::TypeId& typeId = it->first.first;
+    O2OXtcSrc src;
+    src.push(it->first.second);
+    const std::vector<char>& data = it->second;
+    
+    dataObject(data.data(), data.size(), typeId, src);
+    
+  }
 }
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject ( const void* data, size_t size,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src )
+O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // find this type in the converter map
-  CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
-  if ( it != m_cvtMap.end() ) {
-
-    do {
-
-      DataTypeCvtPtr converter = it->second ;
-      try {
-        converter->convert( data, size, typeId, src, m_eventTime ) ;
-      } catch (const O2OXTCSizeException& ex) {
-        // on size mismatch print an error message but continue
-        MsgLog(logger, error, ex.what());
-      }
-
-      ++ it ;
-
-    } while ( it != m_cvtMap.end() and it->first == typeId.value() ) ;
-
-  } else if (typeId.id() != Pds::TypeId::Id_EpicsConfig) {
-
+  O2OCvtFactory::iterator it = m_cvtFactory.find(typeId);
+  if (it == m_cvtFactory.end() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
     MsgLogRoot( error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
-                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() ) ;
+                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+  }
 
+  // call convert method on every matching converter
+  for ( ; it != m_cvtFactory.end() and it->first == typeId.value(); ++ it) {
+    try {
+      it->second->convert( data, size, typeId, src, m_eventTime ) ;
+    } catch (const O2OXTCSizeException& ex) {
+      // on size mismatch print an error message but continue
+      MsgLog(logger, error, ex.what());
+    }
   }
 
 }
@@ -413,8 +449,9 @@ O2OHdf5Writer::groupName( State state, unsigned counter ) const
 void
 O2OHdf5Writer::openFile()
 {
-  std::string fileTempl = m_nameFactory.makePath ( m_split == Family ? O2OFileNameFactory::Family : 1 ) ;
-  MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
+  std::string fileTempl = m_nameFactory.makePath ( m_split == Family ? O2OFileNameFactory::Family : m_serialScan ) ;
+  m_scanAtOpen = m_serialScan;
+  MsgLog( logger, trace, "O2OHdf5Writer - open output file " << fileTempl ) ;
 
   // Disable printing of error messages
   //stat = H5Eset_auto2( H5E_DEFAULT, 0, 0 ) ;
@@ -470,6 +507,11 @@ O2OHdf5Writer::openFile()
 void 
 O2OHdf5Writer::closeFile()
 {
+  if (not m_file.valid()) {
+    // it was not open
+    return;
+  }
+  
   m_file.close();
   
   if (not m_finalDir.empty()) {
@@ -499,7 +541,7 @@ O2OHdf5Writer::closeFile()
     } else {
       
       // there should be just one file
-      fs::path src = m_nameFactory.makePath(1);
+      fs::path src = m_nameFactory.makePath(m_scanAtOpen);
       fs::path basename = src.filename();
       fs::path dst = fs::path(m_finalDir) / src.filename();
       moveMap[src] = dst;

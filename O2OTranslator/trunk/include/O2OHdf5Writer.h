@@ -33,6 +33,7 @@
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/DataTypeCvtI.h"
+#include "O2OTranslator/O2OCvtFactory.h"
 #include "pdsdata/xtc/TransitionId.hh"
 
 //------------------------------------
@@ -117,7 +118,7 @@ protected:
   std::string groupName( State state, unsigned counter ) const ;
 
   void openGroup ( const Pds::Dgram& dgram, State state ) ;
-  void closeGroup ( const Pds::Dgram& dgram, State state ) ;
+  void closeGroup ( const Pds::Dgram& dgram, State state, bool updateCounters = true ) ;
 
   // open new file
   void openFile();
@@ -125,10 +126,11 @@ protected:
   // close file/move to the final dir
   void closeFile();
 
+  // store all configuration object from special store to a file
+  void storeConfig0(); 
+
 private:
 
-  typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
-  typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
   typedef unsigned StateCounters[NumberOfStates] ;
   typedef LusiTime::Time TransitionClock[Pds::TransitionId::NumberOf] ;
 
@@ -146,12 +148,16 @@ private:
   std::stack<State> m_state ;
   std::stack<hdf5pp::Group> m_groups ;
   H5DataTypes::XtcClockTime m_eventTime ;
-  CvtMap m_cvtMap ;
   StateCounters m_stateCounters ;
   Pds::TransitionId::Value m_transition;
-  ConfigObjectStore m_configStore;
+  ConfigObjectStore m_configStore0;  // This contains only objects from latest Configure
+  ConfigObjectStore m_configStore;   // This contains all configuration objects
   CalibObjectStore m_calibStore;
+  O2OCvtFactory m_cvtFactory;        // must be after m_configStore and m_calibStore
   TransitionClock m_transClock;
+  bool m_reopen;                     // if true then means time to reopen file in SplitScan mode
+  unsigned m_serialScan;             // serial scan number, incremented on every EndCalibCycle
+  unsigned m_scanAtOpen;             // scan number used to open the file
 
   // close all containers
   void closeContainers() ;

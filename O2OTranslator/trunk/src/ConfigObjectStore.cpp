@@ -36,7 +36,7 @@ namespace O2OTranslator {
 
 // comparison operator for Src objects
 bool
-ConfigObjectStore::_KeyCmp::operator()( const ConfigKey& lhs, const ConfigKey& rhs ) const
+ConfigObjectStore::key_compare::operator()( const key_type& lhs, const key_type& rhs ) const
 {
   if ( lhs.first.value() < rhs.first.value() ) return true ;
   if ( lhs.first.value() > rhs.first.value() ) return false ;
@@ -60,38 +60,23 @@ ConfigObjectStore::ConfigObjectStore ()
 //--------------
 ConfigObjectStore::~ConfigObjectStore ()
 {
-  for ( ConfigMap::iterator it = m_config.begin() ; it != m_config.end() ; ++ it ) {
-    delete [] (char*)it->second;
-  }
 }
 
 // store new config object
 void
-ConfigObjectStore::store(const Pds::TypeId& typeId, const Pds::Src& src, const void* data, uint32_t size)
+ConfigObjectStore::store(const Pds::TypeId& typeId, const Pds::Src& src, const std::vector<char>& data)
 {
-  ConfigKey key(typeId, src);
-  ConfigMap::iterator it = m_config.find(key);
-  if ( it != m_config.end() ) {
-    // delete old object, replace with new
-    char* newobj = new char[size];
-    std::copy( (const char*)data, ((const char*)data)+size, newobj);
-    delete [] (char*)it->second;
-    it->second = newobj;
-  } else {
-    // create new one
-    char* newobj = new char[size];
-    std::copy( (const char*)data, ((const char*)data)+size, newobj);
-    m_config.insert(ConfigMap::value_type(key, newobj));
-  }
+  key_type key(typeId, src);
+  m_config.insert(value_type(key, data));
 }
 
-// find new config object
+// find config object
 const void*
 ConfigObjectStore::_find(const Pds::TypeId& typeId, const Pds::Src& src) const
 {
-  ConfigKey key(typeId, src);
-  ConfigMap::const_iterator it = m_config.find(key);
-  if ( it != m_config.end() ) return it->second;
+  key_type key(typeId, src);
+  const_iterator it = m_config.find(key);
+  if ( it != m_config.end() ) return it->second.data();
   return 0;
 }
 

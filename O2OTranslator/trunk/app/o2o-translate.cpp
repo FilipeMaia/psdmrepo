@@ -132,7 +132,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
-  , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
+  , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, scan, or size; def: none", O2OHdf5Writer::NoSplit )
   , m_splitSize  ( 'z', "split-size",   "size",     "max. size of output files. def: 10G", 10*1073741824ULL )
   , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
   , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
@@ -160,7 +160,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_runNumber ) ;
   addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
-  m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
+  m_splitMode.add ( "size", O2OHdf5Writer::Family ) ;
   m_splitMode.add ( "scan", O2OHdf5Writer::SplitScan ) ;
   addOption( m_splitMode ) ;
   addOption( m_splitSize ) ;
