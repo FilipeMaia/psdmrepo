@@ -838,6 +838,7 @@ HERE;
             <option>created</option>
             <option>archived</option>
             <option>disk</option>
+            <option>migration</option>
           </select>
         </td>
         <td><div style="font-size:120%; padding-left:10px;"><button id="datafiles-files-reverse">Show in Reverse Order</button></div></td>
@@ -845,6 +846,7 @@ HERE;
         <td><input type="checkbox" name="type" /></td><td>Type</td>
         <td><input type="checkbox" name="size" /></td><td>Size</td>
         <td><input type="checkbox" name="created" /></td><td>Created</td>
+        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
       </tr><tr>
         <td></td>
         <td></td>
@@ -852,7 +854,7 @@ HERE;
         <td></td>
         <td><input type="checkbox" name="archived" /></td><td>Archived</td>
         <td><input type="checkbox" name="local" /></td><td>On disk</td>
-        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+        <td><input type="checkbox" name="migration" /></td><td colspan=3>Begin Migration Delay</td>
       </tr>
     </tbody></table>
   </div>

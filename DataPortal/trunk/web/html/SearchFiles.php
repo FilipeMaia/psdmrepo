@@ -178,6 +178,39 @@ try {
     $experiment = $logbook->find_experiment_by_id( $exper_id ) or report_error("No such experiment");
     $instrument = $experiment->instrument();
 
+    /* Get the migration delay of the known files of the experiment
+     * and prepare a dictionary mapping file names into the correponding
+     * objects. If the file is found in the database then possible values
+     * for the migration delay can be:
+     *
+     * - return null if the migration hasn't started
+     * - otherwise it has to be a positive number (0 or more)
+     * - negative values aren't allowed
+     */
+    $migration_status = array();
+    foreach( $experiment->regdb_experiment()->data_migration_files() as $file )
+        $migration_status[$file->name()] = $file;
+
+    $migration_delay = array();
+    foreach( $experiment->regdb_experiment()->files() as $file ) {
+        $filename =
+            sprintf("e%d-r%04d-s%02d-c%02d.xtc",
+                $experiment->id(),
+                $file->run(),
+                $file->stream(),
+                $file->chunk());
+        if( array_key_exists($filename, $migration_status)) {
+            $start_time = $migration_status[$filename]->start_time();
+            if( $start_time ) {
+                $seconds = $start_time->to_float() - $file->open_time()->to_float();
+                if( $seconds < 0 ) $seconds = 0.;
+                $migration_delay[$filename] = intval($seconds);
+            } else {
+                $migration_delay[$filename] = null;
+            }
+        }
+    }
+
     /* If no specific run range is provided find out the one by probing all
      * known file types.
      */
@@ -272,12 +305,14 @@ HERE;
 			$first_file = true;
             foreach( $files_by_runs[$runnum] as $file ) {
 
+                $filename = $file['name'];
+
             	$total_size_gb += $file['size'] / (1024.0 * 1024.0 * 1024.0);
 				if($first_file) $first_file = false;
 				else print ',';
-				print json_encode( array(
+				$entry = array(
 					'runnum'          => $runnum,
-   					'name'            => $file['name'],
+   					'name'            => $filename,
    					'type'            => strtoupper( $file['type'] ),
 					'size_bytes'      => $file['size'],
     				'size'            => number_format( $file['size'] ),
@@ -289,7 +324,13 @@ HERE;
    	            		'<a class="link" href="javascript:display_path('."'".$file['local_path']."'".')">path</a>' :
                	   		$file['local'],
                	   	'checksum' => $file['checksum']
-  				));
+  				);
+                if(array_key_exists($filename, $migration_delay)) {
+                    $start_migration_delay_sec = $migration_delay[$filename];
+                    if( !is_null($start_migration_delay_sec))
+                        $entry['start_migration_delay_sec'] = $start_migration_delay_sec;
+                }
+                print json_encode($entry); 
    	        }
 
    	        /* Add XTC files which haven't been reported to iRODS because they have either
@@ -298,18 +339,18 @@ HERE;
    	        if( in_array( 'xtc', $types )) {
 	    		foreach( $experiment->regdb_experiment()->files( $runnum ) as $file ) {
 
-	    			$name = sprintf("e%d-r%04d-s%02d-c%02d.xtc",
+	    			$filename = sprintf("e%d-r%04d-s%02d-c%02d.xtc",
 									$experiment->id(),
 									$file->run(),
 									$file->stream(),
 									$file->chunk());
 
-					if( !array_key_exists( $name, $files_reported_by_iRODS )) {
+					if( !array_key_exists( $filename, $files_reported_by_iRODS )) {
 						if($first_file) $first_file = false;
 						else print ',';
-						print json_encode( array(
+						$entry = array(
 							'runnum'          => $runnum,
-   							'name'            => '<span style="color:red;">'.$name.'</span>',
+   							'name'            => '<span style="color:red;">'.$filename.'</span>',
    							'type'            => 'XTC',
 							'size_bytes'      => '0',
     						'size'            => '<span style="color:red;">n/a</span>',
@@ -318,7 +359,13 @@ HERE;
 	   						'archived'        => '<span style="color:red;">n/a</span>',
 		   					'local'           => '<span style="color:red;">never migrated from DAQ or deleted</span>',
         	    	   	   	'checksum'        => ''
-  						));
+  						);
+                        if(array_key_exists($filename, $migration_delay)) {
+                            $start_migration_delay_sec = $migration_delay[$filename];
+                            if( !is_null($start_migration_delay_sec))
+                                $entry['start_migration_delay_sec'] = $start_migration_delay_sec;
+                        }
+                        print json_encode($entry);
 					}
 				}
     		}
@@ -373,7 +420,7 @@ HERE;
     	        $files = $files_by_runs[$runnum];
 	            foreach( $files as $file ) {
 
-	                $name = pre( $file['name'] );
+	                $filename = pre( $file['name'] );
     	            if( $file['local_flag'] ) {
         	            $local = pre( '<a class="link" href="javascript:display_path('."'".$file['local_path']."'".')">path</a>' );
             	    } else {
@@ -389,7 +436,7 @@ HERE;
     				echo DataPortal::table_row_html(
     					array(
     						$filenum == 1 ? $run_url : '',
-    						$name,
+    						$filename,
     						$type,
 	    					$size,
     						$created,

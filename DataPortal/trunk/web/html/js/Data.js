@@ -83,6 +83,12 @@ function datafiles_create() {
 	this.files_last_request_files = null;
 	this.files_reverse_order = true;
 
+    function migration_status2html(f) {
+        var html = f.start_migration_delay_sec !== undefined ?
+            f.start_migration_delay_sec :
+            '';
+        return html;
+    }
 	function file2html(f,run_url,display,extra_class) {
 		var hightlight_class = f.type != 'XTC' ? 'datafiles-files-highlight' : '';
 		var html =
@@ -100,7 +106,9 @@ function datafiles_create() {
 			(display.archived?
 '    <td class="table_cell '+hightlight_class+' '+extra_class+'">'+f.archived+'</td>':'')+
 			(display.local?
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class+'">'+f.local+'</td>':'')+
+'    <td class="table_cell '+hightlight_class+' '+extra_class+'">'+f.local+'</td>':'')+
+			(display.migration?
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class+'">'+migration_status2html(f)+'</td>':'')+
 '  </tr>';
 		return html;
 	}
@@ -110,9 +118,10 @@ function datafiles_create() {
 		display.type          = $('#datafiles-files-wa' ).find('input[name="type"]').attr('checked');
 		display.size          = $('#datafiles-files-wa' ).find('input[name="size"]').attr('checked');
 		display.created       = $('#datafiles-files-wa' ).find('input[name="created"]').attr('checked');
+	    display.checksum      = $('#datafiles-files-wa' ).find('input[name="checksum"]').attr('checked');
 		display.archived      = $('#datafiles-files-wa' ).find('input[name="archived"]').attr('checked');
 		display.local         = $('#datafiles-files-wa' ).find('input[name="local"]').attr('checked');
-	    display.checksum      = $('#datafiles-files-wa' ).find('input[name="checksum"]').attr('checked');
+	    display.migration     = $('#datafiles-files-wa' ).find('input[name="migration"]').attr('checked');
 
 		var num_runs = 0;
 		var num_files = 0;
@@ -134,6 +143,8 @@ function datafiles_create() {
 '    <td class="table_hdr">Archived</td>':'')+
             (display.local?
 '    <td class="table_hdr">On disk</td>':'')+
+			(display.migration?
+'    <td class="table_hdr">Begin migration delay [s]</td>':'')+
 '  </tr>';
 
 		if( $('#datafiles-files-wa' ).find('select[name="sort"]').val() == 'run' ) {
@@ -209,22 +220,28 @@ function datafiles_create() {
 
 	};
 	this.files_sort = function() {
-		function compare_elements_by_run     (a, b) { return   a.runnum          - b.runnum; }
-		function compare_elements_by_name    (a, b) { return ( a.name < b.name ? -1 : (a.name > b.name ? 1 : 0 )); }
-		function compare_elements_by_type    (a, b) { return ( a.type < b.type ? -1 : (a.type > b.type ? 1 : compare_elements_by_run(a,b))); }
-		function compare_elements_by_size    (a, b) { return   a.size_bytes      - b.size_bytes; }
-		function compare_elements_by_created (a, b) { return   a.created_seconds - b.created_seconds; }
-		function compare_elements_by_archived(a, b) { return ( a.archived < b.archived ? -1 : (a.archived > b.archived ? 1 : compare_elements_by_run(a,b))); }
-		function compare_elements_by_disk    (a, b) { return ( a.local    < b.local    ? -1 : (a.local    > b.local    ? 1 : compare_elements_by_run(a,b))); }
+		function compare_elements_by_run      (a, b) { return   a.runnum          - b.runnum; }
+		function compare_elements_by_name     (a, b) { return ( a.name < b.name ? -1 : (a.name > b.name ? 1 : 0 )); }
+		function compare_elements_by_type     (a, b) { return ( a.type < b.type ? -1 : (a.type > b.type ? 1 : compare_elements_by_run(a,b))); }
+		function compare_elements_by_size     (a, b) { return   a.size_bytes      - b.size_bytes; }
+		function compare_elements_by_created  (a, b) { return   a.created_seconds - b.created_seconds; }
+		function compare_elements_by_archived (a, b) { return ( a.archived < b.archived ? -1 : (a.archived > b.archived ? 1 : compare_elements_by_run(a,b))); }
+		function compare_elements_by_disk     (a, b) { return ( a.local    < b.local    ? -1 : (a.local    > b.local    ? 1 : compare_elements_by_run(a,b))); }
+        function compare_elements_by_migration(a, b) {
+            var a_delay = a.start_migration_delay_sec !== undefined ? a.start_migration_delay_sec : 0;
+            var b_delay = b.start_migration_delay_sec !== undefined ? b.start_migration_delay_sec : 0;
+            return ( a_delay < b_delay ? -1 : (a_delay > b_delay ? 1 : compare_elements_by_run(a,b)));
+        }
 		var sort_function = null;
 		switch( $('#datafiles-files-wa' ).find('select[name="sort"]').val()) {
-		case 'run':      sort_function = compare_elements_by_run;      break;
-		case 'name':     sort_function = compare_elements_by_name;     break;
-		case 'type':     sort_function = compare_elements_by_type;     break;
-		case 'size':     sort_function = compare_elements_by_size;     break;
-		case 'created':  sort_function = compare_elements_by_created;  break;
-		case 'archived': sort_function = compare_elements_by_archived; break;
-		case 'disk':     sort_function = compare_elements_by_disk;     break;
+		case 'run':       sort_function = compare_elements_by_run;       break;
+		case 'name':      sort_function = compare_elements_by_name;      break;
+		case 'type':      sort_function = compare_elements_by_type;      break;
+		case 'size':      sort_function = compare_elements_by_size;      break;
+		case 'created':   sort_function = compare_elements_by_created;   break;
+		case 'archived':  sort_function = compare_elements_by_archived;  break;
+		case 'disk':      sort_function = compare_elements_by_disk;      break;
+		case 'migration': sort_function = compare_elements_by_migration; break;
 		}
 		this.files_last_request_files.sort( sort_function );
 	};
