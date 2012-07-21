@@ -42,6 +42,8 @@ try {
     // Required parameters, no empty values allowed
     //
     $cable_id = NeoCaptarUtils::get_param_POST('cable_id');
+    $comments = NeoCaptarUtils::get_param_POST('comments', false, true);  // not required and allowed to be empty
+    $comments = is_null($comments) ? '' : trim($comments);
 
     $cable = $neocaptar->find_cable_by_id($cable_id);
     if( is_null($cable)) NeoCaptarUtils::report_error('no cable exists for id: '.$cable_id);
@@ -59,6 +61,7 @@ try {
         // Optional parameters, empty values are allowed
         //
         $param_names = array(
+            "description",
             "device",
             "device_location",
             "device_region",
@@ -97,7 +100,7 @@ try {
             $val = NeoCaptarUtils::get_param_POST($name,false,true);
             if( !is_null($val)) $params[$name] = $val;
         }
-        $cable = $cable->update_self($params);
+        $cable = $cable->update_self($params, $comments);
 
     } else {
 
@@ -110,46 +113,46 @@ try {
         }
         switch( $status ) {
             case 'Planned':
-                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->un_register_cable  ($cable);
+                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->un_register_cable  ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Registered':
-                if     ($cable->status() == 'Planned'     ) $cable = $neocaptar->register_cable     ($cable);
-                else if($cable->status() == 'Labeled'     ) $cable = $neocaptar->un_label_cable     ($cable);
+                if     ($cable->status() == 'Planned'     ) $cable = $neocaptar->register_cable     ($cable, $comments);
+                else if($cable->status() == 'Labeled'     ) $cable = $neocaptar->un_label_cable     ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Labeled':
-                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->label_cable        ($cable);
-                else if($cable->status() == 'Fabrication' ) $cable = $neocaptar->un_fabricate_cable ($cable);
+                if     ($cable->status() == 'Registered'  ) $cable = $neocaptar->label_cable        ($cable, $comments);
+                else if($cable->status() == 'Fabrication' ) $cable = $neocaptar->un_fabricate_cable ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Fabrication':
-                if     ($cable->status() == 'Labeled'     ) $cable = $neocaptar->fabricate_cable    ($cable);
-                else if($cable->status() == 'Ready'       ) $cable = $neocaptar->un_ready_cable     ($cable);
+                if     ($cable->status() == 'Labeled'     ) $cable = $neocaptar->fabricate_cable    ($cable, $comments);
+                else if($cable->status() == 'Ready'       ) $cable = $neocaptar->un_ready_cable     ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Ready':
-                if     ($cable->status() == 'Fabrication' ) $cable = $neocaptar->ready_cable        ($cable);
-                else if($cable->status() == 'Installed'   ) $cable = $neocaptar->un_install_cable   ($cable);
+                if     ($cable->status() == 'Fabrication' ) $cable = $neocaptar->ready_cable        ($cable, $comments);
+                else if($cable->status() == 'Installed'   ) $cable = $neocaptar->un_install_cable   ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Installed':
-                if     ($cable->status() == 'Ready'       ) $cable = $neocaptar->install_cable      ($cable);
-                else if($cable->status() == 'Commissioned') $cable = $neocaptar->un_commission_cable($cable);
+                if     ($cable->status() == 'Ready'       ) $cable = $neocaptar->install_cable      ($cable, $comments);
+                else if($cable->status() == 'Commissioned') $cable = $neocaptar->un_commission_cable($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Commissioned':
-                if     ($cable->status() == 'Installed'   ) $cable = $neocaptar->commission_cable   ($cable);
-                else if($cable->status() == 'Damaged'     ) $cable = $neocaptar->un_damage_cable    ($cable);
+                if     ($cable->status() == 'Installed'   ) $cable = $neocaptar->commission_cable   ($cable, $comments);
+                else if($cable->status() == 'Damaged'     ) $cable = $neocaptar->un_damage_cable    ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Damaged':
-                if     ($cable->status() == 'Commissioned') $cable = $neocaptar->damage_cable       ($cable);
-                else if($cable->status() == 'Retired'     ) $cable = $neocaptar->un_retire_cable    ($cable);
+                if     ($cable->status() == 'Commissioned') $cable = $neocaptar->damage_cable       ($cable, $comments);
+                else if($cable->status() == 'Retired'     ) $cable = $neocaptar->un_retire_cable    ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             case 'Retired':
-                if     ($cable->status() == 'Damaged'     ) $cable = $neocaptar->retire_cable       ($cable);
+                if     ($cable->status() == 'Damaged'     ) $cable = $neocaptar->retire_cable       ($cable, $comments);
                 else                                        assert_status($cable,$status);
                 break;
             default:

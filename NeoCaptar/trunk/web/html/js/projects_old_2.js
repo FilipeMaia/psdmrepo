@@ -104,6 +104,10 @@ function p_appl_projects() {
             var proj = this.project[pidx];
 			if( !proj.is_loaded ) {
 				proj.is_loaded = true;
+				$('#proj-edit-'+pidx ).
+                    button().
+                    button(this.can_manage_project(pidx)?'enable':'disable').
+                    click(function() { that.edit_attributes(pidx); });
 				$('#proj-delete-'+pidx ).
                     button().
                     button(this.can_manage_project(pidx)?'enable':'disable').
@@ -129,7 +133,43 @@ function p_appl_projects() {
 			$(container).removeClass('proj-vis').addClass('proj-hdn');
 		}
 	};
-    this.save_attributes = function(pidx) {
+    this.edit_attributes = function(pidx) {
+        var proj = this.project[pidx];
+        var html =
+'        <table id="proj-editor-'+pidx+'" style="font-size:95%;"><tbody>'+
+'          <tr>'+
+'            <td><b>Owner: </b></td>'+
+'            <td><select name="owner" style="padding:1px;" '+(global_current_user.is_administrator?'':' disabled="disabled"')+'>';
+        var users = global_get_projmanagers();
+        for( var i in users ) {
+            var user = users[i];
+            html +=
+'                  <option '+(proj.owner==user?'selected="selected"':'')+'>'+user+'</option>';
+        }
+        html +=
+'                </select></td>'+
+'            <td><b>Title: </b></td>'+
+'            <td><input type="text" size="36" name="title" value="'+proj.title+'" style="padding:1px;"></td>'+
+'            <td></td>'+
+'            <td><b>Due by: </b></td>'+
+'            <td><input type="text" size="10" name="due" value="'+proj.due+'" style="padding:1px;"></td>'+
+'          </tr>'+
+'          <tr>'+
+'            <td><b>Descr: </b></td>'+
+'            <td colspan="6"><textarea cols=64 rows=4 name="description" style="padding:4px;" title="Here be the project description">'+proj.description+'</textarea></td>'+
+'          </tr>'+
+'        </tbody></table>';
+        edit_dialog(
+            'Edit Project Attributes',
+            html,
+            function() { that.edit_attributes_save(pidx); },
+            function() { return; } );
+        $('#proj-editor-'+pidx).find('input[name="due"]').
+            datepicker().
+            datepicker('option','dateFormat','yy-mm-dd').
+            datepicker('setDate',proj.due);
+    }
+    this.edit_attributes_save = function(pidx) {
 
         var proj = this.project[pidx];
 
@@ -204,39 +244,35 @@ function p_appl_projects() {
 '    <button class="proj-cable-tool" name="edit"        onclick="projects.edit_cable       ('+pidx+','+cidx+')" title="edit"                                 ><b>E</b></button>'+
 '  </td>' : '';
         html += cols2display.project ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 >&nbsp;<a class="link" href="javascript:global_search_project_by_id('+proj.id+');">'+proj.title+'</a></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom ">&nbsp;<a class="link" href="javascript:global_search_project_by_id('+proj.id+');">'+proj.title+'</a></td>' : '';
         html += cols2display.cable ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="cable"          >&nbsp;'+c.cable          +'</div></td>' : '';
-        html += cols2display.revision ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="revision"       >&nbsp;'+c.revision       +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="cable"          >&nbsp;'+c.cable          +'</div></td>' : '';
         html += cols2display.device ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="device"         >&nbsp;'+c.device         +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="device"         >&nbsp;'+c.device         +'</div></td>' : '';
         html += cols2display.func ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="func"           >&nbsp;'+c.func           +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="func"           >&nbsp;'+c.func           +'</div></td>' : '';
         html +=
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="cable_type"     >&nbsp;'+dict.cable2url(c.cable_type)+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.origin.pinlist)+'</div></td>';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="cable_type"     >&nbsp;'+dict.cable2url(c.cable_type)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom"                 ><div class="origin_pinlist" >&nbsp;'+dict.pinlist2url(c.origin.pinlist)+'</div></td>';
         html += cols2display.length ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="length"         >&nbsp;'+c.length         +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="length"         >&nbsp;'+c.length         +'</div></td>' : '';
         html += cols2display.routing ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="routing"        >&nbsp;'+c.routing        +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom "                ><div class="routing"        >&nbsp;'+c.routing        +'</div></td>' : '';
         html +=
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_name"    >&nbsp;'+c.origin.name    +'</div></td>';
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_name"    >&nbsp;'+c.origin.name    +'</div></td>';
         html += cols2display.sd ?
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_loc"     >&nbsp;'+c.origin.loc     +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_rack"    >&nbsp;'+c.origin.rack    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_ele"     >&nbsp;'+c.origin.ele     +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_side"    >&nbsp;'+c.origin.side    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_slot"    >&nbsp;'+c.origin.slot    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_conn"    >&nbsp;'+c.origin.conn    +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_conntype">&nbsp;'+dict.connector2url(c.origin.conntype)+'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell "                                                    ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
-        html += cols2display.description ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div style="width:320px; max-height:52px; overflow:auto;"><pre class="description">'+c.description+'</pre></div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_loc"     >&nbsp;'+c.origin.loc     +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_rack"    >&nbsp;'+c.origin.rack    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_ele"     >&nbsp;'+c.origin.ele     +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_side"    >&nbsp;'+c.origin.side    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_slot"    >&nbsp;'+c.origin.slot    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conn"    >&nbsp;'+c.origin.conn    +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_station" >&nbsp;'+c.origin.station +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_conntype">&nbsp;'+dict.connector2url(c.origin.conntype)+'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell "                                  ><div class="origin_instr"   >&nbsp;'+c.origin.instr   +'</div></td>' : '';
         html += cols2display.modified ?
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom "                 rowspan=2 ><div class="modified"     >&nbsp;'+c.modified.time  +'</div></td>'+
-'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_right" rowspan=2 ><div class="modified_uid" >&nbsp;'+c.modified.uid   +'</div></td>' : '';
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom                 "><div class="modified"       >&nbsp;'+c.modified.time  +'</div></td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_bottom table_cell_right"><div class="modified_uid"   >&nbsp;'+c.modified.uid   +'</div></td>' : '';
         html +=
 '</tr>'+
 '<tr class="table_row " id="proj-cable-'+pidx+'-'+cidx+'-2">';
@@ -254,6 +290,21 @@ function p_appl_projects() {
 '    <button class="proj-cable-tool" name="history" onclick="projects.show_cable_history('+pidx+','+cidx+')" title="history"><b>H</b></button>'+
 '    <button class="proj-cable-tool" name="label"   onclick="projects.show_cable_label  ('+pidx+','+cidx+')" title="label"  ><b>L</b></button>'+
 '  </td>' : '';
+        html += cols2display.project ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_left ">&nbsp;</td>' : '';
+        html += cols2display.cable ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
+        html += cols2display.device ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
+        html += cols2display.func ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
+        html +=
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>';
+        html += cols2display.length ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
+        html += cols2display.routing ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom ">&nbsp;</td>' : '';
         html +=
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_name"    >&nbsp;'+c.destination.name    +'</div></td>';
         html += cols2display.sd ?
@@ -266,6 +317,9 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_station" >&nbsp;'+c.destination.station +'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_conntype">&nbsp;'+dict.connector2url(c.destination.conntype)+'</div></td>'+
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
+        html += cols2display.modified ?
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom                  ">&nbsp;</td>'+
+'  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_right ">&nbsp;</td>' : '';
         html +=
 '</tr>';
 		return html;
@@ -296,8 +350,6 @@ function p_appl_projects() {
 '    <td nowrap="nowrap" class="table_hdr">project</td>' : '';
         html += cols2display.cable ?
 '    <td nowrap="nowrap" class="table_hdr">cable #</td>' : '';
-        html += cols2display.revision ?
-'    <td nowrap="nowrap" class="table_hdr">rev.</td>' : '';
         html += cols2display.device ?
 '    <td nowrap="nowrap" class="table_hdr">device</td>' : '';
         html += cols2display.func ?
@@ -321,8 +373,6 @@ function p_appl_projects() {
 '    <td nowrap="nowrap" class="table_hdr">station</td>'+
 '    <td nowrap="nowrap" class="table_hdr">contype</td>'+
 '    <td nowrap="nowrap" class="table_hdr">instr</td>' : '';
-        html += cols2display.description ?
-'    <td nowrap="nowrap" class="table_hdr">description</td>' : '';
         html += cols2display.modified ?
 '    <td nowrap="nowrap" class="table_hdr">modified</td>'+
 '    <td nowrap="nowrap" class="table_hdr">by user</td>' : '';
@@ -517,14 +567,7 @@ function p_appl_projects() {
             report_error('failed to obtain the project history because of: '+jqXHR.statusText, null);
             return;
         });
-    };
-    this.get_project_link = function(pidx) {
-        var idx = window.location.href.indexOf( '?' );
-        var proj_url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?app=projects:search&project_id='+this.project[pidx].id;
-        var title = 'the persistent link to be embeded into external documentation, Web pages, or used in e-mail correspondence';
-        var link = '<a href="'+proj_url+'" target="_blank" class="link" title="'+title+'" >'+proj_url+'</a>';
-        return link;
-    };
+    }
 	this.show_cable_history = function(pidx,cidx) {
         var params = {id:this.project[pidx].cable[cidx].id};
         var jqXHR = $.get('../neocaptar/cable_history.php',params,function(data) {
@@ -640,12 +683,6 @@ function p_appl_projects() {
         var html  = '';
 
 		switch(prop) {
-
-        case 'description':
-
-            base.val(cable.description);
-            cable.read_description = function() { return base.val(); };
-            break;
 
 		case 'device':
 
@@ -1146,15 +1183,16 @@ function p_appl_projects() {
     }
     this.edit_cable = function(pidx,cidx) {
         var cable = this.project[pidx].cable[cidx];
-        var required_field_html = '<span style="color:red; font-weight:bold;"> * </span>';
+        var required_field_html = '<span style="color:red; font-size:110%; font-weight:bold;"> * </span>';
         var html =
 '<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #c0c0c0;">'+
-'<div style="float:left; margin-bottom: 10px; margin-right: 40px; width: 750px;">'+
-'  Please, note that choices for some cable parameters found on this page are loaded from a dictionary'+
-'  in order to prevent project managers from assigning non-valid values to the parameters.'+
-'  Please, contact administrators of the Cable Management Software if you feel the dictionary is'+
-'  not complete. You may also request \'Dictionary Editor\' privilege if you are confident that'+
-'  you are sufficiently quailified to manage the Sictionary. Also consider the following tips:'+
+'<div style="float:left; margin-bottom: 20px; margin-right: 40px; color: #900; width: 820px;">'+
+'  Please, note that choices for some cable parameters found on this page are loaded from a dictionary.'+
+'  Regular users of this software are not allowed to modify the dictionary neither assign arbitrary values'+
+'  to those parameters. This has been done to enforce the corresponding SLAC CAPTOR and PCDS naming convention for cables'+
+'  Please, contact administrators of the Cable Management Software'+
+'  to request dictionary extensions if you feel the dictionary is not complete, or if you need'+
+'  any non-standard names. Consider the following tips:'+
 '  <ul>'+
 '    <li>if you know the pinlist you need then start from it. This will preset cable type and connectors on both ends</li>'+
 '    <li>if you know the cable type then start from it. This will limit choices of connectors on both ends</li>'+
@@ -1163,15 +1201,10 @@ function p_appl_projects() {
 '  </ul>'+
 '</div>'+
 '<div style="float:left; padding-top: 20px;">'+
-'  <button name="save"              title="save unconditionally">Save</button>'+
-'  <button name="save_with_comment" title="an additional dialog asking you to input comments on modifications you have made will pop up">Save w/ comment</button>'+
-'  <button name="cancel"            title="ignore the modifications and close the Cable Editor">Cancel</button>'+
+'  <button name="save">Save</button>'+
+'  <button name="cancel">Cancel</button>'+
 '</div>'+
 '<div style="clear:both;"></div>'+
-'<div style="padding-left: 12px; margin-bottom:  3px; font-weight:bold; font-family: Arial, sans-serif;">Cable description:</div>'+
-'<div style="padding-left: 10px; margin-bottom: 10px;">'+
-'  <textarea rows="2" cols="116" style="padding:4px;" class="description" ></textarea>'+
-'</div>'+
 '<div style="float:left; margin-right:40px;">'+
 '  <table><tbody>'+
 '    <tr><td class="table_cell table_cell_left">Status</td>'+
@@ -1259,23 +1292,13 @@ required_field_html+' required feild';
         var elem = $('#proj-con-'+pidx+'-shadow');
         elem.html(html);
         elem.find('button[name="save"]').button().click(function() {
-            that.edit_cable_save(pidx, cidx);
-        });
-        elem.find('button[name="save_with_comment"]').button().click(function() {
-            ask_for_input(
-                'About to Save',
-                'Please, provide an optional comment. Then press <b>Ok</b> to proceed or <b>Cancel</b> to return back to the <b>Cable Editor</b>.',
-                function(comments) {
-                    that.edit_cable_save(pidx, cidx, comments);
-                }
-            );
+            that.edit_cable_save(pidx,cidx);
         });
         elem.find('button[name="cancel"]').button().click(function() {
             that.edit_cable_cancel(pidx,cidx);
         });
         var is_registered = global_cable_status2rank(cable.status) >= global_cable_status2rank('Registered');
         var is_labeled    = global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled');
-        this.cable_property_edit(pidx,cidx,'description',         is_labeled)
 		this.cable_property_edit(pidx,cidx,'device',              is_labeled);
 		this.cable_property_edit(pidx,cidx,'device_location',     is_labeled);
 		this.cable_property_edit(pidx,cidx,'device_region',       is_labeled);
@@ -1326,7 +1349,7 @@ required_field_html+' required feild';
 
         toggle_cable_editor(pidx,cidx,true);
     };
-	this.edit_cable_save = function(pidx, cidx, comments) {
+	this.edit_cable_save = function(pidx,cidx) {
 
         var cable = this.project[pidx].cable[cidx];
 
@@ -1335,8 +1358,6 @@ required_field_html+' required feild';
 		//
         var params = {
             cable_id             : cable.id,
-            comments             : comments === undefined ? '' : comments,
-            description          : cable.read_description(),
             device               : global_truncate_device          (cable.read_device          ()),
             device_location      : global_truncate_device_location (cable.read_device_location ()),
             device_region        : global_truncate_device_region   (cable.read_device_region   ()),
@@ -1384,7 +1405,7 @@ required_field_html+' required feild';
                     //
                     return;
                 }
-                that.project[pidx].cable[cidx] = data.cable;
+                var cable = that.project[pidx].cable[cidx] = data.cable;
 
                 toggle_cable_editor(pidx,cidx,false);
 
@@ -1415,19 +1436,16 @@ required_field_html+' required feild';
         $('.proj-cable-tool').button();
 		this.update_cable_tools(pidx,cidx);
 
-        var base_1           =   '#proj-cable-'+pidx+'-'+cidx+'-1 td div.';
-        var base_description = $('#proj-cable-'+pidx+'-'+cidx+'-1').find('pre.description');
+        var base_1 = '#proj-cable-'+pidx+'-'+cidx+'-1 td div.';
 
-        $(base_1+'status'         ).html('&nbsp;'+cable.status);
-        $(base_1+'cable'          ).html('&nbsp;'+cable.cable);
-        $(base_1+'revision'       ).html('&nbsp;'+cable.revision);
-        base_description.text(cable.description);
-        $(base_1+'device'         ).html('&nbsp;'+cable.device);
-        $(base_1+'func'           ).html('&nbsp;'+cable.func);
-        $(base_1+'cable_type'     ).html('&nbsp;'+dict.cable2url(cable.cable_type));
-        $(base_1+'origin_pinlist' ).html('&nbsp;'+dict.pinlist2url(cable.origin.pinlist));
-        $(base_1+'length'         ).html('&nbsp;'+cable.length);
-        $(base_1+'routing'        ).html('&nbsp;'+cable.routing);
+        $(base_1+'status'        ).html('&nbsp;'+cable.status);
+        $(base_1+'cable'         ).html('&nbsp;'+cable.cable);
+        $(base_1+'device'        ).html('&nbsp;'+cable.device);
+        $(base_1+'func'          ).html('&nbsp;'+cable.func);
+        $(base_1+'cable_type'    ).html('&nbsp;'+dict.cable2url(cable.cable_type));
+        $(base_1+'origin_pinlist').html('&nbsp;'+dict.pinlist2url(cable.origin.pinlist));
+        $(base_1+'length'        ).html('&nbsp;'+cable.length);
+        $(base_1+'routing'       ).html('&nbsp;'+cable.routing);
 
         $(base_1+'origin_name'    ).html('&nbsp;'+cable.origin.name);
         $(base_1+'origin_loc'     ).html('&nbsp;'+cable.origin.loc);
@@ -1465,12 +1483,8 @@ required_field_html+' required feild';
         	window.open('../neocaptar/cable_label.php?project_id='+proj.id,'cable labels for the project');
         }
 	};
-    this.change_cable_status = function(pidx, cidx, new_status, comments) {
-		var params = {
-            cable_id: this.project[pidx].cable[cidx].id,
-            status:   new_status,
-            comments: comments
-        };
+    this.change_cable_status = function(pidx,cidx,new_status) {
+		var params = {cable_id: this.project[pidx].cable[cidx].id, status: new_status};
 		var jqXHR = $.post(
 			'../neocaptar/cable_save.php', params,
 			function(data) {
@@ -1495,192 +1509,23 @@ required_field_html+' required feild';
 			}
 		);
     };
-	this.register_cable = function(pidx,cidx) {
-        this.change_cable_status(pidx, cidx, 'Registered', '');
-    };
-	this.label_cable = function(pidx,cidx) {
-        ask_yes_no (
-            'Confirm Cable Label Lock',
-            "You're about to <b>LOCK</b> the cable label of revision <b>"+this.project[pidx].cable[cidx].revision+"</b>. "+
-            "The revision number will appear on the printed cable label.<br><br>"+
-            "Note that if you proceed with this operation then most properties of the cable will no longer be allowed for editing "+
-            "and you will need to unlock the label in order to allow the editing again. "+
-            "Un-locking would also increment the revision number of the cable label.",
-            function() {
-                that.change_cable_status(pidx, cidx, 'Labeled', '');
-            }
-        );
-    };
-	this.fabricate_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Fabrication Request',
-            "You're about to request cable <b>FABRICATION</b>.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the fabrication process.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Fabrication', comments);
-            }
-        );
-    };
-	this.ready_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Fabrication Completion',
-            "By hitting 'Ok' you will confirm that cable <b>FABRICATION</b> has finished and it's <b>READY</b> to be installed, terminated (if needed) and commissioned.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the subsequent operations with the cable as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Ready', comments);
-            }
-        );
-   };
-	this.install_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Installation',
-            "By hitting 'Ok' you will confirm that cable has been <b>INSTALLED</b> and cable is ready to be <b>TERMINATED</b> and commissioned.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the subsequent operations with the cable as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Installed',comments);
-            }
-        );
-    };
-	this.commission_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Commissioning',
-            "By hitting 'Ok' you will confirm that cable has been <b>COMMISSIONED</b> (tested and deployed for use).<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Commissioned', comments);
-            }
-        );
-    };
-	this.damage_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Damage',
-            "By hitting 'Ok' you will confirm that cable has been <b>DAMAGED</b> and that it needs to be fixed or replaced.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the subsequent operations with the cable as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Damaged', comments);
-            }
-        );
-    };
-	this.retire_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Retirement',
-            "By hitting 'Ok' you will confirm that cable has been <b>RETIRED</b> and that is no longer in use.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the subsequent operations with the cable as well as to the project manager who's requested the cable. "+
-            "Another important note regarding retired cables is that their cable numbers can not be reused for new cables.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Retired', comments);
-            }
-        );
-    };
-    this.un_register_cable = function(pidx,cidx) {
-        ask_yes_no (
-            'Confirm Cable Un-Registration',
-            "By hitting 'Yes' you will confirm that cable needs to be put back into the <b>PLANNED</b> state.<br><br>"+
-            "Note that in some circumstances this operation may revoke the previously allocated cable number. "+
-            "Though, usually you will still get the same number when registering the cable again. "+
-            "Also note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the project manager who's requested the cable.",
-            function() {
-                that.change_cable_status(pidx, cidx, 'Planned', '');
-            }
-        );
-    };
-	this.un_label_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Label Un-Lock',
-            "You're about to <b>UN-LOCK</b> the cable label of revision <b>"+this.project[pidx].cable[cidx].revision+"</b>.<br><br>"+
-            "Note that if you proceed with this operation then you will gain access to editing of those cable properties which are not currently available for editing. "+
-            "Un-locking would also increment the revision number of the cable label. So, you will have to reprint new cable labels.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Registered', comments);
-            }
-        );
-    };
-	this.un_fabricate_cable  = function(pidx,cidx) {
-        ask_for_input (
-            'Revoke Cable Fabrication Request',
-            "You're about to revoke previously made cable <b>FABRICATION</b> request.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the cable fabrication as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Labeled', comments);
-            }
-        );
-    };
-	this.un_ready_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Putting Cable back for Fabrication',
-            "You're about to confirm that the cable is <b>NOT READY</b> and its further <b>FABRICATION</b> is needed.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the cable fabrication as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Fabrication', comments);
-            }
-        );
-    };
-	this.un_install_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Un-Install the Cable',
-            "You're about to confirm that the cable has been removed from where it was previously <b>INSTALLED</b>. The cable will be placed into the <b>READY</b> state.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the cable installation as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Ready', comments);
-            }
-        );
-    };
-	this.un_commission_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable De-Commissioning',
-            "You're about to confirm that the cable has been temporarily <b>DE-COMMISSIONED</b>. The cable will be put back into the <b>INSTALLED</b> state.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the personal in charge for the cable installation as well as to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Installed', comments);
-            }
-        );
-    };
-	this.un_damage_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Confirm Cable Repair',
-            "You're about to confirm that the cable has been repaired and it's now <b>COMMISSIONED</b> again.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Commissioned', comments);
-            }
-        );
-    };
-	this.un_retire_cable = function(pidx,cidx) {
-        ask_for_input (
-            'Revoke Cable from the list of Retired ones',
-            "You're about to confirm that the cable isn't actually <b>RETIRED</b> and it should be put back to the <b>DAMAGED</b> state for further repair and probably putting it back to service.<br><br>"+
-            "Note that if you proceed with this request then automated e-mail messages will be sent "+
-            "to the project manager who's requested the cable.<br><br>"+
-            "<b>Optional comments:</b>",
-            function(comments) {
-                that.change_cable_status(pidx, cidx, 'Damaged', comments);
-            }
-        );
-    };
+	this.register_cable   = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Registered');   };
+	this.label_cable      = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Labeled');      };
+	this.fabricate_cable  = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Fabrication');  };
+	this.ready_cable      = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Ready');        };
+	this.install_cable    = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Installed');    };
+	this.commission_cable = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Commissioned'); };
+	this.damage_cable     = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Damaged');      };
+	this.retire_cable     = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Retired');      };
+
+    this.un_register_cable   = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Planned');      };
+	this.un_label_cable      = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Registered');   };
+	this.un_fabricate_cable  = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Labeled');      };
+	this.un_ready_cable      = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Fabrication');  };
+	this.un_install_cable    = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Ready');        };
+	this.un_commission_cable = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Installed');    };
+	this.un_damage_cable     = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Commissioned'); };
+	this.un_retire_cable     = function(pidx,cidx) { this.change_cable_status(pidx,cidx,'Damaged');      };
 
     this.sort_cables = function(pidx) {
         var sort_by = $('#proj-displ-'+pidx).find('select[name="sort"]').val();
@@ -1740,12 +1585,10 @@ required_field_html+' required feild';
 '<div class="proj-con proj-cable-editor proj-hdn" id="proj-con-'+pidx+'-shadow"></div>'+
 '<div class="proj-con proj-hdn" id="proj-con-'+pidx+'">'+
 '  <div style="padding-bottom:10px;">'+
-'    <div style="margin-bottom:10px;">'+
-'      <b>Project URL:</b>&nbsp;&nbsp;'+this.get_project_link(pidx)+
-'    </div>'+
-'    <div style="float:left; width:555px; height:125px; overflow:auto; padding:5px; background-color:#f0f0f0; border-bottom:1px solid #c0c0c0; border-right:1px solid #c0c0c0;"><pre class="proj-description" style="font-family:Lucida Grande, Lucida Sans, Arial, sans-serif" title="Click on the Edit Project Attributes button to edit this description"></pre></div>'+
+'    <div style="float:left; width:555px; height:158px; overflow:auto; padding:5px; background-color:#f0f0f0; border-bottom:1px solid #c0c0c0; border-right:1px solid #c0c0c0;"><pre class="proj-description" style="font-family:Lucida Grande, Lucida Sans, Arial, sans-serif" title="Click on the Edit Project Attributes button to edit this description"></pre></div>'+
 '    <div style="float:left; margin-left:20px; " >'+
 '      <div>'+
+'        <button id="proj-edit-'+pidx+'" title="edit attributes of the project">edit project attributes</button>'+
 '        <button id="proj-delete-'+pidx+'" title="delete the project and all associated cables from the database">delete project</button>'+
 '        <button id="proj-clone-'+pidx+'" title="clone the whole project and all associated cables and create a new project with a temporary name (which can be changed later)">clone project</button>'+
 '        <button id="proj-history-'+pidx+'" title="show major events in the project history">show project history</button>'+
@@ -1755,84 +1598,43 @@ required_field_html+' required feild';
 '        <button id="proj-label-'+pidx+'" title="show cable labels.">generate cable labels</button>'+
 '      </div>'+
 '      <div style="margin-top:20px;">'+
-'        <div id="proj-extra-'+pidx+'" >'+
-'          <h3><a href="#">edit project attributes</a></h3>'+
-'          <div id="proj-editor-'+pidx+'" style="font-size:11px;">';
-        if(this.can_manage_project_security(pidx)) {
-            html +=
-'            <div style="float:left;" >'+
-'              <table><tbody>'+
-'                <tr>'+
-'                  <td><b>Owner: </b></td>'+
-'                  <td><select name="owner" style="padding:1px;" '+(global_current_user.is_administrator?'':' disabled="disabled"')+'>';
-            var users = global_get_projmanagers();
-            for( var i in users ) {
-                var user = users[i];
-                html +=
-'                        <option '+(p.owner==user?'selected="selected"':'')+'>'+user+'</option>';
-            }
-            html +=
-'                      </select></td>'+
-'                  <td><b>Title: </b></td>'+
-'                  <td><input type="text" size="36" name="title" value="'+p.title+'" style="padding:1px;"></td>'+
-'                  <td></td>'+
-'                  <td><b>Due by: </b></td>'+
-'                  <td><input type="text" size="10" name="due" value="'+p.due+'" style="padding:1px;"></td>'+
-'                </tr>'+
-'                <tr>'+
-'                  <td><b>Descr: </b></td>'+
-'                  <td colspan="6"><textarea cols=64 rows=4 name="description" style="padding:4px;" title="Here be the project description">'+p.description+'</textarea></td>'+
-'                </tr>'+
-'              </tbody></table>'+
-'            </div>'+
-'            <div style="float:left; margin-left:20px; " >'+
-'              <button name="save" title="save modifications to the database">save</button>'+
-'            </div>'+
-'            <div style="clear:both; " ></div>';
-        } else {
-            html +=
-'            <b>We are sorry, you are not authorized to manage this information!</b>';
-        }
-        html +=
-'          </div>'+
-'          <h3><a href="#">view/manage project security settings</a></h3>'+
-'          <div style="width:240px; font-size:11px;">';
+'        <div style="margin-bottom:10px; color:maroon; font-weight:bold;">PROJECT SECURITY SETTINGS:</div>'+
+'        <div style="padding-left:10px;">';
         if(this.can_manage_project_security(pidx)) html +=
-'            <select id="proj-shared-add-'+pidx+'"></select><span style="color:maroon;">&larr; add co-manager</span>';
+'          <select id="proj-shared-add-'+pidx+'"></select><span style="color:maroon;">&larr; add co-manager</span>';
         html +=
-'            <div id="proj-shared-table-'+pidx+'"></div>'+
-'          </div>'+
-'          <h3><a href="#">view THERMOMARK X1.2 settings for labels</a></h3>'+
-'          <div style="font-size:11px;">'+
-'            <table><tbody>'+
-'              <tr>'+
-'                <td class="table_cell table_cell_left"  >orientation</td>'+
-'                <td class="table_cell"                  >auto</td>'+
-'                <td class="table_cell table_cell_left"  >size option</td>'+
-'                <td class="table_cell table_cell_right" >actual size</td>'+
-'              </tr>'+
-'              <tr>'+
-'                <td class="table_cell table_cell_left"  >width</td>'+
-'                <td class="table_cell"                  >3.54 in</td>'+
-'                <td class="table_cell table_cell_left"  >height</td>'+
-'                <td class="table_cell table_cell_right" >1.0 in</td>'+
-'              </tr>'+
-'              <tr>'+
-'                <td class="table_cell table_cell_left  table_cell_bottom" >all margins</td>'+
-'                <td class="table_cell                  table_cell_bottom" >0 in</td>'+
-'                <td class="table_cell table_cell_left  table_cell_bottom" >darkness</td>'+
-'                <td class="table_cell table_cell_right table_cell_bottom" >8</td>'+
-'              </tr>'+
-'            </tbody></table>'+
-'          </div>'+
+'          <div id="proj-shared-table-'+pidx+'"></div>'+
 '        </div>'+
 '      </div>'+
+'    </div>'+
+'    <div style="float:left; margin-left:20px; color:maroon;">'+
+'      <b>THERMOMARK X1.2 SETTINGS FOR LABELS:</b><br>'+
+'      <table style="margin-top:5px; font-size:120%;"><tbody>'+
+'        <tr>'+
+'          <td class="table_cell table_cell_left"           >orientation</td>'+
+'          <td class="table_cell"                           >auto</td>'+
+'          <td class="table_cell table_cell_left"           >size option</td>'+
+'          <td class="table_cell table_cell_right"          >actual size</td>'+
+'        </tr>'+
+'        <tr>'+
+'          <td class="table_cell table_cell_left"           >width</td>'+
+'          <td class="table_cell"                           >3.54 in</td>'+
+'          <td class="table_cell table_cell_left"           >height</td>'+
+'          <td class="table_cell table_cell_right"          >1.0 in</td>'+
+'        </tr>'+
+'          <td class="table_cell table_cell_left  table_cell_bottom" >all margins</td>'+
+'          <td class="table_cell                  table_cell_bottom" >0 in</td>'+
+'          <td class="table_cell table_cell_left  table_cell_bottom" >darkness</td>'+
+'          <td class="table_cell table_cell_right table_cell_bottom" >8</td>'+
+'        <tr>'+
+'        </tr>'+
+'      </tbody></table>'+
 '    </div>'+
 '    <div style="clear:both;"></div>'+
 '    <div style="margin-top:15px;">'+
 '      <div id="proj-displ-'+pidx+'">'+
-'        <div>'+
-'          <table><tbody>'+
+'        <div style=font-size:80%;">'+
+'          <table style="font-size:120%;"><tbody>'+
 '            <tr>'+
 '              <td rowspan=2><button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="img/EXCEL_icon.gif" /></button></td>'+
 '              <td><div style="width:20px;"></div></td>'+
@@ -1840,7 +1642,6 @@ required_field_html+' required feild';
 '              <td><input type="checkbox" name="project"  checked="checked"></input>project</td>'+
 '              <td><input type="checkbox" name="job"      checked="checked"></input>job #</td>'+
 '              <td><input type="checkbox" name="cable"    checked="checked"></input>cable #</td>'+
-'              <td><input type="checkbox" name="revision" checked="checked"></input>revision</td>'+
 '              <td><input type="checkbox" name="device"   checked="checked"></input>device</td>'+
 '              <td><input type="checkbox" name="func"     checked="checked"></input>function</td>'+
 '              <td rowspan=2><div style="width:20px;"></div></td>'+
@@ -1860,11 +1661,10 @@ required_field_html+' required feild';
 '            </tr>'+
 '            <tr>'+
 '              <td colspan=1></td>'+
-'              <td          ><input type="checkbox" name="length"      checked="checked"></input>length</td>'+
-'              <td          ><input type="checkbox" name="routing"                      ></input>routing</td>'+
-'              <td colspan=3><input type="checkbox" name="sd"                           ></input>expanded ORIGIN/DESTINATION</td>'+
-'              <td          ><input type="checkbox" name="description" checked="checked"></input>description</td>'+
-'              <td          ><input type="checkbox" name="modified"    checked="checked"></input>modified</td>'+
+'              <td          ><input type="checkbox" name="length"   checked="checked"></input>length</td>'+
+'              <td          ><input type="checkbox" name="routing"  checked="checked"></input>routing</td>'+
+'              <td colspan=3><input type="checkbox" name="sd"                        ></input>expanded ORIGIN/DESTINATION</td>'+
+'              <td          ><input type="checkbox" name="modified" checked="checked"></input>modified</td>'+
 '            </tr>'+
 '          </tbody></table>'+
 '        </div>'+
@@ -1883,17 +1683,15 @@ required_field_html+' required feild';
 			var proj = this.project[pidx];
 			proj.is_loaded = false;
             proj.cols2display = {
-                project:     false,
-                tools:       true,
-                cable:       true,
-                revision:    true,
-                device:      true,
-                func:        true,
-                length:      true,
-                routing:     false,
-                sd:          false,
-                description: true,
-                modified:    true
+                project:  false,
+                tools:    true,
+                cable:    true,
+                device:   true,
+                func:     true,
+                length:   true,
+                routing:  true,
+                sd:       false,
+                modified: true
             };
 			html += this.project2html(pidx);
             total++;
@@ -1940,21 +1738,6 @@ required_field_html+' required feild';
             button().
             click(function() {
                 that.export_project(that.project[pidx].id,this.name); });
-        $('#proj-extra-'+pidx).accordion({
-            collapsible: true,
-            autoHeight: false,
-            animated: false,
-            active: false
-        });
-        $('#proj-editor-'+pidx).find('input[name="due"]').
-            datepicker().
-            datepicker('option','dateFormat','yy-mm-dd').
-            datepicker('setDate',that.project[pidx].due);
-        $('#proj-editor-'+pidx).find('button[name="save"]').
-            button().
-            click(function() {
-                that.save_attributes(pidx); 
-            });
     };
     this.display_shared_managers = function(pidx) {
 		var p = this.project[pidx];

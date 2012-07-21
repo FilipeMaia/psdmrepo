@@ -48,17 +48,18 @@ function label($pdf, $cable, $now, $src2dst=true) {
 //    $pdf->rectangle(145, 0,110,35);
 //    $pdf->rectangle(150, 5,100,25);
 
+    $revision_str = 'R'.sprintf("%02d",$cable->revision());
     //$pdf->selectFont( './fonts/Courier.afm' );
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (     $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
-    $pdf->addText  (    38, 29, $font_size, 'R00',                                                   $angle);
+    $pdf->addText  (    38, 29, $font_size, $revision_str,                                           $angle);
     //$pdf->addText  (    58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (    53, 29, $font_size, $cable->origin_pinlist(),                                $angle);
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (145+ $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
-    $pdf->addText  (145+38, 29, $font_size, 'R00',                                                   $angle);
+    $pdf->addText  (145+38, 29, $font_size, $revision_str,                                           $angle);
     //$pdf->addText  (145+58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (145+53, 29, $font_size, $cable->destination_pinlist(),                           $angle);
 

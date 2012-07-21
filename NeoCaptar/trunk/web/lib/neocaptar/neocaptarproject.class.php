@@ -145,7 +145,7 @@ class NeoCaptarProject {
      * ======================
      */
     public function add_cable() {
-        $sql = "INSERT INTO {$this->connection->database}.cable VALUES(NULL,{$this->id()},'Planned','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','')";
+        $sql = "INSERT INTO {$this->connection->database}.cable VALUES(NULL,{$this->id()},'Planned','',0,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','')";
         $this->connection->query($sql);
         $new_cable = $this->find_cable_by_('id IN (SELECT LAST_INSERT_ID())');
         if( is_null($new_cable)) return null;
@@ -162,7 +162,9 @@ class NeoCaptarProject {
         $sql =
             "INSERT INTO {$this->connection->database}.cable VALUES(NULL,{$this->id()},".
             "'Planned',".   // status must be reset
-            "'',".                              // cable number can't be cloned
+            "'',".          // cable number can't be cloned
+            "0,".           // revision number must be reset            
+            "'{$this->connection->escape_string(trim($c->description()))}',".
             "'{$this->connection->escape_string(trim($c->device()))}',".
             "'{$this->connection->escape_string(trim($c->device_location()))}',".
             "'{$this->connection->escape_string(trim($c->device_region()))}',".
@@ -221,7 +223,7 @@ class NeoCaptarProject {
         $this->neocaptar->add_notification_event4cable('on_cable_create', $new_cable, '');
         return $new_cable;
     }
-    public function update_cable($cable,$params) {
+    public function update_cable($cable, $params, $user_comments="") {
         if(is_null($cable))
             throw new NeoCaptarException (
         		__METHOD__, "wrong parameter: null cable object passed into the method." );
@@ -260,7 +262,7 @@ class NeoCaptarProject {
                 "See details in the cable history"
             )
         );
-        $comments = array();
+        $comments = array("User comments: {$user_comments}");
         foreach( $new_cable->attr as $property => $new_value ) {
             $old_value = $cable->attr[$property];
             if( $new_value != $old_value ) {
@@ -269,7 +271,7 @@ class NeoCaptarProject {
         }
         if( !count($comments )) array_push($comments,'no changes to the cable were made');
         $this->neocaptar->add_cable_event($new_cable,'Modified', $comments);
-        $this->neocaptar->add_notification_event4cable('on_cable_edit', $new_cable, '');
+        $this->neocaptar->add_notification_event4cable('on_cable_edit', $new_cable, "User comments: {$user_comments}");
         return $new_cable;
     }
     public function delete_cable_by_id( $id ) {

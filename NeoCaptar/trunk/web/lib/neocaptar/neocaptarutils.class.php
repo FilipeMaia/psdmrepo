@@ -238,6 +238,8 @@ class NeoCaptarUtils {
             'status'       => $c->status(),
             'job'          => $c->project()->job(),
             'cable'        => $c->cable(),
+            'revision'     => $c->revision(),
+            'description'  => $c->description(),
             'device'           => $c->device(),
             'device_location'  => $c->device_location(),
             'device_region'    => $c->device_region(),

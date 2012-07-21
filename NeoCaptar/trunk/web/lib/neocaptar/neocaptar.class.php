@@ -1574,12 +1574,12 @@ class NeoCaptar {
         return NeoCaptar::cable_status2rank($lhs_status) -
                NeoCaptar::cable_status2rank($rhs_status);
     }
-    private function change_cable_status($cable,$new_status) {
+    private function change_cable_status($cable, $new_status, $user_comments="") {
         if(is_null($cable)) throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
         $this->connection->query("UPDATE {$this->connection->database}.cable SET status='{$new_status}' WHERE id={$cable->id()}");
         $new_cable = $this->find_cable_by_id($cable->id());
         if( is_null($new_cable)) return null;
-        $comments = array();
+        $comments = array("User comments: {$user_comments}");
         if( NeoCaptar::compare_cable_status_ranks($new_cable->status(), $cable->status()) < 0 )
             array_push(
                 $comments,
@@ -1589,7 +1589,7 @@ class NeoCaptar {
         return $new_cable;
 
     }
-    public function register_cable($cable) {
+    public function register_cable($cable, $comments="") {
         if(is_null($cable))
             throw new NeoCaptarException( __METHOD__, "invalid cable passed into the method." );
 
@@ -1599,85 +1599,87 @@ class NeoCaptar {
 
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='{$cablenumber}' WHERE id={$cable->id()}");
 
-        $new_cable = $this->change_cable_status($cable,'Registered');
-        $this->add_notification_event4cable('on_register', $cable, "Cable number: {$new_cable->cable()}");
+        $new_cable = $this->change_cable_status($cable, 'Registered', $comments);
+        $this->add_notification_event4cable('on_register', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
 
-    public function label_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Labeled');
-        $this->add_notification_event4cable('on_label', $cable, "Cable number: {$new_cable->cable()}");
+    public function label_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Labeled', $comments);
+        $this->add_notification_event4cable('on_label', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function fabricate_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Fabrication');
-        $this->add_notification_event4cable('on_fabrication', $cable, "Cable number: {$new_cable->cable()}");
+    public function fabricate_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Fabrication', $comments);
+        $this->add_notification_event4cable('on_fabrication', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function ready_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Ready');
-        $this->add_notification_event4cable('on_ready', $cable, "Cable number: {$new_cable->cable()}");
+    public function ready_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Ready', $comments);
+        $this->add_notification_event4cable('on_ready', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function install_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Installed');
-        $this->add_notification_event4cable('on_install', $cable, "Cable number: {$new_cable->cable()}");
+    public function install_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Installed', $comments);
+        $this->add_notification_event4cable('on_install', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function commission_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Commissioned');
-        $this->add_notification_event4cable('on_commission', $cable, "Cable number: {$new_cable->cable()}");
+    public function commission_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Commissioned', $comments);
+        $this->add_notification_event4cable('on_commission', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function damage_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Damaged');
-        $this->add_notification_event4cable('on_damage', $cable, "Cable number: {$new_cable->cable()}");
+    public function damage_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Damaged', $comments);
+        $this->add_notification_event4cable('on_damage', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function retire_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Retired');
-        $this->add_notification_event4cable('on_retire', $cable, "Cable number: {$new_cable->cable()}");
+    public function retire_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Retired', $comments);
+        $this->add_notification_event4cable('on_retire', $cable, "Cable number:  {$new_cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_register_cable($cable) {
+    public function un_register_cable($cable, $comments="") {
         $this->connection->query("UPDATE {$this->connection->database}.cable SET cable='' WHERE id={$cable->id()}");
-        $new_cable = $this->change_cable_status($cable,'Planned');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+        $new_cable = $this->change_cable_status($cable, 'Planned', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_label_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Registered');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_label_cable($cable, $comments="") {
+        $new_revision = $cable->revision() + 1;
+        $this->connection->query("UPDATE {$this->connection->database}.cable SET revision={$new_revision} WHERE id={$cable->id()}");
+        $new_cable = $this->change_cable_status($cable, 'Registered', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_fabricate_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Labeled');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_fabricate_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Labeled', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_ready_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Fabrication');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_ready_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Fabrication', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_install_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Ready');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_install_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Ready', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_commission_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Installed');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_commission_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Installed', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_damage_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Commissioned');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_damage_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Commissioned', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
-    public function un_retire_cable($cable) {
-        $new_cable = $this->change_cable_status($cable,'Damaged');
-        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number: {$cable->cable()}");
+    public function un_retire_cable($cable, $comments="") {
+        $new_cable = $this->change_cable_status($cable, 'Damaged', $comments);
+        $this->add_notification_event4cable('on_cable_state_reversed', $cable, "Cable number:  {$cable->cable()} \nUser comments: {$comments}");
         return $new_cable;
     }
     private function add_event_impl($scope, $scope_id, $event, $comments) {
@@ -2052,7 +2054,7 @@ Project title: {$project_title}
 Project owner: {$project_owner} {$project_owner_name}
 
 {$cable_info}
-Cable URL:    https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=search:cables&cable_id={$cable_id}
+Cable URL:     https://pswww.slac.stanford.edu/apps-dev/neocaptar/?app=search:cables&cable_id={$cable_id}
 
 The change was made by user:       {$originator_uid} {$originator_name}
 The time when the change was made: {$event_time->toStringShort()}

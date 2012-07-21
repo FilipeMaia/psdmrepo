@@ -38,7 +38,9 @@ class NeoCaptarCable {
     public function id     () { return $this->attr['id'    ]; }
     public function status () { return $this->attr['status']; }
 
-    public function cable  () { return $this->attr['cable' ]; }
+    public function cable      () { return        $this->attr['cable'      ];  }
+    public function revision   () { return intval($this->attr['revision'   ]); }
+    public function description() { return        $this->attr['description'];  }
 
     public function device          () { return $this->attr['device'          ]; }
     public function device_location () { return $this->attr['device_location' ]; }
@@ -159,8 +161,8 @@ class NeoCaptarCable {
      * @param array $params
      * @return NeoCaptarCable
      */
-    public function update_self($params) {
-        return $this->project()->update_cable($this, $params);
+    public function update_self($params, $comments="") {
+        return $this->project()->update_cable($this, $params, $comments);
     }
 }
 ?>

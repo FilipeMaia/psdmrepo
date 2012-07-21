@@ -27,14 +27,16 @@ try {
 
     $neocaptar = NeoCaptar::instance();
 	$neocaptar->begin();
+
 ?>
 
 
-<!------------------- Document Begins Here ------------------------->
+<!-- Document Begins Here -->
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
+
 <head>
 <title><?php echo $document_title ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -58,13 +60,15 @@ try {
 <script type="text/javascript" src="js/Table.js"></script>
 
 
-<!----------- Window layout styles and supppot actions ----------->
+<!-- Window layout styles and support actions -->
 
 <style type="text/css">
 
 body {
   margin: 0;
   padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 11px;
 }
 #p-top {
   position: absolute;
@@ -104,8 +108,10 @@ body {
   color: #0071bc;
 }
 #p-login {
-  font-size: 70%;
-  font-family: Arial, Helvetica, Verdana, Sans-Serif;
+  padding-top:   15px;
+  padding-right: 10px;
+  font-size:     11px;
+  font-family:   Arial, Helvetica, Verdana, Sans-Serif;
 }
 
 a, a.link {
@@ -222,7 +228,7 @@ div.m-select {
   height: 100%;
   background: url('img/menu-bg-gradient-4.png') repeat;
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
+  font-size: 12px;
 }
 #menu-title {
   height: 10px;
@@ -241,8 +247,8 @@ div.v-item:hover {
 .application-workarea {
   overflow: auto;
   padding: 20px;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
+  /*font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;*/
+  /*font-size: 75%;*/
 }
 .section1,
 .section2,
@@ -279,15 +285,22 @@ div.v-item:hover {
 
 #popupdialogs {
   display: none;
+  font-size: 11px;
+}
+#popupdialogs-varable-size {
+  display: none;
+  font-size: 11px;
 }
 
 #infodialogs {
   display: none;
   padding: 20px;
+  font-size: 11px;
 }
 #editdialogs {
   display: none;
   padding: 20px;
+  font-size: 11px;
 }
 
 </style>
@@ -497,6 +510,31 @@ function ask_yes_no( title, msg, on_yes, on_cancel ) {
 			"Yes": function() {
 				$( this ).dialog('close');
 				if(on_yes) on_yes();
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+				if(on_cancel) on_cancel();
+			}
+		},
+		title: title
+	});
+}
+
+function ask_for_input( title, msg, on_ok, on_cancel ) {
+	$('#popupdialogs-varable-size').html(
+'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'+
+'<div><textarea rows=4 cols=60></textarea/>'
+	 );
+	$('#popupdialogs-varable-size').dialog({
+		resizable: true,
+		modal: true,
+        width:  470,
+        height: 300,
+		buttons: {
+			"Ok": function() {
+                var user_input = $('#popupdialogs-varable-size').find('textarea').val();
+				$( this ).dialog('close');
+				if(on_ok) on_ok(user_input);
 			},
 			Cancel: function() {
 				$(this).dialog('close');
@@ -901,29 +939,24 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
         <span id="p-title"><?php echo $document_title?></span>
         <span id="p-subtitle"><?php echo $document_subtitle?></span>
       </div>
-      <div style="float:right; padding-right:4px;">
-        <table><tbody><tr>
-          <td valign="bottom">
-            <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly()" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></div>
-            <div style="clear:both;" class="not4print"></div>
-          </td>
-          <td>
-            <table id="p-login"><tbody>
-              <tr>
-                <td>&nbsp;</td>
-                <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td>
-              </tr>
-              <tr>
-                <td>Welcome,&nbsp;</td>
-                <td><p><b><?php echo $authdb->authName()?></b></p></td>
-              </tr>
-              <tr>
-                <td>Session expires in:&nbsp;</td>
-                <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
-              </tr>
-            </tbody></table>
-          </td>
-        </tr></tbody></table>
+      <div id="p-login" style="float:right;" >
+        <div style="float:left; padding-top:20px;" class="not4print" >
+          <a href="javascript:printer_friendly()" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" style="border-radius: 5px;" /></a>
+        </div>
+        <div style="float:left; margin-left:10px;" >
+          <table><tbody>
+            <tr>
+              <td>&nbsp;</td>
+              <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td></tr>
+            <tr>
+              <td>User:&nbsp;</td>
+              <td><b><?php echo $authdb->authName()?></b></td></tr>
+            <tr>
+              <td>Session expires in:&nbsp;</td>
+              <td id="auth_expiration_info"><b>00:00.00</b></td></tr>
+          </tbody></table>
+        </div>
+        <div style="clear:both;" class="not4print"></div>
       </div>
       <div style="clear:both;"></div>
     </div>
@@ -1106,7 +1139,7 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
         print <<<HERE
       <div style="margin-bottom:20px; border-bottom:1px dashed #c0c0c0;">
         <div style="float:left;">
-          <div style="color:maroon; margin-bottom:10px; width:480px;">
+          <div style="margin-bottom:10px; width:480px;">
             When making a clone of an existing project make sure the new project title differs
             from the original one. All cables of the original project will be copied into the new one.
             The copied cables will all be put into the 'Planned' state, and they won't have numbers.
@@ -1114,7 +1147,7 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
             ones before finalizing cable labesl.
           </div>
           <form id="projects-create-form">
-            <table style="font-size:95%;"><tbody>
+            <table><tbody>
               <tr><td><b>Project to clone:</b></td>
                   <td><input type="text" name="project2clone" size="16" class="projects-create-form-element" style="padding:2px;" value="" /></td></tr>
               <tr><td>&nbsp;</td></tr>
@@ -1180,44 +1213,48 @@ HERE;
 		  <li><a href="#connectors2cables">Connector Type View</a></li>
 	    </ul>
 
-        <div id="cables2connectors" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="float:left;">
-            <div style="margin-top:20px;">
-              <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
-              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
-              <div style="clear:both; "></div>
+        <div id="cables2connectors" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="float:left;">
+              <div style="margin-top:20px;">
+                <div style="float:left; "><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
+                <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
+                <div style="clear:both; "></div>
+              </div>
+              <div id="dictionary-types-cables"></div>
             </div>
-            <div id="dictionary-types-cables"></div>
-          </div>
-          <div style="float:left; margin-left:20px;">
-            <div style="margin-top:20px;">
-              <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
-              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
-              <div style="clear:both; "></div>
+            <div style="float:left; margin-left:20px;">
+              <div style="margin-top:20px;">
+                <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
+                <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
+                <div style="clear:both; "></div>
+              </div>
+              <div id="dictionary-types-connectors" ></div>
             </div>
-            <div id="dictionary-types-connectors"></div>
+            <div style="clear:both;"></div>
           </div>
-          <div style="clear:both;"></div>
         </div>
       
-        <div id="connectors2cables" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="float:left;">
-            <div style="margin-top:20px;">
-              <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
-              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
-              <div style="clear:both; "></div>
+        <div id="connectors2cables" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="float:left;">
+              <div style="margin-top:20px;">
+                <div style="float:left; "><input type="text" size="12" name="connector2add" title="fill in new connector type (limit 7 characters), then press RETURN to save" /></div>
+                <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new connector type here</div>
+                <div style="clear:both; "></div>
+              </div>
+              <div id="dictionary-types-connectors-reverse"></div>
             </div>
-            <div id="dictionary-types-connectors-reverse"></div>
-          </div>
-          <div style="float:left; margin-left:20px;">
-            <div style="margin-top:20px;">
-              <div style="float:left;"><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
-              <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
-              <div style="clear:both; "></div>
+            <div style="float:left; margin-left:20px;">
+              <div style="margin-top:20px;">
+                <div style="float:left;"><input type="text" size="12" name="cable2add" title="fill in new cable type (limit 8 characters), then press RETURN to save" /></div>
+                <div style="float:left; padding-top:4px; color:maroon;">  &larr; add new cable type here</div>
+                <div style="clear:both; "></div>
+              </div>
+              <div id="dictionary-types-cables-reverse"></div>
             </div>
-            <div id="dictionary-types-cables-reverse"></div>
+            <div style="clear:both;"></div>
           </div>
-          <div style="clear:both;"></div>
         </div>
 
       </div>
@@ -1390,37 +1427,43 @@ HERE;
 		  <li><a href="#others">Other Users</a></li>
 	    </ul>
 
-        <div id="administrators" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>Administrators posses highest level privileges in the application as they're allowed
-            to perform any operation on projects, cables and other users. The only restriction is that
-            an administrator is not allowed to remove their own account from the list of administrators.</p>
+        <div id="administrators" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>Administrators posses highest level privileges in the application as they're allowed
+              to perform any operation on projects, cables and other users. The only restriction is that
+              an administrator is not allowed to remove their own account from the list of administrators.</p>
+            </div>
+            <div style="float:left; "><input type="text" size="8" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+            <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+            <div style="clear:both; "></div>
+            <div id="admin-access-ADMINISTRATOR"></div>
           </div>
-          <div style="float:left; "><input type="text" size="8" name="administrator2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
-          <div style="clear:both; "></div>
-          <div id="admin-access-ADMINISTRATOR"></div>
         </div>
 
-        <div id="projmanagers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>Project managers can create new projects, and, delete or edit cables, and also manage certain
-            aspects of the cables life-cycle.</p>
+        <div id="projmanagers" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>Project managers can create new projects, and, delete or edit cables, and also manage certain
+              aspects of the cables life-cycle.</p>
+            </div>
+            <div style="float:left; "><input type="text" size="8" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+            <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+            <div style="clear:both; "></div>
+            <div id="admin-access-PROJMANAGER"></div>
           </div>
-          <div style="float:left; "><input type="text" size="8" name="projmanager2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
-          <div style="clear:both; "></div>
-          <div id="admin-access-PROJMANAGER"></div>
         </div>
 
-        <div id="others" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>Other users may be allowed some limited access to manage certain aspects of the cables life-cycle.</p>
+        <div id="others" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>Other users may be allowed some limited access to manage certain aspects of the cables life-cycle.</p>
+            </div>
+            <div style="float:left; "><input type="text" size="8" name="other2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
+            <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
+            <div style="clear:both; "></div>
+            <div id="admin-access-OTHER"></div>
           </div>
-          <div style="float:left; "><input type="text" size="8" name="other2add" title="fill in a UNIX account of a user, press RETURN to save" /></div>
-          <div style="float:left; padding-top: 4px; color:maroon; "> &larr; add new user here</div>
-          <div style="clear:both; "></div>
-          <div id="admin-access-OTHER"></div>
         </div>
       </div>
     </div>
@@ -1445,67 +1488,75 @@ HERE;
 		  <li><a href="#pending">Pending</a></li>
 	    </ul>
 
-        <div id="myself" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>This section is aiming at project managers who might be interested to track changes
-            made to their projects by other people involved into various stages
-            of the project workflow. Note that project managers will not get notifications
-            on changes made by themselves.</p>
-            <p>Notification settings found in this section can only be managed by project managers themselves
-            or by administrators of the application.</p>
+        <div id="myself" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>This section is aiming at project managers who might be interested to track changes
+              made to their projects by other people involved into various stages
+              of the project workflow. Note that project managers will not get notifications
+              on changes made by themselves.</p>
+              <p>Notification settings found in this section can only be managed by project managers themselves
+              or by administrators of the application.</p>
+            </div>
+            <div style="margin-bottom:20px;">
+              <select name="policy4PROJMANAGER" disabled="disabled">
+                <option value="DELAYED">daily notification (08:00am)</option>
+                <option value="INSTANT">instant notification</option>
+              </select>
+            </div>
+            <div id="admin-notifications-PROJMANAGER"></div>
           </div>
-          <div style="margin-bottom:20px;">
-            <select name="policy4PROJMANAGER" disabled="disabled">
-              <option value="DELAYED">daily notification (08:00am)</option>
-              <option value="INSTANT">instant notification</option>
-            </select>
-          </div>
-          <div id="admin-notifications-PROJMANAGER"></div>
         </div>
 
-        <div id="administrators" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>This section is aiming at administrators of this software who might be interested to track major changes
-            made to the projects, user accounts or software configuration. Note that administrators will not get notifications
-            on changes made by themselves.</p>
-            <p>Notification settings found in this section can only be managed by any administrator of the software.</p>
+        <div id="administrators" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>This section is aiming at administrators of this software who might be interested to track major changes
+              made to the projects, user accounts or software configuration. Note that administrators will not get notifications
+              on changes made by themselves.</p>
+              <p>Notification settings found in this section can only be managed by any administrator of the software.</p>
+            </div>
+            <div style="margin-bottom:20px;">
+              <select name="policy4ADMINISTRATOR" disabled="disabled">
+                <option value="DELAYED">daily notification (08:00am)</option>
+                <option value="INSTANT">instant notification</option>
+              </select>
+            </div>
+            <div id="admin-notifications-ADMINISTRATOR"></div>
           </div>
-          <div style="margin-bottom:20px;">
-            <select name="policy4ADMINISTRATOR" disabled="disabled">
-              <option value="DELAYED">daily notification (08:00am)</option>
-              <option value="INSTANT">instant notification</option>
-            </select>
-          </div>
-          <div id="admin-notifications-ADMINISTRATOR"></div>
         </div>
 
-        <div id="others" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>This section is aiming at users (not necessarily project managers) who are involved
-            into various stages of the project workflow.</p>
-            <p>Only administrators of this application are
-            allowed to modify notification settings found on this page.</p>
+        <div id="others" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>This section is aiming at users (not necessarily project managers) who are involved
+              into various stages of the project workflow.</p>
+              <p>Only administrators of this application are
+              allowed to modify notification settings found on this page.</p>
+            </div>
+            <div style="margin-bottom:20px;">
+              <select name="policy4OTHER" disabled="disabled">
+                <option value="DELAYED">daily notification (08:00am)</option>
+                <option value="INSTANT">instant notification</option>
+              </select>
+            </div>
+            <div id="admin-notifications-OTHER"></div>
           </div>
-          <div style="margin-bottom:20px;">
-            <select name="policy4OTHER" disabled="disabled">
-              <option value="DELAYED">daily notification (08:00am)</option>
-              <option value="INSTANT">instant notification</option>
-            </select>
-          </div>
-          <div id="admin-notifications-OTHER"></div>
         </div>
 
-        <div id="pending" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>Pending/scheduled notifications (if any found below) can be submitted for instant delivery by pressing a group 'Submit' button or individually if needed.
-            Notifications can also be deleted if needed. An additional dialog will be initiated to confirm group operations.</p>
-            <p>Only administrators of this application are authorized for these operations.</p>
+        <div id="pending" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>Pending/scheduled notifications (if any found below) can be submitted for instant delivery by pressing a group 'Submit' button or individually if needed.
+              Notifications can also be deleted if needed. An additional dialog will be initiated to confirm group operations.</p>
+              <p>Only administrators of this application are authorized for these operations.</p>
+            </div>
+            <div style="margin-bottom:20px;"">
+              <button name="submit_all" title="Submit all pending notifications to be instantly delivered to their recipient">submit</button>
+              <button name="delete_all" title="Delete all pending notifications">delete</button>
+            </div>
+            <div id="admin-notifications-pending"></div>
           </div>
-          <div style="margin-bottom:20px;"">
-            <button name="submit_all" title="Submit all pending notifications to be instantly delivered to their recipient">submit</button>
-            <button name="delete_all" title="Delete all pending notifications">delete</button>
-          </div>
-          <div id="admin-notifications-pending"></div>
         </div>
 
       </div>
@@ -1530,68 +1581,74 @@ HERE;
 		  <li><a href="#reserved">Reserved Numbers</a></li>
 	    </ul>
 
-        <div id="cablenumbers" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>Each PCDS location (a building or an instrument) is associated with a set of cable numbers. The set represents
-               a family of cable numbers starting with so called 'prefix' (an upper case character string of the length of 2).
-               Multiple locations can share the same set (prefix). Each set is composed of one or many subranges of cable numbers.
-               Different prefixes have independent sets of numbers. Individual cable numbers are allocated from (any range) of a set
-               when a new cable is being registered in the database. This page is meant to be used by administrators to configure
-               the cable number generator.</p>
-          </div>
-          <div id="prefixes" style="float:left; margin-right:20px;">
-            <div style="margin-bottom:10px;">
-              <button name="edit">Edit</button>
-              <button name="save">Save</button>
-              <button name="cancel">Cancel</button>
+        <div id="cablenumbers" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; ">
+              <p>Each PCDS location (a building or an instrument) is associated with a set of cable numbers. The set represents
+                 a family of cable numbers starting with so called 'prefix' (an upper case character string of the length of 2).
+                 Multiple locations can share the same set (prefix). Each set is composed of one or many subranges of cable numbers.
+                 Different prefixes have independent sets of numbers. Individual cable numbers are allocated from (any range) of a set
+                 when a new cable is being registered in the database. This page is meant to be used by administrators to configure
+                 the cable number generator.</p>
             </div>
-            <div id="admin-cablenumbers-prefixes-table"></div>
-          </div>
-          <div id="ranges" style="float:left; margin-right:20px;">
-            <div style="margin-bottom:10px;">
-              <button name="edit">Edit</button>
-              <button name="save">Save</button>
-              <button name="cancel">Cancel</button>
+            <div id="prefixes" style="float:left; margin-right:20px;">
+              <div style="margin-bottom:10px;">
+                <button name="edit">Edit</button>
+                <button name="save">Save</button>
+                <button name="cancel">Cancel</button>
+              </div>
+              <div id="admin-cablenumbers-prefixes-table"></div>
             </div>
-            <div id="admin-cablenumbers-ranges-table"></div>
+            <div id="ranges" style="float:left; margin-right:20px;">
+              <div style="margin-bottom:10px;">
+                <button name="edit">Edit</button>
+                <button name="save">Save</button>
+                <button name="cancel">Cancel</button>
+              </div>
+              <div id="admin-cablenumbers-ranges-table"></div>
+            </div>
+            <div style="clear:both;"></div>
           </div>
-          <div style="clear:both;"></div>
         </div>
-        <div id="orphan" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>This page is meant for discovering cable numbers which are in use but which are not yet associated with any
-               allocation range known to this application. The numbers will be grouped according to their prefixes
-               and potential eligibility to be synchronized with allocation ranges. Administrators of this applications
-               will be allowed to synchronize the later numbers with the managed allocation ranges.
-               Note that some cables which were imported into this database from the "big" CAPTOR may not be synchronized.</p>
+        <div id="orphan" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; ">
+              <p>This page is meant for discovering cable numbers which are in use but which are not yet associated with any
+                 allocation range known to this application. The numbers will be grouped according to their prefixes
+                 and potential eligibility to be synchronized with allocation ranges. Administrators of this applications
+                 will be allowed to synchronize the later numbers with the managed allocation ranges.
+                 Note that some cables which were imported into this database from the "big" CAPTOR may not be synchronized.</p>
+            </div>
+            <div style="margin-bottom:10px;">
+              <button name="scan">Scan</button>
+              <button name="synchronize">Synchronize</button>
+            </div>
+            <div id="admin-orphan-table"></div>
           </div>
-          <div style="margin-bottom:10px;">
-            <button name="scan">Scan</button>
-            <button name="synchronize">Synchronize</button>
-          </div>
-          <div id="admin-orphan-table"></div>
         </div>
-        <div id="reserved" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; ">
-            <p>This page will display cable numbers which are reserved but not used for specific cables.
-               And here follows an explanation of what it means. When a user "registers" a cable
-               for the first time (either on purpose or by a mistake) the cable gets some number
-               from the allocation pool. This will establish a permanent database associated between a cable
-               and its number. "Unregistering" the cable won't break this association, hence next time a user
-               "Registers" the same cable the application will always use the previously allocated number.
-               This page is meant to monitor cable numbers (and also find the corresponding cables) which  
-               are found in this intermediate state (of reserved by not really used).
-               Administrators of this applications will also be allowed to clean the permanent associations
-               for those cable and cable number pairs. Another possibility is to delete the corresponding cables
-               from their projects if they are not needed. This will free cable numbers allocated for those
-               (deleted) cables.
-            </p>
+        <div id="reserved" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; ">
+              <p>This page will display cable numbers which are reserved but not used for specific cables.
+                 And here follows an explanation of what it means. When a user "registers" a cable
+                 for the first time (either on purpose or by a mistake) the cable gets some number
+                 from the allocation pool. This will establish a permanent database associated between a cable
+                 and its number. "Unregistering" the cable won't break this association, hence next time a user
+                 "Registers" the same cable the application will always use the previously allocated number.
+                 This page is meant to monitor cable numbers (and also find the corresponding cables) which  
+                 are found in this intermediate state (of reserved by not really used).
+                 Administrators of this applications will also be allowed to clean the permanent associations
+                 for those cable and cable number pairs. Another possibility is to delete the corresponding cables
+                 from their projects if they are not needed. This will free cable numbers allocated for those
+                 (deleted) cables.
+              </p>
+            </div>
+            <div style="margin-bottom:10px;">
+              <button name="scan">Scan</button>
+              <button name="free">Free</button>
+            </div>
+            <div id="admin-reserved-table"></div>
           </div>
-          <div style="margin-bottom:10px;">
-            <button name="scan">Scan</button>
-            <button name="free">Free</button>
-          </div>
-          <div id="admin-reserved-table"></div>
         </div>
       </div>
     </div>
@@ -1614,20 +1671,24 @@ HERE;
 		  <li><a href="#allocations">Allocated Numbers</a></li>
 	    </ul>
 
-        <div id="ranges" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>Each user (including administrators and project managers) who's authorized to create new projects
-            is assigned a range of cable numbers. The range is configured below.
-            Only administrators of this application are allowed to modify the ranges.</p>
+        <div id="ranges" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>Each user (including administrators and project managers) who's authorized to create new projects
+              is assigned a range of cable numbers. The range is configured below.
+              Only administrators of this application are allowed to modify the ranges.</p>
+            </div>
+            <div id="admin-jobnumbers-jobnumbers"></div>
           </div>
-          <div id="admin-jobnumbers-jobnumbers"></div>
         </div>
       
-        <div id="allocations" style="font-size:12px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;">
-          <div style="margin-bottom:10px; width:720px;">
-            <p>This section shows all job numbers allocated by the application.</p>
+        <div id="allocations" >
+          <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
+            <div style="margin-bottom:10px; width:720px;">
+              <p>This section shows all job numbers allocated by the application.</p>
+            </div>
+            <div id="admin-jobnumbers-allocations"></div>
           </div>
-          <div id="admin-jobnumbers-allocations"></div>
         </div>
       </div>
     </div>
@@ -1635,8 +1696,9 @@ HERE;
   </div>
 
   <div id="popupdialogs" ></div>
-  <div id="infodialogs"  ></div>
-  <div id="editdialogs"  ></div>
+  <div id="popupdialogs-varable-size" ></div>
+  <div id="infodialogs" ></div>
+  <div id="editdialogs" ></div>
 
 </div>
 

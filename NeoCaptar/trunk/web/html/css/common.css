@@ -12,7 +12,7 @@ td.table_hdr {
   border-left: none;
   font-family: Arial, sans-serif;
   font-weight: bold;
-  font-size: 75%;
+  /*font-size: 75%;*/
 }
 td.table_hdr_tight {
   padding: 0px 0px 0px 0px;
@@ -23,7 +23,7 @@ td.table_cell {
   border-left: none;
   padding: 4px 8px 4px 8px;
   font-family: Arial, sans-serif;
-  font-size: 75%;
+  /*font-size: 75%;*/
 }
 td.table_cell_strong_bottom {
   border-bottom: solid 1px #000000;
@@ -62,11 +62,11 @@ td.ctable_hdr {
   padding: 2px 6px 2px 6px;
   font-family: Arial, sans-serif;
   font-weight: bold;
-  font-size: 75%;
+  /*font-size: 75%;*/
 }
 td.ctable_cell {
   font-family: Arial, sans-serif;
-  font-size: 75%;
+  /*font-size: 75%;*/
 }
 td.ctable_cell_left {
   font-weight: bold;

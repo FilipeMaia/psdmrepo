@@ -51,8 +51,8 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
-<script type="text/javascript" src="js/projects_new.js"></script>
-<script type="text/javascript" src="js/dictionary_new.js"></script>
+<script type="text/javascript" src="js/projects.js"></script>
+<script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/search.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
 <script type="text/javascript" src="js/Table.js"></script>
