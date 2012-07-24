@@ -19,6 +19,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+#include <string.h>
 
 //-------------------------------
 // Collaborating Class Headers --

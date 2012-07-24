@@ -71,7 +71,7 @@ private:
   std::string m_name ;
   SQLSMALLINT m_colNum ;
   SQLSMALLINT m_dataType ;
-  SQLUINTEGER m_columnSize ;
+  SQLULEN     m_columnSize ;
   SQLSMALLINT m_decimalDigits ;
   SQLSMALLINT m_nullable ;
 
