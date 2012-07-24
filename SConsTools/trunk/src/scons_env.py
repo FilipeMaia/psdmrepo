@@ -144,6 +144,9 @@ def buildEnv () :
     cythonflags = ' '.join(cythonflags)
     env.Replace(CYTHONFLAGS=cythonflags, CYTHONCFILESUFFIX=".cpp")
 
+    # use alternative location for sconsign file
+    env.SConsignFile(pjoin("build", sit_arch, ".sconsign"))
+
     # may want to use "relative" RPATH
     # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
 
