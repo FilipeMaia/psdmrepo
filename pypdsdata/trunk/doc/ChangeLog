@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-71
+2012-07-24 Andy Salnikov
+- more warnings to suppress
+
 Tag: V00-00-70
 2012-07-24 Andy Salnikov
 - migrate to gcc44, moved some header and added few pragmas to

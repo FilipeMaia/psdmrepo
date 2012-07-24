@@ -171,7 +171,7 @@
 #include "types/timepix/DataV2.h"
 
 #define PDSDATA_IMPORT_ARRAY
-#import "pdsdata_numpy.h"
+#include "pdsdata_numpy.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

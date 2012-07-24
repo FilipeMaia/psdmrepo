@@ -37,6 +37,9 @@ namespace {
   int epicsTimeStamp_compare( PyObject *self, PyObject *other);
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyMemberDef members[] = {
     {"secPastEpoch", T_UINT, offsetof(pypdsdata::Epics::epicsTimeStamp,m_obj.secPastEpoch),
        0, "integer number, seconds since 00:00 Jan 1, 1990" },

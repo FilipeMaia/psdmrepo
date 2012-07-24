@@ -37,6 +37,9 @@ namespace {
   PyObject* FrameCoord_str( PyObject *self );
   PyObject* FrameCoord_repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyMemberDef members[] = {
     {"x",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
        0, "column index" },

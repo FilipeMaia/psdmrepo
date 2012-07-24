@@ -154,6 +154,9 @@ XtcFilter_init(PyObject* self, PyObject* args, PyObject* kwds)
     return -1;
   }
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   // parse arguments
   static char *kwlist[] = {"callable", "keepEmptyCont", "keepEmptyDgram", "keepAny", 0};
   PyObject* obj = 0;
