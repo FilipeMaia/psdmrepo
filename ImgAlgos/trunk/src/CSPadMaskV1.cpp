@@ -20,6 +20,7 @@
 //-----------------
 #include <fstream>
 #include <stdexcept>
+#include <cstring>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -97,7 +98,7 @@ void CSPadMaskV1::fillArrFromVector( const std::vector<mask_t> v_parameters )
     }
 
     size_t arr_size = sizeof( mask_t ) * v_parameters.size();
-    memcpy( &m_mask, &v_parameters[0], arr_size );
+    std::memcpy( &m_mask, &v_parameters[0], arr_size );
     //this->print();
 }
 

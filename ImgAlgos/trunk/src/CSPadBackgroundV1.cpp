@@ -20,6 +20,7 @@
 //-----------------
 #include <fstream>
 #include <stdexcept>
+#include <cstring>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -85,7 +86,7 @@ void CSPadBackgroundV1::fillArrFromVector( const std::vector<background_t> v_par
     }
 
     size_t arr_size = sizeof( background_t ) * v_parameters.size();
-    memcpy( &m_bkgd, &v_parameters[0], arr_size );
+    std::memcpy( &m_bkgd, &v_parameters[0], arr_size );
     //this->print();
 }
 
