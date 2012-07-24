@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <stdio.h>
 
 //-------------------------------
 // Collaborating Class Headers --
