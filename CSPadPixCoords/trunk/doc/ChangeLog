@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-07
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
 Tag: V00-02-06
 2012-07-06 Mikhail S. Dubrovin
 - Add print_bits

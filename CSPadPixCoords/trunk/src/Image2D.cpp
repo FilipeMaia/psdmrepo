@@ -19,7 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-
+#include <stdint.h>
 #include <iostream> // for cout
 #include <fstream>
 
