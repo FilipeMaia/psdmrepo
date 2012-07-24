@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #ifdef PDS_CODEC_STREAMCOMPRESSOR_DEBUG
 #include <iostream>
@@ -264,7 +265,9 @@ Pds::Codec::StreamCompressor<COMPRESSOR,MT>::compress(const void*   inData, size
         //   <last segment>
         //
         outDataSize = sizeof(uint32_t)  + sizeof(uint32_t) * numSegments;
+#ifdef PDS_CODEC_STREAMCOMPRESSOR_DEBUG
         const size_t outDataHdrSize = outDataSize;
+#endif
         for( size_t s = 0; s < numSegments; ++s ) outDataSize += m_segmentOutDataSize[s];
  
         // Reallocate the cache size if needed.
