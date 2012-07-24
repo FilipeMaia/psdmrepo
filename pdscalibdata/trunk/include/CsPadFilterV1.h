@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 //----------------------
 // Base Class Headers --

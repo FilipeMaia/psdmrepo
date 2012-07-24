@@ -18,7 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-using namespace std;
+#include <string.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -28,6 +28,8 @@ using namespace std;
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+using namespace std;
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --

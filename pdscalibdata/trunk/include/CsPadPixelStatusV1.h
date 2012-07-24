@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <stdint.h>
 
 //----------------------
 // Base Class Headers --

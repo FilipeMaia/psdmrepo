@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <boost/utility.hpp>
+#include <stdint.h>
 
 //----------------------
 // Base Class Headers --
