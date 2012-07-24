@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
 Tag: V00-01-04
 2012-07-12 Andy Salnikov
 - fixing changelog entry

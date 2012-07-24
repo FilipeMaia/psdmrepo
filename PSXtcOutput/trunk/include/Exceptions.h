@@ -19,7 +19,7 @@
 //----------------------
 #include "ErrSvc/Issue.h"
 #include <cerrno>
-#include <string.h>
+#include <cstring>
 
 //-------------------------------
 // Collaborating Class Headers --
