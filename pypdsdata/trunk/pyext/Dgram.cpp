@@ -44,6 +44,9 @@ namespace {
   PyObject* Dgram_getnewargs( PyObject* self, PyObject* );
   PyObject* Dgram_setClock( PyObject* self, PyObject* args );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     { "env", Dgram_env, 0, "Attribute contains the env field as an integer number.", 0 },
     { "seq", Dgram_seq, 0, "Attribute contains seq field as an :py:class:`Sequence` object.", 0 },

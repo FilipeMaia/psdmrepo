@@ -56,6 +56,9 @@ namespace {
     {0, 0, 0, 0}
    };
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"damage",   Xtc_damage,   0, "Attribute which contains damage bitmask (xtc.Damage)", 0},
     {"src",      Xtc_src,      0, "Attribute with data source object, one of :py:class:`BldInfo`, :py:class:`DetInfo`, or :py:class:`ProcInfo`", 0},

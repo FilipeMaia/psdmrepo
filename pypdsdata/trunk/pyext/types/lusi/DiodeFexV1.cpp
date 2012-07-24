@@ -37,6 +37,9 @@ namespace {
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::DiodeFexV1, value)
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"value",       value,   0, "Floating point number", 0},
     {0, 0, 0, 0, 0}

@@ -38,6 +38,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fCharge2)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"fFitTime1", fFitTime1, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime1, in pico-seconds", 0},
     {"fFitTime2", fFitTime2, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime2, in pico-seconds", 0},

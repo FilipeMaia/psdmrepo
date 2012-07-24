@@ -40,6 +40,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV2, yscale)
   PyObject* IpmFexConfigV2_diode( PyObject* self, void* );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"xscale",   xscale,                0, "Floating point number", 0},
     {"yscale",   yscale,                0, "Floating point number", 0},

@@ -36,6 +36,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPadProtectionSystemThreshold, pixelCountThreshold)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"adcThreshold",        adcThreshold,        0, "Integer number", 0},
     {"pixelCountThreshold", pixelCountThreshold, 0, "Integer number", 0},

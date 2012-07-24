@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -20,7 +21,6 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "python/Python.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -105,9 +105,15 @@ protected:
   // standard Python deallocation function
   static void PdsDataType_dealloc( PyObject* self );
 
+#if PY_VERSION_HEX >= 0x02050000
+  typedef Py_ssize_t PySsizeType;
+#else
+  typedef int PySsizeType;
+#endif
+
   // class supports buffer interface
-  static int readbufferproc(PyObject* self, int segment, void** ptrptr);
-  static int segcountproc(PyObject* self, int* lenp);
+  static PySsizeType readbufferproc(PyObject* self, PySsizeType segment, void** ptrptr);
+  static PySsizeType segcountproc(PyObject* self, PySsizeType* lenp);
 
   // repr() function
   static PyObject* repr( PyObject *self )  {
@@ -255,13 +261,12 @@ PdsDataType<ConcreteType, PdsType>::initType( const char* name, PyObject* module
   if ( PyType_Ready( type ) < 0 ) return;
 
   // register it in a module
-  Py_INCREF( type );
-  PyModule_AddObject( module, (char*)name, (PyObject*) type );
+  PyDict_SetItemString( PyModule_GetDict(module), (char*)name, (PyObject*) type );
 }
 
 template <typename ConcreteType, typename PdsType>
-int
-PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, int segment, void** ptrptr)
+typename PdsDataType<ConcreteType, PdsType>::PySsizeType
+PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, PySsizeType segment, void** ptrptr)
 {
   ConcreteType* py_this = static_cast<ConcreteType*>(self);
   if( ! py_this->m_obj ){
@@ -274,8 +279,8 @@ PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, int segment, 
 }
 
 template <typename ConcreteType, typename PdsType>
-int
-PdsDataType<ConcreteType, PdsType>::segcountproc(PyObject* self, int* lenp)
+typename PdsDataType<ConcreteType, PdsType>::PySsizeType
+PdsDataType<ConcreteType, PdsType>::segcountproc(PyObject* self, PySsizeType* lenp)
 {
   ConcreteType* py_this = static_cast<ConcreteType*>(self);
   if( ! py_this->m_obj ){

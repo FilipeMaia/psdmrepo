@@ -34,6 +34,9 @@ namespace {
   MEMBER_WRAPPER_EMBEDDED(pypdsdata::EvrData::DataV3_FIFOEvent, TimestampLow)
   MEMBER_WRAPPER_EMBEDDED(pypdsdata::EvrData::DataV3_FIFOEvent, EventCode)
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"TimestampHigh",  TimestampHigh,     0, "Integer number", 0},
     {"TimestampLow",   TimestampLow,      0, "Integer number", 0},

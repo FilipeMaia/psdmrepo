@@ -40,6 +40,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Epics::PvConfigV1, sPvDesc)
   MEMBER_WRAPPER(pypdsdata::Epics::PvConfigV1, fInterval)
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"iPvId",       iPvId,          0, "Integer number, PV Id", 0},
     {"sPvDesc",     sPvDesc,        0, "String, PV description", 0},

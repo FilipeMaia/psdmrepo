@@ -38,6 +38,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_22_ENRC)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"f_11_ENRC",   f_11_ENRC,   0, "floating number, PV name: GDET:FEE1:11:ENRC", 0},
     {"f_12_ENRC",   f_12_ENRC,   0, "floating number, PV name: GDET:FEE1:12:ENRC", 0},

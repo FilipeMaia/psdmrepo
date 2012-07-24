@@ -39,6 +39,9 @@ namespace {
   PyObject* DiodeFexConfigV1_base( PyObject* self, void* );
   PyObject* DiodeFexConfigV1_scale( PyObject* self, void* );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"base",       DiodeFexConfigV1_base,   0, "List of NRANGES floating numbers", 0},
     {"scale",      DiodeFexConfigV1_scale,  0, "List of NRANGES floating numbers", 0},

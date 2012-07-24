@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-70
+2012-07-24 Andy Salnikov
+- migrate to gcc44, moved some header and added few pragmas to
+  get rid of lots of warnings
+
 Tag: V00-00-69
 2012-07-06 Andy Salnikov
 - upgrade to pdsdata V03-07-10

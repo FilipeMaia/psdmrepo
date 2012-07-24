@@ -84,6 +84,9 @@ namespace {
   PyObject* EpicsPvCtrl_values( PyObject* self, void* );
   PyObject* EpicsPvCtrl_getnewargs( PyObject* self, PyObject* );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"iPvId",        iPvId,                0, "Integer number, Pv Id", 0},
     {"iDbrType",     iDbrType,             0, "Integer number, Epics Data Type", 0},

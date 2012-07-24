@@ -13,12 +13,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"
 #include <map>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "python/Python.h"
 
 //-------------------------------
 // Collaborating Class Headers --

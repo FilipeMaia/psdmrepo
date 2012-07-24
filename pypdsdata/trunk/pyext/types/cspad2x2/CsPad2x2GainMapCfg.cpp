@@ -42,6 +42,9 @@ namespace {
     {0, 0, 0, 0}
    };
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"gainMap",         gainMap,         0, "Array [ColumnsPerASIC][MaxRowsPerASIC] of integers", 0},
     {0, 0, 0, 0, 0}

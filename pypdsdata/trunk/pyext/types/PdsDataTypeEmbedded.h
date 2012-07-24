@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"
 #include <new>
 #include <string>
 #include <iostream>
@@ -21,7 +22,6 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "python/Python.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -214,8 +214,7 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::initType( const char* name, PyObject
   if ( PyType_Ready( type ) < 0 ) return;
 
   // register it in a module
-  Py_INCREF( type );
-  PyModule_AddObject( module, (char*)name, (PyObject*) type );
+  PyDict_SetItemString( PyModule_GetDict(module), (char*)name, (PyObject*) type );
 }
 
 } // namespace pypdsdata

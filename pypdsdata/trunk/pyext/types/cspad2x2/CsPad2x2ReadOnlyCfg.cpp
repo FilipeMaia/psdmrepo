@@ -36,6 +36,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, version)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"shiftTest",       shiftTest,       0, "Integer number", 0},
     {"version",         version,         0, "Integer number", 0},

@@ -37,6 +37,9 @@ namespace {
   PyObject* _encoder_count( PyObject* self, void* );
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"_33mhz_timestamp", _33mhz_timestamp,  0, "Integer number", 0},
     {"_encoder_count",   _encoder_count,    0, "List of 3 integer numbers", 0},

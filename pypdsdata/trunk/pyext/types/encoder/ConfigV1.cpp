@@ -61,6 +61,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _ticks_per_sec)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"_chan_num",         _chan_num,        0, "Integer number", 0},
     {"_count_mode",      _count_mode,       0, "Integer number (:py:class:`ConfigV1.count_mode`)", 0},

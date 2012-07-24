@@ -41,6 +41,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV0, fEbeamLTUAngY)
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"uDamageMask",    uDamageMask,    0, "integer number", 0},
     {"fEbeamCharge",   fEbeamCharge,   0, "floating number, in nC", 0},

@@ -40,6 +40,9 @@ namespace {
   PyObject* frame( PyObject* self, void* );
   PyObject* _repr( PyObject *self );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"camConfig",    camConfig,  0, "attribute of type :py:class:`_pdsdata.pulnix.TM6740ConfigV2`", 0},
     {"pimConfig",    pimConfig,  0, "attribute of type :py:class:`_pdsdata.lusi.PimImageConfigV1`", 0},

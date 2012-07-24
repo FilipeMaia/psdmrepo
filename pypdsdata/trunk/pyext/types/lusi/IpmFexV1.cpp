@@ -42,6 +42,9 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexV1, ypos)
   PyObject* IpmFexV1_channel( PyObject* self, void* );
 
+  // disable warnings for non-const strings, this is a temporary measure
+  // newer Python versions should get constness correctly
+#pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"sum",     sum,               0, "Floating point number", 0},
     {"xpos",    xpos,              0, "Floating point number", 0},
