@@ -97,8 +97,8 @@ BOOST_AUTO_TEST_CASE( test_3 )
 {
   cout << "\n=== Leap (100) years ===\n";
   
-  int diff_2100_1_1 = printTimeDiff(2100, 1, 1);
-  int diff_2100_6_1 = printTimeDiff(2100, 6, 1);
+  /*int diff_2100_1_1 =*/ printTimeDiff(2100, 1, 1);
+  /*int diff_2100_6_1 =*/ printTimeDiff(2100, 6, 1);
 
   // timezone info does not have DST for 2100 yet, 
   // may be one of the two depending on platform
