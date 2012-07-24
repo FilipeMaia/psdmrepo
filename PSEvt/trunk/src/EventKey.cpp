@@ -20,6 +20,7 @@
 //-----------------
 #include <iostream>
 #include <cxxabi.h>
+#include <stdlib.h>
 
 //-------------------------------
 // Collaborating Class Headers --
