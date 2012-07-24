@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2013-07-24 Andy Salnikov
+- disable unit tests, the tests are producing some root files
+
 Tag: V00-01-00
 2011-06-29 Andy Salnikov
 - PSHist interface changed, updating this implementation
