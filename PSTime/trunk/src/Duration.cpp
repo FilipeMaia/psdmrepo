@@ -21,6 +21,9 @@
 #include <iostream>
 #include <iomanip>
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using std::cout;
 using std::ostream;

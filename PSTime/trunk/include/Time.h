@@ -24,6 +24,7 @@
 #include <time.h>
 #include <iosfwd>
 #include <string>
+#include <stdint.h>
 
 #include "PSTime/Duration.h"
 

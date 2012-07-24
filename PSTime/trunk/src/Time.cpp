@@ -20,6 +20,7 @@
 // C/C++ Headers --
 //-----------------
 #include <iostream>
+#include <string.h>
 
 //-------------------------------
 // Collaborating Class Headers --
