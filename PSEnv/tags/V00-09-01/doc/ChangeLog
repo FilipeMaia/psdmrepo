@@ -1,0 +1,101 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSEnv
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-09-01
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-09-00
+2012-05-01 Andy Salnikov
+- Changes to EpicsStore to implement alias support
+
+Tag: V00-08-00
+2012-03-08 Andy Salnikov
+- add methods PSEnv::expNum and IExpNameProvider::expNum
+
+Tag: V00-07-00
+2011-10-28 Andy Salnikov
+- proxy dict keys() method now takes source argument, updating 
+  interface of EnvObjectStore to match
+
+Tag: V00-06-00
+2011-10-05 Andy Salnikov
+- update EpicsStore classes to support multi-source EPICS data
+
+Tag: V00-05-00
+2011-09-01 Andy Salnikov
+- new method PSEnv::calibDir() which returns the name of the calibration
+  directory for current experiment
+- PSEnv constructor takes one more argument which specifies template for
+  calib directory name, strings {exp} and {instr} in this template are 
+  replaced with the real experiment/instrument
+
+Tag: V00-04-00
+2011-08-17 Andy Salnikov
+- added new methods PSEnv::instrument() and PSEnv::experiment()
+- new abstract class IExpNameProvider, above two methods forward to 
+  this class
+- instance of IExpNameProvider must be provided on PSEnv construction
+
+Tag: V00-03-00
+2011-07-15 Andy Salnikov
+- renamed ConfigStore class to EnvObjectStore
+- Env now contains config store and calib store which are both
+  of the same type EnvObjectStore
+
+Tag: V00-02-01
+2011-06-29 Andy Salnikov
+- new method Env::hmgr which returns instance of PSHist::Hmanager
+- rhmgr() is marked as deprecated
+
+Tag: V00-02-00
+2011-05-06 Andy Salnikov
+- few methods in proxy dict classes now take EventKey instead of triplet
+  of parameters
+- doxygenating headers
+
+Tag: V00-01-00
+2011-04-26 Andy Salnikov
+- added optional argument to ConfigStore::get to return exact address
+  of the data object
+
+Tag: V00-00-07
+2011-04-14 Andy Salnikov
+- added root histo manager to the environment
+
+Tag: V00-00-06
+2011-03-28 Andy Salnikov
+- added EpicsStore class and Env::epicsStore() method
+- added few exception classes for use in this package
+
+Tag: V00-00-05
+2011-03-23 Andy Salnikov
+- modified ConfigStore to work with PSEvt::Source instead of Pds::Data
+
+Tag: V00-00-04
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
+Tag: V00-00-03
+2011-03-20 Andy Salnikov
+- added ConfigStore class which is a part of the environment storing 
+  configuration objects
+
+Tag: V00-00-02
+2011-01-31 Andy Salnikov
+- renamed this package to PSEnv
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- first commit to repository
+- Env class exists with nothing in it, placeholder for future dev
