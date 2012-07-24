@@ -206,7 +206,7 @@ if [ -z "$sit_arch" -a -z "$comp" ] ; then
   compilers=`/bin/ls -1 "$SIT_RELDIR/$rel/arch" | grep "$pfx" | cut -d- -f3 | sort -u | tr ' ' ','`
   if [ -z "$compilers" ] ; then
     warn "OS or processor type ($os/$proc) are not supported in release \"$rel\""
-    compilers="gcc34,gcc41,CC"
+    compilers="gcc41,gcc44,gcc45,gcc46,gcc47,CC"
   fi
   comp=`set_intersect $options $compilers`
   test -z "$comp" && comp=`set_first $compilers`
