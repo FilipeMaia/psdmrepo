@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <string.h>
 
 //-------------------------------
 // Collaborating Class Headers --
