@@ -1,0 +1,117 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pdscalibdata
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-03-03
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added some missing headers
+
+Tag: V00-03-02
+2012-04-23 Andy Salnikov
+- two new calibraion data classes: CsPad2x2PixelGain and CsPadPixelGain
+
+Tag: V00-03-01
+2012-02-08 Andy Salnikov
+- small fix to comments
+
+Tag: V00-03-00
+2012-02-08 Andy Salnikov
+- renamed CsPadMini classes to CsPad2x2
+
+Tag: V00-02-00
+2011-12-10 Andy Salnikov
+- switch to using ndarray for arrays
+
+Tag: V00-01-01
+2011-10-04 Andy Salnikov
+- CsPadCommonModeSubV1 and CsPadFilterV1 now can be initialized through
+  constructor parameters without reading data from files
+
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- CsPadCommonModeSubV1::findCommonMode() now takes int16_t* for image data
+- CsPadFilterV1::filter() was missing const for input data
+
+Tag: V00-00-14
+2011-09-11 Andy Salnikov
+- in CsPadCommonModeSubV1 inlined rounding to improve performance
+
+Tag: V00-00-13
+2011-09-06 Andy Salnikov
+- last change in CsPadCommonModeSubV1::findCommonMode introduced a bug,
+  variable in for loop masked other variable. Making a quick fix.
+
+Tag: V00-00-12
+2011-09-01 Andy Salnikov
+- add classes for CsPad::MiniElementV1 calibration: CsPadMiniPedestalsV1
+  and CsPadMiniPixelStatusV1
+- CsPad::MiniElementV1 data is organized differently (sections are 
+  interleaved) so to be able to use common mode calculator with that data 
+  type I added "stride" argument to CsPadCommonModeSubV1::findCommonMode
+  method which is 1 (default) for standard CsPad elements and should be set 
+  to 2 for MiniElement.
+
+Tag: V00-00-11
+2011-08-09 Mikhail Dubrovin
+- Replace float -> double for all CSPad stuff.
+	
+Tag: V00-00-10
+2011-07-22 Mikhail Dubrovin
+- fix problem with CalibParsOffsetCorrV1.cpp (it was empty).
+- add description to all CalibPars*V1.h modules.
+	
+Tag: V00-00-09
+2011-07-19 Mikhail Dubrovin
+- add new classes for CSPad image calibration parameters:
+	CalibParsCenterV1
+        CalibParsCenterCorrV1
+	CalibParsMargGapShiftV1
+	CalibParsOffsetV1
+	CalibParsOffsetCorrV1
+	CalibParsRotationV1
+	CalibParsTiltV1
+	CalibParsQuadRotationV1
+	CalibParsQuadTiltV1	
+	
+Tag: V00-00-08
+2011-05-23 Andy Salnikov
+- removed SITConfig include, not useful any more
+
+Tag: V00-00-07
+2011-05-23 Andy Salnikov
+- suppress compilation warnings for comparison between int and 
+  unsigned in ScPadCommonModeSubV1.cpp  
+
+Tag: V00-00-06
+2011-02-17 Andy Salnikov
+- for common mode correction make the threshold value configurable 
+
+Tag: V00-00-05
+2011-02-15 Andy Salnikov
+- adding new calibration "configuration" type CsPadFilterV1
+
+Tag: V00-00-04
+2011-02-01 Andy Salnikov
+- added protection to CsPadCommonModeSubV1::findCommonMode for the case of 
+  missing pixel status data
+
+Tag: V00-00-03
+2010-11-22 Andy Salnikov
+- adding new calibration "configuration" type CsPadCommonModeSubV1
+
+Tag: V00-00-02
+2010-11-16 Andy Salnikov
+- adding new calibration type CsPadPixelStatus
+
+Tag: V00-00-01
+2010-11-08 Andy Salnikov
+- for now there is a single calibration class CsPadPedestalsV1
