@@ -24,7 +24,9 @@ pkg_ver = "1.3.0"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 
-PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages", pkg)
+libdir = 'lib'
+if env['PYTHON'] == 'python2.4': libdir = '$LIB_ABI'
+PYDIR = pjoin(libdir, '$PYTHON', "site-packages", pkg)
 PYDIRSEP = True
 INCDIR = pjoin(PYDIR, "core", "include", pkg)
 PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
