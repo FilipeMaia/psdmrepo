@@ -19,11 +19,12 @@ def generate(env):
     
     elif env['SIT_ARCH_OS'] == 'rhel6':
         
-        env['PYTHON_VERSION'] = "2.6"
+        env['PYTHON_VERSION'] = "2.7"
+        dir = os.path.join("/reg/g/psdm/sw/external/python/2.7.2", env['SIT_ARCH_BASE_OPT'])
         env['PYTHON'] = "python"+env['PYTHON_VERSION']
-        env['PYTHON_INCDIR'] = "/usr/include/"+env['PYTHON']
-        env['PYTHON_LIBDIR'] = "/usr/"+env['LIB_ABI']
-        env['PYTHON_BIN'] = "/usr/bin/"+env['PYTHON']
+        env['PYTHON_INCDIR'] = os.path.join(dir, "include", env['PYTHON'])
+        env['PYTHON_LIBDIR'] = os.path.join(dir, "lib")
+        env['PYTHON_BIN'] = os.path.join(dir, "bin", env['PYTHON'])
     
     elif env['SIT_ARCH_OS'] == 'ubu11':
         

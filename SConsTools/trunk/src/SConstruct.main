@@ -43,6 +43,9 @@ if os.environ["SIT_RELEASE"] != test_rel:
 for dirs in [("SConsTools/src", "SConsTools"), ("SConsTools/src/tools", "SConsTools/tools")]:
     if os.path.isdir(dirs[0]):
 
+        # python tends to remember empty directories, reset its cache
+        sys.path_importer_cache = {}
+
         # list of python files in source directory
         pys = set(f for f in os.listdir(dirs[0]) if os.path.splitext(f)[1] == ".py")
 
