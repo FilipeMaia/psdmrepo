@@ -16,8 +16,10 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string>
 #include <vector>
+#include <string.h>
 
 //----------------------
 // Base Class Headers --
@@ -156,7 +158,7 @@ RdbMySQLDumpTable::runApp ()
   }
 
   // calculate max field sizes
-  std::vector<int> sizes( nf, 0 ) ;
+  std::vector<unsigned> sizes( nf, 0 ) ;
   for ( int i = 0 ; i < nf ; ++ i ) {
     const Field& field = header.field(i) ;
     sizes[i] = strlen(field.name()) ;
