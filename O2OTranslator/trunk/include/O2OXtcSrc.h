@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <vector>
+#include <string>
 
 //----------------------
 // Base Class Headers --
