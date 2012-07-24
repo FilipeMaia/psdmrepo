@@ -1,4 +1,6 @@
 #include <cassert>
+#include <stdio.h>
+#include <string.h>
 #include <psddl_python/GetterMap.h>
 
 namespace Psana {
