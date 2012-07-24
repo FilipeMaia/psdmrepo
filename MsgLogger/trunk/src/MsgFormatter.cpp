@@ -24,9 +24,12 @@
 //-------------
 // C Headers --
 //-------------
+#include <algorithm>
 extern "C" {
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 }
