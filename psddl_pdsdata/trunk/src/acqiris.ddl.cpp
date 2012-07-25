@@ -15,7 +15,7 @@ ConfigV1::nbrChannels() const {
 }
 uint64_t
 TimestampV1::value() const {
-  return ((uint64_t)this->_timeStampHi)<<32 + this->_timeStampLo;
+  return (((uint64_t)this->_timeStampHi)<<32) + this->_timeStampLo;
 }
 std::vector<int>
 DataDescV1::data_shape(const Acqiris::ConfigV1& cfg) const {
