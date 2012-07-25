@@ -1,0 +1,255 @@
+# $Id: README,v 1.2 2005/02/16 17:07:23 salnikov Exp $
+
+Package: RdbMySQL
+Date   : 2005-02-08
+Author : Andy Salnikov
+
+This package contains C++ interface to MySQL database. Allowed
+dependencies are on mysql itself, ErrLogger, and standard C++ lirbary.
+
+Classes in this package:
+
+RdbMySQLConn:
+    Represents a connection to MySQL server. Have open() and close() 
+    methods for connecting/disconnecting to server. 
+
+RdbMySQLQuery:
+    Class which builds and executes queries. Has many execute() methods
+    (which simulate variable-length argument lists) for different
+    input parameters (see below for details.) All execute() methods 
+    return pointer to RdbMySQLResult object or zero pointer in case of 
+    failure.
+
+RdbMySQLQueryBuf:
+    This is a helper class which is a buffer for building queries. Used 
+    only by RdbMySQLQuery, not supposed to be used by ordinary users.
+
+RdbMySQLResult:
+    Represents the result of the queries. Can be either just a "number 
+    of affected rows" for INSERT/UPDATE/DELETE queries, or a relation
+    returned from SELECT-like queries.
+
+RdbMySQLHeader:
+    Collection of the fields in the RdbMySQLResult object.
+
+RdbMySQLField:
+    Description of a single field in the result. Analog of the MYSQL_FIELD
+    struct (or rather its mirror.)
+
+RdbMySQLRow:
+    Represents single row in the result set (mirror of MYSQL_ROW). 
+    Provides access to the fields as strings or can do a conversion of
+    these strings to the numeric values.
+
+RdbMySQLRowIter:
+    Iterator for the rows in the result set.
+
+RdbMuSQLBuffer:
+    A special "string" class for the cases when you have a long pre-filled 
+    buffer of a known length that you need to put into query but do not 
+    want to make a std::string out of it for efficiency reason. 
+
+RdbMySQLTypeTraits:
+    Templated stuff for the conversion of different types to/from strings
+    in the format recognized by MySQL. Used by RdbMySQLQueryBuf/RdbMySQLRow
+    to provide typed access to untyped data.
+
+
+RdbMySQLDumpTable application in this package shows one example of how 
+the above classes could be used for building select query and dumping 
+the results of the query.
+
+
+                Building queries with RdbMySQLQuery class
+                =========================================
+
+RdbMySQLQuery could be used as helpful tool for building complex 
+queries. The class has many methods which take different parameters 
+and make build complete queries from those parametrs. The are few 
+bsaic methods in the class which take complete queries:
+
+  RdbMySQLResult* execute ( const char* q ) ;
+  RdbMySQLResult* execute ( const std::string& q ) ;
+  RdbMySQLResult* execute ( const char* q, size_t size ) ;
+
+Fist of these takes a pointer to zero-teminated array of chars 
+(C-string), second takes standard C++ string class object, and the 
+last takes pointer to the beginning of the C-string and its length. 
+Last method could be used when query has embedded zeros (which is 
+allowed by MySQL,) when you cannot add terminating zero to a string, 
+or just for efficiency when you already know the size of the 
+(potentially huge) query. [Note that C++ strings can also have 
+embedded zeros.]
+
+Remaining methods with the names executePar() are used to build the 
+complete queries from the query templates. Query template is an 
+incomplete query where parts of the query that need to be formed from 
+external parametrs are marked with the special placeholders. Example 
+of the query template is here:
+
+        "SELECT * FROM ATable WHERE name = ??"
+
+When you use this query template with one of the methods which builds 
+query, the placeholder (??) is replaced with the value of the additional 
+parameter that you provide, properly quoted and escaped in case of the 
+string parameter. There are two placeholder types defined currently:
+
+  ?  - this only converts its value to string and inserts this string
+       into query. 
+  ?? - this does the same as ? but for string parameters it also does
+       quoting and escaping.
+
+The rule for ?/?? placeholders is that ? should be used for the things 
+like table name, field name, etc., which do not need quotes around 
+them. The ?? placeholders should be used for the data values. Note 
+that for the numbers there is no difference in the result produced by 
+either of the two placeholders.
+
+The substitution is currently defined for the folloing types:
+
+  const char*    - string with escaping/quoting for ??
+  std::string    - string with escaping/quoting for ??
+  char           - 1-char string with escaping/quoting for ??
+  signed char    - numeric
+  unsigned char  - numeric
+  short          - numeric
+  unsigned short - numeric
+  int            - numeric
+  unsigned int   - numeric
+  long           - numeric
+  unsigned long  - numeric
+  float          - numeric
+  double         - numeric
+  long double    - numeric
+
+Here are few examples with the corresponding expansion.
+
+Call:  executePar ( "SELECT * from ?", "ATable" ) 
+Query: "SELECT * from ATable"
+
+Call:  executePar ( "SELECT * from ? WHERE name = ??", "ATable", "Andy" ) 
+Query: "SELECT * from ATable WHERE name = "Andy""
+
+Call:  executePar ( "INSERT INTO ? VALUES ( ??, ?? )", "ATable", 0, "<XML>\n</XML>" ) 
+Query: "INSERT INTO ATable VALUES ( 0, "<XML>\n</XML>" )"
+
+There are few executePar() methods defined in the query class, each 
+taking different number of parameters, templated on every parameter 
+type (this is done to emulate variable-length argument list of 
+arbitrary types.) Currently maximum number of the parateres that you 
+can pass is 7, if you need larger number, then you either have to 
+build query yourself, or modify this class to add more methods to it.
+
+
+                Working with the result set
+                ===========================
+
+All the execute() methods return the result set returned by the last 
+query, or zero pointer if the query was unsuccessfull. For the 
+INSERT/DELETE/UPDATE queries there no actual result set, but you would 
+still get an object from which you can obtain the number of the rows
+affected by this query. Here is the example of the [untested] code
+which prints the number of deleted rows:
+
+    RdbMySQLConn conn (...) ;
+    RdbMySQLQuery query ( conn ) ;
+    RdbMySQLResult* res = query.execute ( "DELETE FROM ATable" ) ;
+    if ( ! res ) {
+      ErrMsg(error) << "query failed: " << conn.error() << endmsg ;
+    } else {
+      ErrMsg(routine) << res->size() << " rows deleted from a table" << endmsg ;
+    }
+    delete res ;
+
+For the SELECT-like queries returned result object will have a 
+collection of 0 or more rows and a relation "header". You can query 
+header for the number of the fields in the result:
+
+    RdbMySQLHeader header = res->header() ;
+    unsigned int nfields = header.size() ;  // or just res->header().size() ;
+
+If the returned number is 0 it will mean that the query was actually 
+non-SELECT type (INSERT/UPDATE/DELETE). 
+
+To scan all rows if the returned result set you should use row 
+iterator object:
+
+    RdbMySQLRowIter iter ( *res ) ;
+    while ( iter.next() ) {
+      const RdbMySQLRow& row = iter.row() ;
+      // do something with the row
+    }
+
+One important note about this - iteration is only guaranteed to work 
+once, which means you cannot iterate over the same rows again, and you 
+cannot have two iterators. If you need to scan the same data again you 
+should either copy all the data somewhere else, or execute another 
+query to get the same (or maybe changed) data.
+
+The rows in the result set keep the data returned by the query as the 
+strings. You can access the strings in the row if you know the the
+field index that you want to access:
+
+    RdbMySQLResult* res = query.execute ( "SELECT firstName, lastName from ATable" ) ;
+    if ( res ) {
+      RdbMySQLRowIter iter ( *res ) ;
+      while ( iter.next() ) {
+        const RdbMySQLRow& row = iter.row() ;
+        cout << "first name: " << row.at(0) << "  last name: " << row.at(1) << '\n' ;
+      }
+    }
+
+If you do not know the order of the fields in the returned result set 
+that you need to use result header to determine the order first:
+
+    RdbMySQLResult* res = query.execute ( "SELECT * from ATable" ) ;
+    if ( res ) {
+      const RdbMySQLHeader& header = res->header() ;
+      int firstIndex = header.index ( "firstName" ) ;
+      int lastIndex = header.index ( "lastName" ) ;
+      if ( firstIndex < 0 || lastIndex < 0 ) {
+        ErrMsg(error) << "There is no firstIndex or lastIndex in the result" << endmsg ;
+      } else {
+        RdbMySQLRowIter iter ( *res ) ;
+        while ( iter.next() ) {
+          const RdbMySQLRow& row = iter.row() ;
+          cout << "first name: " << row.at(firstIndex) << "  last name: " << row.at(lastIndex) << '\n' ;
+        }
+      }
+    }
+
+The row object can also convert the string representation of the field 
+to a numeric type or std::string:
+
+    RdbMySQLResult* res = query.execute ( "SELECT idx, name from ATable" ) ;
+    if ( res ) {
+      RdbMySQLRowIter iter ( *res ) ;
+      while ( iter.next() ) {
+        const RdbMySQLRow& row = iter.row() ;
+        unsigned int idx ;
+        if ( ! row.at ( 0, idx ) ) {
+          ErrMsg(error) << "error while extracting index, index string = " << row.at(0) << endmsg ;
+        }
+        std::string name ;
+        if ( ! row.at ( 1, name ) ) {
+          ErrMsg(error) << "error while extracting name, name string = " << row.at(1) << endmsg ;
+        }
+        cout << "index: " << idx << "  name: " << name << '\n' ;
+      }
+    }
+
+Because this conversion proceeds through the string representation, 
+there is no real type checking done during conversion. In some cases 
+conversion can detect out-of-range values for the requested types in 
+which case it will return false without changing the value of the 
+parameter.
+
+
+                    Future enhancements
+                    ===================
+
+- add option to use mysql_use_result() instead of mysql_store_result() to 
+  retrieve query data
+- add DATE/TIME/DATETIME/TIMESTAMP classes
+- better type checking in RdbMySQLRow
+
