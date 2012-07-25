@@ -175,7 +175,7 @@ EventNumberFilter::printInputParameters()
 void 
 EventNumberFilter::parseEvtString()
 {
-  char* separ = ",";
+  const char* separ = ",";
   char rec[80];
   size_t pos;
   size_t pos1=0;
@@ -204,7 +204,7 @@ EventNumberFilter::parseOneRecord(char* rec)
 {
   MsgLog(name(), debug, ":parseOneRecord: "  << rec );
 
-  char* separ = "-";
+  const char* separ = "-";
   string recstring = rec;
   size_t pos = recstring.find(separ);
   if (pos != string::npos) {

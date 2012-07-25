@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2012-07-25 Andy Salnikov
+- fix const char* warning
+
 Tag: V00-00-10
 2012-07-24 Andy Salnikov
 - rhel6/gcc44 migration, added missing headers
