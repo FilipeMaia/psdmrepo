@@ -11,10 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-03-08
+Tag: V00-03-09
 2012-07-24 Andy Salnikov
 - acqiris.ddl: bug fix in Timestamp::value() method
-- regenerate whole thing from psddldata V00-03-06
+- regenerate whole thing from psddldata V00-03-07
 
 Tag: V00-03-07
 2012-07-06 Andy Salnikov
