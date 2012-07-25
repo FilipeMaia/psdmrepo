@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-07-24 Andy Salnikov
+- fixing my last edit of SConscript
+
 Tag: V00-01-04
 2013-07-24 Andy Salnikov
 - disable unit tests, the tests are producing some root files
