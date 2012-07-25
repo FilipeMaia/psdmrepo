@@ -1,0 +1,54 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pazlib
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-03
+2012-07-24 Andy Salnikov
+- gcc44 migration, fixing missing header in test app
+
+Tag: V00-01-02
+2012-07-24 Andy Salnikov
+- rhel6 migration, fixing header name
+
+Tag: V00-01-00
+2012-06-22 Andy Salnikov
+- adding few files from which we can build tarball for distributing
+  pazlib outsize our standard release structure
+
+Tag: V00-00-05
+2011-11-07 Andy Salnikov
+- add libpthread to the link list
+- small changes to test case
+
+Tag: V00-00-04
+2011-10-12 Andy Salnikov
+- there is a bug in adler32_combine() in zlib 1.2.3-3 which is currently
+  istalled on our machines: https://bugzilla.redhat.com/show_bug.cgi?id=622779
+- copy correct version of adler32.c into package, will build it into libpazlib
+
+Tag: V00-00-03
+2011-09-12 Andy Salnikov
+- threads are created in detached state
+
+Tag: V00-00-02
+2011-09-12 Andy Salnikov
+- limit threads' stack size to 32kB
+
+Tag: V00-00-01
+2011-09-12 Andy Salnikov
+- threads are reused between invocations
+
+2011-09-09 Andy Salnikov
+- get rid of memory allocation, reuse space in user-provided buffer
+
+2011-09-08 Andy Salnikov
+- first working version, thread lifetime needs to be improved
