@@ -1,0 +1,58 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ConfigSvc
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-10
+2012-07-24 Joseph Barrera
+- fix unsigned conversion warnings
+
+Tag: V00-00-09
+2012-06-08 Joseph Barrera
+- allow options to have empty string as value, e.g. {inputdark =} and {outputfile =}
+- add getKeys() method to ConfigSvc
+
+Tag: V00-00-08
+2012-04-18 Andy Salnikov
+- adding docstrings to all Python classes/methods
+
+Tag: V00-00-07
+2012-04-16 Andy Salnikov
+- adding python wrapper for config service, implemented as Cython module
+- adding unit test for Python wrapper
+
+Tag: V00-00-06
+2011-04-01 Andy Salnikov
+- support line continuation with backslashes at end of line
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added default constructor to ConfigSvcImplFile to instantiate 
+  empty configuration
+
+Tag: V00-00-04
+2011-01-26 Andy Salnikov
+- removed SITConfig/SITConfig.h include from test case
+
+Tag: V00-00-03
+2011-01-26 Andy Salnikov
+- added put() method to ConfigSvc to add/change the value of parameters
+
+Tag: V00-00-02
+2010-12-16 Andry Salnikov
+- template magic did not work correctly for std::string assignments,
+  the Result class conversion to std::string was too ambiguous
+- defining special method getStr() in ConfigSvc class to fix above problem
+- adding unit test for ConfigSvc
+
+Tag: V00-00-01
+2010-09-28 Andry Salnikov
+- first import into repository, basic functionality is here
