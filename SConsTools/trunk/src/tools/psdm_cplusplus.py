@@ -35,8 +35,8 @@ def generate(env):
     elif comp == 'gcc41' :
         env['CC'] = 'gcc'
         env['CXX'] = 'g++'
-        env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
-        env['CXXFLAGS'] = '-Wno-invalid-offsetof -Wunknown-pragmas'
+        env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall -Wno-unknown-pragmas'
+        env['CXXFLAGS'] = '-Wno-invalid-offsetof'
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     elif comp == 'gcc44' :
