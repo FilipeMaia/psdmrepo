@@ -14,7 +14,7 @@ ConfigV1::~ConfigV1() {}
 
 uint64_t
 TimestampV1::value() const {
-  return ((uint64_t)this->_timeStampHi)<<32 + this->_timeStampLo;
+  return (((uint64_t)this->_timeStampHi)<<32) + this->_timeStampLo;
 }
 
 DataDescV1Elem::~DataDescV1Elem() {}
