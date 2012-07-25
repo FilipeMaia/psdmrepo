@@ -224,7 +224,7 @@
 
             <method name="value" type="uint64_t">
                 Full timestamp as 64-bit number.
-                <expr lang="C++" value="((uint64_t){self}._timeStampHi)&lt;&lt;32 + {self}._timeStampLo" />
+                <expr lang="C++" value="(((uint64_t){self}._timeStampHi)&lt;&lt;32) + {self}._timeStampLo" />
             </method>
 
             <ctor>

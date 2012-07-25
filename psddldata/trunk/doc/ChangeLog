@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-07
+2012-07-24 Andy Salnikov
+- acqiris.ddl.xml: bug fix in Timestamp::value() method
+
 Tag: V00-03-06
 2012-07-06 Andy Salnikov
 - new package quartz with single class ConfigV1 similar to opal1k.ConfigV1
