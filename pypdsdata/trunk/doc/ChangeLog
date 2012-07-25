@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-72
+2012-07-24 Andy Salnikov
+- moved #pragma GCC diagnostic out of function
+
 Tag: V00-00-71
 2012-07-24 Andy Salnikov
 - more warnings to suppress
