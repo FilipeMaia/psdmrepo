@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2012-07-24 Andy Salnikov
+- moved trunk to branch version1
+- moved branch version0 to trunk
+
 Tag: V00-01-01 (made from branch version0)
 2011-06-29 Andy Salnikov
 - removed all Tuple stuff
