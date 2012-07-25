@@ -281,7 +281,7 @@ cdef class ConfigSvc:
         cdef string strparam = string(param)
         cdef vector[string] tmpvec
         cdef object s
-        cdef int i
+        cdef unsigned i
 
         if defval is None:
             tmpvec = self.thisptr.getStrList(strsec, strparam)
@@ -308,6 +308,7 @@ cdef class ConfigSvc:
         cdef string strparam = string(param)
         cdef vector[int] tmpvec
         cdef int i
+        cdef unsigned j
 
         if defval is None:
             tmpvec = self.thisptr.getBoolList(strsec, strparam)
@@ -316,7 +317,7 @@ cdef class ConfigSvc:
                 tmpvec.push_back(i)
             tmpvec = self.thisptr.getBoolList(strsec, strparam, tmpvec)
 
-        return [PyBool_FromLong(tmpvec[i]) for i in range(tmpvec.size())]
+        return [PyBool_FromLong(tmpvec[j]) for j in range(tmpvec.size())]
         
 
     def getIntList(self, char* section, char* param, list defval = None):
@@ -334,6 +335,7 @@ cdef class ConfigSvc:
         cdef string strparam = string(param)
         cdef vector[long] tmpvec
         cdef int i
+        cdef unsigned j
 
         if defval is None:
             tmpvec = self.thisptr.getIntList(strsec, strparam)
@@ -342,7 +344,7 @@ cdef class ConfigSvc:
                 tmpvec.push_back(i)
             tmpvec = self.thisptr.getIntList(strsec, strparam, tmpvec)
 
-        return [tmpvec[i] for i in range(tmpvec.size())]
+        return [tmpvec[j] for j in range(tmpvec.size())]
         
 
     def getFloatList(self, char* section, char* param, list defval = None):
@@ -360,7 +362,7 @@ cdef class ConfigSvc:
         cdef string strparam = string(param)
         cdef vector[double] tmpvec
         cdef float f
-        cdef int i
+        cdef unsigned i
 
         if defval is None:
             tmpvec = self.thisptr.getDoubleList(strsec, strparam)
