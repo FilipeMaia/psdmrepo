@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+- moved older version from branch "version0" to trunk
+- newer development version will be on branch "version1"
+
 Tag: V00-01-00
 2011-06-29 Andy Salnikov
 - Adding doxygen comments everywhere
