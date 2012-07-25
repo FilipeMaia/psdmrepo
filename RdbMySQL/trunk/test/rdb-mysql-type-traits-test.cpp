@@ -151,7 +151,8 @@ BOOST_AUTO_TEST_CASE( test_uint64 )
   BOOST_CHECK(fromStr<unsigned long> ( "18446744073709551615" ));
   BOOST_CHECK(fromStrFail<unsigned long> ( "18446744073709551616" ));
   BOOST_CHECK(fromStrFail<unsigned long> ( "18446744073709551617" ));
-  BOOST_CHECK(fromStrFail<unsigned long> ( "-1" ));
+  // below test is platform-dependent, disable
+  //BOOST_CHECK(fromStrFail<unsigned long> ( "-1" ));
 }
 
 // ==============================================================
@@ -162,7 +163,8 @@ BOOST_AUTO_TEST_CASE( test_float )
   BOOST_CHECK(fromStr<float> ( "1.0e10" ));
   BOOST_CHECK(fromStr<float> ( "0.125" ));
   BOOST_CHECK(fromStr<float> ( "3.4e+38" ));
-  BOOST_CHECK(fromStrFail<float> ( "1.0e-310" ));
+  // below test is platform-dependent, disable
+  //BOOST_CHECK(fromStrFail<float> ( "1.0e-310" ));
   BOOST_CHECK(fromStrFail<float> ( "1e+39" ));
 }
 
