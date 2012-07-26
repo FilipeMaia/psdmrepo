@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+usage() {
+
+  echo `basename $0` build_dir release [copy_request_dir]
+
+}
+
+rels=${1:?Required parameter missing (build directory name)}
+shift
+rel=${1:?Required parameter missing (release name)}
+shift
+reqdir=$1
+shift
+
+#
+# say we are done
+#
+touch "$rels/$rel/.build-done"
+
+#
+# send request to copy job
+#
+test -n "$reqdir" -a -d "$reqdir" && touch "$reqdir/$rel"

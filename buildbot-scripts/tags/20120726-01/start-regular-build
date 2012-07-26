@@ -1,0 +1,88 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+# host and port where buildbot listens
+bbot=pslogin02:9989
+
+usage() {
+  echo Usage: `basename $0` '<release-name> <tags-file> [<description-file>]' 1>&2
+}
+
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
+
+# check arguments
+if [ $# -lt 2 ] ; then
+  echo "Required parameters missing" 1>&2
+  usage
+  exit 2
+fi
+
+rel=$1
+tags=$2
+desc=$3
+
+#
+# directory for the new release
+#
+rels="$SIT_ROOT/sw/releases"
+
+#
+# Check that releases directory is there, if not we may be on wrong host
+#
+if [ ! -d "$rels" ] ; then
+    echo "Releases directory $rels does not exist, aborting." 1>&2
+    exit 2
+fi
+
+#
+# check that release does not exist 
+#
+if [ -d "$rels/$rel" ] ; then
+    echo "Release directory $rels/$rel already there, aborting." 1>&2
+    exit 2
+fi
+
+#
+# check that tags file is there 
+#
+if [ ! -f "$tags" ] ; then
+    echo "Tags file $tags does not exist, aborting." 1>&2
+    exit 2
+fi
+
+#
+# Make absolute name for files
+#
+tags=$(cd $(dirname $tags); pwd)/$(basename $tags)
+test -n "$desc" && desc=$(cd $(dirname $desc); pwd)/$(basename $desc) 
+
+#
+# Checkout the release
+#
+echo "Checking out release to $rels/$rel"
+log="$rels/$rel/.co-done"
+cd "$rels" && \
+newrel -n "$rel" "$rel" && \
+cd "$rel" && \
+cp "$tags" ./tags && \
+addpkg -x -f ./tags >"$log.out" 2>"$log.err"
+status=$?
+
+test -n "$desc" -a -f "$desc" && cp "$desc" ./release-notes
+
+test -s "$log.err" || rm "$log.err"
+mv "$log.out" "$rels/$rel/.co-done"
+
+if [ $status -ne 0 ] ; then
+    echo "Release checkout failed, aborting." 1>&2
+    echo "Check log: $log.err" 1>&2
+    exit 2
+fi
+
+#
+# Send a signal to buildbot
+#
+echo "Sending notification to BuildBot"
+buildbot sendchange --user=$USER --master=$bbot --branch="$rel" --comments="Requesting to build release $rel" /dev/null
