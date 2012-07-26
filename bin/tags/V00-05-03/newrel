@@ -1,0 +1,118 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Script for creation of the new software release
+#
+
+#
+# Steps to create a release
+#  1. Create new directory for release
+#  2. Create .sit_release in that directory
+#  3. Copy SConstruct file from base release
+#
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [options] release directory
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+    -n          make new release from scratch, release must not exist 
+                in \$SIT_RELDIR yet
+
+  Creates directory structure for the software release. If option -n is
+not given then this will create a user release directory which is based 
+on the existing release with the given name (which must exist already).
+If option -n is given then create brand new release which has no 
+corresponding base release, The release name given must not exist in
+\$SIT_RELDIR.
+
+EOD
+}
+
+
+# default values for options
+newrel="no"
+
+# get the options
+while getopts hdn c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    n) newrel="yes" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check arguments
+if [ $# -ne 2 ] ; then
+  usage
+  exit 2
+fi
+
+release="$1"
+directory="$2"
+
+# check that $SIT_RELDIR is there
+if [ -z "$SIT_RELDIR" ] ; then
+  echo "Release directory \$SIT_RELDIR is not defined" 1>&2
+  exit 2
+fi
+if [ ! -d "$SIT_RELDIR" ] ; then
+  echo "Release directory $SIT_RELDIR does not exist" 1>&2
+  exit 2
+fi
+
+# check that directory is not there yet
+if [ -d "$directory" ] ; then
+  echo "Directory $directory already exists" 1>&2
+  exit 2
+fi
+
+if [ "$newrel" = "yes" ] ; then
+  
+  # make brand new release, should not exist yet
+  if [ -e "$SIT_RELDIR/$release" ] ; then
+    echo "Release $release already exists in $SIT_RELDIR" 1>&2
+    exit 2
+  fi
+
+  # make directory
+  mkdir "$directory" || exit 3
+
+  # store release number
+  echo "$release" > "$directory/.sit_release" || exit 3
+
+else
+
+  if [ ! -d "$SIT_RELDIR/$release" ] ; then
+    echo "Release $release does not exist in $SIT_RELDIR" 1>&2
+    exit 2
+  fi
+
+  # if release is linked to another one get its real name
+  if [ -f "$SIT_RELDIR/$release/.sit_release" ] ; then
+    release=`cat "$reldir/$release/.sit_release"`
+    # check that linked release exists
+    if [ ! -d "$SIT_RELDIR/$release" ] ; then
+      echo "Linked release $release does not exist in $SIT_RELDIR" 1>&2
+      exit 2
+    fi
+  fi
+	
+  # make directory
+  mkdir "$directory" || exit 3
+
+  # store its number
+  echo "$release" > "$directory/.sit_release" || exit 3
+	
+  # copy SConstruct from base release
+  if [ -r "$reldir/$release/SConstruct" ] ; then
+    cp "$reldir/$release/SConstruct" "$directory"
+  fi
+
+fi
