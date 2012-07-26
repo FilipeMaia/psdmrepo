@@ -80,7 +80,7 @@ tmpdir="$tmpdir/rel-make-tarball-$$"
 mkdir -p "$tmpdir"
 
 # make new release
-(cd "$tmpdir"; newrel $rel $rel)
+(cd "$tmpdir"; newrel -n $rel $rel) || exit 2
 
 # copy tags and relnotes
 cp "$tags" "$tmpdir/$rel/tags"
