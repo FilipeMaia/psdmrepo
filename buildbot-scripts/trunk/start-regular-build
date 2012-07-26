@@ -4,7 +4,7 @@
 #
 
 # host and port where buildbot listens
-bbot=psdev:9989
+bbot=pslogin02:9989
 
 usage() {
   echo Usage: `basename $0` '<release-name> <tags-file> [<description-file>]' 1>&2
@@ -13,7 +13,7 @@ usage() {
 tmp=${SIT_ROOT:?Missing SIT_ROOT}
 
 # check arguments
-if [ $# -ne 2 ] ; then
+if [ $# -lt 2 ] ; then
   echo "Required parameters missing" 1>&2
   usage
   exit 2
@@ -64,7 +64,7 @@ test -n "$desc" && desc=$(cd $(dirname $desc); pwd)/$(basename $desc)
 echo "Checking out release to $rels/$rel"
 log="$rels/$rel/.co-done"
 cd "$rels" && \
-newrel "$rel" "$rel" && \
+newrel -n "$rel" "$rel" && \
 cd "$rel" && \
 cp "$tags" ./tags && \
 addpkg -x -f ./tags >"$log.out" 2>"$log.err"

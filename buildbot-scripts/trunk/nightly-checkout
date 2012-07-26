@@ -36,8 +36,13 @@ getTags() {
     for pkg in $packages ; do
         tag=`getPkgTag $pkg` || return 2
         if [ -n "$tag" ] ; then
-            # check also that SConscript file is there
-            svn ls "$SIT_SVN/$pkg/tags/$tag/SConscript" >/dev/null 2>&1 && echo $pkg $tag
+            if [ $pkg = "SConsTools" ] ; then
+                # SConsTools does not have SConscript file
+                echo $pkg $tag
+            else
+                # check also that SConscript file is there
+                svn ls "$SIT_SVN/$pkg/tags/$tag/SConscript" >/dev/null 2>&1 && echo $pkg $tag
+            fi
         fi
     done
     return 0
@@ -54,7 +59,7 @@ checkout() {
         return 2
     fi
     cd "$reldir" || return 3
-    newrel "$rel" "$rel" || return 3
+    newrel -n "$rel" "$rel" || return 3
     cd "$rel"
 
     #

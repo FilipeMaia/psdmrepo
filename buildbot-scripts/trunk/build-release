@@ -36,5 +36,5 @@ source "$SIT_ROOT/bin/sit_setup.sh" "$@"
 #
 # run the build
 #
-scons -j 3 $target 
+scons -k $target 
 
