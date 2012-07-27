@@ -273,15 +273,6 @@ if [ -z "$python" ] ; then
   fi
 fi
 
-# add SCons to the PATH
-pyver=`python -c "from distutils import sysconfig; print sysconfig.get_config_var('VERSION')"`
-for v in $scons_ver ; do
-  if [ -d "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin" ] ; then
-    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin"
-    break
-  fi
-done
-
 # add SIT_ROOT/bin to PATH
 prepend_path PATH "$SIT_ROOT/bin"
 test "$SIT_RELEASE" = "nobase" || prepend_path PATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin"
@@ -290,6 +281,16 @@ prepend_path PATH "./arch/$SIT_ARCH/bin"
 # shared libs path
 test "$SIT_RELEASE" = "nobase" || prepend_path LD_LIBRARY_PATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/lib"
 prepend_path LD_LIBRARY_PATH "./arch/$SIT_ARCH/lib"
+
+# add SCons to the PATH, this has to be done when other PATH components are set already
+# as it needs correct python executable to be found
+pyver=`python -c "from distutils import sysconfig; print sysconfig.get_config_var('VERSION')"`
+for v in $scons_ver ; do
+  if [ -d "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin" ] ; then
+    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin"
+    break
+  fi
+done
 
 # releases dirs
 test "$SIT_RELEASE" = "nobase" || set_env SIT_REPOS "$SIT_RELDIR/$SIT_RELEASE"
