@@ -265,7 +265,7 @@ if [ -z "$python" ] ; then
         pypath="$dir/$SIT_ARCH/bin"
         break
       elif [ -x "$dir/$sit_arch_base-opt/bin/python" ] ; then
-        pypath="$dir/$sit_arch_base-opt/bin/python"
+        pypath="$dir/$sit_arch_base-opt/bin"
         break
       fi
     done
