@@ -19,10 +19,12 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 python = env['PYTHON']   # python with version number such as python2.7
-PREFIX = "/usr"
+PREFIX = env['PYTHON_PREFIX']
 INCDIR = env['PYTHON_INCDIR']
 LIBDIR  = env['PYTHON_LIBDIR']
+BINDIR  = env['PYTHON_BINDIR']
 PKGLIBS = python
 LINKLIBS = "lib"+python+".so*"
+LINKBINS = ["python", python]
 
-standardExternalPackage ( 'python', **locals() )
+standardExternalPackage('python', **locals())
