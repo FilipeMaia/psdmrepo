@@ -50,7 +50,7 @@ class XtcChunkDgIter : boost::noncopyable {
 public:
 
   /**
-   *  @build Create iterator instance
+   *  @brief Create iterator instance
    *
    *  Constructor for iterator which reads datagrams from single XTC file.
    *  It tries to open specified path first, if it fails and path has

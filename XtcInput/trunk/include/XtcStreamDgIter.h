@@ -61,10 +61,9 @@ public:
   /**
    *  @brief Make iterator instance
    *
-   *  Constructor accepts the list of files, the files will be sorted
-   *  based on the chunk number extracted from files name.
+   *  Constructor accepts iterator object which iterators over chunks in a stream.
    *
-   *  @param[in]  files    List of input files
+   *  @param[in]  chunkIter Iterator over chunks in a stream
    *  @param[in]  maxDgSize Maximum allowed datagram size
    */
   XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize);

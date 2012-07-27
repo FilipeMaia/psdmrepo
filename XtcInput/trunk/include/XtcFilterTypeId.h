@@ -79,8 +79,7 @@ public:
    *  filtering. The size of the buffer must be big enough to fit the data,
    *  output data cannot be larger than input XTC.
    *
-   *  @param[in] xtc     XTC container object
-   *  @param[out] buffer Buffer for output data
+   *  @param[in] input     XTC container object
    *  @return  True or false to accept/reject given XTC.
    */
   bool operator()(const Pds::Xtc* input) const;

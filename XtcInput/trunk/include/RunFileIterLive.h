@@ -62,6 +62,7 @@ public:
    *
    *  @param[in] begin     Iterator pointing to the beginning of run number sequence
    *  @param[in] end       Iterator pointing to the end of run number sequence
+   *  @param[in] expNum    Experiment number
    *  @param[in] liveTimeout Specifies timeout in second when reading live data
    *  @param[in] dbConnStr Database connection string
    *  @param[in] table     Database table name
