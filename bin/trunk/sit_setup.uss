@@ -18,7 +18,7 @@
 def_sit_root=/reg/g/psdm
 
 # SCons versions
-scons_ver="2.1.0-python2.4 1.2.0"
+scons_ver="2.1.0"
 
 # The map which lists acceptable (compatible) architectures 
 # for the current processor. For example if system is detected
@@ -237,17 +237,6 @@ remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
 remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*.*"
 unset_env SIT_REPOS
 
-# add SCons to the PATH
-for v in $scons_ver ; do
-  if [ -d "$SIT_ROOT/sw/external/scons/$v/$SIT_ARCH/bin" ] ; then
-    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v/$SIT_ARCH/bin"
-    break
-  elif [ -d "$SIT_ROOT/sw/external/scons/$v/bin" ] ; then
-    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v/bin"
-    break
-  fi
-done
-
 # if there is no base release or if there is no python link in the base release or 
 # current release then we need to add path to python executable if it can be found in 
 # non-standard location (sw/external); a lot of guessing is involved here
@@ -284,6 +273,15 @@ if [ -z "$python" ] ; then
   fi
 fi
 
+# add SCons to the PATH
+pyver=`python -c "from distutils import sysconfig; print sysconfig.get_config_var('VERSION')"`
+for v in $scons_ver ; do
+  if [ -d "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin" ] ; then
+    prepend_path PATH "$SIT_ROOT/sw/external/scons/$v-python$pyver/bin"
+    break
+  fi
+done
+
 # add SIT_ROOT/bin to PATH
 prepend_path PATH "$SIT_ROOT/bin"
 test "$SIT_RELEASE" = "nobase" || prepend_path PATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin"
@@ -300,7 +298,7 @@ test "$SIT_RELEASE" = "nobase" || set_env SIT_REPOS "$SIT_RELDIR/$SIT_RELEASE"
 has_pyextra="no"
 # for releases without base (these are brand new releases) assume that they all have pyextra links, 
 # otherwise check base release for pyextra and current release too
-test "$SIT_RELEASE" = "nobase" -o -f "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra" && has_pyextra="yes"
+test "$SIT_RELEASE" = "nobase" -o -e "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra" && has_pyextra="yes"
 test -d "./pyextra" && has_pyextra="yes"
 if [ $has_pyextra = "yes" ]; then
   test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra"
