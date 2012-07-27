@@ -222,10 +222,12 @@ fi
 
 # define architecture
 if [ -z "$sit_arch" ] ; then
-  set_env SIT_ARCH "$proc-$os-$comp-$build"
+  sit_arch_base="$proc-$os-$comp"
+  sit_arch="$proc-$os-$comp-$build"
 else
-  set_env SIT_ARCH "$sit_arch"
+  sit_arch_base=`echo $sit_arch | cut -d- -f1-3`
 fi
+set_env SIT_ARCH "$sit_arch"
 
 # remove all PSDM dirs from PATHs for the moment
 remove_from_path PATH "$SIT_ROOT/bin/*"
@@ -262,8 +264,8 @@ if [ -z "$python" ] ; then
       if [ -x "$dir/$SIT_ARCH/bin/python" ] ; then
         pypath="$dir/$SIT_ARCH/bin"
         break
-      elif [ -x "$dir/$proc-$os-$comp-opt/bin/python" ] ; then
-        pypath="$dir/$proc-$os-$comp-opt/bin/python"
+      elif [ -x "$dir/$sit_arch_base-opt/bin/python" ] ; then
+        pypath="$dir/$sit_arch_base-opt/bin/python"
         break
       fi
     done
