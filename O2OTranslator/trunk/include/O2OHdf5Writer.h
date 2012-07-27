@@ -77,7 +77,7 @@ public:
    *  
    *  @param[in] nameFactory  Instance of the factory class which creates output file names
    *  @param[in] overwrite    If true then allow overwriting of the outpur files
-   *  @param[in] spit         Output file splitting mode
+   *  @param[in] split        Output file splitting mode
    *  @param[in] splitSize    Size of the files at which to split
    *  @param[in] compression  Compression level, give negative number to disable compression
    *  @param[in] extGroups    If true generate extended group names with :NNNN suffix 
