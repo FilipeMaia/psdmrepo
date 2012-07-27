@@ -1,0 +1,199 @@
+#!/bin/sh
+#
+# $Id$
+
+usage() {
+  echo "Usage: $(basename $0) [options] output-dir package [package ...]"
+  echo
+  echo "Availabale options:"
+  echo "    -h        print this message"
+  echo "    -p name   project name"
+  echo "    -q        suppress normal output"
+  echo "    -Q        suppress warnings (and normal output)"
+  echo "    -H        use html output instead of dirhtml"
+  echo "    -d        debug (turn on -x shell option)"
+  echo
+  echo "If no package are provided then standard set is used"
+}
+
+# print the list of modules in given package
+modules() {
+    python -c "import $1 as m; from $1 import *; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type(m) and v.__name__.startswith(m.__name__)]);" |\
+    	tr ' ' '\n' | grep -v '^_' | sort
+}
+
+# print the list of classes in given package
+classes() {
+    python -c "import $1 as m; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type and v.__module__ == m.__name__]);" |\
+        tr ' ' '\n' | grep -v '^_' | sort
+}
+
+# print the list of functions in given package
+functions() {
+    python -c "import $1 as m; print ' '.join([k for k, v in m.__dict__.items() if type(v) in [type(len), type(lambda x:x)] and v.__module__ == m.__name__]);" |\
+        tr ' ' '\n' | grep -v '^_' | sort
+}
+
+genpkg() {
+    str="Package $1"
+    echo "$str" >> $out
+    echo "$str" | sed 's/./=/g' >> $out
+    echo ".. automodule:: $1" >> $out
+    echo "" >> $out
+}
+
+genmod() {
+      str="Module $1"
+      echo "$str" >> $out
+      echo "$str" | sed 's/./-/g' >> $out
+      echo ".. automodule:: $1" >> $out
+      echo "" >> $out
+}
+
+genclass() {
+    cls="$1.$2"
+    str="Class $cls"
+    echo "$str" >> $out
+    echo "$str" | sed 's/./^/g' >> $out
+    echo ".. autoclass:: $cls" >> $out
+    echo "   :members:" >> $out
+    echo "   :undoc-members:" >> $out
+    echo "   :private-members:" >> $out
+    echo "" >> $out
+}
+
+genfun() {
+    fun="$1.$2"
+    str="Function $fun"
+    echo "$str" >> $out
+    echo "$str" | sed 's/./^/g' >> $out
+    echo ".. autofunction:: $fun" >> $out
+    echo "" >> $out
+}
+
+project=
+warn=
+format=dirhtml
+
+# get the options
+while getopts hqQHdp: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    q) warn=-q ;;
+    Q) warn=-Q ;;
+    H) format=html ;;
+    d) set -x ;;
+    p) project="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# get output directory name
+if [ $# -le 1 ] ; then
+  usage
+  exit 2
+fi
+output="$1"
+shift
+
+# package names
+packages="$@"
+
+# try to make directory
+mkdir -p "$output" 2>/dev/null
+
+# make temporary directory
+tmpdir="/tmp/pydoc-driver-$$"
+mkdir -p "$tmpdir" || exit 2
+
+#
+#  Generate index file
+#
+idx=$tmpdir/index.rst
+cat >"$idx" <<EOD
+Reference Documentation for Python Packages 
+===========================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+EOD
+
+for pkg in $packages; do
+  echo "   $pkg" >>"$idx"
+done
+
+cat >>"$idx" <<EOD
+
+Indices and tables
+==================
+
+* :ref:\`genindex\`
+* :ref:\`modindex\`
+* :ref:\`search\`
+EOD
+
+#
+#  generate files for individual packages
+#
+for pkg in $packages; do
+
+	[ -z "$warn" ] && echo "Parsing package $pkg..."
+  	  	
+  	out=$tmpdir/$pkg.rst
+
+    echo ".. contents:: Table of Contents" > $out
+    echo "" >> $out
+
+    genpkg $pkg >> $out
+    
+    for class in `classes $pkg`; do
+      genclass $pkg $class >> $out
+    done
+
+    for fun in `functions $pkg`; do
+      genfun $pkg $fun >> $out
+    done
+
+    for module in `modules $pkg`; do
+    	
+      mod="$pkg.$module"
+      
+      genmod "$mod" >> $out
+      
+      for class in `classes $mod`; do
+        genclass $mod $class >> $out
+      done
+
+      for fun in `functions $mod`; do
+        genfun $mod $fun >> $out
+      done
+      
+    done
+  
+done    	
+
+year=`date +%Y`
+
+# generate config file
+conf=$tmpdir/conf.py
+cat >$conf <<EOD
+
+project="$project"
+copyright="$year, LCLS"
+
+extensions = ['sphinx.ext.autodoc', 'doctools.doxy_kw_subs']
+
+master_doc = 'index'
+exclude_patterns = ['_build']
+html_theme = 'nature'
+autoclass_content = 'both'
+EOD
+
+# run sphinx
+sphinx-build $warn -b $format "$tmpdir" "$output"
+
+rm -rf "$tmpdir"
