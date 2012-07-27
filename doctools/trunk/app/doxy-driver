@@ -75,7 +75,6 @@ doxygen - << EOD
 PROJECT_NAME           = $project
 OUTPUT_DIRECTORY       = $output
 CREATE_SUBDIRS         = NO
-DETAILS_AT_TOP         = NO
 BUILTIN_STL_SUPPORT    = YES
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
