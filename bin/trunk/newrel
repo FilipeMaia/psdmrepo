@@ -114,8 +114,8 @@ else
   echo "$release" > "$directory/.sit_release" || exit 3
 	
   # copy SConstruct from base release
-  if [ -r "$reldir/$release/SConstruct" ] ; then
-    cp "$reldir/$release/SConstruct" "$directory"
+  if [ -r "$SIT_RELDIR/$release/SConstruct" ] ; then
+    cp "$SIT_RELDIR/$release/SConstruct" "$directory"
   fi
 
 fi
