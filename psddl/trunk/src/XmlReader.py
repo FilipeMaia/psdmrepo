@@ -32,8 +32,12 @@ __version__ = "$Revision$"
 import sys
 import os
 import os.path
-import elementtree.ElementTree as ET
 import logging
+try:
+    import xml.etree.ElementTree as ET
+except:
+    import elementtree.ElementTree as ET
+
 
 #---------------------------------
 #  Imports of base class module --
