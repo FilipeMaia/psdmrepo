@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04
+2012-07-27 Andy Salnikov
+- small fixes to doxygen comments
+
 Tag: V00-03-03
 2012-07-24 Andy Salnikov
 - rhel6/gcc44 migration, added some missing headers

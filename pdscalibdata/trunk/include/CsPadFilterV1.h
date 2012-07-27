@@ -82,7 +82,6 @@ public:
    *   
    *  @param pixelData    Pixel data from cspad, after pedestal (and 
    *                      optionally common mode) subtraction
-   *  @param nPixel       Number of pixels in the data
    */
   bool filter(const ndarray<int16_t, 3>& pixelData) const;
   

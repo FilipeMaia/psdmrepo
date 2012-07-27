@@ -94,6 +94,7 @@ public:
    *  @param peddata  pedestal data, can be zero pointer
    *  @param pixStatus  pixel status data, can be zero pointer
    *  @param ssize  size of all above arrays
+   *  @param stride increment for pixel indices
    */ 
   float findCommonMode(const int16_t* sdata,
                        const float* peddata, 
