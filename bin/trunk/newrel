@@ -22,13 +22,14 @@ Usage: `basename $0` [options] release directory
     -d          debug (turn on -x shell option)
     -n          make new release from scratch, release must not exist 
                 in \$SIT_RELDIR yet
+    -i          do not check for existing releases when using -n option
 
   Creates directory structure for the software release. If option -n is
 not given then this will create a user release directory which is based 
 on the existing release with the given name (which must exist already).
 If option -n is given then create brand new release which has no 
-corresponding base release, The release name given must not exist in
-\$SIT_RELDIR.
+corresponding base release, the release name given must not exist in
+\$SIT_RELDIR unless option -i is given too.
 
 EOD
 }
@@ -36,13 +37,15 @@ EOD
 
 # default values for options
 newrel="no"
+checknew="yes"
 
 # get the options
-while getopts hdn c ; do
+while getopts hdni c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     n) newrel="yes" ;;
+    i) checknew="no" ;;
     \?) usage ; exit 2 ;;
   esac
 done
@@ -76,7 +79,7 @@ fi
 if [ "$newrel" = "yes" ] ; then
   
   # make brand new release, should not exist yet
-  if [ -e "$SIT_RELDIR/$release" ] ; then
+  if [ "$checknew" = "yes" -a -e "$SIT_RELDIR/$release" ] ; then
     echo "Release $release already exists in $SIT_RELDIR" 1>&2
     exit 2
   fi

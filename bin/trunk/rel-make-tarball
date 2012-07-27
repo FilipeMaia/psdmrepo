@@ -16,7 +16,6 @@ Usage: `basename $0` [options] <release-name> <tags-file> [<description-file>]
     -o file     Name of output tarball, default is <release name>.tar[.gz|.bz2]
     -z          Compress tar file with gzip
     -j          Compress tar file with bzip2
-    -s file     Name of RPM SPEC file, by default SPEC is not generated
     -t dir      Temporary directory name, default is /tmp
 
 First argument is a required release name such as 5.2.1 or ana-6.3.12. Second 
@@ -30,19 +29,17 @@ EOD
 }
 
 # default values for options
-spec=""
 compress=""
 file=""
 tmpdir="/tmp"
 
 # get the options
-while getopts hzjo:s:t: c ; do
+while getopts hzjo:t: c ; do
   case $c in
     h) usage ; exit 0 ;;
     z) compress="-z" ;;
     j) compress="-j" ;;
     o) file="$OPTARG" ;;
-    s) spec="$OPTARG" ;;
     t) tmpdir="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
@@ -80,7 +77,7 @@ tmpdir="$tmpdir/rel-make-tarball-$$"
 mkdir -p "$tmpdir"
 
 # make new release
-(cd "$tmpdir"; newrel -n $rel $rel) || exit 2
+(cd "$tmpdir"; newrel -n -i $rel $rel) || exit 2
 
 # copy tags and relnotes
 cp "$tags" "$tmpdir/$rel/tags"
@@ -91,13 +88,6 @@ test -n "$desc" -a -f "$desc" && cp "$desc" "$tmpdir/$rel/release-notes"
 
 # make tarball
 tar -C "$tmpdir" -c -f "$file" $compress "$rel"
-
-# run scons to make a SPEC file
-if [ -n "$spec" ]; then
-    (cd "$tmpdir/$rel"; . $SIT_ROOT/bin/sit_setup.sh "$rel"; export SIT_RELEASE="$rel"; \
-        scons RPM_SPEC_FILE=./release.spec rpm_spec)
-    cp "$tmpdir/$rel/release.spec" "$spec"
-fi
 
 # cleanup
 rm -rf "$tmpdir"
