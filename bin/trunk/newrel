@@ -99,7 +99,7 @@ else
 
   # if release is linked to another one get its real name
   if [ -f "$SIT_RELDIR/$release/.sit_release" ] ; then
-    release=`cat "$reldir/$release/.sit_release"`
+    release=`cat "$SIT_RELDIR/$release/.sit_release"`
     # check that linked release exists
     if [ ! -d "$SIT_RELDIR/$release" ] ; then
       echo "Linked release $release does not exist in $SIT_RELDIR" 1>&2
