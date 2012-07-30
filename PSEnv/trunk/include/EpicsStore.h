@@ -132,7 +132,7 @@ public:
   /**
    *  Helper class which converts the result of EpicsStore::get() call into
    *  real data. Objects of this type can be converted to one of the basic
-   *  numeric types of std::string.
+   *  numeric types or std::string.
    */
   struct EpicsValue {
     
