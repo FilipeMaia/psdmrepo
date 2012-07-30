@@ -68,6 +68,9 @@ public:
   // empty then wait until somebody calls push()
   value_type pop() ;
 
+  // completely erase all queue
+  void clear() ;
+
 protected:
 
 private:

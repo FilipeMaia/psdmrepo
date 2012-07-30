@@ -59,7 +59,7 @@ DgramQueue::push (const value_type& dg)
 {
   boost::mutex::scoped_lock qlock ( m_mutex ) ;
 
-  // wait unil we have an empty slot
+  // wait until we have an empty slot
   while ( m_queue.size() >= m_maxSize ) {
     m_condFull.wait( qlock ) ;
   }
@@ -79,7 +79,7 @@ DgramQueue::pop()
 {
   boost::mutex::scoped_lock qlock ( m_mutex ) ;
 
-  // wait unil we have something in the queue
+  // wait until we have something in the queue
   while ( m_queue.empty() ) {
     m_condEmpty.wait( qlock ) ;
   }
@@ -92,6 +92,19 @@ DgramQueue::pop()
   m_condFull.notify_one () ;
 
   return p ;
+}
+
+// completely erase all queue
+void 
+DgramQueue::clear()
+{
+  boost::mutex::scoped_lock qlock ( m_mutex ) ;
+
+  // erase everything
+  while (not m_queue.empty()) m_queue.pop() ;
+
+  // tell anybody waiting for queue to become non-full
+  m_condFull.notify_one () ;
 }
 
 } // namespace XtcInput

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-05
+2012-07-29 Andy Salnikov
+- if the queue is full and terminate is called on DgramReader thread
+  it will hang forever trying to push one more datagram into a queue,
+  fix by removing all datagrams first before adding EOD datagram
+
 Tag: V00-06-04
 2012-07-27 Andy Salnikov
 - small fixes to doxygen comments

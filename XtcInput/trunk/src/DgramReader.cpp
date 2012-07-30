@@ -187,7 +187,10 @@ try {
 
 } catch (const boost::thread_interrupted& ex) {
 
-  // we just stop happily
+  // we just stop happily, remove all current datagrams from a queue
+  // to make sure there is enough free spave and add end-of-data datagram just in
+  // case someone needs it
+  m_queue.clear();
   m_queue.push ( Dgram() ) ;
 
 } catch ( std::exception& e ) {
