@@ -83,7 +83,7 @@ class FilesController(BaseController):
         try:
             form_result = schema.to_python(dict(request.params))
         except formencode.Invalid, error:
-            abort( 400, unicode(error) )
+            abort( 400, str(error) )
 
         recursive = form_result['recursive']
 
@@ -127,7 +127,7 @@ class FilesController(BaseController):
         try:
             form_result = schema.to_python(dict(request.params))
         except formencode.Invalid, error:
-            abort( 400, unicode(error) )
+            abort( 400, str(error) )
 
         # replica number must be non-negative
         replica = form_result['replica']

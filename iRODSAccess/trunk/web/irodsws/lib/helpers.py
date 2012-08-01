@@ -23,13 +23,13 @@ def catch_all(func, *args, **kwargs):
     except ConnectionError, ex:
         abort(503, unicode(ex))
     except ObjectMissing, ex:
-        abort(404, unicode(ex))
+        abort(404, str(ex))
     except CollectionMissing, ex:
-        abort(404, unicode(ex))
+        abort(404, str(ex))
     except ObjectReplicaMissing, ex:
-        abort(404, unicode(ex))
+        abort(404, str(ex))
     except Exception, ex:
-        abort(500, unicode(ex))
+        abort(500, str(ex))
 
 def checkAccess (path) :
     """ Checks that user is authorized to see particular path """
