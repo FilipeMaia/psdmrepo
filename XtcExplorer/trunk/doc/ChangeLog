@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Aug-01 salnikov V00-01-36
+	- fix shebang line in app/xtcscantest
+
 2012-July-10 ofte / jbarrera V00-01-35
 	- waveforms from different devices split into separate modules, to 
 	  enable individual configuration for each device

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!@PYTHON@
 
 from random import randint
 from os import system
