@@ -47,7 +47,14 @@ class _ShowForm(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
     if_key_missing = None
-    recursive = formencode.validators.Int()
+    recursive = formencode.validators.Int(if_empty=0)
+
+class _RemoveForm(formencode.Schema):
+    allow_extra_fields = True
+    filter_extra_fields = True
+    if_key_missing = None
+    replica = formencode.validators.Int(not_empty=True)
+    unregister = formencode.validators.Bool(if_empty=False)
 
 #------------------------
 # Exported definitions --
@@ -58,11 +65,16 @@ class _ShowForm(formencode.Schema):
 #---------------------
 class FilesController(BaseController):
 
+    @h.catch_all
     @jsonify
     def show(self, path=''):
-        """GET /resources/*path: Show a specific item"""
-        # url('resource', id=ID)
-
+        """
+        GET /files/*path: Show full info for files and collections.
+        Takes path of the object or collection.
+        Additionally accepts parameter "recursive", if non-zero then
+        show recursively content of the nested collections.
+        """
+        
         # see if user can have an access
         h.checkAccess(path)
 
@@ -73,14 +85,11 @@ class FilesController(BaseController):
         except formencode.Invalid, error:
             abort( 400, unicode(error) )
 
-        # empty exp_id ito become NULL
-        try:
-            recursive = int(form_result['recursive'])
-        except :
-            recursive = None
+        recursive = form_result['recursive']
 
         model = IrodsModel()
         res = model.files( '/'+path, recursive )
+
         if res is None :
             abort(404)
         else :
@@ -99,8 +108,43 @@ class FilesController(BaseController):
                     
             return res
 
+    @h.catch_all
+    @jsonify
+    def remove(self, path):
+        """
+        DELETE /files/*path: Remove specified object from irods.
+        Takes path of the object (not collection).
+        Currently requires parameter "replica" which must be non-negative number.
+        Optionally accepts parameter "unregister", if present then files will
+        not be removed from resources, only unregistered.
+        """
+
+        # see if user can have an access
+        h.checkAccess(path)
+
+        # validate parameters
+        schema = _RemoveForm()
+        try:
+            form_result = schema.to_python(dict(request.params))
+        except formencode.Invalid, error:
+            abort( 400, unicode(error) )
+
+        # replica number must be non-negative
+        replica = form_result['replica']
+        if replica < 0: abort( 400, U"Replica number must be non-negative" )
+
+        unregister = form_result['unregister']
+
+        model = IrodsModel()
+        model.removeObj('/'+path, replica, unregister)
+
+        return []
 
     def environ(self):
+        """
+        Dump all variables in the environment, useful for tests only.
+        """
+        
         result = '<html><body><h1>Environ</h1><table>'
         keys = request.environ.keys()
         keys.sort()

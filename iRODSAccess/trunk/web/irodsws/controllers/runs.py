@@ -65,6 +65,7 @@ def _run_number ( obj ):
 #---------------------
 class RunsController(BaseController):
 
+    @h.catch_all
     @jsonify
     def index(self, instrument, experiment, type ):
         """ GET /runs/{instrument}/{experiment}/{type} """
@@ -91,6 +92,7 @@ class RunsController(BaseController):
         
         return runs
         
+    @h.catch_all
     @jsonify
     def show(self, instrument, experiment, type, runs ):
         """GET /runs/{instrument}/{experiment}/{type}/{runs} """

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2012-08-01 Andy Salnikov
+- IrodsClient has new removeObj() and removeColl() methods
+- adding DELETE method to files controller
+
 Tag: V00-00-11
 2011-03-08 Andy Salnikov
 - irods-scan now reports mismatched file sizes and problems accessing

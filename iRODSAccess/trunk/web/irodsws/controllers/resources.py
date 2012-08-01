@@ -50,6 +50,7 @@ class ResourcesController(BaseController):
     # file has a resource setup:
     #     map.resource('resource', 'resources')
 
+    @h.catch_all
     @jsonify
     def index(self):
         """GET /resources: All items in the collection"""
@@ -59,6 +60,7 @@ class ResourcesController(BaseController):
         res = [ dict( id=x, url=h.url_for( action='show', id=x, qualified=True ) ) for x in res ]
         return res
 
+    @h.catch_all
     @jsonify
     def show(self, id):
         """GET /resources/id: Show a specific item"""
@@ -66,6 +68,7 @@ class ResourcesController(BaseController):
 
         model = IrodsModel()
         res = model.resource(id)
+            
         if not res :
             abort(404)
         elif len(res) == 1 :

@@ -13,6 +13,23 @@ from routes import url_for
 from WSClient.WSApp import WSApp
 from WSClient.WSResource import WSResource
 
+from pylons.decorators import decorator
+from iRODSAccess.Exceptions import *
+
+@decorator
+def catch_all(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except ConnectionError, ex:
+        abort(503, unicode(ex))
+    except ObjectMissing, ex:
+        abort(404, unicode(ex))
+    except CollectionMissing, ex:
+        abort(404, unicode(ex))
+    except ObjectReplicaMissing, ex:
+        abort(404, unicode(ex))
+    except Exception, ex:
+        abort(500, unicode(ex))
 
 def checkAccess (path) :
     """ Checks that user is authorized to see particular path """

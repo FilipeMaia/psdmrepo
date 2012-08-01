@@ -46,7 +46,7 @@ def make_map():
     # list the files
     map.connect('/files', controller='files', action='show', conditions=cond_get )
     map.connect('/files/*path', controller='files', action='show', conditions=cond_get )
-        
+    map.connect('/files/*path', controller='files', action='remove', conditions=cond_delete )
 
     ###### runs controller
     

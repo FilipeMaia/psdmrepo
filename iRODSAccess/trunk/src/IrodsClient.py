@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import types
 
 #---------------------------------
 #  Imports of base class module --
@@ -40,10 +41,14 @@ import sys
 #-----------------------------
 import irods
 from irods_error import *
+from Exceptions import *
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+# PyRODS misses definition for UNREG_OPR constant
+_UNREG_OPR = 26
 
 def _getSqlResultByInx ( genQueryOut, inx ):
     data = irods.getSqlResultByInx(genQueryOut, inx)
@@ -78,7 +83,7 @@ class IrodsClient ( object ) :
         """ Return the list of resources """
         
         conn = self._conn.connection()
-        if not conn : return None
+        if not conn : raise ConnectionError()
         
         genQueryInp = irods.genQueryInp_t()   
         
@@ -102,11 +107,11 @@ class IrodsClient ( object ) :
 
         return [ x[0] for x in res ]
 
-    def resource(self,name):
+    def resource(self, name):
         """ Return the description of single resource """
         
         conn = self._conn.connection()
-        if not conn : return None
+        if not conn : raise ConnectionError()
         
         genQueryInp = irods.genQueryInp_t()   
         
@@ -150,11 +155,11 @@ class IrodsClient ( object ) :
         return res
 
 
-    def files (self, path, recursive=None ):
+    def files(self, path, recursive=None):
         """ Gets the list of files/collections and returns info about every file """
 
         conn = self._conn.connection()
-        if not conn : return None
+        if not conn : raise ConnectionError()
 
         rodsPath = irods.rodsPath_t()
         rodsPath.setInPath( path )
@@ -162,16 +167,114 @@ class IrodsClient ( object ) :
         
         status = rodsPath.getRodsObjType(conn)
         if rodsPath.getObjState() == irods.NOT_EXIST_ST:
-            return None
+            raise ObjectMissing(path)
         
         if rodsPath.getObjType() == irods.DATA_OBJ_T:
             res = self._file ( conn, rodsPath.getOutPath() )
         elif rodsPath.getObjType() ==  irods.COLL_OBJ_T:
             res = self._filesInColl ( conn, rodsPath.getOutPath(), recursive )
         else :
-            res = None
+            raise IrodsException("Unexpected type of object '%s'" % path)
         
         return res
+    
+
+    def removeObj(self, path, replica=None, unreg=False, force=False):
+        """
+        Remove specified object and its corresponding file on disk or other 
+        resource. If path refers to a collection then exception is raised. 
+        
+        If replica number is not given then remove all replicas, otherwise 
+        remove only given replica. 
+        
+        If "unreg" argument is set to true then instead of deleting files
+        they will be unregistered and not deleted from storage.
+        
+        If force is true then files are removed immediately, otherwise
+        files are moved to trash container.
+        """  
+
+        conn = self._conn.connection()
+        if not conn : raise ConnectionError()
+
+        rodsPath = irods.rodsPath_t()
+        rodsPath.setInPath( path )
+        rodsPath.setOutPath( path )
+        
+        status = rodsPath.getRodsObjType(conn)
+        if rodsPath.getObjState() == irods.NOT_EXIST_ST:
+            raise ObjectMissing(path)
+
+        if rodsPath.getObjType() == irods.DATA_OBJ_T:
+            self._removeObj(conn, rodsPath.getOutPath(), replica, unreg, force)
+        elif rodsPath.getObjType() ==  irods.COLL_OBJ_T:
+            raise IrodsException("Unexpected type of object '%s', use removeColl() to remove collections" % path)
+        else:
+            raise IrodsException("Unexpected type of object '%s'" % path)
+
+
+    def removeColl(self, path, unreg=False, force=False):
+        """
+        Remove specified collection and all its files and sub-collections.
+        
+        If "unreg" argument is set to true then instead of deleting files
+        they will be unregistered and not deleted from storage.
+        
+        If force is true then files are removed immediately, otherwise
+        files are moved to trash container.
+        """  
+
+        conn = self._conn.connection()
+        if not conn : raise ConnectionError()
+
+        rodsPath = irods.rodsPath_t()
+        rodsPath.setInPath( path )
+        rodsPath.setOutPath( path )
+        
+        status = rodsPath.getRodsObjType(conn)
+        if rodsPath.getObjState() == irods.NOT_EXIST_ST:
+            raise CollectionMissing(path)
+
+        if rodsPath.getObjType() == irods.DATA_OBJ_T:
+            raise IrodsException("Unexpected type of object '%s', use removeObj() to remove objects" % path)
+        elif rodsPath.getObjType() ==  irods.COLL_OBJ_T:
+            self._removeColl(conn, rodsPath.getOutPath(), unreg, force)
+        else:
+            raise IrodsException("Unexpected type of object '%s'" % path)
+
+#    def rule(self, rule, params = {}, outParam=None):
+#        """
+#        Execute a rule on irods server
+#        """
+#        
+#        conn = self._conn.connection()
+#        if not conn : raise ConnectionError()
+#
+#        execMyRuleInp = irods.execMyRuleInp_t()
+#        msParamArray = irods.msParamArray_t()
+#        
+#        execMyRuleInp.getCondInput().setLen(0)
+#        execMyRuleInp.setInpParamArray(msParamArray)
+#        if outParam: execMyRuleInp.setOutParamDesc(outParam)
+#
+#        # rule to execute
+#        execMyRuleInp.setMyRule(rule) 
+#
+#        # fill in parameters
+#        for k, v in params.items():
+#            if type(v) in types.StringTypes:
+#                ptype = irods.STR_MS_T
+#            elif type(v) == types.IntType:
+#                ptype = irods.INT_MS_T
+#            elif type(v) == types.FloatType:
+#                ptype = irods.DOUBLE_MS_T
+#            irods.addMsParamToArray(msParamArray, k, ptype, v)
+#
+#        # execute rule, get its output
+#        outParamArray = irods.rcExecMyRule(conn, execMyRuleInp)
+#        
+#        mP = outParamArray.getMsParamByLabel(outParam)
+
 
     #--------------------
     #  Private methods --
@@ -336,6 +439,52 @@ class IrodsClient ( object ) :
             for col, sql in zip(columns,sqlres) :
                 res[col] = sql.getValues()[i]
             yield res
+
+    def _removeObj(self, conn, path, replica, unreg, force):
+        """
+        Remove object from irods. If replica is not None then only that 
+        replica is removed, otherwise all replicas. If unreg is set to True 
+        then object will be unregistered and not deleted from storage.
+        If force is true then files are removed immediately and not moved to 
+        trash container.
+        """
+
+        dataObjInp = irods.dataObjInp_t()
+        if force: dataObjInp.getCondInput().addKeyVal(irods.FORCE_FLAG_KW, "")
+        if replica is not None: dataObjInp.getCondInput().addKeyVal(irods.REPL_NUM_KW, str(replica))
+        if unreg: dataObjInp.setOprType(_UNREG_OPR)
+        dataObjInp.setOpenFlags(irods.O_RDONLY)
+        dataObjInp.setObjPath(path)
+        
+        status = irods.rcDataObjUnlink(conn, dataObjInp)
+        if status == CAT_NO_ROWS_FOUND:
+            raise ObjectReplicaMissing(path, replica)
+        elif status < 0:
+            raise IrodsException("Failed to remove object '%s', status: %s" % (path, status))
+
+
+    def _removeColl(self, conn, path, unreg, force):
+        """
+        Remove collection from irods. If recursive argument is set to true 
+        then all objects and sub-collections are removed too. If recursive 
+        is set to False and collection is non-empty then exception is raised.
+        If unreg is set to True  then object will be unregistered and not 
+        deleted from storage. If force is true then files are removed 
+        immediately and not moved to trash container.
+        """
+
+        collInp = irods.collInp_t()
+        if force: collInp.getCondInput().addKeyVal(irods.FORCE_FLAG_KW, "")
+        collInp.getCondInput().addKeyVal(irods.RECURSIVE_OPR__KW, "")
+        if unreg: collInp.setOprType(_UNREG_OPR)
+        collInp.setCollName(path)
+        
+        status = irods.rcRmColl(conn, collInp, 0)
+        if status == CAT_NO_ROWS_FOUND:
+            raise CollectionMissing(path)
+        elif status < 0:
+            raise IrodsException("Failed to remove collection '%s', status: %s" % (path, status))
+
 
 #
 #  In case someone decides to run this module

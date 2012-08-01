@@ -48,44 +48,13 @@ from LusiPython.LusiPyApp import LusiPyApp
 # Imports for other modules --
 #-----------------------------
 from iRODSAccess.IrodsClient import IrodsClient
+from iRODSAccess.Connection import Connection
 import irods
 from irods_error import *
 
 #---------------------
 # Local definitions --
 #---------------------
-class _Connection( object ) :
-
-    def __init__( self ):
-
-        self._conn = None
-
-    def __del__(self):
-        if self._conn : self._conn.disconnect() 
-
-    def connection(self):
-        
-        if self._conn : return self._conn
-
-        # some parameters come from the configuration
-        myEnv, status = irods.getRodsEnv()
-        if status < 0:
-            return self._conn
-            
-        host = myEnv.getRodsHost()
-        port = myEnv.getRodsPort()
-        user = myEnv.getRodsUserName()
-        zone = myEnv.getRodsZone()
-    
-        conn, errMsg = irods.rcConnect(host, port, user, zone)
-        if conn :
-            status = irods.clientLogin(conn)
-            if status != 0:
-                conn.disconnect()
-                conn = None
-        self._conn = conn
-
-        return self._conn
 
 #---------------------------------
 #  Application class definition --
@@ -120,7 +89,7 @@ class irodsScan ( LusiPyApp ) :
             return 2
 
         # prepare iRODS connection
-        conn = _Connection()
+        conn = Connection()
         client = IrodsClient(conn)
 
         stat = 0
