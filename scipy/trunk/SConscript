@@ -33,7 +33,7 @@ del LINKLIBS
 scipy_ver = "0.7.1"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "scipy", scipy_ver)
 
-PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages", "scipy")
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages", "scipy")
 PYDIRSEP = True
 PKGINFO = ("scipy", scipy_ver, '$PYTHON', '$SIT_ARCH.found')
 
