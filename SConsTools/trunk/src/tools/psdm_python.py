@@ -14,6 +14,7 @@ def generate(env):
 
         prefix = "/usr"
         version = "2.4"
+        # RH-distributed Python is patched to use lib64 on 64-bit platforms
         libdir = env['LIB_ABI']
     
     elif env['SIT_ARCH_OS'] == 'rhel6':
@@ -26,11 +27,12 @@ def generate(env):
         
         prefix = "/usr"
         version = "2.7"
-        libdir = env['LIB_ABI']
+        libdir = 'lib'
     
     env['PYTHON_PREFIX'] = prefix
     env['PYTHON_VERSION'] = version
     env['PYTHON'] = "python"+version
+    env['PYTHON_LIBDIRNAME'] = libdir
     env['PYTHON_INCDIR'] = pjoin(prefix, "include", env['PYTHON'])
     env['PYTHON_LIBDIR'] = pjoin(prefix, libdir)
     env['PYTHON_BINDIR'] = pjoin(prefix, "bin")

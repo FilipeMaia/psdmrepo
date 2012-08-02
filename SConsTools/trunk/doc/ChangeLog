@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-10
+2012-08-02 Andy Salnikov
+- tools/psdm_python: add PYTHON_LIBDIRNAME to the environment which resolves 
+  to "lib" or "lib64" depending on which system/Python is used
+- standardExternalPackage: check that LIBDIR/PYDIR/INCDIR/BINDIR actually
+  exist (if given), otherwise build will fail, or if OPTIONAL=True is
+  specified the warning will be printed
+
 Tag: V00-06-09
 2012-07-27 Andy Salnikov
 - tools/psdm_python.py: added env['PYTHON_BINDIR'], small refactoring

@@ -18,6 +18,8 @@ from SCons.Script import *
 from SConsTools.trace import *
 from SConsTools.dependencies import *
 
+from scons_functions import fail, warning
+
 #
 # This is an interface package for the external package. We wan to make
 # symlinks to the include files, libs and binaries
@@ -59,16 +61,6 @@ def _prefix(prefix, env):
     return (prefix, "")
 
 
-# build package name from prefix and directory
-def _absdir(prefix, dir):
-    if dir is None:
-        return None
-    if prefix and not os.path.isabs(dir) :
-        dir = pjoin(prefix, dir)
-    if not os.path.isdir(dir) :
-        dir = None
-    return dir
-
 def _glob(dir, patterns):
 
     if patterns is None :
@@ -86,6 +78,24 @@ def _glob(dir, patterns):
 
     return result
 
+def _get_dir(package, dirvar, kw, env, prefix):
+    """
+    Locate directory name specified as the variable in keyword arguments,
+    if directory is specified then append prefix if needed and check that directory exists
+    """
+    dir = kw.get(dirvar)
+    if dir is not None:
+        dir = env.subst(dir)
+        if prefix and not os.path.isabs(dir) :
+            dir = pjoin(prefix, dir)
+        if not os.path.isdir(dir):
+            msg = "Building external package %s: missing %s directory: %s" % (package, dirvar, dir)
+            if kw.get('OPTIONAL'):
+                dir = None
+                warning(msg)
+            else:
+                fail(msg)
+    return dir
 
 #
 # Define all builders for the external package
@@ -107,6 +117,7 @@ def standardExternalPackage(package, **kw) :
         PKGLIBS  - names of libraries that have to be linked for this package
         DEPS     - names of other packages that we depend upon
         PKGINFO  - package information, such as RPM package name
+        OPTIONAL - If true then missing directories do not cause build errors
     """
 
     pkg = os.path.basename(os.getcwd())
@@ -120,9 +131,7 @@ def standardExternalPackage(package, **kw) :
     trace("prefix: %s" % prefix, "standardExternalPackage", 3)
 
     # link include directory
-    inc_dir = kw.get('INCDIR')
-    if inc_dir: inc_dir = env.subst(inc_dir)
-    inc_dir = _absdir(prefix, inc_dir)
+    inc_dir = _get_dir(package, 'INCDIR', kw, env, prefix)
     if inc_dir is not None :
 
         trace("include_dir: %s" % inc_dir, "standardExternalPackage", 5)
@@ -158,9 +167,7 @@ def standardExternalPackage(package, **kw) :
 
 
     # link python directory
-    py_dir = kw.get('PYDIR')
-    if py_dir: py_dir = env.subst(py_dir)
-    py_dir = _absdir(prefix, py_dir)
+    py_dir = _get_dir(package, 'PYDIR', kw, env, prefix)
     if py_dir is not None :
         trace("py_dir: %s" % py_dir, "standardExternalPackage", 5)
         if kw.get('PYDIRSEP', False) :
@@ -182,9 +189,7 @@ def standardExternalPackage(package, **kw) :
 
 
     # link all libraries
-    lib_dir = kw.get('LIBDIR')
-    if lib_dir: lib_dir = env.subst(lib_dir)
-    lib_dir = _absdir(prefix, lib_dir)
+    lib_dir = _get_dir(package, 'LIBDIR', kw, env, prefix)
     if lib_dir is not None :
         trace("lib_dir: %s" % lib_dir, "standardExternalPackage", 5)
 
@@ -222,9 +227,7 @@ def standardExternalPackage(package, **kw) :
                 env['ALL_TARGETS']['LIBS'].extend(targ)
 
     # link all executables
-    bin_dir = kw.get('BINDIR')
-    if bin_dir: bin_dir = env.subst(bin_dir)
-    bin_dir = _absdir(prefix, bin_dir)
+    bin_dir = _get_dir(package, 'BINDIR', kw, env, prefix)
     if bin_dir is not None :
         trace("bin_dir: %s" % bin_dir, "standardExternalPackage", 5)
 

@@ -19,6 +19,9 @@ from SCons.Script import *
 #     Local functions
 # ==========================
 
+def warning(msg):
+    print >> sys.stderr, "WARNING:", msg
+
 def fail ( msg, code = 2 ):
     print >> sys.stderr, msg
     print >> sys.stderr, "Exiting with code %d" % code
