@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSXtcQC
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2012-08-01 Mikhail S. Dubrovin
+  First version
+  Contains:
+A       test/dgreader.cpp
+
+A       include/XtcQCIterator.h
+A       include/QCStatistics.h
+A       include/MyXtcQCIterator.h
+A       include/FileFinder.h
+
+A       src/QCStatistics.cpp
+A       src/FileFinder.cpp
+A       src/XtcQCIterator.cpp
+	
