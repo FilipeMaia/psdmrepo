@@ -24,4 +24,5 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 irods_ver = "2.4.1"
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', "irods-client", irods_ver)
 BINDIR  = "bin"
+OPTIONAL = True
 standardExternalPackage('irods-client', **locals())
