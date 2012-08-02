@@ -24,17 +24,19 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 py_ver = env['PYTHON_VERSION']
 
 mxml_ver = "2.5"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/mxml",mxml_ver)
+PREFIX  = pjoin("$SIT_EXTERNAL_SW", "mxml", mxml_ver)
 LIBDIR  = "lib"
 PKGLIBS = "mxml m"
+OPTIONAL = True
 standardExternalPackage ( 'mxml', **locals() )
 
 nexus_ver = "4.1.0"
-PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/nexus",nexus_ver)
+PREFIX  = pjoin("$SIT_EXTERNAL_SW", "nexus", nexus_ver)
 DEPS    = "hdf5 mxml"
 INCDIR  = "include"
 LIBDIR  = "lib"
 BINDIR  = "bin"
 PYDIR   = "lib/python"+py_ver+"/site-packages"
 PKGLIBS = "NeXus"
+OPTIONAL = True
 standardExternalPackage ( 'nexus', **locals() )
