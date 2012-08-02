@@ -23,6 +23,6 @@ pkg = "pyrods"
 pkg_ver = "2.4.1"
 
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', "PyRods", pkg_ver)
-PYDIR = pjoin('$LIB_ABI', '$PYTHON', "site-packages")
-
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+OPTIONAL = True
 standardExternalPackage ( pkg, **locals() )
