@@ -11,6 +11,26 @@ from routes.middleware import RoutesMiddleware
 
 from irodsws.config.environment import load_environment
 
+
+
+class _MyApp(PylonsApp):
+    """
+    Subclass of PylonsApp which returns text/plain message when resource is 
+    not found instead of html document.
+    """
+
+    def dispatch(self, controller, environ, start_response):
+
+        if not controller:
+            body = "Resource '%s' does not exist" % environ.get('REQUEST_URI')
+            headers = [('Content-Type', 'text/plain; charset=utf8'),
+                       ('Content-Length', str(len(body)))]
+            start_response("404 Not Found", headers) 
+            return [body]
+        else:
+            return PylonsApp.dispatch(self, controller, environ, start_response)
+
+
 def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
     """Create a Pylons WSGI application and return it
 
@@ -38,7 +58,7 @@ def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
     load_environment(global_conf, app_conf)
 
     # The Pylons WSGI app
-    app = PylonsApp()
+    app = _MyApp()
 
     # Routing/Session/Cache Middleware
     app = RoutesMiddleware(app, config['routes.map'])

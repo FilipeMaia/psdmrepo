@@ -108,11 +108,11 @@ class RunsController(BaseController):
         model = IrodsModel()
 
         # make the list of runs
-        allRuns = set([ r for r in self._runList( runs ) ])
+        allRuns = set(self._runList(runs))
 
         # get list of files
         files = model.files( path )
-        if files is None : abort(404)
+        if files is None : abort(404, "Collection does not exist: "+str(path))
         
         res = {}
         for file in files :
@@ -135,7 +135,7 @@ class RunsController(BaseController):
             # append to the list of file for this run
             res.setdefault(run,[]).append(file)
 
-        if not res : abort(404)
+        if not res : abort(404, "No files found for given run numbers: "+str(runs))
 
         # convert to the list of dictionaries
         reslist = [ dict(run=k, files=v) for k,v in res.iteritems() ]
@@ -166,7 +166,7 @@ class RunsController(BaseController):
 
         # list all file in path
         res = model.files( path )
-        if res is None : abort(404)
+        if res is None : abort(404, "Collection does not exist: "+(path))
 
         # get file names, extract -rNNNN- part, convert it to run number
         for r in res :

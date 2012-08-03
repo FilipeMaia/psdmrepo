@@ -91,7 +91,7 @@ class FilesController(BaseController):
         res = model.files( '/'+path, recursive )
 
         if res is None :
-            abort(404)
+            abort(404, "Collection does not exist: "+str(path))
         else :
             
             # add URI for each file or collection
@@ -131,7 +131,7 @@ class FilesController(BaseController):
 
         # replica number must be non-negative
         replica = form_result['replica']
-        if replica < 0: abort( 400, U"Replica number must be non-negative" )
+        if replica < 0: abort( 400, "Replica number must be non-negative" )
 
         unregister = form_result['unregister']
 

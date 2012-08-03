@@ -5,7 +5,7 @@ available to Controllers. This module is available to templates as 'h'.
 """
 # Import helpers as desired, or define your own, ie:
 #from webhelpers.html.tags import checkbox, password
-from pylons import request
+from pylons import request, response
 from pylons import config
 from pylons.controllers.util import abort
 from routes import url_for
@@ -15,28 +15,35 @@ from WSClient.WSResource import WSResource
 
 from pylons.decorators import decorator
 from iRODSAccess.Exceptions import *
+from webob.exc import HTTPException
 
 @decorator
 def catch_all(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
     except ConnectionError, ex:
-        abort(503, unicode(ex))
-    except ObjectMissing, ex:
-        abort(404, str(ex))
-    except CollectionMissing, ex:
-        abort(404, str(ex))
-    except ObjectReplicaMissing, ex:
-        abort(404, str(ex))
+        response.status = '503 Service Unavailable'
+        response.content_type = 'text/plain'
+        return str(ex)
+    except MissingError, ex:
+        response.status = '404 Not Found'
+        response.content_type = 'text/plain'
+        return str(ex)
+    except HTTPException, ex:
+        response.status = '%d %s' % (ex.code, ex.title)
+        response.content_type = 'text/plain'
+        return ex.detail
     except Exception, ex:
-        abort(500, str(ex))
+        response.status = '500 Internal Server Error'
+        response.content_type = 'text/plain'
+        return str(ex)
 
 def checkAccess (path) :
     """ Checks that user is authorized to see particular path """
     
     # must have user name here
     if 'REMOTE_USER' not in request.environ :
-        abort(401)
+        abort( 401, "User name missing, permissions not granted")
     user = request.environ['REMOTE_USER']
 
     # get parameters from config
@@ -83,7 +90,7 @@ def checkAccess (path) :
         pass
 
     # nothing works, just fail
-    abort( 401 )
+    abort( 401, "User '%s' lacks permissions to access path %s:%s" % (user, appname, path) )
     
     
 def server_uri() :

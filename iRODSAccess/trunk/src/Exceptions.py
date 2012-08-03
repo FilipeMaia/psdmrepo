@@ -58,20 +58,23 @@ class ConnectionError(IrodsException):
     def __init__(self, *args):
         IrodsException.__init__(self, "No connection to iRODS server")
         
-class ObjectMissing(IrodsException):
+class MissingError(IrodsException):
+    pass
+
+class ObjectMissing(MissingError):
 
     def __init__(self, objectName):
-        IrodsException.__init__(self, "Object '%s' does not exist" % objectName)
+        MissingError.__init__(self, "Object '%s' does not exist" % objectName)
         
-class CollectionMissing(IrodsException):
+class CollectionMissing(MissingError):
 
     def __init__(self, collName):
-        IrodsException.__init__(self, "Collection '%s' does not exist" % collName)
+        MissingError.__init__(self, "Collection '%s' does not exist" % collName)
         
-class ObjectReplicaMissing(IrodsException):
+class ObjectReplicaMissing(MissingError):
 
     def __init__(self, objectName, replica):
-        IrodsException.__init__(self, "Object or specified replica does not exist: '%s', replica=%s" % (objectName, replica))
+        MissingError.__init__(self, "Object or specified replica does not exist: '%s', replica=%s" % (objectName, replica))
         
 #
 #  In case someone decides to run this module

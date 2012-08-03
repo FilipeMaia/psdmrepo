@@ -70,7 +70,7 @@ class ResourcesController(BaseController):
         res = model.resource(id)
             
         if not res :
-            abort(404)
+            abort(404, "Unknown resource: "+str(id))
         elif len(res) == 1 :
             return res[0]
         else :
