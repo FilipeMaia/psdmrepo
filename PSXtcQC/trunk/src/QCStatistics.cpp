@@ -17,11 +17,13 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 #include <string>   // for string, substring
 #include <sstream>  // for streamstring
 #include <iostream> // for cout, puts etc.
 #include <iomanip>  // for setw
 #include <unistd.h> // read()
+#include <stdio.h>
 #include <time.h>   // time
 
 //-------------------------------
@@ -421,7 +423,7 @@ void printDgramHeader(Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_f
              //dg->xtc.damage.value(),
              //dg->xtc.sizeofPayload(),
 	     //(int)sizeof(*dg),
-	     (uint)dg_first_byte);
+	     (unsigned)dg_first_byte);
 }
 
 //===================

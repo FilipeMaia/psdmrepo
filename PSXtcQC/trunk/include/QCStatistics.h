@@ -33,6 +33,9 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace Pds {
+class Xtc;
+}
 
 //		---------------------
 // 		-- Class Interface --
@@ -54,8 +57,6 @@ namespace PSXtcQC {
  *
  *  @author Mikhail S. Dubrovin
  */
-
-class Pds::Xtc;
 
 
 struct BrokenTimeRecord {
