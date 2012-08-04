@@ -20,8 +20,6 @@ interpreter plus some extra options) and copied to arch/$SIT_ARCH/bin area.
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgement.
 
-@see RelatedModule
-
 @version $$Id$$ 
 
 @author $author
@@ -56,7 +54,7 @@ from LusiPython.LusiPyApp import LusiPyApp
 # local variable accessible in this module only
 _OP_X = 'Y'
 
-# local method name starts with undescore
+# local method name starts with underscore
 def _localMethod() :
 	pass
 
@@ -78,7 +76,7 @@ class $class ( LusiPyApp ) :
         
 
     #
-    #  Run the whole thing after parsing the command argunments and 
+    #  Run the whole thing after parsing the command arguments and 
     #  installing logger. See BbrPyApp class for details.
     #
     def _run ( self ) :

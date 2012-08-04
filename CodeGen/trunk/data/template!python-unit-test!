@@ -20,8 +20,6 @@ interpreter plus some extra options) and copied to arch/$SIT_ARCH/bin area.
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgement.
 
-@see RelatedModule
-
 @version $$Id$$ 
 
 @author $author

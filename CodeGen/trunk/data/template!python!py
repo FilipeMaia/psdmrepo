@@ -19,8 +19,6 @@ scripts cannot be run by themselves.
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
-
 @version $$Id: template!python!py 4 2008-10-08 19:27:36Z salnikov $$
 
 @author $author
@@ -118,7 +116,7 @@ class $class $BASEDECL :
         @param y   second parameter
         """
 
-        # call ctor for base class explicitely
+        # call ctor for base class explicitly
         $BASEINIT
 
         # define instance variables
