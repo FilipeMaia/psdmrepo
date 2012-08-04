@@ -52,7 +52,6 @@ from InterfaceCtlr.FileMgrIrods import FileMgrIrods
 #---------------------
 
 _conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
-_regdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
 
 #---------------------------------
 #  Application class definition --

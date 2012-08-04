@@ -53,14 +53,21 @@ import popen2
 #  Class definition --
 #---------------------
 class FileMgrIrods ( object ) :
-
+    """
+    File management interface implemented on top of the iRODS i-commands.
+    """
+    
     #----------------
     #  Constructor --
     #----------------
     def __init__ ( self, cmd, config, logger ) :
-        """Constructor.
+        """
+        FileMgrIrods(cmd: str, config: object, logger: object)
 
-        @param cmd   command to use, one of iput or ireg
+        Constructor takes a list of arguments:
+            - cmd: command to use, one of "iput" or "ireg"
+            - config: configuration object of type Config (from this package) or dictionary 
+            - logger: instance of logger class from logging package (or logging module itself)
         """
 
         self._cmd = cmd
@@ -77,7 +84,13 @@ class FileMgrIrods ( object ) :
     #-------------------
 
     def storeFile ( self, src_path, dst_path ) :
-        """ Store single file """
+        """
+        self.storeFile(src_path: str, dst_path: str) -> int
+        
+        Store single file, takes the name of file on disk and the name of
+        file in iRODS. Returns 0 for success, non-zero on failure, code 
+        should be interpreted as a result of os.spawnvp() call.
+        """
         self._log.info ( "FileMgrIrods.storeFile: %s -> %s", src_path, dst_path )
         
         # create collection if needed
@@ -98,7 +111,13 @@ class FileMgrIrods ( object ) :
         return returncode
         
     def storeDir ( self, src_dir, dst_coll ) :
-        """ Store all files in a directory """
+        """
+        self.storeDir(src_dir: str, dst_coll: str) -> int
+        
+        Store all files in a directory, takes the name of directory on disk 
+        and the name of iRODS collection. Returns 0 for success, non-zero on 
+        failure, code should be interpreted as a result of os.spawnvp() call.
+        """
 
         # create collection if needed
 #        self._log.info ( "FileMgrIrods.storeFile: creating collection %s", dst_coll )
@@ -116,7 +135,11 @@ class FileMgrIrods ( object ) :
         return returncode
         
     def listdir(self, coll):
-        """ List files in the collection """
+        """
+        self.listdir(coll: str) -> list of strings
+        
+        Returns the list of files in the collection.
+        """
         
         cmd = ['ils', coll]
         child = popen2.Popen3(cmd)

@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-18
+2012-08-04 Andy Salnikov
+- adding class FileMgrRegisterwhich can be used to register files in irods
+
 Tag: V01-00-17
 2012-07-20 Andy Salnikov
 - changes to web stuff:
