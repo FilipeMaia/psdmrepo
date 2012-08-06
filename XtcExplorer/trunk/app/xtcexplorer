@@ -52,10 +52,14 @@ from XtcExplorer.XtcExplorerMain import XtcExplorerMain
 
 def main(argv) :
 
-    psana = False
+    psana = True
     if '--psana' in argv :
 	index = argv.index('--psana')
 	psana = True
+	argv.pop(index)
+    if '--pyana' in argv :
+	index = argv.index('--pyana')
+	psana = False
 	argv.pop(index)
 
     # optional argument(s): input xtc-file(s)
