@@ -35,7 +35,7 @@ def checkAccess (instrument, experiment, mode) :
     
     # must have user name here
     if 'REMOTE_USER' not in request.environ :
-        abort(401)
+        abort(401, "Authorization failure, user name is not defined")
     user = request.environ['REMOTE_USER']
 
     # get parameters from config
