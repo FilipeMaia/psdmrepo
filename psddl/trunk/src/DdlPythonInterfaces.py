@@ -514,6 +514,11 @@ class DdlPythonInterfaces ( object ) :
                 wrappertype = method_type + "_Wrapper"
                 print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(($method_type*) &o->$method_name($args)); }")(locals())
                 policy = ", policy"
+            elif ("Ipimb::" in rettype) or ("Lusi::" in rettype):
+                method_type = rettype.replace("&", "").replace("const ", "")
+                wrappertype = method_type + "_Wrapper"
+                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(($method_type*) &o->$method_name($args)); }")(locals())
+                policy = ", policy"
             else:
                 method_type = rettype
                 print >>self.inc, T("  $method_type $method_name($argsspec) const { return o->$method_name($args); }")(locals())
