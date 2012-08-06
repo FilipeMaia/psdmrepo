@@ -143,9 +143,9 @@ public:
   enum { Version = 0 };
   BldDataIpimbV0_Wrapper(shared_ptr<BldDataIpimbV0> obj) : _o(obj), o(_o.get()) {}
   BldDataIpimbV0_Wrapper(BldDataIpimbV0* obj) : o(obj) {}
-  const Ipimb::DataV1_Wrapper ipimbData() const { return Ipimb::DataV1_Wrapper((Ipimb::DataV1*)&o->ipimbData()); }
-  const Ipimb::ConfigV1& ipimbConfig() const { return o->ipimbConfig(); }
-  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*)&o->ipmFexData()); }
+  const Ipimb::DataV1_Wrapper ipimbData() const { return Ipimb::DataV1_Wrapper((Ipimb::DataV1*) &o->ipimbData()); }
+  const Ipimb::ConfigV1_Wrapper ipimbConfig() const { return Ipimb::ConfigV1_Wrapper((Ipimb::ConfigV1*) &o->ipimbConfig()); }
+  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*) &o->ipmFexData()); }
 };
 
 class BldDataIpimbV1_Wrapper {
@@ -156,9 +156,9 @@ public:
   enum { Version = 1 };
   BldDataIpimbV1_Wrapper(shared_ptr<BldDataIpimbV1> obj) : _o(obj), o(_o.get()) {}
   BldDataIpimbV1_Wrapper(BldDataIpimbV1* obj) : o(obj) {}
-  const Ipimb::DataV2_Wrapper ipimbData() const { return Ipimb::DataV2_Wrapper((Ipimb::DataV2*)&o->ipimbData()); }
-  const Ipimb::ConfigV2& ipimbConfig() const { return o->ipimbConfig(); }
-  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*)&o->ipmFexData()); }
+  const Ipimb::DataV2_Wrapper ipimbData() const { return Ipimb::DataV2_Wrapper((Ipimb::DataV2*) &o->ipimbData()); }
+  const Ipimb::ConfigV2_Wrapper ipimbConfig() const { return Ipimb::ConfigV2_Wrapper((Ipimb::ConfigV2*) &o->ipimbConfig()); }
+  const Lusi::IpmFexV1_Wrapper ipmFexData() const { return Lusi::IpmFexV1_Wrapper((Lusi::IpmFexV1*) &o->ipmFexData()); }
 };
 
 class BldDataPimV1_Wrapper {
@@ -170,7 +170,7 @@ public:
   BldDataPimV1_Wrapper(shared_ptr<BldDataPimV1> obj) : _o(obj), o(_o.get()) {}
   BldDataPimV1_Wrapper(BldDataPimV1* obj) : o(obj) {}
   const Pulnix::TM6740ConfigV2& camConfig() const { return o->camConfig(); }
-  const Lusi::PimImageConfigV1& pimConfig() const { return o->pimConfig(); }
+  const Lusi::PimImageConfigV1_Wrapper pimConfig() const { return Lusi::PimImageConfigV1_Wrapper((Lusi::PimImageConfigV1*) &o->pimConfig()); }
   const Camera::FrameV1& frame() const { return o->frame(); }
 };
 
