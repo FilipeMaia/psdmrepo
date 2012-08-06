@@ -293,6 +293,115 @@ class IcdbModel ( InterfaceDb ) :
         regdb = self._regdb()
         return regdb.find_experiment_by_name(instrument, experiment) is not None
 
+    def get_config_sections(self):
+        """
+        self.get_config_sections() -> list of strings
+        
+        Returns the list of section names.
+        """ 
+
+        cursor = self._conn.cursor()
+
+        vars = ()
+        q = "SELECT DISTINCT section FROM config_def"
+        cursor.execute(q)
+
+        return [row[0] for row in cursor.fetchall()]
+
+    def get_config(self, section=None):
+        """
+        self.get_config([section: str]) -> list of dicts
+        
+        Returns contents of configuration database as list of dict object,
+        every dict object will have this set of keys:
+        ("section", "param", "value", "type", "description", "instrument", "experiment").
+        Instrument or experiment values can be None.
+        
+        If section name is given then parameter from single section are returned, otherwise
+        all parameters are returned.
+        """ 
+
+        cursor = self._conn.cursor(True)
+
+        vars = ()
+        q = "SELECT section, param, value, type, description, instrument, experiment FROM config_def"
+        if section is not None: 
+            q += " WHERE section=%s"
+            vars = (section,)
+        cursor.execute(q, vars)
+
+        return list(cursor.fetchall())
+
+    def create_config(self, section, param, value, type, description, instrument, experiment):
+        """
+        self.create_config(section, param, value, type, description, instrument, experiment)
+
+        Create new configuration parameter. Instrument or experiment values can be None.
+        """ 
+
+        cursor = self._conn.cursor()
+
+        # create parameter
+        columns = ['section', 'param', 'value', 'type', 'description', 'instrument', 'experiment']
+        qpar = (section, param, value, type, description, instrument, experiment)
+        valstr = ','.join(["%s"] * len(columns))
+        q = "INSERT  INTO config_def (%s) VALUES (%s)" % (','.join(columns), valstr)
+
+        cursor.execute(q, qpar)
+        self._conn.connection().commit()
+
+    def update_config(self, section, param, value, instrument, experiment):
+        """
+        self.update_config(section, param, value, instrument, experiment)
+
+        Update configuration parameter. Instrument or experiment values can be None.
+        """ 
+
+        cursor = self._conn.cursor()
+
+        # update parameter if it exists
+        q = "UPDATE config_def SET value = %s WHERE section = %s AND param = %s"
+        qpar = [value, section, param]
+        if instrument:
+            q += " AND instrument = %s"
+            qpar.append(instrument)
+        else:
+            q += " AND instrument IS NULL"
+        if experiment:
+            q += " AND experiment = %s"
+            qpar.append(experiment)
+        else:
+            q += " AND experiment IS NULL"
+
+        cursor.execute(q, qpar)
+        self._conn.connection().commit()
+
+    def delete_config(self, section, param, instrument, experiment):
+        """
+        self.delete_config(section, param, instrument, experiment)
+
+        Delete configuration parameter(s). Instrument or experiment values can be None.
+        If param is None then all parameters in a section are deleted.
+        """ 
+
+        cursor = self._conn.cursor()
+
+        q = "DELETE FROM config_def WHERE section = %s"
+        qpar = [section]
+        if instrument:
+            q += " AND instrument = %s"
+            qpar.append(instrument)
+        else:
+            q += " AND instrument IS NULL"
+        if experiment:
+            q += " AND experiment = %s"
+            qpar.append(experiment)
+        else:
+            q += " AND experiment IS NULL"
+
+        cursor.execute(q, qpar)
+        self._conn.connection().commit()
+
     def _regdb(self) :
 
         icdb = InterfaceDb(self._conn.connection())

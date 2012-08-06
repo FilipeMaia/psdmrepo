@@ -5,13 +5,29 @@ available to Controllers. This module is available to templates as 'h'.
 """
 # Import helpers as desired, or define your own, ie:
 #from webhelpers.html.tags import checkbox, password
-from pylons import request
+from pylons import request, response
 from pylons import config
 from pylons.controllers.util import abort
 from routes import url_for
 
 from WSClient.WSApp import WSApp
 from WSClient.WSResource import WSResource
+
+from pylons.decorators import decorator
+from webob.exc import HTTPException
+
+@decorator
+def catch_all(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except HTTPException, ex:
+        response.status = '%d %s' % (ex.code, ex.title)
+        response.content_type = 'text/plain'
+        return ex.detail
+    except Exception, ex:
+        response.status = '500 Internal Server Error'
+        response.content_type = 'text/plain'
+        return str(ex)
 
 
 def checkAccess (instrument, experiment, mode) :
@@ -65,5 +81,5 @@ def checkAccess (instrument, experiment, mode) :
         pass
 
     # nothing works, just fail
-    abort( 401 )
+    abort( 401, "User '%s' lacks permissions to access data in application %s" % (user, appname) )
 

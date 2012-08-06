@@ -193,11 +193,11 @@ class ICConfig ( AppBase ) :
 
         elif len(self._args) == 5:
             
-            # section, option and value given, this can be done only in replace mode
+            # all parameters there, this can be done only in create mode
             if self._options.replace:
                 self._parser.error("Type and description cannot be used with -r option")
 
-            # update parameter if it exists
+            # create parameter 
             columns = ['section', 'param', 'value', 'type', 'description', 'instrument', 'experiment']
             qpar = self._args + [self._options.instrument, self._options.experiment]
             valstr = ','.join(["%s"] * len(columns))

@@ -87,6 +87,49 @@ def make_map():
     # returns list of all requests for given experiment
     map.connect('/exp/{instrument}/{experiment}', controller='request', action='exp_requests', conditions=cond_get )
 
+    # ============== Search interface ==================
+
+    # GET /config
+    # returns list of configuration sections
+    map.connect('/config.{renderer}', controller='config', action='index', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/config', controller='config', action='index', renderer="json", conditions=cond_get)
+
+    # GET /config/{section_id}
+    # returns list configuration parameters for a section
+    map.connect('/config/{section_id}.{renderer}', controller='config', action='section', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/config/{section_id}', controller='config', action='section', renderer="json", conditions=cond_get)
+
+    # GET /config/{section_id}/{param_id}
+    # returns full info for one configuration parameter
+    map.connect("param_url", '/config/{section_id}/{param_id}.{renderer}', controller='config', action='parameter', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/config/{section_id}/{param_id}', controller='config', action='parameter', renderer="json", conditions=cond_get)
+
+    # POST /config
+    # create configuration parameter
+    map.connect('/config', controller='config', action='create', conditions=cond_post)
+
+    # PUT /config/{section_id}/{param_id}
+    # update configuration parameter
+    map.connect('/config/{section_id}/{param_id}', controller='config', action='update', conditions=cond_put)
+
+    # DELETE /config/{section_id}/{param_id}
+    # delete single configuration parameter
+    map.connect('/config/{section_id}/{param_id}', controller='config', action='delete', conditions=cond_delete)
+
+    # DELETE /config/{section_id}
+    # delete all configuration parameters in one section
+    map.connect('/config/{section_id}', controller='config', action='delete', param_id=None, conditions=cond_delete)
+
+    # GET /config-full
+    # returns combined list of all configuration parameters from all sections
+    map.connect('/config-full.{renderer}', controller='config', action='show_full', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/config-full', controller='config', action='show_full', renderer="json", conditions=cond_get)
+
+
     # ============== Access logs ==================
 
     # GET /log/{mode}/...

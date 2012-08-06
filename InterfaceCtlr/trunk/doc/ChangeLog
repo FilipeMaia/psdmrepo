@@ -10,9 +10,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-19
+2012-08-06 Andy Salnikov
+- updated web service to include operations on configuration table
+
 Tag: V01-00-18
 2012-08-04 Andy Salnikov
-- adding class FileMgrRegisterwhich can be used to register files in irods
+- adding class FileMgrRegister which can be used to register files in irods
 
 Tag: V01-00-17
 2012-07-20 Andy Salnikov
