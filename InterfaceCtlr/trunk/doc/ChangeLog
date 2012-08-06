@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-21
+2012-08-06 Andy Salnikov
+- web stuff: clear up mess with different renderers
+
 Tag: V01-00-20
 2012-08-06 Andy Salnikov
 - web stuff: update one of 401 messages which was missing message body

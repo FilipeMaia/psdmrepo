@@ -103,9 +103,9 @@ def make_map():
 
     # GET /config/{section_id}/{param_id}
     # returns full info for one configuration parameter
-    map.connect("param_url", '/config/{section_id}/{param_id}.{renderer}', controller='config', action='parameter', conditions=cond_get,
+    map.connect('/config/{section_id}/{param_id}.{renderer}', controller='config', action='parameter', conditions=cond_get,
                 requirements={'renderer' : 'json|xml'})
-    map.connect('/config/{section_id}/{param_id}', controller='config', action='parameter', renderer="json", conditions=cond_get)
+    map.connect("param_url", '/config/{section_id}/{param_id}', controller='config', action='parameter', renderer="json", conditions=cond_get)
 
     # POST /config
     # create configuration parameter

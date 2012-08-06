@@ -366,7 +366,7 @@ class ConfigController(BaseController):
         for d in data:
             section_id = _sectId(d['section'])
             d['section_id'] = section_id
-            d['url'] = h.url_for("param_url", section_id=section_id, param_id=d['param'], renderer=renderer, qualified=True)
+            d['url'] = h.url_for("param_url", section_id=section_id, param_id=d['param'], renderer='json', qualified=True)
             sections.setdefault(d['section'], []).append(d)
             del d['section']
 

@@ -341,6 +341,10 @@ class IcdbModel ( InterfaceDb ) :
 
         cursor = self._conn.cursor()
 
+        # use NULLs if they are empty
+        instrument = instrument or None
+        experiment = experiment or None
+
         # create parameter
         columns = ['section', 'param', 'value', 'type', 'description', 'instrument', 'experiment']
         qpar = (section, param, value, type, description, instrument, experiment)
@@ -358,6 +362,10 @@ class IcdbModel ( InterfaceDb ) :
         """ 
 
         cursor = self._conn.cursor()
+
+        # use NULLs if they are empty
+        instrument = instrument or None
+        experiment = experiment or None
 
         # update parameter if it exists
         q = "UPDATE config_def SET value = %s WHERE section = %s AND param = %s"
@@ -385,9 +393,16 @@ class IcdbModel ( InterfaceDb ) :
         """ 
 
         cursor = self._conn.cursor()
+        
+        # use NULLs if they are empty
+        instrument = instrument or None
+        experiment = experiment or None
 
         q = "DELETE FROM config_def WHERE section = %s"
         qpar = [section]
+        if param:
+            q += " AND param = %s"
+            qpar.append(param)
         if instrument:
             q += " AND instrument = %s"
             qpar.append(instrument)
