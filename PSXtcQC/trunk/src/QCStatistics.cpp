@@ -4,6 +4,7 @@
 //
 // Description:
 //	Class QCStatistics...
+//      Accumulate and summarize statistics for XTC files.
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -20,7 +21,6 @@
 #include <algorithm>
 #include <string>   // for string, substring
 #include <sstream>  // for streamstring
-#include <iostream> // for cout, puts etc.
 #include <iomanip>  // for setw
 #include <unistd.h> // read()
 #include <stdio.h>
@@ -46,25 +46,24 @@ using namespace std;
 namespace PSXtcQC {
 //===================
 
-QCStatistics::QCStatistics() 
+QCStatistics::QCStatistics(std::ostream& out): m_out(out)
 {
-  std::fill_n(&m_transIdCounter[0],     (int)Pds::TransitionId::NumberOf, 0);
+  std::fill_n(&m_transIdCounter[0],   (int)Pds::TransitionId::NumberOf, 0);
 
-  std::fill_n(&m_typeIdCounter[0],      (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(&m_payloadZeroCounter[0], (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(&m_payloadMin[0],         (int)Pds::TypeId::NumberOf, 11111111);
-  std::fill_n(&m_payloadMax[0],         (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(&m_versionMin[0],         (int)Pds::TypeId::NumberOf,  111);
-  std::fill_n(&m_versionMax[0],         (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(& m_srclogMin[0],         (int)Pds::TypeId::NumberOf, 11111111);
-  std::fill_n(& m_srclogMax[0],         (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(& m_srcphyMin[0],         (int)Pds::TypeId::NumberOf, 1111111111);
-  std::fill_n(& m_srcphyMax[0],         (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(& m_srclevelMin[0],       (int)Pds::TypeId::NumberOf, 11111111);
-  std::fill_n(& m_srclevelMax[0],       (int)Pds::TypeId::NumberOf,    0);
-  std::fill_n(& m_depthMin[0],          (int)Pds::TypeId::NumberOf, 11111111);
-  std::fill_n(& m_depthMax[0],          (int)Pds::TypeId::NumberOf,    0);
-
+  std::fill_n(&m_typeIdCounter[0],          (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(&m_payloadZeroCounter[0],     (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(&m_payloadMin[0],             (int)Pds::TypeId::NumberOf, 11111111);
+  std::fill_n(&m_payloadMax[0],             (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(&m_versionMin[0],             (int)Pds::TypeId::NumberOf,  111);
+  std::fill_n(&m_versionMax[0],             (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(& m_srclogMin[0],             (int)Pds::TypeId::NumberOf, 11111111);
+  std::fill_n(& m_srclogMax[0],             (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(& m_srcphyMin[0],             (int)Pds::TypeId::NumberOf, 1111111111);
+  std::fill_n(& m_srcphyMax[0],             (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(& m_srclevelMin[0],           (int)Pds::TypeId::NumberOf, 11111111);
+  std::fill_n(& m_srclevelMax[0],           (int)Pds::TypeId::NumberOf,    0);
+  std::fill_n(& m_depthMin[0],              (int)Pds::TypeId::NumberOf, 11111111);
+  std::fill_n(& m_depthMax[0],              (int)Pds::TypeId::NumberOf,    0);
   std::fill_n(&m_damageCounter[0][0],       (int)Pds::TypeId::NumberOf*32, 0);
   std::fill_n(&m_damageCounterForTypeId[0], (int)Pds::TypeId::NumberOf, 0);
   std::fill_n(&m_damageCounterForBit[0],    32, 0);
@@ -101,19 +100,19 @@ void QCStatistics::accumulateXTCStatistics(Pds::Xtc* xtc, unsigned depth)
 
   if ( payload == 0 ) m_payloadZeroCounter[ind] ++;
 
-  if ( payload  < m_payloadMin[ind] )   m_payloadMin[ind] = payload;
-  if ( payload  > m_payloadMax[ind] )   m_payloadMax[ind] = payload;				        
-  if ( typevers < m_versionMin[ind] )   m_versionMin[ind] = typevers;
-  if ( typevers > m_versionMax[ind] )   m_versionMax[ind] = typevers;				        
-  if ( srclog   < m_srclogMin[ind] )    m_srclogMin[ind]  = srclog;
-  if ( srclog   > m_srclogMax[ind] )    m_srclogMax[ind]  = srclog;
-  if ( srcphy   < m_srcphyMin[ind] )    m_srcphyMin[ind]  = srcphy;
-  if ( srcphy   > m_srcphyMax[ind] )    m_srcphyMax[ind]  = srcphy;
-  if ( level    < m_srclevelMin[ind] )  m_srclevelMin[ind]= level;
-  if ( level    > m_srclevelMax[ind] )  m_srclevelMax[ind]= level;
-  if ( depth    < m_depthMin[ind] )     m_depthMin[ind]   = depth;
-  if ( depth    > m_depthMax[ind] )     m_depthMax[ind]   = depth; 
-  if ( std::find(v_src_names[ind].begin(), v_src_names[ind].end(), src_name) == v_src_names[ind].end() )
+  if ( payload  < m_payloadMin [ind] )  m_payloadMin [ind] = payload;
+  if ( payload  > m_payloadMax [ind] )  m_payloadMax [ind] = payload;				        
+  if ( typevers < m_versionMin [ind] )  m_versionMin [ind] = typevers;
+  if ( typevers > m_versionMax [ind] )  m_versionMax [ind] = typevers;				        
+  if ( srclog   < m_srclogMin  [ind] )  m_srclogMin  [ind] = srclog;
+  if ( srclog   > m_srclogMax  [ind] )  m_srclogMax  [ind] = srclog;
+  if ( srcphy   < m_srcphyMin  [ind] )  m_srcphyMin  [ind] = srcphy;
+  if ( srcphy   > m_srcphyMax  [ind] )  m_srcphyMax  [ind] = srcphy;
+  if ( level    < m_srclevelMin[ind] )  m_srclevelMin[ind] = level;
+  if ( level    > m_srclevelMax[ind] )  m_srclevelMax[ind] = level;
+  if ( depth    < m_depthMin   [ind] )  m_depthMin   [ind] = depth;
+  if ( depth    > m_depthMax   [ind] )  m_depthMax   [ind] = depth; 
+  if ( std::find(v_src_names   [ind].begin(), v_src_names[ind].end(), src_name) == v_src_names[ind].end() )
     v_src_names[ind].push_back(src_name); // if the src_name is not in v_src_names[ind], then add it
 
   for (unsigned bit=0; bit<17; bit++) {
@@ -127,33 +126,33 @@ void QCStatistics::accumulateXTCStatistics(Pds::Xtc* xtc, unsigned depth)
 
 //===================
 
-void QCStatistics::printTransIdCounter() // unsigned m_transIdCounter[]
+void QCStatistics::printTransIdStatistics() // unsigned m_transIdCounter[]
 {
-  std::cout << "\n\nQCStatistics::printTransIdCounter()\nTotal number of known TransitionId : " << Pds::TransitionId::NumberOf << "\n";
+  m_out << "\n\nQCStatistics::printTransIdStatistics()\nTotal number of known TransitionId : " << Pds::TransitionId::NumberOf << "\n";
   for(int id=0; id < (int)Pds::TransitionId::NumberOf; id++) {
     Pds::TransitionId::Value tid = (Pds::TransitionId::Value) id;
-    std::cout << std::setw(16) << std::left << Pds::TransitionId::name(tid) << ": "  << std::setw(6) << m_transIdCounter[id] << "    "; 
-    if (id&1) std::cout << "\n";
+    m_out << std::setw(16) << std::left << Pds::TransitionId::name(tid) << ": "  << std::setw(6) << m_transIdCounter[id] << "    "; 
+    if (id&1) m_out << "\n";
   }
-  std::cout << "\n";
+  m_out << "\n";
 }
 
 //===================
 
-void QCStatistics::printTypeIdCounter() // unsigned m_typeIdCounter[]
+void QCStatistics::printTypeIdStatistics() // unsigned m_typeIdCounter[]
 {
-  std::cout << "\nQCStatistics::printTypeIdCounter()\nTotal number of known TypeId : " << Pds::TypeId::NumberOf << "\n";
-  std::cout << "Ind: TypeId name             : Entries Vers       payload                 Depth     Src:Level    Src:Names\n";  
-  std::cout << "                             :         min/max    min/max     : #zeros    min/max   min/max \n";
+  m_out << "\nQCStatistics::printTypeIdStatistics()\nTotal number of known TypeId : " << Pds::TypeId::NumberOf << "\n";
+  m_out << "Ind: TypeId name             : Entries Vers       payload                 Depth     Src:Level    Src:Names\n";  
+  m_out << "                             :         min/max    min/max     : #zeros    min/max   min/max \n";
 
   for(int id=0; id < (int)Pds::TypeId::NumberOf; id++) {
     Pds::TypeId::Type tid = (Pds::TypeId::Type) id;
-    std::cout << std::setw(3)  << std::right << id  << ": " 
+    m_out << std::setw(3)  << std::right << id  << ": " 
               << std::setw(24) << std::left  << Pds::TypeId::name(tid) 
               << ": "      << std::setw(6)   << m_typeIdCounter[id]; 
-    if (m_typeIdCounter[id] == 0 ) { std::cout << "\n"; continue;}
+    if (m_typeIdCounter[id] == 0 ) { m_out << "\n"; continue;}
 
-    std::cout << "  "   << std::setw(3)   << std::right << m_versionMin[id] 
+    m_out << "  "   << std::setw(3)   << std::right << m_versionMin[id] 
               << "/"                      << std::left  << m_versionMax[id] 
               << " "    << std::setw(8)   << std::right << m_payloadMin[id] 
               << "/"    << std::setw(8)   << std::left  << m_payloadMax[id] 
@@ -171,55 +170,55 @@ void QCStatistics::printTypeIdCounter() // unsigned m_typeIdCounter[]
     unsigned counter=0;
     for(std::vector<std::string>::const_iterator it  = v_src_names[id].begin();
                                                  it != v_src_names[id].end(); it++) {
-      counter++; if(counter>1) std::cout << std::setw(93) << " " << std::setw(4);
-      std::cout << " " << *it << "\n";
+      counter++; if(counter>1) m_out << std::setw(93) << " " << std::setw(4);
+      m_out << " " << *it << "\n";
     }
 
   }
-  std::cout << "\n";
+  m_out << "\n";
 }
 
 //===================
 
-void QCStatistics::printDamageCounter() // unsigned m_damageCounter[]
+void QCStatistics::printDamageStatistics() // unsigned m_damageCounter[]
 {
   std::string strNA = "N/A-";
 
-  std::cout << "\nQCStatistics::printDamageCounter()\nTotal number of known TypeId : " << Pds::TypeId::NumberOf << "\n";
-  std::cout << "Ind: TypeId name             : Entries  DmgTot  Bits:";
+  m_out << "\nQCStatistics::printDamageStatistics()\nTotal number of known TypeId : " << Pds::TypeId::NumberOf << "\n";
+  m_out << "Ind: TypeId name             : Entries  DmgTot  Bits:";
     for (unsigned bit=1; bit<17; bit++) {
       if (std::string(nameOfDamageBit(bit)).substr(0,4) == strNA) continue;
-      std::cout  << std::setw(8) << std::left << bit;  // << std::setfill('0') 
+      m_out  << std::setw(8) << std::left << bit;  // << std::setfill('0') 
     }
-    std::cout << "\n";
+    m_out << "\n";
 
   for(int id=0; id < (int)Pds::TypeId::NumberOf; id++) {
     Pds::TypeId::Type tid = (Pds::TypeId::Type) id;
-    std::cout << std::setw(3)  << std::right << id  << ": " 
+    m_out << std::setw(3)  << std::right << id  << ": " 
               << std::setw(24) << std::left  << Pds::TypeId::name(tid) 
               << ": "      << std::setw(7)   << m_typeIdCounter[id]; 
-    if (m_typeIdCounter[id] == 0 ) { std::cout << "\n"; continue;}
+    if (m_typeIdCounter[id] == 0 ) { m_out << "\n"; continue;}
 
-    std::cout << std::setw(8) << std::right << m_damageCounterForTypeId[id];
+    m_out << std::setw(8) << std::right << m_damageCounterForTypeId[id];
 
     for (unsigned bit=1; bit<17; bit++) {
       if (std::string(nameOfDamageBit(bit)).substr(0,4) == strNA) continue;
-      std::cout << std::setw(8) << std::right  << m_damageCounter[id][bit];
+      m_out << std::setw(8) << std::right  << m_damageCounter[id][bit];
     }
-    std::cout << "\n";
+    m_out << "\n";
   }
-  std::cout << "\n";
+  m_out << "\n";
 }
 
 //===================
 
-void QCStatistics::printDamageBitCounter()
+void QCStatistics::printDamageBitStatistics()
 {  
-  std::cout << "\nQCStatistics::printDamageBitCounter()   Damage counter\n";
+  m_out << "\nQCStatistics::printDamageBitStatistics()   Damage counter\n";
   for (unsigned bit=1; bit<17; bit++) {
     if (std::string(nameOfDamageBit(bit)).substr(0,4) == (std::string)"N/A-") continue;
 
-    std::cout << "Damage bit:" << std::setw(2)  << bit << " : "  
+    m_out << "Damage bit:" << std::setw(2)  << bit << " : "  
               << std::left     << std::setw(24) << nameOfDamageBit(bit)  
               << std::right    << std::setw(8)  << m_damageCounterForBit[bit] << "\n"; 
   }
@@ -239,7 +238,7 @@ void QCStatistics::saveBrokenTimeRecord(Pds::Dgram* dg, unsigned& ndgram)
 
 void QCStatistics::printBrokenTimeRecords()
 {
-  std::cout << "\nQCStatistics::printBrokenTimeRecords()\nTotal number of broken time records : " << v_brokenTime.size() << "\n";
+  m_out << "\nQCStatistics::printBrokenTimeRecords()\nTotal number of broken time records : " << v_brokenTime.size() << "\n";
 
   for( vector<BrokenTimeRecord>::const_iterator p  = v_brokenTime.begin();
                                                 p != v_brokenTime.end(); p++ ) {
@@ -258,13 +257,13 @@ void QCStatistics::printBrokenTimeRecords()
  
     uint32_t dam_value = p->damage_value;
 
-    std::cout << "BrokenTimeRecord: Dgram:" << std::setw(6) << std::right  << p->ndg 
+    m_out << "BrokenTimeRecord: Dgram:" << std::setw(6) << std::right  << p->ndg 
               << "  t:"           << ct0_buf << "." << std::right << std::setfill('0') << std::setw(3) << t0_msec
 	      << "  t-previous:"  << ct1_buf << "." << std::right << std::setfill('0') << std::setw(3) << t1_msec
 	      << "  damage:"      << dam_value 
               << "\n" << std::setfill(' ');  
 
-    printDamagedBits(dam_value);
+    printDamagedBits(m_out, dam_value, 80);
   }
 }
  
@@ -272,10 +271,11 @@ void QCStatistics::printBrokenTimeRecords()
 
 void QCStatistics::checkDgramTimeSequense(Pds::Dgram* dg, unsigned& ndgram)
 {
-    if( m_t_prev > dg->seq.clock() ) {
-      std::cout << "Datagram:" << ndgram 
-                << "  time: "                    << dg->seq.clock().seconds() << "."  << std::setw(9) << std::setfill('0') << dg->seq.clock().nanoseconds()
-                << "  less then previous time:"  << m_t_prev       .seconds() << "."  << std::setw(9) << std::setfill('0') << m_t_prev       .nanoseconds()
+//    if( dg->seq.clock() > m_t_prev ) { // for test of printout
+      if( m_t_prev > dg->seq.clock() ) {
+      m_out << "Datagram:" << ndgram 
+                << " time:"                << dg->seq.clock().seconds() << "."  << std::setw(9) << std::setfill('0') << dg->seq.clock().nanoseconds()
+                << " less then previous:"  << m_t_prev       .seconds() << "."  << std::setw(9) << std::setfill('0') << m_t_prev       .nanoseconds()
                 << "\n" << std::setfill(' ');
 
       saveBrokenTimeRecord(dg, ndgram);
@@ -290,10 +290,10 @@ void QCStatistics::processDgram(Pds::Dgram* dg, unsigned ndgram, unsigned long l
     this->checkDgramTimeSequense(dg,ndgram);              // Check Dgram time sequense
     this->accumulateDgramStatistics(dg);                  // counts TransitionID etc.
 
-    if(  (ndgram < 5) 
+    if(  (ndgram < 11) 
       || (ndgram < 50 && ndgram%10==0) 
       || (ndgram%100==0) ) 
-      printDgramHeader(dg,ndgram,dg_first_byte);          // Print Dgram header
+      printDgramHeader(m_out,dg,ndgram,dg_first_byte);          // Print Dgram header
 }
 
 //===================
@@ -308,28 +308,19 @@ void QCStatistics::saveDamageRecord(Pds::Xtc* xtc, unsigned depth, unsigned ndgr
 
 void QCStatistics::printDamageRecords()
 {
-  std::cout << "\nQCStatistics::printDamageRecords()\nTotal number of damage records : " << v_damageRecords.size() << "\n";
+  m_out << "\nQCStatistics::printDamageRecords()\nTotal number of damage records : " 
+            << v_damageRecords.size() << "\n";
 
   for( vector<DamageRecord>::const_iterator p  = v_damageRecords.begin();
                                             p != v_damageRecords.end(); p++ ) {
 
-    std::cout << "Damage Record: Dgram:" << std::setfill(' ') << std::setw(6) << std::right  << p->ndg 
+    m_out << "Damage record: Dgram:" << std::setfill(' ') << std::setw(6) << std::right  << p->ndg 
 	      << "  depth:"       << p->depth
 	      << "  type:"        << std::left << std::setw(24) << Pds::TypeId::name(p->type_id)
 	      << "  damage:"      << std::right<< std::setw(6)  << p->damage_value ;  
 
-    //printDamagedBits(p->damage_value);
-    // Print damaged bits
-    uint32_t value = p->damage_value;
-    if (!value) return;
-      unsigned counter=0;
-      for (unsigned bit=0; bit<17; bit++) {
-        if (value & 1<<bit) { 
-	  counter++; if (counter>1) std::cout << std::setw(82) << " " << std::setw(4);
-          std::cout << "  bit:" << std::setw(2) << bit << ": " << std::left << nameOfDamageBit(bit) << "\n"; 
-        }
-      }
-    }
+    printDamagedBits(m_out, p->damage_value, 82);
+  }
 }
 
 //===================
@@ -340,13 +331,15 @@ bool QCStatistics::processXTC(Pds::Xtc* xtc, unsigned depth, unsigned ndgram)
     uint32_t damage_value = xtc->damage.value();
 
     if (damage_value & 0xffffffff) {
-      std::cout << "Datagram:" << ndgram << "  Depth:" << depth << "  Type:" << Pds::TypeId::name(xtc->contains.id());
-      printDamagedBits(damage_value);
+      m_out << "Datagram " << std::left << std::setw(6) << ndgram 
+                << " Damage Depth:" << depth 
+                << " Type:" << Pds::TypeId::name(xtc->contains.id());
+      printDamagedBits(m_out, damage_value,39);
       saveDamageRecord(xtc, depth, ndgram);
     }
  
     // Work on xtc
-    //std::cout << "Depth:" << depth; printXtcHeader( (*xtc) );
+    //m_out << "Depth:" << depth; printXtcHeader(m_out, (*xtc) );
     accumulateXTCStatistics(xtc,depth);
 
     // Fatal damage -> stop
@@ -358,19 +351,20 @@ bool QCStatistics::processXTC(Pds::Xtc* xtc, unsigned depth, unsigned ndgram)
 
 void QCStatistics::processXTCSizeError(Pds::Xtc* root, Pds::Xtc* xtc, int remaining, unsigned depth, unsigned ndgram)
 {
-  SizeErrorRecord size_error_record = {ndgram, depth, remaining, root->damage.value(), xtc->damage.value(), root->contains.id(), xtc->contains.id()};
+  SizeErrorRecord size_error_record = {ndgram, depth, remaining, root->damage.value(), 
+                                       xtc->damage.value(), root->contains.id(), xtc->contains.id()};
   v_sizeErrorRecords.push_back(size_error_record);
 }
 //===================
 
 void QCStatistics::printXTCSizeErrorRecords()
 {
-  std::cout << "\nQCStatistics::printXTCSizeErrorRecords()\nTotal number of size error records : " << v_sizeErrorRecords.size() << "\n";
+  m_out << "\nQCStatistics::printXTCSizeErrorRecords()\nTotal number of size error records : " 
+            << v_sizeErrorRecords.size() << "\n";
 
   for( vector<SizeErrorRecord>::const_iterator  p  = v_sizeErrorRecords.begin();
                                                 p != v_sizeErrorRecords.end(); p++ ) {
-
-    std::cout << "Size Error Record: Dgram:" 
+    m_out << "Size Error Record: Dgram:" 
               << std::setw(6) << std::right  << p->ndg 
 	      << "  depth:"                  << p->depth
 	      << "  remaining:"              << p->remaining
@@ -379,7 +373,8 @@ void QCStatistics::printXTCSizeErrorRecords()
 	      << "  name ext:"               << Pds::TypeId::name(p->typeid_ext)
 	      << "  name int:"               << Pds::TypeId::name(p->typeid_int)
               << "\n";  
-    printDamagedBits(p->damage_ext);
+
+    printDamagedBits(m_out, p->damage_ext,80);
   }
 }
 
@@ -387,11 +382,15 @@ void QCStatistics::printXTCSizeErrorRecords()
 
 void QCStatistics::printQCSummary(unsigned ndgram)
 {
-  std::cout << "Total number of dgrams=" << ndgram << "\n";
-  printTransIdCounter();
-  printTypeIdCounter();
-  printDamageCounter();
-  printDamageBitCounter();
+  m_out << "\n\n";
+  m_out << std::setfill('=') << std::setw(27) << right << "  " << std::endl;
+  m_out << "  Quality check summary\n"; 
+  m_out << std::setfill('=') << std::setw(27) << "  " << std::endl << std::setfill(' ');
+  m_out << "Total number of dgrams=" << ndgram << "\n";
+  printTransIdStatistics();
+  printTypeIdStatistics();
+  printDamageStatistics();
+  printDamageBitStatistics();
   printDamageRecords();
   printBrokenTimeRecords();
   printXTCSizeErrorRecords();
@@ -403,6 +402,33 @@ void QCStatistics::printQCSummary(unsigned ndgram)
 //===================
 //===================
 
+void printDgramHeader(std::ostream& out, Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_first_byte)
+{
+    time_t t_sec  = dg->seq.clock().seconds();
+    time_t t_nsec = dg->seq.clock().nanoseconds();
+    int    t_msec = (int)(1e-6 * t_nsec);
+    struct tm* stm; stm = localtime(&t_sec); 
+    char   ct_buf[40];  strftime (ct_buf,80,"%Y-%m-%d %H:%M:%S",stm);
+
+    //printf("Datagram:%d  Transition:%s/%2d  seqtype:%1d  %s.%03d  fiducial:%06x  ticks:%06x  pos 0x%x \n",  
+                                                       // dmg %08x  payloadSize 0x%x  size(always=40) %u 
+    out << "Datagram:"    << std::setw(4)  << std::left << ndgram
+        << " Transition:" << std::setw(16) << Pds::TransitionId::name(dg->seq.service())
+        << "/"            << std::setw(2)  << dg->seq.service() // TransitionId id 
+        << " seqtype:"    << std::setw(2)  << dg->seq.type()
+        << ct_buf 
+        << "."            << std::setw(3)  << t_msec
+        << " fiducial:"   << std::setw(6)  << std::hex << dg->seq.stamp().fiducials()
+        << " ticks:"      << std::setw(6)  << dg->seq.stamp().ticks()
+             //dg->xtc.damage.value(),
+             //dg->xtc.sizeofPayload(),
+	     //(int)sizeof(*dg),
+	<< " pos:"        << (uint)dg_first_byte 
+	<< std::dec << "\n";
+}
+
+//===================
+
 void printDgramHeader(Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_first_byte)
 {
     time_t t_sec  = dg->seq.clock().seconds();
@@ -411,7 +437,8 @@ void printDgramHeader(Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_f
     struct tm* stm; stm = localtime(&t_sec); 
     char   ct_buf[40];  strftime (ct_buf,80,"%Y-%m-%d %H:%M:%S",stm);
 
-    printf("Datagram:%d  Transition:%s/%2d  seqtype:%1d  %s.%03d  fiducial:%06x  ticks:%06x  pos 0x%x \n",  // dmg %08x  payloadSize 0x%x  size(always=40) %u 
+    printf("Datagram:%d  Transition:%s/%2d  seqtype:%1d  %s.%03d  fiducial:%06x  ticks:%06x  pos 0x%x \n",  
+                                                       // dmg %08x  payloadSize 0x%x  size(always=40) %u 
              ndgram,
              Pds::TransitionId::name(dg->seq.service()),
              dg->seq.service(), // TransitionId id 
@@ -428,11 +455,11 @@ void printDgramHeader(Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_f
 
 //===================
 
-void printXtcHeader(Pds::Xtc& xtc)
+void printXtcHeader(std::ostream& out, Pds::Xtc& xtc)
 {
   std::stringstream ssrc; ssrc << xtc.src;
 
-  std::cout // << std::hex << std::showbase << std::setw(8) << std::setfill('0') 
+     out // << std::hex << std::showbase << std::setw(8) << std::setfill('0') 
             << "  XTC header: dmg:"  << xtc.damage.value() 
             << "  payload:"   << xtc.sizeofPayload()
             << "  extent:"    << xtc.extent
@@ -453,15 +480,18 @@ void printXtcHeader(Pds::Xtc& xtc)
 const char* nameOfDamageBit(unsigned bit)
 { 
   static const char* _namesOfDamageBit[] = {
-    "N/A-0",
-    "DroppedContribution",    //  1 
-    "N/A-2","N/A-3","N/A-4","N/A-5","N/A-6","N/A-7","N/A-8","N/A-9","N/A-10","N/A-11",
+    "N/A-00",
+    "DroppedContribution",    // 01 
+    "N/A-02","N/A-03","N/A-04","N/A-05","N/A-06",
+    "N/A-07","N/A-08","N/A-09","N/A-10","N/A-11",
     "OutOfOrder",             // 12 
     "OutOfSynch",             // 13 
     "UserDefined",            // 14 
     "IncompleteContribution", // 15 
     "ContainsIncomplete",     // 16
-    "N/A-17","N/A-18","N/A-19","N/A-20","N/A-21","N/A-22","N/A-23","N/A-24","N/A-25","N/A-26","N/A-27","N/A-28","N/A-29","N/A-30","N/A-31"
+    "N/A-17","N/A-18","N/A-19","N/A-20","N/A-21",
+    "N/A-22","N/A-23","N/A-24","N/A-25","N/A-26",
+    "N/A-27","N/A-28","N/A-29","N/A-30","N/A-31"
   };
   return (bit < 32 ? _namesOfDamageBit[bit] : "-Invalid-");
 }
@@ -475,25 +505,30 @@ const char* nameOfDamageBit(Pds::Damage::Value vid)
 
 //===================
 
-void printDamagedBits(uint32_t value)
+void printDamagedBits(std::ostream& out, uint32_t value, unsigned offset)
 {
-  if (!value) return;
-    for (unsigned bit=0; bit<17; bit++) {
-      if (value & 1<<bit) { std::cout << "  Damage bit " << std::setw(2) << bit << ": " << nameOfDamageBit(bit) << "\n"; }
-    }
+    // offset begins to work after the 1st line.
+    if (!value) return;
+      unsigned counter=0;
+      for (unsigned bit=0; bit<17; bit++) {
+        if (value & 1<<bit) { 
+	  counter++; if (counter>1) out << std::setw(offset) << " " << std::setw(4);
+          out << "  bit:" << std::setw(2) << bit << ": " << std::left << nameOfDamageBit(bit) << "\n"; 
+        }
+      }
 }      
 
 //===================
 
-void printListOfDamagedBits()
+void printListOfDamagedBits(std::ostream& out)
 {  
   std::string strNA = "N/A-";
-  std::cout << "\nPSXtcQC::printListOfDamagedBits() List of defined damage bits\n";
+  out << "\nPSXtcQC::printListOfDamagedBits() List of defined damage bits\n";
   for (unsigned bit=1; bit<17; bit++) {
 
     if (std::string(nameOfDamageBit(bit)).substr(0,4) == strNA) continue;
 
-    std::cout << "Damage bit:" << std::setw(2) << bit 
+          out << "Damage bit:" << std::setw(2) << bit 
               << " : "         << nameOfDamageBit(bit) << "\n"; 
   }
 }      

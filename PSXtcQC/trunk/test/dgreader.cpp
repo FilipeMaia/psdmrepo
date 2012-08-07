@@ -1,6 +1,7 @@
 //===================
 
 #include <stdlib.h>
+#include <fstream> // 
 #include <iostream> // for cout, puts etc.
 #include <fcntl.h>  // open()
 #include <unistd.h> // read()
@@ -22,6 +23,8 @@
 #include "PSXtcQC/QCStatistics.h"
 #include "PSXtcQC/FileFinder.h"
 
+#include "PSXtcQC/InputParameters.h"
+
 //===================
 // for iterate_over_dgrams_in_xstream
 #include "XtcInput/ChunkFileIterList.h"
@@ -40,56 +43,6 @@ using namespace XtcInput;
 
 //===================
 
-void usage(char* name) {
-  fprintf(stderr,"Usage: %s [-f] <filename> [-h]\n", name);
-}
-
-//===================
-
-std::string parse_input_parameters(int argc, char *argv[])
-{
-  // parse standard option-arguments:
-  char* xtcname = 0;
-  int   c;
-  while ((c=getopt(argc, argv, ":f:h")) != -1) {
-    switch (c) {
-    case 'f' :
-      xtcname = optarg;
-      break;
-    case 'h' :
-      usage(argv[0]);
-      //exit(0);
-      break;
-    case ':' :
-      std::cout << "Missing argument\n";          
-      usage(argv[0]);
-      exit(0);
-    case '?' :
-      std::cout << "Non-defined option\n";          
-      usage(argv[0]);
-      exit(0);
-    default:
-      std::cout << "Default should never happen...";
-      abort();
-    }
-  }
-
-  // if a single additional argument is used without option "-f", assume that this is a file name...
-  if (argc == 2) {
-     xtcname = argv[1];
-  }
-  
-  // if the file-name still is not defined 
-  if (!xtcname) { 
-      std::cout << "File name is not defined...\n";          
-      usage(argv[0]); return std::string("file-name-is-non-defined");
-  } // exit(2); }
-
-  return std::string(xtcname);
-}
-
-//===================
-
 void iterate_over_dgrams_in_xfile(std::string& xtcfname) // int fd)
 {
   int fd = open(xtcfname.c_str(),O_RDONLY | O_LARGEFILE);    
@@ -99,7 +52,7 @@ void iterate_over_dgrams_in_xfile(std::string& xtcfname) // int fd)
   Pds::Dgram* dg;
   unsigned long long dg_first_byte=0;
   unsigned ndgram=0;
-  PSXtcQC::QCStatistics* qcstat= new PSXtcQC::QCStatistics();
+  PSXtcQC::QCStatistics* qcstat= new PSXtcQC::QCStatistics(INPARS->get_ostream());
 
   while ((dg = iter.next())) {                         // Iterate over all datagrams in file
 
@@ -121,10 +74,12 @@ void iterate_over_dgrams_in_xfile(std::string& xtcfname) // int fd)
 
 //===================
 
-void iterate_over_dgrams_in_xstream(FileFinder* ff)
+//void iterate_over_dgrams_in_xstream(FileFinder* ff)
+
+void iterate_over_dgrams_in_xstream(std::vector<std::string>& v_names)
 {
   // Get vector with list of input chunk-files for one stream: 
-  std::vector<std::string> v_names = ff->get_vect_of_chunks();
+  // std::vector<std::string> v_names = ff->get_vect_of_chunks();
   std::vector<XtcFileName> file_names;
   // Copy vector for recasting...
   for(std::vector<std::string>::iterator it=v_names.begin(); it!=v_names.end(); it++)
@@ -137,7 +92,7 @@ void iterate_over_dgrams_in_xstream(FileFinder* ff)
   Pds::Dgram* dg;
   unsigned long long dg_first_byte=0;
   unsigned ndgram=0;
-  PSXtcQC::QCStatistics* qcstat= new PSXtcQC::QCStatistics();
+  PSXtcQC::QCStatistics* qcstat= new PSXtcQC::QCStatistics(INPARS->get_ostream());
 
   while (true) {
 
@@ -164,14 +119,16 @@ void iterate_over_dgrams_in_xstream(FileFinder* ff)
 
 int main(int argc, char *argv[])
 {
-  std::string xtcfname = parse_input_parameters(argc, argv); 
-  std::cout << "Input file name: " << xtcfname << "\n";
+  INPARS->parse_input_parameters(argc, argv); 
 
+  //std::string xtcfname = "non-defined-file";
   //iterate_over_dgrams_in_xfile(xtcfname);
+  //FileFinder* ff = new FileFinder(xtcfname);
+  //iterate_over_dgrams_in_xstream(ff);
 
-  FileFinder* ff = new FileFinder(xtcfname);
-  iterate_over_dgrams_in_xstream(ff);
+  iterate_over_dgrams_in_xstream(INPARS->get_vector_fnames());
 
+  INPARS->close_log_file();
   return 0;
 }
 

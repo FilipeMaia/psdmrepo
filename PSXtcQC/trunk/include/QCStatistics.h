@@ -15,6 +15,7 @@
 //-----------------
 #include <vector>
 #include <string>
+#include <iostream> // for cout, puts etc.
 
 //----------------------
 // Base Class Headers --
@@ -26,9 +27,9 @@
 
 #include "pdsdata/xtc/Xtc.hh"
 #include "pdsdata/xtc/Dgram.hh"
-//#include "pdsdata/xtc/Damage.hh"
 #include "pdsdata/xtc/TransitionId.hh"
 #include "pdsdata/xtc/TypeId.hh"
+//#include "pdsdata/xtc/Damage.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -90,16 +91,15 @@ class QCStatistics  {
 public:
     enum {Stop, Continue};
 
-
-    QCStatistics(); // {}
+    QCStatistics(std::ostream& out); // {}
     virtual ~QCStatistics() {}
 
     void accumulateDgramStatistics(Pds::Dgram* dg);
     void accumulateXTCStatistics(Pds::Xtc* xtc, unsigned depth);
-    void printTransIdCounter();
-    void printTypeIdCounter();
-    void printDamageCounter();
-    void printDamageBitCounter();
+    void printTransIdStatistics();
+    void printTypeIdStatistics();
+    void printDamageStatistics();
+    void printDamageBitStatistics();
     void saveBrokenTimeRecord(Pds::Dgram* dg, unsigned& ndgram);
     void printBrokenTimeRecords();
     void checkDgramTimeSequense(Pds::Dgram* dg, unsigned& ndgram);
@@ -114,20 +114,20 @@ public:
 private:
     unsigned m_transIdCounter[(int)Pds::TransitionId::NumberOf];
 
-    unsigned m_typeIdCounter     [(int)Pds::TypeId::NumberOf];
-    unsigned m_payloadZeroCounter[(int)Pds::TypeId::NumberOf];
-    int      m_payloadMin[(int)Pds::TypeId::NumberOf];
-    int      m_payloadMax[(int)Pds::TypeId::NumberOf];
-    unsigned m_versionMin[(int)Pds::TypeId::NumberOf];
-    unsigned m_versionMax[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srclogMin[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srclogMax[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srcphyMin[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srcphyMax[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srclevelMin[(int)Pds::TypeId::NumberOf];
-    unsigned  m_srclevelMax[(int)Pds::TypeId::NumberOf];
-    unsigned  m_depthMin   [(int)Pds::TypeId::NumberOf];
-    unsigned  m_depthMax   [(int)Pds::TypeId::NumberOf];
+    unsigned  m_typeIdCounter     [(int)Pds::TypeId::NumberOf];
+    unsigned  m_payloadZeroCounter[(int)Pds::TypeId::NumberOf];
+    int       m_payloadMin        [(int)Pds::TypeId::NumberOf];
+    int       m_payloadMax        [(int)Pds::TypeId::NumberOf];
+    unsigned  m_versionMin        [(int)Pds::TypeId::NumberOf];
+    unsigned  m_versionMax        [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srclogMin         [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srclogMax         [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srcphyMin         [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srcphyMax         [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srclevelMin       [(int)Pds::TypeId::NumberOf];
+    unsigned  m_srclevelMax       [(int)Pds::TypeId::NumberOf];
+    unsigned  m_depthMin          [(int)Pds::TypeId::NumberOf];
+    unsigned  m_depthMax          [(int)Pds::TypeId::NumberOf];
     std::vector<std::string> v_src_names[(int)Pds::TypeId::NumberOf];
 
     unsigned  m_damageCounter[(int)Pds::TypeId::NumberOf][32];
@@ -143,6 +143,8 @@ private:
     std::vector<BrokenTimeRecord> v_brokenTime;
     std::vector<DamageRecord> v_damageRecords;
     std::vector<SizeErrorRecord> v_sizeErrorRecords;
+
+    std::ostream& m_out;
 };
 
 //===================
@@ -151,12 +153,13 @@ private:
 //===================
 //===================
 
-    void printDgramHeader(Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_first_byte);
-    void printXtcHeader(Pds::Xtc& xtc);
+    void printDgramHeader(                   Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_first_byte); // printf
+    void printDgramHeader(std::ostream& out, Pds::Dgram* dg, unsigned& ndgram, unsigned long long& dg_first_byte);
+    void printXtcHeader(std::ostream& out, Pds::Xtc& xtc);
     const char* nameOfDamageBit(unsigned bit);
     const char* nameOfDamageBit(Pds::Damage::Value vid);
-    void printDamagedBits(uint32_t value);
-    void printListOfDamagedBits();
+    void printDamagedBits(std::ostream& out, uint32_t value, unsigned offset=31);
+    void printListOfDamagedBits(std::ostream& out);
 
 } // namespace PSXtcQC
 
