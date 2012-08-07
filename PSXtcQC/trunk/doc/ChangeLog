@@ -13,6 +13,11 @@ reverse time order.
 
 =======
 Tag: V00-00-03
+2012-08-06 Andy
+- add missing include to build on RHEL6/gcc44
+
+=======
+Tag: V00-00-03
 2012-08-06 Mikhail S. Dubrovin
 - modify the input parameters sparsification in accordance with 
   Igor's request for command line interface like

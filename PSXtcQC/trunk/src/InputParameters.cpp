@@ -14,6 +14,7 @@
 // Headers --
 //-----------------------
 #include "PSXtcQC/InputParameters.h"
+#include <stdlib.h>
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
