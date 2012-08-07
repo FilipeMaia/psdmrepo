@@ -80,7 +80,11 @@ class IrodsClient ( object ) :
     #-------------------
 
     def resources(self):
-        """ Return the list of resources """
+        """
+        self.resources() -> list of str
+        
+        Returns the list of resource names.
+        """
         
         conn = self._conn.connection()
         if not conn : raise ConnectionError()
@@ -108,7 +112,24 @@ class IrodsClient ( object ) :
         return [ x[0] for x in res ]
 
     def resource(self, name):
-        """ Return the description of single resource """
+        """
+        self.resource(name: str) -> dict
+        
+        Return the description of single resource as a dictionary object. Dictionary
+        has these string keys:
+            - name: str, resource name 
+            - resc_id: str, internal resource ID
+            - zone: str, iRODS zone name
+            - type: str, resource type
+            - class: str, resource class
+            - location: str, host name where resource is located
+            - vault: str, base path for the resource directories
+            - free_space: str 
+            - info: str
+            - comment: str
+            - ctime: str
+            - mtime: str
+        """
         
         conn = self._conn.connection()
         if not conn : raise ConnectionError()
@@ -156,7 +177,34 @@ class IrodsClient ( object ) :
 
 
     def files(self, path, recursive=None):
-        """ Gets the list of files/collections and returns info about every file """
+        """ 
+        self.files(path: str, [recursive: bool]) -> list of dicts
+        
+        Gets the list of files/collections and returns info about every file.
+        If recursive is given and evaluates to True then all sub-collections 
+        are also scanned and their contents is returned as well.
+        
+        Returns the list of dictionary objects. For collections dictionary 
+        contains these keys:
+            - type: string 'collection'
+            - name: path of this collection
+
+        For objects (files) dictionary contains keys:
+            - type: str, string 'object'
+            - name: str, object name (relative to its containing collection)
+            - size: number, object data size in bytes
+            - ctime: str, time of creation, UNIX seconds in string representation
+            - mtime: str, time of modification, UNIX seconds in string representation
+            - owner: str, name of the owner account
+            - checksum, str, if not None then it is a string representing checksum
+            - collName: str, name of containg collection
+            - id: str, internal ID
+            - datamode: int
+            - path: str, physical path of the file on corresponding resource 
+            - replica: int, replica number
+            - replStat, int, replica status
+            - resource, str: resource name
+        """
 
         conn = self._conn.connection()
         if not conn : raise ConnectionError()
@@ -179,8 +227,42 @@ class IrodsClient ( object ) :
         return res
     
 
+    def fileInfo(self, path):
+        """ 
+        self.fileInfo(path: str) -> list of dicts
+        
+        Gets the list of files/collections and returns info about every file.
+        Unlike files(), if path refers to a collection then information about
+        collection itself is returned.
+        
+        Returns the same type of objects as files().
+        """
+
+        conn = self._conn.connection()
+        if not conn : raise ConnectionError()
+
+        rodsPath = irods.rodsPath_t()
+        rodsPath.setInPath( path )
+        rodsPath.setOutPath( path )
+        
+        status = rodsPath.getRodsObjType(conn)
+        if rodsPath.getObjState() == irods.NOT_EXIST_ST:
+            raise ObjectMissing(path)
+        
+        if rodsPath.getObjType() == irods.DATA_OBJ_T:
+            res = self._file ( conn, rodsPath.getOutPath() )
+        elif rodsPath.getObjType() ==  irods.COLL_OBJ_T:
+            res = self._coll ( conn, rodsPath.getOutPath() )
+        else :
+            raise IrodsException("Unexpected type of object '%s'" % path)
+        
+        return res
+    
+
     def removeObj(self, path, replica=None, unreg=False, force=False):
         """
+        self.removeObj(path: str, [replica: int, unreg: bool, force: bool])
+        
         Remove specified object and its corresponding file on disk or other 
         resource. If path refers to a collection then exception is raised. 
         
@@ -215,6 +297,8 @@ class IrodsClient ( object ) :
 
     def removeColl(self, path, unreg=False, force=False):
         """
+        self.removeColl(path: str, [unreg: bool, force: bool])
+        
         Remove specified collection and all its files and sub-collections.
         
         If "unreg" argument is set to true then instead of deleting files
@@ -242,38 +326,132 @@ class IrodsClient ( object ) :
         else:
             raise IrodsException("Unexpected type of object '%s'" % path)
 
-#    def rule(self, rule, params = {}, outParam=None):
-#        """
-#        Execute a rule on irods server
-#        """
-#        
-#        conn = self._conn.connection()
-#        if not conn : raise ConnectionError()
-#
-#        execMyRuleInp = irods.execMyRuleInp_t()
-#        msParamArray = irods.msParamArray_t()
-#        
-#        execMyRuleInp.getCondInput().setLen(0)
-#        execMyRuleInp.setInpParamArray(msParamArray)
-#        if outParam: execMyRuleInp.setOutParamDesc(outParam)
-#
-#        # rule to execute
-#        execMyRuleInp.setMyRule(rule) 
-#
-#        # fill in parameters
-#        for k, v in params.items():
-#            if type(v) in types.StringTypes:
-#                ptype = irods.STR_MS_T
-#            elif type(v) == types.IntType:
-#                ptype = irods.INT_MS_T
-#            elif type(v) == types.FloatType:
-#                ptype = irods.DOUBLE_MS_T
-#            irods.addMsParamToArray(msParamArray, k, ptype, v)
-#
-#        # execute rule, get its output
-#        outParamArray = irods.rcExecMyRule(conn, execMyRuleInp)
-#        
-#        mP = outParamArray.getMsParamByLabel(outParam)
+    def rule(self, rule, params = {}, outParam=[]):
+        """
+        self.rule(rule:str, [params: dict, [outParam: list]]) -> list
+        
+        Execute a rule on irods server. Takes the rule string, optional 
+        input parameters dictionary, and optional list of output parameter
+        names.
+        
+        Returns  the list of output parameters corresponding to the list 
+        of names given on input.
+        """
+        
+        conn = self._conn.connection()
+        if not conn : raise ConnectionError()
+
+        execMyRuleInp = irods.execMyRuleInp_t()
+        msParamArray = irods.msParamArray_t()
+        
+        execMyRuleInp.getCondInput().setLen(0)
+        execMyRuleInp.setInpParamArray(msParamArray)
+        for parm in outParam: 
+            execMyRuleInp.setOutParamDesc(parm)
+
+        # rule to execute
+        execMyRuleInp.setMyRule(rule) 
+
+        # fill in parameters
+        for k, v in params.items():
+            if type(v) in types.StringTypes:
+                ptype = irods.STR_MS_T
+            elif type(v) == types.IntType:
+                ptype = irods.INT_MS_T
+            elif type(v) == types.FloatType:
+                ptype = irods.DOUBLE_MS_T
+            irods.addMsParamToArray(execMyRuleInp.getInpParamArray(), k, ptype, v)
+
+        # execute rule, get its output
+        outParamArray = irods.rcExecMyRule(conn, execMyRuleInp)
+
+        # get output params
+        res = [outParamArray.getMsParamByLabel(parm) for parm in outParam]
+        return res
+
+
+    def replicate(self, path, dst_resource, src_resource=None):
+        """
+        self.replicate(path: str, src_resource: str, [dst_resource: str])
+        
+        Make new replica of the specified object. dst_resource gives resource name of
+        the destination replica. src_resource if given and non-empty gives resource name 
+        of the source replica, otherwise source replica is chosen automatically.
+        
+        There is no way currently to check the status of rule execution, so this
+        method returns nothing. Use other means to check whether the replication 
+        succeeded.
+        """
+        
+        # build 
+        replOpt = "destRescName="+dst_resource
+        if src_resource: replOpt += "++++rescName="+src_resource
+
+        # run delayed replication, do not wait for it to finish
+        params = {"*PATH": path, "*OPT": replOpt}
+        self.rule("replicate||delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl(*PATH,*OPT,null),nop)|nop", params)
+
+
+    def queue(self):
+        """
+        self.queue() -> list of dicts
+        
+        Get the list of rules in execution queue (iqstat analog). Returns the list of dictionaries,
+        each dictionary has these string keys:
+            - id: str, rule identifier
+            - name: str, rule name
+            - rei_file_path: str, path to "rule env" file
+            - user_name: str, user account name
+            - address: str, host address where rule is executed, empty most of the time
+            - time: str, UNIX time encoded as string 
+            - frequency: str, execution frequency
+            - priority: str, execution priority
+            - estimated_exe_time: str
+            - notification_addr: str
+            - last_exe_time: str
+            - exec_status: str, one of ('RE_RUNNING', 'RE_FAILED', 'RE_IN_QUEUE', '')
+        """
+        
+        conn = self._conn.connection()
+        if not conn : raise ConnectionError()
+        
+        genQueryInp = irods.genQueryInp_t()   
+        
+        i1 = irods.inxIvalPair_t()
+        i1.addInxIval(irods.COL_RULE_EXEC_ID, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_NAME, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_REI_FILE_PATH, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_USER_NAME, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_ADDRESS, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_TIME, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_FREQUENCY, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_PRIORITY, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_ESTIMATED_EXE_TIME, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_NOTIFICATION_ADDR, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_LAST_EXE_TIME, 0)
+        i1.addInxIval(irods.COL_RULE_EXEC_STATUS, 0)
+        genQueryInp.setSelectInp(i1)
+        
+        genQueryInp.setMaxRows(200)
+        genQueryInp.setContinueInx(0)
+
+        columns = ["id", "name", "rei_file_path", "user_name", 
+                   "address", "time", "frequency", "priority",
+                   "estimated_exe_time", "notification_addr", 
+                   "last_exe_time", "exec_status"]
+
+        res = []
+        while True:
+
+            genQueryOut, status = irods.rcGenQuery(conn, genQueryInp)
+            if status == 0 :
+                res += self._result2dict( genQueryOut, columns )
+            if status == 0 and genQueryOut.getContinueInx() > 0:
+                genQueryInp.setContinueInx(genQueryOut.getContinueInx())
+            else :
+                break
+
+        return res
 
 
     #--------------------
@@ -290,6 +468,7 @@ class IrodsClient ( object ) :
     
         myColl, myData, status = irods.splitPathByKey(srcPath, '/')
         if status < 0: return None
+        print myColl, myData
 
         condStr = "='%s'" % myColl.encode('utf-8')
         genQueryInp.getSqlCondInp().addInxVal(irods.COL_COLL_NAME, condStr)
@@ -300,6 +479,30 @@ class IrodsClient ( object ) :
         if status < 0: return None
 
         res = [ self._objectEntry(x) for x in self._qo2oe(genQueryOut) ]
+        return res
+
+    def _coll (self, conn, srcPath):
+        """ return collection info """
+
+        genQueryInp = irods.genQueryInp_t()
+        
+        i1 = irods.inxIvalPair_t()
+        i1.addInxIval(irods.COL_COLL_NAME, 0)
+        genQueryInp.setSelectInp(i1)
+    
+        condStr = "='%s'" % srcPath.encode('utf-8')
+        genQueryInp.getSqlCondInp().addInxVal(irods.COL_COLL_NAME, condStr)
+        
+        genQueryInp.setMaxRows(10)
+        genQueryInp.setContinueInx(0)
+
+        genQueryOut, status = irods.rcGenQuery(conn, genQueryInp)
+        if status < 0: return None
+
+        res = []
+        for collName in _getSqlResultByInx(genQueryOut, irods.COL_COLL_NAME) or []:
+            res.append(dict(type="collection", name=collName))
+
         return res
 
     def _qo2oe(self, genQueryOut):

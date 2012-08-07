@@ -53,8 +53,14 @@ class _RemoveForm(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
     if_key_missing = None
-    replica = formencode.validators.Int(not_empty=True)
     unregister = formencode.validators.Bool(if_empty=False)
+
+class _ReplicateForm(formencode.Schema):
+    allow_extra_fields = True
+    filter_extra_fields = True
+    if_key_missing = None
+    src_resource = formencode.validators.String(if_empty=None)
+    dst_resource = formencode.validators.String(not_empty=True)
 
 #------------------------
 # Exported definitions --
@@ -105,16 +111,50 @@ class FilesController(BaseController):
                     name = name.lstrip('/')
                     url = h.url_for( action='show', path=name, qualified=True )
                     r['url'] = url
+                    replica_url = h.url_for(action='replica_show', path=name, replica_num=r['replica'], qualified=True)
+                    r['replica_url'] = replica_url
                     
             return res
 
     @h.catch_all
     @jsonify
-    def remove(self, path):
+    def replica_show(self, path, replica_num):
         """
-        DELETE /files/*path: Remove specified object from irods.
-        Takes path of the object (not collection).
-        Currently requires parameter "replica" which must be non-negative number.
+        GET /replica/*path/{replica_num}: Show full info for specific replica of a file.
+        Takes path of the object and replica number.
+        """
+                
+        # see if user can have an access
+        h.checkAccess(path)
+
+        model = IrodsModel()
+        res = model.fileInfo('/'+path)
+
+        if res is None :
+            abort(404, "Object does not exist: "+str(path))
+        else :
+            
+            replica = int(replica_num)
+            res = [r for r in res if r.get('replica') == replica]
+            if not res: abort(404, "Replica does not exist: "+str(path)+":"+str(replica))
+            
+            # add URI for each file or collection
+            r = res[0]
+            name = r['collName']+'/'+r['name']
+            name = name.lstrip('/')
+            url = h.url_for(action='show', path=name, replica_num=None, qualified=True)
+            r['url'] = url
+            replica_url = h.url_for(action='replica_show', path=name, replica_num=replica_num, qualified=True)
+            r['replica_url'] = replica_url
+                    
+            return r
+
+    @h.catch_all
+    @jsonify
+    def replica_delete(self, path, replica_num):
+        """
+        DELETE /replica/*path/{replica_num}: Remove specified object from irods.
+        Takes path of the object (not collection) and replica number.
         Optionally accepts parameter "unregister", if present then files will
         not be removed from resources, only unregistered.
         """
@@ -127,18 +167,47 @@ class FilesController(BaseController):
         try:
             form_result = schema.to_python(dict(request.params))
         except formencode.Invalid, error:
-            abort( 400, str(error) )
-
-        # replica number must be non-negative
-        replica = form_result['replica']
-        if replica < 0: abort( 400, "Replica number must be non-negative" )
-
+            abort(400, str(error))
         unregister = form_result['unregister']
+
+        # replica number, integer
+        replica = int(replica_num)
 
         model = IrodsModel()
         model.removeObj('/'+path, replica, unregister)
 
-        return []
+        return dict(path='/'+path, replica=replica)
+
+    @h.catch_all
+    @jsonify
+    def replicate(self, path):
+        """
+        POST /files/*path: Make new replicate of specified object.
+        Takes path of the object (not collection).
+        Currently requires parameter "dst_resource" which must be a name of 
+        destination resource.
+        Optionally accepts parameter "src_resource" which is a name of the 
+        source resource.
+        """
+
+        # see if user can have an access
+        h.checkAccess(path)
+
+        # validate parameters
+        schema = _ReplicateForm()
+        try:
+            form_result = schema.to_python(dict(request.params))
+        except formencode.Invalid, error:
+            abort(400, str(error))
+
+        # replica number must be non-negative
+        src_resource = form_result['src_resource']
+        dst_resource = form_result['dst_resource']
+
+        model = IrodsModel()
+        model.replicate('/'+path, dst_resource, src_resource)
+
+        return dict(path='/'+path, dst_resource=dst_resource, src_resource=src_resource)
 
     def environ(self):
         """

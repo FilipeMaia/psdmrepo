@@ -44,9 +44,22 @@ def make_map():
     
     # GET /files/...
     # list the files
-    map.connect('/files', controller='files', action='show', conditions=cond_get )
-    map.connect('/files/*path', controller='files', action='show', conditions=cond_get )
-    map.connect('/files/*path', controller='files', action='remove', conditions=cond_delete )
+    map.connect('/files', controller='files', action='show', conditions=cond_get)
+    map.connect('/files/*path', controller='files', action='show', conditions=cond_get)
+
+    # POST /files/*path
+    # make new replica of a file
+    map.connect('/files/*path', controller='files', action='replicate', conditions=cond_post)
+    
+    # GET /replica/*path/{replica_num}
+    # get replica information
+    map.connect('/replica/*path/{replica_num}', controller='files', action='replica_show', conditions=cond_get,
+                requirements=dict(replica_num=r"\d+"))
+
+    # DELETE /replica/*path/{replica_num}
+    # delete specified replica
+    map.connect('/replica/*path/{replica_num}', controller='files', action='replica_delete', conditions=cond_delete,
+                requirements=dict(replica_num=r"\d+"))
 
     ###### runs controller
     
@@ -58,7 +71,12 @@ def make_map():
     # list the files
     map.connect('/runs/{instrument}/{experiment}/{type}/{runs}', controller='runs', action='show', conditions=cond_get )
 
-        
+    ###### queue controller
+
+    # GET /queue
+    # list the queued or executing rules
+    map.connect('/queue', controller='queue', action='index', conditions=cond_get)
+
 
     # default actions
 
