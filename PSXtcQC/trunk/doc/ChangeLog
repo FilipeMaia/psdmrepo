@@ -12,7 +12,7 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
-Tag: V00-00-03
+Tag: V00-00-04
 2012-08-06 Andy
 - add missing include to build on RHEL6/gcc44
 
