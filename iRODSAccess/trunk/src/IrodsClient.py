@@ -468,7 +468,6 @@ class IrodsClient ( object ) :
     
         myColl, myData, status = irods.splitPathByKey(srcPath, '/')
         if status < 0: return None
-        print myColl, myData
 
         condStr = "='%s'" % myColl.encode('utf-8')
         genQueryInp.getSqlCondInp().addInxVal(irods.COL_COLL_NAME, condStr)

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2012-08-07 Andy Salnikov
+- forgot to remove print statement
+
 Tag: V00-00-15
 2012-08-07 Andy Salnikov
 - IrodsClient has new methods fileInfo(), queue(), replicate()
