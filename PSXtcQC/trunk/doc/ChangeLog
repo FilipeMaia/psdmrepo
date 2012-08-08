@@ -12,6 +12,16 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-05
+2012-08-08 Mikhail S. Dubrovin
+- Move PSXtcQC/test/dgreader.cpp PSXtcQC/app/xtcqc.cpp
+D       test/dgreader.cpp
+A       app
+A       app/xtcqc.cpp
+M       doc/ChangeLog
+	
+=======
+
 Tag: V00-00-04
 2012-08-06 Andy
 - add missing include to build on RHEL6/gcc44
