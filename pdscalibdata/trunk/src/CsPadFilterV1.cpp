@@ -127,4 +127,35 @@ CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData) const
 
 }
 
+bool
+CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData, const ndarray<uint16_t, 3>& pixelStatus) const
+{
+  if (m_mode == None) return true;
+
+  if (pixelData.size() != pixelStatus.size()) {
+    MsgLog(logger, debug, "CsPadFilterV1::filter - pixel data array and pixel status array have different sizes");
+    return false;
+  }
+
+  // calculate number of pixels exceeding m_data[0] threshold,
+  // only take pixels with good status (=0)
+  unsigned count = 0;
+  int threshold = int(m_data[0]);
+  typedef ndarray<int16_t, 3>::const_iterator Iter;
+  ndarray<uint16_t, 3>::const_iterator stat_iter = pixelStatus.begin();
+  for (Iter data_iter = pixelData.begin(); data_iter != pixelData.end(); ++ data_iter, ++ stat_iter) {
+    if (*stat_iter == 0 and *data_iter > threshold) ++ count;
+  }
+
+  MsgLog(logger, debug, "CsPadFilterV1::filter - " << count << " pixels above " << m_data[0]);
+
+  if (m_data[1] < 0) {
+    // m_data[0] is a percentage
+    return count > -m_data[1]/100*pixelData.size();
+  } else {
+    // m_data[0] is absolute pixel count
+    return count > m_data[1];
+  }
+}
+
 } // namespace pdscalibdata
