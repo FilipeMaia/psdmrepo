@@ -173,6 +173,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   H5DataTypes::CsPadElementV2 elems[nQuad] ;
   int16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
   float commonMode[nSect];
+  const uint16_t* pixStatus[nSect];
 
   // quadrants may come unordered in XTC container, while clients
   // prefer them to be ordered, do ordering here
@@ -220,9 +221,9 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       commonMode[sect] = pdscalibdata::CsPadCommonModeSubV1::UnknownCM;
 
       // status codes for pixels
-      const uint16_t* pixStatus = 0;
+      pixStatus[sect] = 0;
       if (pixStatusCalib.get()) {
-        pixStatus = &pixStatusCalib->status()[q][is][0][0];
+        pixStatus[sect] = &pixStatusCalib->status()[q][is][0][0];
       }
 
       // this sector's pedestal data
@@ -235,7 +236,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       float cmode = 0;
       if (cModeCalib.get()) {
         MsgLog(logger, debug, "calculating common mode for q=" << q << " s=" << is);
-        cmode = cModeCalib->findCommonMode(sdata, peddata, pixStatus, ssize);
+        cmode = cModeCalib->findCommonMode(sdata, peddata, pixStatus[sect], ssize);
         if (cmode == pdscalibdata::CsPadCommonModeSubV1::UnknownCM) {
           // reset subtracted value
           cmode = 0;
@@ -268,8 +269,21 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // may not need it
   bool filter = true;
   if (filterCalib.get()) {
+
+    // wrap data into ndarray
     ndarray<int16_t, 3> pixArr = make_ndarray(&pixelData[0][0][0], nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2);
-    filter = filterCalib->filter(pixArr);
+
+    if (pixStatusCalib) {
+      // copy pixel status to an array
+      uint16_t pixelStatusArray[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+      for (unsigned sect = 0; sect != nSect; ++ sect) {
+        std::copy(pixStatus[sect], pixStatus[sect]+ssize, &pixelStatusArray[sect][0][0]);
+      }
+      ndarray<uint16_t, 3> statArr = make_ndarray(&pixelStatusArray[0][0][0], nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2);
+      filter = filterCalib->filter(pixArr, statArr);
+    } else {
+      filter = filterCalib->filter(pixArr);
+    }
   }
   if (not filter) {
     MsgLog(logger, debug, "skipping CsPad data");

@@ -198,7 +198,11 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   bool filter = true;
   if (filterCalib.get()) {
     ndarray<int16_t, 3> pixArr = make_ndarray(&pixelData[0][0][0], Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2, nSect);
-    filter = filterCalib->filter(pixArr);
+    if (pixStatusCalib) {
+      filter = filterCalib->filter(pixArr, pixStatusCalib->status());
+    } else {
+      filter = filterCalib->filter(pixArr);
+    }
   }
   if (not filter) {
     MsgLog(logger, debug, "skipping CsPad data");
