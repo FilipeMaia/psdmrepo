@@ -759,14 +759,14 @@ HERE;
     <div style="float:left;">
       <div style="font-weight:bold;">Search runs:</div>
       <div style="margin-top:5px;">
-        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211"></input>
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211. Then press RETURN to activate search."></input>
       </div>
     </div>
     <div style="float:left; margin-left:20px;">
       <div style="font-weight:bold;">Types:</div>
       <div style="margin-top:5px;">
         <select name="types" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option>any</option>
+          <option></option>
           <option>XTC</option>
           <option>HDF5</option>
         </select>
@@ -776,7 +776,7 @@ HERE;
       <div style="font-weight:bold;">Created:</div>
       <div style="margin-top:5px;">
         <select name="created" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option>any</option>
+          <option></option>
           <option>1 hr</option>
           <option>12 hrs</option>
           <option>24 hrs</option>
@@ -790,17 +790,17 @@ HERE;
       <div style="font-weight:bold;">Checksum:</div>
       <div style="margin-top:5px;">
         <select name="checksum" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option>any</option>
+          <option></option>
           <option>none</option>
           <option>is known</option>
         </select>
       </div>
     </div>
     <div style="float:left; margin-left:20px;">
-      <div style="font-weight:bold;">Archived:</div>
+      <div style="font-weight:bold;">On tape:</div>
       <div style="margin-top:5px;">
         <select name="archived" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option>any</option>
+          <option></option>
           <option>yes</option>
           <option>no</option>
         </select>
@@ -810,55 +810,70 @@ HERE;
       <div style="font-weight:bold;">On disk:</div>
       <div style="margin-top:5px;">
         <select name="local" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option>any</option>
-          <option>yes</option>
+          <option></option>
+          <option>90 DAYS</option>
+          <option>2 YEARS</option>
           <option>no</option>
         </select>
       </div>
     </div>
     <div style="clear:both;"></div>
   </div>
-  <div style="float:right; margin-left:5px;"><button id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="float:left; margin-left:20px;">
+    <div style="font-weight:bold;">&nbsp;</div>
+    <div style="margin-top:5px;">
+      <button id="datafiles-files-reset" title="click to reset the file search form">Reset Form</button>
+    </div>
+  </div>
+  <div style="float:right; margin-left:5px; margin-right:10px;">
+    <div style="font-weight:bold;">&nbsp;</div>
+    <div style="margin-top:5px;">
+      <button id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button>
+    </div>
+  </div>
   <div style="clear:both;"></div>
 </div>
 <div id="datafiles-files-wa">
-  <div class="datafiles-info" id="datafiles-files-info" style="float:left;">&nbsp;</div>
+  <div class="datafiles-info" id="datafiles-files-info"    style="float:left;" >&nbsp;</div>
   <div class="datafiles-info" id="datafiles-files-updated" style="float:right;">&nbsp;</div>
   <div style="clear:both;"></div>
-  <div style="margin-top:10px;" >
-    <table style="font-size:80%;"><tbody>
+  <div id="datafiles-files-table-ctrl">
+
+    <select name="page_size" style="margin-left:10px; padding:1px;">
+      <option>auto-page-size</option>
+      <option>1</option>
+      <option>5</option>
+      <option>10</option>
+      <option>50</option>
+    </select>
+
+    <button id="datafiles-files-reverse">Show in Reverse Order</button>
+
+    <table style="margin:5px; font-size:80%;"><tbody>
       <tr>
-        <td style="font-size:120%;"><b>Sort by:</b></td>
-        <td>
-          <select name="sort" style="padding:1px;">
-            <option>run</option>
-            <option>name</option>
-            <option>type</option>
-            <option>size</option>
-            <option>created</option>
-            <option>archived</option>
-            <option>disk</option>
-            <option>migration</option>
-          </select>
-        </td>
-        <td><div style="font-size:120%; padding-left:10px;"><button id="datafiles-files-reverse">Show in Reverse Order</button></div></td>
-        <td style="font-size:120%; padding-left: 20px;"><b>Columns:</b></td>
-        <td><input type="checkbox" name="type" /></td><td>Type</td>
-        <td><input type="checkbox" name="size" /></td><td>Size</td>
-        <td><input type="checkbox" name="created" /></td><td>Created</td>
+        <td><input type="checkbox" name="type"     /></td><td>Type</td>
+        <td><input type="checkbox" name="size"     /></td><td>Size</td>
+        <td><input type="checkbox" name="created"  /></td><td>Created</td>
         <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
-      </tr><tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td><input type="checkbox" name="archived" /></td><td>Archived</td>
-        <td><input type="checkbox" name="local" /></td><td>On disk</td>
-        <td><input type="checkbox" name="migration" /></td><td colspan=3>Begin Migration Delay</td>
-      </tr>
-    </tbody></table>
+        <td><input type="checkbox" name="archived" /></td><td>On tape</td>
+        <td><input type="checkbox" name="storage"  /></td><td>Storage info</td>
+        <td><input type="checkbox" name="migration"/></td><td>DAQ-to-OFFLINE Migration info</td>
+        <td><select name="format" style="padding:1px;">
+              <option>auto-format-file-size</option>
+              <option>Bytes</option>
+              <option>KBytes</option>
+              <option>MBytes</option>
+              <option>GBytes</option>
+              <option>created</option>
+            </select></td>
+       </tr>
+     </tbody></table>
   </div>
-  <div id="datafiles-files-list" style="margin-top:5px;"></div>
+  <div id="datafiles-files-pages">
+    <div id="header"></div>
+    <div id="summary"></div>
+  </div>
+  <div id="datafiles-files-list"></div>
 </div>
 HERE;
 
@@ -1486,7 +1501,38 @@ function printer_friendly() {
 	}	
 }
 
+function ask_yes_no( title, msg, on_yes, on_cancel ) {
+	$('#popupdialogs').html(
+		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+	 );
+	$('#popupdialogs').dialog({
+		resizable: false,
+		modal: true,
+		buttons: {
+			"Yes": function() {
+				$( this ).dialog('close');
+				if(on_yes) on_yes();
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+				if(on_cancel) on_cancel();
+			}
+		},
+		title: title
+	});
+}
 
+function report_error(msg) {
+    $('#popupdialogs').html( '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>' );
+    $('#popupdialogs').dialog({
+        resizable: true,
+        modal: true,
+        buttons: {
+            'Ok': function() { $(this).dialog('close'); }
+        },
+        title: 'Error'
+    });
+};
 
 /* ------------------------------------------------------
  *             APPLICATION INITIALIZATION

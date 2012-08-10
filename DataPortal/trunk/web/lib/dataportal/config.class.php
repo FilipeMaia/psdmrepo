@@ -126,7 +126,8 @@ To unsubscribe from this service, please use the Data Migration Monitor app:
   {$url}
 
 HERE
-       		);
+                ,'LCLS Data Migration Monitor'
+            );
         else
         	$this->do_notify(
         		$address,
@@ -147,6 +148,7 @@ To subscribe back to this service, please use the Data Migration Monitor app:
   {$url}
 
 HERE
+                ,'LCLS Data Migration Monitor'
 			);
     }
 
@@ -202,13 +204,178 @@ HERE
         return $list;
     }
 
-    public function do_notify( $address, $subject, $body ) {
+    /* Add a persistent record for a file restore request which is passed as
+     * a dictionary of:
+     * 
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_src_resource'
+     *   'irods_dst_resource'
+     * 
+     * The methood will return an extended object as explain in the corresponding
+     * find_* method:
+     * 
+     * @see Config::find_file_restore_request
+     */
+    public function add_file_restore_request ( $request ) {
+
+    	$this->connect();
+
+        $exper_id           = intval($request['exper_id']);
+        $runnum             = intval($request['runnum']);
+        $file_type          = $this->escape_string( trim( $request['file_type'] ));
+        $irods_filepath     = $this->escape_string( trim( $request['irods_filepath'] ));
+        $irods_src_resource = $this->escape_string( trim( $request['irods_src_resource'] ));
+        $irods_dst_resource = $this->escape_string( trim( $request['irods_dst_resource'] ));
+    	$requested_time     = LusiTime::now();
+    	$requested_uid      = $this->escape_string( trim( AuthDB::instance()->authName()));
+
+        $sql = "INSERT INTO file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}')";
+    	$this->query($sql);
+        
+        return find_file_restore_request( $request );
+    }
+
+    /* Find a persistent record for a file restore request which is passed as
+     * a dictionary of:
+     * 
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_src_resource'
+     *   'irods_dst_resource'
+     * 
+     * If such request found then return an extended dictionary:
+     *
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_src_resource'
+     *   'irods_dst_resource'
+     *   'requested_time'
+     *   'requested_uid'
+     *
+     * Otherwise return null.
+     */
+    public function find_file_restore_request( $request ) {
+    	$this->connect();
+
+        $exper_id           = intval($request['exper_id']);
+        $runnum             = intval($request['runnum']);
+        $file_type          = $this->escape_string( trim( $request['file_type'] ));
+        $irods_filepath     = $this->escape_string( trim( $request['irods_filepath'] ));
+        $irods_src_resource = $this->escape_string( trim( $request['irods_src_resource'] ));
+        $irods_dst_resource = $this->escape_string( trim( $request['irods_dst_resource'] ));
+
+        $sql = "SELECT * FROM file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+    	$result = $this->query($sql);
+       	$nrows = mysql_numrows( $result );
+    	if( !$nrows ) return null;
+    	if( $nrows != 1 )
+			throw new DataPortalException (
+				__METHOD__,
+				"duplicate entries for query {$sql}). Database can be corrupted." );
+		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+       	$request['requested_time'] = LusiTime::from64($row['requested_time']);
+       	$request['requested_uid' ] = trim(            $row['requested_uid' ]);
+
+        return $request;
+    }
+
+    /* Register a file in the MEDIUM_TERM storage with parameters found in
+     * a dictionary of:
+     * 
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_resource'
+     *   'irods_size'
+     * 
+     * The methood will return an extended object as explain in the corresponding
+     * find_* method:
+     * 
+     * @see Config::find_medium_store_file
+     */
+    public function add_medium_store_file ( $request ) {
+
+    	$this->connect();
+
+        $exper_id        = intval($request['exper_id']);
+        $runnum          = intval($request['runnum']);
+        $file_type       = $this->escape_string( trim( $request['file_type'] ));
+        $irods_filepath  = $this->escape_string( trim( $request['irods_filepath'] ));
+        $irods_resource  = $this->escape_string( trim( $request['irods_resource'] ));
+        $irods_size      = intval($request['irods_size']);
+    	$registered_time = LusiTime::now();
+    	$registered_uid  = $this->escape_string( trim( AuthDB::instance()->authName()));
+
+        $sql = "INSERT INTO medium_term_storage VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_resource}',{$irods_size},{$registered_time->to64()},'{$registered_uid}')";
+    	$this->query($sql);
+        
+        return $this->find_medium_store_file($request);
+    }
+
+    /* Find a file entry in the MEDIUM_TERM storage using a request which is passed as
+     * a dictionary of:
+     * 
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_resource'
+     * 
+     * If such request found then return an extended dictionary:
+     *
+     *   'exper_id'
+     *   'runnum'
+     *   'file_type'
+     *   'irods_filepath'
+     *   'irods_resource'
+     *   'irods_size'
+     *   'registered_time'
+     *   'registered_uid'
+     *
+     * Otherwise return null.
+     */
+    public function find_medium_store_file( $request ) {
+    	$this->connect();
+
+        $exper_id       = intval($request['exper_id']);
+        $runnum         = intval($request['runnum']);
+        $file_type      = $this->escape_string( trim( $request['file_type'] ));
+        $irods_filepat  = $this->escape_string( trim( $request['irods_filepath'] ));
+        $irods_resource = $this->escape_string( trim( $request['irods_resource'] ));
+
+        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+    	$result = $this->query($sql);
+       	$nrows = mysql_numrows( $result );
+    	if( !$nrows ) return null;
+    	if( $nrows != 1 )
+			throw new DataPortalException (
+				__METHOD__,
+				"duplicate entries for query {$sql}). Database can be corrupted." );
+		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+       	$request['irods_size'     ] = intval          ($row['irods_size'     ]);
+        $request['registered_time'] = LusiTime::from64($row['registered_time']);
+       	$request['registered_uid' ] = trim            ($row['registered_uid' ]);
+
+        return $request;
+    }
+
+    public function do_notify( $address, $subject, $body, $application ) {
         $tmpfname = tempnam("/tmp", "webportal");
         $handle = fopen( $tmpfname, "w" );
         fwrite( $handle, $body );
         fclose( $handle );
 
-        shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F 'LCLS Data Migration Monitor'" );
+        shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F '{$application}'" );
 
         // Delete the file only after piping its contents to the mailer command.
         // Otherwise its contents will be lost before we use it.

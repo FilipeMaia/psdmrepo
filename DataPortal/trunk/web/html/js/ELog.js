@@ -90,17 +90,6 @@ function elog_create() {
 			this.post_reset();
 		}
 	};
-    this.report_error = function(msg) {
-        $('#popupdialogs').html( '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>' );
-        $('#popupdialogs').dialog({
-        	resizable: false,
-        	modal: true,
-        	buttons: {
-        		'Ok': function() { $(this).dialog('close'); }
-        	},
-        	title: 'Error'
-        });
-    };
 
 	/* ----------------------------------------------
 	 *  Initialize the form for posting new messages
@@ -190,7 +179,7 @@ function elog_create() {
 			// an empty message.
 			//
 			if( $('#elog-form-post textarea[name="message_text"]').val() == '' ) {
-				that.report_error('Can not post the empty message. Please put some text into the message box.');
+				report_error('Can not post the empty message. Please put some text into the message box.');
 				return;
 			}
 
@@ -221,7 +210,7 @@ function elog_create() {
 			 */
 			$('#elog-form-post').ajaxSubmit({
 				success: function(data) {
-					if( data.Status != 'success' ) { that.report_error(data.Message); return; }
+					if( data.Status != 'success' ) { report_error(data.Message); return; }
 					that.post_reset();
 
 					// If the parent provided a call back then tell the parent
@@ -229,7 +218,7 @@ function elog_create() {
 					//
 					if( that.post_onsuccess != null ) that.post_onsuccess();
 				},
-				error: function() {	that.report_error('The request can not go through due a failure to contact the server.'); },
+				error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
 				dataType: 'json'
 			});
 		});
@@ -493,7 +482,7 @@ function elog_create() {
 				for(var i=0; i < authors.length; i++) authors_html += '<option>'+authors[i]+'</option>';
 				$('#elog-form-search select[name="author"]').html(authors_html);
 			},
-			'JSON').error(function () {	that.report_error( 'failed because of: '+jqXHR.statusText ); });
+			'JSON').error(function () {	report_error( 'failed because of: '+jqXHR.statusText ); });
 		});
 		$('#elog-form-search').find('input[name="runs"]').keyup(function(e) { if( e.keyCode == 13 ) that.search(); });
 	};
@@ -675,7 +664,7 @@ function elog_create() {
 			$('#el-sh-info').html('<b>'+that.shifts_last_request.length+'</b> shifts');
 			$('#el-sh-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
+		'JSON').error(function () { report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.shifts_init = function() {
 		$('#el-sh-refresh').button().click(function() { that.update_shifts(); });
@@ -798,7 +787,7 @@ function elog_create() {
 			$('#el-r-info').html('<b>'+that.runs_last_request.length+'</b> runs');
 			$('#el-r-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
+		'JSON').error(function () { report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.runs_init = function() {
 		$('#el-r-refresh').button().click(function() { that.update_runs(); });
@@ -1119,7 +1108,7 @@ function elog_create() {
 			$('#el-at-info').html('<b>'+num_attachments+'</b> attachments');
 			$('#el-at-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
+		'JSON').error(function () { report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.attachments_init = function() {
 		$('#el-at-refresh').button().click(function() { that.update_attachments(); });
@@ -1149,7 +1138,7 @@ function elog_create() {
 		if( id != null ) params.id = id;
 		var jqXHR = $.get('../logbook/CheckSubscription.php',params,function(data) {
 			var result = eval(data);
-			if(result.Status != 'success') { that.report_error( result.Message ); return; }
+			if(result.Status != 'success') { report_error( result.Message ); return; }
 			$('#el-subscribed'  ).css('display', result.Subscribed ? 'block' : 'none' );
 			$('#el-unsubscribed').css('display', result.Subscribed ? 'none'  : 'block');
 			var html = '';
@@ -1182,7 +1171,7 @@ html+
 				that.subscription('UNSUBSCRIBE', $(this).val());
 			});
 		},
-		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
+		'JSON').error(function () { report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.subscribe_init = function() {
 		$('#el-subscribe'  ).button().click(function() { that.subscription('SUBSCRIBE',   null); });

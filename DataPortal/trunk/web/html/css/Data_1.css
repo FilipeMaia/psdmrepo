@@ -6,9 +6,6 @@
   padding: 10px 10px 10px 10px;
   background-color:#f0f0f0;
 }
-#datafiles-files-table-ctrl {
-  margin-top:10px;
-}
 #datafiles-summary-wa,
 #datafiles-files-wa {
   width: inherit;
@@ -24,26 +21,24 @@
   background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
 }
 
-#datafiles-files-pages #header {
-  margin-top:10px;
+#datafiles-files-pages {
+
+  /*
+  margin-top:20px;
+  */
   padding:3px;
-  padding-top:6px;
-  background-color:#d0d0d0;
+
+  background-color: #c0c0c0;
+  border: 1px solid #b0b0b0;
+  border-bottom: 1px solid #000000;
+
   border-radius:5px;
   border-bottom-left-radius:0px;
   border-bottom-right-radius:0px;
-  -moz-border-radius:5px;
+
+  -moz-border-radius: 5px;
   -moz-border-radius-bottomleft: 0;
   -moz-border-radius-bottomright: 0;
-}
-#datafiles-files-pages #summary {
-  padding:3px;
-  padding-top:6px;
-  padding-bottom:6px;
-  background-color:#f0f0f0;
-  border:1px solid #CFCF73;
-  border-top:0;
-  border-bottom:1px solid #000000;
 }
 
 .datafiles-table-hdr {
@@ -100,12 +95,6 @@ div.df-r-highlighted {
   color: red;
 }
 
-div.df-r-min-run {
-  margin-left: 20px;
-  width: 30px;
-  text-align: right;
-  font-weight: bold;
-}
 div.df-r-separator {
   margin-left: 5px;
   margin-right: 5px;
@@ -113,62 +102,63 @@ div.df-r-separator {
   text-align: center;
   font-weight: bold;
 }
+
+div.df-r-min-run {
+  margin-left: 20px;
+  width: 30px;
+  text-align: right;
+  font-weight: bold;
+}
+
 div.df-r-max-run {
   margin-left: 0px;
-  width: 75px;
+  width: 30px;
   text-align: left;
   font-weight: bold;
 }
 
-div.df-r-total-files {
+div.df-r-overstay {
+  margin-left: 25px;
   width: 30px;
-  text-align: right;
 }
-div.df-r-total-size {
-  width: 70px;
+
+div.df-r-size {
+  margin-left: 70px;
+  width: 30px;
   text-align: right;
 }
 
-div.df-r-tape-files {
-  margin-left: 60px;
+div.df-r-files {
+  margin-left: 25px;
   width: 30px;
-  text-align: right;
-}
-div.df-r-tape-size {
-  margin-left: 0px;
-  width: 70px;
   text-align: right;
 }
 
-div.df-r-raw-files {
-  margin-left: 60px;
-  width: 30px;
+div.df-r-archived {
+  margin-left: 18px;
+  width: 45px;
   text-align: right;
-}
-div.df-r-raw-size {
-  margin-left: 0px;
-  width: 70px;
-  text-align: right;
-}
-div.df-r-raw-overstay {
-  margin-left: 5px;
-  width: 20px;
 }
 
-div.df-r-medium-files {
-  margin-left: 35px;
+div.df-r-local {
+  margin-left: 20px;
   width: 30px;
   text-align: right;
 }
-div.df-r-medium-size {
-  margin-left: 0px;
-  width: 70px;
+
+
+div.df-r-size1 {
+  margin-left: 170px;
+  width: 30px;
   text-align: right;
 }
-div.df-r-medium-overstay {
-  margin-left: 5px;
-  width: 20px;
+
+div.df-r-files1 {
+  margin-left: 25px;
+  width: 30px;
+  text-align: right;
 }
+
 
 div.df-r-hdn {
   display: none;
