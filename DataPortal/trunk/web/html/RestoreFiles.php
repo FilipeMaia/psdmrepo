@@ -28,7 +28,7 @@ use FileMgr\FileMgrException;
 use DataPortal\Config;
 use DataPortal\DataPortalException;
 
-function report_success() {
+function report_success($result) {
     
     $updated_str = json_encode( LusiTime::now()->toStringShort());
     
@@ -36,19 +36,27 @@ function report_success() {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
     
-    print json_encode( array( 'status' => 'success', 'updated' => $updated_str ));
-
+    print json_encode(
+        array_merge(
+            array( 'status' => 'success', 'updated' => $updated_str ),
+            $result
+        )
+    );
     exit;
 }
 
-function report_error($msg) {
+function report_error( $msg, $result=array()) {
     
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    print json_encode( array( 'status' => 'error', 'message' => $msg ));
-
+    print json_encode(
+        array_merge(
+            array( 'status' => 'error', 'message' => $msg  ),
+            $result
+        )
+    );
     exit;
 }
 
@@ -86,7 +94,10 @@ try {
     if( is_null($experiment)) report_error("No such experiment");
 
     $run = $experiment->find_run_by_num($runnum);
-    if( is_null($run)) report_error("No such run in the experiment");
+    if( is_null($run))
+        report_error(
+            "No such run in the experiment",
+            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
 
     $runs2files = array();
 
@@ -102,7 +113,10 @@ try {
         $type,
         $runnum.'-'.$runnum );
 
-    if( is_null($runs )) report_error('server encountered an internal error when trying to get a list of files for the run');
+    if( is_null($runs ))
+        report_error(
+            'server encountered an internal error when trying to get a list of files for the run',
+            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
 
     $files = array();
     foreach( $runs as $run ) {
@@ -143,8 +157,14 @@ try {
         $http_code = intval($responseInfo['http_code']);
         switch($http_code) {
             case 200: break;
-            case 404: report_error("file '{$file->name}' doesn't exist");
-            default:  report_error("failed to restore file '{$file->name}' because of HTTP error {$http_code}");
+            case 404:
+                report_error(
+                    "file '{$file->name}' doesn't exist",
+                    array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+            default:
+                report_error(
+                    "failed to restore file '{$file->name}' because of HTTP error {$http_code}",
+                    array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
         }
         $config->add_file_restore_request(
             array(
@@ -157,10 +177,15 @@ try {
             )
         );
     }
+
+    // Calculated medium term quota usage for the experiment
+    //
+    $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
+
     $logbook->commit();
     $config->commit();
 
-    report_success();
+    report_success( array( 'medium_quota_used_gb' => $medium_quota_used_gb ));
 
 } catch( LogBookException    $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   catch( LusiTimeException   $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }

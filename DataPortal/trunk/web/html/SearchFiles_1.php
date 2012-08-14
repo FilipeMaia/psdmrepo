@@ -1,16 +1,8 @@
 <?php
 
-require_once( 'dataportal/dataportal.inc.php' );
-require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
-require_once( 'regdb/regdb.inc.php' );
-
-use DataPortal\Config;
-use DataPortal\DataPortalException;
-
-use FileMgr\FileMgrIrodsWs;
-use FileMgr\FileMgrException;
+require_once( 'filemgr/filemgr.inc.php' );
+require_once( 'dataportal/dataportal.inc.php' );
 
 use LogBook\LogBook;
 use LogBook\LogBookException;
@@ -18,14 +10,17 @@ use LogBook\LogBookException;
 use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
-use RegDB\RegDB;
-use RegDB\RegDBException;
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
+
+use DataPortal\Config;
+use DataPortal\DataPortalException;
 
 define( 'KB', 1024.0 );
 define( 'MB', 1024.0 * 1024.0 );
 define( 'GB', 1024.0 * 1024.0 * 1024.0 );
 
-define( 'SECONDS_IN_MONTH', 31 * 24 * 3600 );
+define( 'SECONDS_IN_3_MONTHS', 3 * 31 * 24 * 3600 );
 
 header( 'Content-type: application/json' );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -172,30 +167,17 @@ function add_files(&$files, $infiles, $type, $file2run, $checksum, $archived, $l
     }
 }
 
-define('SHORT_TERM_RETENTION_DEFAULT',   3);
-define('MEDIUM_TERM_RETENTION_DEFAULT', 24);
-
 $allowed_stay4storage_defaults = array (
-    'SHORT-TERM'  =>   SHORT_TERM_RETENTION_DEFAULT * SECONDS_IN_MONTH,
-    'MEDIUM-TERM' =>  MEDIUM_TERM_RETENTION_DEFAULT * SECONDS_IN_MONTH
+    'SHORT-TERM'  =>          SECONDS_IN_3_MONTHS,
+    'MEDIUM-TERM' =>  1 * 4 * SECONDS_IN_3_MONTHS       // 1 year for the testing purposes
 );
-function allowed_stay( $expire_ctime, $sec ) {
-    $expire_time = new LusiTime( $expire_ctime, 0 );
-    $expire_day_str = $expire_time->toStringDay();
-    if( $sec < 3600 )
-        return array (
-            'expiration'   => "<span style=\"color:red\">{$expire_day_str}</span>",
-            'allowed_stay' => "<span style=\"color:red\">expired</span>"
-        );
-    if( $sec < 7 * 24 * 3600 )
-        return array (
-            'expiration'   => $expire_day_str,
-            'allowed_stay' => intval( $sec / ( 24 * 3600 ))." days"
-        );
-    return array (
-        'expiration'   => $expire_day_str,
-        'allowed_stay' => intval( $sec / ( 7 * 24 * 3600 ))." weeks"
-    );
+function allowed_stay( $sec ) {
+    if( $sec <                3600 ) return '<span style="color:red">OVERSTAY</span>';
+    if( $sec <           24 * 3600 ) return intval( $sec / (                3600 ))."h";
+    if( $sec <       7 * 24 * 3600 ) return intval( $sec / (           24 * 3600 ))."d";
+    if( $sec <      31 * 24 * 3600 ) return intval( $sec / (       7 * 24 * 3600 ))."w ".intval(( $sec % (       7 * 24 * 3600 )) / (      24 * 3600 ))."d";
+    if( $sec < 12 * 31 * 24 * 3600 ) return intval( $sec / (      31 * 24 * 3600 ))."m ".intval(( $sec % (      31 * 24 * 3600 )) / (  7 * 24 * 3600 ))."w";
+    return                                  intval( $sec / ( 12 * 31 * 24 * 3600 ))."y ".intval(( $sec % ( 12 * 31 * 24 * 3600 )) / ( 31 * 24 * 3600 ))."m";
 }
 
 /*
@@ -204,9 +186,6 @@ function allowed_stay( $expire_ctime, $sec ) {
 try {
 
     $now = LusiTime::now();
-
-	$regdb = RegDB::instance();
-	$regdb->begin();
 
     $logbook = new LogBook();
     $logbook->begin();
@@ -217,33 +196,6 @@ try {
     $experiment = $logbook->find_experiment_by_id( $exper_id ) or report_error("No such experiment");
     $instrument = $experiment->instrument();
 
-    // Get experiment-specific ovverides and apply them (if any found)
-    //
-    $short_quota_ctime       = $experiment->regdb_experiment()->find_param_by_name( 'SHORT-TERM-DISK-QUOTA-CTIME' );
-    $short_quota_ctime_time  = is_null( $short_quota_ctime ) ? null : LusiTime::parse($short_quota_ctime->value());
-
-    $short_retention         = $experiment->regdb_experiment()->find_param_by_name( 'SHORT-TERM-DISK-QUOTA-RETENTION' );
-    $short_retention_months  = is_null( $short_retention ) ? 0 : intval($short_retention->value());
-
-    $medium_quota            = $experiment->regdb_experiment()->find_param_by_name( 'MEDIUM-TERM-DISK-QUOTA' );
-    $medium_quota_gb         = is_null( $medium_quota ) ? 0 : intval($medium_quota->value());
-
-    $medium_quota_ctime      = $experiment->regdb_experiment()->find_param_by_name( 'MEDIUM-TERM-DISK-QUOTA-CTIME' );
-    $medium_quota_ctime_time = is_null( $medium_quota_ctime ) ? null : LusiTime::parse($medium_quota_ctime->value());
-
-    $medium_retention        = $experiment->regdb_experiment()->find_param_by_name( 'MEDIUM-TERM-DISK-QUOTA-RETENTION' );
-    $medium_retention_months = is_null( $medium_retention ) ? 0 : intval($medium_retention->value());
-
-    if( $short_retention_months  ) {
-        $allowed_stay4storage_defaults['SHORT-TERM' ] = $short_retention_months  * SECONDS_IN_MONTH;
-    } else {
-        $short_retention_months = SHORT_TERM_RETENTION_DEFAULT;
-    }
-    if( $medium_retention_months ) {
-        $allowed_stay4storage_defaults['MEDIUM-TERM'] = $medium_retention_months * SECONDS_IN_MONTH;
-    } else {
-        $medium_retention_months = MEDIUM_TERM_RETENTION_DEFAULT;
-    }
     $first_run = $experiment->find_first_run();
     $last_run  = $experiment->find_last_run();
     $num_runs  = $experiment->num_runs();
@@ -452,13 +404,29 @@ try {
 	    }
     }
 
+    $success_encoded = json_encode("success");
+    $updated_str     = json_encode( $now->toStringShort());
+
+    print <<< HERE
+{ "Status": {$success_encoded},
+  "updated": {$updated_str},
+  "summary": {
+    "runs": {$num_runs},
+    "min_run" : {$min_run},
+    "max_run" : {$max_run},
+    "xtc" : { "size": {$xtc_size_str},  "files": {$xtc_num_files},  "archived": {$xtc_archived},  "archived_html": {$xtc_archived_html},  "disk": {$xtc_local_copy},  "disk_html": {$xtc_local_copy_html} },
+    "hdf5": { "size": {$hdf5_size_str}, "files": {$hdf5_num_files}, "archived": {$hdf5_archived}, "archived_html": {$hdf5_archived_html}, "disk": {$hdf5_local_copy}, "disk_html": {$hdf5_local_copy_html} }
+  },
+  "runs": [
+HERE;
+
     $total_size_gb   = 0;
     $overstay_by_storage_run = array();
 
+    $first_run_entry = true;
+
     $run_numbers = array_keys( $files_by_runs );
     sort( $run_numbers, SORT_NUMERIC );
-
-    $nonempty_runs = array();
 
     foreach( $run_numbers as $runnum ) {
 
@@ -487,34 +455,10 @@ try {
             $size_gb = $bytes / (1024.0 * 1024.0 * 1024.0);
             $total_size_gb += $size_gb;
 
-            // Override the file creation for the purposes of calculating the file expiration
-            // parameters in case if such override is registered for the experiment. Note that\
-            // each storage gets a separate override (if any).
-            //
-            $short_ctime = intval( $file['created'] );
-            if( $short_quota_ctime_time && ( $short_ctime < $short_quota_ctime_time->sec )) $short_ctime = $short_quota_ctime_time->sec;
-
-            $medium_ctime = intval( $file['created'] );
-            if( $medium_quota_ctime_time && ( $medium_ctime < $medium_quota_ctime_time->sec )) $medium_ctime = $medium_quota_ctime_time->sec;
-
-            $short_allowed_stay_sec  = $file['local_flag'] ? max( 0, $allowed_stay4storage_defaults['SHORT-TERM' ] - ( $now->sec - $short_ctime  )) : 0;
-            $medium_allowed_stay_sec = $file['local_flag'] ? max( 0, $allowed_stay4storage_defaults['MEDIUM-TERM'] - ( $now->sec - $medium_ctime )) : 0;
-
-            $short_expire_ctime  = $short_ctime  + $allowed_stay4storage_defaults['SHORT-TERM' ];
-            $medium_expire_ctime = $medium_ctime + $allowed_stay4storage_defaults['MEDIUM-TERM'];
-
-            $allowed_stay = array(
-                'SHORT-TERM' => array_merge (
-                    array('seconds' => $short_allowed_stay_sec ),
-                    $file['local_flag'] ? allowed_stay( $short_expire_ctime, $short_allowed_stay_sec ) : array()
-                ),
-                'MEDIUM-TERM' => array_merge (
-                    array('seconds' => $medium_allowed_stay_sec ),
-                    $file['local_flag'] ? allowed_stay( $medium_expire_ctime, $medium_allowed_stay_sec ) : array()
-                )
-            );
+            $allowed_stay_sec = $file['local_flag'] ? max( 0, $allowed_stay4storage_defaults[$file_storage] - ( $now->sec - $file['created'] )) : 0;
+            $allowed_stay     = $file['local_flag'] ? allowed_stay( $allowed_stay_sec ) : '';
         
-            if( $file['local_flag'] && ( $allowed_stay[$file_storage]['seconds'] < 3600 )) {
+            if( $file['local_flag'] && ( $allowed_stay_sec < 3600 )) {
 
                 if( !array_key_exists( $file_storage, $overstay_by_storage_run ))
                     $overstay_by_storage_run[$file_storage] = array(
@@ -559,7 +503,7 @@ try {
                     $file['local'],
                 'local_flag'             => $file['local_flag'],
                 'checksum'               => $file['checksum'],
-
+                'allowed_stay_sec'       => $allowed_stay_sec,
                 'allowed_stay'           => $allowed_stay,
 
                 'restore_flag'           => 0,
@@ -605,17 +549,6 @@ try {
                                 $file->stream(),
                                 $file->chunk());
 
-                $allowed_stay = array(
-                    'SHORT-TERM' => array(
-                        'seconds'    => 0,
-                        'expiration' => ''
-                    ),
-                    'MEDIUM-TERM' => array(
-                        'seconds'    => 0,
-                        'expiration' => ''
-                    )
-                );
-
                 if( !array_key_exists( $filename, $files_reported_by_iRODS )) {
                     $entry = array(
                         'runnum'                 => $runnum,
@@ -636,9 +569,8 @@ try {
                         'local'                  => '<span style="color:red;">never migrated from DAQ or deleted</span>',
                             'local_flag'         => 0,
                         'checksum'               => '',
-
-                        'allowed_stay'           => $allowed_stay,
-
+                        'allowed_stay_sec'       => 0,
+                        'allowed_stay'           => '',
                         'restore_flag'           => 0,
                         'restore_requested_time' => '',
                         'restore_requested_uid'  => ''
@@ -655,72 +587,26 @@ try {
             }
         }
         if( count($run_entries)) {
+
             $run = $experiment->find_run_by_num( $runnum );
             $run_url = is_null( $run ) ?
                 $runnum :
                 '<a class="link" href="/apps/logbook?action=select_run_by_id&id='.$run->id().'" target="_blank" title="click to see a LogBook record for this run">'.$runnum.'</a>';
-            array_push(
-                $nonempty_runs,
-                array(
-                    'url'    => $run_url,
-                    'runnum' => $runnum,
-                    'files'  => $run_entries ));
+
+            if($first_run_entry) $first_run_entry = false;
+            else print ',';
+            print ' { "url": '.json_encode($run_url).
+                  ' , "runnum": '.$runnum.
+                  ' , "files": '.json_encode($run_entries).
+                  ' }';
         }
     }
-
-    // Calculated medium term quota usage for the experiment
-    //
-    $medium_quota_used_gb = 0;
-    foreach( $config->medium_store_files($experiment->id()) as $file ) {
-        $medium_quota_used_gb += $file['irods_size'];
-    }
-    $medium_quota_used_gb = intval( $medium_quota_used_gb / GB );
-
-    // Commit transactions and dumnp the JSON output.
-    //
-    $logbook->commit();
-    $regdb->commit();
-    $config->commit();
-
-
-    $success_encoded = json_encode("success");
-    $updated_str     = json_encode( $now->toStringShort());
-
-    print <<< HERE
-{ "Status": {$success_encoded},
-  "updated": {$updated_str},
-  "summary": {
-    "runs": {$num_runs},
-    "min_run" : {$min_run},
-    "max_run" : {$max_run},
-    "xtc" : { "size": {$xtc_size_str},  "files": {$xtc_num_files},  "archived": {$xtc_archived},  "archived_html": {$xtc_archived_html},  "disk": {$xtc_local_copy},  "disk_html": {$xtc_local_copy_html} },
-    "hdf5": { "size": {$hdf5_size_str}, "files": {$hdf5_num_files}, "archived": {$hdf5_archived}, "archived_html": {$hdf5_archived_html}, "disk": {$hdf5_local_copy}, "disk_html": {$hdf5_local_copy_html} }
-  },
-  "runs": [
-HERE;
-
-    $first_run_entry = true;
-    foreach( $nonempty_runs as $run ) {
-        if($first_run_entry) $first_run_entry = false;
-        else print ',';
-        print json_encode($run);
-    }
     $total_size_gb_str = json_encode( sprintf( "%.0f", $total_size_gb ));
-    $overstay_str = json_encode( $overstay_by_storage_run );    
+    $overstay_str = json_encode( $overstay_by_storage_run );
     print <<< HERE
   ],
   "total_size_gb": {$total_size_gb_str},
-  "overstay": {$overstay_str},
-  "policies": {
-    "SHORT-TERM": {
-      "retention_months": {$short_retention_months}
-    },
-    "MEDIUM-TERM" : {
-      "retention_months": {$medium_retention_months},
-      "quota_gb"      : {$medium_quota_gb},
-      "quota_used_gb" : {$medium_quota_used_gb}
-    }
-  }
+  "overstay": {$overstay_str}
 }
 HERE;
     

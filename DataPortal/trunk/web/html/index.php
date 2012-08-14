@@ -811,8 +811,8 @@ HERE;
       <div style="margin-top:5px;">
         <select name="local" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
           <option></option>
-          <option>90 DAYS</option>
-          <option>2 YEARS</option>
+          <option>SHORT-TERM</option>
+          <option>MEDIUM-TERM</option>
           <option>no</option>
         </select>
       </div>
@@ -838,36 +838,40 @@ HERE;
   <div class="datafiles-info" id="datafiles-files-updated" style="float:right;">&nbsp;</div>
   <div style="clear:both;"></div>
   <div id="datafiles-files-table-ctrl">
+    <div>
 
-    <select name="page_size" style="margin-left:10px; padding:1px;">
-      <option>auto-page-size</option>
-      <option>1</option>
-      <option>5</option>
-      <option>10</option>
-      <option>50</option>
-    </select>
+      <select name="page_size" style="margin-left:10px; padding:1px;">
+        <option>auto-page-size</option>
+        <option>1</option>
+        <option>5</option>
+        <option>10</option>
+        <option>50</option>
+      </select>
 
-    <button id="datafiles-files-reverse">Show in Reverse Order</button>
+      <button id="datafiles-files-reverse">Show in Reverse Order</button>
 
-    <table style="margin:5px; font-size:80%;"><tbody>
-      <tr>
-        <td><input type="checkbox" name="type"     /></td><td>Type</td>
-        <td><input type="checkbox" name="size"     /></td><td>Size</td>
-        <td><input type="checkbox" name="created"  /></td><td>Created</td>
-        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
-        <td><input type="checkbox" name="archived" /></td><td>On tape</td>
-        <td><input type="checkbox" name="storage"  /></td><td>Storage info</td>
-        <td><input type="checkbox" name="migration"/></td><td>DAQ-to-OFFLINE Migration info</td>
-        <td><select name="format" style="padding:1px;">
-              <option>auto-format-file-size</option>
-              <option>Bytes</option>
-              <option>KBytes</option>
-              <option>MBytes</option>
-              <option>GBytes</option>
-              <option>created</option>
-            </select></td>
-       </tr>
-     </tbody></table>
+      <table style="margin:5px; font-size:80%;"><tbody>
+        <tr>
+          <td><input type="checkbox" name="type"     /></td><td>Type</td>
+          <td><input type="checkbox" name="size"     /></td><td>Size</td>
+          <td><input type="checkbox" name="created"  /></td><td>Created</td>
+          <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+          <td><input type="checkbox" name="storage"  /></td><td>Storage details</td>
+          <td><input type="checkbox" name="migration"/></td><td>DAQ-to-OFFLINE Migration info</td>
+          <td><select name="format" style="padding:1px;">
+                <option>auto-format-file-size</option>
+                <option>Bytes</option>
+                <option>KBytes</option>
+                <option>MBytes</option>
+                <option>GBytes</option>
+                <option>created</option>
+              </select></td>
+        </tr>
+      </tbody></table>
+    </div>
+    <div id="quota-usage">
+      <span style="color:maroon; font-size:24px;"></span>
+    </div>
   </div>
   <div id="datafiles-files-pages">
     <div id="header"></div>
@@ -985,7 +989,7 @@ HERE;
     top: 0;
     left: 0;
     width: 100%;
-    height: 129px;
+    height: 130px;
     background-color: #e0e0e0;
   }
   #p-top-header {
@@ -1023,6 +1027,7 @@ HERE;
     border-left: 1px solid #a0a0a0;
     border-right: 1px solid #a0a0a0;
   }
+  /*
   #p-bottom {
     z-index: 100;
     position: absolute;
@@ -1038,6 +1043,7 @@ HERE;
     font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
     font-size: 75%;
   }
+  */
   #p-center {
     position: relative;
     top:130px;
@@ -1052,9 +1058,12 @@ HERE;
 <script type="text/javascript">
 
 function resize() {
-	$('#p-left').height($(window).height()-125-20);
-	$('#p-splitter').height($(window).height()-125-20);
-	$('#p-center').height($(window).height()-125-20);
+    var    top_height = 130;
+    var bottom_height = 0;
+    var center_height = $(window).height()-top_height-bottom_height;
+	$('#p-left'    ).height(center_height);
+	$('#p-splitter').height(center_height);
+	$('#p-center'  ).height(center_height);
 }
 
 /* Get mouse position relative to the document.
@@ -1922,13 +1931,13 @@ function p_appl_help() {
 </div>
 
 <div id="p-splitter"></div>
-
+<!--
 <div id="p-bottom">
   <div id="p-status">
     <center>- status bar to be here at some point -</center>
   </div>
 </div>
-
+-->
 <div id="p-center">
   <div id="application-workarea">
     <div id="experiment-summary" class="application-workarea hidden"><?php echo $experiment_summary_workarea ?></div>

@@ -9,6 +9,15 @@
 #datafiles-files-table-ctrl {
   margin-top:10px;
 }
+#datafiles-files-table-ctrl #quota-usage {
+    position:fixed;
+    right:35px;
+    top:265px;
+    border:1px solid maroon;
+    padding:5px;
+    font-size:24px;
+    color:maroon;
+}
 #datafiles-summary-wa,
 #datafiles-files-wa {
   width: inherit;

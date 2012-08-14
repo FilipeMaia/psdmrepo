@@ -235,7 +235,7 @@ HERE
         $sql = "INSERT INTO file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}')";
     	$this->query($sql);
         
-        return find_file_restore_request( $request );
+        return $this->find_file_restore_request( $request );
     }
 
     /* Find a persistent record for a file restore request which is passed as
@@ -286,8 +286,26 @@ HERE
 
         return $request;
     }
+    /**
+     * Delete the specified file restore request (if any found in teh database)
+     *
+     * @param type $request 
+     */
+    public function delete_file_restore_request( $request ) {
+    	$this->connect();
 
-    /* Register a file in the MEDIUM_TERM storage with parameters found in
+        $exper_id           = intval($request['exper_id']);
+        $runnum             = intval($request['runnum']);
+        $file_type          = $this->escape_string( trim( $request['file_type'] ));
+        $irods_filepath     = $this->escape_string( trim( $request['irods_filepath'] ));
+        $irods_src_resource = $this->escape_string( trim( $request['irods_src_resource'] ));
+        $irods_dst_resource = $this->escape_string( trim( $request['irods_dst_resource'] ));
+
+        $sql = "DELETE FROM file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+    	$result = $this->query($sql);
+    }
+
+    /* Register a file in the MEDIUM-TERM storage with parameters found in
      * a dictionary of:
      * 
      *   'exper_id'
@@ -308,7 +326,7 @@ HERE
 
         $exper_id        = intval($request['exper_id']);
         $runnum          = intval($request['runnum']);
-        $file_type       = $this->escape_string( trim( $request['file_type'] ));
+        $file_type       = $this->escape_string( strtoupper ( trim( $request['file_type'] )));
         $irods_filepath  = $this->escape_string( trim( $request['irods_filepath'] ));
         $irods_resource  = $this->escape_string( trim( $request['irods_resource'] ));
         $irods_size      = intval($request['irods_size']);
@@ -320,8 +338,28 @@ HERE
         
         return $this->find_medium_store_file($request);
     }
+    /**
+     * Remove the specified file from the MEDIUM-STORE registry
+     *
+     * @param type $exper_id
+     * @param type $runnum
+     * @param type $file_type
+     * @param type $irods_filepath 
+     */
+    public function remove_medium_store_file ( $exper_id, $runnum, $file_type, $irods_filepath ) {
 
-    /* Find a file entry in the MEDIUM_TERM storage using a request which is passed as
+    	$this->connect();
+
+        $exper_id       = intval($exper_id);
+        $runnum         = intval($runnum);
+        $file_type      = $this->escape_string( strtoupper ( trim( $file_type )));
+        $irods_filepath = $this->escape_string( trim( $irods_filepath ));
+
+        $sql = "DELETE FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}'";
+    	$this->query($sql);
+     }
+
+    /* Find a file entry in the MEDIUM-TERM storage using a request which is passed as
      * a dictionary of:
      * 
      *   'exper_id'
@@ -348,11 +386,11 @@ HERE
 
         $exper_id       = intval($request['exper_id']);
         $runnum         = intval($request['runnum']);
-        $file_type      = $this->escape_string( trim( $request['file_type'] ));
-        $irods_filepat  = $this->escape_string( trim( $request['irods_filepath'] ));
+        $file_type      = $this->escape_string( strtoupper( trim( $request['file_type'] )));
+        $irods_filepath = $this->escape_string( trim( $request['irods_filepath'] ));
         $irods_resource = $this->escape_string( trim( $request['irods_resource'] ));
 
-        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_resource='{$irods_resource}'";
     	$result = $this->query($sql);
        	$nrows = mysql_numrows( $result );
     	if( !$nrows ) return null;
@@ -367,6 +405,46 @@ HERE
        	$request['registered_uid' ] = trim            ($row['registered_uid' ]);
 
         return $request;
+    }
+    /**
+     * Get a list of file entries for the specified experiment.
+     * @param integer $exper_id
+     * @param string $file_type
+     * @return array
+     */
+    public function medium_store_files( $exper_id, $file_type=null ) {
+        
+        $list = array();
+    	$this->connect();
+
+        $exper_id         = intval($exper_id);
+        $file_type_option = is_null($file_type) ? '' : ", AND file_type='".$this->escape_string( strtoupper( trim( $file_type )))."'";
+
+        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} {$file_type_option} ORDER BY runnum, file_type, irods_filepath";
+    	$result = $this->query($sql);
+        for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
+    		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+           	$row['runnum'         ] = intval                                ( $row['runnum'         ] );
+            $row['file_type'      ] = $this->escape_string( strtoupper( trim( $row['file_type'      ] )));
+           	$row['irods_size'     ] = intval                                ( $row['irods_size'     ] );
+            $row['registered_time'] = LusiTime::from64                      ( $row['registered_time'] );
+            array_push($list, $row);
+        }
+        return $list;
+    }
+
+    /**
+     * Calculated medium term quota usage (GB) for the experiment
+     * @param type $exper_id
+     * @return integer 
+     */
+    public function calculate_medium_quota($exper_id) {
+        $used_gb = 0;
+        $bytes_in_gb = 1024 * 1024 * 1024;
+        foreach( $this->medium_store_files($exper_id) as $file ) {
+            $used_gb += $file['irods_size'];
+        }
+        return intval( $used_gb / $bytes_in_gb );
     }
 
     public function do_notify( $address, $subject, $body, $application ) {

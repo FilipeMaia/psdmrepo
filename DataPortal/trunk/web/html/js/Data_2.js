@@ -154,14 +154,14 @@ function datafiles_create() {
 '</div>'+
 '<div style="float:left; width:160px;">'+
 '  <div                            ><span class="datafiles-table-hdr">S H O R T - T E R M</span></div>'+
-'  <div style="padding-bottom:6px; padding-left:20px;"><span class="datafiles-table-hdr">'+this.files_last_request.policies['SHORT-TERM'].retention_months+' months, disk</span></div>'+
+'  <div style="padding-bottom:6px; padding-left:20px;"><span class="datafiles-table-hdr">3 months, disk</span></div>'+
 '  <div style="float:left; width:80px;"><span class="datafiles-table-hdr-plain">[# files]</span></div>'+
 '  <div style="float:left; width:60px;"><span class="datafiles-table-hdr-plain">[GB]</span></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div style="float:left; width:160px;">'+
 '  <div                            ><span class="datafiles-table-hdr">M E D I U M - T E R M</span></div>'+
-'  <div style="padding-bottom:6px; padding-left:25px;"><span class="datafiles-table-hdr">'+this.files_last_request.policies['MEDIUM-TERM'].retention_months+' months, disk</span></div>'+
+'  <div style="padding-bottom:6px; padding-left:25px;"><span class="datafiles-table-hdr">2 years, disk</span></div>'+
 '  <div style="float:left; width:80px;"><span class="datafiles-table-hdr-plain">[# files]</span></div>'+
 '  <div style="float:left; width:60px;"><span class="datafiles-table-hdr-plain">[GB]</span></div>'+
 '  <div style="clear:both;"></div>'+
@@ -289,8 +289,6 @@ function datafiles_create() {
         elem.find('.df-r-medium-size'    ).html(totals['MEDIUM-TERM'].size_gb);
         elem.find('.df-r-medium-overstay').html(overstay_medium ? '<span class="ui-icon ui-icon-alert"></span>' : '<span>&nbsp;<span>');
 
-        $('#datafiles-files-table-ctrl #quota-usage span').html('Quota usage: '+
-            this.files_last_request.policies['MEDIUM-TERM'].quota_used_gb+' GB (out of '+this.files_last_request.policies['MEDIUM-TERM'].quota_gb+')');
     }
     this.on_page_select = function(pidx) {
         this.page_idx = pidx;
@@ -315,25 +313,23 @@ function datafiles_create() {
 		var html =
 '  <tr>'+
 '    <td class="table_cell table_cell_left '+extra_class1+'">'+run_url+'</td>'+
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.name+'</td>'+
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.name+'</td>'+
 			(display.type?
-'	 <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.type+'</td>':'')+
+'	 <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.type+'</td>':'')+
 			(display.size?
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'" style="text-align:right">&nbsp;'+this.file_size(f)+'</td>':'')+
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'" style="text-align:right">'+this.file_size(f)+'</td>':'')+
 			(display.created?
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.created+'</td>':'')+
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.created+'</td>':'')+
 			(display.checksum?
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.checksum+'</td>':'');
-        html +=
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.archived+'</td>';
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.checksum+'</td>'+
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.archived+'</td>':'');
 		if(display.storage) {
             switch(f.storage) {
                 case 'SHORT-TERM':
                     html +=
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.local+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['SHORT-TERM'].expiration+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['SHORT-TERM'].allowed_stay+'</td>'+
-'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;';
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.local+'</td>'+
+'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.allowed_stay+'</td>'+
+'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">';
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
@@ -347,25 +343,22 @@ function datafiles_create() {
                     }
                     html +=
 '    </td>'+
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>';
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>'+
+'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>'+
+'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>';
                     break;
                 case 'MEDIUM-TERM':
                     html +=
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.local+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].expiration+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].allowed_stay+'</td>'+
-'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;';
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>'+
+'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>'+
+'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'"></td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.local+'</td>'+
+'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.allowed_stay+'</td>'+
+'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">';
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
-'      <button class="delete_from_medium" style="font-size:7px;" onclick="datafiles.delete_from_disk('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage and move them back to the SHORT-TERM storage">REMOVE</button>';
+'      <button class="delete_from_medium" style="font-size:7px;" onclick="datafiles.delete_from_disk('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">REMOVE</button>';
                         }
                         if(f.archived_flag && !f.local_flag && !f.restore_flag) {
                             html +=
@@ -378,11 +371,11 @@ function datafiles_create() {
             }
         } else {
             html +=
-'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.local+'</td>';
+'    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+f.local+'</td>';
         }
         html +=
 			(display.migration?
-'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+migration_status2html(f)+'</td>':'')+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">'+migration_status2html(f)+'</td>':'')+
 '  </tr>';
 		return html;
 	};
@@ -413,13 +406,12 @@ function datafiles_create() {
             (display.created?
 '    <td class="table_hdr" rowspan='+rowspan+' align="center" >Created</td>':'')+
 			(display.checksum?
-'    <td class="table_hdr" rowspan='+rowspan+' align="center" >Checksum</td>':'');
-        html +=
-'    <td class="table_hdr" rowspan='+rowspan+' align="center" >On tape</td>';
+'    <td class="table_hdr" rowspan='+rowspan+' align="center" >Checksum</td>'+
+'    <td class="table_hdr" rowspan='+rowspan+' align="center" >On tape</td>':'');
         if(display.storage)
             html +=
-'    <td class="table_hdr " colspan=4 align="center" >SHORT-TERM</td>'+
-'    <td class="table_hdr " colspan=4 align="center" >MEDIUM-TERM</td>';
+'    <td class="table_hdr " colspan=3 align="center" >SHORT-TERM</td>'+
+'    <td class="table_hdr " colspan=3 align="center" >MEDIUM-TERM</td>';
         else
             html +=
 '    <td class="table_hdr">On Disk</td>';
@@ -430,12 +422,10 @@ function datafiles_create() {
             html +=
 '  <tr>'+
 '    <td class="table_hdr " align="center" >on disk</td>'+
-'    <td class="table_hdr " align="center" >expiration</td>'+
-'    <td class="table_hdr " align="center" >allowed stay</td>'+
+'    <td class="table_hdr " align="center" >time left</td>'+
 '    <td class="table_hdr " align="center" >actions</td>'+
 '    <td class="table_hdr " align="center" >on disk</td>'+
-'    <td class="table_hdr " align="center" >expiration</td>'+
-'    <td class="table_hdr " align="center" >allowed stay</td>'+
+'    <td class="table_hdr " align="center" >time left</td>'+
 '    <td class="table_hdr " align="center" >actions</td>'+
 '  </tr>';
 
@@ -467,7 +457,6 @@ function datafiles_create() {
         page.find('.restore_from_archive').button();
         page.find('.delete_from_raw').button().button('disable');
         page.find('.delete_from_medium').button();
-        $('#datafiles-files-table-ctrl #quota-usage').css('display', display.storage ? 'block' : 'none' );
 	};
     this.stats_display = function() {
         var stats = { runs: 0, files: 0, size_gb: 0, storage: {}};
@@ -620,8 +609,6 @@ function datafiles_create() {
                     report_error(result.message);
                     return;
                 }
-                that.files_last_request.policies['MEDIUM-TERM'].quota_used_gb = result.medium_quota_used_gb;
-
                 // Update entries for all relevant files from the transient data structure
                 //
                 var run = that.files_last_request.runs[ridx];
@@ -630,6 +617,8 @@ function datafiles_create() {
                     var f = run.files[i];
                     if((f.type == type) && (f.storage == storage)) {
                         f.storage = 'MEDIUM-TERM';
+                        f.allowed_stay_sec = 12 * 31 * 24 * 3600;
+                        f.allowed_stay = '11m 4w';
                     }
                 }
                 // Redisplay the corresponding page
@@ -654,10 +643,7 @@ function datafiles_create() {
                     runnum,
                     type,
                     storage,
-                    function(result) {
-
-                        that.files_last_request.policies['MEDIUM-TERM'].quota_used_gb = result.medium_quota_used_gb;
-
+                    function() {
                         // Update entries for all relevant files from the transient data structure
                         //
                         var run = that.files_last_request.runs[ridx];
@@ -672,7 +658,6 @@ function datafiles_create() {
                         }
                         // Redisplay the corresponding page
                         //
-                        that.update_page_header(pidx);
                         that.on_page_select(pidx);
                         that.on_page_select(pidx);
                     }
@@ -694,7 +679,7 @@ function datafiles_create() {
                     report_error(result.message);
                     return;
                 }
-                if( on_success ) on_success(result);
+                if( on_success ) on_success();
             },
             'JSON'
         ).error(function () {
@@ -704,37 +689,36 @@ function datafiles_create() {
         var warning = '';
         if(storage == 'MEDIUM-TERM')
             warning =
-            'This operation will move all files of the selected run back to the SHORT-TERM term storage from where they would be eventually deleted. '+
-            'So be advised that proceeding with this operation may result in irreversable loss of informaton. '+
-            'Also note that this operation may be reported to the PI of the experiment. ';
+            'The files you\'re about to delete may not be saved to tape. '+
+            'Proceeding with this operation may result in irreversable loss of informaton. '+
+            'Also note that this operation will be reported to the PI of the experiment. ';
         else if(storage == 'SHORT-TERM')
             warning =
             'Remember that these files can be later restored from tope';
         ask_yes_no(
-            'Confirm File Removal',
-            'Are you sure you want to remove all <b>'+type+'</b> files of run <b>'+runnum+'</b> from the <b>'+storage+'</b> disk storage?<br><br>'+
+            'Confirm File Deletion',
+            'Are you sure you want to delete all <b>'+type+'</b> files of run <b>'+runnum+'</b> from the <b>'+storage+'</b> disk storage?<br><br>'+
             warning,
             function() {
                 that.delete_from_disk_impl(
                     runnum,
                     type,
                     storage,
-                    function(result) {
-
-                        that.files_last_request.policies['MEDIUM-TERM'].quota_used_gb = result.medium_quota_used_gb;
-
+                    function() {
                         // Update entries for all relevant files from the transient data structure
                         //
                         var run = that.files_last_request.runs[ridx];
                         for( var i in run.files ) {
                             var f = run.files[i];
                             if((f.runnum == runnum) && (f.type == type) && (f.storage == storage)) {
-                                f.storage = 'SHORT-TERM';
+                                f.local_flag = 0;
+                                f.local = '<span style="color:red;">No</span>';
+                                f.allowed_stay_sec = 0;
+                                f.allowed_stay = '';
                             }
                         }
                         // Redisplay the corresponding page
                         //
-                        that.update_page_header(pidx);
                         that.on_page_select(pidx);
                         that.on_page_select(pidx);
                     }
@@ -756,7 +740,7 @@ function datafiles_create() {
                     report_error(result.message);
                     return;
                 }
-                if( on_success ) on_success(result);
+                if( on_success ) on_success();
             },
             'JSON'
         ).error(function () {

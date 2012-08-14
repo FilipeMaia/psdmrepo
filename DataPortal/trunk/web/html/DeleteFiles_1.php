@@ -28,7 +28,7 @@ use FileMgr\FileMgrException;
 use DataPortal\Config;
 use DataPortal\DataPortalException;
 
-function report_success($result) {
+function report_success() {
     
     $updated_str = json_encode( LusiTime::now()->toStringShort());
     
@@ -36,27 +36,19 @@ function report_success($result) {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
     
-    print json_encode(
-        array_merge(
-            array( 'status' => 'success', 'updated' => $updated_str ),
-            $result
-        )
-    );
+    print json_encode( array( 'status' => 'success', 'updated' => $updated_str ));
+
     exit;
 }
 
-function report_error( $msg, $result=array()) {
+function report_error($msg) {
     
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    print json_encode(
-        array_merge(
-            array( 'status' => 'error', 'message' => $msg  ),
-            $result
-        )
-    );
+    print json_encode( array( 'status' => 'error', 'message' => $msg ));
+
     exit;
 }
 
@@ -94,10 +86,7 @@ try {
     if( is_null($experiment)) report_error("No such experiment");
 
     $run = $experiment->find_run_by_num($runnum);
-    if( is_null($run))
-        report_error(
-            "No such run in the experiment",
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+    if( is_null($run)) report_error("No such run in the experiment");
 
     $runs2files = array();
 
@@ -112,26 +101,19 @@ try {
         $type,
         $runnum.'-'.$runnum );
 
-    if( is_null($runs ))
-        report_error(
-            'server encountered an internal error when trying to get a list of files for thr run',
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+    if( is_null($runs )) report_error('server encountered an internal error when trying to get a list of files for thr run');
 
     $files = array();
     foreach( $runs as $run )
         foreach( $run->files as $file )
             if( $file->resource == 'lustre-resc' ) array_push($files, $file);
 
-    // Proceed with the operation
+    // Delete selected files by their full path and a replica. Also make sure
+    // no old entries remain in the file restore queue. Otherwise it would
+    // (falsfully) appear as if the deleted file is being restored.
     //
     foreach( $files as $file ) {
-
         $irods_filepath = "{$file->collName}/{$file->name}";
-
-        // Delete selected files by their full path and a replica. Also make sure
-        // no old entries remain in the file restore queue. Otherwise it would
-        // (falsefully) appear as if the deleted file is being restored.
-        //
         $config->delete_file_restore_request(
             array(
                 'exper_id'  => $exper_id,
@@ -142,51 +124,23 @@ try {
                 'irods_dst_resource' => 'lustre-resc'
             )
         );
-
-        switch( $storage ) {
-
-            case 'SHORT-TERM':
-
-                // Delete selected files by their full path and a replica.
-                //
-//                $request = new RestRequest(
-//                    "/replica{$file->collName}/{$file->name}/{$file->replica}",
-//                    'DELETE'
-//                );
-//                $request->execute();
-//                $responseInfo = $request->getResponseInfo();
-//                $http_code = intval($responseInfo['http_code']);
-//                switch($http_code) {
-//                    case 200: break;
-//                    case 404:
-//                       report_error(
-//                           "file '{$file->name}' doesn't exist",
-//                           array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-//                    default:
-//                        report_error(
-//                            "failed to delete file '{$file->name}' because of HTTP error {$http_code}",
-//                            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-//                }
-                break;
-
-            case 'MEDIUM-TERM':
-                
-                // Do not delete the file. Just send it back to the 'SHORT-TERM' storage
-                // by removing the file's record from the 'MEDIUM-TERM' registry.
-                //
-                $config->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
-                break;
+        $request = new RestRequest(
+            "/replica{$file->collName}/{$file->name}/{$file->replica}",
+            'DELETE'
+        );
+        $request->execute();
+        $responseInfo = $request->getResponseInfo();
+        $http_code = intval($responseInfo['http_code']);
+        switch($http_code) {
+            case 200: break;
+            case 404: report_error("file '{$file->name}' doesn't exist");
+            default:  report_error("failed to delete file '{$file->name}' because of HTTP error {$http_code}");
         }
     }
-
-    // Calculated medium term quota usage for the experiment
-    //
-    $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
-
     $logbook->commit();
     $config->commit();
 
-    report_success( array( 'medium_quota_used_gb' => $medium_quota_used_gb ));
+    report_success();
 
 } catch( LogBookException    $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   catch( LusiTimeException   $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }

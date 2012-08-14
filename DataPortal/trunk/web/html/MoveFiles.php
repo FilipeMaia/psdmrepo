@@ -1,8 +1,9 @@
 <?php
 
 /*
- * This script will process a request for deleting a set of files
- * from an OFFLINE disk storage managed by the Data Management System.
+ * This script will process a request for moving a set of files
+ * from the SHORT-TERM store to the MEDIUM-TERM data store. This operation
+ * only applies to files managed by the Data MAnagement System.
  * A data set is defined by the following parameters:
  * 
  *   <exper_id> <run_number> <storage_class> <file_type>
@@ -77,7 +78,7 @@ if( $type == '' ) report_error( "invalid file type found in the request" );
 if( !isset( $_GET['storage'] )) report_error( "no storage class parameter found in the request" );
 $storage = strtoupper( trim( $_GET['storage'] ));
 if( $storage == '' ) report_error( "invalid storage class found in the request" );
-
+if( $storage != 'SHORT-TERM' ) report_error( "inappropriate storage class of files in the request" );
 
 /*
  * Analyze and process the request
@@ -101,7 +102,8 @@ try {
 
     $runs2files = array();
 
-    // Find the files to be deleted
+    // Find the files to be moved. And skip files which are already at their
+    // intended destination.
     //
     $runs = null;
 
@@ -112,74 +114,65 @@ try {
         $type,
         $runnum.'-'.$runnum );
 
-    if( is_null($runs ))
-        report_error(
-            'server encountered an internal error when trying to get a list of files for thr run',
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+    if( is_null($runs )) report_error(
+        'server encountered an internal error when trying to get a list of files for the run',
+        array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
 
     $files = array();
-    foreach( $runs as $run )
-        foreach( $run->files as $file )
-            if( $file->resource == 'lustre-resc' ) array_push($files, $file);
-
-    // Proceed with the operation
-    //
-    foreach( $files as $file ) {
-
-        $irods_filepath = "{$file->collName}/{$file->name}";
-
-        // Delete selected files by their full path and a replica. Also make sure
-        // no old entries remain in the file restore queue. Otherwise it would
-        // (falsefully) appear as if the deleted file is being restored.
-        //
-        $config->delete_file_restore_request(
-            array(
-                'exper_id'  => $exper_id,
-                'runnum'    => $runnum,
-                'file_type' => $type,
-                'irods_filepath'     => $irods_filepath,
-                'irods_src_resource' => 'hpss-resc',
-                'irods_dst_resource' => 'lustre-resc'
-            )
-        );
-
-        switch( $storage ) {
-
-            case 'SHORT-TERM':
-
-                // Delete selected files by their full path and a replica.
-                //
-//                $request = new RestRequest(
-//                    "/replica{$file->collName}/{$file->name}/{$file->replica}",
-//                    'DELETE'
-//                );
-//                $request->execute();
-//                $responseInfo = $request->getResponseInfo();
-//                $http_code = intval($responseInfo['http_code']);
-//                switch($http_code) {
-//                    case 200: break;
-//                    case 404:
-//                       report_error(
-//                           "file '{$file->name}' doesn't exist",
-//                           array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-//                    default:
-//                        report_error(
-//                            "failed to delete file '{$file->name}' because of HTTP error {$http_code}",
-//                            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-//                }
-                break;
-
-            case 'MEDIUM-TERM':
-                
-                // Do not delete the file. Just send it back to the 'SHORT-TERM' storage
-                // by removing the file's record from the 'MEDIUM-TERM' registry.
-                //
-                $config->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
-                break;
+    foreach( $runs as $run ) {
+        foreach( $run->files as $file ) {
+            if( $file->resource == 'lustre-resc' ) {
+                $request = $config->find_medium_store_file(
+                    array(
+                        'exper_id'       => $exper_id,
+                        'runnum'         => $runnum,
+                        'file_type'      => $type,
+                        'irods_filepath' => "{$file->collName}/{$file->name}",
+                        'irods_resource' => 'lustre-resc'
+                    )
+                );
+                if( is_null($request))
+                    array_push($files, $file);
+            }
         }
     }
 
-    // Calculated medium term quota usage for the experiment
+    // Evaluate quota availability (if the one applies for the experiment)
+    //
+    $medium_quota    = $experiment->regdb_experiment()->find_param_by_name( 'MEDIUM-TERM-DISK-QUOTA' );
+    $medium_quota_gb = is_null( $medium_quota ) ? 0 : intval($medium_quota->value());
+    if( $medium_quota_gb ) {
+        $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
+        $size_gb = 0;
+        $bytes_in_gb = 1024.0 * 1024.0 * 1024.0;
+        foreach( $files as $file ) {
+            $size_gb += $file->size / $bytes_in_gb;
+        }
+        $size_gb = intval($size_gb);
+        if( $medium_quota_used_gb + $size_gb > $medium_quota_gb )
+            report_error(
+              'You can no longer move files into the MEDIUM-TERM storage '.
+              'either because the experiment has run out of its storage quota or because the amount of data '.
+              'involved in this request would result in exceeding  quota limit of the experiment.',
+              array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+    }
+
+    // Register selected files in the MEDIUM-TERM storage
+    //
+    foreach( $files as $file ) {
+        $config->add_medium_store_file (
+            array(
+                'exper_id'       => $exper_id,
+                'runnum'         => $runnum,
+                'file_type'      => $type,
+                'irods_filepath' => "{$file->collName}/{$file->name}",
+                'irods_resource' => 'lustre-resc',
+                'irods_size'     => $file->size
+            )
+        );
+    }
+
+    // Update quota usage for the experiment
     //
     $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
 
@@ -192,4 +185,5 @@ try {
   catch( LusiTimeException   $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   catch( FileMgrException    $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   catch( DataPortalException $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
 ?>
