@@ -168,8 +168,7 @@ function load_hdf5_files(exper_id) {
         url: '../portal/SearchFiles.php',
         data: {
             exper_id: exper_id,
-            types: 'hdf5',
-            json: ''
+            types: 'hdf5'
         },
         success: function(data) {
             if( data.Status != 'success' ) { alert(data.Message); return; }

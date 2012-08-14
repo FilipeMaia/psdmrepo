@@ -39,10 +39,10 @@ class RegDBDataMigrationFile {
         return $this->attr['file_type']; }
         
     public function start_time () {
-        return LusiTime::from64( $this->attr['start_time'] ); }
+        return $this->attr['start_time'] ? LusiTime::from64( $this->attr['start_time'] ) : null; }
 
     public function stop_time () {
-        return LusiTime::from64( $this->attr['stop_time'] ); }
+        return $this->attr['stop_time'] ? LusiTime::from64( $this->attr['stop_time'] ) : null; }
 
     public function error_msg () {
         return $this->attr['error_msg']; }
