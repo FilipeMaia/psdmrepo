@@ -62,16 +62,13 @@ class LusiTime {
         return new LusiTime( time() - 31*24*3600 ); }
 
     /* Factory method from an input string to be parsed into an object
-     * of the class.
+     * representing a timestamp in the local timezone.
      *
      * Input formats:
      *
+     *   2009-05-19
      *   2009-05-19 17:59:49
-     *   2009-05-19 17:59:49-07
-     *   2009-05-19 17:59:49-07:00
-     *   2009-05-19 17:59:49-0700
      *   2009-05-19 12:18:49.123456789
-     *   2009-05-19 12:18:49.123456789-0700
      *
      * The last example illustrates how to specify nanoseconds. The number
      * of nanoseconds (if not empty) must be in the range of 0..999999999.
@@ -81,23 +78,29 @@ class LusiTime {
      */
     public static function parse($str) {
 
-        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?(([-+])(\d{2}):?(\d{2})?)?/';
+        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2})(\s+(\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?)?/';
         if( !preg_match( $expr, $str, $matches2 )) return null;
 
-        $sign = isset( $matches2[10] ) ? ( $matches2[10] == '-' ? +1 : -1 ) : 0;
-        $tzone_hours = isset( $matches2[11] ) ? $matches2[11] : 0;
-        $tzone_minutes = isset( $matches2[12] ) ? $matches2[12] : 0;
-        $shift = $sign * ( 3600 * $tzone_hours + 60 * $tzone_minutes );
-        $local_time_str = "$matches2[1]-$matches2[2]-$matches2[3] $matches2[4]:$matches2[5]:$matches2[6]";
-        $local_time = strtotime( $local_time_str );
-        if( !$local_time ) return null;
+        // Begin with interpreting result as a time w/ optonal nanoseconds
+        // in the default timezone. Normally the default timezone is the local one.
+        //
+        $year          = $matches2[1];
+        $month         = $matches2[2];
+        $day           = $matches2[3];
+        $hour          = '00';
+        $min           = '00';
+        $sec           = '00';
+        if(        isset($matches2[4])) {
+            $hour      = $matches2[5];
+            $min       = $matches2[6];
+            $sec       = $matches2[7];
+        }
+        $default_tz_time_sec = strtotime( "{$year}-{$month}-{$day} {$hour}:{$min}:{$sec}" );
+        if( !$default_tz_time_sec ) return null;
 
-        //$gmt_time = ($local_time+$shift);
-        $gmt_time = $local_time;
+        $nsec = isset( $matches2[9] ) ? $matches2[9] : 0;
 
-        $nsec = isset( $matches2[8] ) ? $matches2[8] : 0;
-
-        return new LusiTime($gmt_time,$nsec);
+        return new LusiTime($default_tz_time_sec,$nsec);
     }
 
     /* Constructor
@@ -207,15 +210,15 @@ class LusiTime {
         if( $len <= 9 ) {
             if( 1 != sscanf( $packed, "%ud", $nsec ))
                 throw new LusiTimeException(
-                    __METHOD__, "failed to translate nanoseconds" );
+                    __METHOD__, "failed to translate nanoseconds from: '{$packed}'" );
         } else {
             if( 1 != sscanf( substr( $packed, 0, $len - 9), "%ud", $sec ))
                 throw new LusiTimeException(
-                    __METHOD__, "failed to translate seconds" );
+                    __METHOD__, "failed to translate seconds from: '{$packed}'" );
 
             if( 1 != sscanf( substr( $packed, -9 ), "%ud", $nsec ))
                 throw new LusiTimeException(
-                    __METHOD__, "failed to translate nanoseconds" );
+                    __METHOD__, "failed to translate nanoseconds from: '{$packed}'" );
         }
         return new LusiTime( $sec, $nsec );
     }
@@ -265,7 +268,7 @@ class LusiTime {
         return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec); }
 }
 /*
-$t = LusiTime::parse( "2010-05-28 14:39:44" );
-print("<br>".$t->toStringShort());
+$t = LusiTime::parse( "2010-05-28 14:39:44.123456789" );
+print("<br>".$t);
 */
 ?>
