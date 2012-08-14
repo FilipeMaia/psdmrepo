@@ -4,6 +4,8 @@ namespace FileMgr;
 
 require_once( 'filemgr.inc.php' );
 
+use FileMgr\FileMgrException;
+
 /* ATTENTION: This limit is required to deal with huge data structures/collections
  * produced by some PHP functions when dealing with irodsws collections. Consider
  * increasing it further down if the interpreter will stop working and if the Web
@@ -13,14 +15,14 @@ require_once( 'filemgr.inc.php' );
  *  Allowed memory size of 16777216 bytes exhausted (tried to allocate 26 bytes)
  *  ..
  */
-ini_set("memory_limit","64M");
+ini_set("memory_limit","256M");
 
 /*
  * The helper utility class to deal with iRODS Web Servive
  */
 class FileMgrIrodsWs {
 
-    private static $base_url = 'https://pswww.slac.stanford.edu/ws-auth/irodsws';
+    private static $base_url = 'https://pswww2.slac.stanford.edu/ws-auth/irodsws';
     private static $opts = array(
     	"timeout"      => 20,
     	"httpauthtype" => HTTP_AUTH_BASIC,
@@ -66,8 +68,10 @@ class FileMgrIrodsWs {
             	if( $range['total'] > $total ) $total = $range['total'];
             }
         }
-        
-        //if( $min > $max || $min <= 0 || $max <= 0 || $total < 0 ) die( "unable to figure out a range of runs" );
+//        if( $min > $max || $min <= 0 || $max <= 0 || $total < 0 )
+//            throw new FileMgrException (
+//                __METHOD__,
+//                "unable to figure out a range of runs" );
 
         return array( 'min' => $min, 'max' => $max, 'total' => $total );        
     }
@@ -78,8 +82,9 @@ class FileMgrIrodsWs {
 
     public static function all_runs( $instrument, $experiment, $type ) {
     	$result = null;
-    	$range = FileMgrIrodsWs::max_run_range( $instrument, $experiment, array( $type ));
-        FileMgrIrodsWs::request( $result, '/runs/'.$instrument.'/'.$experiment.'/'.$type.'/'.$range['min'].'-'.$range['max'] );
+    	$range = FileMgrIrodsWs::run_range( $instrument, $experiment, $type );
+        if( $range['total'] != 0 )
+            FileMgrIrodsWs::request( $result, '/runs/'.$instrument.'/'.$experiment.'/'.$type.'/'.$range['min'].'-'.$range['max'] );
         return $result;
     }
     
@@ -123,7 +128,9 @@ class FileMgrIrodsWs {
         		//
         		return json_decode( '' );
             }
-            die( "Web service request faild: {$url}, eror code: ".$info['response_code'] );
+            throw new FileMgrException (
+                __METHOD__,
+                "Web service request faild: {$url}, eror code: ".$info['response_code'] );
         }
         $response_parsed = http_parse_message( $response );
 
