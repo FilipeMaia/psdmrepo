@@ -54,12 +54,9 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   : Module(name)
   , m_calibDir()
   , m_typeGroupName()
-  , m_source()
-  , m_src()
+  , m_str_src()
   , m_inkey()
   , m_imgkey()
-  , m_maxEvents()
-  , m_filter()
   , m_tiltIsApplied()
   , m_print_bits()
   , m_count(0)
@@ -67,14 +64,11 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   // get the values from configuration or use defaults
   m_calibDir      = configStr("calibDir",      ""); // if not provided default from env will be used
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
-  m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
+  m_str_src       = configStr("source",        "CxiDs1.0:Cspad.0");
   m_inkey         = configStr("key",           "");
   m_imgkey        = configStr("imgkey",        "Image2D");
-  m_maxEvents     = config   ("events",        1<<31U);
-  m_filter        = config   ("filter",        false);
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
-  m_src           = m_source;
 }
 
 
@@ -100,7 +94,7 @@ CSPadImageProducer::beginJob(Event& evt, Env& env)
 void 
 CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
-  if( m_print_bits & 1<<1 ) MsgLog(name(), info, "ImageCSPad::beginRun ");
+  if( m_print_bits & 2 ) MsgLog(name(), info, "ImageCSPad::beginRun ");
 
   // get run number
   shared_ptr<EventId> eventId = evt.get();
@@ -115,12 +109,12 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
 
   //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
                                                       // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_source, run);
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_str_src, run);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
 
-  if( m_print_bits & 1<<0 ) m_cspad_calibpar  -> printCalibPars();
+  if( m_print_bits & 1 ) m_cspad_calibpar  -> printCalibPars();
   //m_pix_coords_2x1  -> print_member_data();
   //m_pix_coords_quad -> print_member_data(); 
 
@@ -132,7 +126,7 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
 void 
 CSPadImageProducer::getQuadConfigPars(Env& env)
 {
-  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_src);
+  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_str_src);
   if (config.get()) {
       for (uint32_t q = 0; q < config->numQuads(); ++ q) {
         m_roiMask[q]         = config->roiMask(q);
@@ -167,13 +161,11 @@ CSPadImageProducer::event(Event& evt, Env& env)
 {
   // this is how to gracefully stop analysis job
   ++m_count;
-  if (m_count >= m_maxEvents) stop();
-  //cout << "Event: " << m_count;
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, m_inkey, &m_actualSrc); // get m_actualSrc here
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_inkey, &m_src); // get m_src here
 
   if (data2.get()) {
 
@@ -194,7 +186,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
 	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
 
-    if( m_print_bits & 1<<1 ) {
+    if( m_print_bits & 2 ) {
       status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
       cout << "  Time to fill cspad is " 
            << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
@@ -306,13 +298,13 @@ CSPadImageProducer::cspad_image_add_in_event(Event& evt)
   if(m_imgkey == "Image2D") {
 
     shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
-    evt.put(img2d, m_actualSrc, m_imgkey);
+    evt.put(img2d, m_src, m_imgkey);
 
   } else {
 
     const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
     shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(&m_arr_cspad_image[0][0],shape) );
-    evt.put(img2d, m_actualSrc, m_imgkey);
+    evt.put(img2d, m_src, m_imgkey);
   }
 }
 

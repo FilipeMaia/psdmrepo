@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-08
+2012-08-15 Mikhail S. Dubrovin
+- Cosmetic improvement: m_actualSrc -> m_src, m_source -> m_src
+- Remove input unnecessary parameters and logic for : m_maxEvents, m_filter
+M       CSPadPixCoords/include/CSPadImageProducer.h
+M       CSPadPixCoords/src/CSPadImageProducer.cpp
+
+=======
 Tag: V00-02-07
 2012-07-24 Andy Salnikov
 - rhel6/gcc44 migration, added missing headers

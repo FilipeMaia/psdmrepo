@@ -120,14 +120,12 @@ private:
 
   std::string m_calibDir;       // i.e. ./calib
   std::string m_typeGroupName;  // i.e. CsPad::CalibV1
-  std::string m_source;         // i.e. CxiDs1.0:Cspad.0
+  std::string m_str_src;        // i.e. CxiDs1.0:Cspad.0
    
-  Source   m_src;         // Data source set from config file
-  Pds::Src m_actualSrc;
+  //Source   m_src;         // Data source set from config file
+  Pds::Src    m_src;
   std::string m_inkey; 
   std::string m_imgkey;   // i.e. "CSPad:Image"
-  unsigned m_maxEvents;
-  bool     m_filter;
   bool     m_tiltIsApplied;
   unsigned m_print_bits;
   long     m_count;
