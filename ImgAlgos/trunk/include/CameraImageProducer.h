@@ -1,13 +1,15 @@
-#ifndef IMGALGOS_IMGPEAKFILTER_H
-#define IMGALGOS_IMGPEAKFILTER_H
+#ifndef IMGALGOS_CAMERAIMAGEPRODUCER_H
+#define IMGALGOS_CAMERAIMAGEPRODUCER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImgPeakFilter.
-//
+//	Class CameraImageProducer.
+// 1. Get Camera data as uint8_t or uint16_t
+// 2. Subtract (if necessary) the offset from frmData->offset();
+// 3. Save image in the event as ndarray<double,2>
 //------------------------------------------------------------------------
 
 //-----------------
@@ -22,7 +24,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ImgAlgos/ImgPeakFinder.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -49,16 +50,14 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class ImgPeakFilter : public Module {
+class CameraImageProducer : public Module {
 public:
 
-  enum SELECTION_MODE{ SELECTION_OFF, SELECTION_ON, SELECTION_INV };
- 
   // Default constructor
-  ImgPeakFilter (const std::string& name) ;
+  CameraImageProducer (const std::string& name) ;
 
   // Destructor
-  virtual ~ImgPeakFilter () ;
+  virtual ~CameraImageProducer () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -83,38 +82,30 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-  void printPeaks();
-  void printEventId(Event& evt);
-  void printEventRecord(Event& evt);
+  void procEvent(Event& evt, Env& env);
+  void saveImageInEvent(Event& evt, double *p_data, const unsigned *shape);
   void printInputParameters();
-  bool eventIsSelected(Event& evt);
-  void doForSelectedEvent(Event& evt);
-  bool peakSelector();
-  void setSelectionMode();
-  void savePeaksInFile(Event& evt);
+  void printEventId(Event& evt);
+  void printTimeStamp(Event& evt, std::string comment="");
+  void printSummary(Event& evt, std::string comment="");
 
 private:
 
-  // Data members, this is for example purposes only
-  
-  Pds::Src       m_src;
-  std::string    m_str_src;
-  std::string    m_key;
-  std::string    m_sel_mode_str;
-  SELECTION_MODE m_sel_mode;
-  double         m_thr_peak;
-  double         m_thr_total;
-  unsigned       m_thr_npeaks;  
-  std::string    m_fname;       // prefix of the file name
+  enum{ MAX_IMG_SIZE=2000*2000 };
+ 
+  Pds::Src       m_src;              // source address of the data object
+  std::string    m_str_src;          // string with source name
+  std::string    m_key_in;           // string with key for input data
+  std::string    m_key_out;          // string with key for output image
+  bool           m_subtract_offset;
   unsigned       m_print_bits;
   long           m_count;
-  long           m_selected;
 
-  unsigned       m_n_selected_peaks;
+  ndarray<double,2> *m_ndarr;
+  double m_data_arr[MAX_IMG_SIZE];
 
-  vector<Peak>* m_peaks;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_IMGPEAKFILTER_H
+#endif // IMGALGOS_CAMERAIMAGEPRODUCER_H

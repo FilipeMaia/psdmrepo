@@ -11,6 +11,34 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2012-08-12 Mikhail S. Dubrovin
+- Add CameraImageProducer
+- Move SaveImageInFile from CSPadPixCoords to ImgAlgos
+- Make new GlobalMethods for common global methods
+- Improve ImgPeakFinder, ImgPeakFilter: input parameters, output file aming etc.
+A       include/CameraImageProducer.h
+M       include/ImgPeakFinder.h
+M       include/ImgPeakFilter.h
+A       include/GlobalMethods.h
+A       include/SaveImageInFile.h
+A       src/CameraImageProducer.cpp
+M       src/ImgPeakFinder.cpp
+M       src/ImgPeakFilter.cpp
+A       src/GlobalMethods.cpp
+M       src/Tahometer.cpp
+M       src/CSPadArrPeakFinder.cpp
+A       src/SaveImageInFile.cpp
+A       data/PlotCSPad2x2ArrayFromFile.py
+M       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotCSPadArrayAndPeaksFromFile.py
+
+Andy has changed:
+U    src/EventNumberFilter.cpp
+U    src/CSPadBackgroundV1.cpp
+U    src/CSPadMaskV1.cpp
+	
 Tag: V00-00-11
 2012-07-25 Andy Salnikov
 - fix const char* warning

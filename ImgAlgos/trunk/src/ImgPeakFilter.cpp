@@ -14,10 +14,12 @@
 // This Class's Header --
 //-----------------------
 #include "ImgAlgos/ImgPeakFilter.h"
+#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <fstream> // for ofstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -47,25 +49,51 @@ namespace ImgAlgos {
 //----------------
 ImgPeakFilter::ImgPeakFilter (const std::string& name)
   : Module(name)
-  , m_src()
+  , m_str_src()
   , m_key()
-  , m_filterIsOn()
+  , m_sel_mode_str()
   , m_thr_peak()
   , m_thr_total()
   , m_thr_npeaks()
+  , m_fname()
   , m_print_bits()
   , m_count(0)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_src        = configStr("source", "DetInfo(:Opal1000)");
-  m_key        = configStr("key",       "peaks");
-  m_filterIsOn = config   ("filterIsOn",   true);
-  m_thr_peak   = config   ("threshold_peak",  0);
-  m_thr_total  = config   ("threshold_total", 0);
-  m_thr_npeaks = config   ("n_peaks_min",     1);
-  m_print_bits = config   ("print_bits",      0);
+  m_str_src      = configStr("source",         "DetInfo(:Opal1000)");
+  m_key          = configStr("key",            "peaks");
+  m_sel_mode_str = configStr("selection_mode", "SELECTION_ON");
+  m_thr_peak     = config   ("threshold_peak",  0);
+  m_thr_total    = config   ("threshold_total", 0);
+  m_thr_npeaks   = config   ("n_peaks_min",     1);
+  m_fname        = configStr("fname",          "");
+  m_print_bits   = config   ("print_bits",      0);
+
+  setSelectionMode(); // m_sel_mode_str -> enum m_sel_mode 
 }
+
+//--------------------
+
+// Print input parameters
+void 
+ImgPeakFilter::printInputParameters()
+{
+  WithMsgLog(name(), info, log) {
+    log << "\n Input parameters:"
+        << "\n source     : "     << m_str_src
+        << "\n key        : "     << m_key      
+        << "\n sel_mode   : "     << m_sel_mode_str  
+        << "\n thr_peak   : "     << m_thr_peak
+        << "\n thr_total  : "     << m_thr_total
+        << "\n thr_npeaks : "     << m_thr_npeaks
+        << "\n fname      : "     << m_fname
+        << "\n print_bits : "     << m_print_bits
+        << "\n";     
+  }
+}
+
+//--------------------
 
 //--------------
 // Destructor --
@@ -100,12 +128,13 @@ ImgPeakFilter::event(Event& evt, Env& env)
 {
   ++ m_count;
 
-  if ( !m_filterIsOn ) { ++ m_selected; return; } // If the filter is OFF then event is selected
+  if ( m_sel_mode == SELECTION_OFF ) { ++ m_selected; return; } // If the filter is OFF then event is selected
 
-  shared_ptr< vector<Peak> > peaks = evt.get(m_src, m_key, &m_actualSrc);
+  shared_ptr< vector<Peak> > peaks = evt.get(m_str_src, m_key, &m_src);
   if (peaks.get()) {
     m_peaks = peaks.get();
-    if ( eventIsSelected(evt) ) { ++ m_selected; return; } // event is selected
+    if ( m_sel_mode == SELECTION_ON  &&  eventIsSelected(evt) ) { doForSelectedEvent(evt); return; } // event is selected
+    if ( m_sel_mode == SELECTION_INV && !eventIsSelected(evt) ) { doForSelectedEvent(evt); return; } // event is inversly-selected
   }
 
   skip(); return; // if event is discarded
@@ -133,30 +162,51 @@ ImgPeakFilter::endJob(Event& evt, Env& env)
 
 //--------------------
 
+void 
+ImgPeakFilter::setSelectionMode()
+{
+  m_sel_mode = SELECTION_OFF;
+  if (m_sel_mode_str == "SELECTION_ON")  m_sel_mode = SELECTION_ON;
+  if (m_sel_mode_str == "SELECTION_INV") m_sel_mode = SELECTION_INV;
+}
+
+//--------------------
+
 bool
 ImgPeakFilter::eventIsSelected(Event& evt)
 {
   if( m_print_bits & 4 ) printPeaks();  
-  if( m_print_bits & 8 ) printEventId(evt);
-
+  if( m_print_bits & 16) printEventId(evt);
   return peakSelector();
 }
+
+//--------------------
+
+void 
+ImgPeakFilter::doForSelectedEvent(Event& evt)
+{
+  ++ m_selected;
+  if( m_print_bits & 8 )           printEventRecord(evt);
+  if( m_fname != std::string("") ) savePeaksInFile(evt);
+}
+
+//--------------------
 
 //--------------------
 // Loop over vector of peaks and count peaks fulfiled the filter conditions
 bool
 ImgPeakFilter::peakSelector()
 {
-  unsigned n_selected_peaks = 0;
+  m_n_selected_peaks = 0;
 
   for( vector<Peak>::const_iterator itv  = m_peaks->begin();
                                     itv != m_peaks->end(); itv++ ) {
     if ( itv->ampmax > m_thr_peak 
-      && itv->amptot > m_thr_total ) n_selected_peaks++;
+      && itv->amptot > m_thr_total ) m_n_selected_peaks++;
   }
 
-  if ( n_selected_peaks >= m_thr_npeaks ) return true;
-  else                                    return false;
+  if ( m_n_selected_peaks >= m_thr_npeaks ) return true;
+  else                                      return false;
 }
 
 //--------------------
@@ -166,8 +216,8 @@ ImgPeakFilter::printPeaks()
 {
   MsgLog( name(), info, "Vector of peaks of size " << m_peaks->size() );
 
-  for( vector<Peak>::const_iterator itv  = m_peaks->begin();
-                                    itv != m_peaks->end(); itv++ ) {
+  for( vector<Peak>::iterator itv  = m_peaks->begin();
+                              itv != m_peaks->end(); itv++ ) {
 
       cout << "  x="      << itv->x     
            << "  y="      << itv->y     
@@ -180,32 +230,63 @@ ImgPeakFilter::printPeaks()
 
 //--------------------
 
-// Print input parameters
 void 
-ImgPeakFilter::printInputParameters()
+ImgPeakFilter::printEventId(Event& evt)
 {
-  WithMsgLog(name(), info, log) {
-    log << "\n Input parameters:"
-        << "\n source     : "     << m_src
-        << "\n key        : "     << m_key      
-        << "\n filterIsOn : "     << m_filterIsOn   
-        << "\n thr_peak   : "     << m_thr_peak
-        << "\n thr_total  : "     << m_thr_total
-        << "\n thr_npeaks : "     << m_thr_npeaks
-        << "\n print_bits : "     << m_print_bits
-        << "\n";     
-  }
+  //shared_ptr<PSEvt::EventId> eventId = evt.get();
+  //if (eventId.get()) MsgLog( name(), info, "event ID: " << *eventId );
+
+  MsgLog( name(), info, "r"        << stringRunNumber(evt) 
+	             << " "        << stringTimeStamp(evt) 
+                     << " evt:"    << stringFromUint(m_count) 
+                     << " sel:"    << stringFromUint(m_selected)
+	           //<< " npeaks:" << m_n_selected_peaks
+  );
 }
 
 //--------------------
 
 void 
-ImgPeakFilter::printEventId(Event& evt)
+ImgPeakFilter::printEventRecord(Event& evt)
 {
-  shared_ptr<PSEvt::EventId> eventId = evt.get();
-  if (eventId.get()) {
-    MsgLog( name(), info, "event ID: " << *eventId);
+  MsgLog( name(), info, "r"        << stringRunNumber(evt) 
+	             << " "        << stringTimeStamp(evt) 
+                     << " evt:"    << stringFromUint(m_count) 
+                     << " sel:"    << stringFromUint(m_selected)
+                     << " npeaks:" << m_n_selected_peaks
+  );
+}
+
+//--------------------
+// Save peak vector info in the file
+void 
+ImgPeakFilter::savePeaksInFile(Event& evt)
+{
+  std::string fname; 
+  fname = m_fname
+        + "-r"    + stringRunNumber(evt) 
+        + "-"     + stringTimeStamp(evt) 
+    //  + "-ev"   + stringFromUint(m_count)
+        + "-peaks.txt";
+
+  MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
+
+  ofstream file; 
+  file.open(fname.c_str(),ios_base::out);
+
+  for( vector<Peak>::iterator itv  = m_peaks->begin();
+                              itv != m_peaks->end(); itv++ ) {
+
+    //if( m_print_bits & 16 ) printPeakInfo(*itv);
+
+    file << itv->x        << "  "
+         << itv->y	  << "  "
+         << itv->ampmax	  << "  "
+         << itv->amptot	  << "  "
+         << itv->npix     << endl; 
   }
+
+  file.close();
 }
 
 //--------------------

@@ -926,7 +926,10 @@ CSPadArrPeakFinder::evaluateSoNForPixel(unsigned col, unsigned row, const int16_
   if ( sum0 > 0 ) {
     res.avg = sum1/sum0;                                // Averaged background level
     res.rms = std::sqrt( sum2/sum0 - res.avg*res.avg ); // RMS os the background around peak
-    res.sig = sectData[row + col*NumRows] - res.avg;    // Signal above the background
+  //res.sig = sectData[row + col*NumRows] - res.avg;    // Signal above the background
+    double dat = sectData[row + col*NumRows];
+    double dif = dat - res.avg;
+    res.sig = (dat>dif) ? dif : dat;                    // Signal above the background
     if (res.rms>0) res.SoN = res.sig/res.rms;           // S/N ratio
   }
 

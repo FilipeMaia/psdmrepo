@@ -58,8 +58,8 @@ Tahometer::Tahometer (const std::string& name)
   , m_count_dn(0)
   , m_count(0)
 {
-  m_dn         = config   ("dn",        10);
-  m_print_bits = config   ("print_bits", 0);
+  m_dn         = config   ("dn",       100);
+  m_print_bits = config   ("print_bits", 2);
 }
 
 //--------------

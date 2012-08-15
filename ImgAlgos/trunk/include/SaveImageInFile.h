@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_IMGPEAKFILTER_H
-#define IMGALGOS_IMGPEAKFILTER_H
+#ifndef IMGALGOS_SAVEIMAGEINFILE_H
+#define IMGALGOS_SAVEIMAGEINFILE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImgPeakFilter.
+//	Class SaveImageInFile.
 //
 //------------------------------------------------------------------------
 
@@ -22,11 +22,13 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ImgAlgos/ImgPeakFinder.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+
+#include "PSEvt/Source.h"
+
 
 //		---------------------
 // 		-- Class Interface --
@@ -39,26 +41,32 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief Example module class for psana
+ *  @brief SaveImageInFile is a test/example module for psana framework.
+ *
+ *  SaveImageInFile psana module class works after CSPadImageProducer.
+ *  It gets the Image2D object from the event.
+ *  This image object may be used in data processing.
+ *  For the test purpose, the image of particular event is saved in the text file.
+ *  This event number is defined in the psana.cfg configuration file. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see CSPadImageProducer
  *
  *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */
 
-class ImgPeakFilter : public Module {
+class SaveImageInFile : public Module {
 public:
 
-  enum SELECTION_MODE{ SELECTION_OFF, SELECTION_ON, SELECTION_INV };
- 
   // Default constructor
-  ImgPeakFilter (const std::string& name) ;
+  SaveImageInFile (const std::string& name) ;
 
   // Destructor
-  virtual ~ImgPeakFilter () ;
+  virtual ~SaveImageInFile () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -82,39 +90,24 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-protected:
-  void printPeaks();
-  void printEventId(Event& evt);
-  void printEventRecord(Event& evt);
+  void saveImageInFile(Event& evt);
   void printInputParameters();
-  bool eventIsSelected(Event& evt);
-  void doForSelectedEvent(Event& evt);
-  bool peakSelector();
-  void setSelectionMode();
-  void savePeaksInFile(Event& evt);
 
 private:
 
   // Data members, this is for example purposes only
-  
-  Pds::Src       m_src;
-  std::string    m_str_src;
-  std::string    m_key;
-  std::string    m_sel_mode_str;
-  SELECTION_MODE m_sel_mode;
-  double         m_thr_peak;
-  double         m_thr_total;
-  unsigned       m_thr_npeaks;  
-  std::string    m_fname;       // prefix of the file name
-  unsigned       m_print_bits;
-  long           m_count;
-  long           m_selected;
 
-  unsigned       m_n_selected_peaks;
-
-  vector<Peak>* m_peaks;
+  //Source      m_src;       // Data source set from config file
+  Pds::Src    m_src;
+  std::string m_str_src;     // i.e. CxiDs1.0:Cspad.0
+  std::string m_key;         // i.e. Image2D
+  unsigned    m_eventSave;   // event number starting from 1 to be saved in file
+  bool        m_saveAll;     // should be true to save all events in files
+  std::string m_fname;       // common part of the file name
+  unsigned    m_print_bits;
+  long        m_count;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_IMGPEAKFILTER_H
+#endif // IMGALGOS_SAVEIMAGEINFILE_H

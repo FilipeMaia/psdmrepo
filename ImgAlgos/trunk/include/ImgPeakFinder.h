@@ -56,10 +56,10 @@ struct Peak{
    double ampmax;
    double amptot;
    unsigned npix;
+};
    // ? double s1;
    // ? double s2; 
    // ? double tilt_angle;  
-} ;
 
 class ImgPeakFinder : public Module {
 public:
@@ -95,34 +95,34 @@ public:
 protected:
   void   printInputParameters();
   void   setWindowRange();
+  void   printWindowRange();
   void   initImage();
   void   smearImage();
   double smearPixAmp(size_t& r0, size_t& c0);
   double weight(int& dr, int& dc);
   void   evaluateWeights();
   void   printWeights();
-  void   saveImageInFile0();
-  void   saveImageInFile1();
-  void   saveImageInFile2();
-  string stringEventN();
-  string stringTimeStamp(Event& evt);
+  void   saveImageInFile0(Event& evt);
+  void   saveImageInFile1(Event& evt);
+  void   saveImageInFile2(Event& evt);
+  string getCommonFileName(Event& evt);
   bool   getAndProcImage(Event& evt);
   bool   procImage(Event& evt);
   void   findPeaks(Event& evt);
-  bool   checkIfPixIsPeak(size_t& r0, size_t& c0);
+  void   checkIfPixIsPeak(size_t& r0, size_t& c0);
   void   printPeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
+  void   printPeakInfo(Peak& p);
   void   savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
   void   savePeaksInEvent(Event& evt);
-  void   savePeaksInFile();
+  void   savePeaksInFile(Event& evt);
 
 private:
 
-  enum{ MAX_IMG_SIZE=4000000 };
+  enum{ MAX_IMG_SIZE=2000*2000 };
   enum{ MARGIN=10, MARGIN1=11 };
 
-  Pds::Src    m_actualSrc;
-  Source      m_source;
-  std::string m_src;
+  Pds::Src    m_src;
+  std::string m_str_src;
   std::string m_key;
   std::string m_peaksKey;
   double   m_thr_low;
@@ -156,7 +156,7 @@ private:
   double m_data_arr[MAX_IMG_SIZE];
   double m_work_arr[MAX_IMG_SIZE];
   TimeInterval *m_time;
-  vector<Peak> m_Peaks;
+  std::vector<Peak> m_Peaks;
 };
 
 } // namespace ImgAlgos

@@ -113,11 +113,13 @@ def do_main() :
     arr_mask = evaluate_mask_array(arr,threshold)
 
     #3. Mask two deffective rectangular regions    
-    arr_mask = mask_rect(arr_mask, 0, 6, row0=115, rowN=175, col0=260, colN=384)    
+    ##arr_mask = mask_rect(arr_mask, 0, 6, row0=115, rowN=175, col0=260, colN=384)    
+    arr_mask = mask_rect(arr_mask, 0, 6, row0=115, rowN=185, col0=260, colN=388)    
     arr_mask = mask_rect(arr_mask, 1, 2, row0=0, rowN=100, col0=0, colN=50)    
 
     #4. Mask central beam-region 
     #for quad in range(4) : arr_mask = mask_rect(arr_mask, quad, 1, row0=80, rowN=185, col0=0, colN=140)    
+    for quad in range(4) : arr_mask = mask_rect(arr_mask, quad, 1, row0=165, rowN=185, col0=0, colN=40)    
 
     save_array_in_file(arr_mask,outfname)
 
