@@ -45,6 +45,9 @@ class CsPad( object ):
             self.cspad_alignment(path)
         else :
             self.cspad2x2_alignment(path)
+
+        self.calib_path = path
+        self.calib_file = None
         
         self.x_coordinates = None
         self.y_coordinates = None
@@ -72,7 +75,8 @@ class CsPad( object ):
 
         if file is None: # assume same file for all runs
             file = '0-end.data'
-            
+        self.calib_file = file
+        
         # angle of each section = rotation (nx90 degrees) + tilt (small angles)
         # ... (4 rows (quads) x 8 columns (sections))
         self.rotation_array =  np.loadtxt('%s/rotation/%s'%(path,file))
@@ -306,11 +310,15 @@ class CsPad( object ):
         #self.image = np.ma.filled( im_hot_masked, 0)
         return self.image
          
-    def load_pedestals(self, pedestalsfile ):
+    def load_pedestals(self, pedestalsfile=None ):
         """ load dark from pedestal file:
         pedestals txt file is (4*8*185)=5920 (lines) x 388 (columns)
         accepted file formats: ascii and npy (binary)
         """
+        if pedestalsfile is None:
+            pedestalsfile = ('%s/pedestals/%s'%(self.calib_path,self.calib_file))            
+            
+
         try: 
             if pedestalsfile.find(".npy") >= 0:
                 self.pedestals = np.load(pedestalsfile).reshape((4,8,185,388))

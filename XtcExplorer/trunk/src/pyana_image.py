@@ -10,7 +10,7 @@ __version__ = "$Revision: 3190 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys
+import sys, os.path
 import time
 import logging
 
@@ -275,8 +275,19 @@ class  pyana_image ( object ) :
 	## load dark image from file
         self.dark_image = self.load_dark(self.darkfile)
 
-        calibfinder = CalibFileFinder(env.calibDir(),"CsPad::CalibV1")
+        if self.calib_path is None:
+            self.calib_path = env.calibDir()
+        
+        calibfinder = CalibFileFinder(self.calib_path,"CsPad::CalibV1")
+        # calibfinder is an object that knows where to look for 'calibration' files:
+        # pedestals, hot pixel mask, alignment parameters etc. 
+        
         for addr in self.sources :
+
+            # For each address (each device), resolve the path name to the calibration files. Start with pedestals... 
+            pedestalsfile = calibfinder.findCalibFile(addr,"pedestals",evt.run() )
+            # get the directory from this (for the alignment)
+            calibdir = '/'.join(os.path.split(pedestalsfile)[0].split('/')[0:-1])
 
             # pick out the device name from the address
             (device, detsrc) = self.parse_address(env, addr)
@@ -306,7 +317,7 @@ class  pyana_image ( object ) :
                             sections.append(section)
                 else:
                     sections = self.config.sections()
-                self.cspad[addr] = cspad.CsPad(sections, path=self.calib_path)
+                self.cspad[addr] = cspad.CsPad(sections, path=calibdir)
                 
             elif addr.find('Cspad')>=0:
                 quads = range(4)
@@ -321,7 +332,7 @@ class  pyana_image ( object ) :
                         sections.append(section)
                 else:
                     sections = map(self.config.sections, quads)
-                self.cspad[addr] = cspad.CsPad(sections, path=self.calib_path)
+                self.cspad[addr] = cspad.CsPad(sections, path=calibdir)
                 self.cspad[addr].cmmode_mode = self.cmmode_mode
                 self.cspad[addr].cmmode_thr = self.cmmode_thr
                 if self.small_tilt :
@@ -329,7 +340,7 @@ class  pyana_image ( object ) :
                 
 
                 try:
-                    self.cspad[addr].load_pedestals( calibfinder.findCalibFile(addr,"pedestals",evt.run() ) )
+                    self.cspad[addr].load_pedestals( pedestalsfile )
                 except OSError, e:
                     print "  ", e
                     print "  ", "No pedestals will be subtracted"
