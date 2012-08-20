@@ -277,6 +277,8 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
 {
   m_time -> startTimeOnce();
 
+  if( m_print_bits &  32 ) printTimeStamp(evt);
+
   maskUpdateControl();
   resetForEventProcessing();
   if( m_print_bits & 512 ) printSelectionStatisticsByCounter();
@@ -290,7 +292,6 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
   bool isSelected = eventSelector();
 
   if( m_print_bits &   4 ) printEventSelectionPars(evt, isSelected);
-  if( m_print_bits &  32 ) printTimeStamp(evt);
   if( m_print_bits & 128 ) printVectorOfPeaks();
 
   if (m_sel_mode == SELECTION_ON  && !isSelected) {skip(); return;}
@@ -648,8 +649,8 @@ CSPadArrPeakFinder::collectStatInSect(unsigned quad, unsigned sect, const int16_
 void 
 CSPadArrPeakFinder::findPeaksInSect(unsigned quad, unsigned sect)
 {
-  //m_quad = quad;
-  //m_sect = sect;
+  m_quad = quad;
+  m_sect = sect;
   for (int ic = 0; ic != NumColumns; ++ ic) {
     for (int ir = 0; ir != NumRows; ++ ir) {
 
@@ -712,17 +713,16 @@ CSPadArrPeakFinder::iterateOverConnectedPixels(int quad, int sect, int ic, int i
 bool
 CSPadArrPeakFinder::peakSelector(PeakWork& pw) {
 
-  if (pw.peak_npix < m_peak_npix_min)       return false;
-  if (pw.peak_npix > m_peak_npix_max)       return false;
+  if( m_print_bits & 2048 && pw.peak_npix > m_peak_npix_min-2) printPeakWork(pw);
 
+  if(pw.peak_npix < m_peak_npix_min) return false;
+  if(pw.peak_npix > m_peak_npix_max) return false;
   if(m_peak_amp_tot_thr > 1 && pw.peak_amp_tot < m_peak_amp_tot_thr) return false;   
   //if (pw.peak_amp_max < m_peak_amp_max_thr) return false;
 
-     pw.peak_noise = std::sqrt( pw.peak_noise2_tot / pw.peak_npix );
-     pw.peak_SoN = (pw.peak_noise > 0) ? pw.peak_amp_tot / pw.peak_noise : 0;
+  pw.peak_noise = std::sqrt( pw.peak_noise2_tot / pw.peak_npix );
+  pw.peak_SoN = (pw.peak_noise > 0) ? pw.peak_amp_tot / pw.peak_noise : 0;
   if(pw.peak_SoN < m_peak_SoN_thr) return false;   
-
-  //printPeakWork(pw);
 
   return true;
 }
@@ -731,13 +731,28 @@ CSPadArrPeakFinder::peakSelector(PeakWork& pw) {
 // This is for test print only
 void 
 CSPadArrPeakFinder::printPeakWork(PeakWork& pw) {
+
+    double col    = pw.peak_amp_x_col1 / pw.peak_amp_tot;
+    double row    = pw.peak_amp_x_row1 / pw.peak_amp_tot; 
+    pw.peak_noise = std::sqrt( pw.peak_noise2_tot / pw.peak_npix );
+    pw.peak_SoN   = (pw.peak_noise > 0) ? pw.peak_amp_tot / pw.peak_noise : 0;
+
     MsgLog(name(), info, 
-             "Peak work struct:" 
-          << "  npix="    << pw.peak_npix
-          << "  bkgd="    << pw.peak_bkgd_tot
-          << "  noise="   << pw.peak_noise
-          << "  amp="     << pw.peak_amp_tot
-          << "  SoN="     << pw.peak_SoN
+             "Peak candidate:" 
+          << "q/s/c/r="           << m_quad
+          << "/"                  << m_sect << std::setprecision(1) << std::fixed
+	  << "/"                  << col
+	  << "/"                  << row
+          << "  npix/min:max="    << pw.peak_npix
+          << "/"                  << m_peak_npix_min
+          << ":"                  << m_peak_npix_max
+	  << "  Btot="            << pw.peak_bkgd_tot
+          << "  noise="           << pw.peak_noise
+          << "  ampmax="          << pw.peak_amp_max
+          << "  amptot/thr="      << pw.peak_amp_tot
+          << "/"                  << m_peak_amp_tot_thr
+          << "  SoN/thr="         << pw.peak_SoN
+          << "/"                  << m_peak_SoN_thr << std::setprecision(6) 
 	   );
 }
 
@@ -775,7 +790,6 @@ CSPadArrPeakFinder::printVectorOfPeaks()
   int i=0;
   for( vector<Peak>::const_iterator p  = v_peaks.begin();
                                     p != v_peaks.end(); p++ ) {
-
     MsgLog(name(), info, 
              "  peak:"      << ++i 
           << "  quad="      << p->quad
@@ -955,7 +969,7 @@ CSPadArrPeakFinder::printTimeStamp(Event& evt, std::string comment)
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
 
-    MsgLog( name(), info, " Run="   <<  eventId->run()
+    MsgLog( name(), info, "Run="    <<  eventId->run()
                        << " Event=" <<  m_count 
                        << " Time="  <<  eventId->time()
 	               << comment.c_str() );

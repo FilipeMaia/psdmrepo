@@ -243,8 +243,8 @@ private:
   std::vector<TwoIndexes> v_sectAndIndexInArray[MaxQuads];
   std::vector<Peak> v_peaks;
   std::vector<Peak> v_peaks_in_sect[MaxQuads][MaxSectors];
-  //unsigned  m_quad;
-  //unsigned  m_sect;
+  unsigned  m_quad;
+  unsigned  m_sect;
   double    m_event_amp_tot;
   TimeInterval *m_time;
 
