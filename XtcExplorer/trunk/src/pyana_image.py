@@ -283,12 +283,19 @@ class  pyana_image ( object ) :
         # pedestals, hot pixel mask, alignment parameters etc. 
         
         for addr in self.sources :
-
-            # For each address (each device), resolve the path name to the calibration files. Start with pedestals... 
-            pedestalsfile = calibfinder.findCalibFile(addr,"pedestals",evt.run() )
-            # get the directory from this (for the alignment)
-            calibdir = '/'.join(os.path.split(pedestalsfile)[0].split('/')[0:-1])
-
+            
+            # For each address (each device), resolve the path name to the calibration files.
+            # if there is one. Start with pedestals... 
+            pedestalsfile = None
+            calibdir = None
+            try: 
+                pedestalsfile = calibfinder.findCalibFile(addr,"pedestals",evt.run() )
+                # get the directory from this (for the alignment)
+                calibdir = '/'.join(os.path.split(pedestalsfile)[0].split('/')[0:-1])
+            except OSError, e:
+                logging.debug( "Calibration directory not found \n "%e )
+                
+                
             # pick out the device name from the address
             (device, detsrc) = self.parse_address(env, addr)
             if not device:
@@ -307,6 +314,7 @@ class  pyana_image ( object ) :
                         if detsrc in str(k):
                             print "*** possible match:", k
                 continue
+
 
             if addr.find('Cspad2x2')>=0:
                 if self.psana:
@@ -344,6 +352,7 @@ class  pyana_image ( object ) :
                 except OSError, e:
                     print "  ", e
                     print "  ", "No pedestals will be subtracted"
+
                     
     # process event/shot data
     def event ( self, evt, env ) :
@@ -453,6 +462,7 @@ class  pyana_image ( object ) :
 
 
             # prepare to apply threshold and see if this is a hit or a dark event
+            isHit = False
             isDark = False
             isSaturated = False
             name = addr
@@ -488,6 +498,7 @@ class  pyana_image ( object ) :
                     #print "average value of the ROI = ", maxvalue
                     
                 # apply the threshold
+                print self.threshold.lower, self.threshold.upper, maxvalue
                 if self.threshold.lower is not None and maxvalue < self.threshold.lower :
                     isDark = True
                     name += "_dark"
@@ -498,7 +509,7 @@ class  pyana_image ( object ) :
                     name += "_sat"
                     title += " (saturated)"
 
-
+                    
                 VeryVerbose = False
                 if VeryVerbose :
                     if (not isDark) and (not isSaturated): 
@@ -537,6 +548,7 @@ class  pyana_image ( object ) :
                 pass 
             else :
                 # ------------- HIT ----------------
+                isHit = True
                 self.n_good[addr]+=1
 
                 if "average" in self.quantities: 
@@ -556,7 +568,7 @@ class  pyana_image ( object ) :
 
 
         # make plot? if so, pass this info to the event. 
-        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+        if isHit and self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')

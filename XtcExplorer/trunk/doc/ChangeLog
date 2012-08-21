@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Aug-20 ofte
+	- pyana_image: plot only hits. 
+	
 2012-Aug-20 ofte V00-01-37
 	- fix path problem with cspad (reported by mcmesser)
 	
