@@ -64,7 +64,7 @@ private:
 
 //--------------------
 
-  std::string stringFromUint(unsigned number, unsigned width=6);
+  std::string stringFromUint(unsigned number, unsigned width=6, char fillchar='0');
   std::string stringTimeStamp(PSEvt::Event& evt, std::string fmt="%Y%m%d-%H%M%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
   std::string stringRunNumber(PSEvt::Event& evt, unsigned width=4);
 

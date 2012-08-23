@@ -59,9 +59,9 @@ GlobalMethods::~GlobalMethods ()
 //--------------------
 
 std::string 
-stringFromUint(unsigned number, unsigned width)
+stringFromUint(unsigned number, unsigned width, char fillchar)
 {
-  stringstream ssNum; ssNum << setw(width) << setfill('0') << number;
+  stringstream ssNum; ssNum << setw(width) << setfill(fillchar) << number;
   return ssNum.str();
 }
 
