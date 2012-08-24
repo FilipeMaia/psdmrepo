@@ -8,6 +8,9 @@
 // Description:
 //	Class ImgParametersV1.
 //
+//      For 2d image parameters like pedestals, background, gain factor, and mask.
+//
+//
 //------------------------------------------------------------------------
 
 //-----------------
@@ -36,6 +39,8 @@
 namespace ImgAlgos {
 
 /**
+ *  ImgParametersV1 serves to input and hold data from files for 2d image
+ *  per-pixel calibration parameters: pedestals, background, gain factor, mask.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -72,10 +77,12 @@ public:
   // Destructor
   ~ImgParametersV1 () ;
 
-  // access pedestal data
-  ndarray<pars_t, 2> pedestals() const {
+  // access parameter data
+  ndarray<pars_t, 2> parameters() const {
     return make_ndarray(m_pars, m_rows, m_cols);
   }
+
+  pars_t* data() {return m_pars;}
 
   void print(std::string comment="");
 

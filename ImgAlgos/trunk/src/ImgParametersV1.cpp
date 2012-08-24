@@ -149,7 +149,9 @@ ImgParametersV1::ImgParametersV1 (const std::string& fname)
 
 unsigned ImgParametersV1::input_data_from_string(std::string& s)
 {
-      std::stringstream ss(s); 
+  s+=" "; // THIS SPACE IS IMPORTANT: othervise stringstream skips the last value...
+
+  std::stringstream ss(s); 
       unsigned col = 0;
       pars_t val;
       while(true) { 

@@ -7,6 +7,7 @@
 //
 // Description:
 //	Class ImgCalib.
+//      Apply corrections to 2d image using pedestals, background, gain factor, and mask.
 //
 //------------------------------------------------------------------------
 
@@ -37,6 +38,8 @@ namespace ImgAlgos {
 /// @addtogroup ImgAlgos
 
 /**
+ *  Apply corrections to 2d image using pedestals, background, gain factor, and mask.
+ *
  *  @ingroup ImgAlgos
  *
  *  @brief Example module class for psana
@@ -86,7 +89,11 @@ public:
 
 protected:
   void init(Event& evt, Env& env);
-  void saveImageInEvent(Event& evt, double *p_data=0, const unsigned *shape=0);
+  void defImgIndexesForBkgdNorm();
+  void procEvent(Event& evt, Env& env);
+  void normBkgd();
+  void saveImageInEvent(Event& evt);
+
 private:
 
   Pds::Src        m_src;              // source address of the data object
@@ -94,19 +101,43 @@ private:
   std::string     m_key_in;           // string with key for input data
   std::string     m_key_out;          // string with key for output image
   std::string     m_fname_peds;       // string file name for pedestals 
-  std::string     m_fname_mask;       // string file name for mask
   std::string     m_fname_bkgd;       // string file name for background
   std::string     m_fname_gain;       // string file name for gain factors     
+  std::string     m_fname_mask;       // string file name for mask
+  double          m_mask_val;         // Value substituted for masked bits
+  unsigned        m_row_min;          // window for background normalization
+  unsigned        m_row_max;          // window for background normalization
+  unsigned        m_col_min;          // window for background normalization
+  unsigned        m_col_max;          // window for background normalization
   unsigned        m_print_bits;       // bit mask for print options
   long            m_count;            // local event counter
 
   unsigned        m_shape[2];         // image shape
-  unsigned        m_size;             // image size (number of elements)
-    
+  unsigned        m_cols;             // number of columns in the image 
+  unsigned        m_rows;             // number of rows    in the image 
+  unsigned        m_size;             // image size = m_cols * m_rows (number of elements)
+
+  bool m_do_peds;                     // flag: true = do pedestal subtraction
+  bool m_do_mask;                     // flag: true = apply mask
+  bool m_do_bkgd;                     // flag: true = subtract background
+  bool m_do_gain;                     // flag: true = apply the gain correction
+
   ImgParametersV1* m_peds;
-  ImgParametersV1* m_mask;
   ImgParametersV1* m_bkgd;
   ImgParametersV1* m_gain;
+  ImgParametersV1* m_mask;
+
+  ImgParametersV1::pars_t* m_peds_data;
+  ImgParametersV1::pars_t* m_bkgd_data;
+  ImgParametersV1::pars_t* m_gain_data;
+  ImgParametersV1::pars_t* m_mask_data;
+
+  std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
+
+  double           m_norm;            // Normalization factor for background subtraction
+
+  const double*    m_rdat;            // Raw image data 
+  double*          m_cdat;            // Calibrated data for image
 };
 
 } // namespace ImgAlgos
