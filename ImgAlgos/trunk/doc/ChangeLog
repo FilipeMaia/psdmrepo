@@ -11,6 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2012-08-27 Mikhail S. Dubrovin
+- Re-name SaveImageInFile (keep it for now...) -> ImgSaveInFile 
+- Add ImgAverage algorithm for image, which is equivalent to CSPadArrAverage
+- Status
+A       include/ImgAverage.h
+A       include/ImgSaveInFile.h
+A       src/ImgAverage.cpp
+A       src/ImgSaveInFile.cpp
+M       src/ImgCalib.cpp
+
 Tag: V00-00-14	
 2012-08-23 Mikhail S. Dubrovin
 - Add new modules

@@ -64,7 +64,7 @@ ImgCalib::ImgCalib (const std::string& name)
   // get the values from configuration or use defaults
   m_str_src           = configStr("source", "DetInfo(:Camera)");
   m_key_in            = configStr("key_in",                 "");
-  m_key_out           = configStr("key_out",  "calibrated_img");
+  m_key_out           = configStr("key_out",      "calibrated");
   m_fname_peds        = configStr("fname_peds",             "");
   m_fname_bkgd        = configStr("fname_bkgd",             "");
   m_fname_gain        = configStr("fname_gain",             "");
