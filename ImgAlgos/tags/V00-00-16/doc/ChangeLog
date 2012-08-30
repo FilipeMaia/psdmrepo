@@ -1,0 +1,271 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ImgAlgos
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-16
+2012-08-30 Mikhail S. Dubrovin
+- Add the peak-finding module with algorithm suggested by Anton Barty (AB),
+	the same as implemented for CSPad in CSPadArrPeakFinder.cpp
+A       include/ImgPeakFinderAB.h
+A       src/ImgPeakFinderAB.cpp
+
+Tag: V00-00-15
+2012-08-27 Mikhail S. Dubrovin
+- Re-name SaveImageInFile (keep it for now...) -> ImgSaveInFile 
+- Add ImgAverage algorithm for image, which is equivalent to CSPadArrAverage
+- Status
+A       include/ImgAverage.h
+A       include/ImgSaveInFile.h
+A       src/ImgAverage.cpp
+A       src/ImgSaveInFile.cpp
+M       src/ImgCalib.cpp
+
+Tag: V00-00-14	
+2012-08-23 Mikhail S. Dubrovin
+- Add new modules
+A       include/ImgParametersV1.h
+A       include/ImgCalib.h
+M       include/GlobalMethods.h
+A       src/ImgCalib.cpp
+A       src/ImgParametersV1.cpp
+M       src/GlobalMethods.cpp
+A       data/MakeImagePixelMask.py
+A       data/MakeCSPadArrayPixelMask.py
+
+Tag: V00-00-13
+2012-08-20 Mikhail S. Dubrovin
+- Add print of info at the peak finding for connected groups of pixels 
+	if( m_print_bits & 2048 ...) printPeakWork(pw);
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadArrPeakFinder.cpp
+
+Tag: V00-00-12
+2012-08-12 Mikhail S. Dubrovin
+- Add CameraImageProducer
+- Move SaveImageInFile from CSPadPixCoords to ImgAlgos
+- Make new GlobalMethods for common global methods
+- Improve ImgPeakFinder, ImgPeakFilter: input parameters, output file aming etc.
+A       include/CameraImageProducer.h
+M       include/ImgPeakFinder.h
+M       include/ImgPeakFilter.h
+A       include/GlobalMethods.h
+A       include/SaveImageInFile.h
+A       src/CameraImageProducer.cpp
+M       src/ImgPeakFinder.cpp
+M       src/ImgPeakFilter.cpp
+A       src/GlobalMethods.cpp
+M       src/Tahometer.cpp
+M       src/CSPadArrPeakFinder.cpp
+A       src/SaveImageInFile.cpp
+A       data/PlotCSPad2x2ArrayFromFile.py
+M       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotCSPadArrayAndPeaksFromFile.py
+
+Andy has changed:
+U    src/EventNumberFilter.cpp
+U    src/CSPadBackgroundV1.cpp
+U    src/CSPadMaskV1.cpp
+	
+Tag: V00-00-11
+2012-07-25 Andy Salnikov
+- fix const char* warning
+
+Tag: V00-00-10
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-00-08
+2012-07-12 Mikhail S. Dubrovin
+- fix error in hot-pixel mask defenition when the file name is omited in parameters
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       data/proc.C
+
+Tag: V00-00-07
+2012-07-06 Mikhail S. Dubrovin
+- add PnccdImageProducer which adds pnccd image in the event
+- add CSPadArrPeakAnalysis which accumulates ntuple and histograms for peaks 
+  and saves them in root file
+A       include/PnccdImageProducer.h
+A       include/CSPadArrPeakAnalysis.h
+M       include/CSPadArrPeakFinder.h
+A       src/PnccdImageProducer.cpp
+A       src/CSPadArrPeakAnalysis.cpp
+M       src/CSPadArrPeakFinder.cpp
+  add renew auxiliary scripts:
+A       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotHDF5Dataset.py
+M       data/PlotCSPadArrayFromFile.py
+A       data/proc.C
+M       data/PlotCameraImageFromFile.py
+A       data/PlotCSPadArrayAndPeaksFromFile.py
+	
+2012-06-27 Mikhail S. Dubrovin
+	- work on PeakFinder
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadArrPeakFinder.cpp
+	
+2012-06-25 Mikhail S. Dubrovin
+- work on PeakFinder
+M       include/TimeInterval.h
+M       include/CSPadMaskApply.h
+A       include/Tahometer.h
+M       src/CSPadCommonModeCorrection.cpp
+M       src/TimeInterval.cpp
+M       src/CSPadArrSaveInFile.cpp
+M       src/CSPadMaskApply.cpp
+M       src/CSPadMaskV1.cpp
+A       src/Tahometer.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       src/CSPadBkgdSubtract.cpp
+M       src/CSPadArrAverage.cpp
+M       src/CSPadArrNoise.cpp
+
+	
+Tag: V00-00-06
+2012-06-21 Mikhail S. Dubrovin
+- multithreading mode for sections in quad of the CSPAD detector.
+M       include/CSPadArrPeakFinder.h
+M       src/TimeStampFilter.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       SConscript
+
+	
+Tag: V00-00-05
+2012-06-15 Mikhail S. Dubrovin
+- finalizing all modules for CSPadArrPeakFinder
+A       include/CSPadArrSaveInFile.h
+M       include/TimeInterval.h
+M       include/CSPadMaskApply.h
+M       include/CSPadArrPeakFinder.h
+A       src/CSPadArrSaveInFile.cpp
+M       src/TimeInterval.cpp
+M       src/CSPadMaskApply.cpp
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+
+	
+Tag: V00-00-04
+2012-05-11 Mikhail S. Dubrovin
+- modified modules:
+M       include/CSPadArrNoise.h
+M       include/CSPadMaskV1.h
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       src/CSPadArrNoise.cpp
+
+
+2012-05-09 Mikhail S. Dubrovin
+- add modules:
+A         ImgAlgos/include/CSPadArrNoise.h
+A         ImgAlgos/include/CSPadArrPeakFinder.h
+A         ImgAlgos/src/CSPadArrPeakFinder.cpp
+A         ImgAlgos/src/CSPadArrNoise.cpp
+	
+Tag: V00-00-03
+2012-04-24 Mikhail S. Dubrovin
+- add/updated scripts:
+        ImgAlgos/data/MakePixelMask.py
+        ImgAlgos/data/PlotCSPadArrayFromFile.py
+        ImgAlgos/data/PlotCameraImageAndPeaks.py
+        ImgAlgos/data/PlotCameraImageFromFile.py
+        ImgAlgos/data/PlotHDF5Dataset.py
+        ImgAlgos/data/PrintHDF5Structure.py
+
+2012-04-20 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/include/CSPadMaskApply.h
+        ImgAlgos/include/CSPadMaskV1.h
+        ImgAlgos/src/CSPadMaskApply.cpp
+        ImgAlgos/src/CSPadMaskV1.cpp
+
+2012-04-11 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/ImgRadialCorrection.cpp
+        ImgAlgos/include/ImgRadialCorrection.h
+	
+2012-04-10 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBackgroundV1.cpp
+	ImgAlgos/include/CSPadBackgroundV1.h	
+
+
+2012-04-04 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBkgdSubtract.cpp 
+	ImgAlgos/include/CSPadBkgdSubtract.h
+
+2012-04-03 Mikhail S. Dubrovin
+- add modules:
+	ImgAlgos/include/EventNumberFilter.h
+	ImgAlgos/include/TimeStampFilter.h
+	ImgAlgos/include/CSPadArrAverage.h
+	ImgAlgos/src/EventNumberFilter.cpp
+	ImgAlgos/src/TimeStampFilter.cpp
+	ImgAlgos/src/CSPadArrAverage.cpp
+	
+Tag: V00-00-02
+2012-03-21 Mikhail S. Dubrovin
+- add modules:
+         ImgPeakFinder.cpp
+         ImgPeakFilter.cpp
+- Add scripts for psana and graphical presentation of results
+         ImgAlgos/data
+         ImgAlgos/data/psana.cfg
+         ImgAlgos/data/PlotCameraImageFromFile.py
+         ImgAlgos/data/PlotCameraImageAndPeaks.py
+
+Tag: V00-00-01
+2012-03-17 Mikhail S. Dubrovin
+	- add EventNumberFilter.cpp
+              ImgPeakFinder.cpp
+              ImgPixAmpFilter.cpp
+	      TimeInterval.cpp
+
+
+2012-02-29 Mikhail S. Dubrovin
+- add CSPadCommonModeCorrection - psana module 
+  for a simple algorithm of common mode correction.
+  It should be used after the pedestal subtraction in cspad_mod.CsPadCalib, 
+  but in stead of doCommonMode in the CsPadCalib... 
+  (a little bit wired, but still this is one more example of correction in psana)
+- psana.cfg for example:
+------------------------
+[psana]                                                               
+files         = /reg/d/psdm/CXI/cxi35711/xtc/e86-r0020-s00-c00.xtc
+modules       = cspad_mod.CsPadCalib ImgAlgos.CSPadCommonModeCorrection 
+
+[cspad_mod.CsPadCalib]
+inputKey      = 
+outputKey     = calibrated
+doPedestals   = yes
+doPixelStatus = no
+doCommonMode  = no
+
+[ImgAlgos.CSPadCommonModeCorrection]                                      
+inputKey      = calibrated
+outputKey     = cm_subtracted
+events        = 10 
+ampthr        = 30
+------------------------
+
+2012-02-23 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
