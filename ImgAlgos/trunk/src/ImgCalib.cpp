@@ -175,7 +175,10 @@ ImgCalib::endJob(Event& evt, Env& env)
 void 
 ImgCalib::init(Event& evt, Env& env)
 {
-    defineImageShape(evt); // shape is not available in beginJob and beginRun
+    defineImageShape(evt, m_str_src, m_key_in, m_shape); // shape is not available in beginJob and beginRun
+    m_rows = m_shape[0];
+    m_cols = m_shape[1];
+    m_size = m_rows*m_cols;
 
     if( m_do_peds ) m_peds = new ImgAlgos::ImgParametersV1(m_fname_peds);
     else            m_peds = new ImgAlgos::ImgParametersV1(m_shape);   // zero array
@@ -255,7 +258,8 @@ ImgCalib::defImgIndexesForBkgdNorm()
 {
   v_inds.clear();
   for(unsigned r = m_row_min; r < m_row_max+1; r++) {
-    for(unsigned c = m_col_min; c < m_col_max+1; c++) v_inds.push_back(r*m_cols+c);
+    for(unsigned c = m_col_min; c < m_col_max+1; c++) 
+      v_inds.push_back(r*m_cols+c);
   }
 }
 
@@ -268,29 +272,6 @@ ImgCalib::printEventRecord(Event& evt)
                      << " Evt="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
   );
-}
-
-//--------------------
-// This method defines the m_shape or throw message that can not do that.
-void 
-ImgCalib::defineImageShape(Event& evt)
-{
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key_in, &m_src);
-  if (img.get()) {
-    //memcpy(m_shape,img->shape(),2*sizeof(unsigned));
-    for(int i=0;i<2;i++) m_shape[i]=img->shape()[i];
-    m_rows = m_shape[0];
-    m_cols = m_shape[1];
-    m_size = m_rows*m_cols;
-    if( m_print_bits & 1 )
-      MsgLog(name(), info, "Image shape (rows,cols) =" << m_shape[0] << ", " << m_shape[1]);
-  } 
-  else
-  {
-    const std::string msg = "Image shape is not defined in the event(...) for source:" + m_str_src + " key:" + m_key_in;
-    MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
-  }
 }
 
 //--------------------

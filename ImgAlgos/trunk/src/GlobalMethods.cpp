@@ -20,11 +20,13 @@
 //-----------------
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for streamstring
+#include <fstream>   // ofstream
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include <boost/shared_ptr.hpp>
+#include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "PSTime/Time.h"
 //#include "psana/Module.h"
@@ -86,7 +88,43 @@ stringRunNumber(PSEvt::Event& evt, unsigned width)
 }
 
 //--------------------
-//--------------------
+// Define the shape or throw message that can not do that.
+void 
+defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape)
+{
+  boost::shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key);
+  if (img.get()) {
+    for(int i=0;i<2;i++) shape[i]=img->shape()[i];
+  } 
+  else
+  {
+    const std::string msg = "Image shape is not defined in the event(...) for source:" + m_str_src + " key:" + m_key;
+    MsgLogRoot(error, msg);
+    throw std::runtime_error(msg);
+  }
+}
 
+//--------------------
+// Save 2-D array in file
+void 
+save2DArrInFile(const std::string& fname, const double* arr, const unsigned& rows, const unsigned& cols, bool print_msg )
+{  
+  if (fname.empty()) {
+    MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
+    return;
+  }
+
+  if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str());
+  std::ofstream out(fname.c_str());
+        for (unsigned r = 0; r != rows; ++r) {
+          for (unsigned c = 0; c != cols; ++c) {
+            out << arr[r*cols + c] << ' ';
+          }
+          out << '\n';
+        }
+  out.close();
+}
+
+//--------------------
 //--------------------
 } // namespace ImgAlgos

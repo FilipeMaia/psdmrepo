@@ -25,6 +25,7 @@
 //-------------------------------
 
 #include "PSEvt/Event.h"
+#include "PSEnv/Env.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -67,6 +68,12 @@ private:
   std::string stringFromUint(unsigned number, unsigned width=6, char fillchar='0');
   std::string stringTimeStamp(PSEvt::Event& evt, std::string fmt="%Y%m%d-%H%M%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
   std::string stringRunNumber(PSEvt::Event& evt, unsigned width=4);
+
+  /// Define the shape or throw message that can not do that.
+  void defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape);
+
+  /// Save 2-D array in file.
+  void save2DArrInFile(const std::string& fname, const double* arr, const unsigned& rows, const unsigned& cols, bool print_msg=true );
 
 //--------------------
 //--------------------

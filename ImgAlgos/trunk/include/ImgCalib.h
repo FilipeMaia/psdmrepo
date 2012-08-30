@@ -85,7 +85,6 @@ public:
 
   void printInputParameters();
   void printEventRecord(Event& evt);
-  void defineImageShape(Event& evt);
 
 protected:
   void init(Event& evt, Env& env);

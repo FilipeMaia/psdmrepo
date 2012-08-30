@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2012-08-29 Mikhail S. Dubrovin
+A       include/ImgPeakFinderAB.h
+A       src/ImgPeakFinderAB.cpp
+
 Tag: V00-00-15
 2012-08-27 Mikhail S. Dubrovin
 - Re-name SaveImageInFile (keep it for now...) -> ImgSaveInFile 

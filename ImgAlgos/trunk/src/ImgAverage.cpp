@@ -151,8 +151,8 @@ void
 ImgAverage::endJob(Event& evt, Env& env)
 {
   procStatArrays();
-  saveArrInFile( m_aveFile, m_ave );
-  saveArrInFile( m_rmsFile, m_rms );
+  save2DArrInFile( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
+  save2DArrInFile( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
 }
 
 //--------------------
@@ -163,7 +163,11 @@ ImgAverage::setCollectionMode(Event& evt)
 {
   // Set the statistics collection mode without gate
   if (m_count == 1 ) {
-    defineImageShape(evt); // shape is not available in beginJob and beginRun
+    defineImageShape(evt, m_str_src, m_key, m_shape); // shape is not available in beginJob and beginRun
+    m_rows = m_shape[0];
+    m_cols = m_shape[1];
+    m_size = m_rows*m_cols;
+
     if( m_print_bits & 1 ) printInputParameters();
     m_stat = new unsigned[m_size];
     m_sum  = new double  [m_size];
@@ -189,26 +193,6 @@ ImgAverage::setCollectionMode(Event& evt)
     resetStatArrays();
     m_gate_width = m_gate_width2;
     if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 2: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
-  }
-}
-
-//--------------------
-// This method defines the m_shape or throw message that can not do that.
-void 
-ImgAverage::defineImageShape(Event& evt)
-{
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get()) {
-    for(int i=0;i<2;i++) m_shape[i]=img->shape()[i];
-    m_rows = m_shape[0];
-    m_cols = m_shape[1];
-    m_size = m_rows*m_cols;
-  } 
-  else
-  {
-    const std::string msg = "Image shape is not defined in the event(...) for source:" + m_str_src + " key:" + m_key;
-    MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
   }
 }
 
@@ -273,28 +257,6 @@ ImgAverage::procStatArrays()
 	  m_rms[i] = 0;
         }
     }
-}
-
-//--------------------
-
-/// Save 4-d array of CSPad structure in file
-void 
-ImgAverage::saveArrInFile(std::string& fname, double* arr)
-{  
-  if (fname.empty()) {
-    MsgLog(name(), warning, "The output file name is empty. Averaged image is not saved.");
-    return;
-  }
-
-  if( m_print_bits & 16 ) MsgLog(name(), info, "Save 2-d image array in file " << fname.c_str());
-  std::ofstream out(fname.c_str());
-        for (unsigned r = 0; r != m_rows; ++r) {
-          for (unsigned c = 0; c != m_cols; ++c) {
-            out << arr[r*m_cols + c] << ' ';
-          }
-          out << '\n';
-        }
-  out.close();
 }
 
 //--------------------

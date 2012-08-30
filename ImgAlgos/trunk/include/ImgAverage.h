@@ -103,7 +103,6 @@ protected:
 
   void printInputParameters();
   void setCollectionMode(Event& evt);
-  void defineImageShape(Event& evt);
   void collectStat(Event& evt);
   void resetStatArrays();
   void procStatArrays();
