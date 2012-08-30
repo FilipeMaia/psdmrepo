@@ -171,8 +171,8 @@ void
 ImgPeakFinderAB::printShapeParameters()
 {
   MsgLog(name(), debug, 
-           "\n Columns : " << m_cols
-        << "\n Rows    : " << m_rows   
+           "\n Rows    : " << m_rows   
+        << "\n Columns : " << m_cols
         << "\n Size    : " << m_size
         << "\n"
 	);
@@ -220,8 +220,6 @@ ImgPeakFinderAB::event(Event& evt, Env& env)
 
   procData(evt);
 
-  savePeaksInEvent(evt);
-
   bool isSelected = eventSelector();
 
   if( m_print_bits &   4 ) printEventSelectionPars(evt, isSelected);
@@ -263,7 +261,7 @@ ImgPeakFinderAB::endJob(Event& evt, Env& env)
 void 
 ImgPeakFinderAB::init(Event& evt, Env& env)
 {
-    defineImageShape(evt, m_str_src, m_key, m_shape);
+  defineImageShape(evt, m_str_src, m_key, m_shape);
     m_rows = m_shape[0];
     m_cols = m_shape[1];
     m_size = m_rows*m_cols;
@@ -325,6 +323,7 @@ void
 ImgPeakFinderAB::resetForEventProcessing()
 {
   v_peaks.clear(); // clear the vector of peaks
+  v_peaks.reserve(1000);
   resetSignalArrays();
 }
 
@@ -477,10 +476,10 @@ ImgPeakFinderAB::findPeaks()
 	pw.peak_noise2_tot = 0;
 	pw.peak_amp_tot    = 0;
 	pw.peak_amp_max    = 0;
-	pw.peak_amp_x_col1 = 0;
-	pw.peak_amp_x_col2 = 0;
 	pw.peak_amp_x_row1 = 0;
 	pw.peak_amp_x_row2 = 0;
+	pw.peak_amp_x_col1 = 0;
+	pw.peak_amp_x_col2 = 0;
 
 	// Begin to iterate over connected region
         // when it is done the connected region is formed
@@ -490,6 +489,7 @@ ImgPeakFinderAB::findPeaks()
       }
     }
   }
+  if( m_print_bits & 2048) MsgLog(name(), info, "Number of selected peaks=" << v_peaks.size() << "\n");
 }
 
 //--------------------
@@ -505,10 +505,10 @@ ImgPeakFinderAB::iterateOverConnectedPixels(int ir, int ic, PeakWork& pw)
   pw.peak_bkgd_tot   +=  m_bkgd[i];
   pw.peak_noise2_tot +=  noise*noise; // sum the pixel noise quadratically, as randomly fluctuating.
   pw.peak_amp_tot    +=  amp;
-  pw.peak_amp_x_col1 += (amp*ic);
-  pw.peak_amp_x_col2 += (amp*ic*ic);
   pw.peak_amp_x_row1 += (amp*ir);
   pw.peak_amp_x_row2 += (amp*ir*ir);
+  pw.peak_amp_x_col1 += (amp*ic);
+  pw.peak_amp_x_col2 += (amp*ic*ic);
 
   if (amp > pw.peak_amp_max) pw.peak_amp_max = amp;
 
@@ -545,15 +545,15 @@ ImgPeakFinderAB::peakSelector(PeakWork& pw) {
 void 
 ImgPeakFinderAB::printPeakWork(PeakWork& pw) {
 
-    double col    = pw.peak_amp_x_col1 / pw.peak_amp_tot;
     double row    = pw.peak_amp_x_row1 / pw.peak_amp_tot; 
+    double col    = pw.peak_amp_x_col1 / pw.peak_amp_tot;
     pw.peak_noise = std::sqrt( pw.peak_noise2_tot / pw.peak_npix );
     pw.peak_SoN   = (pw.peak_noise > 0) ? pw.peak_amp_tot / pw.peak_noise : 0;
 
     MsgLog(name(), info, 
-             "Peak candidate:" 
-          << "c/r="               << std::setprecision(1) << std::fixed << col
-	  << "/"                  << row
+             "Peak candidate: " 
+          << "row, col="           << std::setprecision(1) << std::fixed << row
+	  << ", "                 << col
           << "  npix/min:max="    << pw.peak_npix
           << "/"                  << m_peak_npix_min
           << ":"                  << m_peak_npix_max
@@ -573,10 +573,10 @@ void
 ImgPeakFinderAB::savePeakInVector(PeakWork& pw) {
   //MsgLog(name(), info, "Save peak info, npix =" << m_peak_npix << ", amp=" << m_peak_amp_tot;);
   Peak peak;
-  peak.col       = pw.peak_amp_x_col1 / pw.peak_amp_tot;
   peak.row       = pw.peak_amp_x_row1 / pw.peak_amp_tot; 
-  peak.sigma_col = std::sqrt( pw.peak_amp_x_col2/pw.peak_amp_tot - peak.col*peak.col );
+  peak.col       = pw.peak_amp_x_col1 / pw.peak_amp_tot;
   peak.sigma_row = std::sqrt( pw.peak_amp_x_row2/pw.peak_amp_tot - peak.row*peak.row );
+  peak.sigma_col = std::sqrt( pw.peak_amp_x_col2/pw.peak_amp_tot - peak.col*peak.col );
   peak.ampmax    = pw.peak_amp_max;
   peak.amptot    = pw.peak_amp_tot;
   peak.bkgdtot   = pw.peak_bkgd_tot;
@@ -597,17 +597,17 @@ ImgPeakFinderAB::printVectorOfPeaks()
   for( vector<Peak>::const_iterator p  = v_peaks.begin();
                                     p != v_peaks.end(); p++ ) {
     MsgLog(name(), info, 
-             "  peak:"      << ++i 
-          << "  col="       << p->col
-          << "  row="       << p->row
-          << "  npix="      << p->npix 
-          << "  SoN="       << p->SoN
-          << "  amptot="    << p->amptot
-          << "  noise="     << p->noise
-          << "  bkgdtot="   << p->bkgdtot
-          << "  ampmax="    << p->ampmax
-          << "  sigma_col=" << p->sigma_col
-          << "  sigma_row=" << p->sigma_row
+             "Peak:"       << ++i 
+          << " col="       << p->col
+          << " row="       << p->row
+          << " npix="      << p->npix 
+          << " SoN="       << p->SoN
+          << " amptot="    << p->amptot
+          << " noise="     << p->noise
+          << " bkgdtot="   << p->bkgdtot
+          << " ampmax="    << p->ampmax
+          << " sigma_col=" << p->sigma_col
+          << " sigma_row=" << p->sigma_row
 	   );
   }
 }
@@ -641,14 +641,14 @@ ImgPeakFinderAB::printEventSelectionPars(Event& evt, bool isSelected)
 {
     MsgLog(name(), info, 
 	   //"  Run="         << stringRunNumber(evt) 
-              "  Event="       << stringFromUint(m_count)  
-           << "  "             << stringTimeStamp(evt)
-           << "  mode="        << m_sel_mode_str  
-           << "  N peaks/min=" << v_peaks.size()
-           << " / "            << m_event_npeak_min
-           << "  A tot/thr="   << m_event_amp_tot
-           << " / "            << m_event_amp_tot_thr
-           << "  isSelected="  << isSelected  
+              "Event="        << stringFromUint(m_count)  
+           << " "             << stringTimeStamp(evt)
+           << " mode="        << m_sel_mode_str  
+           << " N peaks/min=" << v_peaks.size()
+           << " / "           << m_event_npeak_min
+           << " A tot/thr="   << m_event_amp_tot
+           << " / "           << m_event_amp_tot_thr
+           << " isSelected="  << isSelected  
 	   );
 }
 
@@ -783,7 +783,7 @@ ImgPeakFinderAB::getMaskFromFile()
      m_mask_initial = new ImgAlgos::ImgParametersV1(m_shape,1); 
      std::fill_n(m_mask, (int)m_size, 1);
   }
-     m_mask_initial -> print("Hot pixel initial mask");
+  if(m_print_bits & 2) m_mask_initial -> print("Hot pixel initial mask");
 }
 
 //--------------------
@@ -812,14 +812,16 @@ ImgPeakFinderAB::doOperationsForSelectedEvent(Event& evt)
 {
   // Define the file name
   std::string fname = m_evtFile_out 
-                    + "e"  + stringFromUint(m_count) 
-                    + "-r" + stringRunNumber(evt) 
+                    + "r"  + stringRunNumber(evt) 
+                    + "-e" + stringFromUint(m_count) 
                     + "-"  + stringTimeStamp(evt);
   std::string fname_arr   =  fname + ".txt";
   std::string fname_peaks =  fname + "-peaks.txt";
 
   if( m_out_file_bits & 4 ) saveImgArrayInFile<double> (fname_arr, m_signal);
   if( m_out_file_bits & 8 ) savePeaksInFile (fname_peaks, v_peaks);
+
+  savePeaksInEvent(evt);
 }
 
 //--------------------
@@ -849,23 +851,13 @@ ImgPeakFinderAB::saveImgArrayInFile(const std::string& fname, const T* arr)
 void 
 ImgPeakFinderAB::savePeaksInFile (std::string& fname, std::vector<Peak> peaks)
 {
+  if( m_print_bits & 256 ) printVectorOfPeaks();
+
   ofstream file; 
   file.open(fname.c_str(),ios_base::out);
 
-  int i=0;
   for( vector<Peak>::const_iterator itv  = peaks.begin();
                                     itv != peaks.end(); itv++ ) {
-
-    if( m_print_bits & 256 ) 
-      MsgLog( name(), info, "  peak:"      << ++i
-                         << "  col="       << itv->col
-                         << "  row="       << itv->row
-                         << "  npix="      << itv->npix
-                         << "  sigma_col=" << itv->sigma_col
-                         << "  sigma_row=" << itv->sigma_row
-                         << "  ampmax="    << itv->ampmax
-                         << "  amptot="    << itv->amptot )
-
     file << itv->col       << "  "
          << itv->row       << "  "
          << itv->npix      << "  "      
@@ -913,9 +905,9 @@ ImgPeakFinderAB::printSelectionStatistics() // Event& evt)
   std::stringstream sf; sf.setf(ios_base::fixed); sf.width(6);  sf.fill(' '); sf.precision(2); sf << fraction;
   std::stringstream st; st.setf(ios_base::fixed); st.width(11); st.fill(' '); st.precision(3); st << dt;
   std::stringstream sr; sr.setf(ios_base::fixed); sr.width(6);  sr.fill(' '); sr.precision(3); sr << rate;
-  std::string s = "  NFrames: " + sc.str()
-	        + "  NHits: "   + sh.str() + " ("  + sf.str() + "%)" 
-	        + "  Time:"     + st.str() + " sec (" + sr.str() + " fps)";
+  std::string s = "NFrames:" + sc.str()
+	        +  " NHits:" + sh.str() + " ("  + sf.str() + "%)" 
+	        +   " Time:" + st.str() + "sec (" + sr.str() + "fps)";
 
   MsgLog( name(), info, s );
 }

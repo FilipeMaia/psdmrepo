@@ -67,8 +67,8 @@ struct MedianResult {
 struct Peak{
   double row; 
   double col;
-  double sigma_col;
   double sigma_row;
+  double sigma_col;
   double ampmax;
   double amptot;
   double bkgdtot;
@@ -86,10 +86,10 @@ struct PeakWork{
   double    peak_noise;
   double    peak_amp_tot;
   double    peak_amp_max;
-  double    peak_amp_x_col1;
-  double    peak_amp_x_col2;
   double    peak_amp_x_row1;
   double    peak_amp_x_row2;
+  double    peak_amp_x_col1;
+  double    peak_amp_x_col2;
 };
 
 class ImgPeakFinderAB : public Module {
