@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-08-31 Mikhail S. Dubrovin
+- Add the image producer for Princeton camera,
+A       include/PrincetonImageProducer.h
+A       src/PrincetonImageProducer.cpp
+	
 Tag: V00-00-16
 2012-08-30 Mikhail S. Dubrovin
 - Add the peak-finding module with algorithm suggested by Anton Barty (AB),

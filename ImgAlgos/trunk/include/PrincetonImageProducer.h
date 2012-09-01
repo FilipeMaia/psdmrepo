@@ -1,15 +1,15 @@
-#ifndef IMGALGOS_CAMERAIMAGEPRODUCER_H
-#define IMGALGOS_CAMERAIMAGEPRODUCER_H
+#ifndef IMGALGOS_PRINCETONIMAGEPRODUCER_H
+#define IMGALGOS_PRINCETONIMAGEPRODUCER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CameraImageProducer.
-// 1. Get Camera data as uint8_t or uint16_t
-// 2. Subtract (if necessary) the offset from frmData->offset();
-// 3. Save image in the event as ndarray<double,2>
+//	Class PrincetonImageProducer.
+// 1. Get Camera data as uint16_t
+// 2.
+// 3. Save image in the event as ndarray<uint16_t,2>
 //------------------------------------------------------------------------
 
 //-----------------
@@ -50,14 +50,14 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CameraImageProducer : public Module {
+class PrincetonImageProducer : public Module {
 public:
 
   // Default constructor
-  CameraImageProducer (const std::string& name) ;
+  PrincetonImageProducer (const std::string& name) ;
 
   // Destructor
-  virtual ~CameraImageProducer () ;
+  virtual ~PrincetonImageProducer () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -104,4 +104,4 @@ private:
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CAMERAIMAGEPRODUCER_H
+#endif // IMGALGOS_PRINCETONIMAGEPRODUCER_H

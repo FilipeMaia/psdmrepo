@@ -15,6 +15,7 @@
 //-----------------
 
 #include <string>
+#include <fstream>   // ofstream
 
 //----------------------
 // Base Class Headers --
@@ -26,6 +27,8 @@
 
 #include "PSEvt/Event.h"
 #include "PSEnv/Env.h"
+#include "PSEvt/Source.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -72,8 +75,39 @@ private:
   /// Define the shape or throw message that can not do that.
   void defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape);
 
-  /// Save 2-D array in file.
-  void save2DArrInFile(const std::string& fname, const double* arr, const unsigned& rows, const unsigned& cols, bool print_msg=true );
+//--------------------
+//--------------------
+//--------------------
+//--------------------
+//--------------------
+// Save 2-D array in file
+  template <typename T>
+  void save2DArrayInFile(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols, bool print_msg )
+  {  
+    if (fname.empty()) {
+      MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
+      return;
+    }
+
+    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str());
+    std::ofstream out(fname.c_str());
+          for (unsigned r = 0; r != rows; ++r) {
+            for (unsigned c = 0; c != cols; ++c) {
+              out << arr[r*cols + c] << ' ';
+            }
+            out << '\n';
+          }
+    out.close();
+  }
+
+//--------------------
+// Save 2-D array in event
+  template <typename T>
+  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const T* data, const unsigned* shape)
+  {
+    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data, shape) );
+    evt.put(img2d, src, key);
+  }
 
 //--------------------
 //--------------------

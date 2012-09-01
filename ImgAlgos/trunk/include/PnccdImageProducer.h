@@ -70,11 +70,10 @@ protected:
  
 private:
 
-  Pds::Src    m_actualSrc;
-  //Source m_src;
+  Pds::Src    m_src;
   std::string m_str_src;
-  std::string m_inkey; 
-  std::string m_outimgkey;
+  std::string m_key_in; 
+  std::string m_key_out;
   unsigned    m_print_bits;
 };
 
