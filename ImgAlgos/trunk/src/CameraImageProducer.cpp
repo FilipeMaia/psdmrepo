@@ -27,7 +27,8 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "psddl_psana/camera.ddl.h"
-#include "PSEvt/EventId.h"
+#include "ImgAlgos/GlobalMethods.h"
+//#include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -113,7 +114,7 @@ void
 CameraImageProducer::event(Event& evt, Env& env)
 {
   ++ m_count;
-  if( m_print_bits & 2 ) printTimeStamp(evt);
+  if( m_print_bits & 2 ) printEventRecord(evt);
   procEvent(evt,env);
 }
   
@@ -145,21 +146,20 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
   shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_str_src, m_key_in, &m_src);
   if (frmData.get()) {
 
-    //unsigned h      = frmData->height();
-    //unsigned w      = frmData->width();
-    int offset = (m_subtract_offset) ? frmData->offset() : 0;
+      // reserve memory for image array:
+      if(m_count == 1) 
+        m_data = new double [frmData->height() * frmData->width()];
 
-    //m_data = new double [h*w];
-    double *p_data = &m_data_arr[0];
-    unsigned ind = 0;
+      int offset = (m_subtract_offset) ? frmData->offset() : 0;
+      unsigned ind = 0;
 
       const ndarray<uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint8_t,2>, subtract offset=" << offset);
         ndarray<uint8_t, 2>::const_iterator cit;
-        for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
+        for(cit=data8.begin(); cit!=data8.end(); cit++) { m_data[ind++] = double(int(*cit) - offset); }
 
-        saveImageInEvent(evt, p_data, data8.shape());
+        save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data8.shape());
       }
 
       const ndarray<uint16_t, 2>& data16 = frmData->data16();
@@ -167,36 +167,27 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint16_t,2>, subtract offset=" << offset);
         ndarray<uint16_t, 2>::const_iterator cit;
         // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
-        for(cit=data16.begin(); cit!=data16.end(); cit++) { p_data[ind++] = double(*cit) - offset; }
+        for(cit=data16.begin(); cit!=data16.end(); cit++) { m_data[ind++] = double(*cit) - offset; }
 
-        saveImageInEvent(evt, p_data, data16.shape());
+	save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data16.shape());
       }
-  }
+    }
+  else
+    {
+      const std::string msg = "Camera::FrameV1 object is not available in the event(...) for source:" + m_str_src + " key:" + m_key_in;
+      MsgLog(name(), info, msg);       
+    }
 }
 
 //--------------------
 
 void 
-CameraImageProducer::saveImageInEvent(Event& evt, double *p_data, const unsigned *shape)
+CameraImageProducer::printEventRecord(Event& evt, std::string comment)
 {
-  //m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
-  shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(p_data, shape) );
-  evt.put(img2d, m_src, m_key_out);
-}
-
-//--------------------
-
-void 
-CameraImageProducer::printTimeStamp(Event& evt, std::string comment)
-{
-  shared_ptr<PSEvt::EventId> eventId = evt.get();
-  if (eventId.get()) {
-
-    MsgLog( name(), info, "Run="   <<  eventId->run()
-                       << " Event=" <<  m_count 
-                       << " Time="  <<  eventId->time()
-                       << comment.c_str() );
-  }
+  MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
+                     << " Evt="    << stringFromUint(m_count) 
+                     << " Time="   << stringTimeStamp(evt) 
+  );
 }
 
 //--------------------
@@ -204,11 +195,10 @@ CameraImageProducer::printTimeStamp(Event& evt, std::string comment)
 void 
 CameraImageProducer::printSummary(Event& evt, std::string comment)
 {
-  MsgLog( name(), info, // " Run=" << eventId->run()
-                       "Number of processed events=" <<  m_count 
-                       << comment.c_str() );
+  MsgLog( name(), info, "Run=" << stringRunNumber(evt) 
+	                << "Number of processed events=" << stringFromUint(m_count)
+                        << comment.c_str() );
 }
 
 //--------------------
-
 } // namespace ImgAlgos

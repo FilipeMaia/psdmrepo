@@ -151,8 +151,8 @@ void
 ImgAverage::endJob(Event& evt, Env& env)
 {
   procStatArrays();
-  save2DArrInFile( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
-  save2DArrInFile( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
+  save2DArrayInFile<double> ( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
+  save2DArrayInFile<double> ( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
 }
 
 //--------------------

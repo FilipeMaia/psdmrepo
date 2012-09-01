@@ -20,13 +20,11 @@
 //-----------------
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for streamstring
-#include <fstream>   // ofstream
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include <boost/shared_ptr.hpp>
-#include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "PSTime/Time.h"
 //#include "psana/Module.h"
@@ -102,27 +100,6 @@ defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::str
     MsgLogRoot(error, msg);
     throw std::runtime_error(msg);
   }
-}
-
-//--------------------
-// Save 2-D array in file
-void 
-save2DArrInFile(const std::string& fname, const double* arr, const unsigned& rows, const unsigned& cols, bool print_msg )
-{  
-  if (fname.empty()) {
-    MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
-    return;
-  }
-
-  if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str());
-  std::ofstream out(fname.c_str());
-        for (unsigned r = 0; r != rows; ++r) {
-          for (unsigned c = 0; c != cols; ++c) {
-            out << arr[r*cols + c] << ' ';
-          }
-          out << '\n';
-        }
-  out.close();
 }
 
 //--------------------
