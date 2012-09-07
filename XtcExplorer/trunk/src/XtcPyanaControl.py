@@ -1022,8 +1022,7 @@ Do you want to proceed?
             options_for_mod[index].append("\ncmmode_thr = 30"); 
             options_for_mod[index].append("\nsmall_tilt = False");
             try:
-                calibpath = '/'.join( self.filenames[0].split('/')[0:6]) + "/calib/*/" +\
-                            address.replace('|',':').replace('-','.')
+                calibpath = '/'.join( self.filenames[0].split('/')[0:6]) + "/calib/"
                 calibpath = glob.glob(calibpath)[0]
                 options_for_mod[index].append("\ncalib_path = %s"%calibpath)
             except:

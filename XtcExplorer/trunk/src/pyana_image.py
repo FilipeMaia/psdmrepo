@@ -130,7 +130,7 @@ class  pyana_image ( object ) :
         
         self.cspad = {}
         self.small_tilt = opt.getOptBoolean(small_tilt)
-        self.cmmode_mode = cmmode_mode
+        self.cmmode_mode = opt.getOptString(cmmode_mode)
         self.cmmode_thr = opt.getOptFloat(cmmode_thr)
 
     def initlists(self):
@@ -275,8 +275,11 @@ class  pyana_image ( object ) :
 	## load dark image from file
         self.dark_image = self.load_dark(self.darkfile)
 
+        # if calibration path wasn't set explicitly, assume the usual location
         if self.calib_path is None:
             self.calib_path = env.calibDir()
+
+        print "Using calibration path: ", self.calib_path
         
         calibfinder = CalibFileFinder(self.calib_path,"CsPad::CalibV1")
         # calibfinder is an object that knows where to look for 'calibration' files:
@@ -652,7 +655,7 @@ class  pyana_image ( object ) :
         for addr in self.sources:
 
             if label is None: 
-                label = '%s shot%d'%(addr,self.n_shots)
+                label = '%s ev%d'%(addr,self.n_shots)
             else :
                 label = "%s %s"%(addr,label)
                 

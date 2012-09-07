@@ -42,6 +42,7 @@ class CsPad( object ):
 
         print "Sections ", sections, len(sections)
         if len(sections)>2 :
+            print "In init: ", path
             self.cspad_alignment(path)
         else :
             self.cspad2x2_alignment(path)
@@ -64,6 +65,7 @@ class CsPad( object ):
         Read in these standard parameter files. Alternative
         path/file can be given by arguments
         """
+        print "in cspad_alignment ", path
         if path is None: # use a local copy
             calibdir = apputils.AppDataPath('XtcExplorer/calib/CSPad')
             path = calibdir.path()
@@ -351,10 +353,11 @@ class CsPad( object ):
                 # array of weights
                 if self.cmmode_thr is not None:
                     warray = (asic<self.cmmode_thr).astype(int)
-            
+                    nnz = len(np.nonzero(warray))
+                    
                 # compute common modes
                 cmode = np.average( asic, axis=1, weights=warray )
-        
+                    
                 for i in xrange(32):
                     asic[i] = asic[i] - cmode[i] 
 
@@ -369,7 +372,7 @@ class CsPad( object ):
 
             # array of weights
             if self.cmmode_thr is not None: 
-                warray = (array<self.cm_thr).astype(int)
+                warray = (array<self.cmmode_thr).astype(int)
 
             cmode = np.average(array, axis=1, weights=warray)
             for i in xrange(32):
