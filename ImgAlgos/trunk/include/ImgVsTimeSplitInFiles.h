@@ -44,14 +44,14 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief ImgVsTimeSplitInFiles is a test/example module for psana framework.
+ *  @brief ImgVsTimeSplitInFiles gets image from event, splits it and saves in files. 
  *
- *  ImgVsTimeSplitInFiles psana module class works after CSPadImageProducer.
- *  It gets the Image2D object from the event.
- *  This image object may be used in data processing.
- *  For the test purpose, the image of particular event is saved in the text file.
- *  This event number is defined in the psana.cfg configuration file. 
- *
+ *  ImgVsTimeSplitInFiles psana module class works after any ImageProducer.
+ *  * It gets the image as ndarray<T,2>
+ *  * splits it for requested number of equal parts
+ *  * saves each part in binary or text format in file for all events,
+ *  * saves metadata in the text file.
+ *  
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -140,19 +140,36 @@ protected:
 //--------------------
 // Splits the image for blocks and saves the blocks in files
     template <typename T>
-    void procImgData(const boost::shared_ptr< ndarray<T,2> >& p_nda)
+    void procImgData(const boost::shared_ptr< ndarray<T,2> >& p_ndarr)
     {
-      const T* data = p_nda->data();
-      for(unsigned i=0; i<m_img_size; i++) {m_data[i] = (data[i] > m_ampl_thr) ? (unsigned)data[i] : (unsigned)m_ampl_min;}
+      const T* data = p_ndarr->data();
+      T        athr = static_cast<T>       (m_ampl_thr);
+      unsigned amin = static_cast<unsigned>(m_ampl_min);
+      for(unsigned i=0; i<m_img_size; i++)
+	m_data[i] = (data[i] > athr) ? static_cast<unsigned>(data[i]) : amin;
     }
 
 //--------------------
 // Splits the image for blocks and saves the blocks in files
     template <typename T>
-    void splitAndWriteImgInFiles (const boost::shared_ptr< ndarray<T,2> >& p_ndarr, 
+    void procImgData(const T* data)
+    {
+      T        athr = static_cast<T>       (m_ampl_thr);
+      unsigned amin = static_cast<unsigned>(m_ampl_min);
+      for(unsigned i=0; i<m_img_size; i++)
+	m_data[i] = (data[i] > athr) ? static_cast<unsigned>(data[i]) : amin;
+    }
+
+//--------------------
+// Splits the image for blocks and saves the blocks in files
+    template <typename T>
+    void procSplitAndWriteImgInFiles (const boost::shared_ptr< ndarray<T,2> >& p_ndarr, 
                                   bool print_msg=false) 
     {
       const T* img_data = p_ndarr->data();               // Access to entire image
+
+      procImgData<T>(img_data);
+
       for(unsigned b=0; b<m_nfiles_out; b++){
 
 	const T* p_block_data = &img_data[b*m_blk_size]; // Access to the block 

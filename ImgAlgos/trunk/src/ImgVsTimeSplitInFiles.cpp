@@ -61,10 +61,10 @@ ImgVsTimeSplitInFiles::ImgVsTimeSplitInFiles (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source", "CxiDs1.0:Cspad.0");
-  m_key           = configStr("key",             "Image2D");
-  m_fname_prefix  = configStr("fname_prefix",        "img");
-  m_file_type     = configStr("file_type",           "txt");
+  m_str_src       = configStr("source", "DetInfo(:Princeton)");
+  m_key           = configStr("key",                 "img");
+  m_fname_prefix  = configStr("fname_prefix",     "my-exp");
+  m_file_type     = configStr("file_type",           "bin");
   m_nfiles_out    = config   ("nfiles_out",              8);
   m_ampl_thr      = config   ("ampl_thr",                1);
   m_ampl_min      = config   ("ampl_min",                1);
@@ -247,7 +247,7 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\n";
 
   out.close();
-  MsgLog( name(), info, "The file with metadata: " << fname << " is created.");
+  if( m_print_bits & 16 ) MsgLog( name(), info, "The file with metadata: " << fname << " is created.");
 }
 
 //--------------------
@@ -268,7 +268,7 @@ ImgVsTimeSplitInFiles::openOutputFiles(Event& evt)
            + "-b"  + stringFromUint(b,3)
            + "."   + m_file_type;
 
-     MsgLog( name(), info, "Open output file: " << fname );     
+     if( m_print_bits & 16 ) MsgLog( name(), info, "Open output file: " << fname );     
 
      p_out[b].open(fname.c_str(), mode);
      //p_out[b] << "This is a content of the file " << fname;
@@ -281,9 +281,7 @@ ImgVsTimeSplitInFiles::openOutputFiles(Event& evt)
 void 
 ImgVsTimeSplitInFiles::closeOutputFiles()
 {
-  for(unsigned b=0; b<m_nfiles_out; b++){
-     p_out[b].close();
-  }
+  for(unsigned b=0; b<m_nfiles_out; b++) p_out[b].close();
 }
 
 //--------------------
@@ -292,15 +290,12 @@ void
 ImgVsTimeSplitInFiles::procEvent(Event& evt)
 {
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get())
-    procImgData<double> (img);
-    splitAndWriteImgInFiles<double> (img, m_print_bits & 8);
-
+  if (img.get()) 
+    procSplitAndWriteImgInFiles<double> (img, m_print_bits & 8);
 
   shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
   if (img_u16.get()) 
-    procImgData<uint16_t> (img);
-    splitAndWriteImgInFiles<uint16_t> (img_u16, m_print_bits & 8);
+    procSplitAndWriteImgInFiles<uint16_t> (img_u16, m_print_bits & 8);
 }
 
 //--------------------

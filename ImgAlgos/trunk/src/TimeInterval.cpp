@@ -70,34 +70,20 @@ TimeInterval::startTime()
 }
 
 //--------------------
-/// Stop and prints time interval since start
+/// Stop time interval
 void 
-TimeInterval::stopTime(long nevents)
+TimeInterval::stopTime()
 {
   m_status = clock_gettime( CLOCK_REALTIME, &m_stop ); // Get LOCAL time
-  double dt = m_stop.tv_sec - m_start.tv_sec + 1e-9*(m_stop.tv_nsec - m_start.tv_nsec);
-  MsgLog("TimeInterval::stopTime", info, "Time to process "<< nevents << " events is " << dt << " sec, or " << dt/nevents << " sec/event");
 }
 
 //--------------------
-/// Prints time at start of the measured interval
+/// Stop and prints time interval since start
 void 
-TimeInterval::printStartTime()
+TimeInterval::stopTime(long nevents, bool print_at_stop)
 {
-  struct tm * timeinfo; timeinfo = localtime ( &m_start.tv_sec ); 
-  char c_time_buf[80]; strftime (c_time_buf, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
-  MsgLog("TimeInterval::startTime", info, "Start time: " << c_time_buf << " and " << m_start.tv_nsec << " nsec");
-}
-
-
-//--------------------
-/// Prints time at start of the measured interval
-std::string
-TimeInterval::strStartTime()
-{
-  struct tm * timeinfo; timeinfo = localtime ( &m_start.tv_sec ); 
-  char c_time_buf[80]; strftime (c_time_buf, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
-  return std::string(c_time_buf);
+  double dt = getCurrentTimeInterval();
+  if(print_at_stop) MsgLog("TimeInterval::stopTime", info, "Time to process "<< nevents << " events is " << dt << " sec, or " << dt/nevents << " sec/event");
 }
 
 //--------------------
@@ -108,6 +94,49 @@ TimeInterval::getCurrentTimeInterval()
   m_status = clock_gettime( CLOCK_REALTIME, &m_stop ); // Get LOCAL time
   double dt = m_stop.tv_sec - m_start.tv_sec + 1e-9*(m_stop.tv_nsec - m_start.tv_nsec);
   return dt;
+}
+
+//--------------------
+/// Prints time at start of the measured interval
+void 
+TimeInterval::printStartTime()
+{
+  MsgLog("TimeInterval::startTime", info, "Start time: " << strStartTime().c_str() << " and " << m_start.tv_nsec << " nsec");
+}
+
+//--------------------
+/// Prints time at stop of the measured interval
+void 
+TimeInterval::printStopTime()
+{
+  MsgLog("TimeInterval::stopTime", info, "Stop time: " << strStopTime().c_str() << " and " << m_stop.tv_nsec << " nsec");
+}
+
+
+//--------------------
+/// Returns formatted string of the start time
+std::string
+TimeInterval::strStartTime(std::string fmt)
+{
+  return strTime(&m_start.tv_sec, fmt);
+}
+
+//--------------------
+/// Returns formatted string of the stop time
+std::string
+TimeInterval::strStopTime(std::string fmt)
+{
+  return strTime(&m_stop.tv_sec, fmt);
+}
+
+//--------------------
+/// Returns formatted string of the raw time in sec
+std::string
+TimeInterval::strTime(time_t* p_tsec, std::string fmt)
+{
+  struct tm * timeinfo; timeinfo = localtime ( p_tsec ); 
+  char c_time_buf[80]; strftime (c_time_buf, 80, fmt.c_str(), timeinfo);
+  return std::string(c_time_buf);
 }
 
 //--------------------

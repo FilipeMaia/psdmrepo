@@ -28,6 +28,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
+#include "ImgAlgos/GlobalMethods.h"
 //#include "PSTime/Time.h"
 
 //-----------------------------------------------------------------------
@@ -115,8 +116,10 @@ void
 Tahometer::endJob(Event& evt, Env& env)
 {
   if( m_print_bits & 2 ) {
-    MsgLog(name(), info, "===== Summary for total number of processed events: " << m_count << " =====");
-    m_time -> stopTime(m_count);
+    MsgLog(name(), info, "===== Summary for " << m_count << " processed events =====");
+    //m_time -> stopTime(m_count);
+    double dt_sec = m_time -> getCurrentTimeInterval();
+    printTimeIntervalSummary(evt, dt_sec, m_count);
   }
 }
 
@@ -138,7 +141,10 @@ Tahometer::procEvent(Event& evt, Env& env)
   if( !(m_print_bits & 4)) return;
   if (++m_count_dn < m_dn) return;
 
-  m_time_dn -> stopTime(m_count_dn);
+  //m_time_dn -> stopTime(m_count_dn, false);
+  double dt_sec = m_time_dn -> getCurrentTimeInterval();
+  printTimeIntervalSummary(evt, dt_sec, m_count_dn);
+
   m_time_dn -> startTime();
   m_count_dn = 0;
 }
@@ -156,38 +162,20 @@ Tahometer::printInputParameters()
 }
 
 //--------------------
-
 void 
-Tahometer::printEventId(Event& evt)
+Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long m_count_dn)
 {
-  shared_ptr<PSEvt::EventId> eventId = evt.get();
-  if (eventId.get()) {
-    //MsgLog( name(), info, "Event="  << m_count << " ID: " << *eventId);
-    MsgLog( name(), info, "Event="  << m_count << " time: " << stringTimeStamp(evt) );
-  }
-}
-
-///--------------------
-
-std::string
-Tahometer::stringTimeStamp(Event& evt)
-{
-  shared_ptr<PSEvt::EventId> eventId = evt.get();
-  if (eventId.get()) {
-    return (eventId->time()).asStringFormat("%Y%m%dT%H:%M:%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
-  }
-  return std::string("Time-stamp-is-unavailable");
+  MsgLog( name(), info,  "Run="             << stringRunNumber(evt) 
+                     << " Evt="             << stringFromUint(m_count) 
+                     << " Time to process " << stringFromUint(m_count_dn) 
+                     << " events is "       << dt_sec 
+                     << " sec, or "         << dt_sec/m_count_dn << " sec/event" 
+	           //<< " Time="   << stringTimeStamp(evt)
+	           //<< comment.c_str() 
+  );
 }
 
 //--------------------
-
-string 
-Tahometer::stringEventN()
-{
-  stringstream ssEvNum; ssEvNum << setw(6) << setfill('0') << m_count;
-  return ssEvNum.str();
-}
-
 //--------------------
 //--------------------
 

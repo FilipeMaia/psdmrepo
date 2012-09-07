@@ -85,10 +85,7 @@ public:
 protected:
   void     printInputParameters();
   void     procEvent(Event& evt, Env& env);
-
-  void     printEventId(Event& evt);
-  string   stringTimeStamp(Event& evt);
-  string   stringEventN();
+  void     printTimeIntervalSummary(Event& evt, double dt_sec, long m_count_dn);
 
 private:
 

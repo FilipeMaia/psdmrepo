@@ -72,9 +72,13 @@ public:
 
   void startTimeOnce();
   void startTime();
-  void stopTime(long nevents=1);
+  void stopTime();
+  void stopTime(long nevents, bool print_at_stop=true);
   void printStartTime();
-  std::string strStartTime();
+  void printStopTime();
+  std::string strStartTime(std::string fmt = "%Y-%m-%d %H:%M:%S");
+  std::string strStopTime (std::string fmt = "%Y-%m-%d %H:%M:%S");
+  std::string strTime(time_t* p_tsec, std::string fmt = "%Y-%m-%d %H:%M:%S");
   double getCurrentTimeInterval();
 
 protected:
