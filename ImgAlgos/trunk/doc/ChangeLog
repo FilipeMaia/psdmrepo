@@ -10,7 +10,15 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-
+2012-09-07 Mikhail S. Dubrovin
+- Add the modules for image correlation analysis
+A       include/ImgVsTimeSplitInFiles.h
+A       src/ImgVsTimeSplitInFiles.cpp
+M       src/PrincetonImageProducer.cpp
+M       src/ImgSaveInFile.cpp
+M       src/GlobalMethods.cpp
+M       include/GlobalMethods.h
+	
 2012-08-31 Mikhail S. Dubrovin
 - Add the image producer for Princeton camera,
 A       include/PrincetonImageProducer.h

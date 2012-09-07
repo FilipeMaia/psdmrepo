@@ -51,15 +51,15 @@ PrincetonImageProducer::PrincetonImageProducer (const std::string& name)
   , m_str_src()
   , m_key_in()
   , m_key_out() 
-  , m_subtract_offset()
+//, m_subtract_offset()
   , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src           = configStr("source", "DetInfo(:Camera)");
+  m_str_src           = configStr("source", "DetInfo(:Princeton)");
   m_key_in            = configStr("key_in",                 "");
   m_key_out           = configStr("key_out",           "image");
-  m_subtract_offset   = config   ("subtract_offset",      true);
+//m_subtract_offset   = config   ("subtract_offset",      true);
   m_print_bits        = config   ("print_bits",             0 );
 }
 
@@ -73,7 +73,7 @@ PrincetonImageProducer::printInputParameters()
         << "\n source           : " << m_str_src
         << "\n key_in           : " << m_key_in      
         << "\n key_out          : " << m_key_out
-        << "\n subtract_offset  : " << m_subtract_offset     
+      //<< "\n subtract_offset  : " << m_subtract_offset     
         << "\n print_bits       : " << m_print_bits
         << "\n";     
   }
@@ -105,72 +105,72 @@ PrincetonImageProducer::beginRun(Event& evt, Env& env)
 void 
 PrincetonImageProducer::beginCalibCycle(Event& evt, Env& env)
 {
-  if(m_count>1) return;
+  if( m_print_bits & 16 ) {
 
-  MsgLog(name(), trace, "in beginCalibCycle()");
-
-  shared_ptr<Psana::Princeton::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {    
-    WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV1:";
-      str << "\n  width = " << config1->width();
-      str << "\n  height = " << config1->height();
-      str << "\n  orgX = " << config1->orgX();
-      str << "\n  orgY = " << config1->orgY();
-      str << "\n  binX = " << config1->binX();
-      str << "\n  binY = " << config1->binY();
-      str << "\n  exposureTime = " << config1->exposureTime();
-      str << "\n  coolingTemp = " << config1->coolingTemp();
-      str << "\n  readoutSpeedIndex = " << config1->readoutSpeedIndex();
-      str << "\n  readoutEventCode = " << config1->readoutEventCode();
-      str << "\n  delayMode = " << config1->delayMode();
-      str << "\n  frameSize = " << config1->frameSize();
-      str << "\n  numPixels = " << config1->numPixels();
+    MsgLog(name(), info, "in beginCalibCycle()");
+    
+    shared_ptr<Psana::Princeton::ConfigV1> config1 = env.configStore().get(m_src);
+    if (config1.get()) {    
+      WithMsgLog(name(), info, str) {
+        str << "Princeton::ConfigV1:";
+        str << "\n  width = " << config1->width();
+        str << "\n  height = " << config1->height();
+        str << "\n  orgX = " << config1->orgX();
+        str << "\n  orgY = " << config1->orgY();
+        str << "\n  binX = " << config1->binX();
+        str << "\n  binY = " << config1->binY();
+        str << "\n  exposureTime = " << config1->exposureTime();
+        str << "\n  coolingTemp = " << config1->coolingTemp();
+        str << "\n  readoutSpeedIndex = " << config1->readoutSpeedIndex();
+        str << "\n  readoutEventCode = " << config1->readoutEventCode();
+        str << "\n  delayMode = " << config1->delayMode();
+        str << "\n  frameSize = " << config1->frameSize();
+        str << "\n  numPixels = " << config1->numPixels();
+      }
+    }
+    
+    shared_ptr<Psana::Princeton::ConfigV2> config2 = env.configStore().get(m_src);
+    if (config2.get()) {
+      WithMsgLog(name(), info, str) {
+        str << "Princeton::ConfigV2:";
+        str << "\n  width = " << config2->width();
+        str << "\n  height = " << config2->height();
+        str << "\n  orgX = " << config2->orgX();
+        str << "\n  orgY = " << config2->orgY();
+        str << "\n  binX = " << config2->binX();
+        str << "\n  binY = " << config2->binY();
+        str << "\n  exposureTime = " << config2->exposureTime();
+        str << "\n  coolingTemp = " << config2->coolingTemp();
+        str << "\n  gainIndex = " << config2->gainIndex();
+        str << "\n  readoutSpeedIndex = " << config2->readoutSpeedIndex();
+        str << "\n  readoutEventCode = " << config2->readoutEventCode();
+        str << "\n  delayMode = " << config2->delayMode();
+        str << "\n  frameSize = " << config2->frameSize();
+        str << "\n  numPixels = " << config2->numPixels();
+      }    
+    }
+    
+    shared_ptr<Psana::Princeton::ConfigV3> config3 = env.configStore().get(m_src);
+    if (config3.get()) {    
+      WithMsgLog(name(), info, str) {
+        str << "Princeton::ConfigV2:";
+        str << "\n  width = " << config3->width();
+        str << "\n  height = " << config3->height();
+        str << "\n  orgX = " << config3->orgX();
+        str << "\n  orgY = " << config3->orgY();
+        str << "\n  binX = " << config3->binX();
+        str << "\n  binY = " << config3->binY();
+        str << "\n  exposureTime = " << config3->exposureTime();
+        str << "\n  coolingTemp = " << config3->coolingTemp();
+        str << "\n  gainIndex = " << config3->gainIndex();
+        str << "\n  readoutSpeedIndex = " << config3->readoutSpeedIndex();
+        str << "\n  exposureEventCode = " << config3->exposureEventCode();
+        str << "\n  numDelayShots = " << config3->numDelayShots();
+        str << "\n  frameSize = " << config3->frameSize();
+        str << "\n  numPixels = " << config3->numPixels();
+      } 
     }
   }
-
-  shared_ptr<Psana::Princeton::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
-    WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV2:";
-      str << "\n  width = " << config2->width();
-      str << "\n  height = " << config2->height();
-      str << "\n  orgX = " << config2->orgX();
-      str << "\n  orgY = " << config2->orgY();
-      str << "\n  binX = " << config2->binX();
-      str << "\n  binY = " << config2->binY();
-      str << "\n  exposureTime = " << config2->exposureTime();
-      str << "\n  coolingTemp = " << config2->coolingTemp();
-      str << "\n  gainIndex = " << config2->gainIndex();
-      str << "\n  readoutSpeedIndex = " << config2->readoutSpeedIndex();
-      str << "\n  readoutEventCode = " << config2->readoutEventCode();
-      str << "\n  delayMode = " << config2->delayMode();
-      str << "\n  frameSize = " << config2->frameSize();
-      str << "\n  numPixels = " << config2->numPixels();
-    }    
-  }
-
-  shared_ptr<Psana::Princeton::ConfigV3> config3 = env.configStore().get(m_src);
-  if (config3.get()) {    
-    WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV2:";
-      str << "\n  width = " << config3->width();
-      str << "\n  height = " << config3->height();
-      str << "\n  orgX = " << config3->orgX();
-      str << "\n  orgY = " << config3->orgY();
-      str << "\n  binX = " << config3->binX();
-      str << "\n  binY = " << config3->binY();
-      str << "\n  exposureTime = " << config3->exposureTime();
-      str << "\n  coolingTemp = " << config3->coolingTemp();
-      str << "\n  gainIndex = " << config3->gainIndex();
-      str << "\n  readoutSpeedIndex = " << config3->readoutSpeedIndex();
-      str << "\n  exposureEventCode = " << config3->exposureEventCode();
-      str << "\n  numDelayShots = " << config3->numDelayShots();
-      str << "\n  frameSize = " << config3->frameSize();
-      str << "\n  numPixels = " << config3->numPixels();
-    } 
-  }
-
 }
 
 /// Method which is called with event data, this is the only required 
@@ -212,6 +212,16 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
   if (frame.get()) {
 
       const ndarray<uint16_t, 2>& data = frame->data();
+
+      /*
+      // copy data with type changing 
+      if(m_count == 1) 
+        m_data = new double [data.size()];
+      unsigned ind = 0;
+      ndarray<uint16_t, 2>::const_iterator cit;
+      for(cit=data.begin(); cit!=data.end(); cit++) { m_data[ind++] = double(*cit); }
+      save2DArrayInEvent<double>   (evt, m_src, m_key_out, m_data, data.shape());
+      */
  
       save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data.data(), data.shape());
 
@@ -225,7 +235,8 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
   }
   else
   {
-    const std::string msg = "Princeton::FrameV1 object is not available in the event(...) for source:" + m_str_src + " key:" + m_key_in;
+    const std::string msg = "Princeton::FrameV1 object is not available in the event(...) for source:" 
+                          + m_str_src + " key:" + m_key_in;
     MsgLog(name(), info, msg);       
   }
 }
@@ -238,6 +249,7 @@ PrincetonImageProducer::printEventRecord(Event& evt, std::string comment)
   MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
                      << " Evt="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
+	             << comment.c_str() 
   );
 }
 
@@ -248,7 +260,8 @@ PrincetonImageProducer::printSummary(Event& evt, std::string comment)
 {
   MsgLog( name(), info, "Run=" << stringRunNumber(evt) 
 	                << " Number of processed events=" << stringFromUint(m_count)
-                        << comment.c_str() );
+                        << comment.c_str()
+  );
 }
 
 //--------------------

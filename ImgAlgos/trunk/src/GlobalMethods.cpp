@@ -93,6 +93,7 @@ defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::str
   boost::shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key);
   if (img.get()) {
     for(int i=0;i<2;i++) shape[i]=img->shape()[i];
+    //shape=img->shape();
   } 
   else
   {

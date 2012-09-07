@@ -101,6 +101,14 @@ private:
   }
 
 //--------------------
+// Save 2-D array in file
+  template <typename T>
+  void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg )
+  {  
+    save2DArrayInFile<T> (fname, p_ndarr->data(), p_ndarr->shape()[0], p_ndarr->shape()[1], print_msg);
+  }
+
+//--------------------
 // Save 2-D array in event
   template <typename T>
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const T* data, const unsigned* shape)
