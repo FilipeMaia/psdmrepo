@@ -11,8 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-09-08 Mikhail S. Dubrovin
-- Add the modules for image correlation analysis
+2012-09-07 Mikhail S. Dubrovin
+- Add modules for image correlation analysis
+A       include/CorAnaInputParameters.h
+A       include/CorAnaData.h
+A       src/CorAnaInputParameters.cpp
+A       src/CorAnaData.cpp
+A       test
+A       test/corana.cpp
 A       include/ImgVsTimeSplitInFiles.h
 A       src/ImgVsTimeSplitInFiles.cpp
 M       src/PrincetonImageProducer.cpp
