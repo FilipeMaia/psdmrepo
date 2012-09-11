@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-73
+2012-09-11 Andy Salnikov
+- fix for very old bug, TimeStamp.vector actually returned ticks()
+- pyxtcreader now prints vector() value
+
 Tag: V00-00-72
 2012-07-24 Andy Salnikov
 - moved #pragma GCC diagnostic out of function
