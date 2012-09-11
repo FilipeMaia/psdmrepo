@@ -32,6 +32,71 @@ using namespace std;
 
 namespace {
 
+// Dummy class which mimics real mysql interface but does no real job
+class ClientDummy : public Client {
+  virtual bool working() { return true; }
+  virtual my_ulonglong mysql_affected_rows(MYSQL *mysql) { return 0; }
+  virtual void mysql_close(MYSQL *mysql) {}
+  virtual unsigned int mysql_errno(MYSQL *mysql) { return 0; }
+  virtual const char *mysql_error(MYSQL *mysql) { return ""; }
+  virtual MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *result) { return 0; }
+  virtual MYSQL_FIELD *mysql_fetch_fields(MYSQL_RES *result) { return 0; }
+  virtual MYSQL_FIELD *mysql_fetch_field_direct(MYSQL_RES *result, unsigned int fieldnr) { return 0; }
+  virtual unsigned long *mysql_fetch_lengths(MYSQL_RES *result) { return 0; }
+  virtual MYSQL_ROW mysql_fetch_row(MYSQL_RES *result) { return 0; }
+  virtual unsigned int mysql_field_count(MYSQL *mysql) { return 0; }
+  virtual void mysql_free_result(MYSQL_RES *result) {}
+  virtual MYSQL *mysql_init(MYSQL *mysql) { return &_mysql; }
+  virtual my_ulonglong mysql_insert_id(MYSQL *mysql) { return 0; }
+  virtual unsigned int mysql_num_fields(MYSQL_RES *result) { return 0; }
+  virtual my_ulonglong mysql_num_rows(MYSQL_RES *result) { return 0; }
+  virtual MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
+                                    const char *passwd, const char *db, unsigned int port,
+                                    const char *unix_socket, unsigned long client_flag) { return mysql; }
+  virtual unsigned long mysql_real_escape_string(MYSQL *mysql, char *to, const char *from, unsigned long length) {
+    char* out = to;
+    for (unsigned long i = 0; i != length; ++ i) {
+      switch(from[i]) {
+      case '\\':
+        *out++ = '\\';
+        *out++ = '\\';
+        break;
+      case '\'':
+        *out++ = '\\';
+        *out++ = '\'';
+        break;
+      case '\"':
+        *out++ = '\\';
+        *out++ = '\"';
+        break;
+      case '\0':
+        *out++ = '\\';
+        *out++ = '0';
+        break;
+      case '\n':
+        *out++ = '\\';
+        *out++ = 'n';
+        break;
+      case '\r':
+        *out++ = '\\';
+        *out++ = 'r';
+        break;
+      default:
+        *out++ = from[i];
+        break;
+      }
+    }
+    *out = '\0';
+    return (unsigned long)(out - to);
+  }
+  virtual int mysql_real_query(MYSQL *mysql, const char *query, unsigned long length) { return 0; }
+  virtual MYSQL_RES *mysql_store_result(MYSQL *mysql) { return 0; }
+  virtual MYSQL_RES *mysql_use_result(MYSQL *mysql) { return 0; }
+
+private:
+
+  MYSQL _mysql;
+};
 
 class QueryTest : public Query {
 public:
@@ -92,8 +157,10 @@ QueryTest::execute ( const std::string& q )
 
 BOOST_AUTO_TEST_CASE( test_1 )
 {
+  Client* client = new ClientDummy;
+
   // make a conection object
-  Conn conn("psdb", "regdb_reader", "", "regdb") ;
+  Conn conn("", client) ;
 
   // open connection
   BOOST_REQUIRE(conn.open());
