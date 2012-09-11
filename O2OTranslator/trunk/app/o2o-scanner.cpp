@@ -183,12 +183,12 @@ O2O_Scanner::runApp ()
     const Pds::Sequence& seq = dg.dg()->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     const Pds::TimeStamp& stamp = seq.stamp() ;
-    printf("%s transition: damage %x, type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, payloadSize %d\n",
+    printf("%s transition: damage %x, type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, vector %u, payloadSize %d\n",
            TransitionId::name(seq.service()),
            dg.dg()->xtc.damage.value(),
            int(seq.type()),
            clock.seconds(), clock.nanoseconds(),
-           stamp.ticks(),stamp.fiducials(),stamp.control(),
+           stamp.ticks(),stamp.fiducials(),stamp.control(),stamp.vector(),
            dg.dg()->xtc.sizeofPayload());
     
     myLevelIter iter(&(dg.dg()->xtc));
