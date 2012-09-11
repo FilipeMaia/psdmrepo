@@ -105,6 +105,7 @@ class DdlPythonInterfaces ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
+        self.psana_ns = backend_options.get('psana-ns', "Psana")
         self.generics = {}
 
         #include guard
@@ -214,6 +215,7 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, T("namespace $name {")[self.pkg]
         print >>self.cpp, ""
         print >>self.cpp, "void createWrappers() {"
+        print >>self.cpp, "  _import_array();"
 
         # loop over packages and types
         for ns in self.pkg.namespaces() :
@@ -246,18 +248,19 @@ class DdlPythonInterfaces ( object ) :
 
     def _getGetterClassForType(self, type):
         if re.match(r'.*(Data|DataDesc|Element)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "Psana::EventGetter"
+            return "psddl_python::EventGetter"
         elif re.match(r'.*(Config)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "Psana::EnvObjectStoreGetter"
+            return "psddl_python::EnvObjectStoreGetter"
         else:
             # Guess what type of Getter to use
-            return "Psana::EventGetter";
+            return "psddl_python::EventGetter";
 
     def _createGetterClass(self, type):
         getter_class = self._getGetterClassForType(type)
         if not getter_class:
             return
         type_name = type.name
+        psana_type_name = type.fullName('C++', self.psana_ns)
         namespace_prefix = self.namespace_prefix()
 
         generic = string.join(re.split("V[0-9]+", type.name), '')
@@ -269,20 +272,20 @@ class DdlPythonInterfaces ( object ) :
         print >>self.inc, ''
         print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
         print >> self.inc, '  public:'
-        print >> self.inc, T('  const char* getTypeName() { return "${namespace_prefix}${type_name}";}')(locals())
+        print >> self.inc, T('  const char* getTypeName() { return "${psana_type_name}";}')(locals())
         print >> self.inc, T('  const char* getGetterClassName() { return "${getter_class}";}')(locals())
         if type.version is not None:
             print >> self.inc, '    int getVersion() {'
-            print >> self.inc, T('      return ${type_name}::Version;')(locals())
+            print >> self.inc, T('      return ${psana_type_name}::Version;')(locals())
             print >> self.inc, '    }'
-        if getter_class == "Psana::EventGetter":
+        if getter_class == "psddl_python::EventGetter":
             print >> self.inc, T('    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {')(locals())
-            print >> self.inc, T('      shared_ptr<$type_name> result = evt.get(source, key, foundSrc);')(locals())
+            print >> self.inc, T('      shared_ptr<${psana_type_name}> result = evt.get(source, key, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
             print >> self.inc, '    }'
-        elif getter_class == "Psana::EnvObjectStoreGetter":
+        elif getter_class == "psddl_python::EnvObjectStoreGetter":
             print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {')(locals())
-            print >> self.inc, T('      boost::shared_ptr<$type_name> result = store.get(source, foundSrc);')(locals())
+            print >> self.inc, T('      boost::shared_ptr<${psana_type_name}> result = store.get(source, foundSrc);')(locals())
             print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
             print >> self.inc, '    }'
         print >> self.inc, '  };'
@@ -305,8 +308,8 @@ class DdlPythonInterfaces ( object ) :
         base = ""
 
         # this class (class being generated)
-        wrapped = type.name
-        name = wrapped + "_Wrapper"
+        wrapped = type.fullName('C++', self.psana_ns)
+        name = type.name + "_Wrapper"
 
         # start class declaration
         print >>self.inc, T("\nclass $name$base {")(name = name, base = base)
@@ -346,7 +349,7 @@ class DdlPythonInterfaces ( object ) :
         # export classes to Python via boost _class
         print >>self.cpp, ""
         if not abstract:
-            print >>self.cpp, T('  _CLASS($prefix$wrapped, return_value_policy<copy_const_reference>());')(locals())
+            print >>self.cpp, T('  _CLASS($wrapped, return_value_policy<copy_const_reference>());')(locals())
         print >>self.cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
         if not abstract:
             print >>self.cpp, T('  std_vector_class_($wrapped);')(locals())
@@ -354,10 +357,10 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, '#undef _CLASS';
 
         getter_class = self._getGetterClassForType(type)
-        if getter_class == "Psana::EventGetter":
-            print >>self.cpp, T('  ADD_EVENT_GETTER($wrapped);')(locals())
-        elif getter_class == "Psana::EnvObjectStoreGetter":
-            print >>self.cpp, T('  ADD_ENV_OBJECT_STORE_GETTER($wrapped);')(locals())
+        if getter_class == "psddl_python::EventGetter":
+            print >>self.cpp, T('  ADD_EVENT_GETTER($type_name);')(type_name=type.name)
+        elif getter_class == "psddl_python::EnvObjectStoreGetter":
+            print >>self.cpp, T('  ADD_ENV_OBJECT_STORE_GETTER($type_name);')(type_name=type.name)
         print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
@@ -415,7 +418,7 @@ class DdlPythonInterfaces ( object ) :
             elif attr.type.value_type :
                 
                 # return ndarray
-                rettype = "ndarray<%s, %d>" % (_typename(attr.type), len(attr.shape.dims))
+                rettype = "ndarray<%s, %d>" % (attr.type.fullName('C++', self.psana_ns), len(attr.shape.dims))
 
             else:
 
@@ -505,24 +508,32 @@ class DdlPythonInterfaces ( object ) :
                 print >>self.inc, T("  vector<$ctype> $method_name($argsspec) const { VEC_CONVERT(o->$method_name($args), $ctype); }")(locals())
             else:
                 print >>self.inc, T("  PyObject* $method_name($argsspec) const { ND_CONVERT(o->$method_name($args), $ctype, $ndim); }")(locals())
-        elif "&" in rettype and "::" in rettype:
+        elif "&" in rettype and "::" in rettype and "Pds::" not in rettype:
             if (self._pkg_name + "::") in rettype:
                 method_type = rettype.replace("&", "").replace("const ", "")
+                xmethod_type = self.psana_ns + "::" + method_type
                 index = method_type.find("::")
                 if index != -1:
                     method_type = method_type[2+index:] # remove "Namespace::"
                 wrappertype = method_type + "_Wrapper"
-                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(($method_type*) &o->$method_name($args)); }")(locals())
+                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(const_cast<$xmethod_type*>(&o->$method_name($args))); }")(locals())
                 policy = ", policy"
-            elif ("Ipimb::" in rettype) or ("Lusi::" in rettype):
+            elif ("Ipimb::" in rettype) or ("Lusi::" in rettype) or ("Camera::" in rettype) or ("Pulnix::" in rettype):
                 method_type = rettype.replace("&", "").replace("const ", "")
+                xmethod_type = self.psana_ns + "::" + method_type
                 wrappertype = method_type + "_Wrapper"
-                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(($method_type*) &o->$method_name($args)); }")(locals())
+                print >>self.inc, T("  const $wrappertype $method_name($argsspec) const { return $wrappertype(const_cast<$xmethod_type*>(&o->$method_name($args))); }")(locals())
                 policy = ", policy"
             else:
-                method_type = rettype
+                method_type = self.psana_ns + "::" + rettype
                 print >>self.inc, T("  $method_type $method_name($argsspec) const { return o->$method_name($args); }")(locals())
                 policy = ", policy"
+        elif "::" in rettype and "Pds::" not in rettype:
+            method_type = self.psana_ns + "::" + rettype
+            print >>self.inc, T("  $method_type $method_name($argsspec) const { return o->$method_name($args); }")(locals())
+        elif "::" in rettype and "Pds::" in rettype:
+            print >>self.inc, T("  $rettype $method_name($argsspec) const { return o->$method_name($args); }")(locals())
+            policy = ", policy"
         else:
             print >>self.inc, T("  $rettype $method_name($argsspec) const { return o->$method_name($args); }")(locals())
 
