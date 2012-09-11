@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream> // for std::ofstream operator << 
 #include <sstream> // for stringstream 
+//#include <typeinfo> // for typeid()
 
 //----------------------
 // Base Class Headers --
@@ -117,6 +118,7 @@ private:
   std::string m_key;          // i.e. Image2D
   std::string m_fname_prefix; // prefix of the file name
   std::string m_file_type;    // file type "txt" or "bin" 
+  std::string m_data_type;    // data type "double", "uint_16t", etc. 
   unsigned    m_nfiles_out;
   double      m_ampl_thr;
   double      m_ampl_min;
@@ -179,17 +181,19 @@ protected:
 	  for(unsigned i=0; i<m_blk_size; i++) ss << *p_block_data++ << " ";
 	  std::string s = ss.str(); 
 	  p_out[b].write(s.c_str(), s.size());
+	  p_out[b] <<  "\n";
 	} 
 
         else if (m_file_mode == BINARY) {
 	  p_out[b].write(reinterpret_cast<const char*>(p_block_data), m_blk_size*sizeof(T));
+	  //p_out[b] <<  "\n";
 	} 
 
         else {
           p_out[b] << " UNKNOWN FILE TYPE:" << m_file_type << " AND MODE:" << m_file_mode;
+
 	}
 
-	p_out[b] <<  "\n";
       }
     }
 

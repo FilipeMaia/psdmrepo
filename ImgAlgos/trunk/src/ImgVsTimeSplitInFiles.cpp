@@ -240,10 +240,11 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nIMAGE_COLS      " << m_img_cols
       << "\nIMAGE_SIZE      " << m_img_size
       << "\nNUMBER_OF_FILES " << m_nfiles_out
-      << "\nFILE_TYPE       " << m_file_type
       << "\nBLOCK_SIZE      " << m_blk_size
       << "\nREST_SIZE       " << m_rst_size
       << "\nNUMBER_OF_IMGS  " << m_count
+      << "\nFILE_TYPE       " << m_file_type
+      << "\nDATA_TYPE       " << m_data_type
       << "\n";
 
   out.close();
@@ -290,12 +291,16 @@ void
 ImgVsTimeSplitInFiles::procEvent(Event& evt)
 {
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get()) 
+  if (img.get()) {
+    m_data_type = "double"; 
     procSplitAndWriteImgInFiles<double> (img, m_print_bits & 8);
+  }
 
   shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
-  if (img_u16.get()) 
+  if (img_u16.get()) {
+    m_data_type = "uint16_t"; 
     procSplitAndWriteImgInFiles<uint16_t> (img_u16, m_print_bits & 8);
+  }
 }
 
 //--------------------

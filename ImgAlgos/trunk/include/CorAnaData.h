@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
 #include <vector>
 #include <fstream>  // for ostream, ofstream
 #include <iostream> // for cout, puts etc.
@@ -53,17 +54,49 @@ namespace ImgAlgos {
 class CorAnaData  {
 public:
 
+  typedef uint16_t data_t;
+
   CorAnaData () ;
   virtual ~CorAnaData () ;
 
 protected:
+
   void readMetadataFile();
-
-
+  void printMetadata();
+  void readDataFile();
+  void printData();
+  void initCorTau();
+  void evaluateCorTau(unsigned tau);
+  void sumCorTau(unsigned i, unsigned f);
+  void saveCorTau(unsigned tau);
+  void printCorTau(unsigned tau);
 
 private:
 
-  std::ostream& m_olog;
+  std::ostream& m_log;
+
+  std::string  m_fname;
+  std::string  m_fname_com;
+  std::string  m_fname_med;
+
+  std::string  m_file_type;
+  std::string  m_data_type;
+
+  unsigned    m_img_rows;
+  unsigned    m_img_cols;
+  unsigned    m_img_size;
+  unsigned    m_nfiles;
+  unsigned    m_blk_size;
+  unsigned    m_rst_size;
+  unsigned    m_nimgs;
+
+  data_t*     m_data;
+
+  double*     m_res_g2;
+  double*     m_sum_g2;
+  double*     m_sum_gi;
+  double*     m_sum_gf;
+  unsigned*   m_sum_st;
 
   // Copy constructor and assignment are disabled by default
   CorAnaData ( const CorAnaData& ) ;
