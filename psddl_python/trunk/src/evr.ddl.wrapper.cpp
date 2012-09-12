@@ -4,10 +4,11 @@
 #include <psddl_psana/evr.ddl.h> // inc_psana
 #include <psddl_python/evr.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace EvrData {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pulse", &n::pulse)\
@@ -29,8 +30,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::PulseConfig, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::PulseConfig_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(PulseConfig);
+  _CLASS(psddl_python::EvrData::PulseConfig_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::PulseConfig);
   std_vector_class_(PulseConfig_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(PulseConfig);
@@ -45,8 +46,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::PulseConfigV3, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::PulseConfigV3_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(PulseConfigV3);
+  _CLASS(psddl_python::EvrData::PulseConfigV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::PulseConfigV3);
   std_vector_class_(PulseConfigV3_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(PulseConfigV3);
@@ -63,8 +64,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::EventCodeV3, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::EventCodeV3_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(EventCodeV3);
+  _CLASS(psddl_python::EvrData::EventCodeV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::EventCodeV3);
   std_vector_class_(EventCodeV3_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EventCodeV3);
@@ -83,8 +84,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::EventCodeV4, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::EventCodeV4_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(EventCodeV4);
+  _CLASS(psddl_python::EvrData::EventCodeV4_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::EventCodeV4);
   std_vector_class_(EventCodeV4_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EventCodeV4);
@@ -105,8 +106,8 @@ void createWrappers() {
     .def("desc_shape", &n::desc_shape)\
 
   _CLASS(Psana::EvrData::EventCodeV5, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::EventCodeV5_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(EventCodeV5);
+  _CLASS(psddl_python::EvrData::EventCodeV5_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::EventCodeV5);
   std_vector_class_(EventCodeV5_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EventCodeV5);
@@ -121,8 +122,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::OutputMap, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::OutputMap_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(OutputMap);
+  _CLASS(psddl_python::EvrData::OutputMap_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::OutputMap);
   std_vector_class_(OutputMap_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(OutputMap);
@@ -138,8 +139,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::OutputMapV2, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::OutputMapV2_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(OutputMapV2);
+  _CLASS(psddl_python::EvrData::OutputMapV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::OutputMapV2);
   std_vector_class_(OutputMapV2_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(OutputMapV2);
@@ -151,7 +152,7 @@ void createWrappers() {
     .def("pulses", &n::pulses)\
     .def("output_maps", &n::output_maps)\
 
-  _CLASS(Psana::EvrData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -166,7 +167,7 @@ void createWrappers() {
     .def("beam", &n::beam)\
     .def("rate", &n::rate)\
 
-  _CLASS(Psana::EvrData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
@@ -180,7 +181,7 @@ void createWrappers() {
     .def("pulses", &n::pulses)\
     .def("output_maps", &n::output_maps)\
 
-  _CLASS(Psana::EvrData::ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV3);
@@ -194,7 +195,7 @@ void createWrappers() {
     .def("pulses", &n::pulses)\
     .def("output_maps", &n::output_maps)\
 
-  _CLASS(Psana::EvrData::ConfigV4_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV4_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV4);
@@ -206,8 +207,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::SequencerEntry, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::SequencerEntry_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(SequencerEntry);
+  _CLASS(psddl_python::EvrData::SequencerEntry_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::SequencerEntry);
   std_vector_class_(SequencerEntry_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(SequencerEntry);
@@ -220,7 +221,7 @@ void createWrappers() {
     .def("cycles", &n::cycles)\
     .def("entries", &n::entries)\
 
-  _CLASS(Psana::EvrData::SequencerConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::SequencerConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(SequencerConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(SequencerConfigV1);
@@ -235,7 +236,7 @@ void createWrappers() {
     .def("output_maps", &n::output_maps)\
     .def("seq_config", &n::seq_config, policy)\
 
-  _CLASS(Psana::EvrData::ConfigV5_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV5_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV5_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV5);
@@ -250,7 +251,7 @@ void createWrappers() {
     .def("output_maps", &n::output_maps)\
     .def("seq_config", &n::seq_config, policy)\
 
-  _CLASS(Psana::EvrData::ConfigV6_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::ConfigV6_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV6_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV6);
@@ -263,8 +264,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::EvrData::FIFOEvent, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::FIFOEvent_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(FIFOEvent);
+  _CLASS(psddl_python::EvrData::FIFOEvent_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::FIFOEvent);
   std_vector_class_(FIFOEvent_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FIFOEvent);
@@ -274,7 +275,7 @@ void createWrappers() {
     .def("numFifoEvents", &n::numFifoEvents)\
     .def("fifoEvents", &n::fifoEvents)\
 
-  _CLASS(Psana::EvrData::DataV3_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::DataV3_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV3_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataV3);
@@ -288,8 +289,8 @@ void createWrappers() {
     .def("name_shape", &n::name_shape)\
 
   _CLASS(Psana::EvrData::IOChannel, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::EvrData::IOChannel_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(IOChannel);
+  _CLASS(psddl_python::EvrData::IOChannel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::IOChannel);
   std_vector_class_(IOChannel_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(IOChannel);
@@ -300,7 +301,7 @@ void createWrappers() {
     .def("channels", &n::channels)\
     .def("conn", &n::conn)\
 
-  _CLASS(Psana::EvrData::IOConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::EvrData::IOConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IOConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(IOConfigV1);
@@ -308,4 +309,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace EvrData
-} // namespace Psana
+} // namespace psddl_python

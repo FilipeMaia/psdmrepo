@@ -2,7 +2,7 @@
 
 using boost::python::numeric::array;
 
-namespace Psana {
+namespace psddl_python {
   static bool did_init = false;
 
   static void init() {

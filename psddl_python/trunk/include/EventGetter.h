@@ -5,7 +5,7 @@
 #include <psddl_python/GetterMap.h>
 #include <PSEvt/Event.h>
 
-namespace Psana {
+namespace psddl_python {
   using boost::python::api::object;
   using PSEvt::Event;
   using PSEvt::Source;

@@ -19,5 +19,5 @@ for f in  psddldata/data/*.ddl.xml ; do
   package=`grep "package name" $f | sed -e 's,^.*name=",,' -e 's,".*,,'`
   echo "DECL($package)" >> psana_python/src/WrapperList.txt
   echo "module $module, package $package"
-  psddlc -b python -I data -I psddl_psana --t Psana -e psddl_python/include/$module.ddl.wrapper.h -o psddl_python/src/$module.ddl.wrapper.cpp psddldata/data/$module.ddl.xml
+  psddlc -b python -I data -I psddl_psana -t psddl_python -e psddl_python/include/$module.ddl.wrapper.h -o psddl_python/src/$module.ddl.wrapper.cpp psddldata/data/$module.ddl.xml
 done

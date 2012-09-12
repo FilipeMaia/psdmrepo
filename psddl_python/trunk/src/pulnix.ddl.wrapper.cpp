@@ -4,10 +4,11 @@
 #include <psddl_psana/pulnix.ddl.h> // inc_psana
 #include <psddl_python/pulnix.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Pulnix {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gain_a", &n::gain_a)\
@@ -21,7 +22,7 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(Psana::Pulnix::TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Pulnix::TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV1);
@@ -39,7 +40,7 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(Psana::Pulnix::TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Pulnix::TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV2);
@@ -47,4 +48,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Pulnix
-} // namespace Psana
+} // namespace psddl_python

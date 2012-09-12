@@ -4,10 +4,11 @@
 #include <psddl_psana/control.ddl.h> // inc_psana
 #include <psddl_python/control.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace ControlData {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("name", &n::name)\
@@ -17,8 +18,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::ControlData::PVControl, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::ControlData::PVControl_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(PVControl);
+  _CLASS(psddl_python::ControlData::PVControl_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::ControlData::PVControl);
   std_vector_class_(PVControl_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(PVControl);
@@ -33,8 +34,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::ControlData::PVMonitor, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::ControlData::PVMonitor_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(PVMonitor);
+  _CLASS(psddl_python::ControlData::PVMonitor_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::ControlData::PVMonitor);
   std_vector_class_(PVMonitor_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(PVMonitor);
@@ -50,7 +51,7 @@ void createWrappers() {
     .def("pvControls", &n::pvControls)\
     .def("pvMonitors", &n::pvMonitors)\
 
-  _CLASS(Psana::ControlData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::ControlData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -58,4 +59,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace ControlData
-} // namespace Psana
+} // namespace psddl_python

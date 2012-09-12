@@ -4,10 +4,11 @@
 #include <psddl_psana/opal1k.ddl.h> // inc_psana
 #include <psddl_python/opal1k.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Opal1k {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("black_level", &n::black_level)\
@@ -24,7 +25,7 @@ void createWrappers() {
     .def("output_offset", &n::output_offset)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(Psana::Opal1k::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Opal1k::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -32,4 +33,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Opal1k
-} // namespace Psana
+} // namespace psddl_python

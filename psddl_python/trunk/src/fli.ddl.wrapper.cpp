@@ -4,10 +4,11 @@
 #include <psddl_psana/fli.ddl.h> // inc_psana
 #include <psddl_python/fli.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Fli {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("width", &n::width)\
@@ -27,7 +28,7 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(Psana::Fli::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Fli::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -39,7 +40,7 @@ void createWrappers() {
     .def("temperature", &n::temperature)\
     .def("data", &n::data)\
 
-  _CLASS(Psana::Fli::FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Fli::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FrameV1);
@@ -47,4 +48,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Fli
-} // namespace Psana
+} // namespace psddl_python

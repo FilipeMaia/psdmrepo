@@ -9,7 +9,7 @@
 #include <psddl_python/vector_indexing_suite_nocopy.hpp>
 #include <numpy/arrayobject.h>
 
-namespace Psana {
+namespace psddl_python {
   extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);
 }
 
@@ -27,7 +27,7 @@ associate_PyArrayType(uint32_t, PyArray_UINT);
 associate_PyArrayType(float, PyArray_FLOAT);
 associate_PyArrayType(double, PyArray_DOUBLE);
 
-#define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return Psana::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
+#define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return psddl_python::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
 #define VEC_CONVERT(value, ctype) const ndarray<ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
 #define ADD_ENV_OBJECT_STORE_GETTER(x) EnvObjectStoreGetter::addGetter(new x ## _Getter())
 #define ADD_EVENT_GETTER(x) EventGetter::addGetter(new x ## _Getter())

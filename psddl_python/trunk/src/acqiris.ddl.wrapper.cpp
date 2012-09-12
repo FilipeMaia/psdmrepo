@@ -4,10 +4,11 @@
 #include <psddl_psana/acqiris.ddl.h> // inc_psana
 #include <psddl_python/acqiris.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Acqiris {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("fullScale", &n::fullScale)\
@@ -18,8 +19,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::VertV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::VertV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(VertV1);
+  _CLASS(psddl_python::Acqiris::VertV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::VertV1);
   std_vector_class_(VertV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(VertV1);
@@ -33,8 +34,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::HorizV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::HorizV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(HorizV1);
+  _CLASS(psddl_python::Acqiris::HorizV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::HorizV1);
   std_vector_class_(HorizV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(HorizV1);
@@ -48,8 +49,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TrigV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TrigV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TrigV1);
+  _CLASS(psddl_python::Acqiris::TrigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TrigV1);
   std_vector_class_(TrigV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TrigV1);
@@ -64,7 +65,7 @@ void createWrappers() {
     .def("vert", &n::vert)\
     .def("nbrChannels", &n::nbrChannels)\
 
-  _CLASS(Psana::Acqiris::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Acqiris::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -78,8 +79,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TimestampV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TimestampV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TimestampV1);
+  _CLASS(psddl_python::Acqiris::TimestampV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TimestampV1);
   std_vector_class_(TimestampV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TimestampV1);
@@ -92,7 +93,7 @@ void createWrappers() {
     .def("timestamp", &n::timestamp)\
     .def("waveforms", &n::waveforms)\
 
-  _CLASS(Psana::Acqiris::DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Acqiris::DataDescV1Elem_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1Elem_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataDescV1Elem);
@@ -103,7 +104,7 @@ void createWrappers() {
     .def("data_shape", &n::data_shape)\
     .def("data_list", &n::data_list)\
 
-  _CLASS(Psana::Acqiris::DataDescV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Acqiris::DataDescV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataDescV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataDescV1);
@@ -119,8 +120,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcChannel, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcChannel_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcChannel);
+  _CLASS(psddl_python::Acqiris::TdcChannel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcChannel);
   std_vector_class_(TdcChannel_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcChannel);
@@ -136,8 +137,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcAuxIO, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcAuxIO_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcAuxIO);
+  _CLASS(psddl_python::Acqiris::TdcAuxIO_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcAuxIO);
   std_vector_class_(TdcAuxIO_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcAuxIO);
@@ -152,8 +153,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcVetoIO, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcVetoIO_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcVetoIO);
+  _CLASS(psddl_python::Acqiris::TdcVetoIO_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcVetoIO);
   std_vector_class_(TdcVetoIO_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcVetoIO);
@@ -164,7 +165,7 @@ void createWrappers() {
     .def("auxio", &n::auxio)\
     .def("veto", &n::veto, policy)\
 
-  _CLASS(Psana::Acqiris::TdcConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Acqiris::TdcConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TdcConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(TdcConfigV1);
@@ -178,8 +179,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcDataV1_Item, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcDataV1_Item_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcDataV1_Item);
+  _CLASS(psddl_python::Acqiris::TdcDataV1_Item_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcDataV1_Item);
   std_vector_class_(TdcDataV1_Item_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcDataV1_Item);
@@ -191,8 +192,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcDataV1Common, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcDataV1Common_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcDataV1Common);
+  _CLASS(psddl_python::Acqiris::TdcDataV1Common_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcDataV1Common);
   std_vector_class_(TdcDataV1Common_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcDataV1Common);
@@ -205,8 +206,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcDataV1Channel, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcDataV1Channel_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcDataV1Channel);
+  _CLASS(psddl_python::Acqiris::TdcDataV1Channel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcDataV1Channel);
   std_vector_class_(TdcDataV1Channel_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcDataV1Channel);
@@ -217,8 +218,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Acqiris::TdcDataV1Marker, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Acqiris::TdcDataV1Marker_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(TdcDataV1Marker);
+  _CLASS(psddl_python::Acqiris::TdcDataV1Marker_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Acqiris::TdcDataV1Marker);
   std_vector_class_(TdcDataV1Marker_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcDataV1Marker);
@@ -227,7 +228,7 @@ void createWrappers() {
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("data", &n::data)\
 
-  _CLASS(Psana::Acqiris::TdcDataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Acqiris::TdcDataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TdcDataV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TdcDataV1);
@@ -235,4 +236,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Acqiris
-} // namespace Psana
+} // namespace psddl_python

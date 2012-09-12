@@ -4,10 +4,11 @@
 #include <psddl_psana/fccd.ddl.h> // inc_psana
 #include <psddl_python/fccd.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace FCCD {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("outputMode", &n::outputMode)\
@@ -16,7 +17,7 @@ void createWrappers() {
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(Psana::FCCD::FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::FCCD::FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(FccdConfigV1);
@@ -34,7 +35,7 @@ void createWrappers() {
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(Psana::FCCD::FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::FCCD::FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(FccdConfigV2);
@@ -42,4 +43,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace FCCD
-} // namespace Psana
+} // namespace psddl_python

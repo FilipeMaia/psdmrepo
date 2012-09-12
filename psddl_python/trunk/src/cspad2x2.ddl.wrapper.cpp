@@ -4,15 +4,16 @@
 #include <psddl_psana/cspad2x2.ddl.h> // inc_psana
 #include <psddl_python/cspad2x2.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace CsPad2x2 {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("pots", &n::pots)\
 
-  _CLASS(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2DigitalPotsCfg_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(CsPad2x2DigitalPotsCfg);
@@ -22,7 +23,7 @@ void createWrappers() {
     .def("shiftTest", &n::shiftTest)\
     .def("version", &n::version)\
 
-  _CLASS(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2ReadOnlyCfg_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(CsPad2x2ReadOnlyCfg);
@@ -32,7 +33,7 @@ void createWrappers() {
     .def("adcThreshold", &n::adcThreshold)\
     .def("pixelCountThreshold", &n::pixelCountThreshold)\
 
-  _CLASS(Psana::CsPad2x2::ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ProtectionSystemThreshold_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(ProtectionSystemThreshold);
@@ -41,7 +42,7 @@ void createWrappers() {
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("gainMap", &n::gainMap)\
 
-  _CLASS(Psana::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2GainMapCfg_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(CsPad2x2GainMapCfg);
@@ -73,7 +74,7 @@ void createWrappers() {
     .def("dp", &n::dp, policy)\
     .def("gm", &n::gm, policy)\
 
-  _CLASS(Psana::CsPad2x2::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1QuadReg);
@@ -94,7 +95,7 @@ void createWrappers() {
     .def("numAsicsRead", &n::numAsicsRead)\
     .def("numAsicsStored", &n::numAsicsStored)\
 
-  _CLASS(Psana::CsPad2x2::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -115,7 +116,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("common_mode", &n::common_mode)\
 
-  _CLASS(Psana::CsPad2x2::ElementV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ElementV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ElementV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(ElementV1);
@@ -123,4 +124,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace CsPad2x2
-} // namespace Psana
+} // namespace psddl_python

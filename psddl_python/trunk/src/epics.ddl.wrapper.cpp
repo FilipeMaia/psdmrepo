@@ -4,10 +4,11 @@
 #include <psddl_psana/epics.ddl.h> // inc_psana
 #include <psddl_python/epics.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Epics {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("sec", &n::sec)\
@@ -15,8 +16,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::epicsTimeStamp, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::epicsTimeStamp_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(epicsTimeStamp);
+  _CLASS(psddl_python::Epics::epicsTimeStamp_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::epicsTimeStamp);
   std_vector_class_(epicsTimeStamp_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(epicsTimeStamp);
@@ -29,8 +30,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_string, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_string_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_string);
+  _CLASS(psddl_python::Epics::dbr_time_string_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_string);
   std_vector_class_(dbr_time_string_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_string);
@@ -43,8 +44,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_short, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_short_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_short);
+  _CLASS(psddl_python::Epics::dbr_time_short_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_short);
   std_vector_class_(dbr_time_short_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_short);
@@ -57,8 +58,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_float, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_float_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_float);
+  _CLASS(psddl_python::Epics::dbr_time_float_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_float);
   std_vector_class_(dbr_time_float_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_float);
@@ -71,8 +72,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_enum, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_enum_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_enum);
+  _CLASS(psddl_python::Epics::dbr_time_enum_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_enum);
   std_vector_class_(dbr_time_enum_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_enum);
@@ -85,8 +86,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_char, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_char_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_char);
+  _CLASS(psddl_python::Epics::dbr_time_char_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_char);
   std_vector_class_(dbr_time_char_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_char);
@@ -99,8 +100,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_long, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_long_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_long);
+  _CLASS(psddl_python::Epics::dbr_time_long_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_long);
   std_vector_class_(dbr_time_long_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_long);
@@ -113,8 +114,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_time_double, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_time_double_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_time_double);
+  _CLASS(psddl_python::Epics::dbr_time_double_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_time_double);
   std_vector_class_(dbr_time_double_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_time_double);
@@ -126,8 +127,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Epics::dbr_sts_string, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_sts_string_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_sts_string);
+  _CLASS(psddl_python::Epics::dbr_sts_string_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_sts_string);
   std_vector_class_(dbr_sts_string_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_sts_string);
@@ -149,8 +150,8 @@ void createWrappers() {
     .def("units_shape", &n::units_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_short, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_short_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_short);
+  _CLASS(psddl_python::Epics::dbr_ctrl_short_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_short);
   std_vector_class_(dbr_ctrl_short_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_short);
@@ -173,8 +174,8 @@ void createWrappers() {
     .def("units_shape", &n::units_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_float, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_float_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_float);
+  _CLASS(psddl_python::Epics::dbr_ctrl_float_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_float);
   std_vector_class_(dbr_ctrl_float_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_float);
@@ -189,8 +190,8 @@ void createWrappers() {
     .def("strings_shape", &n::strings_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_enum, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_enum_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_enum);
+  _CLASS(psddl_python::Epics::dbr_ctrl_enum_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_enum);
   std_vector_class_(dbr_ctrl_enum_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_enum);
@@ -212,8 +213,8 @@ void createWrappers() {
     .def("units_shape", &n::units_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_char, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_char_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_char);
+  _CLASS(psddl_python::Epics::dbr_ctrl_char_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_char);
   std_vector_class_(dbr_ctrl_char_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_char);
@@ -235,8 +236,8 @@ void createWrappers() {
     .def("units_shape", &n::units_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_long, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_long_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_long);
+  _CLASS(psddl_python::Epics::dbr_ctrl_long_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_long);
   std_vector_class_(dbr_ctrl_long_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_long);
@@ -259,8 +260,8 @@ void createWrappers() {
     .def("units_shape", &n::units_shape)\
 
   _CLASS(Psana::Epics::dbr_ctrl_double, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Epics::dbr_ctrl_double_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(dbr_ctrl_double);
+  _CLASS(psddl_python::Epics::dbr_ctrl_double_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Epics::dbr_ctrl_double);
   std_vector_class_(dbr_ctrl_double_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(dbr_ctrl_double);
@@ -276,7 +277,7 @@ void createWrappers() {
     .def("status", &n::status)\
     .def("severity", &n::severity)\
 
-  _CLASS(Psana::Epics::EpicsPvHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvHeader_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvHeader);
@@ -286,7 +287,7 @@ void createWrappers() {
     .def("pvName", &n::pvName)\
     .def("pvName_shape", &n::pvName_shape)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlHeader_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlHeader);
@@ -295,7 +296,7 @@ void createWrappers() {
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("stamp", &n::stamp)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeHeader_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeHeader_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeHeader);
@@ -308,7 +309,7 @@ void createWrappers() {
     .def("data_shape", &n::data_shape)\
     .def("data_list", &n::data_list)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlString_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlString_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlString);
@@ -319,7 +320,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlShort_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlShort_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlShort);
@@ -330,7 +331,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlFloat_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlFloat_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlFloat);
@@ -341,7 +342,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlEnum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlEnum_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlEnum);
@@ -352,7 +353,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlChar_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlChar_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlChar);
@@ -363,7 +364,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlLong_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlLong_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlLong);
@@ -374,7 +375,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvCtrlDouble_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvCtrlDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvCtrlDouble_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvCtrlDouble);
@@ -387,7 +388,7 @@ void createWrappers() {
     .def("data_shape", &n::data_shape)\
     .def("data_list", &n::data_list)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeString_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeString_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeString_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeString);
@@ -398,7 +399,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeShort_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeShort_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeShort_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeShort);
@@ -409,7 +410,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeFloat_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeFloat_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeFloat_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeFloat);
@@ -420,7 +421,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeEnum_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeEnum_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeEnum_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeEnum);
@@ -431,7 +432,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeChar_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeChar_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeChar_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeChar);
@@ -442,7 +443,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeLong_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeLong_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeLong_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeLong);
@@ -453,7 +454,7 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Epics::EpicsPvTimeDouble_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::EpicsPvTimeDouble_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(EpicsPvTimeDouble_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(EpicsPvTimeDouble);
@@ -464,7 +465,7 @@ void createWrappers() {
     .def("description", &n::description)\
     .def("interval", &n::interval)\
 
-  _CLASS(Psana::Epics::PvConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::PvConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(PvConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(PvConfigV1);
@@ -476,7 +477,7 @@ void createWrappers() {
     .def("pvControls_shape", &n::pvControls_shape)\
     .def("pvControls_list", &n::pvControls_list)\
 
-  _CLASS(Psana::Epics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Epics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -484,4 +485,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Epics
-} // namespace Psana
+} // namespace psddl_python

@@ -4,10 +4,11 @@
 #include <psddl_psana/encoder.ddl.h> // inc_psana
 #include <psddl_python/encoder.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Encoder {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("chan_num", &n::chan_num)\
@@ -17,7 +18,7 @@ void createWrappers() {
     .def("input_rising", &n::input_rising)\
     .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(Psana::Encoder::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -31,7 +32,7 @@ void createWrappers() {
     .def("input_rising", &n::input_rising)\
     .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(Psana::Encoder::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
@@ -42,7 +43,7 @@ void createWrappers() {
     .def("encoder_count", &n::encoder_count)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Encoder::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataV1);
@@ -53,7 +54,7 @@ void createWrappers() {
     .def("encoder_count", &n::encoder_count)\
     .def("value", &n::value)\
 
-  _CLASS(Psana::Encoder::DataV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::DataV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataV2);
@@ -61,4 +62,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Encoder
-} // namespace Psana
+} // namespace psddl_python

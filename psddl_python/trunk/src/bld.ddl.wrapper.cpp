@@ -4,10 +4,11 @@
 #include <psddl_psana/bld.ddl.h> // inc_psana
 #include <psddl_python/bld.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Bld {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("f_11_ENRC", &n::f_11_ENRC)\
@@ -17,8 +18,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataFEEGasDetEnergy, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataFEEGasDetEnergy_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataFEEGasDetEnergy);
+  _CLASS(psddl_python::Bld::BldDataFEEGasDetEnergy_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataFEEGasDetEnergy);
   std_vector_class_(BldDataFEEGasDetEnergy_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataFEEGasDetEnergy);
@@ -35,8 +36,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataEBeamV0, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataEBeamV0_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataEBeamV0);
+  _CLASS(psddl_python::Bld::BldDataEBeamV0_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataEBeamV0);
   std_vector_class_(BldDataEBeamV0_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataEBeamV0);
@@ -54,8 +55,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataEBeamV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataEBeamV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataEBeamV1);
+  _CLASS(psddl_python::Bld::BldDataEBeamV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataEBeamV1);
   std_vector_class_(BldDataEBeamV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataEBeamV1);
@@ -74,8 +75,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataEBeamV2, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataEBeamV2_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataEBeamV2);
+  _CLASS(psddl_python::Bld::BldDataEBeamV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataEBeamV2);
   std_vector_class_(BldDataEBeamV2_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataEBeamV2);
@@ -96,8 +97,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataEBeamV3, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataEBeamV3_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataEBeamV3);
+  _CLASS(psddl_python::Bld::BldDataEBeamV3_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataEBeamV3);
   std_vector_class_(BldDataEBeamV3_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataEBeamV3);
@@ -111,8 +112,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Bld::BldDataPhaseCavity, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Bld::BldDataPhaseCavity_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(BldDataPhaseCavity);
+  _CLASS(psddl_python::Bld::BldDataPhaseCavity_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Bld::BldDataPhaseCavity);
   std_vector_class_(BldDataPhaseCavity_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataPhaseCavity);
@@ -123,7 +124,7 @@ void createWrappers() {
     .def("ipimbConfig", &n::ipimbConfig, policy)\
     .def("ipmFexData", &n::ipmFexData, policy)\
 
-  _CLASS(Psana::Bld::BldDataIpimbV0_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Bld::BldDataIpimbV0_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataIpimbV0_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataIpimbV0);
@@ -134,7 +135,7 @@ void createWrappers() {
     .def("ipimbConfig", &n::ipimbConfig, policy)\
     .def("ipmFexData", &n::ipmFexData, policy)\
 
-  _CLASS(Psana::Bld::BldDataIpimbV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Bld::BldDataIpimbV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataIpimbV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataIpimbV1);
@@ -145,7 +146,7 @@ void createWrappers() {
     .def("pimConfig", &n::pimConfig, policy)\
     .def("frame", &n::frame, policy)\
 
-  _CLASS(Psana::Bld::BldDataPimV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Bld::BldDataPimV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataPimV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(BldDataPimV1);
@@ -153,4 +154,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Bld
-} // namespace Psana
+} // namespace psddl_python

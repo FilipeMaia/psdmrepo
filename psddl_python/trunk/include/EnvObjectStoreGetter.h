@@ -5,7 +5,7 @@
 #include <psddl_python/GetterMap.h>
 #include <PSEnv/EnvObjectStore.h>
 
-namespace Psana {
+namespace psddl_python {
   using boost::python::api::object;
   using PSEnv::EnvObjectStore;
   using PSEvt::Source;

@@ -1,7 +1,7 @@
 #ifndef PSANA_GETTER_H
 #define PSANA_GETTER_H
 
-namespace Psana {
+namespace psddl_python {
   class Getter {
   public:
     virtual const char* getTypeName() = 0; // C++ type name

@@ -4,10 +4,11 @@
 #include <psddl_psana/camera.ddl.h> // inc_psana
 #include <psddl_python/camera.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Camera {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("column", &n::column)\
@@ -15,8 +16,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Camera::FrameCoord, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Camera::FrameCoord_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(FrameCoord);
+  _CLASS(psddl_python::Camera::FrameCoord_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Camera::FrameCoord);
   std_vector_class_(FrameCoord_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FrameCoord);
@@ -24,7 +25,7 @@ void createWrappers() {
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
 
-  _CLASS(Psana::Camera::FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Camera::FrameFccdConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFccdConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(FrameFccdConfigV1);
@@ -40,7 +41,7 @@ void createWrappers() {
     .def("number_of_masked_pixels", &n::number_of_masked_pixels)\
     .def("masked_pixel_coordinates", &n::masked_pixel_coordinates)\
 
-  _CLASS(Psana::Camera::FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Camera::FrameFexConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameFexConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(FrameFexConfigV1);
@@ -55,7 +56,7 @@ void createWrappers() {
     .def("data8", &n::data8)\
     .def("data16", &n::data16)\
 
-  _CLASS(Psana::Camera::FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Camera::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FrameV1);
@@ -69,7 +70,7 @@ void createWrappers() {
     .def("minor_axis_width", &n::minor_axis_width)\
     .def("major_axis_tilt", &n::major_axis_tilt)\
 
-  _CLASS(Psana::Camera::TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Camera::TwoDGaussianV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(TwoDGaussianV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(TwoDGaussianV1);
@@ -77,4 +78,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Camera
-} // namespace Psana
+} // namespace psddl_python

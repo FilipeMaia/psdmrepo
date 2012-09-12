@@ -4,10 +4,11 @@
 #include <psddl_psana/oceanoptics.ddl.h> // inc_psana
 #include <psddl_python/oceanoptics.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace OceanOptics {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("exposureTime", &n::exposureTime)\
@@ -15,7 +16,7 @@ void createWrappers() {
     .def("nonlinCorrect", &n::nonlinCorrect)\
     .def("strayLightConstant", &n::strayLightConstant)\
 
-  _CLASS(Psana::OceanOptics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::OceanOptics::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -27,8 +28,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::OceanOptics::timespec64, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::OceanOptics::timespec64_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(timespec64);
+  _CLASS(psddl_python::OceanOptics::timespec64_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::OceanOptics::timespec64);
   std_vector_class_(timespec64_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(timespec64);
@@ -49,7 +50,7 @@ void createWrappers() {
     .def("durationOfFrame", &n::durationOfFrame)\
     .def("nonlinerCorrected", &n::nonlinerCorrected)\
 
-  _CLASS(Psana::OceanOptics::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::OceanOptics::DataV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DataV1);
@@ -57,4 +58,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace OceanOptics
-} // namespace Psana
+} // namespace psddl_python

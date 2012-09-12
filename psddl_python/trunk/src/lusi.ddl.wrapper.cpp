@@ -4,10 +4,11 @@
 #include <psddl_psana/lusi.ddl.h> // inc_psana
 #include <psddl_python/lusi.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace Lusi {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("base", &n::base)\
@@ -15,8 +16,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Lusi::DiodeFexConfigV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Lusi::DiodeFexConfigV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(DiodeFexConfigV1);
+  _CLASS(psddl_python::Lusi::DiodeFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Lusi::DiodeFexConfigV1);
   std_vector_class_(DiodeFexConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(DiodeFexConfigV1);
@@ -28,8 +29,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Lusi::DiodeFexConfigV2, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Lusi::DiodeFexConfigV2_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(DiodeFexConfigV2);
+  _CLASS(psddl_python::Lusi::DiodeFexConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Lusi::DiodeFexConfigV2);
   std_vector_class_(DiodeFexConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(DiodeFexConfigV2);
@@ -40,8 +41,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Lusi::DiodeFexV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Lusi::DiodeFexV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(DiodeFexV1);
+  _CLASS(psddl_python::Lusi::DiodeFexV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Lusi::DiodeFexV1);
   std_vector_class_(DiodeFexV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(DiodeFexV1);
@@ -52,7 +53,7 @@ void createWrappers() {
     .def("xscale", &n::xscale)\
     .def("yscale", &n::yscale)\
 
-  _CLASS(Psana::Lusi::IpmFexConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Lusi::IpmFexConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IpmFexConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(IpmFexConfigV1);
@@ -63,7 +64,7 @@ void createWrappers() {
     .def("xscale", &n::xscale)\
     .def("yscale", &n::yscale)\
 
-  _CLASS(Psana::Lusi::IpmFexConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Lusi::IpmFexConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(IpmFexConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(IpmFexConfigV2);
@@ -77,8 +78,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Lusi::IpmFexV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Lusi::IpmFexV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(IpmFexV1);
+  _CLASS(psddl_python::Lusi::IpmFexV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Lusi::IpmFexV1);
   std_vector_class_(IpmFexV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(IpmFexV1);
@@ -90,8 +91,8 @@ void createWrappers() {
     .def("_sizeof", &n::_sizeof)\
 
   _CLASS(Psana::Lusi::PimImageConfigV1, return_value_policy<copy_const_reference>());
-  _CLASS(Psana::Lusi::PimImageConfigV1_Wrapper, return_value_policy<return_by_value>());
-  std_vector_class_(PimImageConfigV1);
+  _CLASS(psddl_python::Lusi::PimImageConfigV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::Lusi::PimImageConfigV1);
   std_vector_class_(PimImageConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(PimImageConfigV1);
@@ -99,4 +100,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace Lusi
-} // namespace Psana
+} // namespace psddl_python

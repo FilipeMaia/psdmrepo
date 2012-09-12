@@ -6,7 +6,7 @@
 #include <pdsdata/xtc/Src.hh>
 #include <psddl_python/Getter.h>
 
-namespace Psana {
+namespace psddl_python {
   using std::map;
   using std::string;
   using Pds::Src;

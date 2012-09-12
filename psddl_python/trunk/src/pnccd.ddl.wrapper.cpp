@@ -4,16 +4,17 @@
 #include <psddl_psana/pnccd.ddl.h> // inc_psana
 #include <psddl_python/pnccd.ddl.wrapper.h> // inc_python
 
-namespace Psana {
+namespace psddl_python {
 namespace PNCCD {
 
 void createWrappers() {
+  _import_array();
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("numLinks", &n::numLinks)\
     .def("payloadSizePerLink", &n::payloadSizePerLink)\
 
-  _CLASS(Psana::PNCCD::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::PNCCD::ConfigV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
@@ -33,7 +34,7 @@ void createWrappers() {
     .def("info_shape", &n::info_shape)\
     .def("timingFName_shape", &n::timingFName_shape)\
 
-  _CLASS(Psana::PNCCD::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::PNCCD::ConfigV2_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
@@ -47,7 +48,7 @@ void createWrappers() {
     .def("_data", &n::_data)\
     .def("data", &n::data)\
 
-  _CLASS(Psana::PNCCD::FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::PNCCD::FrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FrameV1);
@@ -59,7 +60,7 @@ void createWrappers() {
     .def("frame_shape", &n::frame_shape)\
     .def("frame_list", &n::frame_list)\
 
-  _CLASS(Psana::PNCCD::FramesV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::PNCCD::FramesV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FramesV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FramesV1);
@@ -72,7 +73,7 @@ void createWrappers() {
     .def("timeStampLo", &n::timeStampLo)\
     .def("data", &n::data)\
 
-  _CLASS(Psana::PNCCD::FullFrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::PNCCD::FullFrameV1_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(FullFrameV1_Wrapper);
 #undef _CLASS
   ADD_EVENT_GETTER(FullFrameV1);
@@ -80,4 +81,4 @@ void createWrappers() {
 
 } // createWrappers()
 } // namespace PNCCD
-} // namespace Psana
+} // namespace psddl_python

@@ -4,7 +4,7 @@
 #include <sstream>
 #include "PSEvt/EventKey.h" // operator<<(Pds::Src) defined here
 
-namespace Psana {
+namespace psddl_python {
   static string toString(const Src& src) {
     std::ostringstream stream;
     stream << src;

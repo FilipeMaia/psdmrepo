@@ -3,7 +3,7 @@
 #include <string.h>
 #include <psddl_python/GetterMap.h>
 
-namespace Psana {
+namespace psddl_python {
 
   GetterMap envObjectStoreGetterMap("Psana::EnvObjectStore");
   GetterMap eventGetterMap("Psana::Event");
