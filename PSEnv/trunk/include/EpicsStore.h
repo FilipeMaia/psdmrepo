@@ -18,6 +18,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -59,7 +60,7 @@ namespace PSEnv {
  *  @author Andrei Salnikov
  */
 
-class EpicsStore : boost::noncopyable {
+class EpicsStore : public boost::enable_shared_from_this<EpicsStore>, boost::noncopyable {
 public:
 
   /**

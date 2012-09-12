@@ -15,6 +15,7 @@
 //-----------------
 #include <typeinfo>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/utility.hpp>
 
 //----------------------
@@ -62,7 +63,7 @@ namespace PSEnv {
  *  @author Andrei Salnikov
  */
 
-class EnvObjectStore : boost::noncopyable {
+class EnvObjectStore : public boost::enable_shared_from_this<EnvObjectStore>, boost::noncopyable {
 public:
 
   /// Special class used for type-less return from get()

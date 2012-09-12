@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <boost/scoped_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -67,7 +68,7 @@ namespace PSEnv {
  *  @author Andrei Salnikov
  */
 
-class Env : boost::noncopyable {
+class Env : public boost::enable_shared_from_this<Env>, boost::noncopyable {
 public:
 
   /**
@@ -127,9 +128,9 @@ private:
 
   // Data members
   std::string m_jobName;   ///< Job name
-  boost::scoped_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
-  boost::scoped_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
-  boost::scoped_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
+  boost::shared_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
+  boost::shared_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
+  boost::shared_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
   boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
   boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager
   boost::shared_ptr<IExpNameProvider> m_expNameProvider; ///< Object which provides experiment and instrument names

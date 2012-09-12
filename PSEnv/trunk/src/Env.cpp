@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/make_shared.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -57,7 +58,7 @@ Env::Env (const std::string& jobName,
   : m_jobName(jobName)
   , m_cfgStore()
   , m_calibStore()
-  , m_epicsStore(new EpicsStore())
+  , m_epicsStore(boost::make_shared<EpicsStore>())
   , m_rhmgr()
   , m_hmgr()
   , m_expNameProvider(expNameProvider)
@@ -66,11 +67,11 @@ Env::Env (const std::string& jobName,
 {
   // instantiate dictionary for config store and store itself
   boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
-  m_cfgStore.reset(new EnvObjectStore(cfgDict));
+  m_cfgStore = boost::make_shared<EnvObjectStore>(cfgDict);
 
   // instantiate dictionary for calib store and store itself
   boost::shared_ptr<PSEvt::ProxyDict> calibDict(new PSEvt::ProxyDict());
-  m_calibStore.reset(new EnvObjectStore(calibDict));
+  m_calibStore = boost::make_shared<EnvObjectStore>(calibDict);
   
   // make root file name
   std::string rfname = jobName + "-rhmgr.root";
