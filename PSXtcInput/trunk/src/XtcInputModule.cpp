@@ -20,6 +20,7 @@
 //-----------------
 #include <algorithm>
 #include <iterator>
+#include <boost/make_shared.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -374,7 +375,9 @@ XtcInputModule::fillEventId(const XtcInput::Dgram& dg, Event& evt)
   // Store event ID
   PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
   unsigned run = dg.file().run();
-  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(run, evtTime) );
+  unsigned fiducials = seq.stamp().fiducials();
+  unsigned vect = seq.stamp().vector();
+  boost::shared_ptr<PSEvt::EventId> eventId = boost::make_shared<XtcEventId>(run, evtTime, fiducials, vect);
   evt.put(eventId);
 }
 

@@ -51,7 +51,7 @@ class XtcEventId : public PSEvt::EventId {
 public:
 
   // Default constructor
-  XtcEventId (int run, const PSTime::Time& time) ;
+  XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned vector) ;
 
   // Destructor
   ~XtcEventId () ;
@@ -63,11 +63,30 @@ public:
 
   /**
    *  @brief Return the run number for event.
-   *  
+   *
    *  If run number is not known -1 will be returned.
    */
   virtual int run() const;
-  
+
+  /**
+   *  @brief Returns fiducials counter for the event.
+   *
+   *  Note that MCC sends fiducials as 17-bit number which overflows
+   *  frequently (fiducials clock runs at 360Hz) so this number is
+   *  not unique. In some cases (e.g. when reading from old HDF5
+   *  files) fiducials is not know, 0 will be returned in this case.
+   */
+  virtual unsigned fiducials() const;
+
+  /**
+   *  @brief Returns event counter since Configure.
+   *
+   *  Note that counter is saved as 15-bits integer and will overflow
+   *  frequently. In some cases (e.g. when reading from old HDF5
+   *  files) counter is not know, 0 will be returned  in this case.
+   */
+  virtual unsigned vector() const;
+
   /// check if two event IDs refer to the same event
   virtual bool operator==(const EventId& other) const;
   
@@ -84,7 +103,8 @@ private:
   // Data members
   int m_run;
   PSTime::Time m_time;
-
+  unsigned m_fiducials;
+  unsigned m_vector;
 };
 
 } // namespace PSXtcInput

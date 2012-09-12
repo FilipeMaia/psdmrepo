@@ -36,10 +36,12 @@ namespace PSXtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcEventId::XtcEventId (int run, const PSTime::Time& time)
+XtcEventId::XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned vector)
   : PSEvt::EventId()
   , m_run(run)
   , m_time(time)
+  , m_fiducials(fiducials)
+  , m_vector(vector)
 {
 }
 
@@ -70,6 +72,24 @@ XtcEventId::run() const
   return m_run;
 }
 
+/**
+ *  @brief Returns fiducials counter for the event.
+ */
+unsigned
+XtcEventId::fiducials() const
+{
+  return m_fiducials;
+}
+
+/**
+ *  @brief Returns event counter since Configure.
+ */
+unsigned
+XtcEventId::vector() const
+{
+  return m_vector;
+}
+
 /// check if two event IDs refer to the same event
 bool 
 XtcEventId::operator==(const EventId& other) const
@@ -88,7 +108,7 @@ XtcEventId::operator<(const EventId& other) const
 void 
 XtcEventId::print(std::ostream& os) const
 {
-  os << "XtcEventId(run=" << m_run << ", time=" << m_time << ')'; 
+  os << "XtcEventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials << ", vector=" << m_vector << ")";
 }
 
 } // namespace PSXtcInput
