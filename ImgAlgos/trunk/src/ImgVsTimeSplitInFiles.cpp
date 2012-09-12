@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "ImgAlgos/GlobalMethods.h"
+#include "ImgAlgos/TimeInterval.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -54,6 +55,7 @@ ImgVsTimeSplitInFiles::ImgVsTimeSplitInFiles (const std::string& name)
   , m_key()
   , m_fname_prefix()
   , m_file_type()
+  , m_add_tstamp()
   , m_nfiles_out()
   , m_ampl_thr()
   , m_ampl_min()
@@ -65,6 +67,7 @@ ImgVsTimeSplitInFiles::ImgVsTimeSplitInFiles (const std::string& name)
   m_key           = configStr("key",                 "img");
   m_fname_prefix  = configStr("fname_prefix",     "my-exp");
   m_file_type     = configStr("file_type",           "bin");
+  m_add_tstamp    = config   ("add_tstamp",           true);
   m_nfiles_out    = config   ("nfiles_out",              8);
   m_ampl_thr      = config   ("ampl_thr",                1);
   m_ampl_min      = config   ("ampl_min",                1);
@@ -85,6 +88,7 @@ ImgVsTimeSplitInFiles::printInputParameters()
         << "\nfname_prefix : "     << m_fname_prefix
         << "\nfile_type    : "     << m_file_type
         << "\nm_file_mode  : "     << m_file_mode
+        << "\nadd_tstamp   : "     << m_add_tstamp
         << "\nnfiles_out   : "     << m_nfiles_out
         << "\nm_ampl_thr   : "     << m_ampl_thr
         << "\nm_ampl_min   : "     << m_ampl_min
@@ -259,14 +263,16 @@ ImgVsTimeSplitInFiles::openOutputFiles(Event& evt)
   p_out = new std::ofstream [m_nfiles_out];
 
   ios_base::openmode mode = ios_base::out | ios_base::binary;
+  TimeInterval* time_job_start = new TimeInterval();
 
-  m_fname_common = m_fname_prefix  
-                 + "-r"  + stringRunNumber(evt); 
+  m_fname_common = m_fname_prefix + "-r"  + stringRunNumber(evt);
+  if(m_add_tstamp)  m_fname_common += time_job_start -> strStartTime("-%Y%m%d-%H%M%S"); 
+
   std::string fname;
   for(unsigned b=0; b<m_nfiles_out; b++){
 
      fname = m_fname_common
-           + "-b"  + stringFromUint(b,3)
+           + "-b"  + stringFromUint(b,4)
            + "."   + m_file_type;
 
      if( m_print_bits & 16 ) MsgLog( name(), info, "Open output file: " << fname );     
@@ -275,6 +281,8 @@ ImgVsTimeSplitInFiles::openOutputFiles(Event& evt)
      //p_out[b] << "This is a content of the file " << fname;
      //p_out[b].close();
   }
+
+  p_out_time.open((m_fname_common + "-time.txt").c_str(), mode);
 }
 
 //--------------------
@@ -283,6 +291,7 @@ void
 ImgVsTimeSplitInFiles::closeOutputFiles()
 {
   for(unsigned b=0; b<m_nfiles_out; b++) p_out[b].close();
+  p_out_time.close();
 }
 
 //--------------------
@@ -290,6 +299,8 @@ ImgVsTimeSplitInFiles::closeOutputFiles()
 void 
 ImgVsTimeSplitInFiles::procEvent(Event& evt)
 {
+  saveTimeRecord(evt);
+
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
     m_data_type = "double"; 
@@ -301,6 +312,22 @@ ImgVsTimeSplitInFiles::procEvent(Event& evt)
     m_data_type = "uint16_t"; 
     procSplitAndWriteImgInFiles<uint16_t> (img_u16, m_print_bits & 8);
   }
+}
+
+//--------------------
+
+void 
+ImgVsTimeSplitInFiles::saveTimeRecord(Event& evt)
+{
+  m_tsec = doubleTime(evt);
+  if(m_count==1) m_tsec_prev = m_tsec;
+
+  p_out_time << std::setw(6) << m_count 
+             << fixed << std::setw(16) << std::setprecision(3) << m_tsec
+             << fixed << std::setw(7) << std::setprecision(3) << m_tsec-m_tsec_prev
+             << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f") << "\n";
+
+  m_tsec_prev = m_tsec;  
 }
 
 //--------------------

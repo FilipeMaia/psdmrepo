@@ -77,6 +77,16 @@ stringTimeStamp(PSEvt::Event& evt, std::string fmt) // fmt="%Y%m%dT%H:%M:%S%f"
 
 //--------------------
 
+double
+doubleTime(PSEvt::Event& evt)
+{
+  boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) return double(eventId->time().sec()) + 1e-9*eventId->time().nsec();
+  else               return double(0);
+}
+
+//--------------------
+
 std::string  
 stringRunNumber(PSEvt::Event& evt, unsigned width)
 {

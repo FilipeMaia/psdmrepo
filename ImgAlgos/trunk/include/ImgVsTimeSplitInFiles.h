@@ -51,6 +51,7 @@ namespace ImgAlgos {
  *  * It gets the image as ndarray<T,2>
  *  * splits it for requested number of equal parts
  *  * saves each part in binary or text format in file for all events,
+ *  * saves timestamps for selected events in the text file.
  *  * saves metadata in the text file.
  *  
  *  This software was developed for the LCLS project.  If you use all or 
@@ -108,6 +109,7 @@ protected:
   void closeOutputFiles();
   void saveMetadataInFile();
   void procEvent(Event& evt);
+  void saveTimeRecord(Event& evt);
 
 private:
 
@@ -119,6 +121,7 @@ private:
   std::string m_fname_prefix; // prefix of the file name
   std::string m_file_type;    // file type "txt" or "bin" 
   std::string m_data_type;    // data type "double", "uint_16t", etc. 
+  bool        m_add_tstamp;
   unsigned    m_nfiles_out;
   double      m_ampl_thr;
   double      m_ampl_min;
@@ -136,7 +139,12 @@ private:
   unsigned*   m_data;         // image data in case if processing is necessary
 
   std::string m_fname_common;
+
   std::ofstream* p_out;
+  std::ofstream  p_out_time;
+
+  double      m_tsec;
+  double      m_tsec_prev;
 
 protected:
 //--------------------

@@ -116,7 +116,7 @@ CorAnaData::readMetadataFile()
     }
     inf.close();
   }
-  else m_log << "Unable to open file :" << m_fname_med;  
+  else m_log << "Unable to open file: " << m_fname_med << "\n";  
 }
 
 //----------------
@@ -146,7 +146,7 @@ CorAnaData::readDataFile()
 
   std::fstream inf(m_fname.c_str(), std::ios::in | std::ios::binary);
   if (!inf.is_open()) {
-     const std::string msg = "Unable to open file :" + m_fname_med; 
+     const std::string msg = "Unable to open file: " + m_fname + "\n"; 
      m_log << msg;  
      abort();
   }
