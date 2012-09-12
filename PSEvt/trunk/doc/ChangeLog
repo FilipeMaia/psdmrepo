@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2012-09-11 Andy Salnikov
+- Even class now inherits from boost::enable_shared_from_this
+- EventId class has new methods fiducials() and vector()
+
 Tag: V00-04-04
 2012-07-24 Andy Salnikov
 - rhel6/gcc44 migration, added missing headers
