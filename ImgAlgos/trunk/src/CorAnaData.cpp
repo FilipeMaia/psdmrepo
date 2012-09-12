@@ -43,14 +43,28 @@ CorAnaData::CorAnaData(): m_log(INPARS->get_ostream())
 {
   m_log << "C-tor: CorAnaData()\n";
 
+  m_timer1 = new TimeInterval();
+  m_log << "Job is started at " << m_timer1->strStartTime() << "\n";
+
   readMetadataFile();
-  printMetadata();
   readDataFile();
+
+  m_log << "Data reading time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
+
+  printMetadata();
   printData();
+
+  makeIndTau();
+  printIndTau();
+  saveIndTauInFile();
+
+  m_timer1->startTime();
 
   initCorTau();
   unsigned tau=10;
   evaluateCorTau(tau);
+
+  m_log << "\nCorrelation processing time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
   printCorTau(tau);
 }
 
@@ -153,8 +167,8 @@ CorAnaData::printData()
 
   for(unsigned r=0; r<m_nimgs; r++) {
     if ( r<10 
-      || r<100  && r%10 == 0 
-      || r<1000 && r%100== 0
+      || r<100 && r%10 == 0 
+      || r%100== 0
       || r==m_nimgs-1 )
       {
         m_log << "\nImg-blk " << std::setw(4) << r << ":";
@@ -205,7 +219,12 @@ CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between imag
 void
 CorAnaData::sumCorTau(unsigned i, unsigned f)
 {
-   m_log << "\nevaluateCorTau: i,f=" << i << ", " << f;
+    if ( i<10 
+      || i<100 && i%10 == 0 
+      || i%100== 0
+      || i==m_nimgs-(f-i)-1 ) 
+      m_log << "\nevaluateCorTau: tau=" << f-i 
+            << "  i, f=" << i << ", " << f;
 
    data_t* p_i = &m_data[i*m_blk_size];
    data_t* p_f = &m_data[f*m_blk_size];
@@ -252,6 +271,49 @@ CorAnaData::printCorTau(unsigned tau)
 }
 
 //----------------
+
+void
+CorAnaData::makeIndTau()
+{
+  //m_log << "\nmakeIndTau():\n";
+  for(unsigned itau=1; itau<m_nimgs; itau++) {
+     if( itau<100 
+      || itau<1000 && itau%10 == 0 
+      || itau%100 == 0 ) v_ind_tau.push_back(itau);
+  }
+}
+
+//----------------
+
+void
+CorAnaData::printIndTau()
+{
+  m_log << "\nVector of indexes for tau: size =" << v_ind_tau.size()  << "\n";
+  unsigned counter=0;
+  for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
+                                       it!= v_ind_tau.end(); it++) {
+    m_log << " "  << std::setw(5) << std::right << *it;
+    counter++; if(counter>19) {counter=0; m_log << "\n";}
+  }
+  m_log << "\n";
+}
+
+//----------------
+
+void
+CorAnaData::saveIndTauInFile()
+{
+  m_fname_tau = m_fname_com + "-tau.txt";
+  m_log << "\nsaveIndTauInFile(): " << m_fname_tau  << "\n";
+
+  std::ofstream out(m_fname_tau.c_str());
+  for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
+                                       it!= v_ind_tau.end(); it++)
+  out << " " << *it;
+  out << "\n";
+  out.close();
+}
+
 //----------------
 //----------------
 //----------------

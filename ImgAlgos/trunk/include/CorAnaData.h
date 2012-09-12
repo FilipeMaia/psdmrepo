@@ -25,6 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ImgAlgos/TimeInterval.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -70,6 +71,9 @@ protected:
   void sumCorTau(unsigned i, unsigned f);
   void saveCorTau(unsigned tau);
   void printCorTau(unsigned tau);
+  void makeIndTau();
+  void printIndTau();
+  void saveIndTauInFile();
 
 private:
 
@@ -78,6 +82,7 @@ private:
   std::string  m_fname;
   std::string  m_fname_com;
   std::string  m_fname_med;
+  std::string  m_fname_tau;
 
   std::string  m_file_type;
   std::string  m_data_type;
@@ -97,6 +102,10 @@ private:
   double*     m_sum_gi;
   double*     m_sum_gf;
   unsigned*   m_sum_st;
+
+  vector<unsigned> v_ind_tau;
+
+  TimeInterval* m_timer1;
 
   // Copy constructor and assignment are disabled by default
   CorAnaData ( const CorAnaData& ) ;
