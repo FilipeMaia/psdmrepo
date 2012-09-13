@@ -46,7 +46,13 @@ CorAnaInputParameters* CorAnaInputParameters::instance()
 
 void CorAnaInputParameters::usage(char* name)
 {
-  std::cout << "Usage: " << name << " [-h] [-l <logfile>] [-b <basedir>] [-f <fname>] [<fname1> [<fname2> [<fname3> ...]]]\n";
+  std::cout << "Usage: " << name 
+            << " -f <fname_data>"
+            << " [-t <fname_tau>]" 
+            << " [-h]"
+            << " [-l <logfile>]" 
+            << " [-b <basedir>]" 
+            << " [<fname1> [<fname2> [<fname3> ...]]]\n";
 }
 
 //===================
@@ -54,7 +60,7 @@ void CorAnaInputParameters::usage(char* name)
 void CorAnaInputParameters::add_file_to_vector(char* name)
 {
   std::string fname;
-  fname = (m_basedir==NONDEF) ? name : m_basedir + "/" + name;
+  fname = (m_basedir.empty()) ? name : m_basedir + "/" + name;
   v_files.push_back(fname);
   std::cout << "CorAnaInputParameters::add_file_to_vector: " << fname.c_str() << "\n";
 }
@@ -64,10 +70,12 @@ void CorAnaInputParameters::add_file_to_vector(char* name)
 void CorAnaInputParameters::parse_input_parameters(int argc, char *argv[])
 {
   // parse standard option-arguments:
-  m_logfile = NONDEF;
-  m_basedir = NONDEF;
+  m_logfile   = std::string();
+  m_basedir   = std::string();
+  m_fname_tau = std::string();
+
   int   c;
-  while ((c=getopt(argc, argv, ":hl:b:f:")) != -1) {
+  while ((c=getopt(argc, argv, ":hl:b:f:t:")) != -1) {
 
     switch (c) {
     case 'l' :
@@ -79,7 +87,12 @@ void CorAnaInputParameters::parse_input_parameters(int argc, char *argv[])
       std::cout << "basedir: " << m_basedir << std::endl;
       break;
     case 'f' :
-      add_file_to_vector(optarg);
+      m_fname_data = optarg;
+      std::cout << "fname_data: " << m_fname_data << std::endl;
+      break;
+    case 't' :
+      m_fname_tau = optarg;
+      std::cout << "fname_tau: " << m_fname_tau << std::endl;
       break;
     case 'h' :
       usage(argv[0]);
@@ -106,14 +119,14 @@ void CorAnaInputParameters::parse_input_parameters(int argc, char *argv[])
   }
 
   // if the file-name still is not defined 
-  if (v_files.size()<1) { 
+  if (m_fname_data.empty()) { 
       std::cout << "File name(s) is not defined... At least one file name is required.\n";          
       usage(argv[0]); 
       exit(0);
   }
 
   // Select the output log-file stream  
-  if (m_logfile == NONDEF) {
+  if (m_logfile.empty()) {
     std::cout << "Output will be directed to stdout\n";
     p_out = &std::cout;
   }
@@ -123,7 +136,7 @@ void CorAnaInputParameters::parse_input_parameters(int argc, char *argv[])
     p_out = &m_ofs;
   }
 
-  //p_out = (m_logfile == NONDEF) ? &std::cout : &m_ofs;
+  //p_out = (m_logfile.empty()) ? &std::cout : &m_ofs;
 
   print_input_parameters();
 
@@ -133,7 +146,7 @@ void CorAnaInputParameters::parse_input_parameters(int argc, char *argv[])
 
 void CorAnaInputParameters::close_log_file()
 {
-  if (m_logfile != NONDEF) {
+  if ( ! m_logfile.empty() ) {
       m_ofs.close();
       std::cout << "CorAnaInputParameters::close_log_file() The log file " << m_logfile << " is closed.\n";
   }

@@ -54,18 +54,11 @@ CorAnaData::CorAnaData(): m_log(INPARS->get_ostream())
   printMetadata();
   printData();
 
-  makeIndTau();
+  readIndTauFromFile(); // makeIndTau(); is called inside
   printIndTau();
   saveIndTauInFile();
 
-  m_timer1->startTime();
-
-  initCorTau();
-  unsigned tau=10;
-  evaluateCorTau(tau);
-
-  m_log << "\nCorrelation processing time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
-  printCorTau(tau);
+  loopProcCorTau();
 }
 
 //--------------
@@ -80,16 +73,17 @@ CorAnaData::~CorAnaData ()
 void
 CorAnaData::readMetadataFile()
 {
-  std::vector<std::string>&  v_names = INPARS -> get_vector_fnames();    
-  //std::string& fname = v_names[0];
-
-  m_fname     =  v_names[0]; // std::string(fname);
+  //std::vector<std::string>&  v_names = INPARS -> get_vector_fnames();    
+  //m_fname     =  v_names[0];
+  m_fname     = INPARS -> get_fname_data(); 
   m_fname_com = m_fname.substr(0,m_fname.rfind("-b"));
-  m_fname_med = m_fname_com + ".med";
+  m_fname_med = m_fname_com + "-med.txt";
+  m_fname_tau = INPARS -> get_fname_tau(); 
 
-  m_log << "Data file name:                " << m_fname     << "\n";
-  m_log << "Commmon part of the file name: " << m_fname_com << "\n";
-  m_log << "Metadata file name:            " << m_fname_med << "\n";
+  m_log << "Data file name:                 " << m_fname     << "\n";
+  m_log << "Commmon part of the file name:  " << m_fname_com << "\n";
+  m_log << "Metadata file name:             " << m_fname_med << "\n";
+  m_log << "Indexes of tau input file name: " << m_fname_tau << "\n";
 
   //std::string line;
   std::string key;
@@ -163,7 +157,7 @@ CorAnaData::readDataFile()
 void
 CorAnaData::printData()
 {
-  m_log << "Data red from file: " << m_fname;
+  m_log << "\nData from file: " << m_fname;
 
   for(unsigned r=0; r<m_nimgs; r++) {
     if ( r<10 
@@ -178,6 +172,19 @@ CorAnaData::printData()
       }
   }
   m_log << "\n";
+}
+
+//----------------
+
+void
+CorAnaData::loopProcCorTau()
+{
+  m_timer1->startTime();
+  initCorTau();
+  unsigned tau=10;
+  evaluateCorTau(tau);
+  m_log << "\nCorrelation processing time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
+  printCorTau(tau);
 }
 
 //----------------
@@ -271,11 +278,45 @@ CorAnaData::printCorTau(unsigned tau)
 }
 
 //----------------
+//----------------
+//----------------
+//----------------
+
+void
+CorAnaData::readIndTauFromFile()
+{
+  m_log << "\nreadIndTauFromFile() " << m_fname_tau  << "\n";
+
+  if (m_fname_tau.empty()) {
+    m_log << "readIndTauFromFile(...): The file name with a list of tau indexes is empty.\n"; 
+    makeIndTau();
+    return;
+  }
+
+  std::ifstream inf(m_fname_tau.c_str());
+  if (inf.is_open())
+  {
+    unsigned val;
+    while ( inf.good() )
+    {
+      inf >> val;
+      v_ind_tau.push_back(val);
+    }
+    inf.close();
+  }
+  else 
+  {
+    m_log << "readIndTauFromFile(...): Unable to open file with a list of tau indexes: " << m_fname_tau << "\n"; 
+    makeIndTau();
+  }
+}
+
+//----------------
 
 void
 CorAnaData::makeIndTau()
 {
-  //m_log << "\nmakeIndTau():\n";
+  m_log << "\nmakeIndTau(): Make the list of tau indexes using standard algorithm.\n";
   for(unsigned itau=1; itau<m_nimgs; itau++) {
      if( itau<100 
       || itau<1000 && itau%10 == 0 
@@ -303,10 +344,10 @@ CorAnaData::printIndTau()
 void
 CorAnaData::saveIndTauInFile()
 {
-  m_fname_tau = m_fname_com + "-tau.txt";
-  m_log << "\nsaveIndTauInFile(): " << m_fname_tau  << "\n";
+  m_fname_tau_out = m_fname_com + "-tau.txt";
+  m_log << "\nsaveIndTauInFile(): " << m_fname_tau_out  << "\n";
 
-  std::ofstream out(m_fname_tau.c_str());
+  std::ofstream out(m_fname_tau_out.c_str());
   for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
                                        it!= v_ind_tau.end(); it++)
   out << " " << *it;

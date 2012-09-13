@@ -83,16 +83,16 @@ ImgVsTimeSplitInFiles::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\nInput parameters:"
-        << "\nsource       : "     << m_str_src
-        << "\nkey          : "     << m_key      
-        << "\nfname_prefix : "     << m_fname_prefix
-        << "\nfile_type    : "     << m_file_type
-        << "\nm_file_mode  : "     << m_file_mode
-        << "\nadd_tstamp   : "     << m_add_tstamp
-        << "\nnfiles_out   : "     << m_nfiles_out
-        << "\nm_ampl_thr   : "     << m_ampl_thr
-        << "\nm_ampl_min   : "     << m_ampl_min
-        << "\nm_print_bits : "     << m_print_bits;
+        << "\nsource       : " << m_str_src
+        << "\nkey          : " << m_key      
+        << "\nfname_prefix : " << m_fname_prefix
+        << "\nfile_type    : " << m_file_type
+        << "\nm_file_mode  : " << m_file_mode
+        << "\nadd_tstamp   : " << m_add_tstamp
+        << "\nnfiles_out   : " << m_nfiles_out
+        << "\nm_ampl_thr   : " << m_ampl_thr
+        << "\nm_ampl_min   : " << m_ampl_min
+        << "\nm_print_bits : " << m_print_bits;
   }
 }
 
@@ -237,7 +237,7 @@ ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
 void 
 ImgVsTimeSplitInFiles::saveMetadataInFile()
 {
-  std::string fname = m_fname_common+".med";
+  std::string fname = m_fname_common+"-med.txt";
   std::ofstream out(fname.c_str());
 
   out <<   "IMAGE_ROWS      " << m_img_rows 

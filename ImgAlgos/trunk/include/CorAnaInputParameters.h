@@ -50,8 +50,10 @@ public:
   void close_log_file();
   void print();
   void print_input_parameters();
+  std::string get_fname_data(){return m_fname_data;}
+  std::string get_fname_tau (){return m_fname_tau; }
 
-  std::ostream& get_ostream(){return *p_out;}
+  std::ostream& get_ostream() {return *p_out;}
   std::vector<std::string>& get_vector_fnames(){return v_files;}
 
 private:
@@ -62,6 +64,8 @@ private:
 
   std::string m_logfile;
   std::string m_basedir;
+  std::string m_fname_data;
+  std::string m_fname_tau;
   std::vector<std::string> v_files;
 
   std::ostream* p_out;                 // Pointer to the output stream (for log-file)

@@ -66,11 +66,13 @@ protected:
   void printMetadata();
   void readDataFile();
   void printData();
+  void loopProcCorTau();
   void initCorTau();
   void evaluateCorTau(unsigned tau);
   void sumCorTau(unsigned i, unsigned f);
   void saveCorTau(unsigned tau);
   void printCorTau(unsigned tau);
+  void readIndTauFromFile();
   void makeIndTau();
   void printIndTau();
   void saveIndTauInFile();
@@ -83,6 +85,7 @@ private:
   std::string  m_fname_com;
   std::string  m_fname_med;
   std::string  m_fname_tau;
+  std::string  m_fname_tau_out;
 
   std::string  m_file_type;
   std::string  m_data_type;
