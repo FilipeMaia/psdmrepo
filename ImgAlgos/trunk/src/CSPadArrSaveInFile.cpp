@@ -20,7 +20,7 @@
 //-----------------
 #include <fstream>
 #include <iomanip> // for setw, setfill
-#include <sstream> // for streamstring
+#include <sstream> // for stringstream
 //#include <cmath>
 
 //-------------------------------

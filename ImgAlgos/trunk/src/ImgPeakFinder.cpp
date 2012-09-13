@@ -34,7 +34,7 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 #include <iomanip>   // for setw, setfill
-#include <sstream>   // for streamstring
+#include <sstream>   // for stringstream
 #include <iostream>  // for setf
 #include <algorithm> // for fill_n
 

@@ -33,7 +33,7 @@
 //-----------------------------------------------------------------------
 //#include <boost/lexical_cast.hpp>
 #include <iomanip> // for setw, setfill
-#include <sstream> // for streamstring
+#include <sstream> // for stringstream
 
 // This declares this class as psana module
 using namespace ImgAlgos;

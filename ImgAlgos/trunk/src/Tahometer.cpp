@@ -35,7 +35,7 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 #include <iomanip> // for setw, setfill
-#include <sstream> // for streamstring
+#include <sstream> // for stringstream
 #include <iostream>// for setf
 
 // This declares this class as psana module

@@ -21,7 +21,7 @@
 #include <fstream>
 #include <cmath>
 #include <iomanip> // for setw, setfill
-#include <sstream> // for streamstring
+#include <sstream> // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --

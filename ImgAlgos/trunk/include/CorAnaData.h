@@ -52,6 +52,13 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
+struct TimeRecord {
+  unsigned ind;
+  double   sec;
+  double   dt_sec;
+  string   tstamp;
+};
+
 class CorAnaData  {
 public:
 
@@ -62,17 +69,22 @@ public:
 
 protected:
 
+  void defineFileNames();
+  void printFileNames();
   void readMetadataFile();
   void printMetadata();
   void readDataFile();
   void printData();
+  void readTimeRecordsFile();
+  void printTimeRecords();
   void loopProcCorTau();
   void initCorTau();
   void evaluateCorTau(unsigned tau);
   void sumCorTau(unsigned i, unsigned f);
   void saveCorTau(unsigned tau);
   void printCorTau(unsigned tau);
-  void readIndTauFromFile();
+  void defineIndTau();
+  int  readIndTauFromFile();
   void makeIndTau();
   void printIndTau();
   void saveIndTauInFile();
@@ -84,8 +96,10 @@ private:
   std::string  m_fname;
   std::string  m_fname_com;
   std::string  m_fname_med;
+  std::string  m_fname_time;
   std::string  m_fname_tau;
   std::string  m_fname_tau_out;
+  std::string  m_fname_result;
 
   std::string  m_file_type;
   std::string  m_data_type;
@@ -107,6 +121,9 @@ private:
   unsigned*   m_sum_st;
 
   vector<unsigned> v_ind_tau;
+  unsigned    m_npoints_tau;
+
+  vector<TimeRecord> v_time_records;
 
   TimeInterval* m_timer1;
 
