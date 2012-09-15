@@ -11,6 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-09-14 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+A       test/corana_merge.cpp
+M       test/corana.cpp
+A       include/CorAnaMergeFiles.h
+M       include/CorAnaData.h
+A       include/CorAna.h
+A       src/CorAna.cpp
+A       src/CorAnaMergeFiles.cpp
+M       src/CorAnaData.cpp
+
 2012-09-07 Mikhail S. Dubrovin
 - Add modules for image correlation analysis
 A       include/CorAnaInputParameters.h

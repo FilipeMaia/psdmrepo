@@ -19,12 +19,10 @@
 // C/C++ Headers --
 //-----------------
 //#include <ifstream>
-#include <sstream> // for stringstream
 #include <iomanip>
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ImgAlgos/CorAnaInputParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -39,24 +37,16 @@ namespace ImgAlgos {
 //----------------
 // Constructors --
 //----------------
-CorAnaData::CorAnaData(): m_log(INPARS->get_ostream())
+CorAnaData::CorAnaData(): CorAna ()
 {
   m_timer1 = new TimeInterval();
-  m_log << "CorAnaData::CorAnaData(): Job is started at " << m_timer1->strStartTime() << "\n";
-  defineFileNames();
-  readMetadataFile();
+  m_log << "CorAnaData::CorAnaData(): Job is started at " 
+        << m_timer1->strStartTime() << "\n";
   readDataFile();
-  readTimeRecordsFile();
-  defineIndTau();
-  saveIndTauInFile();
-  m_log << "CorAnaData::CorAnaData(): Data reading and initialization time: " << m_timer1->getCurrentTimeInterval() << "sec\n";
+  m_log << "CorAnaData::CorAnaData(): Data reading and initialization time: " 
+        << m_timer1->getCurrentTimeInterval() << "sec\n";
 
-  printFileNames();
-  printMetadata();
   printData();
-  printTimeRecords();
-  printIndTau();
-
   loopProcCorTau();
 }
 
@@ -65,88 +55,6 @@ CorAnaData::CorAnaData(): m_log(INPARS->get_ostream())
 //--------------
 CorAnaData::~CorAnaData ()
 {
-}
-
-//----------------
-
-void
-CorAnaData::defineFileNames()
-{
-  //std::vector<std::string>&  v_names = INPARS -> get_vector_fnames();    
-  //m_fname     =  v_names[0];
-  m_fname         = INPARS -> get_fname_data(); 
-  m_fname_com     = m_fname.substr(0,m_fname.rfind("-b"));
-  m_fname_med     = m_fname_com + "-med.txt";
-  m_fname_time    = m_fname_com + "-time.txt"; 
-  m_fname_tau     = INPARS -> get_fname_tau(); 
-  m_fname_tau_out = m_fname_com + "-tau.txt";
-  m_fname_result  = m_fname.substr(0,m_fname.rfind(".")) + "-result.bin";
-}
-
-//----------------
-
-void
-CorAnaData::printFileNames()
-{
-  m_log << "CorAnaData::printFileNames(): I/O file names:\n";
-  m_log << "Data file name                  : " << m_fname         << "\n";
-  m_log << "Commmon part of the file name   : " << m_fname_com     << "\n";
-  m_log << "Metadata file name              : " << m_fname_med     << "\n";
-  m_log << "Image time records file name    : " << m_fname_time    << "\n";
-  m_log << "Indexes of tau input file name  : " << m_fname_tau     << "\n";
-  m_log << "Indexes of tau output file name : " << m_fname_tau_out << "\n";
-  m_log << "Resulting output file name      : " << m_fname_result  << "\n";
-}
-
-//----------------
-
-void
-CorAnaData::readMetadataFile()
-{
-  //std::string line;
-  std::string key;
-
-  std::ifstream inf(m_fname_med.c_str());
-  if (inf.is_open())
-  {
-    while ( inf.good() )
-    {
-      //getline (inf,line);
-      //std::cout << line << "\n";
-      inf >> key;
-             if (key=="IMAGE_ROWS")      inf >> m_img_rows;
-	else if (key=="IMAGE_COLS")      inf >> m_img_cols;
-	else if (key=="IMAGE_SIZE")      inf >> m_img_size;
-	else if (key=="NUMBER_OF_FILES") inf >> m_nfiles;
-	else if (key=="BLOCK_SIZE")      inf >> m_blk_size;
-	else if (key=="REST_SIZE")       inf >> m_rst_size;
-	else if (key=="NUMBER_OF_IMGS")  inf >> m_nimgs;
-        else if (key=="FILE_TYPE")       inf >> m_file_type;
-        else if (key=="DATA_TYPE")       inf >> m_data_type;
-        else std::cout << "\nWARNING! The key: " << key
-                       << " is not recognized in the metadata file: " << m_fname_med;
-    }
-    inf.close();
-  }
-  else m_log << "CorAnaData::readMetadataFile(): Unable to open file: " << m_fname_med << "\n";  
-}
-
-//----------------
-
-void
-CorAnaData::printMetadata()
-{
-    m_log   << "\nCorAnaData::printMetadata(): Metadata from input file: " << m_fname_med 
-            << "\nIMAGE_ROWS      " << m_img_rows 
-            << "\nIMAGE_COLS      " << m_img_cols
-            << "\nIMAGE_SIZE      " << m_img_size
-            << "\nNUMBER_OF_FILES " << m_nfiles
-            << "\nBLOCK_SIZE      " << m_blk_size
-            << "\nREST_SIZE       " << m_rst_size
-            << "\nNUMBER_OF_IMGS  " << m_nimgs
-            << "\nFILE_TYPE       " << m_file_type
-            << "\nDATA_TYPE       " << m_data_type
-            << "\n";
 }
 
 //----------------
@@ -191,56 +99,6 @@ CorAnaData::printData()
   }
   m_log << "\n";
 }
-//----------------
-
-void
-CorAnaData::readTimeRecordsFile()
-{
-  m_log << "\nCorAnaData::readTimeRecordsFile(): Read time records from file: " << m_fname_time << "\n";
-
-  std::string s;
-  TimeRecord tr;
-
-  std::ifstream inf(m_fname_time.c_str());
-  if (inf.is_open())
-  {
-    while ( true )
-    {
-      getline (inf,s);
-      if(!inf.good()) break;
-      std::stringstream ss(s); 
-      ss >> tr.ind >> tr.sec >> tr.dt_sec >> tr.tstamp;
-      v_time_records.push_back(tr);
-    }
-    inf.close();
-  }
-  else m_log << "CorAnaData::readTimeRecordsFile(): Unable to open file: " << m_fname_time << "\n";  
-}
-
-//----------------
-
-void
-CorAnaData::printTimeRecords()
-{
-  m_log << "\nCorAnaData::printTimeRecords(): Time records from file: " << m_fname_time
-        << " size=" << v_time_records.size() << "\n";
-  unsigned counter=0;
-  for(vector<TimeRecord>::const_iterator it = v_time_records.begin(); 
-                                         it!= v_time_records.end(); it++) {
-    counter++;
-    if ( counter<10 
-      || counter<100  && counter%10  == 0 
-      || counter<1000 && counter%100 == 0 
-      || counter%1000 == 0 
-      || counter==v_time_records.size() ) 
-      m_log << " ind:"    << std::setw(4)                                   << it->ind
-            << " sec:"    << fixed << std::setw(15) << std::setprecision(3) << it->sec
-            << " dt_sec:" << std::setw(6)                                   << it->dt_sec
-            << " tstamp:"                                                   << it->tstamp
-            << "\n";      
-  }
-  m_log << "\n";
-}
 
 //----------------
 
@@ -248,11 +106,22 @@ void
 CorAnaData::loopProcCorTau()
 {
   m_timer1->startTime();
+  unsigned counter=0;
   initCorTau();
-  unsigned tau=10;
-  evaluateCorTau(tau);
+
+  std::ofstream ofs(m_fname_result.c_str());
+
+  for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
+                                       it!= v_ind_tau.end(); it++) {
+    evaluateCorTau(*it);
+    saveCorTau(ofs);
+    //printCorTau(*it);
+    counter++; 
+  }
+
+  ofs.close();
+
   m_log << "\nCorAnaData::loopProcCorTau(): Correlation processing time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
-  printCorTau(tau);
 }
 
 //----------------
@@ -261,11 +130,11 @@ void
 CorAnaData::initCorTau()
 {
   m_log << "\nCorAnaData::initCorTau(): " << m_fname;
-  m_res_g2 = new double   [m_blk_size];
   m_sum_g2 = new double   [m_blk_size];
   m_sum_gi = new double   [m_blk_size];
   m_sum_gf = new double   [m_blk_size];
   m_sum_st = new unsigned [m_blk_size];
+  m_res_g2 = new cor_t    [m_blk_size];
 }
 
 //----------------
@@ -274,19 +143,17 @@ void
 CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between images
 {
   m_log << "\nCorAnaData::evaluateCorTau(tau): tau=" << tau;
-  std::fill_n(m_res_g2, m_blk_size, double(0));
   std::fill_n(m_sum_g2, m_blk_size, double(0));
   std::fill_n(m_sum_gi, m_blk_size, double(0));
   std::fill_n(m_sum_gf, m_blk_size, double(0));
   std::fill_n(m_sum_st, m_blk_size, unsigned(0));
+  std::fill_n(m_res_g2, m_blk_size, cor_t(0));
 
   for (unsigned i=0; i<m_nimgs-tau; i++) {
        unsigned f=i+tau;
 
        sumCorTau(i,f);
-
   }
-       saveCorTau(tau);
 }
 
 //----------------
@@ -294,12 +161,13 @@ CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between imag
 void
 CorAnaData::sumCorTau(unsigned i, unsigned f)
 {
-    if ( i<10 
-      || i<100 && i%10 == 0 
+  /*
+    if ( i<5 
+      || i<50 && i%10 == 0 
       || i%100== 0
       || i==m_nimgs-(f-i)-1 ) 
-      m_log << "\nCorAnaData::sumCorTau(i,f): tau=" << f-i 
-            << "  i, f=" << i << ", " << f;
+      m_log << "\nCorAnaData::sumCorTau(i,f): tau=" << f-i << "  i, f=" << i << ", " << f;
+  */
 
    data_t* p_i = &m_data[i*m_blk_size];
    data_t* p_f = &m_data[f*m_blk_size];
@@ -315,14 +183,17 @@ CorAnaData::sumCorTau(unsigned i, unsigned f)
 //----------------
 
 void
-CorAnaData::saveCorTau(unsigned tau)
+CorAnaData::saveCorTau(std::ostream& out)
 {
-   m_log << "\nCorAnaData::saveCorTau(tau): tau=" << tau;
+   m_log << "  ->  CorAnaData::saveCorTau(tau)";
    double den(0);
+
    for(unsigned pix=0; pix<m_blk_size; pix++) {
      den = m_sum_gi[pix] * m_sum_gf[pix];
-     m_res_g2[pix] = (den != 0) ? m_sum_g2[pix] * m_sum_st[pix] / den : 0; 
+     m_res_g2[pix] = (den != 0) ? cor_t(m_sum_g2[pix] * m_sum_st[pix] / den) : 0; 
    }
+
+   out.write(reinterpret_cast<const char*>(m_res_g2), m_blk_size*sizeof(cor_t));
 }
 
 //----------------
@@ -345,94 +216,6 @@ CorAnaData::printCorTau(unsigned tau)
   m_log << "\n" << std::setprecision(8) << std::setw(10);
 }
 
-//----------------
-//----------------
-//----------------
-//----------------
-
-void
-CorAnaData::defineIndTau()
-{
-  if( readIndTauFromFile() ) makeIndTau();
-}
-
-//----------------
-
-int
-CorAnaData::readIndTauFromFile()
-{
-  if (m_fname_tau.empty()) {
-    m_log << "\nCorAnaData::readIndTauFromFile(): The file name with a list of tau indexes is empty.\n"; 
-    return 1;
-  }
-
-  std::ifstream inf(m_fname_tau.c_str());
-  if (inf.is_open())
-  {
-    m_log << "\nCorAnaData::readIndTauFromFile(): " << m_fname_tau  << "\n";
-
-    unsigned val;
-    while ( inf.good() )
-    {
-      inf >> val;
-      v_ind_tau.push_back(val);
-    }
-    inf.close();
-    m_npoints_tau = v_ind_tau.size();
-    return 0;
-  }
-  else 
-  {
-    m_log << "\nCorAnaData::readIndTauFromFile(): Unable to open file with a list of tau indexes: " << m_fname_tau << "\n"; 
-    return 2;
-  }
-}
-
-//----------------
-
-void
-CorAnaData::makeIndTau()
-{
-  m_log << "\nCorAnaData::makeIndTau(): Make the list of tau indexes using standard algorithm.\n";
-  for(unsigned itau=1; itau<m_nimgs; itau++) {
-     if( itau<100 
-      || itau<1000 && itau%10 == 0 
-      || itau%100 == 0 ) v_ind_tau.push_back(itau);
-  }
-  m_npoints_tau = v_ind_tau.size();
-}
-
-//----------------
-
-void
-CorAnaData::printIndTau()
-{
-  m_log << "\nCorAnaData::printIndTau(): Vector of indexes for tau: size =" << m_npoints_tau << "\n";
-  unsigned counter=0;
-  for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
-                                       it!= v_ind_tau.end(); it++) {
-    m_log << " "  << std::setw(5) << std::right << *it;
-    counter++; if(counter>19) {counter=0; m_log << "\n";}
-  }
-  m_log << "\n";
-}
-
-//----------------
-
-void
-CorAnaData::saveIndTauInFile()
-{
-  m_log << "\nCorAnaData::saveIndTauInFile(): " << m_fname_tau_out  << "\n";
-
-  std::ofstream out(m_fname_tau_out.c_str());
-  for(vector<unsigned>::const_iterator it = v_ind_tau.begin(); 
-                                       it!= v_ind_tau.end(); it++)
-  out << " " << *it;
-  out << "\n";
-  out.close();
-}
-
-//----------------
 //----------------
 //----------------
 //----------------

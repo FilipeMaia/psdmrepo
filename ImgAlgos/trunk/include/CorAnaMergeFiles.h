@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_CORANADATA_H
-#define IMGALGOS_CORANADATA_H
+#ifndef IMGALGOS_CORANAMERGEFILES_H
+#define IMGALGOS_CORANAMERGEFILES_H
 
 //---------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CorAnaData.
+//	Class CorAnaMergeFiles.
 //
 //---------------------------------
 
@@ -41,7 +41,7 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief C++ source file code template.
+ *  @brief Merge the input (block vs tau-index) to output (image vs tau-index)
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -51,43 +51,34 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CorAnaData : public CorAna {
+class CorAnaMergeFiles : public CorAna {
 public:
 
   typedef uint16_t data_t;
 
-  CorAnaData () ;
-  virtual ~CorAnaData () ;
+  CorAnaMergeFiles () ;
+  virtual ~CorAnaMergeFiles () ;
 
 protected:
+  void openFiles();
+  void closeFiles();
+  void mergeFiles();
 
-  void readDataFile();
-  void printData();
-  void loopProcCorTau();
-  void initCorTau();
-  void evaluateCorTau(unsigned tau);
-  void sumCorTau(unsigned i, unsigned f);
-  void saveCorTau(std::ostream& ofs);
-  void printCorTau(unsigned tau);
+  void readCorFile();
 
 private:
 
-  data_t*     m_data;
+  cor_t*         m_cor;    // array for correlation results for test
+  TimeInterval*  m_timer1;
 
-  double*     m_sum_g2;
-  double*     m_sum_gi;
-  double*     m_sum_gf;
-  unsigned*   m_sum_st;
-
-  cor_t*      m_res_g2;
-
-  TimeInterval* m_timer1;
+  std::ifstream* p_inp;    // pointer to input array of input files 
+  std::ofstream  p_out;    // pointer to output file 
 
   // Copy constructor and assignment are disabled by default
-  CorAnaData ( const CorAnaData& ) ;
-  CorAnaData& operator = ( const CorAnaData& ) ;
+  CorAnaMergeFiles ( const CorAnaMergeFiles& ) ;
+  CorAnaMergeFiles& operator = ( const CorAnaMergeFiles& ) ;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CORANADATA_H
+#endif // IMGALGOS_CORANAMERGEFILES_H
