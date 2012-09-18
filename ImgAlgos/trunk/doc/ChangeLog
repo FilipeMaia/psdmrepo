@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2012-09-17 Mikhail S. Dubrovin
+- Add modules for extraction of spectral array from image	
+A         include/ImgSpectraProc.h
+A         include/ImgSpectra.h
+A         src/ImgSpectra.cpp
+A         src/ImgSpectraProc.cpp
+	
 2012-09-14 Mikhail S. Dubrovin
 - Add/modify modules for image correlation analysis
 A       test/corana_merge.cpp
