@@ -52,8 +52,6 @@ namespace PSXtcQC {
  *  @author Mikhail S. Dubrovin
  */
 
-class Pds::Xtc;
-
 class MyXtcQCIterator : public PSXtcQC::XtcQCIterator {
 public:
   enum {Stop, Continue};

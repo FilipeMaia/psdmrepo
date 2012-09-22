@@ -49,8 +49,6 @@ namespace PSXtcQC {
  *  @author Mikhail S. Dubrovin
  */
 
-class Pds::Xtc;
-
 
 class XtcQCIterator  {
 public:

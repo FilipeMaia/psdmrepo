@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-06
+2012-09-22 Andy Salnikov
+- suppress compilation warnings on RHEL6/gcc4
+
+=======
 Tag: V00-00-05
 2012-08-08 Mikhail S. Dubrovin
 - Move PSXtcQC/test/dgreader.cpp PSXtcQC/app/xtcqc.cpp
