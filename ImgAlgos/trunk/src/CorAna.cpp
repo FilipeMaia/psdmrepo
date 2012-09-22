@@ -183,8 +183,8 @@ CorAna::printTimeRecords()
                                               it!= v_time_records.end(); it++) {
     counter++;
     if ( counter<10 
-      || counter<100  && counter%10  == 0 
-      || counter<1000 && counter%100 == 0 
+      || (counter<100  && counter%10  == 0) 
+      || (counter<1000 && counter%100 == 0)
       || counter%1000 == 0 
       || counter==v_time_records.size() ) 
       m_log << " ind:"    << std::setw(4)                                        << it->ind
@@ -244,13 +244,13 @@ CorAna::makeIndTau()
   m_log << "\nCorAna::makeIndTau(): Make the list of tau indexes using standard algorithm.\n";
   for(unsigned itau=1; itau<m_nimgs; itau++) {
      if( itau<8 
-      || itau<16     && itau%2    == 0 
-      || itau<32     && itau%4    == 0 
-      || itau<64     && itau%8    == 0 
-      || itau<128    && itau%16   == 0 
-      || itau<256    && itau%32   == 0 
-      || itau<512    && itau%64   == 0 
-      || itau<1024   && itau%128  == 0 
+      || (itau<16     && itau%2    == 0) 
+      || (itau<32     && itau%4    == 0) 
+      || (itau<64     && itau%8    == 0) 
+      || (itau<128    && itau%16   == 0) 
+      || (itau<256    && itau%32   == 0) 
+      || (itau<512    && itau%64   == 0) 
+      || (itau<1024   && itau%128  == 0) 
       ||                itau%256  == 0 ) v_ind_tau.push_back(itau);
   }
   m_npoints_tau = v_ind_tau.size();

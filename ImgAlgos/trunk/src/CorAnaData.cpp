@@ -20,6 +20,8 @@
 //-----------------
 //#include <ifstream>
 #include <iomanip>
+#include <stdlib.h>
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -87,7 +89,7 @@ CorAnaData::printData()
 
   for(unsigned r=0; r<m_nimgs; r++) {
     if ( r<10 
-      || r<100 && r%10 == 0 
+      || (r<100 && r%10 == 0) 
       || r%100== 0
       || r==m_nimgs-1 )
       {
