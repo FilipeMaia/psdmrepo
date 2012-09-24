@@ -141,18 +141,18 @@ class DdlPythonInterfaces ( object ) :
             print inc_base
 
         # add necessary includes to include file
+        print >>self.inc, "#include <psddl_python/DdlWrapper.h>"
         print >>self.inc, "#include <vector>"
         print >>self.inc, "#include <ndarray/ndarray.h>"
         print >>self.inc, "#include <pdsdata/xtc/TypeId.hh>"
-        print >>self.inc, "#include <psddl_python/DdlWrapper.h>"
+        inc_psana = "psddl_psana/" + string.replace(inc_base, ".wrapper", "")
+        print >>self.inc, "#include <%s> // inc_psana" % inc_psana
         print >>self.inc, ""
 
         # add necessary includes to source file
-        print >>self.cpp, "#include <cstddef>"
-        inc_psana = "psddl_psana/" + string.replace(inc_base, ".wrapper", "")
         inc_python = "psddl_python/" + inc_base
-        print >>self.cpp, "#include <%s> // inc_psana" % inc_psana
         print >>self.cpp, "#include <%s> // inc_python" % inc_python
+        print >>self.cpp, "#include <cstddef>"
         print >>self.cpp, ""
 
         # headers for other included packages
