@@ -5,16 +5,16 @@
 #include "PSEvt/EventKey.h" // operator<<(Pds::Src) defined here
 
 namespace psddl_python {
-  static string toString(const Src& src) {
-    std::ostringstream stream;
-    stream << src;
-    return stream.str();
-  }
-
-  static void printGetResult(const char* typeName, const char* foundTypeName, const Src* foundSrc) {
-    printf("get(%s) -> %s -> %s\n",
-           typeName, foundTypeName, toString(*foundSrc).c_str());
-  }
+//  static string toString(const Src& src) {
+//    std::ostringstream stream;
+//    stream << src;
+//    return stream.str();
+//  }
+//
+//  static void printGetResult(const char* typeName, const char* foundTypeName, const Src* foundSrc) {
+//    printf("get(%s) -> %s -> %s\n",
+//           typeName, foundTypeName, toString(*foundSrc).c_str());
+//  }
 
   object CLASS::get(ARGS_DECL) {
     Src src;

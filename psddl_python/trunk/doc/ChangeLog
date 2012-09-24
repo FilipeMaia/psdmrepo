@@ -11,6 +11,11 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2012-09-24 Andy Salnikov
+- rearrange includes to get rid of the compilation warnings
+- commented-out dead code for the same reason
+
 Tag: V00-01-00
 2012-09-11 Andy Salnikov
 - all content of this package should be in psddl_python namespace, not Psana

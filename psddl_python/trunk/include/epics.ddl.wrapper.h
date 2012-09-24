@@ -3,10 +3,11 @@
 #ifndef PSDDL_PYTHON_EPICS_DDL_WRAPPER_H
 #define PSDDL_PYTHON_EPICS_DDL_WRAPPER_H 1
 
+#include <psddl_python/DdlWrapper.h>
 #include <vector>
 #include <ndarray/ndarray.h>
 #include <pdsdata/xtc/TypeId.hh>
-#include <psddl_python/DdlWrapper.h>
+#include <psddl_psana/epics.ddl.h> // inc_psana
 
 namespace psddl_python {
 namespace Epics {

@@ -1,13 +1,13 @@
 #ifndef PSANA_DDLWRAPPER_H
 #define PSANA_DDLWRAPPER_H 1
 
-#include "EventGetter.h"
-#include "EnvObjectStoreGetter.h"
-
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>
 #include <psddl_python/vector_indexing_suite_nocopy.hpp>
 #include <numpy/arrayobject.h>
+
+#include "EventGetter.h"
+#include "EnvObjectStoreGetter.h"
 
 namespace psddl_python {
   extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);

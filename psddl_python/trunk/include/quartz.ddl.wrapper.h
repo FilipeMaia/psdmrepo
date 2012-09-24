@@ -3,10 +3,11 @@
 #ifndef PSDDL_PYTHON_QUARTZ_DDL_WRAPPER_H
 #define PSDDL_PYTHON_QUARTZ_DDL_WRAPPER_H 1
 
+#include <psddl_python/DdlWrapper.h>
 #include <vector>
 #include <ndarray/ndarray.h>
 #include <pdsdata/xtc/TypeId.hh>
-#include <psddl_python/DdlWrapper.h>
+#include <psddl_psana/quartz.ddl.h> // inc_psana
 
 #include <psddl_psana/camera.ddl.h>
 #include <psddl_python/camera.ddl.wrapper.h>

@@ -3,10 +3,11 @@
 #ifndef PSDDL_PYTHON_EVR_DDL_WRAPPER_H
 #define PSDDL_PYTHON_EVR_DDL_WRAPPER_H 1
 
+#include <psddl_python/DdlWrapper.h>
 #include <vector>
 #include <ndarray/ndarray.h>
 #include <pdsdata/xtc/TypeId.hh>
-#include <psddl_python/DdlWrapper.h>
+#include <psddl_psana/evr.ddl.h> // inc_psana
 
 #include <pdsdata/xtc/DetInfo.hh>
 namespace psddl_python {

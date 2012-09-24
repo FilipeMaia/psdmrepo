@@ -3,10 +3,11 @@
 #ifndef PSDDL_PYTHON_GSC16AI_DDL_WRAPPER_H
 #define PSDDL_PYTHON_GSC16AI_DDL_WRAPPER_H 1
 
+#include <psddl_python/DdlWrapper.h>
 #include <vector>
 #include <ndarray/ndarray.h>
 #include <pdsdata/xtc/TypeId.hh>
-#include <psddl_python/DdlWrapper.h>
+#include <psddl_psana/gsc16ai.ddl.h> // inc_psana
 
 namespace psddl_python {
 namespace Gsc16ai {
