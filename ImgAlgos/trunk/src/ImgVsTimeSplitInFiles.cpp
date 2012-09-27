@@ -34,6 +34,7 @@
 //#include <boost/lexical_cast.hpp>
 #include <iomanip> // for setw, setfill
 #include <sstream> // for stringstream
+#include <cmath> // for sqrt, atan2, etc.
 
 // This declares this class as psana module
 using namespace ImgAlgos;
@@ -184,6 +185,7 @@ void
 ImgVsTimeSplitInFiles::endJob(Event& evt, Env& env)
 {
   closeOutputFiles();
+  evaluateMeanTimeBetweenEvents();
   saveMetadataInFile();
   if( m_print_bits & 4 ) printSummary(evt, " images are splitted");
 }
@@ -249,6 +251,8 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nNUMBER_OF_IMGS  " << m_count
       << "\nFILE_TYPE       " << m_file_type
       << "\nDATA_TYPE       " << m_data_type
+      << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
+      << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
       << "\n";
 
   out.close();
@@ -317,17 +321,46 @@ ImgVsTimeSplitInFiles::procEvent(Event& evt)
 //--------------------
 
 void 
+ImgVsTimeSplitInFiles::evaluateMeanTimeBetweenEvents()
+{
+  m_t_ave = (m_sumt0) ? m_sumt1/m_sumt0 : 0;
+  m_t_rms = (m_sumt0) ? std::sqrt(m_sumt2/m_sumt0 - m_t_ave*m_t_ave) : 0;
+}
+
+//--------------------
+
+void 
 ImgVsTimeSplitInFiles::saveTimeRecord(Event& evt)
 {
   m_tsec = doubleTime(evt);
-  if(m_count==1) m_tsec_prev = m_tsec;
+  m_nevt = eventCounterSinceConfigure(evt);
+
+  if(m_count==1) {
+    m_tsec_prev = m_tsec;
+    m_nevt_prev = m_nevt;
+    m_sumt0 = 0;
+    m_sumt1 = 0;
+    m_sumt2 = 0;
+  }
+
+  m_dt = m_tsec-m_tsec_prev;
+  
+  if ( (m_nevt-m_nevt_prev)==1 ) {
+    m_sumt0 ++;
+    m_sumt1 += m_dt;
+    m_sumt2 += m_dt*m_dt;
+  }
 
   p_out_time << std::setw(6) << m_count 
              << fixed << std::setw(16) << std::setprecision(3) << m_tsec
-             << fixed << std::setw(7) << std::setprecision(3) << m_tsec-m_tsec_prev
-             << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f") << "\n";
+             << fixed << std::setw(7)  << std::setprecision(3) << m_dt
+             << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f")
+             << fixed << std::setw(8) << stringFromUint(fiducials(evt),6)
+             << fixed << std::setw(7) << stringFromUint(m_nevt,5)
+             << "\n";
 
   m_tsec_prev = m_tsec;  
+  m_nevt_prev = m_nevt;
 }
 
 //--------------------

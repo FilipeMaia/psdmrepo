@@ -88,6 +88,7 @@ protected:
   std::string  m_fname_tau_out;
   std::string  m_fname_result;
   std::string  m_fname_result_img;
+  std::string  m_file_num_str;
 
   unsigned     m_img_rows;
   unsigned     m_img_cols;

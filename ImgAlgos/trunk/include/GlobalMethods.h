@@ -72,6 +72,8 @@ private:
   std::string stringRunNumber(PSEvt::Event& evt, unsigned width=4);
   std::string stringTimeStamp(PSEvt::Event& evt, std::string fmt="%Y%m%d-%H%M%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
   double doubleTime(PSEvt::Event& evt);
+  unsigned fiducials(PSEvt::Event& evt);                  // returns 17-bits (131071) integer value: fiducials clock runs at 360Hz.
+  unsigned eventCounterSinceConfigure(PSEvt::Event& evt); // returns 15-bits (32767)  integer value: event counter since Configure.
 
   /// Define the shape or throw message that can not do that.
   void defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape);

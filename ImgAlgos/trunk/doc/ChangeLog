@@ -11,6 +11,20 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-09-26 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+A       app
+A       app/corana_submit.py
+M       include/CorAna.h
+A       src/CorAnaPars.py
+M       src/CorAna.cpp
+A       src/CorAnaSubmit.py	
+M       src/GlobalMethods.cpp
+M       src/ImgVsTimeSplitInFiles.cpp
+M       include/GlobalMethods.h
+M       include/ImgVsTimeSplitInFiles.h
+	
+=======
 Tag: V00-00-18
 2012-09-22 Andy Salnikov
 - fix compilation errors and warnings on RHEL6/gcc44

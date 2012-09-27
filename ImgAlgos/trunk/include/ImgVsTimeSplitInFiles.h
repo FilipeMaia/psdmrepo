@@ -110,6 +110,7 @@ protected:
   void saveMetadataInFile();
   void procEvent(Event& evt);
   void saveTimeRecord(Event& evt);
+  void evaluateMeanTimeBetweenEvents();
 
 private:
 
@@ -145,6 +146,14 @@ private:
 
   double      m_tsec;
   double      m_tsec_prev;
+  double      m_dt;
+  unsigned    m_nevt_prev;
+  unsigned    m_nevt;
+  unsigned    m_sumt0;
+  double      m_sumt1;
+  double      m_sumt2;
+  double      m_t_ave;
+  double      m_t_rms;
 
 protected:
 //--------------------

@@ -96,6 +96,26 @@ stringRunNumber(PSEvt::Event& evt, unsigned width)
 }
 
 //--------------------
+
+unsigned 
+fiducials(PSEvt::Event& evt)
+{
+  boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) return eventId->fiducials();
+  else               return 0;
+}
+
+//--------------------
+
+unsigned 
+eventCounterSinceConfigure(PSEvt::Event& evt)
+{
+  boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) return eventId->vector();
+  else               return 0;
+}
+
+//--------------------
 // Define the shape or throw message that can not do that.
 void 
 defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape)
