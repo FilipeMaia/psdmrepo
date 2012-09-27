@@ -59,9 +59,11 @@ namespace ImgAlgos {
 
 struct TimeRecord {
   unsigned    ind;
-  double      sec;
+  double      t_sec;
   double      dt_sec;
   std::string tstamp;
+  unsigned    fiduc;
+  unsigned    evnum;
 };
 
 

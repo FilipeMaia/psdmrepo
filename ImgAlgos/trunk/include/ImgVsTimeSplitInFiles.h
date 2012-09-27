@@ -111,6 +111,7 @@ protected:
   void procEvent(Event& evt);
   void saveTimeRecord(Event& evt);
   void evaluateMeanTimeBetweenEvents();
+  void saveTimeRecordWithIndexInFile();
 
 private:
 
@@ -140,20 +141,24 @@ private:
   unsigned*   m_data;         // image data in case if processing is necessary
 
   std::string m_fname_common;
+  std::string m_fname_time;
+  std::string m_fname_time_ind;
 
   std::ofstream* p_out;
   std::ofstream  p_out_time;
 
-  double      m_tsec;
-  double      m_tsec_prev;
-  double      m_dt;
-  unsigned    m_nevt_prev;
-  unsigned    m_nevt;
+  double      m_tsec_0;       // time of the 1st event
+  double      m_tsec;         // time of current event
+  double      m_tsec_prev;    // time of previous event
+  double      m_dt;           // delta time between current and previous event
+  unsigned    m_nevt;         // event number of current event frim eventID().vector()
+  unsigned    m_nevt_prev;    // event number of previous event
   unsigned    m_sumt0;
   double      m_sumt1;
   double      m_sumt2;
-  double      m_t_ave;
-  double      m_t_rms;
+  double      m_t_ave;        // average time between consecutive events in eventID().vector()
+  double      m_t_rms;        // rms spread of dt 
+  unsigned    m_tind_max;     // maximal value of the time index.
 
 protected:
 //--------------------

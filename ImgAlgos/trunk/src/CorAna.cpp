@@ -166,7 +166,7 @@ CorAna::readTimeRecordsFile()
       getline (inf,s);
       if(!inf.good()) break;
       std::stringstream ss(s); 
-      ss >> tr.ind >> tr.sec >> tr.dt_sec >> tr.tstamp;
+      ss >> tr.ind >> tr.t_sec >> tr.dt_sec >> tr.tstamp >> tr.fiduc >> tr.evnum;
       v_time_records.push_back(tr);
     }
     inf.close();
@@ -191,9 +191,11 @@ CorAna::printTimeRecords()
       || counter%1000 == 0 
       || counter==v_time_records.size() ) 
       m_log << " ind:"    << std::setw(4)                                        << it->ind
-            << " sec:"    << std::fixed << std::setw(15) << std::setprecision(3) << it->sec
+            << " t_sec:"  << std::fixed << std::setw(15) << std::setprecision(3) << it->t_sec
             << " dt_sec:" << std::setw(6)                                        << it->dt_sec
             << " tstamp:"                                                        << it->tstamp
+            << " fiduc:"  << std::setw(8)                                        << it->fiduc
+            << " evnum:"  << std::setw(7)                                        << it->evnum
             << "\n";      
   }
   m_log << "\n";

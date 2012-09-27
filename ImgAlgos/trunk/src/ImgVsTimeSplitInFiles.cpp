@@ -186,6 +186,7 @@ ImgVsTimeSplitInFiles::endJob(Event& evt, Env& env)
 {
   closeOutputFiles();
   evaluateMeanTimeBetweenEvents();
+  saveTimeRecordWithIndexInFile();
   saveMetadataInFile();
   if( m_print_bits & 4 ) printSummary(evt, " images are splitted");
 }
@@ -253,6 +254,7 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nDATA_TYPE       " << m_data_type
       << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
       << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
+      << "\nTIME_INDEX_MAX  " << std::setw(8) << m_tind_max
       << "\n";
 
   out.close();
@@ -286,7 +288,8 @@ ImgVsTimeSplitInFiles::openOutputFiles(Event& evt)
      //p_out[b].close();
   }
 
-  p_out_time.open((m_fname_common + "-time.txt").c_str(), mode);
+  m_fname_time = m_fname_common + "-time.txt";
+  p_out_time.open(m_fname_time.c_str());
 }
 
 //--------------------
@@ -336,6 +339,7 @@ ImgVsTimeSplitInFiles::saveTimeRecord(Event& evt)
   m_nevt = eventCounterSinceConfigure(evt);
 
   if(m_count==1) {
+    m_tsec_0    = m_tsec;
     m_tsec_prev = m_tsec;
     m_nevt_prev = m_nevt;
     m_sumt0 = 0;
@@ -352,11 +356,11 @@ ImgVsTimeSplitInFiles::saveTimeRecord(Event& evt)
   }
 
   p_out_time << std::setw(6) << m_count 
-             << fixed << std::setw(16) << std::setprecision(3) << m_tsec
-             << fixed << std::setw(7)  << std::setprecision(3) << m_dt
+             << fixed << std::setw(16) << std::setprecision(6) << m_tsec - m_tsec_0
+             << fixed << std::setw(10) << std::setprecision(6) << m_dt
              << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f")
-             << fixed << std::setw(8) << stringFromUint(fiducials(evt),6)
-             << fixed << std::setw(7) << stringFromUint(m_nevt,5)
+             << std::setw(8) << fiducials(evt)
+             << std::setw(7) << m_nevt
              << "\n";
 
   m_tsec_prev = m_tsec;  
@@ -384,6 +388,62 @@ ImgVsTimeSplitInFiles::printSummary(Event& evt, std::string comment)
 	                << " Number of processed events=" << stringFromUint(m_count)
                         << comment.c_str()
   );
+}
+
+//--------------------
+
+void  
+ImgVsTimeSplitInFiles::saveTimeRecordWithIndexInFile()
+{
+  m_fname_time_ind = m_fname_common + "-time-ind.txt";
+
+  MsgLog( name(), info,  "CorAna::readTimeRecordsFile(): Read time records from the file      : " << m_fname_time 
+	              << "\n                             and save them with time-index in file: " << m_fname_time_ind );
+ 
+  std::string s;
+
+  unsigned    evind;
+  double      t_sec;
+  double      dt_sec;
+  std::string tstamp;
+  unsigned    fiduc;
+  unsigned    evnum;
+  unsigned    tind;
+  double      rind;
+
+  m_tind_max = 0;
+
+  std::ifstream fin(m_fname_time.c_str());
+  if (! fin.is_open()) {
+    const std::string msg = "Unable to open input file: " + m_fname_time;
+    MsgLogRoot(error, msg);
+    throw std::runtime_error(msg);
+  }
+
+  std::ofstream fout(m_fname_time_ind.c_str());
+  if (! fout.is_open()) {
+    const std::string msg = "Unable to open output file: " + m_fname_time_ind;
+    MsgLogRoot(error, msg);
+    throw std::runtime_error(msg);
+  }
+
+  while ( true )
+  {
+    getline (fin,s);
+    if(!fin.good()) break;
+    std::stringstream ss(s); 
+    ss >> evind >> t_sec >> dt_sec >> tstamp >> fiduc >> evnum;
+
+    // === Time index of the event evaluation ===
+    rind = (t_sec + 0.5*m_t_ave) / m_t_ave;
+    tind = (rind>0) ? static_cast<unsigned>(rind) : 0;
+    if (tind > m_tind_max) m_tind_max = tind;
+    
+    fout << s << fixed << std::setw(9) << tind << " \n";
+  }
+
+  fin .close();
+  fout.close();
 }
 
 //--------------------
