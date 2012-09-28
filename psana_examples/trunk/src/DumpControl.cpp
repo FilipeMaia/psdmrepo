@@ -150,7 +150,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
 
       const ndarray<Psana::ControlData::PVLabel, 1>& pvLabels = config2->pvLabels();
       for (unsigned i = 0; i < pvLabels.size(); ++ i) {
-        if (i == 0) str << "\n  PV Monitors:";
+        if (i == 0) str << "\n  PV Labels:";
         const Psana::ControlData::PVLabel& lbl = pvLabels[i];
         str << "\n    " << lbl.name() << " value=" << lbl.value();
       }
