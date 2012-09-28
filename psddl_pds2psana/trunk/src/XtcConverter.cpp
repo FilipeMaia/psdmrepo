@@ -417,6 +417,14 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_QuartzConfig:
     break;
+  case Pds::TypeId::Id_CompressedFrame:
+    break;
+  case Pds::TypeId::Id_CompressedTimePixFrame:
+    break;
+  case Pds::TypeId::Id_AndorConfig:
+    break;
+  case Pds::TypeId::Id_AndorFrame:
+    break;
   case Pds::TypeId::NumberOf:
     break;
 
@@ -593,6 +601,14 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_QuartzConfig:
     if (version == 1) ::storeCfgObject<Quartz::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_CompressedFrame:
+    break;
+  case Pds::TypeId::Id_CompressedTimePixFrame:
+    break;
+  case Pds::TypeId::Id_AndorConfig:
+    break;
+  case Pds::TypeId::Id_AndorFrame:
     break;
   case Pds::TypeId::NumberOf:
     break;
