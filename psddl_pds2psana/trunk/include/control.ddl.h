@@ -14,6 +14,8 @@ Psana::ControlData::PVControl pds_to_psana(PsddlPds::ControlData::PVControl pds)
 
 Psana::ControlData::PVMonitor pds_to_psana(PsddlPds::ControlData::PVMonitor pds);
 
+Psana::ControlData::PVLabel pds_to_psana(PsddlPds::ControlData::PVLabel pds);
+
 
 class ConfigV1 : public Psana::ControlData::ConfigV1 {
 public:
@@ -37,6 +39,35 @@ private:
   unsigned _pvControls_ndarray_shape_[1];
   std::vector<Psana::ControlData::PVMonitor> _pvMonitors_ndarray_storage_;
   unsigned _pvMonitors_ndarray_shape_[1];
+};
+
+
+class ConfigV2 : public Psana::ControlData::ConfigV2 {
+public:
+  typedef PsddlPds::ControlData::ConfigV2 XtcType;
+  typedef Psana::ControlData::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual uint32_t events() const;
+  virtual uint8_t uses_duration() const;
+  virtual uint8_t uses_events() const;
+  virtual const Pds::ClockTime& duration() const;
+  virtual uint32_t npvControls() const;
+  virtual uint32_t npvMonitors() const;
+  virtual uint32_t npvLabels() const;
+  virtual ndarray<Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<Psana::ControlData::PVMonitor, 1> pvMonitors() const;
+  virtual ndarray<Psana::ControlData::PVLabel, 1> pvLabels() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  Pds::ClockTime _duration;
+  std::vector<Psana::ControlData::PVControl> _pvControls_ndarray_storage_;
+  unsigned _pvControls_ndarray_shape_[1];
+  std::vector<Psana::ControlData::PVMonitor> _pvMonitors_ndarray_storage_;
+  unsigned _pvMonitors_ndarray_shape_[1];
+  std::vector<Psana::ControlData::PVLabel> _pvLabels_ndarray_storage_;
+  unsigned _pvLabels_ndarray_shape_[1];
 };
 
 } // namespace ControlData

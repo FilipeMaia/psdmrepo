@@ -459,6 +459,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 4) ::storeCfgObject<EvrData::ConfigV4>(xtc, cfgStore);
     if (version == 5) ::storeCfgObject<EvrData::ConfigV5>(xtc, cfgStore);
     if (version == 6) ::storeCfgObject<EvrData::ConfigV6>(xtc, cfgStore);
+    if (version == 7) ::storeCfgObject<EvrData::ConfigV7>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_TM6740Config:
     if (version == 1) ::storeCfgObject<Pulnix::TM6740ConfigV1>(xtc, cfgStore);
@@ -466,6 +467,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_ControlConfig:
     if (version == 1) ::storeCfgObject<ControlData::ConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<ControlData::ConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_pnCCDframe:
     break;

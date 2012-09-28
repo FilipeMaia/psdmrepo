@@ -19,6 +19,11 @@ Psana::ControlData::PVMonitor pds_to_psana(PsddlPds::ControlData::PVMonitor pds)
   return Psana::ControlData::PVMonitor(pds.name(), pds.index(), pds.loValue(), pds.hiValue());
 }
 
+Psana::ControlData::PVLabel pds_to_psana(PsddlPds::ControlData::PVLabel pds)
+{
+  return Psana::ControlData::PVLabel(pds.name(), pds.value());
+}
+
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::ControlData::ConfigV1()
   , m_xtcObj(xtcPtr)
@@ -65,5 +70,65 @@ uint32_t ConfigV1::npvMonitors() const { return m_xtcObj->npvMonitors(); }
 ndarray<Psana::ControlData::PVControl, 1> ConfigV1::pvControls() const { return ndarray<Psana::ControlData::PVControl, 1>(&_pvControls_ndarray_storage_[0], _pvControls_ndarray_shape_); }
 
 ndarray<Psana::ControlData::PVMonitor, 1> ConfigV1::pvMonitors() const { return ndarray<Psana::ControlData::PVMonitor, 1>(&_pvMonitors_ndarray_storage_[0], _pvMonitors_ndarray_shape_); }
+ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::ControlData::ConfigV2()
+  , m_xtcObj(xtcPtr)
+  , _duration(xtcPtr->duration())
+{
+  {
+    typedef ndarray<PsddlPds::ControlData::PVControl, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
+    _pvControls_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvControls_ndarray_storage_.push_back(psddl_pds2psana::ControlData::pds_to_psana(*it));
+    }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvControls_ndarray_shape_);
+  }
+  {
+    typedef ndarray<PsddlPds::ControlData::PVMonitor, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvMonitors();
+    _pvMonitors_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvMonitors_ndarray_storage_.push_back(psddl_pds2psana::ControlData::pds_to_psana(*it));
+    }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvMonitors_ndarray_shape_);
+  }
+  {
+    typedef ndarray<PsddlPds::ControlData::PVLabel, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvLabels();
+    _pvLabels_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvLabels_ndarray_storage_.push_back(psddl_pds2psana::ControlData::pds_to_psana(*it));
+    }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvLabels_ndarray_shape_);
+  }
+}
+ConfigV2::~ConfigV2()
+{
+}
+
+
+uint32_t ConfigV2::events() const { return m_xtcObj->events(); }
+
+uint8_t ConfigV2::uses_duration() const { return m_xtcObj->uses_duration(); }
+
+uint8_t ConfigV2::uses_events() const { return m_xtcObj->uses_events(); }
+
+const Pds::ClockTime& ConfigV2::duration() const { return _duration; }
+
+uint32_t ConfigV2::npvControls() const { return m_xtcObj->npvControls(); }
+
+uint32_t ConfigV2::npvMonitors() const { return m_xtcObj->npvMonitors(); }
+
+uint32_t ConfigV2::npvLabels() const { return m_xtcObj->npvLabels(); }
+
+ndarray<Psana::ControlData::PVControl, 1> ConfigV2::pvControls() const { return ndarray<Psana::ControlData::PVControl, 1>(&_pvControls_ndarray_storage_[0], _pvControls_ndarray_shape_); }
+
+ndarray<Psana::ControlData::PVMonitor, 1> ConfigV2::pvMonitors() const { return ndarray<Psana::ControlData::PVMonitor, 1>(&_pvMonitors_ndarray_storage_[0], _pvMonitors_ndarray_shape_); }
+
+ndarray<Psana::ControlData::PVLabel, 1> ConfigV2::pvLabels() const { return ndarray<Psana::ControlData::PVLabel, 1>(&_pvLabels_ndarray_storage_[0], _pvLabels_ndarray_shape_); }
 } // namespace ControlData
 } // namespace psddl_pds2psana

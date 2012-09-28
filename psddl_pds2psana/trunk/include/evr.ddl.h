@@ -20,6 +20,8 @@ Psana::EvrData::EventCodeV4 pds_to_psana(PsddlPds::EvrData::EventCodeV4 pds);
 
 Psana::EvrData::EventCodeV5 pds_to_psana(PsddlPds::EvrData::EventCodeV5 pds);
 
+Psana::EvrData::EventCodeV6 pds_to_psana(PsddlPds::EvrData::EventCodeV6 pds);
+
 Psana::EvrData::OutputMap pds_to_psana(PsddlPds::EvrData::OutputMap pds);
 
 Psana::EvrData::OutputMapV2 pds_to_psana(PsddlPds::EvrData::OutputMapV2 pds);
@@ -180,6 +182,32 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   std::vector<Psana::EvrData::EventCodeV5> _eventcodes_ndarray_storage_;
+  unsigned _eventcodes_ndarray_shape_[1];
+  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMapV2> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
+  psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
+};
+
+
+class ConfigV7 : public Psana::EvrData::ConfigV7 {
+public:
+  typedef PsddlPds::EvrData::ConfigV7 XtcType;
+  typedef Psana::EvrData::ConfigV7 PsanaType;
+  ConfigV7(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV7();
+  virtual uint32_t neventcodes() const;
+  virtual uint32_t npulses() const;
+  virtual uint32_t noutputs() const;
+  virtual ndarray<Psana::EvrData::EventCodeV6, 1> eventcodes() const;
+  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMapV2, 1> output_maps() const;
+  virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  std::vector<Psana::EvrData::EventCodeV6> _eventcodes_ndarray_storage_;
   unsigned _eventcodes_ndarray_shape_[1];
   std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
   unsigned _pulses_ndarray_shape_[1];
