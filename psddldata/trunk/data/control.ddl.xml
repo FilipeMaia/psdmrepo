@@ -6,20 +6,20 @@
     <use file="psddldata/xtc.ddl.xml" 
         cpp_headers="pdsdata/xtc/ClockTime.hh"/>
 
-	<package name="ControlData">
+        <package name="ControlData">
 	
-		<pstype name="PVControl" pack="4">
+        <pstype name="PVControl" pack="4">
 		
-        	<tag name="config-type"/>
+            <tag name="config-type"/>
 		
             <tag name="value-type"/>
         
-		    <const name="NameSize" value="32">
-		    Length of the name array.
-		    </const>
-		    <const name="NoArray" value="0xFFFFFFFF">
-		    Special value used for _index when PV is not an array
-		    </const>
+            <const name="NameSize" value="32">
+            Length of the name array.
+            </const>
+            <const name="NoArray" value="0xFFFFFFFF">
+            Special value used for _index when PV is not an array
+            </const>
 		
             <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
             Name of the control.
@@ -48,11 +48,11 @@
                 <tag name="inline"/>
             </ctor>
 
-		</pstype>
+        </pstype>
+
+        <!-- ========================================================================= -->
 		
-		<!-- ========================================================================= -->
-		
-		<pstype name="PVMonitor" pack="4">
+        <pstype name="PVMonitor" pack="4">
 		
             <tag name="value-type"/>
         
@@ -94,25 +94,61 @@
                 <tag name="inline"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 		
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="ConfigV1" version="1" type_id="Id_ControlConfig">
+        <pstype name="PVLabel" pack="4">
 		
+            <tag name="value-type"/>
+        
+            <const name="NameSize" value="32">
+            Length of the PV name array.
+            </const>
+            <const name="ValueSize" value="64">
+            Length of the value array.
+            </const>
+		
+            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
+            PV name.
+            </attribute>
+
+            <attribute name="_value" type="char" shape="64" accessor="value" shape_method="None">
+            Label value.
+            </attribute>
+
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
+
+        </pstype>
+		
+        <!-- ========================================================================= -->
+		
+        <pstype name="ConfigV1" version="1" type_id="Id_ControlConfig">
+		
+            <tag name="config-type"/>
+
             <attribute name="_control" type="uint32_t" accessor="">
             
-                <bitfield name="_bf_events" size="30" type="uint32_t" accessor="events">
-                Maximum number of events per scan.
-                </bitfield>
-            
-                <bitfield name="_bf_uses_duration" size="1" type="uint8_t" accessor="uses_duration">
-                returns true if the configuration uses duration control.
-                </bitfield>
-            
-                <bitfield name="_bf_uses_events" size="1" type="uint8_t" accessor="uses_events">
-                returns true if the configuration uses events limit.
-                </bitfield>
+            <bitfield name="_bf_events" size="30" type="uint32_t" accessor="events">
+            Maximum number of events per scan.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_duration" size="1" type="uint8_t" accessor="uses_duration">
+            returns true if the configuration uses duration control.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_events" size="1" type="uint8_t" accessor="uses_events">
+            returns true if the configuration uses events limit.
+            </bitfield>
             
             </attribute>
 
@@ -143,5 +179,64 @@
 
         </pstype>
         
-	</package>
+        <!-- ========================================================================= -->
+		
+        <pstype name="ConfigV2" version="2" type_id="Id_ControlConfig">
+
+            <tag name="config-type"/>
+		
+            <attribute name="_control" type="uint32_t" accessor="">
+            
+            <bitfield name="_bf_events" size="30" type="uint32_t" accessor="events">
+            Maximum number of events per scan.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_duration" size="1" type="uint8_t" accessor="uses_duration">
+            returns true if the configuration uses duration control.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_events" size="1" type="uint8_t" accessor="uses_events">
+            returns true if the configuration uses events limit.
+            </bitfield>
+            
+            </attribute>
+
+            <attribute name="_reserved" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_duration" type="Pds.ClockTime" accessor="duration">
+            Maximum duration of the scan.
+            </attribute>
+
+            <attribute name="_npvControls" type="uint32_t" accessor="npvControls">
+            Number of PVControl objects in this configuration.
+            </attribute>
+
+            <attribute name="_npvMonitors" type="uint32_t" accessor="npvMonitors">
+            Number of PVMonitor objects in this configuration.
+            </attribute>
+
+            <attribute name="_npvLabels" type="uint32_t" accessor="npvLabels">
+            Number of PVLabel objects in this configuration.
+            </attribute>
+
+            <attribute name="_pvControls" type="PVControl"
+                shape="{self}._npvControls" accessor="pvControls" shape_method="pvControls_shape">
+                PVControl configuration objects
+            </attribute>
+
+            <attribute name="_pvMonitors" type="PVMonitor"
+                shape="{self}._npvMonitors" accessor="pvMonitors" shape_method="pvMonitors_shape">
+                PVMonitor configuration objects
+            </attribute>
+
+            <attribute name="_pvLabels" type="PVLabel"
+                shape="{self}._npvLabels" accessor="pvLabels" shape_method="pvLabels_shape">
+                PVLabel configuration objects
+            </attribute>
+
+        </pstype>
+        
+    </package>
+    
 </psddl>

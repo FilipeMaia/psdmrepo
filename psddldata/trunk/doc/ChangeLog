@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-08
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- added new classes control.ConfigV2, evr.ConfigV7
+
 Tag: V00-03-07
 2012-07-24 Andy Salnikov
 - acqiris.ddl.xml: bug fix in Timestamp::value() method

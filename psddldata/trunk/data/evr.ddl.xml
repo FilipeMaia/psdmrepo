@@ -6,25 +6,25 @@
     <use file="psddldata/xtc.ddl.xml" 
         cpp_headers="pdsdata/xtc/DetInfo.hh"/>
 
-	<package name="EvrData">
+    <package name="EvrData">
 
     Package containing definitions for Event Receiver (EVR) data types.
 
-        <!-- ========================================================================= -->
+    <!-- ========================================================================= -->
 	
-		<pstype name="PulseConfig">
+        <pstype name="PulseConfig">
 
 		
-		    <tag name="value-type"/>
-
-		    <const name="Trigger_Shift" value="0" />
-		    <const name="Set_Shift" value="8" />
-		    <const name="Clear_Shift" value="16" />
-		    
-		    <const name="Polarity_Shift" value="0" />
-		    <const name="Map_Set_Ena_Shift" value="1" />
-		    <const name="Map_Reset_Ena_Shift" value="2" />
-		    <const name="Map_Trigger_Ena_Shift" value="3" />
+            <tag name="value-type"/>
+          
+            <const name="Trigger_Shift" value="0" />
+            <const name="Set_Shift" value="8" />
+            <const name="Clear_Shift" value="16" />
+            
+            <const name="Polarity_Shift" value="0" />
+            <const name="Map_Set_Ena_Shift" value="1" />
+            <const name="Map_Reset_Ena_Shift" value="2" />
+            <const name="Map_Trigger_Ena_Shift" value="3" />
 		
 		
             <attribute name="_pulse" type="uint32_t" accessor="pulse">
@@ -80,14 +80,14 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 		
 		
         <!-- ========================================================================= -->
 	
-		<pstype name="PulseConfigV3" pack="4">
+        <pstype name="PulseConfigV3" pack="4">
 		
-		    <tag name="value-type"/>
+            <tag name="value-type"/>
 
             <attribute name="_u16PulseId" type="uint16_t" accessor="pulseId">
             </attribute>
@@ -118,13 +118,13 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 
         <!-- ========================================================================= -->
 	
-		<pstype name="EventCodeV3" pack="4">
+        <pstype name="EventCodeV3" pack="4">
 		
-		    <tag name="value-type"/>
+            <tag name="value-type"/>
 
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
@@ -153,13 +153,13 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 
         <!-- ========================================================================= -->
 	
-		<pstype name="EventCodeV4" pack="4">
+        <pstype name="EventCodeV4" pack="4">
 		
-		    <tag name="value-type"/>
+            <tag name="value-type"/>
 
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
@@ -194,15 +194,15 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 
         <!-- ========================================================================= -->
 	
-		<pstype name="EventCodeV5" pack="4">
+        <pstype name="EventCodeV5" pack="4">
 				
-		    <tag name="value-type"/>
+            <tag name="value-type"/>
 
-			<const name="DescSize" value="16"/>
+            <const name="DescSize" value="16"/>
 				
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
@@ -241,22 +241,74 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+	
+        <pstype name="EventCodeV6" pack="4">
+				
+            <tag name="value-type"/>
 
-		<pstype name="OutputMap">
+            <const name="DescSize" value="16"/>
+            
+            <const name="MaxReadoutGroup" value="7"/>
+				
+            <attribute name="_u16Code" type="uint16_t" accessor="code">
+            </attribute>
+
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
+                <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
+                <bitfield name="_bf_isCommand" size="1" type="uint8_t" accessor="isCommand"/>                
+                <bitfield name="_bf_isLatch" size="1" type="uint8_t" accessor="isLatch"/>                
+            </attribute>
+
+            <attribute name="_u32ReportDelay" type="uint32_t" accessor="reportDelay">
+            </attribute>
+
+            <attribute name="_u32ReportWidth" type="uint32_t" accessor="reportWidth">
+            </attribute>
+
+            <attribute name="_u32MaskTrigger" type="uint32_t" accessor="maskTrigger">
+            </attribute>
+
+            <attribute name="_u32MaskSet" type="uint32_t" accessor="maskSet">
+            </attribute>
+
+            <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
+            </attribute>
+
+            <attribute name="_desc" type="char" shape="DescSize" accessor="desc">
+            </attribute>
+
+            <attribute name="_u16ReadGroup" type="uint16_t" accessor="readoutGroup">
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+
+        <pstype name="OutputMap">
 		
             <tag name="value-type"/>
-        
-		    <enum name="Source">
-		        <enum-const name="Pulse" />
-		        <enum-const name="DBus" />
-		        <enum-const name="Prescaler" />
-		        <enum-const name="Force_High" />
-		        <enum-const name="Force_Low" />
-		    </enum>
+
+            <enum name="Source">
+                <enum-const name="Pulse" />
+                <enum-const name="DBus" />
+                <enum-const name="Prescaler" />
+                <enum-const name="Force_High" />
+                <enum-const name="Force_Low" />
+            </enum>
 
             <enum name="Conn">
                 <enum-const name="FrontPanel" />
@@ -285,22 +337,22 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 		
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
 
-		<pstype name="OutputMapV2">
+        <pstype name="OutputMapV2">
 		
             <tag name="value-type"/>
         
-		    <enum name="Source">
-		        <enum-const name="Pulse" />
-		        <enum-const name="DBus" />
-		        <enum-const name="Prescaler" />
-		        <enum-const name="Force_High" />
-		        <enum-const name="Force_Low" />
-		    </enum>
+            <enum name="Source">
+                <enum-const name="Pulse" />
+                <enum-const name="DBus" />
+                <enum-const name="Prescaler" />
+                <enum-const name="Force_High" />
+                <enum-const name="Force_Low" />
+            </enum>
 
             <enum name="Conn">
                 <enum-const name="FrontPanel" />
@@ -331,13 +383,13 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
+        </pstype>
 		
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="ConfigV1" version="1" type_id="Id_EvrConfig">
+        <pstype name="ConfigV1" version="1" type_id="Id_EvrConfig">
 		
-			<tag name="config-type"/>
+            <tag name="config-type"/>
 		
             <attribute name="_npulses" type="uint32_t" accessor="npulses">
             </attribute>
@@ -355,15 +407,15 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="ConfigV2" version="2" type_id="Id_EvrConfig">
+        <pstype name="ConfigV2" version="2" type_id="Id_EvrConfig">
 		
-			<tag name="config-type"/>
+            <tag name="config-type"/>
 		
-		    <const name="beamOn" value="100"/>
-		    <const name="baseRate" value="40"/>
-		    <const name="singleShot" value="150"/>
+            <const name="beamOn" value="100"/>
+            <const name="baseRate" value="40"/>
+            <const name="singleShot" value="150"/>
 		
             <enum name="RateCode">
                 <enum-const name="r120Hz" />
@@ -411,11 +463,11 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="ConfigV3" version="3" type_id="Id_EvrConfig" pack="4">
-		
-			<tag name="config-type"/>
+        <pstype name="ConfigV3" version="3" type_id="Id_EvrConfig" pack="4">
+        
+            <tag name="config-type"/>
 		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
@@ -438,11 +490,11 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 		
-		<pstype name="ConfigV4" version="4" type_id="Id_EvrConfig" pack="4">
+        <pstype name="ConfigV4" version="4" type_id="Id_EvrConfig" pack="4">
 		
-			<tag name="config-type"/>
+            <tag name="config-type"/>
 		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
@@ -465,11 +517,11 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="SequencerEntry">
-
-		    <tag name="value-type"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="SequencerEntry">
+        
+            <tag name="value-type"/>
 
             <attribute name="_value" type="uint32_t">
             
@@ -494,9 +546,9 @@
 
         </pstype>
 		
-		<!-- ========================================================================= -->
-		
-		<pstype name="SequencerConfigV1">
+        <!-- ========================================================================= -->
+        
+        <pstype name="SequencerConfigV1">
 
             <enum name="Source">
                 <enum-const name="r120Hz" />
@@ -541,11 +593,11 @@
 
         </pstype>
 		
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV5" version="5" type_id="Id_EvrConfig" pack="4">
-		
-			<tag name="config-type"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV5" version="5" type_id="Id_EvrConfig" pack="4">
+        
+            <tag name="config-type"/>
 		
             <const name="MaxPulses" value="32"/>
             <const name="EvrOutputs" value="10"/>
@@ -574,18 +626,18 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV6" version="6" type_id="Id_EvrConfig" pack="4">
 		
-		<pstype name="ConfigV6" version="6" type_id="Id_EvrConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
-		    <const name="MaxPulses" value="256">
-		    Maximum pulses in the system
-		    </const>
-		    <const name="MaxOutputs" value="256">
-		    Maximum outputs in the system
-		    </const>
+            <tag name="config-type"/>
+
+            <const name="MaxPulses" value="256">
+            Maximum pulses in the system
+            </const>
+            <const name="MaxOutputs" value="256">
+            Maximum outputs in the system
+            </const>
 		
             <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
             </attribute>
@@ -611,9 +663,46 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV7" version="7" type_id="Id_EvrConfig" pack="4">
 		
-		<pstype name="FIFOEvent">
+            <tag name="config-type"/>
+
+            <const name="MaxPulses" value="256">
+            Maximum pulses in the system
+            </const>
+            <const name="MaxOutputs" value="256">
+            Maximum outputs in the system
+            </const>
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="EventCodeV6" shape="{self}._neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMapV2" shape="{self}._noutputs" accessor="output_maps">
+            </attribute>
+
+            <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
+            </attribute>
+
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+
+	<pstype name="FIFOEvent">
 		
             <tag name="value-type"/>
         
