@@ -213,6 +213,52 @@ private:
 };
 #pragma pack(pop)
 
+/** @class EventCodeV6
+
+  
+*/
+
+#pragma pack(push,4)
+
+class EventCodeV6 {
+public:
+  enum { DescSize = 16 };
+  enum { MaxReadoutGroup = 7 };
+  EventCodeV6()
+  {
+  }
+  EventCodeV6(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isCommand, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isCommand & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
+  {
+    std::copy(arg__desc, arg__desc+(16), _desc);
+  }
+  uint16_t code() const { return _u16Code; }
+  uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
+  uint8_t isCommand() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
+  uint8_t isLatch() const { return uint8_t((this->_u16MaskEventAttr>>2) & 0x1); }
+  uint32_t reportDelay() const { return _u32ReportDelay; }
+  uint32_t reportWidth() const { return _u32ReportWidth; }
+  uint32_t maskTrigger() const { return _u32MaskTrigger; }
+  uint32_t maskSet() const { return _u32MaskSet; }
+  uint32_t maskClear() const { return _u32MaskClear; }
+  const char* desc() const { return _desc; }
+  uint16_t readoutGroup() const { return _u16ReadGroup; }
+  static uint32_t _sizeof()  { return (24+(1*(DescSize)))+2; }
+  /** Method which returns the shape (dimensions) of the data returned by desc() method. */
+  std::vector<int> desc_shape() const;
+private:
+  uint16_t	_u16Code;
+  uint16_t	_u16MaskEventAttr;
+  uint32_t	_u32ReportDelay;
+  uint32_t	_u32ReportWidth;
+  uint32_t	_u32MaskTrigger;
+  uint32_t	_u32MaskSet;
+  uint32_t	_u32MaskClear;
+  char	_desc[DescSize];
+  uint16_t	_u16ReadGroup;
+};
+#pragma pack(pop)
+
 /** @class OutputMap
 
   
@@ -560,6 +606,44 @@ private:
   uint32_t	_npulses;
   uint32_t	_noutputs;
   //EvrData::EventCodeV5	_eventcodes[this->_neventcodes];
+  //EvrData::PulseConfigV3	_pulses[this->_npulses];
+  //EvrData::OutputMapV2	_output_maps[this->_noutputs];
+  //EvrData::SequencerConfigV1	_seq_config;
+};
+#pragma pack(pop)
+
+/** @class ConfigV7
+
+  
+*/
+
+#pragma pack(push,4)
+
+class ConfigV7 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 7 /**< XTC type version number */ };
+  enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  uint32_t neventcodes() const { return _neventcodes; }
+  uint32_t npulses() const { return _npulses; }
+  uint32_t noutputs() const { return _noutputs; }
+  ndarray<EvrData::EventCodeV6, 1> eventcodes() const { ptrdiff_t offset=12;
+  EvrData::EventCodeV6* data = (EvrData::EventCodeV6*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_neventcodes); }
+  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(42*(this->_neventcodes));
+  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_npulses); }
+  ndarray<EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(42*(this->_neventcodes)))+(16*(this->_npulses));
+  EvrData::OutputMapV2* data = (EvrData::OutputMapV2*)(((const char*)this)+offset);
+  return make_ndarray(data, this->_noutputs); }
+  const EvrData::SequencerConfigV1& seq_config() const { ptrdiff_t offset=((12+(42*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
+  return *(const EvrData::SequencerConfigV1*)(((const char*)this)+offset); }
+private:
+  uint32_t	_neventcodes;
+  uint32_t	_npulses;
+  uint32_t	_noutputs;
+  //EvrData::EventCodeV6	_eventcodes[this->_neventcodes];
   //EvrData::PulseConfigV3	_pulses[this->_npulses];
   //EvrData::OutputMapV2	_output_maps[this->_noutputs];
   //EvrData::SequencerConfigV1	_seq_config;

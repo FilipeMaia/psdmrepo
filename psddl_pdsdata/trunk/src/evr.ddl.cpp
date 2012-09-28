@@ -24,6 +24,13 @@ EventCodeV5::desc_shape() const {
   shape.push_back(DescSize);
   return shape;
 }
+std::vector<int>
+EventCodeV6::desc_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(DescSize);
+  return shape;
+}
 EvrData::ConfigV2::BeamCode
 ConfigV2::beam() const {
   return (this->_opcode > beamOn) ? On : Off;
