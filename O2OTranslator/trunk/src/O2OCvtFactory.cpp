@@ -38,6 +38,7 @@
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
+#include "H5DataTypes/ControlDataConfigV2.h"
 #include "H5DataTypes/CsPad2x2ConfigV1.h"
 #include "H5DataTypes/CsPadConfigV1.h"
 #include "H5DataTypes/CsPadConfigV2.h"
@@ -54,6 +55,7 @@
 #include "H5DataTypes/EvrConfigV4.h"
 #include "H5DataTypes/EvrConfigV5.h"
 #include "H5DataTypes/EvrConfigV6.h"
+#include "H5DataTypes/EvrConfigV7.h"
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
@@ -162,10 +164,12 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   ::registerConfigCvt<H5DataTypes::EvrConfigV4>(m_cvtMap, "EvrData::ConfigV4", Pds::TypeId::Id_EvrConfig, 4);
   ::registerConfigCvt<H5DataTypes::EvrConfigV5>(m_cvtMap, "EvrData::ConfigV5", Pds::TypeId::Id_EvrConfig, 5);
   ::registerConfigCvt<H5DataTypes::EvrConfigV6>(m_cvtMap, "EvrData::ConfigV6", Pds::TypeId::Id_EvrConfig, 6);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV7>(m_cvtMap, "EvrData::ConfigV7", Pds::TypeId::Id_EvrConfig, 7);
 
   ::registerConfigCvt<H5DataTypes::EvrIOConfigV1>(m_cvtMap, "EvrData::IOConfigV1", Pds::TypeId::Id_EvrIOConfig, 1);
 
   ::registerConfigCvt<H5DataTypes::ControlDataConfigV1>(m_cvtMap, "ControlData::ConfigV1", Pds::TypeId::Id_ControlConfig, 1);
+  ::registerConfigCvt<H5DataTypes::ControlDataConfigV2>(m_cvtMap, "ControlData::ConfigV2", Pds::TypeId::Id_ControlConfig, 2);
 
   ::registerConfigCvt<H5DataTypes::PnCCDConfigV1>(m_cvtMap, "PNCCD::ConfigV1", Pds::TypeId::Id_pnCCDconfig, 1);
   ::registerConfigCvt<H5DataTypes::PnCCDConfigV2>(m_cvtMap, "PNCCD::ConfigV2", Pds::TypeId::Id_pnCCDconfig, 2);
