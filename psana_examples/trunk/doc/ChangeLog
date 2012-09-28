@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-12
+2012-09-28 Andy Salnikov
+- update examples with new classes from pdsdata V04-01-00
+
 Tag: V00-02-11
 2012-07-06 Andy Salnikov
 - add new module DumpQuartz

@@ -112,6 +112,51 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
     }
     
   }
+
+
+  shared_ptr<Psana::ControlData::ConfigV2> config2 = env.configStore().get(m_src);
+  if (not config2.get()) {
+    MsgLog(name(), info, "ControlData::ConfigV2 not found");
+  } else {
+
+    WithMsgLog(name(), info, str) {
+
+      str << "ControlData::ConfigV2:"
+          <<  "\n  uses_duration = " << (config2->uses_duration() ? "yes" : "no")
+          <<  "\n  duration = ";
+      printClockTime(str, config2->duration());
+      str <<  "\n  uses_events = " << (config2->uses_events() ? "yes" : "no")
+          << "\n  events = " << config2->events();
+
+      const ndarray<Psana::ControlData::PVControl, 1>& pvControls = config2->pvControls();
+      for (unsigned i = 0; i < pvControls.size(); ++ i) {
+        if (i == 0) str << "\n  PV Controls:";
+        const Psana::ControlData::PVControl& ctrl = pvControls[i];
+        str << "\n    " << ctrl.name() << " index=" << ctrl.index()
+            << " value=" << ctrl.value() << " array=" << int(ctrl.array());
+
+      }
+
+      const ndarray<Psana::ControlData::PVMonitor, 1>& pvMonitors = config2->pvMonitors();
+      for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
+        if (i == 0) str << "\n  PV Monitors:";
+        const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
+        str << "\n    " << mon.name() << " index=" << mon.index()
+            << " low value=" << mon.loValue()
+            << " high value=" << mon.hiValue()
+            << " array=" << int(mon.array());
+
+      }
+
+      const ndarray<Psana::ControlData::PVLabel, 1>& pvLabels = config2->pvLabels();
+      for (unsigned i = 0; i < pvLabels.size(); ++ i) {
+        if (i == 0) str << "\n  PV Monitors:";
+        const Psana::ControlData::PVLabel& lbl = pvLabels[i];
+        str << "\n    " << lbl.name() << " value=" << lbl.value();
+      }
+    }
+
+  }
 }
 
 // Method which is called with event data

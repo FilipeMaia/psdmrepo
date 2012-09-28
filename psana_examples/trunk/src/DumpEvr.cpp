@@ -111,7 +111,24 @@ namespace {
         << " reportWidth=" << ecfg.reportWidth()
         << " maskTrigger=" << ecfg.maskTrigger()
         << " maskSet=" << ecfg.maskSet()
-        << " maskClear=" << ecfg.maskClear();
+        << " maskClear=" << ecfg.maskClear()
+        << " description=" << ecfg.desc();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::EventCodeV6& ecfg)
+  {
+    str << "\n  event code #" << i
+        << ": code=" << ecfg.code()
+        << " isReadout=" << int(ecfg.isReadout())
+        << " isCommand=" << int(ecfg.isCommand())
+        << " isLatch=" << int(ecfg.isLatch())
+        << " reportDelay=" << ecfg.reportDelay()
+        << " reportWidth=" << ecfg.reportWidth()
+        << " maskTrigger=" << ecfg.maskTrigger()
+        << " maskSet=" << ecfg.maskSet()
+        << " maskClear=" << ecfg.maskClear()
+        << " readoutGroup=" << ecfg.readoutGroup()
+        << " description=" << ecfg.desc();
   }
 
   void print(std::ostream& str, unsigned i, const Psana::EvrData::SequencerEntry& e)
@@ -271,7 +288,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
   if (config6.get()) {
     
     WithMsgLog(name(), info, str) {
-      str << "EvrData::ConfigV5: npulses = " << config6->npulses()
+      str << "EvrData::ConfigV6: npulses = " << config6->npulses()
           << " noutputs = " << config6->noutputs()
           << " neventcodes = " << config6->neventcodes();
 
@@ -289,6 +306,31 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
     }
     
+  }
+
+  // Try to get V7 config object
+  shared_ptr<Psana::EvrData::ConfigV7> config7 = env.configStore().get(m_src);
+  if (config7.get()) {
+
+    WithMsgLog(name(), info, str) {
+      str << "EvrData::ConfigV7: npulses = " << config7->npulses()
+          << " noutputs = " << config7->noutputs()
+          << " neventcodes = " << config7->neventcodes();
+
+      ::print_array(str, config7->pulses());
+      ::print_array(str, config7->output_maps());
+      ::print_array(str, config7->eventcodes());
+
+      const Psana::EvrData::SequencerConfigV1& scfg = config7->seq_config();
+      str << "\n  seq_config: sync_source=" << scfg.sync_source()
+          << " beam_source=" << scfg.beam_source()
+          << " length=" << scfg.length()
+          << " cycles=" << scfg.cycles();
+
+      ::print_array(str, scfg.entries());
+
+    }
+
   }
 
   shared_ptr<Psana::EvrData::IOConfigV1> iocfg1 = env.configStore().get(m_src);
