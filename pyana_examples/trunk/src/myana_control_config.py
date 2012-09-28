@@ -99,6 +99,14 @@ class myana_control_config ( object ) :
                 pv = control.pvMonitor(i)
                 print "  Monitor PV %d: %s [%d] High Limit %f  Low Limit %f" % \
                     (i, pv.name(), pv.index(), pv.loValue(), pv.hiValue())
+                    
+            try:
+                # this can only work with V2
+                for i in range(control.npvLabels()) :
+                    lbl = control.pvLabel(i)
+                    print "  PV Label %d: %s -> %s" % (i, lbl.name(), lbl.value())
+            except:
+                pass
         
 
     def event( self, evt, env ) :

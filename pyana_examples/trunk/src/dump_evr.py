@@ -69,9 +69,15 @@ def _printEventCodeV4(i, ecfg):
 
 def _printEventCodeV5(i, ecfg):
     
-    print "  event code #%d: code=%d isReadout=%d isCommand=%d isLatch=%d reportDelay=%d reportWidth=%d maskTrigger=%d maskSet=%d maskClear=%d" % \
+    print "  event code #%d: code=%d isReadout=%d isCommand=%d isLatch=%d reportDelay=%d reportWidth=%d maskTrigger=%d maskSet=%d maskClear=%d description=%s" % \
         (i, ecfg.code(), ecfg.isReadout(), ecfg.isCommand(), ecfg.isLatch(), ecfg.reportDelay(), ecfg.reportWidth(), \
-         ecfg.maskTrigger(), ecfg.maskSet(), ecfg.maskClear())
+         ecfg.maskTrigger(), ecfg.maskSet(), ecfg.maskClear(), ecfg.desc())
+
+def _printEventCodeV6(i, ecfg):
+    
+    print "  event code #%d: code=%d isReadout=%d isCommand=%d isLatch=%d reportDelay=%d reportWidth=%d maskTrigger=%d maskSet=%d maskClear=%d readoutGroup=%d description=%s" % \
+        (i, ecfg.code(), ecfg.isReadout(), ecfg.isCommand(), ecfg.isLatch(), ecfg.reportDelay(), ecfg.reportWidth(), \
+         ecfg.maskTrigger(), ecfg.maskSet(), ecfg.maskClear(), ecfg.readoutGroup(), ecfg.desc())
 
 def _printFIFOEvent(i, f):
     
@@ -185,6 +191,21 @@ class dump_evr (object) :
                 for i in range(config.npulses()): _printPulseConfigV3(i, config.pulse(i))
                 for i in range(config.noutputs()): _printOutputMapV2(i, config.output_map(i))
                 for i in range(config.neventcodes()): _printEventCodeV5(i, config.eventcode(i))
+
+                scfg = config.seq_config()
+                print "  seq_config: sync_source=%s beam_source=%s length=%d cycles=%d" % \
+                    (scfg.sync_source(), scfg.beam_source(), scfg.length(), scfg.cycles())
+
+
+            if className == "ConfigV7":
+                
+                print "  npulses =", config.npulses()
+                print "  noutputs =", config.noutputs()
+                print "  neventcodes =", config.neventcodes()
+                
+                for i in range(config.npulses()): _printPulseConfigV3(i, config.pulse(i))
+                for i in range(config.noutputs()): _printOutputMapV2(i, config.output_map(i))
+                for i in range(config.neventcodes()): _printEventCodeV6(i, config.eventcode(i))
 
                 scfg = config.seq_config()
                 print "  seq_config: sync_source=%s beam_source=%s length=%d cycles=%d" % \
