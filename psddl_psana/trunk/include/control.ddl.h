@@ -83,6 +83,36 @@ private:
 };
 #pragma pack(pop)
 
+/** @class PVLabel
+
+  
+*/
+
+#pragma pack(push,4)
+
+class PVLabel {
+public:
+  enum { NameSize = 32 /**< Length of the PV name array. */ };
+  enum { ValueSize = 64 /**< Length of the value array. */ };
+  PVLabel()
+  {
+  }
+  PVLabel(const char* arg__name, const char* arg__value)
+  {
+    std::copy(arg__name, arg__name+(32), _name);
+    std::copy(arg__value, arg__value+(64), _value);
+  }
+  /** PV name. */
+  const char* name() const { return _name; }
+  /** Label value. */
+  const char* value() const { return _value; }
+  static uint32_t _sizeof()  { return (0+(1*(32)))+(1*(64)); }
+private:
+  char	_name[32];	/**< PV name. */
+  char	_value[64];	/**< Label value. */
+};
+#pragma pack(pop)
+
 /** @class ConfigV1
 
   
@@ -110,6 +140,39 @@ public:
   virtual ndarray<ControlData::PVControl, 1> pvControls() const = 0;
   /** PVMonitor configuration objects */
   virtual ndarray<ControlData::PVMonitor, 1> pvMonitors() const = 0;
+};
+
+/** @class ConfigV2
+
+  
+*/
+
+
+class ConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~ConfigV2();
+  /** Maximum number of events per scan. */
+  virtual uint32_t events() const = 0;
+  /** returns true if the configuration uses duration control. */
+  virtual uint8_t uses_duration() const = 0;
+  /** returns true if the configuration uses events limit. */
+  virtual uint8_t uses_events() const = 0;
+  /** Maximum duration of the scan. */
+  virtual const Pds::ClockTime& duration() const = 0;
+  /** Number of PVControl objects in this configuration. */
+  virtual uint32_t npvControls() const = 0;
+  /** Number of PVMonitor objects in this configuration. */
+  virtual uint32_t npvMonitors() const = 0;
+  /** Number of PVLabel objects in this configuration. */
+  virtual uint32_t npvLabels() const = 0;
+  /** PVControl configuration objects */
+  virtual ndarray<ControlData::PVControl, 1> pvControls() const = 0;
+  /** PVMonitor configuration objects */
+  virtual ndarray<ControlData::PVMonitor, 1> pvMonitors() const = 0;
+  /** PVLabel configuration objects */
+  virtual ndarray<ControlData::PVLabel, 1> pvLabels() const = 0;
 };
 } // namespace ControlData
 } // namespace Psana

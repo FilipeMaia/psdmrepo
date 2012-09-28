@@ -16,5 +16,8 @@ PVMonitor::array() const {
 
 ConfigV1::~ConfigV1() {}
 
+
+ConfigV2::~ConfigV2() {}
+
 } // namespace ControlData
 } // namespace Psana

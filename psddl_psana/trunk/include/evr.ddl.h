@@ -212,6 +212,52 @@ private:
 };
 #pragma pack(pop)
 
+/** @class EventCodeV6
+
+  
+*/
+
+#pragma pack(push,4)
+
+class EventCodeV6 {
+public:
+  enum { DescSize = 16 };
+  enum { MaxReadoutGroup = 7 };
+  EventCodeV6()
+  {
+  }
+  EventCodeV6(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isCommand, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isCommand & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
+  {
+    std::copy(arg__desc, arg__desc+(16), _desc);
+  }
+  uint16_t code() const { return _u16Code; }
+  uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
+  uint8_t isCommand() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
+  uint8_t isLatch() const { return uint8_t((this->_u16MaskEventAttr>>2) & 0x1); }
+  uint32_t reportDelay() const { return _u32ReportDelay; }
+  uint32_t reportWidth() const { return _u32ReportWidth; }
+  uint32_t maskTrigger() const { return _u32MaskTrigger; }
+  uint32_t maskSet() const { return _u32MaskSet; }
+  uint32_t maskClear() const { return _u32MaskClear; }
+  const char* desc() const { return _desc; }
+  uint16_t readoutGroup() const { return _u16ReadGroup; }
+  static uint32_t _sizeof()  { return (24+(1*(DescSize)))+2; }
+  /** Method which returns the shape (dimensions) of the data returned by desc() method. */
+  std::vector<int> desc_shape() const;
+private:
+  uint16_t	_u16Code;
+  uint16_t	_u16MaskEventAttr;
+  uint32_t	_u32ReportDelay;
+  uint32_t	_u32ReportWidth;
+  uint32_t	_u32MaskTrigger;
+  uint32_t	_u32MaskSet;
+  uint32_t	_u32MaskClear;
+  char	_desc[DescSize];
+  uint16_t	_u16ReadGroup;
+};
+#pragma pack(pop)
+
 /** @class OutputMap
 
   
@@ -465,6 +511,28 @@ public:
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
   virtual ndarray<EvrData::EventCodeV5, 1> eventcodes() const = 0;
+  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<EvrData::OutputMapV2, 1> output_maps() const = 0;
+  virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
+};
+
+/** @class ConfigV7
+
+  
+*/
+
+
+class ConfigV7 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 7 /**< XTC type version number */ };
+  enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  virtual ~ConfigV7();
+  virtual uint32_t neventcodes() const = 0;
+  virtual uint32_t npulses() const = 0;
+  virtual uint32_t noutputs() const = 0;
+  virtual ndarray<EvrData::EventCodeV6, 1> eventcodes() const = 0;
   virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
   virtual ndarray<EvrData::OutputMapV2, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;

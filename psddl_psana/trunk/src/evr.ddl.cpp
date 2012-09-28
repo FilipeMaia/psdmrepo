@@ -24,6 +24,13 @@ EventCodeV5::desc_shape() const {
   shape.push_back(DescSize);
   return shape;
 }
+std::vector<int>
+EventCodeV6::desc_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(DescSize);
+  return shape;
+}
 
 ConfigV1::~ConfigV1() {}
 
@@ -44,6 +51,9 @@ ConfigV5::~ConfigV5() {}
 
 
 ConfigV6::~ConfigV6() {}
+
+
+ConfigV7::~ConfigV7() {}
 
 
 DataV3::~DataV3() {}
