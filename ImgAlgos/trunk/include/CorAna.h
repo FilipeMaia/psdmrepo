@@ -58,12 +58,13 @@ namespace ImgAlgos {
  */
 
 struct TimeRecord {
-  unsigned    ind;
+  unsigned    evind;
   double      t_sec;
   double      dt_sec;
   std::string tstamp;
   unsigned    fiduc;
   unsigned    evnum;
+  unsigned    tind;
 };
 
 
@@ -86,6 +87,7 @@ protected:
   std::string  m_fname_com;
   std::string  m_fname_med;
   std::string  m_fname_time;
+  std::string  m_fname_time_ind;
   std::string  m_fname_tau;
   std::string  m_fname_tau_out;
   std::string  m_fname_result;
@@ -101,6 +103,12 @@ protected:
   unsigned     m_nimgs;
   std::string  m_file_type;
   std::string  m_data_type;
+  double       m_t_ave;   
+  double       m_t_rms;   
+  unsigned     m_tind_max;
+  unsigned     m_tind_size;
+
+  int*         m_tind_to_evind;
 
   std::vector<TimeRecord> v_time_records;
 

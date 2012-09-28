@@ -58,12 +58,8 @@ def do_main() :
 
 # 2)===========
     print '\n2) Run psana to split image for files:'
-    submit_job_for_splitter()
+#    submit_job_for_splitter()
     #submit_job_for_splitter_interactive()
-
-#---===========
-    sys.exit('TEST END')
-#---===========
 
 # 3)===========
     print '\n3) Check that all splitted files are produced:'
@@ -71,8 +67,14 @@ def do_main() :
 
 # 4)===========
     print '\n4) Submit job for time-correlation processing:'
-    submit_jobs_for_cor_proc()
+#    submit_jobs_for_cor_proc()
     #submit_jobs_for_cor_proc_interactive()
+
+
+#---===========
+#    sys.exit('TEST END')
+#---===========
+
 
 # 5)===========
     print '\n5) Check that all processed files are produced:'

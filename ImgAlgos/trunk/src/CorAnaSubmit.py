@@ -376,12 +376,13 @@ def one_batch_job_submit_and_wait (command_seq) :
     job_id, cp.status = batch_job_submit(command_seq), None
     #=====
     print 'Wait untill batch job is compleated...\n',
+    sleep_time = 5 # sleep time in sec
     counter=0
     while cp.status != 'DONE':
         counter+=1
-        time.sleep(5) # sleep time in sec 
+        time.sleep(sleep_time) # sleep time in sec 
         cp.status, cp.nodename = batch_job_status_and_nodename(job_id)
-        print 'Check status #', counter, job_id, cp.status, cp.nodename
+        print 'Check batch status in', counter*sleep_time,'sec after submission:', job_id, cp.status, cp.nodename
 
         if cp.status == 'EXIT':
             print 'Something is going wrong. Check the log file for this command sequence:\n', command_seq
@@ -437,21 +438,28 @@ def submit_jobs_for_cor_proc() :
 
     print 'Wait untill all splitted files processing is compleated...\n',
 
+    sleep_time = 10 # sleep time in sec
     cp.all_done = False
     counter=0
     while not cp.all_done :
         counter+=1
-        time.sleep(5) # sleep time in sec 
-        print 'Check status #', counter
+        time.sleep(sleep_time)
+        print 'Check batch status in', counter*sleep_time, 'sec after submission:'
         cp.all_done = True
         
         for ind,job_pars in d_jobs.items():
             job_id = job_pars[0]
             if job_pars[1] != 'DONE' :
                 job_pars[1],job_pars[2] = batch_job_status_and_nodename(job_id)
+
             print ind, job_pars
             if job_pars[1] != 'DONE' :
                 cp.all_done = False
+
+            if job_pars[1] == 'EXIT' :
+                logfn = cp.fname_com + '-b%04d'%(ind) + '-result-log.txt'
+                print '\nSomething is going wrong. Check the log file: ' + logfn
+                sys.exit('EXIT: Job IS NOT completed !!!')
 
     #sys.exit('TEST EXIT')
 

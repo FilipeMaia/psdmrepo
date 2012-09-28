@@ -355,7 +355,7 @@ ImgVsTimeSplitInFiles::saveTimeRecord(Event& evt)
     m_sumt2 += m_dt*m_dt;
   }
 
-  p_out_time << std::setw(6) << m_count 
+  p_out_time << std::setw(6) << m_count-1 // Save the event index starting from 0. 
              << fixed << std::setw(16) << std::setprecision(6) << m_tsec - m_tsec_0
              << fixed << std::setw(10) << std::setprecision(6) << m_dt
              << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f")
@@ -391,7 +391,10 @@ ImgVsTimeSplitInFiles::printSummary(Event& evt, std::string comment)
 }
 
 //--------------------
-
+// 1. read the time record from the file m_fname_time 
+// 2. from t_sec and m_t_ave evaluate the time index tind
+// 3. save the time record with time index in another file m_fname_time_ind.
+// - In CorAnaData this file is used to associate the time index with event index
 void  
 ImgVsTimeSplitInFiles::saveTimeRecordWithIndexInFile()
 {
@@ -401,7 +404,6 @@ ImgVsTimeSplitInFiles::saveTimeRecordWithIndexInFile()
 	              << "\n                             and save them with time-index in file: " << m_fname_time_ind );
  
   std::string s;
-
   unsigned    evind;
   double      t_sec;
   double      dt_sec;

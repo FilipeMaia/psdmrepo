@@ -75,7 +75,7 @@ CorAnaData::readDataFile()
 
   m_data = new data_t [m_blk_size * m_nimgs];
   //inf.seekg(0);
-  inf.read((char*)m_data, sizeof(unsigned) * m_blk_size * m_nimgs); 
+  inf.read((char*)m_data, sizeof(data_t) * m_blk_size * m_nimgs); 
 
   inf.close();
 }
@@ -151,17 +151,25 @@ CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between imag
   std::fill_n(m_sum_st, m_blk_size, unsigned(0));
   std::fill_n(m_res_g2, m_blk_size, cor_t(0));
 
-  for (unsigned i=0; i<m_nimgs-tau; i++) {
-       unsigned f=i+tau;
+  for (unsigned ti=0; ti<m_tind_size-tau; ti++) {
+       unsigned tf=ti+tau;
+       
+       // get the event index in array for time index
+       unsigned evi = m_tind_to_evind[ti];
+       unsigned evf = m_tind_to_evind[tf];
 
-       sumCorTau(i,f);
+       // If the event does not exist for specified time index -> skip it in sum
+       if(evi<0) continue;
+       if(evf<0) continue;
+
+       sumCorTau((unsigned)evi,(unsigned)evf);
   }
 }
 
 //----------------
 
 void
-CorAnaData::sumCorTau(unsigned i, unsigned f)
+CorAnaData::sumCorTau(unsigned i, unsigned f) // i and f are the event indexes
 {
   /*
     if ( i<5 

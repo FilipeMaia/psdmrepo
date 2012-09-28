@@ -72,6 +72,7 @@ CorAna::defineFileNames()
   m_fname_com        = m_fname.substr(0,posb);
   m_fname_med        = m_fname_com + "-med.txt";
   m_fname_time       = m_fname_com + "-time.txt"; 
+  m_fname_time_ind   = m_fname_com + "-time-ind.txt"; 
   m_fname_tau        = INPARS -> get_fname_tau(); 
   m_fname_tau_out    = m_fname_com + "-tau.txt";
   m_fname_result     = m_fname.substr(0,m_fname.rfind(".")) + "-result.bin";
@@ -89,6 +90,7 @@ CorAna::printFileNames()
   m_log << "Commmon part of the file name   : " << m_fname_com         << "\n";
   m_log << "Metadata file name              : " << m_fname_med         << "\n";
   m_log << "Image time records file name    : " << m_fname_time        << "\n";
+  m_log << "Time records with tindex fname  : " << m_fname_time_ind    << "\n";
   m_log << "Indexes of tau input file name  : " << m_fname_tau         << "\n";
   m_log << "Indexes of tau output file name : " << m_fname_tau_out     << "\n";
   m_log << "Resulting output file for block : " << m_fname_result      << "\n";
@@ -123,12 +125,16 @@ CorAna::readMetadataFile()
 	else if (key=="NUMBER_OF_IMGS")  inf >> m_nimgs;
         else if (key=="FILE_TYPE")       inf >> m_file_type;
         else if (key=="DATA_TYPE")       inf >> m_data_type;
+        else if (key=="TIME_SEC_AVE")    inf >> m_t_ave;
+        else if (key=="TIME_SEC_RMS")    inf >> m_t_rms;
+        else if (key=="TIME_INDEX_MAX") {inf >> m_tind_max; m_tind_size = m_tind_max+1;}
+
         else std::cout << "\nWARNING! The key: " << key
                        << " is not recognized in the metadata file: " << m_fname_med;
     }
     inf.close();
   }
-  else m_log << "CorAna::readMetadataFile(): Unable to open file: " << m_fname_med << "\n";  
+  else m_log << "CorAna::readMetadataFile(): Unable to open file: " << m_fname_med << "\n";
 }
 
 //----------------
@@ -146,6 +152,9 @@ CorAna::printMetadata()
             << "\nNUMBER_OF_IMGS  " << m_nimgs
             << "\nFILE_TYPE       " << m_file_type
             << "\nDATA_TYPE       " << m_data_type
+            << "\nTIME_SEC_AVE    " << m_t_ave    
+            << "\nTIME_SEC_RMS    " << m_t_rms    
+            << "\nTIME_INDEX_MAX  " << m_tind_max 
             << "\n";
 }
 //----------------
@@ -153,12 +162,15 @@ CorAna::printMetadata()
 void
 CorAna::readTimeRecordsFile()
 {
-  m_log << "\nCorAna::readTimeRecordsFile(): Read time records from file: " << m_fname_time << "\n";
+  m_log << "\nCorAna::readTimeRecordsFile(): Read time records from file: " << m_fname_time_ind << "\n";
+  
+  m_tind_to_evind = new int [m_tind_size];
+  std::fill_n(m_tind_to_evind, int(m_tind_size), int(-1));
 
   std::string s;
   TimeRecord tr;
 
-  std::ifstream inf(m_fname_time.c_str());
+  std::ifstream inf(m_fname_time_ind.c_str());
   if (inf.is_open())
   {
     while ( true )
@@ -166,12 +178,13 @@ CorAna::readTimeRecordsFile()
       getline (inf,s);
       if(!inf.good()) break;
       std::stringstream ss(s); 
-      ss >> tr.ind >> tr.t_sec >> tr.dt_sec >> tr.tstamp >> tr.fiduc >> tr.evnum;
+      ss >> tr.evind >> tr.t_sec >> tr.dt_sec >> tr.tstamp >> tr.fiduc >> tr.evnum >> tr.tind;
       v_time_records.push_back(tr);
+      m_tind_to_evind[tr.tind] = tr.evind; 
     }
     inf.close();
   }
-  else m_log << "CorAna::readTimeRecordsFile(): Unable to open file: " << m_fname_time << "\n";  
+  else m_log << "CorAna::readTimeRecordsFile(): Unable to open file: " << m_fname_time_ind << "\n";  
 }
 
 //----------------
@@ -179,7 +192,7 @@ CorAna::readTimeRecordsFile()
 void
 CorAna::printTimeRecords()
 {
-  m_log << "\nCorAna::printTimeRecords(): Time records from file: " << m_fname_time
+  m_log << "\nCorAna::printTimeRecords(): Time records from file: " << m_fname_time_ind
         << " size=" << v_time_records.size() << "\n";
   unsigned counter=0;
   for(std::vector<TimeRecord>::const_iterator it = v_time_records.begin(); 
@@ -190,12 +203,13 @@ CorAna::printTimeRecords()
       || (counter<1000 && counter%100 == 0)
       || counter%1000 == 0 
       || counter==v_time_records.size() ) 
-      m_log << " ind:"    << std::setw(4)                                        << it->ind
+      m_log << " evind:"  << std::setw(4)                                        << it->evind
             << " t_sec:"  << std::fixed << std::setw(15) << std::setprecision(3) << it->t_sec
             << " dt_sec:" << std::setw(6)                                        << it->dt_sec
             << " tstamp:"                                                        << it->tstamp
             << " fiduc:"  << std::setw(8)                                        << it->fiduc
             << " evnum:"  << std::setw(7)                                        << it->evnum
+            << " tind:"   << std::setw(9)                                        << it->tind
             << "\n";      
   }
   m_log << "\n";
@@ -224,11 +238,11 @@ CorAna::readIndTauFromFile()
   {
     m_log << "\nCorAna::readIndTauFromFile(): " << m_fname_tau  << "\n";
 
-    unsigned val;
+    unsigned itau;
     while ( inf.good() )
     {
-      inf >> val;
-      v_ind_tau.push_back(val);
+      inf >> itau;
+      v_ind_tau.push_back(itau);
     }
     inf.close();
     m_npoints_tau = v_ind_tau.size();
@@ -247,8 +261,8 @@ void
 CorAna::makeIndTau()
 {
   m_log << "\nCorAna::makeIndTau(): Make the list of tau indexes using standard algorithm.\n";
-  for(unsigned itau=1; itau<m_nimgs; itau++) {
-     if( itau<8 
+  for(unsigned itau=1; itau<m_tind_size; itau++) {
+     if(  itau<8 
       || (itau<16     && itau%2    == 0) 
       || (itau<32     && itau%4    == 0) 
       || (itau<64     && itau%8    == 0) 
@@ -256,7 +270,7 @@ CorAna::makeIndTau()
       || (itau<256    && itau%32   == 0) 
       || (itau<512    && itau%64   == 0) 
       || (itau<1024   && itau%128  == 0) 
-      ||                itau%256  == 0 ) v_ind_tau.push_back(itau);
+      ||                 itau%256  == 0) v_ind_tau.push_back(itau);
   }
   m_npoints_tau = v_ind_tau.size();
 }
