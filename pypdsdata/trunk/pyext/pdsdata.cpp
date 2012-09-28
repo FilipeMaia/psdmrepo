@@ -72,7 +72,9 @@
 #include "types/camera/TwoDGaussianV1.h"
 
 #include "types/control/ConfigV1.h"
+#include "types/control/ConfigV2.h"
 #include "types/control/PVControl.h"
+#include "types/control/PVLabel.h"
 #include "types/control/PVMonitor.h"
 
 #include "types/cspad/ConfigV1.h"
@@ -109,11 +111,13 @@
 #include "types/evr/ConfigV4.h"
 #include "types/evr/ConfigV5.h"
 #include "types/evr/ConfigV6.h"
+#include "types/evr/ConfigV7.h"
 #include "types/evr/DataV3.h"
 #include "types/evr/DataV3_FIFOEvent.h"
 #include "types/evr/EventCodeV3.h"
 #include "types/evr/EventCodeV4.h"
 #include "types/evr/EventCodeV5.h"
+#include "types/evr/EventCodeV6.h"
 #include "types/evr/IOChannel.h"
 #include "types/evr/IOConfigV1.h"
 #include "types/evr/OutputMap.h"
@@ -266,7 +270,9 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.control", 0, "The Python wrapper module for pdsdata/control" );
   pypdsdata::ControlData::ConfigV1::initType( module );
+  pypdsdata::ControlData::ConfigV2::initType( module );
   pypdsdata::ControlData::PVControl::initType( module );
+  pypdsdata::ControlData::PVLabel::initType( module );
   pypdsdata::ControlData::PVMonitor::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "control", module );
@@ -318,11 +324,13 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::EvrData::ConfigV4::initType( module );
   pypdsdata::EvrData::ConfigV5::initType( module );
   pypdsdata::EvrData::ConfigV6::initType( module );
+  pypdsdata::EvrData::ConfigV7::initType( module );
   pypdsdata::EvrData::DataV3::initType( module );
   pypdsdata::EvrData::DataV3_FIFOEvent::initType( module );
   pypdsdata::EvrData::EventCodeV3::initType( module );
   pypdsdata::EvrData::EventCodeV4::initType( module );
   pypdsdata::EvrData::EventCodeV5::initType( module );
+  pypdsdata::EvrData::EventCodeV6::initType( module );
   pypdsdata::EvrData::IOChannel::initType( module );
   pypdsdata::EvrData::IOConfigV1::initType( module );
   pypdsdata::EvrData::OutputMap::initType( module );

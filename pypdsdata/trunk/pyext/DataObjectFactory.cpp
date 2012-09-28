@@ -44,6 +44,7 @@
 #include "types/camera/TwoDGaussianV1.h"
 
 #include "types/control/ConfigV1.h"
+#include "types/control/ConfigV2.h"
 
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV2.h"
@@ -69,6 +70,7 @@
 #include "types/evr/ConfigV4.h"
 #include "types/evr/ConfigV5.h"
 #include "types/evr/ConfigV6.h"
+#include "types/evr/ConfigV7.h"
 #include "types/evr/DataV3.h"
 #include "types/evr/IOConfigV1.h"
 
@@ -204,6 +206,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV4, 4>(xtc, parent);
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV5, 5>(xtc, parent);
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV6, 6>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<EvrData::ConfigV7, 7>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TM6740Config :
@@ -213,6 +216,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_ControlConfig :
     if ( not obj ) obj = xtc2obj<ControlData::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<ControlData::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_pnCCDframe :
@@ -429,6 +433,18 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_QuartzConfig :
     if ( not obj ) obj = xtc2obj<Quartz::ConfigV1, 1>(xtc, parent);
     break ;
+
+  case Pds::TypeId::Id_CompressedFrame :
+    break;
+
+  case Pds::TypeId::Id_CompressedTimePixFrame :
+    break;
+
+  case Pds::TypeId::Id_AndorConfig :
+    break;
+
+  case Pds::TypeId::Id_AndorFrame :
+    break;
 
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum

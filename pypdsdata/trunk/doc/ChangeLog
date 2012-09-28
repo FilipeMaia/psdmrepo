@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-74
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- added new classes control.ConfigV2, evr.ConfigV7
+
 Tag: V00-00-73
 2012-09-11 Andy Salnikov
 - fix for very old bug, TimeStamp.vector actually returned ticks()

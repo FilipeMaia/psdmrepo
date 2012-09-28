@@ -279,7 +279,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_FliConfig, 55 )
         self.assertEqual ( TypeId.Type.Id_FliFrame, 56 )
         self.assertEqual ( TypeId.Type.Id_QuartzConfig, 57 )
-        self.assertEqual ( TypeId.Type.NumberOf, 58 )
+        self.assertEqual ( TypeId.Type.Id_CompressedFrame, 58 )
+        self.assertEqual ( TypeId.Type.Id_CompressedTimePixFrame, 59 )
+        self.assertEqual ( TypeId.Type.Id_AndorConfig, 60 )
+        self.assertEqual ( TypeId.Type.Id_AndorFrame, 61 )
+        self.assertEqual ( TypeId.Type.NumberOf, 62 )
 
         # instantiation
         TypeId ()
@@ -439,7 +443,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Opal8000, 22 )
         self.assertEqual ( DetInfo.Device.Fli, 23 )
         self.assertEqual ( DetInfo.Device.Quartz4A150, 24 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 25 )
+        self.assertEqual ( DetInfo.Device.Andor, 25 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 26 )
 
         
         o1 = DetInfo(0,0,0,0)

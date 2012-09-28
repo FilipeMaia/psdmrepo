@@ -92,6 +92,10 @@ namespace {
       { "Id_FliConfig",       Pds::TypeId::Id_FliConfig },
       { "Id_FliFrame",        Pds::TypeId::Id_FliFrame },
       { "Id_QuartzConfig",    Pds::TypeId::Id_QuartzConfig },
+      { "Id_CompressedFrame", Pds::TypeId::Id_CompressedFrame },
+      { "Id_CompressedTimePixFrame", Pds::TypeId::Id_CompressedTimePixFrame },
+      { "Id_AndorConfig",     Pds::TypeId::Id_AndorConfig },
+      { "Id_AndorFrame",      Pds::TypeId::Id_AndorFrame },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
