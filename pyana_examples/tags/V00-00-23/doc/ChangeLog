@@ -1,0 +1,109 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyana_examples
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-23
+2012-09-28 Andy Salnikov
+- update examples with new classes from pdsdata V04-01-00
+
+Tag: V00-00-21
+2012-06-22 Andy Salnikov
+- added dump_evr module
+
+Tag: V00-00-20
+2012-04-24 Andy Salnikov
+- added dump_epics module
+
+Tag: V00-00-19
+2012-03-27 Andy Salnikov
+- added dump_bld module
+
+Tag: V00-00-18
+2012-03-14 Andy Salnikov
+- dump_timepix: added extra info dumping for ConfigV2
+
+Tag: V00-00-17
+2012-02-15 Andy Salnikov
+- new module skip_stop_example
+
+Tag: V00-00-16
+2012-02-06 Andy Salnikov
+- rename  dump_cspad_mini to dump_cspad2x2
+- add cspad2x2.ConfigV1 dump to dump_cspad2x2
+
+2012-01-17 Ingrid Ofte
+- added two modules used for xpp tutorial: 
+	pyana_examples/src/xppt_image_analysis.py and 
+	pyana_examples/src/xppt_delayscan.py
+	
+Tag: V00-00-15
+2012-01-12 Andy Salnikov
+- adding dump_timepix module
+
+Tag: V00-00-14
+2011-11-11 Andy Salnikov
+- added three more dump_* modules, some of them are copies of 
+  myana_* modules
+- all these new methods use generic evt.get() method
+
+Tag: V00-00-13
+2011-09-13 Andy Salnikov
+- added new module dump_cspad_mini
+
+Tag: V00-00-12
+2011-08-22 Andy Salnikov
+- added new module dump_princenton
+
+Tag: V00-00-11
+2011-07-13 Andy Salnikov
+- replaced tabs in pyana_fccd_delay
+- added new module dump_shared_ipimb
+
+Tag: V00-00-10
+2011-07-07 Ingrid Ofte
+- added pyana_fccd_delay as example of time-resolved scan of images from FCCD 
+	
+Tag: V00-00-09
+2011-01-23 Andy Salnikov
+- added example for accessing EPICS data
+
+Tag: V00-00-08
+2010-10-14 Andy Salnikov
+- adding new example module myana_opal
+
+Tag: V00-00-07
+2010-10-14 Andy Salnikov
+- adding new example module myana_cspad
+
+Tag: V00-00-06
+2010-09-21 Andy Salnikov
+- added new example module myana_control_config and its config file
+
+Tag: V00-00-05
+2010-07-07 Andy Salnikov
+- pyana user modules now may have optional methods begincalibcycle and 
+  endcalibcycle
+- evt.get() can return None if data is missing or damaged, need to check
+  return value
+
+Tag: V00-00-04
+2010-05-13 Andy Salnikov
+- updated examples to get config objects from env instead of evt
+
+Tag: V00-00-02
+2010-04-14 Andy Salnikov
+- forgot to add SConscript and doc/ directory
+
+Tag: V00-00-01
+2010-04-14 Andy Salnikov
+- files from pyana/examples were moved into this new package
+- First import into repository
