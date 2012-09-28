@@ -32,6 +32,7 @@
 #include "pdsdata/evr/EventCodeV3.hh"
 #include "pdsdata/evr/EventCodeV4.hh"
 #include "pdsdata/evr/EventCodeV5.hh"
+#include "pdsdata/evr/EventCodeV6.hh"
 #include "pdsdata/evr/IOChannel.hh"
 #include "pdsdata/evr/OutputMap.hh"
 #include "pdsdata/evr/OutputMapV2.hh"
@@ -229,6 +230,38 @@ private:
   uint32_t  maskSet;
   uint32_t  maskClear;
   char*     desc;
+
+};
+
+//
+// Helper type for Pds::EvrData::EventCodeV6
+//
+class EvrEventCodeV6 : boost::noncopyable {
+public:
+
+  EvrEventCodeV6 ();
+  EvrEventCodeV6 ( const Pds::EvrData::EventCodeV6& evtcode ) ;
+  ~EvrEventCodeV6 ();
+
+  EvrEventCodeV6& operator= ( const Pds::EvrData::EventCodeV6& evtcode ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+
+  uint16_t  code;
+  uint8_t   isReadout;
+  uint8_t   isCommand;
+  uint8_t   isLatch;
+  uint32_t  reportDelay;
+  uint32_t  reportWidth;
+  uint32_t  releaseCode;
+  uint32_t  maskTrigger;
+  uint32_t  maskSet;
+  uint32_t  maskClear;
+  char*     desc;
+  uint16_t  readoutGroup;
 
 };
 

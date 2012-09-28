@@ -363,6 +363,88 @@ EvrEventCodeV5::native_type()
 }
 
 //
+// Helper type for Pds::EvrData::EventCodeV6
+//
+EvrEventCodeV6::EvrEventCodeV6 ()
+  : desc(0)
+{
+}
+
+EvrEventCodeV6::EvrEventCodeV6 ( const Pds::EvrData::EventCodeV6& evtcode )
+  : code(evtcode.code())
+  , isReadout(evtcode.isReadout())
+  , isCommand(evtcode.isCommand())
+  , isLatch(evtcode.isLatch())
+  , reportDelay(evtcode.reportDelay())
+  , reportWidth(evtcode.reportWidth())
+  , releaseCode(evtcode.releaseCode())
+  , maskTrigger(evtcode.maskTrigger())
+  , maskSet(evtcode.maskSet())
+  , maskClear(evtcode.maskClear())
+  , readoutGroup(evtcode.readoutGroup())
+{
+  const char* p = evtcode.desc();
+  int len = strlen(p)+1;
+  desc = new char[len];
+  std::copy(p, p+len, desc);
+}
+
+EvrEventCodeV6&
+EvrEventCodeV6::operator= ( const Pds::EvrData::EventCodeV6& evtcode )
+{
+  code = evtcode.code();
+  isReadout = evtcode.isReadout();
+  isCommand = evtcode.isCommand();
+  isLatch = evtcode.isLatch();
+  reportDelay = evtcode.reportDelay();
+  reportWidth = evtcode.reportWidth();
+  releaseCode = evtcode.releaseCode();
+  maskTrigger = evtcode.maskTrigger();
+  maskSet = evtcode.maskSet();
+  maskClear = evtcode.maskClear();
+  readoutGroup = evtcode.readoutGroup();
+
+  delete [] desc;
+  const char* p = evtcode.desc();
+  int len = strlen(p)+1;
+  desc = new char[len];
+  std::copy(p, p+len, desc);
+
+  return *this;
+}
+
+EvrEventCodeV6::~EvrEventCodeV6 ()
+{
+  delete [] desc;
+}
+
+hdf5pp::Type
+EvrEventCodeV6::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrEventCodeV6::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV6 >() ;
+  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV6,code) ) ;
+  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV6,isReadout) ) ;
+  type.insert_native<uint8_t>( "isCommand", offsetof(EvrEventCodeV6,isCommand) ) ;
+  type.insert_native<uint8_t>( "isLatch", offsetof(EvrEventCodeV6,isLatch) ) ;
+  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV6,reportDelay) ) ;
+  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV6,reportWidth) ) ;
+  type.insert_native<uint32_t>( "releaseCode", offsetof(EvrEventCodeV6,releaseCode) ) ;
+  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV6,maskTrigger) ) ;
+  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV6,maskSet) ) ;
+  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV6,maskClear) ) ;
+  type.insert_native<const char*>( "desc", offsetof(EvrEventCodeV6,desc) ) ;
+  type.insert_native<uint16_t>( "readoutGroup", offsetof(EvrEventCodeV6,readoutGroup) ) ;
+
+  return type ;
+}
+
+//
 // Helper type for Pds::EvrData::IOChannel
 //
 
