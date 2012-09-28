@@ -113,6 +113,27 @@ public:
   vector<int> desc_shape() const { return o->desc_shape(); }
 };
 
+class EventCodeV6_Wrapper {
+  shared_ptr<Psana::EvrData::EventCodeV6> _o;
+  Psana::EvrData::EventCodeV6* o;
+public:
+  EventCodeV6_Wrapper(shared_ptr<Psana::EvrData::EventCodeV6> obj) : _o(obj), o(_o.get()) {}
+  EventCodeV6_Wrapper(Psana::EvrData::EventCodeV6* obj) : o(obj) {}
+  uint16_t code() const { return o->code(); }
+  uint8_t isReadout() const { return o->isReadout(); }
+  uint8_t isCommand() const { return o->isCommand(); }
+  uint8_t isLatch() const { return o->isLatch(); }
+  uint32_t reportDelay() const { return o->reportDelay(); }
+  uint32_t reportWidth() const { return o->reportWidth(); }
+  uint32_t maskTrigger() const { return o->maskTrigger(); }
+  uint32_t maskSet() const { return o->maskSet(); }
+  uint32_t maskClear() const { return o->maskClear(); }
+  const char* desc() const { return o->desc(); }
+  uint16_t readoutGroup() const { return o->readoutGroup(); }
+  uint32_t _sizeof() const { return o->_sizeof(); }
+  vector<int> desc_shape() const { return o->desc_shape(); }
+};
+
 class OutputMap_Wrapper {
   shared_ptr<Psana::EvrData::OutputMap> _o;
   Psana::EvrData::OutputMap* o;
@@ -263,6 +284,23 @@ public:
   const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper(const_cast<Psana::EvrData::SequencerConfigV1*>(&o->seq_config())); }
 };
 
+class ConfigV7_Wrapper {
+  shared_ptr<Psana::EvrData::ConfigV7> _o;
+  Psana::EvrData::ConfigV7* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrConfig };
+  enum { Version = 7 };
+  ConfigV7_Wrapper(shared_ptr<Psana::EvrData::ConfigV7> obj) : _o(obj), o(_o.get()) {}
+  ConfigV7_Wrapper(Psana::EvrData::ConfigV7* obj) : o(obj) {}
+  uint32_t neventcodes() const { return o->neventcodes(); }
+  uint32_t npulses() const { return o->npulses(); }
+  uint32_t noutputs() const { return o->noutputs(); }
+  vector<Psana::EvrData::EventCodeV6> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV6); }
+  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
+  vector<Psana::EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMapV2); }
+  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper(const_cast<Psana::EvrData::SequencerConfigV1*>(&o->seq_config())); }
+};
+
 class FIFOEvent_Wrapper {
   shared_ptr<Psana::EvrData::FIFOEvent> _o;
   Psana::EvrData::FIFOEvent* o;
@@ -360,6 +398,16 @@ public:
     object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<Psana::EvrData::EventCodeV5> result = evt.get(source, key, foundSrc);
       return result.get() ? object(EventCodeV5_Wrapper(result)) : object();
+    }
+  };
+
+  class EventCodeV6_Getter : public psddl_python::EventGetter {
+  public:
+  const char* getTypeName() { return "Psana::EvrData::EventCodeV6";}
+  const char* getGetterClassName() { return "psddl_python::EventGetter";}
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
+      shared_ptr<Psana::EvrData::EventCodeV6> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(EventCodeV6_Wrapper(result)) : object();
     }
   };
 
@@ -478,6 +526,19 @@ public:
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<Psana::EvrData::ConfigV6> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV6_Wrapper(result)) : object();
+    }
+  };
+
+  class ConfigV7_Getter : public psddl_python::EnvObjectStoreGetter {
+  public:
+  const char* getTypeName() { return "Psana::EvrData::ConfigV7";}
+  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
+    int getVersion() {
+      return Psana::EvrData::ConfigV7::Version;
+    }
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<Psana::EvrData::ConfigV7> result = store.get(source, foundSrc);
+      return result.get() ? object(ConfigV7_Wrapper(result)) : object();
     }
   };
 

@@ -41,6 +41,19 @@ void createWrappers() {
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("name", &n::name)\
+    .def("value", &n::value)\
+    .def("_sizeof", &n::_sizeof)\
+
+  _CLASS(Psana::ControlData::PVLabel, return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::ControlData::PVLabel_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::ControlData::PVLabel);
+  std_vector_class_(PVLabel_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(PVLabel);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("events", &n::events)\
     .def("uses_duration", &n::uses_duration)\
     .def("uses_events", &n::uses_events)\
@@ -54,6 +67,24 @@ void createWrappers() {
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("events", &n::events)\
+    .def("uses_duration", &n::uses_duration)\
+    .def("uses_events", &n::uses_events)\
+    .def("duration", &n::duration, policy)\
+    .def("npvControls", &n::npvControls)\
+    .def("npvMonitors", &n::npvMonitors)\
+    .def("npvLabels", &n::npvLabels)\
+    .def("pvControls", &n::pvControls)\
+    .def("pvMonitors", &n::pvMonitors)\
+    .def("pvLabels", &n::pvLabels)\
+
+  _CLASS(psddl_python::ControlData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
+#undef _CLASS
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
 
 
 } // createWrappers()

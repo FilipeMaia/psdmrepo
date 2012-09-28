@@ -113,6 +113,29 @@ void createWrappers() {
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("code", &n::code)\
+    .def("isReadout", &n::isReadout)\
+    .def("isCommand", &n::isCommand)\
+    .def("isLatch", &n::isLatch)\
+    .def("reportDelay", &n::reportDelay)\
+    .def("reportWidth", &n::reportWidth)\
+    .def("maskTrigger", &n::maskTrigger)\
+    .def("maskSet", &n::maskSet)\
+    .def("maskClear", &n::maskClear)\
+    .def("desc", &n::desc)\
+    .def("readoutGroup", &n::readoutGroup)\
+    .def("_sizeof", &n::_sizeof)\
+    .def("desc_shape", &n::desc_shape)\
+
+  _CLASS(Psana::EvrData::EventCodeV6, return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::EvrData::EventCodeV6_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(Psana::EvrData::EventCodeV6);
+  std_vector_class_(EventCodeV6_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(EventCodeV6);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("value", &n::value)\
     .def("source", &n::source)\
     .def("source_id", &n::source_id)\
@@ -254,6 +277,21 @@ void createWrappers() {
   std_vector_class_(ConfigV6_Wrapper);
 #undef _CLASS
   ADD_ENV_OBJECT_STORE_GETTER(ConfigV6);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("neventcodes", &n::neventcodes)\
+    .def("npulses", &n::npulses)\
+    .def("noutputs", &n::noutputs)\
+    .def("eventcodes", &n::eventcodes)\
+    .def("pulses", &n::pulses)\
+    .def("output_maps", &n::output_maps)\
+    .def("seq_config", &n::seq_config, policy)\
+
+  _CLASS(psddl_python::EvrData::ConfigV7_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV7_Wrapper);
+#undef _CLASS
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV7);
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
