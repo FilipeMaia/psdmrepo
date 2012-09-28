@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-75
+2012-09-28 Andy Salnikov
+- added label formatting to method control.ConfigV2.__repr__
+
 Tag: V00-00-74
 2012-09-28 Andy Salnikov
 - upgrading to pdsdata V04-01-00

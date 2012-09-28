@@ -174,6 +174,15 @@ _repr( PyObject *self )
     str << "]";
     comma = ", ";
   }
+  if (pdsObj->npvLabels()) {
+    str << comma << "labels=[";
+    for (unsigned i = 0; i != pdsObj->npvLabels(); ++ i ) {
+      if (i != 0) str << ", ";
+      str << pdsObj->pvLabel(i).name() << ": " << pdsObj->pvLabel(i).value();
+    }
+    str << "]";
+    comma = ", ";
+  }
   str << ")";
   return PyString_FromString( str.str().c_str() );
 }
