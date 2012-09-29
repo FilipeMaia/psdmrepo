@@ -55,7 +55,7 @@ namespace ImgAlgos {
 class CorAnaMergeFiles : public CorAna {
 public:
 
-  typedef uint16_t data_t;
+  typedef double hist_t;
 
   CorAnaMergeFiles () ;
   virtual ~CorAnaMergeFiles () ;
@@ -66,10 +66,24 @@ protected:
   void mergeFiles();
 
   void readCorFile();
+  unsigned getBinInImg(unsigned pix);
+  void fillHistogram();
+  void saveHistogramInFile();
 
 private:
 
   cor_t*         m_cor;    // array for correlation results for test
+
+  unsigned*      m_sum0;
+  double*        m_sum1;
+  hist_t*        m_hist;
+  unsigned       m_hsize;
+  unsigned       m_nbins;  // Staff for test binning...
+  unsigned       m_row_c;  // image center for binning in rings...
+  unsigned       m_col_c;  // ... 
+  double         m_radmax;
+  double         m_radbin;
+
   TimeInterval*  m_timer1;
 
   std::ifstream* p_inp;    // pointer to input array of input files 

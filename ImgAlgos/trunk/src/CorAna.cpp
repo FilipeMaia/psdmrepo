@@ -77,6 +77,7 @@ CorAna::defineFileNames()
   m_fname_tau_out    = m_fname_com + "-tau.txt";
   m_fname_result     = m_fname.substr(0,m_fname.rfind(".")) + "-result.bin";
   m_fname_result_img = m_fname_com + "-image-result.bin";
+  m_fname_hist       = m_fname_com + "-hist.txt";
   m_file_num_str     = m_fname.substr(posb+1,5); // cut something like: "b0000"
 }
 
@@ -93,9 +94,9 @@ CorAna::printFileNames()
   m_log << "Time records with tindex fname  : " << m_fname_time_ind    << "\n";
   m_log << "Indexes of tau input file name  : " << m_fname_tau         << "\n";
   m_log << "Indexes of tau output file name : " << m_fname_tau_out     << "\n";
-  m_log << "Resulting output file for block : " << m_fname_result      << "\n";
   m_log << "Resulting output file name      : " << m_fname_result      << "\n";
   m_log << "Resulting output file for image : " << m_fname_result_img  << "\n";
+  m_log << "Resulting output file for hist  : " << m_fname_hist        << "\n";
   m_log << "Sting with file number          : " << m_file_num_str      << "\n";
   m_log << "sizeof(cor_t)                   : " << sizeof(cor_t)       << "\n";
 }
