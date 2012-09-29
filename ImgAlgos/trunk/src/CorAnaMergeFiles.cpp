@@ -206,6 +206,9 @@ CorAnaMergeFiles::saveHistogramInFile()
   std::ofstream out(m_fname_hist.c_str());
 
   for(unsigned itau=0; itau<m_npoints_tau; itau++) {
+
+    out << std::setw(8) << v_ind_tau[itau];
+
     for(unsigned bin=0; bin<m_nbins; bin++) 
       out << std::fixed << std::setw(12) << std::setprecision(6) << 100*m_hist[m_nbins * itau + bin];
     out << " \n";
