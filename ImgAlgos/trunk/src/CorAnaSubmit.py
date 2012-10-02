@@ -54,13 +54,13 @@ cp = cap.coranapars
 
 def input_option_parser() :
 
-    def_fname_cfg   = 'ana-misc-exp/psana-xcsi0112-r0015-img-auto-correlation.cfg'
+    def_fname_cfg   = 'ImgAlgos/data/psana-xcsi0112-r0015-img-auto-correlation.cfg' # 'ana-misc-exp/
     def_fname_xtc   = '/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc'
-    def_fname_tau   = None 
+    def_fname_tau   = None           # 'my-tau.txt'
     def_cmd_split   = 'psana'
-    def_cmd_proc    = '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
-    def_cmd_merge   = '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
-    def_batch_queue = 'psfehq' # for XCS, CXI, and MEC;    Or: 'psnehq' for AMO, SXR, XPP
+    def_cmd_proc    = 'corana'       # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
+    def_cmd_merge   = 'corana_merge' # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
+    def_batch_queue = 'psfehq'       # for XCS, CXI, and MEC;    Or: 'psnehq' for AMO, SXR, XPP
 
     parser = OptionParser(description='Process optional input parameters.', usage = "usage: %prog [options] <xtc-file-name>")
     parser.add_option('-c', '--fname_cfg',   dest='fname_cfg',  default=def_fname_cfg,   action='store', type='string', help='psana config file name')
@@ -168,12 +168,13 @@ def print_all_files_in_dir(dirname) :
 
 #--------------------
 
-def print_list_of_files_in_dir(dirname, fname) :
-    print 'print_list_of_files_in_dir(): ' + fname
-    print 'in the directory: ' + dirname
-    for fname in get_list_of_files_in_dir(dirname) :
-        if cp.fname_com in fname :
-            print fname    
+def print_list_of_files_in_dir(dirname, path_or_fname) :
+    dname, fname = os.path.split(path_or_fname)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
+    print 'print_list_of_files_in_dir():  directory:' + dirname + '  fname:' + fname
+
+    for fname_in_dir in get_list_of_files_in_dir(dirname) :
+        if fname in fname_in_dir :
+            print fname_in_dir    
     print '\n'
 
 #--------------------
@@ -304,10 +305,13 @@ def check_list_of_files(trailer) :
     print 'check_list_of_files(trailer): for trailer: ' + trailer
     print 'in the directory: ' + cp.dname_work
     list_of_files = get_list_of_files_in_dir(cp.dname_work)
+    #print 'list_of_files =', list_of_files
     
     for f in range (cp.nfiles_out) :
-        fname = cp.fname_com + '-b%04d'%(f) + trailer
-        print fname,        
+        path = cp.fname_com + '-b%04d'%(f) + trailer
+        dname, fname = os.path.split(path)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
+        print path,        
+
         if fname in list_of_files :
             print '- is found'
         else :

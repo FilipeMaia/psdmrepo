@@ -1,4 +1,7 @@
 //===================
+// The main module for merging the g2 for image parts into g2 for entire image
+//    g2(tau) = <I(t)*I(t+tau)> / (<I(t)> * <I(t+tau)>)
+//
 
 #include "ImgAlgos/CorAnaInputParameters.h"
 #include "ImgAlgos/CorAnaMergeFiles.h"
