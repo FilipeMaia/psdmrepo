@@ -80,7 +80,25 @@ def do_main() :
     #submit_job_for_merging_interactive()
 
 # 7)===========
-    print '\n7) List all created files:'
+    print '\n7) Check that merged file is produced:'
+    check_the_file('-image-result.bin')
+
+# 8)===========
+    print '\n8) Submit job for test processing of the file with results:'
+    submit_job_for_proc_results()
+    #submit_job_for_proc_results_interactive()
+
+# 9)===========
+    print '\n9) List all created files:'
+    print_list_of_files_in_dir(cp.dname_work, cp.fname_com)
+
+# 10)===========
+    print '\n10) Clean work files in the work directory:'
+    remove_file_for_tail(['-time.txt', '-split-log.txt', '-image-result-log.txt', '-proc-results-log.txt'])
+    remove_split_files()
+
+# 11)===========
+    print '\n11) List of preserved files:'
     print_list_of_files_in_dir(cp.dname_work, cp.fname_com)
 
 #---===========

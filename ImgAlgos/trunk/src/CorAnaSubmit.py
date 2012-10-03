@@ -56,11 +56,12 @@ def input_option_parser() :
 
     def_fname_cfg   = 'ImgAlgos/data/psana-xcsi0112-r0015-img-auto-correlation.cfg' # 'ana-misc-exp/
     def_fname_xtc   = '/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc'
-    def_fname_tau   = None           # 'my-tau.txt'
+    def_fname_tau   = None             # 'my-tau.txt'
     def_cmd_split   = 'psana'
-    def_cmd_proc    = 'corana'       # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
-    def_cmd_merge   = 'corana_merge' # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
-    def_batch_queue = 'psfehq'       # for XCS, CXI, and MEC;    Or: 'psnehq' for AMO, SXR, XPP
+    def_cmd_proc    = 'corana'         # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
+    def_cmd_merge   = 'corana_merge'   # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
+    def_cmd_procres = 'corana_procres' # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_procres'
+    def_batch_queue = 'psfehq'         # for XCS, CXI, and MEC;    Or: 'psnehq' for AMO, SXR, XPP
 
     parser = OptionParser(description='Process optional input parameters.', usage = "usage: %prog [options] <xtc-file-name>")
     parser.add_option('-c', '--fname_cfg',   dest='fname_cfg',  default=def_fname_cfg,   action='store', type='string', help='psana config file name')
@@ -69,6 +70,7 @@ def input_option_parser() :
     parser.add_option('-s', '--cmd_split',   dest='cmd_split',  default=def_cmd_split,   action='store', type='string', help='process for split (psana)')
     parser.add_option('-p', '--cmd_proc',    dest='cmd_proc',   default=def_cmd_proc,    action='store', type='string', help='process for auto-corr (corana)')
     parser.add_option('-m', '--cmd_merge',   dest='cmd_merge',  default=def_cmd_merge,   action='store', type='string', help='process for merging (corana_merge)')
+    parser.add_option('-r', '--cmd_procres', dest='cmd_procres',default=def_cmd_procres, action='store', type='string', help='process results for auto-corr (corana_procres)')
     parser.add_option('-q', '--batch_queue', dest='batch_queue',default=def_batch_queue, action='store', type='string', help='queue name for batch')
 
     #parser.add_option('-n', '--cols', dest='cols', default=100, action='store', type='int', help='number of columns in the image array')
@@ -101,6 +103,7 @@ def init_pars() :
     cmd_split   = opts.cmd_split  
     cmd_proc    = opts.cmd_proc   
     cmd_merge   = opts.cmd_merge  
+    cmd_procres = opts.cmd_procres   
     batch_queue = opts.batch_queue
 
     if args != [] : fname_xtc = args[0]
@@ -112,6 +115,7 @@ def init_pars() :
     print 'cmd_split       :', cmd_split  
     print 'cmd_proc        :', cmd_proc   
     print 'cmd_merge       :', cmd_merge  
+    print 'cmd_procres     :', cmd_procres   
     print 'batch_queue     :', batch_queue
 
 # 1-2) parse path to XTC file
@@ -146,7 +150,7 @@ def init_pars() :
 # 1-5) save all parameters in a singleton object coranapars = CorAnaPars()
     print '\n1-5) Save all parameters in a singleton object "coranapars"'
     cp = cap.coranapars
-    cp.set_default_pars(cmd_split, cmd_proc, cmd_merge, batch_queue, pwdir)
+    cp.set_default_pars(cmd_split, cmd_proc, cmd_merge, cmd_procres, batch_queue, pwdir)
     cp.set_input_pars(fname_cfg, fname_xtc, fname_tau)
     cp.set_path_pars(dname, name, ext)
     cp.set_xtc_name_pars(instrument, experiment, run_str, run_num)
@@ -301,6 +305,24 @@ def split_string(str,separator='-s') :
 
 #--------------------
 
+def check_the_file(trailer) :
+    print 'check_the_file(trailer): for trailer: ' + trailer
+    print 'in the directory: ' + cp.dname_work
+    list_of_files = get_list_of_files_in_dir(cp.dname_work)
+    #print 'list_of_files =', list_of_files
+    
+    path = cp.fname_com + trailer
+    dname, fname = os.path.split(path)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
+    print path,        
+
+    if fname in list_of_files :
+        print '- is found'
+    else :
+        print '- is NOT FOUND !!!'
+        sys.exit('Files with splitted image are not produced successfully... Job is terminated.')
+
+#--------------------
+
 def check_list_of_files(trailer) :
     print 'check_list_of_files(trailer): for trailer: ' + trailer
     print 'in the directory: ' + cp.dname_work
@@ -318,6 +340,29 @@ def check_list_of_files(trailer) :
             print '- is NOT FOUND !!!'
             sys.exit('Files with splitted image are not produced successfully... Job is terminated.')
 
+#--------------------
+
+def remove_file(path) :
+    print 'remove file: ' + path
+    p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
+    p.wait() # short time waiting untill submission is done, 
+
+#--------------------
+
+def remove_file_for_tail(list_of_tails) :
+    for tail in list_of_tails :
+        fname = cp.fname_com + tail
+        remove_file(fname)
+
+#--------------------
+
+def remove_split_files() :
+    for f in range (cp.nfiles_out) :
+        path_com = cp.fname_com + '-b%04d'%(f)
+        remove_file(path_com + '.bin')
+        remove_file(path_com + '-result.bin')
+        remove_file(path_com + '-result-log.txt')
+        
 #--------------------
 
 def print_subproc_attributes(proc):
@@ -395,7 +440,7 @@ def one_batch_job_submit_and_wait (command_seq) :
 #--------------------
 
 def submit_jobs_for_cor_proc_interactive() :
-    cmd_base = cp.cmd_proc # './build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
+    cmd_base = cp.cmd_proc # 'corana'
     print '-cmd_base:\n', cmd_base + ' -f <fname_data> [-t <fname_tau>] [-l <logfile>]'
 
     for f in range (cp.nfiles_out) :
@@ -416,9 +461,9 @@ def submit_jobs_for_cor_proc_interactive() :
 #--------------------
 
 def submit_jobs_for_cor_proc() :
-    cmd_base = cp.cmd_proc # './build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
+    cmd_base = cp.cmd_proc # 'corana'
 
-    #bcmd = "bsub -q psfehq -o ~/LCLS/PSANA-V01/log.txt '~/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana -f img-xcs-r0015-b0001.bin'"
+    #bcmd = "bsub -q psfehq -o ~/LCLS/PSANA-V01/log.txt 'corana -f img-xcs-r0015-b0001.bin'"
     #print 'command should be like that:\n', bcmd
 
     print 'Command stub:', cmd_base + ' -f <fname_data> [-t <fname_tau>] [-l <logfile>]'
@@ -501,7 +546,7 @@ def submit_job_for_splitter() :
 #--------------------
 
 def submit_job_for_merging_interactive() :
-    cmd_base = cp.cmd_merge # './build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
+    cmd_base = cp.cmd_merge # 'corana_merge'
     print 'cmd_base:\n', cmd_base + ' -f <fname_data> [-t <fname_tau>]'
     fname = cp.fname_com + '-b0000-result.bin'
     cmd = cmd_base + ' -f ' + fname
@@ -519,7 +564,7 @@ def submit_job_for_merging_interactive() :
 #--------------------
 
 def submit_job_for_merging() :
-    cmd_base = cp.cmd_merge # './build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
+    cmd_base = cp.cmd_merge # 'corana_merge'
     #print 'cmd_base:\n', cmd_base + ' -f <fname_data> [-t <fname_tau>]'
     logfn = cp.fname_com + '-image-result-log.txt'
     fname = cp.fname_com + '-b0000-result.bin'
@@ -529,6 +574,38 @@ def submit_job_for_merging() :
 
     one_batch_job_submit_and_wait(['bsub', '-q', cp.batch_queue, '-o', logfn, cmd])
     print 'Merging is completed.'
+
+#--------------------
+
+def submit_job_for_proc_results_interactive() :
+    cmd_base = cp.cmd_procres # 'corana_procres'
+    print 'cmd_base:\n', cmd_base + ' -f <fname_data> [-t <fname_tau>]'
+    fname = cp.fname_com + '-b0000-result.bin'
+    cmd = cmd_base + ' -f ' + fname
+    if cp.fname_tau is not None : cmd += ' -t ' + cp.fname_tau
+    print cmd
+    print '  Wait untill test processing of results is compleated...\n',
+    status, log =0, 'DEFAULT LOGFILE FOR TEST PROCESSING OF RESULTS - THIS IS A TEST MODE !!!\nTHE getstatusoutput(cmd) IS COMMENTED OUT !!!'
+    #=====
+    status, log = commands.getstatusoutput(cmd)
+    #=====
+    if status != 0 : 
+       print 'Test processing of results job status: ', status
+       sys.exit('Job test processing of results  is completed with non-zero status... Job is terminated.')
+
+#--------------------
+
+def submit_job_for_proc_results() :
+    cmd_base = cp.cmd_procres # 'corana_procres'
+    #print 'cmd_base:\n', cmd_base + ' -f <fname_data> [-t <fname_tau>]'
+    logfn = cp.fname_com + '-proc-results-log.txt'
+    fname = cp.fname_com + '-b0000-result.bin'
+    cmd  = 'cd ' + cp.pwdir + '; '
+    cmd += cmd_base + ' -f ' + fname
+    if cp.fname_tau is not None : cmd += ' -t ' + cp.fname_tau
+
+    one_batch_job_submit_and_wait(['bsub', '-q', cp.batch_queue, '-o', logfn, cmd])
+    print 'Test processing of results is completed.'
 
 #--------------------
 

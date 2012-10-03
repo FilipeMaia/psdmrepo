@@ -51,6 +51,7 @@ class CorAnaPars :
     cmd_split    = None # 'psana'
     cmd_proc     = None # 'corana'
     cmd_merge    = None # 'corana_merge'
+    cmd_procres  = None # 'corana_procres'
     batch_queue  = None # 'psnehq'
     pwdir        = None # echo $PWD
 
@@ -75,10 +76,11 @@ class CorAnaPars :
         print """__init__"""
         pass
 
-    def set_default_pars(self, cmd_split, cmd_proc, cmd_merge, batch_queue, pwdir) :
+    def set_default_pars(self, cmd_split, cmd_proc, cmd_merge, cmd_procres, batch_queue, pwdir) :
         self.cmd_split   = cmd_split
         self.cmd_proc    = cmd_proc
         self.cmd_merge   = cmd_merge
+        self.cmd_procres = cmd_procres
         self.batch_queue = batch_queue
         self.pwdir       = pwdir
 
@@ -123,6 +125,7 @@ class CorAnaPars :
         print 'cmd_split        :', self.cmd_split  
         print 'cmd_proc         :', self.cmd_proc   
         print 'cmd_merge        :', self.cmd_merge  
+        print 'cmd_procres      :', self.cmd_procres  
         print 'batch_queue      :', self.batch_queue
         print 'pwdir            :', self.pwdir
         print '                 :', 

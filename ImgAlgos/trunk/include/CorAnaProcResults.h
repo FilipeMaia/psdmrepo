@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_CORANAMERGEFILES_H
-#define IMGALGOS_CORANAMERGEFILES_H
+#ifndef IMGALGOS_CORANAPROCRESULTS_H
+#define IMGALGOS_CORANAPROCRESULTS_H
 
 //---------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CorAnaMergeFiles.
+//	Class CorAnaProcResults.
 //
 //---------------------------------
 
@@ -52,31 +52,45 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CorAnaMergeFiles : public CorAna {
+class CorAnaProcResults : public CorAna {
 public:
 
   typedef double hist_t;
 
-  CorAnaMergeFiles () ;
-  virtual ~CorAnaMergeFiles () ;
+  CorAnaProcResults () ;
+  virtual ~CorAnaProcResults () ;
 
 protected:
-  void openFiles();
-  void closeFiles();
-  void mergeFiles();
+
+  void readCorFile();
+  unsigned getBinInImg(unsigned pix);
+  void fillHistogram();
+  void saveHistogramInFile();
 
 private:
 
+  cor_t*         m_cor;    // array for correlation results for test
+
+  unsigned*      m_sum0;
+  double*        m_sum1;
+  hist_t*        m_hist;
+  unsigned       m_hsize;
+  unsigned       m_nbins;  // Staff for test binning...
+  unsigned       m_row_c;  // image center for binning in rings...
+  unsigned       m_col_c;  // ... 
+  double         m_radmax;
+  double         m_radbin;
+
   TimeInterval*  m_timer1;
 
-  std::ifstream* p_inp;    // pointer to input array of input files 
-  std::ofstream  p_out;    // pointer to output file 
+  //std::ifstream* p_inp;    // pointer to input array of input files 
+  //std::ofstream  p_out;    // pointer to output file 
 
   // Copy constructor and assignment are disabled by default
-  CorAnaMergeFiles ( const CorAnaMergeFiles& ) ;
-  CorAnaMergeFiles& operator = ( const CorAnaMergeFiles& ) ;
+  CorAnaProcResults ( const CorAnaProcResults& ) ;
+  CorAnaProcResults& operator = ( const CorAnaProcResults& ) ;
 };
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_CORANAMERGEFILES_H
+#endif // IMGALGOS_CORANAPROCRESULTS_H
