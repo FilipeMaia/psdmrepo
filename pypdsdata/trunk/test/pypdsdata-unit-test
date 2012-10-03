@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
 import unittest
 
 #---------------------------------
@@ -706,6 +707,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
     def test_XtcFileIterator(self):
         """ Test for XtcFileIterator class """
 
+        if not os.path.exists(_data): return 
+
         try :
             f = file(_data)
         except :
@@ -769,6 +772,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
                 return [ visit(x,op) for x in xtc ]
             else :
                 return op(xtc)
+
+        if not os.path.exists(_data): return 
 
         try :
             f = file(_data)
