@@ -1,0 +1,39 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana_python
+#------------------------------------------------------------------------
+
+Package author: Joseph S. Barrera III
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-03
+2012-10-03 Andy Salnikov
+- move unittest for python module here from psana package
+- run unit test only if input test file is present
+
+Tag: V00-01-02
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- regenerate devicetypes.py thing from psddldata V00-03-08
+
+Tag: V00-01-01
+2012-09-24 Andy Salnikov
+- rearrange includes to get rid of compilation warnings (Python.h
+  has to be included first)
+
+Tag: V00-01-00
+2012-09-11 Andy Salnikov
+- moved pyext directory (which makes _psana python module) here from 
+  psana package
+- psddl_python stuff is now in psddl_python namespace, all references 
+  here updated
+
+2012-07-10	jbarrera	V00-00-02
+	- Fixes for Epics variables
+
+2012-07-08	jbarrera	Tag V00-00-01.           Initial working version
