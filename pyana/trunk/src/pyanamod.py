@@ -35,6 +35,7 @@ import logging
 import multiprocessing as mp
 from resource import *
 import gc
+import traceback
 
 #---------------------------------
 #  Imports of base class module --
@@ -343,6 +344,7 @@ def _pyana ( argv ) :
         
         # might mean communication with sub-processes error, stop here
         logging.error("exception caught: %s", exc)
+        traceback.print_exc()
         status = exc.errno
 
     # wait for all processes
