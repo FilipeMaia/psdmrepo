@@ -55,10 +55,10 @@ public:
   /** geometric transformation of the image */
   Opal1k::ConfigV1::Mirroring output_mirroring() const { return Mirroring((this->_outputOptions>>8) & 0xf); }
   /** 1: remap the pixels to appear in natural geometric order 
-	                  (left->right, top->bottom);
-	            0: pixels appear on dual taps from different rows
-	                  (left->right, top->bottom) alternated with
-	                  (left->right, bottom->top) pixel by pixel */
+                      (left->right, top->bottom);
+                0: pixels appear on dual taps from different rows
+                      (left->right, top->bottom) alternated with
+                      (left->right, bottom->top) pixel by pixel */
   uint8_t vertical_remapping() const { return uint8_t((this->_outputOptions>>12) & 0x1); }
   /** correct defective pixels internally */
   uint8_t defect_pixel_correction_enabled() const { return uint8_t((this->_outputOptions>>13) & 0x1); }

@@ -460,16 +460,16 @@ public:
   int16_t* data = (int16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV1& cfg) const;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV2& cfg) const;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV3& cfg) const;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV4& cfg) const;
   /** Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
@@ -580,13 +580,13 @@ public:
   int16_t* data = (int16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV2& cfg) const;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV3& cfg) const;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   uint32_t sectionMask(const CsPad::ConfigV4& cfg) const;
   /** Common mode value for a given section, section number can be 0 to config.numSect().
                 Will return 0 for data read from XTC, may be non-zero after calibration. */

@@ -17,7 +17,7 @@ namespace Bld {
 /** @class BldDataFEEGasDetEnergy
 
   Four energy measurements from Front End Enclosure Gas Detector.
-	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
+               PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
 */
 
 #pragma pack(push,4)
@@ -330,6 +330,58 @@ private:
   Pulnix::TM6740ConfigV2	_camConfig;
   Lusi::PimImageConfigV1	_pimConfig;
   Camera::FrameV1	_frame;
+};
+#pragma pack(pop)
+
+/** @class BldDataGMDV0
+
+  Gas Monitor Detector data.
+*/
+
+#pragma pack(push,4)
+
+class BldDataGMDV0 {
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  /** String describing gas type */
+  const char* gasType() const { return _strGasType; }
+  /** Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
+  double pressure() const { return _fPressure; }
+  /** Temp from PT100, SXR:GMD:RTD:40:RAW_AI */
+  double temperature() const { return _fTemperature; }
+  /** Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading */
+  double current() const { return _fCurrent; }
+  /** HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure */
+  int32_t hvMeshElectron() const { return _iHvMeshElectron; }
+  /** HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  int32_t hvMeshIon() const { return _iHvMeshIon; }
+  /** HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  int32_t hvMultIon() const { return _iHvMultIon; }
+  /** Charge Q, SXR:GMD:IMD:Charge_Q */
+  double chargeQ() const { return _fChargeQ; }
+  /** Photon Energy, SIOC:SYS0:ML00:AO627 */
+  double photonEnergy() const { return _fPhotonEnergy; }
+  /** Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
+  double photonsPerPulse() const { return _fPhotonsPerPulse; }
+  static uint32_t _sizeof()  { return (((((((((((((((0+(1*(32)))+8)+8)+8)+4)+4)+4)+8)+8)+8)+8)+8)+8)+8)+8)+8; }
+private:
+  char	_strGasType[32];	/**< String describing gas type */
+  double	_fPressure;	/**< Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
+  double	_fTemperature;	/**< Temp from PT100, SXR:GMD:RTD:40:RAW_AI */
+  double	_fCurrent;	/**< Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading */
+  int32_t	_iHvMeshElectron;	/**< HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure */
+  int32_t	_iHvMeshIon;	/**< HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  int32_t	_iHvMultIon;	/**< HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  double	_fChargeQ;	/**< Charge Q, SXR:GMD:IMD:Charge_Q */
+  double	_fPhotonEnergy;	/**< Photon Energy, SIOC:SYS0:ML00:AO627 */
+  double	_fPhotonsPerPulse;	/**< Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
+  double	_fSpare1;
+  double	_fSpare2;
+  double	_fSpare3;
+  double	_fSpare4;
+  double	_fSpare5;
+  double	_fSpare6;
 };
 #pragma pack(pop)
 } // namespace Bld
