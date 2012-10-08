@@ -16,6 +16,11 @@ Tag: V00-01-02
 - upgrading to pdsdata V04-01-00
 - regenerate whole thing from psddldata V00-03-08
 
+Tag: V00-01-03
+2012-10-08 Andy Salnikov
+- upgrading to pdsdata V04-02-01
+- regenerate whole thing from psddldata V00-03-09
+
 Tag: V00-01-01
 2012-09-24 Andy Salnikov
 - rearrange includes to get rid of the compilation warnings

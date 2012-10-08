@@ -151,6 +151,24 @@ void createWrappers() {
   ADD_EVENT_GETTER(BldDataPimV1);
 
 
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("gasType", &n::gasType)\
+    .def("pressure", &n::pressure)\
+    .def("temperature", &n::temperature)\
+    .def("current", &n::current)\
+    .def("hvMeshElectron", &n::hvMeshElectron)\
+    .def("hvMeshIon", &n::hvMeshIon)\
+    .def("hvMultIon", &n::hvMultIon)\
+    .def("chargeQ", &n::chargeQ)\
+    .def("photonEnergy", &n::photonEnergy)\
+    .def("photonsPerPulse", &n::photonsPerPulse)\
+
+  _CLASS(psddl_python::Bld::BldDataGMDV0_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(BldDataGMDV0_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(BldDataGMDV0);
+
+
 } // createWrappers()
 } // namespace Bld
 } // namespace psddl_python

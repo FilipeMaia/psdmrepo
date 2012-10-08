@@ -175,6 +175,26 @@ public:
   const Camera::FrameV1_Wrapper frame() const { return Camera::FrameV1_Wrapper(const_cast<Psana::Camera::FrameV1*>(&o->frame())); }
 };
 
+class BldDataGMDV0_Wrapper {
+  shared_ptr<Psana::Bld::BldDataGMDV0> _o;
+  Psana::Bld::BldDataGMDV0* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD };
+  enum { Version = 1 };
+  BldDataGMDV0_Wrapper(shared_ptr<Psana::Bld::BldDataGMDV0> obj) : _o(obj), o(_o.get()) {}
+  BldDataGMDV0_Wrapper(Psana::Bld::BldDataGMDV0* obj) : o(obj) {}
+  const char* gasType() const { return o->gasType(); }
+  double pressure() const { return o->pressure(); }
+  double temperature() const { return o->temperature(); }
+  double current() const { return o->current(); }
+  int32_t hvMeshElectron() const { return o->hvMeshElectron(); }
+  int32_t hvMeshIon() const { return o->hvMeshIon(); }
+  int32_t hvMultIon() const { return o->hvMultIon(); }
+  double chargeQ() const { return o->chargeQ(); }
+  double photonEnergy() const { return o->photonEnergy(); }
+  double photonsPerPulse() const { return o->photonsPerPulse(); }
+};
+
   class BldDataFEEGasDetEnergy_Getter : public psddl_python::EventGetter {
   public:
   const char* getTypeName() { return "Psana::Bld::BldDataFEEGasDetEnergy";}
@@ -289,6 +309,19 @@ public:
     object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<Psana::Bld::BldDataPimV1> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataPimV1_Wrapper(result)) : object();
+    }
+  };
+
+  class BldDataGMDV0_Getter : public psddl_python::EventGetter {
+  public:
+  const char* getTypeName() { return "Psana::Bld::BldDataGMDV0";}
+  const char* getGetterClassName() { return "psddl_python::EventGetter";}
+    int getVersion() {
+      return Psana::Bld::BldDataGMDV0::Version;
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
+      shared_ptr<Psana::Bld::BldDataGMDV0> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(BldDataGMDV0_Wrapper(result)) : object();
     }
   };
 } // namespace Bld
