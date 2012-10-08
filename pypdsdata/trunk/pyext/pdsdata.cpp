@@ -61,6 +61,7 @@
 #include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataEBeamV3.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
+#include "types/bld/BldDataGMDV0.h"
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
@@ -174,6 +175,9 @@
 #include "types/timepix/DataV1.h"
 #include "types/timepix/DataV2.h"
 
+#include "types/usdusb/ConfigV1.h"
+#include "types/usdusb/DataV1.h"
+
 #define PDSDATA_IMPORT_ARRAY
 #include "pdsdata_numpy.h"
 
@@ -253,6 +257,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::BldDataEBeamV2::initType( module );
   pypdsdata::BldDataEBeamV3::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
+  pypdsdata::BldDataGMDV0::initType( module );
   pypdsdata::BldDataIpimbV0::initType( module );
   pypdsdata::BldDataIpimbV1::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
@@ -424,6 +429,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Timepix::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "timepix", module );
+
+  module = Py_InitModule3( "_pdsdata.usdusb", 0, "The Python wrapper module for pdsdata/usdusb" );
+  pypdsdata::UsdUsb::ConfigV1::initType( module );
+  pypdsdata::UsdUsb::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "usdusb", module );
 
   module = Py_InitModule3( "_pdsdata.io", 0, "The Python module for several I/O related classes" );
   pypdsdata::XtcFilter::initType( module );

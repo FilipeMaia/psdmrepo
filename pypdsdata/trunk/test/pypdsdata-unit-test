@@ -280,11 +280,18 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_FliConfig, 55 )
         self.assertEqual ( TypeId.Type.Id_FliFrame, 56 )
         self.assertEqual ( TypeId.Type.Id_QuartzConfig, 57 )
-        self.assertEqual ( TypeId.Type.Id_CompressedFrame, 58 )
-        self.assertEqual ( TypeId.Type.Id_CompressedTimePixFrame, 59 )
+        # Reserved enums are not exposed
+        #self.assertEqual ( TypeId.Type.Reserved1, 58 )
+        #self.assertEqual ( TypeId.Type.Reserved2, 59 )
         self.assertEqual ( TypeId.Type.Id_AndorConfig, 60 )
         self.assertEqual ( TypeId.Type.Id_AndorFrame, 61 )
-        self.assertEqual ( TypeId.Type.NumberOf, 62 )
+        self.assertEqual ( TypeId.Type.Id_UsdUsbData, 62 )
+        self.assertEqual ( TypeId.Type.Id_UsdUsbConfig, 63 )
+        self.assertEqual ( TypeId.Type.Id_GMD, 64 )
+        self.assertEqual ( TypeId.Type.NumberOf, 65 )
+
+        # chec compressed bitmask
+        self.assertEqual ( TypeId.VCompressed, 0x8000 )
 
         # instantiation
         TypeId ()
@@ -292,6 +299,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         TypeId ( TypeId.Type.Any, 1 )
         TypeId ( TypeId.Type.Any, 100 )
         TypeId ( TypeId.Type.Id_Epics, 0 )
+        TypeId ( TypeId.Type.Id_TimepixData, 1, True )
 
         # out of range, type error
         self.assertRaises( TypeError, lambda : TypeId( TypeId.Type.NumberOf ) )
@@ -320,7 +328,38 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( str(TypeId()), "Any" )
         self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc)), "Xtc" )
         self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc,1)), "Xtc_V1" )
-        
+
+        # check values
+        typeId = TypeId ()
+        self.assertEqual ( typeId.id(), TypeId.Type.Any )
+        self.assertEqual ( typeId.version(), 0 )
+        self.assertEqual ( typeId.compressed(), False )
+        self.assertEqual ( typeId.compressed_version(), 0 )
+
+        typeId = TypeId ( TypeId.Type.Id_TimepixData )
+        self.assertEqual ( typeId.id(), TypeId.Type.Id_TimepixData )
+        self.assertEqual ( typeId.version(), 0 )
+        self.assertEqual ( typeId.compressed(), False )
+        self.assertEqual ( typeId.compressed_version(), 0 )
+
+        typeId = TypeId ( TypeId.Type.Id_TimepixData, 1 )
+        self.assertEqual ( typeId.id(), TypeId.Type.Id_TimepixData )
+        self.assertEqual ( typeId.version(), 1 )
+        self.assertEqual ( typeId.compressed(), False )
+        self.assertEqual ( typeId.compressed_version(), 1 )
+
+        typeId = TypeId ( TypeId.Type.Id_TimepixData, 1, False )
+        self.assertEqual ( typeId.id(), TypeId.Type.Id_TimepixData )
+        self.assertEqual ( typeId.version(), 1 )
+        self.assertEqual ( typeId.compressed(), False )
+        self.assertEqual ( typeId.compressed_version(), 1 )
+
+        typeId = TypeId ( TypeId.Type.Id_TimepixData, 1, True )
+        self.assertEqual ( typeId.id(), TypeId.Type.Id_TimepixData )
+        self.assertEqual ( typeId.version(), TypeId.VCompressed | 1 )
+        self.assertEqual ( typeId.compressed(), True )
+        self.assertEqual ( typeId.compressed_version(), 1 )
+
         
     def test_TimeStamp(self):
         """ Test for TimeStamp class """
@@ -445,7 +484,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Fli, 23 )
         self.assertEqual ( DetInfo.Device.Quartz4A150, 24 )
         self.assertEqual ( DetInfo.Device.Andor, 25 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 26 )
+        self.assertEqual ( DetInfo.Device.USDUSB, 26 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 27 )
 
         
         o1 = DetInfo(0,0,0,0)
@@ -574,7 +614,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.MecXt2Ipm02, 23 )
         self.assertEqual ( BldInfo.Type.MecXt2Ipm03, 24 )
         self.assertEqual ( BldInfo.Type.MecHxmIpm01, 25 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 26 )
+        self.assertEqual ( BldInfo.Type.GMD, 26 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 27 )
 
         o1 = BldInfo(0,0)
         

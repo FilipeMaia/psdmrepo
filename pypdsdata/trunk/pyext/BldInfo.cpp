@@ -60,6 +60,7 @@ namespace {
         { "MecXt2Ipm02",     Pds::BldInfo::MecXt2Ipm02 },
         { "MecXt2Ipm03",     Pds::BldInfo::MecXt2Ipm03 },
         { "MecHxmIpm01",     Pds::BldInfo::MecHxmIpm01 },
+        { "GMD",             Pds::BldInfo::GMD },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };

@@ -92,10 +92,11 @@ namespace {
       { "Id_FliConfig",       Pds::TypeId::Id_FliConfig },
       { "Id_FliFrame",        Pds::TypeId::Id_FliFrame },
       { "Id_QuartzConfig",    Pds::TypeId::Id_QuartzConfig },
-      { "Id_CompressedFrame", Pds::TypeId::Id_CompressedFrame },
-      { "Id_CompressedTimePixFrame", Pds::TypeId::Id_CompressedTimePixFrame },
       { "Id_AndorConfig",     Pds::TypeId::Id_AndorConfig },
       { "Id_AndorFrame",      Pds::TypeId::Id_AndorFrame },
+      { "Id_UsdUsbData",      Pds::TypeId::Id_UsdUsbData },
+      { "Id_UsdUsbConfig",    Pds::TypeId::Id_UsdUsbConfig },
+      { "Id_GMD",             Pds::TypeId::Id_GMD },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
@@ -112,21 +113,26 @@ namespace {
   FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, value);
   ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, id, typeEnum);
   FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, version);
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, compressed);
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::TypeId, compressed_version);
 
   PyMethodDef methods[] = {
     { "value",    value,   METH_NOARGS, "self.value() -> int\n\nReturns the whole type ID number including version" },
     { "id",       id,      METH_NOARGS, "self.id() -> Type\n\nReturns the type ID number without version (:py:class:`Type`)" },
     { "version",  version, METH_NOARGS, "self.version() -> int\n\nReturns the type ID version number" },
+    { "compressed", compressed, METH_NOARGS, "self.compressed() -> bool\n\nReturns true if the object is compressed" },
+    { "compressed_version", compressed_version, METH_NOARGS, "self.compressed_version() -> int\n\nReturns the type ID version number excluding compressed bits" },
     {0, 0, 0, 0}
    };
 
   char typedoc[] = "Python class wrapping C++ Pds::TypeId class.\n\n"
       "This class inherits from a int type, the instances of this class\n"
       "are regular numbers with some additional niceties: repr() and str()\n"
-      "functions witll print string representaion of the enum values.\n"
+      "functions will print string representaion of the enum values.\n"
       "Class defines several attributes which correspond to the C++ enum values.\n\n"
-      "Class constructor takes teo optional positional arguments - type id and\n"
-      "version number. If missing the values are initialized with 0.";
+      "Class constructor takes three optional positional arguments - type id,\n"
+      "version number, and compressed flag. If missing the values are initialized \n"
+      "with 0.";
 
 }
 
@@ -147,9 +153,11 @@ pypdsdata::TypeId::initType( PyObject* module )
   type->tp_repr = TypeId_repr;
 
   // define class attributes for enums
-  PyObject* tp_dict = PyDict_New();
-  PyDict_SetItemString( tp_dict, "Type", typeEnum.type() );
-  type->tp_dict = tp_dict;
+  type->tp_dict = PyDict_New();
+  PyDict_SetItemString( type->tp_dict, "Type", typeEnum.type() );
+  PyObject* val = PyInt_FromLong(Pds::TypeId::VCompressed);
+  PyDict_SetItemString( type->tp_dict, "VCompressed", val );
+  Py_XDECREF(val);
 
   BaseType::initType( "TypeId", module );
 }
@@ -169,14 +177,15 @@ TypeId_init(PyObject* self, PyObject* args, PyObject* kwds)
   // parse arguments
   unsigned val = Pds::TypeId::Any;
   unsigned version = 0;
-  if ( not PyArg_ParseTuple( args, "|II:TypeId", &val, &version ) ) return -1;
+  int compressed = 0;
+  if ( not PyArg_ParseTuple( args, "|IIi:TypeId", &val, &version, &compressed ) ) return -1;
 
   if ( val >= Pds::TypeId::NumberOf ) {
     PyErr_SetString(PyExc_TypeError, "Error: TypeId out of range");
     return -1;
   }
 
-  new(&py_this->m_obj) Pds::TypeId( Pds::TypeId::Type(val), version );
+  new(&py_this->m_obj) Pds::TypeId( Pds::TypeId::Type(val), version, compressed );
 
   return 0;
 }

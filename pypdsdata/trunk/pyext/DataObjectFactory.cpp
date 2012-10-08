@@ -29,11 +29,12 @@
 #include "types/acqiris/TdcConfigV1.h"
 #include "types/acqiris/TdcDataV1.h"
 
-#include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataEBeamV3.h"
+#include "types/bld/BldDataFEEGasDetEnergy.h"
+#include "types/bld/BldDataGMDV0.h"
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
@@ -120,6 +121,9 @@
 #include "types/timepix/ConfigV2.h"
 #include "types/timepix/DataV1.h"
 #include "types/timepix/DataV2.h"
+
+#include "types/usdusb/ConfigV1.h"
+#include "types/usdusb/DataV1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -434,16 +438,28 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<Quartz::ConfigV1, 1>(xtc, parent);
     break ;
 
-  case Pds::TypeId::Id_CompressedFrame :
+  case Pds::TypeId::Reserved1 :
     break;
 
-  case Pds::TypeId::Id_CompressedTimePixFrame :
+  case Pds::TypeId::Reserved2 :
     break;
 
   case Pds::TypeId::Id_AndorConfig :
     break;
 
   case Pds::TypeId::Id_AndorFrame :
+    break;
+
+  case Pds::TypeId::Id_UsdUsbData :
+    if ( not obj ) obj = xtc2obj<UsdUsb::DataV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_UsdUsbConfig :
+    if ( not obj ) obj = xtc2obj<UsdUsb::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_GMD :
+    if ( not obj ) obj = xtc2obj<BldDataGMDV0, 0>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

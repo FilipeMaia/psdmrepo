@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-77
+2012-10-08 Andy Salnikov
+- upgrading to pdsdata V04-02-01
+- added new classes bld.BldDataGMDV0, usdusb.ConfigV1, usdusb.DataV1
+
 Tag: V00-00-76
 2012-10-03 Andy Salnikov
 - skip unit tests that need input file if file is not there
