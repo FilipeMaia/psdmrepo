@@ -30,6 +30,7 @@
 #include "H5DataTypes/BldDataEBeamV2.h"
 #include "H5DataTypes/BldDataEBeamV3.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
+#include "H5DataTypes/BldDataGMDV0.h"
 #include "H5DataTypes/BldDataIpimbV0.h"
 #include "H5DataTypes/BldDataIpimbV1.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
@@ -85,6 +86,8 @@
 #include "H5DataTypes/QuartzConfigV1.h"
 #include "H5DataTypes/TimepixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV2.h"
+#include "H5DataTypes/UsdUsbConfigV1.h"
+#include "H5DataTypes/UsdUsbDataV1.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
 #include "O2OTranslator/AcqirisTdcDataV1Cvt.h"
 #include "O2OTranslator/CameraFrameV1Cvt.h"
@@ -146,6 +149,11 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
 {
   // instantiate all factories
   DataTypeCvtPtr converter ;
+
+
+  //
+  //  ========================== Converters for config types ===============================
+  //
 
   ::registerConfigCvt<H5DataTypes::AcqirisConfigV1>(m_cvtMap, "Acqiris::ConfigV1", Pds::TypeId::Id_AcqConfig, 1);
 
@@ -211,7 +219,9 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
 
   ::registerConfigCvt<H5DataTypes::FliConfigV1>(m_cvtMap, "Fli::ConfigV1", Pds::TypeId::Id_FliConfig, 1);
 
-  ::registerConfigCvt<H5DataTypes::QuartzConfigV1>(m_cvtMap, "Quartz::ConfigV1", Pds::TypeId::Id_QuartzConfig,1);
+  ::registerConfigCvt<H5DataTypes::QuartzConfigV1>(m_cvtMap, "Quartz::ConfigV1", Pds::TypeId::Id_QuartzConfig, 1);
+
+  ::registerConfigCvt<H5DataTypes::UsdUsbConfigV1>(m_cvtMap, "UsdUsb::ConfigV1", Pds::TypeId::Id_UsdUsbConfig, 1);
 
   // special converter object for CsPad calibration data
   converter.reset(new CsPadCalibV1Cvt("CsPad::CalibV1", metadata, calibStore));
@@ -225,6 +235,12 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   // some cspad2x2 data was produced without Cspad2x2Config object but
   // with CspadConfig/3 instead
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, 3, converter);
+
+
+  //
+  //    ===================================  Converters for regular data ======================================
+  //
+
 
   hsize_t chunk_size = 16*1024*1024 ;
 
@@ -278,6 +294,11 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
       "Bld::BldDataPimV1", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_SharedPim, 1, converter);
 
+  // version for this type is 0
+  converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::BldDataGMDV0> >(
+      "Bld::BldDataGMDV0", chunk_size, compression);
+  ::registerCvt(m_cvtMap, Pds::TypeId::Id_GMD, 0, converter);
+
   // version for this type is 1
   converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::EncoderDataV1> >(
       "Encoder::DataV1", chunk_size, compression);
@@ -297,6 +318,11 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::IpimbDataV2> >(
       "Ipimb::DataV2", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_IpimbData, 2, converter);
+
+  // version for this type is 1
+  converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::UsdUsbDataV1> >(
+      "UsdUsb::DataV1", chunk_size, compression);
+  ::registerCvt(m_cvtMap, Pds::TypeId::Id_UsdUsbData, 1, converter);
 
   // special converter for CameraFrame type
   converter = make_shared<CameraFrameV1Cvt>("Camera::FrameV1", chunk_size, compression);
