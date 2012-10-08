@@ -1,5 +1,5 @@
-#ifndef H5DATATYPES_BldDataEBeamV3_H
-#define H5DATATYPES_BldDataEBeamV3_H
+#ifndef H5DATATYPES_BLDDATAEBEAMV3_H
+#define H5DATATYPES_BLDDATAEBEAMV3_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
@@ -67,4 +67,4 @@ private:
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_BldDataEBeamV3_H
+#endif // H5DATATYPES_BLDDATAEBEAMV3_H
