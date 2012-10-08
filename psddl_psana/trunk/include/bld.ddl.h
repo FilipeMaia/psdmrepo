@@ -16,7 +16,7 @@ namespace Bld {
 /** @class BldDataFEEGasDetEnergy
 
   Four energy measurements from Front End Enclosure Gas Detector.
-	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
+               PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
 */
 
 #pragma pack(push,4)
@@ -313,6 +313,39 @@ public:
   virtual const Pulnix::TM6740ConfigV2& camConfig() const = 0;
   virtual const Lusi::PimImageConfigV1& pimConfig() const = 0;
   virtual const Camera::FrameV1& frame() const = 0;
+};
+
+/** @class BldDataGMDV0
+
+  Gas Monitor Detector data.
+*/
+
+
+class BldDataGMDV0 {
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~BldDataGMDV0();
+  /** String describing gas type */
+  virtual const char* gasType() const = 0;
+  /** Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
+  virtual double pressure() const = 0;
+  /** Temp from PT100, SXR:GMD:RTD:40:RAW_AI */
+  virtual double temperature() const = 0;
+  /** Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading */
+  virtual double current() const = 0;
+  /** HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure */
+  virtual int32_t hvMeshElectron() const = 0;
+  /** HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  virtual int32_t hvMeshIon() const = 0;
+  /** HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
+  virtual int32_t hvMultIon() const = 0;
+  /** Charge Q, SXR:GMD:IMD:Charge_Q */
+  virtual double chargeQ() const = 0;
+  /** Photon Energy, SIOC:SYS0:ML00:AO627 */
+  virtual double photonEnergy() const = 0;
+  /** Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
+  virtual double photonsPerPulse() const = 0;
 };
 } // namespace Bld
 } // namespace Psana

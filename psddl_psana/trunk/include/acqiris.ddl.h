@@ -428,7 +428,7 @@ class TdcDataV1_Item {
 public:
 
   /** Enum for types of data objects. Comm means data object has TdcDataV1Common
-	          type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel. */
+              type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel. */
   enum Source {
     Comm,
     Chan1,

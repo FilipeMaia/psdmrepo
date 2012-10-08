@@ -345,7 +345,7 @@ public:
   virtual uint32_t frame_type() const = 0;
   virtual ndarray<int16_t, 3> data() const = 0;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const = 0;
   /** Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
@@ -403,7 +403,7 @@ public:
   virtual uint32_t frame_type() const = 0;
   virtual ndarray<int16_t, 3> data() const = 0;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active. */
+                total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const = 0;
   /** Common mode value for a given section, section number can be 0 to config.numSect().
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
