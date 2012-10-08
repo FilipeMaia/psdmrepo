@@ -2,28 +2,28 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Acqiris">
-	
-	   Package containing all data classes produced by Acqiris devices.
-	   
-	
-		<pstype name="VertV1" version="1" pack="4">
-		
-	       	Class containing Acqiris configuration data for vertical axis.
-		
-		    <tag name="value-type"/>
-		
-		    <enum name="Coupling">
-		    
-		      Coupling modes
-		    
-		      <enum-const name="GND" />
-		      <enum-const name="DC" />
-		      <enum-const name="AC" />
-		      <enum-const name="DC50ohm" />
-		      <enum-const name="AC50ohm" />
-		    </enum>
-		
+    <package name="Acqiris">
+    
+       Package containing all data classes produced by Acqiris devices.
+       
+    
+        <pstype name="VertV1" version="1" pack="4">
+        
+               Class containing Acqiris configuration data for vertical axis.
+        
+            <tag name="value-type"/>
+        
+            <enum name="Coupling">
+            
+              Coupling modes
+            
+              <enum-const name="GND" />
+              <enum-const name="DC" />
+              <enum-const name="AC" />
+              <enum-const name="DC50ohm" />
+              <enum-const name="AC50ohm" />
+            </enum>
+        
             <enum name="Bandwidth">
               <enum-const name="None" />
               <enum-const name="MHz25" />
@@ -32,13 +32,13 @@
               <enum-const name="MHz20" />
               <enum-const name="MHz35" />
             </enum>
-		
+        
             <attribute name="_fullScale" type="double" accessor="fullScale">
             Full vertical scale.
             </attribute>
 
             <attribute name="_offset" type="double" accessor="offset">
-	        Offset value.
+            Offset value.
             </attribute>
 
             <attribute name="_coupling" type="uint32_t" accessor="coupling">
@@ -64,14 +64,14 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="HorizV1" version="1" pack="4">
-		
-		    Class containing Acqiris configuration data for horizontal axis.
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="HorizV1" version="1" pack="4">
+        
+            Class containing Acqiris configuration data for horizontal axis.
+        
             <tag name="value-type"/>
         
             <attribute name="_sampInterval" type="double" accessor="sampInterval">
@@ -100,14 +100,14 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
+        </pstype>
+        
         <!-- ========================================================================= -->
 
-		<pstype name="TrigV1" version="1" pack="4">
-		
-		    Class containing Acqiris configuration data for triggering.
-		
+        <pstype name="TrigV1" version="1" pack="4">
+        
+            Class containing Acqiris configuration data for triggering.
+        
             <tag name="value-type"/>
         
             <enum name="Source">
@@ -159,17 +159,17 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
+        </pstype>
+        
         <!-- ========================================================================= -->
 
         <pstype name="ConfigV1" version="1" type_id="Id_AcqConfig" pack="4" levels="Source">
         
             Class containing all Acqiris configuration data.
 
-			<tag name="config-type"/>
-		
-		
+            <tag name="config-type"/>
+        
+        
             <const name="MaxChan" value="20">
             Maximum number of the configured channels.
             </const>
@@ -527,8 +527,8 @@
         
             Class with complete Acqiris TDC configuration. 
 
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <const name="NChannels" value="8">
             Total number of channel configurations.
             </const>
@@ -559,18 +559,18 @@
 
             <tag name="value-type"/>
         
-	        <enum name="Source">
-	          Enum for types of data objects. Comm means data object has TdcDataV1Common
-	          type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel.
-	          <enum-const name="Comm" />
-	          <enum-const name="Chan1" />
-	          <enum-const name="Chan2" />
-	          <enum-const name="Chan3" />
-	          <enum-const name="Chan4" />
-	          <enum-const name="Chan5" />
-	          <enum-const name="Chan6" />
-	          <enum-const name="AuxIO" />
-	        </enum>
+            <enum name="Source">
+              Enum for types of data objects. Comm means data object has TdcDataV1Common
+              type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel.
+              <enum-const name="Comm" />
+              <enum-const name="Chan1" />
+              <enum-const name="Chan2" />
+              <enum-const name="Chan3" />
+              <enum-const name="Chan4" />
+              <enum-const name="Chan5" />
+              <enum-const name="Chan6" />
+              <enum-const name="AuxIO" />
+            </enum>
 
             <attribute name="_value" type="uint32_t" accessor="value">
             
@@ -685,5 +685,5 @@
 
         </pstype>
 
-	</package>
+    </package>
 </psddl>

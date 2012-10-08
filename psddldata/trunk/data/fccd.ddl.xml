@@ -2,17 +2,17 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="FCCD">
+    <package name="FCCD">
 
     Package containing definitions for Fast CCD Camera (FCCD) data types.
 
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="FccdConfigV1" version="1" type_id="Id_FccdConfig">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="FccdConfigV1" version="1" type_id="Id_FccdConfig">
+        
+            <tag name="config-type"/>
+        
             <enum name="Depth">
                 <enum-const name="Sixteen_bit" value="16" />
             </enum>
@@ -50,12 +50,12 @@
         
         
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="FccdConfigV2" version="2" type_id="Id_FccdConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="FccdConfigV2" version="2" type_id="Id_FccdConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <enum name="Depth">
                 <enum-const name="Eight_bit" value="8" />
                 <enum-const name="Sixteen_bit" value="16" />
@@ -115,5 +115,5 @@
         
         
         
-	</package>
+    </package>
 </psddl>

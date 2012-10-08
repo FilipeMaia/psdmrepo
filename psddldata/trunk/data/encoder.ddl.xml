@@ -2,33 +2,33 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Encoder">
+    <package name="Encoder">
 
         Package containing definitions for Encoder data types.
 
 
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_EncoderConfig">
-		
-			<tag name="config-type"/>
-		
-		    <enum name="count_mode_type">
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_EncoderConfig">
+        
+            <tag name="config-type"/>
+        
+            <enum name="count_mode_type">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
                 <enum-const name="HALT"/>
                 <enum-const name="WRAP_PRESET"/>
                 <enum-const name="COUNT_END"/>
             </enum>
-		
-		    <enum name="quad_mode">
+        
+            <enum name="quad_mode">
                 <enum-const name="CLOCK_DIR"/>
                 <enum-const name="X1"/>
                 <enum-const name="X2"/>
                 <enum-const name="X4"/>
                 <enum-const name="QUAD_END"/>
             </enum>
-		
+        
             <attribute name="_chan_num" type="uint32_t" accessor="chan_num">
             </attribute>
 
@@ -49,28 +49,28 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV2" version="2" type_id="Id_EncoderConfig">
-		
-			<tag name="config-type"/>
-		
-		    <enum name="count_mode_type">
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV2" version="2" type_id="Id_EncoderConfig">
+        
+            <tag name="config-type"/>
+        
+            <enum name="count_mode_type">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
                 <enum-const name="HALT"/>
                 <enum-const name="WRAP_PRESET"/>
                 <enum-const name="COUNT_END"/>
             </enum>
-		
-		    <enum name="quad_mode">
+        
+            <enum name="quad_mode">
                 <enum-const name="CLOCK_DIR"/>
                 <enum-const name="X1"/>
                 <enum-const name="X2"/>
                 <enum-const name="X4"/>
                 <enum-const name="QUAD_END"/>
             </enum>
-		
+        
             <attribute name="_chan_mask" type="uint32_t" accessor="chan_mask">
             </attribute>
 
@@ -92,9 +92,9 @@
         </pstype>
         
         <!-- ========================================================================= -->
-		
+        
         <pstype name="DataV1" version="1" type_id="Id_EncoderData">
-		
+        
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
 
@@ -109,13 +109,13 @@
         </pstype>
         
         <!-- ========================================================================= -->
-		
+        
         <pstype name="DataV2" version="2" type_id="Id_EncoderData">
-		
+        
             <const name="NEncoders" value="3">
             Number of encoders.
             </const>
-		
+        
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
 
@@ -131,5 +131,5 @@
 
         </pstype>
         
-	</package>
+    </package>
 </psddl>

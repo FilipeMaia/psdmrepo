@@ -5,17 +5,17 @@
 
     <use file="psddldata/camera.ddl.xml" />
 
-	<package name="Opal1k">
+    <package name="Opal1k">
 
     Package containing definitions for Opal Camera data types.
 
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_Opal1kConfig">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_Opal1kConfig">
+        
+            <tag name="config-type"/>
+        
             <enum name="Depth">
             Image bit depth modes.
                 <enum-const name="Eight_bit" />
@@ -73,11 +73,11 @@
                 </bitfield>
                 
                 <bitfield name="_bf_vremap" size="1" type="uint8_t" accessor="vertical_remapping">
-	            1: remap the pixels to appear in natural geometric order 
-	                  (left->right, top->bottom);
-	            0: pixels appear on dual taps from different rows
-	                  (left->right, top->bottom) alternated with
-	                  (left->right, bottom->top) pixel by pixel
+                1: remap the pixels to appear in natural geometric order 
+                      (left->right, top->bottom);
+                0: pixels appear on dual taps from different rows
+                      (left->right, top->bottom) alternated with
+                      (left->right, bottom->top) pixel by pixel
                 </bitfield>
                 
                 <bitfield name="_bf_corr" size="1" type="uint8_t" accessor="defect_pixel_correction_enabled">
@@ -116,5 +116,5 @@
         
         
         
-	</package>
+    </package>
 </psddl>

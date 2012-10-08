@@ -2,7 +2,7 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="CsPad">
+    <package name="CsPad">
 
     Package containing definitions for CsPad-produced data types.
 
@@ -44,8 +44,8 @@
         
         
         <enum name="RunModes">
-        	
-        	Enum specifying different running modes.
+            
+            Enum specifying different running modes.
         
             <enum-const name="NoRunning" />
             <enum-const name="RunButDrop" />
@@ -57,8 +57,8 @@
         </enum>
 
         <enum name="DataModes">
-        	
-        	Enum specifying different data collection modes.
+            
+            Enum specifying different data collection modes.
         
             <enum-const name="normal" value="0" />
             <enum-const name="shiftTest" value="1" />
@@ -68,66 +68,66 @@
 
 
         <!-- ========================================================================= -->
-	
-		<pstype name="CsPadDigitalPotsCfg">
-		
-		    Class defining configuration for CsPad POTs?
-		
+    
+        <pstype name="CsPadDigitalPotsCfg">
+        
+            Class defining configuration for CsPad POTs?
+        
             <attribute name="_pots" type="uint8_t" shape="PotsPerQuad" accessor="pots">
             </attribute>
 
-		</pstype>
-		
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="CsPadReadOnlyCfg">
-		
-		    Class defining read-only configuration.
-		
+        <pstype name="CsPadReadOnlyCfg">
+        
+            Class defining read-only configuration.
+        
             <attribute name="_shiftTest" type="uint32_t" accessor="shiftTest">
             </attribute>
 
             <attribute name="_version" type="uint32_t" accessor="version">
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="ProtectionSystemThreshold">
-		
+        <pstype name="ProtectionSystemThreshold">
+        
             <attribute name="_adcThreshold" type="uint32_t" accessor="adcThreshold">
             </attribute>
 
             <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="CsPadGainMapCfg">
+        <pstype name="CsPadGainMapCfg">
 
             Class defining ASIC gain map.
-		
+        
             <attribute name="_gainMap" type="uint16_t" shape="ColumnsPerASIC,MaxRowsPerASIC" 
                     accessor="gainMap">
             Array with the gain map for single ASIC.
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="ConfigV1QuadReg">
-		
-		    Configuration data for single quadrant.
-		
+        <pstype name="ConfigV1QuadReg">
+        
+            Configuration data for single quadrant.
+        
             <attribute name="_shiftSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="shiftSelect">
             </attribute>
 
@@ -175,15 +175,15 @@
             Gain map.
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="ConfigV2QuadReg">
-		
-		    Configuration data for single quadrant.
-		
+        <pstype name="ConfigV2QuadReg">
+        
+            Configuration data for single quadrant.
+        
             <attribute name="_shiftSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="shiftSelect">
             </attribute>
 
@@ -240,16 +240,16 @@
             Gain map.
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_CspadConfig">
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_CspadConfig">
 
             Configuration data for complete CsPad device.
-		
-			<tag name="config-type"/>
-		
+        
+            <tag name="config-type"/>
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -299,14 +299,14 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV2" version="2" type_id="Id_CspadConfig">
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV2" version="2" type_id="Id_CspadConfig">
+        
             Configuration data for complete CsPad device.
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -374,14 +374,14 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV3" version="3" type_id="Id_CspadConfig">
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV3" version="3" type_id="Id_CspadConfig">
+        
             Configuration data for complete CsPad device.
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -456,14 +456,14 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV4" version="4" type_id="Id_CspadConfig">
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV4" version="4" type_id="Id_CspadConfig">
+        
             Configuration data for complete CsPad device.
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -538,21 +538,21 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ElementV1">
+        <!-- ========================================================================= -->
+        
+        <pstype name="ElementV1">
 
             CsPad data from single CsPad quadrant.
-		
-		    <const name="Nsbtemp" value="4">
-		    Number of the elements in _sbtemp array.
-		    </const>
-		
-		    <xtc-config name="ConfigV1" />
-		    <xtc-config name="ConfigV2" />
-		    <xtc-config name="ConfigV3" />
-		    <xtc-config name="ConfigV4" />
-		
+        
+            <const name="Nsbtemp" value="4">
+            Number of the elements in _sbtemp array.
+            </const>
+        
+            <xtc-config name="ConfigV1" />
+            <xtc-config name="ConfigV2" />
+            <xtc-config name="ConfigV3" />
+            <xtc-config name="ConfigV4" />
+        
             <attribute name="_word0" type="uint32_t" accessor="">
             
                 <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
@@ -611,8 +611,8 @@
             </attribute>
 
             <method name="sectionMask" type="uint32_t">
-				Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active.  
+                Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+                total bit count gives the number of sections active.  
                 <expr lang="C++" value="({xtc-config}.asicMask() &amp; 0xf)==1 ? 0x3 : 0xff"/>
             </method>
 
@@ -626,8 +626,8 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
         <pstype name="DataV1" version="1" type_id="Id_CspadElement">
 
             CsPad data from whole detector.
@@ -646,20 +646,20 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ElementV2">
-		
-		    CsPad data from single CsPad quadrant.
-		
-		    <const name="Nsbtemp" value="4">
-		    Number of the elements in _sbtemp array.
-		    </const>
-		
-		    <xtc-config name="ConfigV2" />
-		    <xtc-config name="ConfigV3" />
-		    <xtc-config name="ConfigV4" />
-		    
+        <!-- ========================================================================= -->
+        
+        <pstype name="ElementV2">
+        
+            CsPad data from single CsPad quadrant.
+        
+            <const name="Nsbtemp" value="4">
+            Number of the elements in _sbtemp array.
+            </const>
+        
+            <xtc-config name="ConfigV2" />
+            <xtc-config name="ConfigV3" />
+            <xtc-config name="ConfigV4" />
+            
             <attribute name="_word0" type="uint32_t" accessor="">
             
                 <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
@@ -717,8 +717,8 @@
             </attribute>
 
             <method name="sectionMask" type="uint32_t">
-				Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
-				total bit count gives the number of sections active.  
+                Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+                total bit count gives the number of sections active.  
                 <expr lang="C++" value="{xtc-config}.roiMask({self}.quad())"/>
             </method>
 
@@ -749,5 +749,5 @@
         
         </pstype>
         
-	</package>
+    </package>
 </psddl>

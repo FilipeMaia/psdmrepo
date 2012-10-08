@@ -2,14 +2,14 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Camera">
-	
-	   Package which defines data types for different kinds of cameras.
-	
-		<pstype name="FrameCoord">
+    <package name="Camera">
+    
+       Package which defines data types for different kinds of cameras.
+    
+        <pstype name="FrameCoord">
 
             Class representing the coordinates of pixels iside the camera frame.
-		
+        
             <tag name="value-type"/>
         
             <attribute name="_column" type="uint16_t" accessor="column">
@@ -30,27 +30,27 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="FrameFccdConfigV1" version="1" type_id="Id_FrameFccdConfig">
-		
-		    This class was never defined/implemented.
-		
-			<tag name="config-type"/>
-		
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="FrameFexConfigV1" version="1" type_id="Id_FrameFexConfig">
+        <pstype name="FrameFccdConfigV1" version="1" type_id="Id_FrameFccdConfig">
+        
+            This class was never defined/implemented.
+        
+            <tag name="config-type"/>
+        
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="FrameFexConfigV1" version="1" type_id="Id_FrameFexConfig">
 
             Class containing configuration data for online frame feature extraction process.
-		
+        
             <tag name="config-type"/>
-		
+        
             <enum name="Forwarding">
                 <enum-const name="NoFrame" />
                 <enum-const name="FullFrame" />
@@ -113,8 +113,8 @@
             </attribute>
 
 
-		</pstype>
-		
+        </pstype>
+        
 
         <!-- ========================================================================= -->
         
@@ -191,5 +191,5 @@
 
         </pstype>
         
-	</package>
+    </package>
 </psddl>

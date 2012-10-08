@@ -2,7 +2,7 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Pds">
+    <package name="Pds">
 
         Package providing DDL definitions for some of the pdsdata data 
         types used by DDL data types. This is not a replacement for pdsdata,
@@ -11,35 +11,35 @@
         <tag name="external"/>
 
         <!-- ========================================================================= -->
-	
-		<pstype name="ClockTime">
-		
-		    <tag name="no-sizeof"/>
-		    <tag name="value-type"/>
-		
+    
+        <pstype name="ClockTime">
+        
+            <tag name="no-sizeof"/>
+            <tag name="value-type"/>
+        
             <attribute name="_low" type="uint32_t" accessor="nanoseconds">
             </attribute>
 
             <attribute name="_high" type="uint32_t" accessor="seconds">
             </attribute>
 
-		</pstype>
-		
+        </pstype>
+        
         <!-- ========================================================================= -->
-	
-		<pstype name="DetInfo">
+    
+        <pstype name="DetInfo">
 
             <tag name="no-sizeof"/>
-		    <tag name="value-type"/>
-		
+            <tag name="value-type"/>
+        
             <attribute name="_low" type="uint32_t">
             </attribute>
 
             <attribute name="_phy" type="uint32_t">
             </attribute>
 
-		</pstype>
-		
-		        
-	</package>
+        </pstype>
+        
+                
+    </package>
 </psddl>

@@ -2,17 +2,17 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="OceanOptics">
+    <package name="OceanOptics">
 
     Package containing definitions for oceanOptics data types.
 
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_OceanOpticsConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_OceanOpticsConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <attribute name="_f32ExposureTime" type="float" accessor="exposureTime">
             </attribute>
 
@@ -27,12 +27,12 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
         
         <pstype name="timespec64" pack="4">
         
-        	<tag name="value-type"/>
+            <tag name="value-type"/>
         
             <attribute name="_tv_sec" type="uint64_t" accessor="tv_sec">
             </attribute>
@@ -52,16 +52,16 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
         
         <pstype name="DataV1" version="1" type_id="Id_OceanOpticsData" pack="4">
         
             <xtc-config name="ConfigV1" />
         
-			<const name="iDataReadSize" value="8192"/>
-			<const name="iNumPixels" value="3840"/>
-			<const name="iActivePixelIndex" value="22"/>
+            <const name="iDataReadSize" value="8192"/>
+            <const name="iNumPixels" value="3840"/>
+            <const name="iActivePixelIndex" value="22"/>
 
 
             <attribute name="lu16Spetra" type="uint16_t" shape="iNumPixels" accessor="data">
@@ -100,28 +100,28 @@
             <attribute name="_iReserved1" type="int8_t" accessor="">
             </attribute>
 
-			<method name="durationOfFrame" type="double">
-				<tag name="inline"/>
-				<expr lang="C++" value="{self}._tsTimeFrameEnd.tv_sec() - {self}._tsTimeFrameStart.tv_sec() + ({self}._tsTimeFrameEnd.tv_nsec() - {self}._tsTimeFrameStart.tv_nsec()) * 1e-9"/>
-			</method>
+            <method name="durationOfFrame" type="double">
+                <tag name="inline"/>
+                <expr lang="C++" value="{self}._tsTimeFrameEnd.tv_sec() - {self}._tsTimeFrameStart.tv_sec() + ({self}._tsTimeFrameEnd.tv_nsec() - {self}._tsTimeFrameStart.tv_nsec()) * 1e-9"/>
+            </method>
 
-			<method name="nonlinerCorrected" type="double">
-				<arg name="iPixel" type="uint32_t"/>
-				<code lang="C++" body="double fRawValue = (double) ({self}.lu16Spetra[iPixel] ^ 0x2000); 
-					ndarray&lt;double, 1&gt; corr = {xtc-config}.nonlinCorrect();
-					return fRawValue / (
-				     corr[0] + fRawValue * 
-				    (corr[1] + fRawValue * 
-				    (corr[2] + fRawValue * 
-				    (corr[3] + fRawValue * 
-				    (corr[4] + fRawValue * 
-				    (corr[5] + fRawValue * 
-				    (corr[6] + fRawValue * 
-				     corr[7])))))));" />
-			</method>
+            <method name="nonlinerCorrected" type="double">
+                <arg name="iPixel" type="uint32_t"/>
+                <code lang="C++" body="double fRawValue = (double) ({self}.lu16Spetra[iPixel] ^ 0x2000); 
+                    ndarray&lt;double, 1&gt; corr = {xtc-config}.nonlinCorrect();
+                    return fRawValue / (
+                     corr[0] + fRawValue * 
+                    (corr[1] + fRawValue * 
+                    (corr[2] + fRawValue * 
+                    (corr[3] + fRawValue * 
+                    (corr[4] + fRawValue * 
+                    (corr[5] + fRawValue * 
+                    (corr[6] + fRawValue * 
+                     corr[7])))))));" />
+            </method>
 
         </pstype>
         
         
-	</package>
+    </package>
 </psddl>

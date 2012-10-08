@@ -2,7 +2,7 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Ipimb">
+    <package name="Ipimb">
 
         Package containing definitions for IPIMB (Intensity Position, Intensity 
         Monitoring Boards) data types.
@@ -19,17 +19,17 @@
 
 
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_IpimbConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
-		    <enum name="CapacitorValue">
-	            <enum-const name="c_1pF" />
-	            <enum-const name="c_100pF" />
-	            <enum-const name="c_10nF" />
-        	</enum>		
+    
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_IpimbConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
+            <enum name="CapacitorValue">
+                <enum-const name="c_1pF" />
+                <enum-const name="c_100pF" />
+                <enum-const name="c_10nF" />
+            </enum>        
 
             <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
             </attribute>
@@ -83,24 +83,24 @@
         </pstype>
         
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV2" version="2" type_id="Id_IpimbConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
-		
-		    <enum name="CapacitorValue">
-	            <enum-const name="c_1pF" />
-	            <enum-const name="c_4p7pF" />
-	            <enum-const name="c_24pF" />
-	            <enum-const name="c_120pF" />
-	            <enum-const name="c_620pF" />
-	            <enum-const name="c_3p3nF" />
-	            <enum-const name="c_10nF" />
-	            <enum-const name="expert" />
-        	</enum>		
-		
+    
+        
+        <pstype name="ConfigV2" version="2" type_id="Id_IpimbConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
+        
+            <enum name="CapacitorValue">
+                <enum-const name="c_1pF" />
+                <enum-const name="c_4p7pF" />
+                <enum-const name="c_24pF" />
+                <enum-const name="c_120pF" />
+                <enum-const name="c_620pF" />
+                <enum-const name="c_3p3nF" />
+                <enum-const name="c_10nF" />
+                <enum-const name="expert" />
+            </enum>        
+        
             <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
             </attribute>
 
@@ -158,7 +158,7 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
         
         <pstype name="DataV1" version="1" type_id="Id_IpimbData" pack="4">
@@ -216,7 +216,7 @@
             
         </pstype>
         
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
         
         <pstype name="DataV2" version="2" type_id="Id_IpimbData" pack="4">
@@ -324,5 +324,5 @@
         </pstype>
         
         
-	</package>
+    </package>
 </psddl>

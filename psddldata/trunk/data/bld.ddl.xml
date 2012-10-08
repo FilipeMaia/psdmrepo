@@ -8,16 +8,16 @@
     <use file="psddldata/lusi.ddl.xml"/>
     <use file="psddldata/pulnix.ddl.xml"/>
 
-	<package name="Bld">
-	
-	   Package (namespace) containing all data types pproduced by BLD 
-	   (BeamLine Data) devices.
-	
-		<pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
-		
-		    Four energy measurements from Front End Enclosure Gas Detector.
-	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
-		
+    <package name="Bld">
+    
+       Package (namespace) containing all data types pproduced by BLD 
+       (BeamLine Data) devices.
+    
+        <pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
+        
+            Four energy measurements from Front End Enclosure Gas Detector.
+               PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
+        
             <tag name="value-type"/>
         
             <attribute name="_f_11_ENRC" type="double" accessor="f_11_ENRC">
@@ -42,15 +42,15 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
-		
-		    Beam parameters.
-		
+        <pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
+        
+            Beam parameters.
+        
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
@@ -87,12 +87,12 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="BldDataEBeamV1" type_id="Id_EBeam" version="1" pack="4">
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="BldDataEBeamV1" type_id="Id_EBeam" version="1" pack="4">
+        
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
@@ -133,12 +133,12 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="BldDataEBeamV2" type_id="Id_EBeam" version="2" pack="4">
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="BldDataEBeamV2" type_id="Id_EBeam" version="2" pack="4">
+        
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
@@ -183,12 +183,12 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
-		<pstype name="BldDataEBeamV3" type_id="Id_EBeam" version="3" pack="4">
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="BldDataEBeamV3" type_id="Id_EBeam" version="3" pack="4">
+        
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
@@ -241,16 +241,16 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="BldDataPhaseCavity" type_id="Id_PhaseCavity" version="0" pack="4">
+        <pstype name="BldDataPhaseCavity" type_id="Id_PhaseCavity" version="0" pack="4">
 
             PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
                 UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
-	
+    
             <tag name="value-type"/>
         
             <attribute name="_fFitTime1" type="double" accessor="fitTime1">
@@ -275,13 +275,13 @@
                 <tag name="auto"/>
             </ctor>
 
-		</pstype>
-		
+        </pstype>
+        
 
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="BldDataIpimbV0" type_id="Id_SharedIpimb" version="0" pack="4">
+        <pstype name="BldDataIpimbV0" type_id="Id_SharedIpimb" version="0" pack="4">
 
             Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and 
             Lusi.IpmFexV1 objects.
@@ -295,12 +295,12 @@
             <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="BldDataIpimbV1" type_id="Id_SharedIpimb" version="1" pack="4">
+        <pstype name="BldDataIpimbV1" type_id="Id_SharedIpimb" version="1" pack="4">
 
             Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and 
             Lusi.IpmFexV1 objects.
@@ -314,13 +314,13 @@
             <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">
             </attribute>
 
-		</pstype>
-		
+        </pstype>
+        
 
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="BldDataPimV1" type_id="Id_SharedPim" version="1" pack="4">
+        <pstype name="BldDataPimV1" type_id="Id_SharedPim" version="1" pack="4">
 
             Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and 
             Camera.FrameV1 objects.
@@ -334,8 +334,65 @@
             <attribute name="_frame" type="Camera.FrameV1" accessor="frame">
             </attribute>
 
-		</pstype>
-		
+        </pstype>
+        
 
-	</package>
+        <!-- ========================================================================= -->
+        
+
+        <pstype name="BldDataGMDV0" type_id="Id_GMD" version="1" pack="4">
+        
+            Gas Monitor Detector data.
+
+            <attribute name="_strGasType" type="char" shape="32" accessor="gasType" shape_method="None">
+            String describing gas type
+            </attribute>
+
+            <attribute name="_fPressure" type="double" accessor="pressure">
+            Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure
+            </attribute>
+
+            <attribute name="_fTemperature" type="double" accessor="temperature">
+            Temp from PT100, SXR:GMD:RTD:40:RAW_AI
+            </attribute>
+
+            <attribute name="_fCurrent" type="double" accessor="current">
+            Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading
+            </attribute>
+
+            <attribute name="_iHvMeshElectron" type="int32_t" accessor="hvMeshElectron">
+            HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure
+            </attribute>
+
+            <attribute name="_iHvMeshIon" type="int32_t" accessor="hvMeshIon">
+            HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
+            </attribute>
+
+            <attribute name="_iHvMultIon" type="int32_t" accessor="hvMultIon">
+            HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
+            </attribute>
+
+            <attribute name="_fChargeQ" type="double" accessor="chargeQ">
+            Charge Q, SXR:GMD:IMD:Charge_Q
+            </attribute>
+
+            <attribute name="_fPhotonEnergy" type="double" accessor="photonEnergy">
+            Photon Energy, SIOC:SYS0:ML00:AO627
+            </attribute>
+
+            <attribute name="_fPhotonsPerPulse" type="double" accessor="photonsPerPulse">
+            Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse
+            </attribute>
+
+            <attribute name="_fSpare1" type="double"/>
+            <attribute name="_fSpare2" type="double"/>
+            <attribute name="_fSpare3" type="double"/>
+            <attribute name="_fSpare4" type="double"/>
+            <attribute name="_fSpare5" type="double"/>
+            <attribute name="_fSpare6" type="double"/>
+
+        </pstype>
+        
+
+    </package>
 </psddl>

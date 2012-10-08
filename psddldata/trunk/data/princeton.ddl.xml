@@ -2,17 +2,17 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Princeton">
+    <package name="Princeton">
 
     Package containing definitions for Princeton Camera data types.
 
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_PrincetonConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_PrincetonConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <attribute name="_uWidth" type="uint32_t" accessor="width">
             </attribute>
 
@@ -53,31 +53,31 @@
 
             <method name="numPixelsX" type="uint32_t">
             calculate frame X size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
             </method>
 
             <method name="numPixelsY" type="uint32_t">
             calculate frame Y size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
             </method>
 
             <method name="numPixels" type="uint32_t">
             calculate total frame size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
             </method>
 
         </pstype>
         
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV2" version="2" type_id="Id_PrincetonConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="ConfigV2" version="2" type_id="Id_PrincetonConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <attribute name="_uWidth" type="uint32_t" accessor="width">
             </attribute>
 
@@ -121,31 +121,31 @@
 
             <method name="numPixelsX" type="uint32_t">
             calculate frame X size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
             </method>
 
             <method name="numPixelsY" type="uint32_t">
             calculate frame Y size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
             </method>
 
             <method name="numPixels" type="uint32_t">
             calculate total frame size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
             </method>
 
         </pstype>
         
         <!-- ========================================================================= -->
-	
-		
-		<pstype name="ConfigV3" version="3" type_id="Id_PrincetonConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+    
+        
+        <pstype name="ConfigV3" version="3" type_id="Id_PrincetonConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <attribute name="_uWidth" type="uint32_t" accessor="width">
             </attribute>
 
@@ -189,26 +189,26 @@
 
             <method name="numPixelsX" type="uint32_t">
             calculate frame X size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
             </method>
 
             <method name="numPixelsY" type="uint32_t">
             calculate frame Y size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
             </method>
 
             <method name="numPixels" type="uint32_t">
             calculate total frame size in pixels based on the current ROI and binning settings
-            	<tag name="inline"/>
+                <tag name="inline"/>
                 <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
             </method>
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
         
         <pstype name="FrameV1" version="1" type_id="Id_PrincetonFrame" pack="4">
         
@@ -227,8 +227,8 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
         
         <pstype name="InfoV1" version="1" type_id="Id_PrincetonInfo">
 
@@ -246,5 +246,5 @@
         </pstype>
         
         
-	</package>
+    </package>
 </psddl>

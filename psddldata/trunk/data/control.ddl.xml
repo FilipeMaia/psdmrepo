@@ -7,11 +7,11 @@
         cpp_headers="pdsdata/xtc/ClockTime.hh"/>
 
         <package name="ControlData">
-	
+    
         <pstype name="PVControl" pack="4">
-		
+        
             <tag name="config-type"/>
-		
+        
             <tag name="value-type"/>
         
             <const name="NameSize" value="32">
@@ -20,7 +20,7 @@
             <const name="NoArray" value="0xFFFFFFFF">
             Special value used for _index when PV is not an array
             </const>
-		
+        
             <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
             Name of the control.
             </attribute>
@@ -51,9 +51,9 @@
         </pstype>
 
         <!-- ========================================================================= -->
-		
+        
         <pstype name="PVMonitor" pack="4">
-		
+        
             <tag name="value-type"/>
         
             <const name="NameSize" value="32">
@@ -62,7 +62,7 @@
             <const name="NoArray" value="0xFFFFFFFF">
             Special value used for _index when PV is not an array
             </const>
-		
+        
             <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
             Name of the control.
             </attribute>
@@ -95,11 +95,11 @@
             </ctor>
 
         </pstype>
-		
+        
         <!-- ========================================================================= -->
-		
+        
         <pstype name="PVLabel" pack="4">
-		
+        
             <tag name="value-type"/>
         
             <const name="NameSize" value="32">
@@ -108,7 +108,7 @@
             <const name="ValueSize" value="64">
             Length of the value array.
             </const>
-		
+        
             <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
             PV name.
             </attribute>
@@ -129,11 +129,11 @@
             </ctor>
 
         </pstype>
-		
+        
         <!-- ========================================================================= -->
-		
+        
         <pstype name="ConfigV1" version="1" type_id="Id_ControlConfig">
-		
+        
             <tag name="config-type"/>
 
             <attribute name="_control" type="uint32_t" accessor="">
@@ -180,11 +180,11 @@
         </pstype>
         
         <!-- ========================================================================= -->
-		
+        
         <pstype name="ConfigV2" version="2" type_id="Id_ControlConfig">
 
             <tag name="config-type"/>
-		
+        
             <attribute name="_control" type="uint32_t" accessor="">
             
             <bitfield name="_bf_events" size="30" type="uint32_t" accessor="events">

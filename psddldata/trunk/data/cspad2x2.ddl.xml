@@ -2,7 +2,7 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="CsPad2x2">
+    <package name="CsPad2x2">
 
     Package containing definitions for CsPad2x2-produced data types.
 
@@ -44,8 +44,8 @@
         
         
         <enum name="RunModes">
-        	
-        	Enum specifying different running modes.
+            
+            Enum specifying different running modes.
         
             <enum-const name="NoRunning" />
             <enum-const name="RunButDrop" />
@@ -57,8 +57,8 @@
         </enum>
 
         <enum name="DataModes">
-        	
-        	Enum specifying different data collection modes.
+            
+            Enum specifying different data collection modes.
         
             <enum-const name="normal" value="0" />
             <enum-const name="shiftTest" value="1" />
@@ -68,66 +68,66 @@
 
 
         <!-- ========================================================================= -->
-	
-		<pstype name="CsPad2x2DigitalPotsCfg">
-		
-		    Class defining configuration for CsPad POTs?
-		
+    
+        <pstype name="CsPad2x2DigitalPotsCfg">
+        
+            Class defining configuration for CsPad POTs?
+        
             <attribute name="_pots" type="uint8_t" shape="PotsPerQuad" accessor="pots">
             </attribute>
 
-		</pstype>
-		
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="CsPad2x2ReadOnlyCfg">
-		
-		    Class defining read-only configuration.
-		
+        <pstype name="CsPad2x2ReadOnlyCfg">
+        
+            Class defining read-only configuration.
+        
             <attribute name="_shiftTest" type="uint32_t" accessor="shiftTest">
             </attribute>
 
             <attribute name="_version" type="uint32_t" accessor="version">
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="ProtectionSystemThreshold">
-		
+        <pstype name="ProtectionSystemThreshold">
+        
             <attribute name="_adcThreshold" type="uint32_t" accessor="adcThreshold">
             </attribute>
 
             <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="CsPad2x2GainMapCfg">
+        <pstype name="CsPad2x2GainMapCfg">
 
             Class defining ASIC gain map.
-		
+        
             <attribute name="_gainMap" type="uint16_t" shape="ColumnsPerASIC,MaxRowsPerASIC" 
                     accessor="gainMap">
             Array with the gain map for single ASIC.
             </attribute>
 
-		</pstype>
-		
-		<!-- ========================================================================= -->
-		
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
 
-		<pstype name="ConfigV1QuadReg">
-		
-		    Configuration data for single quadrant.
-		
+        <pstype name="ConfigV1QuadReg">
+        
+            Configuration data for single quadrant.
+        
             <attribute name="_shiftSelect" type="uint32_t" accessor="shiftSelect">
             </attribute>
 
@@ -202,16 +202,16 @@
             Gain map.
             </attribute>
 
-		</pstype>
+        </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_Cspad2x2Config">
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_Cspad2x2Config">
+        
             Configuration data for complete CsPad device.
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -256,16 +256,16 @@
             
         </pstype>
         
-		<!-- ========================================================================= -->
-				
-		<pstype name="ElementV1" version="1" type_id="Id_Cspad2x2Element">
-		
-		    CsPad data from single 2x2 element.
-		
-		    <const name="Nsbtemp" value="4">
-		    Number of the elements in _sbtemp array.
-		    </const>
-		
+        <!-- ========================================================================= -->
+                
+        <pstype name="ElementV1" version="1" type_id="Id_Cspad2x2Element">
+        
+            CsPad data from single 2x2 element.
+        
+            <const name="Nsbtemp" value="4">
+            Number of the elements in _sbtemp array.
+            </const>
+        
             <attribute name="_word0" type="uint32_t" accessor="">
             
                 <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
@@ -327,5 +327,5 @@
         </pstype>
         
         
-	</package>
+    </package>
 </psddl>

@@ -2,21 +2,21 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Lusi">
+    <package name="Lusi">
 
         This package and namespace gives access to some feature-extracted parameters 
         for IPIMB and YAG.
 
-		<!-- ========================================================================= -->
-		
-		<pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <tag name="value-type"/>
 
-		    <const name="NRANGES" value="3" />
-		
+            <const name="NRANGES" value="3" />
+        
             <attribute name="_base" type="float" shape="NRANGES" accessor="base">
             </attribute>
 
@@ -36,16 +36,16 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="DiodeFexConfigV2" version="2" type_id="Id_DiodeFexConfig" pack="4">
-		
-			<tag name="config-type"/>
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="DiodeFexConfigV2" version="2" type_id="Id_DiodeFexConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
             <tag name="value-type"/>
 
-		    <const name="NRANGES" value="16" />
-		
+            <const name="NRANGES" value="16" />
+        
             <attribute name="_base" type="float" shape="NRANGES" accessor="base">
             </attribute>
 
@@ -65,10 +65,10 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="DiodeFexV1" version="1" type_id="Id_DiodeFex" pack="4">
-		
+        <!-- ========================================================================= -->
+        
+        <pstype name="DiodeFexV1" version="1" type_id="Id_DiodeFex" pack="4">
+        
             <tag name="value-type"/>
 
             <attribute name="_value" type="float" accessor="value">
@@ -83,13 +83,13 @@
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
 
         <pstype name="IpmFexConfigV1" version="1" type_id="Id_IpmFexConfig" pack="4">
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <const name="NCHANNELS" value="4" />
         
             <attribute name="_diode" type="DiodeFexConfigV1" shape="NCHANNELS" accessor="diode">
@@ -104,13 +104,13 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
 
         <pstype name="IpmFexConfigV2" version="2" type_id="Id_IpmFexConfig" pack="4">
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <const name="NCHANNELS" value="4" />
         
             <attribute name="_diode" type="DiodeFexConfigV2" shape="NCHANNELS" accessor="diode">
@@ -125,8 +125,8 @@
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
+        <!-- ========================================================================= -->
+        
 
         <pstype name="IpmFexV1" version="1" type_id="Id_IpmFex" pack="4">
         
@@ -161,8 +161,8 @@
 
         <pstype name="PimImageConfigV1" version="1" type_id="Id_PimImageConfig" pack="4">
         
-			<tag name="config-type"/>
-		
+            <tag name="config-type"/>
+        
             <tag name="value-type"/>
 
             <attribute name="_xscale" type="float" accessor="xscale">
@@ -182,5 +182,5 @@
         
         
         
-	</package>
+    </package>
 </psddl>
