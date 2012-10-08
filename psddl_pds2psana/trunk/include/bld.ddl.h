@@ -79,6 +79,28 @@ private:
   psddl_pds2psana::Camera::FrameV1 _frame;
 };
 
+
+class BldDataGMDV0 : public Psana::Bld::BldDataGMDV0 {
+public:
+  typedef PsddlPds::Bld::BldDataGMDV0 XtcType;
+  typedef Psana::Bld::BldDataGMDV0 PsanaType;
+  BldDataGMDV0(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataGMDV0();
+  virtual const char* gasType() const;
+  virtual double pressure() const;
+  virtual double temperature() const;
+  virtual double current() const;
+  virtual int32_t hvMeshElectron() const;
+  virtual int32_t hvMeshIon() const;
+  virtual int32_t hvMultIon() const;
+  virtual double chargeQ() const;
+  virtual double photonEnergy() const;
+  virtual double photonsPerPulse() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Bld
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_BLD_DDL_H

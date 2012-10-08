@@ -93,5 +93,34 @@ const Psana::Pulnix::TM6740ConfigV2& BldDataPimV1::camConfig() const { return _c
 const Psana::Lusi::PimImageConfigV1& BldDataPimV1::pimConfig() const { return _pimConfig; }
 
 const Psana::Camera::FrameV1& BldDataPimV1::frame() const { return _frame; }
+BldDataGMDV0::BldDataGMDV0(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataGMDV0()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataGMDV0::~BldDataGMDV0()
+{
+}
+
+
+const char* BldDataGMDV0::gasType() const { return m_xtcObj->gasType(); }
+
+double BldDataGMDV0::pressure() const { return m_xtcObj->pressure(); }
+
+double BldDataGMDV0::temperature() const { return m_xtcObj->temperature(); }
+
+double BldDataGMDV0::current() const { return m_xtcObj->current(); }
+
+int32_t BldDataGMDV0::hvMeshElectron() const { return m_xtcObj->hvMeshElectron(); }
+
+int32_t BldDataGMDV0::hvMeshIon() const { return m_xtcObj->hvMeshIon(); }
+
+int32_t BldDataGMDV0::hvMultIon() const { return m_xtcObj->hvMultIon(); }
+
+double BldDataGMDV0::chargeQ() const { return m_xtcObj->chargeQ(); }
+
+double BldDataGMDV0::photonEnergy() const { return m_xtcObj->photonEnergy(); }
+
+double BldDataGMDV0::photonsPerPulse() const { return m_xtcObj->photonsPerPulse(); }
 } // namespace Bld
 } // namespace psddl_pds2psana

@@ -50,6 +50,7 @@
 #include "psddl_pds2psana/pulnix.ddl.h"
 #include "psddl_pds2psana/quartz.ddl.h"
 #include "psddl_pds2psana/timepix.ddl.h"
+#include "psddl_pds2psana/usdusb.ddl.h"
 #include "psddl_pds2psana/TimepixDataV1ToV2.h"
 
 //-----------------------------------------------------------------------
@@ -417,13 +418,21 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_QuartzConfig:
     break;
-  case Pds::TypeId::Id_CompressedFrame:
+  case Pds::TypeId::Reserved1:
     break;
-  case Pds::TypeId::Id_CompressedTimePixFrame:
+  case Pds::TypeId::Reserved2:
     break;
   case Pds::TypeId::Id_AndorConfig:
     break;
   case Pds::TypeId::Id_AndorFrame:
+    break;
+  case Pds::TypeId::Id_UsdUsbData:
+    if (version == 1) ::storeDataProxy<UsdUsb::DataV1>(xtc, evt);
+    break;
+  case Pds::TypeId::Id_UsdUsbConfig:
+    break;
+  case Pds::TypeId::Id_GMD:
+    if (version == 0) ::storeDataProxy<Bld::BldDataGMDV0>(xtc, evt);
     break;
   case Pds::TypeId::NumberOf:
     break;
@@ -602,13 +611,20 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_QuartzConfig:
     if (version == 1) ::storeCfgObject<Quartz::ConfigV1>(xtc, cfgStore);
     break;
-  case Pds::TypeId::Id_CompressedFrame:
+  case Pds::TypeId::Reserved1:
     break;
-  case Pds::TypeId::Id_CompressedTimePixFrame:
+  case Pds::TypeId::Reserved2:
     break;
   case Pds::TypeId::Id_AndorConfig:
     break;
   case Pds::TypeId::Id_AndorFrame:
+    break;
+  case Pds::TypeId::Id_UsdUsbData:
+    break;
+  case Pds::TypeId::Id_UsdUsbConfig:
+    if (version == 1) ::storeCfgObject<UsdUsb::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_GMD:
     break;
   case Pds::TypeId::NumberOf:
     break;
