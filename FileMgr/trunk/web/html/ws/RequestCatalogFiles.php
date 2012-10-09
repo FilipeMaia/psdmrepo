@@ -12,6 +12,11 @@ use FileMgr\FileMgrException;
 
 use RegDB\RegDBHtml;
 
+// Make sure we're using the rigth tomezone. Otherwise PHP will complain
+// into Web server's log files.
+//
+date_default_timezone_set('America/Los_Angeles');
+
 /*
  * This script will process requests for various information stored in the database.
  * The result will be returned an embedable HTML element (<div>).
@@ -29,8 +34,7 @@ function pre( $str, $width=null ) {
  */
 try {
 
-    $authdb = new AuthDB();
-    $authdb->begin();
+    AuthDB::instance()->begin();
 
     $files = null;    
     FileMgrIrodsWs::files_only( $files, $path );
@@ -73,11 +77,9 @@ try {
     }
     print $con->html();
 
-    $authdb->commit();
+    AuthDB::instance()->commit();
 
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-} catch( FileMgrException $e ) {
-    print $e->toHtml();
-}
+} catch (AuthDBException  $e ) { print $e->toHtml(); }
+  catch (FileMgrException $e ) { print $e->toHtml(); }
+
 ?>

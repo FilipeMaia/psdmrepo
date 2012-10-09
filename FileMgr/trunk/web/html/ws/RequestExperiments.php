@@ -12,9 +12,9 @@ use RegDB\RegDBException;
 if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
-define( BROWSE_INSTRUMENTS, 1 );
-define( BROWSE_EXPERIMENTS, 2 );
-define( BROWSE_FILES,       3 );
+define( 'BROWSE_INSTRUMENTS', 1 );
+define( 'BROWSE_EXPERIMENTS', 2 );
+define( 'BROWSE_FILES',       3 );
 
 $instrument = null;
 $experiment = null;
@@ -66,11 +66,8 @@ function exper2json( $exper ) {
  */
 try {
 
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    // Proceed to the operation
-    //
     header( "Content-type: application/json" );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
@@ -82,8 +79,7 @@ HERE;
     $first = true;
 
     if( $type == BROWSE_INSTRUMENTS ) {
-        $instruments = $regdb->instruments();
-        foreach( $instruments as $i ) {
+        foreach (RegDB::instance()->instruments() as $i) {
             if( $i->is_location()) continue;
             if( $first ) {
                 $first = false;
@@ -93,10 +89,8 @@ HERE;
             }
         }
     } else if( $type == BROWSE_EXPERIMENTS ) {
-        $instrument = $regdb->find_instrument_by_name( $instrument )
-            or die("No such instrument");
-        $experiments = $regdb->experiments_for_instrument( $instrument->name());
-        foreach( $experiments as $e ) {
+        $instrument = RegDB::instance()->find_instrument_by_name( $instrument ) or die("No such instrument");
+        foreach (RegDB::instance()->experiments_for_instrument( $instrument->name()) as $e) {
           if( $first ) {
               $first = false;
               echo "\n".exper2json( $e );
@@ -118,9 +112,8 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

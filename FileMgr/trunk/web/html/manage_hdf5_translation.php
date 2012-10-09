@@ -70,7 +70,7 @@
   }
 </style>
 
-<script type="text/javascript" src="Loader.js"></script>
+<script type="text/javascript" src="js/Loader.js"></script>
 
 </head>
 
@@ -270,7 +270,7 @@ function apply_filter() {
     	if( filter_end_stopped_value   != '' ) filter += '&end_stopped='  +encodeURIComponent( filter_end_stopped_value );
 
         document.getElementById('experiment_requests').innerHTML='<p>Loading...<p>';
-        load( 'DisplayExperimentRequests.php?instr='+instrument_name+'&exp='+experiment_name+filter, 'experiment_requests' );
+        load( '../explorer/ws/DisplayExperimentRequests.php?instr='+instrument_name+'&exp='+experiment_name+filter, 'experiment_requests' );
     }
 }
 
@@ -303,7 +303,7 @@ function set_filter( filter_params ) {
 }
 
 function reset_filter() {
-	var url = 'LimitsOfExperimentRequests.php?instr='+instrument_name+'&exp='+experiment_name;
+	var url = '../explorer/ws/LimitsOfExperimentRequests.php?instr='+instrument_name+'&exp='+experiment_name;
 	load_then_call (
 		url,
 		function( filter_params ) {

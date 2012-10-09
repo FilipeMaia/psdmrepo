@@ -7,17 +7,22 @@ require_once( 'lusitime/lusitime.inc.php' );
 use RegDB\RegDB;
 use RegDB\RegDBAuth;
 use RegDB\RegDBHtml;
-use RegDB\RegDBException;
 
 use FileMgr\FileMgrIrodsWs;
-use FileMgr\FileMgrException;
-
-use LusiTime\LusiTime;
 
 /*
  * This script will generate a module with input elements for the filter form
  * in a context of the specified experiment.
  */
+header( 'Content-type: text/html' );
+header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+function report_error($msg) {
+    print $msg;
+    exit;
+}
+
 if( isset( $_GET['exper_id'] )) {
     $exper_id = trim( $_GET['exper_id'] );
     if( $exper_id == '' ) {
@@ -30,31 +35,24 @@ if( isset( $_GET['exper_id'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB;
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $experiment = $regdb->find_experiment_by_id( $exper_id )
-        or die( "no such experiment" );
+    $experiment =  RegDB::instance()->find_experiment_by_id( $exper_id );
+    if (is_null($experiment)) report_error( "no such experiment" );
 
     $instrument = $experiment->instrument();
 
     // Check for the authorization
     //
-    if( !RegDBAuth::instance()->canRead()) {
-        print( RegDBAuth::reporErrorHtml(
-            'You are not authorized to access any information from the Experiment Registration Database',
-            'index.php'));
-        exit;
-    }
+    if( !RegDBAuth::instance()->canRead())
+        report_error(
+            RegDBAuth::reporErrorHtml(
+                'You are not authorized to access any information from the Experiment Registration Database',
+                'index.php'));
+
     $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array( 'xtc', 'hdf5' ));
     $range_of_runs = $range['min'].'-'.$range['max'];
     $range_help = '1,3,5,10-20,200';
-
-    /* Proceed to the operation
-     */
-    header( 'Content-type: text/html' );
-    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
     $con = new RegDBHtml( 0, 0, 350, 140 );
     echo $con
@@ -82,11 +80,8 @@ try {
         
         ->html();
 
-    $regdb->commit();
+     RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-} catch( FileMgrException $e ) {
-    print $e->toHtml();
-}
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
 ?>

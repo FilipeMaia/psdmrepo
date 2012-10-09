@@ -28,16 +28,13 @@ if( isset( $_GET['id'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $experiment = $regdb->find_experiment_by_id( $id )
+    $experiment = RegDB::instance()->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
     $instrument = $experiment->instrument();
 
-    /* Check for the authorization
-     */
     if( !RegDBAuth::instance()->canRead( $experiment->id())) {
         print( RegDBAuth::reporErrorHtml(
             'You are not authorized to access any information about the experiment' ));
@@ -101,13 +98,13 @@ try {
     $value_color = 'maroon';
     $label_color = '#b0b0b0';
 
-    $elog_url = '<a href="../logbook?action=select_experiment_by_id&id='.$experiment->id().
+    $elog_url =
+        '<a href="../logbook?action=select_experiment_by_id&id='.$experiment->id().
         '" target="_blank" class="lb_link">LogBook</a>';
 
     $con = new RegDBHtml( 0, 0, 450, 180 );
 
     echo $con
-
 
         ->label (   0,   0, 'R u n s' )
         ->label (  20,  20, 'Number of runs:', false    )->value( 130, 20, $num_runs, $value_color )
@@ -126,11 +123,9 @@ try {
         ->label ( 220, 160, 'On disk:',          false )->value( 300, 160, $hdf5_local_copy.' / '.$hdf5_num_files, $value_color )
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-} catch ( FileMgrException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException   $e) { print $e->toHtml(); }
+  catch (FileMgrException $e) { print $e->toHtml(); }
+
 ?>

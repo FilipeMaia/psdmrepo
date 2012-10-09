@@ -41,11 +41,8 @@ function return_result($result) {
 
 try {
 
-    $authdb = AuthDB::instance();
-	$authdb->begin();
-
-    $logbook = new LogBook();
-    $logbook->begin();
+    AuthDB::instance()->begin();
+    LogBook::instance()->begin();
 
     if( !isset($_POST['files'])) report_error("missing parameter: 'files'");
     $input_files = json_decode(trim($_POST['files']));
@@ -65,7 +62,7 @@ try {
         $exper_id = intval($triplet[0]);
         if( !$exper_id ) report_error("invalid experiment identifier found in the request");
         if( !array_key_exists($exper_id, $files_grouped)) {
-            $experiment = $logbook->find_experiment_by_id( $exper_id );
+            $experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
             if( is_null($experiment)) report_error("unknown experiment identifier {$exper_id} found in the request");
             $files_grouped[$exper_id] = array(
                 'experiment' => $experiment,
@@ -149,7 +146,7 @@ try {
         }
     }
 
-	$authdb->commit();
+    AuthDB::instance()->commit();
 
     report_success(array('files_extended' => $files_extended));
 

@@ -3,15 +3,12 @@
 require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
 
 use FileMgr\FileMgrIrodsWs;
 use FileMgr\FileMgrException;
 
 use LogBook\LogBook;
 use LogBook\LogBookException;
-
-use LusiTime\LusiTime;
 
 use RegDB\RegDBHtml;
 
@@ -128,12 +125,9 @@ function add_files( &$files, $infiles, $type, $file2run, $archived, $local ) {
  */
 try {
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    LogBook::instance()->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $exper_id )
-        or die("No such experiment");
-
+    $experiment = LogBook::instance()->find_experiment_by_id( $exper_id ) or die("No such experiment");
     $instrument = $experiment->instrument();
 
     /* If no specific run range is provided find out the one by probing all
@@ -247,11 +241,9 @@ try {
         }
         print $con->html();
     }
-    $logbook->commit();
+    LogBook::instance()->commit();
 
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-} catch( FileMgrException $e ) {
-    print $e->toHtml();
-}
+} catch (LogBookException $e) { print $e->toHtml(); }
+  catch (FileMgrException $e) { print $e->toHtml(); }
+
 ?>

@@ -16,8 +16,8 @@ use FileMgr\FileMgrException;
 if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
-define( BROWSE_ZONES,    1 );
-define( BROWSE_CATALOGS, 2 );
+define( 'BROWSE_ZONES',    1 );
+define( 'BROWSE_CATALOGS', 2 );
 
 if( !isset( $_GET['path'] )) die( "no valid path in the request" );
 $path = trim( $_GET['path'] );
@@ -65,11 +65,8 @@ function catalog2json( $c ) {
  */
 try {
 
-    $authdb = new AuthDB();
-    $authdb->begin();
+    AuthDB::instance()->begin();
 
-    // Proceed to the operation
-    //
     header( "Content-type: application/json" );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
@@ -94,11 +91,9 @@ HERE;
  ] } }
 HERE;
 
-    $authdb->commit();
+    AuthDB::instance()->commit();
 
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-} catch( FileMgrException $e ) {
-    print $e->toHtml();
-}
+} catch (AuthDBException  $e) { print $e->toHtml(); }
+  catch (FileMgrException $e) { print $e->toHtml(); }
+
 ?>

@@ -22,7 +22,7 @@ ini_set("memory_limit","256M");
  */
 class FileMgrIrodsWs {
 
-    private static $base_url = 'https://pswww2.slac.stanford.edu/ws-auth/irodsws';
+    private static $base_url = 'https://pswww.slac.stanford.edu/ws-auth/irodsws';
     private static $opts = array(
     	"timeout"      => 20,
     	"httpauthtype" => HTTP_AUTH_BASIC,
@@ -39,15 +39,16 @@ class FileMgrIrodsWs {
      */
     public static function run_range( $instrument, $experiment, $type ) {
 
-        $runs = null;
-        FileMgrIrodsWs::request( $runs, '/runs/'.$instrument.'/'.$experiment.'/'.$type );
-
         $min = PHP_INT_MAX;
         $max = -1;
-        foreach( $runs as $r ) {
-            if( $r->run < $min ) $min = $r->run;
-            if( $r->run > $max ) $max = $r->run;
-        }
+
+        $runs = null;
+        FileMgrIrodsWs::request( $runs, '/runs/'.$instrument.'/'.$experiment.'/'.$type );
+        if ($runs)
+            foreach( $runs as $r ) {
+                if( $r->run < $min ) $min = $r->run;
+                if( $r->run > $max ) $max = $r->run;
+            }
         return array( 'min' => $min, 'max' => $max, 'total' => count( $runs ));
     }
 

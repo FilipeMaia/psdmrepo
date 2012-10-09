@@ -164,11 +164,11 @@ Menu source file
 <!--
 Custom JavaScript
 -->
-<script type="text/javascript" src="Menubar.js"></script>
-<script type="text/javascript" src="Dialogs.js"></script>
-<script type="text/javascript" src="Loader.js"></script>
-<script type="text/javascript" src="JSON.js"></script>
-<script type="text/javascript" src="Utilities.js"></script>
+<script type="text/javascript" src="js/Menubar.js"></script>
+<script type="text/javascript" src="js/Dialogs.js"></script>
+<script type="text/javascript" src="js/Loader.js"></script>
+<script type="text/javascript" src="js/JSON.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
 
 
 <!--
@@ -492,7 +492,7 @@ function browse_experiments() {
 
         //prepare URL for XHR request:
         //
-        var sUrl = "RequestExperiments.php?type="+node.data.type;
+        var sUrl = "../explorer/ws/RequestExperiments.php?type="+node.data.type;
         switch( node.data.type ) {
             case BROWSE_FILES:
                 sUrl += '&path='+node.data.path;
@@ -611,7 +611,7 @@ function apply_filter( exper_id ) {
         }
     }
 
-    var url = 'RequestExperimentFiles.php?exper_id='+exper_id + types + runs + archived + local;
+    var url = '../explorer/ws/RequestExperimentFiles.php?exper_id='+exper_id + types + runs + archived + local;
 
     document.getElementById('experiment_files').innerHTML='Updating...';
 
@@ -658,7 +658,7 @@ function import_list( exper_id ) {
             break;
         }
     }
-    var url = 'RequestExperimentFiles.php?exper_id='+exper_id + types + runs + archived + local + '&import';
+    var url = '../explorer/ws/RequestExperimentFiles.php?exper_id='+exper_id + types + runs + archived + local + '&import';
 
     window.open( url );
 }
@@ -677,9 +677,9 @@ function display_experiment_files( instrument, experiment, exper_id ) {
         '</form>';
     document.getElementById('experiment_files').innerHTML='Loading...';
 
-    load( 'ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
-    load( 'Filter.php?exper_id='+exper_id, 'filter_form_params' );
-    load( 'RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
+    load( '../explorer/ws/ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
+    load( '../explorer/ws/Filter.php?exper_id='+exper_id, 'filter_form_params' );
+    load( '../explorer/ws/RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
 
     YAHOO.util.Event.onContentReady (
         "reset_filter_button",
@@ -853,7 +853,7 @@ function manage_hdf5_translation() {
 
         // prepare URL for XHR request:
         //
-        var sUrl = "RequestExperiments.php?type="+node.data.type;
+        var sUrl = "../explorer/ws/RequestExperiments.php?type="+node.data.type;
         switch( node.data.type ) {
             case MANAGE_FILES:
                 sUrl += '&path='+node.data.path;
@@ -942,8 +942,8 @@ function display_experiment_files( instrument, experiment, exper_id ) {
     document.getElementById('experiment_summary').innerHTML='Loading...';
     document.getElementById('experiment_files').innerHTML='Loading...';
 
-    load( 'ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
-    load( 'RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
+    load( '../explorer/ws/ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
+    load( '../explorer/ws/RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
 }
 */
 /*
@@ -1046,7 +1046,7 @@ function browse_catalogs() {
 
         //prepare URL for XHR request:
         //
-        var sUrl = "RequestCatalogs.php?type="+node.data.type;
+        var sUrl = "../explorer/ws/RequestCatalogs.php?type="+node.data.type;
         switch( node.data.type ) {
             case BROWSE_ZONES:
                 sUrl += '&path=';
@@ -1132,7 +1132,7 @@ function display_catalog_files( node_data ) {
 
     document.getElementById('catalog_files').innerHTML='Loading...';
 
-    load( 'RequestCatalogFiles.php?path='+node_data.path, 'catalog_files' );
+    load( '../explorer/ws/RequestCatalogFiles.php?path='+node_data.path, 'catalog_files' );
 }
 
 </script>
