@@ -7,14 +7,14 @@ use RegDB\RegDBAuth;
 use RegDB\RegDBException;
 
 /*
- * This script will process a request for displaying parameters of an experiment.
+ * This script will process a request for displaying parameters of an instrument.
  */
 if( isset( $_GET['id'] )) {
     $id = trim( $_GET['id'] );
     if( $id == '' )
-        die( "experiment identifier can't be empty" );
+        die( "instrument identifier can't be empty" );
 } else
-    die( "no valid experiment identifier" );
+    die( "no valid instrument identifier" );
 
 function param2json( $param ) {
     return json_encode(
@@ -30,12 +30,9 @@ function param2json( $param ) {
  * Return JSON objects with a list of parameters.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $experiment = $regdb->find_experiment_by_id( $id )
-        or die( "no such experiment" );
-    $params = $experiment->params();
+    RegDB::instance()->begin();
+    $instrument = RegDB::instance()->find_instrument_by_id( $id ) or die( "no such instrument" );
+    $params = $instrument->params();
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -59,10 +56,8 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
 
 ?>

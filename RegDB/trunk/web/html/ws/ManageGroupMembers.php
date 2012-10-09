@@ -100,12 +100,11 @@ function member2json_simple( $member ) {
  * Return JSON objects with a list of groups.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
     /* Make sure the group exists
      */
-    if( !$regdb->is_known_posix_group( $groupname )) {
+    if( !RegDB::instance()->is_known_posix_group( $groupname )) {
         report_error_and_return( "The group doen't exist" );
     }
 
@@ -116,7 +115,7 @@ try {
 
         /* Make sure the group can be managed in the local realm
          */
-    	if( !array_key_exists( $groupname, $regdb->experiment_specific_groups())) {
+    	if( !array_key_exists( $groupname, RegDB::instance()->experiment_specific_groups())) {
             report_error_and_return( "The group can't be managed by this application" );
         }
     	
@@ -128,10 +127,10 @@ try {
 
         /* Proceed to the requested operation
          */
-        if(      $action == 'include' ) $regdb->add_user_to_posix_group     ( $uid, $groupname );
-    	else if( $action == 'exclude' ) $regdb->remove_user_from_posix_group( $uid, $groupname );
+        if(      $action == 'include' ) RegDB::instance()->add_user_to_posix_group     ( $uid, $groupname );
+    	else if( $action == 'exclude' ) RegDB::instance()->remove_user_from_posix_group( $uid, $groupname );
     }
-    $members = $regdb->posix_group_members( $groupname );
+    $members = RegDB::instance()->posix_group_members( $groupname );
 
     $status_encoded = json_encode( "success" );
     print <<< HERE
@@ -154,12 +153,9 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    report_error_and_return( $e->toHtml());
-} catch( Exception $e ) {
-    report_error_and_return( $e );
-}
+} catch (RegDBException $e) { report_error_and_return( $e->toHtml()); }
+  catch (Exception      $e) { report_error_and_return( $e );}
 
 ?>

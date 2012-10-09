@@ -27,10 +27,9 @@ if( isset( $_GET['id'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $experiment = $regdb->find_experiment_by_id( $id )
+    $experiment = RegDB::instance()->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
     $instrument = $experiment->instrument();
@@ -62,9 +61,8 @@ try {
         ->value         ( 100, 225, $experiment->leader_account())
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

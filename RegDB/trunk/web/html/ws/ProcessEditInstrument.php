@@ -48,12 +48,9 @@ if( isset( $_POST['actionSuccess'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $instrument = $regdb->find_instrument_by_id ( $id )
-        or die( "no such instrument" );
-
+    $instrument = RegDB::instance()->find_instrument_by_id ( $id ) or die( "no such instrument" );
     $instrument->set_description( $description );
 
     /* Replace parameters if the list is passed
@@ -68,20 +65,13 @@ try {
         }
     }
     if( isset( $actionSuccess )) {
-        if( $actionSuccess == 'home' )
-            header( 'Location: index.php' );
-        else if( $actionSuccess == 'list_instruments' )
-            header( 'Location: index.php?action=list_instruments' );
-        else if( $actionSuccess == 'view_instrument' )
-            header( 'Location: index.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
-        else if( $actionSuccess == 'edit_instrument' )
-            header( 'Location: index.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
-        else
-            ;
+        if     ($actionSuccess == 'home')             header('Location: ../index.php');
+        elseif ($actionSuccess == 'list_instruments') header('Location: ../index.php?action=list_instruments');
+        elseif ($actionSuccess == 'view_instrument')  header('Location: ../index.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
+        elseif ($actionSuccess == 'edit_instrument')  header('Location: ../index.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
     }
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

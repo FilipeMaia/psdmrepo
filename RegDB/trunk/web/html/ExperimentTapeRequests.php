@@ -1,11 +1,11 @@
-<!-- The script for reporting and optionally modifying the DATA_PATH
-     parameter of experiments. -->
+<!-- The script is for viewing and managing outstanding file restore requests.
+  -->
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 
-<title>Report and modify Data Path parameter for known experiments</title>
+<title>is</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />

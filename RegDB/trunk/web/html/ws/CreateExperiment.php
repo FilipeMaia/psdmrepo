@@ -25,11 +25,10 @@ if( !RegDBAuth::instance()->canEdit()) {
  */
 try {
 
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $instrument_names = $regdb->instrument_names();
-    $posix_groups     = $regdb->posix_groups();
+    $instrument_names = RegDB::instance()->instrument_names();
+    $posix_groups     = RegDB::instance()->posix_groups();
 
     // Get the currnt time in the ISO format, then stripe out
     // the date-time separator 'T' and timezone.
@@ -65,11 +64,9 @@ try {
         ->value_input   ( 100, 225, 'leader', $logged_user )
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( LusiTimeException $e ) {
-    print $e->toHtml();
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (LusiTimeException $e) { print $e->toHtml(); }
+  catch (RegDBException    $e) { print $e->toHtml(); }
+
 ?>

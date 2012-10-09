@@ -38,10 +38,8 @@ function group2json( $group ) {
  * Return JSON objects with a list of groups.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $groups = $regdb->posix_groups();
+    RegDB::instance()->begin();
+    $groups = RegDB::instance()->posix_groups();
 
     // Choose the desired presentation
     //
@@ -51,43 +49,43 @@ try {
     	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-	   	echo "<table><thead>\n";
+        echo "<table><thead>\n";
 
-	   	if( $grid == 'vertical' ) {
+        if( $grid == 'vertical' ) {
 
-	    	$num_groups = count( $groups );
-    		$num_rows   = floor( $num_groups / $NUM_COLUMNS ) + ( $num_groups % $NUM_COLUMNS == 0 ? 0 : 1 );
-    		$rows = array();
-    		for( $i = 0; $i < $num_rows; $i++ ) array_push( $rows, "  <tr>\n    " );
-    		$r = 0;
-    		foreach( $groups as $g ) {
-    			$rows[$r] .= '<td><div style="padding:2px; padding-right:10px;">'.groupUrl( $g ).'</div></td>';
-    			if( ++$r >= $num_rows ) $r = 0;
-    		}
-	   		for( $i = 0; $i < $num_rows; $i++ ) echo $rows[$i]."\n  </tr>\n";
+        $num_groups = count( $groups );
+        $num_rows   = floor( $num_groups / $NUM_COLUMNS ) + ( $num_groups % $NUM_COLUMNS == 0 ? 0 : 1 );
+        $rows = array();
+        for( $i = 0; $i < $num_rows; $i++ ) array_push( $rows, "  <tr>\n    " );
+        $r = 0;
+        foreach( $groups as $g ) {
+            $rows[$r] .= '<td><div style="padding:2px; padding-right:10px;">'.groupUrl( $g ).'</div></td>';
+            if( ++$r >= $num_rows ) $r = 0;
+        }
+        for( $i = 0; $i < $num_rows; $i++ ) echo $rows[$i]."\n  </tr>\n";
 	   		
     	} else if( $grid == 'horizontal' ) {
 
-	    	$num_groups       = count( $groups );
-    		$num_full_rows    = floor( $num_groups / $NUM_COLUMNS );
-    		$cols_in_last_row = $num_groups % $NUM_COLUMNS;
- 
-	    	for( $r = 0; $r < $num_full_rows; $r++ ) {
-    			$base = $r*$NUM_COLUMNS;
-    			echo "  <tr>\n    ";
-    			for( $c = 0; $c < $NUM_COLUMNS; $c++ ) {
-    				echo '<td><div style="padding:2px;">'.groupUrl( $groups[$base+$c] ).'</div></td>';
-    			}
-    			echo "\n  </tr>\n";
-    		}
-    		if( $cols_in_last_row > 0 ) {
-    			$base = $num_groups - $cols_in_last_row;
-    			echo "  <tr>\n    ";
-    			for( $c = 0; $c < $cols_in_last_row; $c++ ) {
-    				echo '<td><div style="padding:2px;">'.groupUrl( $groups[$base+$c] ).'</div></td>';
-    			}
-    			echo "\n  </tr>\n";
-    		}
+            $num_groups       = count( $groups );
+            $num_full_rows    = floor( $num_groups / $NUM_COLUMNS );
+            $cols_in_last_row = $num_groups % $NUM_COLUMNS;
+
+            for( $r = 0; $r < $num_full_rows; $r++ ) {
+                $base = $r*$NUM_COLUMNS;
+                echo "  <tr>\n    ";
+                for( $c = 0; $c < $NUM_COLUMNS; $c++ ) {
+                    echo '<td><div style="padding:2px;">'.groupUrl( $groups[$base+$c] ).'</div></td>';
+                }
+                echo "\n  </tr>\n";
+            }
+            if( $cols_in_last_row > 0 ) {
+                $base = $num_groups - $cols_in_last_row;
+                echo "  <tr>\n    ";
+                for( $c = 0; $c < $cols_in_last_row; $c++ ) {
+                    echo '<td><div style="padding:2px;">'.groupUrl( $groups[$base+$c] ).'</div></td>';
+                }
+                echo "\n  </tr>\n";
+            }
     	}
     	echo "</thead></table>\n";
 
@@ -114,11 +112,9 @@ HERE;
     	print <<< HERE
  ] } }
 HERE;
-	}
-    $regdb->commit();
+    }
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
 
 ?>

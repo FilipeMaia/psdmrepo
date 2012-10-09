@@ -31,10 +31,8 @@ function experiment2json( $experiment ) {
  * Return JSON objects with a list of experiments.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $experiments = $regdb->experiments();
+    RegDB::instance()->begin();
+    $experiments = RegDB::instance()->experiments();
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -58,10 +56,8 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
 
 ?>

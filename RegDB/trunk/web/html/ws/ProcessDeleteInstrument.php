@@ -7,7 +7,7 @@ use RegDB\RegDBAuth;
 use RegDB\RegDBException;
 
 /*
- * This script will process a request for deleting an experiment
+ * This script will process a request for deleting an instrument
  * from the database.
  */
 if( !RegDBAuth::instance()->canEdit()) {
@@ -19,9 +19,9 @@ if( !RegDBAuth::instance()->canEdit()) {
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
-        die( "experiment identifier can't be empty" );
+        die( "instrument identifier can't be empty" );
 } else
-    die( "no valid experiment identifier" );
+    die( "no valid instrument identifier" );
 
 if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
@@ -30,22 +30,15 @@ if( isset( $_POST['actionSuccess'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $regdb->delete_experiment_by_id ( $id );
+    RegDB::instance()->begin();
+    RegDB::instance()->delete_instrument_by_id ( $id );
 
     if( isset( $actionSuccess )) {
-        if( $actionSuccess == 'home' )
-            header( 'Location: index.php' );
-        else if( $actionSuccess == 'list_experiments' )
-            header( 'Location: index.php?action=list_experiments' );
-        else
-            ;
+        if     ($actionSuccess == 'home')             header('Location: ../index.php');
+        elseif ($actionSuccess == 'list_instruments') header('Location: ../index.php?action=list_instruments');
     }
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

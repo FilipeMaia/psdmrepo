@@ -20,10 +20,9 @@ if( isset( $_GET['exper_id'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $experiment = $regdb->find_experiment_by_id( $exper_id )
+    $experiment = RegDB::instance()->find_experiment_by_id( $exper_id )
         or die( "no such experiment" );
 
     $instrument = $experiment->instrument();
@@ -52,9 +51,8 @@ try {
         ->value   ( 275, 100, is_null( $last_run ) ? 'n/a' : $last_run->request_time()->toStringShort())
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
+
 ?>

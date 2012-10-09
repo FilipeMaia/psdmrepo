@@ -23,10 +23,8 @@ function instrument2json( $instrument ) {
  * Return JSON objects with a list of instruments.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $instruments = $regdb->instruments();
+    RegDB::instance()->begin();
+    $instruments = RegDB::instance()->instruments();
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -50,10 +48,8 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
 
 ?>

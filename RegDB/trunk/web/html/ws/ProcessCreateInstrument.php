@@ -48,13 +48,10 @@ if( isset( $_POST['actionSuccess'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
+    $instrument = RegDB::instance()->register_instrument ($instrument_name, $description);
 
-    $instrument = $regdb->register_instrument (
-        $instrument_name, $description );
-
-    /* Add parameters if any
+    /* Add parameters if any were provided
      */
     if( !is_null( $params ))
         foreach( $params as $p )
@@ -62,20 +59,13 @@ try {
                 or die( "failed to add instrument parameter: {$pa}");
 
     if( isset( $actionSuccess )) {
-        if( $actionSuccess == 'home' )
-            header( 'Location: index.php' );
-        else if( $actionSuccess == 'list_instruments' )
-            header( 'Location: index.php?action=list_instruments' );
-        else if( $actionSuccess == 'view_instrument' )
-            header( 'Location: index.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
-        else if( $actionSuccess == 'edit_instrument' )
-            header( 'Location: index.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
-        else
-            ;
+        if     ($actionSuccess == 'home'            ) header('Location: ../index.php');
+        elseif ($actionSuccess == 'list_instruments') header('Location: ../index.php?action=list_instruments');
+        elseif ($actionSuccess == 'view_instrument' ) header('Location: ../index.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
+        elseif ($actionSuccess == 'edit_instrument' ) header('Location: ../index.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
     }
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

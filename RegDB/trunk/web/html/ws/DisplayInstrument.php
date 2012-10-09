@@ -20,10 +20,9 @@ if( isset( $_GET['id'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
-    $instrument = $regdb->find_instrument_by_id( $id )
+    $instrument = RegDB::instance()->find_instrument_by_id( $id )
         or die( "no such instrument" );
 
     header( 'Content-type: text/html' );
@@ -38,9 +37,8 @@ try {
         ->textarea( 200,  25, $instrument->description(), 500, 125 )
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
+
 ?>

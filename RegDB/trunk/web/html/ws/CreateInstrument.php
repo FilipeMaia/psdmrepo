@@ -18,8 +18,7 @@ if( !RegDBAuth::instance()->canEdit()) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -35,9 +34,8 @@ try {
         ->textarea_input( 300,  25, 'description', 500, 125 )
         ->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

@@ -19,10 +19,6 @@ use AuthDB\AuthDB;
  */
 class RegDBAuth {
 
-    /* Data members
-     */
-    private $authdb;
-
     private static $instance = null;
 
     public static function instance() {
@@ -30,21 +26,9 @@ class RegDBAuth {
         return RegDBAuth::$instance;
     }
 
-    public function __construct () {
-        $this->authdb = new AuthDB();
-    }
-
-    public function authName() {
-        return $this->authdb->authName(); // $_SERVER['REMOTE_USER'];
-    }
-
-    public function authType() {
-        return $this->authdb->authType(); // $_SERVER['AUTH_TYPE'];
-    }
-
-    public function isAuthenticated() {
-        return $this->authdb->isAuthenticated(); // RegDBAuth::instance()->authName() != '';
-    }
+    public function authName        () { return AuthDb::instance()->authName(); }
+    public function authType        () { return AuthDb::instance()->authType(); }
+    public function isAuthenticated () { return AuthDb::instance()->isAuthenticated(); }
 
     public function canRead() {
     	// Anyone who's been authenticated can read the contents of
@@ -55,8 +39,8 @@ class RegDBAuth {
 
     public function canEdit() {
         if( !$this->isAuthenticated()) return false;
-        $this->authdb->begin();
-        return $this->authdb->hasPrivilege(
+        AuthDb::instance()->begin();
+        return AuthDb::instance()->hasPrivilege(
             RegDBAuth::instance()->authName(), null, 'RegDB', 'edit' );
     }
 
@@ -73,17 +57,12 @@ class RegDBAuth {
 
     	/* Find experiment in order to get its identifier.
     	 */
-    	$regdb = new RegDB();
-    	$regdb->begin();
-    	$experiment = $regdb->find_experiment_by_unique_name( $name );
+    	RegDB::instance()->begin();
+        $experiment = RegDB::instance()->find_experiment_by_unique_name( $name );
     	if( is_null( $experiment )) return false;
-    	/*
-    		throw new RegDBException (
-            	__METHOD__,
-            	"no such experiement: ".$name );
-        */
-        $this->authdb->begin();
-        return $this->authdb->hasPrivilege(
+
+        AuthDb::instance()->begin();
+        return AuthDb::instance()->hasPrivilege(
             RegDBAuth::instance()->authName(), $experiment->id(), 'LDAP', 'manage_groups' );
     }
 
@@ -99,12 +78,12 @@ class RegDBAuth {
   
         if( !$this->isAuthenticated()) return false;
 
-        $this->authdb->begin();
+        AuthDb::instance()->begin();
 
         /* Check if a user is allowed to manage any groups.
          * If so then unconditionally proceed with the authorization.
          */
-        if( $this->authdb->hasPrivilege(
+        if( AuthDb::instance()->hasPrivilege(
             RegDBAuth::instance()->authName(),
             null, /* exper_id */
             'LDAP',
@@ -112,12 +91,11 @@ class RegDBAuth {
 
         /* Go through all experiments. Skip 'facilities'.
     	 */
-        $regdb = new RegDB();
-    	$regdb->begin();
-    	foreach( $regdb->experiments() as $experiment ) {    	
+    	RegDB::instance()->begin();
+    	foreach( RegDB::instance()->experiments() as $experiment ) {    	
     		if( $experiment->is_facility()) continue;
     		if( $experiment->POSIX_gid() == $name ) {
-                if( $this->authdb->hasPrivilege(
+                if( AuthDb::instance()->hasPrivilege(
                     RegDBAuth::instance()->authName(),
                     $experiment->id(),
                     'LDAP',

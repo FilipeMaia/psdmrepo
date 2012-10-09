@@ -165,7 +165,7 @@ input.autotranslate2hdf5 {
 function load_hdf5_files(exper_id) {
     $.ajax({
         type: 'GET',
-        url: '../portal/SearchFiles.php',
+        url: '../portal/ws/SearchFiles.php',
         data: {
             exper_id: exper_id,
             types: 'hdf5'
@@ -178,7 +178,7 @@ function load_hdf5_files(exper_id) {
             }
             $('#num_translated_'+exper_id).html(num_files?num_files:'');
         },
-        error: function() {	alrt('The request can not go through due a failure to contact the server.'); },
+        error: function() { alert('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
     });
 }
@@ -195,7 +195,7 @@ $(function() {
 
         $.ajax({
             type: 'POST',
-            url: '../regdb/SetAutoTranslate2HDF5.php',
+            url: '../regdb/ws/SetAutoTranslate2HDF5.php',
             data: {
                 exper_id: exper_id,
                 autotranslate2hdf5: is_checked ? 1 : 0

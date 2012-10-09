@@ -144,11 +144,11 @@ Menu source file
 <!--
 Custom JavaScript
 -->
-<script type="text/javascript" src="Menubar.js"></script>
-<script type="text/javascript" src="Dialogs.js"></script>
-<script type="text/javascript" src="Loader.js"></script>
-<script type="text/javascript" src="JSON.js"></script>
-<script type="text/javascript" src="Utilities.js"></script>
+<script type="text/javascript" src="js/Menubar.js"></script>
+<script type="text/javascript" src="js/Dialogs.js"></script>
+<script type="text/javascript" src="js/Loader.js"></script>
+<script type="text/javascript" src="js/JSON.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
 
 
 <!--
@@ -739,7 +739,7 @@ function list_experiments() {
           { key: "begin_time",  sortable: true,  resizeable: true },
           { key: "end_time",    sortable: true,  resizeable: true },
           { key: "description", sortable: false, resizeable: true } ],
-        'RequestExperiments.php',
+        '../regdb/ws/RequestExperiments.php',
         false
     );
     table.refreshTable();
@@ -771,10 +771,10 @@ function view_experiment( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'DisplayExperiment.php?id='+id, 'experiment_info' );
+    load( '../regdb/ws/DisplayExperiment.php?id='+id, 'experiment_info' );
 
     var params = create_params_table(
-        'RequestExperimentParams.php?id='+id,
+        '../regdb/ws/RequestExperimentParams.php?id='+id,
         false );
 
     var action_edit = create_button (
@@ -803,7 +803,7 @@ function edit_experiment( id, name ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info" style="height:250px;">'+
-        '    <form name="edit_experiment_form" action="ProcessEditExperiment.php" method="post">'+
+        '    <form name="edit_experiment_form" action="../regdb/ws/ProcessEditExperiment.php" method="post">'+
         '      <div id="experiment_info_within_form"></div>'+
         '      <input type="hidden" name="id" value="'+id+'" />'+
         '      <input type="hidden" name="actionSuccess" value="view_experiment" />'+
@@ -822,10 +822,10 @@ function edit_experiment( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'EditExperiment.php?id='+id, 'experiment_info_within_form' );
+    load( '../regdb/ws/EditExperiment.php?id='+id, 'experiment_info_within_form' );
 
     var params = create_params_table_editable (
-        'RequestExperimentParams.php?id='+id,
+        '../regdb/ws/RequestExperimentParams.php?id='+id,
         false );
 
     var save = create_button (
@@ -854,7 +854,7 @@ function create_experiment( ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info" style="height:250px;">'+
-        '    <form name="create_experiment_form" action="ProcessCreateExperiment.php" method="post">'+
+        '    <form name="create_experiment_form" action="../regdb/ws/ProcessCreateExperiment.php" method="post">'+
         '      <div id="experiment_info_within_form"></div>'+
         '      <input type="hidden" name="actionSuccess" value="view_experiment" />'+
         '      <input type="hidden" name="params" value="" />'+
@@ -872,7 +872,7 @@ function create_experiment( ) {
         '  </div>'+
         '</div>';
 
-    load( 'CreateExperiment.php', 'experiment_info_within_form' );
+    load( '../regdb/ws/CreateExperiment.php', 'experiment_info_within_form' );
 
     var params = create_params_table_editable( null, false );
 
@@ -903,7 +903,7 @@ function delete_experiment( id, name ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info" style="height:250px;">'+
-        '    <form name="delete_experiment_form" action="ProcessDeleteExperiment.php" method="post">'+
+        '    <form name="delete_experiment_form" action="../regdb/ws/ProcessDeleteExperiment.php" method="post">'+
         '      <div id="experiment_info_within_form"></div>'+
         '        <input type="hidden" name="id" value="'+id+'" />'+
         '      <input type="hidden" name="actionSuccess" value="list_experiments" />'+
@@ -919,10 +919,10 @@ function delete_experiment( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'DisplayExperiment.php?id='+id, 'experiment_info_within_form' );
+    load( '../regdb/ws/DisplayExperiment.php?id='+id, 'experiment_info_within_form' );
 
     var params = create_params_table (
-        'RequestExperimentParams.php?id='+id,
+        '../regdb/ws/RequestExperimentParams.php?id='+id,
         false
     );
     var save = create_button (
@@ -969,7 +969,7 @@ function list_instruments() {
         "workarea",
         [ { key: "instrument",  sortable: true,  resizeable: true },
           { key: "description", sortable: false, resizeable: true } ],
-        'RequestInstruments.php',
+        '../regdb/ws/RequestInstruments.php',
         false
     );
     table.refreshTable();
@@ -999,10 +999,10 @@ function view_instrument( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'DisplayInstrument.php?id='+id, 'instrument_info' );
+    load( '../regdb/ws/DisplayInstrument.php?id='+id, 'instrument_info' );
 
     var params = create_params_table (
-        'RequestInstrumentParams.php?id='+id,
+        '../regdb/ws/RequestInstrumentParams.php?id='+id,
         false
     );
     var action_edit = create_button (
@@ -1031,7 +1031,7 @@ function edit_instrument( id, name ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="instrument_info" style="height:150px;">'+
-        '    <form name="edit_instrument_form" action="ProcessEditInstrument.php" method="post">'+
+        '    <form name="edit_instrument_form" action="../regdb/ws/ProcessEditInstrument.php" method="post">'+
         '      <div id="instrument_info_within_form"></div>'+
         '      <input type="hidden" name="id" value="'+id+'" />'+
         '      <input type="hidden" name="actionSuccess" value="view_instrument" />'+
@@ -1050,10 +1050,10 @@ function edit_instrument( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'EditInstrument.php?id='+id, 'instrument_info_within_form' );
+    load( '../regdb/ws/EditInstrument.php?id='+id, 'instrument_info_within_form' );
 
     var params = create_params_table_editable (
-        'RequestInstrumentParams.php?id='+id,
+        '../regdb/ws/RequestInstrumentParams.php?id='+id,
         false
     );
     var save = create_button (
@@ -1084,7 +1084,7 @@ function create_instrument( ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="instrument_info" style="height:150px;">'+
-        '    <form name="create_instrument_form" action="ProcessCreateInstrument.php" method="post">'+
+        '    <form name="create_instrument_form" action="../regdb/ws/ProcessCreateInstrument.php" method="post">'+
         '      <div id="instrument_info_within_form"></div>'+
         '      <input type="hidden" name="actionSuccess" value="view_instrument" />'+
         '      <input type="hidden" name="params" value="" />'+
@@ -1102,7 +1102,7 @@ function create_instrument( ) {
         '  </div>'+
         '</div>';
 
-    load( 'CreateInstrument.php', 'instrument_info_within_form' );
+    load( '../regdb/ws/CreateInstrument.php', 'instrument_info_within_form' );
 
     var params = create_params_table_editable( null, false );
 
@@ -1134,7 +1134,7 @@ function delete_instrument( id, name ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="instrument_info" style="height:150px;">'+
-        '    <form name="delete_instrument_form" action="ProcessDeleteInstrument.php" method="post">'+
+        '    <form name="delete_instrument_form" action="../regdb/ws/ProcessDeleteInstrument.php" method="post">'+
         '      <div id="instrument_info_within_form"></div>'+
         '      <input type="hidden" name="id" value="'+id+'" />'+
         '      <input type="hidden" name="actionSuccess" value="list_instruments" />'+
@@ -1150,10 +1150,10 @@ function delete_instrument( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'DisplayInstrument.php?id='+id, 'instrument_info_within_form' );
+    load( '../regdb/ws/DisplayInstrument.php?id='+id, 'instrument_info_within_form' );
 
     var params = create_params_table (
-        'RequestInstrumentParams.php?id='+id,
+        '../regdb/ws/RequestInstrumentParams.php?id='+id,
         false
     );
     var save = create_button (
@@ -1200,7 +1200,7 @@ function run_numbers() {
           { key: "experiment",   sortable: true, resizeable: true },
           { key: "last_run_num", sortable: true, resizeable: true },
           { key: "request_time", sortable: true, resizeable: true } ],
-        'RequestRunNumbers.php',
+        '../regdb/ws/RequestRunNumbers.php',
         true
     );
     table.refreshTable();
@@ -1216,7 +1216,7 @@ function view_run_numbers( id, name ) {
         '<div id="actions_container">'+
         //'  <button disabled="disabled" id="generate_button" title="This will generate next run number. This operation is used for testing purposes only.">Generate Next Run</button>'+
         '  <button id="generate_button" title="This will generate next run number. This operation is used for testing purposes only.">Generate Next Run</button>'+
-        '  <form name="generate_run_form" action="ProcessGenerateRun.php" method="post">'+
+        '  <form name="generate_run_form" action="../regdb/ws/ProcessGenerateRun.php" method="post">'+
         '    <input type="hidden" name="id" value="'+id+'" />'+
         '    <input type="hidden" name="actionSuccess" value="view_run_numbers" />'+
         '  </form>'+
@@ -1234,7 +1234,7 @@ function view_run_numbers( id, name ) {
         '  </div>'+
         '</div>';
 
-    load( 'DisplayRunNumbers.php?exper_id='+id, 'runs_info' );
+    load( '../regdb/ws/DisplayRunNumbers.php?exper_id='+id, 'runs_info' );
 
     var generate = create_button (
         "generate_button",
@@ -1242,7 +1242,7 @@ function view_run_numbers( id, name ) {
         !auth_granted.edit
     );
     var runs = create_runs_table (
-        'RequestRunNumbers.php?exper_id='+id,
+        '../regdb/ws/RequestRunNumbers.php?exper_id='+id,
         false
     );
 }

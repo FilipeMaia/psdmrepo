@@ -31,26 +31,16 @@ if( isset( $_POST['actionSuccess'] )) {
 /* Proceed with the operation
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
-
-    $experiment = $regdb->find_experiment_by_id ( $id )
-        or die( 'no such experiment' );
-
-    $run = $experiment->generate_run()
-        or die( 'failed to generate the number' );
+    RegDB::instance()->begin();
+    $experiment = RegDB::instance()->find_experiment_by_id ( $id ) or die( 'no such experiment' );
+    $run = $experiment->generate_run() or die( 'failed to generate the number' );
 
     if( isset( $actionSuccess )) {
-        if( $actionSuccess == 'home' )
-            header( 'Location: index.php' );
-        else if( $actionSuccess == 'view_run_numbers' )
-            header( 'Location: index.php?action=view_run_numbers&id='.$experiment->id().'&name='.$experiment->name());
-        else
-            ;
+        if     ($actionSuccess == 'home')             header('Location: ../index.php' );
+        elseif ($actionSuccess == 'view_run_numbers') header('Location: ../index.php?action=view_run_numbers&id='.$experiment->id().'&name='.$experiment->name());
     }
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

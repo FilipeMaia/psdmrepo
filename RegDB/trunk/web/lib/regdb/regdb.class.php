@@ -9,15 +9,24 @@ use LusiTime\LusiTime;
 
 class RegDB {
 
-	private static $default_instance = null;
+	private static $instance = null;
 
 	/**
 	 * Return an instance of the object initialzied with default version
 	 * of parameters.
 	 */
 	public static function instance() {
-		if( is_null(RegDB::$default_instance)) RegDB::$default_instance = new RegDB();
-		return RegDB::$default_instance;
+		if( is_null(RegDB::$instance)) RegDB::$instance =
+                    new RegDB(
+                        REGDB_DEFAULT_HOST,
+                        REGDB_DEFAULT_USER,
+                        REGDB_DEFAULT_PASSWORD,
+                        REGDB_DEFAULT_DATABASE,
+                        REGDB_DEFAULT_LDAP_HOST,
+                        REGDB_DEFAULT_LDAP_USER,
+                        REGDB_DEFAULT_LDAP_PASSWD
+                    );
+		return RegDB::$instance;
 	}
 
 	/* Data members
@@ -29,24 +38,17 @@ class RegDB {
      * Construct the top-level API object using the specified connection
      * parameters. Put null to envorce default values of parameters.
      */
-    public function __construct (
-        $host        = null,
-        $user        = null,
-        $password    = null,
-        $database    = null,
-        $ldap_host   = null,
-        $ldap_user   = null,
-        $ldap_passwd = null ) {
+    public function __construct ($host, $user, $password, $database, $ldap_host, $ldap_user, $ldap_passwd) {
 
         $this->connection =
             new RegDBConnection (
-                is_null($host)        ? REGDB_DEFAULT_HOST        : $host,
-                is_null($user)        ? REGDB_DEFAULT_USER        : $user,
-                is_null($password)    ? REGDB_DEFAULT_PASSWORD    : $password,
-                is_null($database)    ? REGDB_DEFAULT_DATABASE    : $database,
-                is_null($ldap_host)   ? REGDB_DEFAULT_LDAP_HOST   : $ldap_host,
-                is_null($ldap_user)   ? REGDB_DEFAULT_LDAP_USER   : $ldap_user,
-                is_null($ldap_passwd) ? REGDB_DEFAULT_LDAP_PASSWD : $ldap_passwd );
+                $host,
+                $user,
+                $password,
+                $database,
+                $ldap_host,
+                $ldap_user,
+                $ldap_passwd );
         }
 
     /*
@@ -559,6 +561,8 @@ HERE;
             $groups['xpp80610'] = True;
             $groups['ps-xpp'] = True;
             $groups['xppopr'] = True;
+            $groups['xppcom12'] = True;
+            $groups['xppcom13'] = True;
     	}
     	/* CXI commissionning, in-house, etc. experiments for the year of 2010.
          */
@@ -579,7 +583,13 @@ HERE;
             $groups['ps-xcs'] = True;
             $groups['xcsopr'] = True;
             $groups['xcscom12'] = True;
+            $groups['xcsc0112'] = True;
     	}
+        
+        /* Add groups which aren't really experiment or instrument specific.
+         */
+        $groups['ps-data'] = True;
+
     	return $groups;
     }
 }
@@ -594,30 +604,34 @@ require_once( 'lusitime/lusitime.inc.php' );
 use LusiTime\LusiTime;
 
 try {
-    $conn = new RegDB();
-    $conn->begin();
+    RegDB::instance()->begin();
 
-    $name = "Exp-A";
-    $instrument_name = "CXI";
-    $description = "Experiment description goes here";
+    $name              = "Exp-A";
+    $instrument_name   = "CXI";
+    $description       = "Experiment description goes here";
     $registration_time = LusiTime::now();
-    $begin_time = LusiTime::parse( "2009-07-01 09:00:01-0700" );
-    $end_time = LusiTime::parse( "2009-09-01 09:00:01-0700" );
-    $posix_gid = "lab-users";
-    $leader = "perazzo";
-    $contact = "Phone: SLAC x5095, E-Mail: gapon@slac.stanford.edu";
+    $begin_time        = LusiTime::parse( "2009-07-01 09:00:01-0700" );
+    $end_time          = LusiTime::parse( "2009-09-01 09:00:01-0700" );
+    $posix_gid         = "ps-data";
+    $leader            = "gapon";
+    $contact           = "Phone: SLAC x5095, E-Mail: gapon@slac.stanford.edu";
 
-    $experiment = $conn->register_experiment (
-        $name, $instrument_name, $description,
-        $registration_time, $begin_time, $end_time,
-        $posix_gid, $leader, $contact );
+    $experiment = RegDB::instance()->register_experiment (
+        $name,
+        $instrument_name,
+        $description,
+        $registration_time, 
+        $begin_time,
+        $end_time,
+        $posix_gid,
+        $leader,
+        $contact );
 
     print_r( $experiment );
 
-    $conn->commit();
+    RegDB::instance()->commit();
 
-} catch ( RegDBException $e ) {
-    print( $e->toHtml());
-}
+} catch ( RegDBException $e ) { print( $e->toHtml()); }
+
 */
 ?>

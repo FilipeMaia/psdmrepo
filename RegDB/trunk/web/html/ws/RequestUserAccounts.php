@@ -80,16 +80,15 @@ function account2json_simple( $account ) {
  * Return JSON objects with a list of groups.
  */
 try {
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
     if( $string2search == '' ) {
-    	$accounts = $regdb->user_accounts();
+    	$accounts = RegDB::instance()->user_accounts();
     } else {
     	$search_in_scope = array( "uid" => true, "gecos" => true );
     	if(      $scope == "uid"  ) $search_in_scope["gecos"] = false;
     	else if( $scope == "name" ) $search_in_scope["uid"]   = false;
-    	$accounts = $regdb->find_user_accounts( $string2search, $search_in_scope );
+    	$accounts = RegDB::instance()->find_user_accounts( $string2search, $search_in_scope );
     }
 
     header( 'Content-type: application/json' );
@@ -115,10 +114,8 @@ HERE;
  ] } }
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+} catch( RegDBException $e ) { print $e->toHtml(); }
 
 ?>
