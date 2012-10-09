@@ -1,16 +1,16 @@
 <?php
 require_once( 'authdb/authdb.inc.php' );
-require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
-use AuthDB\Logger;
 
-use RegDB\RegDB;
-use RegDB\RegDBException;
+use AuthDB\Logger;
 
 /* The script for reporting the LDAP group management operations
 */
+function report_error($msg) {
+    print $msg;
+    exit;
+}
 
 $as_text = isset( $_GET['as_text']);
 
@@ -155,8 +155,7 @@ HERE;
 	}
 	$authdb->commit();
 	
-} catch( AuthDBException  $e ) { print $e->toHtml(); }
-  catch( RegDBException   $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
 
 ?>
 

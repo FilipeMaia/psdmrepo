@@ -5,41 +5,43 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use LogBook\LogBook;
-use LogBook\LogBookException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
-/** Harvest the optional parameters first.
+/* Harvest the optional parameters first.
  */
+function report_error($msg) {
+    print $msg;
+    exit;
+}
 if( isset( $_GET['instr_name'] )) {
-	$instr_name = strtoupper( trim( $_GET['instr_name'] ));
-	if( $instr_name == '' ) die( "<b>error:</b> instrument name parameter if present can't have an empty value" );
+    $instr_name = strtoupper( trim( $_GET['instr_name'] ));
+    if( $instr_name == '' )
+        report_error( "<b>error:</b> instrument name parameter if present can't have an empty value" );
 }
 $fix = isset( $_GET['fix'] );
 
 try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+	AuthDB::instance()->begin();
 
-	if( $fix && !$authdb->canEdit()) die( "<b>error:</b> your account doesn't posseses sufficient privileges to perform the operaton" );
+	if( $fix && !AuthDB::instance()->canEdit())
+            report_error( "<b>error:</b> your account doesn't posseses sufficient privileges to perform the operaton" );
 
-	$logbook = new LogBook();
-	$logbook->begin();
+	LogBook::instance()->begin();
 
 	$instrument_names = array();
 	if( isset( $instr_name )) {
-		if( is_null( $logbook->regdb()->find_instrument_by_name( $instr_name ))) die( "<b>error:</b> the specified instrument isn't known" );
+		if( is_null( LogBook::instance()->regdb()->find_instrument_by_name( $instr_name )))
+                    report_error( "<b>error:</b> the specified instrument isn't known" );
 		array_push( $instrument_names, $instr_name  );
 	} else {
 
 		// Get all known instruments. Skip  pseudo-instruments.
 		//
-		foreach( $logbook->regdb()->instrument_names() as $name ) {
-			$instrument = $logbook->regdb()->find_instrument_by_name($name);
+		foreach( LogBook::instance()->regdb()->instrument_names() as $name ) {
+			$instrument = LogBook::instance()->regdb()->find_instrument_by_name($name);
 			if( $instrument->is_location()) continue;
 			array_push( $instrument_names, $name  );
 		}
@@ -159,9 +161,9 @@ td.table_cell_within_group {
 
 		$group = 'ps-'.strtolower( $instr_name );
 		$group4auth = 'gid:'.$group;
-		$experiments = $logbook->experiments_for_instrument( $instr_name );
+		$experiments = LogBook::instance()->experiments_for_instrument( $instr_name );
 		foreach( $experiments as $experiment ) {
-			$has_role = $authdb->hasRole( $group4auth, $experiment->id(), $application, $role );
+			$has_role = AuthDB::instance()->hasRole( $group4auth, $experiment->id(), $application, $role );
 			$num_shifts = $experiment->num_shifts();
 			print
 				'<tr>'.
@@ -173,7 +175,7 @@ td.table_cell_within_group {
 				'<td class="table_cell">'.$role.'</td>';
 			if( $fix ) {
 				if( !$has_role ) {
-					$authdb->createRolePlayer( $application, $role, $experiment->id(), $group4auth );
+					AuthDB::instance()->createRolePlayer( $application, $role, $experiment->id(), $group4auth );
 					print
 						'<td class="table_cell"><span style="color:green;">Yes</span></td>'.
 						'<td class="table_cell"'.( $num_shifts == 0 ? ' style="font-color:red;"' : '' ).'>'.$num_shifts.'</td>'.
@@ -195,12 +197,10 @@ td.table_cell_within_group {
 	}
 	print '</tbody><table>';
 	
-	$logbook->commit();
-	$authdb->commit();
+	LogBook::instance()->commit();
+	AuthDB::instance()->commit();
 	
-} catch( AuthDBException  $e ) { print $e->toHtml(); }
-  catch( LogBookException $e ) { print $e->toHtml(); }
-  catch( RegDBException   $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   
 ?>
 

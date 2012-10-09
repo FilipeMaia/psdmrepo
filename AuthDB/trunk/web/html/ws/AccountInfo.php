@@ -4,7 +4,6 @@ require_once( 'authdb/authdb.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use RegDB\RegDB;
 use RegDB\RegDBAuth;
@@ -13,15 +12,21 @@ use RegDB\RegDBHtml;
 /*
  * This script will lay out a form for viewing/editing a user account.
  */
+
+header( 'Content-type: text/html' );
+header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+function report_error($msg) {
+    print $msg;
+    exit;
+}
+
 if( isset( $_GET['uid'] )) {
     $uid = trim( $_GET['uid'] );
-    if( $uid == '' ) {
-        print( AuthDB::reporErrorHtml( "user identifier can't be empty" ));
-        exit;
-    }
+    if( $uid == '' ) report_error( AuthDB::reporErrorHtml( "user identifier can't be empty" ));
 } else {
-    print( AuthDB::reporErrorHtml( "no valid user identifier" ));
-    exit;
+    report_error( AuthDB::reporErrorHtml( "no valid user identifier" ));
 }
 $edit = isset( $_GET['edit'] );
 
@@ -29,30 +34,21 @@ $edit = isset( $_GET['edit'] );
  */
 try {
 
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
 
     /* Get all groups the account is member of. The account must exist.
      */
-    $account = $regdb->find_user_account( $uid );
-    if( is_null( $account )) {
-        print( RegDBAuth::reporErrorHtml(
-            'No such account known to LDAP server: '.$uid ));
-        exit;
-    }
+    $account = RegDB::instance()->find_user_account( $uid );
+    if( is_null( $account ))
+        report_error( RegDBAuth::reporErrorHtml('No such account known to LDAP server: '.$uid ));
+
     $account_groups = array();
-    foreach( $account['groups'] as $g ) {
-    	$account_groups[$g] = True;
-    }
+    foreach( $account['groups'] as $g ) $account_groups[$g] = True;
 
     /* Use this as a cache to avoid showing duplicate entries when
      * displaying groups.
      */
     $displayed_groups = array();
-
-    header( 'Content-type: text/html' );
-    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
     
     /* Create a container with standard fields
      */
@@ -68,17 +64,17 @@ try {
 
     /* Experiment-specific groups.
      */
-    foreach( $regdb->instrument_names() as $instr ) {
+    foreach( RegDB::instance()->instrument_names() as $instr ) {
 
         /* Skip "locations" of "facilities" which do not have any real POSIX
          * groups neither data associated with them.
          */
-        $instrument = $regdb->find_instrument_by_name( $instr );
+        $instrument = RegDB::instance()->find_instrument_by_name( $instr );
         if( $instrument->is_location()) continue;
 
         /* Skip instruments for which there are no eligible experiments/groups yet.
          */
-        $experiment_specific_groups = $regdb->experiment_specific_groups( $instr );
+        $experiment_specific_groups = RegDB::instance()->experiment_specific_groups( $instr );
         if( !count( $experiment_specific_groups )) continue;
 
         $row = 0;
@@ -118,10 +114,8 @@ try {
         
     echo $con->html();
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-} catch( RegDBException $e ) {
-    print $e->toHtml();}
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
 ?>

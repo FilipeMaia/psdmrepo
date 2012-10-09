@@ -13,15 +13,13 @@ class AuthDBRole {
 
    /* Data members
      */
-    private $connection;
     private $authdb;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $authdb, $attr ) {
-        $this->connection = $connection;
+    public function __construct ( $authdb, $attr ) {
         $this->authdb = $authdb;
         $this->attr = $attr;
     }

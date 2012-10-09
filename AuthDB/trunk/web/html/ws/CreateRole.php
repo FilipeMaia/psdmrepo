@@ -4,25 +4,23 @@ require_once( 'authdb/authdb.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use RegDB\RegDBHtml;
 
 /*
  * This script will lay out a form for creating a new role.
  */
-
-// TODO: This needs to be changed with the real test
-//
-//if( !RegDBAuth::isAuthenticated()) return;
+function report_error($msg) {
+    print $msg;
+    exit;
+}
 
 /* Proceed with the operation
  */
 try {
-    $authdb = new AuthDB();
-    $authdb->begin();
-
-    $applications = $authdb->applications();
+    AuthDB::instance()->begin();
+    $applications = AuthDB::instance()->applications();
+    AuthDB::instance()->commit();
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -40,9 +38,6 @@ try {
         ->value_input   ( 100,  75, 'role_name' )
         ->html();
 
-    $authdb->commit();
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
 
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-}
 ?>

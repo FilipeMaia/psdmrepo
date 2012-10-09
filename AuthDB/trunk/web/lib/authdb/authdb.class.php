@@ -3,6 +3,9 @@
 namespace AuthDB;
 
 require_once( 'authdb.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
+
+use FileMgr\DbConnection;
 
 use RegDB\RegDB;
 
@@ -11,52 +14,27 @@ use RegDB\RegDB;
  *
  * @author gapon
  */
-class AuthDB {
+class AuthDB extends DbConnection {
 
-    // ---------------------------------------------------
-    // --- SIMPLIFIED INTERFACE AND ITS IMPLEMENTATION ---
-    // ---------------------------------------------------
+    // ------------------------
+    // --- STATIC INTERFACE ---
+    // ------------------------
 
     private static $instance = null;
 
     /**
      * Singleton to simplify certain operations.
      *
-     * @return unknown_type
+     * @return AuthDB
      */
     public static function instance() {
-        if( is_null( AuthDB::$instance )) AuthDB::$instance = new AuthDB();
+        if( is_null( AuthDB::$instance )) AuthDB::$instance =
+            new AuthDB(
+                AUTHDB_DEFAULT_HOST,
+                AUTHDB_DEFAULT_USER,
+                AUTHDB_DEFAULT_PASSWORD,
+                AUTHDB_DEFAULT_DATABASE);
         return AuthDB::$instance;
-    }
-
-    public function authName() {
-        return $_SERVER['REMOTE_USER'];
-    }
-
-    public function authType() {
-        return $_SERVER['AUTH_TYPE'];
-    }
-
-    public function authRemoteAddr() {
-        return $_SERVER['REMOTE_ADDR'];
-    }
-    
-    public function isAuthenticated() {
-        return AuthDB::instance()->authName() != '';
-    }
-
-    public function canRead() {
-    	// Anyone who's been authenticated can read the contents of
-    	// this database.
-    	//
-        return $this->isAuthenticated();
-    }
-
-    public function canEdit() {
-        if( !$this->isAuthenticated()) return false;
-        $this->begin();
-        return $this->hasRole(
-            $this->authName(), null, 'RoleDB', 'Admin' );
     }
 
     public static function reporErrorHtml( $message, $link=null ) {
@@ -78,69 +56,54 @@ class AuthDB {
 HERE;
     }
 
-    // -----------------------------------------
-    // --- CORE CLASS AND ITS IMPLEMENTATION ---
-    // -----------------------------------------
-    
-    /* Data members
-     */
-    private $connection;
-    private $regdb;
-
     /* Constructor
      *
      * Construct the top-level API object using the specified connection
      * parameters. Put null to envorce default values of parameters.
      */
-    public function __construct (
-        $host     = null,
-        $user     = null,
-        $password = null,
-        $database = null ) {
-
-        $this->connection =
-            new AuthDBConnection (
-                is_null($host)     ? AUTHDB_DEFAULT_HOST : $host,
-                is_null($user)     ? AUTHDB_DEFAULT_USER : $user,
-                is_null($password) ? AUTHDB_DEFAULT_PASSWORD : $password,
-                is_null($database) ? AUTHDB_DEFAULT_DATABASE : $database);
-
-        $this->regdb = new RegDB();
+    public function __construct ($host, $user, $password, $database) {
+        parent::__construct ( $host, $user, $password, $database );
     }
 
     /*
-     * ==========================
-     *   TRANSACTION MANAGEMENT
-     * ==========================
+     * ====================================
+     *   AUTHENTICATION REQUEST OPERATION
+     * ====================================
      */
-    public function begin () {
-        $this->connection->begin (); }
-
-    public function commit () {
-        $this->connection->commit (); }
-
-    public function rollback () {
-        $this->connection->rollback (); }
+    public function authName       () { return $_SERVER['REMOTE_USER']; }
+    public function authType       () { return $_SERVER['AUTH_TYPE']; }
+    public function authRemoteAddr () { return $_SERVER['REMOTE_ADDR']; }
+    public function isAuthenticated() { return AuthDB::instance()->authName() != ''; }
 
     /*
-     * =================================
-     *   INFORMATION REQUEST OPERATION
-     * =================================
+     * =========================================
+     *   AUTHORIZATION REQUESTS AND OPERATIONS
+     * =========================================
      */
+    public function canRead() {
+    	// Anyone who's been authenticated can read the contents of
+    	// this database.
+    	//
+        return $this->isAuthenticated();
+    }
+
+    public function canEdit() {
+        if( !$this->isAuthenticated()) return false;
+        $this->begin();
+        return $this->hasRole ($this->authName(), null, 'RoleDB', 'Admin' );
+    }
+
     public function roles( $exper_id ) {
 
         $list = array();
 
-        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->connection->database}.user, {$this->connection->database}.role WHERE ((user.exp_id IS NULL) OR (user.exp_id={$exper_id})) AND user.role_id=role.id ORDER BY role.app,role.name";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->database}.user, {$this->database}.role WHERE ((user.exp_id IS NULL) OR (user.exp_id={$exper_id})) AND user.role_id=role.id ORDER BY role.app,role.name";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push (
                 $list,
-                new AuthDBRole (
-                    $this->connection,
-                    $this,
-                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+                new AuthDBRole ($this, mysql_fetch_array( $result, MYSQL_ASSOC )));
 
         return $list;
     }
@@ -212,7 +175,7 @@ ORDER BY instr,exper,user,app,name
 
 HERE;
 
-        $result = $this->connection->query ( $sql );
+        $result = $this->query ( $sql );
 		$nrows = mysql_numrows( $result );
     	$list = array();
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -220,14 +183,10 @@ HERE;
             array_push (
                 $list,
                 array (
-                	'instr'    => $attr['instr'   ],
-                	'exper'    => $attr['exper'   ],
-                	'exper_id' => $attr['exper_id'],
-                    'role'     => new AuthDBRole (
-                    	$this->connection,
-                    	$this,
-                    	$attr
-                    )
+                    'instr'    => $attr['instr'   ],
+                    'exper'    => $attr['exper'   ],
+                    'exper_id' => $attr['exper_id'],
+                    'role'     => new AuthDBRole ($this, $attr)
                 )
             );
         }
@@ -238,16 +197,13 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->connection->database}.user, {$this->connection->database}.role WHERE role.id={$role_id} AND user.role_id=role.id ORDER BY user.exp_id, role.app";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->database}.user, {$this->database}.role WHERE role.id={$role_id} AND user.role_id=role.id ORDER BY user.exp_id, role.app";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push (
                 $list,
-                new AuthDBRole (
-                    $this->connection,
-                    $this,
-                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+                new AuthDBRole ($this, mysql_fetch_array( $result, MYSQL_ASSOC )));
 
         return $list;
     }
@@ -256,8 +212,8 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT * FROM {$this->connection->database}.role WHERE app='{$application}' ORDER BY name";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT * FROM {$this->database}.role WHERE app='{$application}' ORDER BY name";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push ( $list, mysql_fetch_array( $result, MYSQL_ASSOC ) );
@@ -267,8 +223,8 @@ HERE;
 
     public function find_role( $application, $role ) {
 
-        $sql = "SELECT * FROM {$this->connection->database}.role WHERE app='{$application}' AND name='{$role}'";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT * FROM {$this->database}.role WHERE app='{$application}' AND name='{$role}'";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows == 1 ) return mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -282,8 +238,8 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT DISTINCT app FROM {$this->connection->database}.role ORDER BY app";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT DISTINCT app FROM {$this->database}.role ORDER BY app";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -297,8 +253,8 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT name FROM {$this->connection->database}.priv WHERE role_id={$role_id} ORDER BY name";
-        $result = $this->connection->query ( $sql );
+        $sql = "SELECT name FROM {$this->database}.priv WHERE role_id={$role_id} ORDER BY name";
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -312,11 +268,11 @@ HERE;
         //return true ;
 
         $sql =
-            "SELECT * FROM {$this->connection->database}.user u, {$this->connection->database}.role r".
+            "SELECT * FROM {$this->database}.user u, {$this->database}.role r".
             " WHERE r.name='{$role}' AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
             ( is_null($exper_id) ? "" : " AND u.exp_id={$exper_id}" );
-        $result = $this->connection->query ( $sql );
+        $result = $this->query ( $sql );
 
         $nrows = mysql_numrows( $result );
         return $nrows >= 1;
@@ -333,7 +289,8 @@ HERE;
          * NOTE #1: Follow the same approach for other operations.
          * NOTE #2: Test the code.
          */
-        $users = $this->regdb->user_accounts( $user );
+        RegDB::instance()->begin();
+        $users = RegDB::instance()->user_accounts( $user );
         if( count( $users ) <= 0 )
                 throw new AuthDBException (
                     __METHOD__,
@@ -359,7 +316,8 @@ HERE;
 
         // Now try the groups.
         //
-        $users = $this->regdb->user_accounts( $user );
+        RegDB::instance()->begin();
+        $users = RegDB::instance()->user_accounts( $user );
         if( count( $users ) <= 0 )
                 throw new AuthDBException (
                     __METHOD__,
@@ -393,7 +351,8 @@ HERE;
         // Check if the user has required privilege via one of groups
         // his/her account is member of.
         //
-        $user_account = $this->regdb->find_user_account( $user );
+        RegDB::instance()->begin();
+        $user_account = RegDB::instance()->find_user_account( $user );
         if( is_null( $user_account ))
             throw new AuthDBException (
                 __METHOD__,
@@ -417,11 +376,11 @@ HERE;
     	//       role playes who're not associated with any particular experiment.
     	//
         $sql =
-            "SELECT * FROM {$this->connection->database}.user u, {$this->connection->database}.role r, {$this->connection->database}.priv p".
+            "SELECT * FROM {$this->database}.user u, {$this->database}.role r, {$this->database}.priv p".
             " WHERE p.name='{$priv}' AND p.role_id=r.id AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
             (is_null($exper_id) ? " AND u.exp_id IS NULL" : " AND ((u.exp_id={$exper_id}) OR (u.exp_id IS NULL))");
-        $result = $this->connection->query ( $sql );
+        $result = $this->query ( $sql );
 
         $nrows = mysql_numrows( $result );
         return $nrows >= 1;
@@ -445,13 +404,13 @@ HERE;
     	//
     	$list = array();
 
-    	$user_u = $this->connection->database.".user u";
-    	$role_r = $this->connection->database.".role r";
-    	$priv_p = $this->connection->database.".priv p";
+    	$user_u = $this->database.".user u";
+    	$role_r = $this->database.".role r";
+    	$priv_p = $this->database.".priv p";
 
         $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
     	$sql = "SELECT DISTINCT u.user FROM {$user_u},{$role_r} WHERE u.role_id IN (SELECT r.id FROM {$role_r},{$priv_p} WHERE r.id=p.role_id AND r.app='{$app}' AND p.name='{$priv}') AND ((u.exp_id IS NULL) OR (u.exp_id={$exper_id_attr})) AND u.role_id=r.id ORDER BY u.user";
-        $result = $this->connection->query ( $sql );
+        $result = $this->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -467,8 +426,8 @@ HERE;
      * ======================
      */
     public function createRole( $application, $role, $privileges ) {
-        $this->connection->query ( "INSERT INTO {$this->connection->database}.role VALUES(NULL,'{$role}','{$application}')" );
-        $result = $this->connection->query ( "SELECT LAST_INSERT_ID() AS 'role_id'" );
+        $this->query ( "INSERT INTO {$this->database}.role VALUES(NULL,'{$role}','{$application}')" );
+        $result = $this->query ( "SELECT LAST_INSERT_ID() AS 'role_id'" );
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
             throw new AuthDBException (
@@ -477,34 +436,34 @@ HERE;
         $row = mysql_fetch_array( $result, MYSQL_ASSOC );
         $role_id = $row['role_id'];
         foreach( $privileges as $p) {
-            $this->connection->query( "INSERT INTO {$this->connection->database}.priv VALUES(NULL,'{$p}',{$role_id})" );
+            $this->query( "INSERT INTO {$this->database}.priv VALUES(NULL,'{$p}',{$role_id})" );
         }
     }
 
     public function deleteRole( $id ) {
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.priv WHERE role_id={$id}" );
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.user WHERE role_id={$id}" );
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.role WHERE id={$id}" );
+        $this->query ( "DELETE FROM {$this->database}.priv WHERE role_id={$id}" );
+        $this->query ( "DELETE FROM {$this->database}.user WHERE role_id={$id}" );
+        $this->query ( "DELETE FROM {$this->database}.role WHERE id={$id}" );
     }
 
     public function deleteApplication( $name ) {
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.priv WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.user WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
-        $this->connection->query ( "DELETE FROM {$this->connection->database}.role WHERE app='{$name}'" );
+        $this->query ( "DELETE FROM {$this->database}.priv WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
+        $this->query ( "DELETE FROM {$this->database}.user WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
+        $this->query ( "DELETE FROM {$this->database}.role WHERE app='{$name}'" );
     }
 
     public function createRolePlayer( $application, $role, $exper_id, $player ) {
         $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
-        $this->connection->query ( "INSERT INTO {$this->connection->database}.user VALUES(NULL,{$exper_id_attr},'{$player}',(SELECT id FROM {$this->connection->database}.role WHERE name='{$role}' AND app='{$application}'))" );
+        $this->query ( "INSERT INTO {$this->database}.user VALUES(NULL,{$exper_id_attr},'{$player}',(SELECT id FROM {$this->database}.role WHERE name='{$role}' AND app='{$application}'))" );
     }
 
     public function deleteRolePlayer( $application, $role, $exper_id, $player ) {
         $exper_id_attr = is_null( $exper_id ) ? 'IS NULL' : "={$exper_id}";
-        $sql = "DELETE FROM {$this->connection->database}.user ".
+        $sql = "DELETE FROM {$this->database}.user ".
         	   "WHERE user='{$player}' ".
-               "AND   role_id=(SELECT id FROM {$this->connection->database}.role WHERE name='{$role}' AND app='{$application}') ".
+               "AND   role_id=(SELECT id FROM {$this->database}.role WHERE name='{$role}' AND app='{$application}') ".
                "AND   exp_id {$exper_id_attr}";
-        $this->connection->query( $sql );
+        $this->query( $sql );
     }
 }
 
@@ -514,79 +473,71 @@ HERE;
 
 function toYesNo( $boolean_val ) { return '<b>'.( $boolean_val ? 'Yes' : 'No').'</b>'; }
 try {
-    $authdb = new AuthDB();
-    $authdb->begin();
+    AuthDB::instance()->begin();
 
-    print( "<br>has LogBook privelege: : ".toYesNo( $authdb->hasPrivilege( 'rolles', 86, 'LogBook', 'read' )));
-    //print( "<br>has LDAP privelege: : ".toYesNo( $authdb->hasPrivilege( 'rolles', null, 'LDAP', 'manage_groups' )));
+    print( "<br>has LogBook privelege: : ".toYesNo( AuthDB::instance()->hasPrivilege( 'rolles', 86, 'LogBook', 'read' )));
+    print( "<br>has LDAP privelege: : ".toYesNo( AuthDB::instance()->hasPrivilege( 'rolles', null, 'LDAP', 'manage_groups' )));
     
-//    $roles = $authdb->roles_by( 'xppopr', 'LogBook', 'XPP' );
-//    print_r($roles);
+    $roles = AuthDB::instance()->roles_by( 'xppopr', 'LogBook', 'XPP' );
+    print_r($roles);
 
-    $authdb->commit();
+    AuthDB::instance()->commit();
 
-} catch( AuthDBException $e ) {
-    print( $e->toHtml());
-}
+} catch( AuthDBException $e ) { print( $e->toHtml()); }
+ 
 */
+
 /*
  * Unit tests
  *
 
 use RegDB\RegDBException;
 
-
 function resolve_exper_id( $instrument_name, $experiment_name ) {
-    $regdb = new RegDB();
-	$regdb->begin();
-    $experiment = $regdb->find_experiment( $instrument_name, $experiment_name )
+    RegDB::instance()->begin();
+    $experiment = RegDB::instance()->find_experiment( $instrument_name, $experiment_name )
         or die( "no such experiment" );
     $exper_id = $experiment->id();
-    $regdb->commit();
+    RegDB::instance()->commit();
     return $exper_id;
 }
 try {
-    $authdb = new AuthDB();
-    $authdb->begin();
+    AuthDB::instance()->begin();
 
     $exper_id = resolve_exper_id( 'SXR', 'sxrcom10');
     $user = 'sxropr'; //'maad';
 
     print( "<h1>privileges of user '{$user}' for 'LogBook' of experiment {$exper_id}</h1>" );
-    print( "<br>'read: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'read' )));
-    print( "<br>'post: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'post' )));
-    print( "<br>'edit: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'edit' )));
-    print( "<br>'delete: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'delete' )));
-    print( "<br>'manage_shifts: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'manage_shifts' )));
+    print( "<br>'read: : ".toYesNo( AuthDB::instance()->hasPrivilege( $user, $exper_id, 'LogBook', 'read' )));
+    print( "<br>'post: : ".toYesNo( AuthDB::instance()->hasPrivilege( $user, $exper_id, 'LogBook', 'post' )));
+    print( "<br>'edit: : ".toYesNo( AuthDB::instance()->hasPrivilege( $user, $exper_id, 'LogBook', 'edit' )));
+    print( "<br>'delete: : ".toYesNo( AuthDB::instance()->hasPrivilege( $user, $exper_id, 'LogBook', 'delete' )));
+    print( "<br>'manage_shifts: : ".toYesNo( AuthDB::instance()->hasPrivilege( $user, $exper_id, 'LogBook', 'manage_shifts' )));
 
     print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'read' ): " );
-    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'read' );
+    $users = AuthDB::instance()->whoHasPrivilege( $exper_id, 'LogBook', 'read' );
     print_r( $users );
 
     print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'post' ): " );
-    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'post' );
+    $users = AuthDB::instance()->whoHasPrivilege( $exper_id, 'LogBook', 'post' );
     print_r( $users );
 
     print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'manage_shifts' ): " );
-    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'manage_shifts' );
+    $users = AuthDB::instance()->whoHasPrivilege( $exper_id, 'LogBook', 'manage_shifts' );
     print_r( $users );
     
     print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'edit' ): " );
-    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'edit' );
+    $users = AuthDB::instance()->whoHasPrivilege( $exper_id, 'LogBook', 'edit' );
     print_r( $users );
     
     print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'delete' ): " );
-    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'delete' );
+    $users = AuthDB::instance()->whoHasPrivilege( $exper_id, 'LogBook', 'delete' );
     print_r( $users );
 
-    $authdb->commit();
+    AuthDB::instance()->commit();
 
-} catch( AuthDBException $e ) {
-    print( $e->toHtml());
-} catch( RegDBException $e ) {
-    print( $e->toHtml());
-}
+} catch( AuthDBException $e ) { print( $e->toHtml()); }
+  catch( RegDBException  $e ) { print( $e->toHtml()); }
 
- *
- */
+*/
 ?>

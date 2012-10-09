@@ -5,17 +5,17 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
+
+function report_error($msg) {
+    print $msg;
+    exit;
+}
 
 try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
-
-	$regdb = new RegDB();
-	$regdb->begin();
+    AuthDB::instance()->begin();
+    RegDB::instance()->begin();
 
 ?>
 
@@ -76,13 +76,13 @@ td.table_cell_within_group {
 <?php
 
 	$experiments_by_names = array();
-	foreach( $regdb->experiments() as $experiment ) {
+	foreach( RegDB::instance()->experiments() as $experiment ) {
 		if( $experiment->is_facility()) continue;
 		$experiments_by_names[$experiment->name()] = $experiment;
 	}
 
 	$accounts_by_names = array();
-	foreach( $regdb->posix_group_members( 'xu' ) as $account ) {
+	foreach( RegDB::instance()->posix_group_members( 'xu' ) as $account ) {
 
 		$uid   = $account['uid'];
 		$gecos = $account['gecos'];
@@ -96,8 +96,8 @@ td.table_cell_within_group {
 		//
 		if( array_key_exists( $uid, $experiments_by_names )) continue;
 
-		if( ! ( $regdb->is_member_of_posix_group( 'ps-users',  $uid ) ||
-			$regdb->is_member_of_posix_group( 'lab-users', $uid ))) {
+		if( ! ( RegDB::instance()->is_member_of_posix_group( 'ps-users',  $uid ) ||
+			RegDB::instance()->is_member_of_posix_group( 'lab-users', $uid ))) {
 			print <<<HERE
       <tr>
         <td class="table_cell table_cell_left"><a href="../authdb/?action=view_account&uid={$uid}">{$uid}</a></td>
@@ -107,12 +107,10 @@ td.table_cell_within_group {
 HERE;
 		}
 	}
-	$regdb->commit();
-	$authdb->commit();
+	RegDB::instance()->commit();
+	AuthDB::instance()->commit();
 	
-} catch( AuthDBException  $e ) { print $e->toHtml(); }
-  catch( LogBookException $e ) { print $e->toHtml(); }
-  catch( RegDBException   $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   
 ?>
 

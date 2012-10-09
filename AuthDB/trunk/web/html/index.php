@@ -2,7 +2,7 @@
 To change this template, choose Tools | Templates
 and open the template in the editor.
 -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
 <head>
 <title>Authorization Database Manager</title>
@@ -174,11 +174,11 @@ Menu source file
 <!--
 Custom JavaScript
 -->
-<script type="text/javascript" src="Menubar.js"></script>
-<script type="text/javascript" src="Dialogs.js"></script>
-<script type="text/javascript" src="Loader.js"></script>
-<script type="text/javascript" src="JSON.js"></script>
-<script type="text/javascript" src="Utilities.js"></script>
+<script type="text/javascript" src="js/Menubar.js"></script>
+<script type="text/javascript" src="js/Dialogs.js"></script>
+<script type="text/javascript" src="js/Loader.js"></script>
+<script type="text/javascript" src="js/JSON.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
 
 
 <!--
@@ -191,7 +191,11 @@ PHP Generated JavaScript with initialization parameters
 require_once( 'authdb/authdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
+
+function report_error($msg) {
+    print $msg;
+    exit;
+}
 
 try {
     $auth_svc = AuthDB::instance();
@@ -270,15 +274,9 @@ echo <<<HERE
   auth_timer_restart();
 
 }
-</script>
 
 HERE;
 ?>
-
-<!--
-Page-specific script
--->
-<script type="text/javascript">
 
 var dialog_element = "popupdialogs";
 
@@ -889,7 +887,7 @@ function list_roles() {
 
         //prepare URL for XHR request:
         //
-        var sUrl = "RequestRoles.php?type="+node.data.type;
+        var sUrl = "../authdb/ws/RequestRoles.php?type="+node.data.type;
         switch( node.data.type ) {
             case ROLES_PRIVS:
                 sUrl += '&role_id='+node.data.role_id;
@@ -977,7 +975,7 @@ function delete_application( application_name ) {
     var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Application?</em>';
     var dialog_body =
         '<div style="text-align:left;">'+
-        '  <form  name="delete_application_form" action="ProcessDeleteApplication.php" method="post">'+
+        '  <form  name="delete_application_form" action="../authdb/ws/ProcessDeleteApplication.php" method="post">'+
         '    <b>PLEASE, READ THIS:</b> the selected application, its roles and connected role players are about to be destroyed!'+
         '    The information may be permanently lost as a result of the operation.'+
         '    Also note that your identity will be recorded.'+
@@ -1007,7 +1005,7 @@ function delete_role( application_name, role_name, role_id ) {
     var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Role?</em>';
     var dialog_body =
         '<div style="text-align:left;">'+
-        '  <form  name="delete_role_form" action="ProcessDeleteRole.php" method="post">'+
+        '  <form  name="delete_role_form" action="../authdb/ws/ProcessDeleteRole.php" method="post">'+
         '    <b>PLEASE, READ THIS:</b> the selected role and connected role players are about to be destroyed!'+
         '    The information may be permanently lost as a result of the operation.'+
         '    Also note that your identity will be recorded.'+
@@ -1046,7 +1044,7 @@ function display_role_players( application, role_name, role_id ) {
           { key: "group",      sortable: true, resizeable: true },
           { key: "user",       sortable: true, resizeable: true },
           { key: "comment",    sortable: true, resizeable: true } ],
-        'RequestRolePlayers.php?role_id='+role_id,
+        '../authdb/ws/RequestRolePlayers.php?role_id='+role_id,
         false
     );
     //table.refreshTable();
@@ -1067,7 +1065,7 @@ function create_role( ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:10px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info" style="height:125px;">'+
-        '    <form name="create_role_form" action="ProcessCreateRole.php" method="post">'+
+        '    <form name="create_role_form" action="../authdb/ws/ProcessCreateRole.php" method="post">'+
         '      <div id="role_info_within_form"></div>'+
         '      <input type="hidden" name="actionSuccess" value="list_roles" />'+
         '      <input type="hidden" name="privileges" value="" />'+
@@ -1096,7 +1094,7 @@ function create_role( ) {
         '  </div>'+
         '</div>';
 
-    load( 'CreateRole.php', 'role_info_within_form' );
+    load( '../authdb/ws/CreateRole.php', 'role_info_within_form' );
 
     var privileges = create_privileges_table_editable( null, false );
 
@@ -1206,7 +1204,7 @@ function list_role_players() {
 
         //prepare URL for XHR request:
         //
-        var sUrl = "RequestRolePlayersExper.php?type="+node.data.type;
+        var sUrl = "../authdb/ws/RequestRolePlayersExper.php?type="+node.data.type;
         switch( node.data.type ) {
             case PLAYERS_EXPER:
                 sUrl += '&instr_id='+node.data.instr_id;
@@ -1302,7 +1300,7 @@ function display_role_players_exper( instrument, experiment, exper_id ) {
           { key: "group",       sortable: true, resizeable: true },
           { key: "user",        sortable: true, resizeable: true },
           { key: "comment",     sortable: true, resizeable: true } ],
-        'RequestRolePlayersExper.php?type='+PLAYERS+'&exper_id='+exper_id,
+        '../authdb/ws/RequestRolePlayersExper.php?type='+PLAYERS+'&exper_id='+exper_id,
         false
     );
 }
@@ -1322,14 +1320,14 @@ function add_role_player( ) {
         '</div>'+
         '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="instrument_info" style="height:150px;">'+
-        '    <form name="create_player_form" action="ProcessAddRolePlayer.php" method="post">'+
+        '    <form name="create_player_form" action="../authdb/ws/ProcessAddRolePlayer.php" method="post">'+
         '      <div id="player_info_within_form"></div>'+
         '      <input type="hidden" name="actionSuccess" value="list_role_players" />'+
         '    </form>'+
         '  </div>'+
         '</div>';
 
-    load( 'AddRolePlayer.php', 'player_info_within_form' );
+    load( '../authdb/ws/AddRolePlayer.php', 'player_info_within_form' );
 
     var save = create_button (
         "save_button",
@@ -1373,7 +1371,7 @@ function list_groups() {
     var table = new Table (
         "workarea",
         [ { key: "group",   sortable: true, resizeable: true } ],
-        '../regdb/RequestGroups.php',
+        '../regdb/ws/RequestGroups.php',
         true
     );
     table.refreshTable();
@@ -1388,7 +1386,7 @@ function list_groups_grid( orientation ) {
     reset_navarea();
     reset_workarea();
 
-    load('../regdb/RequestGroups.php?grid='+orientation, 'workarea');
+    load('../regdb/ws/RequestGroups.php?grid='+orientation, 'workarea');
 }
 
 function view_group( name ) {
@@ -1412,7 +1410,7 @@ function view_group( name ) {
         [ { key: "uid",   sortable: true, resizeable: true },
           { key: "name",  sortable: true, resizeable: true },
           { key: "email", sortable: true, resizeable: true } ],
-        '../regdb/ManageGroupMembers.php?group='+name,
+        '../regdb/ws/ManageGroupMembers.php?group='+name,
         true
     );
     table.refreshTable();
@@ -1447,7 +1445,7 @@ function create_accounts_table() {
           { key: "name",   sortable: true,  resizeable: true },
           { key: "email",  sortable: true,  resizeable: true },
           { key: "groups", sortable: false, resizeable: true } ],
-        '../regdb/RequestUserAccounts.php?' + accounts_filter(),
+        '../regdb/ws/RequestUserAccounts.php?' + accounts_filter(),
         true
     );
 }
@@ -1472,7 +1470,7 @@ function list_accounts() {
         '</div>';
 
     load(
-        'AccountsFilter.php?' + accounts_filter(),
+        '../authdb/ws/AccountsFilter.php?' + accounts_filter(),
         'accounts_filter_form_params' );
 
     YAHOO.util.Event.onContentReady (
@@ -1526,7 +1524,7 @@ function view_account( uid ) {
         '  </form>'+
         '</div>';
 
-    load( 'AccountInfo.php?uid=' + uid, 'account_edit_form_params' );
+    load( '../authdb/ws/AccountInfo.php?uid=' + uid, 'account_edit_form_params' );
 
     var action_edit = create_button (
             "edit_button",
@@ -1549,13 +1547,13 @@ function edit_account( uid ) {
         '  <button id="cancel_button">Cancel</button>'+
         '</div>'+
         '<div style="margin-top:25px; width:1000px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
-        '  <form name="account_edit_form" action="ProcessAccountEdit.php" method="post">'+
+        '  <form name="account_edit_form" action="../authdb/ws/ProcessAccountEdit.php" method="post">'+
         '    <div id="account_edit_form_params">Loading...</div>'+
         '    <input type="hidden" name="actionSuccess" value="view_account" />'+
         '  </form>'+
         '</div>';
 
-    load( 'AccountInfo.php?uid=' + uid + '&edit', 'account_edit_form_params' );
+    load( '../authdb/ws/AccountInfo.php?uid=' + uid + '&edit', 'account_edit_form_params' );
 
     var save = create_button (
             "save_button",
@@ -1624,7 +1622,7 @@ function apply_my_accounts_filter() {
 	apply_accounts_filter();
 
     load_then_call(
-        '../regdb/RequestUserAccounts.php?'+accounts_filter()+'&simple',
+        '../regdb/ws/RequestUserAccounts.php?'+accounts_filter()+'&simple',
         callback_on_load,
         callback_on_failure );
 }
@@ -1686,7 +1684,7 @@ function apply_select_group(theObj) {
     }
 
     load_then_call(
-        '../regdb/ManageGroupMembers.php?group='+group+'&simple',
+        '../regdb/ws/ManageGroupMembers.php?group='+group+'&simple',
         callback_on_load,
         callback_on_failure );
 }
@@ -1714,7 +1712,7 @@ function apply_modify_group(action, uid, group) {
     }
 
     load_then_call(
-        '../regdb/ManageGroupMembers.php?group='+group+'&simple&action='+action+'&uid='+uid,
+        '../regdb/ws/ManageGroupMembers.php?group='+group+'&simple&action='+action+'&uid='+uid,
         callback_on_load,
         callback_on_failure );
 }
@@ -1755,8 +1753,8 @@ function manage_my_groups() {
         '  </div>'+
         '</div>';
 
-    load( 'AccountsFilter.php?' + accounts_filter(), 'accounts_filter_form_params' );
-    load( 'GroupsFilter.php', 'groups_filter_form_params' );
+    load( '../authdb/ws/AccountsFilter.php?' + accounts_filter(), 'accounts_filter_form_params' );
+    load( '../authdb/ws/GroupsFilter.php', 'groups_filter_form_params' );
 
     YAHOO.util.Event.onContentReady (
     	    "groups_filter_input",
@@ -1862,7 +1860,6 @@ HERE;
 
 <?php
 
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-}
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
 ?>

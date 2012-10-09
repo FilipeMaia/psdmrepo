@@ -4,16 +4,26 @@ require_once( 'authdb/authdb.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
 /*
  * This script will process requests for various information stored in the database.
  * The result will be returned as JSON object (array).
  */
-if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
+header( "Content-type: application/json" );
+header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+function report_error($msg) {
+    print json_encode ( array (
+        "ResultSet" => array("Result" => array()),
+        "Message" => $msg
+    ));
+    exit;
+}
+
+if( !isset( $_GET['type'] )) report_error( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
 define( 'PLAYERS_INSTR', 1 ); // instruments
@@ -24,11 +34,11 @@ $instr_id = null;
 $exper_id = null;
 switch( $type ) {
     case PLAYERS:
-        if( !isset( $_GET['exper_id'] )) die( "no valid experiment identifier in the request" );
+        if( !isset( $_GET['exper_id'] )) report_error( "no valid experiment identifier in the request" );
         $exper_id = trim( $_GET['exper_id'] );
         break;
     case PLAYERS_EXPER:
-        if( !isset( $_GET['instr_id'] )) die( "no valid instrument identifier in the request" );
+        if( !isset( $_GET['instr_id'] )) report_error( "no valid instrument identifier in the request" );
         $instr_id = trim( $_GET['instr_id'] );
         break;
     case PLAYERS_INSTR:
@@ -95,39 +105,30 @@ function role2json( $role ) {
  */
 try {
 
-    $regdb = new RegDB();
-    $regdb->begin();
+    RegDB::instance()->begin();
+    AuthDB::instance()->begin();
 
-    $authdb = new AuthDB();
-    $authdb->begin();
-
-    // Proceed to the operation
-    //
-    header( "Content-type: application/json" );
-    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
     print <<< HERE
 {
   "ResultSet": {
     "Result": [
 HERE;
+
     $first = true;
 
     if( $type == PLAYERS_INSTR ) {
-        $instruments = $regdb->instruments();
-        foreach( $instruments as $i ) {
-          if( $first ) {
-              $first = false;
-              echo "\n".instr2json( $i );
-          } else {
-              echo ",\n".instr2json( $i );
-          }
+        foreach (RegDB::instance()->instruments() as $i) {
+            if( $first ) {
+                $first = false;
+                echo "\n".instr2json( $i );
+            } else {
+                echo ",\n".instr2json( $i );
+            }
         }
     } else if( $type == PLAYERS_EXPER ) {
-        $instrument = $regdb->find_instrument_by_id( $instr_id )
-            or die("No such instrument");
-        $experiments = $regdb->experiments_for_instrument($instrument->name());
-        foreach( $experiments as $e ) {
+        $instrument = RegDB::instance()->find_instrument_by_id( $instr_id )
+            or report_error("No such instrument");
+        foreach (RegDB::instance()->experiments_for_instrument($instrument->name()) as $e) {
           if( $first ) {
               $first = false;
               echo "\n".exper2json( $e );
@@ -136,34 +137,31 @@ HERE;
           }
         }
     } else if( $type == PLAYERS ) {
-        $roles = $authdb->roles( $exper_id );
-        foreach( $roles as $r ) {
-        	// Skip roles which are known not to be associated with particular experiments
-        	//
-        	// TODO: This is a request from Andy Salnikov.
-        	//
-        	if(( $r->application() == 'RoleDB' ) || ( $r->application() == 'RegDB' )) {
-        		;
-        	} else {
-          		if( $first ) {
-            	  	$first = false;
-        	      	echo "\n".role2json( $r );
-    	      	} else {
-	              	echo ",\n".role2json( $r );
-    	      	}
-          	}
+        foreach (AuthDB::instance()->roles( $exper_id ) as $r) {
+            // Skip roles which are known not to be associated with particular experiments
+            //
+            // TODO: This is a request from Andy Salnikov.
+            //
+            if(( $r->application() == 'RoleDB' ) || ( $r->application() == 'RegDB' )) {
+                ;
+            } else {
+                if( $first ) {
+                    $first = false;
+                    echo "\n".role2json( $r );
+                } else {
+                    echo ",\n".role2json( $r );
+                }
+            }
         }
     }
     print <<< HERE
  ] } }
 HERE;
 
-    $regdb->commit();
-    $authdb->commit();
+    RegDB::instance()->commit();
+    AuthDB::instance()->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-} catch( AuthDBException $e ) {
-    print $e->toHtml();
-}
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
+
 ?>

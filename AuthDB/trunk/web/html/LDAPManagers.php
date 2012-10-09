@@ -5,54 +5,57 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use LogBook\LogBook;
-use LogBook\LogBookException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
 /** Harvest the optional parameters first.
  */
+function report_error($msg) {
+    print $msg;
+    exit;
+}
+
 if( isset( $_GET['instr_name'] )) {
 	$instr_name = strtoupper( trim( $_GET['instr_name'] ));
-	if( $instr_name == '' ) die( "<b>error:</b> instrument name parameter if present can't have an empty value" );
+	if( $instr_name == '' )
+            report_error( "<b>error:</b> instrument name parameter if present can't have an empty value" );
 }
 $fix = isset( $_GET['fix'] );
 
 try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+	AuthDB::instance()->begin();
 
-	if( $fix && !$authdb->canEdit()) die( "<b>error:</b> your account doesn't posseses sufficient privileges to perform the operaton" );
+	if( $fix && !AuthDB::instance()->canEdit())
+            report_error( "<b>error:</b> your account doesn't posseses sufficient privileges to perform the operaton" );
 
-	$logbook = new LogBook();
-	$logbook->begin();
+	LogBook::instance()->begin();
 
 	$instrument_names = array();
 	if( isset( $instr_name )) {
-		if( is_null( $logbook->regdb()->find_instrument_by_name( $instr_name ))) die( "<b>error:</b> the specified instrument isn't known" );
+		if( is_null( LogBook::instance()->regdb()->find_instrument_by_name( $instr_name )))
+                    report_error( "<b>error:</b> the specified instrument isn't known" );
 		array_push( $instrument_names, $instr_name  );
 	} else {
 
 		// Get all known instruments. Skip  pseudo-instruments.
 		//
-		foreach( $logbook->regdb()->instrument_names() as $name ) {
-			$instrument = $logbook->regdb()->find_instrument_by_name($name);
+		foreach( LogBook::instance()->regdb()->instrument_names() as $name ) {
+			$instrument = LogBook::instance()->regdb()->find_instrument_by_name($name);
 			if( $instrument->is_location()) continue;
 			array_push( $instrument_names, $name  );
 		}
 	}
 	$all_instrument_names_subpattern = '';
-	foreach( $logbook->regdb()->instrument_names() as $name ) {
-		$instrument = $logbook->regdb()->find_instrument_by_name($name);
+	foreach( LogBook::instance()->regdb()->instrument_names() as $name ) {
+		$instrument = LogBook::instance()->regdb()->find_instrument_by_name($name);
 		if( $instrument->is_location()) continue;
 		if( $all_instrument_names_subpattern != '') $all_instrument_names_subpattern .= '|';
 		$all_instrument_names_subpattern .= strtolower( $name );
 	}
 	
-	$all_accounts = $logbook->regdb()->user_accounts();
+	$all_accounts = LogBook::instance()->regdb()->user_accounts();
 
 	$extra_operations = <<<HERE
   <h2>Extra Operations</h2>
@@ -142,7 +145,7 @@ td.table_cell_within_group {
 <?php
 
 	$experiments_by_names = array();
-	foreach( $logbook->experiments() as $e ) $experiments_by_names[$e->name()] = $e;
+	foreach( LogBook::instance()->experiments() as $e ) $experiments_by_names[$e->name()] = $e;
 
 	$application = 'LDAP';
 	$role = 'Admin';
@@ -164,7 +167,7 @@ td.table_cell_within_group {
 
 		print $header;
 
-		$experiments = $logbook->experiments_for_instrument( $instr_name );
+		$experiments = LogBook::instance()->experiments_for_instrument( $instr_name );
 		foreach( $experiments as $experiment ) {
 
 			// Get the real UNIX account of the PI if the one has such account.
@@ -179,7 +182,7 @@ td.table_cell_within_group {
 			$real_pi_uid = $experiment->leader_account();
 			$alledged_pi_uids_found = array();
 			if( $real_pi_uid == $experiment->name()) {
-				$account = $logbook->regdb()->find_user_account( $real_pi_uid );
+				$account = LogBook::instance()->regdb()->find_user_account( $real_pi_uid );
 
 				// Extract first and last names
 				//
@@ -213,12 +216,12 @@ td.table_cell_within_group {
 
 			$has_role =
 				$alledged_pi_uid == '' ?
-				$authdb->hasRole( $real_pi_uid,     $experiment->id(), $application, $role ) || $authdb->hasRole( $real_pi_uid,     null, $application, $role ) :
-				$authdb->hasRole( $alledged_pi_uid, $experiment->id(), $application, $role ) || $authdb->hasRole( $alledged_pi_uid, null, $application, $role );
+				AuthDB::instance()->hasRole( $real_pi_uid,     $experiment->id(), $application, $role ) || AuthDB::instance()->hasRole( $real_pi_uid,     null, $application, $role ) :
+				AuthDB::instance()->hasRole( $alledged_pi_uid, $experiment->id(), $application, $role ) || AuthDB::instance()->hasRole( $alledged_pi_uid, null, $application, $role );
 
 			$current_authorizations_str = '';
-			$current_authorizations = $authdb->whoHasPrivilege( $experiment->id(), $application, $priv );
-			sort( $current_authorizations_str );
+			$current_authorizations = AuthDB::instance()->whoHasPrivilege( $experiment->id(), $application, $priv );
+			sort( $current_authorizations );
 			foreach( $current_authorizations as $user ) {
 				if( $has_role ) {
 					if( $user == $alledged_pi_uid ) continue;
@@ -247,7 +250,7 @@ td.table_cell_within_group {
 			if( $fix ) {
 				if( !$has_role  ) {
 					if( $real_pi_uid != $experiment->name()) {
-						//$authdb->createRolePlayer( $application, $role, $experiment->id(), $group4auth );
+						//AuthDB::instance()->createRolePlayer( $application, $role, $experiment->id(), $group4auth );
 						print
 							'<td class="table_cell"><span style="color:red; font-weight:bold;">No</span></td>'.
 							'<td class="table_cell"></td>'.
@@ -275,12 +278,10 @@ td.table_cell_within_group {
 	}
 	print '</tbody><table>';
 	
-	$logbook->commit();
-	$authdb->commit();
+	LogBook::instance()->commit();
+	AuthDB::instance()->commit();
 	
-} catch( AuthDBException  $e ) { print $e->toHtml(); }
-  catch( LogBookException $e ) { print $e->toHtml(); }
-  catch( RegDBException   $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
   
 ?>
 
