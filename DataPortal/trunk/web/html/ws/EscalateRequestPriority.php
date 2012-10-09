@@ -55,12 +55,11 @@ function return_result( $priority ) {
 }
 
 try {
-	$logbook = new LogBook();
-	$logbook->begin();
+	LogBook::instance()->begin();
 
 	/* Find the experiment & run
 	 */
-	$experiment = $logbook->find_experiment_by_id( $exper_id );
+	$experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
 	if( is_null( $experiment )) report_error( 'no such experiment exists' );
 	
 	/* Find pending requests for the experiment in order to calculate

@@ -55,6 +55,7 @@ $exper_id = trim( $_GET['exper_id'] );
  * status      - a desired status for translation requests
  * show_files - a flag indicating if files should be shown as well for each run
  */
+$range_of_runs= null;
 if( isset( $_GET['runs'] )) {
     $range_of_runs = trim( $_GET['runs'] );
     if( $range_of_runs == '' ) report_error( 'run range parameter shall not have an empty value' );
@@ -63,7 +64,7 @@ if( isset( $_GET['runs'] )) {
 $known_simple_statuses = array( 'FINISHED' => 1, 'FAILED' => 1, 'TRANSLATING' => 1, 'QUEUED' => 1, 'NOT-TRANSLATED' => 1 );
 $status = null;
 if( isset( $_GET['status'] )) {
-	$status = strtoupper( trim( $_GET['status'] ));
+    $status = strtoupper( trim( $_GET['status'] ));
     if( $status == '' ) report_error( 'translation status parameter shall not have an empty value' );
     if( !array_key_exists( $status, $known_simple_statuses )) report_error( 'unsupported value of the translatioon status parameter' );
 }
@@ -118,12 +119,12 @@ try {
     	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-   		print
-   		'{ "Status": '.json_encode("success").
-   		', "updated": '.json_encode( LusiTime::now()->toStringShort()).
-   		', "autotranslate2hdf5": '.(get_auto_translation($exper_id) ? 1 : 0).
-   		', "requests": '.json_encode( $requests ).
-   		'}';
+        print
+        '{ "Status": '.json_encode("success").
+        ', "updated": '.json_encode( LusiTime::now()->toStringShort()).
+        ', "autotranslate2hdf5": '.(get_auto_translation($exper_id) ? 1 : 0).
+        ', "requests": '.json_encode( $requests ).
+        '}';
 
     } else {
 

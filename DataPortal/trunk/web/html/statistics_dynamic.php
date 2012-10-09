@@ -172,7 +172,7 @@ $(function() {
 
     $.ajax({
         type: 'GET',
-        url: '../portal/statistics_get.php',
+        url: '../portal/ws/statistics_get.php',
         data: {
             json: ''},
         success: function(result) {

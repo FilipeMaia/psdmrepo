@@ -60,25 +60,24 @@ function return_result( $requests ) {
 
 try {
 
-	$logbook = new LogBook();
-	$logbook->begin();
+    LogBook::instance()->begin();
 
-	/* Find the experiment & run
-	 */
-	$experiment = $logbook->find_experiment_by_id( $exper_id );
-	if( is_null( $experiment )) report_error( 'no such experiment exists' );
+    /* Find the experiment & run
+     */
+    $experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
+    if( is_null( $experiment )) report_error( 'no such experiment exists' );
 
-	$run = $experiment->find_run_by_num( $runnum );
-	if( is_null( $run )) report_error( 'no such run exists' );
+    $run = $experiment->find_run_by_num( $runnum );
+    if( is_null( $run )) report_error( 'no such run exists' );
 
-	$requests = null;
-	FileMgrIfaceCtrlWs::create_request(
-		$requests,
-		$experiment->instrument()->name(),
-		$experiment->name(),
-		$runnum );
+    $requests = null;
+    FileMgrIfaceCtrlWs::create_request(
+            $requests,
+            $experiment->instrument()->name(),
+            $experiment->name(),
+            $runnum );
 
-	return_result( $requests );
+    return_result( $requests );
 
 } catch( LogBookException $e ) { report_error( $e->toHtml()); }
   catch( FileMgrException $e ) { report_error( $e->toHtml()); }

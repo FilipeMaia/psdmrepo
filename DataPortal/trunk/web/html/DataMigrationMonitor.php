@@ -123,7 +123,7 @@ function request_update() {
 	case '1w': params.ignore_1w = ''; break;
 	}
 	var jqXHR = $.get(
-		'../portal/DataMigrationMonitorImpl.php', params,
+		'../portal/ws/DataMigrationMonitorImpl.php', params,
 		function(data) {
 			$('#search_result').html(data);
 		},
@@ -148,7 +148,7 @@ $(function() {
 	$('#unsubscribe_button').button().click(function() {
 		var params = {};
 		var jqXHR = $.get(
-			'../portal/DataMigrationSubscriptionToggle.php', params,
+			'../portal/ws/DataMigrationSubscriptionToggle.php', params,
 			function(data) {
 				$('#subscribe_area'  ).removeClass('hidden').addClass('visible');
 				$('#unsubscribe_area').removeClass('visible').addClass('hidden');
@@ -162,7 +162,7 @@ $(function() {
 	$('#subscribe_button').button().click(function() {
 		var params = {};
 		var jqXHR = $.get(
-			'../portal/DataMigrationSubscriptionToggle.php', params,
+			'../portal/ws/DataMigrationSubscriptionToggle.php', params,
 			function(data) {
 				$('#subscribe_area'  ).removeClass('visible').addClass('hidden');
 				$('#unsubscribe_area').removeClass('hidden').addClass('visible');
@@ -199,7 +199,7 @@ $(function() {
   <br>
   <div style="padding-left:20px; font-family: Arial, sans-serif; font-size:80%;">
     <div style="float:left;">
-      <form id="file_filter_form" style="margin-bottom:0px;" action="DataMigrationMonitorImpl.php" method="get">
+      <form id="file_filter_form" style="margin-bottom:0px;" action="../portal/ws/DataMigrationMonitorImpl.php" method="get">
         <div style="float:left; margin-right:20px;">
           <b>Select experiments which:</b><br>
           <div style="padding-left:20px; padding-top:5px; padding-bottom:5px;">

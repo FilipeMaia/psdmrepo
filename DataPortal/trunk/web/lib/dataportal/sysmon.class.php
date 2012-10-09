@@ -4,10 +4,13 @@ namespace DataPortal;
 
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 use AuthDB\AuthDB;
+
+use FileMgr\DbConnection;
 
 use LogBook\LogBook;
 
@@ -17,30 +20,12 @@ use LusiTime\LusiIntervalItr;
 /**
  * Class SysMon encapsulates operations with the PCDS systems monitoring database
  */
-class SysMon {
+class SysMon extends DbConnection {
 
-	// ---------------------------------------------------
-    // --- SIMPLIFIED INTERFACE AND ITS IMPLEMENTATION ---
-    // ---------------------------------------------------
+    // ------------------------
+    // --- STATIC INTERFACE ---
+    // ------------------------
 
-    private static $instance = null;
-
-    /**
-     * Singleton to simplify certain operations.
-     *
-     * @return unknown_type
-     */
-    public static function instance() {
-        if( is_null( SysMon::$instance )) SysMon::$instance =
-        	new SysMon (
-        		SYSMON_DEFAULT_HOST,
-				SYSMON_DEFAULT_USER,
-				SYSMON_DEFAULT_PASSWORD,
-				SYSMON_DEFAULT_DATABASE );
-        return SysMon::$instance;
-    }
-	/* Static members of the class
-     */
     private static $instrument_names = array(
         'AMO',
         'SXR',
@@ -70,17 +55,22 @@ class SysMon {
         'MEC' => 128
     );
 
-    /* Object members
-     */
-    private $host;
-    private $user;
-    private $password;
-    public  $database;
+    private static $instance = null;
 
-    /* Current state of the object
+    /**
+     * Singleton to simplify certain operations.
+     *
+     * @return SysMon
      */
-    private $link;
-    private $in_transaction = false;
+    public static function instance() {
+        if( is_null( SysMon::$instance )) SysMon::$instance =
+            new SysMon (
+                SYSMON_DEFAULT_HOST,
+                SYSMON_DEFAULT_USER,
+                SYSMON_DEFAULT_PASSWORD,
+                SYSMON_DEFAULT_DATABASE );
+        return SysMon::$instance;
+    }
 
     /**
      * Constructor
@@ -94,21 +84,7 @@ class SysMon {
      * @param string $database 
      */
     public function __construct ( $host, $user, $password, $database ) {
-        $this->host      = $host;
-        $this->user      = $user;
-        $this->password  = $password;
-        $this->database  = $database;
-    }
-
-    /**
-     * Destructor
-     */
-    public function __destruct () {
-
-    	// Do not close this connection from here because it might be shared
-    	// with other instances of the class (also from other APIs).
-    	//
-        //if( isset( $this->link )) mysql_close( $this->link );
+        parent::__construct ( $host, $user, $password, $database );
     }
 
     /**
@@ -173,12 +149,11 @@ class SysMon {
      */
 
     public function beamtime_config() {
-	    $config = array();
-   		$this->connect();
+        $config = array();
     	$result = $this->query( "SELECT * FROM beamtime_config" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-        	$row   = mysql_fetch_array( $result, MYSQL_ASSOC );
+            $row   = mysql_fetch_array( $result, MYSQL_ASSOC );
             $param = trim($row['param']);
             $value = trim($row['value']);
             switch($param) {
@@ -192,14 +167,13 @@ class SysMon {
 
     public function beamtime_runs( $begin_time=null, $end_time=null ) {
         $list = array();
-   		$this->connect();
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." begin_time < {$end_time->to64()}";
     	$result = $this->query( "SELECT * FROM beamtime_runs {$interval} ORDER BY begin_time" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
-        	array_push(
+            array_push(
                 $list,
                 new SysMonBeamTimeRun(
                     $this,
@@ -209,14 +183,13 @@ class SysMon {
 
     public function beamtime_gaps( $begin_time=null, $end_time=null ) {
         $list = array();
-   		$this->connect();
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." begin_time < {$end_time->to64()}";
     	$result = $this->query( "SELECT * FROM beamtime_gaps {$interval} ORDER BY begin_time" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
-        	array_push(
+            array_push(
                 $list,
                 new SysMonBeamTimeGap(
                     $this,
@@ -225,14 +198,13 @@ class SysMon {
     }
     public function beamtime_comments( $begin_time=null, $end_time=null ) {
         $list = array();
-   		$this->connect();
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE gap_begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." gap_begin_time < {$end_time->to64()}";
     	$result = $this->query( "SELECT * FROM beamtime_comments {$interval} ORDER BY gap_begin_time" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
-        	array_push(
+            array_push(
                 $list,
                 new SysMonBeamTimeComment(
                     $this,
@@ -241,8 +213,7 @@ class SysMon {
     }
     public function beamtime_systems() {
         $list = array();
-   		$this->connect();
-    	$result = $this->query( "SELECT DISTINCT system FROM beamtime_comments WHERE system != ''" );
+    	$result = $this->query( "SELECT DISTINCT system FROM beamtime_comments WHERE system != '' ORDER BY system" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -253,7 +224,6 @@ class SysMon {
         return $list;
     }
     public function beamtime_comment_at($begin_time, $instr) {
-        $this->connect();
         $instr_escaped = $this->escape_string(trim($instr));
         $result = $this->query( "SELECT * FROM beamtime_comments WHERE gap_begin_time={$begin_time->to64()} AND instr_name='{$instr_escaped}'" );
     	$nrows = mysql_numrows( $result );
@@ -281,9 +251,23 @@ class SysMon {
      */
     public function beamtime_beam_status($pvname,$begin_time,$end_time) {
 
-        $leftmost = null;
+        $maxtimestamp = null;
         {
-            $sql = "select timestamp,value from pv,pv_val WHERE pv.id=pv_val.pv_id AND name='{$pvname}' AND timestamp IN (select MAX(timestamp) AS timestamp from pv,pv_val WHERE pv.id=pv_val.pv_id AND name='{$pvname}' AND timestamp <= {$begin_time->to64()} ) ORDER BY timestamp";
+            $sql = "select MAX(timestamp) AS timestamp from pv,pv_val WHERE pv.id=pv_val.pv_id AND name='{$pvname}' AND timestamp <= {$begin_time->to64()}";
+            $result = $this->query($sql);
+            $nrows = mysql_numrows( $result );
+            if( $nrows ) {
+                if( $nrows != 1 )
+                    throw new DataPortalException (
+                        __METHOD__,
+                        "unexpected result set returned by the query: ".$sql );
+                $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+                if( $attr['timestamp'] ) $maxtimestamp = $attr['timestamp'];
+            }
+        }
+        $leftmost = null;
+        if( !is_null($maxtimestamp)) {
+            $sql = "select timestamp,value from pv,pv_val WHERE pv.id=pv_val.pv_id AND name='{$pvname}' AND timestamp={$maxtimestamp} ORDER BY timestamp";
             $result = $this->query($sql);
             $nrows = mysql_numrows( $result );
             if( $nrows ) {
@@ -341,7 +325,6 @@ class SysMon {
      */
 
     public function update_beamtime_config($config) {
-        $this->connect();
         $old_config = $this->beamtime_config();
         foreach( $config as $param => $value ) {
 
@@ -381,18 +364,15 @@ class SysMon {
     }
 
     public function beamtime_clear_all() {
-        $this->connect();
         $this->query('DELETE FROM beamtime_gaps');
         $this->query('DELETE FROM beamtime_runs');
     }
     public function beamtime_clear_from($begin_time) {
-        $this->connect();
         $this->query("DELETE FROM beamtime_gaps WHERE begin_time >= {$begin_time->to64()}");
         $this->query("DELETE FROM beamtime_runs WHERE begin_time >= {$begin_time->to64()}");
     }
 
     public function add_beamtime_run($begin, $end, $exper_id, $runnum, $exper_name, $instr_name) {
-        $this->connect();
         $exper_name_escaped = $this->escape_string(trim($exper_name));
         $instr_name_escaped = $this->escape_string(trim($instr_name));
         $this->query(
@@ -401,13 +381,11 @@ class SysMon {
     }
     public function add_beamtime_gap($begin, $end, $instr_name) {
         $instr_name_escaped = $this->escape_string(trim($instr_name));
-        $this->connect();
         $this->query(
             "INSERT INTO beamtime_gaps VALUES({$begin->to64()},{$end->to64()},'{$instr_name_escaped}')"
         );
     }
     public function beamtime_set_gap_comment($gap_begin_time, $instr_name, $comment, $system, $post_time, $posted_by_uid) {
-        $this->connect();
         $instr_name_escaped    = $this->escape_string(trim($instr_name));
         $posted_by_uid_escaped = $this->escape_string(trim($posted_by_uid));
         $comment_escaped       = $this->escape_string(trim($comment));
@@ -418,7 +396,6 @@ class SysMon {
         );
     }
     public function beamtime_clear_gap_comment($gap_begin_time, $instr_name) {
-        $this->connect();
         $instr_name_escaped = $this->escape_string(trim($instr_name));
         $this->query("DELETE FROM beamtime_comments WHERE gap_begin_time={$gap_begin_time->to64()} AND instr_name='{$instr_name_escaped}'");
     }
@@ -435,13 +412,13 @@ class SysMon {
 
         if( $no_beam_correction4gaps ) {
             array_push(
-                    $gaps,
-                    array(
-                        'begin'      => LusiTime::from64($begin_time_64),
-                        'end'        => LusiTime::from64($end_time_64),
-                        'instr_name' => $instr_name
-                    )
-                );
+                $gaps,
+                array(
+                    'begin'      => LusiTime::from64($begin_time_64),
+                    'end'        => LusiTime::from64($end_time_64),
+                    'instr_name' => $instr_name
+                )
+            );
         } else {
 
             // Consider only those beam time intervals where the beam time status
@@ -559,16 +536,15 @@ class SysMon {
         // an optimization step needed to prevent unneccesary database
         // operations.
         //
-        $logbook = new LogBook();
-        $logbook->begin();
+        LogBook::instance()->begin();
 
         $instrument_names = array();
         $experiments = array();
-        foreach( $logbook->regdb()->instruments() as $instrument ) {
+        foreach( LogBook::instance()->regdb()->instruments() as $instrument ) {
             if( !$instrument->is_location()) {
                 array_push( $instrument_names, $instrument->name());
                 $experiments[$instrument->name()] = array();
-                foreach( $logbook->experiments_for_instrument($instrument->name()) as $experiment ) {
+                foreach( LogBook::instance()->experiments_for_instrument($instrument->name()) as $experiment ) {
                     array_push( $experiments[$instrument->name()], $experiment);
                 }
             }
@@ -721,8 +697,6 @@ class SysMon {
      */
     public function subscribe4explanations_if ( $subscribe, $subscriber, $address ) {
 
-    	$this->connect();
-
     	$authdb = AuthDB::instance();
     	$authdb->begin();
 
@@ -802,20 +776,18 @@ HERE
      */
     public function check_if_subscribed4explanations ( $subscriber, $address ) {
 
-        $this->connect();
-
     	$subscriber_str = $this->escape_string( trim( $subscriber ));
     	$address_str    = $this->escape_string( trim( $address ));
-    	$result = $this->query(
-    		"SELECT * FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
-    	);
-    	$nrows = mysql_numrows( $result );
+
+        $sql    = "SELECT * FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'";
+    	$result = $this->query($sql);
+    	$nrows  = mysql_numrows( $result );
     	if( !$nrows ) return null;
     	if( $nrows != 1 )
-			throw new DataPortalException (
-				__METHOD__,
-				"duplicate entries for downtime explanations subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
-		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+            throw new DataPortalException (
+                __METHOD__,
+		"duplicate entries for downtime explanations subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
+	$row = mysql_fetch_array( $result, MYSQL_ASSOC );
        	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
        	return $row;
     }
@@ -826,8 +798,8 @@ HERE
      * the ones reported by the previous method.
      */
     public function get_all_subscribed4explanations () {
-	    $list = array();
-   		$this->connect();
+
+        $list = array();
     	$result = $this->query( "SELECT * FROM beamtime_subscriber" );
     	$nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -839,15 +811,15 @@ HERE
     }
 
     public function notify_allsubscribed4explanations ($instr_name, $gap_begin_time) {
-        $this->connect();
-		$url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
+        $url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
         foreach( $this->get_all_subscribed4explanations() as $subscriber ) {
             $address = $subscriber['address'];
             $this->do_notify(
                 'LCLS Data Taking Monitor',
-        		$address,
-        		"*** DOWNTIME EXPLANATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
-				<<<HERE
+        	$address,
+        	"*** DOWNTIME EXPLANATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
+                <<<HERE
+
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
@@ -874,107 +846,6 @@ HERE
         // Otherwise its contents will be lost before we use it.
         //
         unlink( $tmpfname );
-    }
-
-    /*
-     * ================================
-     *   MySQL TRANSACTION MANAGEMENT
-     * ================================
-     */
-    public function begin () {
-        $this->connect();
-        if( $this->in_transaction ) return;
-        $this->transaction( 'BEGIN' );
-        $this->in_transaction = true;
-    }
-
-    public function commit () {
-        $this->connect();
-        if( !$this->in_transaction ) return;
-        $this->transaction( 'COMMIT' );
-        $this->in_transaction = false;
-    }
-
-    public function rollback () {
-        $this->connect();
-        if( !$this->in_transaction ) return;
-        $this->transaction( 'ROLLBACK' );
-        $this->in_transaction = false;
-    }
-
-    private function transaction ( $transition ) {
-        if( !mysql_query( $transition, $this->link ))
-            throw new DataPortalException (
-                __METHOD__,
-                "MySQL error: ".mysql_error( $this->link ).', in query: '.$transition );
-    }
-
-    /* =================
-     *   MySQL QUERIES
-     * =================
-     */
-    public function query ( $sql ) {
-
-        $this->connect();
-
-        if( !$this->in_transaction )
-            throw new DataPortalException (
-                __METHOD__, "no active transaction" );
-
-        $result = mysql_query( $sql, $this->link );
-        if( !$result )
-            throw new DataPortalException (
-                __METHOD__,
-                "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
-        return $result;
-    }
-
-    /* ==========================================================
-     *   MISC. OPERATIONS REQUIREING DATABASE SERVER CONNECTION
-     * ==========================================================
-     */
-    public function escape_string( $text ) {
-        return mysql_real_escape_string( $text, $this->link );  }
- 
-    /**
-     * Make a connection if this hasn't been done yet.
-     */
-    private function connect () {
-        if( !isset( $this->link )) {
-
-            /* Connect to MySQL server and register the shutdown function
-             * to clean up after self by doing 'ROLLBACK'. This would allow
-             * to use so called 'persistent' MySQL connections.
-             * 
-             * NOTE: using the 'persistent' connection. This connection won't be
-             * closed by 'mysql_close()'.
-             */
-        	$new_link = false; // true;
-            $this->link = mysql_pconnect( $this->host, $this->user, $this->password, $new_link );
-            if( !$this->link )
-                throw new DataPortalException (
-                    __METHOD__,
-                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_connect" );
-
-            if( !mysql_select_db( $this->database, $this->link ))
-                throw new DataPortalException (
-                    __METHOD__,
-                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_select_db" );
-
-            $sql = "SET SESSION SQL_MODE='ANSI'";
-            if( !mysql_query( $sql, $this->link ))
-                throw new DataPortalException (
-                    __METHOD__,
-                    "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
-
-            $sql = "SET SESSION AUTOCOMMIT=0";
-            if( !mysql_query( $sql, $this->link ))
-                throw new DataPortalException (
-                    __METHOD__,
-                    "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
-
-            register_shutdown_function( array( $this, "rollback" ));
-        }
     }
 }
 

@@ -89,20 +89,15 @@ try {
     // Fetch data from the database, then filter and extract the information
     // which is expected to be returned to a caller.
     //
-    $logbook = new LogBook();
-	$logbook->begin();
-
-	$regdb = new RegDB();
-	$regdb->begin();
-
-    $sysmon = SysMon::instance();
-	$sysmon->begin();
+    LogBook::instance()->begin();
+    RegDB::instance()->begin();
+    SysMon::instance()->begin();
 
     // Repopulate the database if the requested day is today
     //
     $shift_is4today = $start->toStringDay() == LusiTime::today()->toStringDay();
     if( $shift_is4today ) {
-        $sysmon->populate('XRAY_DESTINATIONS');
+        SysMon::instance()->populate('XRAY_DESTINATIONS');
     }
 
     // Instrument specific statistics stored in the following dictionary
@@ -142,7 +137,7 @@ try {
     // NOTE: runs are reported in a scope of the corresponding
     //       instruments.
     //
-    foreach( $sysmon->beamtime_runs($start,$stop) as $run ) {
+    foreach( SysMon::instance()->beamtime_runs($start,$stop) as $run ) {
         $instr_name = $run->instr_name();
         array_push(
             $instruments[$instr_name]['runs'],
@@ -163,11 +158,11 @@ try {
     // NOTE: gaps are reported in a scope of the corresponding
     //       instruments.
     //
-    foreach( $sysmon->beamtime_gaps($start,$stop) as $gap ) {
+    foreach( SysMon::instance()->beamtime_gaps($start,$stop) as $gap ) {
 
         $instr = $gap->instr_name();
 
-        $comment      = $sysmon->beamtime_comment_at($gap->begin_time(), $instr);
+        $comment      = SysMon::instance()->beamtime_comment_at($gap->begin_time(), $instr);
         $comment_info = is_null($comment) ?
             array('available'     => 0) :
             array('available'     => 1,
@@ -193,7 +188,7 @@ try {
     // found in justtifications for gaps. The categories can be used
     // by any instruments.
     //
-    $systems = $sysmon->beamtime_systems();
+    $systems = SysMon::instance()->beamtime_systems();
     sort($systems);
 
     // Retreive and process beam-time and LCLS records
@@ -216,7 +211,7 @@ try {
         // NOTE: gaps are reported in a scope of the corresponding
         //       instruments.
         //
-        foreach( $sysmon->beamtime_beam_status('XRAY_DESTINATIONS',$start,$stop) as $ival ) {
+        foreach( SysMon::instance()->beamtime_beam_status('XRAY_DESTINATIONS',$start,$stop) as $ival ) {
 
             $ival_begin_sec = $ival['begin_time']->to_float();
             $ival_end_sec   = $ival['end_time'  ]->to_float();
@@ -259,7 +254,7 @@ try {
 
         // LCLS statistics
         //
-        foreach( $sysmon->beamtime_beam_status('LIGHT:LCLS:STATE',$start,$stop) as $ival ) {
+        foreach( SysMon::instance()->beamtime_beam_status('LIGHT:LCLS:STATE',$start,$stop) as $ival ) {
 
             $ival_begin_sec = $ival['begin_time']->to_float();
             $ival_end_sec   = $ival['end_time'  ]->to_float();
@@ -330,9 +325,9 @@ try {
     $minutes = floor(( $total_runs_duration_sec % 3600. ) / 60. );
     $total_data_taking = sprintf("%02d hr %02d min", $hours, $minutes );
 
-    $logbook->commit();
-    $regdb->commit();
-	$sysmon->commit();
+    LogBook::instance()->commit();
+    RegDB::instance()->commit();
+    SysMon::instance()->commit();
 
     report_success( array(
         'shift'                       => $start->toStringDay(),

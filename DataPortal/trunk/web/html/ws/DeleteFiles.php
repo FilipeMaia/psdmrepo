@@ -11,22 +11,21 @@
  * status of the operation.
  */
 
+require_once( 'authdb/authdb.inc.php' );
+require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
-require_once( 'dataportal/dataportal.inc.php' );
 
-use LogBook\LogBook;
-use LogBook\LogBookException;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
-
-use FileMgr\RestRequest;
-use FileMgr\FileMgrIrodsWs;
-use FileMgr\FileMgrException;
+use AuthDB\AuthDB;
 
 use DataPortal\Config;
-use DataPortal\DataPortalException;
+
+use FileMgr\RestRequest;
+use FileMgr\FileMgrIrodsDb;
+
+use LogBook\LogBook;
+use LusiTime\LusiTime;
 
 function report_success($result) {
     
@@ -84,41 +83,32 @@ if( $storage == '' ) report_error( "invalid storage class found in the request" 
  */
 try {
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    if ($storage == 'SHORT-TERM')
+        if (!AuthDB::instance()->hasPrivilege(AuthDB::instance()->authName(), null, 'StoragePolicyMgr', 'edit'))
+            report_error ("sorry, you don't possess sufficient privileges of rthis operation");
 
-    $config = Config::instance();
-    $config->begin();
+    LogBook::instance()->begin();
+    Config::instance()->begin();
+    FileMgrIrodsDb::instance()->begin();
 
-    $experiment = $logbook->find_experiment_by_id($exper_id);
+    $experiment = LogBook::instance()->find_experiment_by_id($exper_id);
     if( is_null($experiment)) report_error("No such experiment");
 
     $run = $experiment->find_run_by_num($runnum);
     if( is_null($run))
         report_error(
             "No such run in the experiment",
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-
-    $runs2files = array();
+            array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 
     // Find the files to be deleted
     //
-    $runs = null;
-
-    FileMgrIrodsWs::runs(
-        $runs,
+    $files = array();
+    foreach( FileMgrIrodsDb::instance()->runs(
         $experiment->instrument()->name(),
         $experiment->name(),
         $type,
-        $runnum.'-'.$runnum );
-
-    if( is_null($runs ))
-        report_error(
-            'server encountered an internal error when trying to get a list of files for thr run',
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-
-    $files = array();
-    foreach( $runs as $run )
+        $runnum,
+        $runnum ) as $run )
         foreach( $run->files as $file )
             if( $file->resource == 'lustre-resc' ) array_push($files, $file);
 
@@ -128,24 +118,24 @@ try {
 
         $irods_filepath = "{$file->collName}/{$file->name}";
 
-        // Delete selected files by their full path and a replica. Also make sure
-        // no old entries remain in the file restore queue. Otherwise it would
-        // (falsefully) appear as if the deleted file is being restored.
-        //
-        $config->delete_file_restore_request(
-            array(
-                'exper_id'  => $exper_id,
-                'runnum'    => $runnum,
-                'file_type' => $type,
-                'irods_filepath'     => $irods_filepath,
-                'irods_src_resource' => 'hpss-resc',
-                'irods_dst_resource' => 'lustre-resc'
-            )
-        );
-
         switch( $storage ) {
 
             case 'SHORT-TERM':
+
+                // Delete selected files by their full path and a replica. Also make sure
+                // no old entries remain in the file restore queue. Otherwise it would
+                // (falsefully) appear as if the deleted file is being restored.
+                //
+                Config::instance()->delete_file_restore_request(
+                    array(
+                        'exper_id'  => $exper_id,
+                        'runnum'    => $runnum,
+                        'file_type' => $type,
+                        'irods_filepath'     => $irods_filepath,
+                        'irods_src_resource' => 'hpss-resc',
+                        'irods_dst_resource' => 'lustre-resc'
+                    )
+                );
 
                 // Delete selected files by their full path and a replica.
                 //
@@ -161,11 +151,11 @@ try {
 //                    case 404:
 //                       report_error(
 //                           "file '{$file->name}' doesn't exist",
-//                           array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+//                           array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 //                    default:
 //                        report_error(
 //                            "failed to delete file '{$file->name}' because of HTTP error {$http_code}",
-//                            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+//                            array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 //                }
                 break;
 
@@ -174,22 +164,21 @@ try {
                 // Do not delete the file. Just send it back to the 'SHORT-TERM' storage
                 // by removing the file's record from the 'MEDIUM-TERM' registry.
                 //
-                $config->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
+                Config::instance()->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
                 break;
         }
     }
 
     // Calculated medium term quota usage for the experiment
     //
-    $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
+    $medium_quota_used_gb = Config::instance()->calculate_medium_quota($exper_id);
 
-    $logbook->commit();
-    $config->commit();
+    LogBook::instance()->commit();
+    Config::instance()->commit();
+    FileMgrIrodsDb::instance()->commit();
 
     report_success( array( 'medium_quota_used_gb' => $medium_quota_used_gb ));
 
-} catch( LogBookException    $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
-  catch( LusiTimeException   $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
-  catch( FileMgrException    $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
-  catch( DataPortalException $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+} catch( Exception $e ) { report_error( $e.'<pre>'.print_r( $e->getTrace(), true ).'</pre>' ); }
+
 ?>

@@ -56,13 +56,17 @@
 }
 
 .datafiles-table-hdr {
+  /*
   font-family: 'Times', serif;
+  */
   font-size: 12px;
   font-weight:bold;
 }
 
 .datafiles-table-hdr-plain {
+  /*
   font-family: 'Times', serif;
+  */
   font-size: 12px;
 }
 
@@ -138,17 +142,6 @@ div.df-r-total-size {
   text-align: right;
 }
 
-div.df-r-tape-files {
-  margin-left: 60px;
-  width: 30px;
-  text-align: right;
-}
-div.df-r-tape-size {
-  margin-left: 0px;
-  width: 70px;
-  text-align: right;
-}
-
 div.df-r-raw-files {
   margin-left: 60px;
   width: 30px;
@@ -177,6 +170,17 @@ div.df-r-medium-size {
 div.df-r-medium-overstay {
   margin-left: 5px;
   width: 20px;
+}
+
+div.df-r-tape-files {
+  margin-left: 35px;
+  width: 30px;
+  text-align: right;
+}
+div.df-r-tape-size {
+  margin-left: 0px;
+  width: 70px;
+  text-align: right;
 }
 
 div.df-r-hdn {

@@ -56,26 +56,25 @@ $no_beam_correction4gaps = isset($_GET['no_beam_correction4gaps']);
 $force = isset($_GET['force']);
 
 try {
-    $authdb = AuthDB::instance();
-	$authdb->begin();
+    AuthDB::instance()->begin();
 
-    if( !$authdb->hasRole($authdb->authName(),null,'BeamTimeMonitor','Editor')) report_error('not authorized to use this service');
+    if (!AuthDB::instance()->hasRole(
+            AuthDB::instance()->authName(),
+            null,
+            'BeamTimeMonitor',
+            'Editor')) report_error('not authorized to use this service');
 
-    $logbook = new LogBook();
-	$logbook->begin();
+    LogBook::instance()->begin();
 
-	$regdb = new RegDB();
-	$regdb->begin();
-
-	$sysmon = SysMon::instance();
-	$sysmon->begin();
+    RegDB::instance()->begin();
+    SysMon::instance()->begin();
 
     // Load configuration parameters stored at the last invocation
     // of the script. The parameters are going to drive how far this script
     // should go back in history. The value of the parameters can also be adjusted
     // 
     //
-    $config = $sysmon->beamtime_config();
+    $config = SysMon::instance()->beamtime_config();
     print <<<HERE
 <h3>Configuration loaded from the database:</h3>
 <div style="padding-left:10;">
@@ -94,16 +93,16 @@ HERE;
 </div>
 HERE;
 
-    $sysmon->populate (
+    SysMon::instance()->populate (
         'XRAY_DESTINATIONS',
         $min_gap_width_sec,
         $no_beam_correction4gaps,
         $force );
 
-	$authdb->commit();
-    $logbook->commit();
-    $regdb->commit();
-	$sysmon->commit();
+    AuthDB::instance()->commit();
+    LogBook::instance()->commit();
+    RegDB::instance()->commit();
+    SysMon::instance()->commit();
 
 } catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
   catch( DataPortalException $e ) { report_error( $e->toHtml()); }

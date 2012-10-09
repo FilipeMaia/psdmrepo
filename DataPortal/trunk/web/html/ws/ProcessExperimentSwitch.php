@@ -14,11 +14,8 @@ use RegDB\RegDBAuth;
 use RegDB\RegDBException;
 
 try {
-    $authdb = new AuthDB();
-    $authdb->begin();
-
-    $regdb = new RegDB();
-    $regdb->begin();
+    AuthDB::instance()->begin();
+    RegDB::instance()->begin();
 
 	/* Find the name of the experiment among  parameters of the request.
 	 */
@@ -36,7 +33,7 @@ try {
 	}
 	$experiment_name = trim( $experiment_param_split[0] );
 
-    $experiment = $regdb->find_experiment_by_unique_name( $experiment_name );
+    $experiment = RegDB::instance()->find_experiment_by_unique_name( $experiment_name );
     if( is_null( $experiment )) {
     	print( RegDBAuth::reporErrorHtml(
         	'No such experiment: {}'));
@@ -48,7 +45,7 @@ try {
 	/* Get more info on the requestor of the switch
 	 */
 	$requestor_uid = AuthDB::authName();
-	$requestor_account = $regdb->find_user_account( $requestor_uid );
+	$requestor_account = RegDB::instance()->find_user_account( $requestor_uid );
 	if( is_null( $requestor_account )) {
 		print( RegDBAuth::reporErrorHtml(
    			"Unable to get user profile for account {$requestor_uid}" ));
@@ -60,10 +57,10 @@ try {
     /* Check if the authenticated user has sufficient authorization to manage
    	 * the switch for this or all experiments.
      */
-   	if( !( $authdb->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage' ) ||
-       	   $authdb->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage' ) ||
-       	   $authdb->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage_'.$instrument_name ) ||
-       	   $authdb->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage_'.$instrument_name ))) {
+   	if( !( AuthDB::instance()->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage' ) ||
+       	   AuthDB::instance()->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage' ) ||
+       	   AuthDB::instance()->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage_'.$instrument_name ) ||
+       	   AuthDB::instance()->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage_'.$instrument_name ))) {
     	print( RegDBAuth::reporErrorHtml(
    	    	'You are not authorized to manage the experiment switch'));
    		exit;
@@ -73,10 +70,10 @@ try {
 	 * return back to the caller.
 	 */
 	$previous_experiment_name = '';
-	$previous_experiment_switch = $regdb->last_experiment_switch( $instrument_name );
+	$previous_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument_name );
 	if( !is_null( $previous_experiment_switch )) {
 		$previous_exper_id = $previous_experiment_switch['exper_id'];
-		$previous_experiment = $regdb->find_experiment_by_id( $previous_exper_id );
+		$previous_experiment = RegDB::instance()->find_experiment_by_id( $previous_exper_id );
 		if( is_null( $previous_experiment ))
 			die( "fatal internal error when resolving experiment id={$previous_exper_id} in the database" );
 		$previous_experiment_name = $previous_experiment->name();	
@@ -107,7 +104,7 @@ try {
 
 				/* Get user full name and their e-mail address.
 				 */
-				$account = $regdb->find_user_account( $uid );
+				$account = RegDB::instance()->find_user_account( $uid );
 				if( is_null( $account )) {
 					print( RegDBAuth::reporErrorHtml(
        					"Unknown user {$uid} found among parameters of the request" ));
@@ -133,7 +130,7 @@ try {
 		 */
 		$instructions = $_POST['instructions'];
 
-		$regdb->switch_experiment( $experiment->name(), $requestor_uid, $notify );
+		RegDB::instance()->switch_experiment( $experiment->name(), $requestor_uid, $notify );
 
 	    // TODO: Make proper adjustments to the AuthDB for the instrument's OPR account
 	    //
@@ -147,7 +144,7 @@ try {
 				array_push( $oprelogauth2keep, array( 'name' => $rolename, 'exper_id' => $exper_id  ));
 			}
 		}
-		foreach( $authdb->roles_by( $opr_account, 'LogBook', $instrument_name ) as $r ) {
+		foreach( AuthDB::instance()->roles_by( $opr_account, 'LogBook', $instrument_name ) as $r ) {
 
 			$rolename   = $r['role']->name();
 			$exper_id   = $r['exper_id'];
@@ -167,17 +164,17 @@ try {
 				}
 			}
 			if( !$keep )
-				$authdb->deleteRolePlayer( 'LogBook', $rolename, $exper_id, $opr_account );
+				AuthDB::instance()->deleteRolePlayer( 'LogBook', $rolename, $exper_id, $opr_account );
 		}
 
 		$oprelogauth = $_POST['oprelogauth'];
 		if( isset( $oprelogauth ) && ( $oprelogauth != '' ))
-			$authdb->createRolePlayer( 'LogBook', $oprelogauth, $experiment_id, $opr_account );
+			AuthDB::instance()->createRolePlayer( 'LogBook', $oprelogauth, $experiment_id, $opr_account );
 
 	    // Commit changes to the database only when everything has been successfully completed
 
-		$authdb->commit();
-    	$regdb->commit();
+            AuthDB::instance()->commit();
+            RegDB::instance()->commit();
 
 	    // Send e-mail notifications.
 
@@ -229,25 +226,22 @@ More information on the current experiment can be found here:
   by mistake.	
 
 HERE;
-	    $tmpfname = tempnam("/tmp", "experiment_switch");
+        $tmpfname = tempnam("/tmp", "experiment_switch");
     	$handle = fopen( $tmpfname, "w" );
     	fwrite( $handle, $body );
     	fclose( $handle );
 
     	$subject = "[ {$instrument_experiment_names} ]  experiment activated for DAQ";
 
-	    foreach( $notify as $n ) {
-    		$address = $n['email'];
-    		shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F 'LCLS Experiment Switch'" );
-	    }
-    	unlink( $tmpfname );
-	}
-    header( "Location: experiment_switch.php?instr_name={$instrument_name}" );
+	foreach( $notify as $n ) {
+            $address = $n['email'];
+            shell_exec( "cat {$tmpfname} | mail -s '{$subject}' {$address} -- -F 'LCLS Experiment Switch'" );
+        }
+        unlink( $tmpfname );
+    }
+    header( "Location: ../experiment_switch.php?instr_name={$instrument_name}" );
 
-} catch( AuthDBException $e ) {
-	print $e->toHtml();
-} catch( RegDBException $e ) {
-	print $e->toHtml();
-}
+} catch (AuthDBException $e) { print $e->toHtml(); }
+  catch (RegDBException  $e) { print $e->toHtml(); }
 
 ?>

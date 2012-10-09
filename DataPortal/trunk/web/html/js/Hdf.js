@@ -49,7 +49,7 @@ function hdf_create() {
 	this.translate_run = function(runnum) {
 		$('#hdf-r-comment-'+runnum).html('<span style="color:red;">Processing...</span>');
 		var params = {exper_id: that.exp_id, runnum: runnum};
-		var jqXHR  = $.get('../portal/NewRequest.php',params,function(data) {
+		var jqXHR  = $.get('../portal/ws/NewRequest.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status == 'success') {
 				$('#hdf-r-comment-'+runnum).html('<span style="color:green;">Translation request was queued</span>');
@@ -104,7 +104,7 @@ function hdf_create() {
 		}
 		$('#hdf-r-comment-'+runnum).html('<span style="color:red;">Processing...</span>');
 		var params = {id: id};
-		var jqXHR  = $.get('../portal/DeleteRequest.php',params,function(data) {
+		var jqXHR  = $.get('../portal/ws/DeleteRequest.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status == 'success') {
 				$('#hdf-r-comment-'+runnum).html('<span style="color:green;">Translation was stopped</span>');
@@ -159,7 +159,7 @@ function hdf_create() {
 		}
 		$('#hdf-r-comment-'+runnum).html('<span style="color:red;">Processing...</span>');
 		var params = {exper_id: that.exp_id, id: id};
-		var jqXHR  = $.get('../portal/EscalateRequestPriority.php',params,function(data) {
+		var jqXHR  = $.get('../portal/ws/EscalateRequestPriority.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status == 'success') {
 				$('#hdf-r-comment-'+runnum).html('');
@@ -175,7 +175,7 @@ function hdf_create() {
     this.set_auto_translation = function(is_on) {
         $.ajax({
             type: 'POST',
-            url: '../regdb/SetAutoTranslate2HDF5.php',
+            url: '../regdb/ws/SetAutoTranslate2HDF5.php',
             data: {
                 exper_id: that.exp_id,
                 autotranslate2hdf5: is_on ? 1 : 0
@@ -359,7 +359,7 @@ function hdf_create() {
 		var params = {exper_id: that.exp_id, show_files: '', json: ''};
 		var runs   = $('#hdf-manage-ctrl').find('input[name="runs"]'  ).val(); if(runs  != '') params.runs  = runs;
 		var status = $('#hdf-manage-ctrl').find('select[name="status"]').val(); if(status != 'any') params.status = status;
-		var jqXHR  = $.get('../portal/SearchRequests.php',params,function(data) {
+		var jqXHR  = $.get('../portal/ws/SearchRequests.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') {
 				$('#hdf-manage-updated').html(result.Message);

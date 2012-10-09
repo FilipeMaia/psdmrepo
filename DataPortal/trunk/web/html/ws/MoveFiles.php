@@ -85,22 +85,17 @@ if( $storage != 'SHORT-TERM' ) report_error( "inappropriate storage class of fil
  */
 try {
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    LogBook::instance()->begin();
+    Config::instance()->begin();
 
-    $config = Config::instance();
-    $config->begin();
-
-    $experiment = $logbook->find_experiment_by_id($exper_id);
+    $experiment = LogBook::instance()->find_experiment_by_id($exper_id);
     if( is_null($experiment)) report_error("No such experiment");
 
     $run = $experiment->find_run_by_num($runnum);
     if( is_null($run))
         report_error(
             "No such run in the experiment",
-            array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
-
-    $runs2files = array();
+            array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 
     // Find the files to be moved. And skip files which are already at their
     // intended destination.
@@ -116,13 +111,13 @@ try {
 
     if( is_null($runs )) report_error(
         'server encountered an internal error when trying to get a list of files for the run',
-        array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+        array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 
     $files = array();
     foreach( $runs as $run ) {
         foreach( $run->files as $file ) {
             if( $file->resource == 'lustre-resc' ) {
-                $request = $config->find_medium_store_file(
+                $request = Config::instance()->find_medium_store_file(
                     array(
                         'exper_id'       => $exper_id,
                         'runnum'         => $runnum,
@@ -139,10 +134,14 @@ try {
 
     // Evaluate quota availability (if the one applies for the experiment)
     //
-    $medium_quota    = $experiment->regdb_experiment()->find_param_by_name( 'MEDIUM-TERM-DISK-QUOTA' );
-    $medium_quota_gb = is_null( $medium_quota ) ? 0 : intval($medium_quota->value());
+    $medium_quota_gb = intval(Config::instance()->get_policy_param('MEDIUM-TERM',   'QUOTA'));
+    $param = $experiment->regdb_experiment()->find_param_by_name('MEDIUM-TERM-DISK-QUOTA');
+    if ($param) {
+        $gb = intval($param->value());
+        if ($gb) $medium_quota_gb = $gb;
+    }
     if( $medium_quota_gb ) {
-        $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
+        $medium_quota_used_gb = Config::instance()->calculate_medium_quota($exper_id);
         $size_gb = 0;
         $bytes_in_gb = 1024.0 * 1024.0 * 1024.0;
         foreach( $files as $file ) {
@@ -154,13 +153,13 @@ try {
               'You can no longer move files into the MEDIUM-TERM storage '.
               'either because the experiment has run out of its storage quota or because the amount of data '.
               'involved in this request would result in exceeding  quota limit of the experiment.',
-              array( 'medium_quota_used_gb' => $config->calculate_medium_quota($exper_id)));
+              array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
     }
 
     // Register selected files in the MEDIUM-TERM storage
     //
     foreach( $files as $file ) {
-        $config->add_medium_store_file (
+        Config::instance()->add_medium_store_file (
             array(
                 'exper_id'       => $exper_id,
                 'runnum'         => $runnum,
@@ -174,10 +173,10 @@ try {
 
     // Update quota usage for the experiment
     //
-    $medium_quota_used_gb = $config->calculate_medium_quota($exper_id);
+    $medium_quota_used_gb = Config::instance()->calculate_medium_quota($exper_id);
 
-    $logbook->commit();
-    $config->commit();
+    LogBook::instance()->commit();
+    Config::instance()->commit();
 
     report_success( array( 'medium_quota_used_gb' => $medium_quota_used_gb ));
 

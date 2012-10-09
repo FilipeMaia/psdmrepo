@@ -466,7 +466,7 @@ function elog_create() {
 			$('#el-s-ms-info').html('Updating tags and authors...');
 			var params = {id: that.exp_id};
 			if($('#elog-form-search input[name="posted_at_instrument"]').attr('checked')) params.accross_instrument = 1;
-			var jqXHR = $.get('../logbook/RequestUsedTagsAndAuthors.php',params,function(data) {
+			var jqXHR = $.get('../logbook/ws/RequestUsedTagsAndAuthors.php',params,function(data) {
 				var result = eval(data);
 				if(result.Status != 'success') {
 					$('#el-s-ms-info').html(result.Message);
@@ -651,7 +651,7 @@ function elog_create() {
 	this.update_shifts = function() {
 		$('#el-sh-updated').html('Updating shifts...');
 		var params = {exper_id: that.exp_id};
-		var jqXHR = $.get('../logbook/RequestAllShifts.php',params,function(data) {
+		var jqXHR = $.get('../logbook/ws/RequestAllShifts.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') {
 				$('#el-sh-updated').html(result.Message);
@@ -774,7 +774,7 @@ function elog_create() {
             exper_id: that.exp_id,
             range_of_runs: $('#el-r-ctrl').find('input[name="runs"]').val()
         };
-		var jqXHR = $.get('../logbook/RequestAllRuns.php',params,function(data) {
+		var jqXHR = $.get('../logbook/ws/RequestAllRuns.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') {
 				$('#el-r-updated').html(result.Message);
@@ -1091,7 +1091,7 @@ function elog_create() {
 	this.update_attachments = function() {
 		$('#el-at-updated').html('Updating attachments...');
 		var params = {exper_id: that.exp_id};
-		var jqXHR = $.get('../logbook/RequestAllAttachments.php',params,function(data) {
+		var jqXHR = $.get('../logbook/ws/RequestAllAttachments.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') {
 				$('#el-at-updated').html(result.Message);
@@ -1136,7 +1136,7 @@ function elog_create() {
 	this.subscription = function(operation, id) {
 		var params = {exper_id: this.exp_id, operation: operation};
 		if( id != null ) params.id = id;
-		var jqXHR = $.get('../logbook/CheckSubscription.php',params,function(data) {
+		var jqXHR = $.get('../logbook/ws/CheckSubscription.php',params,function(data) {
 			var result = eval(data);
 			if(result.Status != 'success') { report_error( result.Message ); return; }
 			$('#el-subscribed'  ).css('display', result.Subscribed ? 'block' : 'none' );
@@ -1528,7 +1528,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			$(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
 			if(entry.loaded) return;
 			$('#'+this.base+'-r-con-'+entry.id).html('Loading...');
-			$.get('../logbook/DisplayRunParams.php',{id:entry.run_id},function(data) {
+			$.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
 				var html =
 '<div style="float:right;" class="s-b-con"><button class="el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
@@ -1606,7 +1606,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			if(inject_runs) params.inject_runs = '';
 			if(inject_deleted_messages) params.inject_deleted_messages = '';
 
-			$.get('../logbook/Search.php',params,function(data) {
+			$.get('../logbook/ws/Search.php',params,function(data) {
 
 				var status = data.ResultSet.Status;
 				if(status!='success') {
@@ -1778,7 +1778,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		that.dim_day();
 
 		$('#'+this.base+'-ms-updated').html('Searching...');
-		$.get('../logbook/Search.php',params,function(data) {
+		$.get('../logbook/ws/Search.php',params,function(data) {
 
 			var status = data.ResultSet.Status;
 			if(status!='success') {
@@ -1919,7 +1919,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose reply. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="message" />'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
@@ -1955,7 +1955,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-xtdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select existing tags or define new tags to be added.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
 '      <input type="hidden" name="num_tags" value="'+num_tags+'" />'+
@@ -1972,7 +1972,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-xadlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select attachments to upload. Note the total limit of <b>25 MB</b>.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
 '      <input type="hidden" name="num_tags" value="0" />'+
@@ -1996,7 +1996,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
 '  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
+'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/ws/UpdateFFEntry4portal.php" method="post">'+
 '      <input type="hidden" name="id" value="'+id+'" />'+
 '      <input type="hidden" name="content_type" value="TEXT" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
@@ -2104,7 +2104,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 					$( this ).dialog('close');
 
 					var jqXHR = $.get(
-						'../logbook/DeleteFFEntry4portalJSON.php', {id: entry.id},
+						'../logbook/ws/DeleteFFEntry4portalJSON.php', {id: entry.id},
 						function(data) {
 
 							if( data.Status != 'success' ) {
@@ -2142,7 +2142,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var entry = that.threads[idx];
 
 		var jqXHR = $.get(
-			'../logbook/UndeleteFFEntry4portalJSON.php', {id: entry.id},
+			'../logbook/ws/UndeleteFFEntry4portalJSON.php', {id: entry.id},
 			function(data) {
 
 				if( data.Status != 'success' ) {
@@ -2184,7 +2184,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 					$( this ).dialog('close');
 
 					var jqXHR = $.get(
-						'../logbook/DeleteFFEntry4portalJSON.php', {id: entry.id},
+						'../logbook/ws/DeleteFFEntry4portalJSON.php', {id: entry.id},
 						function(data) {
 
 							if( data.Status != 'success' ) {
@@ -2218,7 +2218,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var entry = that.messages[id];
 
 		var jqXHR = $.get(
-			'../logbook/UndeleteFFEntry4portalJSON.php', {id: entry.id},
+			'../logbook/ws/UndeleteFFEntry4portalJSON.php', {id: entry.id},
 			function(data) {
 
 				if( data.Status != 'success' ) {
@@ -2279,7 +2279,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 					$( this ).dialog('close');
 
 					var jqXHR = $.get(
-						'../logbook/MoveFFEntry4portalJSON.php',
+						'../logbook/ws/MoveFFEntry4portalJSON.php',
                         params,
 						function(data) {
 
@@ -2588,7 +2588,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '<div id="'+this.base+'-r-rdlg-'+id+'" class="el-l-r-rdlg el-l-r-dlg-hdn">'+
 '  <div id="'+this.base+'-r-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="run" />'+
 '      <input type="hidden" name="message_id" value="" />'+
@@ -3020,7 +3020,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 			$(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
 			if(entry.loaded) return;
 			$('#'+this.base+'-r-con-'+entry.id).html('Loading...');
-			$.get('../logbook/DisplayRunParams.php',{id:entry.run_id},function(data) {
+			$.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
 				var html =
 '<div style="float:right;" class="s-b-con"><button class="el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
@@ -3059,7 +3059,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 			inject_runs: '',
 			format: 'detailed'
 		};
-		$.get('../logbook/Search.php',params,function(data) {
+		$.get('../logbook/ws/Search.php',params,function(data) {
 
 			if(data.ResultSet.Status != 'success') { that.parent.report_error( data.ResultSet.Message ); return; }
 
@@ -3098,7 +3098,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose reply. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="message" />'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
@@ -3134,7 +3134,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-xtdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select existing tags or define new tags to be added.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
 '      <input type="hidden" name="num_tags" value="'+num_tags+'" />'+
@@ -3151,7 +3151,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
 '  <div id="'+this.base+'-m-xadlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select attachments to upload. Note the total limit of <b>25 MB</b>.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
 '      <input type="hidden" name="num_tags" value="0" />'+
@@ -3175,7 +3175,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
 '  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
+'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/ws/UpdateFFEntry4portal.php" method="post">'+
 '      <input type="hidden" name="id" value="'+id+'" />'+
 '      <input type="hidden" name="content_type" value="TEXT" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
@@ -3293,7 +3293,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 					$( this ).dialog('close');
 
 					var jqXHR = $.get(
-						'../logbook/MoveFFEntry4portalJSON.php',
+						'../logbook/ws/MoveFFEntry4portalJSON.php',
                         params,
 						function(data) {
 
@@ -3595,7 +3595,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 //'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">C o m p o s e &nbsp; m e s s a g e</div>'+
 '  <div id="'+this.base+'-r-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="run" />'+
 '      <input type="hidden" name="message_id" value="" />'+

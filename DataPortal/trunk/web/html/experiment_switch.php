@@ -29,17 +29,12 @@ if( isset( $_GET['instr_name'] )) {
 
 try {
 
-	$regdb = new RegDB();
-	$regdb->begin();
-
-	$authdb = new AuthDB();
-	$authdb->begin();
-
-	$logbook = new LogBook();
-	$logbook->begin();
+	AuthDB::instance()->begin();
+	RegDB::instance()->begin();
+	LogBook::instance()->begin();
 	
 	if( isset( $instr_name )) {
-		$instrument = $regdb->find_instrument_by_name( $instr_name );
+		$instrument = RegDB::instance()->find_instrument_by_name( $instr_name );
 		if( is_null( $instrument )) die( 'unknown instrument name provided to the script' );
 	}
 
@@ -89,7 +84,7 @@ var page1 = '<?=(isset($instrument) ? $instrument->name() : "null")?>';
 var instruments = new Array();
 <?php
 	$idx = 0;
-	foreach( $regdb->instruments() as $instrument )
+	foreach( RegDB::instance()->instruments() as $instrument )
 		if( !$instrument->is_location()) {
 			echo <<<HERE
 instruments[{$idx}] = "{$instrument->name()}";
@@ -141,7 +136,7 @@ function init_tab( instrument ) {
 		}
 	);
 	$( "#search2notify-"+instrument ).autocomplete({
-		source: 'search_account.php',
+		source: '../portal/ws/search_account.php',
 		minLength: 2,
 		select: function( event, ui ) {
 			var user = eval('('+ui.item.value+')');
@@ -173,7 +168,7 @@ function on_experiment_select( elem, instrument ) {
 	var splitString = elem.value.split(',');
 	var experiment  = splitString[0];
 	$.ajax({
-		url: 'experiment_info.php?name='+experiment,
+		url: '../portal/ws/experiment_info.php?name='+experiment,
 		success: function( data ) {
 			var data = eval( '('+data+')' );  // translate into a JSON object
 			$('#input-notify-pi-'+instrument).html(
@@ -205,7 +200,7 @@ function on_experiment_select( elem, instrument ) {
 
 	$tabs = array();
 
-	foreach( $regdb->instruments() as $instrument ) {
+	foreach( RegDB::instance()->instruments() as $instrument ) {
 
 		if( $instrument->is_location()) continue;
 
@@ -222,11 +217,11 @@ function on_experiment_select( elem, instrument ) {
 		$last_experiment_switch_time      = '&lt; none &gt;';
 		$last_experiment_switch_requestor = '&lt; none &gt;';
 
-		$last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
+		$last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
 		if( !is_null( $last_experiment_switch )) {
 
 			$exper_id = $last_experiment_switch['exper_id'];
-			$experiment = $logbook->find_experiment_by_id( $exper_id );
+			$experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
 
 			if( is_null( $experiment ))
 				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
@@ -309,7 +304,7 @@ HERE;
 		$experiments_html =<<<HERE
 <select name="experiment" id="select-experiment-{$instrument->name()}" onchange="on_experiment_select(this,'{$instrument->name()}')">
 HERE;
-		foreach( $regdb->experiments_for_instrument( $instrument->name()) as $e ) {
+		foreach( RegDB::instance()->experiments_for_instrument( $instrument->name()) as $e ) {
 
 			if( is_null( $experiment ))	$experiment = $e; // remember the first experiment in the list.
 
@@ -321,7 +316,7 @@ HERE;
 		$opr_account = strtolower($instrument->name()).'opr';
 
 		$opr_account_prev_auth_html = '';
-		foreach( $authdb->roles_by( $opr_account, 'LogBook', $instrument->name()) as $r ) {
+		foreach( AuthDB::instance()->roles_by( $opr_account, 'LogBook', $instrument->name()) as $r ) {
 			if( $opr_account_prev_auth_html == '' ) $opr_account_prev_auth_html .= '<div style="float:left; padding:5px;">';
 			$instr    = $r['instr'];
 			$exper    = $r['exper'];
@@ -365,7 +360,7 @@ HERE;
     	$admins = array( 'perazzo', 'gapon', 'salnikov' );
     	$admins_html = '';
     	foreach( $admins as $uid ) {
-    		$account = $regdb->find_user_account( $uid );
+    		$account = RegDB::instance()->find_user_account( $uid );
     		$gecos = $account['gecos'];
     		$email = $account['email'];
     		$admins_html .=<<<HERE
@@ -375,7 +370,7 @@ HERE;
     	
     	$instrument_scientists_group = 'ps-'.strtolower($instrument->name());
     	$instrument_scientists_html = '';
-    	foreach( $regdb->posix_group_members( $instrument_scientists_group, /* $and_as_primary_group=*/ false ) as $account ) {
+    	foreach( RegDB::instance()->posix_group_members( $instrument_scientists_group, /* $and_as_primary_group=*/ false ) as $account ) {
     		$uid = $account['uid'];
     		$gecos = $account['gecos'];
     		$instrument_scientists_html .=<<<HERE
@@ -383,7 +378,7 @@ HERE;
 HERE;
     	}
 
-    	$pi_account = $regdb->find_user_account( $last_experiment_leader /*$experiment->leader_account()*/ );
+    	$pi_account = RegDB::instance()->find_user_account( $last_experiment_leader /*$experiment->leader_account()*/ );
     	$pi_uid   = $pi_account['uid'];
     	$pi_gecos = $pi_account['gecos'];
     	$pi_email = $pi_account['email'];
@@ -435,7 +430,7 @@ HERE;
   </div>
   <br>
   <div style="padding-left:10px;">
-  <form name="form-{$instrument->name()}" action="ProcessExperimentSwitch.php" method="post">
+  <form name="form-{$instrument->name()}" action="ws/ProcessExperimentSwitch.php" method="post">
     <table>
       <tbody>
         <tr>
@@ -468,10 +463,10 @@ HERE;
 				array( 'name' => 'By User',     'width' => 160 )
 			)
 		);
-		foreach( $regdb->experiment_switches( $instrument->name()) as $experiment_switch ) {
+		foreach( RegDB::instance()->experiment_switches( $instrument->name()) as $experiment_switch ) {
 
 			$exper_id = $experiment_switch['exper_id'];
-			$experiment = $regdb->find_experiment_by_id( $exper_id );
+			$experiment = RegDB::instance()->find_experiment_by_id( $exper_id );
 
 			if( is_null( $experiment ))
 				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );

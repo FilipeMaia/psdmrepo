@@ -13,11 +13,10 @@ $string2search = trim( $_GET[ 'term' ] );
 if( !isset( $string2search )) die( 'missing or empty mandatory parameter' );
 
 try {
-	$regdb = new RegDB();
-	$regdb->begin();
+    RegDB::instance()->begin();
 
-	$search_in_scope = array( "uid" => true, "gecos" => true );
-    $accounts = $regdb->find_user_accounts( $string2search, $search_in_scope );
+    $search_in_scope = array( "uid" => true, "gecos" => true );
+    $accounts = RegDB::instance()->find_user_accounts( $string2search, $search_in_scope );
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -41,10 +40,8 @@ HERE;
 ]
 HERE;
 
-    $regdb->commit();
+    RegDB::instance()->commit();
 
-} catch( RegDBException   $e ) {
-	print $e->toHtml();
-	exit;
-}
+} catch (RegDBException $e) { print $e->toHtml(); }
+
 ?>

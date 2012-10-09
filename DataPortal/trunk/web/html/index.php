@@ -68,40 +68,34 @@ if( isset( $_GET['params'] )) {
 
 try {
 
-	// Connect to databases
-	//
-	$auth_svc = AuthDB::instance();
-	$auth_svc->begin();
+    $auth_svc = AuthDB::instance();
+    $auth_svc->begin();
 
-	$regdb = new RegDB();
-	$regdb->begin();
+    RegDB::instance()->begin();
+    LogBook::instance()->begin();
 
-	$logbook = new LogBook();
-	$logbook->begin();
+    $logbook_experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
+    if( is_null( $logbook_experiment )) die( 'invalid experiment identifier provided to the script' );
 
-	$logbook_experiment = $logbook->find_experiment_by_id( $exper_id );
-	if( is_null( $logbook_experiment )) die( 'invalid experiment identifier provided to the script' );
-
-	$experiment = $logbook_experiment->regdb_experiment();
+    $experiment = $logbook_experiment->regdb_experiment();
     $instrument = $experiment->instrument();
 
     $can_manage_group = false;
-    foreach( array_keys( $regdb->experiment_specific_groups()) as $g ) {
-    	
-  		if( $g == $experiment->POSIX_gid()) {
-	        $can_manage_group = RegDBAuth::instance()->canManageLDAPGroup( $g );
+    foreach( array_keys( RegDB::instance()->experiment_specific_groups()) as $g ) {
+        if( $g == $experiment->POSIX_gid()) {
+            $can_manage_group = RegDBAuth::instance()->canManageLDAPGroup( $g );
             break;
         }
     }
-	$has_data_access =
-		$can_manage_group ||
-		$regdb->is_member_of_posix_group( 'ps-data', $auth_svc->authName()) ||
-		$regdb->is_member_of_posix_group( $logbook_experiment->POSIX_gid(), $auth_svc->authName()) ||
-		$regdb->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName());
+    $has_data_access =
+        $can_manage_group ||
+        RegDB::instance()->is_member_of_posix_group( 'ps-data', $auth_svc->authName()) ||
+        RegDB::instance()->is_member_of_posix_group( $logbook_experiment->POSIX_gid(), $auth_svc->authName()) ||
+        RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName());
 
-	$has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
+    $has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
 
-	$num_runs = $logbook_experiment->num_runs();
+    $num_runs = $logbook_experiment->num_runs();
     $min_run  = $logbook_experiment->find_first_run();
     $max_run  = $logbook_experiment->find_last_run();
 
@@ -111,7 +105,7 @@ try {
     $document_subtitle = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>';
 
     $decorated_experiment_status = '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>';
-    $last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
+    $last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
     if( !is_null( $last_experiment_switch ) && ( $exper_id == $last_experiment_switch['exper_id'] )) $decorated_experiment_status = '<span style="color:#ff0000; font-weight:bold;">ACTIVE</span>';
 	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
 	$decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
@@ -321,7 +315,7 @@ HERE;
           <div style="clear:both;"></div>
         </div>
       </div>
-      <form id="elog-form-post" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">
+      <form id="elog-form-post" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">
         <input type="hidden" name="id" value="{$experiment->id()}" />
         <input type="hidden" name="scope" value="" />
         <input type="hidden" name="run_num" value="" />
@@ -407,7 +401,7 @@ HERE;
     $elog_search_workarea =<<<HERE
 <div id="el-s-ctrl">
   <div style="float:left;">
-    <form id="elog-form-search" action="../logbook/Search.php" method="get">
+    <form id="elog-form-search" action="../logbook/ws/Search.php" method="get">
       <div style="float:left;">
         <div style="font-weight:bold;">Text to search:</div>
         <div><input type="text" name="text2search" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px; width:100%;" /></div>
@@ -504,7 +498,7 @@ HERE;
     </tbody></table>
     <div id="el-sh-new-wa" class="el-sh-new-hdn">
       <div style="float:left;">
-        <form id="elog_new_shift_form" action="../logbook/CreateShift.php" method="post">
+        <form id="elog_new_shift_form" action="../logbook/ws/CreateShift.php" method="post">
           <div style="float:left;">
             <input type="hidden" name="id" value="{$exper_id}" />
             <input type="hidden" name="actionSuccess" value="" />
@@ -770,20 +764,6 @@ HERE;
           <option>XTC</option>
           <option>HDF5</option>
         </select>
-      </div>
-    </div>
-    <div style="float:left; margin-left:20px;">
-      <div style="font-weight:bold;">Created:</div>
-      <div style="margin-top:5px;">
-        <select name="created" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
-          <option></option>
-          <option>1 hr</option>
-          <option>12 hrs</option>
-          <option>24 hrs</option>
-          <option>7 days</option>
-          <option>1 month</option>
-          <option>1 year</option>
-          </select>
       </div>
     </div>
     <div style="float:left; margin-left:20px;">
@@ -1512,7 +1492,8 @@ function printer_friendly() {
 
 function ask_yes_no( title, msg, on_yes, on_cancel ) {
 	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+//		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+		msg
 	 );
 	$('#popupdialogs').dialog({
 		resizable: false,

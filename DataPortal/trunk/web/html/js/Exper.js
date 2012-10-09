@@ -61,7 +61,7 @@ function exper_create() {
 	 */
 	this.do_manage_user = function(action,uid) {
 		var params = {group: this.posix_group, simple: '', action: action, uid: uid };
-		var jqXHR = $.get('../regdb/ManageGroupMembers.php',params,function(data) {
+		var jqXHR = $.get('../regdb/ws/ManageGroupMembers.php',params,function(data) {
 			var result = eval(data);
 			if(result.ResultSet.Status != 'success') {
 				$('#exp-m-g-members-stat').html(result.ResultSet.Message);
@@ -85,7 +85,7 @@ function exper_create() {
 			scope: $('#exp-m-g-scope > input:checked').val()
 		};
 		$('#exp-m-g-users-stat').html('<span style="color:maroon;">Searching...</span>');
-		var jqXHR = $.get('../regdb/RequestUserAccounts.php',params,function(data) {
+		var jqXHR = $.get('../regdb/ws/RequestUserAccounts.php',params,function(data) {
 			var result = eval(data);
 			var users = result.ResultSet.Result;
 			$('#exp-m-g-users-stat').html('<span style="color:maroon;">Found <b>'+users.length+'</b> users</span>');
@@ -111,7 +111,7 @@ function exper_create() {
 	this.do_refresh_members = function() {
 		var params = {group: this.posix_group, simple: '' };
 		$('#exp-m-g-members-stat').html('<span style="color:maroon;">Fetching...</span>');
-		var jqXHR = $.get('../regdb/ManageGroupMembers.php',params,function(data) {
+		var jqXHR = $.get('../regdb/ws/ManageGroupMembers.php',params,function(data) {
 			var result = eval(data);
 			if(result.ResultSet.Status != 'success') {
 				$('#exp-m-g-members-stat').html(result.ResultSet.Message);

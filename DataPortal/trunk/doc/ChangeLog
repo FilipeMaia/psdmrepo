@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
 Tag: V00-03-00
 2012-08-14 Igor Gaponenko
 - added support for the new data retention policy

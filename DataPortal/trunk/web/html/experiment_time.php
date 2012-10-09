@@ -302,7 +302,7 @@ function page_specific_init() {
     $('#unsubscribe_button').button().click(function() {
 		$.ajax({
             type: 'GET',
-            url: '../portal/experiment_time_subscription_toggle.php',
+            url: '../portal/ws/experiment_time_subscription_toggle.php',
             data: {},
 			success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
@@ -316,7 +316,7 @@ function page_specific_init() {
     $('#subscribe_button').button().click(function() {
 		$.ajax({
             type: 'GET',
-            url: '../portal/experiment_time_subscription_toggle.php',
+            url: '../portal/ws/experiment_time_subscription_toggle.php',
             data: {},
 			success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
@@ -336,7 +336,7 @@ function report_error(msg) {
 function save_comment(gap_begin_time_64,instr_name,comment,system) {
     $.ajax({
         type: 'POST',
-        url: '../portal/experiment_time_save_comment.php',
+        url: '../portal/ws/experiment_time_save_comment.php',
         data: {
             gap_begin_time_64: gap_begin_time_64,
             instr_name: instr_name,
@@ -680,7 +680,7 @@ function set_comment(gap_begin_time_64, instr_name, comment) {
 function load_shift(shift,delta) {
     $.ajax({
         type: 'GET',
-        url: '../portal/experiment_time_get.php',
+        url: '../portal/ws/experiment_time_get.php',
         data: {shift: shift, delta:delta},
         success: function(data) {
             if( data.status != 'success' ) { report_error(data.message); return; }

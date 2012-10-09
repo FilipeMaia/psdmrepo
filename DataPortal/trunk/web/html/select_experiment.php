@@ -30,22 +30,19 @@ function sort_experiments_by_id_desc( $experiments ) {
 
 /* Global variables used by the rest of the script
  */
-$logbook = null;
 $instrument_names = array();
 
 try {
 
-	$logbook = new LogBook();
-	$logbook->begin();
+    LogBook::instance()->begin();
 
-	$regdb = new RegDB();
-	$regdb->begin();
+    RegDB::instance()->begin();
 
-	foreach( $logbook->regdb()->instruments() as $instrument )
-		if( !$instrument->is_location())
-			array_push( $instrument_names, $instrument->name());
+    foreach( LogBook::instance()->regdb()->instruments() as $instrument )
+        if( !$instrument->is_location())
+            array_push( $instrument_names, $instrument->name());
 
-	sort( $instrument_names );
+    sort( $instrument_names );
 ?>
 
 
@@ -98,7 +95,7 @@ function page_specific_init() {
 function search_experiment() {
 	$( '#experiment-search-result' ).html( 'Searching...' );
 	$.get(
-	   	'SearchExperiment.php',
+	   	'../portal/ws/SearchExperiment.php',
 	   	{ name_or_id: $('#experiment-search input').val() },
 	   	function( data ) {
 			$( '#experiment-search-result' ).html( data );
@@ -159,8 +156,8 @@ function show_email( user, addr ) {
 	/* Experiments my account is a member of.
 	 */
 	$html = table_header();
-	$my_account = $logbook->regdb()->find_user_account( AuthDB::instance()->authName());
-	foreach( sort_experiments_by_id_desc( $logbook->experiments()) as $e ) {
+	$my_account = LogBook::instance()->regdb()->find_user_account( AuthDB::instance()->authName());
+	foreach( sort_experiments_by_id_desc( LogBook::instance()->experiments()) as $e ) {
    		if( $e->is_facility()) continue;
    		if( $e->leader_account() == $my_account['uid']) {
    			$html .= table_row( $e );
@@ -188,12 +185,12 @@ function show_email( user, addr ) {
 	 * activated with the 'Experiment Switch'.
      */
 	$html = table_header();
-	foreach( $regdb->instruments() as $instrument ) {
+	foreach( RegDB::instance()->instruments() as $instrument ) {
 		if( $instrument->is_location()) continue;
 
-		$last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
+		$last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
 		if( !is_null( $last_experiment_switch ))
-			$html .= table_row( $logbook->find_experiment_by_id( $last_experiment_switch['exper_id'] ));
+			$html .= table_row( LogBook::instance()->find_experiment_by_id( $last_experiment_switch['exper_id'] ));
 	}	
     $html .= DataPortal::table_end_html();
 	array_push(
@@ -209,7 +206,7 @@ function show_email( user, addr ) {
 	/* All experiments in one tab. The tab has a subtab for each year of operation.
      */
     $experiment_by_year = array();
-   	foreach( sort_experiments_by_id_desc( $logbook->experiments()) as $e ) {
+   	foreach( sort_experiments_by_id_desc( LogBook::instance()->experiments()) as $e ) {
    		if( $e->is_facility()) continue;
    		$first_run = $e->find_first_run();
    		$year = is_null($first_run) ? 0 : $first_run->begin_time()->year();
@@ -246,7 +243,7 @@ function show_email( user, addr ) {
 	 */
     foreach( $instrument_names as $i ) {
     	$experiment_by_year = array();
-    	foreach( sort_experiments_by_id_desc( $logbook->experiments_for_instrument( $i )) as $e ) {
+    	foreach( sort_experiments_by_id_desc( LogBook::instance()->experiments_for_instrument( $i )) as $e ) {
    			if( $e->is_facility()) continue;
 			$first_run = $e->find_first_run();
    			$year = is_null($first_run) ? 0 : $first_run->begin_time()->year();
@@ -314,7 +311,7 @@ HERE;
 
 <?php
 
-	$logbook->commit();
+    LogBook::instance()->commit();
 
 } catch( AuthDBException   $e ) { print $e->toHtml(); exit; }
   catch( LogBookException  $e ) { print $e->toHtml(); exit; }

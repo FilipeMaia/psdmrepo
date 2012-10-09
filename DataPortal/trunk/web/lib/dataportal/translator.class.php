@@ -23,16 +23,15 @@ class Translator {
 
 	static function get_requests( $exper_id, $range_of_runs, $status, $show_files ) {
 
-		$logbook = new LogBook();
-	    $logbook->begin();
+	    LogBook::instance()->begin();
 
-	    $experiment = $logbook->find_experiment_by_id( $exper_id );
+	    $experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
 	    if( is_null( $experiment ))
 	    	throw new DataPortalexception(
             	__METHOD__,
                 "No such experiment" );
 
-        $instrument = $experiment->instrument();
+            $instrument = $experiment->instrument();
 
 	    $runs = Translator::merge_and_filter (
     	   	Translator::requests2dict (
@@ -163,7 +162,7 @@ class Translator {
         	}
 	        $request = array(
     	   		'state' => array(
-   					'id' => $run_icws->id,
+   					'id' => !is_null( $run_icws ) ? $run_icws->id : 0,
 					'run_number' => $run_logbook->num(),
 					'run_id' => $run_logbook->id(),
 					'end_of_run' => is_null( $run_logbook->end_time()) ? '' : $run_logbook->end_time()->toStringShort(),
@@ -286,21 +285,23 @@ class Translator {
 	function array2dict_and_merge( $in_xtc, $in_hdf5 ) {
 
 		$out = array();
-		foreach( $in_xtc as $i ) {
-			$out[$i->run]['xtc']  = $i->files;
-			$out[$i->run]['hdf5'] = null;
-		}
+                if ($in_xtc)
+                    foreach( $in_xtc as $i ) {
+                            $out[$i->run]['xtc']  = $i->files;
+                            $out[$i->run]['hdf5'] = null;
+                    }
 
 		/* Note that not having XTC for a run is rathen unusual situation. But let's handle
 		 * it at a higher level logic, not here. For now just put null to where the list
 		 * of XTC files is expected.
 		 */
-		foreach( $in_hdf5 as $i ) {
-			if( !array_key_exists( $i->run, $out )) {
-				$out[$i->run]['xtc'] = null;
-			}
-			$out[$i->run]['hdf5'] = $i->files;
-		}
+                if ($in_hdf5)
+                    foreach( $in_hdf5 as $i ) {
+                            if( !array_key_exists( $i->run, $out )) {
+                                    $out[$i->run]['xtc'] = null;
+                            }
+                            $out[$i->run]['hdf5'] = $i->files;
+                    }
 		return $out;
 	}
 
@@ -326,8 +327,8 @@ class Translator {
 
 		/* Apply two stages of optional filters first.
 		 */
-		$logbook_runs = isset( $range_of_runs ) ? Translator::apply_filter_range2runs( $range_of_runs, $logbook_runs_all ) : $logbook_runs_all;
-		$logbook_runs = isset( $status ) ? Translator::apply_filter_status2runs( $icws_runs, $logbook_runs, $status ) : $logbook_runs;
+		$logbook_runs = !is_null($range_of_runs) ? Translator::apply_filter_range2runs ($range_of_runs, $logbook_runs_all )  : $logbook_runs_all;
+		$logbook_runs = !is_null($status       ) ? Translator::apply_filter_status2runs($icws_runs, $logbook_runs, $status ) : $logbook_runs;
 
 		$out = array();
 		foreach( $logbook_runs as $run ) {

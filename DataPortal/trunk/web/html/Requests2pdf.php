@@ -370,12 +370,9 @@ function decorated_request_status( $status ) {
  */
 try {
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    LogBook::instance()->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $exper_id )
-        or die("No such experiment");
-
+    $experiment = LogBook::instance()->find_experiment_by_id( $exper_id ) or die("No such experiment");
     $instrument = $experiment->instrument();
 
    	$runs = merge_and_filter (

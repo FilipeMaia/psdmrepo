@@ -12,6 +12,7 @@ use LogBook\LogBookException;
 use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
+use FileMgr\FileMgrIrodsDb;
 use FileMgr\FileMgrIrodsWs;
 use FileMgr\FileMgrException;
 
@@ -34,9 +35,16 @@ HERE;
     exit;
 }
 
-/* This optional p[aramater, if present, will tell the script to produce JSON output
+/*
+ * This optional paramater, if present, will tell the script to produce JSON output
  */
 $json = isset( $_GET['json'] );
+
+/*
+ * This parameter will direct the script to use the slow Web service to access
+ * file catalog rather than using iRODS catalog database directly.
+ */
+$use_ws = isset($_GET['use_ws']);
 
 define( 'BYTES_IN_GB', 1000*1000*1000 );
 
@@ -54,8 +62,8 @@ function as_percent( $fraction, $total           ) {
 }
 try {
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    LogBook::instance()->begin();
+    FileMgrIrodsDb::instance()->begin();
 
     // Build an array of experiment specific info using the begin time of
     // the experiment's run as the array key. Consider "real" experiments
@@ -70,7 +78,7 @@ try {
 //
 // $counter = 0;
 
-    foreach( $logbook->experiments() as $experiment ) {
+    foreach( LogBook::instance()->experiments() as $experiment ) {
 
 // TODO: This is the debug line. It will stop the loop after a few iterations in order
 //       to see the result. Please, remove this line when finished debugging.
@@ -81,7 +89,7 @@ try {
 
     	// Ignore experiments which haven't taken (yet) any data
     	//
-    	$first_run = $experiment->find_first_run();	if( is_null($first_run)) continue;
+    	$first_run = $experiment->find_first_run(); if( is_null($first_run)) continue;
     	$last_run  = $experiment->find_last_run (); if( is_null($last_run))  continue;
 
    		// Find all runs and files per run. Narrow the search to HPSS archived files
@@ -96,8 +104,12 @@ try {
 
    		foreach( array( 'xtc', 'hdf5' ) as $type ) {
         	$runs = null;
-        	FileMgrIrodsWs::runs( $runs, $experiment->instrument()->name(), $experiment->name(), $type, $range_of_runs );
-        	if( is_null($runs)) continue;
+                if ($use_ws) {
+                    FileMgrIrodsWs::runs( $runs, $experiment->instrument()->name(), $experiment->name(), $type, $range_of_runs );
+                    if( is_null($runs)) continue;
+                } else {
+                    $runs = FileMgrIrodsDb::instance()->runs ($experiment->instrument()->name(), $experiment->name(), $type, $first_run->num(), $last_run->num());
+                }
         	foreach( $runs as $irods_run ) {
         		$num_runs++;
         		$this_run_files   = 0;
