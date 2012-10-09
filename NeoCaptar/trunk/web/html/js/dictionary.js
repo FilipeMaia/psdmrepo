@@ -210,28 +210,28 @@ function p_appl_dictionary() {
 		if( cable_name == '' ) return;
         var params = { cable_name: cable_name, cable_documentation: cable_documentation };
         if((connector_name != null) && (connector_name != '')) params.connector_name = connector_name;
-        this.type_action('../neocaptar/dict_cable_new.php', params); };
+        this.type_action('../neocaptar/ws/dict_cable_new.php', params); };
 
 	this.save_connector = function(connector_name, connector_documentation, cable_name) {
 		if( connector_name == '' ) return;
         var params = { connector_name: connector_name, connector_documentation: connector_documentation };
         if((cable_name != null) && (cable_name != '')) params.cable_name = cable_name;
-        this.type_action('../neocaptar/dict_connector_new.php', params); };
+        this.type_action('../neocaptar/ws/dict_connector_new.php', params); };
 
 	this.delete_cable = function(id) {
-        this.type_action('../neocaptar/dict_cable_delete.php', { id: id });	};
+        this.type_action('../neocaptar/ws/dict_cable_delete.php', { id: id });	};
 
 	this.delete_connector = function(id) {
-        this.type_action('../neocaptar/dict_connector_delete.php', { id: id }); };
+        this.type_action('../neocaptar/ws/dict_connector_delete.php', { id: id }); };
 
 	this.load_types = function() {
-        this.type_action('../neocaptar/dict_types_get.php', {}); };
+        this.type_action('../neocaptar/ws/dict_types_get.php', {}); };
 
     this.save_cable_documentation = function(id,documentation) {
-        this.type_action('../neocaptar/dict_cable_update.php', { id: id, documentation: documentation }); };
+        this.type_action('../neocaptar/ws/dict_cable_update.php', { id: id, documentation: documentation }); };
 
     this.save_connector_documentation = function(id,documentation) {
-        this.type_action('../neocaptar/dict_connector_update.php', { id: id, documentation: documentation }); };
+        this.type_action('../neocaptar/ws/dict_connector_update.php', { id: id, documentation: documentation }); };
 
     this.type_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -680,26 +680,26 @@ function p_appl_dictionary() {
 
 	this.save_pinlist = function(name,documentation) {
 		if( name == '' ) return;
-		this.pinlist_action('../neocaptar/dict_pinlist_new.php', { name: name, documentation: documentation },
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_new.php', { name: name, documentation: documentation },
             function(result) {that.pinlist[name] = result.pinlist[name]; }); };
 
 	this.delete_pinlist = function(id) {
-		this.pinlist_action('../neocaptar/dict_pinlist_delete.php', { id: id }); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_delete.php', { id: id }); };
 
 	this.load_pinlists = function() {
-		this.pinlist_action('../neocaptar/dict_pinlist_get.php', {}); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_get.php', {}); };
 
     this.save_pinlist_documentation = function(id,documentation) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, documentation: documentation }); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, documentation: documentation }); };
 
     this.save_pinlist_cable = function(id,cable) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, cable: cable }); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, cable: cable }); };
 
     this.save_pinlist_origin_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, origin_connector: connector }); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, origin_connector: connector }); };
 
     this.save_pinlist_destination_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/dict_pinlist_update.php', { id: id, destination_connector: connector }); };
+		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, destination_connector: connector }); };
 
     this.pinlist_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -911,17 +911,17 @@ function p_appl_dictionary() {
 
 	this.save_location = function(location_name) {
 		if( location_name == '' ) return;
-        this.location_action('../neocaptar/dict_location_new.php', {location:location_name}); };
+        this.location_action('../neocaptar/ws/dict_location_new.php', {location:location_name}); };
 
 	this.save_rack = function(location_name, rack_name) {
 		if(( location_name == '' ) || ( rack_name == '' )) return;
-        this.location_action('../neocaptar/dict_location_new.php', {location:location_name, rack:rack_name}); };
+        this.location_action('../neocaptar/ws/dict_location_new.php', {location:location_name, rack:rack_name}); };
 
 	this.delete_location_element = function(element,id) {
-        this.location_action('../neocaptar/dict_location_delete.php', {scope:element, id:id}); };
+        this.location_action('../neocaptar/ws/dict_location_delete.php', {scope:element, id:id}); };
 
 	this.load_locations = function() {
-        this.location_action('../neocaptar/dict_location_get.php', {}); };
+        this.location_action('../neocaptar/ws/dict_location_get.php', {}); };
 
     this.location_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -1114,13 +1114,13 @@ function p_appl_dictionary() {
 
 	this.save_routing = function(name) {
         if( name == '' ) return;
-        this.routing_action('../neocaptar/dict_routing_new.php', { name: name }); };
+        this.routing_action('../neocaptar/ws/dict_routing_new.php', { name: name }); };
 
 	this.delete_routing = function(id) {
-        this.routing_action('../neocaptar/dict_routing_delete.php', { id: id }); };
+        this.routing_action('../neocaptar/ws/dict_routing_delete.php', { id: id }); };
 
 	this.load_routings = function() {
-        this.routing_action('../neocaptar/dict_routing_get.php', {}); };
+        this.routing_action('../neocaptar/ws/dict_routing_get.php', {}); };
 
     this.routing_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -1287,21 +1287,21 @@ function p_appl_dictionary() {
 	};
 	this.save_device_location = function(location_name) {
 		if( location_name == '' ) return;
-        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name}); };
+        this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name}); };
 
 	this.save_device_region = function(location_name, region_name) {
 		if(( location_name == '' ) || ( region_name == '' )) return;
-        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name, region:region_name}); };
+        this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name, region:region_name}); };
 
 	this.save_device_component = function(location_name, region_name, component_name) {
 		if(( location_name == '' ) || ( region_name == '' ) || ( component_name == '' )) return;
-        this.device_action('../neocaptar/dict_device_location_new.php', {location:location_name, region:region_name, component:component_name}); };
+        this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name, region:region_name, component:component_name}); };
 
 	this.delete_device_element = function(element,id) {
-        this.device_action('../neocaptar/dict_device_location_delete.php', {scope:element, id:id}); };
+        this.device_action('../neocaptar/ws/dict_device_location_delete.php', {scope:element, id:id}); };
 
 	this.load_device_locations = function() {
-        this.device_action('../neocaptar/dict_device_location_get.php', {}); };
+        this.device_action('../neocaptar/ws/dict_device_location_get.php', {}); };
 
     this.device_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -1570,13 +1570,13 @@ function p_appl_dictionary() {
 	};
 	this.save_instr = function(instr_name) {
 		if( instr_name == '' ) return;
-        this.instr_action('../neocaptar/dict_instr_new.php',{instr:instr_name}); };
+        this.instr_action('../neocaptar/ws/dict_instr_new.php',{instr:instr_name}); };
 
 	this.delete_instr_element = function(element,id) {
-        this.instr_action('../neocaptar/dict_instr_delete.php',{scope:element, id:id}); };
+        this.instr_action('../neocaptar/ws/dict_instr_delete.php',{scope:element, id:id}); };
 
 	this.load_instrs = function() {
-        this.instr_action('../neocaptar/dict_instr_get.php',{}); };
+        this.instr_action('../neocaptar/ws/dict_instr_get.php',{}); };
 
     this.instr_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {

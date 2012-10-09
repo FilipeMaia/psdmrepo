@@ -858,7 +858,7 @@ function global_export_cables(search_params,outformat) {
     var html = '<img src="../logbook/images/ajaxloader.gif" />';
     var dialog = report_action('Generating Document: '+outformat,html);
     var jqXHR = $.get(
-        '../neocaptar/cable_search.php', search_params,
+        '../neocaptar/ws/cable_search.php', search_params,
         function(data) {
             if( data.status != 'success' ) {
                 report_error( data.message );

@@ -38,6 +38,7 @@ td.table_cell {
   padding: 4px 8px 4px 8px;
   font-family: Arial, sans-serif;
   /*font-size: 75%;*/
+  white-space: nowrap;
 }
 td.table_cell_strong_bottom {
   border-bottom: solid 1px #000000;
