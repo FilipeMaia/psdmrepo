@@ -17,15 +17,15 @@ class LogBookExperiment {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $regdb_experiment;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $regdb_experiment ) {
-        $this->connection = $connection;
+    public function __construct ( $logbook, $regdb_experiment ) {
+        $this->logbook = $logbook;
         $this->regdb_experiment = $regdb_experiment;
         $this->attr = array (
             'id'         => $this->regdb_experiment->id(),
@@ -107,8 +107,8 @@ class LogBookExperiment {
         $list = array();
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
-        $result = $this->connection->query (
-            "SELECT * FROM {$this->connection->database}.shift WHERE exper_id=".$this->id().$extra_condition.
+        $result = $this->logbook->query (
+            "SELECT * FROM {$this->logbook->database}.shift WHERE exper_id=".$this->id().$extra_condition.
             ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
@@ -116,7 +116,7 @@ class LogBookExperiment {
             array_push(
                 $list,
                 new LogBookShift(
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -184,8 +184,8 @@ class LogBookExperiment {
 
         /* Proceed with the new shift and the shift crew.
          */
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.shift VALUES(NULL,".$this->attr['id']
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.shift VALUES(NULL,".$this->attr['id']
             .",".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time ))
             .",'".$leader."')" );
@@ -197,8 +197,8 @@ class LogBookExperiment {
                 "internal implementation errort" );
 
         foreach( $shift_crew as $member )
-            $this->connection->query (
-                "INSERT INTO {$this->connection->database}.shift_crew VALUES({$new_shift->id()},'$member')" );
+            $this->logbook->query (
+                "INSERT INTO {$this->logbook->database}.shift_crew VALUES({$new_shift->id()},'$member')" );
 
         return $new_shift;
     }
@@ -213,18 +213,18 @@ class LogBookExperiment {
         return $this->find_shift_by_( 'begin_time <= '.$time.' AND (end_time IS NULL OR '.$time.'< end_time)') ; }
 
     public function find_last_shift () {
-        return $this->find_shift_by_( "begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()})" ) ; }
+        return $this->find_shift_by_( "begin_time=(SELECT MAX(begin_time) FROM {$this->logbook->database}.shift WHERE exper_id={$this->id()})" ) ; }
 
 
     public function find_prev_shift_for( $shift ) {
         $sql = <<<HERE
-begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()} AND begin_time<{$shift->begin_time()->to64()} AND id!={$shift->id()})
+begin_time=(SELECT MAX(begin_time) FROM {$this->logbook->database}.shift WHERE exper_id={$this->id()} AND begin_time<{$shift->begin_time()->to64()} AND id!={$shift->id()})
 HERE;
         return $this->find_shift_by_( $sql );
     }
     public function find_next_shift_for( $shift ) {
         $sql = <<<HERE
-begin_time=(SELECT MIN(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()} AND begin_time>{$shift->begin_time()->to64()} AND id!={$shift->id()})
+begin_time=(SELECT MIN(begin_time) FROM {$this->logbook->database}.shift WHERE exper_id={$this->id()} AND begin_time>{$shift->begin_time()->to64()} AND id!={$shift->id()})
 HERE;
         return $this->find_shift_by_( $sql );
     }
@@ -232,14 +232,14 @@ HERE;
     private function find_shift_by_ ( $condition=null ) {
 
         $extra_condition = is_null( $condition ) ? '' : ' AND '.$condition;
-        $result = $this->connection->query(
-            "SELECT * FROM {$this->connection->database}.shift WHERE exper_id=".
+        $result = $this->logbook->query(
+            "SELECT * FROM {$this->logbook->database}.shift WHERE exper_id=".
             $this->attr['id'].$extra_condition.' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookShift(
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -312,15 +312,15 @@ HERE;
         $list = array();
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
-        $sql = "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
+        $sql = "SELECT * FROM {$this->logbook->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
                ' ORDER BY num, begin_time DESC'.$limit;
-        $result = $this->connection->query($sql);
+        $result = $this->logbook->query($sql);
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
             array_push(
                 $list,
                 new LogBookRun (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -335,23 +335,23 @@ HERE;
 
     public function find_first_run () {
         return $this->find_run_by_(
-            "id=(SELECT MIN(id) FROM {$this->connection->database}.run WHERE exper_id=".
+            "num=(SELECT MIN(num) FROM {$this->logbook->database}.run WHERE exper_id=".
             $this->attr['id'].')' ); }
 
     public function find_last_run () {
         return $this->find_run_by_(
-            "id=(SELECT MAX(id) FROM {$this->connection->database}.run WHERE exper_id=".
+            "num=(SELECT MAX(num) FROM {$this->logbook->database}.run WHERE exper_id=".
             $this->attr['id'].')' ); }
 
     public function find_prev_run_for( $run ) {
         $sql = <<<HERE
-begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.run WHERE exper_id={$this->id()} AND begin_time<{$run->begin_time()->to64()} AND id!={$run->id()})
+begin_time=(SELECT MAX(begin_time) FROM {$this->logbook->database}.run WHERE exper_id={$this->id()} AND begin_time<{$run->begin_time()->to64()} AND id!={$run->id()})
 HERE;
         return $this->find_run_by_( $sql );
     }
     public function find_next_run_for( $run ) {
         $sql = <<<HERE
-begin_time=(SELECT MIN(begin_time) FROM {$this->connection->database}.run WHERE exper_id={$this->id()} AND begin_time>{$run->begin_time()->to64()} AND id!={$run->id()})
+begin_time=(SELECT MIN(begin_time) FROM {$this->logbook->database}.run WHERE exper_id={$this->id()} AND begin_time>{$run->begin_time()->to64()} AND id!={$run->id()})
 HERE;
         return $this->find_run_by_( $sql );
     }
@@ -359,15 +359,15 @@ HERE;
     private function find_run_by_ ( $condition=null ) {
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
-        $result = $this->connection->query(
-            "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".
+        $result = $this->logbook->query(
+            "SELECT * FROM {$this->logbook->database}.run WHERE exper_id=".
             $this->attr['id'].$extra_condition.
             ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookRun(
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -409,8 +409,8 @@ HERE;
 
         /* Proceed to creating new run in the database.
          */
-        $this->connection->query(
-            "INSERT INTO {$this->connection->database}.run VALUES(NULL,".( $num > 0 ? $num : $this->allocate_run( $num ))
+        $this->logbook->query(
+            "INSERT INTO {$this->logbook->database}.run VALUES(NULL,".( $num > 0 ? $num : $this->allocate_run( $num ))
             .",".$this->attr['id']
             .",".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time )).")" );
@@ -428,8 +428,8 @@ HERE;
      */
     private function allocate_run () {
 
-        $result = $this->connection->query(
-            "SELECT MAX(num) AS \"num\" FROM {$this->connection->database}.run WHERE exper_id=".
+        $result = $this->logbook->query(
+            "SELECT MAX(num) AS \"num\" FROM {$this->logbook->database}.run WHERE exper_id=".
             $this->attr['id'] );
 
         $nrows = mysql_numrows( $result );
@@ -452,15 +452,15 @@ HERE;
         $list = array();
 
         $extra_condition = $condition == '' ? '' : 'AND '.$condition;
-        $result = $this->connection->query (
-            "SELECT * FROM {$this->connection->database}.run_param WHERE exper_id=".$this->attr['id'].$extra_condition );
+        $result = $this->logbook->query (
+            "SELECT * FROM {$this->logbook->database}.run_param WHERE exper_id=".$this->attr['id'].$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
             array_push(
                 $list,
                 new LogBookRunParam (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -476,14 +476,14 @@ HERE;
     private function find_run_param_by_ ( $condition=null ) {
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
-        $result = $this->connection->query (
-            "SELECT * FROM {$this->connection->database}.run_param WHERE exper_id=".
+        $result = $this->logbook->query (
+            "SELECT * FROM {$this->logbook->database}.run_param WHERE exper_id=".
             $this->attr['id'].$extra_condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookRunParam (
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -492,8 +492,8 @@ HERE;
 
     public function create_run_param ( $param, $type, $descr ) {
 
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.run_param VALUES(NULL,'".$param.
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.run_param VALUES(NULL,'".$param.
             "',".$this->attr['id'].
             ",'".$type.
             "','".$descr."')" );
@@ -780,9 +780,9 @@ HERE;
          * from the newest entry. We need it to make sure the limit woud work. In the end
          * (before returning from the method) the array will be reversed.
          */
-        $tables = $this->connection->database.'.header h, '.
-                  $this->connection->database.'.entry e'.
-                  ($use_tags ? ', '.$this->connection->database.'.tag t ' : ' ');
+        $tables = $this->logbook->database.'.header h, '.
+                  $this->logbook->database.'.entry e'.
+                  ($use_tags ? ', '.$this->logbook->database.'.tag t ' : ' ');
         return
             "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.*\n".
             "FROM $tables\n".
@@ -815,13 +815,13 @@ fclose( $debug_file );
             __METHOD__, $sql );
         */
 
-        $result = $this->connection->query ( $sql );
+        $result = $this->logbook->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             array_push(
                 $list,
                 new LogBookFFEntry (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -849,14 +849,14 @@ fclose( $debug_file );
      */
     public function find_last_entry () {
 
-        $result = $this->connection->query (
-            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e WHERE h.exper_id=".$this->attr['id'].
+        $result = $this->logbook->query (
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e WHERE h.exper_id=".$this->attr['id'].
             ' AND h.id = e.hdr_id ORDER BY relevance_time DESC LIMIT 1' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookFFEntry (
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -866,14 +866,14 @@ fclose( $debug_file );
     public function find_entry_by_ ( $condition=null ) {
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
-        $result = $this->connection->query (
-            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e WHERE h.exper_id=".$this->attr['id'].
+        $result = $this->logbook->query (
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e WHERE h.exper_id=".$this->attr['id'].
             ' AND h.id = e.hdr_id'.$extra_condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookFFEntry (
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -888,34 +888,34 @@ fclose( $debug_file );
 
         $insert_time = is_null( $relevance_time ) ? LusiTime::now() : $relevance_time;
 
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.header VALUES(NULL,".$this->id().
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.header VALUES(NULL,".$this->id().
             ",".( is_null( $shift_id       ) ? 'NULL' : $shift_id ).
             ",".( is_null( $run_id         ) ? 'NULL' : $run_id ).
             ",".LusiTime::to64from( $insert_time ).")" );
 
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
             ",".$insert_time->to64().
             ",'".$author.
-            "','".$this->connection->escape_string( $content ).
+            "','".$this->logbook->escape_string( $content ).
             "','".$content_type."',NULL,NULL)" );
 
         return $this->find_entry_by_ (
-            "hdr_id = (SELECT h.id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e".
+            "hdr_id = (SELECT h.id FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e".
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
     }
 
     public function delete_entry ( $id, $deleted_time, $deleted_by ) {
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.entry SET deleted_time=".$deleted_time->to64().
-            ", deleted_by='".$this->connection->escape_string( trim( $deleted_by )).
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.entry SET deleted_time=".$deleted_time->to64().
+            ", deleted_by='".$this->logbook->escape_string( trim( $deleted_by )).
             "' WHERE id=".$id );
     }
 
     public function undelete_entry ( $id ) {
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.entry SET deleted_time=NULL, deleted_by=NULL WHERE id=".$id );
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.entry SET deleted_time=NULL, deleted_by=NULL WHERE id=".$id );
     }
 
     /* ====================
@@ -926,8 +926,8 @@ fclose( $debug_file );
 
         $list = array();
 
-        $result = $this->connection->query (
-            "SELECT DISTINCT t.tag FROM {$this->connection->database}.tag t, {$this->connection->database}.header h WHERE h.id=t.hdr_id AND h.exper_id=".$this->id().
+        $result = $this->logbook->query (
+            "SELECT DISTINCT t.tag FROM {$this->logbook->database}.tag t, {$this->logbook->database}.header h WHERE h.id=t.hdr_id AND h.exper_id=".$this->id().
             ' ORDER BY tag' );
 
         $nrows = mysql_numrows( $result );
@@ -941,8 +941,8 @@ fclose( $debug_file );
 
         $list = array();
 
-        $result = $this->connection->query (
-            "SELECT DISTINCT e.author FROM {$this->connection->database}.entry e, {$this->connection->database}.header h WHERE h.id=e.hdr_id AND h.exper_id=".$this->id().
+        $result = $this->logbook->query (
+            "SELECT DISTINCT e.author FROM {$this->logbook->database}.entry e, {$this->logbook->database}.header h WHERE h.id=e.hdr_id AND h.exper_id=".$this->id().
             ' ORDER BY author' );
 
         $nrows = mysql_numrows( $result );
@@ -959,8 +959,8 @@ fclose( $debug_file );
     public function subscribe( $subscriber, $address, $time, $host ) {
 
     	$time64 = LusiTime::to64from( $time );
-    	$this->connection->query (
-            "INSERT INTO {$this->connection->database}.subscriber VALUES(NULL,{$this->id()},'{$subscriber}','{$address}',{$time64},'{$host}')" );
+    	$this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.subscriber VALUES(NULL,{$this->id()},'{$subscriber}','{$address}',{$time64},'{$host}')" );
 
     	$s = $this->find_subscriber_by_( "s.id=(SELECT LAST_INSERT_ID())");
     	if( is_null( $s ))
@@ -999,8 +999,8 @@ HERE;
                 __METHOD__,
                 "no subscriber for id={$id} error" );
 
-    	$this->connection->query (
-            "DELETE FROM {$this->connection->database}.subscriber WHERE id={$id}" );
+    	$this->logbook->query (
+            "DELETE FROM {$this->logbook->database}.subscriber WHERE id={$id}" );
 
         $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/';
         $logbook = $this->instrument()->name().'/'.$this->name();
@@ -1024,14 +1024,14 @@ HERE;
     }
 
     public function find_subscriber_by_( $condition ) {
-        $result = $this->connection->query (
-            "SELECT * FROM {$this->connection->database}.subscriber s WHERE s.exper_id={$this->id()} AND {$condition}" );
+        $result = $this->logbook->query (
+            "SELECT * FROM {$this->logbook->database}.subscriber s WHERE s.exper_id={$this->id()} AND {$condition}" );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows == 1 )
             return new LogBookSubscription (
-                $this->connection,
+                $this->logbook,
                 $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
@@ -1052,15 +1052,15 @@ HERE;
         // TODO: Select authorized subscribers only.
         //
         $extra = is_null( $subscribed_by ) ? "" : "AND s.subscriber='{$subscribed_by}'";
-        $result = $this->connection->query (
-            "SELECT * FROM {$this->connection->database}.subscriber s WHERE s.exper_id={$this->id()} {$extra} ORDER BY s.subscriber" );
+        $result = $this->logbook->query (
+            "SELECT * FROM {$this->logbook->database}.subscriber s WHERE s.exper_id={$this->id()} {$extra} ORDER BY s.subscriber" );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ )
             array_push(
                 $list,
                 new LogBookSubscription (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;

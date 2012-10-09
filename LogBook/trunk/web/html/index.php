@@ -220,11 +220,11 @@ Menu source file
 <!--
 Custom JavaScript
 -->
-<script type="text/javascript" src="Menubar.js"></script>
-<script type="text/javascript" src="Dialogs.js"></script>
-<script type="text/javascript" src="Loader.js"></script>
-<script type="text/javascript" src="JSON.js"></script>
-<script type="text/javascript" src="Utilities.js"></script>
+<script type="text/javascript" src="js/Menubar.js"></script>
+<script type="text/javascript" src="js/Dialogs.js"></script>
+<script type="text/javascript" src="js/Loader.js"></script>
+<script type="text/javascript" src="js/JSON.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
 
 <!--
 PHP Generated JavaScript with initialization parameters
@@ -242,11 +242,10 @@ use LogBook\LogBookException;
 try {
     $auth_svc = LogBookAuth::instance();
 
-    $logbook = new LogBook();
-    $logbook->begin();
+    LogBook::instance()->begin();
 
-    $instruments = $logbook->instruments();
-    $experiments = $logbook->experiments();
+    $instruments = LogBook::instance()->instruments();
+    $experiments = LogBook::instance()->experiments();
 
     echo <<<HERE
 
@@ -305,7 +304,7 @@ var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
 
 var auth_granted = {
 HERE;
-    $experiments = $logbook->experiments();
+    $experiments = LogBook::instance()->experiments();
     $first = true;
     foreach( $experiments as $e ) {
         if( $first ) $first = false;
@@ -361,7 +360,7 @@ HERE;
 
         } else if( $action == 'select_experiment_by_id' ) {
             $id = $_GET['id'];
-            $experiment = $logbook->find_experiment_by_id( $id );
+            $experiment = LogBook::instance()->find_experiment_by_id( $id );
             if( is_null( $experiment )) {
                 echo "  alert( 'no experiment found for id: {$id}' );";
             } else {
@@ -393,7 +392,7 @@ HERE;
         } else if( $action == 'select_run' ) {
             $instr_name = $_GET['instr_name'];
             $exper_name = $_GET['exper_name'];
-            $experiment = $logbook->find_experiment( $instr_name, $exper_name );
+            $experiment = LogBook::instance()->find_experiment( $instr_name, $exper_name );
             if( is_null( $experiment )) {
                 echo "  alert( 'no experiment found for instrument: {$instr_name} and experiment: {$exper_name}' );";
             } else {
@@ -413,7 +412,7 @@ HERE;
 
         } else if( $action == 'select_run_by_id' ) {
             $run_id  = $_GET['id'];
-            $run = $logbook->find_run_by_id( $run_id );
+            $run = LogBook::instance()->find_run_by_id( $run_id );
             if( is_null( $run )) {
                 echo "  alert( 'no run found for id: {$run_id}' );";
             } else {
@@ -429,7 +428,7 @@ HERE;
 
         } else if( $action == 'select_message' ) {
             $id    = $_GET['id'];
-            $entry = $logbook->find_entry_by_id( $id );
+            $entry = LogBook::instance()->find_entry_by_id( $id );
             if( is_null( $entry )) {
                 echo "  alert( 'no message found for id: {$id}' );";
             } else {
@@ -953,7 +952,7 @@ function list_experiments( instr, is_location ) {
         if( params == '' ) params = '?is_location=';
         else               params = params + '&is_location=';
     }
-    var url = 'RequestExperiments.php'+params;
+    var url = '../logbook/ws/RequestExperiments.php'+params;
     var table = null;
     if( is_location )
         table = new Table (
@@ -1006,7 +1005,7 @@ function display_experiment() {
         '  <div id="messages_actions_container"></div>'+
         '</div>';
 
-    load( 'Display'+( is_facility( exper_id ) ? 'Facility' : 'Experiment' )+'.php?id='+exper_id, 'experiment_info_container' );
+    load( '../logbook/ws/Display'+( is_facility( exper_id ) ? 'Facility' : 'Experiment' )+'.php?id='+exper_id, 'experiment_info_container' );
 
     var messages_dialog = create_messages_dialog( 'experiment', null, null );
 }
@@ -1022,7 +1021,7 @@ function create_messages_dialog( scope, shift_id, run_id ) {
 
     var html_new_message =
         '<div id="new_message_dialog" style="padding:10px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
-        '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
+        '<form enctype="multipart/form-data" name="new_message_form" action="../logbook/ws/NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="scope" value="'+scope+'" />'+
@@ -1375,7 +1374,7 @@ function create_message_reply_dialog( rid, message_id, run_id, run ) {
     var scope = run_id == null ? 'message' : 'run';
 
     rid.innerHTML =
-        '<form enctype="multipart/form-data" name="message_reply_form" action="NewFFEntry.php" method="post">'+
+        '<form enctype="multipart/form-data" name="message_reply_form" action="../logbook/ws/NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="scope" value="'+scope+'" />'+
@@ -1691,7 +1690,7 @@ function create_message_edit_dialog( eid, message_id ) {
     }
 
     eid.innerHTML =
-        '<form name="message_edit_form" action="UpdateFFEntry.php" method="post">'+
+        '<form name="message_edit_form" action="../logbook/ws/UpdateFFEntry.php" method="post">'+
         '  <input type="hidden" name="id" value="'+message_id+'" />'+
         '  <input type="hidden" name="content_type" value="TEXT" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
@@ -1739,7 +1738,7 @@ function create_message_delete_dialog( did, id ) {
     var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Message?</em>';
     var dialog_body =
         '<div style="text-align:left;">'+
-        '  <form  name="delete_message_form" action="DeleteFFEntry.php" method="post">'+
+        '  <form  name="delete_message_form" action="../logbook/ws/DeleteFFEntry.php" method="post">'+
         '    <b>PLEASE, READ THIS:</b> the selected message and all its children are about to be destroyed!'+
         '    The information may be permanently lost as a result of the operation. In most cases a better'+
         '    alternative would be to <b>Reply</b> to the message or to <b>Edit</b> its contents.'+
@@ -1768,7 +1767,6 @@ function create_message_delete_dialog( did, id ) {
 function preview_atatchment( id ) {
 
     var viewarea = document.getElementById('viewarea');
-    //viewarea.innerHTML='<img src="ShowAttachment.php?id='+id+'" width="250" height="250"/>';
     viewarea.innerHTML='<img src="attachments/'+id+'/preview" width="250" height="250"/>';
 }
 
@@ -1793,7 +1791,7 @@ function list_shifts() {
           { key: "end_time",   sortable: true, resizeable: false },
           { key: "leader",     sortable: true, resizeable: false },
           { key: "num_runs",   sortable: true, resizeable: false } ],
-        'RequestShifts.php?id='+current_selection.experiment.id,
+        '../logbook/ws/RequestShifts.php?id='+current_selection.experiment.id,
         false
     );
     //table.refreshTable();
@@ -1801,7 +1799,7 @@ function list_shifts() {
 
 function select_last_shift() {
     load_then_call(
-        'RequestShifts.php?id='+current_selection.experiment.id+'&last',
+        '../logbook/ws/RequestShifts.php?id='+current_selection.experiment.id+'&last',
         function( result ) {
             select_shift( result.ResultSet.Result[0].id );
         },
@@ -1845,11 +1843,11 @@ function display_shift() {
 
     document.getElementById('workarea').innerHTML = html;
 
-    load( 'DisplayShift.php?id='+current_selection.shift.id, 'experiment_info_container' );
+    load( '../logbook/ws/DisplayShift.php?id='+current_selection.shift.id, 'experiment_info_container' );
 
     if( !is_facility( current_selection.experiment.id )) {
         var runs = create_runs_table (
-            'RequestRuns.php?shift_id='+current_selection.shift.id,
+            '../logbook/ws/RequestRuns.php?shift_id='+current_selection.shift.id,
             true, 10
         );
     }
@@ -1864,7 +1862,7 @@ function close_shift( shift_id ) {
     ask_complex_input(
         "popupdialogs",
         "Close Last Shift",
-        '<form  name="close_shift_form" action="CloseShift.php" method="post">'+
+        '<form  name="close_shift_form" action="../logbook/ws/CloseShift.php" method="post">'+
         '  <b>ATTENTION:</b> the selected shift is about to be closed. Press <b>Submit</b>'+
         '   to proceed, or press <b>Cancel</b> to abort the operation.'+
         '  <input type="hidden" name="id" value="'+shift_id+'" />'+
@@ -1888,7 +1886,7 @@ function begin_new_shift() {
         'The shift will begin instantly after submitting the form. '+
         'The previously open shift (if any) will be atomatically closed. '+
         'Please, provide a leader name or account and a list of (up to 10 extra) crew members.</p><br>'+
-        '<form  name="begin_new_shift_form" action="CreateShift.php" method="post">'+
+        '<form  name="begin_new_shift_form" action="../logbook/ws/CreateShift.php" method="post">'+
         '  <input type="hidden" name="max_crew_size" value="10" />'+
         '  <input type="hidden" name="author" value="'+auth_remote_user+'" />'+
         '  <table><tbody>'+
@@ -1968,7 +1966,7 @@ function list_runs() {
           { key: "begin_time",       sortable: true, resizeable: false },
           { key: "end_time",         sortable: true, resizeable: false },
           { key: "shift_begin_time", sortable: true, resizeable: false } ],
-        'RequestRuns.php?id='+current_selection.experiment.id,
+        '../logbook/ws/RequestRuns.php?id='+current_selection.experiment.id,
         true, 25
     );
     table.refreshTable();
@@ -1976,7 +1974,7 @@ function list_runs() {
 
 function select_last_run() {
     load_then_call(
-        'RequestRuns.php?id='+current_selection.experiment.id+'&last',
+        '../logbook/ws/RequestRuns.php?id='+current_selection.experiment.id+'&last',
         function( result ) {
             select_run( result.ResultSet.Result[0].shift_id, result.ResultSet.Result[0].id );
         },
@@ -2012,8 +2010,8 @@ function display_run() {
         '<div id="run_parameters" style="width:820px; height:300px; overflow:auto; background-color:#E3F5FA; margin-top:10px; margin-left:20px; padding:10px;">Loading...</div>'+
         '<div id="messages_actions_container" style="margin-top:30px;"></div>';
 
-    load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
-    load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
+    load( '../logbook/ws/DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
+    load( '../logbook/ws/DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
 
     var messages_dialog = create_messages_dialog( 'run', null, current_selection.run.id );
 }
@@ -2033,7 +2031,7 @@ function display_message( id ) {
     reset_navarea();
     reset_workarea();
 
-    this.url='SearchOne.php?id='+id;
+    this.url='../logbook/ws/SearchOne.php?id='+id;
 
     var html=
         '<div id="messages_area" style="min-width:800px;">'+
@@ -2097,10 +2095,10 @@ function container_unhighlight ( which, color ) {
 function display_history( type, data ) {
 
     var request_shifts_url =
-        'RequestShifts.php?id='+current_selection.experiment.id;
+        '../logbook/ws/RequestShifts.php?id='+current_selection.experiment.id;
 
     var request_runs_url =
-        'RequestRuns.php?id='+current_selection.experiment.id;
+        '../logbook/ws/RequestRuns.php?id='+current_selection.experiment.id;
 
     var context='';
     var begin='', end='';
@@ -2342,7 +2340,7 @@ function browse_contents() {
 
         //prepare URL for XHR request:
         //
-        var sUrl = "RequestInfo.php?type="+node.data.type;
+        var sUrl = "../logbook/ws/RequestInfo.php?type="+node.data.type;
         switch( node.data.type ) {
             case TYPE_HISTORY_P:
             case TYPE_HISTORY_D:
@@ -2556,36 +2554,11 @@ function AttachmentLoader( a, aid ) {
             //load( 'attachments/'+this.id+'/preview', aid4text );
         } else if( this.type[0] == 'application' && this.type[1] == 'rtf' ) {
             a_elem.innerHTML =
-            //'<object data="attachments/'+this.id+'/preview" type="application/rtf" width="800" height="600"></object>';
             '<object data="attachments/'+this.id+'" type="application/rtf" width="800" height="600"></object>';
         } else {
             a_elem.innerHTML =
             '<a href="attachments/'+this.id+'/preview" target="_blank"><img max-width="800" src="attachments/preview/'+this.id+'" /></a>';
         }
-        /*
-        if( this.type[0] == 'image' ) {
-            a_elem.innerHTML =
-            '<a href="attachments/'+this.id+'/attachment" target="_blank"><img max-width="800" src="attachments/preview/'+this.id+'" /></a>';
-            //'<img max-width="800" src="ShowAttachment.php?id='+this.id+'" />';
-        } else if( this.type[0] == 'text' ) {
-            var aid4text = 'attachment_id_'+this.id+'_txt';
-            a_elem.innerHTML =
-            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto; border:solid 1px;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
-            load( 'attachments/'+this.id+'/preview', aid4text );
-            //load( 'ShowAttachment.php?id='+this.id, aid4text );
-        } else if( this.type[0] == 'application' && this.type[1] == 'pdf' ) {
-            a_elem.innerHTML =
-            '<object data="attachments/'+this.id+'/preview" type="application/pdf" width="800" height="600"></object>';
-            //'<object data="ShowAttachment.php?id='+this.id+'" type="application/pdf" width="800" height="600"></object>';
-        } else if( this.type[0] == 'application' && this.type[1] == 'rtf' ) {
-            a_elem.innerHTML =
-            '<object data="attachments/'+this.id+'/preview" type="application/rtf" width="800" height="600"></object>';
-            //'<object data="ShowAttachment.php?id='+this.id+'" type="application/rtf" width="800" height="600"></object>';
-        } else {
-            a_elem.innerHTML =
-            '<img src="images/NoPreview.png" />';
-        }
-        */
     }
 }
 
@@ -3111,7 +3084,7 @@ function display_messages_table(
     last_display_auto_refresh = auto_refresh;
     last_limit_per_view = limit_per_view;
 
-    this.url='Search.php?id='+current_selection.experiment.id+
+    this.url='../logbook/ws/Search.php?id='+current_selection.experiment.id+
         (scope == '' ? '' : '&'+scope)+
         '&format=detailed'+
         '&text2search='+encodeURIComponent(text2search)+
@@ -3373,7 +3346,7 @@ function load_search_form( accross_instrument ) {
         '  <div id="search_form_params"></div>'+
         '</form>';
 
-	load( 'SearchFormParams.php?id='+current_selection.experiment.id+( accross_instrument ? '&accross_instrument' : '' ), 'search_form_params' );
+	load( '../logbook/ws/SearchFormParams.php?id='+current_selection.experiment.id+( accross_instrument ? '&accross_instrument' : '' ), 'search_form_params' );
 
     YAHOO.util.Event.onContentReady (
         "reset_form_button",
@@ -3476,7 +3449,7 @@ function subscribe() {
         '    </div>'+
         '  </div>'+
         '</div>'+
-        '<form name="manage_subscriptions_form" action="UpdateSubscriptions.php" method="post">'+
+        '<form name="manage_subscriptions_form" action="../logbook/ws/UpdateSubscriptions.php" method="post">'+
         '  <input type="hidden" name="exper_id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  <input type="hidden" name="subscriptions" value="" />'+
@@ -3484,7 +3457,7 @@ function subscribe() {
 
     var subscribers = null;
 
-    var url = 'RequestSubscriptions.php?exper_id='+current_selection.experiment.id+'&subscribed_by='+auth_remote_user;
+    var url = '../logbook/ws/RequestSubscriptions.php?exper_id='+current_selection.experiment.id+'&subscribed_by='+auth_remote_user;
  
     function create_table() {
         if( subscribers == null )
@@ -3678,9 +3651,8 @@ HERE;
 
 <?php
 
-$logbook->commit();
+LogBook::instance()->commit();
 
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-}
+} catch( LogBookException $e ) {  print $e->toHtml(); }
+
 ?>

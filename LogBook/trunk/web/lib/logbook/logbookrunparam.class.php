@@ -8,37 +8,26 @@ class LogBookRunParam {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $experiment;
 
     public $attr;
 
     /** Constructor
      */
-    public function __construct ( $connection, $experiment, $attr ) {
-        $this->connection = $connection;
+    public function __construct ( $logbook, $experiment, $attr ) {
+        $this->logbook    = $logbook;
         $this->experiment = $experiment;
-        $this->attr = $attr;
+        $this->attr       = $attr;
     }
 
     /* Accessors
      */
-    public function parent () {
-        return $this->experiment; }
-
-    public function id () {
-        return $this->attr['id']; }
-
-    public function name () {
-        return $this->attr['param']; }
-
-    public function exper_id () {
-        return $this->attr['exper_id']; }
-
-    public function type_name () {
-        return $this->attr['type']; }
-
-    public function description () {
-        return $this->attr['descr']; }
+    public function parent      () { return $this->experiment; }
+    public function id          () { return $this->attr['id']; }
+    public function name        () { return $this->attr['param']; }
+    public function exper_id    () { return $this->attr['exper_id']; }
+    public function type_name   () { return $this->attr['type']; }
+    public function description () { return $this->attr['descr']; }
 }
 ?>

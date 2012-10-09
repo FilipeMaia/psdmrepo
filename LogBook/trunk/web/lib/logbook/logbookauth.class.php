@@ -7,21 +7,12 @@ require_once( 'authdb/authdb.inc.php' );
 
 use AuthDB\AuthDB;
 
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Class LogBookAuth provides an interface to the Authorization Service
  *
  * @author gapon
  */
 class LogBookAuth {
-
-    /* Data members
-     */
-    private $authdb;
 
     private static $instance = null;
 
@@ -30,46 +21,20 @@ class LogBookAuth {
         return LogBookAuth::$instance;
     }
 
-    public function __construct () {
-        $this->authdb = new AuthDB();
-    }
+    public function authName        () { return AuthDb::instance()->authName(); }
+    public function authType        () { return AuthDb::instance()->authName(); }
+    public function isAuthenticated () { return LogBookAuth::instance()->authName() != ''; }
 
-    public function authName() {
-        return $this->authdb->authName(); //return $_SERVER['REMOTE_USER'];
-    }
-
-    public function authType() {
-        return $this->authdb->authName(); //return $_SERVER['AUTH_TYPE'];
-    }
-
-    public function isAuthenticated() {
-        return LogBookAuth::instance()->authName() != '';
-    }
-
-    public function canRead( $exper_id ) {
-        return $this->can( $exper_id, 'read' );
-    }
-
-    public function canPostNewMessages( $exper_id ) {
-        return $this->can( $exper_id, 'post' );
-    }
-
-    public function canEditMessages( $exper_id ) {
-        return $this->can( $exper_id, 'edit' );
-    }
-
-    public function canDeleteMessages( $exper_id ) {
-        return $this->can( $exper_id, 'delete' );
-    }
-
-    public function canManageShifts( $exper_id ) {
-        return $this->can( $exper_id, 'manage_shifts' );
-    }
+    public function canRead            ($exper_id) { return $this->can($exper_id, 'read'); }
+    public function canPostNewMessages ($exper_id) { return $this->can($exper_id, 'post'); }
+    public function canEditMessages    ($exper_id) { return $this->can($exper_id, 'edit'); }
+    public function canDeleteMessages  ($exper_id) { return $this->can($exper_id, 'delete'); }
+    public function canManageShifts    ($exper_id) { return $this->can($exper_id, 'manage_shifts' ); }
 
     private function can( $exper_id, $priv ) {
         if( !$this->isAuthenticated()) return false;
-        $this->authdb->begin();
-        return $this->authdb->hasPrivilege(
+        AuthDb::instance()->begin();
+        return AuthDb::instance()->hasPrivilege(
             LogBookAuth::instance()->authName(), $exper_id, 'LogBook', $priv );
     }
 
@@ -91,6 +56,5 @@ class LogBookAuth {
 </center>
 HERE;
     }
-
 }
 ?>

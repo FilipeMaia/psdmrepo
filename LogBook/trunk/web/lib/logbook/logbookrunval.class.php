@@ -11,7 +11,7 @@ class LogBookRunVal {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $run;
     private $name;
     private $type;
@@ -20,12 +20,12 @@ class LogBookRunVal {
 
     /* Constructor
      */
-    public function __construct( $connection, $run, $name, $type, $attr ) {
-        $this->connection = $connection;
-        $this->run  = $run;
-        $this->name = $name;
-        $this->type = $type;
-        $this->attr = $attr;
+    public function __construct( $logbook, $run, $name, $type, $attr ) {
+        $this->logbook = $logbook;
+        $this->run     = $run;
+        $this->name    = $name;
+        $this->type    = $type;
+        $this->attr    = $attr;
     }
 
     /* Accessors

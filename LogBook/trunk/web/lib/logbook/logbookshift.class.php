@@ -14,39 +14,27 @@ class LogBookShift {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $experiment;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct( $connection, $experiment, $attr ) {
-        $this->connection = $connection;
+    public function __construct( $logbook, $experiment, $attr ) {
+        $this->logbook    = $logbook;
         $this->experiment = $experiment;
-        $this->attr = $attr;
+        $this->attr       = $attr;
     }
 
     /* Accessors
      */
-    public function parent() {
-        return $this->experiment; }
-
-    public function id() {
-        return $this->attr['id']; }
-
-    public function exper_id() {
-        return $this->attr['exper_id']; }
-
-    public function begin_time() {
-        return LusiTime::from64( $this->attr['begin_time'] ); }
-
-    public function end_time() {
-        if( is_null( $this->attr['end_time'] )) return null;
-        return LusiTime::from64( $this->attr['end_time'] ); }
-
-    public function leader() {
-        return $this->attr['leader']; }
+    public function parent    () { return $this->experiment; }
+    public function id        () { return $this->attr['id']; }
+    public function exper_id  () { return $this->attr['exper_id']; }
+    public function begin_time() { return LusiTime::from64( $this->attr['begin_time'] ); }
+    public function end_time  () { return is_null( $this->attr['end_time'] ) ? null : LusiTime::from64( $this->attr['end_time'] ); }
+    public function leader    () { return $this->attr['leader']; }
 
     public function in_interval ( $time ) {
         return LusiTime::in_interval (
@@ -76,8 +64,8 @@ class LogBookShift {
         /* Make the update
          */
         $end_time_64 = LusiTime::to64from( $end_time );
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.shift SET end_time=".$end_time_64.
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.shift SET end_time=".$end_time_64.
             ' WHERE exper_id='.$this->exper_id().' AND begin_time='.$this->attr['begin_time'] );
 
         /* Update the current state of the object
@@ -94,8 +82,8 @@ class LogBookShift {
 
         $list = array();
 
-        $result = $this->connection->query(
-            "SELECT member FROM {$this->connection->database}.shift_crew WHERE shift_id=".$this->id());
+        $result = $this->logbook->query(
+            "SELECT member FROM {$this->logbook->database}.shift_crew WHERE shift_id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {

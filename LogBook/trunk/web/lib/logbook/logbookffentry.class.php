@@ -32,15 +32,15 @@ class LogBookFFEntry {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $experiment;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $experiment, $attr ) {
-        $this->connection = $connection;
+    public function __construct ( $logbook, $experiment, $attr ) {
+        $this->logbook = $logbook;
         $this->experiment = $experiment;
         $this->attr = $attr;
     }
@@ -120,8 +120,8 @@ class LogBookFFEntry {
 
         $list = array();
 
-        $result = $this->connection->query (
-            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e".
+        $result = $this->logbook->query (
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e".
             ' WHERE h.id = e.hdr_id AND e.parent_entry_id='.$this->id().
             ' ORDER BY e.insert_time ASC' );
 
@@ -130,7 +130,7 @@ class LogBookFFEntry {
             array_push(
                 $list,
                 new LogBookFFEntry (
-                    $this->connection,
+                    $this->logbook,
                     $this->experiment,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -139,12 +139,12 @@ class LogBookFFEntry {
 
     public function create_child( $author, $content_type, $content ) {
 
-        $subquery = "(SELECT h.id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e WHERE h.id = e.hdr_id AND e.id=".$this->attr['id'].")";
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.entry VALUES(NULL,".$subquery.",".$this->attr['id'].
+        $subquery = "(SELECT h.id FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e WHERE h.id = e.hdr_id AND e.id=".$this->attr['id'].")";
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.entry VALUES(NULL,".$subquery.",".$this->attr['id'].
             ",".LusiTime::now()->to64().
             ",'".$author.
-            "','".$this->connection->escape_string( $content ).
+            "','".$this->logbook->escape_string( $content ).
             "','".$content_type."',NULL,NULL)" );
 
         return $this->experiment->find_entry_by_ (
@@ -155,8 +155,8 @@ class LogBookFFEntry {
 
         $list = array();
 
-        $result = $this->connection->query (
-            "SELECT t.* FROM {$this->connection->database}.header h, {$this->connection->database}.tag t WHERE h.exper_id=".$this->exper_id().
+        $result = $this->logbook->query (
+            "SELECT t.* FROM {$this->logbook->database}.header h, {$this->logbook->database}.tag t WHERE h.exper_id=".$this->exper_id().
             ' AND h.id = t.hdr_id'.
             ' AND h.id='.$this->hdr_id());
 
@@ -165,7 +165,7 @@ class LogBookFFEntry {
             array_push (
                 $list,
                 new LogBookFFTag (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -174,13 +174,13 @@ class LogBookFFEntry {
 
     public function add_tag( $tag, $value ) {
 
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.tag VALUES(".$this->hdr_id().
-            ",'".$this->connection->escape_string( $tag ).
-            "','".$this->connection->escape_string( $value )."')" );
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.tag VALUES(".$this->hdr_id().
+            ",'".$this->logbook->escape_string( $tag ).
+            "','".$this->logbook->escape_string( $value )."')" );
 
-        $result = $this->connection->query (
-            "SELECT t.* FROM {$this->connection->database}.header h, {$this->connection->database}.tag t WHERE h.exper_id=".$this->exper_id().
+        $result = $this->logbook->query (
+            "SELECT t.* FROM {$this->logbook->database}.header h, {$this->logbook->database}.tag t WHERE h.exper_id=".$this->exper_id().
             ' AND h.id = t.hdr_id'.
             ' AND h.id='.$this->hdr_id().
             " AND t.tag='".$tag."'" );
@@ -192,7 +192,7 @@ class LogBookFFEntry {
 
 
         return new LogBookFFTag (
-            $this->connection,
+            $this->logbook,
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
@@ -205,16 +205,16 @@ class LogBookFFEntry {
          */
         $list = array();
 
-        $result = $this->connection->query (
+        $result = $this->logbook->query (
             'SELECT id,entry_id,description,document_type,  LENGTH(document) AS "document_size"'.
-            " FROM {$this->connection->database}.attachment WHERE entry_id=".$this->id());
+            " FROM {$this->logbook->database}.attachment WHERE entry_id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             array_push (
                 $list,
                 new LogBookFFAttachment (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
@@ -223,9 +223,9 @@ class LogBookFFEntry {
 
     public function find_attachment_by_id( $id ) {
 
-        $result = $this->connection->query (
+        $result = $this->logbook->query (
             'SELECT id,entry_id,description,document_type, LENGTH(document) AS "document_size"'.
-            "FROM {$this->connection->database}.attachment WHERE id=".$id );
+            "FROM {$this->logbook->database}.attachment WHERE id=".$id );
 
         $nrows = mysql_numrows( $result );
         if( !$nrows ) return null;
@@ -234,7 +234,7 @@ class LogBookFFEntry {
                 __METHOD__, "unexpected size of result set" );
 
         return new LogBookFFAttachment (
-            $this->connection,
+            $this->logbook,
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
@@ -248,10 +248,10 @@ class LogBookFFEntry {
      */
     public function attach_document( $document, $document_type, $description ) {
 
-        $this->connection->query (
-            "INSERT INTO {$this->connection->database}.attachment VALUES(NULL,".$this->id().
-            ",'".$this->connection->escape_string( $description ).
-            "','".$this->connection->escape_string( $document ).
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.attachment VALUES(NULL,".$this->id().
+            ",'".$this->logbook->escape_string( $description ).
+            "','".$this->logbook->escape_string( $document ).
             "','".$document_type."',NULL)" );
 
         return $this->find_attachment_by_id( '(SELECT LAST_INSERT_ID())' );
@@ -266,10 +266,10 @@ class LogBookFFEntry {
      */
     public function update_content( $content_type, $content ) {
 
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.entry SET".
-            " content_type='".$this->connection->escape_string( $content_type ).
-            "',content='".$this->connection->escape_string( $content ).
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.entry SET".
+            " content_type='".$this->logbook->escape_string( $content_type ).
+            "',content='".$this->logbook->escape_string( $content ).
             "' WHERE id=".$this->id());
         $this->attr['content_type'] = $content_type;
         $this->attr['content'] = $content;

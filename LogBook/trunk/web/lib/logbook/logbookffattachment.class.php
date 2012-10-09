@@ -19,15 +19,15 @@ class LogBookFFAttachment {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $entry;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $entry, $attr ) {
-        $this->connection = $connection;
+    public function __construct ( $logbook, $entry, $attr ) {
+        $this->logbook = $logbook;
         $this->entry = $entry;
         $this->attr = $attr;
     }
@@ -54,8 +54,8 @@ class LogBookFFAttachment {
 
     public function document() {
 
-        $result = $this->connection->query (
-            "SELECT document FROM {$this->connection->database}.attachment WHERE id=".$this->id());
+        $result = $this->logbook->query (
+            "SELECT document FROM {$this->logbook->database}.attachment WHERE id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
@@ -66,8 +66,8 @@ class LogBookFFAttachment {
     }
     public function document_preview() {
 
-        $result = $this->connection->query (
-            "SELECT document_preview FROM {$this->connection->database}.attachment WHERE id=".$this->id());
+        $result = $this->logbook->query (
+            "SELECT document_preview FROM {$this->logbook->database}.attachment WHERE id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
@@ -78,9 +78,9 @@ class LogBookFFAttachment {
     }
     public function update_document_preview( $preview ) {
 
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.attachment SET".
-            " document_preview='".$this->connection->escape_string( $preview ).
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.attachment SET".
+            " document_preview='".$this->logbook->escape_string( $preview ).
             "' WHERE id=".$this->id());
     }
 }

@@ -11,41 +11,29 @@ class LogBookRun {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $experiment;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $experiment, $attr ) {
-        $this->connection = $connection;
+    public function __construct ( $logbook, $experiment, $attr ) {
+        $this->logbook    = $logbook;
         $this->experiment = $experiment;
-        $this->attr = $attr;
+        $this->attr       = $attr;
     }
 
     /* Accessors
      */
-    public function parent () {
-        return $this->experiment; }
-
-    public function id () {
-        return $this->attr['id']; }
-
-    public function num () {
-        return $this->attr['num']; }
-
-    public function exper_id () {
-        return $this->attr['exper_id']; }
-
-    public function begin_time () {
-        return LusiTime::from64( $this->attr['begin_time'] ); }
-
-    public function end_time () {
-        if( is_null( $this->attr['end_time'] )) return null;
-        return LusiTime::from64( $this->attr['end_time'] ); }
-
-    public function in_interval ( $time ) {
+    public function parent     () { return $this->experiment; }
+    public function id         () { return $this->attr['id']; }
+    public function num        () { return $this->attr['num']; }
+    public function exper_id   () { return $this->attr['exper_id']; }
+    public function begin_time () { return LusiTime::from64( $this->attr['begin_time'] ); }
+    public function end_time   () { return is_null( $this->attr['end_time'] ) ? null : LusiTime::from64( $this->attr['end_time'] ); }
+ 
+    public function in_interval( $time ) {
         return LusiTime::in_interval (
             $time,
             $this->begin_time(),
@@ -73,8 +61,8 @@ class LogBookRun {
             $type     = $p->attr['type'];
 
             $extra_condition = $condition == '' ? '' : ' AND '.$condition;
-            $result = $this->connection->query (
-                "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, {$this->connection->database}.run_val_".$type.' v WHERE p.run_id='.$run_id.
+            $result = $this->logbook->query (
+                "SELECT p.*,v.val FROM {$this->logbook->database}.run_val p, {$this->logbook->database}.run_val_".$type.' v WHERE p.run_id='.$run_id.
                 ' AND p.param_id='.$param_id.
                 ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
                 $extra_condition );
@@ -84,7 +72,7 @@ class LogBookRun {
             	if( $return_dict )
             	    $list[$param] =
                         new LogBookRunVal (
-                            $this->connection,
+                            $this->logbook,
                             $this,
                             $param,
                             $type,
@@ -93,7 +81,7 @@ class LogBookRun {
                     array_push(
                         $list,
                         new LogBookRunVal (
-                            $this->connection,
+                            $this->logbook,
                             $this,
                             $param,
                             $type,
@@ -122,8 +110,8 @@ class LogBookRun {
 
         /* Fetch the value and the bookkeeping info
          */
-        $result = $this->connection->query (
-            "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$this->id().
+        $result = $this->logbook->query (
+            "SELECT p.*,v.val FROM {$this->logbook->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$this->id().
             ' AND p.param_id='.$param_id.
             ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
             $extra_condition );
@@ -136,7 +124,7 @@ class LogBookRun {
                 "unexpected size of the result set returned by query" );
 
         return new LogBookRunVal (
-            $this->connection,
+            $this->logbook,
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
@@ -176,15 +164,15 @@ class LogBookRun {
             /* Treat it as the string */
             $value4sql = "'".$value."'";
         }
-        $value_table = "{$this->connection->database}.run_val_".$type;
+        $value_table = "{$this->logbook->database}.run_val_".$type;
 
         /* Check if its value is already set, and if so - if we're allowed
          * to update it.
          */
         $run_id = $this->id();
 
-        $result = $this->connection->query (
-            "SELECT COUNT(*) AS \"count\" FROM {$this->connection->database}.run_val p WHERE p.run_id=".$run_id.
+        $result = $this->logbook->query (
+            "SELECT COUNT(*) AS \"count\" FROM {$this->logbook->database}.run_val p WHERE p.run_id=".$run_id.
             ' AND p.param_id='.$param_id );
 
         $nrows = mysql_numrows( $result );
@@ -201,26 +189,26 @@ class LogBookRun {
                     __METHOD__,
                     "the value of parameter: '".$param."' was set before and it's not allowed to be updated" );
 
-            $this->connection->query (
-                "UPDATE {$this->connection->database}.run_val SET source='".$source."', updated=".$updated->to64().
+            $this->logbook->query (
+                "UPDATE {$this->logbook->database}.run_val SET source='".$source."', updated=".$updated->to64().
                 ' WHERE run_id='.$run_id.' AND param_id='.$param_id );
 
-            $this->connection->query(
+            $this->logbook->query(
                 "UPDATE ".$value_table." SET val=".$value4sql.
                 ' WHERE run_id='.$run_id.' AND param_id='.$param_id );
 
         } else {
-            $this->connection->query (
-                "INSERT INTO {$this->connection->database}.run_val VALUES (".$run_id.",".$param_id.",'".$source."',".$updated->to64().")" );
+            $this->logbook->query (
+                "INSERT INTO {$this->logbook->database}.run_val VALUES (".$run_id.",".$param_id.",'".$source."',".$updated->to64().")" );
 
-            $this->connection->query (
+            $this->logbook->query (
                 "INSERT INTO ".$value_table." VALUES (".$run_id.",".$param_id.",".$value4sql.")" );
         }
 
         /* Fetch the value and the bookkeeping info
          */
-        $result = $this->connection->query (
-            "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$run_id.
+        $result = $this->logbook->query (
+            "SELECT p.*,v.val FROM {$this->logbook->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$run_id.
             ' AND p.param_id='.$param_id.
             ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
             $extra_condition );
@@ -232,7 +220,7 @@ class LogBookRun {
                 "unexpected size of the result set returned by query" );
 
         return new LogBookRunVal (
-            $this->connection,
+            $this->logbook,
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
@@ -243,7 +231,7 @@ class LogBookRun {
      * ======================
      */
     public function attr_classes() {
-        $result = $this->connection->query("SELECT DISTINCT class FROM {$this->connection->database}.run_attr WHERE run_id={$this->id()} ORDER BY class");
+        $result = $this->logbook->query("SELECT DISTINCT class FROM {$this->logbook->database}.run_attr WHERE run_id={$this->id()} ORDER BY class");
         $list = array();
         for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
             $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -252,19 +240,19 @@ class LogBookRun {
         return $list;
     }
     public function attributes($class_name) {
-        $class_name_sql = is_null($class_name) ? '' : $this->connection->escape_string($class_name);
+        $class_name_sql = is_null($class_name) ? '' : $this->logbook->escape_string($class_name);
         if($class_name_sql == '')
             throw new LogBookException (
                 __METHOD__,
                 "no attribute class name provided");
-        $result = $this->connection->query("SELECT * FROM {$this->connection->database}.run_attr WHERE run_id={$this->id()}  AND class='{$class_name_sql}' ORDER BY name");
+        $result = $this->logbook->query("SELECT * FROM {$this->logbook->database}.run_attr WHERE run_id={$this->id()}  AND class='{$class_name_sql}' ORDER BY name");
         $list = array();
         for( $i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++ ) {
             $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
             array_push(
                 $list,
                 new LogBookRunAttr (
-                    $this->connection,
+                    $this->logbook,
                     $this,
                     $attr,
                     $this->attr_val($attr['id'],$attr['type'])));
@@ -272,7 +260,7 @@ class LogBookRun {
         return $list;
     }
     private function attr_val($attr_id, $attr_type) {
-        $result = $this->connection->query("SELECT val FROM {$this->connection->database}.run_attr_{$attr_type} WHERE attr_id={$attr_id}");
+        $result = $this->logbook->query("SELECT val FROM {$this->logbook->database}.run_attr_{$attr_type} WHERE attr_id={$attr_id}");
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
             throw new LogBookException (
@@ -323,8 +311,8 @@ class LogBookRun {
         /* Make the update
          */
         $end_time_64 = LusiTime::to64from( $end_time );
-        $this->connection->query (
-            "UPDATE {$this->connection->database}.run SET end_time=".$end_time_64.
+        $this->logbook->query (
+            "UPDATE {$this->logbook->database}.run SET end_time=".$end_time_64.
             ' WHERE exper_id='.$this->exper_id().' AND num='.$this->attr['num'] );
 
         /* Update the current state of the object

@@ -19,31 +19,22 @@ class LogBookFFTag {
 
     /* Data members
      */
-    private $connection;
+    private $logbook;
     private $entry;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $entry, $attr ) {
-        $this->connection = $connection;
-        $this->exntry = $entry;
-        $this->attr = $attr;
+    public function __construct ( $logbook, $entry, $attr ) {
+        $this->logbook = $logbook;
+        $this->exntry  = $entry;
+        $this->attr    = $attr;
     }
 
-    /* Accessors
-     */
-    public function parent() {
-        return $this->entry; }
-
-    public function entry_hdr_id() {
-        return $this->attr['hdr_id']; }
-
-    public function tag() {
-        return $this->attr['tag']; }
-
-    public function value() {
-        return $this->attr['value']; }
+    public function parent       () { return $this->entry; }
+    public function entry_hdr_id () { return $this->attr['hdr_id']; }
+    public function tag          () { return $this->attr['tag']; }
+    public function value        () { return $this->attr['value']; }
 }
 ?>
