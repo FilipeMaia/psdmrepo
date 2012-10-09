@@ -29,6 +29,14 @@ class LusiTime {
     public static function now() {
         return new LusiTime( time()); }
 
+    /* Factory method for getting the current time with the micro-seconds resolution
+     * (if the host operating system permits).
+     */
+    public static function now_micro() {
+        $now = gettimeofday();
+        return new LusiTime( $now['sec'], 1000*$now['usec']);
+    }
+
     /* Factory method for getting the time -1 hour from now
      */
     public static function minus_hour() {
