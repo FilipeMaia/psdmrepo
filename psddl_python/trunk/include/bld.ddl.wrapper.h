@@ -180,7 +180,7 @@ class BldDataGMDV0_Wrapper {
   Psana::Bld::BldDataGMDV0* o;
 public:
   enum { TypeId = Pds::TypeId::Id_GMD };
-  enum { Version = 1 };
+  enum { Version = 0 };
   BldDataGMDV0_Wrapper(shared_ptr<Psana::Bld::BldDataGMDV0> obj) : _o(obj), o(_o.get()) {}
   BldDataGMDV0_Wrapper(Psana::Bld::BldDataGMDV0* obj) : o(obj) {}
   const char* gasType() const { return o->gasType(); }
