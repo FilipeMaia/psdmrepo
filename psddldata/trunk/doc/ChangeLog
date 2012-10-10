@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-10
+2012-10-10 Andy Salnikov
+- fix version numer for BldDataGMDV0
+
 Tag: V00-03-09
 2012-10-08 Andy Salnikov
 - upgrading to pdsdata V04-02-01

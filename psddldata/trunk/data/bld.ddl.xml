@@ -340,7 +340,7 @@
         <!-- ========================================================================= -->
         
 
-        <pstype name="BldDataGMDV0" type_id="Id_GMD" version="1" pack="4">
+        <pstype name="BldDataGMDV0" type_id="Id_GMD" version="0" pack="4">
         
             Gas Monitor Detector data.
 
