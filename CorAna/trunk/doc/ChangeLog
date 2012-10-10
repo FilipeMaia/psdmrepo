@@ -1,0 +1,51 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CorAna
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+
+
+2012-10-10 Mikhail S. Dubrovin
+- add dirs/modules:
+A       app
+A       app/coranash
+A       doc
+A       doc/ChangeLog
+A       doc/README
+A       SConscript
+A       src
+A       src/GUIMain.py
+A       src/ConfigParameters.py
+A       src/ConfigParametersCorAna.py
+A       src/GUIConfigParameters.py
+
+2012-10-08 Mikhail S. Dubrovin
+Creation of the CorAna packageon dubrovin@pslogin01 
+cd LCLS/PSANA-V01
+kinit
+sit_setup
+
+# create local package
+newpkg CorAna
+mkdir CorAna/src
+
+# create package in SVN and check it out
+psvn newpkg CorAna
+addpkg CorAna
+	
+	
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
