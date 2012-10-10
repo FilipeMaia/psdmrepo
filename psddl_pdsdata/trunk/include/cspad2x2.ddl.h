@@ -68,7 +68,7 @@ namespace CsPad2x2 {
 class CsPad2x2DigitalPotsCfg {
 public:
   ndarray<uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
-  static uint32_t _sizeof()  { return 0+(1*(PotsPerQuad)); }
+  static uint32_t _sizeof()  { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
   uint8_t	_pots[PotsPerQuad];
 };
@@ -115,7 +115,7 @@ class CsPad2x2GainMapCfg {
 public:
   /** Array with the gain map for single ASIC. */
   ndarray<uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
-  static uint32_t _sizeof()  { return 0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)); }
+  static uint32_t _sizeof()  { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
   uint16_t	_gainMap[ColumnsPerASIC][MaxRowsPerASIC];	/**< Array with the gain map for single ASIC. */
 };
@@ -154,7 +154,7 @@ public:
   const CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const { return _digitalPots; }
   /** Gain map. */
   const CsPad2x2::CsPad2x2GainMapCfg& gm() const { return _gainMap; }
-  static uint32_t _sizeof()  { return ((84+(CsPad2x2::CsPad2x2ReadOnlyCfg::_sizeof()))+(CsPad2x2::CsPad2x2DigitalPotsCfg::_sizeof()))+(CsPad2x2::CsPad2x2GainMapCfg::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((((84+(CsPad2x2::CsPad2x2ReadOnlyCfg::_sizeof()))+(CsPad2x2::CsPad2x2DigitalPotsCfg::_sizeof()))+(CsPad2x2::CsPad2x2GainMapCfg::_sizeof()))+4)-1)/4)*4; }
 private:
   uint32_t	_shiftSelect;
   uint32_t	_edgeSelect;
@@ -206,7 +206,7 @@ public:
   uint32_t numAsicsRead() const;
   /** Number of ASICs in given quadrant */
   uint32_t numAsicsStored() const;
-  static uint32_t _sizeof()  { return (((((((((4+(CsPad2x2::ProtectionSystemThreshold::_sizeof()))+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad2x2::ConfigV1QuadReg::_sizeof()); }
+  static uint32_t _sizeof()  { return (((((((((((((4+(CsPad2x2::ProtectionSystemThreshold::_sizeof()))+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad2x2::ConfigV1QuadReg::_sizeof()))+4)-1)/4)*4; }
 private:
   uint32_t	_concentratorVersion;
   CsPad2x2::ProtectionSystemThreshold	_protectionThreshold;
@@ -252,7 +252,7 @@ public:
   /** Common mode value for a given section, section number can be 0 or 1.
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
   float common_mode(uint32_t section) const;
-  static uint32_t _sizeof()  { return ((20+(2*(Nsbtemp)))+4)+(2*(ColumnsPerASIC)*( MaxRowsPerASIC*2)*( 2)); }
+  static uint32_t _sizeof()  { return ((((((20+(2*(Nsbtemp)))+4)+(2*(ColumnsPerASIC)*( MaxRowsPerASIC*2)*( 2)))+4)-1)/4)*4; }
 private:
   uint32_t	_word0;
   uint32_t	_word1;

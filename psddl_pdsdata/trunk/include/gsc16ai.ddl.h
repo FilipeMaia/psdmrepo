@@ -83,7 +83,7 @@ public:
   ndarray<uint16_t, 1> channelValue(const Gsc16ai::ConfigV1& cfg) const { ptrdiff_t offset=6;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.numChannels()); }
-  static uint32_t _sizeof(const Gsc16ai::ConfigV1& cfg)  { return (0+(2*(3)))+(2*(cfg.numChannels())); }
+  static uint32_t _sizeof(const Gsc16ai::ConfigV1& cfg)  { return (((((0+(2*(3)))+(2*(cfg.numChannels())))+2)-1)/2)*2; }
 private:
   uint16_t	_timestamp[3];
   //uint16_t	_channelValue[cfg.numChannels()];

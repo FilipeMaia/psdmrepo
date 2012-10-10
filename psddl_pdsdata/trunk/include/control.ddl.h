@@ -38,7 +38,7 @@ public:
   double value() const { return _value; }
   /** Returns true if the control is an array. */
   uint8_t array() const;
-  static uint32_t _sizeof()  { return ((0+(1*(32)))+4)+8; }
+  static uint32_t _sizeof()  { return ((((((0+(1*(32)))+4)+8)+4)-1)/4)*4; }
 private:
   char	_name[32];	/**< Name of the control. */
   uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
@@ -75,7 +75,7 @@ public:
   double hiValue() const { return _hiValue; }
   /** Returns true if the monitor is an array. */
   uint8_t array() const;
-  static uint32_t _sizeof()  { return (((0+(1*(32)))+4)+8)+8; }
+  static uint32_t _sizeof()  { return (((((((0+(1*(32)))+4)+8)+8)+4)-1)/4)*4; }
 private:
   char	_name[32];	/**< Name of the control. */
   uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
@@ -107,7 +107,7 @@ public:
   const char* name() const { return _name; }
   /** Label value. */
   const char* value() const { return _value; }
-  static uint32_t _sizeof()  { return (0+(1*(32)))+(1*(64)); }
+  static uint32_t _sizeof()  { return (((((0+(1*(32)))+(1*(64)))+1)-1)/1)*1; }
 private:
   char	_name[32];	/**< PV name. */
   char	_value[64];	/**< Label value. */
@@ -144,7 +144,7 @@ public:
   ndarray<ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->_npvControls));
   ControlData::PVMonitor* data = (ControlData::PVMonitor*)(((const char*)this)+offset);
   return make_ndarray(data, this->_npvMonitors); }
-  uint32_t _sizeof() const { return (24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)); }
+  uint32_t _sizeof() const { return (((((24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+4)-1)/4)*4; }
 private:
   uint32_t	_control;
   uint32_t	_reserved;
@@ -191,7 +191,7 @@ public:
   ndarray<ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->_npvControls)))+(52*(this->_npvMonitors));
   ControlData::PVLabel* data = (ControlData::PVLabel*)(((const char*)this)+offset);
   return make_ndarray(data, this->_npvLabels); }
-  uint32_t _sizeof() const { return ((28+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+(ControlData::PVLabel::_sizeof()*(this->_npvLabels)); }
+  uint32_t _sizeof() const { return ((((((28+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+(ControlData::PVLabel::_sizeof()*(this->_npvLabels)))+4)-1)/4)*4; }
 private:
   uint32_t	_control;
   uint32_t	_reserved;

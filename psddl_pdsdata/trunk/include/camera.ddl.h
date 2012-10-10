@@ -87,7 +87,7 @@ public:
   ndarray<Camera::FrameCoord, 1> masked_pixel_coordinates() const { ptrdiff_t offset=28;
   Camera::FrameCoord* data = (Camera::FrameCoord*)(((const char*)this)+offset);
   return make_ndarray(data, this->_masked_pixel_count); }
-  uint32_t _sizeof() const { return ((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count)); }
+  uint32_t _sizeof() const { return ((((((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count)))+4)-1)/4)*4; }
 private:
   uint32_t	_forwarding;	/**< frame forwarding policy */
   uint32_t	_forward_prescale;	/**< Prescale of events with forwarded frames */
@@ -128,7 +128,7 @@ public:
   /** Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).
                 If data type is 8-bit then empty array is returned, use data8() method in this case. */
   ndarray<uint16_t, 2> data16() const;
-  uint32_t _sizeof() const { return 16+(1*(this->_width*this->_height*((this->_depth+7)/8))); }
+  uint32_t _sizeof() const { return ((((16+(1*(this->_width*this->_height*((this->_depth+7)/8))))+4)-1)/4)*4; }
 private:
   uint32_t	_width;	/**< Number of pixels in a row. */
   uint32_t	_height;	/**< Number of pixels in a column. */

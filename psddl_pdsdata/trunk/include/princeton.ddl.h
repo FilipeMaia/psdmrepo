@@ -177,9 +177,9 @@ public:
   ndarray<uint16_t, 2> data(const Princeton::ConfigV3& cfg) const { ptrdiff_t offset=8;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
-  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
-  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
-  static uint32_t _sizeof(const Princeton::ConfigV3& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
+  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV3& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;

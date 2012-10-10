@@ -75,7 +75,7 @@ public:
   uint16_t output_offset() const;
   /** bit-depth of pixel counts */
   uint32_t output_resolution_bits() const;
-  uint32_t _sizeof() const { return (12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount)); }
+  uint32_t _sizeof() const { return (((((12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount)))+4)-1)/4)*4; }
 private:
   uint32_t	_offsetAndGain;	/**< offset and gain */
   uint32_t	_outputOptions;	/**< bit mask of output formatting options */

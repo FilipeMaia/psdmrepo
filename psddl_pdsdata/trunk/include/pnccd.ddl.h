@@ -60,7 +60,7 @@ public:
   const char* info() const { return _info; }
   /** Timing file name string */
   const char* timingFName() const { return _timingFName; }
-  static uint32_t _sizeof()  { return (32+(1*(256)))+(1*(256)); }
+  static uint32_t _sizeof()  { return (((((32+(1*(256)))+(1*(256)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by info() method. */
   std::vector<int> info_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by timingFName() method. */
@@ -106,8 +106,8 @@ public:
   return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
   ndarray<uint16_t, 2> data(const PNCCD::ConfigV1& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
   ndarray<uint16_t, 2> data(const PNCCD::ConfigV2& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
-  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
-  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return 16+(2*((cfg.payloadSizePerLink()-16)/2)); }
+  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return ((((16+(2*((cfg.payloadSizePerLink()-16)/2)))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return ((((16+(2*((cfg.payloadSizePerLink()-16)/2)))+4)-1)/4)*4; }
 private:
   uint32_t	_specialWord;	/**< Special values */
   uint32_t	_frameNumber;	/**< Frame number */
@@ -143,8 +143,8 @@ public:
   return *(const PNCCD::FrameV1*)((const char*)memptr + (i0)*memsize); }
   uint32_t numLinks(const PNCCD::ConfigV1& cfg) const { return cfg.numLinks(); }
   uint32_t numLinks(const PNCCD::ConfigV2& cfg) const { return cfg.numLinks(); }
-  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return 0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())); }
-  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return 0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())); }
+  static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return ((((0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return ((((0+(PNCCD::FrameV1::_sizeof(cfg)*(cfg.numLinks())))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by frame() method. */
   std::vector<int> frame_shape(const PNCCD::ConfigV1& cfg) const;
   /** Method which returns the shape (dimensions) of the data returned by frame() method. */
@@ -175,7 +175,7 @@ public:
   uint32_t timeStampLo() const { return _timeStampLo; }
   /** Full frame data, image size is 1024x1024. */
   ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], 1024, 1024); }
-  static uint32_t _sizeof()  { return 16+(2*(1024)*(1024)); }
+  static uint32_t _sizeof()  { return ((((16+(2*(1024)*(1024)))+4)-1)/4)*4; }
 private:
   uint32_t	_specialWord;	/**< Special values */
   uint32_t	_frameNumber;	/**< Frame number */

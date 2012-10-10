@@ -35,7 +35,7 @@ public:
   };
   ndarray<uint32_t, 1> counting_mode() const { return make_ndarray(&_count_mode[0], NCHANNELS); }
   ndarray<uint32_t, 1> quadrature_mode() const { return make_ndarray(&_quad_mode[0], NCHANNELS); }
-  static uint32_t _sizeof()  { return (0+(4*(NCHANNELS)))+(4*(NCHANNELS)); }
+  static uint32_t _sizeof()  { return (((((0+(4*(NCHANNELS)))+(4*(NCHANNELS)))+4)-1)/4)*4; }
 private:
   uint32_t	_count_mode[NCHANNELS];
   uint32_t	_quad_mode[NCHANNELS];
@@ -58,7 +58,7 @@ public:
   uint32_t timestamp() const { return _timestamp; }
   /** Lower 24 bits of encoder_count as signed integer value. */
   int32_t value(uint32_t i) const;
-  static uint32_t _sizeof()  { return ((((((0+(1*(6)))+1)+1)+4)+(4*(Encoder_Inputs)))+(1*(4)))+(2*(Analog_Inputs)); }
+  static uint32_t _sizeof()  { return ((((((((((0+(1*(6)))+1)+1)+4)+(4*(Encoder_Inputs)))+(1*(4)))+(2*(Analog_Inputs)))+4)-1)/4)*4; }
 private:
   uint8_t	_header[6];
   uint8_t	_din;

@@ -110,7 +110,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -133,7 +133,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+2; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -157,7 +157,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -180,7 +180,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+2; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -204,7 +204,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return ((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1; }
+  static uint32_t _sizeof()  { return ((((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -229,7 +229,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -252,7 +252,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+4; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+4)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -306,7 +306,7 @@ public:
   int16_t lower_alarm_limit() const { return _lower_alarm_limit; }
   int16_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   int16_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2; }
+  static uint32_t _sizeof()  { return ((((((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2)+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -349,7 +349,7 @@ public:
   float lower_alarm_limit() const { return _lower_alarm_limit; }
   float upper_ctrl_limit() const { return _upper_ctrl_limit; }
   float lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4; }
+  static uint32_t _sizeof()  { return ((((((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -386,7 +386,7 @@ public:
   int16_t severity() const { return _severity; }
   int16_t no_str() const { return _no_str; }
   const char* strings(uint32_t i0) const { return _strs[i0]; }
-  static uint32_t _sizeof()  { return 6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE)); }
+  static uint32_t _sizeof()  { return ((((6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE)))+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by strings() method. */
   std::vector<int> strings_shape() const;
 private:
@@ -421,7 +421,7 @@ public:
   uint8_t lower_alarm_limit() const { return _lower_alarm_limit; }
   uint8_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   uint8_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return (((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1; }
+  static uint32_t _sizeof()  { return (((((((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1)+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -464,7 +464,7 @@ public:
   int32_t lower_alarm_limit() const { return _lower_alarm_limit; }
   int32_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   int32_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4; }
+  static uint32_t _sizeof()  { return ((((((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -507,7 +507,7 @@ public:
   double lower_alarm_limit() const { return _lower_alarm_limit; }
   double upper_ctrl_limit() const { return _upper_ctrl_limit; }
   double lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8; }
+  static uint32_t _sizeof()  { return ((((((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8)+8)-1)/8)*8; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -567,7 +567,7 @@ class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
   /** PV name. */
   const char* pvName() const { return _sPvName; }
-  static uint32_t _sizeof()  { return (Epics::EpicsPvHeader::_sizeof())+(1*(iMaxPvNameLength)); }
+  static uint32_t _sizeof()  { return (((((Epics::EpicsPvHeader::_sizeof())+(1*(iMaxPvNameLength)))+1)-1)/1)*1; }
   /** Method which returns the shape (dimensions) of the data returned by pvName() method. */
   std::vector<int> pvName_shape() const;
 private:
@@ -584,7 +584,7 @@ class EpicsPvTimeHeader: public EpicsPvHeader {
 public:
   /** EPICS timestamp value. */
   Epics::epicsTimeStamp stamp() const;
-  static uint32_t _sizeof()  { return Epics::EpicsPvHeader::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Epics::EpicsPvHeader::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class EpicsPvCtrlString
@@ -601,7 +601,7 @@ public:
   const atype* pchar = (const atype*)(((const char*)this)+offset);
   return pchar[i0]; }
   const char* value(uint32_t i) const;
-  uint32_t _sizeof() const { return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_sts_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE)); }
+  uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_sts_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE)))+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape() const;
 private:
@@ -622,7 +622,7 @@ public:
   int16_t* data = (int16_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int16_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_short::_sizeof()))+(2*(this->numElements())); }
+  uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_short::_sizeof()))+(2*(this->numElements())))+2)-1)/2)*2; }
 private:
   Epics::dbr_ctrl_short	_dbr;
   //int16_t	_data[this->numElements()];
@@ -641,7 +641,7 @@ public:
   float* data = (float*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   float value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_float::_sizeof()))+(4*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_float::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_float	_dbr;
@@ -661,7 +661,7 @@ public:
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint16_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_enum::_sizeof()))+(2*(this->numElements())); }
+  uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_enum::_sizeof()))+(2*(this->numElements())))+2)-1)/2)*2; }
 private:
   Epics::dbr_ctrl_enum	_dbr;
   //uint16_t	_data[this->numElements()];
@@ -676,11 +676,11 @@ private:
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_char& dbr() const { return _dbr; }
-  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=91;
+  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=92;
   uint8_t* data = (uint8_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint8_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_char::_sizeof()))+(1*(this->numElements())); }
+  uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_char::_sizeof()))+(1*(this->numElements())))+2)-1)/2)*2; }
 private:
   Epics::dbr_ctrl_char	_dbr;
   //uint8_t	_data[this->numElements()];
@@ -699,7 +699,7 @@ public:
   int32_t* data = (int32_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int32_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_long::_sizeof()))+(4*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_long::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_long	_dbr;
@@ -719,7 +719,7 @@ public:
   double* data = (double*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   double value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_double::_sizeof()))+(8*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_double::_sizeof()))+(8*(this->numElements())))+8)-1)/8)*8; }
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_double	_dbr;
@@ -740,7 +740,7 @@ public:
   const atype* pchar = (const atype*)(((const char*)this)+offset);
   return pchar[i0]; }
   const char* value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE)); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape() const;
 private:
@@ -758,11 +758,11 @@ private:
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_short& dbr() const { return _dbr; }
-  ndarray<int16_t, 1> data() const { ptrdiff_t offset=22;
+  ndarray<int16_t, 1> data() const { ptrdiff_t offset=24;
   int16_t* data = (int16_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int16_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_short::_sizeof()))+(2*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_short::_sizeof()))+(2*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_time_short	_dbr;
@@ -782,7 +782,7 @@ public:
   float* data = (float*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   float value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_float::_sizeof()))+(4*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_float::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_time_float	_dbr;
@@ -798,11 +798,11 @@ private:
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_enum& dbr() const { return _dbr; }
-  ndarray<uint16_t, 1> data() const { ptrdiff_t offset=22;
+  ndarray<uint16_t, 1> data() const { ptrdiff_t offset=24;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint16_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_enum::_sizeof()))+(2*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_enum::_sizeof()))+(2*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_time_enum	_dbr;
@@ -818,11 +818,11 @@ private:
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_char& dbr() const { return _dbr; }
-  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=23;
+  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=24;
   uint8_t* data = (uint8_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint8_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_char::_sizeof()))+(1*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_char::_sizeof()))+(1*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_time_char	_dbr;
@@ -842,7 +842,7 @@ public:
   int32_t* data = (int32_t*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int32_t value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_long::_sizeof()))+(4*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_long::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
 private:
   int16_t	pad0;
   Epics::dbr_time_long	_dbr;
@@ -862,7 +862,7 @@ public:
   double* data = (double*)(((const char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   double value(uint32_t i) const;
-  uint32_t _sizeof() const { return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_double::_sizeof()))+(8*(this->numElements())); }
+  uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_double::_sizeof()))+(8*(this->numElements())))+8)-1)/8)*8; }
 private:
   int16_t	pad0;
   Epics::dbr_time_double	_dbr;
@@ -882,7 +882,7 @@ public:
   int16_t pvId() const { return iPvId; }
   const char* description() const { return sPvDesc; }
   float interval() const { return fInterval; }
-  static uint32_t _sizeof()  { return ((2+(1*(iMaxPvDescLength)))+2)+4; }
+  static uint32_t _sizeof()  { return ((((((2+(1*(iMaxPvDescLength)))+2)+4)+4)-1)/4)*4; }
 private:
   int16_t	iPvId;
   char	sPvDesc[iMaxPvDescLength];
@@ -907,7 +907,7 @@ public:
   const Epics::PvConfigV1* memptr = (const Epics::PvConfigV1*)(((const char*)this)+offset);
   size_t memsize = memptr->_sizeof();
   return *(const Epics::PvConfigV1*)((const char*)memptr + (i0)*memsize); }
-  uint32_t _sizeof() const { return 4+(Epics::PvConfigV1::_sizeof()*(this->_iNumPv)); }
+  uint32_t _sizeof() const { return ((((4+(Epics::PvConfigV1::_sizeof()*(this->_iNumPv)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */
   std::vector<int> pvControls_shape() const;
 private:

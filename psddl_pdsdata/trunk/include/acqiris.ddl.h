@@ -179,7 +179,7 @@ public:
   ndarray<Acqiris::VertV1, 1> vert() const { return make_ndarray(&_vert[0], MaxChan); }
   /** Number of channels calculated from channel bit mask. */
   uint32_t nbrChannels() const;
-  static uint32_t _sizeof()  { return ((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan)); }
+  static uint32_t _sizeof()  { return ((((((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan)))+4)-1)/4)*4; }
 private:
   uint32_t	_nbrConvertersPerChannel;	/**< Number of ADCs per channel. */
   uint32_t	_channelMask;	/**< Bit mask for channels. */
@@ -247,7 +247,7 @@ public:
   ndarray<int16_t, 2> waveforms(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=(64+(16*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint()));
   int16_t* data = (int16_t*)(((const char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments(), cfg.horiz().nbrSamples()); }
-  uint32_t _sizeof(const Acqiris::ConfigV1& cfg) const { return (((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(2*(_extraSize-this->indexFirstPoint())); }
+  uint32_t _sizeof(const Acqiris::ConfigV1& cfg) const { return (((((((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(2*(_extraSize-this->indexFirstPoint())))+4)-1)/4)*4; }
 private:
   uint32_t	_returnedSamplesPerSeg;	/**< Number of samples in one segment. */
   uint32_t	_indexFirstPoint;
@@ -456,7 +456,7 @@ public:
   /** Axiliary configurations, one object per channel. */
   ndarray<Acqiris::TdcAuxIO, 1> auxio() const { return make_ndarray(&_auxIO[0], NAuxIO); }
   const Acqiris::TdcVetoIO& veto() const { return _veto; }
-  static uint32_t _sizeof()  { return ((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof()))+4)-1)/4)*4; }
 private:
   Acqiris::TdcChannel	_channel[NChannels];	/**< Channel configurations, one object per channel. */
   Acqiris::TdcAuxIO	_auxIO[NAuxIO];	/**< Axiliary configurations, one object per channel. */
@@ -518,7 +518,7 @@ public:
   uint32_t nhits() const;
   /** Returns overflow status. */
   uint8_t overflow() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Channel
@@ -535,7 +535,7 @@ public:
   uint8_t overflow() const;
   /** Ticks converted to time, tick resolution is 50 picosecond. */
   double time() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Marker
@@ -556,7 +556,7 @@ public:
   };
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1

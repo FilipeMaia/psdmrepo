@@ -280,7 +280,7 @@ public:
   const Ipimb::DataV1& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV1& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
-  static uint32_t _sizeof()  { return ((0+(Ipimb::DataV1::_sizeof()))+(Ipimb::ConfigV1::_sizeof()))+(Lusi::IpmFexV1::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((((0+(Ipimb::DataV1::_sizeof()))+(Ipimb::ConfigV1::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
 private:
   Ipimb::DataV1	_ipimbData;
   Ipimb::ConfigV1	_ipimbConfig;
@@ -303,7 +303,7 @@ public:
   const Ipimb::DataV2& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV2& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
-  static uint32_t _sizeof()  { return ((0+(Ipimb::DataV2::_sizeof()))+(Ipimb::ConfigV2::_sizeof()))+(Lusi::IpmFexV1::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((((0+(Ipimb::DataV2::_sizeof()))+(Ipimb::ConfigV2::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
 private:
   Ipimb::DataV2	_ipimbData;
   Ipimb::ConfigV2	_ipimbConfig;
@@ -343,7 +343,7 @@ private:
 class BldDataGMDV0 {
 public:
   enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
-  enum { Version = 1 /**< XTC type version number */ };
+  enum { Version = 0 /**< XTC type version number */ };
   /** String describing gas type */
   const char* gasType() const { return _strGasType; }
   /** Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
@@ -364,7 +364,7 @@ public:
   double photonEnergy() const { return _fPhotonEnergy; }
   /** Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
   double photonsPerPulse() const { return _fPhotonsPerPulse; }
-  static uint32_t _sizeof()  { return (((((((((((((((0+(1*(32)))+8)+8)+8)+4)+4)+4)+8)+8)+8)+8)+8)+8)+8)+8)+8; }
+  static uint32_t _sizeof()  { return (((((((((((((((((((0+(1*(32)))+8)+8)+8)+4)+4)+4)+8)+8)+8)+8)+8)+8)+8)+8)+8)+4)-1)/4)*4; }
 private:
   char	_strGasType[32];	/**< String describing gas type */
   double	_fPressure;	/**< Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */

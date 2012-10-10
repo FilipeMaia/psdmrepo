@@ -125,7 +125,7 @@ public:
   ndarray<uint32_t, 1> encoder_count() const { return make_ndarray(&_encoder_count[0], NEncoders); }
   /** Lower 24 bits of encoder_count as signed integer value. */
   int32_t value(uint32_t i) const;
-  static uint32_t _sizeof()  { return 4+(4*(NEncoders)); }
+  static uint32_t _sizeof()  { return ((((4+(4*(NEncoders)))+4)-1)/4)*4; }
 private:
   uint32_t	_33mhz_timestamp;
   uint32_t	_encoder_count[NEncoders];

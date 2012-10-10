@@ -68,7 +68,7 @@ namespace CsPad {
 class CsPadDigitalPotsCfg {
 public:
   ndarray<uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
-  static uint32_t _sizeof()  { return 0+(1*(PotsPerQuad)); }
+  static uint32_t _sizeof()  { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
   uint8_t	_pots[PotsPerQuad];
 };
@@ -115,7 +115,7 @@ class CsPadGainMapCfg {
 public:
   /** Array with the gain map for single ASIC. */
   ndarray<uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
-  static uint32_t _sizeof()  { return 0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)); }
+  static uint32_t _sizeof()  { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
   uint16_t	_gainMap[ColumnsPerASIC][MaxRowsPerASIC];	/**< Array with the gain map for single ASIC. */
 };
@@ -145,7 +145,7 @@ public:
   const CsPad::CsPadDigitalPotsCfg& dp() const { return _digitalPots; }
   /** Gain map. */
   const CsPad::CsPadGainMapCfg& gm() const { return _gainMap; }
-  static uint32_t _sizeof()  { return ((((((((((((((0+(4*(TwoByTwosPerQuad)))+(4*(TwoByTwosPerQuad)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::CsPadReadOnlyCfg::_sizeof()))+(CsPad::CsPadDigitalPotsCfg::_sizeof()))+(CsPad::CsPadGainMapCfg::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((((((((((((((((0+(4*(TwoByTwosPerQuad)))+(4*(TwoByTwosPerQuad)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::CsPadReadOnlyCfg::_sizeof()))+(CsPad::CsPadDigitalPotsCfg::_sizeof()))+(CsPad::CsPadGainMapCfg::_sizeof()))+4)-1)/4)*4; }
 private:
   uint32_t	_shiftSelect[TwoByTwosPerQuad];
   uint32_t	_edgeSelect[TwoByTwosPerQuad];
@@ -192,7 +192,7 @@ public:
   const CsPad::CsPadDigitalPotsCfg& dp() const { return _digitalPots; }
   /** Gain map. */
   const CsPad::CsPadGainMapCfg& gm() const { return _gainMap; }
-  static uint32_t _sizeof()  { return (((((((((((((((((0+(4*(TwoByTwosPerQuad)))+(4*(TwoByTwosPerQuad)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::CsPadReadOnlyCfg::_sizeof()))+(CsPad::CsPadDigitalPotsCfg::_sizeof()))+(CsPad::CsPadGainMapCfg::_sizeof()); }
+  static uint32_t _sizeof()  { return (((((((((((((((((((((0+(4*(TwoByTwosPerQuad)))+(4*(TwoByTwosPerQuad)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::CsPadReadOnlyCfg::_sizeof()))+(CsPad::CsPadDigitalPotsCfg::_sizeof()))+(CsPad::CsPadGainMapCfg::_sizeof()))+4)-1)/4)*4; }
 private:
   uint32_t	_shiftSelect[TwoByTwosPerQuad];
   uint32_t	_edgeSelect[TwoByTwosPerQuad];
@@ -239,7 +239,7 @@ public:
   uint32_t numAsicsRead() const;
   uint32_t numQuads() const;
   uint32_t numSect() const;
-  static uint32_t _sizeof()  { return 44+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)); }
+  static uint32_t _sizeof()  { return ((((44+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 private:
@@ -288,7 +288,7 @@ public:
   uint32_t numQuads() const;
   /** Total number of sections (2x1) in all quadrants */
   uint32_t numSect() const;
-  static uint32_t _sizeof()  { return 48+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)); }
+  static uint32_t _sizeof()  { return ((((48+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 private:
@@ -340,7 +340,7 @@ public:
   uint32_t numQuads() const;
   /** Total number of sections (2x1) in all quadrants */
   uint32_t numSect() const;
-  static uint32_t _sizeof()  { return (((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)); }
+  static uint32_t _sizeof()  { return (((((((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
   std::vector<int> protectionThresholds_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
@@ -396,7 +396,7 @@ public:
   uint32_t numQuads() const;
   /** Total number of sections (2x1) in all quadrants */
   uint32_t numSect() const;
-  static uint32_t _sizeof()  { return (((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV2QuadReg::_sizeof()*(MaxQuadsPerSensor)); }
+  static uint32_t _sizeof()  { return (((((((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV2QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
   std::vector<int> protectionThresholds_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
@@ -474,10 +474,10 @@ public:
   /** Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
   float common_mode(uint32_t section) const;
-  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
-  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
-  static uint32_t _sizeof(const CsPad::ConfigV3& cfg)  { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
-  static uint32_t _sizeof(const CsPad::ConfigV4& cfg)  { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
+  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV3& cfg)  { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV4& cfg)  { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
 private:
   uint32_t	_word0;
   uint32_t	_word1;
@@ -528,10 +528,10 @@ public:
   const CsPad::ElementV1* memptr = (const CsPad::ElementV1*)(((const char*)this)+offset);
   size_t memsize = memptr->_sizeof(cfg);
   return *(const CsPad::ElementV1*)((const char*)memptr + (i0)*memsize); }
-  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  { return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())); }
-  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  { return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())); }
-  static uint32_t _sizeof(const CsPad::ConfigV3& cfg)  { return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())); }
-  static uint32_t _sizeof(const CsPad::ConfigV4& cfg)  { return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())); }
+  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  { return ((((0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  { return ((((0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV3& cfg)  { return ((((0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const CsPad::ConfigV4& cfg)  { return ((((0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads())))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape(const CsPad::ConfigV1& cfg) const;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
@@ -591,9 +591,9 @@ public:
   /** Common mode value for a given section, section number can be 0 to config.numSect().
                 Will return 0 for data read from XTC, may be non-zero after calibration. */
   float common_mode(uint32_t section) const;
-  uint32_t _sizeof(const CsPad::ConfigV2& cfg) const { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
-  uint32_t _sizeof(const CsPad::ConfigV3& cfg) const { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
-  uint32_t _sizeof(const CsPad::ConfigV4& cfg) const { return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)); }
+  uint32_t _sizeof(const CsPad::ConfigV2& cfg) const { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
+  uint32_t _sizeof(const CsPad::ConfigV3& cfg) const { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
+  uint32_t _sizeof(const CsPad::ConfigV4& cfg) const { return (((((((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2)))+4)-1)/4)*4; }
 private:
   uint32_t	_word0;
   uint32_t	_word1;
