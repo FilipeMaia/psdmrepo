@@ -472,7 +472,7 @@ public:
   uint32_t nhits() const;
   /** Returns overflow status. */
   uint8_t overflow() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Channel
@@ -489,7 +489,7 @@ public:
   uint8_t overflow() const;
   /** Ticks converted to time, tick resolution is 50 picosecond. */
   double time() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Marker
@@ -510,7 +510,7 @@ public:
   };
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
-  static uint32_t _sizeof()  { return Acqiris::TdcDataV1_Item::_sizeof(); }
+  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1

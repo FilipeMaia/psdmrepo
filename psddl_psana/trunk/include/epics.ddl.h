@@ -109,7 +109,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -132,7 +132,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+2; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -156,7 +156,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -179,7 +179,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+2; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -203,7 +203,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return ((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1; }
+  static uint32_t _sizeof()  { return ((((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -228,7 +228,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return 4+(Epics::epicsTimeStamp::_sizeof()); }
+  static uint32_t _sizeof()  { return ((((4+(Epics::epicsTimeStamp::_sizeof()))+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -251,7 +251,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof()  { return (4+(Epics::epicsTimeStamp::_sizeof()))+4; }
+  static uint32_t _sizeof()  { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+4)+4)-1)/4)*4; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -305,7 +305,7 @@ public:
   int16_t lower_alarm_limit() const { return _lower_alarm_limit; }
   int16_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   int16_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2; }
+  static uint32_t _sizeof()  { return ((((((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2)+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -348,7 +348,7 @@ public:
   float lower_alarm_limit() const { return _lower_alarm_limit; }
   float upper_ctrl_limit() const { return _upper_ctrl_limit; }
   float lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4; }
+  static uint32_t _sizeof()  { return ((((((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -385,7 +385,7 @@ public:
   int16_t severity() const { return _severity; }
   int16_t no_str() const { return _no_str; }
   const char* strings(uint32_t i0) const { return _strs[i0]; }
-  static uint32_t _sizeof()  { return 6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE)); }
+  static uint32_t _sizeof()  { return ((((6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE)))+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by strings() method. */
   std::vector<int> strings_shape() const;
 private:
@@ -420,7 +420,7 @@ public:
   uint8_t lower_alarm_limit() const { return _lower_alarm_limit; }
   uint8_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   uint8_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return (((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1; }
+  static uint32_t _sizeof()  { return (((((((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1)+2)-1)/2)*2; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -463,7 +463,7 @@ public:
   int32_t lower_alarm_limit() const { return _lower_alarm_limit; }
   int32_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   int32_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4; }
+  static uint32_t _sizeof()  { return ((((((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -506,7 +506,7 @@ public:
   double lower_alarm_limit() const { return _lower_alarm_limit; }
   double upper_ctrl_limit() const { return _upper_ctrl_limit; }
   double lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof()  { return ((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8; }
+  static uint32_t _sizeof()  { return ((((((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8)+8)-1)/8)*8; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:

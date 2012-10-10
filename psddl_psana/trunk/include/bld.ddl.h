@@ -324,7 +324,7 @@ public:
 class BldDataGMDV0 {
 public:
   enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
-  enum { Version = 1 /**< XTC type version number */ };
+  enum { Version = 0 /**< XTC type version number */ };
   virtual ~BldDataGMDV0();
   /** String describing gas type */
   virtual const char* gasType() const = 0;

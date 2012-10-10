@@ -197,7 +197,7 @@ public:
   uint32_t maskSet() const { return _u32MaskSet; }
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
-  static uint32_t _sizeof()  { return 24+(1*(DescSize)); }
+  static uint32_t _sizeof()  { return ((((24+(1*(DescSize)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
 private:
@@ -242,7 +242,7 @@ public:
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
   uint16_t readoutGroup() const { return _u16ReadGroup; }
-  static uint32_t _sizeof()  { return (24+(1*(DescSize)))+2; }
+  static uint32_t _sizeof()  { return (((((24+(1*(DescSize)))+2)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
 private:
@@ -600,7 +600,7 @@ public:
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
   ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
-  static uint32_t _sizeof()  { return ((0+(1*(NameLength)))+4)+(8*(MaxInfos)); }
+  static uint32_t _sizeof()  { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
   std::vector<int> name_shape() const;
 private:
