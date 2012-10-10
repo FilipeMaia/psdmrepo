@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-78
+2012-10-10 Andy Salnikov
+- in control.ConfigV1.__str__ method print control and monitor values
+
 Tag: V00-00-77
 2012-10-08 Andy Salnikov
 - upgrading to pdsdata V04-02-01

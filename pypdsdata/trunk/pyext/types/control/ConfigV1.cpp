@@ -141,7 +141,8 @@ _repr( PyObject *self )
     str << comma << "controls=["; 
     for (unsigned i = 0; i != pdsObj->npvControls(); ++ i ) {
       if (i != 0) str << ", ";
-      str << pdsObj->pvControl(i).name();
+      const Pds::ControlData::PVControl& control = pdsObj->pvControl(i);
+      str << control.name() << "=" << control.value();
     }
     str << "]";
     comma = ", ";
@@ -150,7 +151,8 @@ _repr( PyObject *self )
     str << comma << "monitors=["; 
     for (unsigned i = 0; i != pdsObj->npvMonitors(); ++ i ) {
       if (i != 0) str << ", ";
-      str << pdsObj->pvMonitor(i).name();
+      const Pds::ControlData::PVMonitor& mon = pdsObj->pvMonitor(i);
+      str << mon.name() << "=" << mon.loValue() << ":" << mon.hiValue();
     }
     str << "]";
     comma = ", ";
