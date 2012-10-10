@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-08
+2012-10-10 Andy Salnikov
+- adding fix for padding after last attribute
+
 Tag: V00-02-07
 2012-09-24 Andy Salnikov
 - DdlPythonInterfaces: rearrange includes to get rid of the warnings

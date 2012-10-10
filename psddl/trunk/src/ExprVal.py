@@ -119,8 +119,18 @@ class ExprVal ( object ) :
         expr += other
         return expr
 
+    def __sub__(self, other):
+        expr = ExprVal(self)
+        expr -= other
+        return expr
+
     def __iadd__(self, other):
         self.value = self._genop(other, operator.add, '+')
+        self.const = self.const and other.const
+        return self
+
+    def __isub__(self, other):
+        self.value = self._genop(other, operator.sub, '-')
         self.const = self.const and other.const
         return self
 
@@ -129,8 +139,18 @@ class ExprVal ( object ) :
         expr *= other
         return expr
 
+    def __div__(self, other):
+        expr = ExprVal(self)
+        expr /= other
+        return expr
+
     def __imul__(self, other):
         self.value = self._genop(other, operator.mul, '*')
+        self.const = self.const and other.const
+        return self
+
+    def __idiv__(self, other):
+        self.value = self._genop(other, operator.div, '/')
         self.const = self.const and other.const
         return self
 

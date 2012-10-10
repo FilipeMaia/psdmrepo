@@ -208,9 +208,14 @@ class Type ( Namespace ) :
             offset = offset+attr.sizeBytes()
 
         if self.pack: maxalign = min(maxalign, self.pack)
-        logging.debug("_calcOffsets: type=%s size=%s align=%s", repr(self), offset, maxalign)
+        logging.debug("_calcOffsets: type=%r offset=%s align=%s", self, offset, maxalign)
         self.align = maxalign
         
+        # adjust for a padding after last element
+        align = ExprVal(self.align)
+        if self.align: offset = ( (offset + align - ExprVal(1)) / align ) * align
+        
+        logging.debug('_calcOffsets: type=%r size = %s', self, self.size)
         if self.size:
             # size was already pre-defined
             if type(self.size) is types.IntType and type(offset.value) is types.IntType:
@@ -225,6 +230,7 @@ class Type ( Namespace ) :
             
             # set it to calculate value
             self.size = offset
+            logging.debug('_calcOffsets: type=%r computed size = %s', self, self.size)
 
         if 'no-sizeof' not in self.tags:
             self._genSizeof()
@@ -272,6 +278,11 @@ class Type ( Namespace ) :
                         size += '*(%s)' % dim
                     size = ExprVal(size, self)
                 expr += size
+
+            # adjust for a padding after last element
+            align = ExprVal(self.align)
+            if self.align: expr = ( (expr + align - ExprVal(1)) / align ) * align
+
             expr = str(expr)
             logging.debug("_genSizeof: expr=%s", expr)
 
