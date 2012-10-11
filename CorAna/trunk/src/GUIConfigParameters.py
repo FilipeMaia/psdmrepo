@@ -125,18 +125,19 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def processRead(self):
         print 'Read'
-        cp.confpars.readParametersFromFile( self.confParsFileName() )
-        #self.parent.fnameEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
+        cp.confpars.readParametersFromFile( self.getFileNameFromEditField() )
+        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
+        #self.parent.fnameEdit.setText( cp.confpars.fname_cp.value() )
         #self.refreshGUIWhatToDisplay()
 
     def processWrite(self):
         print 'Write'
-        cp.confpars.saveParametersInFile( self.confParsFileName() )
+        cp.confpars.saveParametersInFile( self.getFileNameFromEditField() )
 
     def processDefault(self):
         print 'Set default values of configuration parameters.'
         cp.confpars.setDefaultValues()
-        #self.parent.fnameEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
+        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
         #self.refreshGUIWhatToDisplay()
 
     def processPrint(self):
@@ -145,7 +146,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def processBrowse(self):
         print 'Browse'
-        self.path = self.confParsFileName()
+        self.path = self.getFileNameFromEditField()
         self.dname,self.fname = os.path.split(self.path)
         print 'dname : %s' % (self.dname)
         print 'fname : %s' % (self.fname)
@@ -160,13 +161,13 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def processFileEdit(self):
         print 'FileEdit'
-        self.path = self.confParsFileName()
+        self.path = self.getFileNameFromEditField()
         cp.confpars.fname_cp.setValue(self.path)
         dname,fname = os.path.split(self.path)
         print 'Set dname : %s' % (dname)
         print 'Set fname : %s' % (fname)
 
-    def confParsFileName(self):
+    def getFileNameFromEditField(self):
         return str( self.fnameEdit.displayText() )
 
 #-----------------------------
