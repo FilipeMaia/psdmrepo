@@ -150,10 +150,10 @@ class ConfigController(BaseController):
 
         if renderer == 'xml':
             response.content_type = 'application/xml'
-            res = ['<?xml version="1.0" encoding="UTF-8"?>', '<config-sections>']
-            res += ['  <config-section id="%(id)s" name="%(name)s" url="%(url)s"/>' % sec for sec in sections]
-            res += ['</config-sections>']
-            return '\n'.join(res)
+            res = ['<?xml version="1.0" encoding="UTF-8"?>\n', '<config-sections>\n']
+            res += ['  <config-section id="%(id)s" name="%(name)s" url="%(url)s"/>\n' % sec for sec in sections]
+            res += ['</config-sections>\n']
+            return res
         else:
             response.content_type = 'application/json'
             return simplejson.dumps(sections)
@@ -181,7 +181,7 @@ class ConfigController(BaseController):
             del parm['section']
             parm['section_id'] = section_id
             parm['id'] = parm.get('param')
-            parm['url'] = h.url_for("param_url", section_id=section_id, param_id=parm['id'], renderer=renderer, qualified=True)
+            parm['url'] = h.url_for("param_url", section_id=section_id, param_id=parm['id'], renderer='json', qualified=True)
         params.sort(key=lambda o: o.get('param'))
 
         # render
@@ -372,19 +372,19 @@ class ConfigController(BaseController):
 
         if renderer == 'xml':
             response.content_type = 'application/xml'
-            res = ['<?xml version="1.0" encoding="UTF-8"?>', _xsl(), '<config-sections>']
+            res = ['<?xml version="1.0" encoding="UTF-8"?>\n', _xsl(), '<config-sections>\n']
             for sec in sorted(sections.keys()):
-                res.append('<config-section id="%s" name="%s">' % (_sectId(sec), sec))
+                res.append('<config-section id="%s" name="%s">\n' % (_sectId(sec), sec))
                 sections[sec].sort(key=lambda o: o.get('param'))
                 for opt in sections[sec]:
                     optstr = ["<config-param"]
                     for k, v in opt.items():
                         optstr.append('%s="%s"' % (quote(k), v or ""))
-                    optstr = ' '.join(optstr) +'/>'
+                    optstr = ' '.join(optstr) +'/>\n'
                     res.append(optstr)
-                res.append('</config-section>')
-            res += ['</config-sections>']
-            return '\n'.join(res)
+                res.append('</config-section>\n')
+            res += ['</config-sections>\n']
+            return res
         else:
             response.content_type = 'application/json'
             return simplejson.dumps(sections)

@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-23
+2012-10-11 Andy Salnikov
+- improvement on the web page to show status of the controller
+
 Tag: V01-00-22
 2012-08-07 Andy Salnikov
 - web stuff: add config file for test database

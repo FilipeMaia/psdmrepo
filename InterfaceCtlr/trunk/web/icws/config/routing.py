@@ -27,11 +27,15 @@ def make_map():
 
     # GET /system
     # returns IC system status
-    map.connect('/system', controller='system', action='status', conditions=cond_get )
+    map.connect('/system.{renderer}', controller='system', action='status', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/system', controller='system', action='status', renderer="json", conditions=cond_get )
 
     # GET /system/{id}
     # returns IC system status
-    map.connect('/system/{id}', controller='system', action='status', conditions=cond_get )
+    map.connect('/system/{id}.{renderer}', controller='system', action='status', conditions=cond_get,
+                requirements={'renderer' : 'json|xml'})
+    map.connect('/system/{id}', controller='system', action='status', renderer="json", conditions=cond_get )
 
     # DELETE /system/{id}
     # returns IC system status

@@ -19,7 +19,7 @@
                         alert("Error deleting parameter: " + client.responseText);
                     }
                 }
-               }
+	    }
 
             function updateParam(form, url, instrument, experiment)
             {
@@ -36,7 +36,7 @@
                 } else {
                     alert("Error updating parameter: " + client.responseText);
                 }
-               }
+            }
 
             function createParam(form)
             {
@@ -59,7 +59,25 @@
                 } else {
                     alert("Error creating parameter: " + client.responseText);
                 }
-               }
+            }
+            
+            function stopController(cid, url)
+            {
+                if (confirm("Do you want to stop controller " + cid + "?")) {
+                
+                    var client = new XMLHttpRequest();
+                    client.open("DELETE", url, false);
+                    client.send();
+                
+                    if (client.status == 200) {
+                        window.location.reload();
+                        alert("Controller may need few seconds to stop, please reload \npage later if it does not stop immediately.");
+                    } else {
+                        alert("Error stopping controller: " + client.responseText);
+                    }
+                }
+      }
+            
         </xsl:text>
     </script>
   </xsl:template>
@@ -125,6 +143,47 @@
     </style>
   </xsl:template>
 
+
+  <xsl:template match="controllers">
+        <h1>Controller status</h1>
+        <br />
+        <table rules="all" frame="border" class="params">
+          <thead>
+            <tr>
+              <th></th>
+              <th>ID</th>
+              <th>Host</th>
+              <th>Status</th>
+              <th>Instruments</th>
+              <th>Started</th>
+              <th>Log file</th>
+            </tr>
+          </thead>
+          <tbody class="params">
+            <xsl:for-each select="controller">
+              <tr>
+                <th>
+                  <form>
+                    <input type="button" value="Stop">
+                      <xsl:attribute name="onclick">
+                        stopController("<xsl:value-of select="@id" />", "<xsl:value-of select="@stop_url" />")
+                      </xsl:attribute>
+                    </input>
+                  </form>
+                </th>
+                <th><xsl:value-of select="@id" /> <br/></th>
+                <td><xsl:value-of select="@host" /></td>
+                <td><xsl:value-of select="@status" /></td>
+                <td><xsl:value-of select="@instruments" /></td>
+                <td><xsl:value-of select="@started" /></td>
+                <td><a><xsl:attribute name="href"><xsl:value-of select="@log_url" /></xsl:attribute><xsl:value-of select="@log" /></a></td>
+              </tr>
+            </xsl:for-each>
+          </tbody>
+        </table>
+  </xsl:template>
+
+
   <!-- config-sections -->
 
   <xsl:template match="config-sections">
@@ -135,6 +194,16 @@
         <xsl:call-template name="style"></xsl:call-template>
       </head>
       <body>
+
+
+        <!--  get the status of the system and insert it before configuration -->      
+        <xsl:apply-templates select="document('../system.xml')"/>
+
+        <br />
+        <hr />
+        <br />
+
+      
         <h1>Controller configuration</h1>
         <br />
         <table rules="all" frame="border" class="params">
