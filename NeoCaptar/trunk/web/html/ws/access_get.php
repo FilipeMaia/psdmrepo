@@ -3,40 +3,14 @@
 /**
  * This service will return an access control lists.
  */
-require_once( 'authdb/authdb.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
-require_once( 'neocaptar/neocaptar.inc.php' );
 
-use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
+require_once 'dataportal/dataportal.inc.php' ;
+require_once 'neocaptar/neocaptar.inc.php' ;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
+\DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
+    $SVC->finish (array (
+        'access' => \NeoCaptar\NeoCaptarUtils::access2array ($SVC->neocaptar()->users())
+    ));
+}) ;
 
-use NeoCaptar\NeoCaptar;
-use NeoCaptar\NeoCaptarUtils;
-use NeoCaptar\NeoCaptarException;
-
-header( 'Content-type: application/json' );
-header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
-try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
-
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
-
-    $access2array = NeoCaptarUtils::access2array($neocaptar->users());
-
-	$authdb->commit();
-	$neocaptar->commit();
-
-    NeoCaptarUtils::report_success( array( 'access' => $access2array ));
-
-} catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( NeoCaptarException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  
 ?>

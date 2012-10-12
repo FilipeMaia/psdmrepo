@@ -4,46 +4,22 @@
  * Search and return all known history events for the specified (by its identifier)
  * cable.
  */
-require_once( 'authdb/authdb.inc.php' );
-require_once( 'neocaptar/neocaptar.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
 
-use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
+require_once 'dataportal/dataportal.inc.php' ;
+require_once 'neocaptar/neocaptar.inc.php' ;
 
-use NeoCaptar\NeoCaptar;
-use NeoCaptar\NeoCaptarUtils;
-use NeoCaptar\NeoCaptarException;
+\DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
-use LusiTime\LusiTimeException;
+    $id = $SVC->required_int ('id') ;
 
-header( 'Content-type: application/json' );
-header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
-header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
+    $cable = $SVC->neocaptar()->find_cable_by_id ($id) ;
+    if (is_null($cable)) $SVC->abort ("cable not found for id: {$id}") ;
 
-try {
-    $id = NeoCaptarUtils::get_param_GET('id');
+    $events2return = array () ;
+    foreach ($cable->history() as $e)
+        array_push ($events2return, \NeoCaptar\NeoCaptarUtils::event2array ($e)) ;
 
-    $authdb = AuthDB::instance();
-	$authdb->begin();
+    $SVC->finish (array ('event' => $events2return )) ;
+}) ;
 
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
-
-	$cable = $neocaptar->find_cable_by_id( $id );
-	if( is_null( $cable )) NeoCaptarUtils::report_error("cable not found for id: {$id}");
-
-    $events2return = array();
-	foreach( $cable->history() as $e )
-        array_push( $events2return, NeoCaptarUtils::event2array($e));
-
-	$neocaptar->commit();
-	$authdb->commit();
-
-    NeoCaptarUtils::report_success( array( 'event' => $events2return ));
-
-} catch( AuthDBException     $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( NeoCaptarException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  
 ?>

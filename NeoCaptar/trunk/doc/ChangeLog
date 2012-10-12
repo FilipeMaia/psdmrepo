@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-10-12 Igor Gaponenko
+- Migrated the following Web services to use the new PHP framework:
+project_security.php, dict_pinlist_get.php, project_search.php, access_get.php, cable_history.php
+
+
 Tag: V00-02-00
 2012-10-08 Igor Gaponenko
 - major code re-organization to separate Web services, JavaScript code and CSS

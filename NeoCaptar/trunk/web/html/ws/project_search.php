@@ -13,88 +13,60 @@
  * 
  * 3. in all other curcumstances a list of all known projects will be returned.
  */
-require_once( 'authdb/authdb.inc.php' );
-require_once( 'neocaptar/neocaptar.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
 
-use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
+require_once 'dataportal/dataportal.inc.php' ;
+require_once 'neocaptar/neocaptar.inc.php' ;
 
-use NeoCaptar\NeoCaptar;
-use NeoCaptar\NeoCaptarUtils;
-use NeoCaptar\NeoCaptarException;
+use \NeoCaptar\NeoCaptarUtils ;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
+\DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
-header( 'Content-type: application/json' );
-header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
-try {
     // All parameters of the search request are optional, and if they're empty
     // then they will be ignored as if they were never specified.
     //
-    $required    = false;
-    $allow_empty = true;
+    $id      = $SVC->optional_int  ('id',      null) ;
+    $title   = $SVC->optional_str  ('title' ,  null) ;
+    $owner   = $SVC->optional_str  ('owner',   null) ;
+    $coowner = $SVC->optional_str  ('coowner', null) ;
+    $job     = $SVC->optional_str  ('job',     null) ;
+    $prefix  = $SVC->optional_str  ('prefix',  null) ;
+    $begin   = $SVC->optional_time ('begin',   null) ;
+    $end     = $SVC->optional_time ('end',     null) ;
 
-    $id = NeoCaptarUtils::get_param_GET('id',$required,$allow_empty);
+    if (!is_null($begin) && !is_null ($end) && $begin->greaterOrEqual ($end))
+        $SVC->abort ('invalid project creation interval: begin time must be strictly less than the end one');
 
-    $title = NeoCaptarUtils::get_param_GET('title',$required,$allow_empty);
-    if( $title == '' ) $title = null;
+    $projects = array () ;
+    if (!is_null($id)) {
 
-    $owner = NeoCaptarUtils::get_param_GET('owner',$required,$allow_empty);
-    if( $owner == '' ) $owner = null;
+        $project = $SVC->neocaptar()->find_project_by_id ($id) ;
+        if (is_null($project)) $SVC->abort ('no project found for id: '.$id) ;
 
-    $coowner = NeoCaptarUtils::get_param_GET('coowner',$required,$allow_empty);
-    if( $coowner == '' ) $coowner = null;
+        array_push ($projects, NeoCaptarUtils::project2array ($project)) ;
 
-    $job = NeoCaptarUtils::get_param_GET('job',$required,$allow_empty);
-    if( $job == '' ) $job = null;
+    } else if (!is_null($job)) {
 
-    $prefix = NeoCaptarUtils::get_param_GET('prefix',$required,$allow_empty);
-    if( $prefix == '' ) $prefix = null;
+        $project = $SVC->neocaptar()->find_project_by_jobnumber ($job) ;
+        if (is_null($project)) $SVC->abort ('no project found for job number: '.$job) ;
 
-    $source_has_hours = false;
-    $begin = NeoCaptarUtils::get_param_GET_time('begin',$required,$allow_empty,$source_has_hours);
-    $end   = NeoCaptarUtils::get_param_GET_time('end',  $required,$allow_empty,$source_has_hours);
+        array_push ($projects, NeoCaptarUtils::project2array ($project)) ;
 
-    if(!is_null($begin) && !is_null($end) && $begin->greaterOrEqual($end))
-        NeoCaptarUtils::report_error('invalid project creation interval: begin time must be strictly less than the end one');
+    } else if (!is_null($prefix)) {
 
-    $authdb = AuthDB::instance();
-	$authdb->begin();
+        foreach ($SVC->neocaptar()->find_projects_by_jobnumber_prefix ($prefix) as $p)
+            array_push ($projects, NeoCaptarUtils::project2array ($p)) ;
 
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
+    } else if (!is_null($coowner)) {
 
-	$project2array = array();
-    if( !is_null($id)) {
-        $project = $neocaptar->find_project_by_id($id);
-        if(is_null($project)) NeoCaptarUtils::report_error('no project found for id: '.$id);
-        array_push($project2array, NeoCaptarUtils::project2array($project));
-    } else if(!is_null($job)) {
-        $project = $neocaptar->find_project_by_jobnumber($job);
-        if(is_null($project)) NeoCaptarUtils::report_error('no project found for job number: '.$job);
-        array_push($project2array, NeoCaptarUtils::project2array($project));
-    } else if(!is_null($prefix)) {
-        foreach( $neocaptar->find_projects_by_jobnumber_prefix($prefix) as $p )
-            array_push($project2array, NeoCaptarUtils::project2array($p));
-    } else if(!is_null($coowner)) {
-        foreach( $neocaptar->projects_by_coowner($coowner) as $p )
-            array_push($project2array, NeoCaptarUtils::project2array($p));
+        foreach ($SVC->neocaptar()->projects_by_coowner ($coowner) as $p)
+            array_push ($projects, NeoCaptarUtils::project2array ($p)) ;
+
     } else {
-        foreach( $neocaptar->projects($title,$owner,$begin,$end) as $p )
-            array_push($project2array, NeoCaptarUtils::project2array($p));
+
+        foreach ($SVC->neocaptar()->projects ($title, $owner, $begin, $end) as $p)
+            array_push($projects, NeoCaptarUtils::project2array ($p)) ;
     }
 
-	$neocaptar->commit();
-	$authdb->commit();
-
-    NeoCaptarUtils::report_success(array('project' => $project2array));
-
-} catch( AuthDBException    $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( LusiTimeException  $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-  catch( NeoCaptarException $e ) { NeoCaptarUtils::report_error( $e->toHtml()); }
-
+    $SVC->finish (array ('project' => $projects)) ;
+}) ;
 ?>
