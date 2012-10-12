@@ -26,13 +26,13 @@ $experiment = trim( $_GET['exp'] );
  * --------------------------------
  */
 if( isset( $_GET['begin_run'] )) {
-	$begin_run = 0;
-	if( 1 != sscanf( trim( $_GET['begin_run'] ), "%u", $begin_run )) die( "begin run must be a number" );
+    $begin_run = 0;
+    if( 1 != sscanf( trim( $_GET['begin_run'] ), "%u", $begin_run )) die( "begin run must be a number" );
 }
 if( isset( $_GET['end_run'] )) {
-	$end_run = 0;
-	if( 1 != sscanf( trim( $_GET['end_run'] ), "%u", $end_run )) die( "end run must be a number" );
-	if( isset( $begin_run ) && ( $end_run < $begin_run )) die( "end run must be equal or greater than the begin run" );
+    $end_run = 0;
+    if( 1 != sscanf( trim( $_GET['end_run'] ), "%u", $end_run )) die( "end run must be a number" );
+    if( isset( $begin_run ) && ( $end_run < $begin_run )) die( "end run must be equal or greater than the begin run" );
 }
 
 if( isset( $_GET['status'] )) {
@@ -41,33 +41,33 @@ if( isset( $_GET['status'] )) {
 }
 
 function parse_time( $parname ) {
-	$result = LusiTime::parse( trim( $_GET[$parname] ));
-	if( is_null( $result )) die( "invalid format of the {$parname} parameter" );
-	return $result;
+    $result = LusiTime::parse( trim( $_GET[$parname] ));
+    if( is_null( $result )) die( "invalid format of the {$parname} parameter" );
+    return $result;
 }
 
 if( isset( $_GET['begin_created'] )) {
-	$begin_created = parse_time( 'begin_created' );
+    $begin_created = parse_time( 'begin_created' );
 }
 if( isset( $_GET['end_created'] )) {
-	$end_created = parse_time( 'end_created' );
-	if( isset( $begin_created ) && $end_created->less( $begin_created ) ) die( "end_created must be equal or greater than the begin_created" );
+    $end_created = parse_time( 'end_created' );
+    if( isset( $begin_created ) && $end_created->less( $begin_created ) ) die( "end_created must be equal or greater than the begin_created" );
 }
 
 if( isset( $_GET['begin_started'] )) {
-	$begin_started = parse_time( 'begin_started' );
+    $begin_started = parse_time( 'begin_started' );
 }
 if( isset( $_GET['end_started'] )) {
-	$end_started = parse_time( 'end_started' );
-	if( isset( $begin_started ) && $end_started->less( $begin_started ) ) die( "end_started must be equal or greater than the begin_started" );
+    $end_started = parse_time( 'end_started' );
+    if( isset( $begin_started ) && $end_started->less( $begin_started ) ) die( "end_started must be equal or greater than the begin_started" );
 }
 
 if( isset( $_GET['begin_stopped'] )) {
-	$begin_stopped = parse_time( 'begin_stopped' );
+    $begin_stopped = parse_time( 'begin_stopped' );
 }
 if( isset( $_GET['end_stopped'] )) {
-	$end_stopped = parse_time( 'end_stopped' );
-	if( isset( $begin_stopped ) && $end_stopped->less( $begin_stopped ) ) die( "end_stopped must be equal or greater than the begin_stopped" );
+    $end_stopped = parse_time( 'end_stopped' );
+    if( isset( $begin_stopped ) && $end_stopped->less( $begin_stopped ) ) die( "end_stopped must be equal or greater than the begin_stopped" );
 }
 
 /*
@@ -76,7 +76,7 @@ if( isset( $_GET['end_stopped'] )) {
  * the default value of the 'width' parameter of the function.
  */
 function bold( $str ) {
-	return '<b>'.$str.'</b>';
+    return '<b>'.$str.'</b>';
 }
 
 function pre( $str, $width=null ) {
@@ -89,12 +89,12 @@ function pre( $str, $width=null ) {
  * -----------------------------------------
  */
 function color_for( $status ) {
-	if( $status == 'Translation_Error' ) return '#ff0000';  // pure red
-	if( $status == 'H5Dir_Error'       ) return '#ff0000';  // pure red
-	if( $status == 'Archive_Error'     ) return '#ff0000';  // pure red
-	if( $status == 'Being_Translated'  ) return '#336600';  // deep green
-	if( $status == 'Complete'          ) return '#a0a0a0';  // deep grey
-	return null;
+    if( $status == 'Translation_Error' ) return '#ff0000';  // pure red
+    if( $status == 'H5Dir_Error'       ) return '#ff0000';  // pure red
+    if( $status == 'Archive_Error'     ) return '#ff0000';  // pure red
+    if( $status == 'Being_Translated'  ) return '#336600';  // deep green
+    if( $status == 'Complete'          ) return '#a0a0a0';  // deep grey
+    return null;
 }
 
 /* ------------------------------------------------------------------------
@@ -104,43 +104,43 @@ function color_for( $status ) {
  */
 function apply_filter( $in ) {
 
-	global $begin_run,     $end_run,
-	       $begin_created, $end_created,
+    global $begin_run,     $end_run,
+           $begin_created, $end_created,
            $begin_started, $end_started,
            $begin_stopped, $end_stopped,
            $status;
 
-	$filter_is_on =
-	    isset( $begin_run     ) || isset( $end_run     ) ||
+    $filter_is_on =
+        isset( $begin_run     ) || isset( $end_run     ) ||
         isset( $begin_created ) || isset( $end_created ) ||
         isset( $begin_started ) || isset( $end_started ) ||
         isset( $begin_stopped ) || isset( $end_stopped ) ||
         isset( $status );
 
-	if( !$filter_is_on ) return $in;
+    if( !$filter_is_on ) return $in;
 
-	$out = array();
-	foreach( $in as $i ) {
-		if( isset( $begin_run ) && ( (int)($i->run) <  $begin_run  )) continue;
-		if( isset( $end_run   ) && ( (int)($i->run) >  $end_run  )) continue;
+    $out = array();
+    foreach( $in as $i ) {
+        if( isset( $begin_run ) && ( (int)($i->run) <  $begin_run  )) continue;
+        if( isset( $end_run   ) && ( (int)($i->run) >  $end_run  )) continue;
 
-		if( isset( $status ) && ( $i->status != $status )) continue;
+        if( isset( $status ) && ( $i->status != $status )) continue;
 
-		if( isset( $i->created )) {
-			if( isset( $begin_created ) && LusiTime::parse( $i->created )->less          ( $begin_created )) continue;
-			if( isset( $end_created   ) && LusiTime::parse( $i->created )->greaterOrEqual( $end_created   )) continue;
-		}
-		if( isset( $i->started )) {
-			if( isset( $begin_started ) && LusiTime::parse( $i->started )->less          ( $begin_started )) continue;
-			if( isset( $end_started   ) && LusiTime::parse( $i->started )->greaterOrEqual( $end_started   )) continue;
-		}
-		if( isset( $i->stopped )) {
-			if( isset( $begin_stopped ) && LusiTime::parse( $i->stopped )->less          ( $begin_stopped )) continue;
-			if( isset( $end_stopped   ) && LusiTime::parse( $i->stopped )->greaterOrEqual( $end_stopped   )) continue;
-		}
-		array_push( $out, $i );
-	}
-	return $out;
+        if( isset( $i->created )) {
+            if( isset( $begin_created ) && LusiTime::parse( $i->created )->less          ( $begin_created )) continue;
+            if( isset( $end_created   ) && LusiTime::parse( $i->created )->greaterOrEqual( $end_created   )) continue;
+        }
+        if( isset( $i->started )) {
+            if( isset( $begin_started ) && LusiTime::parse( $i->started )->less          ( $begin_started )) continue;
+            if( isset( $end_started   ) && LusiTime::parse( $i->started )->greaterOrEqual( $end_started   )) continue;
+        }
+        if( isset( $i->stopped )) {
+            if( isset( $begin_stopped ) && LusiTime::parse( $i->stopped )->less          ( $begin_stopped )) continue;
+            if( isset( $end_stopped   ) && LusiTime::parse( $i->stopped )->greaterOrEqual( $end_stopped   )) continue;
+        }
+        array_push( $out, $i );
+    }
+    return $out;
 }
 
 /* --------------------------------------------------------------------
@@ -152,21 +152,21 @@ function apply_filter( $in ) {
  * --------------------------------------------------------------------
  */
 function apply_sort( $in ) {
-	$run2created2request = array();
-	foreach( $in as $i ) {
-		$run2created2request[$i->run][$i->created] = $i;
-	}
-	$out = array();
-	$runs = array_keys( $run2created2request );
-	sort( $runs );
-	foreach( $runs as $r ) {
-		$created = array_keys( $run2created2request[$r] );
-		sort( $created );
-	    foreach( $created as $c ) {
-		    array_push( $out, $run2created2request[$r][$c] );
-	    }
-	}
-	return $out;
+    $run2created2request = array();
+    foreach( $in as $i ) {
+        $run2created2request[$i->run][$i->created] = $i;
+    }
+    $out = array();
+    $runs = array_keys( $run2created2request );
+    sort( $runs );
+    foreach( $runs as $r ) {
+        $created = array_keys( $run2created2request[$r] );
+        sort( $created );
+        foreach( $created as $c ) {
+            array_push( $out, $run2created2request[$r][$c] );
+        }
+    }
+    return $out;
 }
 
 /* -----------------------------
@@ -177,10 +177,10 @@ try {
 
     $requests = apply_sort(
         apply_filter (
-        	FileMgrIfaceCtrlWs::experiment_requests (
-            	$instrument,
-            	$experiment
-           	)
+            FileMgrIfaceCtrlWs::experiment_requests (
+                $instrument,
+                $experiment
+               )
         )
     );
 
@@ -211,6 +211,6 @@ try {
     print $con->html();
 
 } catch( FileMgrException $e ) {
-	echo $e->toHtml();
+    echo $e->toHtml();
 }
 ?>
