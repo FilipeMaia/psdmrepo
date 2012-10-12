@@ -197,10 +197,13 @@ try {
         foreach (FileMgrIrodsDb::instance()->find_file ($experiment->instrument()->name(),$experiment->name(), $file_type, $file_name) as $r) {
             if ($r->run == $runnum) {
                 foreach ($r->files as $f) {
-                    if ($f->resource == 'lustre-resc') {
-                        $disk_ctime = $f->ctime;
-                        $size_bytes = $f->size;
-                        break;
+                    switch ($f->resource) {
+                        case 'lustre-resc':
+                            $disk_ctime = $f->ctime;
+                            break;
+                        case 'hpss-resc':
+                            $size_bytes = $f->size;
+                            break;
                     }
                 }
                 if (!is_null($disk_ctime)) break;
@@ -237,7 +240,8 @@ try {
         if ($size_bytes) {
             $size = $f->size < BYTES_IN_GB ? intval($size_bytes / BYTES_IN_MB).' MB' : sprintf( "%0.1f", $f->size / BYTES_IN_GB).' GB';
             $size_mb    = intval($size_bytes / BYTES_IN_MB);
-            $speed_mbps = $service_delay_sec ? sprintf("%.1f", $size_mb / $service_delay_sec) : '';
+            if ($disk_ctime)
+                $speed_mbps = $service_delay_sec ? sprintf("%.1f", $size_mb / $service_delay_sec) : '';
         }
         $resubmit_action = "file_action('resubmit',{$exper_id}, {$runnum}, '{$file_type}', '{$irods_filepath}')";
         $cancel_action   = "file_action('cancel',  {$exper_id}, {$runnum}, '{$file_type}', '{$irods_filepath}')";
