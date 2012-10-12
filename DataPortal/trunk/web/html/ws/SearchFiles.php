@@ -31,14 +31,12 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");   // Date in the past
  * to a caller. The script's execution will end at this point.
  */ 
 function report_error ($msg) {
-    $status_encoded = json_encode("error");
-    $msg_encoded = json_encode('<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg);
-    print <<< HERE
-{
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
-}
-HERE;
+    print json_encode(
+        array(
+            'Status'  => 'error',
+            'Message' => '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg
+        )
+    );
     exit;
 }
 
@@ -57,7 +55,7 @@ $exper_id = trim($_GET['exper_id']);
  * archived - a flag indicating if the files are archived (allowed values: '0', '1')
  * local    - a flag indicating if there is a local copy of files (allowed values: '0', '1')
  */
-$range_of_runs = null;
+$range_of_runs = array('min' => null, 'max' => null);
 if (isset ($_GET['runs'])) {
     $str = trim($_GET['runs']);
     if ($str == '')
@@ -132,7 +130,7 @@ function autoformat_size($bytes) {
     if      ($bytes < KB) return sprintf(                              "%d   ", $bytes);
     else if ($bytes < MB) return sprintf($bytes < 10 * KB ? "%.1f KB" : "%d KB", $bytes / KB);
     else if ($bytes < GB) return sprintf($bytes < 10 * MB ? "%.1f MB" : "%d MB", $bytes / MB);
-	else                  return sprintf($bytes < 10 * GB ? "%.1f GB" : "%d GB", $bytes / GB);
+    else                  return sprintf($bytes < 10 * GB ? "%.1f GB" : "%d GB", $bytes / GB);
 }
 
 function add_files(&$files, $infiles, $type, $file2run, $checksum, $archived, $local) {
@@ -153,7 +151,7 @@ function add_files(&$files, $infiles, $type, $file2run, $checksum, $archived, $l
                     'name'           => $file->name,
                     'irods_filepath' => "{$file->collName}/{$file->name}",
                     'run'            => $file2run[$file->name],
-                	'type'           => $type,
+                    'type'           => $type,
                     'size'           => $file->size,
                     'created'        => $file->ctime,
                     'archived'       => '<span style="color:red;">No</span>',
@@ -182,7 +180,7 @@ function add_files(&$files, $infiles, $type, $file2run, $checksum, $archived, $l
      */
     foreach ($result as $file) {
         if ((!is_null($checksum) && ($checksum ^ ($file['checksum'] != ''))) ||
-    	   (!is_null($archived) && ($archived ^   $file['archived_flag'])) ||
+           (!is_null($archived) && ($archived ^   $file['archived_flag'])) ||
            (!is_null($local)    && ($local    ^   $file['local_flag']))) continue;
         $files[$file['name']] = $file;
     }
@@ -334,28 +332,28 @@ try {
     $runs_encoded    = json_encode($runs2files);
 
     $xtc_archived_html = json_encode(
-    	$xtc_num_files == 0 ?
-    	'' : (	$xtc_num_files == $xtc_archived ?
-    			'100%' :
-    			'<span style="color:red;">'.$xtc_archived.'</span> / '.$xtc_num_files)
-   	);
+        $xtc_num_files == 0 ?
+        '' : (    $xtc_num_files == $xtc_archived ?
+                '100%' :
+                '<span style="color:red;">'.$xtc_archived.'</span> / '.$xtc_num_files)
+       );
     $xtc_local_copy_html = json_encode(
-    	$xtc_num_files == 0 ?
-    	'' : (	$xtc_num_files == $xtc_local_copy ?
-		    	'100%' :
-    			'<span style="color:red;">'.sprintf("%2.0f", floor(100.0*$xtc_local_copy/$xtc_num_files)).'%</span> ('.$xtc_local_copy.' / '.$xtc_num_files.')')
-   	);
+        $xtc_num_files == 0 ?
+        '' : (    $xtc_num_files == $xtc_local_copy ?
+                '100%' :
+                '<span style="color:red;">'.sprintf("%2.0f", floor(100.0*$xtc_local_copy/$xtc_num_files)).'%</span> ('.$xtc_local_copy.' / '.$xtc_num_files.')')
+       );
     $hdf5_archived_html = json_encode(
-    	$hdf5_num_files == 0 ?
-   		'' : (	$hdf5_num_files == $hdf5_archived ?
-    			'100%' :
-    			'<span style="color:red;">'.$hdf5_archived.'</span> / '.$hdf5_num_files)
-   	);
+        $hdf5_num_files == 0 ?
+           '' : (    $hdf5_num_files == $hdf5_archived ?
+                '100%' :
+                '<span style="color:red;">'.$hdf5_archived.'</span> / '.$hdf5_num_files)
+       );
     $hdf5_local_copy_html = json_encode(
-    	$hdf5_num_files == 0 ?
-   		'' : (	$hdf5_num_files == $hdf5_local_copy ?
-   				'100%' :
-   				'<span style="color:red;">'.sprintf("%2.0f", floor(100.0*$hdf5_local_copy/$hdf5_num_files)).'%</span> ('.$hdf5_local_copy.' / '.$hdf5_num_files.')')
+        $hdf5_num_files == 0 ?
+           '' : (    $hdf5_num_files == $hdf5_local_copy ?
+                   '100%' :
+                   '<span style="color:red;">'.sprintf("%2.0f", floor(100.0*$hdf5_local_copy/$hdf5_num_files)).'%</span> ('.$hdf5_local_copy.' / '.$hdf5_num_files.')')
    );
 
     /* Get the migration delay of the known files of the experiment
@@ -393,12 +391,8 @@ try {
 
     /* Make proper corrections to the range of runs.
      */
-    if ($min_run && $max_run) {
-        $range_of_runs['min'] = null;
-        $range_of_runs['max'] = null;
-    }
-    if (!is_null($range_of_runs['min']) && ($range_of_runs['min'] < $min_run)) $range_of_runs['min'] = $min_run;
-    if (!is_null($range_of_runs['max']) && ($range_of_runs['max'] > $max_run)) $range_of_runs['max'] = $max_run;
+    if (is_null($range_of_runs['min']) || ($range_of_runs['min'] < $min_run)) $range_of_runs['min'] = $min_run;
+    if (is_null($range_of_runs['max']) || ($range_of_runs['max'] > $max_run)) $range_of_runs['max'] = $max_run;
 
     /* Build two structures:
      * - a mapping from file names to the corresponding run numbers. This information will be shown in the GUI.
@@ -449,7 +443,7 @@ try {
 
     $nonempty_runs = array ();
 
-    for ($runnum = $min_run; $runnum <= $max_run; $runnum++) {
+    for ($runnum = $range_of_runs['min']; $runnum <= $range_of_runs['max']; $runnum++) {
 
         $run_entries = array ();
 
@@ -642,11 +636,9 @@ try {
                         'archived'               => '',
                         'archived_flag'          => 0,
                         'local'                  => '<span style="color:red;">never migrated from DAQ or deleted</span>',
-                            'local_flag'         => 0,
+                        'local_flag'             => 0,
                         'checksum'               => '',
-
                         'allowed_stay'           => $allowed_stay,
-
                         'restore_flag'           => 0,
                         'restore_requested_time' => '',
                         'restore_requested_uid'  => ''

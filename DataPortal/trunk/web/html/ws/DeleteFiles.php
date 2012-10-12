@@ -1,16 +1,5 @@
 <?php
 
-/*
- * This script will process a request for deleting a set of files
- * from an OFFLINE disk storage managed by the Data Management System.
- * A data set is defined by the following parameters:
- * 
- *   <exper_id> <run_number> <storage_class> <file_type>
- * 
- * When finished the script will return a JSOB object with the completion
- * status of the operation.
- */
-
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
@@ -27,29 +16,30 @@ use FileMgr\FileMgrIrodsDb;
 use LogBook\LogBook;
 use LusiTime\LusiTime;
 
-function report_success($result) {
-    
-    $updated_str = json_encode( LusiTime::now()->toStringShort());
-    
-    header( 'Content-type: application/json' );
-    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-    
+/*
+ * This script will process a request for deleting a set of files
+ * from an OFFLINE disk storage managed by the Data Management System.
+ * A data set is defined by the following parameters:
+ * 
+ *   <exper_id> <run_number> <storage_class> <file_type>
+ * 
+ * When finished the script will return a JSOB object with the completion
+ * status of the operation.
+ */
+header( 'Content-type: application/json' );
+header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+function report_success($result) {    
     print json_encode(
         array_merge(
-            array( 'status' => 'success', 'updated' => $updated_str ),
+            array( 'status' => 'success', 'updated' => LusiTime::now()->toStringShort()),
             $result
         )
     );
     exit;
 }
-
 function report_error( $msg, $result=array()) {
-    
-    header( 'Content-type: application/json' );
-    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
     print json_encode(
         array_merge(
             array( 'status' => 'error', 'message' => $msg  ),
@@ -75,17 +65,22 @@ if( $type == '' ) report_error( "invalid file type found in the request" );
 
 if( !isset( $_GET['storage'] )) report_error( "no storage class parameter found in the request" );
 $storage = strtoupper( trim( $_GET['storage'] ));
-if( $storage == '' ) report_error( "invalid storage class found in the request" );
-
+switch( $storage ) {
+    case 'SHORT-TERM':
+    case 'MEDIUM-TERM':
+        break;
+    default:
+        report_error( "inappropriate storage class of files in the request" );
+}
 
 /*
  * Analyze and process the request
  */
 try {
 
-    if ($storage == 'SHORT-TERM')
-        if (!AuthDB::instance()->hasPrivilege(AuthDB::instance()->authName(), null, 'StoragePolicyMgr', 'edit'))
-            report_error ("sorry, you don't possess sufficient privileges of rthis operation");
+    AuthDB::instance()->begin();
+    if (!AuthDB::instance()->hasPrivilege(AuthDB::instance()->authName(), null, 'StoragePolicyMgr', 'edit'))
+        report_error ("sorry, you don't possess sufficient privileges for this operation");
 
     LogBook::instance()->begin();
     Config::instance()->begin();
@@ -100,7 +95,8 @@ try {
             "No such run in the experiment",
             array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
 
-    // Find the files to be deleted
+    // Find the files to be deleted. Only consider file which are associated
+    // with the specified storage class.
     //
     $files = array();
     foreach( FileMgrIrodsDb::instance()->runs(
@@ -110,7 +106,21 @@ try {
         $runnum,
         $runnum ) as $run )
         foreach( $run->files as $file )
-            if( $file->resource == 'lustre-resc' ) array_push($files, $file);
+            if( $file->resource == 'lustre-resc' ) {
+                $request = Config::instance()->find_medium_store_file(
+                    array(
+                        'exper_id'       => $exper_id,
+                        'runnum'         => $runnum,
+                        'file_type'      => $type,
+                        'irods_filepath' => "{$file->collName}/{$file->name}",
+                        'irods_resource' => 'lustre-resc'
+                    )
+                );
+                switch( $storage ) {
+                    case 'SHORT-TERM' : if(  is_null($request)) array_push($files, $file); break;
+                    case 'MEDIUM-TERM': if( !is_null($request)) array_push($files, $file); break;
+                }
+            }
 
     // Proceed with the operation
     //
@@ -118,61 +128,49 @@ try {
 
         $irods_filepath = "{$file->collName}/{$file->name}";
 
-        switch( $storage ) {
-
-            case 'SHORT-TERM':
-
-                // Delete selected files by their full path and a replica. Also make sure
-                // no old entries remain in the file restore queue. Otherwise it would
-                // (falsefully) appear as if the deleted file is being restored.
-                //
-                Config::instance()->delete_file_restore_request(
-                    array(
-                        'exper_id'  => $exper_id,
-                        'runnum'    => $runnum,
-                        'file_type' => $type,
-                        'irods_filepath'     => $irods_filepath,
-                        'irods_src_resource' => 'hpss-resc',
-                        'irods_dst_resource' => 'lustre-resc'
-                    )
-                );
-
-                // Delete selected files by their full path and a replica.
-                //
-//                $request = new RestRequest(
-//                    "/replica{$file->collName}/{$file->name}/{$file->replica}",
-//                    'DELETE'
-//                );
-//                $request->execute();
-//                $responseInfo = $request->getResponseInfo();
-//                $http_code = intval($responseInfo['http_code']);
-//                switch($http_code) {
-//                    case 200: break;
-//                    case 404:
-//                       report_error(
-//                           "file '{$file->name}' doesn't exist",
-//                           array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
-//                    default:
-//                        report_error(
-//                            "failed to delete file '{$file->name}' because of HTTP error {$http_code}",
-//                            array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
-//                }
-                break;
-
-            case 'MEDIUM-TERM':
-                
-                // Do not delete the file. Just send it back to the 'SHORT-TERM' storage
-                // by removing the file's record from the 'MEDIUM-TERM' registry.
-                //
-                Config::instance()->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
-                break;
+        // Delete selected files by their full path and a replica.
+        //
+        $request = new RestRequest(
+            "/replica{$irods_filepath}/{$file->replica}",
+            'DELETE'
+        );
+        $request->execute();
+        $responseInfo = $request->getResponseInfo();
+        $http_code = intval($responseInfo['http_code']);
+        switch($http_code) {
+            case 200: break;
+            case 404:
+               report_error(
+                   "file '{$file->name}' doesn't exist",
+                   array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
+            default:
+                report_error(
+                    "failed to delete file '{$file->name}' because of HTTP error {$http_code}",
+                    array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
         }
+
+        if ($storage == 'MEDIUM-TERM')
+            Config::instance()->remove_medium_store_file ( $exper_id, $runnum, $type, $irods_filepath );
+
+        // Delete selected files by their full path and a replica. Also make sure
+        // no old entries remain in the file restore queue. Otherwise it would
+        // (falsefully) appear as if the deleted file is being restored.
+        //
+        Config::instance()->delete_file_restore_request(
+            array(
+                'exper_id'  => $exper_id,
+                'runnum'    => $runnum,
+                'file_type' => $type,
+                'irods_filepath'     => $irods_filepath,
+                'irods_src_resource' => 'hpss-resc',
+                'irods_dst_resource' => 'lustre-resc'
+            )
+        );
     }
 
-    // Calculated medium term quota usage for the experiment
-    //
     $medium_quota_used_gb = Config::instance()->calculate_medium_quota($exper_id);
 
+    AuthDB::instance()->commit();
     LogBook::instance()->commit();
     Config::instance()->commit();
     FileMgrIrodsDb::instance()->commit();

@@ -22,12 +22,12 @@ use FileMgr\FileMgrException;
  */
 function report_error( $msg ) {
 
-	header( 'Content-type: application/json' );
-	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
-	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
+    header( 'Content-type: application/json' );
+    header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
+    header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"Status":"error","Message":'.json_encode( $msg ).'}';
-	exit;
+    echo '{"Status":"error","Message":'.json_encode( $msg ).'}';
+    exit;
 }
 
 /* Translate & analyze input parameters
@@ -47,15 +47,15 @@ if( $runnum <= 0 ) report_error( 'invalid run number' );
  * submitted requests.
  *
  * @param $result - an array of requests
- */	
+ */    
 function return_result( $requests ) {
 
-	header( 'Content-type: application/json' );
-	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
-	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
+    header( 'Content-type: application/json' );
+    header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
+    header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"Status":"success","Result":'.json_encode( $requests ).'}';
-	exit;
+    echo '{"Status":"success","Result":'.json_encode( $requests ).'}';
+    exit;
 }
 
 try {

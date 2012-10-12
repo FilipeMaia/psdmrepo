@@ -17,8 +17,13 @@ use LusiTime\LusiTimeException;
 /**
  * This service will save a comment for the specified gap.
  */
+
+header( 'Content-type: application/json' );
+header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
+header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
+
 function report_error($msg) {
-	return_result(
+    return_result(
         array(
             'status' => 'error',
             'message' => $msg
@@ -27,21 +32,16 @@ function report_error($msg) {
 }
 function report_success($result) {
     $result['status'] = 'success';
-  	return_result($result);
+    return_result($result);
 }
 function return_result($result) {
-
-	header( 'Content-type: application/json' );
-	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
-	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
-
     echo json_encode($result);
-	exit;
+    exit;
 }
 
 try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
     if( !$authdb->hasRole($authdb->authName(),null,'BeamTimeMonitor','Editor')) report_error('not authorized for this this service');
 
@@ -61,7 +61,7 @@ try {
     $system_text = trim( $_POST['system']);
  
     $sysmon = SysMon::instance();
-	$sysmon->begin();
+    $sysmon->begin();
     if( $comment_text == '' )
         $sysmon->beamtime_clear_gap_comment($gap_begin_time, $instr_name);
     else
@@ -85,8 +85,8 @@ try {
               'posted_by_uid' => $comment->posted_by_uid(),
               'post_time'     => $comment->post_time()->toStringShort());
 
-	$authdb->commit();
-	$sysmon->commit();
+    $authdb->commit();
+    $sysmon->commit();
 
     report_success(array('comment' => $comment_info));
 

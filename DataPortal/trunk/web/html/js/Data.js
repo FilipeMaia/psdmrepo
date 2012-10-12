@@ -8,36 +8,38 @@
 
 function datafiles_create() {
 
-	/* Add this anchor to access this object's variables from within
-	 * for anonymous functions. Just using this.varname won't work
-	 * due to a well known bug in JavaScript. */
+    /* Add this anchor to access this object's variables from within
+     * for anonymous functions. Just using this.varname won't work
+     * due to a well known bug in JavaScript. */
 
-	var that = this;
+    var that = this;
 
-	/* ---------------------------------------
-	 *  This application specific environment
-	 * ---------------------------------------
-	 *
-	 * NOTE: These variables should be initialized externally.
-	 */
-	this.exp_id  = null;
+    /* ---------------------------------------
+     *  This application specific environment
+     * ---------------------------------------
+     *
+     * NOTE: These variables should be initialized externally.
+     */
+    this.exp_id  = null;
+    this.uid = null;
+    this.is_data_administrator = false;
 
-	/* The context for v-menu items
-	 */
-	var context2_default = {
-		'summary' : '',
-		'files'   : ''
-	};
-	this.name = 'datafiles';
-	this.full_name = 'File Manager';
-	this.context1 = 'summary';
-	this.context2 = '';
-	this.select_default = function() { this.select(this.context1, this.context2); };
-	this.select = function(ctx1, ctx2) {
-		this.init();
-		this.context1 = ctx1;
-		this.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
-	};
+    /* The context for v-menu items
+     */
+    var context2_default = {
+        'summary' : '',
+        'files'   : ''
+    };
+    this.name = 'datafiles';
+    this.full_name = 'File Manager';
+    this.context1 = 'summary';
+    this.context2 = '';
+    this.select_default = function() { this.select(this.context1, this.context2); };
+    this.select = function(ctx1, ctx2) {
+        this.init();
+        this.context1 = ctx1;
+        this.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
+    };
 
     /* The last request data is shared beetween all pages of this
      * application. Hence if anyting request an update all pages will
@@ -45,12 +47,12 @@ function datafiles_create() {
      */
     this.files_last_request = null;
 
-	/* --------------
-	 *  Summary page
-	 * --------------
-	 */
-	this.summary_display = function() {
-		$('#datafiles-summary-info').html('Updating...');
+    /* --------------
+     *  Summary page
+     * --------------
+     */
+    this.summary_display = function() {
+        $('#datafiles-summary-info').html('Updating...');
 
     $('#datafiles-summary-info').html('[ Last update on: <b>'+this.files_last_request.updated+'</b> ]');
     $('#datafiles-summary-runs'         ).html(this.files_last_request.summary.runs);
@@ -65,17 +67,17 @@ function datafiles_create() {
     $('#datafiles-summary-hdf5-archived').html(this.files_last_request.summary.hdf5.archived_html);
     $('#datafiles-summary-hdf5-disk'    ).html(this.files_last_request.summary.hdf5.disk_html);
 
-	};
-	this.summary_init = function() {
-		$('#datafiles-summary-refresh').button().click(function() { that.files_update(); });
-		this.files_update();
-	};
+    };
+    this.summary_init = function() {
+        $('#datafiles-summary-refresh').button().click(function() { that.files_update(); });
+        this.files_update();
+    };
 
-	/* -----------------------------
-	 *  Files groupped by runs page
-	 * -----------------------------
-	 */
-	this.files_reverse_order = true;
+    /* -----------------------------
+     *  Files groupped by runs page
+     * -----------------------------
+     */
+    this.files_reverse_order = true;
 
     function migration_status2html(f) {
         var html = f.start_migration_delay_sec !== undefined ?
@@ -298,35 +300,36 @@ function datafiles_create() {
         this.page_idx = pidx;
         this.page_min_ridx = this.page_idx * this.page_size;
         this.page_max_ridx = Math.min( this.files_last_request.runs.length, this.page_min_ridx + this.page_size ) - 1;
-		var toggler='#df-r-tgl-'+this.page_idx;
-		var container='#df-r-con-'+this.page_idx;
-		if( $(container).hasClass('df-r-hdn')) {
-			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-			$(container).removeClass('df-r-hdn').addClass('df-r-vis');
-			$('#df-r-con-'+this.page_idx).html('Loading...');
+        var toggler='#df-r-tgl-'+this.page_idx;
+        var container='#df-r-con-'+this.page_idx;
+        if( $(container).hasClass('df-r-hdn')) {
+            $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+            $(container).removeClass('df-r-hdn').addClass('df-r-vis');
+            $('#df-r-con-'+this.page_idx).html('Loading...');
             this.files_display();
-		} else {
-			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-			$(container).removeClass('df-r-vis').addClass('df-r-hdn');
-			$(container).html('');
-		}
+        } else {
+            $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+            $(container).removeClass('df-r-vis').addClass('df-r-hdn');
+            $(container).html('');
+        }
     };
 
     this.file2html = function(f, run_url, first_of_a_kind, display, extra_class1, extra_class2, pidx, ridx) {
-		var hightlight_class = ''; // f.type != 'XTC' ? 'datafiles-files-highlight' : '';
-		var html =
+        var hightlight_class = ''; // f.type != 'XTC' ? 'datafiles-files-highlight' : '';
+        var html =
 '  <tr>'+
 '    <td class="table_cell table_cell_left '+extra_class1+'">'+run_url+'</td>'+
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.name+'</td>'+
-			(display.type?
+            (display.type?
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.type+'</td>':'')+
-			(display.size?
+            (display.size?
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'" style="text-align:right">&nbsp;'+this.file_size(f)+'</td>':'')+
-			(display.created?
+            (display.created?
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.created+'</td>':'')+
-			(display.checksum?
+            (display.checksum?
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.checksum+'</td>':'');
-		if(display.storage) {
+        if(display.storage) {
+            var op_params = f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx;
             switch(f.storage) {
                 case 'SHORT-TERM':
                     html +=
@@ -337,38 +340,46 @@ function datafiles_create() {
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
-'<button class="move_to_medium_term" name="'+pidx+'_'+ridx+'" style="font-size:7px;" onclick="datafiles.move_to_medium_term('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+')" title="save all '+f.type+' files of run '+f.runnum+' to MEDIUM-TERM disk storage">SAVE TO MEDIUM</button>';
+'<button class="move_to_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="save all '+f.type+' files of run '+f.runnum+' to MEDIUM-TERM disk storage">SAVE TO MEDIUM</button>';
+                        }
+                        if(f.local_flag && f.archived_flag && this.is_data_administrator) {
+                            html +=
+'<button class="delete_from_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
                         }
                         if(f.archived_flag && !f.local_flag && !f.restore_flag) {
                             html +=
-'<button class="restore_from_archive" name="'+pidx+'_'+ridx+'" style="font-size:7px;" onclick="datafiles.restore_from_archive('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
+'<button class="restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
                         }
                     }
                     html +=
 '    </td>'+
 '    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>';
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
+'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>';
                     break;
                 case 'MEDIUM-TERM':
                     html +=
 '    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
-'	 <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
+'    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;</td>'+
 '    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.local+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].expiration+'</td>'+
-'	 <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].allowed_stay+'</td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].expiration+'</td>'+
+'    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.allowed_stay['MEDIUM-TERM'].allowed_stay+'</td>'+
 '    <td class="table_cell                  '+hightlight_class+' '+extra_class1+' '+extra_class2+'" style="white-space: nowrap;"> ';
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
-'<button class="delete_from_medium" name="'+pidx+'_'+ridx+'" style="font-size:7px;" onclick="datafiles.delete_from_disk('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+','+f.archived_flag+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage and move them back to the SHORT-TERM storage">MOVE TO SHORT</button>';
+'<button class="move_to_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage and move them back to the SHORT-TERM storage">MOVE TO SHORT</button>';
+                        }
+                        if(f.local_flag && f.archived_flag && this.is_data_administrator) {
+                            html +=
+'<button class="delete_from_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
                         }
                         if(f.archived_flag && !f.local_flag && !f.restore_flag) {
                             html +=
-'<button class="restore_from_archive" name="'+pidx+'_'+ridx+'" style="font-size:7px;" onclick="datafiles.restore_from_archive('+f.runnum+',\''+f.type+'\',\''+f.storage+'\','+pidx+','+ridx+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
+'<button class="restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
                         }
                     }
                     html +=
@@ -382,38 +393,38 @@ function datafiles_create() {
         html +=
 '    <td class="table_cell '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+f.archived+'</td>';
         html +=
-			(display.migration?
+            (display.migration?
 '    <td class="table_cell table_cell_right '+hightlight_class+' '+extra_class1+' '+extra_class2+'">&nbsp;'+migration_status2html(f)+'</td>':'')+
 '  </tr>';
-		return html;
-	};
-	this.files_display = function() {
+        return html;
+    };
+    this.files_display = function() {
 
-		var display = new Object();
-		display.type      = $('#datafiles-files-wa' ).find('input[name="type"]'     ).attr('checked');
-		display.size      = $('#datafiles-files-wa' ).find('input[name="size"]'     ).attr('checked');
-		display.created   = $('#datafiles-files-wa' ).find('input[name="created"]'  ).attr('checked');
-	    display.checksum  = $('#datafiles-files-wa' ).find('input[name="checksum"]' ).attr('checked');
-		display.storage   = $('#datafiles-files-wa' ).find('input[name="storage"]'  ).attr('checked');
-	    display.migration = $('#datafiles-files-wa' ).find('input[name="migration"]').attr('checked');
+        var display = new Object();
+        display.type      = $('#datafiles-files-wa' ).find('input[name="type"]'     ).attr('checked');
+        display.size      = $('#datafiles-files-wa' ).find('input[name="size"]'     ).attr('checked');
+        display.created   = $('#datafiles-files-wa' ).find('input[name="created"]'  ).attr('checked');
+        display.checksum  = $('#datafiles-files-wa' ).find('input[name="checksum"]' ).attr('checked');
+        display.storage   = $('#datafiles-files-wa' ).find('input[name="storage"]'  ).attr('checked');
+        display.migration = $('#datafiles-files-wa' ).find('input[name="migration"]').attr('checked');
 
         var rowspan = display.storage ? 2 : 1;
 
-		var num_runs  = 0;
-		var num_files = 0;
+        var num_runs  = 0;
+        var num_files = 0;
 
-		var html =
+        var html =
 '<table><tbody>'+
 '  <tr>'+
 '    <td class="table_hdr" rowspan='+rowspan+' align="right"  >Run</td>'+
 '    <td class="table_hdr" rowspan='+rowspan+' align="center" >File</td>'+
-          	(display.type?
+              (display.type?
 '    <td class="table_hdr" rowspan='+rowspan+' align="center" >Type</td>':'')+
-			(display.size?
+            (display.size?
 '    <td class="table_hdr" rowspan='+rowspan+' align="right" >Size</td>':'')+
             (display.created?
 '    <td class="table_hdr" rowspan='+rowspan+' align="center" >Created</td>':'')+
-			(display.checksum?
+            (display.checksum?
 '    <td class="table_hdr" rowspan='+rowspan+' align="center" >Checksum</td>':'');
         if(display.storage)
             html +=
@@ -461,16 +472,18 @@ function datafiles_create() {
                 first_of_a_kind[f.storage][f.type] = false;
             }
         }
-		html +=
+        html +=
 '</tbody></table>';
 
         var page = $('#df-r-con-'+this.page_idx);
         page.html(html);
+        page.find('.delete_from_short_term').button();
         page.find('.move_to_medium_term').button();
+        page.find('.move_to_short_term').button();
+        page.find('.delete_from_medium_term').button();
         page.find('.restore_from_archive').button();
-        page.find('.delete_from_medium').button();
         $('#datafiles-files-table-ctrl #quota-usage').css('display', display.storage ? 'block' : 'none' );
-	};
+    };
     this.stats_display = function() {
         var stats = { runs: 0, files: 0, size_gb: 0, storage: {}};
         var runs = this.files_last_request.runs;
@@ -508,116 +521,132 @@ function datafiles_create() {
             html +=
 '</div>';
         $('#datafiles-files-info').html(html);
-		$('#datafiles-files-updated').html(
+        $('#datafiles-files-updated').html(
 '[ Last update on: <b>'+this.files_last_request.updated+'</b> ]'
         );
     };
-	this.files_update = function() {
-		$('#datafiles-summary-info').html('Updating...');
-		$('#datafiles-files-updated').html('Updating...');
-		var params   = {exper_id: this.exp_id};
-		var runs     = $('#datafiles-files-ctrl').find('input[name="runs"]'     ).val(); if(runs     != '') params.runs     = runs;
-		var types    = $('#datafiles-files-ctrl').find('select[name="types"]'   ).val(); if(types    != '') params.types    = types;
-		var checksum = $('#datafiles-files-ctrl').find('select[name="checksum"]').val(); if(checksum != '') params.checksum = checksum == 'is known' ? 1 : 0;
-		var archived = $('#datafiles-files-ctrl').find('select[name="archived"]').val(); if(archived != '') params.archived = archived == 'yes' ? 1 : 0;
-		var local    = $('#datafiles-files-ctrl').find('select[name="local"]'   ).val(); if(local    != '') params.local    = local    == 'no'  ? 0 : 1;
-		switch($('#datafiles-files-ctrl').find('select[name="local"]').val()) {
+    this.files_update = function() {
+        $('#datafiles-summary-info').html('Updating...');
+        $('#datafiles-files-updated').html('Updating...');
+        var params   = {exper_id: this.exp_id};
+        var runs     = $('#datafiles-files-ctrl').find('input[name="runs"]'     ).val(); if(runs     != '') params.runs     = runs;
+        var types    = $('#datafiles-files-ctrl').find('select[name="types"]'   ).val(); if(types    != '') params.types    = types;
+        var checksum = $('#datafiles-files-ctrl').find('select[name="checksum"]').val(); if(checksum != '') params.checksum = checksum == 'is known' ? 1 : 0;
+        var archived = $('#datafiles-files-ctrl').find('select[name="archived"]').val(); if(archived != '') params.archived = archived == 'yes' ? 1 : 0;
+        var local    = $('#datafiles-files-ctrl').find('select[name="local"]'   ).val(); if(local    != '') params.local    = local    == 'no'  ? 0 : 1;
+        switch($('#datafiles-files-ctrl').find('select[name="local"]').val()) {
         case 'SHORT-TERM':  params.storage = 'SHORT-TERM';  break;
         case 'MEDIUM-TERM': params.storage = 'MEDIUM-TERM'; break;
         }
-		var jqXHR = $.get('../portal/ws/SearchFiles.php',params,function(data) {
-			var result = eval(data);
-			if(result.Status != 'success') {
-				report_error(result.Message);
-				return;
-			}
-			that.files_last_request = result;
-			for(var i in result.runs) {
-				var run = result.runs[i];
-				for(var j in run.files) {
-					var f = run.files[j];
+        var jqXHR = $.get('../portal/ws/SearchFiles.php',params,function(data) {
+            var result = eval(data);
+            if(result.Status != 'success') {
+                report_error(result.Message);
+                return;
+            }
+            that.files_last_request = result;
+            for(var i in result.runs) {
+                var run = result.runs[i];
+                for(var j in run.files) {
+                    var f = run.files[j];
                     f.run_url = run.url;
                 }
             }
-			if( that.files_reverse_order ) {
-				that.files_last_request.runs.reverse();
-			}
+            if( that.files_reverse_order ) {
+                that.files_last_request.runs.reverse();
+            }
             that.files_display_header();
             that.repaginate();
-			that.files_display();
-			that.stats_display();
-        	that.summary_display();
-		},
-		'JSON').error(function () {
-			report_error('failed because of: '+jqXHR.statusText);
-		});
-	};
-	this.files_init = function() {
-		$('#datafiles-files-reset').button().click(function() {
-    		$('#datafiles-files-ctrl').find('input').val('');
+            that.files_display();
+            that.stats_display();
+            that.summary_display();
+        },
+        'JSON').error(function () {
+            report_error('failed because of: '+jqXHR.statusText);
+        });
+    };
+    this.files_init = function() {
+        $('#datafiles-files-reset').button().click(function() {
+            $('#datafiles-files-ctrl').find('input').val('');
             $('#datafiles-files-ctrl').find('select').val('');
             that.files_update();
         });
-		$('#datafiles-files-refresh').button().click(function() { that.files_update(); });
-		$('#datafiles-files-ctrl').find('input').keyup(function(e) { if(e.keyCode == 13) that.files_update(); });
-		$('#datafiles-files-ctrl').find('select').change(function() { that.files_update(); });
-		$('#datafiles-files-reverse').button().click(function() {
-			that.files_reverse_order = !that.files_reverse_order;
-			that.files_last_request.runs.reverse();
+        $('#datafiles-files-refresh').button().click(function() { that.files_update(); });
+        $('#datafiles-files-ctrl').find('input').keyup(function(e) { if(e.keyCode == 13) that.files_update(); });
+        $('#datafiles-files-ctrl').find('select').change(function() { that.files_update(); });
+        $('#datafiles-files-reverse').button().click(function() {
+            that.files_reverse_order = !that.files_reverse_order;
+            that.files_last_request.runs.reverse();
             that.repaginate();
-			that.files_display();
-		});
-		$('#datafiles-files-wa' ).find('input[name="storage"]' ).attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input[name="type"]'    ).attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input[name="size"]'    ).attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input[name="created"]' ).attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input[name="archived"]').attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input[name="local"]'   ).attr('checked','checked');
-		$('#datafiles-files-wa' ).find('input').change(function(){
-			that.files_display();
-		});
-		$('#datafiles-files-wa' ).find('select[name="format"]').change(function(){
+            that.files_display();
+        });
+        $('#datafiles-files-wa' ).find('input[name="storage"]' ).attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input[name="type"]'    ).attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input[name="size"]'    ).attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input[name="created"]' ).attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input[name="archived"]').attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input[name="local"]'   ).attr('checked','checked');
+        $('#datafiles-files-wa' ).find('input').change(function(){
+            that.files_display();
+        });
+        $('#datafiles-files-wa' ).find('select[name="format"]').change(function(){
             that.file_size_format = $(this).val();
-			that.files_display();
-		});
+            that.files_display();
+        });
         $('#datafiles-files-wa').find('select[name="page_size"]').change(function(){
             if( $(this).val() == 'auto-page-size' ) that.page_size = that.page_size_default;
             else                                    that.page_size = parseInt($(this).val());
             that.repaginate();
-			that.files_display();
-		});
-		this.files_update();
-	};
+            that.files_display();
+        });
+        this.files_update();
+    };
 
     this.confirm_move = true;
-    this.move_to_medium_term = function(runnum, type, storage, pidx, ridx) {
+    this.move_files = function(runnum, type, storage, pidx, ridx) {
         if( !this.confirm_move ) {
-            this.move_to_medium_term_impl(runnum, type, storage, pidx, ridx );
+            this.move_files_impl(runnum, type, storage, pidx, ridx );
             return;
         }
+        var warning = '';
+        switch( storage ) {
+            case 'SHORT-TERM' :
+                warning =
+'Are you sure you want to save all <b>'+type+'</b> files of run <b>'+runnum+'</b> to the <b>MEDIUM-TERM</b> disk storage?<br><br>'+
+'Note this operation will succeed only if your experiment has sufficient quota to accomodate new files. '+
+'Once saved the files will be able to stay in the MEDIUM-TERM storage as long as it\'s permited by <b>LCLS Data Retention Policies</b>.<br><br>';
+                break;
+            case 'MEDIUM-TERM':
+                warning =
+'Are you sure you want to move all <b>'+type+'</b> files of run <b>'+runnum+'</b> back to the <b>SHORT-TERM</b> storage?<br><br>'+
+'Keep in mind that data retention period is typically much shorted for files stored on the <b>SHORT-TERM</b> storage and when expired the files may be automatically deleted from disk. '+
+'So be advised that proceeding with this operation may result in loss of informaton. '+
+'This operation may be reported to the PI of the experiment.<br><br>';
+                break;
+        }
         ask_yes_no(
-            'Confirm File Migration',
-            'Are you sure you want to save all <b>'+type+'</b> files of run <b>'+runnum+'</b> to the <b>MEDIUM-TERM</b> disk storage?<br><br>'+
-            'Note this operation will succeed only if your experiment has sufficient quota to accomodate new files. '+
-            'Once saved the files will be able to stay in the MEDIUM-TERM storage as long as it\'s permited by <b>LCLS Data Retention Policies</b>.<br><br>'+
+            'Confirm File Move',
+            warning+
             '<span class="ui-icon ui-icon-info" style="float:left; margin-right:4px;"></span><input type="checkbox" id="datafiles-confirm-move" /> check to prevent this dialog for the rest of the current session',
             function() {
                 that.confirm_move = $('#datafiles-confirm-move').attr('checked') ? false : true;
-                that.move_to_medium_term_impl(runnum, type, storage, pidx, ridx );
+                that.move_files_impl(runnum, type, storage, pidx, ridx );
             },
             null
         );
     };
-	this.move_to_medium_term_impl = function(runnum, type, storage, pidx, ridx) {
-
-        var button = $('button.move_to_medium_term[name="'+pidx+'_'+ridx+'"]').button();
+    this.move_files_impl = function(runnum, type, storage, pidx, ridx) {
+        var classname = '';
+        switch( storage ) {
+            case 'SHORT-TERM' : classname = 'move_to_medium_term'; break;
+            case 'MEDIUM-TERM': classname = 'move_to_short_term';  break;
+        }
+        var button = $('button.'+classname+'[name="'+pidx+'_'+ridx+'"]').button();
         button.button('disable');
 
-		var params  = {exper_id: this.exp_id, runnum: runnum, type: type, storage: storage };
-
-		var jqXHR = $.get(
+        var jqXHR = $.get(
             '../portal/ws/MoveFiles.php',
-            params,
+            { exper_id: this.exp_id, runnum: runnum, type: type, storage: storage },
             function(data) {
                 var result = eval(data);
                 if(result.status != 'success') {
@@ -630,14 +659,17 @@ function datafiles_create() {
                 //
                 var run = that.files_last_request.runs[ridx];
                 if( run.runnum != runnum ) {
-                    report_error('internal error in Data.js:datafiles_create.move_to_medium_term_impl()');
+                    report_error('internal error in Data.js:datafiles_create.move_files_impl()');
                     button.button('enable');
                     return;
                 }
                 for( var i in run.files ) {
                     var f = run.files[i];
                     if((f.type == type) && (f.storage == storage)) {
-                        f.storage = 'MEDIUM-TERM';
+                        switch( storage ) {
+                            case 'SHORT-TERM' : f.storage = 'MEDIUM-TERM'; break;
+                            case 'MEDIUM-TERM': f.storage = 'SHORT-TERM';  break;
+                        }
                     }
                 }
                 // Redisplay the corresponding page
@@ -651,7 +683,7 @@ function datafiles_create() {
             report_error('failed because of: '+jqXHR.statusText);
             button.button('enable');
         });
-	};
+    };
 
     this.confirm_restore = true;
     this.restore_from_archive = function(runnum, type, storage, pidx, ridx) {
@@ -672,16 +704,14 @@ function datafiles_create() {
             null
         );
     };
-	this.restore_from_archive_impl = function(runnum, type, storage, pidx, ridx) {
+    this.restore_from_archive_impl = function(runnum, type, storage, pidx, ridx) {
 
         var button = $('button.restore_from_archive[name="'+pidx+'_'+ridx+'"]').button();
         button.button('disable');
 
-		var params  = {exper_id: this.exp_id, runnum: runnum, type: type, storage: storage };
-
-		var jqXHR = $.get(
+        var jqXHR = $.get(
             '../portal/ws/RestoreFiles.php',
-            params,
+            { exper_id: this.exp_id, runnum: runnum, type: type, storage: storage },
             function(data) {
                 var result = eval(data);
                 if(result.status != 'success') {
@@ -700,7 +730,7 @@ function datafiles_create() {
                         f.local = '<span style="color:black;">Restoring from tape...</span>';
                         f.restore_flag = 1;
                         f.restore_requested_time = '';
-                        f.restore_requested_uid = auth_remote_user;
+                        f.restore_requested_uid = that.uid;
                     }
                 }
                 // Redisplay the corresponding page
@@ -714,36 +744,30 @@ function datafiles_create() {
             report_error('failed because of: '+jqXHR.statusText);
             button.button('enable');
         });
-	};
+    };
 
     this.confirm_delete = true;
-    this.delete_from_disk = function(runnum, type, storage, pidx, ridx, archived_flag) {
-        archived_flag = false;
+    this.delete_from_disk = function(runnum, type, storage, pidx, ridx) {
         if( !this.confirm_delete ) {
             this.delete_from_disk_impl(runnum, type, storage, pidx, ridx );
             return;
         }
         var warning = '';
-        switch(storage) {
-            case'MEDIUM-TERM':
+        switch( storage ) {
+            case 'SHORT-TERM' : 
+            case 'MEDIUM-TERM':
                 warning =
-'Are you sure you want to move all <b>'+type+'</b> files of run <b>'+runnum+'</b> from the <b>MEDIUM-TERM</b> storage to the <b>SHORT-TERM</b> storage?<br><br>'+
-'Keep in mind that data retention period is much shorted for files stored on the <b>SHORT-TERM</b> storage. '+
+'Are you sure you want to delete all <b>'+type+'</b> files of run <b>'+runnum+'</b> from disk?<br><br>'+
 'So be advised that proceeding with this operation may result in irreversable loss of informaton. '+
 'This operation may be reported to the PI of the experiment.<br><br>';
-                (archived_flag ?
-'Note that these files have already been archived to tape, so they can later be restored from there to disk if needed' :
-'<span class="ui-icon ui-icon-alert" style="float:left; margin-right:4px;"></span>'+
-'Also note that the files which are about to be moved are <b>NOT</b> found in the <b>LONG-TERM</b> (tape) storage. '+
-'So be advised that proceeding with this operation may result in irreversable loss of informaton. '+
-'This operation may be reported to the PI of the experiment. ');
                 break;
             default:
                 report_error('datafiles.delete_from_disk_impl() implementation error');
+                return;
         }
         ask_yes_no(
-            'Confirm File Migration',
-            warning+'<br><br>'+
+            'Confirm File Deletion',
+            warning+
             '<span class="ui-icon ui-icon-info" style="float:left; margin-right:4px;"></span><input type="checkbox" id="datafiles-confirm-delete" /> check to prevent this dialog for the rest of the current session',
             function() {
                 that.confirm_delete = $('#datafiles-confirm-delete').attr('checked') ? false : true;
@@ -752,11 +776,12 @@ function datafiles_create() {
             null
         );
     };
-	this.delete_from_disk_impl = function(runnum, type, storage, pidx, ridx) {
+    this.delete_from_disk_impl = function(runnum, type, storage, pidx, ridx) {
 
         var classname = '';
         switch( storage ) {
-            case 'MEDIUM-TERM': classname = 'delete_from_medium'; break;
+            case 'SHORT-TERM' : classname = 'delete_from_short_term'; break;
+            case 'MEDIUM-TERM': classname = 'delete_from_medium_term';  break;
             default:
                 report_error('datafiles.delete_from_disk_impl() implementation error');
                 return;
@@ -764,11 +789,9 @@ function datafiles_create() {
         var button = $('button.'+classname+'[name="'+pidx+'_'+ridx+'"]').button();
         button.button('disable');
 
-		var params  = {exper_id: this.exp_id, runnum: runnum, type: type, storage: storage };
-
-		var jqXHR = $.get(
+        var jqXHR = $.get(
             '../portal/ws/DeleteFiles.php',
-            params,
+            { exper_id: this.exp_id, runnum: runnum, type: type, storage: storage },
             function(data) {
                 var result = eval(data);
                 if(result.status != 'success') {
@@ -778,13 +801,17 @@ function datafiles_create() {
                 }
                 that.files_last_request.policies['MEDIUM-TERM'].quota_used_gb = result.medium_quota_used_gb;
 
-                // Update entries for all relevant files from the transient data structure
+                // Remove entries for all relevant files from the transient data structure
                 //
                 var run = that.files_last_request.runs[ridx];
                 for( var i in run.files ) {
                     var f = run.files[i];
                     if((f.runnum == runnum) && (f.type == type) && (f.storage == storage)) {
-                        f.storage = 'SHORT-TERM';
+                        f.local = '<span style="color:red;">No</span>';
+                        f.local_flag = 0;
+                        f.allowed_stay[f.storage].seconds = '';
+                        f.allowed_stay[f.storage].expiration = '';
+                        f.allowed_stay[f.storage].allowed_stay = '';
                     }
                 }
                 // Redisplay the corresponding page
@@ -798,23 +825,23 @@ function datafiles_create() {
             report_error('failed because of: '+jqXHR.statusText);
             button.button('enable');
         });
-	};
+    };
 
-	/* ----------------------------------
-	 *  Application initialization point
-	 * ----------------------------------
-	 *
-	 * RETURN: true if the real initialization took place. Return false
-	 *         otherwise.
-	 */
-	this.is_initialized = false;
-	this.init = function() {
-		if(that.is_initialized) return false;
-		this.is_initialized = true;
-		this.summary_init();
-		this.files_init();
-		return true;
-	};
+    /* ----------------------------------
+     *  Application initialization point
+     * ----------------------------------
+     *
+     * RETURN: true if the real initialization took place. Return false
+     *         otherwise.
+     */
+    this.is_initialized = false;
+    this.init = function() {
+        if(that.is_initialized) return false;
+        this.is_initialized = true;
+        this.summary_init();
+        this.files_init();
+        return true;
+    };
 }
 
 var datafiles = new datafiles_create();

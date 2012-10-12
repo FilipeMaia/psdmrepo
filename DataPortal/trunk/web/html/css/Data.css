@@ -190,3 +190,7 @@ div.df-r-hdn {
 div.df-r-vis {
   display: block;
 }
+
+button.df-file-button {
+    font-size: 7px;
+}

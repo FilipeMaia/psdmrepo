@@ -9,8 +9,6 @@ require_once( 'authdb/authdb.inc.php' );
 
 use DataPortal\DataPortal;
 
-use FileMgr\FileMgrIrodsWs;
-use FileMgr\FileMgrIfaceCtrlWs;
 use FileMgr\FileMgrException;
 
 use RegDB\RegDB;
@@ -70,6 +68,8 @@ try {
 
     $auth_svc = AuthDB::instance();
     $auth_svc->begin();
+
+    $is_data_administrator = $auth_svc->hasPrivilege($auth_svc->authName(), null, 'StoragePolicyMgr', 'edit');
 
     RegDB::instance()->begin();
     LogBook::instance()->begin();
@@ -1002,7 +1002,7 @@ HERE;
     left: 200px;
     top: 130px;
     width: 1px;
-    overflow: none;
+    overflow: hidden;
     cursor: e-resize;
     border-left: 1px solid #a0a0a0;
     border-right: 1px solid #a0a0a0;
@@ -1368,7 +1368,7 @@ $(document).ready(function(){
  * -----------------------------------------
  */
 elog.author = '<?=$auth_svc->authName()?>';
-elog.exp_id = '<?=$exper_id?>';
+elog.exp_id = <?=$exper_id?>;
 elog.exp = '<?=$experiment->name()?>';
 elog.instr = '<?=$experiment->instrument()->name()?>';
 <?php
@@ -1402,8 +1402,11 @@ elog.post_onsuccess = function() {
 
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 
-datafiles.exp_id = '<?=$exper_id?>';
-hdf.exp_id = '<?=$exper_id?>';
+datafiles.exp_id = <?=$exper_id?>;
+datafiles.uid = '<?=$auth_svc->authName()?>';
+datafiles.is_data_administrator = <?=$is_data_administrator?>;
+
+hdf.exp_id = <?=$exper_id?>;
 
 var select_app = '<?=$select_app?>';
 var select_app_context1 = '<?=$select_app_context1?>';
@@ -1955,3 +1958,4 @@ function p_appl_help() {
   catch( AuthDBException   $e ) { print $e->toHtml(); }
 
 ?>
+ 
