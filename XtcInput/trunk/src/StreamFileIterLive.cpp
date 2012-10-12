@@ -84,8 +84,7 @@ StreamFileIterLive::next()
 
     std::vector<XtcFileName> files = m_filesdb->files(m_expNum, m_run);
     if (files.empty()) {
-      MsgLog(logger, error, "No files in database for run #" << m_run);
-      return next;
+      throw ErrDbRunLiveData(ERR_LOC, m_run);
     }
 
     if (not files.empty()) {

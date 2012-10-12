@@ -90,6 +90,14 @@ public:
 
 };
 
+class ErrDbRunLiveData : public Exception {
+public:
+
+  ErrDbRunLiveData(const ErrSvc::Context& ctx, int run)
+    : Exception(ctx, "ErrDbRunLiveData", "No files in database for run #"+boost::lexical_cast<std::string>(run)) {}
+
+};
+
 class XTCReadException : public ErrnoException {
 public:
 
@@ -126,7 +134,7 @@ public:
 
 };
 
-/// Error generated when dataset directory is not found
+/// Error generated when dataset specification is incorrect
 class DatasetSpecError : public Exception {
 public:
 
