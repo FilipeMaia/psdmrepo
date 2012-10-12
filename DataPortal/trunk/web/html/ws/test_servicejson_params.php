@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This is an example of hwo to use the JSON Web services framework
+ * in the functional way. The sample code will demonstrate framework's
+ * service for parsing script parameters.
+ */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
 

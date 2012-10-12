@@ -28,6 +28,7 @@ class ServiceJSON {
     private $logbook    = null ;
     private $configdb   = null ;
     private $irodsdb    = null ;
+    private $neocaptar  = null ;
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -58,12 +59,12 @@ class ServiceJSON {
     //   Parameters parsers
     // ----------------------
 
-    private function parse ($name, $required=true, $has_value=true) {
+    private function parse ($name, $required=true, $has_value=true, $allow_empty_value=false) {
         $name = trim($name) ;
         if (isset($this->method_var[$name])) {
             if ($has_value) {
                 $val = trim($this->method_var[$name]) ;
-                if ($val !== '') return array (true, $val) ;
+                if ($allow_empty_value || ($val !== '')) return array (true, $val) ;
                 throw new DataPortalException (
                     __CLASS__.'::'.__METHOD__, "parameter '{$name}' requires a non-empty value") ;
             }
@@ -77,11 +78,11 @@ class ServiceJSON {
     }
 
     public function required_str ($name) {
-        $result = $this->parse ($name, true, true) ;
+        $result = $this->parse ($name, true, true, true) ;
         return $result[1] ;
     }
     public function optional_str ($name, $default) {
-        $result = $this->parse ($name, false, true) ;
+        $result = $this->parse ($name, false, true, true) ;
         if ($result[0]) return $result[1] ;
         return $default ;
     }
@@ -91,8 +92,8 @@ class ServiceJSON {
         return intval ($result[1]) ;
     }
     public function optional_int ($name, $default) {
-        $result = $this->parse ($name, false, true) ;
-        if ($result[0]) return intval ($result[1]) ;
+        $result = $this->parse ($name, false, true, true) ;
+        if ($result[0] && ($result[1] != '')) return intval ($result[1]) ;
         return $default ;
     }
 
@@ -107,7 +108,7 @@ class ServiceJSON {
     }
     public function optional_bool ($name, $default) {
         $result = $this->parse ($name, false, true) ;
-        if (!$result[0]) return $default ;
+        if (!$result[0] || ($result[1] == '')) return $default ;
         $val = strtolower($result[1]) ;
         switch ($val) {
             case 'false' : return false ;
@@ -153,8 +154,8 @@ class ServiceJSON {
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
     public function optional_time ($name, $default) {
-        $result = $this->parse ($name, false, true) ;
-        if (!$result[0]) return $default ;
+        $result = $this->parse ($name, false, true, true) ;
+        if (!$result[0] || ($result[1] == '')) return $default ;
         require_once 'lusitime/lusitime.inc.php' ;
         $time = \LusiTime\LusiTime::parse ($result[1]) ;
         if (!is_null($time)) return $time ;
@@ -206,6 +207,14 @@ class ServiceJSON {
         }
         return $this->irodsdb ;
     }
+    public function neocaptar () {
+        if (is_null($this->neocaptar)) {
+            require_once 'neocaptar/neocaptar.inc.php' ;
+            $this->neocaptar = \NeoCaptar\NeoCaptar::instance() ;
+            $this->neocaptar->begin() ;
+        }
+        return $this->neocaptar ;
+    }
 
     // -------------
     //  Finalizers
@@ -215,11 +224,12 @@ class ServiceJSON {
         ServiceJSON::report_error ($message, $parameters) ;
     }
     public function finish ($parameters=array()) {
-        if (!is_null($this->authdb))   $this->authdb->commit() ;
-        if (!is_null($this->regdb))    $this->regdb->commit() ;
-        if (!is_null($this->logbook))  $this->logbook->commit() ;
-        if (!is_null($this->configdb)) $this->configdb->commit() ;
-        if (!is_null($this->irodsdb))  $this->irodsdb->commit() ;
+        if (!is_null($this->authdb))    $this->authdb->commit() ;
+        if (!is_null($this->regdb))     $this->regdb->commit() ;
+        if (!is_null($this->logbook))   $this->logbook->commit() ;
+        if (!is_null($this->configdb))  $this->configdb->commit() ;
+        if (!is_null($this->irodsdb))   $this->irodsdb->commit() ;
+        if (!is_null($this->neocaptar)) $this->neocaptar->commit() ;
         ServiceJSON::report_success ($parameters) ;
     }
 

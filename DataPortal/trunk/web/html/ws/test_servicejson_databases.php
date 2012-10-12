@@ -1,13 +1,22 @@
 <?php
 
+/**
+ * This is an example of hwo to use the JSON Web services framework
+ * in the functional way.
+ */
+
 require_once 'dataportal/dataportal.inc.php' ;
 
 \DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
-    $experiment = $SVC->regdb()->find_experiment_by_id ($SVC->required_int ('exper_id')) ;
-    if (is_null($experiment)) $SVC->abort ('no such experiment') ;
+
+    $id = $SVC->required_int ('id') ;
+
+    $e = $SVC->regdb()->find_experiment_by_id ($id) ;
+    if (is_null($e)) $SVC->abort ('no such experiment') ;
+
     $SVC->finish (array (
-        'exper_id'   => $experiment->id() ,
-        'exper_name' => $experiment->name()
+        'id'   => $e->id() ,
+        'name' => $e->name()
     )) ;
 }) ;
 

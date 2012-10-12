@@ -101,7 +101,7 @@ try {
 
     $logbook_shifts = $logbook_experiment->shifts();
 
-    $document_title = 'Web Portal of Experiment:';
+    $document_title = $experiment->is_facility() ? 'E-Log of Facility:' : 'Web Portal of Experiment:';
     $document_subtitle = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>';
 
     $decorated_experiment_status = '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>';
@@ -125,12 +125,27 @@ try {
       <td class="table_cell table_cell_right">{$experiment->id()}</td></tr>
   <tr><td class="table_cell table_cell_left">Status</td>
       <td class="table_cell table_cell_right">{$decorated_experiment_status}</td></tr>
+HERE;
+    if ($experiment->is_facility()) {
+        $last_entry = $logbook_experiment->find_last_entry();
+        $last_entry_str = is_null($last_entry) ? '' : $last_entry->insert_time()->toStringShort();
+        $experiment_summary_workarea .=<<<HERE
+  <tr><td class="table_cell table_cell_left">Total # of e-Log entries</td>
+      <td class="table_cell table_cell_right">{$logbook_experiment->num_entries()}</td></tr>
+  <tr><td class="table_cell table_cell_left">Last entry</td>
+      <td class="table_cell table_cell_right">{$last_entry_str}</td></tr>
+HERE;
+    } else {
+        $experiment_summary_workarea .=<<<HERE
   <tr><td class="table_cell table_cell_left">Total # of runs taken</td>
       <td class="table_cell table_cell_right">{$num_runs}</td></tr>
   <tr><td class="table_cell table_cell_left">First run</td>
       <td class="table_cell table_cell_right">{$decorated_min_run}</td></tr>
   <tr><td class="table_cell table_cell_left">Last run</td>
       <td class="table_cell table_cell_right">{$decorated_max_run}</td></tr>
+HERE;
+    }
+        $experiment_summary_workarea .=<<<HERE
   <tr><td class="table_cell table_cell_left">Description</td>
       <td class="table_cell table_cell_right"><pre style="background-color:#e0e0e0; padding:0.5em;">{$experiment->description()}</pre></td></tr>
   <tr><td class="table_cell table_cell_left">Contact</td>
@@ -934,7 +949,7 @@ HERE;
 <html>
 <head>
 
-<title>Web Portal of Experiment: <?php echo $instrument->name()?> / <?php echo $experiment->name()?></title>
+<title><?php if ($experiment->is_facility()) { ?>E-Log of Facility<?php } else { ?>Web Portal of Experiment<?php } ?>:  <?php echo $instrument->name()?> / <?php echo $experiment->name()?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
@@ -1777,8 +1792,10 @@ function p_appl_help() {
   <div id="p-menu">
     <div class="m-item m-item-first m-select" id="p-appl-experiment">Experiment</div>
     <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
+<?php   if (!$experiment->is_facility()) { ?>
     <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
     <div class="m-item m-item-next" id="p-appl-hdf">HDF5 Translation</div>
+<?php   } ?>
     <div class="m-item m-item-last" id="p-appl-help">Help</div>
     <div class="m-item-end"></div>
   </div>
