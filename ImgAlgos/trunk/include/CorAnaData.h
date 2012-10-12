@@ -75,12 +75,13 @@ private:
 
   data_t*     m_data;
 
-  double*     m_sum_g2;
   double*     m_sum_gi;
   double*     m_sum_gf;
+  double*     m_sum_g2;
   unsigned*   m_sum_st;
-
-  cor_t*      m_res_g2;
+  cor_t*      m_cor_gi;
+  cor_t*      m_cor_gf;
+  cor_t*      m_cor_g2;
 
   TimeInterval* m_timer1;
 

@@ -54,6 +54,8 @@ ImgCalib::ImgCalib (const std::string& name)
   , m_fname_gain()
   , m_fname_mask()
   , m_mask_val()
+  , m_low_thre()
+  , m_low_val()
   , m_row_min()
   , m_row_max()
   , m_col_min()
@@ -61,25 +63,30 @@ ImgCalib::ImgCalib (const std::string& name)
   , m_print_bits()
   , m_count(0)
 {
-  // get the values from configuration or use defaults
-  m_str_src           = configStr("source", "DetInfo(:Camera)");
-  m_key_in            = configStr("key_in",                 "");
-  m_key_out           = configStr("key_out",      "calibrated");
-  m_fname_peds        = configStr("fname_peds",             "");
-  m_fname_bkgd        = configStr("fname_bkgd",             "");
-  m_fname_gain        = configStr("fname_gain",             "");
-  m_fname_mask        = configStr("fname_mask",             "");
-  m_mask_val          = config   ("masked_value",           0 );
-  m_row_min           = config   ("bkgd_row_min",           0 );
-  m_row_max           = config   ("bkgd_row_max",          10 );
-  m_col_min           = config   ("bkgd_col_min",           0 );
-  m_col_max           = config   ("bkgd_col_max",          10 );
-  m_print_bits        = config   ("print_bits",             0 );
+  double def_low_thre = -123456;
 
-  m_do_peds = (m_fname_peds.empty()) ? false : true;
-  m_do_mask = (m_fname_mask.empty()) ? false : true;
-  m_do_bkgd = (m_fname_bkgd.empty()) ? false : true;
-  m_do_gain = (m_fname_gain.empty()) ? false : true;
+  // get the values from configuration or use defaults
+  m_str_src           = configStr("source",   "DetInfo(:Camera)");
+  m_key_in            = configStr("key_in",                   "");
+  m_key_out           = configStr("key_out",        "calibrated");
+  m_fname_peds        = configStr("fname_peds",               "");
+  m_fname_bkgd        = configStr("fname_bkgd",               "");
+  m_fname_gain        = configStr("fname_gain",               "");
+  m_fname_mask        = configStr("fname_mask",               "");
+  m_mask_val          = config   ("masked_value",             0 );
+  m_low_thre          = config   ("threshold",     def_low_thre );
+  m_low_val           = config   ("below_thre_value",         0 );
+  m_row_min           = config   ("bkgd_row_min",             0 );
+  m_row_max           = config   ("bkgd_row_max",            10 );
+  m_col_min           = config   ("bkgd_col_min",             0 );
+  m_col_max           = config   ("bkgd_col_max",            10 );
+  m_print_bits        = config   ("print_bits",               0 );
+
+  m_do_peds = (m_fname_peds.empty())     ? false : true;
+  m_do_mask = (m_fname_mask.empty())     ? false : true;
+  m_do_bkgd = (m_fname_bkgd.empty())     ? false : true;
+  m_do_gain = (m_fname_gain.empty())     ? false : true;
+  m_do_thre = (m_low_thre==def_low_thre) ? false : true;
 }
 
 //--------------------
@@ -100,7 +107,10 @@ ImgCalib::printInputParameters()
         << "\n m_do_mask         : " << m_do_mask     
         << "\n m_do_bkgd         : " << m_do_bkgd     
         << "\n m_do_gain         : " << m_do_gain     
+        << "\n m_do_thre         : " << m_do_thre     
         << "\n m_mask_val        : " << m_mask_val   
+        << "\n m_low_thre        : " << m_low_thre   
+        << "\n m_low_val         : " << m_low_val   
         << "\n m_row_min         : " << m_row_min    
         << "\n m_row_max         : " << m_row_max    
         << "\n m_col_min         : " << m_col_min    
@@ -224,9 +234,16 @@ ImgCalib::procEvent(Event& evt, Env& env)
     if (m_do_peds) {             for(unsigned i=0; i<m_size; i++) m_cdat[i] -= m_peds_data[i]; }
     if (m_do_bkgd) { normBkgd(); for(unsigned i=0; i<m_size; i++) m_cdat[i] -= m_bkgd_data[i]*m_norm; }
     if (m_do_gain) {             for(unsigned i=0; i<m_size; i++) m_cdat[i] *= m_gain_data[i]; }
+
     if (m_do_mask) {             
       for(unsigned i=0; i<m_size; i++) {
         if (m_mask_data[i]==0) m_cdat[i] = m_mask_val; 
+      }
+    }
+
+    if (m_do_thre) {             
+      for(unsigned i=0; i<m_size; i++) {
+        if (m_cdat[i] < m_low_thre) m_cdat[i] = m_low_val; 
       }
     }
   } 

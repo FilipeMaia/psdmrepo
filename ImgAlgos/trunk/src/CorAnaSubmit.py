@@ -54,14 +54,14 @@ cp = cap.coranapars
 
 def input_option_parser() :
 
-    def_fname_cfg   = 'ImgAlgos/data/psana-xcsi0112-r0015-img-auto-correlation.cfg' # 'ana-misc-exp/
+    def_fname_cfg   = 'ImgAlgos/data/psana-corana.cfg'
     def_fname_xtc   = '/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc'
     def_fname_tau   = None             # 'my-tau.txt'
     def_cmd_split   = 'psana'
-    def_cmd_proc    = 'corana'         # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
-    def_cmd_merge   = 'corana_merge'   # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
-    def_cmd_procres = 'corana_procres' # '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_procres'
-    def_batch_queue = 'psfehq'         # for XCS, CXI, and MEC;    Or: 'psnehq' for AMO, SXR, XPP
+    def_cmd_proc    = 'corana'         # or '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana'
+    def_cmd_merge   = 'corana_merge'   # or '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_merge'
+    def_cmd_procres = 'corana_procres' # or '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/build/x86_64-rhel5-gcc41-opt/ImgAlgos/corana_procres'
+    def_batch_queue = 'psfehq'         # for XCS, CXI, and MEC; or 'psnehq' for AMO, SXR, XPP
 
     parser = OptionParser(description='Process optional input parameters.', usage = "usage: %prog [options] <xtc-file-name>")
     parser.add_option('-c', '--fname_cfg',   dest='fname_cfg',  default=def_fname_cfg,   action='store', type='string', help='psana config file name')

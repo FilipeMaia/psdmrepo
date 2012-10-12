@@ -74,8 +74,8 @@ CorAnaProcResults::readCorFile()
      abort();
   }
 
-  m_cor = new cor_t [m_img_size * m_npoints_tau];
-  inf.read((char*)m_cor, sizeof(cor_t) * m_img_size * m_npoints_tau); 
+  m_cor = new cor_t [3 * m_img_size * m_npoints_tau];
+  inf.read((char*)m_cor, sizeof(cor_t) * 3 * m_img_size * m_npoints_tau); 
   inf.close();
 
   m_log << "CorAnaProcResults::readCorFile(): Array is loaded from file.\n";
@@ -118,13 +118,18 @@ CorAnaProcResults::fillHistogram()
 
   for(unsigned itau=0; itau<m_npoints_tau; itau++) {
 
-    cor_t* p_img_cor = &m_cor[m_img_size*itau];
+    cor_t* p_cor_gi = &m_cor   [3*m_img_size*itau];
+    cor_t* p_cor_gf = &p_cor_gi[m_img_size];
+    cor_t* p_cor_g2 = &p_cor_gf[m_img_size];
 
     for(unsigned pix=0; pix<m_img_size; pix++) {
 
+      double den = p_cor_gi[pix] * p_cor_gf[pix];
+      double G2  = (den>0) ? p_cor_g2[pix]/den : 0;
+
       unsigned hind = m_nbins * itau + getBinInImg(pix);
       m_sum0[hind] += 1; 
-      m_sum1[hind] += p_img_cor[pix]; 
+      m_sum1[hind] += G2; 
     }
 
     for(unsigned hind=0; hind<m_hsize; hind++) {
@@ -147,7 +152,7 @@ CorAnaProcResults::saveHistogramInFile()
     out << std::setw(8) << v_ind_tau[itau];
 
     for(unsigned bin=0; bin<m_nbins; bin++) 
-      out << std::fixed << std::setw(12) << std::setprecision(6) << 100*m_hist[m_nbins * itau + bin];
+      out << std::fixed << std::setw(12) << std::setprecision(6) << m_hist[m_nbins * itau + bin];
     out << " \n";
   }
 

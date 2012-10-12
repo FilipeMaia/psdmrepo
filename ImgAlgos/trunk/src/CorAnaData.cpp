@@ -132,11 +132,13 @@ void
 CorAnaData::initCorTau()
 {
   m_log << "\nCorAnaData::initCorTau(): " << m_fname;
-  m_sum_g2 = new double   [m_blk_size];
   m_sum_gi = new double   [m_blk_size];
   m_sum_gf = new double   [m_blk_size];
+  m_sum_g2 = new double   [m_blk_size];
   m_sum_st = new unsigned [m_blk_size];
-  m_res_g2 = new cor_t    [m_blk_size];
+  m_cor_gi = new cor_t    [m_blk_size];
+  m_cor_gf = new cor_t    [m_blk_size];
+  m_cor_g2 = new cor_t    [m_blk_size];
 }
 
 //----------------
@@ -145,11 +147,14 @@ void
 CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between images
 {
   m_log << "\nCorAnaData::evaluateCorTau(tau): tau=" << tau;
-  std::fill_n(m_sum_g2, m_blk_size, double(0));
   std::fill_n(m_sum_gi, m_blk_size, double(0));
   std::fill_n(m_sum_gf, m_blk_size, double(0));
+  std::fill_n(m_sum_g2, m_blk_size, double(0));
   std::fill_n(m_sum_st, m_blk_size, unsigned(0));
-  std::fill_n(m_res_g2, m_blk_size, cor_t(0));
+  std::fill_n(m_cor_gi, m_blk_size, cor_t(0));
+  std::fill_n(m_cor_gf, m_blk_size, cor_t(0));
+  std::fill_n(m_cor_g2, m_blk_size, cor_t(0));
+
 
   for (unsigned ti=0; ti<m_tind_size-tau; ti++) {
        unsigned tf=ti+tau;
@@ -183,9 +188,9 @@ CorAnaData::sumCorTau(unsigned i, unsigned f) // i and f are the event indexes
    data_t* p_f = &m_data[f*m_blk_size];
 
    for(unsigned pix=0; pix<m_blk_size; pix++) {
-     m_sum_g2[pix] += p_i[pix]*p_f[pix]; 
      m_sum_gi[pix] += p_i[pix]; 
      m_sum_gf[pix] += p_f[pix]; 
+     m_sum_g2[pix] += p_i[pix]*p_f[pix]; 
      m_sum_st[pix] += 1; 
    }
 }
@@ -196,14 +201,18 @@ void
 CorAnaData::saveCorTau(std::ostream& out)
 {
    m_log << "  ->  CorAnaData::saveCorTau(tau)";
-   double den(0);
 
    for(unsigned pix=0; pix<m_blk_size; pix++) {
-     den = m_sum_gi[pix] * m_sum_gf[pix];
-     m_res_g2[pix] = (den != 0) ? cor_t(m_sum_g2[pix] * m_sum_st[pix] / den) : 0; 
+     if(m_sum_st[pix]) {
+       m_cor_gi[pix] = cor_t( m_sum_gi[pix] / m_sum_st[pix] ); 
+       m_cor_gf[pix] = cor_t( m_sum_gf[pix] / m_sum_st[pix] ); 
+       m_cor_g2[pix] = cor_t( m_sum_g2[pix] / m_sum_st[pix] ); 
+     }
    }
 
-   out.write(reinterpret_cast<const char*>(m_res_g2), m_blk_size*sizeof(cor_t));
+   out.write(reinterpret_cast<const char*>(m_cor_gi), m_blk_size*sizeof(cor_t));
+   out.write(reinterpret_cast<const char*>(m_cor_gf), m_blk_size*sizeof(cor_t));
+   out.write(reinterpret_cast<const char*>(m_cor_g2), m_blk_size*sizeof(cor_t));
 }
 
 //----------------
@@ -218,9 +227,9 @@ CorAnaData::printCorTau(unsigned tau)
 
   for(unsigned pix=0; pix<m_blk_size; pix++) {
     if(c==0)             m_log << "\nRow=" << std::setw(4) << r << ": "; 
-    if(c<c0)             m_log << " " << std::setw(6) << m_res_g2[pix];
+    if(c<c0)             m_log << " " << std::setw(6) << m_cor_g2[pix];
     if(c==c0)            m_log << " ...";
-    if(c>=m_img_cols-c0) m_log << " " << std::setw(6) << m_res_g2[pix];
+    if(c>=m_img_cols-c0) m_log << " " << std::setw(6) << m_cor_g2[pix];
     c++; if(c==m_img_cols) {c=0; r++;}
   }
   m_log << "\n" << std::setprecision(8) << std::setw(10);

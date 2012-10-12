@@ -99,16 +99,16 @@ CorAnaMergeFiles::mergeFiles()
         << m_nfiles << " blocks for " 
         << m_npoints_tau << " points in tau in a single image vs tau index \n";
 
-  cor_t* buf = new cor_t [m_blk_size];
+  cor_t* buf = new cor_t [3*m_blk_size]; // 3* stands for gi, gf, and g2 correlators
 
   for(unsigned itau=0; itau<m_npoints_tau; itau++) {
     for(unsigned b=0; b<m_nfiles; b++) {
-      p_inp[b].read((char*)buf, m_blk_size*sizeof(cor_t)); 
+      p_inp[b].read((char*)buf, 3*m_blk_size*sizeof(cor_t));
       if(!p_inp[b].good()) {
         m_log << "CorAnaMergeFiles::mergeFiles(): Something is wrong with input for itau:" << itau << " blk:" << b << "\n";
 	break;
       }
-      p_out.write(reinterpret_cast<const char*>(buf), m_blk_size*sizeof(cor_t)); 
+      p_out.write(reinterpret_cast<const char*>(buf), 3*m_blk_size*sizeof(cor_t)); 
     }
   }
 }

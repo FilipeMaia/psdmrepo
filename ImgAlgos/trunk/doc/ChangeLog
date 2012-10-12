@@ -12,6 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ==============
+2012-10-12 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+M       include/ImgCalib.h - add low implementation for low threshold
+M       src/ImgCalib.cpp            
+A       include/ImgMaskEvaluation.h - evaluation of the dynamic masks for saturated and noisy pixels 
+A       src/ImgMaskEvaluation.cpp
+	
 Tag: V00-00-19
 2012-10-02 Mikhail S. Dubrovin
 - Add/modify modules for image correlation analysis

@@ -104,6 +104,8 @@ private:
   std::string     m_fname_gain;       // string file name for gain factors     
   std::string     m_fname_mask;       // string file name for mask
   double          m_mask_val;         // Value substituted for masked bits
+  double          m_low_thre;         // The low threshold
+  double          m_low_val;          // The value of substituting amplitude below threshold
   unsigned        m_row_min;          // window for background normalization
   unsigned        m_row_max;          // window for background normalization
   unsigned        m_col_min;          // window for background normalization
@@ -120,6 +122,7 @@ private:
   bool m_do_mask;                     // flag: true = apply mask
   bool m_do_bkgd;                     // flag: true = subtract background
   bool m_do_gain;                     // flag: true = apply the gain correction
+  bool m_do_thre;                     // flag: true = apply the threshold
 
   ImgParametersV1* m_peds;
   ImgParametersV1* m_bkgd;
