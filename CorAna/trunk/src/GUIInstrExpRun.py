@@ -31,6 +31,17 @@ from PyQt4 import QtGui, QtCore
 import ConfigParametersCorAna as cp
 
 #---------------------
+
+def xtc_fname_parser_helper( part, prefix ) :    
+    """In parsing the xtc file name, this function extracts the string after expected prefix, i.e. 'r0123' -> '0123'"""
+    if len(part)>1 and part[0] == prefix :
+        try :
+            return part[1:]
+        except :
+            pass
+    return None
+
+#---------------------
 #  Class definition --
 #---------------------
 class GUIInstrExpRun ( QtGui.QWidget ) :
@@ -44,7 +55,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 50)
+        self.setGeometry(200, 400, 500, 30)
         self.setWindowTitle('Instrument Experiment Run')
         self.setFrame()
 
@@ -98,12 +109,12 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
 
         self.setLayout(self.hbox)
 
-        self.connect( self.butInstr,   QtCore.SIGNAL('clicked()'),          self.processInstr  )
         self.connect( self.ediExp,     QtCore.SIGNAL('editingFinished ()'), self.processEdiExp )
-        self.connect( self.butExp,     QtCore.SIGNAL('clicked()'),          self.processButExp )
         self.connect( self.ediRun,     QtCore.SIGNAL('editingFinished ()'), self.processEdiRun )
-        self.connect( self.butRun,     QtCore.SIGNAL('clicked()'),          self.processButRun )
         self.connect( self.ediRunDark, QtCore.SIGNAL('editingFinished ()'), self.processEdiRunDark )
+        self.connect( self.butInstr,   QtCore.SIGNAL('clicked()'),          self.processInstr  )
+        self.connect( self.butExp,     QtCore.SIGNAL('clicked()'),          self.processButExp )
+        self.connect( self.butRun,     QtCore.SIGNAL('clicked()'),          self.processButRun )
         self.connect( self.butRunDark, QtCore.SIGNAL('clicked()'),          self.processButRunDark )
 
         self.showToolTips()
@@ -115,9 +126,15 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
+        msg_edi = 'WARNING: whatever you edit may be incorrect...\nIt is recommended to use the '
+
         self.butInstr  .setToolTip('Select the instrument name from the pop-up menu.')
         self.butExp    .setToolTip('Select the experiment name from the directory list.')
-        self.ediExp    .setToolTip('Edit the name of the experiment.\nWARNING: whatever you edit may be incorrect!\nIt is recommended to use the "Exp:" button.')
+        self.butRun    .setToolTip('Sets the run number from the file name,\nselected from the list of xtc files.')
+        self.butRunDark.setToolTip('Sets the dark run number from the file name,\nselected from the list of xtc files.')
+        self.ediExp    .setToolTip( msg_edi + '"Exp:" button.')
+        self.ediRun    .setToolTip( msg_edi + '"Run:" button.')
+        self.ediRunDark.setToolTip( msg_edi + '"Dark:" button.')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -150,6 +167,16 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         pass
 #        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
 
+    def processEdiRun(self):
+        print 'WARNING! Non-editable field.'
+
+    def processEdiExp(self):
+        print 'WARNING! Non-editable field.'
+
+    def processEdiRunDark(self):
+        print 'WARNING! Non-editable field.'
+
+
     def processInstr(self):
         print 'processInstr'
         action_selected = self.popupMenuInstr.exec_(QtGui.QCursor.pos())
@@ -158,6 +185,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         cp.confpars.instr_name.setValue( self.instr_name )
         self.butInstr.setText( self.instr_name + self.char_expand )
         print ' ---> selected instrument:', self.instr_name
+
 
     def processButExp(self):
         print 'processButExp'
@@ -181,64 +209,73 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         self.ediExp.setText(name)        
 
 
-    def processEdiExp(self):
-        print 'WARNING! Non-editable field.'
-
     def processButRun(self):
         print 'processButRun'
 
-    def processEdiRun(self):
-        print 'WARNING! Non-editable field.'
+        dir  = self.instr_dir + '/' + self.instr_name + '/' + self.exp_name + '/xtc'
+        path = str( QtGui.QFileDialog.getOpenFileName(self,'Select experiment',dir) )
+        path1, fname = os.path.split(path) # where fname looks like: e170-r0003-s00-c00.xtc
+        print 'Returned path and fname =', path1, fname
+
+        if path1=='' and fname=='' :
+            print 'The run number is unchanged: ' + self.run_number
+            return
+
+        if path1 != dir :
+            print 'WARNING! Wrong directory: ' + path1
+            print 'Select the run being in the directory: ' + dir
+            return
+
+        print 'Set run from file name: ' + fname
+        self.parse_xtc_file_name(fname) # Parse: e170-r0003-s00-c00.xtc
+        self.run_number = self._runnum
+        cp.confpars.str_run_number.setValue(self.run_number)
+        self.ediRun.setText(self.run_number)        
+
 
     def processButRunDark(self):
         print 'processButRunDark'
 
-    def processEdiRunDark(self):
-        print 'WARNING! Non-editable field.'
+        dir  = self.instr_dir + '/' + self.instr_name + '/' + self.exp_name + '/xtc'
+        path = str( QtGui.QFileDialog.getOpenFileName(self,'Select experiment',dir) )
+        path1, fname = os.path.split(path) # where fname looks like: e170-r0003-s00-c00.xtc
+        print 'Returned path and fname =', path1, fname
+
+        if path1=='' and fname=='' :
+            print 'The run number is unchanged: ' + self.run_number_dark
+            return
+
+        if path1 != dir :
+            print 'WARNING! Wrong directory: ' + path1
+            print 'Select the run being in the directory: ' + dir
+            return
+
+        print 'Set run from file name: ' + fname
+        self.parse_xtc_file_name(fname) # Parse: e170-r0003-s00-c00.xtc
+        self.run_number_dark = self._runnum
+        cp.confpars.str_run_number.setValue(self.run_number_dark)
+        self.ediRunDark.setText(self.run_number_dark)        
 
 
-#    def processRead(self):
-#        print 'Read'
-#        cp.confpars.readParametersFromFile( self.getFileNameFromEditField() )
-#        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
-#        #self.parent.fnameEdit.setText( cp.confpars.fname_cp.value() )
-#        #self.refreshGUIWhatToDisplay()
+    def parse_xtc_file_name(self, fname):
+        """Parse the file name like e170-r0003-s00-c00.xtc"""
+        name, self._ext = os.path.splitext(fname) # i.e. ('e167-r0015-s00-c00', '.xtc')
+        parts = name.split('-') # it gives parts = ('e167', 'r0015', 's00', 'c00')
 
-#    def processWrite(self):
-#        print 'Write'
-#        cp.confpars.saveParametersInFile( self.getFileNameFromEditField() )
+        self._expnum = None
+        self._runnum = None
+        self._stream = None
+        self._chunk  = None
 
-#    def processDefault(self):
-#        print 'Set default values of configuration parameters.'
-#        cp.confpars.setDefaultValues()
-#        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
-#        #self.refreshGUIWhatToDisplay()
+        parts = map( xtc_fname_parser_helper, parts, ['e', 'r', 's', 'c'] )
 
-#    def processBrowse(self):
-#        print 'Browse'
-#        self.path = self.getFileNameFromEditField()
-#        self.dname,self.fname = os.path.split(self.path)
-#        print 'dname : %s' % (self.dname)
-#        print 'fname : %s' % (self.fname)
-#        self.path = QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dname)
-#        self.dname,self.fname = os.path.split(str(self.path))
+        if None not in parts :
+            self._expnum = parts[0]
+            self._runnum = parts[1]
+            self._stream = parts[2]
+            self._chunk  = parts[3]
 
-#        if self.dname == '' or self.fname == '' :
-#            print 'Input directiry name or file name is empty... use default values'  
-#        else :
-#            self.fnameEdit.setText(self.path)
-#            cp.confpars.fname_cp.setValue(self.path)
-
-#    def processFileEdit(self):
-#        print 'FileEdit'
-#        self.path = self.getFileNameFromEditField()
-#        cp.confpars.fname_cp.setValue(self.path)
-#        dname,fname = os.path.split(self.path)
-#        print 'Set dname : %s' % (dname)
-#        print 'Set fname : %s' % (fname)
-
-#    def getFileNameFromEditField(self):
-#        return str( self.fnameEdit.displayText() )
+        print 'e,r,s,c,ext:', self._expnum, self._runnum, self._stream, self._chunk, self._ext
 
 #-----------------------------
 

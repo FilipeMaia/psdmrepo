@@ -112,8 +112,8 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         #print 'closeEvent'
         try: # try to delete self object in the cp.confpars
             del cp.confpars.guiconfigparameters 
-        except AttributeError:
-            pass # silently ignore
+        except : # AttributeError:
+            pass
 
     def processClose(self):
         #print 'Close button'
@@ -150,8 +150,8 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         self.dname,self.fname = os.path.split(self.path)
         print 'dname : %s' % (self.dname)
         print 'fname : %s' % (self.fname)
-        self.path = QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dname)
-        self.dname,self.fname = os.path.split(str(self.path))
+        self.path = str( QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dname) )
+        self.dname,self.fname = os.path.split(self.path)
 
         if self.dname == '' or self.fname == '' :
             print 'Input directiry name or file name is empty... use default values'  

@@ -43,6 +43,8 @@ import ConfigParametersCorAna as cp
 
 import GUIConfigParameters as guiconfigpars
 
+from GUIInstrExpRun import *
+
 #import GUIPlayer          as guiplr
 #import GUIComplexCommands as guicomplex
 #import GUIWhatToDisplay   as guiwtd
@@ -98,6 +100,8 @@ class GUIMain ( QtGui.QWidget ) :
         #self.titFile   = QtGui.QLabel('File:')
         #self.titTree   = QtGui.QLabel('HDF5 Tree GUI')
 
+        cp.confpars.guiinstrexprun = GUIInstrExpRun()
+
 #        self.fileEdit  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
         self.fileEdit  = QtGui.QLineEdit('Some name can be edit here...')
 
@@ -112,14 +116,15 @@ class GUIMain ( QtGui.QWidget ) :
         self.setButtonColors()
 
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.confpars, 0, 0, 1,2)
-        grid.addWidget(self.browse,   1, 0)
-        grid.addWidget(self.fileEdit, 1, 1, 1,6)
-        grid.addWidget(self.display,  2, 0, 1,4)
-        grid.addWidget(self.wtd,      3, 0, 1,4)
+        grid.addWidget(cp.confpars.guiinstrexprun, 0, 0, 1, 7)
+        grid.addWidget(self.confpars, 1, 0, 1,4)
+        grid.addWidget(self.save,     1, 6)
+        grid.addWidget(self.browse,   2, 0)
+        grid.addWidget(self.fileEdit, 2, 1, 1,6)
+        grid.addWidget(self.display,  3, 0, 1,4)
+        grid.addWidget(self.wtd,      5, 0, 1,4)
         grid.addWidget(self.player,   4, 0, 1,4)
-        grid.addWidget(self.save,     3, 6)
-        grid.addWidget(self.exit,     4, 6)
+        grid.addWidget(self.exit,     5, 6)
 
         self.setLayout(grid)
 
@@ -193,7 +198,13 @@ class GUIMain ( QtGui.QWidget ) :
 #        printh5.print_hdf5_file_structure(fname)
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
+        try : # try to delete self object in the cp.confpars
+            del cp.confpars.guimain
+        except :
+            pass
+
+
 #        #print 'Quit GUIMain'
 #        #self.drawev.quitDrawEvent()
 #        if cp.confpars.playerGUIIsOpen :
@@ -274,7 +285,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processSave(self):
         print 'Save'
-#        cp.confpars.writeParameters()
+        cp.confpars.saveParametersInFile( cp.confpars.fname_cp.value() )
 
 
     def processWhatToDisplay(self):
