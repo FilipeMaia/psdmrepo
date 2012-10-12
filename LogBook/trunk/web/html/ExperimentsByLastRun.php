@@ -51,7 +51,7 @@ try {
         $last_run = $e->find_last_run();
         if (is_null($last_run)) continue;
         $begin_time = $last_run->begin_time();
-        array_push ($experiment_by_year_month[$begin_time->year()][$begin_time->month()], $e->name());
+        array_push ($experiment_by_year_month[$begin_time->year()][$begin_time->month()], $e);
     }
     print <<<HERE
 <h3>Experiments groupped by a month when they took their last run</h3>
@@ -67,8 +67,9 @@ HERE;
         foreach (array_reverse(array_keys($experiment_by_year_month[$y])) as $m) {
             $month = $month2name[$m];
             print "<div style=\"float:left; font-weight:bold; width:80px;\">{$month}:</div>";
-            foreach ($experiment_by_year_month[$y][$m] as $name) {
-                print " <div style=\"float:left; width:80px;\">{$name}</div>";
+            foreach ($experiment_by_year_month[$y][$m] as $e) {
+                $url = "<a href=\"../portal?exper_id={$e->id()}&app=datafiles:files\" target=\"_blank\" title=\"open Web Portal of the experiment in a separate tab\">{$e->name()}</a>";
+                print " <div style=\"float:left; width:80px;\">{$url}</div>";
             }
             print "<div style=\"clear:both;\"></div>";
         }

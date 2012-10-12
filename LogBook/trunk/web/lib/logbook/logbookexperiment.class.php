@@ -507,10 +507,18 @@ HERE;
      */
     public function num_entries ( $all = false) {
 
-        /* TODO: This is very inefficient implementation. Replace it by
-         * a direct SQL statement for counting rows instead!.
-         */
-        return count( $this->entries()); }
+        $result = $this->logbook->query (
+            "SELECT COUNT(*) AS 'num_entries' FROM {$this->logbook->database}.header h, {$this->logbook->database}.entry e WHERE h.exper_id=".$this->attr['id'].
+            ' AND h.id = e.hdr_id'.
+            ($all ? '' : ' AND e.parent_entry_id IS NULL'));
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            return intval($attr['num_entries']);
+        }
+        return 0;
+     }
 
     /**
      * Get all known entries
