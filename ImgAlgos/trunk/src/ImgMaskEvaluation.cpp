@@ -231,7 +231,7 @@ ImgMaskEvaluation::collectStat(Event& evt)
       for (unsigned i=0; i<m_size; ++i) {
 	amp = _data[i];
 	if ( amp > m_thre_satu ) p_stat_satu[i] ++;
-	if ( amp < m_thre_nois ) p_stat_nois[i] ++;
+	if ( amp > m_thre_nois ) p_stat_nois[i] ++;
       }          
   } 
   else
