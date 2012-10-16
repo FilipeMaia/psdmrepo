@@ -3,6 +3,9 @@
 namespace DataPortal ;
 
 require_once 'dataportal.inc.php' ;
+require_once 'lusitime/lusitime.inc.php' ;
+
+use \LusiTime\LusiTime;
 
 class ServiceJSON {
 
@@ -29,6 +32,7 @@ class ServiceJSON {
     private $configdb   = null ;
     private $irodsdb    = null ;
     private $neocaptar  = null ;
+    private $irep       = null ;
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -215,7 +219,14 @@ class ServiceJSON {
         }
         return $this->neocaptar ;
     }
-
+    public function irep () {
+        if (is_null($this->irep)) {
+            require_once 'irep/irep.inc.php' ;
+            $this->irep = \Irep\Irep::instance() ;
+            $this->irep->begin() ;
+        }
+        return $this->irep ;
+    }
     // -------------
     //  Finalizers
     // -------------
@@ -224,12 +235,13 @@ class ServiceJSON {
         ServiceJSON::report_error ($message, $parameters) ;
     }
     public function finish ($parameters=array()) {
-        if (!is_null($this->authdb))    $this->authdb->commit() ;
-        if (!is_null($this->regdb))     $this->regdb->commit() ;
-        if (!is_null($this->logbook))   $this->logbook->commit() ;
-        if (!is_null($this->configdb))  $this->configdb->commit() ;
-        if (!is_null($this->irodsdb))   $this->irodsdb->commit() ;
+        if (!is_null($this->authdb   )) $this->authdb   ->commit() ;
+        if (!is_null($this->regdb    )) $this->regdb    ->commit() ;
+        if (!is_null($this->logbook  )) $this->logbook  ->commit() ;
+        if (!is_null($this->configdb )) $this->configdb ->commit() ;
+        if (!is_null($this->irodsdb  )) $this->irodsdb  ->commit() ;
         if (!is_null($this->neocaptar)) $this->neocaptar->commit() ;
+        if (!is_null($this->irep     )) $this->irep     ->commit() ;
         ServiceJSON::report_success ($parameters) ;
     }
 
@@ -253,7 +265,8 @@ class ServiceJSON {
         print json_encode (
             array_merge (
                 array (
-                    'status' => 'success' ,
+                    'status'  => 'success' ,
+                    'updated' => LusiTime::now()->toStringShort()
                 ) ,
                 $parameters
             )

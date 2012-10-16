@@ -1419,7 +1419,7 @@ exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 
 datafiles.exp_id = <?=$exper_id?>;
 datafiles.uid = '<?=$auth_svc->authName()?>';
-datafiles.is_data_administrator = <?=$is_data_administrator?>;
+datafiles.is_data_administrator = <? echo $is_data_administrator ? 1 : 0; ?>;
 
 hdf.exp_id = <?=$exper_id?>;
 

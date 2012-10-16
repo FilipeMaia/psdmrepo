@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-04-04
+2012-10-16 Igor Gaponenko
+- fixed a bug in the index.php. Teh bug affected non-privileged users who
+aren't data administrators.
+
 Tag: V00-04-03
 2012-10-12 Igor Gaponenko
 - Web Portal now partially supports facility e-logs
