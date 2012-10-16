@@ -1,0 +1,155 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DataPortal
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+
+Tag: V00-04-04
+2012-10-16 Igor Gaponenko
+- fixed a bug in the index.php. Teh bug affected non-privileged users who
+aren't data administrators.
+
+Tag: V00-04-03
+2012-10-12 Igor Gaponenko
+- Web Portal now partially supports facility e-logs
+- minor improvemenmts in the PHP WS framework
+
+Tag: V00-04-02
+2012-10-11 Igor Gaponenko
+- added a simple framework to simplify development of JSON Web services in PHP
+- added 3 tests for the new framework
+
+Tag: V00-04-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-03-00
+2012-08-14 Igor Gaponenko
+- added support for the new data retention policy
+
+Tag: V00-02-02
+2012-07-20 Igor Gaponenko
+- added support for migration delay (seconds) in the File Manager tab
+
+Tag: V00-02-01
+2012-06-06 Igor Gaponenko
+- enchanced implementation of the JS class Table
+
+Tag: V00-02-00
+2012-05-21 Igor Gaponenko
+- moved NeoCaptar into a dedicated package
+
+Tag: V00-01-07
+2012-05-17 Igor Gaponenko
+- updated database schema for NeoCaptar
+
+Tag: V00-01-06
+2012-04-23 Igor Gaponenko
+- first production version of the Data Taking (Beam Time) Monitor application
+- finished implementing label printout for NeoCAPTAR cables
+
+Tag: V00-01-05
+2012-03-16 Igor Gaponenko
+- saving results of the on-going development
+- lots of new code added, including Beam-Time Monitor
+- improved e-log in Web Portal allowing to expand/collaps messages on
+a per-day basis
+- note this isn't a stable version of NeoCaptar!
+
+Tag: V00-01-04
+2012-02-14 Igor Gaponenko
+- saving results of the on-going development
+
+
+Tag: V00-01-03
+2011-11-16 Igor Gaponenko
+- migrated to the NetBeans IDE
+
+Tag: V00-01-02-NeoCaptar
+2011-11-16 Igor Gaponenko
+- added new application NeoCaptar; the project is yet to be completed
+- the tag is created to save the status of teh on-going development before migrating from Eclipse
+to NetBeans IDE
+
+Tag: V00-01-01
+2011-09-20 Igor Gaponenko
+- implemented message deletion. Note, that  this operation requires to extend
+LogBook schema using the following MySQL DDL:
+ALTER TABLE `entry` ADD COLUMN (`deleted_time`  BIGINT UNSIGNED DEFAULT NULL, `deleted_by` VARCHAR(32) DEFAULT NULL);
+
+Tag: V00-01-00
+2011-09-16 Igor Gaponenko
+- code refactoring and clean up
+- renaming multiple files
+
+Tag: V00-00-09
+2011-09-16 Igor Gaponenko
+- implemented Data Migration Monitor
+
+Tag: V00-00-08
+2011-07-12 Igor Gaponenko
+- optimized implementation of the Portal to reduce the startup time
+by not loading run information
+- show IDs for threads and replies (this feature is needed by the new verison of
+the Grabber to post messages as replies)
+- allow posting for any run
+- improving the diagnostics by displaying a pop-up modal dialog in case
+of errors in e-log
+- do not allow posting messages/replies w/a any message
+
+
+Tag: V00-00-07
+2011-07-07 Igor Gaponenko
+- adding attachments and tags to existing messages
+- improved (more dynamic) interactions when posting/modifying e-log contents
+- final implementation of the message viewer in the list of runs
+- changed appearance of the message reply dialogs
+
+Tag: V00-00-06
+2011-06-30 Igor Gaponenko
+- added statistics.php to report data management statistics accross all experiments
+- the improved version of Web Portal; numerious improvements and bug fixes
+
+Tag: V00-00-05
+2011-06-14 Igor Gaponenko
+- added a tab for 'Active' experiments into Experiment Switch
+- allowed to deselect anyone (in the e-mail notification section) in
+the Experiment Switch
+- tightened Experiment Switch GUI
+- allowed to retranslate 'FAILED' runs in teh HDF5 translaton interface
+- improved e-log 'Post' and 'Reply' dialogs to submit messages (w/ attachments)
+w/o refreshing the page. This required to bring in an additional
+JQuery plug-in (AJAX Form)
+
+Tag: V00-00-04
+2011-06-10 Igor Gaponenko
+- committing and tagging the first production version of the Protal
+
+Tag: V00-00-03
+2011-05-15 Igor Gaponenko
+- protected Portal pages from being accessed by non-authorized users
+- tagging as the first production version
+
+2011-05-13 Igor Gaponenko
+- save results of the on-going development
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-02
+2011-02-25 Igor Gaponenko
+- the first usable version of e-log Live & Post pages
+
+Tag: V00-00-01
+2010-10-20 Igor Gaponenko
+- this is an initial commit of the Protal implementation with the main goal to save the
+code to SVN.
