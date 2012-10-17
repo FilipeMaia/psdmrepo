@@ -13,7 +13,17 @@ reverse time order.
 
 Tag: V00-00-01
 
-
+2012-10-16 Mikhail S. Dubrovin
+- add/modify modules:
+M       src/GUIMain.py
+A       src/GUISpecularPars.py
+M       src/ConfigParametersCorAna.py
+A       src/GUIBatchInfoLeft.py
+A       src/GUIBeamZeroPars.py
+A       src/GUIImgSizePosition.py
+M       src/GUIInstrExpRun.py
+A       src/GUILoadFiles.py
+	
 2012-10-10 Mikhail S. Dubrovin
 - add dirs/modules:
 A       app

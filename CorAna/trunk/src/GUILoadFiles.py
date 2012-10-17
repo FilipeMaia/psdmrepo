@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIInstrExpRun...
+#  Module GUILoadFiles...
 #
 #------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ def xtc_fname_parser_helper( part, prefix ) :
 #---------------------
 #  Class definition --
 #---------------------
-class GUIInstrExpRun ( QtGui.QWidget ) :
+class GUILoadFiles ( QtGui.QWidget ) :
     """GUI sets the instrument, experiment, and run number for signal and dark data"""
 
     #----------------
@@ -154,7 +154,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
     def closeEvent(self, event):
         #print 'closeEvent'
         try: # try to delete self object in the cp.confpars
-            del cp.confpars.guiinstrexprun# GUIInstrExpRun
+            del cp.confpars.guiinstrexprun# GUILoadFiles
         except AttributeError:
             pass # silently ignore
 
@@ -286,7 +286,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIInstrExpRun ()
+    widget = GUILoadFiles ()
     widget.show()
     app.exec_()
 

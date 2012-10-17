@@ -59,11 +59,13 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.declareCorAnaParameters()
         self.readParametersFromFile ( fname )
         self.initRunTimeParameters()
+        self.defineStyles()
 
-
+  
     def initRunTimeParameters( self ) :
         #self.guiConfigParsIsOpen = False
         pass
+
 
     def declareCorAnaParameters( self ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
@@ -76,7 +78,33 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.str_run_number     = self.declareParameter( name='RUN_NUMBER',        val_def='0015',         typ='str' ) 
         self.str_run_number_dark= self.declareParameter( name='RUN_NUMBER_DARK',   val_def='0014',         typ='str' ) 
 
-#---------------------------------------
+        self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     typ='float' ) 
+        self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     typ='float' ) 
+        self.x0_pos_in_beam0    = self.declareParameter( name='X0_POS_IN_BEAM_ZERO',      val_def=-59,        typ='int' ) 
+        self.z0_pos_in_beam0    = self.declareParameter( name='Z0_POS_IN_BEAM_ZERO',      val_def=175,        typ='int' ) 
+
+        self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR', val_def=-1,     typ='float' ) 
+        self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR', val_def=-2,     typ='float' ) 
+        self.x0_pos_in_specular = self.declareParameter( name='X0_SPEC_IN_SPECULAR',   val_def=-3,     typ='int' ) 
+        self.z0_pos_in_specular = self.declareParameter( name='Z0_SPEC_IN_SPECULAR',   val_def=-4,     typ='int' ) 
+
+        self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=4000.1,          typ='float' )
+        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Transmission',  typ='str' )
+        self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          typ='float' )
+        self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              typ='float' )
+
+
+    def defineStyles( self ) :
+        self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0)" # Yellowish
+        self.stylePink   = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0)" # Pinkish
+        self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0)" # Gray
+        self.styleGreen  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0)" # Greenish
+        #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
+        #self.styleTitle  = "color: rgb(150, 160, 100);"
+        self.styleTitle  = "color: rgb(150, 100, 50);"
+        self.styleLabel  = "color: rgb(000, 000, 255);"
+        self.styleEdit   = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
+
 
     def printParsDirectly( self ) :
         print 'Direct use of parameter:' + self.fname_cp .name(), self.fname_cp .value()  
