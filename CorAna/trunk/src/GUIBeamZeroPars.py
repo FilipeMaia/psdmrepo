@@ -97,7 +97,7 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
     def setStyle(self):
         self.            setStyleSheet (cp.confpars.styleYellow)
@@ -131,7 +131,7 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
     def closeEvent(self, event):
         #print 'closeEvent'
         try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibatchinfoleft # GUIBeamZeroPars
+            del cp.confpars.guibeamzeropars # GUIBeamZeroPars
         except AttributeError:
             pass # silently ignore
 

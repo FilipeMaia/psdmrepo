@@ -93,12 +93,24 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          typ='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              typ='float' )
 
+        self.col_begin          = self.declareParameter( name='IMG_COL_BEGIN',         val_def=0,              typ='int' )
+        self.col_end            = self.declareParameter( name='IMG_COL_END',           val_def=1339,           typ='int' )
+        self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',         val_def=1,              typ='int' )
+        self.row_end            = self.declareParameter( name='IMG_ROW_END',           val_def=1299,           typ='int' )
+        self.x_frame_pos        = self.declareParameter( name='X_FRAME_POS',           val_def=-51,            typ='int' )
+        self.z_frame_pos        = self.declareParameter( name='Z_FRAME_POS',           val_def=183,            typ='int' )
+
+        self.kin_mode               = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',typ='str' )
+        self.kin_win_size           = self.declareParameter( name='KINETICS_WIN_SIZE',    val_def=1,             typ='int' )
+        self.kin_top_row            = self.declareParameter( name='KINETICS_TOP_ROW',     val_def=2,             typ='int' )
+        self.kin_slice_first        = self.declareParameter( name='KINETICS_SLICE_FIRST', val_def=3,             typ='int' )
+        self.kin_slice_last         = self.declareParameter( name='KINETICS_SLICE_LAST',  val_def=4,             typ='int' )
 
     def defineStyles( self ) :
-        self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0)" # Yellowish
-        self.stylePink   = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0)" # Pinkish
-        self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0)" # Gray
-        self.styleGreen  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0)" # Greenish
+        self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
+        self.stylePink   = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
+        self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
+        self.styleGreen  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
         #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
         #self.styleTitle  = "color: rgb(150, 160, 100);"
         self.styleTitle  = "color: rgb(150, 100, 50);"

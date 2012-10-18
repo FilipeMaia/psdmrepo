@@ -47,37 +47,47 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.setWindowTitle('Specularly Reflected Beam Parameters')
         self.setFrame()
 
-        self.titImageSize  = QtGui.QLabel('Saved CCD Image Size:')
-        self.tit_col       = QtGui.QLabel('column(x)')
-        self.tit_row       = QtGui.QLabel('row(y)')
+        self.titImageSize  = QtGui.QLabel('Saved Camera Image Size:')
+        self.tit_col       = QtGui.QLabel('column (x)')
+        self.tit_row       = QtGui.QLabel('row (y)')
         self.tit_begin     = QtGui.QLabel('begin')
         self.tit_end       = QtGui.QLabel('end')
-
-        self.titCameraPos  = QtGui.QLabel('CCD Posituion During Data Collection:')
-        self.tit_frame_x   = QtGui.QLabel('CCD x')
-        self.tit_frame_y   = QtGui.QLabel('CCD y')
+        self.titCameraPos  = QtGui.QLabel('Camera Posituion During Data Collection:')
+        self.tit_frame_x   = QtGui.QLabel('Pos x')
+        self.tit_frame_z   = QtGui.QLabel('Pos z')
  
-        self.edi_x_coord = QtGui.QLineEdit( str( cp.confpars.x_coord_specular.value() ) )        
-        self.edi_y_coord = QtGui.QLineEdit( str( cp.confpars.y_coord_specular.value() ) )        
-        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.confpars.x0_pos_in_specular.value() ) )        
-        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.confpars.z0_pos_in_specular.value() ) )        
+        self.edi_col_begin    = QtGui.QLineEdit( str( cp.confpars.col_begin  .value() ) )        
+        self.edi_col_end      = QtGui.QLineEdit( str( cp.confpars.col_end    .value() ) )        
+        self.edi_row_begin    = QtGui.QLineEdit( str( cp.confpars.row_begin  .value() ) )        
+        self.edi_row_end      = QtGui.QLineEdit( str( cp.confpars.row_end    .value() ) )        
+        self.edi_x_frame_pos  = QtGui.QLineEdit( str( cp.confpars.x_frame_pos.value() ) )        
+        self.edi_z_frame_pos  = QtGui.QLineEdit( str( cp.confpars.z_frame_pos.value() ) )        
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.titSpecular,       0, 0, 1, 9)
-        self.grid.addWidget(self.tit_x_coord,       1, 1, 1, 9)
-        self.grid.addWidget(self.tit_y_coord,       2, 1, 1, 9)
-        self.grid.addWidget(self.tit_x0_pos ,       3, 1, 1, 9)
-        self.grid.addWidget(self.tit_z0_pos ,       4, 1, 1, 9)
-        self.grid.addWidget(self.edi_x_coord,       1, 10)
-        self.grid.addWidget(self.edi_y_coord,       2, 10)
-        self.grid.addWidget(self.edi_x0_pos ,       3, 10)
-        self.grid.addWidget(self.edi_z0_pos ,       4, 10)
+        self.grid.addWidget(self.titImageSize,       0, 0, 1,8)
+        self.grid.addWidget(self.tit_col     ,       1, 3)
+        self.grid.addWidget(self.tit_row     ,       1, 5)
+        self.grid.addWidget(self.tit_begin   ,       2, 2)
+        self.grid.addWidget(self.tit_end     ,       3, 2)
+        self.grid.addWidget(self.titCameraPos,       4, 0, 1,8)
+        self.grid.addWidget(self.tit_frame_x ,       5, 2)
+        self.grid.addWidget(self.tit_frame_z ,       5, 4)
+
+        self.grid.addWidget(self.edi_col_begin  ,       2, 3)
+        self.grid.addWidget(self.edi_col_end    ,       3, 3)
+        self.grid.addWidget(self.edi_row_begin  ,       2, 5)
+        self.grid.addWidget(self.edi_row_end    ,       3, 5)
+        self.grid.addWidget(self.edi_x_frame_pos,       5, 3)
+        self.grid.addWidget(self.edi_z_frame_pos,       5, 5)
+
         self.setLayout(self.grid)
 
-        self.connect( self.edi_x_coord,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_x_coord )
-        self.connect( self.edi_y_coord,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_y_coord )
-        self.connect( self.edi_x0_pos ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_x0_pos )
-        self.connect( self.edi_z0_pos ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_z0_pos )
+        self.connect( self.edi_col_begin  ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_col_begin   )
+        self.connect( self.edi_col_end    ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_col_end     )
+        self.connect( self.edi_row_begin  ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_row_begin   )
+        self.connect( self.edi_row_end    ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_row_end     )
+        self.connect( self.edi_x_frame_pos,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_x_frame_pos )
+        self.connect( self.edi_z_frame_pos,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_z_frame_pos )
  
         self.showToolTips()
         self.setStyle()
@@ -88,12 +98,14 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
 
     def showToolTips(self):
         # Tips for buttons and fields:
-        msg = 'Edit coordinate'
-        self.titSpecular.setToolTip('This section allows to monitor/modify\nthe beam/spec parameters\nin specular mode')
-        self.edi_x_coord.setToolTip( msg )
-        self.edi_y_coord.setToolTip( msg )
-        self.edi_x0_pos .setToolTip( msg )
-        self.edi_z0_pos .setToolTip( msg )
+        msg = 'You may edit this field...\non your own risk, of cause...'
+        self.titImageSize.setToolTip('This section allows to monitor/modify\nthe frame image size and position')
+        self.edi_col_begin  .setToolTip( msg )
+        self.edi_col_end    .setToolTip( msg )
+        self.edi_row_begin  .setToolTip( msg )
+        self.edi_row_end    .setToolTip( msg )
+        self.edi_x_frame_pos.setToolTip( msg )
+        self.edi_z_frame_pos.setToolTip( msg )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -101,32 +113,57 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.confpars.styleYellow)
-        self.titSpecular.setStyleSheet (cp.confpars.styleTitle)
-        self.tit_x_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_y_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_x0_pos .setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_z0_pos .setStyleSheet (cp.confpars.styleLabel) 
-
-        self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_x0_pos .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_z0_pos .setAlignment(QtCore.Qt.AlignRight)
 
         width = 80
+        width_label = 50
 
-        self.edi_x_coord.setFixedWidth(width)
-        self.edi_y_coord.setFixedWidth(width)
-        self.edi_x0_pos .setFixedWidth(width)
-        self.edi_z0_pos .setFixedWidth(width)
+        self.              setStyleSheet (cp.confpars.styleYellow)
+        self.titImageSize .setStyleSheet (cp.confpars.styleTitle)
+        self.tit_col      .setStyleSheet (cp.confpars.styleLabel)
+        self.tit_row      .setStyleSheet (cp.confpars.styleLabel)
+        self.tit_begin    .setStyleSheet (cp.confpars.styleLabel) 
+        self.tit_end      .setStyleSheet (cp.confpars.styleLabel) 
+        self.titCameraPos .setStyleSheet (cp.confpars.styleTitle) 
+        self.tit_frame_x  .setStyleSheet (cp.confpars.styleLabel) 
+        self.tit_frame_z  .setStyleSheet (cp.confpars.styleLabel) 
 
-        self.edi_x_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_y_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_x0_pos .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_z0_pos .setStyleSheet(cp.confpars.styleEdit) 
+        self.tit_begin    .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_end      .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_col      .setAlignment(QtCore.Qt.AlignCenter)
+        self.tit_row      .setAlignment(QtCore.Qt.AlignCenter)
+        self.tit_frame_x  .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_frame_z  .setAlignment(QtCore.Qt.AlignRight)
+
+        self.tit_begin    .setFixedWidth(width_label)
+        self.tit_end      .setFixedWidth(width_label)
+        self.tit_frame_x  .setFixedWidth(width_label)
+        self.tit_frame_z  .setFixedWidth(width_label)
+
+
+        self.edi_col_begin  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_col_end    .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_row_begin  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_row_end    .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_x_frame_pos.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_z_frame_pos.setAlignment(QtCore.Qt.AlignRight)
+
+        self.edi_col_begin  .setFixedWidth(width)
+        self.edi_col_end    .setFixedWidth(width)
+        self.edi_row_begin  .setFixedWidth(width)
+        self.edi_row_end    .setFixedWidth(width)
+        self.edi_x_frame_pos.setFixedWidth(width)
+        self.edi_z_frame_pos.setFixedWidth(width)
+
+
+        self.edi_col_begin  .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_col_end    .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_row_begin  .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_row_end    .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_x_frame_pos.setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_z_frame_pos.setStyleSheet(cp.confpars.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -135,7 +172,7 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
     def closeEvent(self, event):
         #print 'closeEvent'
         try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibatchinfoleft # GUIImgSizePosition
+            del cp.confpars.guiimgsizeposition # GUIImgSizePosition
         except AttributeError:
             pass # silently ignore
 
@@ -152,22 +189,29 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         pass
 #        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
 
-    def on_edi_x_coord(self):
-        cp.confpars.x_coord_specular.setValue( float(self.edi_x_coord.displayText()) )
-        print 'Set x_coord_specular =', cp.confpars.x_coord_specular.value()
+    def on_edi_col_begin(self):
+        cp.confpars.col_begin.setValue( float(self.edi_col_begin.displayText()) )
+        print 'Set col_begin =', cp.confpars.col_begin.value()
 
-    def on_edi_y_coord(self):
-        print 'on_edi_y_coord'
-        cp.confpars.y_coord_specular.setValue( float(self.edi_y_coord.displayText()) )
-        print 'Set y_coord_specular =', cp.confpars.y_coord_specular.value()
+    def on_edi_col_end(self):
+        cp.confpars.col_end.setValue( float(self.edi_col_end.displayText()) )
+        print 'Set col_end =', cp.confpars.col_end.value()
 
-    def on_edi_x0_pos(self):
-        cp.confpars.x0_pos_in_specular.setValue( float(self.edi_x0_pos.displayText()) )
-        print 'Set x0_pos_in_specular =', cp.confpars.x0_pos_in_specular.value()
+    def on_edi_row_begin(self):
+        cp.confpars.row_begin.setValue( float(self.edi_row_begin.displayText()) )
+        print 'Set row_begin =', cp.confpars.row_begin.value()
 
-    def on_edi_z0_pos(self):
-        cp.confpars.z0_pos_in_specular.setValue( float(self.edi_z0_pos.displayText()) )
-        print 'Set z0_pos_in_specular =', cp.confpars.z0_pos_in_specular.value()
+    def on_edi_row_end(self):
+        cp.confpars.row_end.setValue( float(self.edi_row_end.displayText()) )
+        print 'Set row_end =', cp.confpars.row_end.value()
+
+    def on_edi_x_frame_pos(self):
+        cp.confpars.x_frame_pos.setValue( float(self.edi_x_frame_pos.displayText()) )
+        print 'Set x_frame_pos =', cp.confpars.x_frame_pos.value()
+
+    def on_edi_z_frame_pos(self):
+        cp.confpars.z_frame_pos.setValue( float(self.edi_z_frame_pos.displayText()) )
+        print 'Set z_frame_pos =', cp.confpars.z_frame_pos.value()
 
 #-----------------------------
 
