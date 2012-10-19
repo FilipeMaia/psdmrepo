@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -44,7 +44,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        #self.parent = cp.confpars.guimain
+        #self.parent = cp.guimain
 
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Configuration Parameters')
@@ -58,7 +58,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         self.butDefault  = QtGui.QPushButton("Reset default")
         self.butPrint    = QtGui.QPushButton("Print current")
         self.butClose    = QtGui.QPushButton("Close")
-        self.fnameEdit   = QtGui.QLineEdit( cp.confpars.fname_cp.value() )        
+        self.fnameEdit   = QtGui.QLineEdit( cp.fname_cp.value() )        
 
         grid = QtGui.QGridLayout()
         grid.addWidget(self.titFile,       0, 0, 1, 4)
@@ -110,8 +110,8 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guiconfigparameters 
+        try: # try to delete self object in the cp
+            del cp.guiconfigparameters 
         except : # AttributeError:
             pass
 
@@ -125,24 +125,24 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def processRead(self):
         print 'Read'
-        cp.confpars.readParametersFromFile( self.getFileNameFromEditField() )
-        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
-        #self.parent.fnameEdit.setText( cp.confpars.fname_cp.value() )
+        cp.readParametersFromFile( self.getFileNameFromEditField() )
+        self.fnameEdit.setText( cp.fname_cp.value() )
+        #self.parent.fnameEdit.setText( cp.fname_cp.value() )
         #self.refreshGUIWhatToDisplay()
 
     def processWrite(self):
         print 'Write'
-        cp.confpars.saveParametersInFile( self.getFileNameFromEditField() )
+        cp.saveParametersInFile( self.getFileNameFromEditField() )
 
     def processDefault(self):
         print 'Set default values of configuration parameters.'
-        cp.confpars.setDefaultValues()
-        self.fnameEdit.setText( cp.confpars.fname_cp.value() )
+        cp.setDefaultValues()
+        self.fnameEdit.setText( cp.fname_cp.value() )
         #self.refreshGUIWhatToDisplay()
 
     def processPrint(self):
         print 'Print'
-        cp.confpars.printParameters()
+        cp.printParameters()
 
     def processBrowse(self):
         print 'Browse'
@@ -157,12 +157,12 @@ class GUIConfigParameters ( QtGui.QWidget ) :
             print 'Input directiry name or file name is empty... use default values'  
         else :
             self.fnameEdit.setText(self.path)
-            cp.confpars.fname_cp.setValue(self.path)
+            cp.fname_cp.setValue(self.path)
 
     def processFileEdit(self):
         print 'FileEdit'
         self.path = self.getFileNameFromEditField()
-        cp.confpars.fname_cp.setValue(self.path)
+        cp.fname_cp.setValue(self.path)
         dname,fname = os.path.split(self.path)
         print 'Set dname : %s' % (dname)
         print 'Set fname : %s' % (fname)

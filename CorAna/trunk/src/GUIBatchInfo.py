@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 from GUIBatchInfoLeft   import *
 from GUIBatchInfoRight  import *
@@ -56,12 +56,12 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.butClose  = QtGui.QPushButton('Close') 
         self.butApply  = QtGui.QPushButton('Apply') 
         self.butShow   = QtGui.QPushButton('Show Image') 
-        cp.confpars.guibatchinfoleft  = GUIBatchInfoLeft()
-        cp.confpars.guibatchinforight = GUIBatchInfoRight()
+        cp.guibatchinfoleft  = GUIBatchInfoLeft()
+        cp.guibatchinforight = GUIBatchInfoRight()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.confpars.guibatchinfoleft)
-        self.hboxM.addWidget(cp.confpars.guibatchinforight)
+        self.hboxM.addWidget(cp.guibatchinfoleft)
+        self.hboxM.addWidget(cp.guibatchinforight)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.titStatus)
@@ -103,12 +103,12 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        #self.          setStyleSheet (cp.confpars.styleYellow)
-        self.titTitle .setStyleSheet (cp.confpars.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
-        self.titStatus.setStyleSheet (cp.confpars.styleTitle)
-        self.butClose .setStyleSheet (cp.confpars.styleGray)
-        self.butApply .setStyleSheet (cp.confpars.styleGray) 
-        self.butShow  .setStyleSheet (cp.confpars.styleGray) 
+        #self.          setStyleSheet (cp.styleYellow)
+        self.titTitle .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
+        self.titStatus.setStyleSheet (cp.styleTitle)
+        self.butClose .setStyleSheet (cp.styleGray)
+        self.butApply .setStyleSheet (cp.styleGray) 
+        self.butShow  .setStyleSheet (cp.styleGray) 
 
         self.titTitle .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()
@@ -118,8 +118,8 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibatchinfo # GUIBatchInfo
+        try: # try to delete self object in the cp
+            del cp.guibatchinfo # GUIBatchInfo
         except AttributeError:
             pass # silently ignore
 
@@ -134,7 +134,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
 
     def onApply(self):

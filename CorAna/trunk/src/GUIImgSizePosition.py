@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -56,12 +56,12 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.tit_frame_x   = QtGui.QLabel('Pos x')
         self.tit_frame_z   = QtGui.QLabel('Pos z')
  
-        self.edi_col_begin    = QtGui.QLineEdit( str( cp.confpars.col_begin  .value() ) )        
-        self.edi_col_end      = QtGui.QLineEdit( str( cp.confpars.col_end    .value() ) )        
-        self.edi_row_begin    = QtGui.QLineEdit( str( cp.confpars.row_begin  .value() ) )        
-        self.edi_row_end      = QtGui.QLineEdit( str( cp.confpars.row_end    .value() ) )        
-        self.edi_x_frame_pos  = QtGui.QLineEdit( str( cp.confpars.x_frame_pos.value() ) )        
-        self.edi_z_frame_pos  = QtGui.QLineEdit( str( cp.confpars.z_frame_pos.value() ) )        
+        self.edi_col_begin    = QtGui.QLineEdit( str( cp.col_begin  .value() ) )        
+        self.edi_col_end      = QtGui.QLineEdit( str( cp.col_end    .value() ) )        
+        self.edi_row_begin    = QtGui.QLineEdit( str( cp.row_begin  .value() ) )        
+        self.edi_row_end      = QtGui.QLineEdit( str( cp.row_end    .value() ) )        
+        self.edi_x_frame_pos  = QtGui.QLineEdit( str( cp.x_frame_pos.value() ) )        
+        self.edi_z_frame_pos  = QtGui.QLineEdit( str( cp.z_frame_pos.value() ) )        
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.titImageSize,       0, 0, 1,8)
@@ -98,7 +98,7 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
 
     def showToolTips(self):
         # Tips for buttons and fields:
-        msg = 'You may edit this field...\non your own risk, of cause...'
+        msg = 'Edit field'
         self.titImageSize.setToolTip('This section allows to monitor/modify\nthe frame image size and position')
         self.edi_col_begin  .setToolTip( msg )
         self.edi_col_end    .setToolTip( msg )
@@ -120,15 +120,15 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         width = 80
         width_label = 50
 
-        self.              setStyleSheet (cp.confpars.styleYellow)
-        self.titImageSize .setStyleSheet (cp.confpars.styleTitle)
-        self.tit_col      .setStyleSheet (cp.confpars.styleLabel)
-        self.tit_row      .setStyleSheet (cp.confpars.styleLabel)
-        self.tit_begin    .setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_end      .setStyleSheet (cp.confpars.styleLabel) 
-        self.titCameraPos .setStyleSheet (cp.confpars.styleTitle) 
-        self.tit_frame_x  .setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_frame_z  .setStyleSheet (cp.confpars.styleLabel) 
+        self.              setStyleSheet (cp.styleYellow)
+        self.titImageSize .setStyleSheet (cp.styleTitle)
+        self.tit_col      .setStyleSheet (cp.styleLabel)
+        self.tit_row      .setStyleSheet (cp.styleLabel)
+        self.tit_begin    .setStyleSheet (cp.styleLabel) 
+        self.tit_end      .setStyleSheet (cp.styleLabel) 
+        self.titCameraPos .setStyleSheet (cp.styleTitle) 
+        self.tit_frame_x  .setStyleSheet (cp.styleLabel) 
+        self.tit_frame_z  .setStyleSheet (cp.styleLabel) 
 
         self.tit_begin    .setAlignment(QtCore.Qt.AlignRight)
         self.tit_end      .setAlignment(QtCore.Qt.AlignRight)
@@ -158,12 +158,12 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.edi_z_frame_pos.setFixedWidth(width)
 
 
-        self.edi_col_begin  .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_col_end    .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_row_begin  .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_row_end    .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_x_frame_pos.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_z_frame_pos.setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_col_begin  .setStyleSheet(cp.styleEdit) 
+        self.edi_col_end    .setStyleSheet(cp.styleEdit) 
+        self.edi_row_begin  .setStyleSheet(cp.styleEdit) 
+        self.edi_row_end    .setStyleSheet(cp.styleEdit) 
+        self.edi_x_frame_pos.setStyleSheet(cp.styleEdit) 
+        self.edi_z_frame_pos.setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -171,8 +171,8 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guiimgsizeposition # GUIImgSizePosition
+        try: # try to delete self object in the cp
+            del cp.guiimgsizeposition # GUIImgSizePosition
         except AttributeError:
             pass # silently ignore
 
@@ -187,31 +187,31 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def on_edi_col_begin(self):
-        cp.confpars.col_begin.setValue( float(self.edi_col_begin.displayText()) )
-        print 'Set col_begin =', cp.confpars.col_begin.value()
+        cp.col_begin.setValue( float(self.edi_col_begin.displayText()) )
+        print 'Set col_begin =', cp.col_begin.value()
 
     def on_edi_col_end(self):
-        cp.confpars.col_end.setValue( float(self.edi_col_end.displayText()) )
-        print 'Set col_end =', cp.confpars.col_end.value()
+        cp.col_end.setValue( float(self.edi_col_end.displayText()) )
+        print 'Set col_end =', cp.col_end.value()
 
     def on_edi_row_begin(self):
-        cp.confpars.row_begin.setValue( float(self.edi_row_begin.displayText()) )
-        print 'Set row_begin =', cp.confpars.row_begin.value()
+        cp.row_begin.setValue( float(self.edi_row_begin.displayText()) )
+        print 'Set row_begin =', cp.row_begin.value()
 
     def on_edi_row_end(self):
-        cp.confpars.row_end.setValue( float(self.edi_row_end.displayText()) )
-        print 'Set row_end =', cp.confpars.row_end.value()
+        cp.row_end.setValue( float(self.edi_row_end.displayText()) )
+        print 'Set row_end =', cp.row_end.value()
 
     def on_edi_x_frame_pos(self):
-        cp.confpars.x_frame_pos.setValue( float(self.edi_x_frame_pos.displayText()) )
-        print 'Set x_frame_pos =', cp.confpars.x_frame_pos.value()
+        cp.x_frame_pos.setValue( float(self.edi_x_frame_pos.displayText()) )
+        print 'Set x_frame_pos =', cp.x_frame_pos.value()
 
     def on_edi_z_frame_pos(self):
-        cp.confpars.z_frame_pos.setValue( float(self.edi_z_frame_pos.displayText()) )
-        print 'Set z_frame_pos =', cp.confpars.z_frame_pos.value()
+        cp.z_frame_pos.setValue( float(self.edi_z_frame_pos.displayText()) )
+        print 'Set z_frame_pos =', cp.z_frame_pos.value()
 
 #-----------------------------
 

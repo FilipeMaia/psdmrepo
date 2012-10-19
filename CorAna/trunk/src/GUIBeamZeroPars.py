@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -53,10 +53,10 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
         self.tit_x0_pos  = QtGui.QLabel('CCD x0 position in beam0 measurement')
         self.tit_z0_pos  = QtGui.QLabel('CCD z0 position in beam0 measurement')
 
-        self.edi_x_coord = QtGui.QLineEdit( str( cp.confpars.x_coord_beam0.value() ) )        
-        self.edi_y_coord = QtGui.QLineEdit( str( cp.confpars.y_coord_beam0.value() ) )        
-        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.confpars.x0_pos_in_beam0.value() ) )        
-        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.confpars.z0_pos_in_beam0.value() ) )        
+        self.edi_x_coord = QtGui.QLineEdit( str( cp.x_coord_beam0.value() ) )        
+        self.edi_y_coord = QtGui.QLineEdit( str( cp.y_coord_beam0.value() ) )        
+        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.x0_pos_in_beam0.value() ) )        
+        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.z0_pos_in_beam0.value() ) )        
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.titBeamZero,       0, 0, 1, 9)
@@ -100,12 +100,12 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.confpars.styleYellow)
-        self.titBeamZero.setStyleSheet (cp.confpars.styleTitle)
-        self.tit_x_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_y_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_x0_pos .setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_z0_pos .setStyleSheet (cp.confpars.styleLabel) 
+        self.            setStyleSheet (cp.styleYellow)
+        self.titBeamZero.setStyleSheet (cp.styleTitle)
+        self.tit_x_coord.setStyleSheet (cp.styleLabel)
+        self.tit_y_coord.setStyleSheet (cp.styleLabel)
+        self.tit_x0_pos .setStyleSheet (cp.styleLabel) 
+        self.tit_z0_pos .setStyleSheet (cp.styleLabel) 
 
         self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
         self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
@@ -119,10 +119,10 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
         self.edi_x0_pos .setFixedWidth(width)
         self.edi_z0_pos .setFixedWidth(width)
 
-        self.edi_x_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_y_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_x0_pos .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_z0_pos .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_x_coord.setStyleSheet(cp.styleEdit) 
+        self.edi_y_coord.setStyleSheet(cp.styleEdit) 
+        self.edi_x0_pos .setStyleSheet(cp.styleEdit) 
+        self.edi_z0_pos .setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -130,8 +130,8 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibeamzeropars # GUIBeamZeroPars
+        try: # try to delete self object in the cp
+            del cp.guibeamzeropars # GUIBeamZeroPars
         except AttributeError:
             pass # silently ignore
 
@@ -146,24 +146,24 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def on_edi_x_coord(self):
-        cp.confpars.x_coord_beam0.setValue( float(self.edi_x_coord.displayText()) )
-        print 'Set x_coord_beam0 =', cp.confpars.x_coord_beam0.value()
+        cp.x_coord_beam0.setValue( float(self.edi_x_coord.displayText()) )
+        print 'Set x_coord_beam0 =', cp.x_coord_beam0.value()
 
     def on_edi_y_coord(self):
         print 'on_edi_y_coord'
-        cp.confpars.y_coord_beam0.setValue( float(self.edi_y_coord.displayText()) )
-        print 'Set y_coord_beam0 =', cp.confpars.y_coord_beam0.value()
+        cp.y_coord_beam0.setValue( float(self.edi_y_coord.displayText()) )
+        print 'Set y_coord_beam0 =', cp.y_coord_beam0.value()
 
     def on_edi_x0_pos(self):
-        cp.confpars.x0_pos_in_beam0.setValue( float(self.edi_x0_pos.displayText()) )
-        print 'Set x0_pos_in_beam0 =', cp.confpars.x0_pos_in_beam0.value()
+        cp.x0_pos_in_beam0.setValue( float(self.edi_x0_pos.displayText()) )
+        print 'Set x0_pos_in_beam0 =', cp.x0_pos_in_beam0.value()
 
     def on_edi_z0_pos(self):
-        cp.confpars.z0_pos_in_beam0.setValue( float(self.edi_z0_pos.displayText()) )
-        print 'Set z0_pos_in_beam0 =', cp.confpars.z0_pos_in_beam0.value()
+        cp.z0_pos_in_beam0.setValue( float(self.edi_z0_pos.displayText()) )
+        print 'Set z0_pos_in_beam0 =', cp.z0_pos_in_beam0.value()
 
 #-----------------------------
 

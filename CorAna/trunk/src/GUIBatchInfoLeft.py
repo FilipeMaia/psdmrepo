@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 from GUIBeamZeroPars    import *
 from GUISpecularPars    import *
@@ -53,26 +53,25 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.setFrame()
  
         self.list_of_modes  = ['Transmission', 'Specular']
-        self.char_expand    = u' \u25BE' # down-head triangle
 
         self.titDistance   = QtGui.QLabel('Sample-Detector Distance (mm):')
         self.titSetupGeom  = QtGui.QLabel('Experiment Setup Geometry:')
         self.titPhotonE    = QtGui.QLabel('X-Ray Photon Energy (keV):')
         self.titNomAngle   = QtGui.QLabel('Nominal Angle:')
 
-        cp.confpars.guiimgsizeposition = GUIImgSizePosition()
+        cp.guiimgsizeposition = GUIImgSizePosition()
 
-        self.ediDistance   = QtGui.QLineEdit  ( str(cp.confpars.sample_det_dist.value()) )
-        self.ediPhotonE    = QtGui.QLineEdit  ( str(cp.confpars.photon_energy.value()) ) 
-        self.ediNomAngle   = QtGui.QLineEdit  ( str(cp.confpars.nominal_angle.value()) ) 
-        self.butSetupGeom  = QtGui.QPushButton( cp.confpars.exp_setup_geom.value() + self.char_expand  ) 
+        self.ediDistance   = QtGui.QLineEdit  ( str(cp.sample_det_dist.value()) )
+        self.ediPhotonE    = QtGui.QLineEdit  ( str(cp.photon_energy.value()) ) 
+        self.ediNomAngle   = QtGui.QLineEdit  ( str(cp.nominal_angle.value()) ) 
+        #self.butSetupGeom  = QtGui.QPushButton( cp.exp_setup_geom.value() + cp.char_expand  ) 
+        #setPopupMenu(self)
+        self.boxSetupGeom  = QtGui.QComboBox( self ) 
+        self.boxSetupGeom.addItems(self.list_of_modes)
+        self.boxSetupGeom.setCurrentIndex( self.list_of_modes.index(cp.exp_setup_geom.value()) )
 
         self.ediNomAngle.setReadOnly( True ) 
         self.ediPhotonE .setReadOnly( True ) 
-
-        self.popupMenuMode = QtGui.QMenu()
-        for mode in self.list_of_modes :
-            self.popupMenuMode.addAction( mode )
 
         self.hboxG = QtGui.QHBoxLayout()
         self.hboxD = QtGui.QHBoxLayout()
@@ -85,7 +84,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
 
         self.hboxG.addWidget(self.titSetupGeom)
         self.hboxG.addStretch(1)     
-        self.hboxG.addWidget(self.butSetupGeom)
+        self.hboxG.addWidget(self.boxSetupGeom)
         self.hboxD.addWidget(self.titDistance)
         self.hboxD.addStretch(1)     
         self.hboxD.addWidget(self.ediDistance)
@@ -100,13 +99,14 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxG)
         self.vbox.addLayout(self.hboxD)
         self.vbox.addLayout(self.hboxW)
-        self.vbox.addWidget(cp.confpars.guiimgsizeposition)
+        self.vbox.addWidget(cp.guiimgsizeposition)
         self.vbox.addLayout(self.hboxE)
         self.vbox.addLayout(self.hboxA)
         self.setLayout(self.vbox)
         
-        self.connect( self.butSetupGeom, QtCore.SIGNAL('clicked()'),         self.onButSetupGeom )
-        self.connect( self.ediDistance,  QtCore.SIGNAL('editingFinished()'), self.onEdiDistance )
+        #self.connect( self.butSetupGeom, QtCore.SIGNAL('clicked()'),         self.onButSetupGeom )
+        self.connect( self.boxSetupGeom, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBoxSetupGeom )
+        self.connect( self.ediDistance,  QtCore.SIGNAL('editingFinished()'),        self.onEdiDistance )
 
         self.showToolTips()
         self.setStyle()
@@ -126,10 +126,10 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
 #        except AttributeError :
 #            pass
 
-#        if cp.confpars.exp_setup_geom.value() == self.list_of_modes[0] :
+#        if cp.exp_setup_geom.value() == self.list_of_modes[0] :
 #            self.hboxA.setEnabled(False)
 
-#        if cp.confpars.exp_setup_geom.value() == self.list_of_modes[1] :
+#        if cp.exp_setup_geom.value() == self.list_of_modes[1] :
 #            self.hboxA.setEnabled(True)
 
 
@@ -141,21 +141,28 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         except AttributeError :
             pass
 
-        if cp.confpars.exp_setup_geom.value() == self.list_of_modes[0] :
-            cp.confpars.guibeamzeropars = GUIBeamZeroPars()
-            self.guiWin = cp.confpars.guibeamzeropars
+        if cp.exp_setup_geom.value() == self.list_of_modes[0] :
+            cp.guibeamzeropars = GUIBeamZeroPars()
+            self.guiWin = cp.guibeamzeropars
 
-        if cp.confpars.exp_setup_geom.value() == self.list_of_modes[1] :
-            cp.confpars.guispecularpars = GUISpecularPars()
-            self.guiWin = cp.confpars.guispecularpars
+        if cp.exp_setup_geom.value() == self.list_of_modes[1] :
+            cp.guispecularpars = GUISpecularPars()
+            self.guiWin = cp.guispecularpars
 
         self.hboxW.addWidget(self.guiWin)
 
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
-        #msg_edi = 'WARNING: whatever you edit may be incorrect...\nIt is recommended to use the '
-        #self.butInstr  .setToolTip('Select the instrument name from the pop-up menu.')
+        msg_edit = 'Edit field'
+        msg_info = 'Information field'
+        msg_sele = 'Selection field'
+        
+        self.boxSetupGeom.setToolTip( msg_sele )
+        self.ediDistance .setToolTip( msg_edit )
+        self.ediPhotonE  .setToolTip( msg_info )
+        self.ediNomAngle .setToolTip( msg_info )
+
         pass
 
     def setFrame(self):
@@ -167,15 +174,16 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.confpars.styleYellow)
-        self.titDistance .setStyleSheet (cp.confpars.styleTitle)
-        self.titPhotonE  .setStyleSheet (cp.confpars.styleTitle)
-        self.titNomAngle .setStyleSheet (cp.confpars.styleTitle)
-        self.titSetupGeom.setStyleSheet (cp.confpars.styleTitle)
+        self.            setStyleSheet (cp.styleYellow)
+        self.titDistance .setStyleSheet (cp.styleTitle)
+        self.titPhotonE  .setStyleSheet (cp.styleTitle)
+        self.titNomAngle .setStyleSheet (cp.styleTitle)
+        self.titSetupGeom.setStyleSheet (cp.styleTitle)
 
-        self.ediDistance .setStyleSheet(cp.confpars.styleEdit) 
-        self.ediPhotonE  .setStyleSheet(cp.confpars.styleGreen) 
-        self.ediNomAngle .setStyleSheet(cp.confpars.styleGreen) 
+        self.ediDistance .setStyleSheet(cp.styleEdit) 
+        self.ediPhotonE  .setStyleSheet(cp.styleGreen) 
+        self.ediNomAngle .setStyleSheet(cp.styleGreen) 
+        self.boxSetupGeom.setStyleSheet(cp.styleGray)
 
         self.ediDistance .setAlignment(QtCore.Qt.AlignRight)
         self.ediPhotonE  .setAlignment(QtCore.Qt.AlignRight)
@@ -185,7 +193,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.ediDistance .setFixedWidth(width)
         self.ediPhotonE  .setFixedWidth(width)
         self.ediNomAngle .setFixedWidth(width)
-        self.butSetupGeom.setFixedWidth(120)
+        self.boxSetupGeom.setFixedWidth(120)
 
 
     def setParent(self,parent) :
@@ -193,8 +201,8 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibatchinfoleft # GUIBatchInfoLeft
+        try: # try to delete self object in the cp
+            del cp.guibatchinfoleft # GUIBatchInfoLeft
         except AttributeError:
             pass # silently ignore
 
@@ -209,23 +217,33 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
+    def onBoxSetupGeom(self):
+        self.mode_name = self.boxSetupGeom.currentText()
+        cp.exp_setup_geom.setValue( self.mode_name )
+        print ' ---> selected setup geometry mode: ' + self.mode_name
+        self.guiSelector()
+        self.guiAnglePanel()
+
+    def setPopupMenu(self):
+        self.popupMenuMode = QtGui.QMenu()
+        for mode in self.list_of_modes :
+            self.popupMenuMode.addAction( mode )
 
     def onButSetupGeom(self):
         action_selected = self.popupMenuMode.exec_(QtGui.QCursor.pos())
         if action_selected is None : return
         self.mode_name = action_selected.text()
-        cp.confpars.exp_setup_geom.setValue( self.mode_name )
-        self.butSetupGeom.setText( self.mode_name + self.char_expand )
+        cp.exp_setup_geom.setValue( self.mode_name )
+        self.butSetupGeom.setText( self.mode_name + cp.char_expand )
         print ' ---> selected setup geometry mode: ' + self.mode_name
-
         self.guiSelector()
         self.guiAnglePanel()
 
     def onEdiDistance(self):
-        cp.confpars.sample_det_dist.setValue( float(self.ediDistance.displayText()) )
-        print 'Set sample_det_dist =', cp.confpars.sample_det_dist.value()
+        cp.sample_det_dist.setValue( float(self.ediDistance.displayText()) )
+        print 'Set sample_det_dist =', cp.sample_det_dist.value()
 
 #-----------------------------
 

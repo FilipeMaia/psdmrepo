@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -53,10 +53,10 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.tit_x0_pos  = QtGui.QLabel('CCD x spec in specular measurement')   
         self.tit_z0_pos  = QtGui.QLabel('CCD z spec in specular measurement')   
 
-        self.edi_x_coord = QtGui.QLineEdit( str( cp.confpars.x_coord_specular.value() ) )        
-        self.edi_y_coord = QtGui.QLineEdit( str( cp.confpars.y_coord_specular.value() ) )        
-        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.confpars.x0_pos_in_specular.value() ) )        
-        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.confpars.z0_pos_in_specular.value() ) )        
+        self.edi_x_coord = QtGui.QLineEdit( str( cp.x_coord_specular.value() ) )        
+        self.edi_y_coord = QtGui.QLineEdit( str( cp.y_coord_specular.value() ) )        
+        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.x0_pos_in_specular.value() ) )        
+        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.z0_pos_in_specular.value() ) )        
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.titSpecular,       0, 0, 1, 9)
@@ -100,12 +100,12 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.confpars.styleYellow)
-        self.titSpecular.setStyleSheet (cp.confpars.styleTitle)
-        self.tit_x_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_y_coord.setStyleSheet (cp.confpars.styleLabel)
-        self.tit_x0_pos .setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_z0_pos .setStyleSheet (cp.confpars.styleLabel) 
+        self.            setStyleSheet (cp.styleYellow)
+        self.titSpecular.setStyleSheet (cp.styleTitle)
+        self.tit_x_coord.setStyleSheet (cp.styleLabel)
+        self.tit_y_coord.setStyleSheet (cp.styleLabel)
+        self.tit_x0_pos .setStyleSheet (cp.styleLabel) 
+        self.tit_z0_pos .setStyleSheet (cp.styleLabel) 
 
         self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
         self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
@@ -119,10 +119,10 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.edi_x0_pos .setFixedWidth(width)
         self.edi_z0_pos .setFixedWidth(width)
 
-        self.edi_x_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_y_coord.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_x0_pos .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_z0_pos .setStyleSheet(cp.confpars.styleEdit) 
+        self.edi_x_coord.setStyleSheet(cp.styleEdit) 
+        self.edi_y_coord.setStyleSheet(cp.styleEdit) 
+        self.edi_x0_pos .setStyleSheet(cp.styleEdit) 
+        self.edi_z0_pos .setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -130,8 +130,8 @@ class GUISpecularPars ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guispecularpars # GUISpecularPars
+        try: # try to delete self object in the cp
+            del cp.guispecularpars # GUISpecularPars
         except AttributeError:
             pass # silently ignore
 
@@ -146,24 +146,24 @@ class GUISpecularPars ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def on_edi_x_coord(self):
-        cp.confpars.x_coord_specular.setValue( float(self.edi_x_coord.displayText()) )
-        print 'Set x_coord_specular =', cp.confpars.x_coord_specular.value()
+        cp.x_coord_specular.setValue( float(self.edi_x_coord.displayText()) )
+        print 'Set x_coord_specular =', cp.x_coord_specular.value()
 
     def on_edi_y_coord(self):
         print 'on_edi_y_coord'
-        cp.confpars.y_coord_specular.setValue( float(self.edi_y_coord.displayText()) )
-        print 'Set y_coord_specular =', cp.confpars.y_coord_specular.value()
+        cp.y_coord_specular.setValue( float(self.edi_y_coord.displayText()) )
+        print 'Set y_coord_specular =', cp.y_coord_specular.value()
 
     def on_edi_x0_pos(self):
-        cp.confpars.x0_pos_in_specular.setValue( float(self.edi_x0_pos.displayText()) )
-        print 'Set x0_pos_in_specular =', cp.confpars.x0_pos_in_specular.value()
+        cp.x0_pos_in_specular.setValue( float(self.edi_x0_pos.displayText()) )
+        print 'Set x0_pos_in_specular =', cp.x0_pos_in_specular.value()
 
     def on_edi_z0_pos(self):
-        cp.confpars.z0_pos_in_specular.setValue( float(self.edi_z0_pos.displayText()) )
-        print 'Set z0_pos_in_specular =', cp.confpars.z0_pos_in_specular.value()
+        cp.z0_pos_in_specular.setValue( float(self.edi_z0_pos.displayText()) )
+        print 'Set z0_pos_in_specular =', cp.z0_pos_in_specular.value()
 
 #-----------------------------
 

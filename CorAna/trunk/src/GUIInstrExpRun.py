@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 
@@ -62,11 +62,11 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
  
         self.list_of_instr  = ['XCS', 'AMO', 'CXI', 'MEC', 'SXR', 'XPP']
         self.char_expand    = u' \u25BE' # down-head triangle
-        self.instr_dir      = cp.confpars.instr_dir.value()
-        self.instr_name     = cp.confpars.instr_name.value()
-        self.exp_name       = cp.confpars.exp_name.value()
-        self.run_number     = cp.confpars.str_run_number.value()
-        self.run_number_dark= cp.confpars.str_run_number_dark.value()
+        self.instr_dir      = cp.instr_dir.value()
+        self.instr_name     = cp.instr_name.value()
+        self.exp_name       = cp.exp_name.value()
+        self.run_number     = cp.str_run_number.value()
+        self.run_number_dark= cp.str_run_number_dark.value()
 
         self.titInstr    = QtGui.QLabel('Instr:')
         self.butInstr    = QtGui.QPushButton( self.instr_name + self.char_expand )
@@ -146,15 +146,15 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setStyleSheet(cp.confpars.styleYellow)
+        self.setStyleSheet(cp.styleYellow)
 
     def setParent(self,parent) :
         self.parent = parent
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guiinstrexprun# GUIInstrExpRun
+        try: # try to delete self object in the cp
+            del cp.guiinstrexprun# GUIInstrExpRun
         except AttributeError:
             pass # silently ignore
 
@@ -169,7 +169,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def processEdiRun(self):
         print 'WARNING! Non-editable field.'
@@ -186,7 +186,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         action_selected = self.popupMenuInstr.exec_(QtGui.QCursor.pos())
         if action_selected is None : return
         self.instr_name = action_selected.text()
-        cp.confpars.instr_name.setValue( self.instr_name )
+        cp.instr_name.setValue( self.instr_name )
         self.butInstr.setText( self.instr_name + self.char_expand )
         print ' ---> selected instrument:', self.instr_name
 
@@ -209,7 +209,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
 
         print 'Set experiment: ' + name
         self.exp_name = name
-        cp.confpars.exp_name.setValue(name)
+        cp.exp_name.setValue(name)
         self.ediExp.setText(name)        
 
 
@@ -233,7 +233,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         print 'Set run from file name: ' + fname
         self.parse_xtc_file_name(fname) # Parse: e170-r0003-s00-c00.xtc
         self.run_number = self._runnum
-        cp.confpars.str_run_number.setValue(self.run_number)
+        cp.str_run_number.setValue(self.run_number)
         self.ediRun.setText(self.run_number)        
 
 
@@ -257,7 +257,7 @@ class GUIInstrExpRun ( QtGui.QWidget ) :
         print 'Set run from file name: ' + fname
         self.parse_xtc_file_name(fname) # Parse: e170-r0003-s00-c00.xtc
         self.run_number_dark = self._runnum
-        cp.confpars.str_run_number.setValue(self.run_number_dark)
+        cp.str_run_number.setValue(self.run_number_dark)
         self.ediRunDark.setText(self.run_number_dark)        
 
 

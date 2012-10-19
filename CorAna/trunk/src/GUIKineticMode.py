@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -48,22 +48,19 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.setFrame()
 
         self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
-        self.char_expand        = u' \u25BE' # down-head triangle
-
-        self.popupMenuMode = QtGui.QMenu()
-        for mode in self.list_of_kin_modes :
-            self.popupMenuMode.addAction( mode )
  
         self.titKinetic          = QtGui.QLabel('Camera Working Mode:')
         self.tit_kin_win_size    = QtGui.QLabel('kinetics window size')
         self.tit_kin_top_row     = QtGui.QLabel('top row number of visible slice')
         self.tit_kin_slice_first = QtGui.QLabel('first usable kinetics slice')
         self.tit_kin_slice_last  = QtGui.QLabel('last usable kinetics slice')
-        self.edi_kin_win_size    = QtGui.QLineEdit( str( cp.confpars.kin_win_size   .value() ) )        
-        self.edi_kin_top_row     = QtGui.QLineEdit( str( cp.confpars.kin_top_row    .value() ) )        
-        self.edi_kin_slice_first = QtGui.QLineEdit( str( cp.confpars.kin_slice_first.value() ) )        
-        self.edi_kin_slice_last  = QtGui.QLineEdit( str( cp.confpars.kin_slice_last .value() ) )        
-        self.but_kin_mode        = QtGui.QPushButton( cp.confpars.kin_mode.value() + self.char_expand  ) 
+        self.edi_kin_win_size    = QtGui.QLineEdit( str( cp.kin_win_size   .value() ) )        
+        self.edi_kin_top_row     = QtGui.QLineEdit( str( cp.kin_top_row    .value() ) )        
+        self.edi_kin_slice_first = QtGui.QLineEdit( str( cp.kin_slice_first.value() ) )        
+        self.edi_kin_slice_last  = QtGui.QLineEdit( str( cp.kin_slice_last .value() ) )        
+        self.box_kin_mode        = QtGui.QComboBox( self ) 
+        self.box_kin_mode.addItems(self.list_of_kin_modes)
+        self.box_kin_mode.setCurrentIndex( self.list_of_kin_modes.index(cp.kin_mode.value()) )
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.titKinetic,                0, 0, 1, 8)
@@ -71,18 +68,18 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_kin_top_row    ,       2, 1, 1, 8)
         self.grid.addWidget(self.tit_kin_slice_first,       3, 1, 1, 8)
         self.grid.addWidget(self.tit_kin_slice_last ,       4, 1, 1, 8)
-        self.grid.addWidget(self.but_kin_mode       ,       0, 8) 
+        self.grid.addWidget(self.box_kin_mode       ,       0, 8) 
         self.grid.addWidget(self.edi_kin_win_size   ,       1, 8)
         self.grid.addWidget(self.edi_kin_top_row    ,       2, 8)
         self.grid.addWidget(self.edi_kin_slice_first,       3, 8)
         self.grid.addWidget(self.edi_kin_slice_last ,       4, 8)
         self.setLayout(self.grid)
 
-        self.connect( self.but_kin_mode       ,     QtCore.SIGNAL('clicked()'),          self.on_but_kin_mode        )
-        self.connect( self.edi_kin_win_size   ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_kin_win_size    )
-        self.connect( self.edi_kin_top_row    ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_kin_top_row     )
-        self.connect( self.edi_kin_slice_first,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_kin_slice_first )
-        self.connect( self.edi_kin_slice_last ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_kin_slice_last  )
+        self.connect( self.box_kin_mode       , QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_kin_mode        )
+        self.connect( self.edi_kin_win_size   , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_win_size    )
+        self.connect( self.edi_kin_top_row    , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_top_row     )
+        self.connect( self.edi_kin_slice_first, QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_slice_first )
+        self.connect( self.edi_kin_slice_last , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_slice_last  )
  
         self.showToolTips()
         self.setStyle()
@@ -110,31 +107,31 @@ class GUIKineticMode ( QtGui.QWidget ) :
 
     def setStyle(self):
 
-        width = 100
+        width = 80
 
-        self.                    setStyleSheet (cp.confpars.styleYellow)
-        self.titKinetic         .setStyleSheet (cp.confpars.styleTitle)
-        self.tit_kin_win_size   .setStyleSheet (cp.confpars.styleLabel)
-        self.tit_kin_top_row    .setStyleSheet (cp.confpars.styleLabel)
-        self.tit_kin_slice_first.setStyleSheet (cp.confpars.styleLabel) 
-        self.tit_kin_slice_last .setStyleSheet (cp.confpars.styleLabel) 
+        self.                    setStyleSheet (cp.styleYellow)
+        self.titKinetic         .setStyleSheet (cp.styleTitle)
+        self.tit_kin_win_size   .setStyleSheet (cp.styleLabel)
+        self.tit_kin_top_row    .setStyleSheet (cp.styleLabel)
+        self.tit_kin_slice_first.setStyleSheet (cp.styleLabel) 
+        self.tit_kin_slice_last .setStyleSheet (cp.styleLabel) 
 
         self.edi_kin_win_size   .setAlignment(QtCore.Qt.AlignRight)
         self.edi_kin_top_row    .setAlignment(QtCore.Qt.AlignRight)
         self.edi_kin_slice_first.setAlignment(QtCore.Qt.AlignRight)
         self.edi_kin_slice_last .setAlignment(QtCore.Qt.AlignRight)
 
-        self.but_kin_mode       .setFixedWidth(width)
+        self.box_kin_mode       .setFixedWidth(100)
         self.edi_kin_win_size   .setFixedWidth(width)
         self.edi_kin_top_row    .setFixedWidth(width)
         self.edi_kin_slice_first.setFixedWidth(width)
         self.edi_kin_slice_last .setFixedWidth(width)
 
-        self.but_kin_mode       .setStyleSheet(cp.confpars.styleGray) 
-        self.edi_kin_win_size   .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_kin_top_row    .setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_kin_slice_first.setStyleSheet(cp.confpars.styleEdit) 
-        self.edi_kin_slice_last .setStyleSheet(cp.confpars.styleEdit) 
+        self.box_kin_mode       .setStyleSheet(cp.styleGray) 
+        self.edi_kin_win_size   .setStyleSheet(cp.styleEdit) 
+        self.edi_kin_top_row    .setStyleSheet(cp.styleEdit) 
+        self.edi_kin_slice_first.setStyleSheet(cp.styleEdit) 
+        self.edi_kin_slice_last .setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -142,8 +139,8 @@ class GUIKineticMode ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibeamzeropars # GUIKineticMode
+        try: # try to delete self object in the cp
+            del cp.guibeamzeropars # GUIKineticMode
         except AttributeError:
             pass # silently ignore
 
@@ -158,30 +155,27 @@ class GUIKineticMode ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def on_edi_kin_win_size(self):
-        cp.confpars.kin_win_size.setValue( float(self.edi_kin_win_size.displayText()) )
-        print 'Set kin_win_size =', cp.confpars.kin_win_size.value()
+        cp.kin_win_size.setValue( float(self.edi_kin_win_size.displayText()) )
+        print 'Set kin_win_size =', cp.kin_win_size.value()
 
     def on_edi_kin_top_row(self):
-        cp.confpars.kin_top_row.setValue( float(self.edi_kin_top_row.displayText()) )
-        print 'Set kin_top_row =', cp.confpars.kin_top_row.value()
+        cp.kin_top_row.setValue( float(self.edi_kin_top_row.displayText()) )
+        print 'Set kin_top_row =', cp.kin_top_row.value()
 
     def on_edi_kin_slice_first(self):
-        cp.confpars.kin_slice_first.setValue( float(self.edi_kin_slice_first.displayText()) )
-        print 'Set kin_slice_first =', cp.confpars.kin_slice_first.value()
+        cp.kin_slice_first.setValue( float(self.edi_kin_slice_first.displayText()) )
+        print 'Set kin_slice_first =', cp.kin_slice_first.value()
 
     def on_edi_kin_slice_last(self):
-        cp.confpars.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
-        print 'Set kin_slice_last =', cp.confpars.kin_slice_last.value()
+        cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
+        print 'Set kin_slice_last =', cp.kin_slice_last.value()
 
-    def on_but_kin_mode(self):
-        action_selected = self.popupMenuMode.exec_(QtGui.QCursor.pos())
-        if action_selected is None : return
-        self.mode_name = action_selected.text()
-        cp.confpars.kin_mode.setValue( self.mode_name )
-        self.but_kin_mode.setText( self.mode_name + self.char_expand )
+    def on_box_kin_mode(self):
+        self.mode_name = self.box_kin_mode.currentText()
+        cp.kin_mode.setValue( self.mode_name )
         print ' ---> selected kinematics mode: ' + self.mode_name
  
 #-----------------------------

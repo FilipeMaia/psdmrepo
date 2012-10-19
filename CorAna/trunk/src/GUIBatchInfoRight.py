@@ -28,10 +28,10 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParametersCorAna as cp
+from ConfigParametersCorAna import confpars as cp
 
 from GUIKineticMode        import *
-from GUIImgSizePosition    import *
+from GUIBatchPars          import *
 
 #---------------------
 #  Class definition --
@@ -52,12 +52,12 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         self.setFrame()
         self.setMinimumWidth(400) 
 
-        cp.confpars.guikineticmode     = GUIKineticMode()
-        cp.confpars.guiimgsizeposition = GUIImgSizePosition()
+        cp.guikineticmode = GUIKineticMode()
+        cp.guibatchpars   = GUIBatchPars()
 
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addWidget(cp.confpars.guikineticmode)
-        self.vbox.addWidget(cp.confpars.guiimgsizeposition)
+        self.vbox.addWidget(cp.guikineticmode)
+        self.vbox.addWidget(cp.guibatchpars)
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
 
@@ -84,15 +84,15 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.confpars.styleYellow)
+        self.            setStyleSheet (cp.styleYellow)
 
     def setParent(self,parent) :
         self.parent = parent
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try: # try to delete self object in the cp.confpars
-            del cp.confpars.guibatchinforight # GUIBatchInfoRight
+        try: # try to delete self object in the cp
+            del cp.guibatchinforight # GUIBatchInfoRight
         except AttributeError:
             pass # silently ignore
 
@@ -107,7 +107,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         pass
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
 #-----------------------------
 

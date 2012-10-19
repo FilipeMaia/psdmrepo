@@ -39,11 +39,12 @@ import time   # for sleep(sec)
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParametersCorAna as cp
 
-import GUIConfigParameters as guiconfigpars
+from ConfigParametersCorAna import confpars as cp
 
-from GUIInstrExpRun import *
+from GUIConfigParameters import * 
+from GUIInstrExpRun      import *
+from GUIBatchInfo        import *
 
 #import GUIPlayer          as guiplr
 #import GUIComplexCommands as guicomplex
@@ -84,12 +85,12 @@ class GUIMain ( QtGui.QWidget ) :
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
-#        cp.confpars.guimain = self
-#        cp.confpars.readParameters()
-#        if not cp.confpars.readParsFromFileAtStart :
-#            cp.confpars.setDefaultParameters()
-#        cp.confpars.Print()
-#        print 'Current event number : %d ' % (cp.confpars.eventCurrent)
+#        cp.guimain = self
+#        cp.readParameters()
+#        if not cp.readParsFromFileAtStart :
+#            cp.setDefaultParameters()
+#        cp.Print()
+#        print 'Current event number : %d ' % (cp.eventCurrent)
 
 	#print 'sys.argv=',sys.argv # list of input parameters
 
@@ -177,28 +178,28 @@ class GUIMain ( QtGui.QWidget ) :
         #self.titStyle   = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
         #self.titStyle   = "color: rgb(100, 160, 100);"
 
-        #self.setStyleSheet(cp.confpars.styleYellow)
-        self.titControl.setStyleSheet (cp.confpars.styleTitle)
+        #self.setStyleSheet(cp.styleYellow)
+        self.titControl.setStyleSheet (cp.styleTitle)
         self.titControl.setAlignment(QtCore.Qt.AlignCenter)
 
 
-#        if cp.confpars.step01IsDone : self.browse .setStyleSheet(cp.confpars.styleGray)
-#        else                        : self.browse .setStyleSheet(cp.confpars.styleGreen)
+#        if cp.step01IsDone : self.browse .setStyleSheet(cp.styleGray)
+#        else                        : self.browse .setStyleSheet(cp.styleGreen)
 
-#        if cp.confpars.step02IsDone : self.display.setStyleSheet(self.styleGray)
+#        if cp.step02IsDone : self.display.setStyleSheet(self.styleGray)
 #        else                        : self.display.setStyleSheet(self.styleGreen)
 
-#        if cp.confpars.step03IsDone : self.wtd    .setStyleSheet(self.styleGray)
+#        if cp.step03IsDone : self.wtd    .setStyleSheet(self.styleGray)
 #        else                        : self.wtd    .setStyleSheet(self.styleGreen)
 
-#        if cp.confpars.step04IsDone : self.player .setStyleSheet(self.styleGray)
+#        if cp.step04IsDone : self.player .setStyleSheet(self.styleGray)
 #        else                        : self.player .setStyleSheet(self.styleGreen)
 
 
     def moveEvent(self, e):
         pass
 #        print 'moveEvent' 
-#        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 
@@ -206,34 +207,20 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processPrint(self):
         print 'processPrint()'
-#        fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+#        fname = cp.dirName+'/'+cp.fileName
 #        print 'Print structure of the HDF5 file:\n %s' % (fname)
 #        printh5.print_hdf5_file_structure(fname)
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        try : # try to delete self object in the cp.confpars
-            del cp.confpars.guimain
-        except :
-            pass
+        try    : del cp.guimain
+        except : pass
 
-#        #print 'Quit GUIMain'
-#        #self.drawev.quitDrawEvent()
-#        if cp.confpars.playerGUIIsOpen :
-#            self.wplayer.processQuit()
-#            self.wcomplex.processQuit()
-#        self.SHowIsOn = False
-#        if cp.confpars.wtdWindowIsOpen :
-#            cp.confpars.guiwhat.close()
-#        if cp.confpars.treeWindowIsOpen :
-#            cp.confpars.guitree.close()
-#        if cp.confpars.configGUIIsOpen :
-#            cp.confpars.guiconfig.close()
-#        if cp.confpars.selectionGUIIsOpen :
-#            cp.confpars.guiselection.close()
-#        #print 'Segmentation fault may happen at exit, when the dialog is closed. \nThis is a known problem of python-qt4 version.'
-#        print 'Exit HDF5Explorer'
+        try    : cp.guiconfigparameters.close()
+        except : pass
 
+        try    : cp.guibatchinfo.close()
+        except : pass
 
     def onExit(self):
         #print 'Exit button is clicked'
@@ -243,21 +230,29 @@ class GUIMain ( QtGui.QWidget ) :
     def onLoadFiles(self):
         print 'onLoadFiles'
         try :
-            cp.confpars.guiconfigparameters.close()
+            cp.guiconfigparameters.close()
         except : # AttributeError: #NameError 
-            cp.confpars.guiconfigparameters = guiconfigpars.GUIConfigParameters()
-            cp.confpars.guiconfigparameters.setParent(self)
-            cp.confpars.guiconfigparameters.move(self.pos().__add__(QtCore.QPoint(100,330))) # open window with offset w.r.t. parent
-            cp.confpars.guiconfigparameters.show()
+            cp.guiconfigparameters = GUIConfigParameters()
+            cp.guiconfigparameters.setParent(self)
+            cp.guiconfigparameters.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
+            cp.guiconfigparameters.show()
+
+
+    def onBatchInfo(self):
+        print 'onBatchInfo'
+        try :
+            cp.guibatchinfo.close()
+        except : # AttributeError: #NameError 
+            cp.guibatchinfo = GUIBatchInfo()
+            cp.guibatchinfo.setParent(self)
+            cp.guibatchinfo.move(self.pos().__add__(QtCore.QPoint(160,90))) # open window with offset w.r.t. parent
+            cp.guibatchinfo.show()
 
 
     def onSave(self):
         print 'onSave'
-        cp.confpars.saveParametersInFile( cp.confpars.fname_cp.value() )
+        cp.saveParametersInFile( cp.fname_cp.value() )
 
-
-    def onBatchInfo(self):  
-        print 'onBatchInfo'
 
     def onAnaDisp(self):    
         print 'onAnaDisp'
