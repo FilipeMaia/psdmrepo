@@ -174,16 +174,16 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.styleYellow)
+        self.             setStyleSheet (cp.styleBkgd)
         self.titDistance .setStyleSheet (cp.styleTitle)
         self.titPhotonE  .setStyleSheet (cp.styleTitle)
         self.titNomAngle .setStyleSheet (cp.styleTitle)
         self.titSetupGeom.setStyleSheet (cp.styleTitle)
 
         self.ediDistance .setStyleSheet(cp.styleEdit) 
-        self.ediPhotonE  .setStyleSheet(cp.styleGreen) 
-        self.ediNomAngle .setStyleSheet(cp.styleGreen) 
-        self.boxSetupGeom.setStyleSheet(cp.styleGray)
+        self.ediPhotonE  .setStyleSheet(cp.styleEditInfo) 
+        self.ediNomAngle .setStyleSheet(cp.styleEditInfo) 
+        self.boxSetupGeom.setStyleSheet(cp.styleBox)
 
         self.ediDistance .setAlignment(QtCore.Qt.AlignRight)
         self.ediPhotonE  .setAlignment(QtCore.Qt.AlignRight)

@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIKineticMode...
+#  Module GUIAnaSettingsRight...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the kinetic mode parameters"""
+"""GUI sets parameters for analysis (right pannel)"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -33,8 +33,8 @@ from ConfigParametersCorAna import confpars as cp
 #---------------------
 #  Class definition --
 #---------------------
-class GUIKineticMode ( QtGui.QWidget ) :
-    """GUI sets the kinetic mode parameters"""
+class GUIAnaSettingsRight ( QtGui.QWidget ) :
+    """GUI sets parameters for analysis (right panel)"""
 
     #----------------
     #  Constructor --
@@ -42,7 +42,7 @@ class GUIKineticMode ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Kinetic Mode')
+        self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
         self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
@@ -138,12 +138,12 @@ class GUIKineticMode ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent')
         try: # try to delete self object in the cp
-            del cp.guikineticmode # GUIKineticMode
+            del cp.guianasettingsright # GUIAnaSettingsRight
         except AttributeError:
             pass # silently ignore
 
-    def processClose(self):
-        logger.debug('processClose')
+    def onClose(self):
+        logger.debug('onClose')
         self.close()
 
     def resizeEvent(self, e):
@@ -181,7 +181,7 @@ class GUIKineticMode ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIKineticMode ()
+    widget = GUIAnaSettingsRight ()
     widget.show()
     app.exec_()
 

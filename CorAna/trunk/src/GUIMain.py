@@ -15,7 +15,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: on 2012-10-08 copied from HDF5Explorer MainGUI $
+@version $Id:$
 
 @author Mikhail S. Dubrovin
 """
@@ -42,23 +42,17 @@ import time   # for sleep(sec)
 
 from ConfigParametersCorAna import confpars as cp
 
-from GUIConfigParameters import * 
-from GUIInstrExpRun      import *
+#from GUIConfigParameters import * 
+from GUILoadFiles        import *
 from GUIBatchInfo        import *
-
-#import GUIPlayer          as guiplr
-#import GUIComplexCommands as guicomplex
-#import GUIWhatToDisplay   as guiwtd
-#import GUISelectItems     as guiselitems
-#import GUISelection       as guisel
-#import DrawEvent          as drev
-#import PrintHDF5          as printh5 # for my print_group(g,offset)
+from GUIAnaSettings      import *
+from Logger              import logger
 
 #---------------------
 #  Class definition --
 #---------------------
 class GUIMain ( QtGui.QWidget ) :
-    """Deals with the main GUI for the interactive analysis project.
+    """Main GUI for the interactive analysis project.
 
     @see BaseClass
     @see OtherClass
@@ -79,30 +73,13 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        #self.setGeometry(370, 10, 500, 300)
         self.setGeometry(10, 20, 150, 500)
         self.setWindowTitle('Interactive Analysis')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
-#        cp.guimain = self
-#        cp.readParameters()
-#        if not cp.readParsFromFileAtStart :
-#            cp.setDefaultParameters()
-#        cp.Print()
-#        print 'Current event number : %d ' % (cp.eventCurrent)
-
-	#print 'sys.argv=',sys.argv # list of input parameters
-
-
         self.setFrame()
  
-        #self.drawev   = drev.DrawEvent()
-
-        #self.titFile   = QtGui.QLabel('File:')
-        #self.titTree   = QtGui.QLabel('HDF5 Tree GUI')
-        self.char_expand    = u' \u25BE' # down-head triangle
-        
         self.titControl    = QtGui.QLabel('Control Panel')
         self.butLoadFiles  = QtGui.QPushButton('Load files')    
         self.butBatchInfo  = QtGui.QPushButton('Batch information')    
@@ -113,8 +90,6 @@ class GUIMain ( QtGui.QWidget ) :
         self.butStop       = QtGui.QPushButton('Stop')
         self.butSave       = QtGui.QPushButton('Save')
         self.butExit       = QtGui.QPushButton('Exit')
-
-        self.setButtonStyle()
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.titControl    )
@@ -141,10 +116,10 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
 
-
         self.showToolTips()
+        self.setStyle()
         self.printStyleInfo()
-
+        
         #print 'End of init'
         
     #-------------------
@@ -155,8 +130,9 @@ class GUIMain ( QtGui.QWidget ) :
         qstyle     = self.style()
         qpalette   = qstyle.standardPalette()
         qcolor_bkg = qpalette.color(1)
-        r,g,b,alp  = qcolor_bkg.getRgb()
-        print 'Background color: r,g,b,alp=', r,g,b,alp
+        #r,g,b,alp  = qcolor_bkg.getRgb()
+        msg = 'Background color: r,g,b,alpha = %d,%d,%d,%d' % ( qcolor_bkg.getRgb() )
+        logger.debug(msg)
 
 
     def showToolTips(self):
@@ -172,29 +148,19 @@ class GUIMain ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
-
-    def setButtonStyle(self):
-
-        #self.titStyle   = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
-        #self.titStyle   = "color: rgb(100, 160, 100);"
-
-        #self.setStyleSheet(cp.styleYellow)
-        self.titControl.setStyleSheet (cp.styleTitle)
-        self.titControl.setAlignment(QtCore.Qt.AlignCenter)
-
-
-#        if cp.step01IsDone : self.browse .setStyleSheet(cp.styleGray)
-#        else                        : self.browse .setStyleSheet(cp.styleGreen)
-
-#        if cp.step02IsDone : self.display.setStyleSheet(self.styleGray)
-#        else                        : self.display.setStyleSheet(self.styleGreen)
-
-#        if cp.step03IsDone : self.wtd    .setStyleSheet(self.styleGray)
-#        else                        : self.wtd    .setStyleSheet(self.styleGreen)
-
-#        if cp.step04IsDone : self.player .setStyleSheet(self.styleGray)
-#        else                        : self.player .setStyleSheet(self.styleGreen)
-
+    def setStyle(self):
+        self.               setStyleSheet(cp.styleBkgd)
+        self.titControl    .setStyleSheet(cp.styleTitle)
+        self.butLoadFiles  .setStyleSheet(cp.styleButton)
+        self.butBatchInfo  .setStyleSheet(cp.styleButton) 
+        self.butAnaDisp    .setStyleSheet(cp.styleButton)
+        self.butSystem     .setStyleSheet(cp.styleButton)
+        self.butRun        .setStyleSheet(cp.styleButton)
+        self.butViewResults.setStyleSheet(cp.styleButton)
+        self.butStop       .setStyleSheet(cp.styleButton)
+        self.butSave       .setStyleSheet(cp.styleButton)
+        self.butExit       .setStyleSheet(cp.styleButton)
+        self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
 
     def moveEvent(self, e):
         pass
@@ -207,39 +173,41 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processPrint(self):
         print 'processPrint()'
-#        fname = cp.dirName+'/'+cp.fileName
-#        print 'Print structure of the HDF5 file:\n %s' % (fname)
-#        printh5.print_hdf5_file_structure(fname)
 
     def closeEvent(self, event):
-        #print 'closeEvent'
+        logger.info('closeEvent')
         try    : del cp.guimain
         except : pass
 
-        try    : cp.guiconfigparameters.close()
+        try    : cp.guiloadfiles.close()
         except : pass
 
         try    : cp.guibatchinfo.close()
         except : pass
 
+        try    : cp.guianasettings.close()
+        except : pass
+
     def onExit(self):
-        #print 'Exit button is clicked'
+        logger.info('onExit')
         self.close()
         
         
     def onLoadFiles(self):
-        print 'onLoadFiles'
+        logger.info('onLoadFiles')
         try :
-            cp.guiconfigparameters.close()
+            cp.guiloadfiles.close()
+            self.butLoadFiles.setStyleSheet(cp.styleButton)
         except : # AttributeError: #NameError 
-            cp.guiconfigparameters = GUIConfigParameters()
-            cp.guiconfigparameters.setParent(self)
-            cp.guiconfigparameters.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
-            cp.guiconfigparameters.show()
+            cp.guiloadfiles = GUILoadFiles()
+            cp.guiloadfiles.setParent(self)
+            cp.guiloadfiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
+            cp.guiloadfiles.show()
+            self.butLoadFiles.setStyleSheet(cp.styleButtonOn)
 
 
     def onBatchInfo(self):
-        print 'onBatchInfo'
+        logger.info('onBatchInfo')
         try :
             cp.guibatchinfo.close()
         except : # AttributeError: #NameError 
@@ -250,25 +218,30 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onSave(self):
-        print 'onSave'
+        logger.info('onSave')
         cp.saveParametersInFile( cp.fname_cp.value() )
 
-
     def onAnaDisp(self):    
-        print 'onAnaDisp'
+        logger.info('onAnaDisp')
+        try :
+            cp.guianasettings.close()
+        except : # AttributeError: #NameError 
+            cp.guianasettings = GUIAnaSettings()
+            cp.guianasettings.setParent(self)
+            cp.guianasettings.move(self.pos().__add__(QtCore.QPoint(160,130))) # open window with offset w.r.t. parent
+            cp.guianasettings.show()
 
     def onSystem(self):     
-        print 'onSystem'
+        logger.info('onSystem - not implemented yet...')
 
     def onRun (self):       
-        print 'onRun'
+        logger.info('onRun - not implemented yet...')
 
     def onViewResults(self):
-        print 'onViewResults'
+        logger.info('onViewResults - not implemented yet...')
 
     def onStop(self):       
-        print 'onStop'
-
+        logger.info('onStop - not implemented yet...')
                 
 #-----------------------------
 #-----------------------------
@@ -288,11 +261,6 @@ class GUIMain ( QtGui.QWidget ) :
         if event.key() == QtCore.Qt.Key_Return:
             print 'event.key() = Return'
 
-            #self.processFileEdit()
-            #self.processNumbEdit()
-            #self.processSpanEdit()
-            #self.currentEventNo()
-
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
 
@@ -302,10 +270,6 @@ class GUIMain ( QtGui.QWidget ) :
 if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
     ex  = GUIMain()
-
-
     ex.show()
-
-
     app.exec_()
 #-----------------------------

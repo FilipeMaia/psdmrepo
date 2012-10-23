@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfo...
+#  Module GUIAnaSettings...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI sets parameters for analysis"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -27,17 +27,17 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-
+from Logger import logger
 from ConfigParametersCorAna import confpars as cp
 
-from GUIBatchInfoLeft   import *
-from GUIBatchInfoRight  import *
+from GUIAnaSettingsLeft  import *
+from GUIAnaSettingsRight import *
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfo ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+class GUIAnaSettings ( QtGui.QWidget ) :
+    """GUI Analysis Settings"""
 
     #----------------
     #  Constructor --
@@ -48,20 +48,20 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info')
+        self.setWindowTitle('Analysis Settings')
         self.setFrame()
  
-        self.titTitle  = QtGui.QLabel('Batch Information')
-        self.titStatus = QtGui.QLabel('Status: Ready!')
+        self.titTitle  = QtGui.QLabel('Analysis Settings')
+        self.titStatus = QtGui.QLabel('Status: Loading')
         self.butClose  = QtGui.QPushButton('Close') 
         self.butApply  = QtGui.QPushButton('Apply') 
-        self.butShow   = QtGui.QPushButton('Show Image') 
-        cp.guibatchinfoleft  = GUIBatchInfoLeft()
-        cp.guibatchinforight = GUIBatchInfoRight()
+        self.butShow   = QtGui.QPushButton('Show Mask & Partitions') 
+        cp.guianasettingsleft  = GUIAnaSettingsLeft()
+        cp.guianasettingsright = GUIAnaSettingsRight()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.guibatchinfoleft)
-        self.hboxM.addWidget(cp.guibatchinforight)
+        self.hboxM.addWidget(cp.guianasettingsleft)
+        self.hboxM.addWidget(cp.guianasettingsright)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.titStatus)
@@ -117,44 +117,44 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.parent = parent
 
     def closeEvent(self, event):
-        #print 'closeEvent'
+        logger.debug('closeEvent')
         try: # try to delete self object in the cp
-            del cp.guibatchinfo # GUIBatchInfo
+            del cp.guianasettings # GUIAnaSettings
         except AttributeError:
             pass # silently ignore
 
-        try    : cp.guibatchinfoleft.close()
+        try    : cp.guianasettingsleft.close()
         except : pass
 
-        try    : cp.guibatchinforight.close()
+        try    : cp.guianasettingsright.close()
         except : pass
 
     def onClose(self):
-        #print 'Close button'
+        logger.info('onClose')
         self.close()
 
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent') 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
+        logger.debug('moveEvent') 
         pass
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
 
     def onApply(self):
-        print 'Apply button is empty'
+        logger.info('onApply - is not implemented yet')
 
     def onShow(self):
-        print 'Show button is empty'
+        logger.info('onShow - is not implemented yet')
 
 #-----------------------------
 
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfo ()
+    widget = GUIAnaSettings ()
     widget.show()
     app.exec_()
 

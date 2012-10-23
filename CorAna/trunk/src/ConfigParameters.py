@@ -32,6 +32,7 @@ import sys
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from Logger import logger
 
 #----------------------------------
 # Local non-exported definitions --
@@ -99,15 +100,15 @@ class Parameter :
             self._value = long( str_val )
 
         elif self._type == 'float' :
-            self._value = long( str_val )
+            self._value = float( str_val )
 
         elif self._type == 'bool' :
             self._value = dicBool[str_val.lower()]
 
         else :
             msg = 'Parameter.setValueForType: Requested parameter type ' + typ + ' is not supported\n'  
-            msg = 'WARNING! The parameter value is left unchanged...\n'
-            print msg
+            msg+= 'WARNING! The parameter value is left unchanged...\n'
+            logger.warning(msg)
 
 #---------------------
 
@@ -181,7 +182,7 @@ class ConfigParameters :
 
     def saveParametersInFile ( self, fname=None ) :
         self.setParsFileName(fname)        
-        print 'saveParametersInFile : Save configuration parameters in file', self.fname
+        logger.info('Save configuration parameters in file ' + self.fname)
         f=open(self.fname,'w')
         for par in self.dict_pars.values() :
             s = '%s %s\n' % ( par.name().ljust(32), str(par.value()) )
@@ -195,7 +196,7 @@ class ConfigParameters :
         if not ( name in self.dict_pars.keys() ) :
             msg  = 'The parameter name ' + name + ' is unknown in the dictionary.\n'
             msg += 'WARNING! Parameter needs to be declared first. Skip this parameter initialization.\n' 
-            print msg
+            logger.warning(msg)
             return
 
         self.dict_pars[name].setValueFromString(str_val)
@@ -204,10 +205,10 @@ class ConfigParameters :
 
     def readParametersFromFile ( self, fname=None ) :
         self.setParsFileName(fname)        
-        print 'readParametersFromFile : Read configuration parameters from file', self.fname
+        logger.info('Read configuration parameters from file ' + self.fname)
 
         if not os.path.exists(self.fname) :
-            print 'readParametersFromFile : The file ' + self.fname + ' is not found'
+            logger.warning('readParametersFromFile : The file ' + self.fname + ' is not found')
             return
  
         f=open(self.fname,'r')
@@ -222,13 +223,16 @@ class ConfigParameters :
 def usage() :
     msg  = 'Use command: ' + sys.argv[0] + ' [<configuration-file-name>]\n'
     msg += 'with a single or without arguments.' 
-    print 51*'-' + '\n' + msg + '\n' + 51*'-'
+    msg = '\n' + 51*'-' + '\n' + msg + '\n' + 51*'-'
+    logger.warning(msg)
 
 #---------------------------------------
 
 def getConfigFileFromInput() :
 
-    print 'List of input parameters:',sys.argv
+    msg = 'List of input parameters: '
+    for par in sys.argv :  msg += par
+    logger.info(msg)
 
     if len(sys.argv) > 2 : 
         usage()

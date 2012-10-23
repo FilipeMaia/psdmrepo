@@ -100,7 +100,7 @@ class GUIBeamZeroPars ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.styleYellow)
+        self.            setStyleSheet (cp.styleBkgd)
         self.titBeamZero.setStyleSheet (cp.styleTitle)
         self.tit_x_coord.setStyleSheet (cp.styleLabel)
         self.tit_y_coord.setStyleSheet (cp.styleLabel)

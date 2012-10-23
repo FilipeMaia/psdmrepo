@@ -81,6 +81,8 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         self.connect(self.butClose,     QtCore.SIGNAL('clicked()'),          self.processClose        )
 
         self.showToolTips()
+        self.setStyle()
+
 
     #-------------------
     #  Public methods --
@@ -105,6 +107,25 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
+    def setStyle(self):
+
+        #width = 80
+        #self.butBrowse .setFixedWidth(width)
+        #self.edi_kin_win_size   .setAlignment(QtCore.Qt.AlignRight)
+
+        self           .setStyleSheet(cp.styleBkgd)
+        self.titFile   .setStyleSheet(cp.styleLabel)
+        self.titPars   .setStyleSheet(cp.styleLabel)
+        self.fnameEdit .setStyleSheet(cp.styleEdit) 
+
+        self.butBrowse .setStyleSheet(cp.styleButton) 
+        self.butRead   .setStyleSheet(cp.styleButton)
+        self.butWrite  .setStyleSheet(cp.styleButton)
+        self.butDefault.setStyleSheet(cp.styleButton)
+        self.butPrint  .setStyleSheet(cp.styleButton)
+        self.butClose  .setStyleSheet(cp.styleButtonClose)
+
+ 
     def setParent(self,parent) :
         self.parent = parent
 

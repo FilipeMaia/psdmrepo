@@ -120,7 +120,7 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         width = 80
         width_label = 50
 
-        self.              setStyleSheet (cp.styleYellow)
+        self.              setStyleSheet (cp.styleBkgd)
         self.titImageSize .setStyleSheet (cp.styleTitle)
         self.tit_col      .setStyleSheet (cp.styleLabel)
         self.tit_row      .setStyleSheet (cp.styleLabel)

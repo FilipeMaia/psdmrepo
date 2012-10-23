@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI sets pars"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -37,7 +37,7 @@ from GUIBatchPars          import *
 #  Class definition --
 #---------------------
 class GUIBatchInfoRight ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+    """GUI Batch Info Right Panel"""
 
     #----------------
     #  Constructor --
@@ -48,7 +48,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info Left Panel')
+        self.setWindowTitle('Batch Info Right Panel')
         self.setFrame()
         self.setMinimumWidth(400) 
 
@@ -84,7 +84,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.styleYellow)
+        self.setStyleSheet(cp.styleBkgd)
 
     def setParent(self,parent) :
         self.parent = parent

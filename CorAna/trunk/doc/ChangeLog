@@ -13,6 +13,15 @@ reverse time order.
 
 Tag: V00-00-01
 
+2012-10-22 Mikhail S. Dubrovin
+- add modules:
+A       src/GUIAnaSettingsLeft.py
+A       src/GUIBatchPars.py
+A       src/Logger.py
+A       src/GlobalUtils.py
+A       src/GUIAnaSettingsRight.py
+A       src/GUIAnaSettings.py
+
 2012-10-17 Mikhail S. Dubrovin
 - add modules:
 A       src/GUIBatchInfoRight.py

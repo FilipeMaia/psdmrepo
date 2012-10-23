@@ -123,19 +123,39 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_flat_start    = self.declareParameter( name='BATCH_FLAT_START',  val_def=7,  typ='int' )
         self.bat_flat_end      = self.declareParameter( name='BATCH_FLAT_END'  ,  val_def=8,  typ='int' )
         self.bat_flat_time     = self.declareParameter( name='BATCH_FLAT_TIME' ,  val_def=9,  typ='int' )
-        self.bat_flux          = self.declareParameter( name='BATCH_FLUX_',       val_def=6.789e8,  typ='float' )
+        self.bat_flux          = self.declareParameter( name='BATCH_FLUX',        val_def=6.789e8,  typ='float' )
         self.bat_current       = self.declareParameter( name='BATCH_CURRENT',     val_def=102.205,  typ='float' )
+
+        # GUILoadFiles.py
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark/',typ='str' )
+        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat/',typ='str' )
+        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data/',typ='str' )
+        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
+        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
+        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
+
 
     def defineStyles( self ) :
         self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
         self.stylePink   = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
         self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreen  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
+        self.styleBluish = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
+        self.styleWhite  = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
         #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
         #self.styleTitle  = "color: rgb(150, 160, 100);"
-        self.styleTitle  = "color: rgb(150, 100, 50);"
-        self.styleLabel  = "color: rgb(000, 000, 255);"
-        self.styleEdit   = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
+        self.styleBlue   = "color: rgb(000, 000, 255);"
+        self.styleBuriy  = "color: rgb(150, 100, 50);"
+
+        self.styleBkgd        = self.styleYellow
+        self.styleTitle       = self.styleBuriy
+        self.styleLabel       = self.styleBlue
+        self.styleEdit        = self.styleWhite
+        self.styleEditInfo    = self.styleGreen
+        self.styleButton      = self.styleGray
+        self.styleButtonOn    = self.styleBluish
+        self.styleButtonClose = self.stylePink
+        self.styleBox         = self.styleGray
 
 
     def printParsDirectly( self ) :
