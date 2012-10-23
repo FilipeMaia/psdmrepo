@@ -18,6 +18,8 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "H5DataTypes/FliFrameV1.h"
+#include "H5DataTypes/AndorFrameV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
@@ -44,12 +46,15 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-FliFrameV1Cvt::FliFrameV1Cvt ( const std::string& typeGroupName,
+template <typename FrameType>
+FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const std::string& typeGroupName,
                                            const ConfigObjectStore& configStore,
+                                           Pds::TypeId cfgTypeId,
                                            hsize_t chunk_size,
                                            int deflate )
-  : EvtDataTypeCvt<Pds::Fli::FrameV1>(typeGroupName)
+  : EvtDataTypeCvt<XtcType>(typeGroupName)
   , m_configStore(configStore)
+  , m_cfgTypeId(cfgTypeId)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
   , m_frameCont(0)
@@ -61,7 +66,8 @@ FliFrameV1Cvt::FliFrameV1Cvt ( const std::string& typeGroupName,
 //--------------
 // Destructor --
 //--------------
-FliFrameV1Cvt::~FliFrameV1Cvt ()
+template <typename FrameType>
+FliFrameV1Cvt<FrameType>::~FliFrameV1Cvt ()
 {
   delete m_frameCont ;
   delete m_frameDataCont ;
@@ -69,8 +75,9 @@ FliFrameV1Cvt::~FliFrameV1Cvt ()
 }
 
 // typed conversion method
+template <typename FrameType>
 void
-FliFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
+FliFrameV1Cvt<FrameType>::typedConvertSubgroup ( hdf5pp::Group group,
                                         const XtcType& data,
                                         size_t size,
                                         const Pds::TypeId& typeId,
@@ -80,8 +87,7 @@ FliFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // find corresponding configuration object
   uint32_t height = 0;
   uint32_t width = 0;
-  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_FliConfig, 1);
-  if (const Pds::Fli::ConfigV1* config = m_configStore.find<Pds::Fli::ConfigV1>(cfgTypeId1, src.top())) {
+  if (const Pds::Fli::ConfigV1* config = m_configStore.find<Pds::Fli::ConfigV1>(m_cfgTypeId, src.top())) {
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
     height = (config->height() + binY - 1) / binY;
@@ -95,7 +101,7 @@ FliFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_frameCont ) {
 
     // create container for frames
-    CvtDataContFactoryDef<H5DataTypes::FliFrameV1> frContFactory( "frame", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<FrameType> frContFactory( "frame", m_chunk_size, m_deflate, true ) ;
     m_frameCont = new FrameCont ( frContFactory ) ;
 
     // create container for frame data
@@ -109,20 +115,25 @@ FliFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   }
 
   // store the data
-  H5DataTypes::FliFrameV1 frame(data);
+  FrameType frame(data);
   m_frameCont->container(group)->append ( frame ) ;
-  hdf5pp::Type type = H5DataTypes::FliFrameV1::stored_data_type(height, width) ;
+  hdf5pp::Type type = FrameType::stored_data_type(height, width) ;
   m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
   m_timeCont->container(group)->append ( time ) ;
 }
 
 /// method called when the driver closes a group in the file
+template <typename FrameType>
 void
-FliFrameV1Cvt::closeSubgroup( hdf5pp::Group group )
+FliFrameV1Cvt<FrameType>::closeSubgroup( hdf5pp::Group group )
 {
   if ( m_frameCont ) m_frameCont->closeGroup( group ) ;
   if ( m_frameDataCont ) m_frameDataCont->closeGroup( group ) ;
   if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
+
+// explicitly instantiate for know types
+template class FliFrameV1Cvt<H5DataTypes::AndorFrameV1>;
+template class FliFrameV1Cvt<H5DataTypes::FliFrameV1>;
 
 } // namespace O2OTranslator

@@ -25,6 +25,8 @@
 //-------------------------------
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/AcqirisTdcConfigV1.h"
+#include "H5DataTypes/AndorConfigV1.h"
+#include "H5DataTypes/AndorFrameV1.h"
 #include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeamV1.h"
 #include "H5DataTypes/BldDataEBeamV2.h"
@@ -61,6 +63,7 @@
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
 #include "H5DataTypes/FliConfigV1.h"
+#include "H5DataTypes/FliFrameV1.h"
 #include "H5DataTypes/Gsc16aiConfigV1.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbConfigV2.h"
@@ -220,6 +223,8 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   ::registerConfigCvt<H5DataTypes::FliConfigV1>(m_cvtMap, "Fli::ConfigV1", Pds::TypeId::Id_FliConfig, 1);
 
   ::registerConfigCvt<H5DataTypes::QuartzConfigV1>(m_cvtMap, "Quartz::ConfigV1", Pds::TypeId::Id_QuartzConfig, 1);
+
+  ::registerConfigCvt<H5DataTypes::AndorConfigV1>(m_cvtMap, "Andor::ConfigV1", Pds::TypeId::Id_AndorConfig, 1);
 
   ::registerConfigCvt<H5DataTypes::UsdUsbConfigV1>(m_cvtMap, "UsdUsb::ConfigV1", Pds::TypeId::Id_UsdUsbConfig, 1);
 
@@ -405,8 +410,12 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_OceanOpticsData, 1, converter);
 
   // very special converter for Fli::FrameV1, it needs two types of data
-  converter = make_shared<FliFrameV1Cvt>("Fli::FrameV1", configStore, chunk_size, compression);
+  converter = make_shared<FliFrameV1Cvt<H5DataTypes::FliFrameV1> >("Fli::FrameV1", configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_FliFrame, 1, converter);
+
+  // very special converter for Andor::FrameV1, it needs two types of data
+  converter = make_shared<FliFrameV1Cvt<H5DataTypes::AndorFrameV1> >("Andor::FrameV1", configStore, Pds::TypeId(Pds::TypeId::Id_AndorConfig, 1), chunk_size, compression);
+  ::registerCvt(m_cvtMap, Pds::TypeId::Id_AndorFrame, 1, converter);
 
 }
 

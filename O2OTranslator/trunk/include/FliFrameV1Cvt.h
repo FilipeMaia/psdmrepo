@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/FliFrameV1.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
 #include "O2OTranslator/CvtDataContFactoryTyped.h"
@@ -49,17 +48,18 @@ class ConfigObjectStore;
  *
  *  @author Andrei Salnikov
  */
-
-class FliFrameV1Cvt : public EvtDataTypeCvt<Pds::Fli::FrameV1> {
+template <typename FrameType>
+class FliFrameV1Cvt : public EvtDataTypeCvt<typename FrameType::XtcType> {
 public:
 
-  typedef Pds::Fli::FrameV1 XtcType ;
+  typedef typename FrameType::XtcType XtcType ;
 
   // constructor
   FliFrameV1Cvt ( const std::string& typeGroupName,
-                        const ConfigObjectStore& configStore,
-                        hsize_t chunk_size,
-                        int deflate ) ;
+                  const ConfigObjectStore& configStore,
+                  Pds::TypeId cfgTypeId,
+                  hsize_t chunk_size,
+                  int deflate ) ;
 
   // Destructor
   virtual ~FliFrameV1Cvt () ;
@@ -79,12 +79,13 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::FliFrameV1> > FrameCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<FrameType> > FrameCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > FrameDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;
+  Pds::TypeId m_cfgTypeId;
   hsize_t m_chunk_size ;
   int m_deflate ;
   FrameCont* m_frameCont ;
