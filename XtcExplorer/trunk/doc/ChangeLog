@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Oct-23 salnikov V00-01-38
+	- tag all latest Ingrid's changes, get it into release
+
 2012-Aug-20 ofte
 	- pyana_image: plot only hits. 
 	
