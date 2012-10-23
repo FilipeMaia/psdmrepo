@@ -28,6 +28,7 @@
 #include "psddl_pds2psana/EvtProxy.h"
 #include "psddl_pds2psana/EvtProxyCfg.h"
 #include "psddl_pds2psana/acqiris.ddl.h"
+#include "psddl_pds2psana/andor.ddl.h"
 #include "psddl_pds2psana/bld.ddl.h"
 #include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/control.ddl.h"
@@ -425,6 +426,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_AndorConfig:
     break;
   case Pds::TypeId::Id_AndorFrame:
+    if (version == 1) ::storeDataProxyCfg<Andor::FrameV1, PsddlPds::Andor::ConfigV1>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_UsdUsbData:
     if (version == 1) ::storeDataProxy<UsdUsb::DataV1>(xtc, evt);
@@ -616,6 +618,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Reserved2:
     break;
   case Pds::TypeId::Id_AndorConfig:
+    if (version == 1) ::storeCfgObject<Andor::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_AndorFrame:
     break;
