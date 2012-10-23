@@ -56,6 +56,9 @@
 #include "types/acqiris/TrigV1.h"
 #include "types/acqiris/VertV1.h"
 
+#include "types/andor/ConfigV1.h"
+#include "types/andor/FrameV1.h"
+
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
@@ -250,6 +253,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Acqiris::VertV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "acqiris", module );
+
+  module = Py_InitModule3( "_pdsdata.andor", 0, "The Python wrapper module for pdsdata/andor" );
+  pypdsdata::Andor::ConfigV1::initType( module );
+  pypdsdata::Andor::FrameV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "andor", module );
 
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python wrapper module for pdsdata/bld" );
   pypdsdata::BldDataEBeamV0::initType( module );

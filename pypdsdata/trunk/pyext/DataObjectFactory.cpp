@@ -29,6 +29,9 @@
 #include "types/acqiris/TdcConfigV1.h"
 #include "types/acqiris/TdcDataV1.h"
 
+#include "types/andor/ConfigV1.h"
+#include "types/andor/FrameV1.h"
+
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
@@ -445,9 +448,11 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_AndorConfig :
+    if ( not obj ) obj = xtc2obj<Andor::ConfigV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_AndorFrame :
+    if ( not obj ) obj = xtc2obj<Andor::FrameV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_UsdUsbData :

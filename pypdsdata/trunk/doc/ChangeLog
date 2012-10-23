@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-79
+2012-10-23 Andy Salnikov
+- upgrading to pdsdata V04-02-07
+- new package andor with classes ConfigV1, FrameV1 (cloned from fli)
+
 Tag: V00-00-78
 2012-10-10 Andy Salnikov
 - in control.ConfigV1.__str__ method print control and monitor values
