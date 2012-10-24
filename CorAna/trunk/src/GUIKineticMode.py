@@ -136,45 +136,45 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.parent = parent
 
     def closeEvent(self, event):
-        logger.debug('closeEvent')
+        logger.debug('closeEvent', __name__)
         try: # try to delete self object in the cp
             del cp.guikineticmode # GUIKineticMode
         except AttributeError:
             pass # silently ignore
 
     def processClose(self):
-        logger.debug('processClose')
+        logger.debug('processClose', __name__)
         self.close()
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent')
+        logger.debug('resizeEvent', __name__)
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent')
+        logger.debug('moveEvent', __name__)
         pass
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def on_edi_kin_win_size(self):
         cp.kin_win_size.setValue( float(self.edi_kin_win_size.displayText()) )
-        logger.info('Set kin_win_size = ' + str(cp.kin_win_size.value()) )
+        logger.info('Set kin_win_size = ' + str(cp.kin_win_size.value()), __name__ )
 
     def on_edi_kin_top_row(self):
         cp.kin_top_row.setValue( float(self.edi_kin_top_row.displayText()) )
-        logger.info('Set kin_top_row =' + str(cp.kin_top_row.value()) )
+        logger.info('Set kin_top_row =' + str(cp.kin_top_row.value()), __name__ )
 
     def on_edi_kin_slice_first(self):
         cp.kin_slice_first.setValue( float(self.edi_kin_slice_first.displayText()) )
-        logger.info('Set kin_slice_first =' + str(cp.kin_slice_first.value()) )
+        logger.info('Set kin_slice_first =' + str(cp.kin_slice_first.value()), __name__ )
 
     def on_edi_kin_slice_last(self):
         cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
-        logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()) )
+        logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()), __name__ )
 
     def on_box_kin_mode(self):
         self.mode_name = self.box_kin_mode.currentText()
         cp.kin_mode.setValue( self.mode_name )
-        logger.info(' ---> selected kinematic mode: ' + self.mode_name )
+        logger.info(' ---> selected kinematic mode: ' + self.mode_name, __name__ )
  
 #-----------------------------
 

@@ -101,7 +101,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        self.frame.setVisible(False)
+        #self.frame.setVisible(False)
 
     def setStyle(self):
 

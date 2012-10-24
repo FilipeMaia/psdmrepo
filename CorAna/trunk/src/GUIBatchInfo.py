@@ -32,6 +32,7 @@ from ConfigParametersCorAna import confpars as cp
 
 from GUIBatchInfoLeft   import *
 from GUIBatchInfoRight  import *
+from Logger             import logger
 
 #---------------------
 #  Class definition --
@@ -43,7 +44,6 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     #  Constructor --
     #----------------
     def __init__ ( self, parent=None ) :
-        """Constructor"""
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -51,11 +51,11 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.setWindowTitle('Batch Info')
         self.setFrame()
  
-        self.titTitle  = QtGui.QLabel('Batch Information')
-        self.titStatus = QtGui.QLabel('Status: Ready!')
-        self.butClose  = QtGui.QPushButton('Close') 
-        self.butApply  = QtGui.QPushButton('Apply') 
-        self.butShow   = QtGui.QPushButton('Show Image') 
+        self.tit_title  = QtGui.QLabel('Batch Information')
+        self.tit_status = QtGui.QLabel('Status: ')
+        self.but_close  = QtGui.QPushButton('Close') 
+        self.but_apply  = QtGui.QPushButton('Apply') 
+        self.but_show   = QtGui.QPushButton('Show Image')
         cp.guibatchinfoleft  = GUIBatchInfoLeft()
         cp.guibatchinforight = GUIBatchInfoRight()
 
@@ -64,21 +64,21 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.hboxM.addWidget(cp.guibatchinforight)
 
         self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.titStatus)
+        self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.butClose)
-        self.hboxB.addWidget(self.butApply)
-        self.hboxB.addWidget(self.butShow )
+        self.hboxB.addWidget(self.but_close)
+        self.hboxB.addWidget(self.but_apply)
+        self.hboxB.addWidget(self.but_show )
 
         self.vbox  = QtGui.QVBoxLayout()
-        self.vbox.addWidget(self.titTitle)
+        self.vbox.addWidget(self.tit_title)
         self.vbox.addLayout(self.hboxM)
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
         
-        self.connect( self.butClose, QtCore.SIGNAL('clicked()'), self.onClose )
-        self.connect( self.butApply, QtCore.SIGNAL('clicked()'), self.onApply )
-        self.connect( self.butShow , QtCore.SIGNAL('clicked()'), self.onShow  )
+        self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
+        self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onApply )
+        self.connect( self.but_show , QtCore.SIGNAL('clicked()'), self.onShow  )
 
         self.showToolTips()
         self.setStyle()
@@ -88,11 +88,10 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
-        #msg_edi = 'WARNING: whatever you edit may be incorrect...\nIt is recommended to use the '
-        #self.butInstr  .setToolTip('Select the instrument name from the pop-up menu.')
-        pass
+        self.but_close .setToolTip('Close this window.')
+        self.but_apply .setToolTip('Apply changes to configuration parameters.')
+        self.but_show  .setToolTip('Show ...')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -104,24 +103,28 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 
     def setStyle(self):
         #self.          setStyleSheet (cp.styleYellow)
-        self.titTitle .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
-        self.titStatus.setStyleSheet (cp.styleTitle)
-        self.butClose .setStyleSheet (cp.styleButton)
-        self.butApply .setStyleSheet (cp.styleButton) 
-        self.butShow  .setStyleSheet (cp.styleButton) 
+        self.tit_title .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
+        self.tit_status.setStyleSheet (cp.styleTitle)
+        self.but_close .setStyleSheet (cp.styleButton)
+        self.but_apply .setStyleSheet (cp.styleButton) 
+        self.but_show  .setStyleSheet (cp.styleButton) 
 
-        self.titTitle .setAlignment(QtCore.Qt.AlignCenter)
+        self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()
 
     def setParent(self,parent) :
         self.parent = parent
 
+    def resizeEvent(self, e):
+        logger.debug('resizeEvent', __name__) 
+        self.frame.setGeometry(self.rect())
+
+    def moveEvent(self, e):
+        logger.debug('moveEvent', __name__) 
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
     def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guibatchinfo # GUIBatchInfo
-        except AttributeError:
-            pass # silently ignore
+        logger.info('closeEvent', __name__)
 
         try    : cp.guibatchinfoleft.close()
         except : pass
@@ -129,25 +132,18 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         try    : cp.guibatchinforight.close()
         except : pass
 
+        try    : del cp.guibatchinfo # GUIBatchInfo
+        except : pass
+
     def onClose(self):
-        #print 'Close button'
+        logger.info('onClose', __name__)
         self.close()
 
-    def resizeEvent(self, e):
-        #print 'resizeEvent' 
-        self.frame.setGeometry(self.rect())
-
-    def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
-
-
     def onApply(self):
-        print 'Apply button is empty'
+        logger.info('onApply - is already applied...', __name__)
 
     def onShow(self):
-        print 'Show button is empty'
+        logger.info('onShow - is not implemented yet...', __name__)
 
 #-----------------------------
 

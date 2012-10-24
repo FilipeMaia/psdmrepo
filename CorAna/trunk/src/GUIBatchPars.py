@@ -29,6 +29,7 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
+from Logger                 import logger
 
 #---------------------
 #  Class definition --
@@ -233,53 +234,50 @@ class GUIBatchPars ( QtGui.QWidget ) :
     def setParent(self,parent) :
         self.parent = parent
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guibatchpars # GUIBatchPars
-        except AttributeError:
-            pass # silently ignore
-
-    def processClose(self):
-        #print 'Close button'
-        self.close()
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
+        logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
+    def closeEvent(self, event):
+        logger.info('closeEvent', __name__)
+        try    : del cp.guibatchpars # GUIBatchPars
+        except : pass
+
+    def onClose(self):
+        logger.info('onClose', __name__)
+        self.close()
 
     def on_edi_bat_num_max(self):
         cp.bat_num_max.setValue( int(self.edi_bat_num_max.displayText()) )
-        print 'Set bat_num_max =', cp.bat_num_max.value()
+        logger.info('Set bat_num_max =' + str(cp.bat_num_max.value()), __name__)
 
     def on_edi_bat_data_start(self):
         cp.bat_data_start.setValue( float(self.edi_bat_data_start.displayText()) )
-        print 'Set bat_data_start =', cp.bat_data_start.value()
+        logger.info('Set bat_data_start =' + str(cp.bat_data_start.value()), __name__)
 
     def on_edi_bat_data_end(self):
         cp.bat_data_end.setValue( float(self.edi_bat_data_end.displayText()) )
-        print 'Set bat_data_end =', cp.bat_data_end.value()
+        logger.info('Set bat_data_end =' + str(cp.bat_data_end.value()), __name__)
 
     def on_edi_bat_dark_start(self):
         cp.bat_dark_start.setValue( float(self.edi_bat_dark_start.displayText()) )
-        print 'Set bat_dark_start =', cp.bat_dark_start.value()
+        logger.info('Set bat_dark_start =' + str(cp.bat_dark_start.value()), __name__)
 
     def on_edi_bat_dark_end(self):
         cp.bat_dark_end.setValue( float(self.edi_bat_dark_end.displayText()) )
-        print 'Set bat_dark_end =', cp.bat_dark_end.value()
+        logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
 
     def on_edi_bat_flat_start(self):
         cp.bat_flat_start.setValue( float(self.edi_bat_flat_start.displayText()) )
-        print 'Set bat_flat_start =', cp.bat_flat_start.value()
+        logger.info('Set bat_flat_start =' + str(cp.bat_flat_start.value()), __name__)
 
     def on_edi_bat_flat_end(self):
         cp.bat_flat_end.setValue( float(self.edi_bat_flat_end.displayText()) )
-        print 'Set bat_flat_end =', cp.bat_flat_end.value()
+        logger.info('Set bat_flat_end =' + str(cp.bat_flat_end.value()), __name__)
 
     def setPopupMenuMode(self):
         self.list_of_nums = range(1,cp.bat_num_max.value()+1)
@@ -294,7 +292,7 @@ class GUIBatchPars ( QtGui.QWidget ) :
         str_selected = action_selected.text()
         cp.bat_num.setValue( str_selected )
         self.but_bat_num.setText( str_selected + self.char_expand )
-        print ' ---> selected batch number: ' + str_selected
+        logger.info(' ---> selected batch number: ' + str_selected, __name__)
 
 #-----------------------------
 

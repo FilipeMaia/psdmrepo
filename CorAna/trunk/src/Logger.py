@@ -44,24 +44,33 @@ class Logger :
         self.levels=['debug','info','warning','error','crytical']
         self.level_thr_ind = self.levels.index(level)
 
-    def debug( self, msg ) :
-        self.message(msg,self.levels[0])
+    def debug( self, msg, name=None ) :
+        self.message(msg, self.levels[0], name)
 
-    def info( self, msg ) :
-        self.message(msg,self.levels[1])
+    def info( self, msg, name=None ) :
+        self.message(msg, self.levels[1], name)
 
-    def warning( self, msg ) :
-        self.message(msg,self.levels[2])
+    def warning( self, msg, name=None ) :
+        self.message(msg, self.levels[2], name)
 
-    def error( self, msg ) :
-        self.message(msg,self.levels[3])
+    def error( self, msg, name=None ) :
+        self.message(msg, self.levels[3], name)
 
-    def crytical( self, msg ) :
-        self.message(msg,self.levels[4])
+    def crytical( self, msg, name=None ) :
+        self.message(msg, self.levels[4], name)
 
-    def message( self, msg, level ) :
+    def message( self, msg, level, name=None ) :
         if(self.levels.index(level) < self.level_thr_ind) : return
-        print self.time_stamp() + ' (' + level + ') ' + msg
+
+        self.msg_tot = '' 
+        if name is not None :
+            self.msg_tot  = self.time_stamp()
+            self.msg_tot += ' (' + level + ') '
+            self.msg_tot += name + ': '
+        else :
+            self.msg_tot += '::::'
+        self.msg_tot += msg
+        print self.msg_tot
 
     def time_stamp( self, fmt='%Y-%m-%d %H:%M:%S' ): # '%Y-%m-%d %H:%M:%S %Z'
         return strftime(fmt, localtime())
@@ -78,9 +87,9 @@ if __name__ == "__main__" :
 
     logger.debug   ('This is a test message 1')
     logger.info    ('This is a test message 2')
-    logger.warning ('This is a test message 3')
-    logger.error   ('This is a test message 4')
-    logger.crytical('This is a test message 5')
+    logger.warning ('This is a test message 3', __name__)
+    logger.error   ('This is a test message 4', __name__)
+    logger.crytical('This is a test message 5', __name__)
 
     sys.exit ( 'End of test for Logger' )
 

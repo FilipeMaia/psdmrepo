@@ -34,10 +34,7 @@ import os
 #-----------------------------
 #import ConfigParameters as cpbase
 from ConfigParameters import * # ConfigParameters
-
-#----------------------------------
-# Local non-exported definitions --
-#----------------------------------
+from Logger import logger
 
 #---------------------
 #  Class definition --
@@ -133,7 +130,17 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
         self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
         self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
 
+        # GUIAnaSettingsLeft.py
+        self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def=1,typ='int' )
+        self.ana_stat_part_phi = self.declareParameter( name='ANA_STATIC_PARTITION_PHI',  val_def=1,typ='int' )
+        self.ana_dyna_part_q   = self.declareParameter( name='ANA_DYNAMIC_PARTITION_Q',   val_def=1,typ='int' )
+        self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def=1,typ='int' )
+
+        self.ana_mask_file     = self.declareParameter( name='ANA_MASK_FILE', val_def='mask.txt',typ='str' )
+
+#-----------------------------
 
     def defineStyles( self ) :
         self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
@@ -159,9 +166,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 
     def printParsDirectly( self ) :
-        print 'Direct use of parameter:' + self.fname_cp .name(), self.fname_cp .value()  
-        print 'Direct use of parameter:' + self.fname_ped.name(), self.fname_ped.value()      
-        print 'Direct use of parameter:' + self.fname_dat.name(), self.fname_dat.value()      
+        logger.info('Direct use of parameter:' + self.fname_cp .name() + ' ' + self.fname_cp .value(), __name__ )
+        logger.info('Direct use of parameter:' + self.fname_ped.name() + ' ' + self.fname_ped.value(), __name__ )     
+        logger.info('Direct use of parameter:' + self.fname_dat.name() + ' ' + self.fname_dat.value(), __name__ )    
 
 #-----------------------------
 

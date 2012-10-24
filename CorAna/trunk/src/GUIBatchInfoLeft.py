@@ -33,6 +33,7 @@ from ConfigParametersCorAna import confpars as cp
 from GUIBeamZeroPars    import *
 from GUISpecularPars    import *
 from GUIImgSizePosition import *
+from Logger             import logger
 
 #---------------------
 #  Class definition --
@@ -199,30 +200,37 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
     def setParent(self,parent) :
         self.parent = parent
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guibatchinfoleft # GUIBatchInfoLeft
-        except AttributeError:
-            pass # silently ignore
-
-    def processClose(self):
-        #print 'Close button'
-        self.close()
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
+        logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
+    def closeEvent(self, event):
+        logger.debug('closeEvent', __name__) 
+
+        try    : cp.guibeamzeropars.close()
+        except : pass
+
+        try    : cp.guispecularpars.close()
+        except : pass
+
+        try    : guiimgsizeposition.close()
+        except : pass
+
+        try    : del cp.guibatchinfoleft # GUIBatchInfoLeft
+        except : pass # silently ignore
+
+    def onClose(self):
+        logger.info('onClose', __name__) 
+        self.close()
 
     def onBoxSetupGeom(self):
         self.mode_name = self.boxSetupGeom.currentText()
         cp.exp_setup_geom.setValue( self.mode_name )
-        print ' ---> selected setup geometry mode: ' + self.mode_name
+        logger.info(' ---> selected setup geometry mode: ' + self.mode_name, __name__)
         self.guiSelector()
         self.guiAnglePanel()
 
@@ -237,13 +245,13 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.mode_name = action_selected.text()
         cp.exp_setup_geom.setValue( self.mode_name )
         self.butSetupGeom.setText( self.mode_name + cp.char_expand )
-        print ' ---> selected setup geometry mode: ' + self.mode_name
+        logger.info(' ---> selected setup geometry mode: ' + self.mode_name, __name__)
         self.guiSelector()
         self.guiAnglePanel()
 
     def onEdiDistance(self):
         cp.sample_det_dist.setValue( float(self.ediDistance.displayText()) )
-        print 'Set sample_det_dist =', cp.sample_det_dist.value()
+        logger.info('Set sample_det_dist = ' + str(cp.sample_det_dist.value()), __name__ )
 
 #-----------------------------
 

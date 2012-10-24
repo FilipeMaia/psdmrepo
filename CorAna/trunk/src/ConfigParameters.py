@@ -165,10 +165,11 @@ class ConfigParameters :
 #---------------------------------------
 
     def printParameters( self ) :
-        print 'Number of declared parameters in the dict:', len(self.dict_pars)
+        msg = 'printParameters - Number of declared parameters in the dict: %d' % len(self.dict_pars)
+        logger.info(msg, __name__)
         for par in self.dict_pars.values() :
             s = 'Par: %s %s %s' % ( par.name().ljust(32), str(par.value()).ljust(32), par.type() )
-            print s
+            logger.info( s )
 
 #---------------------------------------
 
@@ -182,7 +183,7 @@ class ConfigParameters :
 
     def saveParametersInFile ( self, fname=None ) :
         self.setParsFileName(fname)        
-        logger.info('Save configuration parameters in file ' + self.fname)
+        logger.info('Save configuration parameters in file ' + self.fname, __name__)
         f=open(self.fname,'w')
         for par in self.dict_pars.values() :
             s = '%s %s\n' % ( par.name().ljust(32), str(par.value()) )
@@ -208,7 +209,7 @@ class ConfigParameters :
         logger.info('Read configuration parameters from file ' + self.fname)
 
         if not os.path.exists(self.fname) :
-            logger.warning('readParametersFromFile : The file ' + self.fname + ' is not found')
+            logger.warning('readParametersFromFile : The file ' + self.fname + ' is not found', __name__)
             return
  
         f=open(self.fname,'r')
@@ -224,7 +225,7 @@ def usage() :
     msg  = 'Use command: ' + sys.argv[0] + ' [<configuration-file-name>]\n'
     msg += 'with a single or without arguments.' 
     msg = '\n' + 51*'-' + '\n' + msg + '\n' + 51*'-'
-    logger.warning(msg)
+    logger.warning(msg, __name__)
 
 #---------------------------------------
 
@@ -232,7 +233,7 @@ def getConfigFileFromInput() :
 
     msg = 'List of input parameters: '
     for par in sys.argv :  msg += par
-    logger.info(msg)
+    logger.info(msg, __name__)
 
     if len(sys.argv) > 2 : 
         usage()

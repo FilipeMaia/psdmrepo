@@ -29,6 +29,7 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
+from Logger                 import logger
 
 #---------------------
 #  Class definition --
@@ -169,49 +170,46 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
     def setParent(self,parent) :
         self.parent = parent
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guiimgsizeposition # GUIImgSizePosition
-        except AttributeError:
-            pass # silently ignore
-
-    def processClose(self):
-        #print 'Close button'
-        self.close()
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
+        logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
+    def closeEvent(self, event):
+        logger.debug('closeEvent', __name__) 
+        try    : del cp.guiimgsizeposition # GUIImgSizePosition
+        except : pass # silently ignore
+
+    def onClose(self):
+        logger.info('onClose', __name__) 
+        self.close()
 
     def on_edi_col_begin(self):
         cp.col_begin.setValue( float(self.edi_col_begin.displayText()) )
-        print 'Set col_begin =', cp.col_begin.value()
+        logger.info('Set col_begin =' + str(cp.col_begin.value()), __name__)
 
     def on_edi_col_end(self):
         cp.col_end.setValue( float(self.edi_col_end.displayText()) )
-        print 'Set col_end =', cp.col_end.value()
+        logger.info('Set col_end =' + str(cp.col_end.value()), __name__)
 
     def on_edi_row_begin(self):
         cp.row_begin.setValue( float(self.edi_row_begin.displayText()) )
-        print 'Set row_begin =', cp.row_begin.value()
+        logger.info('Set row_begin =' + str(cp.row_begin.value()), __name__)
 
     def on_edi_row_end(self):
         cp.row_end.setValue( float(self.edi_row_end.displayText()) )
-        print 'Set row_end =', cp.row_end.value()
+        logger.info('Set row_end =' + str(cp.row_end.value()), __name__)
 
     def on_edi_x_frame_pos(self):
         cp.x_frame_pos.setValue( float(self.edi_x_frame_pos.displayText()) )
-        print 'Set x_frame_pos =', cp.x_frame_pos.value()
+        logger.info('Set x_frame_pos =' + str(cp.x_frame_pos.value()), __name__)
 
     def on_edi_z_frame_pos(self):
         cp.z_frame_pos.setValue( float(self.edi_z_frame_pos.displayText()) )
-        print 'Set z_frame_pos =', cp.z_frame_pos.value()
+        logger.info('Set z_frame_pos =' + str(cp.z_frame_pos.value()), __name__)
 
 #-----------------------------
 

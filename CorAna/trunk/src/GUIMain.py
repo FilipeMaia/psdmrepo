@@ -68,8 +68,8 @@ class GUIMain ( QtGui.QWidget ) :
     #  Constructor --
     #----------------
     def __init__ (self, parent=None, app=None) :
-        """Constructor of GUIMain."""
 
+        self.name = 'GUIMain'
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
@@ -162,20 +162,15 @@ class GUIMain ( QtGui.QWidget ) :
         self.butExit       .setStyleSheet(cp.styleButton)
         self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
 
-    def moveEvent(self, e):
-        pass
-#        print 'moveEvent' 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
 
-    def processPrint(self):
-        print 'processPrint()'
+    def moveEvent(self, e):
+        logger.debug('moveEvent', self.name) 
 
     def closeEvent(self, event):
-        logger.info('closeEvent')
+        logger.info('closeEvent', self.name)
         try    : del cp.guimain
         except : pass
 
@@ -189,12 +184,14 @@ class GUIMain ( QtGui.QWidget ) :
         except : pass
 
     def onExit(self):
-        logger.info('onExit')
+        logger.info('onExit', self.name)
         self.close()
         
+    def onPrint(self):
+        logger.info('onPrint', self.name)
         
     def onLoadFiles(self):
-        logger.info('onLoadFiles')
+        logger.info('onLoadFiles', self.name)
         try :
             cp.guiloadfiles.close()
             self.butLoadFiles.setStyleSheet(cp.styleButton)
@@ -207,7 +204,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onBatchInfo(self):
-        logger.info('onBatchInfo')
+        logger.info('onBatchInfo', self.name)
         try :
             cp.guibatchinfo.close()
         except : # AttributeError: #NameError 
@@ -218,11 +215,11 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onSave(self):
-        logger.info('onSave')
+        logger.info('onSave', self.name)
         cp.saveParametersInFile( cp.fname_cp.value() )
 
     def onAnaDisp(self):    
-        logger.info('onAnaDisp')
+        logger.info('onAnaDisp', self.name)
         try :
             cp.guianasettings.close()
         except : # AttributeError: #NameError 
@@ -232,16 +229,16 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guianasettings.show()
 
     def onSystem(self):     
-        logger.info('onSystem - not implemented yet...')
+        logger.info('onSystem - not implemented yet...', self.name)
 
     def onRun (self):       
-        logger.info('onRun - not implemented yet...')
+        logger.info('onRun - not implemented yet...', self.name)
 
     def onViewResults(self):
-        logger.info('onViewResults - not implemented yet...')
+        logger.info('onViewResults - not implemented yet...', self.name)
 
     def onStop(self):       
-        logger.info('onStop - not implemented yet...')
+        logger.info('onStop - not implemented yet...', self.name)
                 
 #-----------------------------
 #-----------------------------

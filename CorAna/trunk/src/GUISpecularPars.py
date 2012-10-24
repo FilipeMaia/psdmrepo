@@ -29,6 +29,7 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
+from Logger                 import logger
 
 #---------------------
 #  Class definition --
@@ -47,19 +48,19 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.setWindowTitle('Specularly Reflected Beam Parameters')
         self.setFrame()
  
-        self.titSpecular = QtGui.QLabel('Specularly Reflected Beam Parameters:')
-        self.tit_x_coord = QtGui.QLabel('x-coordinate in full frame mode')      
-        self.tit_y_coord = QtGui.QLabel('y-coordinate in full frame mode')      
-        self.tit_x0_pos  = QtGui.QLabel('CCD x spec in specular measurement')   
-        self.tit_z0_pos  = QtGui.QLabel('CCD z spec in specular measurement')   
+        self.tit_specular = QtGui.QLabel('Specularly Reflected Beam Parameters:')
+        self.tit_x_coord  = QtGui.QLabel('x-coordinate in full frame mode')      
+        self.tit_y_coord  = QtGui.QLabel('y-coordinate in full frame mode')      
+        self.tit_x0_pos   = QtGui.QLabel('CCD x spec in specular measurement')   
+        self.tit_z0_pos   = QtGui.QLabel('CCD z spec in specular measurement')   
 
-        self.edi_x_coord = QtGui.QLineEdit( str( cp.x_coord_specular.value() ) )        
-        self.edi_y_coord = QtGui.QLineEdit( str( cp.y_coord_specular.value() ) )        
-        self.edi_x0_pos  = QtGui.QLineEdit( str( cp.x0_pos_in_specular.value() ) )        
-        self.edi_z0_pos  = QtGui.QLineEdit( str( cp.z0_pos_in_specular.value() ) )        
+        self.edi_x_coord  = QtGui.QLineEdit( str( cp.x_coord_specular.value() ) )        
+        self.edi_y_coord  = QtGui.QLineEdit( str( cp.y_coord_specular.value() ) )        
+        self.edi_x0_pos   = QtGui.QLineEdit( str( cp.x0_pos_in_specular.value() ) )        
+        self.edi_z0_pos   = QtGui.QLineEdit( str( cp.z0_pos_in_specular.value() ) )        
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.titSpecular,       0, 0, 1, 9)
+        self.grid.addWidget(self.tit_specular,      0, 0, 1, 9)
         self.grid.addWidget(self.tit_x_coord,       1, 1, 1, 9)
         self.grid.addWidget(self.tit_y_coord,       2, 1, 1, 9)
         self.grid.addWidget(self.tit_x0_pos ,       3, 1, 1, 9)
@@ -85,11 +86,11 @@ class GUISpecularPars ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         msg = 'Edit coordinate'
-        self.titSpecular.setToolTip('This section allows to monitor/modify\nthe beam/spec parameters\nin specular mode')
-        self.edi_x_coord.setToolTip( msg )
-        self.edi_y_coord.setToolTip( msg )
-        self.edi_x0_pos .setToolTip( msg )
-        self.edi_z0_pos .setToolTip( msg )
+        self.tit_specular.setToolTip('This section allows to monitor/modify\nthe beam/spec parameters\nin specular mode')
+        self.edi_x_coord .setToolTip( msg )
+        self.edi_y_coord .setToolTip( msg )
+        self.edi_x0_pos  .setToolTip( msg )
+        self.edi_z0_pos  .setToolTip( msg )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -100,12 +101,12 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.            setStyleSheet (cp.styleBkgd)
-        self.titSpecular.setStyleSheet (cp.styleTitle)
-        self.tit_x_coord.setStyleSheet (cp.styleLabel)
-        self.tit_y_coord.setStyleSheet (cp.styleLabel)
-        self.tit_x0_pos .setStyleSheet (cp.styleLabel) 
-        self.tit_z0_pos .setStyleSheet (cp.styleLabel) 
+        self.             setStyleSheet (cp.styleBkgd)
+        self.tit_specular.setStyleSheet (cp.styleTitle)
+        self.tit_x_coord .setStyleSheet (cp.styleLabel)
+        self.tit_y_coord .setStyleSheet (cp.styleLabel)
+        self.tit_x0_pos  .setStyleSheet (cp.styleLabel) 
+        self.tit_z0_pos  .setStyleSheet (cp.styleLabel) 
 
         self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
         self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
@@ -128,42 +129,34 @@ class GUISpecularPars ( QtGui.QWidget ) :
     def setParent(self,parent) :
         self.parent = parent
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guispecularpars # GUISpecularPars
-        except AttributeError:
-            pass # silently ignore
-
-    def processClose(self):
-        #print 'Close button'
-        self.close()
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
+        logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
+    def closeEvent(self, event):
+        logger.debug('closeEvent', __name__) 
+        try    : del cp.guispecularpars # GUISpecularPars
+        except : pass # silently ignore
 
     def on_edi_x_coord(self):
         cp.x_coord_specular.setValue( float(self.edi_x_coord.displayText()) )
-        print 'Set x_coord_specular =', cp.x_coord_specular.value()
+        logger.info('Set x_coord_specular =' + str(cp.x_coord_specular.value()), __name__)
 
     def on_edi_y_coord(self):
-        print 'on_edi_y_coord'
         cp.y_coord_specular.setValue( float(self.edi_y_coord.displayText()) )
-        print 'Set y_coord_specular =', cp.y_coord_specular.value()
+        logger.info('Set y_coord_specular =' + str(cp.y_coord_specular.value()), __name__)
 
     def on_edi_x0_pos(self):
         cp.x0_pos_in_specular.setValue( float(self.edi_x0_pos.displayText()) )
-        print 'Set x0_pos_in_specular =', cp.x0_pos_in_specular.value()
+        logger.info('Set x0_pos_in_specular =' + str(cp.x0_pos_in_specular.value()), __name__)
 
     def on_edi_z0_pos(self):
         cp.z0_pos_in_specular.setValue( float(self.edi_z0_pos.displayText()) )
-        print 'Set z0_pos_in_specular =', cp.z0_pos_in_specular.value()
+        logger.info('Set z0_pos_in_specular =' + str(cp.z0_pos_in_specular.value()), __name__)
 
 #-----------------------------
 

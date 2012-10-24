@@ -29,9 +29,9 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
-
-from GUIKineticMode        import *
-from GUIBatchPars          import *
+from GUIKineticMode         import *
+from GUIBatchPars           import *
+from Logger                 import logger
 
 #---------------------
 #  Class definition --
@@ -89,25 +89,28 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
     def setParent(self,parent) :
         self.parent = parent
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        try: # try to delete self object in the cp
-            del cp.guibatchinforight # GUIBatchInfoRight
-        except AttributeError:
-            pass # silently ignore
-
-    def processClose(self):
-        #print 'Close button'
-        self.close()
-
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #print 'moveEvent' 
-        pass
+        logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
+
+    def closeEvent(self, event):
+        logger.info('closeEvent', __name__)
+        try    : del cp.guibatchinforight # GUIBatchInfoRight
+        except : pass # silently ignore
+
+        try    : cp.guikineticmode.close()
+        except : pass
+
+        try    : cp.guibatchpars  .close()
+        except : pass
+
+    def onClose(self):
+        logger.info('onClose', __name__)
+        self.close()
 
 #-----------------------------
 
