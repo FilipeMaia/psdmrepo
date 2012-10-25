@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module ConfigParameters...
+#  Module ConfigParametersCorAna...
 #
 #------------------------------------------------------------------------
 
-"""Is intended as a storage for configuration parameters.
+"""Is intended as a storage for configuration parameters for CorAna project.
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -41,7 +41,7 @@ from Logger import logger
 #---------------------
 
 class ConfigParametersCorAna ( ConfigParameters ) :
-    """Is intended as a storage for configuration parameters.
+    """Is intended as a storage for configuration parameters for CorAna project.
     #@see BaseClass ConfigParameters
     #@see OtherClass Parameters
     """
@@ -133,12 +133,20 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
 
         # GUIAnaSettingsLeft.py
-        self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def=1,typ='int' )
-        self.ana_stat_part_phi = self.declareParameter( name='ANA_STATIC_PARTITION_PHI',  val_def=1,typ='int' )
-        self.ana_dyna_part_q   = self.declareParameter( name='ANA_DYNAMIC_PARTITION_Q',   val_def=1,typ='int' )
-        self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def=1,typ='int' )
+        self.ana_type          = self.declareParameter( name='ANA_TYPE',                  val_def='static',typ='str' )
 
-        self.ana_mask_file     = self.declareParameter( name='ANA_MASK_FILE', val_def='mask.txt',typ='str' )
+        self.ana_stat_meth_q   = self.declareParameter( name='ANA_STATIC_METHOD_Q',       val_def='evenly-spaced',typ='str' )
+        self.ana_stat_meth_phi = self.declareParameter( name='ANA_STATIC_METHOD_PHI',     val_def='evenly-spaced',typ='str' )
+        self.ana_dyna_meth_q   = self.declareParameter( name='ANA_DYNAMIC_METHOD_Q',      val_def='non-evenly-spaced',typ='str' )
+        self.ana_dyna_meth_phi = self.declareParameter( name='ANA_DYNAMIC_METHOD_PHI',    val_def='evenly-spaced',typ='str' )
+
+        self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def='1',typ='str' )
+        self.ana_stat_part_phi = self.declareParameter( name='ANA_STATIC_PARTITION_PHI',  val_def='2',typ='str' )
+        self.ana_dyna_part_q   = self.declareParameter( name='ANA_DYNAMIC_PARTITION_Q',   val_def='3',typ='str' )
+        self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def='4',typ='str' )
+
+        self.ana_mask_type     = self.declareParameter( name='ANA_MASK_TYPE',             val_def='no-mask',typ='str' )
+        self.ana_mask_file     = self.declareParameter( name='ANA_MASK_FILE',             val_def='mask.txt',typ='str' )
 
 #-----------------------------
 

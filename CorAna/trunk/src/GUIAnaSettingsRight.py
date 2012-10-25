@@ -47,11 +47,11 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
  
-        self.tit_kinetic         = QtGui.QLabel('Camera Working Mode:')
-        self.tit_kin_win_size    = QtGui.QLabel('kinetics window size')
-        self.tit_kin_top_row     = QtGui.QLabel('top row number of visible slice')
-        self.tit_kin_slice_first = QtGui.QLabel('first usable kinetics slice')
-        self.tit_kin_slice_last  = QtGui.QLabel('last usable kinetics slice')
+        self.tit_ana_opts        = QtGui.QLabel('Dynamic Analysis Options:')
+        self.tit_ana_opts1       = QtGui.QLabel('# of delays per multiple tau level')
+        self.tit_ana_opts2       = QtGui.QLabel('# of slice delays per multiple tau level')
+        self.tit_ana_opts3       = QtGui.QLabel('use smoothed symmetric normalization')
+        self.tit_ana_opts4       = QtGui.QLabel('minimum number of pixels used to smooth')
         self.edi_kin_win_size    = QtGui.QLineEdit( str( cp.kin_win_size   .value() ) )        
         self.edi_kin_top_row     = QtGui.QLineEdit( str( cp.kin_top_row    .value() ) )        
         self.edi_kin_slice_first = QtGui.QLineEdit( str( cp.kin_slice_first.value() ) )        
@@ -61,11 +61,11 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.box_kin_mode.setCurrentIndex( self.list_of_kin_modes.index(cp.kin_mode.value()) )
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_kinetic,               0, 0, 1, 8)
-        self.grid.addWidget(self.tit_kin_win_size   ,       1, 1, 1, 8)
-        self.grid.addWidget(self.tit_kin_top_row    ,       2, 1, 1, 8)
-        self.grid.addWidget(self.tit_kin_slice_first,       3, 1, 1, 8)
-        self.grid.addWidget(self.tit_kin_slice_last ,       4, 1, 1, 8)
+        self.grid.addWidget(self.tit_ana_opts,              0, 0, 1, 8)
+        self.grid.addWidget(self.tit_ana_opts1,             1, 1, 1, 8)
+        self.grid.addWidget(self.tit_ana_opts2,             2, 1, 1, 8)
+        self.grid.addWidget(self.tit_ana_opts3,             3, 1, 1, 8)
+        self.grid.addWidget(self.tit_ana_opts4,             4, 1, 1, 8)
         self.grid.addWidget(self.box_kin_mode       ,       0, 8) 
         self.grid.addWidget(self.edi_kin_win_size   ,       1, 8)
         self.grid.addWidget(self.edi_kin_top_row    ,       2, 8)
@@ -89,11 +89,10 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         msg = 'Edit field'
-        self.tit_kinetic.setToolTip('This section allows to monitor/modify\nthe beam zero parameters\nin transmission mode')
-        self.edi_kin_win_size   .setToolTip( msg )
-        self.edi_kin_top_row    .setToolTip( msg )
-        self.edi_kin_slice_first.setToolTip( msg )
-        self.edi_kin_slice_last .setToolTip( msg )
+        self.tit_ana_opts.setToolTip('This section allows to monitor/modify\nthe beam zero parameters\nin transmission mode')
+        #self.edi_kin_top_row    .setToolTip( msg )
+        #self.edi_kin_slice_first.setToolTip( msg )
+        #self.edi_kin_slice_last .setToolTip( msg )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -108,11 +107,11 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         width = 80
 
         self.                    setStyleSheet (cp.styleBkgd)
-        self.tit_kinetic        .setStyleSheet (cp.styleTitle)
-        self.tit_kin_win_size   .setStyleSheet (cp.styleLabel)
-        self.tit_kin_top_row    .setStyleSheet (cp.styleLabel)
-        self.tit_kin_slice_first.setStyleSheet (cp.styleLabel) 
-        self.tit_kin_slice_last .setStyleSheet (cp.styleLabel) 
+        self.tit_ana_opts       .setStyleSheet (cp.styleTitle)
+        self.tit_ana_opts1      .setStyleSheet (cp.styleLabel)
+        self.tit_ana_opts2      .setStyleSheet (cp.styleLabel)
+        self.tit_ana_opts3      .setStyleSheet (cp.styleLabel) 
+        self.tit_ana_opts4      .setStyleSheet (cp.styleLabel) 
 
         self.edi_kin_win_size   .setAlignment(QtCore.Qt.AlignRight)
         self.edi_kin_top_row    .setAlignment(QtCore.Qt.AlignRight)
