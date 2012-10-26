@@ -30,7 +30,7 @@ standardExternalPackage('atlas', **locals())
 del LIBDIR
 del LINKLIBS
 
-scipy_ver = "0.7.1"
+scipy_ver = "0.11.0"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "scipy", scipy_ver)
 
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages", "scipy")
