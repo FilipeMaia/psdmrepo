@@ -148,6 +148,24 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_mask_type     = self.declareParameter( name='ANA_MASK_TYPE',             val_def='no-mask',typ='str' )
         self.ana_mask_file     = self.declareParameter( name='ANA_MASK_FILE',             val_def='mask.txt',typ='str' )
 
+        # GUIAnaSettingsRight.py
+        self.ana_ndelays       = self.declareParameter( name='ANA_NDELAYS_PER_MTAU_LEVEL',       val_def=4,     typ='int' )
+        self.ana_nslice_delays = self.declareParameter( name='ANA_NSLICE_DELAYS_PER_MTAU_LEVEL', val_def=4,     typ='int' )
+        self.ana_npix_to_smooth= self.declareParameter( name='ANA_NPIXELS_TO_SMOOTH',            val_def=100,   typ='int' )
+        self.ana_smooth_norm   = self.declareParameter( name='ANA_SMOOTH_SYM_NORM',              val_def=False, typ='bool' )
+        self.ana_two_corfuns   = self.declareParameter( name='ANA_TWO_TIME_CORFUNS_CONTROL',     val_def=False, typ='bool' )
+        self.ana_spec_stab     = self.declareParameter( name='ANA_CHECK_SPECKLE_STABILITY',      val_def=False, typ='bool' )
+
+        self.lld_type          = self.declareParameter( name='LOW_LEVEL_DISC_TYPE',              val_def='NONE',typ='str' )
+        self.lld_adu           = self.declareParameter( name='LOW_LEVEL_DISC_ADU',               val_def=15,    typ='float' )
+        self.lld_rms           = self.declareParameter( name='LOW_LEVEL_DISC_RMS',               val_def=4,     typ='float' )
+
+        self.res_ascii_out     = self.declareParameter( name='RES_ASCII_OUTPUT',                 val_def=True,  typ='bool' )
+        self.res_fit1          = self.declareParameter( name='RES_PERFORM_FIT1',                 val_def=False, typ='bool' )
+        self.res_fit2          = self.declareParameter( name='RES_PERFORM_FIT1',                 val_def=False, typ='bool' )  
+        self.res_fit_cust      = self.declareParameter( name='RES_PERFORM_FIT_CUSTOM',           val_def=False, typ='bool' ) 
+        self.res_png_out       = self.declareParameter( name='RES_PNG_FILES',                    val_def=False, typ='bool' )  
+
 #-----------------------------
 
     def defineStyles( self ) :

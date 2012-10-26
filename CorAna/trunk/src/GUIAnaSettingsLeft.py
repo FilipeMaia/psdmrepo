@@ -134,7 +134,9 @@ class GUIAnaSettingsLeft ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setMinimumWidth(450)
         self.setStyleSheet(cp.styleBkgd)
+
         self.tit_ana_type.setStyleSheet (cp.styleTitle)
         self.rad_ana_stat.setStyleSheet (cp.styleLabel)
         self.rad_ana_dyna.setStyleSheet (cp.styleLabel)

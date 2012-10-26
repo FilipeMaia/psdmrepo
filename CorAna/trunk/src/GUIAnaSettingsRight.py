@@ -45,40 +45,97 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
-        self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
- 
         self.tit_ana_opts        = QtGui.QLabel('Dynamic Analysis Options:')
-        self.tit_ana_opts1       = QtGui.QLabel('# of delays per multiple tau level')
-        self.tit_ana_opts2       = QtGui.QLabel('# of slice delays per multiple tau level')
-        self.tit_ana_opts3       = QtGui.QLabel('use smoothed symmetric normalization')
-        self.tit_ana_opts4       = QtGui.QLabel('minimum number of pixels used to smooth')
-        self.edi_kin_win_size    = QtGui.QLineEdit( str( cp.kin_win_size   .value() ) )        
-        self.edi_kin_top_row     = QtGui.QLineEdit( str( cp.kin_top_row    .value() ) )        
-        self.edi_kin_slice_first = QtGui.QLineEdit( str( cp.kin_slice_first.value() ) )        
-        self.edi_kin_slice_last  = QtGui.QLineEdit( str( cp.kin_slice_last .value() ) )        
-        self.box_kin_mode        = QtGui.QComboBox( self ) 
-        self.box_kin_mode.addItems(self.list_of_kin_modes)
-        self.box_kin_mode.setCurrentIndex( self.list_of_kin_modes.index(cp.kin_mode.value()) )
+        self.tit_ana_opt1        = QtGui.QLabel('# of delays per multiple tau level:')
+        self.tit_ana_opt2        = QtGui.QLabel('# of slice delays per multiple tau level:')
+        self.edi_ana_opt1        = QtGui.QLineEdit( str( cp.ana_ndelays.value() ) )        
+        self.edi_ana_opt2        = QtGui.QLineEdit( str( cp.ana_nslice_delays.value() ) )        
+        self.edi_ana_opt3        = QtGui.QLineEdit( str( cp.ana_npix_to_smooth.value() ) )        
+        self.cbx_ana_smooth_norm = QtGui.QCheckBox('use smoothed symmetric normalization,  Npix min:', self)
+        self.cbx_ana_two_corfuns = QtGui.QCheckBox('Two time correlation function control', self)
+        self.cbx_ana_spec_stab   = QtGui.QCheckBox('Check speckle stability', self)
+        self.cbx_ana_smooth_norm.setChecked( cp.ana_smooth_norm.value() )
+        self.cbx_ana_two_corfuns.setChecked( cp.ana_two_corfuns.value() )
+        self.cbx_ana_spec_stab  .setChecked( cp.ana_spec_stab.value() )
+
+        self.tit_lld      = QtGui.QLabel('Low Level Discrimination (LLD):')
+        self.edi_lld_adu  = QtGui.QLineEdit( str( cp.lld_adu.value() ) )        
+        self.edi_lld_rms  = QtGui.QLineEdit( str( cp.lld_rms.value() ) )        
+        self.rad_lld_none = QtGui.QRadioButton('no LLD')
+        self.rad_lld_adu  = QtGui.QRadioButton('ADU threshold:')
+        self.rad_lld_rms  = QtGui.QRadioButton('dark RMS threshold:')
+        self.rad_lld_grp  = QtGui.QButtonGroup()
+        self.rad_lld_grp.addButton(self.rad_lld_none)
+        self.rad_lld_grp.addButton(self.rad_lld_adu )
+        self.rad_lld_grp.addButton(self.rad_lld_rms )
+        self.list_lld_types = ['NONE', 'ADU', 'RMS']
+        if   cp.lld_type.value() == self.list_lld_types[1] : self.rad_lld_adu .setChecked(True)
+        elif cp.lld_type.value() == self.list_lld_types[2] : self.rad_lld_rms .setChecked(True)
+        else                                               : self.rad_lld_none.setChecked(True)
+
+        self.tit_res_sets        = QtGui.QLabel('Saving settings:')
+        self.cbx_res_ascii_out   = QtGui.QCheckBox('ASCII output', self)
+        self.cbx_res_fit1        = QtGui.QCheckBox('Perform Fit1', self)
+        self.cbx_res_fit2        = QtGui.QCheckBox('Perform Fit2', self)
+        self.cbx_res_fit_cust    = QtGui.QCheckBox('Perform Custom Fit', self)
+        self.cbx_res_png_out     = QtGui.QCheckBox('Create PNG Files', self)
+        self.cbx_res_ascii_out.setChecked( cp.res_ascii_out.value() )
+        self.cbx_res_fit1     .setChecked( cp.res_fit1     .value() )
+        self.cbx_res_fit2     .setChecked( cp.res_fit2     .value() )
+        self.cbx_res_fit_cust .setChecked( cp.res_fit_cust .value() )
+        self.cbx_res_png_out  .setChecked( cp.res_png_out  .value() )
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_ana_opts,              0, 0, 1, 8)
-        self.grid.addWidget(self.tit_ana_opts1,             1, 1, 1, 8)
-        self.grid.addWidget(self.tit_ana_opts2,             2, 1, 1, 8)
-        self.grid.addWidget(self.tit_ana_opts3,             3, 1, 1, 8)
-        self.grid.addWidget(self.tit_ana_opts4,             4, 1, 1, 8)
-        self.grid.addWidget(self.box_kin_mode       ,       0, 8) 
-        self.grid.addWidget(self.edi_kin_win_size   ,       1, 8)
-        self.grid.addWidget(self.edi_kin_top_row    ,       2, 8)
-        self.grid.addWidget(self.edi_kin_slice_first,       3, 8)
-        self.grid.addWidget(self.edi_kin_slice_last ,       4, 8)
-        self.setLayout(self.grid)
+        self.grid.addWidget(self.tit_ana_opts,             0, 0, 1, 8)
+        self.grid.addWidget(self.tit_ana_opt1,             1, 1, 1, 8)
+        self.grid.addWidget(self.edi_ana_opt1,             1, 9)
+        self.grid.addWidget(self.tit_ana_opt2,             2, 1, 1, 8)
+        self.grid.addWidget(self.edi_ana_opt2,             2, 9)
+        self.grid.addWidget(self.cbx_ana_smooth_norm,      3, 1, 1, 8)
+        self.grid.addWidget(self.edi_ana_opt3,             3, 9)
+        self.grid.addWidget(self.cbx_ana_two_corfuns,      4, 1, 1, 7)
+        self.grid.addWidget(self.cbx_ana_spec_stab,        5, 1, 1, 7)
 
-        self.connect( self.box_kin_mode       , QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_kin_mode        )
-        self.connect( self.edi_kin_win_size   , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_win_size    )
-        self.connect( self.edi_kin_top_row    , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_top_row     )
-        self.connect( self.edi_kin_slice_first, QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_slice_first )
-        self.connect( self.edi_kin_slice_last , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_slice_last  )
- 
+        self.grid.addWidget(self.tit_lld,                  6, 0, 1, 8)
+        self.grid.addWidget(self.rad_lld_none,             7, 1, 1, 3)
+        self.grid.addWidget(self.rad_lld_adu,              8, 1, 1, 3)
+        self.grid.addWidget(self.edi_lld_adu,              8, 4)
+        self.grid.addWidget(self.rad_lld_rms,              9, 1, 1, 3)
+        self.grid.addWidget(self.edi_lld_rms,              9, 4)
+
+        self.grid.addWidget(self.tit_res_sets,            10, 0, 1, 8)     
+        self.grid.addWidget(self.cbx_res_fit1,            11, 1, 1, 4)     
+        self.grid.addWidget(self.cbx_res_fit2,            12, 1, 1, 4)          
+        self.grid.addWidget(self.cbx_res_fit_cust,        13, 1, 1, 4) 
+        self.grid.addWidget(self.cbx_res_ascii_out,       11, 6, 1, 3)
+        self.grid.addWidget(self.cbx_res_png_out,         12, 6, 1, 3) 
+
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(self.grid)
+        self.vbox.addStretch(1)
+
+        self.setLayout(self.vbox)
+
+        self.connect(self.rad_lld_none, QtCore.SIGNAL('clicked()'), self.onRadioLLD )
+        self.connect(self.rad_lld_adu,  QtCore.SIGNAL('clicked()'), self.onRadioLLD )
+        self.connect(self.rad_lld_rms,  QtCore.SIGNAL('clicked()'), self.onRadioLLD )
+
+        self.connect(self.edi_ana_opt1, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_ana_opt2, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_ana_opt3, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_lld_adu , QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_lld_rms , QtCore.SIGNAL('editingFinished()'), self.onEdit )
+
+        self.connect(self.cbx_ana_smooth_norm   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
+        self.connect(self.cbx_ana_two_corfuns   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox) 
+        self.connect(self.cbx_ana_spec_stab     , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+
+        self.connect(self.cbx_res_ascii_out     , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_fit1          , QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
+        self.connect(self.cbx_res_fit2          , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_fit_cust      , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_png_out       , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+
         self.showToolTips()
         self.setStyle()
 
@@ -104,35 +161,60 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
     def setStyle(self):
 
-        width = 80
-
+        width = 60
+        self.                    setMinimumWidth(450)
         self.                    setStyleSheet (cp.styleBkgd)
+
         self.tit_ana_opts       .setStyleSheet (cp.styleTitle)
-        self.tit_ana_opts1      .setStyleSheet (cp.styleLabel)
-        self.tit_ana_opts2      .setStyleSheet (cp.styleLabel)
-        self.tit_ana_opts3      .setStyleSheet (cp.styleLabel) 
-        self.tit_ana_opts4      .setStyleSheet (cp.styleLabel) 
+        self.tit_ana_opt1       .setStyleSheet (cp.styleLabel)
+        self.tit_ana_opt2       .setStyleSheet (cp.styleLabel)
+        self.cbx_ana_smooth_norm.setStyleSheet (cp.styleLabel)
 
-        self.edi_kin_win_size   .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_kin_top_row    .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_kin_slice_first.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_kin_slice_last .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_res_sets       .setStyleSheet (cp.styleTitle)     
+        self.cbx_res_ascii_out  .setStyleSheet (cp.styleLabel)
+        self.cbx_res_fit1       .setStyleSheet (cp.styleLabel)
+        self.cbx_res_fit2       .setStyleSheet (cp.styleLabel)
+        self.cbx_res_fit_cust   .setStyleSheet (cp.styleLabel)
+        self.cbx_res_png_out    .setStyleSheet (cp.styleLabel)
+        self.cbx_ana_two_corfuns.setStyleSheet (cp.styleLabel)
+        self.cbx_ana_spec_stab  .setStyleSheet (cp.styleLabel)
 
-        self.box_kin_mode       .setFixedWidth(100)
-        self.edi_kin_win_size   .setFixedWidth(width)
-        self.edi_kin_top_row    .setFixedWidth(width)
-        self.edi_kin_slice_first.setFixedWidth(width)
-        self.edi_kin_slice_last .setFixedWidth(width)
+        self.edi_ana_opt1       .setStyleSheet(cp.styleEdit)
+        self.edi_ana_opt2       .setStyleSheet(cp.styleEdit)
+        self.edi_ana_opt3       .setStyleSheet(cp.styleEdit) 
+        self.edi_lld_adu        .setStyleSheet(cp.styleEdit) 
+        self.edi_lld_rms        .setStyleSheet(cp.styleEdit) 
 
-        self.box_kin_mode       .setStyleSheet(cp.styleBox) 
-        self.edi_kin_win_size   .setStyleSheet(cp.styleEdit) 
-        self.edi_kin_top_row    .setStyleSheet(cp.styleEdit) 
-        self.edi_kin_slice_first.setStyleSheet(cp.styleEdit) 
-        self.edi_kin_slice_last .setStyleSheet(cp.styleEdit) 
+        self.edi_ana_opt1       .setFixedWidth(width)
+        self.edi_ana_opt2       .setFixedWidth(width)
+        self.edi_ana_opt3       .setFixedWidth(width) 
+        self.edi_lld_adu        .setFixedWidth(width)
+        self.edi_lld_rms        .setFixedWidth(width)
+
+        self.edi_ana_opt1       .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_ana_opt2       .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_ana_opt3       .setAlignment(QtCore.Qt.AlignRight) 
+        self.edi_lld_adu        .setAlignment(QtCore.Qt.AlignRight) 
+        self.edi_lld_rms        .setAlignment(QtCore.Qt.AlignRight) 
+
+        self.tit_lld            .setStyleSheet (cp.styleTitle)
+        self.rad_lld_none       .setStyleSheet (cp.styleLabel)
+        self.rad_lld_adu        .setStyleSheet (cp.styleLabel)
+        self.rad_lld_rms        .setStyleSheet (cp.styleLabel)
+
+#        self.box_kin_mode       .setStyleSheet(cp.styleBox) 
 
 
     def setParent(self,parent) :
         self.parent = parent
+
+    def resizeEvent(self, e):
+        logger.debug('resizeEvent')
+        self.frame.setGeometry(self.rect())
+
+    def moveEvent(self, e):
+        logger.debug('moveEvent')
+#        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def closeEvent(self, event):
         logger.debug('closeEvent')
@@ -145,36 +227,107 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         logger.debug('onClose')
         self.close()
 
-    def resizeEvent(self, e):
-        logger.debug('resizeEvent')
-        self.frame.setGeometry(self.rect())
+    def on(self):
+        logger.debug('on click - is not implemented yet')
 
-    def moveEvent(self, e):
-        logger.debug('moveEvent')
-        pass
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
-
-    def on_edi_kin_win_size(self):
-        cp.kin_win_size.setValue( float(self.edi_kin_win_size.displayText()) )
-        logger.info('Set kin_win_size = ' + str(cp.kin_win_size.value()) )
-
-    def on_edi_kin_top_row(self):
-        cp.kin_top_row.setValue( float(self.edi_kin_top_row.displayText()) )
-        logger.info('Set kin_top_row =' + str(cp.kin_top_row.value()) )
-
-    def on_edi_kin_slice_first(self):
-        cp.kin_slice_first.setValue( float(self.edi_kin_slice_first.displayText()) )
-        logger.info('Set kin_slice_first =' + str(cp.kin_slice_first.value()) )
-
-    def on_edi_kin_slice_last(self):
-        cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
-        logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()) )
-
-    def on_box_kin_mode(self):
-        self.mode_name = self.box_kin_mode.currentText()
-        cp.kin_mode.setValue( self.mode_name )
-        logger.info(' ---> selected kinematic mode: ' + self.mode_name )
+    def onCBox(self):
+        if  self.cbx_ana_smooth_norm.hasFocus() :
+            self.cbx = self.cbx_ana_smooth_norm
+            self.par = cp.ana_smooth_norm
+            self.tit = 'ana_smooth_norm'
  
+        elif self.cbx_ana_two_corfuns.hasFocus() :
+            self.cbx = self.cbx_ana_two_corfuns
+            self.par = cp.ana_two_corfuns
+            self.tit = 'ana_two_corfuns' 
+
+        elif self.cbx_ana_spec_stab  .hasFocus() :
+            self.cbx = self.cbx_ana_spec_stab
+            self.par = cp.ana_spec_stab
+            self.tit = 'ana_spec_stab' 
+
+        elif self.cbx_res_ascii_out  .hasFocus() :
+            self.cbx = self.cbx_res_ascii_out
+            self.par = cp.res_ascii_out
+            self.tit = 'res_ascii_out' 
+
+        elif self.cbx_res_fit1       .hasFocus() :
+            self.cbx = self.cbx_res_fit1
+            self.par = cp.res_fit1
+            self.tit = 'res_fit1' 
+
+        elif self.cbx_res_fit2       .hasFocus() :
+            self.cbx = self.cbx_res_fit2
+            self.par = cp.res_fit2
+            self.tit = 'res_fit2' 
+
+        elif self.cbx_res_fit_cust   .hasFocus() :
+            self.cbx = self.cbx_res_fit_cust
+            self.par = cp.res_fit_cust
+            self.tit = 'res_fit_cust' 
+
+        elif self.cbx_res_png_out    .hasFocus() :
+            self.cbx = self.cbx_res_png_out
+            self.par = cp.res_png_out
+            self.tit = 'res_png_out' 
+
+        self.par.setValue( self.cbx.isChecked() )
+        msg = 'onCBox - set status of ' + self.tit  + ': ' + str( self.par.value())
+        logger.info(msg, __name__ )
+    
+
+    def onEdit(self):
+
+        if self.edi_ana_opt1.isModified() :            
+            self.edi = self.edi_ana_opt1
+            self.par = cp.ana_ndelays
+            self.tit = 'ana_ndelays'
+
+        elif self.edi_ana_opt2.isModified() :            
+            self.edi = self.edi_ana_opt2
+            self.par = cp.ana_nslice_delays
+            self.tit = 'ana_nslice_delays'
+
+        elif self.edi_ana_opt3.isModified() :            
+            self.edi = self.edi_ana_opt3
+            self.par = cp.ana_npix_to_smooth
+            self.tit = 'ana_npix_to_smooth'
+
+        elif self.edi_lld_adu.isModified() :            
+            self.edi = self.edi_lld_adu 
+            self.par = cp.lld_adu
+            self.tit = 'lld_adu'
+
+        elif self.edi_lld_rms.isModified() :            
+            self.edi = self.edi_lld_rms
+            self.par = cp.lld_rms
+            self.tit = 'lld_rms'
+
+        else : return # no-modification
+
+        self.edi.setModified(False)
+        self.par.setValue( self.edi.displayText() )        
+        msg = 'onEdit - set value of ' + self.tit  + ': ' + str( self.par.value())
+        logger.info(msg, __name__ )
+
+
+    def onRadioLLD(self): 
+        if self.rad_lld_none.isChecked() : cp.lld_type.setValue( self.list_lld_types[0] )
+        if self.rad_lld_adu .isChecked() : cp.lld_type.setValue( self.list_lld_types[1] )
+        if self.rad_lld_rms .isChecked() : cp.lld_type.setValue( self.list_lld_types[2] )
+        logger.info('onRadioLLD - selected Low Level Discrimination type: ' + cp.lld_type.value(), __name__ )
+
+#-----------------------------
+
+#    def on_edi_kin_slice_last(self):
+#        cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
+#        logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()) )#
+
+#    def on_box_kin_mode(self):
+#        self.mode_name = self.box_kin_mode.currentText()
+#        cp.kin_mode.setValue( self.mode_name )
+#        logger.info(' ---> selected kinematic mode: ' + self.mode_name )
+
 #-----------------------------
 
 if __name__ == "__main__" :
