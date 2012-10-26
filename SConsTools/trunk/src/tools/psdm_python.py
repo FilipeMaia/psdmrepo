@@ -10,14 +10,7 @@ from SConsTools.scons_functions import *
 
 def generate(env):
     
-    if env['SIT_ARCH_OS'] == 'rhel5':
-
-        prefix = "/usr"
-        version = "2.4"
-        # RH-distributed Python is patched to use lib64 on 64-bit platforms
-        libdir = env['LIB_ABI']
-    
-    elif env['SIT_ARCH_OS'] == 'rhel6':
+    if env['SIT_ARCH_OS'] in ['rhel5', 'rhel6']:
         
         prefix = pjoin("/reg/g/psdm/sw/external/python/2.7.2", env['SIT_ARCH_BASE_OPT'])
         version = "2.7"
