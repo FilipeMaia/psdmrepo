@@ -21,7 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "tables"
 pkg_ver = "2.1.2"
-pkg_dir = "2.1.2-1.8.6"
+pkg_dir = "2.1.2-1.8.6-$PYTHON"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
