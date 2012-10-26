@@ -15,7 +15,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 
 pkg = "pyfits"
-pkg_ver = "2.3.1"
+pkg_ver = "3.1"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
