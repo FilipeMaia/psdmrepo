@@ -81,7 +81,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.setFrame()
  
         self.titControl    = QtGui.QLabel('Control Panel')
-        self.butLoadFiles  = QtGui.QPushButton('Load files')    
+        self.butLoadFiles  = QtGui.QPushButton('Files')    
         self.butBatchInfo  = QtGui.QPushButton('Batch information')    
         self.butAnaDisp    = QtGui.QPushButton('Analysis && Display')
         self.butSystem     = QtGui.QPushButton('System')

@@ -126,11 +126,14 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         # GUILoadFiles.py
         self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark/',typ='str' )
         self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat/',typ='str' )
+        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam/',typ='str' )
         self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data/',typ='str' )
         self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
         self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
+        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='blam.xtc',typ='str' )
         self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
 
         # GUIAnaSettingsLeft.py
         self.ana_type          = self.declareParameter( name='ANA_TYPE',                  val_def='static',typ='str' )

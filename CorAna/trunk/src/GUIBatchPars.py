@@ -50,8 +50,9 @@ class GUIBatchPars ( QtGui.QWidget ) :
 
         self.char_expand         = u' \u25BE' # down-head triangle
  
-        self.tit_bat_num_max     = QtGui.QLabel('Batches To Be Analysied:')
-        self.tit_bat_num         = QtGui.QLabel('View and Edit Batch #')
+        #self.tit_bat_num_max     = QtGui.QLabel('Batches To Be Analysied:')
+        #self.tit_bat_num         = QtGui.QLabel('View and Edit Batch #')
+        self.tit_bat             = QtGui.QLabel('Batch Parameters:')
         self.tit_bat_start       = QtGui.QLabel('start')
         self.tit_bat_end         = QtGui.QLabel('end')
         self.tit_bat_time        = QtGui.QLabel('time (sec)')
@@ -63,8 +64,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.tit_bat_photons     = QtGui.QLabel('photons/sec')
         self.tit_bat_ma          = QtGui.QLabel('mA')
 
-        self.but_bat_num         = QtGui.QPushButton(str( cp.bat_num       .value() ) + self.char_expand  ) 
-        self.edi_bat_num_max     = QtGui.QLineEdit ( str( cp.bat_num_max   .value() ) )        
+        #self.but_bat_num         = QtGui.QPushButton(str( cp.bat_num       .value() ) + self.char_expand  ) 
+        #self.edi_bat_num_max     = QtGui.QLineEdit ( str( cp.bat_num_max   .value() ) )        
         self.edi_bat_data_start  = QtGui.QLineEdit ( str( cp.bat_data_start.value() ) )        
         self.edi_bat_data_end    = QtGui.QLineEdit ( str( cp.bat_data_end  .value() ) )        
         self.edi_bat_data_time   = QtGui.QLineEdit ( str( cp.bat_data_time .value() ) )        
@@ -84,8 +85,9 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_current  .setReadOnly( True ) 
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_bat_num_max,                0, 0, 1, 4)
-        self.grid.addWidget(self.tit_bat_num    ,                1, 0, 1, 4)
+        #self.grid.addWidget(self.tit_bat_num_max,                0, 0, 1, 4)
+        #self.grid.addWidget(self.tit_bat_num    ,                1, 0, 1, 4)
+        self.grid.addWidget(self.tit_bat        ,                0, 0, 1, 4)
         self.grid.addWidget(self.tit_bat_start  ,                2, 3)
         self.grid.addWidget(self.tit_bat_end    ,                2, 4)
         self.grid.addWidget(self.tit_bat_time   ,                2, 5)
@@ -97,8 +99,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_bat_photons,                6, 5)
         self.grid.addWidget(self.tit_bat_ma     ,                7, 5)
 
-        self.grid.addWidget(self.edi_bat_num_max   ,             0, 4)
-        self.grid.addWidget(self.but_bat_num       ,             1, 4)
+        #self.grid.addWidget(self.edi_bat_num_max   ,             0, 4)
+        #self.grid.addWidget(self.but_bat_num       ,             1, 4)
         self.grid.addWidget(self.edi_bat_data_start,             3, 3)
         self.grid.addWidget(self.edi_bat_data_end  ,             3, 4)
         self.grid.addWidget(self.edi_bat_data_time ,             3, 5)
@@ -113,8 +115,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
 
         self.setLayout(self.grid)
 
-        self.connect( self.but_bat_num        ,     QtCore.SIGNAL('clicked()'),          self.on_but_bat_num        )
-        self.connect( self.edi_bat_num_max    ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_num_max    )
+        #self.connect( self.but_bat_num        ,     QtCore.SIGNAL('clicked()'),          self.on_but_bat_num        )
+        #self.connect( self.edi_bat_num_max    ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_num_max    )
         self.connect( self.edi_bat_data_start ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_data_start )
         self.connect( self.edi_bat_data_end   ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_data_end   )
         self.connect( self.edi_bat_dark_start ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_dark_start )
@@ -135,8 +137,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
         msg_info = 'Information field'
         msg_sele = 'Selection field'
         
-        self.but_bat_num       .setToolTip( msg_sele )
-        self.edi_bat_num_max   .setToolTip( msg_edit )        
+        #self.but_bat_num       .setToolTip( msg_sele )
+        #self.edi_bat_num_max   .setToolTip( msg_edit )        
         self.edi_bat_data_start.setToolTip( msg_edit )        
         self.edi_bat_data_end  .setToolTip( msg_edit )        
         self.edi_bat_data_time .setToolTip( msg_edit )        
@@ -163,8 +165,9 @@ class GUIBatchPars ( QtGui.QWidget ) :
         width = 80
 
         self.                setStyleSheet (cp.styleBkgd)
-        self.tit_bat_num_max.setStyleSheet (cp.styleTitle)
-        self.tit_bat_num    .setStyleSheet (cp.styleTitle)
+        #self.tit_bat_num_max.setStyleSheet (cp.styleTitle)
+        #self.tit_bat_num    .setStyleSheet (cp.styleTitle)
+        self.tit_bat        .setStyleSheet (cp.styleTitle)
         self.tit_bat_start  .setStyleSheet (cp.styleLabel)
         self.tit_bat_end    .setStyleSheet (cp.styleLabel)
         self.tit_bat_time   .setStyleSheet (cp.styleLabel)
@@ -179,6 +182,7 @@ class GUIBatchPars ( QtGui.QWidget ) :
 
         #self.tit_bat_num_max.setAlignment(QtCore.Qt.AlignRight)
         #self.tit_bat_num    .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_bat        .setAlignment(QtCore.Qt.AlignLeft)
         self.tit_bat_start  .setAlignment(QtCore.Qt.AlignCenter)
         self.tit_bat_end    .setAlignment(QtCore.Qt.AlignCenter)
         self.tit_bat_time   .setAlignment(QtCore.Qt.AlignCenter)
@@ -190,7 +194,7 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.tit_bat_photons.setAlignment(QtCore.Qt.AlignLeft)
         self.tit_bat_ma     .setAlignment(QtCore.Qt.AlignLeft)
 
-        self.edi_bat_num_max   .setAlignment(QtCore.Qt.AlignRight)
+        #self.edi_bat_num_max   .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_data_start.setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_data_end  .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_data_time .setAlignment(QtCore.Qt.AlignRight)
@@ -203,8 +207,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_flux      .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_current   .setAlignment(QtCore.Qt.AlignRight)
 
-        self.edi_bat_num_max   .setFixedWidth(60)
-        self.but_bat_num       .setFixedWidth(60)
+        #self.edi_bat_num_max   .setFixedWidth(60)
+        #self.but_bat_num       .setFixedWidth(60)
         self.edi_bat_data_start.setFixedWidth(width)
         self.edi_bat_data_end  .setFixedWidth(width)
         self.edi_bat_data_time .setFixedWidth(width)
@@ -217,8 +221,8 @@ class GUIBatchPars ( QtGui.QWidget ) :
         #self.edi_bat_flux      .setFixedWidth(width)
         #self.edi_bat_current   .setFixedWidth(width)
                                
-        self.edi_bat_num_max   .setStyleSheet(cp.styleEdit)
-        self.but_bat_num       .setStyleSheet(cp.styleButton)
+        #self.edi_bat_num_max   .setStyleSheet(cp.styleEdit)
+        #self.but_bat_num       .setStyleSheet(cp.styleButton)
         self.edi_bat_data_start.setStyleSheet(cp.styleEdit)
         self.edi_bat_data_end  .setStyleSheet(cp.styleEdit)
         self.edi_bat_data_time .setStyleSheet(cp.styleEditInfo)

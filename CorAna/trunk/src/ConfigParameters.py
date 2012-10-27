@@ -103,7 +103,7 @@ class Parameter :
             self._value = float( str_val )
 
         elif self._type == 'bool' :
-            self._value = dicBool[str_val.lower()]
+            self._value = self.dicBool[str_val.lower()]
 
         else :
             msg = 'Parameter.setValueForType: Requested parameter type ' + typ + ' is not supported\n'  

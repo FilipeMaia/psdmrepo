@@ -54,7 +54,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.tit_title  = QtGui.QLabel('Batch Information')
         self.tit_status = QtGui.QLabel('Status: ')
         self.but_close  = QtGui.QPushButton('Close') 
-        self.but_apply  = QtGui.QPushButton('Apply') 
+        self.but_apply  = QtGui.QPushButton('Save') 
         self.but_show   = QtGui.QPushButton('Show Image')
         cp.guibatchinfoleft  = GUIBatchInfoLeft()
         cp.guibatchinforight = GUIBatchInfoRight()
@@ -77,7 +77,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.setLayout(self.vbox)
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
-        self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onApply )
+        self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
         self.connect( self.but_show , QtCore.SIGNAL('clicked()'), self.onShow  )
 
         self.showToolTips()
@@ -139,8 +139,11 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         logger.info('onClose', __name__)
         self.close()
 
-    def onApply(self):
-        logger.info('onApply - is already applied...', __name__)
+    def onSave(self):
+        fname = cp.fname_cp.value()
+        logger.info('onSave - save all configuration parameters in file: ' + fname, __name__)
+        cp.saveParametersInFile( fname )
+
 
     def onShow(self):
         logger.info('onShow - is not implemented yet...', __name__)

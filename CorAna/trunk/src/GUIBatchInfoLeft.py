@@ -30,10 +30,11 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 
-from GUIBeamZeroPars    import *
-from GUISpecularPars    import *
-from GUIImgSizePosition import *
-from Logger             import logger
+from GUIBeamZeroPars     import *
+from GUISpecularPars     import *
+from GUITransmissionPars import *
+from GUIImgSizePosition  import *
+from Logger              import logger
 
 #---------------------
 #  Class definition --
@@ -53,60 +54,53 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.setWindowTitle('Batch Info Left Panel')
         self.setFrame()
  
-        self.list_of_modes  = ['Transmission', 'Specular']
-
         self.titDistance   = QtGui.QLabel('Sample-Detector Distance (mm):')
         self.titSetupGeom  = QtGui.QLabel('Experiment Setup Geometry:')
         self.titPhotonE    = QtGui.QLabel('X-Ray Photon Energy (keV):')
         self.titNomAngle   = QtGui.QLabel('Nominal Angle:')
 
         cp.guiimgsizeposition = GUIImgSizePosition()
+        cp.guibeamzeropars    = GUIBeamZeroPars()
 
         self.ediDistance   = QtGui.QLineEdit  ( str(cp.sample_det_dist.value()) )
         self.ediPhotonE    = QtGui.QLineEdit  ( str(cp.photon_energy.value()) ) 
         self.ediNomAngle   = QtGui.QLineEdit  ( str(cp.nominal_angle.value()) ) 
-        #self.butSetupGeom  = QtGui.QPushButton( cp.exp_setup_geom.value() + cp.char_expand  ) 
-        #setPopupMenu(self)
-        self.boxSetupGeom  = QtGui.QComboBox( self ) 
-        self.boxSetupGeom.addItems(self.list_of_modes)
-        self.boxSetupGeom.setCurrentIndex( self.list_of_modes.index(cp.exp_setup_geom.value()) )
 
         self.ediNomAngle.setReadOnly( True ) 
         self.ediPhotonE .setReadOnly( True ) 
 
-        self.hboxG = QtGui.QHBoxLayout()
         self.hboxD = QtGui.QHBoxLayout()
         self.hboxW = QtGui.QHBoxLayout()
         self.hboxE = QtGui.QHBoxLayout()
         self.hboxA = QtGui.QHBoxLayout()
 
+        self.makeTabBar()
         self.guiSelector()
         self.guiAnglePanel()
 
-        self.hboxG.addWidget(self.titSetupGeom)
-        self.hboxG.addStretch(1)     
-        self.hboxG.addWidget(self.boxSetupGeom)
         self.hboxD.addWidget(self.titDistance)
         self.hboxD.addStretch(1)     
         self.hboxD.addWidget(self.ediDistance)
+
         self.hboxA.addWidget(self.titNomAngle)
         self.hboxA.addStretch(1)     
         self.hboxA.addWidget(self.ediNomAngle)
+
         self.hboxE.addWidget(self.titPhotonE)
         self.hboxE.addStretch(1)     
         self.hboxE.addWidget(self.ediPhotonE)
 
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addLayout(self.hboxG)
+        self.vbox.addWidget(self.titSetupGeom)
+        self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxD)
         self.vbox.addLayout(self.hboxW)
+        self.vbox.addWidget(cp.guibeamzeropars)
         self.vbox.addWidget(cp.guiimgsizeposition)
         self.vbox.addLayout(self.hboxE)
         self.vbox.addLayout(self.hboxA)
         self.setLayout(self.vbox)
         
-        #self.connect( self.butSetupGeom, QtCore.SIGNAL('clicked()'),         self.onButSetupGeom )
-        self.connect( self.boxSetupGeom, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBoxSetupGeom )
         self.connect( self.ediDistance,  QtCore.SIGNAL('editingFinished()'),        self.onEdiDistance )
 
         self.showToolTips()
@@ -134,6 +128,26 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
 #            self.hboxA.setEnabled(True)
 
 
+    def makeTabBar(self,mode=None) :
+        #if mode != None : self.tab_bar.close()
+        self.tab_bar = QtGui.QTabBar()
+
+        self.list_of_modes  = ['Transmission', 'Specular']
+
+        self.ind_tab_bar_transm = self.tab_bar.addTab( self.list_of_modes[0] )
+        self.ind_tab_bar_specul = self.tab_bar.addTab( self.list_of_modes[1] )
+
+        self.tab_bar.setTabTextColor(self.ind_tab_bar_transm,QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_bar_specul,QtGui.QColor('blue'))
+        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+
+        print 'Set mode: ', cp.exp_setup_geom.value()
+
+        #self.tab_bar.setTabEnabled(self.list_of_modes.index(cp.exp_setup_geom.value()),False)
+        self.tab_bar.setCurrentIndex(self.list_of_modes.index(cp.exp_setup_geom.value()))
+
+        self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
+
 
     def guiSelector(self):
 
@@ -143,14 +157,15 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
             pass
 
         if cp.exp_setup_geom.value() == self.list_of_modes[0] :
-            cp.guibeamzeropars = GUIBeamZeroPars()
-            self.guiWin = cp.guibeamzeropars
+            cp.guitransmissionpars = GUITransmissionPars() # GUIBeamZeroPars()
+            self.guiWin = cp.guitransmissionpars
 
         if cp.exp_setup_geom.value() == self.list_of_modes[1] :
             cp.guispecularpars = GUISpecularPars()
             self.guiWin = cp.guispecularpars
 
         self.hboxW.addWidget(self.guiWin)
+
 
     def showToolTips(self):
         # Tips for buttons and fields:
@@ -159,7 +174,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         msg_info = 'Information field'
         msg_sele = 'Selection field'
         
-        self.boxSetupGeom.setToolTip( msg_sele )
+        #self.boxSetupGeom.setToolTip( msg_sele )
         self.ediDistance .setToolTip( msg_edit )
         self.ediPhotonE  .setToolTip( msg_info )
         self.ediNomAngle .setToolTip( msg_info )
@@ -184,7 +199,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.ediDistance .setStyleSheet(cp.styleEdit) 
         self.ediPhotonE  .setStyleSheet(cp.styleEditInfo) 
         self.ediNomAngle .setStyleSheet(cp.styleEditInfo) 
-        self.boxSetupGeom.setStyleSheet(cp.styleBox)
+        #self.boxSetupGeom.setStyleSheet(cp.styleBox)
 
         self.ediDistance .setAlignment(QtCore.Qt.AlignRight)
         self.ediPhotonE  .setAlignment(QtCore.Qt.AlignRight)
@@ -194,8 +209,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.ediDistance .setFixedWidth(width)
         self.ediPhotonE  .setFixedWidth(width)
         self.ediNomAngle .setFixedWidth(width)
-        self.boxSetupGeom.setFixedWidth(120)
-
+        #self.boxSetupGeom.setFixedWidth(120)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -214,6 +228,9 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         try    : cp.guibeamzeropars.close()
         except : pass
 
+        try    : cp.guitransmissionpars.close()
+        except : pass
+
         try    : cp.guispecularpars.close()
         except : pass
 
@@ -227,10 +244,11 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         logger.info('onClose', __name__) 
         self.close()
 
-    def onBoxSetupGeom(self):
-        self.mode_name = self.boxSetupGeom.currentText()
-        cp.exp_setup_geom.setValue( self.mode_name )
-        logger.info(' ---> selected setup geometry mode: ' + self.mode_name, __name__)
+    def onTabBar(self):
+        tab_ind  = self.tab_bar.currentIndex()
+        tab_name = str(self.tab_bar.tabText(tab_ind))
+        cp.exp_setup_geom.setValue( tab_name )
+        logger.info(' ---> selected tab: ' + str(tab_ind) + ' - setup geometry mode: ' + tab_name, __name__)
         self.guiSelector()
         self.guiAnglePanel()
 

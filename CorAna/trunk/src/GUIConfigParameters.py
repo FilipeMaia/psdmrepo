@@ -75,7 +75,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
         self.connect(self.fnameEdit,    QtCore.SIGNAL('editingFinished ()'), self.onFileEdit     )
         self.connect(self.butRead,      QtCore.SIGNAL('clicked()'),          self.onRead         )
-        self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'),          self.onWrite        )
+        self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'),          self.onSave         )
         self.connect(self.butPrint,     QtCore.SIGNAL('clicked()'),          self.onPrint        )
         self.connect(self.butDefault,   QtCore.SIGNAL('clicked()'),          self.onDefault      )
         self.connect(self.butBrowse,    QtCore.SIGNAL('clicked()'),          self.onBrowse       )
@@ -155,8 +155,14 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         #self.refreshGUIWhatToDisplay()
 
     def onWrite(self):
-        logger.info('onWrite', __name__)
-        cp.saveParametersInFile( self.getFileNameFromEditField() )
+        fname = self.getFileNameFromEditField()
+        logger.info('onWrite - save all configuration parameters in file: ' + fname, __name__)
+        cp.saveParametersInFile( fname )
+
+    def onSave(self):
+        fname = cp.fname_cp.value()
+        logger.info('onSave - save all configuration parameters in file: ' + fname, __name__)
+        cp.saveParametersInFile( fname )
 
     def onDefault(self):
         logger.info('onDefault - Set default values of configuration parameters.', __name__)
