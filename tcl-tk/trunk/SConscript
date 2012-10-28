@@ -1,0 +1,22 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package tcl-tk
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+pkg = "tcl-tk"
+pkg_ver = "8.5.12"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+LIBDIR = "lib"
+LINKLIBS = "libtcl*.so libtk*.so"
+
+standardExternalPackage ( pkg, **locals() )
