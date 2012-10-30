@@ -22,9 +22,6 @@ First argument is a required release name such as 5.2.1 or ana-6.3.12. Second
 argument is a required file name with the package tags (same as accepted by
 addpkg script). If optional third argument is given then it is copied into
 release with the name release-notes.
-
-If option -s with the file name is provided then this script also produces
-SPEC file for RPM that can be used to build the release.
 EOD
 }
 
