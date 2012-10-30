@@ -45,18 +45,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
-        self.tit_ana_opts        = QtGui.QLabel('Dynamic Analysis Options:')
-        self.tit_ana_opt1        = QtGui.QLabel('# of delays per multiple tau level:')
-        self.tit_ana_opt2        = QtGui.QLabel('# of slice delays per multiple tau level:')
-        self.edi_ana_opt1        = QtGui.QLineEdit( str( cp.ana_ndelays.value() ) )        
-        self.edi_ana_opt2        = QtGui.QLineEdit( str( cp.ana_nslice_delays.value() ) )        
-        self.edi_ana_opt3        = QtGui.QLineEdit( str( cp.ana_npix_to_smooth.value() ) )        
-        self.cbx_ana_smooth_norm = QtGui.QCheckBox('use smoothed symmetric normalization,  Npix min:', self)
-        self.cbx_ana_two_corfuns = QtGui.QCheckBox('Two time correlation function control', self)
-        self.cbx_ana_spec_stab   = QtGui.QCheckBox('Check speckle stability', self)
-        self.cbx_ana_smooth_norm.setChecked( cp.ana_smooth_norm.value() )
-        self.cbx_ana_two_corfuns.setChecked( cp.ana_two_corfuns.value() )
-        self.cbx_ana_spec_stab  .setChecked( cp.ana_spec_stab.value() )
+        self.list_mask_types = ['no-mask', 'new-mask', 'from-file']
 
         self.tit_lld      = QtGui.QLabel('Low Level Discrimination (LLD):')
         self.edi_lld_adu  = QtGui.QLineEdit( str( cp.lld_adu.value() ) )        
@@ -73,7 +62,24 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         elif cp.lld_type.value() == self.list_lld_types[2] : self.rad_lld_rms .setChecked(True)
         else                                               : self.rad_lld_none.setChecked(True)
 
-        self.tit_res_sets        = QtGui.QLabel('Saving settings:')
+        self.tit_mask_set  = QtGui.QLabel('Mask Settings:')
+        self.rad_mask_none = QtGui.QRadioButton('no mask (use all pixels)')
+        self.rad_mask_new  = QtGui.QRadioButton('new mask')
+        self.rad_mask_file = QtGui.QRadioButton('from existing file')
+        self.rad_mask_grp  = QtGui.QButtonGroup()
+        self.rad_mask_grp.addButton(self.rad_mask_none)
+        self.rad_mask_grp.addButton(self.rad_mask_new )
+        self.rad_mask_grp.addButton(self.rad_mask_file)
+        if cp.ana_mask_type.value() == self.list_mask_types[0] : self.rad_mask_none.setChecked(True)
+        if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_new .setChecked(True)
+        if cp.ana_mask_type.value() == self.list_mask_types[2] : self.rad_mask_file.setChecked(True)
+
+        self.but_mask_poly = QtGui.QPushButton('Mask Polygon')
+        self.but_browser   = QtGui.QPushButton('Browser')
+        self.edi_mask_file = QtGui.QLineEdit( cp.ana_mask_file.value() )        
+        self.edi_mask_file.setReadOnly( True )  
+
+        self.tit_res_sets        = QtGui.QLabel('Result saving settings:')
         self.cbx_res_ascii_out   = QtGui.QCheckBox('ASCII output', self)
         self.cbx_res_fit1        = QtGui.QCheckBox('Perform Fit1', self)
         self.cbx_res_fit2        = QtGui.QCheckBox('Perform Fit2', self)
@@ -86,29 +92,31 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.cbx_res_png_out  .setChecked( cp.res_png_out  .value() )
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_ana_opts,             0, 0, 1, 8)
-        self.grid.addWidget(self.tit_ana_opt1,             1, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt1,             1, 9)
-        self.grid.addWidget(self.tit_ana_opt2,             2, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt2,             2, 9)
-        self.grid.addWidget(self.cbx_ana_smooth_norm,      3, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt3,             3, 9)
-        self.grid.addWidget(self.cbx_ana_two_corfuns,      4, 1, 1, 7)
-        self.grid.addWidget(self.cbx_ana_spec_stab,        5, 1, 1, 7)
 
-        self.grid.addWidget(self.tit_lld,                  6, 0, 1, 8)
-        self.grid.addWidget(self.rad_lld_none,             7, 1, 1, 3)
-        self.grid.addWidget(self.rad_lld_adu,              8, 1, 1, 3)
-        self.grid.addWidget(self.edi_lld_adu,              8, 4)
-        self.grid.addWidget(self.rad_lld_rms,              9, 1, 1, 3)
-        self.grid.addWidget(self.edi_lld_rms,              9, 4)
+        self.grid_row = 0
+        self.grid.addWidget(self.tit_lld,           self.grid_row+1, 0, 1, 8)
+        self.grid.addWidget(self.rad_lld_none,      self.grid_row+2, 1, 1, 3)
+        self.grid.addWidget(self.rad_lld_adu,       self.grid_row+3, 1, 1, 3)
+        self.grid.addWidget(self.edi_lld_adu,       self.grid_row+3, 4)
+        self.grid.addWidget(self.rad_lld_rms,       self.grid_row+4, 1, 1, 3)
+        self.grid.addWidget(self.edi_lld_rms,       self.grid_row+4, 4)
 
-        self.grid.addWidget(self.tit_res_sets,            10, 0, 1, 8)     
-        self.grid.addWidget(self.cbx_res_fit1,            11, 1, 1, 4)     
-        self.grid.addWidget(self.cbx_res_fit2,            12, 1, 1, 4)          
-        self.grid.addWidget(self.cbx_res_fit_cust,        13, 1, 1, 4) 
-        self.grid.addWidget(self.cbx_res_ascii_out,       11, 6, 1, 3)
-        self.grid.addWidget(self.cbx_res_png_out,         12, 6, 1, 3) 
+        self.grid_row = 4
+        self.grid.addWidget(self.tit_mask_set,      self.grid_row+1, 0, 1, 9)
+        self.grid.addWidget(self.rad_mask_none,     self.grid_row+2, 1, 1, 8)
+        self.grid.addWidget(self.rad_mask_new ,     self.grid_row+3, 1, 1, 8)
+        self.grid.addWidget(self.rad_mask_file,     self.grid_row+4, 1, 1, 8)
+        self.grid.addWidget(self.but_mask_poly,     self.grid_row+3, 8, 1, 2)
+        self.grid.addWidget(self.but_browser,       self.grid_row+4, 8, 1, 2)
+        self.grid.addWidget(self.edi_mask_file,     self.grid_row+5, 1, 1, 9)
+
+        self.grid_row = 9
+        self.grid.addWidget(self.tit_res_sets,      self.grid_row+1, 0, 1, 8)     
+        self.grid.addWidget(self.cbx_res_fit1,      self.grid_row+2, 1, 1, 4)     
+        self.grid.addWidget(self.cbx_res_fit2,      self.grid_row+3, 1, 1, 4)          
+        self.grid.addWidget(self.cbx_res_fit_cust,  self.grid_row+4, 1, 1, 4) 
+        self.grid.addWidget(self.cbx_res_ascii_out, self.grid_row+2, 6, 1, 3)
+        self.grid.addWidget(self.cbx_res_png_out,   self.grid_row+3, 6, 1, 3) 
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -120,21 +128,20 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.connect(self.rad_lld_adu,  QtCore.SIGNAL('clicked()'), self.onRadioLLD )
         self.connect(self.rad_lld_rms,  QtCore.SIGNAL('clicked()'), self.onRadioLLD )
 
-        self.connect(self.edi_ana_opt1, QtCore.SIGNAL('editingFinished()'), self.onEdit )
-        self.connect(self.edi_ana_opt2, QtCore.SIGNAL('editingFinished()'), self.onEdit )
-        self.connect(self.edi_ana_opt3, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_lld_adu , QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_lld_rms , QtCore.SIGNAL('editingFinished()'), self.onEdit )
 
-        self.connect(self.cbx_ana_smooth_norm   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-        self.connect(self.cbx_ana_two_corfuns   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox) 
-        self.connect(self.cbx_ana_spec_stab     , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_ascii_out  , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_fit1       , QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
+        self.connect(self.cbx_res_fit2       , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_fit_cust   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_png_out    , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
 
-        self.connect(self.cbx_res_ascii_out     , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
-        self.connect(self.cbx_res_fit1          , QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-        self.connect(self.cbx_res_fit2          , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
-        self.connect(self.cbx_res_fit_cust      , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
-        self.connect(self.cbx_res_png_out       , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect( self.rad_mask_none,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
+        self.connect( self.rad_mask_new,     QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
+        self.connect( self.rad_mask_file,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
+        self.connect( self.but_mask_poly,    QtCore.SIGNAL('clicked()'), self.onMaskPoly     )
+        self.connect( self.but_browser,      QtCore.SIGNAL('clicked()'), self.onButBrowser   )
 
         self.showToolTips()
         self.setStyle()
@@ -146,10 +153,16 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         msg = 'Edit field'
-        self.tit_ana_opts.setToolTip('This section allows to monitor/modify\nthe beam zero parameters\nin transmission mode')
-        #self.edi_kin_top_row    .setToolTip( msg )
-        #self.edi_kin_slice_first.setToolTip( msg )
-        #self.edi_kin_slice_last .setToolTip( msg )
+
+        msg_rad_mask = 'Use this group of radio buttons\nto select the type of mask'
+        self.rad_mask_none.setToolTip(msg_rad_mask)
+        self.rad_mask_new .setToolTip(msg_rad_mask)
+        self.rad_mask_file.setToolTip(msg_rad_mask)
+        self.but_mask_poly.setToolTip('Click on this button\nto use the polygon mask')
+        self.but_browser  .setToolTip('Click on this button\nto change the mask file.')
+        self.edi_mask_file.setToolTip('Click on "Browse"\nto change this field.')
+
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -165,10 +178,6 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.                    setMinimumWidth(450)
         self.                    setStyleSheet (cp.styleBkgd)
 
-        self.tit_ana_opts       .setStyleSheet (cp.styleTitle)
-        self.tit_ana_opt1       .setStyleSheet (cp.styleLabel)
-        self.tit_ana_opt2       .setStyleSheet (cp.styleLabel)
-        self.cbx_ana_smooth_norm.setStyleSheet (cp.styleLabel)
 
         self.tit_res_sets       .setStyleSheet (cp.styleTitle)     
         self.cbx_res_ascii_out  .setStyleSheet (cp.styleLabel)
@@ -176,24 +185,13 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.cbx_res_fit2       .setStyleSheet (cp.styleLabel)
         self.cbx_res_fit_cust   .setStyleSheet (cp.styleLabel)
         self.cbx_res_png_out    .setStyleSheet (cp.styleLabel)
-        self.cbx_ana_two_corfuns.setStyleSheet (cp.styleLabel)
-        self.cbx_ana_spec_stab  .setStyleSheet (cp.styleLabel)
 
-        self.edi_ana_opt1       .setStyleSheet(cp.styleEdit)
-        self.edi_ana_opt2       .setStyleSheet(cp.styleEdit)
-        self.edi_ana_opt3       .setStyleSheet(cp.styleEdit) 
         self.edi_lld_adu        .setStyleSheet(cp.styleEdit) 
         self.edi_lld_rms        .setStyleSheet(cp.styleEdit) 
 
-        self.edi_ana_opt1       .setFixedWidth(width)
-        self.edi_ana_opt2       .setFixedWidth(width)
-        self.edi_ana_opt3       .setFixedWidth(width) 
         self.edi_lld_adu        .setFixedWidth(width)
         self.edi_lld_rms        .setFixedWidth(width)
 
-        self.edi_ana_opt1       .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_ana_opt2       .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_ana_opt3       .setAlignment(QtCore.Qt.AlignRight) 
         self.edi_lld_adu        .setAlignment(QtCore.Qt.AlignRight) 
         self.edi_lld_rms        .setAlignment(QtCore.Qt.AlignRight) 
 
@@ -203,7 +201,19 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.rad_lld_rms        .setStyleSheet (cp.styleLabel)
 
 #        self.box_kin_mode       .setStyleSheet(cp.styleBox) 
+        #width = 80
+        #self.but_mask_poly.setFixedWidth(width)
+        #self.but_browser  .setFixedWidth(width)
 
+        self.tit_mask_set .setStyleSheet (cp.styleTitle)
+        self.rad_mask_none.setStyleSheet (cp.styleLabel)
+        self.rad_mask_new .setStyleSheet (cp.styleLabel)
+        self.rad_mask_file.setStyleSheet (cp.styleLabel)
+
+        self.but_mask_poly.setStyleSheet (cp.styleButton)
+        self.but_browser  .setStyleSheet (cp.styleButton)
+        self.edi_mask_file.setStyleSheet (cp.styleEditInfo)
+        self.edi_mask_file.setAlignment (QtCore.Qt.AlignRight)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -231,22 +241,8 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         logger.debug('on click - is not implemented yet')
 
     def onCBox(self):
-        if  self.cbx_ana_smooth_norm.hasFocus() :
-            self.cbx = self.cbx_ana_smooth_norm
-            self.par = cp.ana_smooth_norm
-            self.tit = 'ana_smooth_norm'
- 
-        elif self.cbx_ana_two_corfuns.hasFocus() :
-            self.cbx = self.cbx_ana_two_corfuns
-            self.par = cp.ana_two_corfuns
-            self.tit = 'ana_two_corfuns' 
 
-        elif self.cbx_ana_spec_stab  .hasFocus() :
-            self.cbx = self.cbx_ana_spec_stab
-            self.par = cp.ana_spec_stab
-            self.tit = 'ana_spec_stab' 
-
-        elif self.cbx_res_ascii_out  .hasFocus() :
+        if self.cbx_res_ascii_out  .hasFocus() :
             self.cbx = self.cbx_res_ascii_out
             self.par = cp.res_ascii_out
             self.tit = 'res_ascii_out' 
@@ -278,22 +274,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
     def onEdit(self):
 
-        if self.edi_ana_opt1.isModified() :            
-            self.edi = self.edi_ana_opt1
-            self.par = cp.ana_ndelays
-            self.tit = 'ana_ndelays'
-
-        elif self.edi_ana_opt2.isModified() :            
-            self.edi = self.edi_ana_opt2
-            self.par = cp.ana_nslice_delays
-            self.tit = 'ana_nslice_delays'
-
-        elif self.edi_ana_opt3.isModified() :            
-            self.edi = self.edi_ana_opt3
-            self.par = cp.ana_npix_to_smooth
-            self.tit = 'ana_npix_to_smooth'
-
-        elif self.edi_lld_adu.isModified() :            
+        if self.edi_lld_adu.isModified() :            
             self.edi = self.edi_lld_adu 
             self.par = cp.lld_adu
             self.tit = 'lld_adu'
@@ -317,16 +298,33 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         if self.rad_lld_rms .isChecked() : cp.lld_type.setValue( self.list_lld_types[2] )
         logger.info('onRadioLLD - selected Low Level Discrimination type: ' + cp.lld_type.value(), __name__ )
 
-#-----------------------------
+    def onMaskRadioGrp(self):
+        if self.rad_mask_none.isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[0])
+        if self.rad_mask_new .isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[1])
+        if self.rad_mask_file.isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[2])
+        logger.info('onMaskRadioGrp - set cp.ana_mask_type = ' + cp.ana_mask_type.value(), __name__)
 
-#    def on_edi_kin_slice_last(self):
-#        cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
-#        logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()) )#
+    def onMaskPoly(self):
+        logger.info('onMaskPoly - is not implemented yet...', __name__)
 
-#    def on_box_kin_mode(self):
-#        self.mode_name = self.box_kin_mode.currentText()
-#        cp.kin_mode.setValue( self.mode_name )
-#        logger.info(' ---> selected kinematic mode: ' + self.mode_name )
+
+    def onButBrowser(self):
+        logger.info('onButBrowser', __name__)
+
+        path = cp.ana_mask_file.value()
+        if path == None : dname = './'
+        else            : dname, fname = os.path.split(path)
+
+        path  = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',dname) )
+        dname, fname = os.path.split(path)
+
+        if dname == '' or fname == '' :
+            logger.warning('Input directiry name or file name is empty... keep file name unchanged...', __name__)
+            return
+
+        self.edi_mask_file.setText(path)
+        cp.ana_mask_file.setValue(path)
+        logger.info('selected file for mask: ' + str(cp.ana_mask_file.value()), __name__ )
 
 #-----------------------------
 

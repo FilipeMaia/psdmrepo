@@ -45,9 +45,9 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.setWindowTitle('Kinetic Mode')
         self.setFrame()
 
-        self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
+        #self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
  
-        self.tit_kinetic         = QtGui.QLabel('Camera Working Mode:')
+        self.tit_kinetic         = QtGui.QLabel('Kinetic Mode parameters:')
         self.tit_kin_win_size    = QtGui.QLabel('kinetics window size')
         self.tit_kin_top_row     = QtGui.QLabel('top row number of visible slice')
         self.tit_kin_slice_first = QtGui.QLabel('first usable kinetics slice')
@@ -56,9 +56,9 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.edi_kin_top_row     = QtGui.QLineEdit( str( cp.kin_top_row    .value() ) )        
         self.edi_kin_slice_first = QtGui.QLineEdit( str( cp.kin_slice_first.value() ) )        
         self.edi_kin_slice_last  = QtGui.QLineEdit( str( cp.kin_slice_last .value() ) )        
-        self.box_kin_mode        = QtGui.QComboBox( self ) 
-        self.box_kin_mode.addItems(self.list_of_kin_modes)
-        self.box_kin_mode.setCurrentIndex( self.list_of_kin_modes.index(cp.kin_mode.value()) )
+        #self.box_kin_mode        = QtGui.QComboBox( self ) 
+        #self.box_kin_mode.addItems(self.list_of_kin_modes)
+        #self.box_kin_mode.setCurrentIndex( self.list_of_kin_modes.index(cp.kin_mode.value()) )
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.tit_kinetic,               0, 0, 1, 8)
@@ -66,14 +66,14 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_kin_top_row    ,       2, 1, 1, 8)
         self.grid.addWidget(self.tit_kin_slice_first,       3, 1, 1, 8)
         self.grid.addWidget(self.tit_kin_slice_last ,       4, 1, 1, 8)
-        self.grid.addWidget(self.box_kin_mode       ,       0, 8) 
+        #self.grid.addWidget(self.box_kin_mode       ,       0, 8) 
         self.grid.addWidget(self.edi_kin_win_size   ,       1, 8)
         self.grid.addWidget(self.edi_kin_top_row    ,       2, 8)
         self.grid.addWidget(self.edi_kin_slice_first,       3, 8)
         self.grid.addWidget(self.edi_kin_slice_last ,       4, 8)
         self.setLayout(self.grid)
 
-        self.connect( self.box_kin_mode       , QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_kin_mode        )
+        #self.connect( self.box_kin_mode       , QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_kin_mode        )
         self.connect( self.edi_kin_win_size   , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_win_size    )
         self.connect( self.edi_kin_top_row    , QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_top_row     )
         self.connect( self.edi_kin_slice_first, QtCore.SIGNAL('editingFinished ()'),       self.on_edi_kin_slice_first )
@@ -104,6 +104,7 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setFixedHeight(150)
 
         width = 80
 
@@ -119,13 +120,13 @@ class GUIKineticMode ( QtGui.QWidget ) :
         self.edi_kin_slice_first.setAlignment(QtCore.Qt.AlignRight)
         self.edi_kin_slice_last .setAlignment(QtCore.Qt.AlignRight)
 
-        self.box_kin_mode       .setFixedWidth(100)
+        #self.box_kin_mode       .setFixedWidth(100)
         self.edi_kin_win_size   .setFixedWidth(width)
         self.edi_kin_top_row    .setFixedWidth(width)
         self.edi_kin_slice_first.setFixedWidth(width)
         self.edi_kin_slice_last .setFixedWidth(width)
 
-        self.box_kin_mode       .setStyleSheet(cp.styleBox) 
+        #self.box_kin_mode       .setStyleSheet(cp.styleBox) 
         self.edi_kin_win_size   .setStyleSheet(cp.styleEdit) 
         self.edi_kin_top_row    .setStyleSheet(cp.styleEdit) 
         self.edi_kin_slice_first.setStyleSheet(cp.styleEdit) 
@@ -171,10 +172,10 @@ class GUIKineticMode ( QtGui.QWidget ) :
         cp.kin_slice_last.setValue( float(self.edi_kin_slice_last.displayText()) )
         logger.info('Set kin_slice_last =' + str(cp.kin_slice_last.value()), __name__ )
 
-    def on_box_kin_mode(self):
-        self.mode_name = self.box_kin_mode.currentText()
-        cp.kin_mode.setValue( self.mode_name )
-        logger.info(' ---> selected kinematic mode: ' + self.mode_name, __name__ )
+#    def on_box_kin_mode(self):
+#        self.mode_name = self.box_kin_mode.currentText()
+#        cp.kin_mode.setValue( self.mode_name )
+#        logger.info(' ---> selected kinematic mode: ' + self.mode_name, __name__ )
  
 #-----------------------------
 

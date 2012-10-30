@@ -136,7 +136,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
 
         # GUIAnaSettingsLeft.py
-        self.ana_type          = self.declareParameter( name='ANA_TYPE',                  val_def='static',typ='str' )
+        self.ana_type          = self.declareParameter( name='ANA_TYPE',                  val_def='Static',typ='str' )
 
         self.ana_stat_meth_q   = self.declareParameter( name='ANA_STATIC_METHOD_Q',       val_def='evenly-spaced',typ='str' )
         self.ana_stat_meth_phi = self.declareParameter( name='ANA_STATIC_METHOD_PHI',     val_def='evenly-spaced',typ='str' )

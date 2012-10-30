@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from GUIKineticMode         import *
+from GUINonKineticMode      import *
 from GUIBatchPars           import *
 from Logger                 import logger
 
@@ -43,7 +44,6 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
     #  Constructor --
     #----------------
     def __init__ ( self, parent=None ) :
-        """Constructor"""
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -52,11 +52,19 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         self.setFrame()
         self.setMinimumWidth(400) 
 
-        cp.guikineticmode = GUIKineticMode()
+        self.hboxW = QtGui.QHBoxLayout()
+        self.makeTabBar()
+        self.guiSelector()
+
+        self.tit_camera_mode = QtGui.QLabel('Camera Mode:')
+   
         cp.guibatchpars   = GUIBatchPars()
 
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addWidget(cp.guikineticmode)
+        self.vbox.addWidget(self.tit_camera_mode)
+        self.vbox.addWidget(self.tab_bar)
+        self.vbox.addLayout(self.hboxW)
+        #self.vbox.addWidget(cp.guikineticmode)
         self.vbox.addWidget(cp.guibatchpars)
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
@@ -83,9 +91,54 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
+    def makeTabBar(self,mode=None) :
+        #if mode != None : self.tab_bar.close()
+        self.tab_bar = QtGui.QTabBar()
+
+        self.list_of_kin_modes  = ['Non-Kinetics', 'Kinetics']
+
+        self.ind_tab_nonkinetic = self.tab_bar.addTab( self.list_of_kin_modes[0] )
+        self.ind_tab_kinetic    = self.tab_bar.addTab( self.list_of_kin_modes[1] )
+
+        self.tab_bar.setTabTextColor(self.ind_tab_kinetic,   QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_nonkinetic,QtGui.QColor('blue'))
+        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+
+        logger.info('makeTabBar - set mode: ' + cp.kin_mode.value(), __name__)
+
+        self.tab_bar.setCurrentIndex(self.list_of_kin_modes.index(cp.kin_mode.value()))
+
+        self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
+
+
+    def guiSelector(self):
+
+        try :
+            self.gui_win.close()
+        except AttributeError :
+            pass
+
+        if cp.kin_mode.value() == self.list_of_kin_modes[0] :
+            cp.guinonkineticmode = GUINonKineticMode() 
+            self.gui_win = cp.guinonkineticmode
+
+        if cp.kin_mode.value() == self.list_of_kin_modes[1] :
+            cp.guikineticmode = GUIKineticMode()
+            self.gui_win = cp.guikineticmode
+
+        self.hboxW.addWidget(self.gui_win)
+
+    def onTabBar(self):
+        tab_ind  = self.tab_bar.currentIndex()
+        tab_name = str(self.tab_bar.tabText(tab_ind))
+        cp.kin_mode.setValue( tab_name )
+        logger.info(' ---> selected tab: ' + str(tab_ind) + ' - setup mode: ' + tab_name, __name__)
+        self.guiSelector()
+ 
     def setStyle(self):
         self.setStyleSheet(cp.styleBkgd)
-
+        self.tit_camera_mode.setStyleSheet(cp.styleTitle)
+        
     def setParent(self,parent) :
         self.parent = parent
 
@@ -103,6 +156,9 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         except : pass # silently ignore
 
         try    : cp.guikineticmode.close()
+        except : pass
+
+        try    : cp.guinonkineticmode.close()
         except : pass
 
         try    : cp.guibatchpars  .close()

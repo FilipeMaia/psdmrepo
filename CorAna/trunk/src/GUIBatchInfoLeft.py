@@ -46,7 +46,6 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
     #  Constructor --
     #----------------
     def __init__ ( self, parent=None ) :
-        """Constructor"""
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -141,7 +140,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         self.tab_bar.setTabTextColor(self.ind_tab_bar_specul,QtGui.QColor('blue'))
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 
-        print 'Set mode: ', cp.exp_setup_geom.value()
+        logger.info(' makeTabBar - set mode: ' + cp.exp_setup_geom.value(), __name__)
 
         #self.tab_bar.setTabEnabled(self.list_of_modes.index(cp.exp_setup_geom.value()),False)
         self.tab_bar.setCurrentIndex(self.list_of_modes.index(cp.exp_setup_geom.value()))
@@ -152,19 +151,19 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
     def guiSelector(self):
 
         try :
-            self.guiWin.close()
+            self.gui_win.close()
         except AttributeError :
             pass
 
         if cp.exp_setup_geom.value() == self.list_of_modes[0] :
             cp.guitransmissionpars = GUITransmissionPars() # GUIBeamZeroPars()
-            self.guiWin = cp.guitransmissionpars
+            self.gui_win = cp.guitransmissionpars
 
         if cp.exp_setup_geom.value() == self.list_of_modes[1] :
             cp.guispecularpars = GUISpecularPars()
-            self.guiWin = cp.guispecularpars
+            self.gui_win = cp.guispecularpars
 
-        self.hboxW.addWidget(self.guiWin)
+        self.hboxW.addWidget(self.gui_win)
 
 
     def showToolTips(self):
