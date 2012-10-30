@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfo...
+#  Module GUISystemSettings...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI sets system parameters."""
 
 #------------------------------
 #  Module's version from CVS --
@@ -30,15 +30,15 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 
-from GUIBatchInfoLeft   import *
-from GUIBatchInfoRight  import *
+from GUISystemSettingsLeft   import *
+from GUISystemSettingsRight  import *
 from Logger             import logger
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfo ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+class GUISystemSettings ( QtGui.QWidget ) :
+    """GUI sets system parameters"""
 
     #----------------
     #  Constructor --
@@ -51,24 +51,24 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.setWindowTitle('Batch Info')
         self.setFrame()
  
-        self.tit_title  = QtGui.QLabel('Batch Information')
+        self.tit_title  = QtGui.QLabel('System Settings')
         self.tit_status = QtGui.QLabel('Status: ')
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
-        self.but_show   = QtGui.QPushButton('Show Image')
-        cp.guibatchinfoleft  = GUIBatchInfoLeft()
-        cp.guibatchinforight = GUIBatchInfoRight()
+        #self.but_show   = QtGui.QPushButton('Show Image')
+        cp.guisystemsettingsleft  = GUISystemSettingsLeft()
+        cp.guisystemsettingsright = GUISystemSettingsRight()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.guibatchinfoleft)
-        self.hboxM.addWidget(cp.guibatchinforight)
+        self.hboxM.addWidget(cp.guisystemsettingsleft )
+        self.hboxM.addWidget(cp.guisystemsettingsright)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
         self.hboxB.addWidget(self.but_close)
         self.hboxB.addWidget(self.but_apply)
-        self.hboxB.addWidget(self.but_show )
+        #self.hboxB.addWidget(self.but_show )
 
         self.vbox  = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_title)
@@ -78,7 +78,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
-        self.connect( self.but_show , QtCore.SIGNAL('clicked()'), self.onShow  )
+        #self.connect( self.but_show , QtCore.SIGNAL('clicked()'), self.onShow  )
 
         self.showToolTips()
         self.setStyle()
@@ -88,10 +88,10 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        #self           .setToolTip('This GUI deals with the configuration parameters.')
+        self           .setToolTip('This GUI sets system parameters.')
         self.but_close .setToolTip('Close this window.')
         self.but_apply .setToolTip('Apply changes to configuration parameters.')
-        self.but_show  .setToolTip('Show ...')
+        #self.but_show  .setToolTip('Show ...')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -107,7 +107,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_apply .setStyleSheet (cp.styleButton) 
-        self.but_show  .setStyleSheet (cp.styleButton) 
+        #self.but_show  .setStyleSheet (cp.styleButton) 
 
         self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()
@@ -126,13 +126,13 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        try    : cp.guibatchinfoleft.close()
+        try    : cp.guisystemsettingsleft.close()
         except : pass
 
-        try    : cp.guibatchinforight.close()
+        try    : cp.guisystemsettingsright.close()
         except : pass
 
-        try    : del cp.guibatchinfo # GUIBatchInfo
+        try    : del cp.guisystemsettings # GUISystemSettings
         except : pass
 
     def onClose(self):
@@ -141,9 +141,8 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 
     def onSave(self):
         fname = cp.fname_cp.value()
-        logger.info('onSave:', __name__)# - save all configuration parameters in file: ' + fname, __name__)
+        logger.info('onSave:', __name__)
         cp.saveParametersInFile( fname )
-
 
     def onShow(self):
         logger.info('onShow - is not implemented yet...', __name__)
@@ -153,7 +152,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfo ()
+    widget = GUISystemSettings ()
     widget.show()
     app.exec_()
 

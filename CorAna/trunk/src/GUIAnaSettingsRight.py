@@ -219,26 +219,26 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent')
+        logger.debug('resizeEvent', __name__)
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent')
+        logger.debug('moveEvent', __name__)
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
     def closeEvent(self, event):
-        logger.debug('closeEvent')
+        logger.debug('closeEvent', __name__)
         try: # try to delete self object in the cp
             del cp.guianasettingsright # GUIAnaSettingsRight
         except AttributeError:
             pass # silently ignore
 
     def onClose(self):
-        logger.debug('onClose')
+        logger.debug('onClose', __name__)
         self.close()
 
     def on(self):
-        logger.debug('on click - is not implemented yet')
+        logger.debug('on click - is not implemented yet', __name__)
 
     def onCBox(self):
 

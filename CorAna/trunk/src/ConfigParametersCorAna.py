@@ -169,6 +169,29 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.res_fit_cust      = self.declareParameter( name='RES_PERFORM_FIT_CUSTOM',           val_def=False, typ='bool' ) 
         self.res_png_out       = self.declareParameter( name='RES_PNG_FILES',                    val_def=False, typ='bool' )  
 
+
+        # GUISystemSettingsRight.py
+        self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',typ='str' )
+        self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      typ='float' )
+        self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      typ='float' )
+
+
+        # GUICCDCorrectionSettings.py
+        self.ccdcorr_blemish         = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  typ='bool' )
+        self.ccdcorr_flatfield       = self.declareParameter( name='CCD_CORRECTION_FLATFIELD',     val_def=False,  typ='bool' )
+        self.ccdcorr_distortion      = self.declareParameter( name='CCD_CORRECTION_DISTORTION',    val_def=False,  typ='bool' )
+        self.ccdcorr_parasitic       = self.declareParameter( name='CCD_CORRECTION_PARASITIC',     val_def=False,  typ='bool' )
+
+
+        # GUICCDSettings.py
+        self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   typ='float' )
+        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=12345, typ='int' )
+        self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=123,   typ='float' )
+        self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  typ='float' )
+        self.ccdset_ccddain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   typ='float' )
+
+        self.sys_ram_size            = self.declareParameter( name='SYS_AVAILABLE_RAM_SIZE',       val_def=750,   typ='int' )
+
 #-----------------------------
 
     def defineStyles( self ) :

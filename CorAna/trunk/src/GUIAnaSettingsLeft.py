@@ -41,7 +41,7 @@ class GUIAnaSettingsLeft ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Log files')
+        self.setWindowTitle('Analysis Settings Left')
         self.setFrame()
 
         self.tit_ana_type = QtGui.QLabel('Select Analysis Type:')

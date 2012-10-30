@@ -46,6 +46,7 @@ from ConfigParametersCorAna import confpars as cp
 from GUILoadFiles        import *
 from GUIBatchInfo        import *
 from GUIAnaSettings      import *
+from GUISystemSettings   import *
 from Logger              import logger
 
 #---------------------
@@ -230,6 +231,13 @@ class GUIMain ( QtGui.QWidget ) :
 
     def onSystem(self):     
         logger.info('onSystem - not implemented yet...', self.name)
+        try    :
+            cp.guisystemsettings.close()
+        except : # AttributeError: #NameError 
+            cp.guisystemsettings = GUISystemSettings()
+            cp.guisystemsettings.setParent(self)
+            cp.guisystemsettings.move(self.pos().__add__(QtCore.QPoint(160,130))) # open window with offset w.r.t. parent
+            cp.guisystemsettings.show()
 
     def onRun (self):       
         logger.info('onRun - not implemented yet...', self.name)

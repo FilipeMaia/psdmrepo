@@ -56,7 +56,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         self.makeTabBar()
         self.guiSelector()
 
-        self.tit_camera_mode = QtGui.QLabel('Camera Mode:')
+        self.tit_camera_mode = QtGui.QLabel('CCD Mode:')
    
         cp.guibatchpars   = GUIBatchPars()
 

@@ -48,12 +48,12 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.setWindowTitle('Specularly Reflected Beam Parameters')
         self.setFrame()
 
-        self.titImageSize  = QtGui.QLabel('Saved Camera Image Size:')
+        self.titImageSize  = QtGui.QLabel('CCD Image Size:')
         self.tit_col       = QtGui.QLabel('column (x)')
         self.tit_row       = QtGui.QLabel('row (y)')
         self.tit_begin     = QtGui.QLabel('begin')
         self.tit_end       = QtGui.QLabel('end')
-        self.titCameraPos  = QtGui.QLabel('Camera Posituion During Data Collection:')
+        self.titCameraPos  = QtGui.QLabel('CCD Posituion During Data Collection:')
         self.tit_frame_x   = QtGui.QLabel('Pos x')
         self.tit_frame_z   = QtGui.QLabel('Pos z')
  
