@@ -44,7 +44,7 @@ class GUILogger ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 600)
+        self.setGeometry(200, 400, 700, 500)
         self.setWindowTitle('GUI Logger')
         self.setFrame()
 
@@ -73,7 +73,7 @@ class GUILogger ( QtGui.QWidget ) :
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_save,  QtCore.SIGNAL('clicked()'), self.onSave  )
 
-        self.startLog()
+        self.startGUILog()
 
         self.showToolTips()
         self.setStyle()
@@ -85,7 +85,7 @@ class GUILogger ( QtGui.QWidget ) :
     def showToolTips(self):
         #self           .setToolTip('This GUI is intended for run control and monitoring.')
         self.but_close .setToolTip('Close this window.')
-        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+cp.fname_guilog)
+        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+cp.fname_log)
         #self.but_show  .setToolTip('Show ...')
 
     def setFrame(self):
@@ -121,7 +121,7 @@ class GUILogger ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        try    : cp.butLogger.setStyleSheet(cp.styleButtonBad)
+        try    : cp.guimain.butLogger.setStyleSheet(cp.styleButtonBad)
         except : pass
 
         try    : del cp.guilogger # GUILogger
@@ -130,63 +130,65 @@ class GUILogger ( QtGui.QWidget ) :
 
     def onClose(self):
         logger.info('onClose', __name__)
-
-        clicked = self.getConfirmation()
-        if clicked == QtGui.QMessageBox.Save :
-            logger.info('Saving is requested', __name__)
-            self.saveGUILogInFile(cp.path_guilog)
-
-        elif clicked == QtGui.QMessageBox.Discard :
-            logger.info('Discard is requested', __name__)
-        else :
-            logger.info('Cancel is requested', __name__)
-            return
-
         self.close()
 
 
     def onSave(self):
-        fname = cp.fname_cp.value()
         logger.info('onSave:', __name__)
-        self.saveGUILogInFile(cp.path_guilog)
+        self.saveLogInFile(cp.dir_work.value() + '/' + cp.fname_log)
 
-    def saveGUILogInFile(self, fname):
-        logger.info('saveGUILogInFile: '+fname, __name__)
-        doc = self.box_txt.document() # returns QTextDocument
-        txt = doc.toPlainText()
-        #print txt
-        #print '\n'
-        f=open(fname,'w')
-        f.write(txt)
-        f.close() 
+
+    def saveLogInFile(self, fname):
+        #logger.info('saveLogInFile: '+fname, __name__)
+        #if cp.res_save_log : 
+        logger.saveLogInFile(fname)
+
+
+#    def saveGUILogInFile(self, fname):
+#        logger.info('saveGUILogInFile: '+fname, __name__)
+#        doc = self.box_txt.document() # returns QTextDocument
+#        txt = doc.toPlainText()
+#        f=open(fname,'w')
+#        f.write(txt)
+#        f.close() 
 
 
     def getConfirmation(self):
+        """Pop-up box for confirmation"""
         msg = QtGui.QMessageBox(self, windowTitle='Confirm closing!',
             text='You are about to close GUI Logger...\nIf the log-file is not saved it will be lost.',
             standardButtons=QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
         msg.setDefaultButton(msg.Save)
-        return msg.exec_()
+
+        clicked = msg.exec_()
+
+        if   clicked == QtGui.QMessageBox.Save :
+            logger.info('Saving is requested', __name__)
+        elif clicked == QtGui.QMessageBox.Discard :
+            logger.info('Discard is requested', __name__)
+        else :
+            logger.info('Cancel is requested', __name__)
+        return clicked
 
 
     def onShow(self):
         logger.info('onShow - is not implemented yet...', __name__)
 
 
-    def startLog(self) :
-        self.str_start_time = logger.time_stamp( fmt='%Y-%m-%d-%H%M%S' )
-        cp.fname_guilog = self.str_start_time + '-guilog.txt'
-        cp.path_guilog  = cp.dir_work.value() + '/' + cp.fname_guilog
-        self.setStatus(0, 'Log-file: ' + cp.fname_guilog)
-
+    def startGUILog(self) :
+        cp.fname_log = logger.getLogFileName()
+        self.setStatus(0, 'Log-file: ' + cp.fname_log)
+        self.box_txt.setText( logger.getLogContent() )
         logger.setGUILogger(self)
-        self.box_txt.setText( self.str_start_time + ' ==== Start Logger' )
 
-    def appendLog(self, msg='...'):
+
+    def appendGUILog(self, msg='...'):
         self.box_txt.append(msg)
+        scrol_bar_v = self.box_txt.verticalScrollBar() # QScrollBar
+        scrol_bar_v.setValue(scrol_bar_v.maximum()) 
 
+        
     def setStatus(self, status_index=0, msg=''):
-
         list_of_states = ['Good','Warning','Alarm']
         if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
         if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)

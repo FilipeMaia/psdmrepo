@@ -169,7 +169,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.res_fit2          = self.declareParameter( name='RES_PERFORM_FIT1',                 val_def=False, typ='bool' )  
         self.res_fit_cust      = self.declareParameter( name='RES_PERFORM_FIT_CUSTOM',           val_def=False, typ='bool' ) 
         self.res_png_out       = self.declareParameter( name='RES_PNG_FILES',                    val_def=False, typ='bool' )  
-
+        self.res_save_log      = self.declareParameter( name='RES_SAVE_LOG_FILE',                val_def=False, typ='bool' )  
 
         # GUISystemSettingsRight.py
         self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',typ='str' )

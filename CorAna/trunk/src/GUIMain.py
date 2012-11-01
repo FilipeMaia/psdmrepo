@@ -103,7 +103,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setLayout(self.vbox)
 
-        self.connect(self.butLoadFiles  ,  QtCore.SIGNAL('clicked()'), self.onLoadFiles   )
+        self.connect(self.butLoadFiles  ,  QtCore.SIGNAL('clicked()'), self.onFiles   )
         self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
         self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
         self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
@@ -175,6 +175,9 @@ class GUIMain ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', self.name)
 
+        if cp.res_save_log : 
+            logger.saveLogInFile(cp.dir_work.value() + '/' + cp.fname_log)
+
         try    : cp.guiloadfiles.close()
         except : pass
 
@@ -207,8 +210,8 @@ class GUIMain ( QtGui.QWidget ) :
     def onPrint(self):
         logger.info('onPrint', self.name)
         
-    def onLoadFiles(self):
-        logger.info('onLoadFiles', self.name)
+    def onFiles(self):
+        logger.info('onFiles', self.name)
         try :
             cp.guiloadfiles.close()
             self.butLoadFiles.setStyleSheet(cp.styleButton)
@@ -287,8 +290,9 @@ class GUIMain ( QtGui.QWidget ) :
         except :
             cp.guilogger = GUILogger()
             cp.guilogger.setParent(self)
-            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,0))) # open window with offset w.r.t. parent
+            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,-20))) # open window with offset w.r.t. parent
             cp.guilogger.show()
+            logger.info('GUILogger is (re-)started', self.name)
             self.butLogger.setStyleSheet(cp.styleButtonGood)
 
 

@@ -85,11 +85,14 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.cbx_res_fit2        = QtGui.QCheckBox('Perform Fit2', self)
         self.cbx_res_fit_cust    = QtGui.QCheckBox('Perform Custom Fit', self)
         self.cbx_res_png_out     = QtGui.QCheckBox('Create PNG Files', self)
+        self.cbx_res_save_log    = QtGui.QCheckBox('Save Log-file', self)
+
         self.cbx_res_ascii_out.setChecked( cp.res_ascii_out.value() )
         self.cbx_res_fit1     .setChecked( cp.res_fit1     .value() )
         self.cbx_res_fit2     .setChecked( cp.res_fit2     .value() )
         self.cbx_res_fit_cust .setChecked( cp.res_fit_cust .value() )
         self.cbx_res_png_out  .setChecked( cp.res_png_out  .value() )
+        self.cbx_res_save_log .setChecked( cp.res_save_log .value() )
 
         self.grid = QtGui.QGridLayout()
 
@@ -117,6 +120,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.grid.addWidget(self.cbx_res_fit_cust,  self.grid_row+4, 1, 1, 4) 
         self.grid.addWidget(self.cbx_res_ascii_out, self.grid_row+2, 6, 1, 3)
         self.grid.addWidget(self.cbx_res_png_out,   self.grid_row+3, 6, 1, 3) 
+        self.grid.addWidget(self.cbx_res_save_log,  self.grid_row+4, 6, 1, 3) 
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -136,6 +140,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.connect(self.cbx_res_fit2       , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
         self.connect(self.cbx_res_fit_cust   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
         self.connect(self.cbx_res_png_out    , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.cbx_res_save_log   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
 
         self.connect( self.rad_mask_none,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
         self.connect( self.rad_mask_new,     QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
@@ -178,13 +183,13 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.                    setMinimumWidth(450)
         self.                    setStyleSheet (cp.styleBkgd)
 
-
         self.tit_res_sets       .setStyleSheet (cp.styleTitle)     
         self.cbx_res_ascii_out  .setStyleSheet (cp.styleLabel)
         self.cbx_res_fit1       .setStyleSheet (cp.styleLabel)
         self.cbx_res_fit2       .setStyleSheet (cp.styleLabel)
         self.cbx_res_fit_cust   .setStyleSheet (cp.styleLabel)
         self.cbx_res_png_out    .setStyleSheet (cp.styleLabel)
+        self.cbx_res_save_log   .setStyleSheet (cp.styleLabel)
 
         self.edi_lld_adu        .setStyleSheet(cp.styleEdit) 
         self.edi_lld_rms        .setStyleSheet(cp.styleEdit) 
@@ -266,6 +271,11 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
             self.cbx = self.cbx_res_png_out
             self.par = cp.res_png_out
             self.tit = 'res_png_out' 
+
+        elif self.cbx_res_save_log   .hasFocus() :
+            self.cbx = self.cbx_res_save_log
+            self.par = cp.res_save_log
+            self.tit = 'res_save_log' 
 
         self.par.setValue( self.cbx.isChecked() )
         msg = 'onCBox - set status of ' + self.tit  + ': ' + str( self.par.value())

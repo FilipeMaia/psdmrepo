@@ -45,6 +45,9 @@ class Logger :
         self.levels=['debug','info','warning','error','crytical']
         self.level_thr_ind = self.levels.index(level)
 
+        self.log_txt = ''
+        self.startLog()
+
     def debug( self, msg, name=None ) :
         self.message(msg, self.levels[0], name)
 
@@ -71,12 +74,14 @@ class Logger :
         else :
             self.msg_tot += '::::'
         self.msg_tot += msg
+
+        self.log_txt += self.msg_tot + '\n'       
+
         self.appendGUILog(self.msg_tot)
         #print self.msg_tot
 
-
     def appendGUILog(self, msg='') :
-        try    : self.guilogger.appendLog(msg)
+        try    : self.guilogger.appendGUILog(msg)
         except : pass
 
     def setGUILogger(self, guilogger) :
@@ -85,9 +90,32 @@ class Logger :
     def time_stamp( self, fmt='%Y-%m-%d %H:%M:%S' ) : # '%Y-%m-%d %H:%M:%S %Z'
         return strftime(fmt, localtime())
 
+    def startLog(self) :
+        self.str_start_time = self.time_stamp( fmt='%Y-%m-%d-%H%M%S' )
+        if  self.fname == None :
+            self.fname = self.str_start_time + '-log.txt'
+        self.info('startLog: Start log for file: '+self.fname, __name__)
+
+    def getLogFileName(self):
+        return self.fname
+
+    def getLogContent(self):
+        return self.log_txt
+
+    def saveLogInFile(self, fname=None):
+        if fname == None :
+            self.fname_log = self.fname
+        else :
+            self.fname_log = fname
+
+        self.info('saveLogInFile: '+self.fname_log, __name__)
+        f=open(self.fname_log,'w')
+        f.write(self.log_txt)
+        f.close() 
+
 #-----------------------------
 
-logger = Logger (fname='log-file.txt')
+logger = Logger (fname=None)
 
 #-----------------------------
 #
