@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Renders the main GUI in the analysis shell.
+"""Renders the main GUI for the image time-correlation analysis.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -47,6 +47,9 @@ from GUILoadFiles        import *
 from GUIBatchInfo        import *
 from GUIAnaSettings      import *
 from GUISystemSettings   import *
+from GUIRun              import *
+from GUIViewResults      import *
+from GUILogger           import *
 from Logger              import logger
 
 #---------------------
@@ -58,16 +61,6 @@ class GUIMain ( QtGui.QWidget ) :
     @see BaseClass
     @see OtherClass
     """
-
-    #--------------------
-    #  Class variables --
-    #--------------------
-    #publicStaticVariable = 0 
-    #__privateStaticVariable = "A string"
-
-    #----------------
-    #  Constructor --
-    #----------------
     def __init__ (self, parent=None, app=None) :
 
         self.name = 'GUIMain'
@@ -81,25 +74,28 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.titControl    = QtGui.QLabel('Control Panel')
-        self.butLoadFiles  = QtGui.QPushButton('Files')    
-        self.butBatchInfo  = QtGui.QPushButton('Batch information')    
-        self.butAnaDisp    = QtGui.QPushButton('Analysis && Display')
-        self.butSystem     = QtGui.QPushButton('System')
-        self.butRun        = QtGui.QPushButton('Run')
-        self.butViewResults= QtGui.QPushButton('View Results')
-        self.butStop       = QtGui.QPushButton('Stop')
-        self.butSave       = QtGui.QPushButton('Save')
-        self.butExit       = QtGui.QPushButton('Exit')
+        self.titControl     = QtGui.QLabel('Control Panel')
+        self.butLoadFiles   = QtGui.QPushButton('Files')    
+        self.butBatchInfo   = QtGui.QPushButton('Batch Information')    
+        self.butAnaSettings = QtGui.QPushButton('Analysis Settings')
+        self.butSystem      = QtGui.QPushButton('System')
+        self.butRun         = QtGui.QPushButton('Run')
+        self.butViewResults = QtGui.QPushButton('View Results')
+        self.butStop        = QtGui.QPushButton('Stop')
+        self.butSave        = QtGui.QPushButton('Save')
+        self.butExit        = QtGui.QPushButton('Exit')
+        self.butLogger      = QtGui.QPushButton('Logger')
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.titControl    )
         self.vbox.addWidget(self.butLoadFiles  )
         self.vbox.addWidget(self.butBatchInfo  )
-        self.vbox.addWidget(self.butAnaDisp    )
+        self.vbox.addWidget(self.butAnaSettings)
         self.vbox.addWidget(self.butSystem     )
         self.vbox.addWidget(self.butRun        )
         self.vbox.addWidget(self.butViewResults)
+        self.vbox.addStretch(1)     
+        self.vbox.addWidget(self.butLogger     )
         self.vbox.addStretch(1)     
         self.vbox.addWidget(self.butStop       )
         self.vbox.addWidget(self.butSave       )
@@ -109,17 +105,22 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.connect(self.butLoadFiles  ,  QtCore.SIGNAL('clicked()'), self.onLoadFiles   )
         self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
-        self.connect(self.butAnaDisp    ,  QtCore.SIGNAL('clicked()'), self.onAnaDisp     )
+        self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
         self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
         self.connect(self.butRun        ,  QtCore.SIGNAL('clicked()'), self.onRun         )
         self.connect(self.butViewResults,  QtCore.SIGNAL('clicked()'), self.onViewResults )
         self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
+        self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
 
         self.showToolTips()
         self.setStyle()
         self.printStyleInfo()
+
+        self.onLogger()
+
+        cp.guimain = self
         
         #print 'End of init'
         
@@ -154,11 +155,12 @@ class GUIMain ( QtGui.QWidget ) :
         self.titControl    .setStyleSheet(cp.styleTitle)
         self.butLoadFiles  .setStyleSheet(cp.styleButton)
         self.butBatchInfo  .setStyleSheet(cp.styleButton) 
-        self.butAnaDisp    .setStyleSheet(cp.styleButton)
+        self.butAnaSettings.setStyleSheet(cp.styleButton)
         self.butSystem     .setStyleSheet(cp.styleButton)
         self.butRun        .setStyleSheet(cp.styleButton)
         self.butViewResults.setStyleSheet(cp.styleButton)
         self.butStop       .setStyleSheet(cp.styleButton)
+        #self.butLogger     .setStyleSheet(cp.styleGreenish)
         self.butSave       .setStyleSheet(cp.styleButton)
         self.butExit       .setStyleSheet(cp.styleButton)
         self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
@@ -172,8 +174,6 @@ class GUIMain ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.info('closeEvent', self.name)
-        try    : del cp.guimain
-        except : pass
 
         try    : cp.guiloadfiles.close()
         except : pass
@@ -183,6 +183,22 @@ class GUIMain ( QtGui.QWidget ) :
 
         try    : cp.guianasettings.close()
         except : pass
+
+        try    : cp.guisystemsettings.close()
+        except : pass
+
+        try    : cp.guiviewresults.close()
+        except : pass
+
+        try    : cp.guirun.close()
+        except : pass
+
+        try    : cp.guilogger.close()
+        except : pass
+
+        try    : del cp.guimain
+        except : pass
+
 
     def onExit(self):
         logger.info('onExit', self.name)
@@ -208,7 +224,7 @@ class GUIMain ( QtGui.QWidget ) :
         logger.info('onBatchInfo', self.name)
         try :
             cp.guibatchinfo.close()
-        except : # AttributeError: #NameError 
+        except :
             cp.guibatchinfo = GUIBatchInfo()
             cp.guibatchinfo.setParent(self)
             cp.guibatchinfo.move(self.pos().__add__(QtCore.QPoint(160,90))) # open window with offset w.r.t. parent
@@ -219,31 +235,62 @@ class GUIMain ( QtGui.QWidget ) :
         logger.info('onSave', self.name)
         cp.saveParametersInFile( cp.fname_cp.value() )
 
-    def onAnaDisp(self):    
-        logger.info('onAnaDisp', self.name)
+
+    def onAnaSettings(self):    
+        logger.info('onAnaSettings', self.name)
         try :
             cp.guianasettings.close()
-        except : # AttributeError: #NameError 
+        except :
             cp.guianasettings = GUIAnaSettings()
             cp.guianasettings.setParent(self)
             cp.guianasettings.move(self.pos().__add__(QtCore.QPoint(160,130))) # open window with offset w.r.t. parent
             cp.guianasettings.show()
 
+
     def onSystem(self):     
-        logger.info('onSystem - not implemented yet...', self.name)
+        logger.info('onSystem', self.name)
         try    :
             cp.guisystemsettings.close()
-        except : # AttributeError: #NameError 
+        except :
             cp.guisystemsettings = GUISystemSettings()
             cp.guisystemsettings.setParent(self)
-            cp.guisystemsettings.move(self.pos().__add__(QtCore.QPoint(160,130))) # open window with offset w.r.t. parent
+            cp.guisystemsettings.move(self.pos().__add__(QtCore.QPoint(160,160))) # open window with offset w.r.t. parent
             cp.guisystemsettings.show()
 
+
     def onRun (self):       
-        logger.info('onRun - not implemented yet...', self.name)
+        logger.info('onRun', self.name)
+        try    :
+            cp.guirun.close()
+        except :
+            cp.guirun = GUIRun()
+            cp.guirun.setParent(self)
+            cp.guirun.move(self.pos().__add__(QtCore.QPoint(160,195))) # open window with offset w.r.t. parent
+            cp.guirun.show()
+
 
     def onViewResults(self):
-        logger.info('onViewResults - not implemented yet...', self.name)
+        logger.info('onViewResults', self.name)
+        try    :
+            cp.guiviewresults.close()
+        except :
+            cp.guiviewresults = GUIViewResults()
+            cp.guiviewresults.setParent(self)
+            cp.guiviewresults.move(self.pos().__add__(QtCore.QPoint(160,230))) # open window with offset w.r.t. parent
+            cp.guiviewresults.show()
+
+    def onLogger (self):       
+        logger.info('onLogger', self.name)
+        try    :
+            cp.guilogger.onClose()
+            #self.butLogger.setStyleSheet(cp.styleButtonBad)
+        except :
+            cp.guilogger = GUILogger()
+            cp.guilogger.setParent(self)
+            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,0))) # open window with offset w.r.t. parent
+            cp.guilogger.show()
+            self.butLogger.setStyleSheet(cp.styleButtonGood)
+
 
     def onStop(self):       
         logger.info('onStop - not implemented yet...', self.name)

@@ -29,6 +29,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 from time import localtime, strftime
+
 #-----------------------------
 
 class Logger :
@@ -70,9 +71,18 @@ class Logger :
         else :
             self.msg_tot += '::::'
         self.msg_tot += msg
-        print self.msg_tot
+        self.appendGUILog(self.msg_tot)
+        #print self.msg_tot
 
-    def time_stamp( self, fmt='%Y-%m-%d %H:%M:%S' ): # '%Y-%m-%d %H:%M:%S %Z'
+
+    def appendGUILog(self, msg='') :
+        try    : self.guilogger.appendLog(msg)
+        except : pass
+
+    def setGUILogger(self, guilogger) :
+        self.guilogger = guilogger
+
+    def time_stamp( self, fmt='%Y-%m-%d %H:%M:%S' ) : # '%Y-%m-%d %H:%M:%S %Z'
         return strftime(fmt, localtime())
 
 #-----------------------------

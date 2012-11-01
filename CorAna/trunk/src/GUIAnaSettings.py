@@ -42,7 +42,6 @@ class GUIAnaSettings ( QtGui.QWidget ) :
     #  Constructor --
     #----------------
     def __init__ ( self, parent=None ) :
-        """Constructor"""
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -51,7 +50,7 @@ class GUIAnaSettings ( QtGui.QWidget ) :
         self.setFrame()
  
         self.tit_title  = QtGui.QLabel('Analysis Settings')
-        self.tit_status = QtGui.QLabel('Status: Loading')
+        self.tit_status = QtGui.QLabel('Status:')
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
         self.but_show   = QtGui.QPushButton('Show Mask && Partitions') 

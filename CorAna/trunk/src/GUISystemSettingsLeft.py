@@ -51,9 +51,7 @@ class GUISystemSettingsLeft ( QtGui.QWidget ) :
         cp.guiccdcorrectionssettings = GUICCDCorrectionSettings()
 
         self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addStretch(1) 
         self.hbox.addWidget(self.tit_sys_ram_size)
-        self.hbox.addStretch(2) 
         self.hbox.addWidget(self.edi_sys_ram_size)
         self.hbox.addStretch(1) 
 
@@ -89,9 +87,9 @@ class GUISystemSettingsLeft ( QtGui.QWidget ) :
     def setStyle(self):
         self.setMinimumWidth(450)
         self.setStyleSheet(cp.styleBkgd)
-        self.tit_sys_ram_size.setStyleSheet (cp.styleTitle)
+        self.tit_sys_ram_size.setStyleSheet(cp.styleTitle)
         self.edi_sys_ram_size.setStyleSheet(cp.styleEdit)
-        self.edi_sys_ram_size.setFixedWidth(60)
+        self.edi_sys_ram_size.setFixedWidth(80)
         self.edi_sys_ram_size.setAlignment(QtCore.Qt.AlignRight) 
 
 

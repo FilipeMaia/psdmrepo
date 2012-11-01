@@ -48,7 +48,7 @@ class GUISystemSettings ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info')
+        self.setWindowTitle('System Settings')
         self.setFrame()
  
         self.tit_title  = QtGui.QLabel('System Settings')
@@ -102,7 +102,7 @@ class GUISystemSettings ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        #self.          setStyleSheet (cp.styleYellow)
+        self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)

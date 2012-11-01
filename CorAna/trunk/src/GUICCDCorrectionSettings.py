@@ -56,7 +56,7 @@ class GUICCDCorrectionSettings ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
 
         self.grid_row = 0
-        self.grid.addWidget(self.tit_ccdcorr_sets      ,  self.grid_row+1, 0, 1, 6)     
+        self.grid.addWidget(self.tit_ccdcorr_sets      ,  self.grid_row+1, 0, 1, 5)     
         self.grid.addWidget(self.cbx_ccdcorr_blemish   ,  self.grid_row+2, 1, 1, 4)     
         self.grid.addWidget(self.cbx_ccdcorr_flatfield ,  self.grid_row+3, 1, 1, 4)          
         self.grid.addWidget(self.cbx_ccdcorr_distortion,  self.grid_row+4, 1, 1, 4) 
@@ -95,7 +95,7 @@ class GUICCDCorrectionSettings ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.                       setMinimumWidth(450)
+        self.                       setMinimumWidth(400)
         self.                       setStyleSheet (cp.styleBkgd)
         self.tit_ccdcorr_sets      .setStyleSheet (cp.styleTitle)
         self.cbx_ccdcorr_blemish   .setStyleSheet (cp.styleLabel)

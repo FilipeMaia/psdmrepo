@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfo...
+#  Module GUIRun ...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI for run control."""
 
 #------------------------------
 #  Module's version from CVS --
@@ -29,46 +29,42 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
+from Logger                 import logger
 
-from GUIBatchInfoLeft   import *
-from GUIBatchInfoRight  import *
-from Logger             import logger
+#from GUIRunLeft   import *
+#from GUIRunRight  import *
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfo ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+class GUIRun ( QtGui.QWidget ) :
+    """GUI for run control"""
 
-    #----------------
-    #  Constructor --
-    #----------------
     def __init__ ( self, parent=None ) :
 
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info')
+        self.setWindowTitle('Run Control and Monitoring')
         self.setFrame()
  
-        self.tit_title  = QtGui.QLabel('Batch Information')
-        self.tit_status = QtGui.QLabel('Status: ')
+        self.tit_title  = QtGui.QLabel('Run Control and Monitoring')
+        self.tit_status = QtGui.QLabel('Status:')
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
-        self.but_show   = QtGui.QPushButton('Show Image')
-        cp.guibatchinfoleft  = GUIBatchInfoLeft()
-        cp.guibatchinforight = GUIBatchInfoRight()
+
+        #cp.guisystemsettingsleft  = GUIRunLeft()
+        #cp.guisystemsettingsright = GUIRunRight()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.guibatchinfoleft)
-        self.hboxM.addWidget(cp.guibatchinforight)
+        #self.hboxM.addWidget(cp.guisystemsettingsleft )
+        #self.hboxM.addWidget(cp.guisystemsettingsright)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
         self.hboxB.addWidget(self.but_close)
         self.hboxB.addWidget(self.but_apply)
-        self.hboxB.addWidget(self.but_show )
 
         self.vbox  = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_title)
@@ -78,20 +74,20 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
-        self.connect( self.but_show , QtCore.SIGNAL('clicked()'), self.onShow  )
 
         self.showToolTips()
         self.setStyle()
+        self.setStatus()
 
     #-------------------
     #  Public methods --
     #-------------------
 
     def showToolTips(self):
-        #self           .setToolTip('This GUI deals with the configuration parameters.')
+        self           .setToolTip('This GUI is intended for run control and monitoring.')
         self.but_close .setToolTip('Close this window.')
         self.but_apply .setToolTip('Apply changes to configuration parameters.')
-        self.but_show  .setToolTip('Show ...')
+        #self.but_show  .setToolTip('Show ...')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -107,7 +103,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_apply .setStyleSheet (cp.styleButton) 
-        self.but_show  .setStyleSheet (cp.styleButton) 
+        #self.but_show  .setStyleSheet (cp.styleButton) 
 
         self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()
@@ -126,13 +122,13 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        try    : cp.guibatchinfoleft.close()
-        except : pass
+        #try    : cp.guisystemsettingsleft.close()
+        #except : pass
 
-        try    : cp.guibatchinforight.close()
-        except : pass
+        #try    : cp.guisystemsettingsright.close()
+        #except : pass
 
-        try    : del cp.guibatchinfo # GUIBatchInfo
+        try    : del cp.guirun # GUIRun
         except : pass
 
     def onClose(self):
@@ -141,19 +137,27 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 
     def onSave(self):
         fname = cp.fname_cp.value()
-        logger.info('onSave:', __name__)# - save all configuration parameters in file: ' + fname, __name__)
+        logger.info('onSave:', __name__)
         cp.saveParametersInFile( fname )
-
 
     def onShow(self):
         logger.info('onShow - is not implemented yet...', __name__)
+
+    def setStatus(self, status_index=0, msg=''):
+
+        list_of_states = ['Good','Warning','Alarm']
+        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
+
+        self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
 
 #-----------------------------
 
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfo ()
+    widget = GUIRun ()
     widget.show()
     app.exec_()
 

@@ -124,15 +124,16 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_current       = self.declareParameter( name='BATCH_CURRENT',     val_def=102.205,  typ='float' )
 
         # GUILoadFiles.py
-        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark/',typ='str' )
-        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat/',typ='str' )
-        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam/',typ='str' )
-        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data/',typ='str' )
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark',typ='str' )
+        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat',typ='str' )
+        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam',typ='str' )
+        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data',typ='str' )
         self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
         self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
         self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='blam.xtc',typ='str' )
         self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
-        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='.',typ='str' )
+        #self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
 
         # GUIAnaSettingsLeft.py
@@ -195,26 +196,34 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 #-----------------------------
 
     def defineStyles( self ) :
-        self.styleYellow = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
-        self.stylePink   = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
-        self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
-        self.styleGreen  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
-        self.styleBluish = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
-        self.styleWhite  = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
+        self.styleYellowish = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
+        self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
+        self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
+        self.styleGreenish  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
+        self.styleBluish    = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
+        self.styleWhite     = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
         #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
         #self.styleTitle  = "color: rgb(150, 160, 100);"
         self.styleBlue   = "color: rgb(000, 000, 255);"
         self.styleBuriy  = "color: rgb(150, 100, 50);"
+        self.styleRed    = "color: rgb(255, 0, 0);"
+        self.styleGreen  = "color: rgb(0, 150, 0);"
+        self.styleYellow = "color: rgb(0, 150, 150);"
 
-        self.styleBkgd        = self.styleYellow
-        self.styleTitle       = self.styleBuriy
-        self.styleLabel       = self.styleBlue
-        self.styleEdit        = self.styleWhite
-        self.styleEditInfo    = self.styleGreen
-        self.styleButton      = self.styleGray
-        self.styleButtonOn    = self.styleBluish
-        self.styleButtonClose = self.stylePink
-        self.styleBox         = self.styleGray
+        self.styleBkgd         = self.styleYellowish
+        self.styleTitle        = self.styleBuriy
+        self.styleLabel        = self.styleBlue
+        self.styleEdit         = self.styleWhite
+        self.styleEditInfo     = self.styleGreenish
+        self.styleButton       = self.styleGray
+        self.styleButtonOn     = self.styleBluish
+        self.styleButtonClose  = self.stylePink
+        self.styleButtonGood   = self.styleGreenish
+        self.styleButtonBad    = self.stylePink
+        self.styleBox          = self.styleGray
+        self.styleStatusGood   = self.styleGreen
+        self.styleStatusWarning= self.styleYellow
+        self.styleStatusAlarm  = self.styleRed
 
 
     def printParsDirectly( self ) :

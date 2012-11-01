@@ -115,7 +115,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                   setMinimumWidth(450)
+        self.                   setMinimumWidth(400)
         self.                   setStyleSheet (cp.styleBkgd)
         self.tit_ccdset        .setStyleSheet (cp.styleTitle)
         self.tit_ccdset_pixsize.setStyleSheet (cp.styleLabel)
