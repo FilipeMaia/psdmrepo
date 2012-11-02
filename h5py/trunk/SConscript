@@ -20,11 +20,12 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "h5py"
-pkg_dir = "2.0.1-vlen-1.8.4p1"
-pkg_ver = "2.0.1"
+pkg_dir = "1.3.1-vlen-1.8.6"
+pkg_ver = "1.3.1"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "h5py", pkg_dir)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+LINKPY = pkg
 PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
