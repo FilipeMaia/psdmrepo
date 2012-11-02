@@ -46,7 +46,7 @@ standardExternalPackage ( pkg, **locals() )
 
 pkg = "wxpython"
 pkg_ver = "2.8.12.1"
-PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages", "wx-2.8-gtk2-unicode")
 LINKPY = "wx wxPython"
 DEPS = "wxgtk"
