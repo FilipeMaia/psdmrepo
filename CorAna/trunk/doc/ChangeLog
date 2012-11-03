@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
+2012-11-02 Mikhail S. Dubrovin
+- add/changed modules:
+D       src/GUILoadFiles.py
+A  +    src/GUIFiles.py
+A         src/Overlay.py
+A         src/CorAnaUtils.py
+A         src/GUILoadResults.py	
+
 2012-10-31 Mikhail S. Dubrovin
 - add modules:
 A         src/GUIViewResults.py

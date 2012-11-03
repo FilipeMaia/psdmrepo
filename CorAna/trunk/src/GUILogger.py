@@ -103,6 +103,8 @@ class GUILogger ( QtGui.QWidget ) :
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_save  .setStyleSheet (cp.styleButton) 
         #self.but_show  .setStyleSheet (cp.styleButton) 
+        self.box_txt    .setReadOnly(True)
+ 
 
         #self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()

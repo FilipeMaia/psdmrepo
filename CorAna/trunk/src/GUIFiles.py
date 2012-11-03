@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUILoadFiles...
+#  Module GUIFiles...
 #
 #------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ from Logger                 import logger
 #---------------------
 #  Class definition --
 #---------------------
-class GUILoadFiles ( QtGui.QWidget ) :
+class GUIFiles ( QtGui.QWidget ) :
     """GUI sets path to files"""
 
     #----------------
@@ -210,7 +210,7 @@ class GUILoadFiles ( QtGui.QWidget ) :
         try    : cp.guiconfigparameters.close()
         except : pass
 
-        try    : del cp.guiloadfiles # GUILoadFiles
+        try    : del cp.guifiles # GUIFiles
         except : pass # silently ignore
 
     def onClose(self):
@@ -311,7 +311,7 @@ class GUILoadFiles ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUILoadFiles ()
+    widget = GUIFiles ()
     widget.show()
     app.exec_()
 

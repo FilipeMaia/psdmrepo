@@ -30,9 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-
-#from GUIViewResultsLeft   import *
-#from GUIViewResultsRight  import *
+from GUILoadResults         import *
 
 #---------------------
 #  Class definition --
@@ -53,11 +51,10 @@ class GUIViewResults ( QtGui.QWidget ) :
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
 
-        #cp.guisystemsettingsleft  = GUIViewResultsLeft()
-        #cp.guisystemsettingsright = GUIViewResultsRight()
+        cp.guiloadresults  = GUILoadResults()
 
         self.hboxM = QtGui.QHBoxLayout()
-        #self.hboxM.addWidget(cp.guisystemsettingsleft )
+        self.hboxM.addWidget(cp.guiloadresults )
         #self.hboxM.addWidget(cp.guisystemsettingsright)
 
         self.hboxB = QtGui.QHBoxLayout()
@@ -71,7 +68,7 @@ class GUIViewResults ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxM)
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
-        
+
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
 
@@ -114,6 +111,7 @@ class GUIViewResults ( QtGui.QWidget ) :
         logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
+
     def moveEvent(self, e):
         logger.debug('moveEvent', __name__) 
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
@@ -121,11 +119,8 @@ class GUIViewResults ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        #try    : cp.guisystemsettingsleft.close()
-        #except : pass
-
-        #try    : cp.guisystemsettingsright.close()
-        #except : pass
+        try    : cp.guiloadresults.close()
+        except : pass
 
         try    : del cp.guiviewresults # GUIViewResults
         except : pass

@@ -43,7 +43,7 @@ import time   # for sleep(sec)
 from ConfigParametersCorAna import confpars as cp
 
 #from GUIConfigParameters import * 
-from GUILoadFiles        import *
+from GUIFiles            import *
 from GUIBatchInfo        import *
 from GUIAnaSettings      import *
 from GUISystemSettings   import *
@@ -75,7 +75,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.setFrame()
  
         self.titControl     = QtGui.QLabel('Control Panel')
-        self.butLoadFiles   = QtGui.QPushButton('Files')    
+        self.butFiles       = QtGui.QPushButton('Files')    
         self.butBatchInfo   = QtGui.QPushButton('Batch Information')    
         self.butAnaSettings = QtGui.QPushButton('Analysis Settings')
         self.butSystem      = QtGui.QPushButton('System')
@@ -88,7 +88,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.titControl    )
-        self.vbox.addWidget(self.butLoadFiles  )
+        self.vbox.addWidget(self.butFiles      )
         self.vbox.addWidget(self.butBatchInfo  )
         self.vbox.addWidget(self.butAnaSettings)
         self.vbox.addWidget(self.butSystem     )
@@ -103,7 +103,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setLayout(self.vbox)
 
-        self.connect(self.butLoadFiles  ,  QtCore.SIGNAL('clicked()'), self.onFiles   )
+        self.connect(self.butFiles      ,  QtCore.SIGNAL('clicked()'), self.onFiles   )
         self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
         self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
         self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
@@ -153,7 +153,7 @@ class GUIMain ( QtGui.QWidget ) :
     def setStyle(self):
         self.               setStyleSheet(cp.styleBkgd)
         self.titControl    .setStyleSheet(cp.styleTitle)
-        self.butLoadFiles  .setStyleSheet(cp.styleButton)
+        self.butFiles      .setStyleSheet(cp.styleButton)
         self.butBatchInfo  .setStyleSheet(cp.styleButton) 
         self.butAnaSettings.setStyleSheet(cp.styleButton)
         self.butSystem     .setStyleSheet(cp.styleButton)
@@ -178,7 +178,7 @@ class GUIMain ( QtGui.QWidget ) :
         if cp.res_save_log : 
             logger.saveLogInFile(cp.dir_work.value() + '/' + cp.fname_log)
 
-        try    : cp.guiloadfiles.close()
+        try    : cp.guifiles.close()
         except : pass
 
         try    : cp.guibatchinfo.close()
@@ -213,14 +213,14 @@ class GUIMain ( QtGui.QWidget ) :
     def onFiles(self):
         logger.info('onFiles', self.name)
         try :
-            cp.guiloadfiles.close()
-            self.butLoadFiles.setStyleSheet(cp.styleButton)
+            cp.guifiles.close()
+            self.butFiles.setStyleSheet(cp.styleButton)
         except : # AttributeError: #NameError 
-            cp.guiloadfiles = GUILoadFiles()
-            cp.guiloadfiles.setParent(self)
-            cp.guiloadfiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
-            cp.guiloadfiles.show()
-            self.butLoadFiles.setStyleSheet(cp.styleButtonOn)
+            cp.guifiles = GUIFiles()
+            cp.guifiles.setParent(self)
+            cp.guifiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
+            cp.guifiles.show()
+            self.butFiles.setStyleSheet(cp.styleButtonOn)
 
 
     def onBatchInfo(self):

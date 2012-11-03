@@ -66,14 +66,30 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
     def declareCorAnaParameters( self ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
+
+        # GUIInstrExpRun.py.py
 #       self.fname_cp           = self.declareParameter( name='FNAME_CONFIG_PARS', val_def='confpars.txt', typ='str' ) 
-        self.fname_ped          = self.declareParameter( name='FNAME_PEDESTALS',   val_def='my_ped.txt',   typ='str' ) 
-        self.fname_dat          = self.declareParameter( name='FNAME_DATA',        val_def='my_dat.txt',   typ='str' ) 
-        self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  typ='str' ) 
-        self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='XCS',          typ='str' ) 
-        self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='xcsi0112',     typ='str' ) 
-        self.str_run_number     = self.declareParameter( name='RUN_NUMBER',        val_def='0015',         typ='str' ) 
-        self.str_run_number_dark= self.declareParameter( name='RUN_NUMBER_DARK',   val_def='0014',         typ='str' ) 
+#        self.fname_ped          = self.declareParameter( name='FNAME_PEDESTALS',   val_def='my_ped.txt',   typ='str' ) 
+#        self.fname_dat          = self.declareParameter( name='FNAME_DATA',        val_def='my_dat.txt',   typ='str' ) 
+#        self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  typ='str' ) 
+#        self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='XCS',          typ='str' ) 
+#        self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='xcsi0112',     typ='str' ) 
+#        self.str_run_number     = self.declareParameter( name='RUN_NUMBER',        val_def='0015',         typ='str' ) 
+#        self.str_run_number_dark= self.declareParameter( name='RUN_NUMBER_DARK',   val_def='0014',         typ='str' ) 
+
+        # GUIFiles.py
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark',typ='str' )
+        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat',typ='str' )
+        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam',typ='str' )
+        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data',typ='str' )
+        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
+        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
+        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='blam.xtc',typ='str' )
+        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',       typ='str' )
+        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
+
 
         # GUIBeamZeroPars.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     typ='float' ) 
@@ -102,11 +118,11 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.z_frame_pos        = self.declareParameter( name='Z_FRAME_POS',           val_def=183,            typ='int' )
 
         # GUIKineticMode.py
-        self.kin_mode               = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',typ='str' )
-        self.kin_win_size           = self.declareParameter( name='KINETICS_WIN_SIZE',    val_def=1,             typ='int' )
-        self.kin_top_row            = self.declareParameter( name='KINETICS_TOP_ROW',     val_def=2,             typ='int' )
-        self.kin_slice_first        = self.declareParameter( name='KINETICS_SLICE_FIRST', val_def=3,             typ='int' )
-        self.kin_slice_last         = self.declareParameter( name='KINETICS_SLICE_LAST',  val_def=4,             typ='int' )
+        self.kin_mode           = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',typ='str' )
+        self.kin_win_size       = self.declareParameter( name='KINETICS_WIN_SIZE',    val_def=1,             typ='int' )
+        self.kin_top_row        = self.declareParameter( name='KINETICS_TOP_ROW',     val_def=2,             typ='int' )
+        self.kin_slice_first    = self.declareParameter( name='KINETICS_SLICE_FIRST', val_def=3,             typ='int' )
+        self.kin_slice_last     = self.declareParameter( name='KINETICS_SLICE_LAST',  val_def=4,             typ='int' )
 
         # GUIBatchPars.py
         self.bat_num           = self.declareParameter( name='BATCH_NUM',         val_def=1,  typ='int' )
@@ -122,19 +138,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_flat_time     = self.declareParameter( name='BATCH_FLAT_TIME' ,  val_def=9,  typ='int' )
         self.bat_flux          = self.declareParameter( name='BATCH_FLUX',        val_def=6.789e8,  typ='float' )
         self.bat_current       = self.declareParameter( name='BATCH_CURRENT',     val_def=102.205,  typ='float' )
-
-        # GUILoadFiles.py
-        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/dark',typ='str' )
-        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat',typ='str' )
-        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam',typ='str' )
-        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data',typ='str' )
-        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='dark.xtc',typ='str' )
-        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
-        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='blam.xtc',typ='str' )
-        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
-        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='.',typ='str' )
-        #self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',typ='str' )
-        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
 
         # GUIAnaSettingsLeft.py
         self.ana_type          = self.declareParameter( name='ANA_TYPE',                  val_def='Static',typ='str' )
@@ -171,18 +174,20 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.res_png_out       = self.declareParameter( name='RES_PNG_FILES',                    val_def=False, typ='bool' )  
         self.res_save_log      = self.declareParameter( name='RES_SAVE_LOG_FILE',                val_def=False, typ='bool' )  
 
+        # GUILoadResults.py
+        self.res_load_mode     = self.declareParameter( name='RES_LOAD_MODE',                    val_def='NONE',typ='str' )
+        self.res_fname         = self.declareParameter( name='RES_LOAD_FNAME',                   val_def='NONE',typ='str' )
+
         # GUISystemSettingsRight.py
         self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',typ='str' )
         self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      typ='float' )
         self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      typ='float' )
-
 
         # GUICCDCorrectionSettings.py
         self.ccdcorr_blemish         = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  typ='bool' )
         self.ccdcorr_flatfield       = self.declareParameter( name='CCD_CORRECTION_FLATFIELD',     val_def=False,  typ='bool' )
         self.ccdcorr_distortion      = self.declareParameter( name='CCD_CORRECTION_DISTORTION',    val_def=False,  typ='bool' )
         self.ccdcorr_parasitic       = self.declareParameter( name='CCD_CORRECTION_PARASITIC',     val_def=False,  typ='bool' )
-
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   typ='float' )
