@@ -20,9 +20,10 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "pyrods"
-pkg_ver = "2.4.1"
+pkg_ver = "2.5.0"
 
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', "PyRods", pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
 OPTIONAL = True
+PKGINFO = ('PyRods', pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 standardExternalPackage ( pkg, **locals() )
