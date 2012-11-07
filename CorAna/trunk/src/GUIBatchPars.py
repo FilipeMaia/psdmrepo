@@ -260,27 +260,27 @@ class GUIBatchPars ( QtGui.QWidget ) :
         logger.info('Set bat_num_max =' + str(cp.bat_num_max.value()), __name__)
 
     def on_edi_bat_data_start(self):
-        cp.bat_data_start.setValue( float(self.edi_bat_data_start.displayText()) )
+        cp.bat_data_start.setValue( int(self.edi_bat_data_start.displayText()) )
         logger.info('Set bat_data_start =' + str(cp.bat_data_start.value()), __name__)
 
     def on_edi_bat_data_end(self):
-        cp.bat_data_end.setValue( float(self.edi_bat_data_end.displayText()) )
+        cp.bat_data_end.setValue( int(self.edi_bat_data_end.displayText()) )
         logger.info('Set bat_data_end =' + str(cp.bat_data_end.value()), __name__)
 
     def on_edi_bat_dark_start(self):
-        cp.bat_dark_start.setValue( float(self.edi_bat_dark_start.displayText()) )
+        cp.bat_dark_start.setValue( int(self.edi_bat_dark_start.displayText()) )
         logger.info('Set bat_dark_start =' + str(cp.bat_dark_start.value()), __name__)
 
     def on_edi_bat_dark_end(self):
-        cp.bat_dark_end.setValue( float(self.edi_bat_dark_end.displayText()) )
+        cp.bat_dark_end.setValue( int(self.edi_bat_dark_end.displayText()) )
         logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
 
     def on_edi_bat_flat_start(self):
-        cp.bat_flat_start.setValue( float(self.edi_bat_flat_start.displayText()) )
+        cp.bat_flat_start.setValue( int(self.edi_bat_flat_start.displayText()) )
         logger.info('Set bat_flat_start =' + str(cp.bat_flat_start.value()), __name__)
 
     def on_edi_bat_flat_end(self):
-        cp.bat_flat_end.setValue( float(self.edi_bat_flat_end.displayText()) )
+        cp.bat_flat_end.setValue( int(self.edi_bat_flat_end.displayText()) )
         logger.info('Set bat_flat_end =' + str(cp.bat_flat_end.value()), __name__)
 
     def setPopupMenuMode(self):

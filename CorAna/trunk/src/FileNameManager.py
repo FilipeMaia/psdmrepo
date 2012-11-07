@@ -49,6 +49,12 @@ class FileNameManager :
     def path_psana_cfg_pedestals(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals.cfg'
 
+    def path_pedestals_ave(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals-ave.txt'
+
+    def path_pedestals_rms(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals-rms.txt'
+
 #-----------------------------
 
 fnm = FileNameManager ()

@@ -31,7 +31,7 @@ import os
 
 from ConfigParametersCorAna   import confpars as cp
 from Logger                   import logger
-from PsanaConfigFileGenerator import pcfg
+from ConfigFileGenerator      import cfg
 from FileNameManager          import fnm
 
 #-----------------------------
@@ -49,8 +49,8 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def      make_psana_cfg_file_for_pedestals(self) :
-        pcfg.make_psana_cfg_file_for_pedestals()
+    def     make_psana_cfg_file_for_pedestals(self) :
+        cfg.make_psana_cfg_file_for_pedestals()
 
 #-----------------------------
 

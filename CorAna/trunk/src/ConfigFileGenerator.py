@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module PsanaConfigFileGenerator...
+#  Module ConfigFileGenerator...
 #
 #------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ import           AppDataPath as apputils # My version, added in path the '../../
 
 #-----------------------------
 
-class PsanaConfigFileGenerator :
+class ConfigFileGenerator :
     """Generates the configuration files for psana from current configuration parameters
     """
 
@@ -62,13 +62,14 @@ class PsanaConfigFileGenerator :
     def make_psana_cfg_file_for_pedestals (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-pedestals.cfg').path()
         self.path_out = fnm.path_psana_cfg_pedestals()
-        self.d_subs   = {'SKIP'     : '100',
-                         'EVENTS'   : '1000',
-                         'DETINFO'  : 'DetInfo(CxiDs1.0:Cspad.0)',
-                         'FILE_AVE' : 'cspad-cxi49012-r0027-pedestals-ave.dat',
-                         'FILE_RMS' : 'cspad-cxi49012-r0027-pedestals-rms.dat'
+        self.d_subs   = {'SKIP'     : str( cp.bat_dark_start.value() ),
+                         'EVENTS'   : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() ),
+                         'DETINFO'  : cp.bat_det_info.value(),
+                         'FILE_AVE' : fnm.path_pedestals_ave(),
+                         'FILE_RMS' : fnm.path_pedestals_rms()
                          }
-        
+
+        self.print_substitution_dict()
         self.make_psana_cfg_file ()
 
 #-----------------------------
@@ -76,26 +77,30 @@ class PsanaConfigFileGenerator :
 #-----------------------------
 #-----------------------------
 
+    def print_substitution_dict (self) :
+        logger.info('Substitution dictionary:',__name__)
+        for k,v in self.d_subs.iteritems() :
+            msg = '%s : %s' % (k.ljust(16), v.ljust(32))
+            logger.info(msg)
+
+
+#-----------------------------
+
     def make_psana_cfg_file (self) :
 
-        print 'path_psana_cfg_stub = ', self.path_in
-        print 'path_psana_cfg      = ', self.path_out
+        logger.info('Make psana configuration file:',__name__)
+        logger.info('path_psana_cfg_stub = ' + self.path_in)
+        logger.info('path_psana_cfg      = ' + self.path_out)
+        print 'path_psana_cfg      = ' + self.path_out
 
         self.keys   = self.d_subs.keys()
-
-        #for k,v in self.d_subs.iteritems() :
-        #    print k, v
-
-        #for k in self.keys :
-        #    print k,
-        #print '\n'
 
         fin  = open(self.path_in, 'r')
         fout = open(self.path_out,'w')
         for line in fin :
-
             line_sub = self.line_with_substitution(line)
             fout.write(line_sub)
+            logger.info(line_sub)
             print line_sub,
 
         fin .close() 
@@ -123,7 +128,7 @@ class PsanaConfigFileGenerator :
 
 #-----------------------------
 
-pcfg = PsanaConfigFileGenerator ()
+cfg = ConfigFileGenerator ()
 
 #-----------------------------
 #
@@ -131,8 +136,8 @@ pcfg = PsanaConfigFileGenerator ()
 #
 if __name__ == "__main__" :
 
-    pcfg.make_psana_cfg_file_for_pedestals()
+    cfg.make_psana_cfg_file_for_pedestals()
 
-    sys.exit ( 'End of test for PsanaConfigFileGenerator' )
+    sys.exit ( 'End of test for ConfigFileGenerator' )
 
 #-----------------------------

@@ -125,6 +125,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.kin_slice_last     = self.declareParameter( name='KINETICS_SLICE_LAST',  val_def=4,             typ='int' )
 
         # GUIBatchPars.py
+        self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',    val_def='DetInfo(:Princeton)',  typ='str' )
         self.bat_num           = self.declareParameter( name='BATCH_NUM',         val_def=1,  typ='int' )
         self.bat_num_max       = self.declareParameter( name='BATCH_NUM_MAX',     val_def=9,  typ='int' )
         self.bat_data_start    = self.declareParameter( name='BATCH_DATA_START',  val_def=1,  typ='int' )

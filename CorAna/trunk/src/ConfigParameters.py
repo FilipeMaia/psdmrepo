@@ -186,7 +186,11 @@ class ConfigParameters :
         logger.info('Save configuration parameters in file ' + self.fname, __name__)
         f=open(self.fname,'w')
         for par in self.dict_pars.values() :
-            s = '%s %s\n' % ( par.name().ljust(32), str(par.value()) )
+
+            v = par.value()
+            #if par.type() == 'int' : v = int( v )
+
+            s = '%s %s\n' % ( par.name().ljust(32), str(v) )
             f.write( s )
         f.close() 
 
