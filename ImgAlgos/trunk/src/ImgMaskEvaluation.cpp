@@ -59,6 +59,7 @@ ImgMaskEvaluation::ImgMaskEvaluation (const std::string& name)
   , m_thre_nois()
   , m_frac_satu()
   , m_frac_nois()
+  , m_dr()
   , m_print_bits()
   , m_count(0)
 {
@@ -70,10 +71,11 @@ ImgMaskEvaluation::ImgMaskEvaluation (const std::string& name)
   m_file_mask_comb = configStr("file_mask_comb", "img-mask-comb.dat");
   m_file_frac_satu = configStr("file_frac_satu", "img-frac-satu.dat");
   m_file_frac_nois = configStr("file_frac_nois", "img-frac-nois.dat");
-  m_thre_satu      =    config("thre_satu", 1000000); 
-  m_thre_nois      =    config("thre_nois",      10);
+  m_thre_satu      =    config("thre_satu", 1000000.); 
+  m_thre_nois      =    config("thre_SoN",        5.);
   m_frac_satu      =    config("frac_satu",       0);
-  m_frac_nois      =    config("frac_nois",     0.5);
+  m_frac_nois      =    config("frac_nois",     0.3);
+  m_dr             =    config("dr_SoN_ave",      1);
   m_print_bits     =    config("print_bits",      0);
 
   m_do_mask_satu   = (m_file_mask_satu.empty()) ? false : true;
@@ -102,6 +104,7 @@ ImgMaskEvaluation::printInputParameters()
         << "\n thre_nois       : " << m_thre_nois     
         << "\n frac_satu       : " << m_frac_satu     
         << "\n frac_nois       : " << m_frac_nois     
+        << "\n dr              : " << m_dr
         << "\n print_bits      : " << m_print_bits
         << "\n do_mask_satu    : " << m_do_mask_satu
         << "\n do_mask_nois    : " << m_do_mask_nois
@@ -187,9 +190,9 @@ ImgMaskEvaluation::initImgArrays(Event& evt)
     defineImageShape(evt, m_str_src, m_key, m_shape); // shape is not available in beginJob and beginRun
     m_rows = m_shape[0];
     m_cols = m_shape[1];
+    m_rows1= m_rows - 1;
+    m_cols1= m_cols - 1;
     m_size = m_rows*m_cols;
-
-    if( m_print_bits & 1 ) printInputParameters();
 
     p_stat_satu = new unsigned[m_size];
     p_stat_nois = new unsigned[m_size];
@@ -200,6 +203,11 @@ ImgMaskEvaluation::initImgArrays(Event& evt)
     p_frac_nois = new double  [m_size]; 
 
     resetStatArrays();
+
+    evaluateVectorOfIndexesForMedian();
+
+    if( m_print_bits & 1 ) printInputParameters();
+    if( m_print_bits & 4 ) printVectorOfIndexesForMedian();
 }
 
 //--------------------
@@ -231,7 +239,9 @@ ImgMaskEvaluation::collectStat(Event& evt)
       for (unsigned i=0; i<m_size; ++i) {
 	amp = _data[i];
 	if ( amp > m_thre_satu ) p_stat_satu[i] ++;
-	if ( amp > m_thre_nois ) p_stat_nois[i] ++;
+
+	//if ( amp > m_thre_nois ) p_stat_nois[i] ++;
+        if ( evaluateSoNForPixel(i,_data).SoN > m_thre_nois ) p_stat_nois[i] ++;  
       }          
   } 
   else
@@ -276,6 +286,90 @@ ImgMaskEvaluation::printEventRecord(Event& evt)
                      << " Evt="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
   );
+}
+
+//--------------------
+/// Evaluate vector of indexes for mediane algorithm
+/// The area of pixels for the mediane algorithm is defined as a rectangular from -m_dr to +m_dr in 2-d
+void 
+ImgMaskEvaluation::evaluateVectorOfIndexesForMedian()
+{
+  v_indForMediane.clear();
+
+  TwoIndexes inds;
+  int indmax = int(m_dr);
+  int indmin = -indmax;
+
+  for (int i = indmin; i <= indmax; ++ i) {
+    for (int j = indmin; j <= indmax; ++ j) {
+
+      //float r = std::sqrt( float(i*i + j*j) );
+      //if ( r < m_rmin || r > m_rmin + m_dr ) continue;
+      if ( i==0 && j==0 ) continue;  // exclude self from averaging
+      //if ( i==0 || j==0 ) continue;  // exclude central row and column from averaging
+      inds.i = i;
+      inds.j = j;
+      v_indForMediane.push_back(inds);
+    }
+  }
+}
+
+//--------------------
+/// Print vector of indexes for mediane algorithm
+void 
+ImgMaskEvaluation::printVectorOfIndexesForMedian()
+{
+  std::cout << "ImgMaskEvaluation::printVectorOfIndexesForMedian():" << std::endl;
+  int n_pairs_in_line=0;
+  for( vector<TwoIndexes>::const_iterator ij  = v_indForMediane.begin();
+                                          ij != v_indForMediane.end(); ij++ ) {
+
+    cout << " (" << ij->i << "," << ij->j << ")";
+    if ( ++n_pairs_in_line > 9 ) {cout << "\n"; n_pairs_in_line=0;}
+  }   
+  cout << "\nVector size: " << v_indForMediane.size() << endl;
+}
+
+//--------------------
+/// Apply median algorithm for one pixel
+MedianResult
+ImgMaskEvaluation::evaluateSoNForPixel(unsigned ind1d, const double* data)
+{
+  unsigned col = ind1d % m_cols;
+  unsigned row = ind1d / m_cols;
+
+  unsigned sum0 = 0;
+  double   sum1 = 0;
+  double   sum2 = 0;
+
+  for( vector<TwoIndexes>::const_iterator ij  = v_indForMediane.begin();
+                                          ij != v_indForMediane.end(); ij++ ) {
+    int ic = col + (ij->i);
+    int ir = row + (ij->j);
+
+    if(ic < 0)       continue;
+    if(ic > m_cols1) continue;
+    if(ir < 0)       continue;
+    if(ir > m_rows1) continue;
+
+    double  amp = data[ir*m_cols + ic];
+    sum0 ++;
+    sum1 += amp;
+    sum2 += amp*amp;
+  }
+
+  MedianResult res = {0,0,0,0};
+
+  if ( sum0 > 0 ) {
+    res.avg = sum1/sum0;                                // Averaged background level
+    res.rms = std::sqrt( sum2/sum0 - res.avg*res.avg ); // RMS os the background around peak
+    double dat = data[ind1d];
+    double dif = dat - res.avg;
+    res.sig = (dif>0) ? dif : 0;                      // Signal above the background
+    if (res.rms>0) res.SoN = res.sig/res.rms;           // S/N ratio
+  }
+
+  return res;
 }
 
 //--------------------

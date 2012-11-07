@@ -215,24 +215,41 @@ ImgAverage::collectStat(Event& evt)
 {
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
-      const double* m_data = img->data();
-      double amp(0);
-
-      for (unsigned i=0; i<m_size; ++i) {
-
-	amp = m_data[i];
-	if ( m_gate_width > 0 && abs(amp-m_ave[i]) > m_gate_width ) continue;
-
-        m_stat[i] ++;
-        m_sum [i] += amp;
-        m_sum2[i] += amp*amp;
-      }          
+      const double* data = img->data();
+      accumulateCorrelators<double>(data);
+      return;
   } 
-  else
-  {
-    const std::string msg = "Image is not available in the event(...) for source:" + m_str_src + " key:" + m_key;
-    MsgLog(name(), info, msg);
-  }
+
+  shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
+  if (img_u16.get()) {
+      const uint16_t* data = img_u16->data();
+      accumulateCorrelators<uint16_t>(data);
+      return;
+  } 
+
+  shared_ptr< ndarray<int,2> > img_int = evt.get(m_str_src, m_key, &m_src);
+  if (img_int.get()) {
+      const int* data = img_int->data();
+      accumulateCorrelators<int>(data);
+      return;
+  } 
+
+  shared_ptr< ndarray<float,2> > img_flo = evt.get(m_str_src, m_key, &m_src);
+  if (img_flo.get()) {
+      const float* data = img_flo->data();
+      accumulateCorrelators<float>(data);
+      return;
+  } 
+
+  shared_ptr< ndarray<uint8_t,2> > img_u8 = evt.get(m_str_src, m_key, &m_src);
+  if (img_u8.get()) {
+      const uint8_t* data = img_u8->data();
+      accumulateCorrelators<uint8_t>(data);
+      return;
+  } 
+
+  const std::string msg = "Image is not available in the event(...) for source:" + m_str_src + " key:" + m_key;
+  MsgLog(name(), info, msg);
 }
 
 //--------------------

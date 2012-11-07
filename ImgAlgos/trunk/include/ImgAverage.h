@@ -135,6 +135,28 @@ private:
   double*        m_sum2;  // sum of squares per pixel
   double*        m_ave;   // average per pixel
   double*        m_rms;   // rms per pixel
+
+
+protected:
+//-------------------
+
+    template <typename T>
+    void accumulateCorrelators(const T* data)
+    { 
+      double amp(0);
+      for (unsigned i=0; i<m_size; ++i) {
+
+	amp = (double)data[i];
+	if ( m_gate_width > 0 && abs(amp-m_ave[i]) > m_gate_width ) continue;
+
+        m_stat[i] ++;
+        m_sum [i] += amp;
+        m_sum2[i] += amp*amp;
+      }
+    }          
+
+//-------------------
+
 };
 
 } // namespace ImgAlgos

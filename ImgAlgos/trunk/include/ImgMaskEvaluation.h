@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -60,6 +61,20 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
+struct TwoIndexes {
+  int i;
+  int j;
+};
+
+
+struct MedianResult {
+  double avg;
+  double rms;
+  double sig;
+  double SoN;
+};
+
+
 class ImgMaskEvaluation : public Module {
 public:
 
@@ -99,6 +114,9 @@ protected:
     void collectStat(Event& evt);
     void procStatArrays();
     void printEventRecord(Event& evt);
+    void evaluateVectorOfIndexesForMedian();
+    void printVectorOfIndexesForMedian();
+    MedianResult evaluateSoNForPixel(unsigned ind1d, const double* data);
 
 private:
 
@@ -114,6 +132,7 @@ private:
   double         m_thre_nois;      // treshold for pixel noise
   double         m_frac_satu;      // allowed fraction of saturated events
   double         m_frac_nois;      // allowed fraction of noisy events 
+  unsigned       m_dr;             // radial size of the area for S/N evaluation
   unsigned       m_print_bits;     // control bits for printout
   unsigned long  m_count;          // number of events from the beginning of job
 
@@ -126,6 +145,8 @@ private:
   unsigned       m_shape[2];       // image shape {rows, cols}
   unsigned       m_rows;
   unsigned       m_cols;
+  int            m_rows1;
+  int            m_cols1;
   unsigned       m_size;           // image size rows*cols 
 
   unsigned*      p_stat_satu;      // statistics per pixel for saturating events
@@ -135,6 +156,9 @@ private:
   int16_t*       p_mask_comb;      // mask combined for saturated & noisy pixels  
   double*        p_frac_satu;      // fraction of saturated events
   double*        p_frac_nois;      // fraction of noisy events
+
+  std::vector<TwoIndexes> v_indForMediane; // Vector of inexes for mediane algorithm
+
 };
 
 } // namespace ImgAlgos

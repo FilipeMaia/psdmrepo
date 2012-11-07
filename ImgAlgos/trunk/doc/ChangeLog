@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ==============
+
+2012-11-06 Mikhail S. Dubrovin
+- Add/modify modules - add other data types for image processing: int, float, uint16_t, uint8_t, etc.
+M       include/ImgAverage.h
+M       include/ImgMaskEvaluation.h
+M       src/ImgMaskEvaluation.cpp
+M       src/ImgAverage.cpp
+M       src/GlobalMethods.cpp
+	
 2012-10-12 Mikhail S. Dubrovin
 - Add/modify modules for image correlation analysis
 M       include/ImgCalib.h - add low implementation for low threshold

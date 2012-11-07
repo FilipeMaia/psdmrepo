@@ -118,19 +118,44 @@ eventCounterSinceConfigure(PSEvt::Event& evt)
 //--------------------
 // Define the shape or throw message that can not do that.
 void 
-defineImageShape(PSEvt::Event& evt, const std::string& m_str_src, const std::string& m_key, unsigned* shape)
+defineImageShape(PSEvt::Event& evt, const std::string& str_src, const std::string& str_key, unsigned* shape)
 {
-  boost::shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key);
+  boost::shared_ptr< ndarray<double,2> > img = evt.get(str_src, str_key);
   if (img.get()) {
     for(int i=0;i<2;i++) shape[i]=img->shape()[i];
     //shape=img->shape();
+    return;
   } 
-  else
-  {
-    const std::string msg = "Image shape is not defined in the event(...) for source:" + m_str_src + " key:" + m_key;
-    MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
-  }
+
+  boost::shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(str_src, str_key);
+  if (img_u16.get()) {
+    for(int i=0;i<2;i++) shape[i]=img_u16->shape()[i];
+    return;
+  } 
+
+  boost::shared_ptr< ndarray<int,2> > img_int = evt.get(str_src, str_key);
+  if (img_int.get()) {
+    for(int i=0;i<2;i++) shape[i]=img_int->shape()[i];
+    return;
+  } 
+
+  boost::shared_ptr< ndarray<float,2> > img_flo = evt.get(str_src, str_key);
+  if (img_flo.get()) {
+    for(int i=0;i<2;i++) shape[i]=img_flo->shape()[i];
+    return;
+  } 
+
+  boost::shared_ptr< ndarray<uint8_t,2> > img_u8 = evt.get(str_src, str_key);
+  if (img_u8.get()) {
+    for(int i=0;i<2;i++) shape[i]=img_u8->shape()[i];
+    return;
+  } 
+
+  const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t and is not defined in the event(...)\nfor source:" 
+                        + str_src + " key:" + str_key;
+  //MsgLogRoot(error, msg);
+  throw std::runtime_error(msg);
+
 }
 
 //--------------------
