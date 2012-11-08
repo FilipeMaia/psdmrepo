@@ -80,7 +80,6 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                              const O2OXtcSrc& src,
                                              const H5DataTypes::XtcClockTime& time )
 {
-
   // find corresponding configuration object
   Pds::TypeId cfgTypeId(Pds::TypeId::Id_AcqConfig,1);
   const Pds::Acqiris::ConfigV1* config = m_configStore.find<Pds::Acqiris::ConfigV1>(cfgTypeId, src.top());
@@ -130,15 +129,17 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     // first verify that the shape of the data returned corresponds to the config
     if ( dd->nbrSamplesInSeg() != nSampl ) {
       std::ostringstream msg ;
-      msg << "Acqiris::DataDescV1 - number of samples in data object ("
-          << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")" ;
-      throw O2OXTCGenException ( ERR_LOC, msg.str() ) ;
+      MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of samples in data object ("
+             << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")");
+      // stop here
+      return;
     }
     if ( dd->nbrSegments() != nSeg ) {
       std::ostringstream msg ;
-      msg << "Acqiris::DataDescV1 - number of segments in data object ("
-          << dd->nbrSegments() << ") different from config object (" << nSeg << ")" ;
-      throw O2OXTCGenException ( ERR_LOC, msg.str() ) ;
+      MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of segments in data object ("
+             << dd->nbrSegments() << ") different from config object (" << nSeg << ")");
+      // stop here
+      return;
     }
 
     for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {

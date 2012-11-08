@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-19-09
+2012-11-08 Andy Salnikov
+- cspad calibration converter was not instantiated for config V4,
+  instantiate it now for versions (0-255), same goes for cspad2x2
+- when acqiris object segments and samples differ from configuration
+  produce error message but do not kill translation
+
 Tag: V00-19-08
 2012-10-23 Andy Salnikov
 - upgrading to pdsdata V04-02-07

@@ -230,13 +230,15 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
 
   // special converter object for CsPad calibration data
   converter.reset(new CsPadCalibV1Cvt("CsPad::CalibV1", metadata, calibStore));
-  ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, 1, converter);
-  ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, 2, converter);
-  ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, 3, converter);
+  for (int v = 0; v < 256; ++ v) {
+    ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, v, converter);
+  }
 
   // special converter object for CsPad calibration data
   converter.reset(new CsPad2x2CalibV1Cvt("CsPad2x2::CalibV1", metadata, calibStore));
-  ::registerCvt(m_cvtMap, Pds::TypeId::Id_Cspad2x2Config, 1, converter);
+  for (int v = 0; v < 256; ++ v) {
+    ::registerCvt(m_cvtMap, Pds::TypeId::Id_Cspad2x2Config, v, converter);
+  }
   // some cspad2x2 data was produced without Cspad2x2Config object but
   // with CspadConfig/3 instead
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_CspadConfig, 3, converter);
