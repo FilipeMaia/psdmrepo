@@ -38,7 +38,6 @@ namespace {
   PyObject* ipimbData( PyObject* self, void* );
   PyObject* ipimbConfig( PyObject* self, void* );
   PyObject* ipmFexData( PyObject* self, void* );
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -63,8 +62,6 @@ pypdsdata::BldDataIpimbV0::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataIpimbV0", module );
 }
@@ -99,17 +96,6 @@ ipmFexData( PyObject* self, void* )
 
   return pypdsdata::Lusi::IpmFexV1::PyObject_FromPds(&pdsObj->ipmFexData, 
       self, sizeof(pdsObj->ipmFexData));  
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  char buf[96];
-  snprintf( buf, sizeof buf, "BldDataIpimbV0(@%p)", pdsObj );
-  return PyString_FromString( buf );
 }
 
 }

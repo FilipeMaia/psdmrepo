@@ -38,7 +38,6 @@ namespace {
   PyObject* camConfig( PyObject* self, void* );
   PyObject* pimConfig( PyObject* self, void* );
   PyObject* frame( PyObject* self, void* );
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -63,8 +62,6 @@ pypdsdata::BldDataPimV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataPimV1", module );
 }
@@ -99,17 +96,6 @@ frame( PyObject* self, void* )
 
   return pypdsdata::Camera::FrameV1::PyObject_FromPds(&pdsObj->frame,
       self, sizeof(pdsObj->frame));
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::BldDataPimV1* pdsObj = pypdsdata::BldDataPimV1::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  char buf[96];
-  snprintf( buf, sizeof buf, "BldDataPimV1(@%p)", pdsObj );
-  return PyString_FromString( buf );
 }
 
 }

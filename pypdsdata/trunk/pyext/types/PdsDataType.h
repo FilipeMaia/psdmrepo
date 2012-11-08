@@ -49,14 +49,19 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 struct PdsDataType : PyObject {
+
+  typedef PdsTypeT PdsType;
 
   // type of the destructor function
   typedef void (*destructor)(PdsType*);
 
   /// Returns the Python type
   static PyTypeObject* typeObject();
+
+  /// Returns type name
+  static const char* typeName() { return typeObject()->tp_name; }
 
   /// Builds Python object from corresponding Pds type, parent is the owner
   /// of the corresponding buffer space, usually XTC object. If destructor
@@ -71,8 +76,8 @@ struct PdsDataType : PyObject {
   }
 
   // returns pointer to an PdsType object
-  static PdsType* pdsObject(PyObject* self) {
-    PdsDataType* py_this = (PdsDataType*) self;
+  static PdsType* pdsObject(const PyObject* self) {
+    const PdsDataType* py_this = static_cast<const PdsDataType*>(self);
     if( ! py_this->m_obj ){
       PyErr_SetString(PyExc_TypeError, "Error: No Valid C++ Object");
     }
@@ -124,17 +129,17 @@ protected:
 };
 
 /// stream insertion operator
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 std::ostream&
-operator<<(std::ostream& out, const PdsDataType<ConcreteType, PdsType>& data) {
+operator<<(std::ostream& out, const PdsDataType<ConcreteType, PdsTypeT>& data) {
   data.print(out);
   return out;
 }
 
 /// Returns the Python type opbject
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 PyTypeObject*
-PdsDataType<ConcreteType, PdsType>::typeObject()
+PdsDataType<ConcreteType, PdsTypeT>::typeObject()
 {
   static PyBufferProcs bufferprocs = {
     readbufferproc, // bf_getreadbuffer
@@ -197,9 +202,9 @@ PdsDataType<ConcreteType, PdsType>::typeObject()
   return &type;
 }
 
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 void
-PdsDataType<ConcreteType, PdsType>::PdsDataType_dealloc( PyObject* self )
+PdsDataType<ConcreteType, PdsTypeT>::PdsDataType_dealloc( PyObject* self )
 {
   PdsDataType* py_this = (PdsDataType*) self;
 
@@ -219,9 +224,9 @@ PdsDataType<ConcreteType, PdsType>::PdsDataType_dealloc( PyObject* self )
 /// Builds Python object from corresponding Pds type, parent is the owner
 /// of the corresponding buffer space, usually XTC object. If destructor
 /// function is provided it will be called to delete the Pds object.
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 ConcreteType*
-PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* parent, size_t size, destructor dtor )
+PdsDataType<ConcreteType, PdsTypeT>::PyObject_FromPds( PdsType* obj, PyObject* parent, size_t size, destructor dtor )
 {
   ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
   if ( not ob ) {
@@ -239,9 +244,9 @@ PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* pa
 }
 
 /// Initialize Python type and register it in a module
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 void
-PdsDataType<ConcreteType, PdsType>::initType( const char* name, PyObject* module )
+PdsDataType<ConcreteType, PdsTypeT>::initType( const char* name, PyObject* module )
 {
   static std::string typeName;
 
@@ -264,9 +269,9 @@ PdsDataType<ConcreteType, PdsType>::initType( const char* name, PyObject* module
   PyDict_SetItemString( PyModule_GetDict(module), (char*)name, (PyObject*) type );
 }
 
-template <typename ConcreteType, typename PdsType>
-typename PdsDataType<ConcreteType, PdsType>::PySsizeType
-PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, PySsizeType segment, void** ptrptr)
+template <typename ConcreteType, typename PdsTypeT>
+typename PdsDataType<ConcreteType, PdsTypeT>::PySsizeType
+PdsDataType<ConcreteType, PdsTypeT>::readbufferproc(PyObject* self, PySsizeType segment, void** ptrptr)
 {
   ConcreteType* py_this = static_cast<ConcreteType*>(self);
   if( ! py_this->m_obj ){
@@ -278,9 +283,9 @@ PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, PySsizeType s
   return py_this->m_size;
 }
 
-template <typename ConcreteType, typename PdsType>
-typename PdsDataType<ConcreteType, PdsType>::PySsizeType
-PdsDataType<ConcreteType, PdsType>::segcountproc(PyObject* self, PySsizeType* lenp)
+template <typename ConcreteType, typename PdsTypeT>
+typename PdsDataType<ConcreteType, PdsTypeT>::PySsizeType
+PdsDataType<ConcreteType, PdsTypeT>::segcountproc(PyObject* self, PySsizeType* lenp)
 {
   ConcreteType* py_this = static_cast<ConcreteType*>(self);
   if( ! py_this->m_obj ){

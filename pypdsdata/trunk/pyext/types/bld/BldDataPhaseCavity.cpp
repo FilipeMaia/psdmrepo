@@ -36,7 +36,6 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fFitTime2)
   MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fCharge1)
   MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fCharge2)
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -62,24 +61,20 @@ pypdsdata::BldDataPhaseCavity::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataPhaseCavity", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::BldDataPhaseCavity::print(std::ostream& out) const
 {
-  Pds::BldDataPhaseCavity* pdsObj = pypdsdata::BldDataPhaseCavity::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  char buf[96];
-  snprintf( buf, sizeof buf, "BldDataPhaseCavity(ft1=%f, ft2=%f, ch1=%f, ch2=%f)",
-            pdsObj->fFitTime1, pdsObj->fFitTime2, pdsObj->fCharge1, pdsObj->fCharge2 );
-  return PyString_FromString( buf );
-}
-
+  if(not m_obj) {
+    out << typeName() << "(None)";
+  } else {
+    out << typeName() << "(ft1=" << m_obj->fFitTime1
+        << ", ft2=" << m_obj->fFitTime2
+        << ", ch1=" << m_obj->fCharge1
+        << ", ch2=" << m_obj->fCharge2
+        << ")";
+  }
 }

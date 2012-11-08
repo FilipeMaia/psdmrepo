@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iomanip>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -59,7 +60,6 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV3, fEbeamEnergyBC2)
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV3, fEbeamPkCurrBC1)
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV3, fEbeamEnergyBC1)
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -92,8 +92,6 @@ pypdsdata::BldDataEBeamV3::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -102,18 +100,14 @@ pypdsdata::BldDataEBeamV3::initType( PyObject* module )
   BaseType::initType( "BldDataEBeamV3", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::BldDataEBeamV3::print(std::ostream& out) const
 {
-  Pds::BldDataEBeamV3* pdsObj = pypdsdata::BldDataEBeamV3::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  char buf[64];
-  snprintf( buf, sizeof buf, "BldDataEBeamV3(Charge=%g, L3Energy=%g, ...)",
-            pdsObj->fEbeamCharge, pdsObj->fEbeamL3Energy );
-  return PyString_FromString( buf );
-}
-
+  if(not m_obj) {
+    out << typeName() << "(None)";
+  } else {
+    out << typeName() << "(DamageMask=" << std::showbase << std::hex << m_obj->uDamageMask << std::dec
+        << ", Charge=" << m_obj->fEbeamCharge
+        << ", L3Energy=" << m_obj->fEbeamL3Energy << ", ...)";
+  }
 }

@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-81
+2012-11-08 Andy Salnikov
+- improve printing of bld classes
+
 Tag: V00-00-80
 2012-11-08 Andy Salnikov
 - upgrading to pdsdata V04-05-00

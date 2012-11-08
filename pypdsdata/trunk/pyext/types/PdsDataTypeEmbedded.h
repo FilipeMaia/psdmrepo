@@ -48,8 +48,10 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 struct PdsDataTypeEmbedded : PyObject {
+
+  typedef PdsTypeT PdsType;
 
   /// Returns the Python type
   static PyTypeObject* typeObject();
@@ -59,8 +61,10 @@ struct PdsDataTypeEmbedded : PyObject {
 
   // Returns reference to embedded object
   static PdsType& pdsObject(PyObject* self) {
-    PdsDataTypeEmbedded* py_this = (PdsDataTypeEmbedded*) self;
-    return py_this->m_obj;
+    return static_cast<PdsDataTypeEmbedded*>(self)->m_obj;
+  }
+  static const PdsType& pdsObject(const PyObject* self) {
+    return static_cast<const PdsDataTypeEmbedded*>(self)->m_obj;
   }
 
   // returns true if object is an instance of this type or subtype
@@ -95,17 +99,17 @@ protected:
 };
 
 /// stream insertion operator
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 std::ostream&
-operator<<(std::ostream& out, const PdsDataTypeEmbedded<ConcreteType, PdsType>& data) {
+operator<<(std::ostream& out, const PdsDataTypeEmbedded<ConcreteType, PdsTypeT>& data) {
   static_cast<const ConcreteType&>(data).print(out);
   return out;
 }
 
 /// Returns the Python type opbject
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 PyTypeObject*
-PdsDataTypeEmbedded<ConcreteType, PdsType>::typeObject()
+PdsDataTypeEmbedded<ConcreteType, PdsTypeT>::typeObject()
 {
   static PyTypeObject type = {
     PyObject_HEAD_INIT(0)
@@ -161,9 +165,9 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::typeObject()
   return &type;
 }
 
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 void
-PdsDataTypeEmbedded<ConcreteType, PdsType>::PdsDataTypeEmbedded_dealloc( PyObject* self )
+PdsDataTypeEmbedded<ConcreteType, PdsTypeT>::PdsDataTypeEmbedded_dealloc( PyObject* self )
 {
   PdsDataTypeEmbedded* py_this = (PdsDataTypeEmbedded*) self;
 
@@ -175,9 +179,9 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::PdsDataTypeEmbedded_dealloc( PyObjec
 }
 
 /// Builds Python object from corresponding Pds type.
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 ConcreteType*
-PdsDataTypeEmbedded<ConcreteType, PdsType>::PyObject_FromPds( const PdsType& obj )
+PdsDataTypeEmbedded<ConcreteType, PdsTypeT>::PyObject_FromPds( const PdsType& obj )
 {
   ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
   if ( not ob ) {
@@ -192,9 +196,9 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::PyObject_FromPds( const PdsType& obj
 }
 
 /// Initialize Python type and register it in a module
-template <typename ConcreteType, typename PdsType>
+template <typename ConcreteType, typename PdsTypeT>
 void
-PdsDataTypeEmbedded<ConcreteType, PdsType>::initType( const char* name, PyObject* module )
+PdsDataTypeEmbedded<ConcreteType, PdsTypeT>::initType( const char* name, PyObject* module )
 {
   static std::string typeName;
 

@@ -48,7 +48,6 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fTransmission)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fTransmissionFEE)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare6)
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -86,24 +85,20 @@ pypdsdata::BldDataGMDV0::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataGMDV0", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::BldDataGMDV0::print(std::ostream& out) const
 {
-  Pds::BldDataGMDV0* pdsObj = pypdsdata::BldDataGMDV0::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  char buf[196];
-  snprintf( buf, sizeof buf, "BldDataGMDV0(strGasType=%s, fPressure=%g, fTemperature=%g, fCurrent=%g, ...)",
-            pdsObj->strGasType, pdsObj->fPressure, pdsObj->fTemperature, pdsObj->fCurrent );
-  return PyString_FromString( buf );
-}
-
+  if(not m_obj) {
+    out << typeName() << "(None)";
+  } else {
+    out << typeName() << "(strGasType=" << m_obj->strGasType
+        << ", fPressure=" << m_obj->fPressure
+        << ", fTemperature=" << m_obj->fTemperature
+        << ", fCurrent=" << m_obj->fCurrent
+        << ", ...)";
+  }
 }
