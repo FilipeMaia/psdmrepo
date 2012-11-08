@@ -183,15 +183,16 @@ public:
 
 
     /**
-      * Find the current experiment for the specified instrument
+      * Find the current experiment for the specified instrument and a station number
       *
       * Return 'true' and initialize experiment descripton if there is
-      * such experiment. Return falase otherwise. In all other cases
+      * such experiment. Return false otherwise. In all other cases
       * throw an exception.
       */
     virtual bool getCurrentExperiment (ExperDescr&        descr,
-                                       const std::string& instrument) throw (WrongParams,
-                                                                             DatabaseError) = 0 ;
+                                       const std::string& instrument,
+                                       unsigned int       station=0) throw (WrongParams,
+                                                                            DatabaseError) = 0 ;
 
     /**
       * Find experiment descriptors in the given scope.
@@ -203,6 +204,19 @@ public:
     virtual void getExperiments (std::vector<ExperDescr >& experiments,
                                  const std::string&        instrument="") throw (WrongParams,
                                                                                  DatabaseError) = 0 ;
+
+
+    /**
+      * Find experiment descriptor of the specified experiment if the one exists
+      *
+      * Return 'true' and initialize experiment descripton if there is
+      * such experiment. Return falase otherwise. In all other cases
+      * throw an exception.
+      */
+    virtual bool getOneExperiment (ExperDescr&        descr,
+                                   const std::string& instrument,
+                                   const std::string& experiment) throw (WrongParams,
+                                                                         DatabaseError) = 0 ;
 
     /**
       * Find an information on a parameter.

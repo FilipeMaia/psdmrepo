@@ -204,6 +204,7 @@ private:
 
     int cmd_current_experiment() throw (std::exception) ; 
     int cmd_experiments       () throw (std::exception) ;
+    int cmd_experiment        () throw (std::exception) ;
 
     int cmd_allocate_run      () throw (std::exception) ;
     int cmd_add_run           () throw (std::exception) ;
@@ -352,6 +353,7 @@ LogBookTestApp::runApp ()
         //
         if      (command == "current_experiment") return cmd_current_experiment () ;
         else if (command == "experiments")        return cmd_experiments () ;
+        else if (command == "experiment")         return cmd_experiment () ;
 
         else if (command == "allocate_run")       return cmd_allocate_run () ;
         else if (command == "add_run")            return cmd_add_run () ;
@@ -374,7 +376,7 @@ LogBookTestApp::runApp ()
         else if (command == "save_files_m")       return cmd_save_files_m () ;
         else if (command == "open_file")          return cmd_open_file () ;
         else {
-            MsgLogRoot( error, "unknown command") ;
+            MsgLogRoot( error, "unknown command: '"+command+"'") ;
             return 2 ;
         }
 
@@ -397,8 +399,9 @@ LogBookTestApp::cmd_help ()
 {
     cout << "SYNTAX:\n"
          << "\n"
-         << "  current_experiment <instrument>\n"
+         << "  current_experiment <instrument> [<station>]\n"
          << "  experiments       [<instrument>]\n"
+         << "  experiment         <instrument> <experiment>\n"
          << "\n"
          << "  allocate_run  <instrument> <experiment>\n"
          << "\n"
@@ -521,20 +524,24 @@ LogBookTestApp::cmd_current_experiment () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 1) {
+    if (m_args.empty() || m_args.size() < 1 || m_args.size() > 2) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
     AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
     const std::string  instrument = *(itr++) ;
+    const unsigned int station    =  m_args.size() == 1 ? 0 : LogBook::str2int (*(itr++)) ;
 
     m_connection->beginTransaction () ;
     LogBook::ExperDescr descr ;
-    m_connection->getCurrentExperiment (
+    if (m_connection->getCurrentExperiment (
         descr,
-        instrument) ;
-    cout << "\n"
-         << descr;
+        instrument,
+        station))
+        cout << "\n"
+             << descr;
+    else
+        cout << "error: no current experiment is set up for the instrument and the station" << endl ;
     m_connection->commitTransaction () ;
 
     return 0 ;
@@ -561,6 +568,34 @@ LogBookTestApp::cmd_experiments () throw (std::exception)
     for (size_t i = 0 ; i < experiments.size(); i++)
         cout << "\n"
              << experiments[i];
+    m_connection->commitTransaction () ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_experiment () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 2) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string instrument = *(itr++) ;
+    const std::string experiment = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+    LogBook::ExperDescr descr ;
+    if (m_connection->getOneExperiment (
+        descr,
+        instrument,
+        experiment))
+        cout << "\n"
+             << descr;
+    else
+        cout << "error: no experiment matching the specified criteria has been found in the database" << endl ;
     m_connection->commitTransaction () ;
 
     return 0 ;

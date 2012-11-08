@@ -208,8 +208,9 @@ ConnectionImpl::transactionIsStarted () const
 
 bool
 ConnectionImpl::getCurrentExperiment (ExperDescr&        descr,
-                                      const std::string& instrument) throw (WrongParams,
-                                                                            DatabaseError)
+                                      const std::string& instrument,
+                                      unsigned int       station) throw (WrongParams,
+                                                                         DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
@@ -220,7 +221,7 @@ ConnectionImpl::getCurrentExperiment (ExperDescr&        descr,
     // Get the identifier of the current experiment first (if any)
     //
     int exper_id = 0 ;
-    if( !this->getCurrentExperimentId ( exper_id, instrument )) return false;
+    if( !this->getCurrentExperimentId ( exper_id, instrument, station )) return false;
 
     // Formulate and execute the query
     //
@@ -259,8 +260,9 @@ ConnectionImpl::getCurrentExperiment (ExperDescr&        descr,
 
 bool
 ConnectionImpl::getCurrentExperimentId (int&               id,
-                                        const std::string& instrument) throw (WrongParams,
-                                                                              DatabaseError)
+                                        const std::string& instrument,
+                                        unsigned int       station) throw (WrongParams,
+                                                                           DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
@@ -273,21 +275,22 @@ ConnectionImpl::getCurrentExperimentId (int&               id,
     std::ostringstream sql;
     sql << "SELECT exper_id FROM expswitch"
         << " WHERE exper_id IN ("
-        << " SELECT experiment.id FROM experiment, instrument"
-        << " WHERE experiment.instr_id=instrument.id AND instrument.name='" << instrument
-        << "' ) ORDER BY switch_time DESC LIMIT 1" ;
+        << "   SELECT experiment.id FROM experiment, instrument"
+        << "   WHERE experiment.instr_id=instrument.id AND instrument.name='" << instrument
+        << "')"
+        << " AND station=" << station
+        << " ORDER BY switch_time DESC LIMIT 1" ;
 
     QueryProcessor query (m_regdb_mysql) ;
     query.execute (sql.str()) ;
 
     // Extract results
     //
-    if (!query.next_row())
-        throw DatabaseError ("unable to get experiment description for the current experiment");
+    if (!query.next_row()) return false ;
 
     query.get (id, "exper_id") ;
 
-    return true;
+    return true ;
 }
 
 
@@ -337,6 +340,50 @@ ConnectionImpl::getExperiments (std::vector<ExperDescr >& experiments,
 
         experiments.push_back (descr) ;
     }
+}
+
+bool
+ConnectionImpl::getOneExperiment (ExperDescr&        descr,
+                                  const std::string& instrument,
+                                  const std::string& experiment) throw (WrongParams,
+                                                                        DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT i.name AS 'instr_name',i.descr AS 'instr_descr',e.* FROM "
+        << "instrument i, "
+        << "experiment e WHERE e.instr_id=i.id"
+        << " AND i.name='" << instrument << "'"
+        << " AND e.name='" << experiment << "'" ;
+
+    QueryProcessor query (m_regdb_mysql) ;
+    query.execute (sql.str()) ;
+
+    // Extract results
+    //
+    if (!query.next_row()) return false ;
+
+    query.get (descr.instr_id,    "instr_id") ;
+    query.get (descr.instr_name,  "instr_name") ;
+    query.get (descr.instr_descr, "instr_descr") ;
+
+    query.get (descr.id,    "id") ;
+    query.get (descr.name,  "name") ;
+    query.get (descr.descr, "descr") ;
+
+    query.get (descr.registration_time, "registration_time") ;
+    query.get (descr.begin_time,        "begin_time") ;
+    query.get (descr.end_time,          "end_time") ;
+
+    query.get (descr.leader_account, "leader_account") ;
+    query.get (descr.contact_info,   "contact_info") ;
+    query.get (descr.posix_gid,      "posix_gid") ;
+
+    return true ;
 }
 
 bool

@@ -203,7 +203,7 @@ Connection::open ( const std::string& config) throw (WrongParams,
     //
     ifstream config_file( config.c_str());
     if( !config_file.good())
-        throw WrongParams( "error in Connection::open(): failed to open the configuration file" );
+        throw WrongParams( "error in Connection::open(): failed to open the configuration file: '"+config+"'" );
 
     std::string logbook_host;
     std::string logbook_user;
@@ -235,7 +235,7 @@ Connection::open ( const std::string& config) throw (WrongParams,
            parse_next_line( ifacedb_password, "ifacedb_password", config_file ) &&
            parse_next_line( ifacedb_db,       "ifacedb_db",       config_file )))
 
-         throw WrongParams( "error in Connection::open(): failed to parse the configuration file" );
+         throw WrongParams( "error in Connection::open(): failed to parse the configuration file: '"+config+"'" );
 
     // Open and configure connections, and create the API object.
     //

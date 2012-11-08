@@ -148,13 +148,14 @@ public:
     virtual bool transactionIsStarted () const;
 
     /**
-      * Find the current experiment for the specified instrument
+      * Find the current experiment for the specified instrument and a station number
       *
       * @see method Connection::getCurrentExperiment()
       */
     virtual bool getCurrentExperiment (ExperDescr&        descr,
-                                       const std::string& instrument) throw (WrongParams,
-                                                                             DatabaseError) ;
+                                       const std::string& instrument,
+                                       unsigned int       station=0) throw (WrongParams,
+                                                                            DatabaseError) ;
 
     /**
       * Find experiment descriptors in the given scope.
@@ -164,6 +165,16 @@ public:
     virtual void getExperiments (std::vector<ExperDescr >& experiments,
                                  const std::string&        instrument="") throw (WrongParams,
                                                                                  DatabaseError) ;
+
+    /**
+      * Find experiment descriptor of the specified experiment if the one exists
+      *
+      * @see method Connection::getOneExperiment()
+      */
+    virtual bool getOneExperiment (ExperDescr&        descr,
+                                   const std::string& instrument,
+                                   const std::string& experiment) throw (WrongParams,
+                                                                         DatabaseError) ;
 
     /**
       * Find an information on a parameter.
@@ -513,12 +524,13 @@ private:
     // Helper methods, implementations, etc.
 
     /**
-      * Find the current experimenti identifier for the specified instrument
+      * Find the current experiment identifier for the specified instrument and a station number
       *
       */
     bool getCurrentExperimentId (int&               id,
-                                 const std::string& instrument) throw (WrongParams,
-                                                                       DatabaseError) ;
+                                 const std::string& instrument,
+                                 unsigned int       station) throw (WrongParams,
+                                                                    DatabaseError) ;
 
     /**
       * Find experiment description in the database using instrument and experiment names.
