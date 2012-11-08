@@ -632,11 +632,13 @@ class Event(object):
             for child in xtcObj :
                 for x in Event._xtcGenerator(child) :
                     yield x
-        else :
-            # skip damaged data
-            if xtcObj.damage.value() == 0 :
-                yield xtcObj
-                    
+        elif xtcObj.damage.value() == 0 :
+            # return any un-damaged data
+            yield xtcObj
+        elif xtcObj.contains.id() == xtc.TypeId.Type.Id_EBeam and xtcObj.damage.value() == xtc.Damage.Mask.UserDefined:
+            # return BLD ebeam data id it has user damage bit set and no other damage bits
+            yield xtcObj
+            
 #
 # class that tracks values of all Epics channels
 #

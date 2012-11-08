@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-55
+2012-11-08 Andy Salnikov
+- allow users to see BLD ebeam data with user damage
+
 Tag: V00-00-54
 2012-10-07 Andy Salnikov
 - when catching exceptions in _pyana also dump a traceback
