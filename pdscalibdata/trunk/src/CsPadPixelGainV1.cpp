@@ -74,6 +74,7 @@ CsPadPixelGainV1::CsPadPixelGainV1 (const std::string& fname)
   // and no data left after we finished reading
   float tmp ;
   if ( in >> tmp ) {
+    ++ count;
     const std::string msg = "Pixel gain file has extra data: "+fname;
     MsgLogRoot(error, msg);
     MsgLogRoot(error, "read " << count << " numbers, expecting " << Size );

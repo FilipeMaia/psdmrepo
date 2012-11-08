@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-07
+2012-11-08 Andy Salnikov
+- for cspad calibrations which read per-pixel data from files improve
+  error message if file contains more data than needed
+
 Tag: V00-03-06
 2012-08-08 Andy Salnikov
 - new method CsPadFilterV1::filter() which takes also pixel status array
