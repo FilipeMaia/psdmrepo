@@ -10,6 +10,13 @@ use FileMgr\FileMgrException;
  * The utility class for database connections.
  */
 class DbConnection {
+
+    /* Error codes from MySQL documentation. See full list at:
+     *
+     *   http://dev.mysql.com/doc/refman/5.0/en/error-messages-server.html
+     */
+    public static $ER_DUP_ENTRY = 1062;  // Message: Duplicate entry '%s' for key %d
+
     /*
      * ================
      *   DATA MEMBERS
