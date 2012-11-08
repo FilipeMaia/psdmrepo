@@ -187,12 +187,17 @@ public:
   double pressure() const { return o->pressure(); }
   double temperature() const { return o->temperature(); }
   double current() const { return o->current(); }
-  int32_t hvMeshElectron() const { return o->hvMeshElectron(); }
-  int32_t hvMeshIon() const { return o->hvMeshIon(); }
-  int32_t hvMultIon() const { return o->hvMultIon(); }
+  double hvMeshElectron() const { return o->hvMeshElectron(); }
+  double hvMeshIon() const { return o->hvMeshIon(); }
+  double hvMultIon() const { return o->hvMultIon(); }
   double chargeQ() const { return o->chargeQ(); }
   double photonEnergy() const { return o->photonEnergy(); }
-  double photonsPerPulse() const { return o->photonsPerPulse(); }
+  double multPulseIntensity() const { return o->multPulseIntensity(); }
+  double keithleyPulseIntensity() const { return o->keithleyPulseIntensity(); }
+  double pulseEnergy() const { return o->pulseEnergy(); }
+  double pulseEnergyFEE() const { return o->pulseEnergyFEE(); }
+  double transmission() const { return o->transmission(); }
+  double transmissionFEE() const { return o->transmissionFEE(); }
 };
 
   class BldDataFEEGasDetEnergy_Getter : public psddl_python::EventGetter {

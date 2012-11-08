@@ -161,7 +161,12 @@ void createWrappers() {
     .def("hvMultIon", &n::hvMultIon)\
     .def("chargeQ", &n::chargeQ)\
     .def("photonEnergy", &n::photonEnergy)\
-    .def("photonsPerPulse", &n::photonsPerPulse)\
+    .def("multPulseIntensity", &n::multPulseIntensity)\
+    .def("keithleyPulseIntensity", &n::keithleyPulseIntensity)\
+    .def("pulseEnergy", &n::pulseEnergy)\
+    .def("pulseEnergyFEE", &n::pulseEnergyFEE)\
+    .def("transmission", &n::transmission)\
+    .def("transmissionFEE", &n::transmissionFEE)\
 
   _CLASS(psddl_python::Bld::BldDataGMDV0_Wrapper, return_value_policy<return_by_value>());
   std_vector_class_(BldDataGMDV0_Wrapper);

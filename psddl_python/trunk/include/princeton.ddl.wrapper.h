@@ -95,9 +95,39 @@ public:
   uint32_t numPixelsY() const { return o->numPixelsY(); }
   uint32_t numPixels() const { return o->numPixels(); }
 };
+
+class ConfigV4_Wrapper {
+  shared_ptr<Psana::Princeton::ConfigV4> _o;
+  Psana::Princeton::ConfigV4* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
+  enum { Version = 4 };
+  ConfigV4_Wrapper(shared_ptr<Psana::Princeton::ConfigV4> obj) : _o(obj), o(_o.get()) {}
+  ConfigV4_Wrapper(Psana::Princeton::ConfigV4* obj) : o(obj) {}
+  uint32_t width() const { return o->width(); }
+  uint32_t height() const { return o->height(); }
+  uint32_t orgX() const { return o->orgX(); }
+  uint32_t orgY() const { return o->orgY(); }
+  uint32_t binX() const { return o->binX(); }
+  uint32_t binY() const { return o->binY(); }
+  uint32_t maskedHeight() const { return o->maskedHeight(); }
+  uint32_t kineticHeight() const { return o->kineticHeight(); }
+  float vsSpeed() const { return o->vsSpeed(); }
+  float exposureTime() const { return o->exposureTime(); }
+  float coolingTemp() const { return o->coolingTemp(); }
+  uint8_t gainIndex() const { return o->gainIndex(); }
+  uint8_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
+  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
+  uint32_t numDelayShots() const { return o->numDelayShots(); }
+  uint32_t frameSize() const { return o->frameSize(); }
+  uint32_t numPixelsX() const { return o->numPixelsX(); }
+  uint32_t numPixelsY() const { return o->numPixelsY(); }
+  uint32_t numPixels() const { return o->numPixels(); }
+};
 class ConfigV1;
 class ConfigV2;
 class ConfigV3;
+class ConfigV4;
 
 class FrameV1_Wrapper {
   shared_ptr<Psana::Princeton::FrameV1> _o;
@@ -160,6 +190,19 @@ public:
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<Psana::Princeton::ConfigV3> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
+    }
+  };
+
+  class ConfigV4_Getter : public psddl_python::EnvObjectStoreGetter {
+  public:
+  const char* getTypeName() { return "Psana::Princeton::ConfigV4";}
+  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
+    int getVersion() {
+      return Psana::Princeton::ConfigV4::Version;
+    }
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<Psana::Princeton::ConfigV4> result = store.get(source, foundSrc);
+      return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 

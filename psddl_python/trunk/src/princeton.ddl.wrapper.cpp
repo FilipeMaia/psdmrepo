@@ -81,6 +81,33 @@ void createWrappers() {
 
 
 #define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("orgX", &n::orgX)\
+    .def("orgY", &n::orgY)\
+    .def("binX", &n::binX)\
+    .def("binY", &n::binY)\
+    .def("maskedHeight", &n::maskedHeight)\
+    .def("kineticHeight", &n::kineticHeight)\
+    .def("vsSpeed", &n::vsSpeed)\
+    .def("exposureTime", &n::exposureTime)\
+    .def("coolingTemp", &n::coolingTemp)\
+    .def("gainIndex", &n::gainIndex)\
+    .def("readoutSpeedIndex", &n::readoutSpeedIndex)\
+    .def("exposureEventCode", &n::exposureEventCode)\
+    .def("numDelayShots", &n::numDelayShots)\
+    .def("frameSize", &n::frameSize)\
+    .def("numPixelsX", &n::numPixelsX)\
+    .def("numPixelsY", &n::numPixelsY)\
+    .def("numPixels", &n::numPixels)\
+
+  _CLASS(psddl_python::Princeton::ConfigV4_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV4_Wrapper);
+#undef _CLASS
+  ADD_ENV_OBJECT_STORE_GETTER(ConfigV4);
+
+
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
     .def("shotIdStart", &n::shotIdStart)\
     .def("readoutTime", &n::readoutTime)\
     .def("data", &n::data)\
