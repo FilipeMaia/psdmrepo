@@ -79,7 +79,7 @@ class dump_bld (object) :
         data = evt.get(xtc.TypeId.Type.Id_EBeam, self.m_src)
         if data:
             print "%s: %s" % (data.__class__.__name__, self.m_src)            
-            print "  uDamageMask =", data.uDamageMask
+            print "  uDamageMask = %#x" % data.uDamageMask
             print "  fEbeamCharge =", data.fEbeamCharge
             print "  fEbeamL3Energy =", data.fEbeamL3Energy
             print "  fEbeamLTUPosX =", data.fEbeamLTUPosX

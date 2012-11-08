@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2012-11-08 Andy Salnikov
+- print hex damage mask for bld ebeam classes
+
 Tag: V00-00-23
 2012-09-28 Andy Salnikov
 - update examples with new classes from pdsdata V04-01-00
