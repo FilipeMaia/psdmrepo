@@ -57,17 +57,17 @@ BldDataGMDV0::BldDataGMDV0 ( const XtcType& xtc )
   : fPressure(xtc.fPressure)
   , fTemperature(xtc.fTemperature)
   , fCurrent(xtc.fCurrent)
-  , iHvMeshElectron(xtc.iHvMeshElectron)
-  , iHvMeshIon(xtc.iHvMeshIon)
-  , iHvMultIon(xtc.iHvMultIon)
+  , fHvMeshElectron(xtc.fHvMeshElectron)
+  , fHvMeshIon(xtc.fHvMeshIon)
+  , fHvMultIon(xtc.fHvMultIon)
   , fChargeQ(xtc.fChargeQ)
   , fPhotonEnergy(xtc.fPhotonEnergy)
-  , fPhotonsPerPulse(xtc.fPhotonsPerPulse)
-  , fSpare1(xtc.fSpare1)
-  , fSpare2(xtc.fSpare2)
-  , fSpare3(xtc.fSpare3)
-  , fSpare4(xtc.fSpare4)
-  , fSpare5(xtc.fSpare5)
+  , fMultPulseIntensity(xtc.fMultPulseIntensity)
+  , fKeithleyPulseIntensity(xtc.fKeithleyPulseIntensity)
+  , fPulseEnergy(xtc.fPulseEnergy)
+  , fPulseEnergyFEE(xtc.fPulseEnergyFEE)
+  , fTransmission(xtc.fTransmission)
+  , fTransmissionFEE(xtc.fTransmissionFEE)
   , fSpare6(xtc.fSpare6)
 {
   std::copy(xtc.strGasType+0, xtc.strGasType+32, strGasType);
@@ -91,17 +91,17 @@ BldDataGMDV0::native_type()
   type.insert_native<double>( "fPressure", offsetof(BldDataGMDV0, fPressure) ) ;
   type.insert_native<double>( "fTemperature", offsetof(BldDataGMDV0, fTemperature) ) ;
   type.insert_native<double>( "fCurrent", offsetof(BldDataGMDV0, fCurrent) ) ;
-  type.insert_native<int32_t>( "iHvMeshElectron", offsetof(BldDataGMDV0, iHvMeshElectron) ) ;
-  type.insert_native<int32_t>( "iHvMeshIon", offsetof(BldDataGMDV0, iHvMeshIon) ) ;
-  type.insert_native<int32_t>( "iHvMultIon", offsetof(BldDataGMDV0, iHvMultIon) ) ;
+  type.insert_native<double>( "fHvMeshElectron", offsetof(BldDataGMDV0, fHvMeshElectron) ) ;
+  type.insert_native<double>( "fHvMeshIon", offsetof(BldDataGMDV0, fHvMeshIon) ) ;
+  type.insert_native<double>( "fHvMultIon", offsetof(BldDataGMDV0, fHvMultIon) ) ;
   type.insert_native<double>( "fChargeQ", offsetof(BldDataGMDV0, fChargeQ) ) ;
   type.insert_native<double>( "fPhotonEnergy", offsetof(BldDataGMDV0, fPhotonEnergy) ) ;
-  type.insert_native<double>( "fPhotonsPerPulse", offsetof(BldDataGMDV0, fPhotonsPerPulse) ) ;
-  type.insert_native<double>( "fSpare1", offsetof(BldDataGMDV0, fSpare1) ) ;
-  type.insert_native<double>( "fSpare2", offsetof(BldDataGMDV0, fSpare2) ) ;
-  type.insert_native<double>( "fSpare3", offsetof(BldDataGMDV0, fSpare3) ) ;
-  type.insert_native<double>( "fSpare4", offsetof(BldDataGMDV0, fSpare4) ) ;
-  type.insert_native<double>( "fSpare5", offsetof(BldDataGMDV0, fSpare5) ) ;
+  type.insert_native<double>( "fMultPulseIntensity", offsetof(BldDataGMDV0, fMultPulseIntensity) ) ;
+  type.insert_native<double>( "fKeithleyPulseIntensity", offsetof(BldDataGMDV0, fKeithleyPulseIntensity) ) ;
+  type.insert_native<double>( "fPulseEnergy", offsetof(BldDataGMDV0, fPulseEnergy) ) ;
+  type.insert_native<double>( "fPulseEnergyFEE", offsetof(BldDataGMDV0, fPulseEnergyFEE) ) ;
+  type.insert_native<double>( "fTransmission", offsetof(BldDataGMDV0, fTransmission) ) ;
+  type.insert_native<double>( "fTransmissionFEE", offsetof(BldDataGMDV0, fTransmissionFEE) ) ;
   type.insert_native<double>( "fSpare6", offsetof(BldDataGMDV0, fSpare6) ) ;
 
   return type ;

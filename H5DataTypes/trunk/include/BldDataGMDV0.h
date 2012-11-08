@@ -51,22 +51,22 @@ public:
 
 private:
 
-  char     strGasType[32];  // Gas Type
-  double   fPressure;       // Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure
-  double   fTemperature;    // Temp from PT100, SXR:GMD:RTD:40:RAW_AI
-  double   fCurrent;        // Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading
-  int32_t  iHvMeshElectron; // HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure
-  int32_t  iHvMeshIon;      // HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
-  int32_t  iHvMultIon;      // HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
-  double   fChargeQ;        // Charge Q, SXR:GMD:IMD:Charge_Q
-  double   fPhotonEnergy;   // Photon Energy, SIOC:SYS0:ML00:AO627
-  double   fPhotonsPerPulse;// Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse
-  double   fSpare1;         // Spare 1
-  double   fSpare2;         // Spare 2
-  double   fSpare3;         // Spare 3
-  double   fSpare4;         // Spare 4
-  double   fSpare5;         // Spare 5
-  double   fSpare6;         // Spare 6
+  char    strGasType[32];         // Gas Type
+  double  fPressure;              // Pressure from Spinning Rotor Gauge
+  double  fTemperature;           // Temp from PT100
+  double  fCurrent;               // Current from Keithley Electrometer
+  double  fHvMeshElectron;        // HV Mesh Electron
+  double  fHvMeshIon;             // HV Mesh Ion
+  double  fHvMultIon;             // HV Mult Ion
+  double  fChargeQ;               // Charge Q
+  double  fPhotonEnergy;          // Photon Energy
+  double  fMultPulseIntensity;    // Pulse Intensity derived from Electron Multiplier
+  double  fKeithleyPulseIntensity;// Pulse Intensity derived from ION cup current
+  double  fPulseEnergy;           // Pulse Energy derived from Electron Multiplier
+  double  fPulseEnergyFEE;        // Pulse Energy from FEE Gas Detector
+  double  fTransmission;          // Transmission derived from Electron Multiplier
+  double  fTransmissionFEE;       // Transmission from FEE Gas Detector
+  double  fSpare6;                // Spare 6
 
 };
 
