@@ -15,6 +15,9 @@ ConfigV2::~ConfigV2() {}
 ConfigV3::~ConfigV3() {}
 
 
+ConfigV4::~ConfigV4() {}
+
+
 FrameV1::~FrameV1() {}
 
 } // namespace Princeton
