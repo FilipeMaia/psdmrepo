@@ -130,6 +130,53 @@ uint32_t ConfigV3::numPixelsX() const { return m_xtcObj->numPixelsX(); }
 uint32_t ConfigV3::numPixelsY() const { return m_xtcObj->numPixelsY(); }
 
 uint32_t ConfigV3::numPixels() const { return m_xtcObj->numPixels(); }
+ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Princeton::ConfigV4()
+  , m_xtcObj(xtcPtr)
+{
+}
+ConfigV4::~ConfigV4()
+{
+}
+
+
+uint32_t ConfigV4::width() const { return m_xtcObj->width(); }
+
+uint32_t ConfigV4::height() const { return m_xtcObj->height(); }
+
+uint32_t ConfigV4::orgX() const { return m_xtcObj->orgX(); }
+
+uint32_t ConfigV4::orgY() const { return m_xtcObj->orgY(); }
+
+uint32_t ConfigV4::binX() const { return m_xtcObj->binX(); }
+
+uint32_t ConfigV4::binY() const { return m_xtcObj->binY(); }
+
+uint32_t ConfigV4::maskedHeight() const { return m_xtcObj->maskedHeight(); }
+
+uint32_t ConfigV4::kineticHeight() const { return m_xtcObj->kineticHeight(); }
+
+float ConfigV4::vsSpeed() const { return m_xtcObj->vsSpeed(); }
+
+float ConfigV4::exposureTime() const { return m_xtcObj->exposureTime(); }
+
+float ConfigV4::coolingTemp() const { return m_xtcObj->coolingTemp(); }
+
+uint8_t ConfigV4::gainIndex() const { return m_xtcObj->gainIndex(); }
+
+uint8_t ConfigV4::readoutSpeedIndex() const { return m_xtcObj->readoutSpeedIndex(); }
+
+uint16_t ConfigV4::exposureEventCode() const { return m_xtcObj->exposureEventCode(); }
+
+uint32_t ConfigV4::numDelayShots() const { return m_xtcObj->numDelayShots(); }
+
+uint32_t ConfigV4::frameSize() const { return m_xtcObj->frameSize(); }
+
+uint32_t ConfigV4::numPixelsX() const { return m_xtcObj->numPixelsX(); }
+
+uint32_t ConfigV4::numPixelsY() const { return m_xtcObj->numPixelsY(); }
+
+uint32_t ConfigV4::numPixels() const { return m_xtcObj->numPixels(); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr)
   : Psana::Princeton::FrameV1()
   , m_xtcObj(xtcPtr)
@@ -148,6 +195,12 @@ FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::sh
   , m_cfgPtr2(cfgPtr)
 {
 }
+FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV4>& cfgPtr)
+  : Psana::Princeton::FrameV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr3(cfgPtr)
+{
+}
 FrameV1::~FrameV1()
 {
 }
@@ -161,6 +214,7 @@ ndarray<uint16_t, 2> FrameV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
+  if (m_cfgPtr3.get()) return m_xtcObj->data(*m_cfgPtr3);
   throw std::runtime_error("FrameV1::data: config object pointer is zero");
 }
 

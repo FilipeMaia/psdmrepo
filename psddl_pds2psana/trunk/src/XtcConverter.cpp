@@ -508,6 +508,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 1) ::storeCfgObject<Princeton::ConfigV1>(xtc, cfgStore);
     if (version == 2) ::storeCfgObject<Princeton::ConfigV2>(xtc, cfgStore);
     if (version == 3) ::storeCfgObject<Princeton::ConfigV3>(xtc, cfgStore);
+    if (version == 4) ::storeCfgObject<Princeton::ConfigV4>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_EvrData:
     break;

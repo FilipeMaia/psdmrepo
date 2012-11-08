@@ -90,12 +90,17 @@ public:
   virtual double pressure() const;
   virtual double temperature() const;
   virtual double current() const;
-  virtual int32_t hvMeshElectron() const;
-  virtual int32_t hvMeshIon() const;
-  virtual int32_t hvMultIon() const;
+  virtual double hvMeshElectron() const;
+  virtual double hvMeshIon() const;
+  virtual double hvMultIon() const;
   virtual double chargeQ() const;
   virtual double photonEnergy() const;
-  virtual double photonsPerPulse() const;
+  virtual double multPulseIntensity() const;
+  virtual double keithleyPulseIntensity() const;
+  virtual double pulseEnergy() const;
+  virtual double pulseEnergyFEE() const;
+  virtual double transmission() const;
+  virtual double transmissionFEE() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

@@ -14,9 +14,19 @@ Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(PsddlPds::Bld::BldDataFEEGasDetE
   return Psana::Bld::BldDataFEEGasDetEnergy(pds.f_11_ENRC(), pds.f_12_ENRC(), pds.f_21_ENRC(), pds.f_22_ENRC());
 }
 
+Psana::Bld::BldDataEBeamV0::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV0::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV0::DamageMask(e);
+}
+
 Psana::Bld::BldDataEBeamV0 pds_to_psana(PsddlPds::Bld::BldDataEBeamV0 pds)
 {
   return Psana::Bld::BldDataEBeamV0(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY());
+}
+
+Psana::Bld::BldDataEBeamV1::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV1::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV1::DamageMask(e);
 }
 
 Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds)
@@ -24,9 +34,19 @@ Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds)
   return Psana::Bld::BldDataEBeamV1(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2());
 }
 
+Psana::Bld::BldDataEBeamV2::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV2::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV2::DamageMask(e);
+}
+
 Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds)
 {
   return Psana::Bld::BldDataEBeamV2(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2());
+}
+
+Psana::Bld::BldDataEBeamV3::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV3::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV3::DamageMask(e);
 }
 
 Psana::Bld::BldDataEBeamV3 pds_to_psana(PsddlPds::Bld::BldDataEBeamV3 pds)
@@ -111,16 +131,26 @@ double BldDataGMDV0::temperature() const { return m_xtcObj->temperature(); }
 
 double BldDataGMDV0::current() const { return m_xtcObj->current(); }
 
-int32_t BldDataGMDV0::hvMeshElectron() const { return m_xtcObj->hvMeshElectron(); }
+double BldDataGMDV0::hvMeshElectron() const { return m_xtcObj->hvMeshElectron(); }
 
-int32_t BldDataGMDV0::hvMeshIon() const { return m_xtcObj->hvMeshIon(); }
+double BldDataGMDV0::hvMeshIon() const { return m_xtcObj->hvMeshIon(); }
 
-int32_t BldDataGMDV0::hvMultIon() const { return m_xtcObj->hvMultIon(); }
+double BldDataGMDV0::hvMultIon() const { return m_xtcObj->hvMultIon(); }
 
 double BldDataGMDV0::chargeQ() const { return m_xtcObj->chargeQ(); }
 
 double BldDataGMDV0::photonEnergy() const { return m_xtcObj->photonEnergy(); }
 
-double BldDataGMDV0::photonsPerPulse() const { return m_xtcObj->photonsPerPulse(); }
+double BldDataGMDV0::multPulseIntensity() const { return m_xtcObj->multPulseIntensity(); }
+
+double BldDataGMDV0::keithleyPulseIntensity() const { return m_xtcObj->keithleyPulseIntensity(); }
+
+double BldDataGMDV0::pulseEnergy() const { return m_xtcObj->pulseEnergy(); }
+
+double BldDataGMDV0::pulseEnergyFEE() const { return m_xtcObj->pulseEnergyFEE(); }
+
+double BldDataGMDV0::transmission() const { return m_xtcObj->transmission(); }
+
+double BldDataGMDV0::transmissionFEE() const { return m_xtcObj->transmissionFEE(); }
 } // namespace Bld
 } // namespace psddl_pds2psana
