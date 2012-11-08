@@ -36,17 +36,17 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fPressure)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fTemperature)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fCurrent)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, iHvMeshElectron)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, iHvMeshIon)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, iHvMultIon)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fHvMeshElectron)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fHvMeshIon)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fHvMultIon)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fChargeQ)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fPhotonEnergy)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fPhotonsPerPulse)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare1)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare2)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare3)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare4)
-  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare5)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fMultPulseIntensity)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fKeithleyPulseIntensity)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fPulseEnergy)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fPulseEnergyFEE)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fTransmission)
+  MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fTransmissionFEE)
   MEMBER_WRAPPER(pypdsdata::BldDataGMDV0, fSpare6)
   PyObject* _repr( PyObject *self );
 
@@ -55,20 +55,20 @@ namespace {
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
     {"strGasType",      strGasType,       0, "string, gas type", 0},
-    {"fPressure",       fPressure,        0, "Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure", 0},
-    {"fTemperature",    fTemperature,     0, "Temp from PT100, SXR:GMD:RTD:40:RAW_AI", 0},
-    {"fCurrent",        fCurrent,         0, "Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading", 0},
-    {"iHvMeshElectron", iHvMeshElectron,  0, "HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure", 0},
-    {"iHvMeshIon",      iHvMeshIon,       0, "HV Mesh Ion, SXR:GMD:VHQ1:ChB:VoltageMeasure", 0},
-    {"iHvMultIon",      iHvMultIon,       0, "HV Mult Ion, SXR:GMD:VHQ1:ChB:VoltageMeasure", 0},
-    {"fChargeQ",        fChargeQ,         0, "Charge Q, SXR:GMD:IMD:Charge_Q", 0},
-    {"fPhotonEnergy",   fPhotonEnergy,    0, "Photon Energy, SIOC:SYS0:ML00:AO627", 0},
-    {"fPhotonsPerPulse",fPhotonsPerPulse, 0, "Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse", 0},
-    {"fSpare1",         fSpare1,          0, "Spare 1", 0},
-    {"fSpare2",         fSpare2,          0, "Spare 2", 0},
-    {"fSpare3",         fSpare3,          0, "Spare 3", 0},
-    {"fSpare4",         fSpare4,          0, "Spare 4", 0},
-    {"fSpare5",         fSpare5,          0, "Spare 5", 0},
+    {"fPressure",       fPressure,        0, "Pressure from Spinning Rotor Gauge", 0},
+    {"fTemperature",    fTemperature,     0, "Temp from PT100", 0},
+    {"fCurrent",        fCurrent,         0, "Current from Keithley Electrometer", 0},
+    {"fHvMeshElectron", fHvMeshElectron,  0, "HV Mesh Electron", 0},
+    {"fHvMeshIon",      fHvMeshIon,       0, "HV Mesh Ion", 0},
+    {"fHvMultIon",      fHvMultIon,       0, "HV Mult Ion", 0},
+    {"fChargeQ",        fChargeQ,         0, "Charge Q", 0},
+    {"fPhotonEnergy",   fPhotonEnergy,    0, "Photon Energy", 0},
+    {"fMultPulseIntensity",fMultPulseIntensity, 0, "Pulse Intensity derived from Electron Multiplier", 0},
+    {"fKeithleyPulseIntensity", fKeithleyPulseIntensity, 0, "Pulse Intensity derived from ION cup current", 0},
+    {"fPulseEnergy",    fPulseEnergy,     0, "Pulse Energy derived from Electron Multiplier", 0},
+    {"fPulseEnergyFEE", fPulseEnergyFEE,  0, "Pulse Energy from FEE Gas Detector", 0},
+    {"fTransmission",   fTransmission,    0, "Transmission derived from Electron Multiplier", 0},
+    {"fTransmissionFEE", fTransmissionFEE, 0, "Transmission from FEE Gas Detector", 0},
     {"fSpare6",         fSpare6,          0, "Spare 6", 0},
     {0, 0, 0, 0, 0}
   };

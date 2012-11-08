@@ -165,6 +165,7 @@
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/ConfigV2.h"
 #include "types/princeton/ConfigV3.h"
+#include "types/princeton/ConfigV4.h"
 #include "types/princeton/FrameV1.h"
 #include "types/princeton/InfoV1.h"
 
@@ -415,6 +416,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Princeton::ConfigV1::initType( module );
   pypdsdata::Princeton::ConfigV2::initType( module );
   pypdsdata::Princeton::ConfigV3::initType( module );
+  pypdsdata::Princeton::ConfigV4::initType( module );
   pypdsdata::Princeton::FrameV1::initType( module );
   pypdsdata::Princeton::InfoV1::initType( module );
   Py_INCREF( module );

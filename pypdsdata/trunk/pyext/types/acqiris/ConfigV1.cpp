@@ -82,7 +82,9 @@ pypdsdata::Acqiris::ConfigV1::print(std::ostream& out) const
         << ", chMask=" << m_obj->channelMask()
         << ", nCh=" << m_obj->nbrChannels()
         << ", nBanks=" << m_obj->nbrBanks()
-        << ", ...)" ;
+        << ", horiz(nSeg=" << m_obj->horiz().nbrSegments()
+        << ", nSampl=" << m_obj->horiz().nbrSamples()
+        << "))";
   }
 }
 

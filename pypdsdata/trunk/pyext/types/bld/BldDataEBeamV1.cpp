@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "../../EnumType.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 
@@ -30,6 +31,18 @@
 //-----------------------------------------------------------------------
 
 namespace {
+
+  pypdsdata::EnumType::Enum damageMaskEnumValues[] = {
+      { "EbeamChargeDamage",    Pds::BldDataEBeamV1::EbeamChargeDamage },
+      { "EbeamL3EnergyDamage",  Pds::BldDataEBeamV1::EbeamL3EnergyDamage },
+      { "EbeamLTUPosXDamage",   Pds::BldDataEBeamV1::EbeamLTUPosXDamage },
+      { "EbeamLTUPosYDamage",   Pds::BldDataEBeamV1::EbeamLTUPosYDamage },
+      { "EbeamLTUAngXDamage",   Pds::BldDataEBeamV1::EbeamLTUAngXDamage },
+      { "EbeamLTUAngYDamage",   Pds::BldDataEBeamV1::EbeamLTUAngYDamage },
+      { "EbeamPkCurrBC2Damage", Pds::BldDataEBeamV1::EbeamPkCurrBC2Damage },
+      { 0, 0 }
+  };
+  pypdsdata::EnumType damageMaskEnum ( "DamageMask", damageMaskEnumValues );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, uDamageMask)
@@ -46,7 +59,7 @@ namespace {
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"uDamageMask",    uDamageMask,    0, "integer number", 0},
+    {"uDamageMask",    uDamageMask,    0, "integer bit mask, see :py:class:`DamageMask` for individual bits meaning", 0},
     {"fEbeamCharge",   fEbeamCharge,   0, "floating number, in nC", 0},
     {"fEbeamL3Energy", fEbeamL3Energy, 0, "floating number, in MeV", 0},
     {"fEbeamLTUPosX",  fEbeamLTUPosX,  0, "floating number, in mm", 0},
@@ -72,6 +85,10 @@ pypdsdata::BldDataEBeamV1::initType( PyObject* module )
   type->tp_getset = ::getset;
   type->tp_str = _repr;
   type->tp_repr = _repr;
+
+  // define class attributes for enums
+  type->tp_dict = PyDict_New();
+  PyDict_SetItemString( type->tp_dict, "DamageMask", damageMaskEnum.type() );
 
   BaseType::initType( "BldDataEBeamV1", module );
 }
