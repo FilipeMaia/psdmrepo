@@ -208,6 +208,83 @@
         </pstype>
         
         <!-- ========================================================================= -->
+    
+        
+        <pstype name="ConfigV4" version="4" type_id="Id_PrincetonConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
+            <attribute name="_uWidth" type="uint32_t" accessor="width">
+            </attribute>
+
+            <attribute name="_uHeight" type="uint32_t" accessor="height">
+            </attribute>
+
+            <attribute name="_uOrgX" type="uint32_t" accessor="orgX">
+            </attribute>
+
+            <attribute name="_uOrgY" type="uint32_t" accessor="orgY">
+            </attribute>
+
+            <attribute name="_uBinX" type="uint32_t" accessor="binX">
+            </attribute>
+
+            <attribute name="_uBinY" type="uint32_t" accessor="binY">
+            </attribute>
+
+            <attribute name="_u32MaskedHeight" type="uint32_t" accessor="maskedHeight">
+            </attribute>
+
+            <attribute name="_u32KineticHeight" type="uint32_t" accessor="kineticHeight">
+            </attribute>
+
+            <attribute name="_f32VsSpeed" type="float" accessor="vsSpeed">
+            </attribute>
+
+            <attribute name="_f32ExposureTime" type="float" accessor="exposureTime">
+            </attribute>
+
+            <attribute name="_f32CoolingTemp" type="float" accessor="coolingTemp">
+            </attribute>
+
+            <attribute name="_u8GainIndex" type="uint8_t" accessor="gainIndex">
+            </attribute>
+
+            <attribute name="_u8ReadoutSpeedIndex" type="uint8_t" accessor="readoutSpeedIndex">
+            </attribute>
+
+            <attribute name="_u16ExposureEventCode" type="uint16_t" accessor="exposureEventCode">
+            </attribute>
+
+            <attribute name="_u32NumDelayShots" type="uint32_t" accessor="numDelayShots">
+            </attribute>
+            
+            <method name="frameSize" type="uint32_t">
+            Total size in bytes of the Frame object
+                <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
+            </method>
+
+            <method name="numPixelsX" type="uint32_t">
+            calculate frame X size in pixels based on the current ROI and binning settings
+                <tag name="inline"/>
+                <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
+            </method>
+
+            <method name="numPixelsY" type="uint32_t">
+            calculate frame Y size in pixels based on the current ROI and binning settings
+                <tag name="inline"/>
+                <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
+            </method>
+
+            <method name="numPixels" type="uint32_t">
+            calculate total frame size in pixels based on the current ROI and binning settings
+                <tag name="inline"/>
+                <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
+            </method>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
         
         
         <pstype name="FrameV1" version="1" type_id="Id_PrincetonFrame" pack="4">
@@ -215,6 +292,7 @@
             <xtc-config name="ConfigV1" />
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
+            <xtc-config name="ConfigV4" />
 
             <attribute name="_iShotIdStart" type="uint32_t" accessor="shotIdStart">
             </attribute>

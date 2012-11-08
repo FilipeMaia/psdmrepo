@@ -50,8 +50,18 @@
         <pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
         
             Beam parameters.
-        
+            
             <tag name="value-type"/>
+        
+            <enum name="DamageMask">
+                Constants defining bit mask for individual damage bits in value returned from damageMask()
+                <enum-const name="EbeamChargeDamage" value="0x001"/>
+                <enum-const name="EbeamL3EnergyDamage" value="0x002"/>
+                <enum-const name="EbeamLTUPosXDamage" value="0x004"/>
+                <enum-const name="EbeamLTUPosYDamage" value="0x008"/>
+                <enum-const name="EbeamLTUAngXDamage" value="0x010"/>
+                <enum-const name="EbeamLTUAngYDamage" value="0x020"/>
+            </enum>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
             Damage mask.
@@ -94,6 +104,17 @@
         <pstype name="BldDataEBeamV1" type_id="Id_EBeam" version="1" pack="4">
         
             <tag name="value-type"/>
+        
+            <enum name="DamageMask">
+                Constants defining bit mask for individual damage bits in value returned from damageMask()
+                <enum-const name="EbeamChargeDamage" value="0x001"/>
+                <enum-const name="EbeamL3EnergyDamage" value="0x002"/>
+                <enum-const name="EbeamLTUPosXDamage" value="0x004"/>
+                <enum-const name="EbeamLTUPosYDamage" value="0x008"/>
+                <enum-const name="EbeamLTUAngXDamage" value="0x010"/>
+                <enum-const name="EbeamLTUAngYDamage" value="0x020"/>
+                <enum-const name="EbeamPkCurrBC2Damage" value="0x040"/>
+            </enum>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
             Damage mask.
@@ -140,6 +161,18 @@
         <pstype name="BldDataEBeamV2" type_id="Id_EBeam" version="2" pack="4">
         
             <tag name="value-type"/>
+        
+            <enum name="DamageMask">
+                Constants defining bit mask for individual damage bits in value returned from damageMask()
+                <enum-const name="EbeamChargeDamage" value="0x001"/>
+                <enum-const name="EbeamL3EnergyDamage" value="0x002"/>
+                <enum-const name="EbeamLTUPosXDamage" value="0x004"/>
+                <enum-const name="EbeamLTUPosYDamage" value="0x008"/>
+                <enum-const name="EbeamLTUAngXDamage" value="0x010"/>
+                <enum-const name="EbeamLTUAngYDamage" value="0x020"/>
+                <enum-const name="EbeamPkCurrBC2Damage" value="0x040"/>
+                <enum-const name="EbeamEnergyBC2Damage" value="0x080"/>
+            </enum>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
             Damage mask.
@@ -190,6 +223,20 @@
         <pstype name="BldDataEBeamV3" type_id="Id_EBeam" version="3" pack="4">
         
             <tag name="value-type"/>
+        
+            <enum name="DamageMask">
+                Constants defining bit mask for individual damage bits in value returned from damageMask()
+                <enum-const name="EbeamChargeDamage" value="0x001"/>
+                <enum-const name="EbeamL3EnergyDamage" value="0x002"/>
+                <enum-const name="EbeamLTUPosXDamage" value="0x004"/>
+                <enum-const name="EbeamLTUPosYDamage" value="0x008"/>
+                <enum-const name="EbeamLTUAngXDamage" value="0x010"/>
+                <enum-const name="EbeamLTUAngYDamage" value="0x020"/>
+                <enum-const name="EbeamPkCurrBC2Damage" value="0x040"/>
+                <enum-const name="EbeamEnergyBC2Damage" value="0x080"/>
+                <enum-const name="EbeamPkCurrBC1Damage" value="0x100"/>
+                <enum-const name="EbeamEnergyBC1Damage" value="0x200"/>
+            </enum>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
             Damage mask.
@@ -349,46 +396,61 @@
             </attribute>
 
             <attribute name="_fPressure" type="double" accessor="pressure">
-            Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure
+            Pressure from Spinning Rotor Gauge
             </attribute>
 
             <attribute name="_fTemperature" type="double" accessor="temperature">
-            Temp from PT100, SXR:GMD:RTD:40:RAW_AI
+            Temp from PT100
             </attribute>
 
             <attribute name="_fCurrent" type="double" accessor="current">
-            Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading
+            Current from Keithley Electrometer
             </attribute>
 
-            <attribute name="_iHvMeshElectron" type="int32_t" accessor="hvMeshElectron">
-            HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure
+            <attribute name="_fHvMeshElectron" type="double" accessor="hvMeshElectron">
+            HV Mesh Electron
             </attribute>
 
-            <attribute name="_iHvMeshIon" type="int32_t" accessor="hvMeshIon">
-            HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
+            <attribute name="_fHvMeshIon" type="double" accessor="hvMeshIon">
+            HV Mesh Ion
             </attribute>
 
-            <attribute name="_iHvMultIon" type="int32_t" accessor="hvMultIon">
-            HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure
+            <attribute name="_fHvMultIon" type="double" accessor="hvMultIon">
+            HV Mult Ion
             </attribute>
 
             <attribute name="_fChargeQ" type="double" accessor="chargeQ">
-            Charge Q, SXR:GMD:IMD:Charge_Q
+            Charge Q
             </attribute>
 
             <attribute name="_fPhotonEnergy" type="double" accessor="photonEnergy">
-            Photon Energy, SIOC:SYS0:ML00:AO627
+            Photon Energy
             </attribute>
 
-            <attribute name="_fPhotonsPerPulse" type="double" accessor="photonsPerPulse">
-            Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse
+            <attribute name="_fMultPulseIntensity" type="double" accessor="multPulseIntensity">
+            Pulse Intensity derived from Electron Multiplier
             </attribute>
 
-            <attribute name="_fSpare1" type="double"/>
-            <attribute name="_fSpare2" type="double"/>
-            <attribute name="_fSpare3" type="double"/>
-            <attribute name="_fSpare4" type="double"/>
-            <attribute name="_fSpare5" type="double"/>
+            <attribute name="_fKeithleyPulseIntensity" type="double" accessor="keithleyPulseIntensity">
+            Pulse Intensity derived from ION cup current
+            </attribute>
+
+            <attribute name="_fPulseEnergy" type="double" accessor="pulseEnergy">
+            Pulse Energy derived from Electron Multiplier
+            </attribute>
+
+            <attribute name="_fPulseEnergyFEE" type="double" accessor="pulseEnergyFEE">
+            Pulse Energy from FEE Gas Detector
+            </attribute>
+
+            <attribute name="_fTransmission" type="double" accessor="transmission">
+            Transmission derived from Electron Multiplier
+            </attribute>
+
+            <attribute name="_fTransmissionFEE" type="double" accessor="transmissionFEE">
+            Transmission from FEE Gas Detector
+            </attribute>
+
             <attribute name="_fSpare6" type="double"/>
 
         </pstype>
