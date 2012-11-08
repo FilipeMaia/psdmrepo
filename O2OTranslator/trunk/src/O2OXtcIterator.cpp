@@ -96,18 +96,19 @@ O2OXtcIterator::process(Xtc* xtc)
       or xtc->src.level() == Pds::Level::Reporter
       or xtc->src.level() == Pds::Level::Control ) {
 
-    if ( xtc->damage.value() ) {
-      // skip damaged data
-      MsgLogRoot( warning, "O2OXtcIterator::process -- damaged data xtc: "
-                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-                  << " payload = " << xtc->sizeofPayload()
-                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
-    } else {
+    if ( xtc->damage.value() == 0 or
+        (xtc->contains.id() == Pds::TypeId::Id_EBeam and xtc->damage.bits() == (1 << Pds::Damage::UserDefined))) {
+      // pass un-damaged data or return BLD ebeam data if it has user damage bit set and no other damage bits
       if (m_config) {
         m_scanner->configObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
       } else {
         m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
       }
+    } else {
+      MsgLogRoot( warning, "O2OXtcIterator::process -- damaged data xtc: "
+                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
+                  << " payload = " << xtc->sizeofPayload()
+                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
     }
 
   } else {
