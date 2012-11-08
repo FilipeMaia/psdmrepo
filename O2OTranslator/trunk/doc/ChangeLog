@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-19-10
+2012-11-08 Andy Salnikov
+- upgrading to pdsdata V04-05-00
+- added conversion for new classes PrincetonConfigV4
+
 Tag: V00-19-09
 2012-11-08 Andy Salnikov
 - cspad calibration converter was not instantiated for config V4,

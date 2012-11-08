@@ -83,6 +83,7 @@
 #include "H5DataTypes/PrincetonConfigV1.h"
 #include "H5DataTypes/PrincetonConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV3.h"
+#include "H5DataTypes/PrincetonConfigV4.h"
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
@@ -188,6 +189,7 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   ::registerConfigCvt<H5DataTypes::PrincetonConfigV1>(m_cvtMap, "Princeton::ConfigV1", Pds::TypeId::Id_PrincetonConfig, 1);
   ::registerConfigCvt<H5DataTypes::PrincetonConfigV2>(m_cvtMap, "Princeton::ConfigV2", Pds::TypeId::Id_PrincetonConfig, 2);
   ::registerConfigCvt<H5DataTypes::PrincetonConfigV3>(m_cvtMap, "Princeton::ConfigV3", Pds::TypeId::Id_PrincetonConfig, 3);
+  ::registerConfigCvt<H5DataTypes::PrincetonConfigV4>(m_cvtMap, "Princeton::ConfigV4", Pds::TypeId::Id_PrincetonConfig, 4);
 
   ::registerConfigCvt<H5DataTypes::FccdConfigV1>(m_cvtMap, "FCCD::FccdConfigV1", Pds::TypeId::Id_FccdConfig, 1);
   ::registerConfigCvt<H5DataTypes::FccdConfigV2>(m_cvtMap, "FCCD::FccdConfigV2", Pds::TypeId::Id_FccdConfig, 2);

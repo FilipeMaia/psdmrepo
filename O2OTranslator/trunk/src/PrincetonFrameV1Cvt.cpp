@@ -24,6 +24,7 @@
 #include "pdsdata/princeton/ConfigV1.hh"
 #include "pdsdata/princeton/ConfigV2.hh"
 #include "pdsdata/princeton/ConfigV3.hh"
+#include "pdsdata/princeton/ConfigV4.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -85,6 +86,7 @@ PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   Pds::TypeId cfgTypeId1(Pds::TypeId::Id_PrincetonConfig, 1);
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_PrincetonConfig, 2);
   Pds::TypeId cfgTypeId3(Pds::TypeId::Id_PrincetonConfig, 3);
+  Pds::TypeId cfgTypeId4(Pds::TypeId::Id_PrincetonConfig, 4);
   if (const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(cfgTypeId1, src.top())) {
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
@@ -96,6 +98,11 @@ PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     height = (config->height() + binY - 1) / binY;
     width = (config->width() + binX - 1) / binX;
   } else if (const Pds::Princeton::ConfigV3* config = m_configStore.find<Pds::Princeton::ConfigV3>(cfgTypeId3, src.top())) {
+    uint32_t binX = config->binX();
+    uint32_t binY = config->binY();
+    height = (config->height() + binY - 1) / binY;
+    width = (config->width() + binX - 1) / binX;
+  } else if (const Pds::Princeton::ConfigV4* config = m_configStore.find<Pds::Princeton::ConfigV4>(cfgTypeId4, src.top())) {
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
     height = (config->height() + binY - 1) / binY;
