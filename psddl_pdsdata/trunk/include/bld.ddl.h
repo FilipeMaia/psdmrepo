@@ -58,6 +58,16 @@ class BldDataEBeamV0 {
 public:
   enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 0 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+  };
   BldDataEBeamV0(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY)
   {
@@ -99,6 +109,17 @@ class BldDataEBeamV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+  };
   BldDataEBeamV1(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2)
   {
@@ -143,6 +164,18 @@ class BldDataEBeamV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+    EbeamEnergyBC2Damage = 0x080,
+  };
   BldDataEBeamV2(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2, double arg__fEbeamEnergyBC2)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2)
   {
@@ -190,6 +223,20 @@ class BldDataEBeamV3 {
 public:
   enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+    EbeamEnergyBC2Damage = 0x080,
+    EbeamPkCurrBC1Damage = 0x100,
+    EbeamEnergyBC1Damage = 0x200,
+  };
   BldDataEBeamV3(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2, double arg__fEbeamEnergyBC2, double arg__fEbeamPkCurrBC1, double arg__fEbeamEnergyBC1)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1)
   {
@@ -346,41 +393,51 @@ public:
   enum { Version = 0 /**< XTC type version number */ };
   /** String describing gas type */
   const char* gasType() const { return _strGasType; }
-  /** Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
+  /** Pressure from Spinning Rotor Gauge */
   double pressure() const { return _fPressure; }
-  /** Temp from PT100, SXR:GMD:RTD:40:RAW_AI */
+  /** Temp from PT100 */
   double temperature() const { return _fTemperature; }
-  /** Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading */
+  /** Current from Keithley Electrometer */
   double current() const { return _fCurrent; }
-  /** HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure */
-  int32_t hvMeshElectron() const { return _iHvMeshElectron; }
-  /** HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
-  int32_t hvMeshIon() const { return _iHvMeshIon; }
-  /** HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
-  int32_t hvMultIon() const { return _iHvMultIon; }
-  /** Charge Q, SXR:GMD:IMD:Charge_Q */
+  /** HV Mesh Electron */
+  double hvMeshElectron() const { return _fHvMeshElectron; }
+  /** HV Mesh Ion */
+  double hvMeshIon() const { return _fHvMeshIon; }
+  /** HV Mult Ion */
+  double hvMultIon() const { return _fHvMultIon; }
+  /** Charge Q */
   double chargeQ() const { return _fChargeQ; }
-  /** Photon Energy, SIOC:SYS0:ML00:AO627 */
+  /** Photon Energy */
   double photonEnergy() const { return _fPhotonEnergy; }
-  /** Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
-  double photonsPerPulse() const { return _fPhotonsPerPulse; }
-  static uint32_t _sizeof()  { return (((((((((((((((((((0+(1*(32)))+8)+8)+8)+4)+4)+4)+8)+8)+8)+8)+8)+8)+8)+8)+8)+4)-1)/4)*4; }
+  /** Pulse Intensity derived from Electron Multiplier */
+  double multPulseIntensity() const { return _fMultPulseIntensity; }
+  /** Pulse Intensity derived from ION cup current */
+  double keithleyPulseIntensity() const { return _fKeithleyPulseIntensity; }
+  /** Pulse Energy derived from Electron Multiplier */
+  double pulseEnergy() const { return _fPulseEnergy; }
+  /** Pulse Energy from FEE Gas Detector */
+  double pulseEnergyFEE() const { return _fPulseEnergyFEE; }
+  /** Transmission derived from Electron Multiplier */
+  double transmission() const { return _fTransmission; }
+  /** Transmission from FEE Gas Detector */
+  double transmissionFEE() const { return _fTransmissionFEE; }
+  static uint32_t _sizeof()  { return (((((((((((((((((((0+(1*(32)))+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+4)-1)/4)*4; }
 private:
   char	_strGasType[32];	/**< String describing gas type */
-  double	_fPressure;	/**< Pressure from Spinning Rotor Gauge, SXR:GMD:SRG:01:Pressure */
-  double	_fTemperature;	/**< Temp from PT100, SXR:GMD:RTD:40:RAW_AI */
-  double	_fCurrent;	/**< Current from Keithley Electrometer, SXR:GMD:ETM:01:Reading */
-  int32_t	_iHvMeshElectron;	/**< HV Mesh Electron, SXR:GMD:VHQ1:ChA:VoltageMeasure */
-  int32_t	_iHvMeshIon;	/**< HV Mesh Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
-  int32_t	_iHvMultIon;	/**< HV Mult Ion,      SXR:GMD:VHQ1:ChB:VoltageMeasure */
-  double	_fChargeQ;	/**< Charge Q, SXR:GMD:IMD:Charge_Q */
-  double	_fPhotonEnergy;	/**< Photon Energy, SIOC:SYS0:ML00:AO627 */
-  double	_fPhotonsPerPulse;	/**< Photons Per Pulse, SXR:GMD:IMD:CalcIMD:PhotonsPerPulse */
-  double	_fSpare1;
-  double	_fSpare2;
-  double	_fSpare3;
-  double	_fSpare4;
-  double	_fSpare5;
+  double	_fPressure;	/**< Pressure from Spinning Rotor Gauge */
+  double	_fTemperature;	/**< Temp from PT100 */
+  double	_fCurrent;	/**< Current from Keithley Electrometer */
+  double	_fHvMeshElectron;	/**< HV Mesh Electron */
+  double	_fHvMeshIon;	/**< HV Mesh Ion */
+  double	_fHvMultIon;	/**< HV Mult Ion */
+  double	_fChargeQ;	/**< Charge Q */
+  double	_fPhotonEnergy;	/**< Photon Energy */
+  double	_fMultPulseIntensity;	/**< Pulse Intensity derived from Electron Multiplier */
+  double	_fKeithleyPulseIntensity;	/**< Pulse Intensity derived from ION cup current */
+  double	_fPulseEnergy;	/**< Pulse Energy derived from Electron Multiplier */
+  double	_fPulseEnergyFEE;	/**< Pulse Energy from FEE Gas Detector */
+  double	_fTransmission;	/**< Transmission derived from Electron Multiplier */
+  double	_fTransmissionFEE;	/**< Transmission from FEE Gas Detector */
   double	_fSpare6;
 };
 #pragma pack(pop)
