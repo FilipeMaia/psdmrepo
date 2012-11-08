@@ -44,31 +44,6 @@ import time
 #--------------------
 #--------------------
 #--------------------
-#--------------------
-
-def get_list_of_files_in_dir(dirname) :
-    return os.listdir(dirname)
-
-#--------------------
-
-def print_all_files_in_dir(dirname) :
-    print 'List of files in the dir.', dirname
-    for fname in get_list_of_files_in_dir(dirname) :
-        print fname
-    print '\n'
-
-#--------------------
-
-def print_list_of_files_in_dir(dirname, path_or_fname) :
-    dname, fname = os.path.split(path_or_fname)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
-    print 'print_list_of_files_in_dir():  directory:' + dirname + '  fname:' + fname
-
-    for fname_in_dir in get_list_of_files_in_dir(dirname) :
-        if fname in fname_in_dir :
-            print fname_in_dir    
-    print '\n'
-
-#--------------------
 
 def get_array_from_file(fname) :
     print 'get_array_from_file:', fname
@@ -76,40 +51,6 @@ def get_array_from_file(fname) :
 
 #--------------------
 
-def print_parsed_path(path) :
-    print 'print_parsed_path(path): path:', path
-    print 'exists(path)  =', os.path.exists(path)
-    print 'splitext(path)=', os.path.splitext(path)
-    print 'basename(path)=', os.path.basename(path)
-    print 'dirname(path) =', os.path.dirname(path)
-    print 'lexists(path) =', os.path.lexists(path)
-    print 'isfile(path)  =', os.path.isfile(path)
-    print 'isdir(path)   =', os.path.isdir(path)
-    print 'split(path)   =', os.path.split(path)   
-
-#--------------------
-
-def parse_path(path) :
-    #print 'parse_path("' + path + '")'
-    dname, fname = os.path.split(path)     # i.e. ('/reg/d/psdm/XCS/xcsi0112/xtc', 'e167-r0015-s00-c00.xtc')
-    name, ext    = os.path.splitext(fname) # i.e. ('e167-r0015-s00-c00', '.xtc')
-    return dname, name, ext
-
-#--------------------
-
-def get_dirname_from_path(path) :
-    dirname, tail = os.path.split(path)
-    if len(dirname) == 0 : dirname = './'
-    #print 'get_dirname_from_path():  path: ' + path + '  dirname: ' + dirname
-    return dirname
-
-#--------------------
-
-def get_pwd() :
-    pwdir = commands.getoutput('echo $PWD')
-    return pwdir
-
-#--------------------
 # This method parse the psana configuration file and returns the one of the xtc file names,
 # from the line like:
 # files = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc \
@@ -170,33 +111,6 @@ def get_parameter_from_cfg_file_line(line, parname) :
     return par_str
 
 #--------------------
-# assumes: fname = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
-
-def parse_xtc_fname(fname) :
-    #print 'parse_xtc_fname("' + fname + '")'
-
-    instrument = None
-    experiment = None
-    run        = None
-
-    pos  = fname.find('/reg/d/psdm/')
-    if pos != -1 : instrument = fname[pos+12:pos+15].upper()  # i.e. XCS in .lower() or .upper() case for all letters
-    experiment = fname[pos+16:].split('/', 1)[0]              # i.e.xcsi0112
-    bname   = os.path.basename(fname)                         # i.e. e167-r0015-s00-c00.xtc
-    run_str = bname.split('-')[1]                             # i.e.  r0015
-    run_num = int(run_str[1:])
-
-    return instrument, experiment, run_str, run_num
-    
-#--------------------
-
-def split_string(str,separator='-s') :
-    #print 'split_string("' + str + '") by the separator: "' + separator + '"'
-    str_pref, str_suff = str.split(separator, 1) 
-    return str_pref, str_suff
-
-
-#--------------------
 
 #def check_the_file(trailer) :
 #    print 'check_the_file(trailer): for trailer: ' + trailer
@@ -235,10 +149,10 @@ def split_string(str,separator='-s') :
 
 #--------------------
 
-def remove_file(path) :
-    print 'remove file: ' + path
-    p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
-    p.wait() # short time waiting untill submission is done, 
+#def remove_file(path) :
+#    print 'remove file: ' + path
+#    p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
+#    p.wait() # short time waiting untill submission is done, 
 
 #--------------------
 
@@ -269,47 +183,6 @@ def print_subproc_attributes(proc):
     print 'returncode    :', proc.returncode
     
 #--------------------
-
-def batch_job_submit(command_seq) : # for example command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
-    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE) #, stdin=subprocess.STDIN, stderr=subprocess.PIPE
-    p.wait()
-    #print_subproc_attributes(p)
-    line = p.stdout.readline() # read() - reads entire file
-    # here we pares the line assuming that it looks like: Job <126090> is submitted to queue <psfehq>.
-    print line
-    line_fields = line.split(' ')
-    if line_fields[0] != 'Job' :
-        sys.exit('EXIT: Unexpected response at batch submission: ' + line)
-    job_id_str = line_fields[1].strip('<').rstrip('>')
-    return job_id_str
-
-#--------------------
-
-def batch_job_status(job_id_str, queue='psnehq') :
-    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE)
-    p.wait() # short time waiting untill submission is done, 
-    status = None
-    lines  = p.stdout.readlines() # returns the list of lines in file
-    if len(lines)<2 : return None
-    line   = lines[1].strip('\n')
-    status = line.split()[2]
-    return status # it might None, 'RUN', 'PEND', 'EXIT', 'DONE', etc 
-
-#--------------------
-
-def batch_job_status_and_nodename(job_id_str, queue='psnehq') :
-    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE)
-    p.wait() # short time waiting untill submission is done, 
-    status = None
-    lines  = p.stdout.readlines() # returns the list of lines in file
-    if len(lines)<2 : return None, None
-    line   = lines[1].strip('\n')
-    fields = line.split()
-    #for field in fields :
-    #    print field,
-    #print ' '    
-    status, nodename = fields[2], fields[5]
-    return status, nodename # status might None, 'RUN', 'PEND', 'EXIT', 'DONE', etc 
 
 #--------------------
 
@@ -511,9 +384,12 @@ def do_test() :
     #print 'list_of_files =', get_list_of_files_in_dir(pwd)
     print_all_files_in_dir(pwd)
 
-    seq=['bsub', '-q', 'psnehq', '-o', 'log-ls.txt', 'ls -l']
-    job_id = batch_job_submit(seq) 
+    command = 'ls -l'
+    job_id  = batch_job_submit(command, 'psnehq', 'log-ls.txt') 
     print 'job_id =', job_id
+
+    out = os_command(['df','-k','.'])
+    print out
 
 #--------------------
 

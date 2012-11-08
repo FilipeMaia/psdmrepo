@@ -61,12 +61,13 @@ class ConfigFileGenerator :
 
     def make_psana_cfg_file_for_pedestals (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-pedestals.cfg').path()
-        self.path_out = fnm.path_psana_cfg_pedestals()
-        self.d_subs   = {'SKIP'     : str( cp.bat_dark_start.value() ),
-                         'EVENTS'   : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() ),
-                         'DETINFO'  : cp.bat_det_info.value(),
-                         'FILE_AVE' : fnm.path_pedestals_ave(),
-                         'FILE_RMS' : fnm.path_pedestals_rms()
+        self.path_out = fnm.path_pedestals_psana_cfg()
+        self.d_subs   = {'SKIP'           : str( cp.bat_dark_start.value() ),
+                         'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() ),
+                         'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
+                         'DETINFO'        : str( cp.bat_det_info.value() ),
+                         'FILE_AVE'       : fnm.path_pedestals_ave(),
+                         'FILE_RMS'       : fnm.path_pedestals_rms()
                          }
 
         self.print_substitution_dict()
