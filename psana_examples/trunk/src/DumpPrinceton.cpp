@@ -127,6 +127,32 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
     }
     
   }
+
+  shared_ptr<Psana::Princeton::ConfigV4> config4 = env.configStore().get(m_src);
+  if (config4.get()) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Princeton::ConfigV2:";
+      str << "\n  width = " << config4->width();
+      str << "\n  height = " << config4->height();
+      str << "\n  orgX = " << config4->orgX();
+      str << "\n  orgY = " << config4->orgY();
+      str << "\n  binX = " << config4->binX();
+      str << "\n  binY = " << config4->binY();
+      str << "\n  maskedHeight = " << config4->maskedHeight();
+      str << "\n  kineticHeight = " << config4->kineticHeight();
+      str << "\n  vsSpeed = " << config4->vsSpeed();
+      str << "\n  exposureTime = " << config4->exposureTime();
+      str << "\n  coolingTemp = " << config4->coolingTemp();
+      str << "\n  gainIndex = " << config4->gainIndex();
+      str << "\n  readoutSpeedIndex = " << config4->readoutSpeedIndex();
+      str << "\n  exposureEventCode = " << config4->exposureEventCode();
+      str << "\n  numDelayShots = " << config4->numDelayShots();
+      str << "\n  frameSize = " << config4->frameSize();
+      str << "\n  numPixels = " << config4->numPixels();
+    }
+
+  }
 }
 
 // Method which is called with event data

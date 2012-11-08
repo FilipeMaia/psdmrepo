@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-14
+2012-11-08 Andy Salnikov
+- dump hex damage mask for bld ebeam classes
+- add princeton::ConfigV4 class
+
 Tag: V00-02-13
 2012-09-28 Andy Salnikov
 - DumpControl.cpp: fix for the code which prints labes

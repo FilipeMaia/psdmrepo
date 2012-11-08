@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iomanip>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -72,7 +73,7 @@ DumpBld::event(Event& evt, Env& env)
   if (ebeam0.get()) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV0:"
-          << "\n  damageMask=" << ebeam0->damageMask()
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam0->damageMask() << std::dec
           << "\n  ebeamCharge=" << ebeam0->ebeamCharge()
           << "\n  ebeamL3Energy=" << ebeam0->ebeamL3Energy()
           << "\n  ebeamLTUPosX=" << ebeam0->ebeamLTUPosX()
@@ -86,7 +87,7 @@ DumpBld::event(Event& evt, Env& env)
   if (ebeam1.get()) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV1:"
-          << "\n  damageMask=" << ebeam1->damageMask()
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam1->damageMask() << std::dec
           << "\n  ebeamCharge=" << ebeam1->ebeamCharge()
           << "\n  ebeamL3Energy=" << ebeam1->ebeamL3Energy()
           << "\n  ebeamLTUPosX=" << ebeam1->ebeamLTUPosX()
@@ -101,7 +102,7 @@ DumpBld::event(Event& evt, Env& env)
   if (ebeam2.get()) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV2:"
-          << "\n  damageMask=" << ebeam2->damageMask()
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam2->damageMask() << std::dec
           << "\n  ebeamCharge=" << ebeam2->ebeamCharge()
           << "\n  ebeamL3Energy=" << ebeam2->ebeamL3Energy()
           << "\n  ebeamLTUPosX=" << ebeam2->ebeamLTUPosX()
@@ -117,7 +118,7 @@ DumpBld::event(Event& evt, Env& env)
   if (ebeam3.get()) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV3:"
-          << "\n  damageMask=" << ebeam3->damageMask()
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam3->damageMask() << std::dec
           << "\n  ebeamCharge=" << ebeam3->ebeamCharge()
           << "\n  ebeamL3Energy=" << ebeam3->ebeamL3Energy()
           << "\n  ebeamLTUPosX=" << ebeam3->ebeamLTUPosX()
