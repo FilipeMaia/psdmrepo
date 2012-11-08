@@ -31,10 +31,10 @@ use LusiTime\LusiTime;
  */
 class DataPortal {
 
-	/* --------------------------------------------------------------------------------------------
-	 */
-	static function begin( $page_name ) {
-		echo <<<HERE
+    /* --------------------------------------------------------------------------------------------
+     */
+    static function begin( $page_name ) {
+        echo <<<HERE
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html> 
@@ -46,16 +46,16 @@ class DataPortal {
 <link type="text/css" href="css/default.css" rel="Stylesheet" />
 
 HERE;
-	}
+    }
 
-	/* --------------------------------------------------------------------------------------------
-	 */
-	static function scripts( $page_specific_init  ) {
+    /* --------------------------------------------------------------------------------------------
+     */
+    static function scripts( $page_specific_init  ) {
 
-		$auth_svc = AuthDB::instance();
-		$auth_svc->begin();
-		
-		echo <<<HERE
+        $auth_svc = AuthDB::instance();
+        $auth_svc->begin();
+        
+        echo <<<HERE
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
@@ -116,20 +116,20 @@ function auth_timer_event() {
     var seconds = auth_webauth_token_expiration - now;
     if( seconds <= 0 ) {
         $('#popupdialogs').html(
-        	'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-        	'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
-        	'of the browser to renew your credentials.</p>'
+            '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+            'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
+            'of the browser to renew your credentials.</p>'
         );
         $('#popupdialogs').dialog({
-        	resizable: false,
-        	modal: true,
-        	buttons: {
-        		"Ok": function() {
-        			$( this ).dialog( "close" );
-        			refresh_page();
-        		}
-        	},
-        	title: 'Session Expiration Notification'
+            resizable: false,
+            modal: true,
+            buttons: {
+                "Ok": function() {
+                    $( this ).dialog( "close" );
+                    refresh_page();
+                }
+            },
+            title: 'Session Expiration Notification'
         });
         return;
     }
@@ -151,59 +151,59 @@ function auth_timer_event() {
 }
 
 function logout() {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-    	'This will log yout out from the current WebAuth session. Are you sure?</p>'
-	 );
-	$('#popupdialogs').dialog( {
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog( "close" );
-	            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            refresh_page();
-			},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-			}
-		},
-		title: 'Session Logout Warning'
-	} );
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+        'This will log yout out from the current WebAuth session. Are you sure?</p>'
+     );
+    $('#popupdialogs').dialog( {
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                $( this ).dialog( "close" );
+                document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                refresh_page();
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        },
+        title: 'Session Logout Warning'
+    } );
 }
 
 function edit_dialog( title, msg, on_save, on_cancel, width, height ) {
-	$('#editdialogs').html(msg);
-	$('#editdialogs').dialog({
-		title:     title,
-		resizable: true,
+    $('#editdialogs').html(msg);
+    $('#editdialogs').dialog({
+        title:     title,
+        resizable: true,
         width:     width == null ? 460 : width,
         height:    height == null ? 240 : height,
-		modal:     true,
-		buttons:   {
-			Save: function() {
-				$(this).dialog('close');
-				if( on_save != null ) on_save();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-				if( on_cancel != null ) on_cancel();
-			}
-		}
-	});
+        modal:     true,
+        buttons:   {
+            Save: function() {
+                $(this).dialog('close');
+                if( on_save != null ) on_save();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+                if( on_cancel != null ) on_cancel();
+            }
+        }
+    });
 }
 
 function large_dialog( title, msg ) {
     var geom = document_inner_geometry();
-	$('#largedialogs').html(msg);
-	$('#largedialogs').dialog({
-		title:     title,
-		resizable: true,
+    $('#largedialogs').html(msg);
+    $('#largedialogs').dialog({
+        title:     title,
+        resizable: true,
         width:     geom.width-20,
         height:    geom.height-20,
-		modal:     true
-	});
+        modal:     true
+    });
 }
 
 /* --------------------------------------------------- 
@@ -213,24 +213,24 @@ function large_dialog( title, msg ) {
 $(document).ready(
     function(){
         auth_timer_restart();
-    	{$page_specific_init}();
+        {$page_specific_init}();
     }
 );
 </script>
 
 HERE;
-	}
+    }
 
-	/* --------------------------------------------------------------------------------------------
-	 */
-	static function body( $document_title, $document_subtitle=null, $document_subtitle_id=null, $extra=null ) {
+    /* --------------------------------------------------------------------------------------------
+     */
+    static function body( $document_title, $document_subtitle=null, $document_subtitle_id=null, $extra=null ) {
 
-		require_once('authdb/authdb.inc.php');
+        require_once('authdb/authdb.inc.php');
 
-		$auth_svc = AuthDB::instance();
-		$auth_svc->begin();
+        $auth_svc = AuthDB::instance();
+        $auth_svc->begin();
 
-		echo <<<HERE
+        echo <<<HERE
 </head>
 <body>
   <div id="body">
@@ -271,64 +271,65 @@ HERE;
   </div>
 
 HERE;
-	}
+    }
 
-	/* --------------------------------------------------------------------------------------------
-	 */
-	static function tabs( $tabs_id, $tabs  ) {
-		echo DataPortal::tabs_html( $tabs_id, $tabs );
-	}
-	static function tabs_html( $tabs_id, $tabs  ) {
-		$html = <<<HERE
+    /* --------------------------------------------------------------------------------------------
+     */
+    static function tabs( $tabs_id, $tabs  ) {
+        echo DataPortal::tabs_html( $tabs_id, $tabs );
+    }
+    static function tabs_html( $tabs_id, $tabs  ) {
+        $html = <<<HERE
 <div id="{$tabs_id}">
   <ul>
 
 HERE;
-		foreach( $tabs as $t  ) {
-			$id = $t['id'];
-			$href = isset($id) ? '#'.$id : $t['url'];
-			$name = $t['name'];
-			$onclick = '';
-			if( array_key_exists ( 'callback', $t )) $onclick = "onclick='".$t['callback']."'";
-			$html .= <<<HERE
-    <li><a href="{$href}" {$onclick}>{$name}</a></li>
+        foreach( $tabs as $t  ) {
+            $id = $t['id'];
+                        $style_html = isset($t['separate']) ? 'style="margin-left:10px;" ' : '';
+            $href = isset($id) ? '#'.$id : $t['url'];
+            $name = $t['name'];
+            $onclick = '';
+            if( array_key_exists ( 'callback', $t )) $onclick = "onclick='".$t['callback']."'";
+            $html .= <<<HERE
+    <li {$style_html} ><a href="{$href}" {$onclick}>{$name}</a></li>
 
 HERE;
-		}
-		$html .= <<<HERE
+        }
+        $html .= <<<HERE
   </ul>
 
 HERE;
-		foreach( $tabs as $t  ) {
-			$id = $t['id'];
-			if(!isset($id)) continue;
-			$tab_html = $t['html'];
-			$class    = $t['class'];
-			$class_html = ( isset( $class ) && !is_null( $class ) && ( $class != '' )) ? 'class="'.$class.'"' : '';
+        foreach( $tabs as $t  ) {
+            $id = $t['id'];
+            if(!isset($id)) continue;
+            $tab_html = $t['html'];
+            $class    = $t['class'];
+            $class_html = ( isset( $class ) && !is_null( $class ) && ( $class != '' )) ? 'class="'.$class.'"' : '';
 
-			// NOTE: the inner <div> is needed to have full control over custom styles,
-			//       classes, etc. That's because JQuery UI will manage its own classes
-			//       and styles to the id-entified outer <div>.
-			//
-			$html .= <<<HERE
+            // NOTE: the inner <div> is needed to have full control over custom styles,
+            //       classes, etc. That's because JQuery UI will manage its own classes
+            //       and styles to the id-entified outer <div>.
+            //
+            $html .= <<<HERE
 <div id="{$id}">
   <div {$class_html}>{$tab_html}</div>
 </div>
 
 HERE;
-		}
-		$html .= <<<HERE
+        }
+        $html .= <<<HERE
 </div>
 
 HERE;
-		return $html;
-	}
-	
-	/* ---------------------------------------------------------------------------------------------
-	 */
-	static function end() {
+        return $html;
+    }
+    
+    /* ---------------------------------------------------------------------------------------------
+     */
+    static function end() {
 
-		echo <<<HERE
+        echo <<<HERE
 
   <div id="popupdialogs" style="display:none;"></div>
   <div id="editdialogs"  style="display:none;"></div>
@@ -341,95 +342,95 @@ HERE;
 
 HERE;
 
-	}
+    }
 
-	/* ---------------------------------------------------------------------------------------------
-	 */
-	static function table_begin_html( $cols ) {
+    /* ---------------------------------------------------------------------------------------------
+     */
+    static function table_begin_html( $cols ) {
 
-		$html = <<<HERE
+        $html = <<<HERE
 <table cellspacing="4">
   <tbody>
     <tr>
 
 HERE;
 
-		foreach( $cols as $c ) {
-			$name  = $c['name'];
-			$width = $c['width'];
-			$html .= <<<HERE
+        foreach( $cols as $c ) {
+            $name  = $c['name'];
+            $width = $c['width'];
+            $html .= <<<HERE
       <td class="table_hdr" width="{$width}">{$name}</td>
 
 HERE;
-		}
-		$html .= <<<HERE
+        }
+        $html .= <<<HERE
     </tr>
 
 HERE;
 
-		return $html;
-	}
+        return $html;
+    }
 
-	static function table_row_html( $values, $end_of_group=true ) {
+    static function table_row_html( $values, $end_of_group=true ) {
 
-		$class = $end_of_group ? 'table_cell' : 'table_cell_within_group';
-		$html = <<<HERE
+        $class = $end_of_group ? 'table_cell' : 'table_cell_within_group';
+        $html = <<<HERE
     <tr>
 
 HERE;
 
-		foreach( $values as $v ) {
+        foreach( $values as $v ) {
 
-			// Replace empty values with non-breakable space to avoid screwing up CSS
-			// for table cells on Mozilla Firefox & IE browsers.
-			//
-			if( $v == '' ) $v = '&nbsp;';
-			$html .= <<<HERE
+            // Replace empty values with non-breakable space to avoid screwing up CSS
+            // for table cells on Mozilla Firefox & IE browsers.
+            //
+            if( $v == '' ) $v = '&nbsp;';
+            $html .= <<<HERE
       <td class="{$class}">{$v}</td>
 
 HERE;
-		}
-		$html .= <<<HERE
+        }
+        $html .= <<<HERE
     </tr>
 
 HERE;
-		return $html;
-	}
+        return $html;
+    }
 
-	static function table_end_html() {
-		return <<<HERE
+    static function table_end_html() {
+        return <<<HERE
   </tbody>
 </table>
 
 HERE;
-	}
-
-	static function decorated_experiment_contact_info( $experiment ) {
-		return preg_replace(
-   			'/(.*)[( ](.+@.+)[) ](.*)/',
-   			'<a class="link" href="javascript:show_email('."'$1','$2'".')" title="click to see e-mail address">$1</a>$3',
-   			$experiment->contact_info());
-	}
-
-	static function decorated_experiment_status( $experiment ) {
-    	$status = $experiment->in_interval( LusiTime::now());
-    	if     ( $status > 0 ) return '<b><em style="color:gray">completed</em></b>';
-    	else if( $status < 0 ) return '<b><em style="color:green">in prep</em></b>';
-    	return '<b><em style="color:red">on-going</em></b>';
     }
 
-	static function decorated_experiment_status_UP( $experiment ) {
-    	$status = $experiment->in_interval( LusiTime::now());
-    	if     ( $status > 0 ) return '<b><em style="color:gray">COMPLETED</em></b>';
-    	else if( $status < 0 ) return '<b><em style="color:green">IN PREPARATION</em></b>';
-    	return '<b><em style="color:red">ON-GOING</em></b>';
+    static function decorated_experiment_contact_info( $experiment ) {
+        return preg_replace(
+               '/(.*)[( ](.+@.+)[) ](.*)/',
+               '<a class="link" href="javascript:show_email('."'$1','$2'".')" title="click to see e-mail address">$1</a>$3',
+               $experiment->contact_info());
     }
 
-	static function error_message( $msg ) {
-		header( 'Content-type: text/plain' );
-    	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-		echo '<span style="font-size:24px; font-weight:bold; color:red;">ERROR: '.$msg.'</span>';
-	}
+    static function decorated_experiment_status( $experiment ) {
+        $status = $experiment->in_interval( LusiTime::now());
+        if     ( $status > 0 ) return '<b><em style="color:gray">completed</em></b>';
+        else if( $status < 0 ) return '<b><em style="color:green">in prep</em></b>';
+        return '<b><em style="color:red">on-going</em></b>';
+    }
+
+    static function decorated_experiment_status_UP( $experiment ) {
+        $status = $experiment->in_interval( LusiTime::now());
+        if     ( $status > 0 ) return '<b><em style="color:gray">COMPLETED</em></b>';
+        else if( $status < 0 ) return '<b><em style="color:green">IN PREPARATION</em></b>';
+        return '<b><em style="color:red">ON-GOING</em></b>';
+    }
+
+    static function error_message( $msg ) {
+        header( 'Content-type: text/plain' );
+        header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+        header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+        echo '<span style="font-size:24px; font-weight:bold; color:red;">ERROR: '.$msg.'</span>';
+    }
 }
 ?>

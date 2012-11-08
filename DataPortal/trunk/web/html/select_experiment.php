@@ -213,9 +213,17 @@ function show_email( user, addr ) {
     foreach( RegDB::instance()->instruments() as $instrument ) {
         if( $instrument->is_location()) continue;
 
-        $last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
-        if( !is_null( $last_experiment_switch ))
-            $html .= table_row( LogBook::instance()->find_experiment_by_id( $last_experiment_switch['exper_id'] ));
+        $num_stations = $instrument->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, instrument: {$instrument->name()}" );
+
+        for( $station=0; $station < intval($num_stations->value()); $station++ ) {
+            $last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name(), $station);
+                if( !is_null( $last_experiment_switch ))
+                    $html .= table_row( LogBook::instance()->find_experiment_by_id( $last_experiment_switch['exper_id'] ));
+        }
     }    
     $html .= DataPortal::table_end_html();
     array_push(
@@ -309,7 +317,7 @@ function show_email( user, addr ) {
         array_push(
             $experiment_tabs,
             array(
-                'name' => $location.' (special e-Logs)',
+                'name' => "Facilities",
                 'id'   => 'experiments-'.$location,
                 'html' => $html,
                 'class' => 'tab-inline-content'

@@ -7,7 +7,7 @@ require_once( 'lusitime/lusitime.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\SysMon;
+use DataPortal\ExpTimeMon;
 use DataPortal\DataPortalException;
 
 use LusiTime\LusiTime;
@@ -60,12 +60,12 @@ try {
     if( !isset($_POST[ 'system'] )) report_error( 'no system comment parameter found' );
     $system_text = trim( $_POST['system']);
  
-    $sysmon = SysMon::instance();
-    $sysmon->begin();
+    $exptimemon = ExpTimeMon::instance();
+    $exptimemon->begin();
     if( $comment_text == '' )
-        $sysmon->beamtime_clear_gap_comment($gap_begin_time, $instr_name);
+        $exptimemon->beamtime_clear_gap_comment($gap_begin_time, $instr_name);
     else
-        $sysmon->beamtime_set_gap_comment(
+        $exptimemon->beamtime_set_gap_comment(
             $gap_begin_time,
             $instr_name,
             $comment_text,
@@ -73,9 +73,9 @@ try {
             LusiTime::now(),
             AuthDB::instance()->authName());
 
-    $sysmon->notify_allsubscribed4explanations($instr_name, $gap_begin_time);
+    $exptimemon->notify_allsubscribed4explanations($instr_name, $gap_begin_time);
 
-    $comment = $sysmon->beamtime_comment_at($gap_begin_time, $instr_name);
+    $comment = $exptimemon->beamtime_comment_at($gap_begin_time, $instr_name);
     $comment_info = is_null($comment) ?
         array('available'     => 0) :
         array('available'     => 1,
@@ -86,7 +86,7 @@ try {
               'post_time'     => $comment->post_time()->toStringShort());
 
     $authdb->commit();
-    $sysmon->commit();
+    $exptimemon->commit();
 
     report_success(array('comment' => $comment_info));
 

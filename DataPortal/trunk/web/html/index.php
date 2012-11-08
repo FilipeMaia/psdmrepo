@@ -29,8 +29,8 @@ use AuthDB\AuthDBException;
  * identifier is supplied to the script.
  */
 if( !isset( $_GET['exper_id'] )) {
-	header("Location: select_experiment.php");
-	exit;
+    header("Location: select_experiment.php");
+    exit;
 }
 $exper_id = trim( $_GET['exper_id'] );
 if( $exper_id == '' ) die( 'no valid experiment identifier provided to the script' );
@@ -39,21 +39,21 @@ if( $exper_id == '' ) die( 'no valid experiment identifier provided to the scrip
  * the corresponding tab.
  */
 $known_apps = array(
-	'experiment' => True,
-	'elog'       => True,
-	'datafiles'  => True,
-	'hdf'        => True );
+    'experiment' => True,
+    'elog'       => True,
+    'datafiles'  => True,
+    'hdf'        => True );
 
 $select_app = 'experiment';
 $select_app_context1 = '';
 
 if( isset( $_GET['app'] )) {
-	$app_path = explode( ':', strtolower( trim( $_GET['app'] )));
-	$app = $app_path[0];
-	if( array_key_exists( $app, $known_apps )) {
-		$select_app = $app;
-		if( count($app_path) > 1 ) $select_app_context1 = $app_path[1];
-	}
+    $app_path = explode( ':', strtolower( trim( $_GET['app'] )));
+    $app = $app_path[0];
+    if( array_key_exists( $app, $known_apps )) {
+        $select_app = $app;
+        if( count($app_path) > 1 ) $select_app_context1 = $app_path[1];
+    }
 }
 
 /* Parse optional parameters which may be used by applications. The parameters
@@ -61,7 +61,7 @@ if( isset( $_GET['app'] )) {
  * etc.).
  */
 if( isset( $_GET['params'] )) {
-	$params = explode( ',', trim( $_GET['params'] ));
+    $params = explode( ',', trim( $_GET['params'] ));
 }
 
 try {
@@ -91,7 +91,7 @@ try {
         $can_manage_group ||
         RegDB::instance()->is_member_of_posix_group( 'ps-data', $auth_svc->authName()) ||
         RegDB::instance()->is_member_of_posix_group( $logbook_experiment->POSIX_gid(), $auth_svc->authName()) ||
-        RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName());
+        (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName()));
 
     $has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
 
@@ -104,27 +104,22 @@ try {
     $document_title = $experiment->is_facility() ? 'E-Log of Facility:' : 'Web Portal of Experiment:';
     $document_subtitle = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>';
 
-    $decorated_experiment_status = '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>';
-    $last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
-    if( !is_null( $last_experiment_switch ) && ( $exper_id == $last_experiment_switch['exper_id'] )) $decorated_experiment_status = '<span style="color:#ff0000; font-weight:bold;">ACTIVE</span>';
-	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
-	$decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
-	$decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->begin_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
-	$experiment_group_members     = "<table><tbody>\n";
+    $decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
+    $decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
+    $decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->begin_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
+    $experiment_group_members     = "<table><tbody>\n";
     $experiment_group_members .= '<tr><td class="table_cell table_cell_left"></td><td class="table_cell table_cell_right"></td></tr>';
-	foreach( $experiment->group_members() as $m ) {
-    	$uid   = $m['uid'];
-    	$gecos = $m['gecos'];
+    foreach( $experiment->group_members() as $m ) {
+        $uid   = $m['uid'];
+        $gecos = $m['gecos'];
         $experiment_group_members .= '<tr><td class="table_cell table_cell_left">'.$uid.'</td><td class="table_cell table_cell_right">'.$gecos.'</td></tr>';
-	}
-	$experiment_group_members .= "</tbody></table>\n";
+    }
+    $experiment_group_members .= "</tbody></table>\n";
     $experiment_summary_workarea =<<<HERE
 
 <table><tbody>
   <tr><td class="table_cell table_cell_left">Id</td>
       <td class="table_cell table_cell_right">{$experiment->id()}</td></tr>
-  <tr><td class="table_cell table_cell_left">Status</td>
-      <td class="table_cell table_cell_right">{$decorated_experiment_status}</td></tr>
 HERE;
     if ($experiment->is_facility()) {
         $last_entry = $logbook_experiment->find_last_entry();
@@ -136,7 +131,12 @@ HERE;
       <td class="table_cell table_cell_right">{$last_entry_str}</td></tr>
 HERE;
     } else {
+        $decorated_experiment_status = RegDB::instance()->is_active_experiment($experiment->id()) ?
+            '<span style="color:#ff0000; font-weight:bold;">ACTIVE</span>' :
+            '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>' ;
         $experiment_summary_workarea .=<<<HERE
+  <tr><td class="table_cell table_cell_left">Status</td>
+      <td class="table_cell table_cell_right">{$decorated_experiment_status}</td></tr>
   <tr><td class="table_cell table_cell_left">Total # of runs taken</td>
       <td class="table_cell table_cell_right">{$num_runs}</td></tr>
   <tr><td class="table_cell table_cell_left">First run</td>
@@ -168,7 +168,7 @@ HERE;
 
     if($can_manage_group) {
 
-    	$experiment_manage_group_workarea =<<<HERE
+        $experiment_manage_group_workarea =<<<HERE
 
 <div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">
   <div style="height:55px;">
@@ -198,7 +198,7 @@ HERE;
 
 HERE;
     } else {
-	    $experiment_manage_group_workarea =<<<HERE
+        $experiment_manage_group_workarea =<<<HERE
 <br><br>
 <center>
   <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
@@ -217,7 +217,7 @@ HERE;
 
     if( $has_elog_access ) {
 
-    	$elog_recent_workarea =<<<HERE
+        $elog_recent_workarea =<<<HERE
 
 <div id="el-l-mctrl">
   <div style="float:left;">
@@ -287,12 +287,12 @@ HERE;
     $used_tags = $logbook_experiment->used_tags();
     $select_tag_html = "<option> select tag </option>\n";
     foreach( $used_tags as $tag )
-    	$select_tag_html .= "<option>{$tag}</option>\n";
+        $select_tag_html .= "<option>{$tag}</option>\n";
 
     $tags_html = '';
     $num_tags  = 3;
     for( $i = 0; $i < $num_tags; $i++)
-    	$tags_html .=<<<HERE
+        $tags_html .=<<<HERE
 <div style="width: 100%;">
   <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
   <input type="text" class="elog-tag-name" id="elog-tag-name-{$i}" name="tag_name_{$i}" value="" size=16 title="type new tag here or select a known one from the left" />
@@ -305,7 +305,7 @@ HERE;
     $now   = "00:00:00";
     $shifts_html = '';
     foreach( $logbook_shifts as $shift )
-    	$shifts_html .= "<option>{$shift->begin_time()->toStringShort()}</option>";
+        $shifts_html .= "<option>{$shift->begin_time()->toStringShort()}</option>";
     
     $elog_post_workarea =<<<HERE
 <div id="el-p">
@@ -407,11 +407,11 @@ HERE;
 
     $tag2search_html = '<option></option>';
     foreach( $logbook_experiment->used_tags() as $tag ) {
-    	$tag2search_html .= "<option>{$tag}</option>\n";
+        $tag2search_html .= "<option>{$tag}</option>\n";
     }
     $author2search_html = '<option></option>';
     foreach( $logbook_experiment->used_authors() as $author ) {
-    	$author2search_html .= "<option>{$author}</option>\n";
+        $author2search_html .= "<option>{$author}</option>\n";
     }
     $elog_search_workarea =<<<HERE
 <div id="el-s-ctrl">
@@ -488,7 +488,7 @@ Make sure the Begin and End time limits are not used!"/>
 </div>
 HERE;
 
-    	$elog_shifts_workarea =<<<HERE
+        $elog_shifts_workarea =<<<HERE
 <div id="el-sh-ctrl">
   <div style="float:right; margin-left:5px;"><button id="el-sh-refresh" title="click to refresh the shifts list">Refresh</button></div>
   <div style="clear:both;"></div>
@@ -558,7 +558,7 @@ HERE;
 </div>
 HERE;
 
-    	$elog_runs_workarea =<<<HERE
+        $elog_runs_workarea =<<<HERE
 <div id="el-r-ctrl">
   <div style="float:left;">
     <div style="float:left;">
@@ -599,7 +599,7 @@ HERE;
 </div>
 HERE;
 
-    	$elog_attachments_workarea =<<<HERE
+        $elog_attachments_workarea =<<<HERE
 <div id="el-at-ctrl">
   <div style="float:right; margin-left:5px;"><button id="el-at-refresh" title="click to refresh the attachments list">Refresh</button></div>
   <div style="clear:both;"></div>
@@ -641,7 +641,7 @@ HERE;
 </div>
 HERE;
 
-    	$elog_subscribe_workarea =<<<HERE
+        $elog_subscribe_workarea =<<<HERE
 
 <div class="el-subscribe" id="el-subscribed" style="display:none;">
   <h3 style="font-size:140%;">Your subscription:</h3>
@@ -688,10 +688,10 @@ HERE;
 <div id="el-subscribe-all"></div>
 
 HERE;
-    	
+        
     } else {
 
-    	$no_elog_access_message =<<<HERE
+        $no_elog_access_message =<<<HERE
 <br><br>
 <center>
   <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
@@ -707,18 +707,18 @@ HERE;
 </div>
 HERE;
 
-    	$elog_recent_workarea      = $no_elog_access_message;
-    	$elog_post_workarea        = $no_elog_access_message;
-    	$elog_search_workarea      = $no_elog_access_message;
-    	$elog_shifts_workarea      = $no_elog_access_message;
-    	$elog_runs_workarea        = $no_elog_access_message;
-    	$elog_attachments_workarea = $no_elog_access_message;
-    	$elog_subscribe_workarea   = $no_elog_access_message;
+        $elog_recent_workarea      = $no_elog_access_message;
+        $elog_post_workarea        = $no_elog_access_message;
+        $elog_search_workarea      = $no_elog_access_message;
+        $elog_shifts_workarea      = $no_elog_access_message;
+        $elog_runs_workarea        = $no_elog_access_message;
+        $elog_attachments_workarea = $no_elog_access_message;
+        $elog_subscribe_workarea   = $no_elog_access_message;
 
     }
     if( $has_data_access ) {
 
-    	$datafiles_summary_workarea =<<<HERE
+        $datafiles_summary_workarea =<<<HERE
 <div id="datafiles-summary-ctrl">
   <div style="float:right;"><button id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
   <div style="clear:both;"></div>
@@ -762,7 +762,7 @@ HERE;
 </div>
 HERE;
 
-    	$datafiles_files_workarea =<<<HERE
+        $datafiles_files_workarea =<<<HERE
 <div id="datafiles-files-ctrl">
   <div style="float:left;">
     <div style="float:left;">
@@ -876,7 +876,7 @@ HERE;
 </div>
 HERE;
 
-    	$hdf_manage_workarea = <<<HERE
+        $hdf_manage_workarea = <<<HERE
 <div id="hdf-manage-ctrl">
   <div style="float:left;">
     <div style="float:left;">
@@ -911,15 +911,15 @@ HERE;
 </div>
 HERE;
 
-    	$hdf_history_workarea = <<<HERE
+        $hdf_history_workarea = <<<HERE
 HERE;
 
-    	$hdf_translators_workarea = <<<HERE
+        $hdf_translators_workarea = <<<HERE
 HERE;
 
     } else {
 
-    	$no_data_access_message =<<<HERE
+        $no_data_access_message =<<<HERE
 <br><br>
 <center>
   <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
@@ -933,11 +933,11 @@ HERE;
 </div>
 HERE;
 
-		$datafiles_summary_workarea = $no_data_access_message;
-		$datafiles_files_workarea   = $no_data_access_message;
-		$hdf_manage_workarea        = $no_data_access_message;
-    	$hdf_history_workarea       = $no_data_access_message;
-		$hdf_translators_workarea   = $no_data_access_message;
+        $datafiles_summary_workarea = $no_data_access_message;
+        $datafiles_files_workarea   = $no_data_access_message;
+        $hdf_manage_workarea        = $no_data_access_message;
+        $hdf_history_workarea       = $no_data_access_message;
+        $hdf_translators_workarea   = $no_data_access_message;
     }
 
 ?>
@@ -1056,52 +1056,52 @@ function resize() {
     var    top_height = 130;
     var bottom_height = 0;
     var center_height = $(window).height()-top_height-bottom_height;
-	$('#p-left'    ).height(center_height);
-	$('#p-splitter').height(center_height);
-	$('#p-center'  ).height(center_height);
+    $('#p-left'    ).height(center_height);
+    $('#p-splitter').height(center_height);
+    $('#p-center'  ).height(center_height);
 }
 
 /* Get mouse position relative to the document.
  */
 function getMousePosition(e) {
 
-	var posx = 0;
-	var posy = 0;
-	if (!e) var e = window.event;
-	if (e.pageX || e.pageY) 	{
-		posx = e.pageX;
-		posy = e.pageY;
-	}
-	else if (e.clientX || e.clientY) 	{
-		posx = e.clientX + document.body.scrollLeft
-			+ document.documentElement.scrollLeft;
-		posy = e.clientY + document.body.scrollTop
-			+ document.documentElement.scrollTop;
-	}
-	return {'x': posx, 'y': posy };
+    var posx = 0;
+    var posy = 0;
+    if (!e) var e = window.event;
+    if (e.pageX || e.pageY)     {
+        posx = e.pageX;
+        posy = e.pageY;
+    }
+    else if (e.clientX || e.clientY)     {
+        posx = e.clientX + document.body.scrollLeft
+            + document.documentElement.scrollLeft;
+        posy = e.clientY + document.body.scrollTop
+            + document.documentElement.scrollTop;
+    }
+    return {'x': posx, 'y': posy };
 }
 
 function move_split(e) {
-	var pos = getMousePosition(e);
-	$('#p-left').css('width', pos['x']);
-	$('#p-splitter').css('left', pos['x']);
-	$('#p-center').css('margin-left', pos['x']+3);
+    var pos = getMousePosition(e);
+    $('#p-left').css('width', pos['x']);
+    $('#p-splitter').css('left', pos['x']);
+    $('#p-center').css('margin-left', pos['x']+3);
 }
 
 $(function() {
 
-	resize();
+    resize();
 
-	var mouse_down = false;
+    var mouse_down = false;
 
-	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
+    $('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
 
-	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
-	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
+    $('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
+    $('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
 
-	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
-	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
-	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
+    $('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
+    $('#p-splitter').mouseup   (function(e) { mouse_down = false; });
+    $('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
 });
 
 
@@ -1312,20 +1312,20 @@ function auth_timer_event() {
     var seconds = auth_webauth_token_expiration - now;
     if( seconds <= 0 ) {
         $('#popupdialogs').html(
-        	'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-        	'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
-        	'of the browser to renew your credentials.</p>'
+            '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+            'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
+            'of the browser to renew your credentials.</p>'
         );
         $('#popupdialogs').dialog({
-        	resizable: false,
-        	modal: true,
-        	buttons: {
-        		'Ok': function() {
-        			$(this).dialog('close');
-        			refresh_page();
-        		}
-        	},
-        	title: 'Session Expiration Notification'
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Ok': function() {
+                    $(this).dialog('close');
+                    refresh_page();
+                }
+            },
+            title: 'Session Expiration Notification'
         });
         return;
     }
@@ -1347,26 +1347,26 @@ function auth_timer_event() {
 }
 
 function logout() {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-    	'This will log yout out from the current WebAuth session. Are you sure?</p>'
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog('close');
-	            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            refresh_page();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-			}
-		},
-		title: 'Session Logout Warning'
-	});
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+        'This will log yout out from the current WebAuth session. Are you sure?</p>'
+     );
+    $('#popupdialogs').dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                $( this ).dialog('close');
+                document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                refresh_page();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+            }
+        },
+        title: 'Session Logout Warning'
+    });
 }
 
 /* --------------------------------------------------- 
@@ -1374,7 +1374,7 @@ function logout() {
  * ---------------------------------------------------
  */
 $(document).ready(function(){
-	auth_timer_restart();
+    auth_timer_restart();
 });
 
 
@@ -1387,11 +1387,11 @@ elog.exp_id = <?=$exper_id?>;
 elog.exp = '<?=$experiment->name()?>';
 elog.instr = '<?=$experiment->instrument()->name()?>';
 <?php
-	foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
+    foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
 ?>
 elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;
 <?php
-	foreach( $used_tags as $tag ) echo "elog.used_tags.push('{$tag}');\n";
+    foreach( $used_tags as $tag ) echo "elog.used_tags.push('{$tag}');\n";
 ?>
 
 // Calback function for e-log to be used after successfully posting
@@ -1404,15 +1404,15 @@ elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'
 //       as 'parent' (a provider of sertain services).
 //
 elog.post_onsuccess = function() {
-	for(var id in applications) {
-		var a = applications[id];
-		if(a.name == 'elog') {
-			$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-			v_item_selected($('#v-menu > #elog > .v-item#recent'));
-			a.select('recent');
-			break;
-		}
-	}
+    for(var id in applications) {
+        var a = applications[id];
+        if(a.name == 'elog') {
+            $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
+            v_item_selected($('#v-menu > #elog > .v-item#recent'));
+            a.select('recent');
+            break;
+        }
+    }
 };
 
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
@@ -1428,24 +1428,24 @@ var select_app_context1 = '<?=$select_app_context1?>';
 
 var extra_params = new Array();
 <?php
-	if( isset($params)) {
-		foreach( $params as $p ) {
-			$kv = explode(':',$p);
-			switch(count($kv)) {
-			case 0:
-				break;
-			case 1:
-				$k = $kv[0];
-				echo "extra_params['{$k}']=true;\n";
-				break;
-			default:
-				$k = $kv[0];
-				$v = $kv[1];
-				echo "extra_params['{$k}']='{$v}';\n";
-				break;
-			}
-		}
-	}
+    if( isset($params)) {
+        foreach( $params as $p ) {
+            $kv = explode(':',$p);
+            switch(count($kv)) {
+            case 0:
+                break;
+            case 1:
+                $k = $kv[0];
+                echo "extra_params['{$k}']=true;\n";
+                break;
+            default:
+                $k = $kv[0];
+                $v = $kv[1];
+                echo "extra_params['{$k}']='{$v}';\n";
+                break;
+            }
+        }
+    }
 ?>
 
 /* ----------------------------------------------
@@ -1455,23 +1455,23 @@ var extra_params = new Array();
 var current_tab = 'applications';
 
 function set_current_tab( tab ) {
-	current_tab = tab;
+    current_tab = tab;
 }
 /*
 function set_context(app) {
-	var ctx = '<b>'+app.full_name+'</b> &gt;';
-	if(app.context1) ctx += ' <b>'+app.context1+'</b>';
-	if(app.context2) ctx += ' &gt; <b>'+app.context2+'</b>';
-	if(app.context3) ctx += ' &gt; <b>'+app.context3+'</b>';;
-	$('#p-context').html(ctx);
+    var ctx = '<b>'+app.full_name+'</b> &gt;';
+    if(app.context1) ctx += ' <b>'+app.context1+'</b>';
+    if(app.context2) ctx += ' &gt; <b>'+app.context2+'</b>';
+    if(app.context3) ctx += ' &gt; <b>'+app.context3+'</b>';;
+    $('#p-context').html(ctx);
 }
 */
 function set_context(app) {
-	var ctx = app.full_name+' &gt;';
-	if(app.context1) ctx += ' '+app.context1;
-	if(app.context2) ctx += ' &gt; '+app.context2;
-	if(app.context3) ctx += ' &gt; '+app.context3;;
-	$('#p-context').html(ctx);
+    var ctx = app.full_name+' &gt;';
+    if(app.context1) ctx += ' '+app.context1;
+    if(app.context2) ctx += ' &gt; '+app.context2;
+    if(app.context3) ctx += ' &gt; '+app.context3;;
+    $('#p-context').html(ctx);
 }
 
 /* ----------------------------------------------
@@ -1479,55 +1479,55 @@ function set_context(app) {
  * ----------------------------------------------
  */
 function show_email( user, addr ) {
-	$('#popupdialogs').html( '<p>'+addr+'</p>' );
-	$('#popupdialogs').dialog({
-		modal:  true,
-		title:  'e-mail: '+user
-	});
+    $('#popupdialogs').html( '<p>'+addr+'</p>' );
+    $('#popupdialogs').dialog({
+        modal:  true,
+        title:  'e-mail: '+user
+    });
 }
 
 function display_path( file ) {
-	$('#popupdialogs').html( '<p>'+file+'</p>' );
-	$('#popupdialogs').dialog({
-		modal:  true,
-		title:  'file path'
-	});
+    $('#popupdialogs').html( '<p>'+file+'</p>' );
+    $('#popupdialogs').dialog({
+        modal:  true,
+        title:  'file path'
+    });
 }
 
 function printer_friendly() {
-	if( current_application != null ) {
-		var wa_id = current_application.name;
-		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-		$('#p-center .application-workarea#'+wa_id).printElement({
-			leaveOpen: true,
-			printMode: 'popup',
-			printBodyOptions: {
-            	styleToAdd:'font-size:12px;'
+    if( current_application != null ) {
+        var wa_id = current_application.name;
+        if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+        $('#p-center .application-workarea#'+wa_id).printElement({
+            leaveOpen: true,
+            printMode: 'popup',
+            printBodyOptions: {
+                styleToAdd:'font-size:12px;'
             }
-		});
-	}	
+        });
+    }    
 }
 
 function ask_yes_no( title, msg, on_yes, on_cancel ) {
-	$('#popupdialogs').html(
-//		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
-		msg
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog('close');
-				if(on_yes) on_yes();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-				if(on_cancel) on_cancel();
-			}
-		},
-		title: title
-	});
+    $('#popupdialogs').html(
+//        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+        msg
+     );
+    $('#popupdialogs').dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                $( this ).dialog('close');
+                if(on_yes) on_yes();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+                if(on_cancel) on_cancel();
+            }
+        },
+        title: title
+    });
 }
 
 function report_error(msg) {
@@ -1547,19 +1547,19 @@ function report_error(msg) {
  * ------------------------------------------------------
  */
 var applications = {
-	'p-appl-experiment' : exper,
-	'p-appl-elog'       : elog,
-	'p-appl-datafiles'  : datafiles,
-	'p-appl-hdf'        : hdf,
-	'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
+    'p-appl-experiment' : exper,
+    'p-appl-elog'       : elog,
+    'p-appl-datafiles'  : datafiles,
+    'p-appl-hdf'        : hdf,
+    'p-appl-help'       : new p_appl_help()            // TODO: implement it the same wa as for e-Log
 };
 
 var current_application = null;
 
 function v_item_group(item) {
-	var parent = $(item).parent();
-	if(parent.hasClass('v-group-members')) return parent.prev();
-	return null;
+    var parent = $(item).parent();
+    if(parent.hasClass('v-group-members')) return parent.prev();
+    return null;
 }
 
 /* Event handler for application selections from the top-level menu bar:
@@ -1567,39 +1567,39 @@ function v_item_group(item) {
  */
 function m_item_selected(item) {
 
-	current_application = applications[item.id];
+    current_application = applications[item.id];
 
-	$('.m-select').removeClass('m-select');
-	$(item).addClass('m-select');
-	$('#p-left > #v-menu .visible').removeClass('visible').addClass('hidden');
-	$('#p-left > #v-menu > #'+current_application.name).removeClass('hidden').addClass('visible');
+    $('.m-select').removeClass('m-select');
+    $(item).addClass('m-select');
+    $('#p-left > #v-menu .visible').removeClass('visible').addClass('hidden');
+    $('#p-left > #v-menu > #'+current_application.name).removeClass('hidden').addClass('visible');
 
-	$('#p-center .application-workarea.visible').removeClass('visible').addClass('hidden');
-	var wa_id = current_application.name;
-	if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-	$('#p-center .application-workarea#'+wa_id).removeClass('hidden').addClass('visible');
+    $('#p-center .application-workarea.visible').removeClass('visible').addClass('hidden');
+    var wa_id = current_application.name;
+    if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+    $('#p-center .application-workarea#'+wa_id).removeClass('hidden').addClass('visible');
 
-	current_application.select_default();
-	if(current_application.context2 == '')
-		v_item_selected($('#v-menu > #'+current_application.name).children('.v-item#'+current_application.context1));
-	else
-		v_item_selected($('#v-menu > #'+current_application.name+' > #'+current_application.context1).next().children('.v-item#'+current_application.context2));
-	
-	set_context(current_application);
+    current_application.select_default();
+    if(current_application.context2 == '')
+        v_item_selected($('#v-menu > #'+current_application.name).children('.v-item#'+current_application.context1));
+    else
+        v_item_selected($('#v-menu > #'+current_application.name+' > #'+current_application.context1).next().children('.v-item#'+current_application.context2));
+    
+    set_context(current_application);
 }
 
 /* Event handler for vertical menu group selections:
  * - only show/hide children (if any).
  */
 function v_group_selected(group) {
-	var toggler = $(group).children('.ui-icon');
-	if(toggler.hasClass('ui-icon-triangle-1-s')) {
-		toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-		$(group).next().removeClass('v-group-members-visible').addClass('v-group-members-hidden');
-	} else {
-		toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-		$(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
-	}
+    var toggler = $(group).children('.ui-icon');
+    if(toggler.hasClass('ui-icon-triangle-1-s')) {
+        toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+        $(group).next().removeClass('v-group-members-visible').addClass('v-group-members-hidden');
+    } else {
+        toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+        $(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
+    }
 }
 
 /* Event handler for vertical menu item (actual commands) selections:
@@ -1610,118 +1610,118 @@ function v_group_selected(group) {
  * - switch the work area (make the old one invisible, and the new one visible)
  */
 function v_item_selected(item) {
-	var item = $(item);
-	if($(item).hasClass('v-select')) return;
+    var item = $(item);
+    if($(item).hasClass('v-select')) return;
 
-	$('#'+current_application.name).find('.v-item.v-select').each(function(){
-		$(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-		$(this).removeClass('v-select');
-		var this_group = v_item_group(this);
-		if(this_group != null) this_group.removeClass('v-select');
-	});
+    $('#'+current_application.name).find('.v-item.v-select').each(function(){
+        $(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+        $(this).removeClass('v-select');
+        var this_group = v_item_group(this);
+        if(this_group != null) this_group.removeClass('v-select');
+    });
 
-	$(item).children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-	$(item).addClass('v-select');
+    $(item).children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+    $(item).addClass('v-select');
 
-	var group = v_item_group(item);
-	if(group != null) {
+    var group = v_item_group(item);
+    if(group != null) {
 
-		/* Force the group to unwrap
-		 *
-		 * NOTE: This migth be needed of the current method is called out of
-		 *       normal sequence.
-		 *
-		 * TODO: Do it "right" when refactoring the menu classes.
-		 */
-		var toggler = $(group).children('.ui-icon');
-		if(!toggler.hasClass('ui-icon-triangle-1-s')) {
-			toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-			$(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
-		}
+        /* Force the group to unwrap
+         *
+         * NOTE: This migth be needed of the current method is called out of
+         *       normal sequence.
+         *
+         * TODO: Do it "right" when refactoring the menu classes.
+         */
+        var toggler = $(group).children('.ui-icon');
+        if(!toggler.hasClass('ui-icon-triangle-1-s')) {
+            toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+            $(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
+        }
 
-		/* Hide the older work area
-		 */
-		var wa_id = current_application.name;
-		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-		$('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
+        /* Hide the older work area
+         */
+        var wa_id = current_application.name;
+        if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+        $('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
 
-		/* Activate new application
-		 */
-		group.addClass('v-select');
-		current_application.select(group.attr('id'), item.attr('id'));
+        /* Activate new application
+         */
+        group.addClass('v-select');
+        current_application.select(group.attr('id'), item.attr('id'));
 
-		/* display the new work area
-		 */
-		wa_id = current_application.name;
-		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-		$('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
+        /* display the new work area
+         */
+        wa_id = current_application.name;
+        if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+        $('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
 
-	} else {
+    } else {
 
-		/* Hide the older work area
-		 */
-		var wa_id = current_application.name;
-		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-		$('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
+        /* Hide the older work area
+         */
+        var wa_id = current_application.name;
+        if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+        $('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
 
-		current_application.select(item.attr('id'), null);
+        current_application.select(item.attr('id'), null);
 
-		/* display the new work area
-		 */
-		wa_id = current_application.name;
-		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
-		$('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
-	}
-	set_context(current_application);
+        /* display the new work area
+         */
+        wa_id = current_application.name;
+        if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+        $('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
+    }
+    set_context(current_application);
 }
 
 $(function() {
 
-	$('.m-item' ).click(function() { m_item_selected (this); });
-	$('.v-group').click(function() { v_group_selected(this); });
-	$('.v-item' ).click(function() { v_item_selected (this); });
+    $('.m-item' ).click(function() { m_item_selected (this); });
+    $('.v-group').click(function() { v_group_selected(this); });
+    $('.v-item' ).click(function() { v_item_selected (this); });
 
-	function simple_search() {
-		for(var id in applications) {
-			var application = applications[id];
-			if(application.name == 'elog') {
-				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-				v_item_selected($('#v-menu > #elog').children('.v-item#search'));
-				application.select('search');
-				application.simple_search($('#p-search-elog-text').val());
-				break;
-			}
-		}
-	}
-	$('#p-search-elog-text').keyup(function(e) { if(($('#p-search-elog-text').val() != '') && (e.keyCode == 13)) simple_search(); });
-	function simple_post() {
-		for(var id in applications) {
-			var application = applications[id];
-			if(application.name == 'elog') {
-				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-				v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
-				application.select('post','experiment');
-				application.simple_post4experiment($('#p-post-elog-text').val());
-				break;
-			}
-		}
-	}
-	$('#p-post-elog-text').keyup(function(e) {
-		if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post();
-	});
+    function simple_search() {
+        for(var id in applications) {
+            var application = applications[id];
+            if(application.name == 'elog') {
+                $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
+                v_item_selected($('#v-menu > #elog').children('.v-item#search'));
+                application.select('search');
+                application.simple_search($('#p-search-elog-text').val());
+                break;
+            }
+        }
+    }
+    $('#p-search-elog-text').keyup(function(e) { if(($('#p-search-elog-text').val() != '') && (e.keyCode == 13)) simple_search(); });
+    function simple_post() {
+        for(var id in applications) {
+            var application = applications[id];
+            if(application.name == 'elog') {
+                $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
+                v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
+                application.select('post','experiment');
+                application.simple_post4experiment($('#p-post-elog-text').val());
+                break;
+            }
+        }
+    }
+    $('#p-post-elog-text').keyup(function(e) {
+        if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post();
+    });
 
-	// Finally, activate the selected application.
-	//
-	for(var id in applications) {
-		var application = applications[id];
-		if(application.name == select_app) {
-			$('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
-			if( '' != select_app_context1 ) {
-				v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context1));
-				application.select(select_app_context1);
-			}
-		}
-	}
+    // Finally, activate the selected application.
+    //
+    for(var id in applications) {
+        var application = applications[id];
+        if(application.name == select_app) {
+            $('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
+            if( '' != select_app_context1 ) {
+                v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context1));
+                application.select(select_app_context1);
+            }
+        }
+    }
 });
 
 /* TODO: Merge these application objects into statically create JavaScript
@@ -1732,22 +1732,22 @@ $(function() {
  */
 
 function p_appl_help() {
-	var that = this;
-	var context2_default = {
-		'' : ''
-	};
-	this.name = 'help';
-	this.full_name = 'Help';
-	this.context1 = '';
-	this.context2 = '';
-	this.select = function(ctx1, ctx2) {
-		that.context1 = ctx1;
-		that.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
-	};
-	$('#p-center > #application-workarea > #help').html('<center>The help area</center>');
-	$('#p-left > #v-menu > #help').html('<center>The workarea of the HDF5 translation</center>');
+    var that = this;
+    var context2_default = {
+        '' : ''
+    };
+    this.name = 'help';
+    this.full_name = 'Help';
+    this.context1 = '';
+    this.context2 = '';
+    this.select = function(ctx1, ctx2) {
+        that.context1 = ctx1;
+        that.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
+    };
+    $('#p-center > #application-workarea > #help').html('<center>The help area</center>');
+    $('#p-left > #v-menu > #help').html('<center>The workarea of the HDF5 translation</center>');
 
-	return this;
+    return this;
 }
 
 </script>
@@ -1968,11 +1968,7 @@ function p_appl_help() {
 
 <?php
 
-} catch( FileMgrException  $e ) { print $e->toHtml(); }
-  catch( LusiTimeException $e ) { print $e->toHtml(); }
-  catch( RegDBException    $e ) { print $e->toHtml(); }
-  catch( LogBookException  $e ) { print $e->toHtml(); }
-  catch( AuthDBException   $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { print $e.'<pre>'.print_r($e->getTrace(), true).'</pre>'; }
 
 ?>
  

@@ -2,28 +2,28 @@
 
 namespace DataPortal;
 
-require_once( 'dataportal.inc.php' );
+require_once 'dataportal.inc.php' ;
 
 use LusiTime\LusiTime;
 
 /**
- * Class SysMonBeamTimeGap is an abstraction for gaps stored
+ * Class ExpTimeMonBeamTimeGap is an abstraction for gaps stored
  * in the beam-time usage monitoring database.
  *
  * @author gapon
  */
-class SysMonBeamTimeGap {
+class ExpTimeMonBeamTimeGap {
 
    /* Data members
      */
-    private $sysmon;
+    private $exptimemon;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $sysmon, $attr ) {
-        $this->sysmon = $sysmon;
+    public function __construct ( $exptimemon, $attr ) {
+        $this->exptimemon = $exptimemon;
         $this->attr = $attr;
     }
 
@@ -32,7 +32,7 @@ class SysMonBeamTimeGap {
      *   OBJECT ATTRIBUTES
      * ======================
      */
-    public function sysmon    () { return                   $this->$sysmon; }
+    public function exptimemon() { return                   $this->$exptimemon; }
     public function begin_time() { return LusiTime::from64( $this->attr['begin_time'] ); }
     public function end_time  () { return LusiTime::from64( $this->attr['end_time'] ); }
     public function instr_name() { return                   $this->attr['instr_name']; }

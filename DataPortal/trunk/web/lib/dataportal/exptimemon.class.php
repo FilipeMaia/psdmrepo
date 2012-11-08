@@ -2,11 +2,11 @@
 
 namespace DataPortal;
 
-require_once( 'authdb/authdb.inc.php' );
-require_once( 'dataportal/dataportal.inc.php' );
-require_once( 'filemgr/filemgr.inc.php' );
-require_once( 'logbook/logbook.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
+require_once 'authdb/authdb.inc.php' ;
+require_once 'dataportal/dataportal.inc.php' ;
+require_once 'filemgr/filemgr.inc.php' ;
+require_once 'logbook/logbook.inc.php' ;
+require_once 'lusitime/lusitime.inc.php' ;
 
 use AuthDB\AuthDB;
 
@@ -18,9 +18,9 @@ use LusiTime\LusiTime;
 use LusiTime\LusiIntervalItr;
 
 /**
- * Class SysMon encapsulates operations with the PCDS systems monitoring database
+ * Class ExpTimeMon encapsulates operations with the PCDS systems monitoring database
  */
-class SysMon extends DbConnection {
+class ExpTimeMon extends DbConnection {
 
     // ------------------------
     // --- STATIC INTERFACE ---
@@ -60,16 +60,16 @@ class SysMon extends DbConnection {
     /**
      * Singleton to simplify certain operations.
      *
-     * @return SysMon
+     * @return ExpTimeMon
      */
     public static function instance() {
-        if( is_null( SysMon::$instance )) SysMon::$instance =
-            new SysMon (
-                SYSMON_DEFAULT_HOST,
-                SYSMON_DEFAULT_USER,
-                SYSMON_DEFAULT_PASSWORD,
-                SYSMON_DEFAULT_DATABASE );
-        return SysMon::$instance;
+        if( is_null( ExpTimeMon::$instance )) ExpTimeMon::$instance =
+            new ExpTimeMon (
+                EXPTIMEMON_DEFAULT_HOST,
+                EXPTIMEMON_DEFAULT_USER,
+                EXPTIMEMON_DEFAULT_PASSWORD,
+                EXPTIMEMON_DEFAULT_DATABASE );
+        return ExpTimeMon::$instance;
     }
 
     /**
@@ -94,7 +94,7 @@ class SysMon extends DbConnection {
      * 
      * @return type array
      */
-    public static function instrument_names() { return SysMon::$instrument_names; }
+    public static function instrument_names() { return ExpTimeMon::$instrument_names; }
 
     /**
      * Check if the specified name is a name of an intrument rather than just
@@ -107,11 +107,11 @@ class SysMon extends DbConnection {
      */
     public static function is_instrument_name($name) {
         $name_trimmed = strtoupper(trim($name));
-        if( false === array_search($name_trimmed, SysMon::$beam_destinations))
+        if( false === array_search($name_trimmed, ExpTimeMon::$beam_destinations))
             throw new DataPortalException (
                 __METHOD__,
                 "illegal parameter value '{$name_trimmed}', beam destination name was expected" );
-        if( false === array_search($name_trimmed, SysMon::$instrument_names)) return false;
+        if( false === array_search($name_trimmed, ExpTimeMon::$instrument_names)) return false;
         return true;
     }
 
@@ -124,7 +124,7 @@ class SysMon extends DbConnection {
      *
      * @return type array
      */
-    public static function beam_destinations() { return SysMon::$beam_destinations; }
+    public static function beam_destinations() { return ExpTimeMon::$beam_destinations; }
 
     /**
      * Return a bitmask for an instrument or location (between instruments) as 
@@ -136,8 +136,8 @@ class SysMon extends DbConnection {
      */
     public static function beam_destination_mask($name) {
         $name_trimmed = strtoupper(trim($name));
-        if( array_key_exists($name_trimmed, SysMon::$beam_destination_masks ))
-            return SysMon::$beam_destination_masks[$name_trimmed];
+        if( array_key_exists($name_trimmed, ExpTimeMon::$beam_destination_masks ))
+            return ExpTimeMon::$beam_destination_masks[$name_trimmed];
         throw new DataPortalException (
             __METHOD__,
             "unexpected result set returned by the query" );
@@ -150,8 +150,8 @@ class SysMon extends DbConnection {
 
     public function beamtime_config() {
         $config = array();
-    	$result = $this->query( "SELECT * FROM beamtime_config" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT * FROM beamtime_config" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $row   = mysql_fetch_array( $result, MYSQL_ASSOC );
             $param = trim($row['param']);
@@ -160,7 +160,7 @@ class SysMon extends DbConnection {
                 case 'min_gap_width_sec':   $config[$param] =                  intval($value);  break;
                 case 'last_run_begin_time': $config[$param] = LusiTime::from64(intval($value)); break;
                 default:                    $config[$param] =                         $value;   break;
-            }        	
+            }            
         }
         return $config;
     }
@@ -170,12 +170,12 @@ class SysMon extends DbConnection {
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." begin_time < {$end_time->to64()}";
-    	$result = $this->query( "SELECT * FROM beamtime_runs {$interval} ORDER BY begin_time" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT * FROM beamtime_runs {$interval} ORDER BY begin_time" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push(
                 $list,
-                new SysMonBeamTimeRun(
+                new ExpTimeMonBeamTimeRun(
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
@@ -186,12 +186,12 @@ class SysMon extends DbConnection {
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." begin_time < {$end_time->to64()}";
-    	$result = $this->query( "SELECT * FROM beamtime_gaps {$interval} ORDER BY begin_time" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT * FROM beamtime_gaps {$interval} ORDER BY begin_time" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push(
                 $list,
-                new SysMonBeamTimeGap(
+                new ExpTimeMonBeamTimeGap(
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
@@ -201,23 +201,23 @@ class SysMon extends DbConnection {
         $interval = '';
         if( !is_null($begin_time)) $interval .= "WHERE gap_begin_time >= {$begin_time->to64()}";
         if( !is_null($end_time  )) $interval .= ($interval == '' ? " WHERE " : " AND ")." gap_begin_time < {$end_time->to64()}";
-    	$result = $this->query( "SELECT * FROM beamtime_comments {$interval} ORDER BY gap_begin_time" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT * FROM beamtime_comments {$interval} ORDER BY gap_begin_time" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push(
                 $list,
-                new SysMonBeamTimeComment(
+                new ExpTimeMonBeamTimeComment(
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         return $list;
     }
     public function beamtime_systems() {
         $list = array();
-    	$result = $this->query( "SELECT DISTINCT system FROM beamtime_comments WHERE system != '' ORDER BY system" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT DISTINCT system FROM beamtime_comments WHERE system != '' ORDER BY system" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
-        	array_push(
+            array_push(
                 $list,
                 $attr['system']);
         }
@@ -226,13 +226,13 @@ class SysMon extends DbConnection {
     public function beamtime_comment_at($begin_time, $instr) {
         $instr_escaped = $this->escape_string(trim($instr));
         $result = $this->query( "SELECT * FROM beamtime_comments WHERE gap_begin_time={$begin_time->to64()} AND instr_name='{$instr_escaped}'" );
-    	$nrows = mysql_numrows( $result );
+        $nrows = mysql_numrows( $result );
         if( !$nrows ) return null;
         if( $nrows != 1 )
             throw new DataPortalException (
                 __METHOD__,
                 "unexpected result set returned by the query" );
-        return new SysMonBeamTimeComment(
+        return new ExpTimeMonBeamTimeComment(
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
@@ -424,7 +424,7 @@ class SysMon extends DbConnection {
             // Consider only those beam time intervals where the beam time status
             // was corresponding to the requested detector.
             //
-            $instr_mask = SysMon::beam_destination_mask($instr_name);
+            $instr_mask = ExpTimeMon::beam_destination_mask($instr_name);
 
             foreach( $beam_status as $ival ) {
 
@@ -609,7 +609,7 @@ class SysMon extends DbConnection {
                             $instr_name);
                     }
                 }
-                usort($runs,"DataPortal\SysMon::cmp_runs_by_begin_time");
+                usort($runs,"DataPortal\ExpTimeMon::cmp_runs_by_begin_time");
 
                 // Find gaps between runs using the following algorithm:
                 //
@@ -636,7 +636,7 @@ class SysMon extends DbConnection {
                     //
                     if(( $begin_time_64 > $prev_end_run_64 ) && ( $begin_time_64 - $prev_end_run_64 > $min_gap_width_64 )) {
                         foreach(
-                            SysMon::intersect_candidate_gap_with_beam_status_unless(
+                            ExpTimeMon::intersect_candidate_gap_with_beam_status_unless(
                                 $no_beam_correction4gaps,
                                 $beam_status,
                                 $instr_name,
@@ -661,7 +661,7 @@ class SysMon extends DbConnection {
                 //
                 if(( $stop_64 > $prev_end_run_64 ) && ( $stop_64 - $prev_end_run_64 > $min_gap_width_64 )) {
                     foreach(
-                        SysMon::intersect_candidate_gap_with_beam_status_unless(
+                        ExpTimeMon::intersect_candidate_gap_with_beam_status_unless(
                             $no_beam_correction4gaps,
                             $beam_status,
                             $instr_name,
@@ -697,29 +697,29 @@ class SysMon extends DbConnection {
      */
     public function subscribe4explanations_if ( $subscribe, $subscriber, $address ) {
 
-    	$authdb = AuthDB::instance();
-    	$authdb->begin();
+        $authdb = AuthDB::instance();
+        $authdb->begin();
 
-    	$subscriber_str = $this->escape_string( trim( $subscriber ));
-    	$address_str    = $this->escape_string( trim( $address ));
-    	$by             = $this->escape_string( trim( $authdb->authName()));
-    	$now            = LusiTime::now();
-    	$host_str       = $this->escape_string( trim( $authdb->authRemoteAddr()));
+        $subscriber_str = $this->escape_string( trim( $subscriber ));
+        $address_str    = $this->escape_string( trim( $address ));
+        $by             = $this->escape_string( trim( $authdb->authName()));
+        $now            = LusiTime::now();
+        $host_str       = $this->escape_string( trim( $authdb->authRemoteAddr()));
 
-    	$this->query(
-			$subscribe ?
-    		"INSERT INTO beamtime_subscriber VALUES (NULL,'{$subscriber_str}','{$address_str}','{$by}',{$now->to64()},'{$host_str}')" :
-    		"DELETE FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
-		);
+        $this->query(
+            $subscribe ?
+            "INSERT INTO beamtime_subscriber VALUES (NULL,'{$subscriber_str}','{$address_str}','{$by}',{$now->to64()},'{$host_str}')" :
+            "DELETE FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
+        );
 
-		$url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
+        $url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps-dev/portal/experiment_time';
 
         if( $subscribe )                
-        	$this->do_notify(
+            $this->do_notify(
                 'LCLS Data Taking Monitor',
-        		$address,
-        		"*** SUBSCRIBED ***",
-				<<<HERE
+                $address,
+                "*** SUBSCRIBED ***",
+                <<<HERE
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
@@ -735,13 +735,13 @@ To unsubscribe from this service, please use the LCLS Data Taking Time Monitor a
   {$url}
 
 HERE
-       		);
+               );
         else
-        	$this->do_notify(
+            $this->do_notify(
                 'LCLS Data Taking Monitor',
-        		$address,
-        		"*** UNSUBSCRIBED ***",
-				<<<HERE
+                $address,
+                "*** UNSUBSCRIBED ***",
+                <<<HERE
                              ** ATTENTION **
 
 The message was sent by the automated notification system because this e-mail
@@ -757,7 +757,7 @@ To subscribe back to this service, please use the LCLS Data Taking Time Monitor 
   {$url}
 
 HERE
-			);
+            );
     }
 
     /* Check if the current user is subscribed for e-mail notifications on downtime
@@ -776,20 +776,20 @@ HERE
      */
     public function check_if_subscribed4explanations ( $subscriber, $address ) {
 
-    	$subscriber_str = $this->escape_string( trim( $subscriber ));
-    	$address_str    = $this->escape_string( trim( $address ));
+        $subscriber_str = $this->escape_string( trim( $subscriber ));
+        $address_str    = $this->escape_string( trim( $address ));
 
         $sql    = "SELECT * FROM beamtime_subscriber WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'";
-    	$result = $this->query($sql);
-    	$nrows  = mysql_numrows( $result );
-    	if( !$nrows ) return null;
-    	if( $nrows != 1 )
+        $result = $this->query($sql);
+        $nrows  = mysql_numrows( $result );
+        if( !$nrows ) return null;
+        if( $nrows != 1 )
             throw new DataPortalException (
                 __METHOD__,
-		"duplicate entries for downtime explanations subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
-	$row = mysql_fetch_array( $result, MYSQL_ASSOC );
-       	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
-       	return $row;
+        "duplicate entries for downtime explanations subscriber: {$subscriber} ({$address}) in database. Database can be corrupted." );
+    $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+           $row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
+           return $row;
     }
 
     /* Get all known subscribers for downtime explanation notifications.
@@ -800,12 +800,12 @@ HERE
     public function get_all_subscribed4explanations () {
 
         $list = array();
-    	$result = $this->query( "SELECT * FROM beamtime_subscriber" );
-    	$nrows = mysql_numrows( $result );
+        $result = $this->query( "SELECT * FROM beamtime_subscriber" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-        	$row = mysql_fetch_array( $result, MYSQL_ASSOC );
-        	$row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
-        	array_push ( $list, $row );
+            $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+            $row['subscribed_time'] = LusiTime::from64($row['subscribed_time']);
+            array_push ( $list, $row );
         }
         return $list;
     }
@@ -816,8 +816,8 @@ HERE
             $address = $subscriber['address'];
             $this->do_notify(
                 'LCLS Data Taking Monitor',
-        	$address,
-        	"*** DOWNTIME EXPLANATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
+            $address,
+            "*** DOWNTIME EXPLANATION POSTED *** [ {$instr_name} ] {$gap_begin_time->toStringShort()}",
                 <<<HERE
 
                              ** ATTENTION **
@@ -854,18 +854,18 @@ HERE
  * =======================
  *
 try {
-	$sysmon  = SysMon::instance();
-	$sysmon->begin();
+    $exptimemon  = ExpTimeMon::instance();
+    $exptimemon->begin();
 
     $begin_time = LusiTime::from64(1332545544195338010);
     $end_time   = LusiTime::from64(1332545888130285024);
-    foreach( $sysmon->beamtime_beam_status('XRAY_DESTINATIONS',$begin_time,$end_time) as $ival ) {
+    foreach( $exptimemon->beamtime_beam_status('XRAY_DESTINATIONS',$begin_time,$end_time) as $ival ) {
         $ival_begin_time = $ival['begin_time'];
         $ival_end_time   = $ival['end_time'];
         $status          = $ival['status'];
         print "<br>{$ival_begin_time->to64()} - {$ival_end_time->to64()} : {$status}";
     }
-    $sysmon->commit();
+    $exptimemon->commit();
 
 } catch ( Exception           $e ) { print $e; }
   catch ( DataPortalException $e ) { print $e->toHtml(); }

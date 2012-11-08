@@ -33,6 +33,8 @@ class ServiceJSON {
     private $irodsdb    = null ;
     private $neocaptar  = null ;
     private $irep       = null ;
+    private $exptimemon = null ;
+    private $sysmon     = null ;
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -227,6 +229,23 @@ class ServiceJSON {
         }
         return $this->irep ;
     }
+    public function exptimemon () {
+        if (is_null($this->exptimemon)) {
+            require_once 'dataportal/dataportal.inc.php' ;
+            $this->exptimemon = \DataPortal\ExpTimeMon::instance() ;
+            $this->exptimemon->begin() ;
+        }
+        return $this->exptimemon ;
+    }
+    public function sysmon () {
+        if (is_null($this->sysmon)) {
+            require_once 'sysmon/sysmon.inc.php' ;
+            $this->sysmon = \SysMon\SysMon::instance() ;
+            $this->sysmon->begin() ;
+        }
+        return $this->sysmon ;
+    }
+
     // -------------
     //  Finalizers
     // -------------
@@ -235,13 +254,15 @@ class ServiceJSON {
         ServiceJSON::report_error ($message, $parameters) ;
     }
     public function finish ($parameters=array()) {
-        if (!is_null($this->authdb   )) $this->authdb   ->commit() ;
-        if (!is_null($this->regdb    )) $this->regdb    ->commit() ;
-        if (!is_null($this->logbook  )) $this->logbook  ->commit() ;
-        if (!is_null($this->configdb )) $this->configdb ->commit() ;
-        if (!is_null($this->irodsdb  )) $this->irodsdb  ->commit() ;
-        if (!is_null($this->neocaptar)) $this->neocaptar->commit() ;
-        if (!is_null($this->irep     )) $this->irep     ->commit() ;
+        if (!is_null($this->authdb    )) $this->authdb    ->commit() ;
+        if (!is_null($this->regdb     )) $this->regdb     ->commit() ;
+        if (!is_null($this->logbook   )) $this->logbook   ->commit() ;
+        if (!is_null($this->configdb  )) $this->configdb  ->commit() ;
+        if (!is_null($this->irodsdb   )) $this->irodsdb   ->commit() ;
+        if (!is_null($this->neocaptar )) $this->neocaptar ->commit() ;
+        if (!is_null($this->irep      )) $this->irep      ->commit() ;
+        if (!is_null($this->exptimemon)) $this->exptimemon->commit() ;
+        if (!is_null($this->sysmon    )) $this->sysmon    ->commit() ;
         ServiceJSON::report_success ($parameters) ;
     }
 

@@ -10,7 +10,7 @@ require_once( 'lusitime/lusitime.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\SysMon;
+use DataPortal\ExpTimeMon;
 use DataPortal\DataPortal;
 use DataPortal\DataPortalException;
 
@@ -53,11 +53,11 @@ try {
 
 try {
 
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
-    $sysmon = SysMon::instance();
-	$sysmon->begin();
+    $exptimemon = ExpTimeMon::instance();
+    $exptimemon->begin();
 
     $can_edit = $authdb->hasRole($authdb->authName(),null,'BeamTimeMonitor','Editor');
 
@@ -300,33 +300,33 @@ function page_specific_init() {
     $('#tabs').tabs();
 
     $('#unsubscribe_button').button().click(function() {
-		$.ajax({
+        $.ajax({
             type: 'GET',
             url: '../portal/ws/experiment_time_subscription_toggle.php',
             data: {},
-			success: function(data) {
+            success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
-				$('#subscribe_area'  ).removeClass('hidden').addClass('visible');
-				$('#unsubscribe_area').removeClass('visible').addClass('hidden');
-			},
-            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+                $('#subscribe_area'  ).removeClass('hidden').addClass('visible');
+                $('#unsubscribe_area').removeClass('visible').addClass('hidden');
+            },
+            error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
             dataType: 'json'
         });
-	});
+    });
     $('#subscribe_button').button().click(function() {
-		$.ajax({
+        $.ajax({
             type: 'GET',
             url: '../portal/ws/experiment_time_subscription_toggle.php',
             data: {},
-			success: function(data) {
+            success: function(data) {
                 if( data.status != 'success' ) { report_error(data.message); return; }
-				$('#subscribe_area'  ).removeClass('visible').addClass('hidden');
-				$('#unsubscribe_area').removeClass('hidden').addClass('visible');
-			},
-            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+                $('#subscribe_area'  ).removeClass('visible').addClass('hidden');
+                $('#unsubscribe_area').removeClass('hidden').addClass('visible');
+            },
+            error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
             dataType: 'json'
         });
-	});
+    });
     load_shift(initial_shift,0);
 }
     
@@ -347,7 +347,7 @@ function save_comment(gap_begin_time_64,instr_name,comment,system) {
             if( data.status != 'success' ) { report_error(data.message); return; }
             set_comment( gap_begin_time_64, instr_name, data.comment );
         },
-        error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+        error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
     });
 }
@@ -693,7 +693,7 @@ function load_shift(shift,delta) {
                 display_shift(shift_data.instruments[instr_name],instr_name);
             }
         },
-        error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+        error: function() { report_error('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
     });
 }
@@ -728,7 +728,7 @@ HERE;
       <li><a href="#tab_beams">X-Ray destinations</a></li>
 
 HERE;
-    foreach( SysMon::instrument_names() as $instr_name) {
+    foreach( ExpTimeMon::instrument_names() as $instr_name) {
         echo <<<HERE
       <li><a href="#tab_{$instr_name}">{$instr_name}</a></li>
 
@@ -754,7 +754,7 @@ HERE;
     </div>
 
 HERE;
-    foreach( SysMon::instrument_names() as $instr_name) {
+    foreach( ExpTimeMon::instrument_names() as $instr_name) {
         echo <<<HERE
     <div id="tab_{$instr_name}" >
       <div class="instrument_container" >
@@ -771,9 +771,9 @@ HERE;
 
 HERE;
     }
-	$subscriber = $authdb->authName();
-	$address    = $subscriber.'@slac.stanford.edu';
-    $is_subscribed = $sysmon->check_if_subscribed4explanations( $subscriber, $address );
+    $subscriber = $authdb->authName();
+    $address    = $subscriber.'@slac.stanford.edu';
+    $is_subscribed = $exptimemon->check_if_subscribed4explanations( $subscriber, $address );
     $subscribe_class   = $is_subscribed ? 'hidden'  : 'visible';
     $unsubscribe_class = $is_subscribed ? 'visible' : 'hidden';
     echo <<<HERE

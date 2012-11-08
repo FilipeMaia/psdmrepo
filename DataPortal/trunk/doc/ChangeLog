@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 
+Tag: V00-04-05
+2012-11-08 Igor Gaponenko
+- added support for multiple DAQ 'stations' per instrument
+- improved Web services
+- fixed bugs
+
 Tag: V00-04-04
 2012-10-16 Igor Gaponenko
 - fixed a bug in the index.php. Teh bug affected non-privileged users who

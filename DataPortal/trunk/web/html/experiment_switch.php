@@ -23,20 +23,22 @@ use LusiTime\LusiTime;
  * identifier is supplied to the script.
  */
 if( isset( $_GET['instr_name'] )) {
-	$instr_name = trim( $_GET['instr_name'] );
-	if( $instr_name == '' ) die( 'no valid instrument name provided to the script' );
+    $instr_name = trim( $_GET['instr_name'] );
+    if( $instr_name == '' ) die( 'no valid instrument name provided to the script' );
 }
-
+if( isset( $_GET['station'] )) {
+    $station = intval( $_GET['station'] );
+}
 try {
 
-	AuthDB::instance()->begin();
-	RegDB::instance()->begin();
-	LogBook::instance()->begin();
-	
-	if( isset( $instr_name )) {
-		$instrument = RegDB::instance()->find_instrument_by_name( $instr_name );
-		if( is_null( $instrument )) die( 'unknown instrument name provided to the script' );
-	}
+    AuthDB::instance()->begin();
+    RegDB::instance()->begin();
+    LogBook::instance()->begin();
+    
+    if( isset( $instr_name )) {
+        $instrument = RegDB::instance()->find_instrument_by_name( $instr_name );
+        if( is_null( $instrument )) die( 'unknown instrument name provided to the script' );
+    }
 
 ?>
 
@@ -81,17 +83,18 @@ try {
  * -----------------------------------------
  */
 var page1 = '<?=(isset($instrument) ? $instrument->name() : "null")?>';
+var page2 = '<?=(isset($station)    ? $station            : "null")?>';
 var instruments = new Array();
 <?php
-	$idx = 0;
-	foreach( RegDB::instance()->instruments() as $instrument )
-		if( !$instrument->is_location()) {
-			echo <<<HERE
+    $idx = 0;
+    foreach( RegDB::instance()->instruments() as $instrument )
+        if( !$instrument->is_location()) {
+            echo <<<HERE
 instruments[{$idx}] = "{$instrument->name()}";
 
 HERE;
-			$idx++;
-		}
+            $idx++;
+        }
 ?>
 
 /* ------------------------------------------------------
@@ -101,15 +104,28 @@ HERE;
 
 function page_specific_init() {
 
-	$('#instruments').tabs();
+    $('#instruments').tabs();
 
-	for( var i=0; i< instruments.length; i++)
-		init_tab( instruments[i]);
+    for( var i=0; i< instruments.length; i++)
+        init_tab( instruments[i]);
 
-	/* Open the initial tab if explicitly requested. Otherwise the first
-	 * tab will be shown.
-	 */
-    if( page1 != null ) $('#instruments').tabs( 'select', '#instrument-'+page1 );
+    /* Open the initial tab if explicitly requested. Otherwise the first
+     * tab will be shown.
+     */
+    if( page1 != null ) {
+        $('#instruments').tabs( 'select', '#instrument-'+page1 );
+        if( page2 != null ) {
+            $('#instrument-'+page1).tabs( 'select', '#instrument-'+page1+'-current-'+page2 );
+        }
+    }
+    
+    var url = 'https://pswww.slac.stanford.edu/apps/portal/experiment_switch';
+    post_info(
+        'Warning',
+        'This is a development version of the application which may not properly function in production.<br><br>'+
+        'Here is a link to the producton version:'+
+        '<ul><li><a class="link" href="'+url+'">'+url+'</a></li></ul>',
+        {width:520, height:160});
 }
 
 /* --------------------------------------------------------
@@ -117,34 +133,37 @@ function page_specific_init() {
  * --------------------------------------------------------
  */
 function init_tab( instrument ) {
-	$('#instrument-'+instrument).tabs();
-	$('#button-switch-experiment-'+instrument).button().click(
-		function() {
-			$('#current-experiment-'+instrument).removeClass( 'module-is-visible' ).addClass( 'module-is-hidden' );
-			$('#select-experiment-' +instrument).removeClass( 'module-is-hidden'  ).addClass( 'module-is-visible' );
-		}
-	);
-	$('#button-submit-experiment-'+instrument).button().click(
-		function() {
-			$('form[name="form-'+instrument+'"]').submit();
-		}
-	);
-	$('#button-cancel-experiment-'+instrument).button().click(
-		function() {
-			$('#current-experiment-'+instrument).removeClass( 'module-is-hidden'  ).addClass( 'module-is-visible' );
-			$('#select-experiment-' +instrument).removeClass( 'module-is-visible' ).addClass( 'module-is-hidden' );
-		}
-	);
-	$( "#search2notify-"+instrument ).autocomplete({
-		source: '../portal/ws/search_account.php',
-		minLength: 2,
-		select: function( event, ui ) {
-			var user = eval('('+ui.item.value+')');
-			$( '#search2notify-'+instrument ).val( '' );
-			$( '<div/>' ).html( '<input type="checkbox" name="notify_other_'+user.uid+'" checked="checked" /> '+user.name+'<br>' ).appendTo( '#registered-'+instrument );
-			return false;
-		}
-	});
+    $('#instrument-'+instrument).tabs();
+    $('.button-switch-experiment-'+instrument).button().click(
+        function() {
+            var station = this.name;
+            $('#current-experiment-'+instrument+'-'+station).removeClass( 'module-is-visible' ).addClass( 'module-is-hidden' );
+            $('#select-experiment-' +instrument+'-'+station).removeClass( 'module-is-hidden'  ).addClass( 'module-is-visible' );
+        }
+    );
+    $('.button-submit-experiment-'+instrument).button().click(
+        function() {
+            var station = this.name;
+            $('form[name="form-'+instrument+'-'+station+'"]').submit();
+        }
+    );
+    $('.button-cancel-experiment-'+instrument).button().click(
+        function() {
+            var station = this.name;
+            $('#current-experiment-'+instrument+'-'+station).removeClass( 'module-is-hidden'  ).addClass( 'module-is-visible' );
+            $('#select-experiment-' +instrument+'-'+station).removeClass( 'module-is-visible' ).addClass( 'module-is-hidden' );
+        }
+    );
+    $( "#search2notify-"+instrument ).autocomplete({
+        source: '../portal/ws/search_account.php',
+        minLength: 2,
+        select: function( event, ui ) {
+            var user = eval('('+ui.item.value+')');
+            $( '#search2notify-'+instrument ).val( '' );
+            $( '<div/>' ).html( '<input type="checkbox" name="notify_other_'+user.uid+'" checked="checked" /> '+user.name+'<br>' ).appendTo( '#registered-'+instrument );
+            return false;
+        }
+    });
 }
 
 /* ----------------------------------------------
@@ -152,11 +171,22 @@ function init_tab( instrument ) {
  * ----------------------------------------------
  */
 function show_email( user, addr ) {
-	$('#popupdialogs').html( '<p>'+addr+'</p>' );
-	$('#popupdialogs').dialog({
-		modal:  true,
-		title:  'e-mail: '+user
-	});
+    $('#popupdialogs').html( '<p>'+addr+'</p>' );
+    $('#popupdialogs').dialog({
+        modal:  true,
+        title:  'e-mail: '+user
+    });
+}
+function post_info( title, msg, extra_options ) {
+    var options = {
+        modal: true,
+        title: title
+    };
+    if(extra_options !== undefined)
+        for( var opt in extra_options )
+            options[opt] = extra_options[opt];
+    $('#largedialogs').html( msg );
+    $('#largedialogs').dialog(options);
 }
 
 // The function is called from a dialog for selecting a new experiment to switch
@@ -165,18 +195,18 @@ function show_email( user, addr ) {
 
 function on_experiment_select( elem, instrument ) {
 
-	var splitString = elem.value.split(',');
-	var experiment  = splitString[0];
-	$.ajax({
-		url: '../portal/ws/experiment_info.php?name='+experiment,
-		success: function( data ) {
-			var data = eval( '('+data+')' );  // translate into a JSON object
-			$('#input-notify-pi-'+instrument).html(
-				'<input type="checkbox" name="notify_pi_'+
-				data['leader_uid']+'" checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true" /> '+
-				data['leader_gecos']+'<br>' );
-		}
-	});
+    var splitString = elem.value.split(',');
+    var experiment  = splitString[0];
+    $.ajax({
+        url: '../portal/ws/experiment_info.php?name='+experiment,
+        success: function( data ) {
+            var data = eval( '('+data+')' );  // translate into a JSON object
+            $('#input-notify-pi-'+instrument).html(
+                '<input type="checkbox" name="notify_pi_'+
+                data['leader_uid']+'" checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true" /> '+
+                data['leader_gecos']+'<br>' );
+        }
+    });
 }
 
 </script>
@@ -186,10 +216,10 @@ function on_experiment_select( elem, instrument ) {
 
 <?php
     DataPortal::body(
-    	'Experiment Switch',
-    	'',
-    	'instrument'
-   	);
+        'Experiment Switch',
+        '',
+        'instrument'
+       );
 ?>
 
 
@@ -198,52 +228,61 @@ function on_experiment_select( elem, instrument ) {
 <!------------------ Page-specific Document Body ------------------->
 <?php
 
-	$tabs = array();
+    $tabs = array();
 
-	foreach( RegDB::instance()->instruments() as $instrument ) {
+    foreach( RegDB::instance()->instruments() as $instrument ) {
 
-		if( $instrument->is_location()) continue;
+        if( $instrument->is_location()) continue;
 
-		/* Generate the page for the last switched experiment (if any)
-		 */
-		$last_experiment_name             = '&lt; No experiment were previously switched by this tool &gt;';
-		$last_experiment_id               = '&lt; none &gt;';
-		$last_experiment_begin_time       = '&lt; none &gt;';
-		$last_experiment_end_time         = '&lt; none &gt;';
-		$last_experiment_description      = '&lt; none &gt;';
-		$last_experiment_contact          = '&lt; none &gt;';
-		$last_experiment_leader           = '&lt; none &gt;';
-		$last_experiment_group            = '&lt; none &gt;';
-		$last_experiment_switch_time      = '&lt; none &gt;';
-		$last_experiment_switch_requestor = '&lt; none &gt;';
+        $num_stations = $instrument->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, instrument: {$instrument->name()}" );
 
-		$last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name());
-		if( !is_null( $last_experiment_switch )) {
+        $html = array();
+        for( $station=0; $station < intval($num_stations->value()); $station++ ) {
 
-			$exper_id = $last_experiment_switch['exper_id'];
-			$experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
+            /* Generate the page for the last switched experiment (if any)
+             */
+            $last_experiment_name             = '&lt; No experiment were previously switched by this tool &gt;';
+            $last_experiment_id               = '&lt; none &gt;';
+            $last_experiment_begin_time       = '&lt; none &gt;';
+            $last_experiment_end_time         = '&lt; none &gt;';
+            $last_experiment_description      = '&lt; none &gt;';
+            $last_experiment_contact          = '&lt; none &gt;';
+            $last_experiment_leader           = '&lt; none &gt;';
+            $last_experiment_group            = '&lt; none &gt;';
+            $last_experiment_switch_time      = '&lt; none &gt;';
+            $last_experiment_switch_requestor = '&lt; none &gt;';
 
-			if( is_null( $experiment ))
-				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
+            $last_experiment_switch = RegDB::instance()->last_experiment_switch( $instrument->name(), $station);
+            if( !is_null( $last_experiment_switch )) {
 
-			$last_experiment_name             = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to the Web Portal of the experiment">'.$experiment->name();
-			$last_experiment_id               = $experiment->id();
-			$first_run = $experiment->find_first_run();
-			$last_run  = $experiment->find_last_run();
-			$last_experiment_begin_time       = is_null( $first_run ) ? '' : $first_run->begin_time()->toStringShort().' (<b>run: '.$first_run->num().'</b>)';
-			$last_experiment_end_time         = is_null( $last_run  ) ? '' : $last_run->begin_time ()->toStringShort().' (<b>run: '.$last_run->num().'</b>)';
-			$last_experiment_description      = $experiment->description();
-			$last_experiment_contact          = DataPortal::decorated_experiment_contact_info( $experiment );
-			$last_experiment_leader           = $experiment->leader_account();
-			$last_experiment_group            = $experiment->POSIX_gid();
-			$last_experiment_switch_time      = LusiTime::from64( $last_experiment_switch['switch_time'] )->toStringShort();
-			$last_experiment_switch_requestor = $last_experiment_switch['requestor_uid'];
-		}
+                $exper_id = $last_experiment_switch['exper_id'];
+                $experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
 
-		$html =<<<HERE
-<div id="current-experiment-{$instrument->name()}" class="module-is-visible">
+                if( is_null( $experiment ))
+                    die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
+
+                $last_experiment_name             = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to the Web Portal of the experiment">'.$experiment->name();
+                $last_experiment_id               = $experiment->id();
+                $first_run = $experiment->find_first_run();
+                $last_run  = $experiment->find_last_run();
+                $last_experiment_begin_time       = is_null( $first_run ) ? '' : $first_run->begin_time()->toStringShort().' (<b>run: '.$first_run->num().'</b>)';
+                $last_experiment_end_time         = is_null( $last_run  ) ? '' : $last_run->begin_time ()->toStringShort().' (<b>run: '.$last_run->num().'</b>)';
+                $last_experiment_description      = $experiment->description();
+                $last_experiment_contact          = DataPortal::decorated_experiment_contact_info( $experiment );
+                $last_experiment_leader           = $experiment->leader_account();
+                $last_experiment_group            = $experiment->POSIX_gid();
+                $last_experiment_switch_time      = LusiTime::from64( $last_experiment_switch['switch_time'] )->toStringShort();
+                $last_experiment_switch_requestor = $last_experiment_switch['requestor_uid'];
+            }
+
+            $html[$station] =<<<HERE
+<div id="current-experiment-{$instrument->name()}-{$station}" class="module-is-visible">
   <div style="font-size:80%;">
-    <button id="button-switch-experiment-{$instrument->name()}" title="select and configure another experiment">Activate another experiment</button>
+    <button class="button-switch-experiment-{$instrument->name()}" name="{$station}" title="select and configure another experiment">Activate another experiment</button>
   </div>
   <br>
   <table>
@@ -293,41 +332,41 @@ function on_experiment_select( elem, instrument ) {
 </div>
 HERE;
 
-		/* Generate invisible module with a selector of experiment. This page will
-		 * be togled on/off by Change/Cancel buttons.
-		 */
-		$experiment = null;	// TODO: the first experiment in the list will be selected as
-							//       the default candidate for the switch. This needs to
-							//       be fixed by selecting the last switched experiment
-							//       if the one is available.
+            /* Generate invisible module with a selector of experiment. This page will
+             * be togled on/off by Change/Cancel buttons.
+             */
+            $experiment = null; // TODO: the first experiment in the list will be selected as
+                                //       the default candidate for the switch. This needs to
+                                //       be fixed by selecting the last switched experiment
+                                //       if the one is available.
 
-		$experiments_html =<<<HERE
-<select name="experiment" id="select-experiment-{$instrument->name()}" onchange="on_experiment_select(this,'{$instrument->name()}')">
+            $experiments_html =<<<HERE
+<select name="experiment" id="select-experiment-{$instrument->name()}-{$station}" onchange="on_experiment_select(this,'{$instrument->name()}')">
 HERE;
-		foreach( RegDB::instance()->experiments_for_instrument( $instrument->name()) as $e ) {
+            foreach( RegDB::instance()->experiments_for_instrument( $instrument->name()) as $e ) {
 
-			if( is_null( $experiment ))	$experiment = $e; // remember the first experiment in the list.
+                if( is_null( $experiment ))    $experiment = $e; // remember the first experiment in the list.
 
-			$selected_option = $last_experiment_id == $e->id() ? 'selected="selected"' : '';
-			$experiments_html .= "<option {$selected_option}>{$e->name()}, id={$e->id()}</option>";
-		}
-		$experiments_html .= '</select>';
+                $selected_option = $last_experiment_id == $e->id() ? 'selected="selected"' : '';
+                $experiments_html .= "<option {$selected_option}>{$e->name()}, id={$e->id()}</option>";
+            }
+            $experiments_html .= '</select>';
 
-		$opr_account = strtolower($instrument->name()).'opr';
+            $opr_account = strtolower($instrument->name()).'opr';
 
-		$opr_account_prev_auth_html = '';
-		foreach( AuthDB::instance()->roles_by( $opr_account, 'LogBook', $instrument->name()) as $r ) {
-			if( $opr_account_prev_auth_html == '' ) $opr_account_prev_auth_html .= '<div style="float:left; padding:5px;">';
-			$instr    = $r['instr'];
-			$exper    = $r['exper'];
-			$exper_id = $r['exper_id'];
-			$role     = $r['role' ];
-			$opr_account_prev_auth_html .=<<<HERE
+            $opr_account_prev_auth_html = '';
+            foreach( AuthDB::instance()->roles_by( $opr_account, 'LogBook', $instrument->name()) as $r ) {
+                if( $opr_account_prev_auth_html == '' ) $opr_account_prev_auth_html .= '<div style="float:left; padding:5px;">';
+                $instr    = $r['instr'];
+                $exper    = $r['exper'];
+                $exper_id = $r['exper_id'];
+                $role     = $r['role' ];
+                $opr_account_prev_auth_html .=<<<HERE
 <input type="checkbox" name="oprelogauth_{$role->name()}_{$exper_id}" checked="checked" /> {$role->name()} @ {$exper} (id={$exper_id})<br>
 HERE;
-		}
-		if( $opr_account_prev_auth_html != '' ) {
-			$opr_account_prev_auth_html .=<<<HERE
+            }
+            if( $opr_account_prev_auth_html != '' ) {
+                $opr_account_prev_auth_html .=<<<HERE
 </div>
 <div style="float:left; padding:5px; width:180px;">
   <span style="color:red;">Uncheck those authorizations which may compromise new experiment's
@@ -335,8 +374,8 @@ HERE;
 </div>
 <div style="clear:both;"></div>
 HERE;
-		}
-		$opr_account_auth_html =<<<HERE
+            }
+            $opr_account_auth_html =<<<HERE
 <div>
   <div style="float:left; padding-right:10px;">
     <b>For new experiment:</b><br>
@@ -355,34 +394,34 @@ HERE;
 </div>
 HERE;
 
-    	$checked_readonly = 'checked="checked"'; //'checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true"';
+            $checked_readonly = 'checked="checked"'; //'checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true"';
 
-    	$admins = array( 'perazzo', 'gapon', 'salnikov' );
-    	$admins_html = '';
-    	foreach( $admins as $uid ) {
-    		$account = RegDB::instance()->find_user_account( $uid );
-    		$gecos = $account['gecos'];
-    		$email = $account['email'];
-    		$admins_html .=<<<HERE
+            $admins = array( 'perazzo', 'gapon', 'salnikov' );
+            $admins_html = '';
+            foreach( $admins as $uid ) {
+                $account = RegDB::instance()->find_user_account( $uid );
+                $gecos = $account['gecos'];
+                $email = $account['email'];
+                $admins_html .=<<<HERE
 <input type="checkbox" name="notify_admin_{$uid}" {$checked_readonly} /> {$gecos}<br>
 HERE;
-    	}
-    	
-    	$instrument_scientists_group = 'ps-'.strtolower($instrument->name());
-    	$instrument_scientists_html = '';
-    	foreach( RegDB::instance()->posix_group_members( $instrument_scientists_group, /* $and_as_primary_group=*/ false ) as $account ) {
-    		$uid = $account['uid'];
-    		$gecos = $account['gecos'];
-    		$instrument_scientists_html .=<<<HERE
+            }
+        
+            $instrument_scientists_group = 'ps-'.strtolower($instrument->name());
+            $instrument_scientists_html = '';
+            foreach( RegDB::instance()->posix_group_members( $instrument_scientists_group, /* $and_as_primary_group=*/ false ) as $account ) {
+                $uid = $account['uid'];
+                $gecos = $account['gecos'];
+                $instrument_scientists_html .=<<<HERE
 <input type="checkbox" name="notify_is_{$uid}" {$checked_readonly} /> {$gecos}<br>
 HERE;
-    	}
+            }
 
-    	$pi_account = RegDB::instance()->find_user_account( $last_experiment_leader /*$experiment->leader_account()*/ );
-    	$pi_uid   = $pi_account['uid'];
-    	$pi_gecos = $pi_account['gecos'];
-    	$pi_email = $pi_account['email'];
-		$notify_html =<<<HERE
+            $pi_account = RegDB::instance()->find_user_account( $last_experiment_leader /*$experiment->leader_account()*/ );
+            $pi_uid   = $pi_account['uid'];
+            $pi_gecos = $pi_account['gecos'];
+            $pi_email = $pi_account['email'];
+            $notify_html =<<<HERE
 <div>
   <div style="float:left;">
     <div style="float:left;">
@@ -414,8 +453,8 @@ HERE;
 </div>
 HERE;
 
-		$html .=<<<HERE
-<div id="select-experiment-{$instrument->name()}" class="module-is-hidden">
+            $html[$station] .=<<<HERE
+<div id="select-experiment-{$instrument->name()}-{$station}" class="module-is-hidden">
   <div style="width:640px;">
     <b>HOW TO USE THIS FORM:</b> Press <b>'Submit'</b> to proceed with the switch and all relevant changes in the system.
     Persons mentioned in the list below will be notified by e-mail. Additional instructions
@@ -425,12 +464,13 @@ HERE;
   </div>
   <br>
   <div style="font-size:80%;">
-    <button id="button-submit-experiment-{$instrument->name()}" title="make changes into effect">Submit</button>
-    <button id="button-cancel-experiment-{$instrument->name()}" title="discard changes and go back to the current experiment status page">Cancel</button>
+    <button class="button-submit-experiment-{$instrument->name()}" name="{$station}" title="make changes into effect">Submit</button>
+    <button class="button-cancel-experiment-{$instrument->name()}" name="{$station}" title="discard changes and go back to the current experiment status page">Cancel</button>
   </div>
   <br>
   <div style="padding-left:10px;">
-  <form name="form-{$instrument->name()}" action="ws/ProcessExperimentSwitch.php" method="post">
+  <form name="form-{$instrument->name()}-{$station}" action="ws/ProcessExperimentSwitch.php" method="post">
+    <input type="hidden" name="station" value="{$station}" />
     <table>
       <tbody>
         <tr>
@@ -451,73 +491,79 @@ HERE;
   </div>
 </div>
 HERE;
+        }
 
-		/* Generate a body of a tab displaying a history of previous switches.
-		 */
-		$html_history = '';
-       	$html_history .= DataPortal::table_begin_html(
-			array(
-				array( 'name' => 'Experiment',  'width' => 105 ),
-				array( 'name' => 'Id',          'width' =>  32 ),
-				array( 'name' => 'Switch Time', 'width' =>  90 ),
-				array( 'name' => 'By User',     'width' => 160 )
-			)
-		);
-		foreach( RegDB::instance()->experiment_switches( $instrument->name()) as $experiment_switch ) {
+        /* Generate a body of a tab displaying a history of previous switches.
+         */
+        $html_history = '';
+        $html_history .= DataPortal::table_begin_html(
+            array(
+                array( 'name' => 'Station',     'width' =>  32 ),
+                array( 'name' => 'Experiment',  'width' => 105 ),
+                array( 'name' => 'Id',          'width' =>  32 ),
+                array( 'name' => 'Switch Time', 'width' =>  90 ),
+                array( 'name' => 'By User',     'width' => 160 )
+            )
+        );
+        foreach( RegDB::instance()->experiment_switches( $instrument->name()) as $experiment_switch ) {
 
-			$exper_id = $experiment_switch['exper_id'];
-			$experiment = RegDB::instance()->find_experiment_by_id( $exper_id );
+            $exper_id = $experiment_switch['exper_id'];
+            $experiment = RegDB::instance()->find_experiment_by_id( $exper_id );
 
-			if( is_null( $experiment ))
-				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
-			
-			$experiment_portal_url = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to Experiment Data Portal">'.$experiment->name().'</a>';
-    		$html_history .= DataPortal::table_row_html(
-    			array(
-    				$experiment_portal_url,
-    				$experiment->id(),
-    				LusiTime::from64( $experiment_switch['switch_time'] )->toStringShort(),
-    				$experiment_switch['requestor_uid']
-   				)
-    		);
-		}
-    	$html_history .= DataPortal::table_end_html();
-		
-		/* Generate two tabs for each instrument: 'Current' and 'History'
-		 */
-		$instrument_tabs = array();
-		array_push(
-			$instrument_tabs,
-			array('name' => 'Current Experiment',
-				  'id'   => 'instrument-'.$instrument->name().'-current',
-				  'html' => $html,
-				  'class' => 'tab-inline-content'
-			)
-		);
-		array_push(
-			$instrument_tabs,
-			array('name' => 'History',
-				  'id'   => 'instrument-'.$instrument->name().'-history',
-				  'html' => $html_history,
-				  'class' => 'tab-inline-content'
-			)
-		);
+            if( is_null( $experiment ))
+                die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
+            
+            $experiment_portal_url = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to Experiment Data Portal">'.$experiment->name().'</a>';
+            $html_history .= DataPortal::table_row_html(
+                array(
+                    $experiment_switch['station'],
+                    $experiment_portal_url,
+                    $experiment->id(),
+                    LusiTime::from64( $experiment_switch['switch_time'] )->toStringShort(),
+                    $experiment_switch['requestor_uid']
+                   )
+            );
+        }
+        $html_history .= DataPortal::table_end_html();
+        
+        /* Generate tabs for each instrument: '0: Current Experiment', '1: Current Experiment', ... and 'History'
+         */
+        $instrument_tabs = array();
 
-		/* Add the instrument to the top-level tab.
-		 */
-		array_push(
-   			$tabs,
-   			array('name' => $instrument->name(),
-   				  'id'   => 'instrument-'.$instrument->name(),
-	   			  'html' => DataPortal::tabs_html( "instrument-{$instrument->name()}-contents", $instrument_tabs ),
-				  'class' => 'tab-inline-content'
-   			)
-   		);
-	}
+        for( $station=0; $station < intval($num_stations->value()); $station++ ) {
+            array_push(
+                $instrument_tabs,
+                array('name' => $station.': Current Experiment',
+                      'id'   => 'instrument-'.$instrument->name().'-current-'.$station,
+                      'html' => $html[$station],
+                      'class' => 'tab-inline-content'
+                )
+            );
+        }
+        array_push(
+            $instrument_tabs,
+            array('name' => 'History',
+                  'id'   => 'instrument-'.$instrument->name().'-history',
+                  'html' => $html_history,
+                  'class' => 'tab-inline-content'
+            )
+        );
 
-   	/* Print the whole tab and its contents (including sub-tabs).
-   	 */
-	DataPortal::tabs( "instruments", $tabs );
+        /* Add the instrument to the top-level tab.
+         */
+        array_push(
+               $tabs,
+               array('name' => $instrument->name(),
+                     'id'   => 'instrument-'.$instrument->name(),
+                     'html' => DataPortal::tabs_html( "instrument-{$instrument->name()}-contents", $instrument_tabs ),
+                  'class' => 'tab-inline-content'
+               )
+           );
+    }
+
+       /* Print the whole tab and its contents (including sub-tabs).
+        */
+    DataPortal::tabs( "instruments", $tabs );
 ?>
 
 <!----------------------------------------------------------------->

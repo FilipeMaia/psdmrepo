@@ -9,7 +9,7 @@ require_once( 'regdb/regdb.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\SysMon;
+use DataPortal\ExpTimeMon;
 use DataPortal\DataPortalException;
 
 use LogBook\LogBook;
@@ -32,7 +32,7 @@ use RegDB\RegDBException;
  *   2012-03-21
  */
 function report_error($msg) {
-	return_result(
+    return_result(
         array(
             'status' => 'error',
             'message' => $msg
@@ -41,16 +41,16 @@ function report_error($msg) {
 }
 function report_success($result) {
     $result['status'] = 'success';
-  	return_result($result);
+      return_result($result);
 }
 function return_result($result) {
 
-	header( 'Content-type: application/json' );
-	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
-	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
+    header( 'Content-type: application/json' );
+    header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
+    header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
     echo json_encode($result);
-	exit;
+    exit;
 }
 
 try {
@@ -91,19 +91,19 @@ try {
     //
     LogBook::instance()->begin();
     RegDB::instance()->begin();
-    SysMon::instance()->begin();
+    ExpTimeMon::instance()->begin();
 
     // Repopulate the database if the requested day is today
     //
     $shift_is4today = $start->toStringDay() == LusiTime::today()->toStringDay();
     if( $shift_is4today ) {
-        SysMon::instance()->populate('XRAY_DESTINATIONS');
+        ExpTimeMon::instance()->populate('XRAY_DESTINATIONS');
     }
 
     // Instrument specific statistics stored in the following dictionary
     //
     $instruments = array();
-    foreach( SysMon::instrument_names() as $instr ) {
+    foreach( ExpTimeMon::instrument_names() as $instr ) {
         $instruments[$instr] = array(
             'runs'                      => array(),
             'runs_duration_sec'         => 0.0,
@@ -120,7 +120,7 @@ try {
     // Beam destination statistics
     //
     $beam_destinations = array();
-    foreach( SysMon::beam_destinations() as $name ) {
+    foreach( ExpTimeMon::beam_destinations() as $name ) {
         $beam_destinations[$name] = array(
             'beam_status' => array()
         );
@@ -137,7 +137,7 @@ try {
     // NOTE: runs are reported in a scope of the corresponding
     //       instruments.
     //
-    foreach( SysMon::instance()->beamtime_runs($start,$stop) as $run ) {
+    foreach( ExpTimeMon::instance()->beamtime_runs($start,$stop) as $run ) {
         $instr_name = $run->instr_name();
         array_push(
             $instruments[$instr_name]['runs'],
@@ -158,11 +158,11 @@ try {
     // NOTE: gaps are reported in a scope of the corresponding
     //       instruments.
     //
-    foreach( SysMon::instance()->beamtime_gaps($start,$stop) as $gap ) {
+    foreach( ExpTimeMon::instance()->beamtime_gaps($start,$stop) as $gap ) {
 
         $instr = $gap->instr_name();
 
-        $comment      = SysMon::instance()->beamtime_comment_at($gap->begin_time(), $instr);
+        $comment      = ExpTimeMon::instance()->beamtime_comment_at($gap->begin_time(), $instr);
         $comment_info = is_null($comment) ?
             array('available'     => 0) :
             array('available'     => 1,
@@ -188,7 +188,7 @@ try {
     // found in justtifications for gaps. The categories can be used
     // by any instruments.
     //
-    $systems = SysMon::instance()->beamtime_systems();
+    $systems = ExpTimeMon::instance()->beamtime_systems();
     sort($systems);
 
     // Retreive and process beam-time and LCLS records
@@ -211,7 +211,7 @@ try {
         // NOTE: gaps are reported in a scope of the corresponding
         //       instruments.
         //
-        foreach( SysMon::instance()->beamtime_beam_status('XRAY_DESTINATIONS',$start,$stop) as $ival ) {
+        foreach( ExpTimeMon::instance()->beamtime_beam_status('XRAY_DESTINATIONS',$start,$stop) as $ival ) {
 
             $ival_begin_sec = $ival['begin_time']->to_float();
             $ival_end_sec   = $ival['end_time'  ]->to_float();
@@ -226,11 +226,11 @@ try {
                     $cut_short = true;
                 }
             }
-            foreach( SysMon::beam_destinations() as $name ) {
+            foreach( ExpTimeMon::beam_destinations() as $name ) {
 
-                $status = $ival['status'] & SysMon::beam_destination_mask($name);
+                $status = $ival['status'] & ExpTimeMon::beam_destination_mask($name);
                 if( $status ) {
-                    if( SysMon::is_instrument_name($name)) {
+                    if( ExpTimeMon::is_instrument_name($name)) {
                         $instruments[$name]['total_beam_time_sec'] += $ival_end_sec - $ival_begin_sec;
                         array_push(
                             $instruments[$name]['beam_status'],
@@ -254,7 +254,7 @@ try {
 
         // LCLS statistics
         //
-        foreach( SysMon::instance()->beamtime_beam_status('LIGHT:LCLS:STATE',$start,$stop) as $ival ) {
+        foreach( ExpTimeMon::instance()->beamtime_beam_status('LIGHT:LCLS:STATE',$start,$stop) as $ival ) {
 
             $ival_begin_sec = $ival['begin_time']->to_float();
             $ival_end_sec   = $ival['end_time'  ]->to_float();
@@ -287,7 +287,7 @@ try {
     }
     $total_beam_time_sec     = 0.0;
     $total_runs_duration_sec = 0.0;
-    foreach( SysMon::instrument_names() as $instr ) {
+    foreach( ExpTimeMon::instrument_names() as $instr ) {
 
         $total_hutch_beam_time_sec = $instruments[$instr]['total_beam_time_sec'];
         $total_beam_time_sec += $total_hutch_beam_time_sec;
@@ -327,7 +327,7 @@ try {
 
     LogBook::instance()->commit();
     RegDB::instance()->commit();
-    SysMon::instance()->commit();
+    ExpTimeMon::instance()->commit();
 
     report_success( array(
         'shift'                       => $start->toStringDay(),
@@ -335,8 +335,8 @@ try {
         'stop'                        => $stop->toStringShort(),
         'start_sec'                   => $start_sec,
         'stop_sec'                    => $stop_sec,
-        'instrument_names'            => SysMon::instrument_names(),
-        'beam_destination_names'      => SysMon::beam_destinations(),
+        'instrument_names'            => ExpTimeMon::instrument_names(),
+        'beam_destination_names'      => ExpTimeMon::beam_destinations(),
         'beam_destinations'           => $beam_destinations,
         'total_beam_destinations'     => $total_beam_destinations,
         'total_beam_destinations_sec' => $total_beam_destinations_sec,

@@ -9,14 +9,12 @@ require_once( 'regdb/regdb.inc.php' );
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
-use DataPortal\SysMon;
+use DataPortal\ExpTimeMon;
 use DataPortal\DataPortalException;
 
 use LogBook\LogBook;
 use LogBook\LogBookException;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiIntervalItr;
 use LusiTime\LusiTimeException;
 
 use RegDB\RegDB;
@@ -67,14 +65,14 @@ try {
     LogBook::instance()->begin();
 
     RegDB::instance()->begin();
-    SysMon::instance()->begin();
+    ExpTimeMon::instance()->begin();
 
     // Load configuration parameters stored at the last invocation
     // of the script. The parameters are going to drive how far this script
     // should go back in history. The value of the parameters can also be adjusted
     // 
     //
-    $config = SysMon::instance()->beamtime_config();
+    $config = ExpTimeMon::instance()->beamtime_config();
     print <<<HERE
 <h3>Configuration loaded from the database:</h3>
 <div style="padding-left:10;">
@@ -93,7 +91,7 @@ HERE;
 </div>
 HERE;
 
-    SysMon::instance()->populate (
+    ExpTimeMon::instance()->populate (
         'XRAY_DESTINATIONS',
         $min_gap_width_sec,
         $no_beam_correction4gaps,
@@ -102,7 +100,7 @@ HERE;
     AuthDB::instance()->commit();
     LogBook::instance()->commit();
     RegDB::instance()->commit();
-    SysMon::instance()->commit();
+    ExpTimeMon::instance()->commit();
 
 } catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
   catch( DataPortalException $e ) { report_error( $e->toHtml()); }
