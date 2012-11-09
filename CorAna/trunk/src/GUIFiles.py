@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
+from GUIDark                import *
 from Logger                 import logger
 
 #---------------------
@@ -50,11 +51,18 @@ class GUIFiles ( QtGui.QWidget ) :
         self.sect_fields  = []
 
         self.tit_dir_work = QtGui.QLabel('Work/Results')
-        self.lab_dir_work = QtGui.QLabel('Dir:')
+
+        self.lab_dir_work = QtGui.QLabel('Dir work:')
         self.edi_dir_work = QtGui.QLineEdit( cp.dir_work.value() )        
         self.but_dir_work = QtGui.QPushButton('Browse')
         self.edi_dir_work.setReadOnly( True )  
-        self.lab_fname_prefix = QtGui.QLabel('Prefix:')
+
+        self.lab_dir_results = QtGui.QLabel('Dir results:')
+        self.edi_dir_results = QtGui.QLineEdit( cp.dir_results.value() )        
+        self.but_dir_results = QtGui.QPushButton('Browse')
+        self.edi_dir_results.setReadOnly( True )  
+
+        self.lab_fname_prefix = QtGui.QLabel('File prefix:')
         self.edi_fname_prefix = QtGui.QLineEdit( cp.fname_prefix.value() )        
 
         self.tit_status = QtGui.QLabel     ('Status: ')
@@ -73,24 +81,31 @@ class GUIFiles ( QtGui.QWidget ) :
  
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
-        self.guiSection('Dark images run', cp.in_dir_dark, cp.in_file_dark)
+        self.guiSection('Dark run',        cp.in_dir_dark, cp.in_file_dark)
         self.guiSection('Flat field',      cp.in_dir_flat, cp.in_file_flat)
-        self.guiSection('Blamish',         cp.in_dir_blam, cp.in_file_blam)
         self.guiSection('Data',            cp.in_dir_data, cp.in_file_data) 
+        #self.guiSection('Blamish',         cp.in_dir_blam, cp.in_file_blam)
 
         self.grid.addWidget(self.tit_dir_work,      self.grid_row,   0, 1, 9)
         self.grid.addWidget(self.lab_dir_work,      self.grid_row+1, 1)
         self.grid.addWidget(self.edi_dir_work,      self.grid_row+1, 2, 1, 7)
         self.grid.addWidget(self.but_dir_work,      self.grid_row+1, 9)
 
-        self.grid.addWidget(self.lab_fname_prefix,  self.grid_row+2, 1)
-        self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+2, 2, 1, 7)
+        self.grid.addWidget(self.lab_dir_results,   self.grid_row+2, 1)
+        self.grid.addWidget(self.edi_dir_results,   self.grid_row+2, 2, 1, 7)
+        self.grid.addWidget(self.but_dir_results,   self.grid_row+2, 9)
 
-        self.grid.addWidget(cp.guiconfigparameters, self.grid_row+3, 0, 1, 10)        
-        self.grid.addLayout(self.hboxB,             self.grid_row+4, 0, 1, 10)
+        self.grid.addWidget(self.lab_fname_prefix,  self.grid_row+3, 1)
+        self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+3, 2, 1, 7)
+
+        self.grid.addWidget(cp.guiconfigparameters, self.grid_row+4, 0, 1, 10)        
+        self.grid.addLayout(self.hboxB,             self.grid_row+5, 0, 1, 10)
         self.setLayout(self.grid)
 
-        self.connect( self.but_dir_work, QtCore.SIGNAL('clicked()'), self.onButDirWork )
+        self.connect( self.but_dir_work,     QtCore.SIGNAL('clicked()'),          self.onButDirWork )
+        self.connect( self.but_dir_results,  QtCore.SIGNAL('clicked()'),          self.onButDirResults )
+        self.connect( self.edi_fname_prefix, QtCore.SIGNAL('editingFinished ()'), self.onEditPrefix )
+
         self.connect( self.but_close,    QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_save,     QtCore.SIGNAL('clicked()'), self.onSave )
         self.connect( self.but_show ,    QtCore.SIGNAL('clicked()'), self.onShow )
@@ -107,8 +122,10 @@ class GUIFiles ( QtGui.QWidget ) :
         self.but_close .setToolTip('Close this window.')
         self.but_save .setToolTip('Apply changes to configuration parameters.')
         self.but_show  .setToolTip('Show ...')
-        self.edi_dir_work.setToolTip('Use button "Browse"\nto change this field.')
+        self.edi_dir_work.setToolTip('Click on "Browse"\nto change the directory.')
         self.but_dir_work.setToolTip('Click on this button\nand select the directory.')
+        self.edi_dir_results.setToolTip('Click on "Browse"\nto change the directory.')
+        self.but_dir_results.setToolTip('Click on this button\nand select the directory.')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -125,15 +142,23 @@ class GUIFiles ( QtGui.QWidget ) :
         self.lab_dir_work    .setStyleSheet (cp.styleLabel)
         self.edi_dir_work    .setStyleSheet (cp.styleEditInfo)       
         self.but_dir_work    .setStyleSheet (cp.styleButton) 
+        self.lab_dir_results .setStyleSheet (cp.styleLabel)
+        self.edi_dir_results .setStyleSheet (cp.styleEditInfo)       
+        self.but_dir_results .setStyleSheet (cp.styleButton) 
         self.lab_fname_prefix.setStyleSheet (cp.styleLabel)
         self.edi_fname_prefix.setStyleSheet (cp.styleEdit)
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.lab_dir_work    .setAlignment (QtCore.Qt.AlignRight)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_dir_results .setAlignment (QtCore.Qt.AlignRight)
+        self.edi_dir_results .setAlignment (QtCore.Qt.AlignRight)
         self.lab_fname_prefix.setAlignment (QtCore.Qt.AlignRight)
         self.lab_dir_work    .setMinimumWidth(90)
         self.edi_dir_work    .setMinimumWidth(300)
         self.but_dir_work    .setFixedWidth(80)
+        self.lab_dir_results .setMinimumWidth(90)
+        self.edi_dir_results .setMinimumWidth(300)
+        self.but_dir_results .setFixedWidth(80)
         self.but_close       .setStyleSheet (cp.styleButton)
         self.but_save        .setStyleSheet (cp.styleButton)
         self.but_show        .setStyleSheet (cp.styleButton)
@@ -147,6 +172,7 @@ class GUIFiles ( QtGui.QWidget ) :
         edi_file= QtGui.QLineEdit( par_file.value() )        
         but_dir = QtGui.QPushButton('Browse')
         but_file= QtGui.QPushButton('Browse')
+        but_proc= QtGui.QPushButton('Process')
 
         edi_dir .setReadOnly( True )  
         edi_file.setReadOnly( True )  
@@ -158,13 +184,15 @@ class GUIFiles ( QtGui.QWidget ) :
         edi_file.setToolTip(msg_info)
         but_dir .setToolTip(msg_dir)
         but_file.setToolTip(msg_file)
+        but_proc.setToolTip('Click on this button\nand process the file.')
 
-        self.grid.addWidget(tit_sect, self.grid_row,   0, 1, 9)
+        self.grid.addWidget(tit_sect, self.grid_row+0, 0, 1, 2)
+        self.grid.addWidget(but_proc, self.grid_row+0, 2)
         self.grid.addWidget(tit_dir,  self.grid_row+1, 1)
-        self.grid.addWidget(tit_file, self.grid_row+2, 1)
         self.grid.addWidget(edi_dir,  self.grid_row+1, 2, 1, 7)
-        self.grid.addWidget(edi_file, self.grid_row+2, 2, 1, 7)
         self.grid.addWidget(but_dir,  self.grid_row+1, 9)
+        self.grid.addWidget(tit_file, self.grid_row+2, 1)
+        self.grid.addWidget(edi_file, self.grid_row+2, 2, 1, 7)
         self.grid.addWidget(but_file, self.grid_row+2, 9)
         self.grid_row += 3
 
@@ -175,22 +203,25 @@ class GUIFiles ( QtGui.QWidget ) :
         edi_file   .setStyleSheet (cp.styleEditInfo) 
         but_dir    .setStyleSheet (cp.styleButton) 
         but_file   .setStyleSheet (cp.styleButton) 
+        but_proc   .setStyleSheet (cp.styleButtonBad) 
 
         tit_dir    .setAlignment (QtCore.Qt.AlignRight)
         tit_file   .setAlignment (QtCore.Qt.AlignRight)
         edi_dir    .setAlignment (QtCore.Qt.AlignRight)
         edi_file   .setAlignment (QtCore.Qt.AlignRight)
 
-        width = 80
+        width = 60
         but_dir    .setFixedWidth(width)
         but_file   .setFixedWidth(width)
+        but_proc   .setFixedWidth(width)
 
         self.connect(edi_dir,  QtCore.SIGNAL('editingFinished ()'), self.onEditDir )
         self.connect(edi_file, QtCore.SIGNAL('editingFinished ()'), self.onEditFile)
         self.connect(but_dir,  QtCore.SIGNAL('clicked()'),          self.onButDir  )
         self.connect(but_file, QtCore.SIGNAL('clicked()'),          self.onButFile )
+        self.connect(but_proc, QtCore.SIGNAL('clicked()'),          self.onButProc )
  
-        self.sect_fields.append( (tit_sect, tit_dir, tit_file, edi_dir, edi_file, but_dir, but_file, par_dir, par_file ) )
+        self.sect_fields.append( (tit_sect, tit_dir, tit_file, edi_dir, edi_file, but_dir, but_file, par_dir, par_file, but_proc ) )
 
 
     def setParent(self,parent) :
@@ -208,6 +239,15 @@ class GUIFiles ( QtGui.QWidget ) :
         logger.debug('closeEvent', __name__)
 
         try    : cp.guiconfigparameters.close()
+        except : pass
+
+        try    : cp.guidark.close()
+        except : pass
+
+        try    : cp.guiflat.close()
+        except : pass
+
+        try    : cp.guidata.close()
         except : pass
 
         try    : del cp.guifiles # GUIFiles
@@ -291,6 +331,41 @@ class GUIFiles ( QtGui.QWidget ) :
                 par.setValue(fname)
                 logger.info('selected the file name: ' + str(par.value()), __name__ )
 
+    def onButProc(self):
+        logger.debug('onButProc', __name__)
+        for fields in self.sect_fields :
+            but = fields[9]
+            if but.hasFocus() :
+                tit = fields[0]
+                str_sec = str(tit.text())
+                logger.info('Section: ' + str_sec + ' - pre-processing', __name__ )
+
+                if   str_sec == 'Dark run'   : self.on_off_gui_dark(but)
+                elif str_sec == 'Flat field' : self.on_off_gui_flat(but) 
+                elif str_sec == 'Data'       : self.on_off_gui_data(but)
+
+
+    def on_off_gui_dark(self,but):
+        logger.info('on_off_gui_dark', __name__)
+        try :
+            cp.guidark.close()
+            but.setStyleSheet(cp.styleButtonBad)
+        except : # AttributeError: #NameError 
+            cp.guidark = GUIDark()
+            cp.guidark.setParent(self)
+            cp.guidark.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
+            cp.guidark.show()
+            but.setStyleSheet(cp.styleButtonGood)
+
+
+    def on_off_gui_flat(self,but):
+        logger.info('on_off_gui_flat', __name__)
+
+
+    def on_off_gui_data(self,but):
+        logger.info('on_off_gui_data', __name__)
+
+
 
     def onButDirWork(self):
         logger.info('onButDirWork - Select work directory.', __name__)
@@ -301,10 +376,29 @@ class GUIFiles ( QtGui.QWidget ) :
         if dir == dir0 or dir == '' :
             logger.info('Work directiry has not been changed.', __name__)
             return
-
         self.edi_dir_work.setText(dir)        
         cp.dir_work.setValue(dir)
         logger.info('Set directory: ' + str(cp.dir_work.value()), __name__)
+
+
+    def onButDirResults(self):
+        logger.info('onButDirResults - Select results directory.', __name__)
+        dir0 = cp.dir_results.value()
+        path, name = os.path.split(dir0)
+        dir = str( QtGui.QFileDialog.getExistingDirectory(self,'Select directory',path) )
+
+        if dir == dir0 or dir == '' :
+            logger.info('Results directiry has not been changed.', __name__)
+            return
+        self.edi_dir_results.setText(dir)        
+        cp.dir_results.setValue(dir)
+        logger.info('Set directory: ' + str(cp.dir_results.value()), __name__)
+
+
+    def onEditPrefix(self):
+        logger.debug('onEditPrefix', __name__)
+        cp.fname_prefix.setValue( str(self.edi_fname_prefix.displayText()) )
+        logger.info('Set file name common prefix: ' + str( cp.fname_prefix.value()), __name__ )
 
 #-----------------------------
 

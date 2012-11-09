@@ -31,7 +31,7 @@ import os
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-
+import GlobalUtils            as   gu
 #-----------------------------
 
 class FileNameManager :
@@ -42,21 +42,64 @@ class FileNameManager :
         """Constructor.
         @param fname  the file name for output log file
         """
+#-----------------------------
 
-    def path_pedestals_xtc(self) :
+    def path_dark_xtc(self) :
         return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
 
+    def path_flat_xtc(self) :
+        return cp.in_dir_flat.value() + '/' + cp.in_file_flat.value()
+
+    def path_data_xtc(self) :
+        return cp.in_dir_data.value() + '/' + cp.in_file_data.value()
+
+    def str_exp_run_dark(self) :
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_dark_xtc())
+        if experiment == None : return 'exp-run-'
+        else                  : return experiment + '-' + run_str + '-'
+
+    def str_exp_run_flat(self) :
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_flat_xtc())
+        if experiment == None : return 'exp-run-'
+        else                  : return experiment + '-' + run_str + '-'
+
+    def str_exp_run_data(self) :
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_data_xtc())
+        if experiment == None : return 'exp-run-'
+        else                  : return experiment + '-' + run_str + '-'
+
+#-----------------------------
+
     def path_pedestals_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals.cfg'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals.cfg'
 
     def path_pedestals_ave(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals-ave.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-ave.txt'
 
     def path_pedestals_rms(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals-rms.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-rms.txt'
 
     def path_pedestals_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'pedestals-batch-log.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-batch-log.txt'
+
+    def path_pedestals_tahometer_batch_log(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer-batch-log.txt'
+
+    def  get_list_of_files_pedestals(self) :
+        self.list_of_files_pedestals = []
+        self.list_of_files_pedestals.append(self.path_dark_xtc())
+        self.list_of_files_pedestals.append(self.path_pedestals_psana_cfg())
+        self.list_of_files_pedestals.append(self.path_pedestals_batch_log())
+        self.list_of_files_pedestals.append(self.path_pedestals_ave())
+        self.list_of_files_pedestals.append(self.path_pedestals_rms())
+        #self.list_of_files_pedestals.append(self.path_tahometer_psana_cfg())
+        #self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
+        return self.list_of_files_pedestals
+
+#-----------------------------
+
+    def path_tahometer_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'tahometer.cfg'
 
 #-----------------------------
 
@@ -66,14 +109,18 @@ fnm = FileNameManager ()
 
 if __name__ == "__main__" :
 
-    print 'path_pedestals_xtc()       : ', fnm.path_pedestals_xtc()
+    print 'path_pedestals_xtc()       : ', fnm.path_dark_xtc()
     print 'path_pedestals_psana_cfg() : ', fnm.path_pedestals_psana_cfg()
     print 'path_pedestals_ave()       : ', fnm.path_pedestals_ave()
     print 'path_pedestals_rms()       : ', fnm.path_pedestals_rms()
     print 'path_pedestals_batch_log() : ', fnm.path_pedestals_batch_log()
-    print '',
-    print '',
-    print '',
+    print 'path_tahometer_psana_cfg() : ', fnm.path_tahometer_psana_cfg()
+    print 'path_tahometer_batch_log() : ', fnm.path_pedestals_tahometer_batch_log()
+    print '\n',
+    print '\n',
+    print 'str_exp_run_dark()   : ', fnm.str_exp_run_dark()
+    print 'str_exp_run_flat()   : ', fnm.str_exp_run_flat()
+    print 'str_exp_run_data()   : ', fnm.str_exp_run_data()
     
     sys.exit ( 'End of test for FileNameManager' )
 

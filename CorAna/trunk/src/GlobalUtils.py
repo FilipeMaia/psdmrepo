@@ -138,10 +138,10 @@ def remove_file(path) :
 # assumes: path = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
 def parse_xtc_path(path='.') :
 
-    instrument = None
-    experiment = None
-    run_str    = None
-    run_num    = None
+    instrument = 'INS'
+    experiment = 'expt'
+    run_str    = 'r0000'
+    run_num    = 0
 
     pos = path.find('/reg/d/psdm/')
     if pos != -1 :
@@ -149,8 +149,10 @@ def parse_xtc_path(path='.') :
         instrument = fields[4].upper()              # i.e. XCS 
         experiment = fields[5]                      # i.e. xcsi0112
         bname   = os.path.basename(path)            # i.e. e167-r0015-s00-c00.xtc
+    try:
         run_str = bname.split('-')[1]               # i.e. r0015
         run_num = int(run_str[1:])                  # i.e. 15
+    except : pass
 
     return instrument, experiment, run_str, run_num
     

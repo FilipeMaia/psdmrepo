@@ -71,28 +71,39 @@ class ConfigFileGenerator :
                          }
 
         self.print_substitution_dict()
-        self.make_psana_cfg_file ()
+        self.make_cfg_file()
 
 #-----------------------------
+
+    def make_psana_cfg_file_for_tahometer (self) :
+        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-tahometer.cfg').path()
+        self.path_out = fnm.path_tahometer_psana_cfg()
+        self.d_subs   = {'SKIP'           : 'IS_NOT_USED',
+                         'EVENTS'         : 'FOR_ALL_EVENTS',
+                         }
+
+        self.print_substitution_dict()
+        self.make_cfg_file()
+
 #-----------------------------
 #-----------------------------
 #-----------------------------
 
     def print_substitution_dict (self) :
-        logger.info('Substitution dictionary:',__name__)
+        logger.debug('Substitution dictionary:',__name__)
         for k,v in self.d_subs.iteritems() :
             msg = '%s : %s' % (k.ljust(16), v.ljust(32))
-            logger.info(msg)
+            logger.debug(msg)
 
 
 #-----------------------------
 
-    def make_psana_cfg_file (self) :
+    def make_cfg_file (self) :
 
-        logger.info('Make psana configuration file:',__name__)
-        logger.info('path_psana_cfg_stub = ' + self.path_in)
-        logger.info('path_psana_cfg      = ' + self.path_out)
-        print 'path_psana_cfg      = ' + self.path_out
+        logger.info('Make configuration file: ' + self.path_out,__name__)
+        logger.debug('path_cfg_stub = ' + self.path_in)
+        logger.debug('path_cfg      = ' + self.path_out)
+        #print 'path_cfg      = ' + self.path_out
 
         self.keys   = self.d_subs.keys()
 
@@ -101,8 +112,8 @@ class ConfigFileGenerator :
         for line in fin :
             line_sub = self.line_with_substitution(line)
             fout.write(line_sub)
-            logger.info(line_sub)
-            print line_sub,
+            #logger.info(line_sub)
+            #print line_sub,
 
         fin .close() 
         fout.close() 
@@ -137,7 +148,8 @@ cfg = ConfigFileGenerator ()
 #
 if __name__ == "__main__" :
 
-    cfg.make_psana_cfg_file_for_pedestals()
+    #cfg.make_psana_cfg_file_for_pedestals()
+    cfg.make_psana_cfg_file_for_tahometer()
 
     sys.exit ( 'End of test for ConfigFileGenerator' )
 
