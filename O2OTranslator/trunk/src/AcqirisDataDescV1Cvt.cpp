@@ -20,6 +20,7 @@
 //-----------------
 #include <algorithm>
 #include <sstream>
+#include <limits>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,6 +37,8 @@
 
 namespace {
   const char logger[] = "AcqirisDataDescV1Cvt" ;
+
+  unsigned warning_count = 10;
 }
 
 //		----------------------------------------
@@ -128,26 +131,50 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
     // first verify that the shape of the data returned corresponds to the config
     if ( dd->nbrSamplesInSeg() != nSampl ) {
-      std::ostringstream msg ;
-      MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of samples in data object ("
-             << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")");
-      // stop here
-      return;
+      if (dd->nbrSamplesInSeg() == 0) {
+        if ( warning_count > 0) {
+          // means there was no data in this channel, will fill it with some nonsensical stuff
+          MsgLog(logger, warning, "AcqirisDataDescV1Cvt - no data samples in data object, will fill with constant data");
+          -- warning_count;
+        }
+      } else {
+        // if non-zero and not as expected then it is an error
+        MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of samples in data object ("
+               << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")");
+        // stop here
+        return;
+      }
     }
     if ( dd->nbrSegments() != nSeg ) {
-      std::ostringstream msg ;
-      MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of segments in data object ("
-             << dd->nbrSegments() << ") different from config object (" << nSeg << ")");
-      // stop here
-      return;
+      if (dd->nbrSegments() == 0) {
+        if ( warning_count > 0) {
+          // means there was no data in this channel, will fill it with some nonsensical stuff
+          MsgLog(logger, warning, "AcqirisDataDescV1Cvt - no segments in data object, will fill with constant data");
+          -- warning_count;
+        }
+      } else {
+        MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of segments in data object ("
+            << dd->nbrSegments() << ") different from config object (" << nSeg << ")");
+        // stop here
+        return;
+      }
     }
 
-    for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
-      timestamps[ch][seg] = dd->timestamp(seg).value();
+    if (dd->nbrSegments() == 0) {
+      // fill with zeros
+      std::fill_n(timestamps[ch], nSeg, uint64_t(0));
+    } else {
+      for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
+        timestamps[ch][seg] = dd->timestamp(seg).value();
+      }
     }
 
-    int16_t* wf = dd->waveform(hconfig) ;
-    std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
+    if (dd->nbrSegments() == 0 or dd->nbrSamplesInSeg() == 0) {
+      std::fill_n(waveforms[ch][0], nSampl*nSeg, int16_t(0));
+    } else {
+      int16_t* wf = dd->waveform(hconfig) ;
+      std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
+    }
   }
 
 
