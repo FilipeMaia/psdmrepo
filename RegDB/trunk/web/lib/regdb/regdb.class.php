@@ -9,27 +9,27 @@ use LusiTime\LusiTime;
 
 class RegDB {
 
-	private static $instance = null;
+    private static $instance = null;
 
-	/**
-	 * Return an instance of the object initialzied with default version
-	 * of parameters.
-	 */
-	public static function instance() {
-		if( is_null(RegDB::$instance)) RegDB::$instance =
-                    new RegDB(
-                        REGDB_DEFAULT_HOST,
-                        REGDB_DEFAULT_USER,
-                        REGDB_DEFAULT_PASSWORD,
-                        REGDB_DEFAULT_DATABASE,
-                        REGDB_DEFAULT_LDAP_HOST,
-                        REGDB_DEFAULT_LDAP_USER,
-                        REGDB_DEFAULT_LDAP_PASSWD
-                    );
-		return RegDB::$instance;
-	}
+    /**
+     * Return an instance of the object initialzied with default version
+     * of parameters.
+     */
+    public static function instance() {
+        if( is_null(RegDB::$instance)) RegDB::$instance =
+            new RegDB(
+                REGDB_DEFAULT_HOST,
+                REGDB_DEFAULT_USER,
+                REGDB_DEFAULT_PASSWORD,
+                REGDB_DEFAULT_DATABASE,
+                REGDB_DEFAULT_LDAP_HOST,
+                REGDB_DEFAULT_LDAP_USER,
+                REGDB_DEFAULT_LDAP_PASSWD
+            );
+        return RegDB::$instance;
+    }
 
-	/* Data members
+    /* Data members
      */
     private $connection;
 
@@ -375,49 +375,74 @@ class RegDB {
      *   EXPERIMENT SWITCH
      * =====================
      */
-    public function switch_experiment( $experiment_name, $requestor_uid, $notifications=null ) {
+    public function switch_experiment( $experiment_name, $station, $requestor_uid, $notifications=null ) {
 
-    	$experiment = $this->find_experiment_by_unique_name( $experiment_name );
+        $experiment = $this->find_experiment_by_unique_name( $experiment_name );
         if( !$experiment )
             throw new RegDBException (
                 __METHOD__,
                 "no such experiment: {$experiment_name}" );
 
-    	$current_time = LusiTime::now();
+        $num_stations = $experiment->instrument()->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, experiment: {$experiment_name}" );
 
-    	$this->connection->query (
-    		"INSERT INTO expswitch (id,exper_id,switch_time,requestor_uid) VALUES (NULL,{$experiment->id()},{$current_time->to64()},'{$requestor_uid}')"
-    	);
-    	if( !is_null($notifications) && count( $notifications ) > 0 ) {
-    		$sql = '';
-    		foreach( $notifications as $n ) {
-    			$uid = trim( $n['uid'] );
-    			$gecos = $this->connection->escape_string( trim( $n['gecos'] ));
-    			$email = $this->connection->escape_string( trim( $n['email'] ));
-    			$rank = trim( $n['rank'] );
-    			$notified = $n['notified'] ? 'YES' : 'NO';
-    			if( $sql != '' ) $sql .= ',';
-    			$sql .=  "(LAST_INSERT_ID(),'{$uid}','{$gecos}','{$email}','{$rank}','{$notified}')";
-    		}
-    		$sql = 'INSERT INTO expswitch_notify (switch_id,uid,full_name,email,rank,notified) VALUES '.$sql;
-    		$this->connection->query( $sql );
-    	}
+        if( $station >= intval($num_stations->value()))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not configured to take data, experiment: {$experiment_name}" );
+
+        $current_time = LusiTime::now();
+
+        $this->connection->query (
+            "INSERT INTO expswitch VALUES (NULL,{$experiment->id()},{$station},{$current_time->to64()},'{$requestor_uid}')"
+        );
+        if( !is_null($notifications) && count( $notifications ) > 0 ) {
+            $sql = '';
+            foreach( $notifications as $n ) {
+                $uid = trim( $n['uid'] );
+                $gecos = $this->connection->escape_string( trim( $n['gecos'] ));
+                $email = $this->connection->escape_string( trim( $n['email'] ));
+                $rank = trim( $n['rank'] );
+                $notified = $n['notified'] ? 'YES' : 'NO';
+                if( $sql != '' ) $sql .= ',';
+                $sql .=  "(LAST_INSERT_ID(),'{$uid}','{$gecos}','{$email}','{$rank}','{$notified}')";
+            }
+            $sql = 'INSERT INTO expswitch_notify VALUES '.$sql;
+            $this->connection->query( $sql );
+        }
     }
 
     /* Find the info for the last experiment switched using this interface. Return null
      * if none was found.
      */
-    public function last_experiment_switch( $instrument_name ) {
+    public function last_experiment_switch( $instrument_name, $station=0 ) {
 
-    	$sql =<<<HERE
+        $instrument = $this->find_instrument_by_name($instrument_name);
+
+        $num_stations = $instrument->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, instrument: {$instrument_name}" );
+
+        if( $station >= intval($num_stations->value()))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not configured to take data, instrument: {$instrument_name}" );
+
+        $sql =<<<HERE
 SELECT * FROM {$this->connection->database}.expswitch
 WHERE exper_id IN ( SELECT e.id FROM {$this->connection->database}.experiment `e`,
-   	                                 {$this->connection->database}.instrument `i`
+                                     {$this->connection->database}.instrument `i`
                     WHERE e.instr_id=i.id
                     AND i.name='{$instrument_name}' )
+AND station={$station}
 ORDER BY switch_time DESC LIMIT 1
 HERE;
-    	$result = $this->connection->query( $sql );
+        $result = $this->connection->query( $sql );
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows == 1 ) {
@@ -427,31 +452,63 @@ HERE;
         throw new RegDBException(
             __METHOD__,
             "unexpected size of result set returned by the query" );
-	}
+    }
+
+    /**
+     * Return true if the specified experiment is active (current) at any DAQ station
+     * of the corresponding instrument.
+     *
+     * @param integer $exper_id
+     * @return boolean
+     * @throws RegDBException
+     */
+    public function is_active_experiment($exper_id) {
+        $experiment = $this->find_experiment_by_id($exper_id);
+        if( !$experiment )
+            throw new RegDBException (
+                __METHOD__,
+                "no such experiment ID: {$exper_id}" );
+
+        $num_stations = $experiment->instrument()->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, experiment ID: {$exper_id}" );
+
+        if( $station >= intval($num_stations->value()))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not configured to take data, experiment ID: {$exper_id}" );
+                
+        for( $station = 0; $station < intval($num_stations->value()); $station++ ) {
+            $last_switch = $this->last_experiment_switch( $experiment->instrument()->name(), $station );
+            if( !is_null($last_switch) && ($exper_id == $last_switch['exper_id'])) return true;
+        }
+        return false;
+    }
 
     /* Return a history for all known experiment switches for the specified instrument.
      */
     public function experiment_switches( $instrument_name ) {
 
-
-    	$sql =<<<HERE
+        $sql =<<<HERE
 SELECT * FROM {$this->connection->database}.expswitch
 WHERE exper_id IN ( SELECT e.id FROM {$this->connection->database}.experiment `e`,
-   	                                 {$this->connection->database}.instrument `i`
+                                     {$this->connection->database}.instrument `i`
                     WHERE e.instr_id=i.id
                     AND i.name='{$instrument_name}' )
 ORDER BY switch_time DESC
 HERE;
-    	$result = $this->connection->query( $sql );
+        $result = $this->connection->query( $sql );
         $nrows = mysql_numrows( $result );
         $list = array();
         for( $i = 0; $i < $nrows; $i++ ) {
-        	array_push(
-        		$list,
-        		mysql_fetch_array( $result, MYSQL_ASSOC ));
+            array_push(
+                $list,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
         }
         return $list;
-	}
+    }
 
     /* ====================
      *   GROUPS AND USERS
@@ -479,10 +536,10 @@ HERE;
         return $this->connection->find_user_account( $user ); }
 
     public function add_user_to_posix_group ( $user_name, $group_name ) {
-		$this->connection->add_user_to_posix_group( $user_name, $group_name ); }
+        $this->connection->add_user_to_posix_group( $user_name, $group_name ); }
 
     public function remove_user_from_posix_group ( $user_name, $group_name ) {
-		$this->connection->remove_user_from_posix_group( $user_name, $group_name ); }
+        $this->connection->remove_user_from_posix_group( $user_name, $group_name ); }
 
     /* Return an associative array of experiment groups whose names
      * follow the pattern:
@@ -516,81 +573,81 @@ HERE;
      *             present then all instruments will be assumed.
      */
     public function experiment_specific_groups( $instr=null ) {
-    	$groups = array();
-    	$instr_names = array();
-    	if( is_null( $instr )) $instr_names = $this->instrument_names();
-    	else array_push( $instr_names, $instr );
-    	foreach( $instr_names as $i ) {
+        $groups = array();
+        $instr_names = array();
+        if( is_null( $instr )) $instr_names = $this->instrument_names();
+        else array_push( $instr_names, $instr );
+        foreach( $instr_names as $i ) {
             foreach( $this->experiments_for_instrument( $i ) as $exper ) {
                 $g = $exper->name();
                 if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
                    ( 1 == preg_match( '/^[a-z]{3}[im][0-9]{4}$/', $g ))) $groups[$g] = True;
             }
-    	}
+        }
 
-    	/* Add known POSIX groups for special experiments which aren't following
-    	 * the standard naming convention:
-    	 *
-    	 *   <instr><proposal><year>
-    	 */
-
-    	/* In-house commissionning, in-house, etc. for the year of 2010.
+        /* Add known POSIX groups for special experiments which aren't following
+         * the standard naming convention:
+         *
+         *   <instr><proposal><year>
          */
-    	if( is_null( $instr ) || ( $instr == 'AMO' )) {
+
+        /* In-house commissionning, in-house, etc. for the year of 2010.
+         */
+        if( is_null( $instr ) || ( $instr == 'AMO' )) {
             $groups['ps-amo'] = True;
             $groups['amoopr'] = True;
-    	}
+        }
 
-    	/* SXR commissionning, in-house, etc. experiments for the year of 2010.
+        /* SXR commissionning, in-house, etc. experiments for the year of 2010.
          */
-    	if( is_null( $instr ) || ( $instr == 'SXR' )) {
+        if( is_null( $instr ) || ( $instr == 'SXR' )) {
             $groups['sxrrsx10'] = True;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
             $groups['ps-sxr'] = True;
             $groups['sxropr'] = True;
-    	}
+        }
 
-    	/* Groups for which there is no entry in RegDB but which we still want
-    	 * to treat as experiment specific groups.
-    	 */
-
-    	/* XPP commissionning, in-house, etc. experiments for the year of 2010.
+        /* Groups for which there is no entry in RegDB but which we still want
+         * to treat as experiment specific groups.
          */
-    	if( is_null( $instr ) || ( $instr == 'XPP' )) {
+
+        /* XPP commissionning, in-house, etc. experiments for the year of 2010.
+         */
+        if( is_null( $instr ) || ( $instr == 'XPP' )) {
             $groups['xpp80610'] = True;
             $groups['ps-xpp'] = True;
             $groups['xppopr'] = True;
             $groups['xppcom12'] = True;
             $groups['xppcom13'] = True;
-    	}
-    	/* CXI commissionning, in-house, etc. experiments for the year of 2010.
+        }
+        /* CXI commissionning, in-house, etc. experiments for the year of 2010.
          */
-    	if( is_null( $instr ) || ( $instr == 'CXI' )) {
+        if( is_null( $instr ) || ( $instr == 'CXI' )) {
             $groups['ps-cxi'] = True;
             $groups['cxiopr'] = True;
-    	}
-    	/* MEC commissionning, in-house, etc. experiments for the year of 2010.
+        }
+        /* MEC commissionning, in-house, etc. experiments for the year of 2010.
          */
-    	if( is_null( $instr ) || ( $instr == 'MEC' )) {
+        if( is_null( $instr ) || ( $instr == 'MEC' )) {
             $groups['ps-mec'] = True;
             $groups['mecopr'] = True;
-    	}
+        }
 
-    	/* XCS commissionning, in-house, etc. experiments for the year of 2010.
+        /* XCS commissionning, in-house, etc. experiments for the year of 2010.
          */
-    	if( is_null( $instr ) || ( $instr == 'XCS' )) {
+        if( is_null( $instr ) || ( $instr == 'XCS' )) {
             $groups['ps-xcs'] = True;
             $groups['xcsopr'] = True;
             $groups['xcscom12'] = True;
             $groups['xcsc0112'] = True;
-    	}
+        }
         
         /* Add groups which aren't really experiment or instrument specific.
          */
         $groups['ps-data'] = True;
 
-    	return $groups;
+        return $groups;
     }
 }
 

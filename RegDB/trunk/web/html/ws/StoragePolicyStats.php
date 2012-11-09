@@ -76,7 +76,7 @@ try {
     $default_medium_retention      = intval(Config::instance()->get_policy_param('MEDIUM-TERM', 'RETENTION'));
     $default_medium_quota          = intval(Config::instance()->get_policy_param('MEDIUM-TERM', 'QUOTA'));
 
-    $deadline_time = LusiTime::parse('2012-11-02');
+    $deadline_time = LusiTime::parse('2012-12-02');
 
     if (is_null($exper_name)) {
 
