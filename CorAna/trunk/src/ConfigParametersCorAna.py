@@ -89,6 +89,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',       typ='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
+        self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Conf.pars',typ='str' )
 
 
         # GUIBeamZeroPars.py
@@ -207,6 +208,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreenish  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
+        self.styleGreenPure = "background-color: rgb(0,   255, 150); color: rgb(0, 0, 0);" # Green
         self.styleBluish    = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
         self.styleWhite     = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
         #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
@@ -225,13 +227,14 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleButton       = self.styleGray
         self.styleButtonOn     = self.styleBluish
         self.styleButtonClose  = self.stylePink
-        self.styleButtonGood   = self.styleGreenish
+        self.styleButtonGood   = self.styleGreenPure
         self.styleButtonBad    = self.stylePink
         self.styleBox          = self.styleGray
         self.styleStatusGood   = self.styleGreen
         self.styleStatusWarning= self.styleYellow
         self.styleStatusAlarm  = self.styleRed
-
+        self.styleTitleBold    = self.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold;'
+        self.styleWhiteFixed   = self.styleWhite + 'font-family: Fixed;'
 
     def printParsDirectly( self ) :
         logger.info('Direct use of parameter:' + self.fname_cp .name() + ' ' + self.fname_cp .value(), __name__ )

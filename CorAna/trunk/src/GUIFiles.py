@@ -32,6 +32,7 @@ from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
 from GUIDark                import *
 from Logger                 import logger
+from BatchJobPedestals      import bjpeds
 
 #---------------------
 #  Class definition --
@@ -70,6 +71,8 @@ class GUIFiles ( QtGui.QWidget ) :
         self.but_save   = QtGui.QPushButton('Save') 
         self.but_show   = QtGui.QPushButton('Show Image') 
 
+        self.hboxW = QtGui.QHBoxLayout()
+   
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
@@ -77,14 +80,15 @@ class GUIFiles ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_show )
 
-        cp.guiconfigparameters = GUIConfigParameters()
- 
+        self.list_file_types = ['Dark run', 'Flat field', 'Data', 'Conf.pars']
+        self.makeTabBar()
+        self.guiSelector()
+
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
-        self.guiSection('Dark run',        cp.in_dir_dark, cp.in_file_dark)
-        self.guiSection('Flat field',      cp.in_dir_flat, cp.in_file_flat)
-        self.guiSection('Data',            cp.in_dir_data, cp.in_file_data) 
-        #self.guiSection('Blamish',         cp.in_dir_blam, cp.in_file_blam)
+        self.guiSection(self.list_file_types[0], cp.in_dir_dark, cp.in_file_dark)
+        self.guiSection(self.list_file_types[1], cp.in_dir_flat, cp.in_file_flat)
+        self.guiSection(self.list_file_types[2], cp.in_dir_data, cp.in_file_data) 
 
         self.grid.addWidget(self.tit_dir_work,      self.grid_row,   0, 1, 9)
         self.grid.addWidget(self.lab_dir_work,      self.grid_row+1, 1)
@@ -98,8 +102,10 @@ class GUIFiles ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_fname_prefix,  self.grid_row+3, 1)
         self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+3, 2, 1, 7)
 
-        self.grid.addWidget(cp.guiconfigparameters, self.grid_row+4, 0, 1, 10)        
-        self.grid.addLayout(self.hboxB,             self.grid_row+5, 0, 1, 10)
+        self.grid.addWidget(self.tab_bar,           self.grid_row+4, 0, 1, 10)
+        #self.grid.addWidget(cp.guiconfigparameters, self.grid_row+5, 0, 1, 10)        
+        self.grid.addLayout(self.hboxW,             self.grid_row+5, 0, 1, 10)
+        self.grid.addLayout(self.hboxB,             self.grid_row+6, 0, 1, 10)
         self.setLayout(self.grid)
 
         self.connect( self.but_dir_work,     QtCore.SIGNAL('clicked()'),          self.onButDirWork )
@@ -134,6 +140,61 @@ class GUIFiles ( QtGui.QWidget ) :
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
         self.frame.setVisible(False)
+
+
+    def makeTabBar(self,mode=None) :
+        #if mode != None : self.tab_bar.close()
+        self.tab_bar = QtGui.QTabBar()
+
+        #Uses self.list_file_types
+
+        self.ind_tab_dark = self.tab_bar.addTab( self.list_file_types[0] )
+        self.ind_tab_flat = self.tab_bar.addTab( self.list_file_types[1] )
+        self.ind_tab_data = self.tab_bar.addTab( self.list_file_types[2] )
+        self.ind_tab_conf = self.tab_bar.addTab( self.list_file_types[3] )
+
+        self.tab_bar.setTabTextColor(self.ind_tab_dark, QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_flat, QtGui.QColor('red'))
+        self.tab_bar.setTabTextColor(self.ind_tab_data, QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_conf, QtGui.QColor('magenta'))
+        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+
+        self.tab_bar.setTabEnabled(1, False)
+        self.tab_bar.setTabEnabled(2, False)
+        
+        logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
+
+        self.tab_bar.setCurrentIndex(self.list_file_types.index(cp.current_file_tab.value()))
+        #self.tab_bar.setCurrentIndex(3)
+
+        self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
+
+
+    def guiSelector(self):
+        try    : self.gui_win.close()
+        except : pass
+
+        #try    : cp.guiconfigparameters.close()
+        #except : pass
+
+        #try    : cp.guidark.close()
+        #except : pass
+
+        if cp.current_file_tab.value() == self.list_file_types[0] :
+            self.gui_win = cp.guidark = GUIDark()
+            
+        if cp.current_file_tab.value() == self.list_file_types[3] :
+            self.gui_win = cp.guiconfigparameters = GUIConfigParameters()
+
+        self.gui_win.setFixedHeight(150)
+        self.hboxW.addWidget(self.gui_win)
+
+    def onTabBar(self):
+        tab_ind  = self.tab_bar.currentIndex()
+        tab_name = str(self.tab_bar.tabText(tab_ind))
+        cp.current_file_tab.setValue( tab_name )
+        logger.info(' ---> selected tab: ' + str(tab_ind) + ' - open GUI to work with: ' + tab_name, __name__)
+        self.guiSelector()
 
     def setStyle(self):
         self.                 setStyleSheet (cp.styleBkgd)
@@ -172,7 +233,7 @@ class GUIFiles ( QtGui.QWidget ) :
         edi_file= QtGui.QLineEdit( par_file.value() )        
         but_dir = QtGui.QPushButton('Browse')
         but_file= QtGui.QPushButton('Browse')
-        but_proc= QtGui.QPushButton('Process')
+        but_proc= QtGui.QPushButton('Check status')
 
         edi_dir .setReadOnly( True )  
         edi_file.setReadOnly( True )  
@@ -184,7 +245,7 @@ class GUIFiles ( QtGui.QWidget ) :
         edi_file.setToolTip(msg_info)
         but_dir .setToolTip(msg_dir)
         but_file.setToolTip(msg_file)
-        but_proc.setToolTip('Click on this button\nand process the file.')
+        but_proc.setToolTip('Click on this button\nto check if the output\nfile is available.')
 
         self.grid.addWidget(tit_sect, self.grid_row+0, 0, 1, 2)
         self.grid.addWidget(but_proc, self.grid_row+0, 2)
@@ -213,7 +274,7 @@ class GUIFiles ( QtGui.QWidget ) :
         width = 60
         but_dir    .setFixedWidth(width)
         but_file   .setFixedWidth(width)
-        but_proc   .setFixedWidth(width)
+        but_proc   .setFixedWidth(90)
 
         self.connect(edi_dir,  QtCore.SIGNAL('editingFinished ()'), self.onEditDir )
         self.connect(edi_file, QtCore.SIGNAL('editingFinished ()'), self.onEditFile)
@@ -331,6 +392,7 @@ class GUIFiles ( QtGui.QWidget ) :
                 par.setValue(fname)
                 logger.info('selected the file name: ' + str(par.value()), __name__ )
 
+
     def onButProc(self):
         logger.debug('onButProc', __name__)
         for fields in self.sect_fields :
@@ -340,30 +402,35 @@ class GUIFiles ( QtGui.QWidget ) :
                 str_sec = str(tit.text())
                 logger.info('Section: ' + str_sec + ' - pre-processing', __name__ )
 
-                if   str_sec == 'Dark run'   : self.on_off_gui_dark(but)
-                elif str_sec == 'Flat field' : self.on_off_gui_flat(but) 
-                elif str_sec == 'Data'       : self.on_off_gui_data(but)
+                if   str_sec == self.list_file_types[0] : self.on_off_gui_dark(but)
+                elif str_sec == self.list_file_types[1] : self.on_off_gui_flat(but) 
+                elif str_sec == self.list_file_types[2] : self.on_off_gui_data(but)
 
 
     def on_off_gui_dark(self,but):
         logger.info('on_off_gui_dark', __name__)
-        try :
-            cp.guidark.close()
-            but.setStyleSheet(cp.styleButtonBad)
-        except : # AttributeError: #NameError 
-            cp.guidark = GUIDark()
-            cp.guidark.setParent(self)
-            cp.guidark.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
-            cp.guidark.show()
-            but.setStyleSheet(cp.styleButtonGood)
+        self.tab_bar.setCurrentIndex(0)
+        if bjpeds.status_for_pedestals() : but.setStyleSheet(cp.styleButtonGood)
+        else                             : but.setStyleSheet(cp.styleButtonBad)
+
+#        try :
+#            cp.guidark.close()
+#            but.setStyleSheet(cp.styleButtonBad)
+#        except : # AttributeError: #NameError 
+#            cp.guidark = GUIDark()
+#            cp.guidark.setParent(self)
+#            cp.guidark.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
+#            cp.guidark.show()
+#            but.setStyleSheet(cp.styleButtonGood)
 
 
     def on_off_gui_flat(self,but):
         logger.info('on_off_gui_flat', __name__)
-
+        self.tab_bar.setCurrentIndex(1)
 
     def on_off_gui_data(self,but):
         logger.info('on_off_gui_data', __name__)
+        self.tab_bar.setCurrentIndex(2)
 
 
 

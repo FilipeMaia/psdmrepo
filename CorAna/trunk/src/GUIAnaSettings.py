@@ -102,7 +102,7 @@ class GUIAnaSettings ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.           setStyleSheet (cp.styleBkgd)
-        self.tit_title .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
+        self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_apply .setStyleSheet (cp.styleButton) 

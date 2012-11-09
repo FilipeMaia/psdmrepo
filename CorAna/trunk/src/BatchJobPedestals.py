@@ -67,7 +67,10 @@ class BatchJobPedestals :
         bat_log_file = fnm.path_pedestals_tahometer_batch_log()
 
         self.job_id_str = gu.batch_job_submit(command, queue, bat_log_file)
-        logger.info('Submit batch for tahometer on dark - job Id: ' + self.job_id_str, __name__) 
+
+        if err != '' : logger.warning( err, __name__) 
+        logger.info(out, __name__) 
+        logger.info('Submit batch for tahometer on dark, job Id: ' + self.job_id_str) 
 
 #-----------------------------
 
@@ -79,8 +82,11 @@ class BatchJobPedestals :
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_pedestals_batch_log()
 
-        self.job_id_str = gu.batch_job_submit(command, queue, bat_log_file)
-        logger.info('submit_batch_for_pedestals() - job Id: ' + self.job_id_str, __name__) 
+        self.job_id_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+
+        if err != '' : logger.warning(err, __name__) 
+        logger.info(out, __name__) 
+        logger.info('   Submit batch for pedestals on dark, job Id: ' + self.job_id_str) 
 
 #-----------------------------
 
@@ -103,7 +109,7 @@ class BatchJobPedestals :
     def print_work_files_for_pedestals(self) :
         logger.info('Print work files for dark run / pedestals:', __name__)         
         for fname in fnm.get_list_of_files_pedestals() :
-            logger.info(fname, __name__)         
+            logger.info(fname)         
 
 #-----------------------------
 
@@ -111,7 +117,16 @@ class BatchJobPedestals :
         logger.info('Check work files for dark run / pedestals:', __name__)         
         for fname in fnm.get_list_of_files_pedestals() :
             msg = '%s %s' % ( fname.ljust(100), str(os.path.lexists(fname)) )
-            logger.info(msg, __name__)         
+            logger.info(msg)         
+
+#-----------------------------
+
+    def status_for_pedestals(self) :
+        logger.info('Status for pedestals:', __name__)         
+        fname  = fnm.path_pedestals_ave()
+        status = os.path.lexists(fname)
+        logger.info('The file: ' + fname + ' is available: ' + str(status)) 
+        return status
 
 #-----------------------------
 

@@ -44,7 +44,7 @@ class GUILogger ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 700, 500)
+        self.setGeometry(200, 400, 900, 500)
         self.setWindowTitle('GUI Logger')
         self.setFrame()
 
@@ -98,12 +98,13 @@ class GUILogger ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.           setStyleSheet (cp.styleBkgd)
-        #self.tit_title .setStyleSheet (cp.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold')
+        #self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_save  .setStyleSheet (cp.styleButton) 
         #self.but_show  .setStyleSheet (cp.styleButton) 
         self.box_txt    .setReadOnly(True)
+        self.box_txt    .setStyleSheet (cp.styleWhiteFixed) 
  
 
         #self.tit_title .setAlignment(QtCore.Qt.AlignCenter)

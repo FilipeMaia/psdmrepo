@@ -79,18 +79,19 @@ class GUIDark ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        msg = 'Use this GUI to set partitions.'
-        self.setToolTip(msg)
-        #edi.setToolTip('Edit number in this field\nor click on "Browse"\nto select the file.')
-        #but.setToolTip('Click on this button\nand select the file.')
-
+        self           .setToolTip('Use this GUI to work with xtc file.')
+        self.edi_path  .setToolTip('The path to the xtc file for processing in this GUI.')
+        self.but_submit.setToolTip('Click on this button\nto submit job in batch.')
+        self.but_status.setToolTip('Click on this button\nto check the batch job status.\nBatch job status will be\nprinted in the GUI Logger.')
+        self.but_wfiles.setToolTip('Click on this button\nto check the files availability.')
+        
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        self.frame.setVisible(False)
+        #self.frame.setVisible(False)
 
     def setStyle(self):
         width = 80

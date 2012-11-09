@@ -74,32 +74,43 @@ def print_list_of_files_in_dir(dirname, path_or_fname) :
 
 #----------------------------------
 
-def os_command(command_seq) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
-    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE) #, stdin=subprocess.STDIN, stderr=subprocess.PIPE
+def subproc(command_seq) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
+    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE, stderr=subprocess.PIPE) #, stdin=subprocess.STDIN
     p.wait()
     out = p.stdout.read() # reads entire file
-    return out
+    err = p.stderr.read() # reads entire file
+    return out, err
 
 
-def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') : # for example, command ='ls -l'
-    p = subprocess.Popen(['bsub', '-q', queue, '-o', log_file, command], stdout=subprocess.PIPE) #, stdin=subprocess.STDIN, stderr=subprocess.PIPE
-    p.wait()
-    #print_subproc_attributes(p)
-    line = p.stdout.readline() # read() - reads entire file
-    # here we parse the line assuming that it looks like: Job <126090> is submitted to queue <psfehq>.
-    print line
-    line_fields = line.split(' ')
+#def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') : # for example, command ='ls -l'
+#    p = subprocess.Popen(['bsub', '-q', queue, '-o', log_file, command], stdout=subprocess.PIPE) #, stdin=subprocess.STDIN, stderr=subprocess.PIPE
+#    p.wait()
+#    #print_subproc_attributes(p)
+#    line = p.stdout.readline() # read() - reads entire file
+#    # here we parse the line assuming that it looks like: Job <126090> is submitted to queue <psfehq>.
+#    #print line
+#    line_fields = line.split(' ')
+#    if line_fields[0] != 'Job' :
+#        sys.exit('EXIT: Unexpected response at batch submission: ' + line)
+#    job_id_str = line_fields[1].strip('<').rstrip('>')
+#    return job_id_str
+
+def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
+    out, err = subproc(['bsub', '-q', queue, '-o', log_file, command])
+    line_fields = out.split(' ')
     if line_fields[0] != 'Job' :
         sys.exit('EXIT: Unexpected response at batch submission: ' + line)
-    job_id_str = line_fields[1].strip('<').rstrip('>')
-    return job_id_str
+        job_id_str = 'JOB_ID_IS_UNKNOWN'
+    else :
+        job_id_str = line_fields[1].strip('<').rstrip('>')
+
+    return job_id_str, out, err
 
 
 def batch_job_check(job_id_str, queue='psnehq') :
-    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE)
-    p.wait() # short time waiting untill submission is done, 
-    lines  = p.stdout.readlines() # returns the list of lines in file
-    return lines
+    out, err = subproc(['bjobs', '-q', queue, job_id_str])
+    if err != '' : return err + '\n' + out
+    else         : return out
 
 
 def batch_job_status(job_id_str, queue='psnehq') :
@@ -185,7 +196,8 @@ def get_dirname_from_path(path) :
 
 def get_pwd() :
     #pwdir = commands.getoutput('echo $PWD')
-    pwdir = os_command(['pwd']).strip('\n')
+    out, err = subproc(['pwd'])
+    pwdir = out.strip('\n')
     return pwdir
 
 #----------------------------------
@@ -294,21 +306,23 @@ if __name__ == "__main__" :
     print_all_files_in_dir(pwd)
 
     command = 'ls -l'
-    job_id_str  = batch_job_submit(command, 'psnehq', 'log-ls.txt') 
+    job_id_str, out, err = batch_job_submit(command, 'psnehq', 'log-ls.txt') 
+    print 'err =', err
+    print 'out =', out
     print 'job_id_str =', job_id_str
 
     #sleep(5) # sleep time in sec
     #print batch_job_status(job_id_str, 'psnehq')
     #print batch_job_status_and_nodename(job_id_str, 'psnehq')
 
-    out = os_command(['df','-k','.'])
-    print out
+    #out,err = subproc(['df','-k','.'])
+    #print 'out=', out
+    #print 'err=', err
 
-    path = '/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc'
-
-    print_parsed_path(path)
-    print 'parse_xtc_path(): ', parse_xtc_path()
-    print 'parse_xtc_path(path): ', parse_xtc_path(path)
+    #path = '/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc'
+    #print_parsed_path(path)
+    #print 'parse_xtc_path(): ', parse_xtc_path()
+    #print 'parse_xtc_path(path): ', parse_xtc_path(path)
 
     sys.exit ( "End of test" )
 

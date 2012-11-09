@@ -72,7 +72,7 @@ class Logger :
             self.msg_tot += ' (' + level + ') '
             self.msg_tot += name + ': '
         else :
-            self.msg_tot += '::::'
+            self.msg_tot += ': '
         self.msg_tot += msg
 
         self.log_txt += self.msg_tot + '\n'       
@@ -91,10 +91,10 @@ class Logger :
         return strftime(fmt, localtime())
 
     def startLog(self) :
-        self.str_start_time = self.time_stamp( fmt='%Y-%m-%d-%H%M%S' )
+        self.str_start_time = self.time_stamp( fmt='%Y-%m-%d-%H:%M:%S' )
         if  self.fname == None :
             self.fname = self.str_start_time + '-log.txt'
-        self.info('startLog: Start log for file: '+self.fname, __name__)
+        self.info('startLog: Start session log file: '+self.fname, __name__)
 
     def getLogFileName(self):
         return self.fname
