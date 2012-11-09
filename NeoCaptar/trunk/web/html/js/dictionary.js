@@ -22,45 +22,45 @@ function p_appl_dictionary() {
      *
      * -------------------------------------------------------------------------
      */
-	this.name      = 'dictionary';
-	this.full_name = 'Dictionary';
-	this.context   = '';
+    this.name      = 'dictionary';
+    this.full_name = 'Dictionary';
+    this.context   = '';
     this.default_context = 'types';
 
     this.select = function(context) {
-		that.context = context;
-		this.init();
-	};
-	this.select_default = function() {
-		this.init();
-		if( this.context == '' ) this.context = this.default_context;
-	};
-	this.if_ready2giveup = function(handler2call) {
-		this.init();
-		handler2call();
-	};
+        that.context = context;
+        this.init();
+    };
+    this.select_default = function() {
+        this.init();
+        if( this.context == '' ) this.context = this.default_context;
+    };
+    this.if_ready2giveup = function(handler2call) {
+        this.init();
+        handler2call();
+    };
 
     /* ----------------------------------------
      *   Internal methods and data structures
      * ----------------------------------------
      */
-	this.initialized = false;
-	this.init = function() {
-		if( this.initialized ) return;
-		this.initialized = true;
-		this.init_cables();
-		this.init_pinlists();
-		this.init_locations();
+    this.initialized = false;
+    this.init = function() {
+        if( this.initialized ) return;
+        this.initialized = true;
+        this.init_cables();
+        this.init_pinlists();
+        this.init_locations();
         this.init_routings();
         this.init_devices();
         this.init_instrs();
-	};
+    };
     this.can_manage = function() {
         return global_current_user.has_dict_priv;
     };
     this.update = function(cable) {
-		this.save_cable    (cable.cable_type, '', cable.origin.conntype);
-		this.save_cable    (cable.cable_type, '', cable.destination.conntype);
+        this.save_cable    (cable.cable_type, '', cable.origin.conntype);
+        this.save_cable    (cable.cable_type, '', cable.destination.conntype);
 
         // TODO: These two calls may not be needed because the previous two
         // are supposed to create new connectors (if needed) and establish
@@ -70,114 +70,115 @@ function p_appl_dictionary() {
         this.save_connector(cable.destination.conntype, '', cable.cable_type);
 
         this.save_pinlist  (cable.origin.pinlist, '');
-		this.save_pinlist  (cable.destination.pinlist, '');
+        this.save_pinlist  (cable.destination.pinlist, '');
 
         this.save_location (cable.origin.loc);
         this.save_location (cable.destination.loc);
 
         this.save_rack     (cable.origin.loc,      cable.origin.rack);
-		this.save_rack     (cable.destination.loc, cable.destination.rack);
+        this.save_rack     (cable.destination.loc, cable.destination.rack);
 
         this.save_routing  (cable.routing);
 
         this.save_instr    (cable.origin.instr);
-		this.save_instr    (cable.destination.instr);
+        this.save_instr    (cable.destination.instr);
 
         this.save_device_location (cable.device_location);
         this.save_device_region   (cable.device_location, cable.device_region);
         this.save_device_component(cable.device_location, cable.device_region, cable.device_component);
     };
     this.web_service_GET = function(url, params, data_handler) {
-		this.init();
-		var jqXHR = $.get(url,params,function(data) {
-			var result = eval(data);
-			if(result.status != 'success') { report_error(result.message, null); return; }
+        this.init();
+        var jqXHR = $.get(url,params,function(data) {
+            var result = eval(data);
+            if(result.status != 'success') { report_error(result.message, null); return; }
             data_handler(result);
-		},
-		'JSON').error(function () {
+        },
+        'JSON').error(function () {
             report_error('update failed because of: '+jqXHR.statusText);
-		}); };
-    
+        });
+    };
+
     // ---------------------
     // CABLES and CONNECTORS
     // ---------------------
 
-	this.type = {};
+    this.type = {};
 
-	this.cables = function() {
-		this.init();
-		return this.type.cable;
-	};
+    this.cables = function() {
+        this.init();
+        return this.type.cable;
+    };
     this.cable_dict_is_empty = function() {
-		for( var cable in this.cables()) return false;
-		return true;
-	};
-	this.cable_is_not_known = function(cable) {
-		return this.cable_dict_is_empty() || ( cable == null ) || ( typeof this.cables()[cable] === 'undefined' );
-	};
-	this.connector_dict_is_empty = function(cable) {
-		for( var connector in this.connectors(cable)) return false;
-		return true;
-	};
-	this.connector_is_not_known = function(cable,connector) {
-		return this.cable_is_not_known(cable) || ( connector == null ) || ( typeof this.connectors(cable)[connector] === 'undefined' );
-	};
-	this.connectors = function(cable) {
-		if( this.cable_is_not_known(cable)) return {};
-		return this.cables()[cable]['connector'];
-	};
+        for( var cable in this.cables()) return false;
+        return true;
+    };
+    this.cable_is_not_known = function(cable) {
+        return this.cable_dict_is_empty() || ( cable == null ) || ( typeof this.cables()[cable] === 'undefined' );
+    };
+    this.connector_dict_is_empty = function(cable) {
+        for( var connector in this.connectors(cable)) return false;
+        return true;
+    };
+    this.connector_is_not_known = function(cable,connector) {
+        return this.cable_is_not_known(cable) || ( connector == null ) || ( typeof this.connectors(cable)[connector] === 'undefined' );
+    };
+    this.connectors = function(cable) {
+        if( this.cable_is_not_known(cable)) return {};
+        return this.cables()[cable]['connector'];
+    };
 
     this.connectors_reverse = function() {
-		this.init();
-		return this.type.connector;
-	};
+        this.init();
+        return this.type.connector;
+    };
     this.connector_dict_is_empty_reverse = function() {
-		for( var connector in this.connectors_reverse()) return false;
-		return true;
-	};
-	this.connector_is_not_known_reverse = function(connector) {
-		return this.connector_dict_is_empty_reverse() || ( connector == null ) || ( typeof this.connectors_reverse()[connector] === 'undefined' );
-	};
-	this.cables_reverse = function(connector) {
-		if( this.connector_is_not_known_reverse(connector)) return {};
-		return this.connectors_reverse()[connector]['cable'];
-	};
+        for( var connector in this.connectors_reverse()) return false;
+        return true;
+    };
+    this.connector_is_not_known_reverse = function(connector) {
+        return this.connector_dict_is_empty_reverse() || ( connector == null ) || ( typeof this.connectors_reverse()[connector] === 'undefined' );
+    };
+    this.cables_reverse = function(connector) {
+        if( this.connector_is_not_known_reverse(connector)) return {};
+        return this.connectors_reverse()[connector]['cable'];
+    };
 
-	this.init_cables = function() {
+    this.init_cables = function() {
         $('#dictionary-types').find('#tabs').tabs();
-		$('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]').
+        $('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]').
             keyup(function(e) {
-        		if( $(this).val() == '' ) { return; }
-            	if( e.keyCode == 13     ) { that.new_cable(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_cable(); return; }
                 $(this).val(global_truncate_cable($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]').
+        $('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]').
             keyup(function(e) {
-    			if( $(this).val() == '' ) { return; }
-        		if( e.keyCode == 13     ) { that.new_connector(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_connector(); return; }
                 $(this).val(global_truncate_connector($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]').
+        $('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]').
             keyup(function(e) {
-        		if( $(this).val() == '' ) { return; }
-            	if( e.keyCode == 13     ) { that.new_connector_reverse(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_connector_reverse(); return; }
                 $(this).val(global_truncate_connector($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]').
+        $('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]').
             keyup(function(e) {
-    			if( $(this).val() == '' ) { return; }
-        		if( e.keyCode == 13     ) { that.new_cable_reverse(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_cable_reverse(); return; }
                 $(this).val(global_truncate_cable($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-types-reload').
+        $('#dictionary-types-reload').
             button().
-    		click(function() { that.load_types(); });
-		this.load_types();
-	};
+            click(function() { that.load_types(); });
+        this.load_types();
+    };
     this.cables_select_tab = function(name) {
         var elem = $('#dictionary-types').find('#tabs');
         var selected = elem.tabs('option','selected');
@@ -187,44 +188,44 @@ function p_appl_dictionary() {
     };
 
     this.new_cable = function() {
-		var input = $('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]');
-		this.save_cable(input.val(),'','');
+        var input = $('#dictionary-types').find('#cables2connectors').find('input[name="cable2add"]');
+        this.save_cable(input.val(),'','');
         input.val(''); };
 
     this.new_connector = function() {
-		var input = $('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]');
+        var input = $('#dictionary-types').find('#cables2connectors').find('input[name="connector2add"]');
         this.save_connector(input.val(), '', this.table_cables.selected_object());
         input.val(''); };
 
-	this.new_connector_reverse = function() {
-		var input = $('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]');
-		this.save_connector(input.val(), '', '');
-		input.val(''); };
+    this.new_connector_reverse = function() {
+        var input = $('#dictionary-types').find('#connectors2cables').find('input[name="connector2add"]');
+        this.save_connector(input.val(), '', '');
+        input.val(''); };
 
-	this.new_cable_reverse = function() {
-		var input = $('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]');
-		this.save_cable(input.val(), '', this.table_connectors_reverse.selected_object());
-		input.val(''); };
+    this.new_cable_reverse = function() {
+        var input = $('#dictionary-types').find('#connectors2cables').find('input[name="cable2add"]');
+        this.save_cable(input.val(), '', this.table_connectors_reverse.selected_object());
+        input.val(''); };
 
-	this.save_cable = function(cable_name, cable_documentation, connector_name) {
-		if( cable_name == '' ) return;
+    this.save_cable = function(cable_name, cable_documentation, connector_name) {
+        if( cable_name == '' ) return;
         var params = { cable_name: cable_name, cable_documentation: cable_documentation };
         if((connector_name != null) && (connector_name != '')) params.connector_name = connector_name;
         this.type_action('../neocaptar/ws/dict_cable_new.php', params); };
 
-	this.save_connector = function(connector_name, connector_documentation, cable_name) {
-		if( connector_name == '' ) return;
+    this.save_connector = function(connector_name, connector_documentation, cable_name) {
+        if( connector_name == '' ) return;
         var params = { connector_name: connector_name, connector_documentation: connector_documentation };
         if((cable_name != null) && (cable_name != '')) params.cable_name = cable_name;
         this.type_action('../neocaptar/ws/dict_connector_new.php', params); };
 
-	this.delete_cable = function(id) {
-        this.type_action('../neocaptar/ws/dict_cable_delete.php', { id: id });	};
+    this.delete_cable = function(id) {
+        this.type_action('../neocaptar/ws/dict_cable_delete.php', { id: id });    };
 
-	this.delete_connector = function(id) {
+    this.delete_connector = function(id) {
         this.type_action('../neocaptar/ws/dict_connector_delete.php', { id: id }); };
 
-	this.load_types = function() {
+    this.load_types = function() {
         this.type_action('../neocaptar/ws/dict_types_get.php', {}); };
 
     this.save_cable_documentation = function(id,documentation) {
@@ -263,7 +264,7 @@ function p_appl_dictionary() {
     this.table_cables     = null;
     this.table_connectors = null;
 
-	this.display_cables = function(selected_cable_name) {
+    this.display_cables = function(selected_cable_name) {
 
         var tab = 'cables2connectors';
         if( selected_cable_name !== undefined ) this.cables_select_tab(tab);
@@ -353,10 +354,10 @@ function p_appl_dictionary() {
         this.display_connectors( this.table_cables.selected_object());
 
         if(this.can_manage())
-    		$('#dictionary-types').find('#'+tab).find('input[name="cable2add"]' ).removeAttr('disabled');
-	};
+            $('#dictionary-types').find('#'+tab).find('input[name="cable2add"]' ).removeAttr('disabled');
+    };
 
-	this.display_connectors = function(cable_name) {
+    this.display_connectors = function(cable_name) {
 
         var tab = 'cables2connectors';
 
@@ -444,15 +445,15 @@ function p_appl_dictionary() {
 
         if(this.can_manage()) {
             var input = $('#dictionary-types').find('#'+tab).find('input[name="connector2add"]');
-        	if( cable_name == null ) input.attr('disabled','disabled');
+            if( cable_name == null ) input.attr('disabled','disabled');
             else                     input.removeAttr('disabled');
         }
-	};
+    };
 
     this.table_connectors_reverse = null;
     this.table_cables_reverse     = null;
 
-	this.display_connectors_reverse = function(selected_connector_name) {
+    this.display_connectors_reverse = function(selected_connector_name) {
 
         var tab = 'connectors2cables';
         if( selected_connector_name !== undefined ) this.cables_select_tab(tab);
@@ -542,10 +543,10 @@ function p_appl_dictionary() {
         this.display_cables_reverse( this.table_connectors_reverse.selected_object());
 
         if(this.can_manage())
-    		$('#dictionary-types').find('#'+tab).find('input[name="connector2add"]' ).removeAttr('disabled');
-	};
+            $('#dictionary-types').find('#'+tab).find('input[name="connector2add"]' ).removeAttr('disabled');
+    };
 
-	this.display_cables_reverse = function(connector_name) {
+    this.display_cables_reverse = function(connector_name) {
 
         var tab = 'connectors2cables';
 
@@ -633,32 +634,32 @@ function p_appl_dictionary() {
 
         if(this.can_manage()) {
             var input = $('#dictionary-types').find('#'+tab).find('input[name="cable2add"]');
-        	if( connector_name == null ) input.attr('disabled','disabled');
+            if( connector_name == null ) input.attr('disabled','disabled');
             else                         input.removeAttr('disabled');
         }
-	};
+    };
 
     // -------------------
     // PINLISTS (DRAWINGS)
     // -------------------
 
-	this.pinlist = {};
-	this.get_pinlist = function() {
-		this.init();
-		return this.pinlist;
-	};
-	this.pinlist_dict_is_empty = function() {
-		for( var pinlist in this.pinlists()) return false;
-		return true;
-	}
-	this.pinlist_is_not_known = function(pinlist) {
-		return this.pinlist_dict_is_empty() || ( pinlist == null ) || ( typeof this.pinlists()[pinlist] === 'undefined' );
-	};
-	this.pinlists = function() {
-		return this.get_pinlist();
-	};
-	this.init_pinlists = function() {
-		$('#dictionary-pinlists').
+    this.pinlist = {};
+    this.get_pinlist = function() {
+        this.init();
+        return this.pinlist;
+    };
+    this.pinlist_dict_is_empty = function() {
+        for( var pinlist in this.pinlists()) return false;
+        return true;
+    }
+    this.pinlist_is_not_known = function(pinlist) {
+        return this.pinlist_dict_is_empty() || ( pinlist == null ) || ( typeof this.pinlists()[pinlist] === 'undefined' );
+    };
+    this.pinlists = function() {
+        return this.get_pinlist();
+    };
+    this.init_pinlists = function() {
+        $('#dictionary-pinlists').
             find('input[name="pinlist2add"]').
             keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
@@ -666,40 +667,40 @@ function p_appl_dictionary() {
                 $(this).val(global_truncate_pinlist($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-pinlists-reload').
+        $('#dictionary-pinlists-reload').
             button().
             click(function() { that.load_pinlists(); });
-		this.load_pinlists();
-	};
-	this.new_pinlist = function() {
+        this.load_pinlists();
+    };
+    this.new_pinlist = function() {
         var input = $('#dictionary-pinlists').find('input[name="pinlist2add"]');
         var pinlist_name = input.val();
         this.save_pinlist(pinlist_name,'');
         input.val('');
-	};
+    };
 
-	this.save_pinlist = function(name,documentation) {
-		if( name == '' ) return;
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_new.php', { name: name, documentation: documentation },
+    this.save_pinlist = function(name,documentation) {
+        if( name == '' ) return;
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_new.php', { name: name, documentation: documentation },
             function(result) {that.pinlist[name] = result.pinlist[name]; }); };
 
-	this.delete_pinlist = function(id) {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_delete.php', { id: id }); };
+    this.delete_pinlist = function(id) {
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_delete.php', { id: id }); };
 
-	this.load_pinlists = function() {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_get.php', {}); };
+    this.load_pinlists = function() {
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_get.php', {}); };
 
     this.save_pinlist_documentation = function(id,documentation) {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, documentation: documentation }); };
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, documentation: documentation }); };
 
     this.save_pinlist_cable = function(id,cable) {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, cable: cable }); };
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, cable: cable }); };
 
     this.save_pinlist_origin_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, origin_connector: connector }); };
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, origin_connector: connector }); };
 
     this.save_pinlist_destination_connector = function(id,connector) {
-		this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, destination_connector: connector }); };
+        this.pinlist_action('../neocaptar/ws/dict_pinlist_update.php', { id: id, destination_connector: connector }); };
 
     this.pinlist_action = function(url, params, data_handler) {
         function handle_data_and_display(result) {
@@ -715,7 +716,7 @@ function p_appl_dictionary() {
         var html = '<a href="'+this.pinlists()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
         return html;
     };
-	this.display_pinlists = function() {
+    this.display_pinlists = function() {
         var elem_pinlists = $('#dictionary-pinlists-pinlists');
         var hdr = [
             {   name:   'DELETE',
@@ -790,7 +791,7 @@ function p_appl_dictionary() {
         for( var cable in this.cables()) cables.push(cable);
 
         var rows = [];
-		for( var name in this.pinlists()) {
+        for( var name in this.pinlists()) {
             var pinlist = this.pinlists()[name];
             var connectors = [''];
             for( var connector in this.connectors(pinlist.cable)) connectors.push(connector);
@@ -846,60 +847,60 @@ function p_appl_dictionary() {
 
         if(this.can_manage())
             $('#dictionary-pinlists').find('input[name="pinlist2add"]').removeAttr('disabled');
-	};
+    };
 
     // -----------------
     // LOCATIONS & RACKS
     // -----------------
 
-	this.location = {};
-	this.get_location = function() {
-		this.init();
-		return this.location;
-	};
-	this.location_dict_is_empty = function() {
-		for( var location in this.locations()) return false;
-		return true;
-	}
-	this.location_is_not_known = function(location) {
-		return this.location_dict_is_empty() || ( location == null ) || ( typeof this.locations()[location] === 'undefined' );
-	};
-	this.rack_dict_is_empty = function(location) {
-		for( var rack in this.racks(location)) return false;
-		return true;
-	};
-	this.rack_is_not_known = function(location,rack) {
-		return this.location_is_not_known(location) || ( rack == null ) || ( typeof this.racks(location)[rack] === 'undefined' );
-	};
-	this.locations = function() {
-		return this.get_location();
-	};
-	this.racks = function(location) {
-		if( this.location_is_not_known(location)) return {};
-		return this.locations()[location]['rack'];
-	};
-	this.init_locations = function() {
-		$('#dictionary-locations').find('input[name="location2add"]').
-    		keyup(function(e) {
+    this.location = {};
+    this.get_location = function() {
+        this.init();
+        return this.location;
+    };
+    this.location_dict_is_empty = function() {
+        for( var location in this.locations()) return false;
+        return true;
+    }
+    this.location_is_not_known = function(location) {
+        return this.location_dict_is_empty() || ( location == null ) || ( typeof this.locations()[location] === 'undefined' );
+    };
+    this.rack_dict_is_empty = function(location) {
+        for( var rack in this.racks(location)) return false;
+        return true;
+    };
+    this.rack_is_not_known = function(location,rack) {
+        return this.location_is_not_known(location) || ( rack == null ) || ( typeof this.racks(location)[rack] === 'undefined' );
+    };
+    this.locations = function() {
+        return this.get_location();
+    };
+    this.racks = function(location) {
+        if( this.location_is_not_known(location)) return {};
+        return this.locations()[location]['rack'];
+    };
+    this.init_locations = function() {
+        $('#dictionary-locations').find('input[name="location2add"]').
+            keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_location(); return; }
                 $(this).val(global_truncate_location($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-locations').find('input[name="rack2add"]').
+        $('#dictionary-locations').find('input[name="rack2add"]').
             keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_rack(); return; }
                 $(this).val(global_truncate_rack($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-locations-reload').
+        $('#dictionary-locations-reload').
             button().
             click(function() { that.load_locations(); });
-		this.load_locations();
-	};
+        this.load_locations();
+    };
 
-	this.new_location = function() {
+    this.new_location = function() {
         var input = $('#dictionary-locations').find('input[name="location2add"]');
         this.save_location(input.val());
         input.val(''); };
@@ -909,18 +910,18 @@ function p_appl_dictionary() {
         this.save_rack(this.table_locations.selected_object(), input.val());
         input.val(''); };
 
-	this.save_location = function(location_name) {
-		if( location_name == '' ) return;
+    this.save_location = function(location_name) {
+        if( location_name == '' ) return;
         this.location_action('../neocaptar/ws/dict_location_new.php', {location:location_name}); };
 
-	this.save_rack = function(location_name, rack_name) {
-		if(( location_name == '' ) || ( rack_name == '' )) return;
+    this.save_rack = function(location_name, rack_name) {
+        if(( location_name == '' ) || ( rack_name == '' )) return;
         this.location_action('../neocaptar/ws/dict_location_new.php', {location:location_name, rack:rack_name}); };
 
-	this.delete_location_element = function(element,id) {
+    this.delete_location_element = function(element,id) {
         this.location_action('../neocaptar/ws/dict_location_delete.php', {scope:element, id:id}); };
 
-	this.load_locations = function() {
+    this.load_locations = function() {
         this.location_action('../neocaptar/ws/dict_location_get.php', {}); };
 
     this.location_action = function(url, params, data_handler) {
@@ -935,7 +936,7 @@ function p_appl_dictionary() {
     this.table_locations = null;
     this.table_racks     = null;
 
-	this.display_locations = function() {
+    this.display_locations = function() {
 
         var elem = $('#dictionary-locations-locations');
 
@@ -1002,10 +1003,10 @@ function p_appl_dictionary() {
         this.display_racks( this.table_locations.selected_object());
 
         if(this.can_manage())
-    		$('#dictionary-locations').find('input[name="location2add"]' ).removeAttr('disabled');
-	};
+            $('#dictionary-locations').find('input[name="location2add"]' ).removeAttr('disabled');
+    };
 
-	this.display_racks = function(location_name) {
+    this.display_racks = function(location_name) {
 
         var elem = $('#dictionary-locations-racks');
 
@@ -1069,32 +1070,32 @@ function p_appl_dictionary() {
 
         if(this.can_manage()) {
             var input = $('#dictionary-locations').find('input[name="rack2add"]');
-        	if( location_name == null ) input.attr('disabled','disabled');
+            if( location_name == null ) input.attr('disabled','disabled');
             else                        input.removeAttr('disabled');
         }
-	};
+    };
 
     // --------
     // ROUTINGS
     // --------
 
-	this.routing = {};
-	this.get_routing = function() {
-		this.init();
-		return this.routing;
-	};
-	this.routing_dict_is_empty = function() {
-		for( var routing in this.routings()) return false;
-		return true;
-	}
-	this.routing_is_not_known = function(routing) {
-		return this.routing_dict_is_empty() || ( routing == null ) || ( typeof this.routings()[routing] === 'undefined' );
-	};
-	this.routings = function() {
-		return this.get_routing();
-	};
-	this.init_routings = function() {
-		$('#dictionary-routings').
+    this.routing = {};
+    this.get_routing = function() {
+        this.init();
+        return this.routing;
+    };
+    this.routing_dict_is_empty = function() {
+        for( var routing in this.routings()) return false;
+        return true;
+    }
+    this.routing_is_not_known = function(routing) {
+        return this.routing_dict_is_empty() || ( routing == null ) || ( typeof this.routings()[routing] === 'undefined' );
+    };
+    this.routings = function() {
+        return this.get_routing();
+    };
+    this.init_routings = function() {
+        $('#dictionary-routings').
             find('input[name="routing2add"]').
             keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
@@ -1102,24 +1103,24 @@ function p_appl_dictionary() {
                 $(this).val(global_truncate_routing($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-routings-reload').
+        $('#dictionary-routings-reload').
             button().
             click(function() { that.load_routings(); });
-		this.load_routings();
-	};
-	this.new_routing = function() {
-		var input = $('#dictionary-routings').find('input[name="routing2add"]');
-		this.save_routing(input.val());
-		input.val(''); };
+        this.load_routings();
+    };
+    this.new_routing = function() {
+        var input = $('#dictionary-routings').find('input[name="routing2add"]');
+        this.save_routing(input.val());
+        input.val(''); };
 
-	this.save_routing = function(name) {
+    this.save_routing = function(name) {
         if( name == '' ) return;
         this.routing_action('../neocaptar/ws/dict_routing_new.php', { name: name }); };
 
-	this.delete_routing = function(id) {
+    this.delete_routing = function(id) {
         this.routing_action('../neocaptar/ws/dict_routing_delete.php', { id: id }); };
 
-	this.load_routings = function() {
+    this.load_routings = function() {
         this.routing_action('../neocaptar/ws/dict_routing_get.php', {}); };
 
     this.routing_action = function(url, params, data_handler) {
@@ -1131,7 +1132,7 @@ function p_appl_dictionary() {
         this.web_service_GET(url, params, handle_data_and_display);
     };
 
-	this.display_routings = function() {
+    this.display_routings = function() {
        var elem = $('#dictionary-routings-routings');
         var hdr = [
             {   name:   'DELETE',
@@ -1163,7 +1164,7 @@ function p_appl_dictionary() {
                             }); }}}
         ];
         var rows = [];
-		for( var name in this.routings()) {
+        for( var name in this.routings()) {
             var routing = this.routings()[name];
             rows.push(
                 [   this.can_manage() ?
@@ -1188,119 +1189,119 @@ function p_appl_dictionary() {
 
         if(this.can_manage())
             $('#dictionary-routings').find('input[name="routing2add"]').removeAttr('disabled');
-	};
+    };
 
 
     // -------------------------------------------
     // DEVICE NAME: LOCATIONS, REGIONS, COMPONENTS
     // -------------------------------------------
 
-	this.device_location = {};
-	this.get_device_location = function() {
-		this.init();
-		return this.device_location;
-	};
-	this.device_location_dict_is_empty = function() {
-		for( var device_location in this.device_locations()) return false;
-		return true;
-	}
-	this.device_location_is_not_known = function(device_location) {
-		return this.device_location_dict_is_empty() || ( device_location == null ) || ( typeof this.device_locations()[device_location] === 'undefined' );
-	};
-	this.device_region_dict_is_empty = function(device_location) {
-		for( var device_region in this.device_regions(device_location)) return false;
-		return true;
-	};
-	this.device_region_is_not_known = function(device_location,device_region) {
-		return this.device_location_is_not_known(device_location) || ( device_region == null ) || ( typeof this.device_regions(device_location)[device_region] === 'undefined' );
-	};
-	this.device_component_dict_is_empty = function(device_location,device_region) {
-		for( var device_component in this.device_components(device_location, device_region)) return false;
-		return true;
-	};
-	this.device_component_is_not_known = function(device_location,device_region,device_component) {
-		return this.device_region_is_not_known(device_location,device_region) || ( device_component == null ) || ( typeof this.device_components(device_location,device_region)[device_component] === 'undefined' );
-	};
-	this.device_locations = function() {
-		return this.get_device_location();
-	};
-	this.device_regions = function(device_location) {
-		if( this.device_location_is_not_known(device_location)) return {};
-		return this.device_locations()[device_location]['region'];
-	};
-	this.device_components = function(device_location,device_region) {
-		if( this.device_region_is_not_known(device_location,device_region)) return {};
-		return this.device_regions(device_location)[device_region]['component'];
-	};
-	this.init_devices = function() {
-		$('#dictionary-devices').find('input[name="device_location2add"]').
+    this.device_location = {};
+    this.get_device_location = function() {
+        this.init();
+        return this.device_location;
+    };
+    this.device_location_dict_is_empty = function() {
+        for( var device_location in this.device_locations()) return false;
+        return true;
+    }
+    this.device_location_is_not_known = function(device_location) {
+        return this.device_location_dict_is_empty() || ( device_location == null ) || ( typeof this.device_locations()[device_location] === 'undefined' );
+    };
+    this.device_region_dict_is_empty = function(device_location) {
+        for( var device_region in this.device_regions(device_location)) return false;
+        return true;
+    };
+    this.device_region_is_not_known = function(device_location,device_region) {
+        return this.device_location_is_not_known(device_location) || ( device_region == null ) || ( typeof this.device_regions(device_location)[device_region] === 'undefined' );
+    };
+    this.device_component_dict_is_empty = function(device_location,device_region) {
+        for( var device_component in this.device_components(device_location, device_region)) return false;
+        return true;
+    };
+    this.device_component_is_not_known = function(device_location,device_region,device_component) {
+        return this.device_region_is_not_known(device_location,device_region) || ( device_component == null ) || ( typeof this.device_components(device_location,device_region)[device_component] === 'undefined' );
+    };
+    this.device_locations = function() {
+        return this.get_device_location();
+    };
+    this.device_regions = function(device_location) {
+        if( this.device_location_is_not_known(device_location)) return {};
+        return this.device_locations()[device_location]['region'];
+    };
+    this.device_components = function(device_location,device_region) {
+        if( this.device_region_is_not_known(device_location,device_region)) return {};
+        return this.device_regions(device_location)[device_region]['component'];
+    };
+    this.init_devices = function() {
+        $('#dictionary-devices').find('input[name="device_location2add"]').
             keyup(function(e) {
-        		if( $(this).val() == '' ) { return; }
-            	if( e.keyCode == 13     ) { that.new_device_location(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_device_location(); return; }
                 $(this).val(global_truncate_device_location($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-devices').find('input[name="device_region2add"]').
+        $('#dictionary-devices').find('input[name="device_region2add"]').
             keyup(function(e) {
-    			if( $(this).val() == '' ) { return; }
-        		if( e.keyCode == 13     ) { that.new_device_region(); return; }
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) { that.new_device_region(); return; }
                 $(this).val(global_truncate_device_region($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-devices').find('input[name="device_component2add"]').
-    		keyup(function(e) {
-        		if( $(this).val() == '' ) { return; }
-            	if( e.keyCode == 13     ) {	that.new_device_component(); return;	}
+        $('#dictionary-devices').find('input[name="device_component2add"]').
+            keyup(function(e) {
+                if( $(this).val() == '' ) { return; }
+                if( e.keyCode == 13     ) {    that.new_device_component(); return;    }
                 $(this).val(global_truncate_device_component($(this).val()));
             }).
             attr('disabled','disabled');
-		$('#dictionary-devices-reload').
+        $('#dictionary-devices-reload').
             button().
-    		click(function() { that.load_device_locations(); });
-		this.load_device_locations();
-	};
-	this.new_device_location = function() {
-		var input = $('#dictionary-devices').find('input[name="device_location2add"]');
+            click(function() { that.load_device_locations(); });
+        this.load_device_locations();
+    };
+    this.new_device_location = function() {
+        var input = $('#dictionary-devices').find('input[name="device_location2add"]');
         var device_location =  input.val();
         if( device_location == null ) return;
-		this.save_device_location(device_location);
-		input.val('');
-	};
-	this.new_device_region = function() {
-		var input = $('#dictionary-devices').find('input[name="device_region2add"]');
+        this.save_device_location(device_location);
+        input.val('');
+    };
+    this.new_device_region = function() {
+        var input = $('#dictionary-devices').find('input[name="device_region2add"]');
         var device_location =  this.table_device_locations.selected_object();
         if( device_location == null ) return;
         var device_region   =  input.val();
         if( device_region   == '' ) return;
         this.save_device_region(device_location, device_region);
         input.val('');
-	};
-	this.new_device_component = function() {
-		var input = $('#dictionary-devices').find('input[name="device_component2add"]');
+    };
+    this.new_device_component = function() {
+        var input = $('#dictionary-devices').find('input[name="device_component2add"]');
         var device_location =  this.table_device_locations.selected_object();
         if( device_location == null ) return;
         var device_region   =  this.table_device_regions.selected_object();
         if( device_region   == null ) return;
-		var component_name  =  input.val();
+        var component_name  =  input.val();
         this.save_device_component(device_location, device_region, component_name);
         input.val('');
-	};
-	this.save_device_location = function(location_name) {
-		if( location_name == '' ) return;
+    };
+    this.save_device_location = function(location_name) {
+        if( location_name == '' ) return;
         this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name}); };
 
-	this.save_device_region = function(location_name, region_name) {
-		if(( location_name == '' ) || ( region_name == '' )) return;
+    this.save_device_region = function(location_name, region_name) {
+        if(( location_name == '' ) || ( region_name == '' )) return;
         this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name, region:region_name}); };
 
-	this.save_device_component = function(location_name, region_name, component_name) {
-		if(( location_name == '' ) || ( region_name == '' ) || ( component_name == '' )) return;
+    this.save_device_component = function(location_name, region_name, component_name) {
+        if(( location_name == '' ) || ( region_name == '' ) || ( component_name == '' )) return;
         this.device_action('../neocaptar/ws/dict_device_location_new.php', {location:location_name, region:region_name, component:component_name}); };
 
-	this.delete_device_element = function(element,id) {
+    this.delete_device_element = function(element,id) {
         this.device_action('../neocaptar/ws/dict_device_location_delete.php', {scope:element, id:id}); };
 
-	this.load_device_locations = function() {
+    this.load_device_locations = function() {
         this.device_action('../neocaptar/ws/dict_device_location_get.php', {}); };
 
     this.device_action = function(url, params, data_handler) {
@@ -1316,7 +1317,7 @@ function p_appl_dictionary() {
     this.table_device_regions    = null;
     this.table_device_components = null;
 
-	this.display_device_locations = function() {
+    this.display_device_locations = function() {
 
         var elem = $('#dictionary-devices-locations');
 
@@ -1383,10 +1384,10 @@ function p_appl_dictionary() {
         this.display_device_regions( this.table_device_locations.selected_object());
 
         if(this.can_manage())
-    		$('#dictionary-devices').find('input[name="device_location2add"]' ).removeAttr('disabled');
-	};
+            $('#dictionary-devices').find('input[name="device_location2add"]' ).removeAttr('disabled');
+    };
 
-	this.display_device_regions = function(location_name) {
+    this.display_device_regions = function(location_name) {
 
         var elem = $('#dictionary-devices-regions');
 
@@ -1456,12 +1457,12 @@ function p_appl_dictionary() {
 
         if(this.can_manage()) {
             var input = $('#dictionary-devices').find('input[name="device_region2add"]');
-        	if( location_name == null ) input.attr('disabled','disabled');
+            if( location_name == null ) input.attr('disabled','disabled');
             else                        input.removeAttr('disabled');
         }
-	};
+    };
 
-	this.display_device_components = function(location_name, region_name) {
+    this.display_device_components = function(location_name, region_name) {
 
         var elem = $('#dictionary-devices-components');
 
@@ -1534,48 +1535,48 @@ function p_appl_dictionary() {
     // INSTRUCTIONS
     // ------------
 
-	this.instr = {};
-	this.get_instr = function() {
-		this.init();
-		return this.instr;
-	};
-	this.instr_dict_is_empty = function() {
-		for( var instr in this.instrs()) return false;
-		return true;
-	}
-	this.instr_is_not_known = function(instr) {
-		return this.instr_dict_is_empty() || ( instr == null ) || ( typeof this.instrs()[instr] === 'undefined' );
-	};
-	this.instrs = function() {
-		return this.get_instr();
-	};
-	this.init_instrs = function() {
-		$('#dictionary-instrs').
+    this.instr = {};
+    this.get_instr = function() {
+        this.init();
+        return this.instr;
+    };
+    this.instr_dict_is_empty = function() {
+        for( var instr in this.instrs()) return false;
+        return true;
+    }
+    this.instr_is_not_known = function(instr) {
+        return this.instr_dict_is_empty() || ( instr == null ) || ( typeof this.instrs()[instr] === 'undefined' );
+    };
+    this.instrs = function() {
+        return this.get_instr();
+    };
+    this.init_instrs = function() {
+        $('#dictionary-instrs').
             find('input[name="instr2add"]').
-    		keyup(function(e) {
+            keyup(function(e) {
                 if( $(this).val() == '' ) { return; }
                 if( e.keyCode == 13     ) { that.new_instr(); return; }
                 $(this).val(global_truncate_instr($(this).val()));
-    		}).
+            }).
             attr('disabled','disabled');
-		$('#dictionary-instrs-reload').
+        $('#dictionary-instrs-reload').
             button().
             click(function() { that.load_instrs(); });
-		this.load_instrs();
-	};
-	this.new_instr = function() {
+        this.load_instrs();
+    };
+    this.new_instr = function() {
         var input = $('#dictionary-instrs').find('input[name="instr2add"]');
         this.save_instr(input.val());
         input.val('');
-	};
-	this.save_instr = function(instr_name) {
-		if( instr_name == '' ) return;
+    };
+    this.save_instr = function(instr_name) {
+        if( instr_name == '' ) return;
         this.instr_action('../neocaptar/ws/dict_instr_new.php',{instr:instr_name}); };
 
-	this.delete_instr_element = function(element,id) {
+    this.delete_instr_element = function(element,id) {
         this.instr_action('../neocaptar/ws/dict_instr_delete.php',{scope:element, id:id}); };
 
-	this.load_instrs = function() {
+    this.load_instrs = function() {
         this.instr_action('../neocaptar/ws/dict_instr_get.php',{}); };
 
     this.instr_action = function(url, params, data_handler) {
@@ -1586,7 +1587,7 @@ function p_appl_dictionary() {
         }
         this.web_service_GET(url, params, handle_data_and_display);
     };
-	this.display_instrs = function() {
+    this.display_instrs = function() {
         var elem = $('#dictionary-instrs-instrs');
         var hdr = [
             {   name:   'DELETE',
@@ -1618,7 +1619,7 @@ function p_appl_dictionary() {
                             }); }}}
         ];
         var rows = [];
-		for( var name in this.instrs()) {
+        for( var name in this.instrs()) {
             var instr = this.instrs()[name];
             rows.push(
                 [   this.can_manage() ?
@@ -1643,9 +1644,9 @@ function p_appl_dictionary() {
 
         if(this.can_manage())
             $('#dictionary-instrs').find('input[name="instr2add"]').removeAttr('disabled');
-	};
+    };
 
-	return this;
+    return this;
 }
 var dict = new p_appl_dictionary();
 

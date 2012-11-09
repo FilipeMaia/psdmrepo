@@ -26,27 +26,27 @@ function p_appl_admin() {
      *
      * -------------------------------------------------------------------------
      */
-	this.name      = 'admin';
-	this.full_name = 'Admin';
-	this.context   = '';
+    this.name      = 'admin';
+    this.full_name = 'Admin';
+    this.context   = '';
     this.default_context = 'access';
 
     this.select = function(context,when_done) {
-		that.context   = context;
-		this.when_done = when_done;
-		this.init();
-	};
-	this.select_default = function() {
-		if( this.context == '' ) this.context = this.default_context;
-		this.init();
-	};
-	this.if_ready2giveup = function(handler2call) {
-		this.init();
+        that.context   = context;
+        this.when_done = when_done;
+        this.init();
+    };
+    this.select_default = function() {
+        if( this.context == '' ) this.context = this.default_context;
+        this.init();
+    };
+    this.if_ready2giveup = function(handler2call) {
+        this.init();
         handler2call();
-	};
+    };
     this.update = function() {
-		this.init();
-		this.access_load();
+        this.init();
+        this.access_load();
         this.notify_load();
         this.cablenumbers_load();
         this.jobnumbers_load();
@@ -56,15 +56,15 @@ function p_appl_admin() {
      *   Internal methods and data structures
      * ----------------------------------------
      */
-	this.initialized = false;
-	this.init = function() {
-		if( this.initialized ) return;
-		this.initialized = true;
+    this.initialized = false;
+    this.init = function() {
+        if( this.initialized ) return;
+        this.initialized = true;
 
-		$('#admin-access-reload'       ).button().click(function() { that.access_load      (); });
-		$('#admin-notifications-reload').button().click(function() { that.notify_load      (); });
-		$('#admin-cablenumbers-reload' ).button().click(function() { that.cablenumbers_load(); });
-		$('#admin-jobnumbers-reload'   ).button().click(function() { that.jobnumbers_load  (); });
+        $('#admin-access-reload'       ).button().click(function() { that.access_load      (); });
+        $('#admin-notifications-reload').button().click(function() { that.notify_load      (); });
+        $('#admin-cablenumbers-reload' ).button().click(function() { that.cablenumbers_load(); });
+        $('#admin-jobnumbers-reload'   ).button().click(function() { that.jobnumbers_load  (); });
 
         var administrator2add = $('#admin-access').find('input[name="administrator2add"]');
         administrator2add.
@@ -102,19 +102,19 @@ function p_appl_admin() {
                submit_pending.attr('disabled','disabled');
                delete_pending.attr('disabled','disabled');
         }
-		var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  ).button().button('disable');
-		var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  ).button().button('disable');
-		var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]').button().button('disable');
+        var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  ).button().button('disable');
+        var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  ).button().button('disable');
+        var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]').button().button('disable');
 
-		var cablenumbers_ranges_edit   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="edit"]'  ).button().button('disable');
-		var cablenumbers_ranges_save   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="save"]'  ).button().button('disable');
-		var cablenumbers_ranges_cancel = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="cancel"]').button().button('disable');
+        var cablenumbers_ranges_edit   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="edit"]'  ).button().button('disable');
+        var cablenumbers_ranges_save   = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="save"]'  ).button().button('disable');
+        var cablenumbers_ranges_cancel = $('#admin-cablenumbers').find('#ranges'  ).find('button[name="cancel"]').button().button('disable');
 
         var cablenumbers_orphan_scan        = $('#admin-cablenumbers').find('#orphan' ).find('button[name="scan"]'       ).button().button('disable');
-		var cablenumbers_orphan_synchronize = $('#admin-cablenumbers').find('#orphan' ).find('button[name="synchronize"]').button().button('disable');
+        var cablenumbers_orphan_synchronize = $('#admin-cablenumbers').find('#orphan' ).find('button[name="synchronize"]').button().button('disable');
 
         var cablenumbers_reserved_scan = $('#admin-cablenumbers').find('#reserved' ).find('button[name="scan"]').button().button('disable');
-		var cablenumbers_reserved_free = $('#admin-cablenumbers').find('#reserved' ).find('button[name="free"]').button().button('disable');
+        var cablenumbers_reserved_free = $('#admin-cablenumbers').find('#reserved' ).find('button[name="free"]').button().button('disable');
 
         if( this.can_manage_access()) {
 
@@ -148,7 +148,7 @@ function p_appl_admin() {
 //        this.jobnumbers_load();
 //        this.reload_timer_restart();
         this.reload_timer_event();
-	};
+    };
     this.can_manage_access = function() { return global_current_user.is_administrator; };
     this.can_manage_notify = this.can_manage_access;
 
@@ -158,7 +158,7 @@ function p_appl_admin() {
     };
     this.reload_timer_event = function() {
         if( !this.jobnumber_editing() && !this.cablenumber_editing()) {
-    		this.access_load();
+            this.access_load();
             this.notify_load();
             this.cablenumbers_load();
             this.jobnumbers_load();
@@ -187,16 +187,16 @@ function p_appl_admin() {
         return html;
     };
     this.cablenumbers_prefixes_edit_tools = function(edit_mode) {
-		var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  );
-		var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  );
-		var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]');
+        var cablenumbers_prefixes_edit   = $('#admin-cablenumbers').find('#prefixes').find('button[name="edit"]'  );
+        var cablenumbers_prefixes_save   = $('#admin-cablenumbers').find('#prefixes').find('button[name="save"]'  );
+        var cablenumbers_prefixes_cancel = $('#admin-cablenumbers').find('#prefixes').find('button[name="cancel"]');
         if( !this.can_manage_access()) return;
         cablenumbers_prefixes_edit.button  (edit_mode ? 'disable' : 'enable');
         cablenumbers_prefixes_save.button  (edit_mode ? 'enable'  : 'disable');
         cablenumbers_prefixes_cancel.button(edit_mode ? 'enable'  : 'disable');
     };
     this.cablenumber_prefixes_table = null;
-	this.cablenumber_prefixes_display = function(edit_mode) {
+    this.cablenumber_prefixes_display = function(edit_mode) {
         this.cablenumber_prefix_editing = edit_mode;
         var rows = [];
         for( var p in this.cablenumber_prefix ) {
@@ -251,9 +251,9 @@ function p_appl_admin() {
     };
     this.cablenumbers_ranges_edit_tools = function(edit_mode) {
         var ranges_elem = $('#admin-cablenumbers').find('#ranges');
-		var cablenumbers_ranges_edit   = ranges_elem.find('button[name="edit"]'  );
-		var cablenumbers_ranges_save   = ranges_elem.find('button[name="save"]'  );
-		var cablenumbers_ranges_cancel = ranges_elem.find('button[name="cancel"]');
+        var cablenumbers_ranges_edit   = ranges_elem.find('button[name="edit"]'  );
+        var cablenumbers_ranges_save   = ranges_elem.find('button[name="save"]'  );
+        var cablenumbers_ranges_cancel = ranges_elem.find('button[name="cancel"]');
         if( !this.can_manage_access()) return;
         cablenumbers_ranges_edit.button  (edit_mode ? 'disable' : 'enable');
         cablenumbers_ranges_save.button  (edit_mode ? 'enable'  : 'disable');
@@ -398,7 +398,7 @@ function p_appl_admin() {
         this.cablenumber_ranges_display(this.cablenumber_prefixes_table.selected_object(),false);
     };
 
-	this.cablenumbers_load = function() {
+    this.cablenumbers_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/ws/cablenumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
@@ -589,7 +589,7 @@ function p_appl_admin() {
             '</tr>';
         return html;
     };
-	this.jobnumbers_display = function() {
+    this.jobnumbers_display = function() {
         var html =
             '<table><tbody>'+
             '  <tr>'+
@@ -609,7 +609,7 @@ function p_appl_admin() {
             '</tbody></table>';
         $('#admin-jobnumbers-jobnumbers').html(html);
         for( var jnidx in this.jobnumber ) {
-			$('#admin-jobnumbers-tools-'+jnidx+' button.admin-jobnumbers-tools').
+            $('#admin-jobnumbers-tools-'+jnidx+' button.admin-jobnumbers-tools').
                 button().
                 button(this.can_manage_access()?'enable':'disable');
             this.jobnumbers_update_tools(jnidx,false);
@@ -635,7 +635,7 @@ function p_appl_admin() {
                 global_search_projects_by_jobnumber_prefix(jn.prefix);
             });
     };
-	this.jobnumbers_update = function(jnidx) {
+    this.jobnumbers_update = function(jnidx) {
         var j = this.jobnumber[jnidx];
         j.editing = false;
         $('#admin-jobnumbers-'+jnidx+' .prefix'                 ).html('&nbsp;'+j.prefix);
@@ -653,20 +653,20 @@ function p_appl_admin() {
             this.jobnumbers_disable_tools(jnidx);
             return;
         }
-		if( editing ) {
-			$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('disable');
-			$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('enable' );
-			$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('enable' );
-			return;
-		}
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('enable' );
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
+        if( editing ) {
+            $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('disable');
+            $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('enable' );
+            $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('enable' );
+            return;
+        }
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('enable' );
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
     };
     this.jobnumbers_disable_tools = function(jnidx) {
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('disable');
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
-		$('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit"]'       ).button('disable');
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_save"]'  ).button('disable');
+        $('#admin-jobnumbers-tools-'+jnidx).find('button[name="edit_cancel"]').button('disable');
     };
     this.jobnumbers_edit = function(jnidx) {
         this.jobnumbers_update_tools(jnidx,true);
@@ -713,7 +713,7 @@ function p_appl_admin() {
     this.jobnumbers_edit_cancel = function(jnidx) {
        this.jobnumbers_update(jnidx);
     };
-	this.jobnumbers_load = function() {
+    this.jobnumbers_load = function() {
         var params = {};
         var jqXHR = $.get('../neocaptar/ws/jobnumber_get.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }

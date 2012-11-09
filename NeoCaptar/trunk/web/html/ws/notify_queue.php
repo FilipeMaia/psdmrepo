@@ -26,11 +26,11 @@ try {
     $action  = strtolower(trim(NeoCaptarUtils::get_param_GET('action')));
     $id      = NeoCaptarUtils::get_param_GET('id', false, false);
 
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
+    $neocaptar = NeoCaptar::instance();
+    $neocaptar->begin();
 
     if(is_null($id)) {
         foreach($neocaptar->notify_queue() as $entry) {
@@ -51,7 +51,7 @@ try {
     $notificatons2return = NeoCaptarUtils::notifications2array($neocaptar);
 
     $authdb->commit();
-	$neocaptar->commit();
+    $neocaptar->commit();
 
     NeoCaptarUtils::report_success($notificatons2return);
 

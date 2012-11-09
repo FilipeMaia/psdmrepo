@@ -30,10 +30,10 @@ try {
     $uid  = NeoCaptarUtils::get_param_GET('uid');
 
     $authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb->begin();
 
-	$neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
+    $neocaptar = NeoCaptar::instance();
+    $neocaptar->begin();
 
     if( !$neocaptar->is_administrator())
         NeoCaptarUtils::report_error("your account not authorized for the operation");
@@ -52,8 +52,8 @@ try {
 
     $access2array = NeoCaptarUtils::access2array($neocaptar->users());
 
-	$authdb->commit();
-	$neocaptar->commit();
+    $authdb->commit();
+    $neocaptar->commit();
     $regdb->commit();
 
     NeoCaptarUtils::report_success( array( 'access' => $access2array ));

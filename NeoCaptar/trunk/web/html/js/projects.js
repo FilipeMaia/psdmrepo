@@ -4,7 +4,7 @@ function p_appl_projects() {
     var that = this;
 
     this.when_done           = null;
-	this.create_form_changed = false;
+    this.create_form_changed = false;
 
     /* -------------------------------------------------------------------------
      * Data structures and methods to be used/called by external users:
@@ -22,67 +22,67 @@ function p_appl_projects() {
      *      an interface focus if there is on-going unfinished editing
      *      within one of the interfaces associated with the object.
      */
-	this.name      = 'projects';
-	this.full_name = 'Projects';
-	this.context   = '';
+    this.name      = 'projects';
+    this.full_name = 'Projects';
+    this.context   = '';
     this.default_context = 'search';
 
     this.select = function(context,when_done) {
-		that.context   = context;
-		this.when_done = when_done;
-		this.init();
-	};
-	this.select_default = function() {
-		if( this.context == '' ) this.context = this.default_context;
-		this.init();
-	};
-	this.if_ready2giveup = function(handler2call) {
-		if(( this.context == 'create' ) && this.create_form_changed ) {
-			ask_yes_no(
-				'Unsaved Data Warning',
-				'You are about to leave the page while there are unsaved data in the form. Are you sure?',
-				handler2call,
-				null );
-			return;
-		}
-		handler2call();
-	};
+        that.context   = context;
+        this.when_done = when_done;
+        this.init();
+    };
+    this.select_default = function() {
+        if (this.context == '' ) this.context = this.default_context;
+        this.init();
+    };
+    this.if_ready2giveup = function(handler2call) {
+        if(( this.context == 'create' ) && this.create_form_changed) {
+            ask_yes_no(
+                'Unsaved Data Warning',
+                'You are about to leave the page while there are unsaved data in the form. Are you sure?',
+                handler2call,
+                null );
+            return;
+        }
+        handler2call();
+    };
 
     /* ----------------------------------------
      *   Internal methods and data structures
      * ----------------------------------------
      */
-	this.initialized = false;
-	this.init = function() {
-		if( this.initialized ) return;
-		this.initialized = true;
+    this.initialized = false;
+    this.init = function() {
+        if (this.initialized ) return;
+        this.initialized = true;
 
         var search_controls = $('#projects-search-controls');
-		search_controls.find('input[name="title"]').change(function() { that.search() ;});
-		search_controls.find('select[name="owner"]').change(function() { that.search() ;});
-		search_controls.find('input[name="begin"]').datepicker().datepicker('option','dateFormat','yy-mm-dd').change(function() { that.search() ;});
-		search_controls.find('input[name="end"]').datepicker().datepicker('option','dateFormat','yy-mm-dd').change(function() { that.search() ;});
+        search_controls.find('input[name="title"]').change(function() { that.search() ;});
+        search_controls.find('select[name="owner"]').change(function() { that.search() ;});
+        search_controls.find('input[name="begin"]').datepicker().datepicker('option','dateFormat','yy-mm-dd').change(function() { that.search() ;});
+        search_controls.find('input[name="end"]').datepicker().datepicker('option','dateFormat','yy-mm-dd').change(function() { that.search() ;});
         search_controls.find('button[name="search"]').button().click(function() { that.search() ;});
-		search_controls.find('button[name="reset"]').button().click(function() { that.search_reset(); });
+        search_controls.find('button[name="reset"]').button().click(function() { that.search_reset(); });
 
         $('#projects-create-form').find('input[name="due_time"]').
             each(function() {
                 $(this).datepicker().datepicker('option','dateFormat','yy-mm-dd'); });
-		$('#projects-create-save').
+        $('#projects-create-save').
             button().
             button('disable').
             click(function() {
                 that.create_project(); });
-		$('#projects-create-reset').
+        $('#projects-create-reset').
             button().
             click(function() {
                 $('#projects-create-save').button('disable'); });
-		$('.projects-create-form-element').
+        $('.projects-create-form-element').
             change(function() {
                 that.create_form_changed = true;
                 $('#projects-create-save').button('enable'); });            
-	};
-	this.project = null;
+    };
+    this.project = null;
     this.can_create_projects = function() {
         return global_current_user.is_administrator || global_current_user.can_manage_projects;
     };
@@ -95,48 +95,48 @@ function p_appl_projects() {
     this.can_manage_workflow = function() {
         return global_current_user.is_administrator || global_current_user.can_manage_projects || global_current_user.is_other;
     };
-	this.toggle_project = function(pidx) {
-		var toggler='#proj-tgl-'+pidx;
-		var container='#proj-con-'+pidx;
-		if( $(container).hasClass('proj-hdn')) {
-			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-			$(container).removeClass('proj-hdn').addClass('proj-vis');
+    this.toggle_project = function(pidx) {
+        var toggler='#proj-tgl-'+pidx;
+        var container='#proj-con-'+pidx;
+        if ($(container).hasClass('proj-hdn')) {
+            $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+            $(container).removeClass('proj-hdn').addClass('proj-vis');
             var proj = this.project[pidx];
-			if( !proj.is_loaded ) {
-				proj.is_loaded = true;
-				$('#proj-delete-'+pidx ).
+            if (!proj.is_loaded) {
+                proj.is_loaded = true;
+                $('#proj-delete-'+pidx ).
                     button().
                     button(this.can_manage_project(pidx)?'enable':'disable').
                     click(function() { that.delete_project(pidx); });
-				$('#proj-clone-'+pidx ).
+                $('#proj-clone-'+pidx ).
                     button().
                     button(this.can_create_projects()?'enable':'disable').
                     click(function() { that.clone_project(pidx); });
-				$('#proj-history-'+pidx ).
+                $('#proj-history-'+pidx ).
                     button().
                     click(function() { that.show_project_history(pidx); });
-				$('#proj-add-'+pidx ).
+                $('#proj-add-'+pidx ).
                     button().
                     button(this.can_manage_project(pidx)?'enable':'disable').
                     click(function() { that.add_cable(pidx); });
-				$('#proj-label-'+pidx).
+                $('#proj-label-'+pidx).
                     button().
                     click(function() { that.show_cable_label(pidx); });
-				this.load_cables(pidx);
-			}
-		} else {
-			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-			$(container).removeClass('proj-vis').addClass('proj-hdn');
-		}
-	};
+                this.load_cables(pidx);
+            }
+        } else {
+            $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+            $(container).removeClass('proj-vis').addClass('proj-hdn');
+        }
+    };
     this.save_attributes = function(pidx) {
 
         var proj = this.project[pidx];
 
         // First we need to submit the request to the database service in order
-		// to get an approval for the proposed changes. If the operation succeeds
+        // to get an approval for the proposed changes. If the operation succeeds
         // then we can also make proper adjustmenens to the current state of the GUI.
-		//
+        //
         var elem = $('#proj-editor-'+pidx);
         $.ajax({
             type: 'POST',
@@ -148,7 +148,7 @@ function p_appl_projects() {
                 due_time:    elem.find('input[name="due"]').val(),
                 description: elem.find('textarea[name="description"]').val()},
             success: function(data) {
-                if( data.status != 'success' ) { report_error(data.message); return; }
+                if (data.status != 'success') { report_error(data.message); return; }
                 var new_proj = data.project;
                 proj.owner       = new_proj.owner;
                 proj.title       = new_proj.title;
@@ -160,13 +160,13 @@ function p_appl_projects() {
                 hdr.find('.proj-due'  ).html(proj.due);
                 $('#proj-con-'+pidx).find('.proj-description').text(proj.description);
             },
-            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
             dataType: 'json'
         });
     };
-	this.cable_action2html = function(pidx,cidx,reverse) {
-		var c = this.project[pidx].cable[cidx];
-		var html = '';
+    this.cable_action2html = function(pidx,cidx,reverse) {
+        var c = this.project[pidx].cable[cidx];
+        var html = '';
         if(reverse) {
             switch(c.status) {
                 case 'Registered':   html = '<button class="proj-cable-tool" name="un_register"   onclick="projects.un_register_cable  ('+pidx+','+cidx+')" title="unregister by releasing cable number" ><b>UNREG</b></button>'; break;
@@ -192,11 +192,11 @@ function p_appl_projects() {
         }
         return html;
     };
-	this.cable2html = function(pidx,cidx) {
+    this.cable2html = function(pidx,cidx) {
         var proj = this.project[pidx];
         var cols2display = proj.cols2display;
-		var c = proj.cable[cidx];
-		var html =
+        var c = proj.cable[cidx];
+        var html =
 '<tr class="table_row " id="proj-cable-'+pidx+'-'+cidx+'-1">'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left table_cell_bottom "><div class="status"><b>'+c.status+'</b></div></td>';
         html += cols2display.tools ?
@@ -268,9 +268,9 @@ function p_appl_projects() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_highlight "><div class="destination_instr"   >&nbsp;'+c.destination.instr   +'</div></td>' : '';
         html +=
 '</tr>';
-		return html;
-	};
-	this.display_cables = function(pidx) {
+        return html;
+    };
+    this.display_cables = function(pidx) {
         var proj = this.project[pidx];
         var cols2display = proj.cols2display;
         var html =
@@ -330,49 +330,49 @@ function p_appl_projects() {
 '  </tr>'+
 '</tbody></table>';
         $('#proj-con-'+pidx).find('div.table').html(html);
-		var prev = $('#proj-cables-hdr-'+pidx);
-		prev.siblings().remove();
-		for( var cidx in proj.cable ) {
-			var html = this.cable2html(pidx, cidx);
-			prev.after( html );
-			prev = $('#proj-cable-'+pidx+'-'+cidx+'-2');
-		}
-		$('.proj-cable-tool').button();
-		for( var cidx in proj.cable )
-			this.update_cable_tools(pidx,cidx);
-	};
-	this.load_cables = function(pidx) {
-		$('#proj-cables-load-'+pidx).html('Loading...');
-		var params = {project_id:this.project[pidx].id};
-		var jqXHR = $.get(
-			'../neocaptar/ws/cable_search.php', params,
-			function(data) {
-				if( data.status != 'success') {
-					report_error('failed to load cables because of: '+data.message);
-					return;
-				}
-				that.project[pidx].cable = data.cable;
+        var prev = $('#proj-cables-hdr-'+pidx);
+        prev.siblings().remove();
+        for (var cidx in proj.cable) {
+            var html = this.cable2html(pidx, cidx);
+            prev.after( html );
+            prev = $('#proj-cable-'+pidx+'-'+cidx+'-2');
+        }
+        $('.proj-cable-tool').button();
+        for (var cidx in proj.cable )
+            this.update_cable_tools(pidx,cidx);
+    };
+    this.load_cables = function(pidx) {
+        $('#proj-cables-load-'+pidx).html('Loading...');
+        var params = {project_id:this.project[pidx].id};
+        var jqXHR = $.get(
+            '../neocaptar/ws/cable_search.php', params,
+            function(data) {
+                if (data.status != 'success') {
+                    report_error('failed to load cables because of: '+data.message);
+                    return;
+                }
+                that.project[pidx].cable = data.cable;
                 that.sort_cables(pidx);
-				that.display_cables(pidx);
-			},
-			'JSON'
-		).error(
-			function () {
-				report_error('failed because of: '+jqXHR.statusText);
-			}
-		).complete(
-			function () {
-				$('#proj-cables-load-'+pidx).html('');
-			}
-		);
-	};
-	this.update_cable_tools = function(pidx,cidx) {
-		var cable = this.project[pidx].cable[cidx];
+                that.display_cables(pidx);
+            },
+            'JSON'
+        ).error(
+            function () {
+                report_error('failed because of: '+jqXHR.statusText);
+            }
+        ).complete(
+            function () {
+                $('#proj-cables-load-'+pidx).html('');
+            }
+        );
+    };
+    this.update_cable_tools = function(pidx,cidx) {
+        var cable = this.project[pidx].cable[cidx];
         $('#proj-cable-action-'+pidx+'-'+cidx+'-reverse button').button('disable');
         $('#proj-cable-action-'+pidx+'-'+cidx+' button'        ).button('disable');
         var tools_1 = $('#proj-cable-tools-'+pidx+'-'+cidx+'-1');
         var tools_2 = $('#proj-cable-tools-'+pidx+'-'+cidx+'-2');
-		tools_2.find('button[name="history"]').button('enable');
+        tools_2.find('button[name="history"]').button('enable');
         tools_2.find('button[name="label"]' ).button(
             global_cable_status2rank(cable.status) > global_cable_status2rank('Registered') ?
             'enable':
@@ -389,14 +389,14 @@ function p_appl_projects() {
                 'disable');
         } else {
             tools_1.find('button[name="edit"]'  ).button('disable');
-			tools_2.find('button[name="clone"]' ).button('disable');
+            tools_2.find('button[name="clone"]' ).button('disable');
             tools_2.find('button[name="delete"]').button('disable');
         }
         if(this.can_manage_workflow()) {
             $('#proj-cable-action-'+pidx+'-'+cidx+'-reverse button').button('enable');
             $('#proj-cable-action-'+pidx+'-'+cidx+' button'        ).button('enable');
         }
-	};
+    };
     this.update_project_hdr = function(pidx) {
         // TODO: Scan over all cables and rebuild the project object and visible
         // header. For now just update the modification time.
@@ -404,11 +404,11 @@ function p_appl_projects() {
         var proj = this.project[pidx];
 
         proj.status.total = 0;
-        for( var status in proj.status ) proj.status[status] = 0;
+        for (var status in proj.status ) proj.status[status] = 0;
 
-        for( var cidx in proj.cable ) {
+        for (var cidx in proj.cable) {
             var cable = proj.cable[cidx];
-            if( cable.modified_time_sec > proj.modified_sec ) {
+            if (cable.modified_time_sec > proj.modified_sec) {
                 proj.modified_sec = cable.modified_time_sec;
                 proj.modified     = cable.modified_time;
             }
@@ -417,31 +417,31 @@ function p_appl_projects() {
         }
         $('#proj-hdr-'+pidx+' div.proj-modified').html(proj.modified);
         $('#proj-hdr-'+pidx+' div.proj-num-cables-total').html(''+proj.status.total+'');
-        for( var status in proj.status )
+        for (var status in proj.status )
             $('#proj-hdr-'+pidx+' div.'+status).html(proj.status[status]);
     };
-	this.add_cable = function(pidx) {
-		var proj = this.project[pidx];
+    this.add_cable = function(pidx) {
+        var proj = this.project[pidx];
 
         // First we need to submit the request to the database service in order
-		// to get a unique cable identifier.
-		//
+        // to get a unique cable identifier.
+        //
         $.ajax({
             type: 'POST',
             url: '../neocaptar/ws/cable_new.php',
             data: {project_id:proj.id},
             success: function(data) {
-                if( data.status != 'success' ) { report_error(data.message); return; }
-				var cidx_new = proj.cable.push(data.cable) - 1;
-				$('#proj-cables-hdr-'+pidx).after( that.cable2html(pidx, cidx_new))
-				$('#proj-cable-'+pidx+'-'+cidx_new+'-1').find('.proj-cable-tool').each( function() { $(this).button(); });
-				$('#proj-cable-'+pidx+'-'+cidx_new+'-2').find('.proj-cable-tool').each( function() { $(this).button(); });
-				that.edit_cable(pidx,cidx_new);
+                if (data.status != 'success') { report_error(data.message); return; }
+                var cidx_new = proj.cable.push(data.cable) - 1;
+                $('#proj-cables-hdr-'+pidx).after( that.cable2html(pidx, cidx_new))
+                $('#proj-cable-'+pidx+'-'+cidx_new+'-1').find('.proj-cable-tool').each( function() { $(this).button(); });
+                $('#proj-cable-'+pidx+'-'+cidx_new+'-2').find('.proj-cable-tool').each( function() { $(this).button(); });
+                that.edit_cable(pidx,cidx_new);
             },
-            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
             dataType: 'json'
         });
-	};
+    };
     this.set_project2clone = function(title) {
         $('#projects-create-form').find('input[name="project2clone"]').val(title);
     };
@@ -451,7 +451,7 @@ function p_appl_projects() {
         var title       = form.find('input[name="title"]').val();
         var description = form.find('textarea[name="description"]').val();
         var due_time    = form.find('input[name="due_time"]').val();
-        if( owner === '' || title === '' || due_time === '' ) {
+        if (owner === '' || title === '' || due_time === '') {
             report_error('One of the required fields is empty. Please correct the form and submit again.', null);
             return;
         }
@@ -467,7 +467,7 @@ function p_appl_projects() {
             $('#projects-create-info').html('&nbsp;');
             if(data.status != 'success') { report_error(data.message, null); return; }
             that.create_form_changed = false;
-            if( that.when_done ) {
+            if (that.when_done) {
                 that.when_done.execute();
                 that.when_done = null;
             }
@@ -485,11 +485,11 @@ function p_appl_projects() {
             report_error('saving failed because of: '+jqXHR.statusText, null);
         });
     };
-	this.delete_project = function(pidx) {
-		ask_yes_no(
-			'Data Deletion Warning',
-			'You are about to delete the project and all cables associated with it. Are you sure?',
-			function() {
+    this.delete_project = function(pidx) {
+        ask_yes_no(
+            'Data Deletion Warning',
+            'You are about to delete the project and all cables associated with it. Are you sure?',
+            function() {
                 var params = {project_id:that.project[pidx].id};
                 var jqXHR = $.get('../neocaptar/ws/project_delete.php',params,function(data) {
                     if(data.status != 'success') { report_error(data.message, null); return; }
@@ -500,10 +500,10 @@ function p_appl_projects() {
                     report_error('failed to delete the project because of: '+jqXHR.statusText, null);
                     return;
                 });
-			},
-			null );
-	};
-	this.clone_project = function(pidx) {
+            },
+            null );
+    };
+    this.clone_project = function(pidx) {
         this.set_project2clone(this.project[pidx].title);
         global_switch_context('projects','create');
     };
@@ -525,7 +525,7 @@ function p_appl_projects() {
         var link = '<a href="'+proj_url+'" target="_blank" class="link" title="'+title+'" >'+proj_url+'</a>';
         return link;
     };
-	this.show_cable_history = function(pidx,cidx) {
+    this.show_cable_history = function(pidx,cidx) {
         var params = {id:this.project[pidx].cable[cidx].id};
         var jqXHR = $.get('../neocaptar/ws/cable_history.php',params,function(data) {
             if(data.status != 'success') { report_error(data.message, null); return; }
@@ -536,12 +536,12 @@ function p_appl_projects() {
             return;
         });
     };
-	this.show_history = function(title,events) {
+    this.show_history = function(title,events) {
         var rows = [];
-        for( var i in events) {
+        for (var i in events) {
             var event = events[i];
             var comments = '';
-            for( var j in event.comments ) comments += '<div>'+event.comments[j]+'</div>';
+            for (var j in event.comments ) comments += '<div>'+event.comments[j]+'</div>';
             rows.push( [event.event_time, event.event_uid, event.event, comments] );
         }
         report_info_table(
@@ -553,36 +553,36 @@ function p_appl_projects() {
             rows
         );
     };
-	this.clone_cable = function(pidx,cidx) {
-		var proj  = this.project[pidx];
-		var cable = proj.cable[cidx];
+    this.clone_cable = function(pidx,cidx) {
+        var proj  = this.project[pidx];
+        var cable = proj.cable[cidx];
 
         // First we need to submit the request to the database service in order
-		// to get a unique cable identifier.
-		//
+        // to get a unique cable identifier.
+        //
         $.ajax({
             type: 'POST',
             url: '../neocaptar/ws/cable_new.php',
             data: {cable_id: cable.id},
             success: function(data) {
-                if( data.status != 'success' ) { report_error(data.message); return; }
-				var cidx_new = proj.cable.push(data.cable) - 1;
-				$('#proj-cables-hdr-'+pidx).after( that.cable2html(pidx, cidx_new))
-				$('#proj-cable-'+pidx+'-'+cidx_new+'-1').find('.proj-cable-tool').each( function() { $(this).button(); });
-				$('#proj-cable-'+pidx+'-'+cidx_new+'-2').find('.proj-cable-tool').each( function() { $(this).button(); });
-				that.edit_cable(pidx,cidx_new);
+                if (data.status != 'success') { report_error(data.message); return; }
+                var cidx_new = proj.cable.push(data.cable) - 1;
+                $('#proj-cables-hdr-'+pidx).after( that.cable2html(pidx, cidx_new))
+                $('#proj-cable-'+pidx+'-'+cidx_new+'-1').find('.proj-cable-tool').each( function() { $(this).button(); });
+                $('#proj-cable-'+pidx+'-'+cidx_new+'-2').find('.proj-cable-tool').each( function() { $(this).button(); });
+                that.edit_cable(pidx,cidx_new);
             },
-            error: function() {	report_error('The request can not go through due a failure to contact the server.'); },
+            error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
             dataType: 'json'
         });
-	};
-	this.delete_cable = function(pidx,cidx) {
-		ask_yes_no(
-			'Data Deletion Warning',
-			'You are about to delete the cable and all information associated with it. Are you sure?',
-			function() {
-				var proj  = that.project[pidx];
-				var cable = proj.cable[cidx];
+    };
+    this.delete_cable = function(pidx,cidx) {
+        ask_yes_no(
+            'Data Deletion Warning',
+            'You are about to delete the cable and all information associated with it. Are you sure?',
+            function() {
+                var proj  = that.project[pidx];
+                var cable = proj.cable[cidx];
                 var params = {cable_id:cable.id};
                 var jqXHR = $.get('../neocaptar/ws/cable_delete.php',params,function(data) {
                     var result = eval(data);
@@ -613,9 +613,9 @@ function p_appl_projects() {
                 'JSON').error(function () {
                     report_error('saving failed because of: '+jqXHR.statusText, null);
                 });
-			},
-			null );
-	};
+            },
+            null );
+    };
     this.recalculate_origin_destination = function(loc,rack,ele,side,slot,conn) {
         var s = loc;
         if(rack) s += (s == '' ? '' : '-') + rack;
@@ -625,7 +625,7 @@ function p_appl_projects() {
         if(conn) s += (s == '' ? '' : '-') + conn;
         return s;
     };
-	this.cable_property_edit = function(pidx,cidx,prop,is_disabled,value) {
+    this.cable_property_edit = function(pidx,cidx,prop,is_disabled,value) {
 
         var cable  = this.project[pidx].cable[cidx];
         var is_disabled_attr = is_disabled ? 'disabled="disabled"' : '';
@@ -639,7 +639,7 @@ function p_appl_projects() {
 
         var html  = '';
 
-		switch(prop) {
+        switch(prop) {
 
         case 'description':
 
@@ -647,7 +647,7 @@ function p_appl_projects() {
             cable.read_description = function() { return base.val(); };
             break;
 
-		case 'device':
+        case 'device':
 
             // This field can't be edited directly. Instead it's composed
             // of its components which are edited via separate inputs (see below).
@@ -667,19 +667,19 @@ function p_appl_projects() {
             };
             break;
 
-		case 'device_location':
+        case 'device_location':
 
             html = '<select '+is_disabled_attr+' >';
-            if( dict.device_location_is_not_known( cable.device_location ))
+            if (dict.device_location_is_not_known( cable.device_location ))
                 html += '<option selected="selected" value="'+cable.device_location+'">'+cable.device_location+'</option>';
-            for( var t in dict.device_locations())
+            for (var t in dict.device_locations())
                 html += '<option'+
                         (t == cable.device_location ? ' selected="selected"' : '')+
                         ' value="'+t+'">'+t+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                     that.cable_property_edit(pidx,cidx,'device_region',false);
                     that.cable_property_edit(pidx,cidx,'device_component',false);
@@ -689,24 +689,24 @@ function p_appl_projects() {
                 }
             });
             cable.read_device_location = read_select;
-			break;
+            break;
 
-		case 'device_region':
+        case 'device_region':
 
             var location = cable.read_device_location();
 
             html = '<select '+is_disabled_attr+' >';
-            if(	dict.device_region_is_not_known( location,cable.device_region))
+            if (   dict.device_region_is_not_known( location,cable.device_region))
                 html += '<option selected="selected" value="'+cable.device_region+'">'+cable.device_region+'</option>';
-            if(	!dict.device_location_is_not_known( location ))
-                for( var t in dict.device_regions( location ))
+            if (   !dict.device_location_is_not_known( location ))
+                for (var t in dict.device_regions( location ))
                     html += '<option'+
                             (t == cable.device_region ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                     that.cable_property_edit(pidx,cidx,'device_component',false);
                 } else {
@@ -716,16 +716,16 @@ function p_appl_projects() {
             cable.read_device_region = read_select;
             break;
 
-		case 'device_component':
+        case 'device_component':
 
             var location = cable.read_device_location();
             var region   = cable.read_device_region();
 
             html = '<select '+is_disabled_attr+' >';
-            if(	dict.device_component_is_not_known( location, region, cable.device_component ))
+            if (   dict.device_component_is_not_known( location, region, cable.device_component ))
                 html += '<option selected="selected" value="'+cable.device_component+'">'+cable.device_component+'</option>';
-            if(	!dict.device_region_is_not_known( location, region ))
-                for( var t in dict.device_components( location, region ))
+            if (   !dict.device_region_is_not_known( location, region ))
+                for (var t in dict.device_components( location, region ))
                     html += '<option'+
                             (t == cable.device_component ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
@@ -733,51 +733,51 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '') {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.read_device_component = read_select;
-			break;
+            break;
 
         case 'device_counter':
-			base.html('<input type="text" value="'+cable.device_counter+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.device_counter+'" size="4" '+is_disabled_attr+' />');
             cable.read_device_counter = read_input;
-			break;
+            break;
 
         case 'device_suffix':
-			base.html('<input type="text" value="'+cable.device_suffix+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.device_suffix+'" size="4" '+is_disabled_attr+' />');
             cable.read_device_suffix = read_input;
-			break;
+            break;
 
         case 'func':
-			base.html('<input type="text" value="'+cable.func+'" size="24" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.func+'" size="24" '+is_disabled_attr+' />');
             cable.read_func = read_input;
-			break;
+            break;
 
-		case 'cable_type':
+        case 'cable_type':
 
             var cable_type                 = cable.read_cable_type           !== undefined ? cable.read_cable_type          () : cable.cable_type;
             var cable_origin_conntype      = cable.origin.read_conntype      !== undefined ? cable.origin.read_conntype     () : cable.origin.conntype;
             var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
 
-            if( value !== undefined ) cable_type = value;
+            if (value !== undefined ) cable_type = value;
 
             var connectors = ((cable_origin_conntype == '') && (cable_destination_conntype == ''))
                 ? dict.cables()
                 : dict.cables_reverse(cable_origin_conntype != '' ? cable_origin_conntype : cable_destination_conntype);
 
             html = '<select '+is_disabled_attr+' >';
-            if( cable_type == '' ) {
+            if (cable_type == '') {
                 html += '<option selected="selected" value="'+cable_type+'">'+cable_type+'</option>';
-                for( var t in connectors )
+                for (var t in connectors )
                     html += '<option value="'+t+'">'+t+'</option>';
             } else {
-                if( cable_type != '' )
+                if (cable_type != '' )
                     html += '<option value=""></option>';
-                if( dict.cable_is_not_known( cable_type ))
+                if (dict.cable_is_not_known( cable_type ))
                     html += '<option selected="selected" value="'+cable_type+'">'+cable_type+'</option>';
-                for( var t in connectors )
+                for (var t in connectors )
                     html += '<option'+
                             (t == cable_type ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
@@ -785,7 +785,7 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,'cable_type',false);
                     that.cable_property_edit(pidx,cidx,'origin_conntype',false);
                     that.cable_property_edit(pidx,cidx,'destination_conntype',false);
@@ -795,14 +795,14 @@ function p_appl_projects() {
                 }
             });
             cable.read_cable_type = read_select;
-			break;
+            break;
 
-		case 'origin_pinlist':
+        case 'origin_pinlist':
 
             html = '<select '+is_disabled_attr+' >';
-            if( dict.pinlist_is_not_known(cable.origin.pinlist))
+            if (dict.pinlist_is_not_known(cable.origin.pinlist))
                 html += '<option selected="selected" value="'+cable.origin.pinlist+'">'+cable.origin.pinlist+'</option>';
-            for( var pinlist in dict.pinlists())
+            for (var pinlist in dict.pinlists())
                 html += '<option'+
                         (pinlist == cable.origin.pinlist ? ' selected="selected"' : '')+
                         ' value="'+pinlist+'">'+pinlist+'</option>';
@@ -821,56 +821,56 @@ function p_appl_projects() {
             });
             cable.origin.read_pinlist = read_select;
 
-			break;
+            break;
 
-		case 'length':
+        case 'length':
             base.html('<input type="text" value="'+cable.length+ '" size="5" '+is_disabled_attr+' />');
             cable.read_length = read_input;
-			break;
+            break;
 
-		case 'routing':
+        case 'routing':
 
             html = '<select '+is_disabled_attr+' >';
-            if( dict.routing_is_not_known(cable.routing))
+            if (dict.routing_is_not_known(cable.routing))
                 html += '<option selected="selected" value="'+cable.routing+'">'+cable.routing+'</option>';
-            for( var routing in dict.routings())
+            for (var routing in dict.routings())
                 html += '<option'+
                         (routing == cable.routing ? ' selected="selected"' : '')+
                         ' value="'+routing+'">'+routing+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.read_routing = read_select;
-			break;
+            break;
 
-		case 'origin_name':
+        case 'origin_name':
             base.html('<input type="text" value="'+value+ '" size="20" '+is_disabled_attr+' />');
             cable.origin.read_name = read_input;
-			break;
+            break;
 
-		case 'origin_conntype':
+        case 'origin_conntype':
 
             var cable_type            = cable.read_cable_type      !== undefined ? cable.read_cable_type     () : cable.cable_type;
             var cable_origin_conntype = cable.origin.read_conntype !== undefined ? cable.origin.read_conntype() : cable.origin.conntype;
 
-            if( value !== undefined ) cable_origin_conntype = value;
+            if (value !== undefined ) cable_origin_conntype = value;
 
             var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
 
             html = '<select '+is_disabled_attr+' >';
-            if( cable_origin_conntype == '' ) {
+            if (cable_origin_conntype == '') {
                 html += '<option selected="selected" value=""></option>';
-                for( var t in connectors)
+                for (var t in connectors)
                     html += '<option value="'+t+'">'+t+'</option>';
             } else {
                 html += '<option value=""></option>';
                 if(dict.connector_is_not_known_reverse(cable_origin_conntype))
                     html += '<option selected="selected" value="'+cable_origin_conntype+'">'+cable_origin_conntype+'</option>';
-                for( var t in connectors )
+                for (var t in connectors )
                     html += '<option'+
                             (t == cable_origin_conntype ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
@@ -878,7 +878,7 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);            
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,'cable_type',false);
                     that.cable_property_edit(pidx,cidx,'origin_conntype',false);
                     that.cable_property_edit(pidx,cidx,'destination_conntype',false);
@@ -889,21 +889,21 @@ function p_appl_projects() {
                 }
             });
             cable.origin.read_conntype = read_select;
-			break;
+            break;
 
-		case 'origin_loc':
+        case 'origin_loc':
 
             html = '<select class="origin_name_component" '+is_disabled_attr+' >';
-            if( dict.location_is_not_known(cable.origin.loc))
+            if (dict.location_is_not_known(cable.origin.loc))
                 html += '<option  selected="selected" value="'+cable.origin.loc+'">'+cable.origin.loc+'</option>';
-            for( var loc in dict.locations())
+            for (var loc in dict.locations())
                 html += '<option'+
                         (loc == cable.origin.loc ? ' selected="selected"' : '')+
                         ' value="'+loc+'">'+loc+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                     that.cable_property_edit(pidx,cidx,'origin_rack',false);
                 } else {
@@ -911,99 +911,99 @@ function p_appl_projects() {
                 }
             });
             cable.origin.read_loc = read_select;
-			break;
+            break;
 
-		case 'origin_rack':
+        case 'origin_rack':
 
             var location = cable.origin.read_loc();
 
             html = '<select class="origin_name_component" '+is_disabled_attr+' >';
 
-            if( dict.rack_is_not_known( location, cable.origin.rack ))
+            if (dict.rack_is_not_known( location, cable.origin.rack ))
                 html += '<option selected="selected" value="'+cable.origin.rack+'">'+cable.origin.rack+'</option>';
-            if( !dict.location_is_not_known( location))
-                for( var rack in dict.racks( location))
+            if (!dict.location_is_not_known( location))
+                for (var rack in dict.racks( location))
                     html += '<option'+
                             (rack == cable.origin.rack ? ' selected="selected"' : '')+
                             ' value="'+rack+'">'+rack+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.origin.read_rack = read_select;
-			break;
+            break;
 
         case 'origin_ele':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.ele+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="origin_name_component" type="text" value="'+cable.origin.ele+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_ele = read_input;
-			break;
+            break;
 
         case 'origin_side':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.side+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="origin_name_component" type="text" value="'+cable.origin.side+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_side = read_input;
-			break;
+            break;
 
         case 'origin_slot':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.slot+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="origin_name_component" type="text" value="'+cable.origin.slot+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_slot = read_input;
-			break;
+            break;
 
         case 'origin_conn':
-			base.html('<input class="origin_name_component" type="text" value="'+cable.origin.conn+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="origin_name_component" type="text" value="'+cable.origin.conn+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_conn = read_input;
-			break;
+            break;
 
         case 'origin_station':
-			base.html('<input type="text" value="'+cable.origin.station+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.origin.station+'" size="4" '+is_disabled_attr+' />');
             cable.origin.read_station = read_input;
-			break;
+            break;
 
-		case 'origin_instr':
+        case 'origin_instr':
 
             html = '<select '+is_disabled_attr+'>';
-            if( dict.instr_is_not_known(cable.origin.instr))
+            if (dict.instr_is_not_known(cable.origin.instr))
                 html += '<option selected="selected" value="'+cable.origin.instr+'">'+cable.origin.instr+'</option>';
-            for( var instr in dict.instrs())
+            for (var instr in dict.instrs())
                 html += '<option'+
                         (instr == cable.origin.instr ? ' selected="selected"' : '')+
                         ' value="'+instr+'">'+instr+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.origin.read_instr = read_select;
-			break;
+            break;
 
-		case 'destination_name':
+        case 'destination_name':
             base.html('<input type="text" value="'+value+ '" size="20" '+is_disabled_attr+' />');
             cable.destination.read_name = read_input;
-			break;
+            break;
 
-		case 'destination_conntype':
+        case 'destination_conntype':
 
             var cable_type                 = cable.read_cable_type           !== undefined ? cable.read_cable_type          () : cable.cable_type;
             var cable_destination_conntype = cable.destination.read_conntype !== undefined ? cable.destination.read_conntype() : cable.destination.conntype;
 
-            if( value !== undefined ) cable_destination_conntype = value;
+            if (value !== undefined ) cable_destination_conntype = value;
 
             var connectors = cable_type == '' ? dict.connectors_reverse() : dict.connectors( cable_type );
 
             html = '<select '+is_disabled_attr+' >';
-            if( cable_destination_conntype == '' ) {
+            if (cable_destination_conntype == '') {
                 html += '<option selected="selected" value=""></option>';
-                for( var t in connectors)
+                for (var t in connectors)
                     html += '<option value="'+t+'">'+t+'</option>';
             } else {
                 html += '<option value=""></option>';
                 if(dict.connector_is_not_known_reverse(cable_destination_conntype))
                     html += '<option selected="selected" value="'+cable_destination_conntype+'">'+cable_destination_conntype+'</option>';
-                for( var t in connectors )
+                for (var t in connectors )
                     html += '<option'+
                             (t == cable_destination_conntype ? ' selected="selected"' : '')+
                             ' value="'+t+'">'+t+'</option>';
@@ -1011,7 +1011,7 @@ function p_appl_projects() {
             html += '</select>';
             base.html(html);            
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,'cable_type',false);
                     that.cable_property_edit(pidx,cidx,'origin_conntype',false);
                     that.cable_property_edit(pidx,cidx,'destination_conntype',false);
@@ -1022,21 +1022,21 @@ function p_appl_projects() {
                 }
             });
             cable.destination.read_conntype = read_select;
-			break;
+            break;
 
-		case 'destination_loc':
+        case 'destination_loc':
 
             html = '<select class="destination_name_component" '+is_disabled_attr+' >';
-            if( dict.location_is_not_known(cable.destination.loc))
+            if (dict.location_is_not_known(cable.destination.loc))
                 html += '<option  selected="selected" value="'+cable.destination.loc+'">'+cable.destination.loc+'</option>';
-            for( var loc in dict.locations())
+            for (var loc in dict.locations())
                 html += '<option'+
                         (loc == cable.destination.loc ? ' selected="selected"' : '')+
                         ' value="'+loc+'">'+loc+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                     that.cable_property_edit(pidx,cidx,'destination_rack',false);
                 } else {
@@ -1044,76 +1044,76 @@ function p_appl_projects() {
                 }
             });
             cable.destination.read_loc = read_select;
-			break;
+            break;
 
-		case 'destination_rack':
+        case 'destination_rack':
 
             var location = cable.destination.read_loc();
 
             html = '<select class="destination_name_component" '+is_disabled_attr+' >';
 
-            if( dict.rack_is_not_known( location, cable.destination.rack ))
+            if (dict.rack_is_not_known( location, cable.destination.rack ))
                 html += '<option selected="selected" value="'+cable.destination.rack+'">'+cable.destination.rack+'</option>';
-            if( !dict.location_is_not_known( location))
-                for( var rack in dict.racks( location))
+            if (!dict.location_is_not_known( location))
+                for (var rack in dict.racks( location))
                     html += '<option'+
                             (rack == cable.destination.rack ? ' selected="selected"' : '')+
                             ' value="'+rack+'">'+rack+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.destination.read_rack = read_select;
-			break;
+            break;
 
         case 'destination_ele':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.ele+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="destination_name_component" type="text" value="'+cable.destination.ele+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_ele = read_input;
-			break;
+            break;
 
         case 'destination_side':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.side+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="destination_name_component" type="text" value="'+cable.destination.side+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_side = read_input;
-			break;
+            break;
 
         case 'destination_slot':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.slot+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="destination_name_component" type="text" value="'+cable.destination.slot+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_slot = read_input;
-			break;
+            break;
 
         case 'destination_conn':
-			base.html('<input class="destination_name_component" type="text" value="'+cable.destination.conn+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input class="destination_name_component" type="text" value="'+cable.destination.conn+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_conn = read_input;
-			break;
+            break;
 
         case 'destination_station':
-			base.html('<input type="text" value="'+cable.destination.station+'" size="4" '+is_disabled_attr+' />');
+            base.html('<input type="text" value="'+cable.destination.station+'" size="4" '+is_disabled_attr+' />');
             cable.destination.read_station = read_input;
-			break;
+            break;
 
-		case 'destination_instr':
+        case 'destination_instr':
 
             html = '<select '+is_disabled_attr+'>';
-            if( dict.instr_is_not_known(cable.destination.instr))
+            if (dict.instr_is_not_known(cable.destination.instr))
                 html += '<option selected="selected" value="'+cable.destination.instr+'">'+cable.destination.instr+'</option>';
-            for( var instr in dict.instrs())
+            for (var instr in dict.instrs())
                 html += '<option'+
                         (instr == cable.destination.instr ? ' selected="selected"' : '')+
                         ' value="'+instr+'">'+instr+'</option>';
             html += '</select>';
             base.html(html);
             base.find('select').change(function() {
-                if( $(this).val() == '' ) {
+                if ($(this).val() == '') {
                     that.cable_property_edit(pidx,cidx,prop,false);
                 }
             });
             cable.destination.read_instr = read_select;
-			break;
-		}
-		base.find('.origin_name_component').change(function() {
+            break;
+        }
+        base.find('.origin_name_component').change(function() {
             that.cable_property_edit(pidx,cidx,'origin_name',false,
                 that.recalculate_origin_destination(
                     cable.origin.read_loc(),
@@ -1123,7 +1123,7 @@ function p_appl_projects() {
                     cable.origin.read_slot(),
                     cable.origin.read_conn()));
         });
-		base.find('.destination_name_component').change(function() {
+        base.find('.destination_name_component').change(function() {
             that.cable_property_edit(pidx,cidx,'destination_name',false,
                 that.recalculate_origin_destination(
                     cable.destination.read_loc(),
@@ -1133,7 +1133,7 @@ function p_appl_projects() {
                     cable.destination.read_slot(),
                     cable.destination.read_conn()));
         });
-	};
+    };
     
     function toggle_cable_editor(pidx,cidx,on) {
         if(on) {
@@ -1276,19 +1276,19 @@ required_field_html+' required feild';
         var is_registered = global_cable_status2rank(cable.status) >= global_cable_status2rank('Registered');
         var is_labeled    = global_cable_status2rank(cable.status) >= global_cable_status2rank('Labeled');
         this.cable_property_edit(pidx,cidx,'description',         is_labeled)
-		this.cable_property_edit(pidx,cidx,'device',              is_labeled);
-		this.cable_property_edit(pidx,cidx,'device_location',     is_labeled);
-		this.cable_property_edit(pidx,cidx,'device_region',       is_labeled);
-		this.cable_property_edit(pidx,cidx,'device_component',    is_labeled);
-		this.cable_property_edit(pidx,cidx,'device_counter',      is_labeled);
-		this.cable_property_edit(pidx,cidx,'device_suffix',       is_labeled);
-		this.cable_property_edit(pidx,cidx,'func',                is_labeled);
-		this.cable_property_edit(pidx,cidx,'cable_type',          false);
-		this.cable_property_edit(pidx,cidx,'origin_pinlist',      is_labeled);
-		this.cable_property_edit(pidx,cidx,'length',              false);
-		this.cable_property_edit(pidx,cidx,'routing',             false);
+        this.cable_property_edit(pidx,cidx,'device',              is_labeled);
+        this.cable_property_edit(pidx,cidx,'device_location',     is_labeled);
+        this.cable_property_edit(pidx,cidx,'device_region',       is_labeled);
+        this.cable_property_edit(pidx,cidx,'device_component',    is_labeled);
+        this.cable_property_edit(pidx,cidx,'device_counter',      is_labeled);
+        this.cable_property_edit(pidx,cidx,'device_suffix',       is_labeled);
+        this.cable_property_edit(pidx,cidx,'func',                is_labeled);
+        this.cable_property_edit(pidx,cidx,'cable_type',          false);
+        this.cable_property_edit(pidx,cidx,'origin_pinlist',      is_labeled);
+        this.cable_property_edit(pidx,cidx,'length',              false);
+        this.cable_property_edit(pidx,cidx,'routing',             false);
 
-		this.cable_property_edit(pidx,cidx,'origin_name',         is_labeled,
+        this.cable_property_edit(pidx,cidx,'origin_name',         is_labeled,
             that.recalculate_origin_destination(
                 cable.origin.loc,
                 cable.origin.rack,
@@ -1296,17 +1296,17 @@ required_field_html+' required feild';
                 cable.origin.side,
                 cable.origin.slot,
                 cable.origin.conn));
-		this.cable_property_edit(pidx,cidx,'origin_loc',          is_registered);
-		this.cable_property_edit(pidx,cidx,'origin_rack',         is_labeled);
-		this.cable_property_edit(pidx,cidx,'origin_ele',          is_labeled);
-		this.cable_property_edit(pidx,cidx,'origin_side',         is_labeled);
-		this.cable_property_edit(pidx,cidx,'origin_slot',         is_labeled);
-		this.cable_property_edit(pidx,cidx,'origin_conn',         is_labeled);
-		this.cable_property_edit(pidx,cidx,'origin_station',      false);
-		this.cable_property_edit(pidx,cidx,'origin_conntype',     false);
-		this.cable_property_edit(pidx,cidx,'origin_instr',        false);
+        this.cable_property_edit(pidx,cidx,'origin_loc',          is_registered);
+        this.cable_property_edit(pidx,cidx,'origin_rack',         is_labeled);
+        this.cable_property_edit(pidx,cidx,'origin_ele',          is_labeled);
+        this.cable_property_edit(pidx,cidx,'origin_side',         is_labeled);
+        this.cable_property_edit(pidx,cidx,'origin_slot',         is_labeled);
+        this.cable_property_edit(pidx,cidx,'origin_conn',         is_labeled);
+        this.cable_property_edit(pidx,cidx,'origin_station',      false);
+        this.cable_property_edit(pidx,cidx,'origin_conntype',     false);
+        this.cable_property_edit(pidx,cidx,'origin_instr',        false);
 
-		this.cable_property_edit(pidx,cidx,'destination_name',    is_labeled,
+        this.cable_property_edit(pidx,cidx,'destination_name',    is_labeled,
             that.recalculate_origin_destination(
                 cable.destination.loc,
                 cable.destination.rack,
@@ -1314,25 +1314,25 @@ required_field_html+' required feild';
                 cable.destination.side,
                 cable.destination.slot,
                 cable.destination.conn));
-		this.cable_property_edit(pidx,cidx,'destination_loc',     is_registered);
-		this.cable_property_edit(pidx,cidx,'destination_rack',    is_labeled);
-		this.cable_property_edit(pidx,cidx,'destination_ele',     is_labeled);
-		this.cable_property_edit(pidx,cidx,'destination_side',    is_labeled);
-		this.cable_property_edit(pidx,cidx,'destination_slot',    is_labeled);
-		this.cable_property_edit(pidx,cidx,'destination_conn',    is_labeled);
-		this.cable_property_edit(pidx,cidx,'destination_station', false);
-		this.cable_property_edit(pidx,cidx,'destination_conntype',false);
-		this.cable_property_edit(pidx,cidx,'destination_instr',   false);
+        this.cable_property_edit(pidx,cidx,'destination_loc',     is_registered);
+        this.cable_property_edit(pidx,cidx,'destination_rack',    is_labeled);
+        this.cable_property_edit(pidx,cidx,'destination_ele',     is_labeled);
+        this.cable_property_edit(pidx,cidx,'destination_side',    is_labeled);
+        this.cable_property_edit(pidx,cidx,'destination_slot',    is_labeled);
+        this.cable_property_edit(pidx,cidx,'destination_conn',    is_labeled);
+        this.cable_property_edit(pidx,cidx,'destination_station', false);
+        this.cable_property_edit(pidx,cidx,'destination_conntype',false);
+        this.cable_property_edit(pidx,cidx,'destination_instr',   false);
 
         toggle_cable_editor(pidx,cidx,true);
     };
-	this.edit_cable_save = function(pidx, cidx, comments) {
+    this.edit_cable_save = function(pidx, cidx, comments) {
 
         var cable = this.project[pidx].cable[cidx];
 
         // Save modifications to the database backend first before making any
         // updates to the transient store or making changes to the UI.
-		//
+        //
         var params = {
             cable_id             : cable.id,
             comments             : comments === undefined ? '' : comments,
@@ -1377,7 +1377,7 @@ required_field_html+' required feild';
             url: '../neocaptar/ws/cable_save.php',
             data: params,
             success: function(data) {
-                if( data.status != 'success' ) {
+                if (data.status != 'success') {
                     report_error(data.message);
                     // TODO: Re-enable editing dialog buttons to allow
                     //       another attempt.
@@ -1399,13 +1399,13 @@ required_field_html+' required feild';
                 return;
             },
             dataType: 'json'
-        });		
-	};
+        });        
+    };
     this.edit_cable_cancel = function(pidx,cidx) {
         toggle_cable_editor(pidx,cidx,false);
         this.view_cable(pidx,cidx);
     };
-	this.view_cable = function(pidx,cidx) {
+    this.view_cable = function(pidx,cidx) {
 
         var cable = this.project[pidx].cable[cidx];
         cable.editing = false;
@@ -1413,7 +1413,7 @@ required_field_html+' required feild';
         $('#proj-cable-action-'+pidx+'-'+cidx+'-reverse').html(this.cable_action2html(pidx,cidx,true ));
         $('#proj-cable-action-'+pidx+'-'+cidx           ).html(this.cable_action2html(pidx,cidx,false));
         $('.proj-cable-tool').button();
-		this.update_cable_tools(pidx,cidx);
+        this.update_cable_tools(pidx,cidx);
 
         var base_1           =   '#proj-cable-'+pidx+'-'+cidx+'-1 td div.';
         var base_description = $('#proj-cable-'+pidx+'-'+cidx+'-1').find('pre.description');
@@ -1455,50 +1455,50 @@ required_field_html+' required feild';
 
         $(base_1+'modified'            ).html('&nbsp;'+cable.modified.time);
         $(base_1+'modified_uid'        ).html('&nbsp;'+cable.modified.uid);
-	};
-	this.show_cable_label = function(pidx,cidx) {
+    };
+    this.show_cable_label = function(pidx,cidx) {
         if(cidx) {
-    		var cable = this.project[pidx].cable[cidx];
-        	window.open('../neocaptar/ws/cable_label.php?cable_id='+cable.id,'cable label');
+            var cable = this.project[pidx].cable[cidx];
+            window.open('../neocaptar/ws/cable_label.php?cable_id='+cable.id,'cable label');
         } else {
-    		var proj = this.project[pidx];
-        	window.open('../neocaptar/ws/cable_label.php?project_id='+proj.id,'cable labels for the project');
+            var proj = this.project[pidx];
+            window.open('../neocaptar/ws/cable_label.php?project_id='+proj.id,'cable labels for the project');
         }
-	};
+    };
     this.change_cable_status = function(pidx, cidx, new_status, comments) {
-		var params = {
+        var params = {
             cable_id: this.project[pidx].cable[cidx].id,
             status:   new_status,
             comments: comments
         };
-		var jqXHR = $.post(
-			'../neocaptar/ws/cable_save.php', params,
-			function(data) {
-				if( data.status != 'success' ) {
-					report_error(data.message);
-					return;
-				}
-				that.project[pidx].cable[cidx] = data.cable;
+        var jqXHR = $.post(
+            '../neocaptar/ws/cable_save.php', params,
+            function(data) {
+                if (data.status != 'success') {
+                    report_error(data.message);
+                    return;
+                }
+                that.project[pidx].cable[cidx] = data.cable;
 
                 that.view_cable        (pidx,cidx);
-				that.update_project_hdr(pidx);
+                that.update_project_hdr(pidx);
 
                 admin.update();
-			},
-			'JSON'
-		).error(
-			function () {
-				report_error('failed because of: '+jqXHR.statusText);
-			}
-		).complete(
-			function () {
-			}
-		);
+            },
+            'JSON'
+        ).error(
+            function () {
+                report_error('failed because of: '+jqXHR.statusText);
+            }
+        ).complete(
+            function () {
+            }
+        );
     };
-	this.register_cable = function(pidx,cidx) {
+    this.register_cable = function(pidx,cidx) {
         this.change_cable_status(pidx, cidx, 'Registered', '');
     };
-	this.label_cable = function(pidx,cidx) {
+    this.label_cable = function(pidx,cidx) {
         ask_yes_no (
             'Confirm Cable Label Lock',
             "You're about to <b>LOCK</b> the cable label of revision <b>"+this.project[pidx].cable[cidx].revision+"</b>. "+
@@ -1511,7 +1511,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.fabricate_cable = function(pidx,cidx) {
+    this.fabricate_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Fabrication Request',
             "You're about to request cable <b>FABRICATION</b>.<br><br>"+
@@ -1523,7 +1523,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.ready_cable = function(pidx,cidx) {
+    this.ready_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Fabrication Completion',
             "By hitting 'Ok' you will confirm that cable <b>FABRICATION</b> has finished and it's <b>READY</b> to be installed, terminated (if needed) and commissioned.<br><br>"+
@@ -1535,7 +1535,7 @@ required_field_html+' required feild';
             }
         );
    };
-	this.install_cable = function(pidx,cidx) {
+    this.install_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Installation',
             "By hitting 'Ok' you will confirm that cable has been <b>INSTALLED</b> and cable is ready to be <b>TERMINATED</b> and commissioned.<br><br>"+
@@ -1547,7 +1547,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.commission_cable = function(pidx,cidx) {
+    this.commission_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Commissioning',
             "By hitting 'Ok' you will confirm that cable has been <b>COMMISSIONED</b> (tested and deployed for use).<br><br>"+
@@ -1559,7 +1559,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.damage_cable = function(pidx,cidx) {
+    this.damage_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Damage',
             "By hitting 'Ok' you will confirm that cable has been <b>DAMAGED</b> and that it needs to be fixed or replaced.<br><br>"+
@@ -1571,7 +1571,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.retire_cable = function(pidx,cidx) {
+    this.retire_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Retirement',
             "By hitting 'Ok' you will confirm that cable has been <b>RETIRED</b> and that is no longer in use.<br><br>"+
@@ -1597,7 +1597,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_label_cable = function(pidx,cidx) {
+    this.un_label_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Label Un-Lock',
             "You're about to <b>UN-LOCK</b> the cable label of revision <b>"+this.project[pidx].cable[cidx].revision+"</b>.<br><br>"+
@@ -1609,7 +1609,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_fabricate_cable  = function(pidx,cidx) {
+    this.un_fabricate_cable  = function(pidx,cidx) {
         ask_for_input (
             'Revoke Cable Fabrication Request',
             "You're about to revoke previously made cable <b>FABRICATION</b> request.<br><br>"+
@@ -1621,7 +1621,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_ready_cable = function(pidx,cidx) {
+    this.un_ready_cable = function(pidx,cidx) {
         ask_for_input (
             'Putting Cable back for Fabrication',
             "You're about to confirm that the cable is <b>NOT READY</b> and its further <b>FABRICATION</b> is needed.<br><br>"+
@@ -1633,7 +1633,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_install_cable = function(pidx,cidx) {
+    this.un_install_cable = function(pidx,cidx) {
         ask_for_input (
             'Un-Install the Cable',
             "You're about to confirm that the cable has been removed from where it was previously <b>INSTALLED</b>. The cable will be placed into the <b>READY</b> state.<br><br>"+
@@ -1645,7 +1645,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_commission_cable = function(pidx,cidx) {
+    this.un_commission_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable De-Commissioning',
             "You're about to confirm that the cable has been temporarily <b>DE-COMMISSIONED</b>. The cable will be put back into the <b>INSTALLED</b> state.<br><br>"+
@@ -1657,7 +1657,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_damage_cable = function(pidx,cidx) {
+    this.un_damage_cable = function(pidx,cidx) {
         ask_for_input (
             'Confirm Cable Repair',
             "You're about to confirm that the cable has been repaired and it's now <b>COMMISSIONED</b> again.<br><br>"+
@@ -1669,7 +1669,7 @@ required_field_html+' required feild';
             }
         );
     };
-	this.un_retire_cable = function(pidx,cidx) {
+    this.un_retire_cable = function(pidx,cidx) {
         ask_for_input (
             'Revoke Cable from the list of Retired ones',
             "You're about to confirm that the cable isn't actually <b>RETIRED</b> and it should be put back to the <b>DAMAGED</b> state for further repair and probably putting it back to service.<br><br>"+
@@ -1699,24 +1699,24 @@ required_field_html+' required feild';
         this.project[pidx].cable.sort(sorter);
     };
     this.select_cables_by_status = function(pidx) {
-		var proj = this.project[pidx];
-		var status = $('#proj-cables-hdr-'+pidx+' td select').val();
-		if( '- status -' == status ) {
-			for( var cidx in proj.cable ) {
-				$('#proj-cable-'+pidx+'-'+cidx+'-1').css('display','');
-				$('#proj-cable-'+pidx+'-'+cidx+'-2').css('display','');
-			}
-		} else {
-			for( var cidx in proj.cable ) {
-				var style = proj.cable[cidx].status == status ? '' : 'none';
-				$('#proj-cable-'+pidx+'-'+cidx+'-1').css('display',style);
-				$('#proj-cable-'+pidx+'-'+cidx+'-2').css('display',style);
-			}
-		}
-	};
-	this.project2html = function(pidx) {
-		var p = this.project[pidx];
-		var html =
+        var proj = this.project[pidx];
+        var status = $('#proj-cables-hdr-'+pidx+' td select').val();
+        if ('- status -' == status) {
+            for (var cidx in proj.cable) {
+                $('#proj-cable-'+pidx+'-'+cidx+'-1').css('display','');
+                $('#proj-cable-'+pidx+'-'+cidx+'-2').css('display','');
+            }
+        } else {
+            for (var cidx in proj.cable) {
+                var style = proj.cable[cidx].status == status ? '' : 'none';
+                $('#proj-cable-'+pidx+'-'+cidx+'-1').css('display',style);
+                $('#proj-cable-'+pidx+'-'+cidx+'-2').css('display',style);
+            }
+        }
+    };
+    this.project2html = function(pidx) {
+        var p = this.project[pidx];
+        var html =
 '<div class="proj-hdr" id="proj-hdr-'+pidx+'" onclick="projects.toggle_project('+pidx+');">'+
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e" id="proj-tgl-'+pidx+'"></span></div>'+
 '  <div class="proj-created"                       >'+p.created            +'</div>'+
@@ -1766,7 +1766,7 @@ required_field_html+' required feild';
 '                  <td><b>Owner: </b></td>'+
 '                  <td><select name="owner" style="padding:1px;" '+(global_current_user.is_administrator?'':' disabled="disabled"')+'>';
             var users = global_get_projmanagers();
-            for( var i in users ) {
+            for (var i in users) {
                 var user = users[i];
                 html +=
 '                        <option '+(p.owner==user?'selected="selected"':'')+'>'+user+'</option>';
@@ -1874,14 +1874,14 @@ required_field_html+' required feild';
 '  <div class="table"></div>'+
 '  <div id="proj-cables-load-'+pidx+'" style="margin-top:5px; color:maroon;"></div>'+
 '</div>';
-		return html;
-	};
-	this.display = function() {
-		var total = 0;
-		var html = '';
-		for( var pidx in this.project ) {
-			var proj = this.project[pidx];
-			proj.is_loaded = false;
+        return html;
+    };
+    this.display = function() {
+        var total = 0;
+        var html = '';
+        for (var pidx in this.project) {
+            var proj = this.project[pidx];
+            proj.is_loaded = false;
             proj.cols2display = {
                 project:     false,
                 tools:       true,
@@ -1895,16 +1895,16 @@ required_field_html+' required feild';
                 description: true,
                 modified:    true
             };
-			html += this.project2html(pidx);
+            html += this.project2html(pidx);
             total++;
-		}
-		var info_html = '<b>'+total+'</b> project'+(total==1?'':'s');
-		$('#projects-search-info').html(info_html);
-		$('#projects-search-list').html(html);
+        }
+        var info_html = '<b>'+total+'</b> project'+(total==1?'':'s');
+        $('#projects-search-info').html(info_html);
+        $('#projects-search-list').html(html);
 
         // Initializations on the rendered HTML.
         //
-		for( pidx in this.project ) {
+        for (pidx in this.project) {
 
             var proj = this.project[pidx];
 
@@ -1921,7 +1921,7 @@ required_field_html+' required feild';
             this.register_display_handlers(pidx);
             this.init_shared_managers(pidx);
         }
-	};
+    };
     this.register_display_handlers = function(pidx) {
         $('#proj-displ-'+pidx).find('input:checkbox').
             change( function() {
@@ -1957,11 +1957,11 @@ required_field_html+' required feild';
             });
     };
     this.display_shared_managers = function(pidx) {
-		var p = this.project[pidx];
+        var p = this.project[pidx];
         var hdr = [];
         var rows = [];
         var default_sort_column = 0;
-        if( this.can_manage_project_security(pidx)) {
+        if (this.can_manage_project_security(pidx)) {
             var elem = $('#proj-shared-table-'+pidx);
             hdr = [{
                 name: 'DELETE', sorted: false,
@@ -1975,7 +1975,7 @@ required_field_html+' required feild';
                             }); }}}, {
                 name: 'Project co-managers'
             }];
-            for( var i in p.comanager ) {
+            for (var i in p.comanager) {
                 var uid = p.comanager[i];
                 rows.push([
                     Button_HTML('x', {
@@ -1991,7 +1991,7 @@ required_field_html+' required feild';
             hdr = [{
                 name: 'Project co-managers'
             }];
-            for( var i in p.comanager ) {
+            for (var i in p.comanager) {
                 var uid = p.comanager[i];
                 rows.push([uid]);
             }
@@ -2011,7 +2011,7 @@ required_field_html+' required feild';
             uid:    uid
         };
         var jqXHR = $.get('../neocaptar/ws/project_security.php', params, function(data) {
-            if( data.status != 'success' ) {
+            if (data.status != 'success') {
                 report_error( data.message );
                 return;
             }
@@ -2022,12 +2022,12 @@ required_field_html+' required feild';
         .complete(function() { });
     };
     this.init_shared_managers = function(pidx) {
-		var p = this.project[pidx];
+        var p = this.project[pidx];
         var html_managers = '<option></option>';
         var projmanagers = admin.projmanagers(true);
-        for( var i in projmanagers ) {
+        for (var i in projmanagers) {
             var uid = projmanagers[i];
-            if( uid != p.owner )
+            if (uid != p.owner )
                 html_managers += '<option>'+uid+'</option>';
         }
         $('#proj-shared-add-'+pidx).html(html_managers);
@@ -2042,18 +2042,18 @@ required_field_html+' required feild';
         global_export_cables(params,outformat);
     };
     this.search_project_by_id = function(id) {
-		$('#projects-search-info').html('Searching...');
-		var params = {id:id};
-		var jqXHR = $.get(
-			'../neocaptar/ws/project_search.php', params,
-			function(data) {
-				if( data.status != 'success' ) {
-					report_error( data.message );
-					return;
-				}
-				that.project = data.project;
+        $('#projects-search-info').html('Searching...');
+        var params = {id:id};
+        var jqXHR = $.get(
+            '../neocaptar/ws/project_search.php', params,
+            function(data) {
+                if (data.status != 'success') {
+                    report_error( data.message );
+                    return;
+                }
+                that.project = data.project;
                 that.display();
-                for( var pidx in that.project )
+                for (var pidx in that.project )
                     that.toggle_project(pidx);
 
                 // Simulate using the form to search for projects based on its
@@ -2062,48 +2062,48 @@ required_field_html+' required feild';
                 var search_controls = $('#projects-search-controls');
                 search_controls.find('input[name="title"]').val(data.project[0].title);
                 search_controls.find('select[name="owner"]').val(data.project[0].owner);
-			},
-			'JSON'
-		).error(
-			function () {
-				report_error('failed because of: '+jqXHR.statusText);
-			}
-		).complete(
-			function () {
-			}
-		);
-	};
+            },
+            'JSON'
+        ).error(
+            function () {
+                report_error('failed because of: '+jqXHR.statusText);
+            }
+        ).complete(
+            function () {
+            }
+        );
+    };
     this.search_projects_by_owner = function(uid) {
         this.init();
         this.search_reset();
         var search_controls = $('#projects-search-controls');
         search_controls.find('select[name="owner"]').val(uid);
-		var params = {owner:uid};
-		this.search_impl(params);
+        var params = {owner:uid};
+        this.search_impl(params);
     };
     this.search_projects_by_coowner = function(uid) {
         this.init();
         this.search_reset();
-		var params = {coowner:uid};
-		this.search_impl(params);
+        var params = {coowner:uid};
+        this.search_impl(params);
     };
     this.search_projects_by_jobnumber = function(jobnumber) {
         this.init();
         this.search_reset();
         var search_controls = $('#projects-search-controls');
         search_controls.find('select[name="job"]').val(jobnumber);
-		var params = {job:jobnumber};
-		this.search_impl(params);
+        var params = {job:jobnumber};
+        this.search_impl(params);
     };
     this.search_projects_by_jobnumber_prefix = function(prefix) {
         this.init();
         this.search_reset();
         var search_controls = $('#projects-search-controls');
         search_controls.find('select[name="prefix"]').val(prefix);
-		var params = {prefix:prefix};
-		this.search_impl(params);
+        var params = {prefix:prefix};
+        this.search_impl(params);
     };
-	this.search_reset = function() {
+    this.search_reset = function() {
         var search_controls = $('#projects-search-controls');
         search_controls.find('input[name="title"]').val('');
         search_controls.find('select[name="owner"]').val('');
@@ -2112,37 +2112,37 @@ required_field_html+' required feild';
         this.project = [];
         this.display();
     }
-	this.search = function() {
+    this.search = function() {
         var search_controls = $('#projects-search-controls');
         var title = search_controls.find('input[name="title"]').val();
         var owner = search_controls.find('select[name="owner"]').val();
         var begin = search_controls.find('input[name="begin"]').val();
         var end = search_controls.find('input[name="end"]').val();
-		var params = {title:title,owner:owner,begin:begin,end:end};
-		this.search_impl(params);
-	};
-	this.search_impl = function(params) {
+        var params = {title:title,owner:owner,begin:begin,end:end};
+        this.search_impl(params);
+    };
+    this.search_impl = function(params) {
         $('#projects-search-info').html('Searching...');
-		var jqXHR = $.get(
-			'../neocaptar/ws/project_search.php', params,
-			function(data) {
-				if( data.status != 'success' ) {
-					report_error( data.message );
-					return;
-				}
-				that.project = data.project;
-				that.display();
-			},
-			'JSON'
-		).error(
-			function () {
-				report_error('failed because of: '+jqXHR.statusText);
-			}
-		).complete(
-			function () {
-			}
-		);
-	};
-	return this;
+        var jqXHR = $.get(
+            '../neocaptar/ws/project_search.php', params,
+            function(data) {
+                if (data.status != 'success') {
+                    report_error( data.message );
+                    return;
+                }
+                that.project = data.project;
+                that.display();
+            },
+            'JSON'
+        ).error(
+            function () {
+                report_error('failed because of: '+jqXHR.statusText);
+            }
+        ).complete(
+            function () {
+            }
+        );
+    };
+    return this;
 }
 var projects = new p_appl_projects();

@@ -9,13 +9,13 @@ require_once( 'neocaptar.inc.php' );
  */
 class NeoCaptarConnection {
 
-	/* Error codes from MySQL documentation. See full list at:
-	 *
-	 *   http://dev.mysql.com/doc/refman/5.0/en/error-messages-server.html
+    /* Error codes from MySQL documentation. See full list at:
+     *
+     *   http://dev.mysql.com/doc/refman/5.0/en/error-messages-server.html
      */
-	public static $ER_DUP_ENTRY = 1062;  // Message: Duplicate entry '%s' for key %d
+    public static $ER_DUP_ENTRY = 1062;  // Message: Duplicate entry '%s' for key %d
 
-	/* Parameters of the object
+    /* Parameters of the object
      */
     private $host;
     private $user;
@@ -50,9 +50,9 @@ class NeoCaptarConnection {
      */
     public function __destruct () {
 
-    	// Do not close this connection from here because it might be shared
-    	// with other instances of the class (also from other APIs).
-    	//
+        // Do not close this connection from here because it might be shared
+        // with other instances of the class (also from other APIs).
+        //
         //if( isset( $this->link )) mysql_close( $this->link );
     }
 
@@ -131,7 +131,7 @@ class NeoCaptarConnection {
              * NOTE: using the 'persistent' connection. This connection won't be
              * closed by 'mysql_close()'.
              */
-        	$new_link = false; // true;
+            $new_link = false; // true;
             $this->link = mysql_pconnect( $this->host, $this->user, $this->password, $new_link );
             if( !$this->link )
                 throw new NeoCaptarException (
