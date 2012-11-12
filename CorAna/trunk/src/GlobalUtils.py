@@ -34,6 +34,8 @@ import os
 #import time
 from time import localtime, gmtime, strftime, clock, time, sleep
 
+import numpy as np
+
 #import commands # use 'subprocess' instead of 'commands'
 import subprocess # for subprocess.Popen
 
@@ -286,7 +288,17 @@ def get_current_local_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
 
 def get_current_gm_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
     return strftime(fmt, gmtime())
-    
+
+
+#----------------------------------
+#----------------------------------
+#----------------------------------
+
+def get_array_from_file(fname) :
+    print 'get_array_from_file:', fname
+    return np.loadtxt(fname, dtype=np.float32)
+
+#    
 #----------------------------------
 #
 #  In case someone decides to run this module

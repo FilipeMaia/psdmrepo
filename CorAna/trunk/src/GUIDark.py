@@ -32,6 +32,8 @@ from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
 from BatchJobPedestals      import bjpeds
+from ImgSpeWithGUI          import *
+#import GlobalGraphics       as gg
 
 #---------------------
 #  Class definition --
@@ -52,6 +54,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit = QtGui.QPushButton('Submit')
         self.but_status = QtGui.QPushButton('Status')
         self.but_wfiles = QtGui.QPushButton('Work files')
+        self.but_plot   = QtGui.QPushButton('Plot')
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
@@ -61,11 +64,13 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_submit, self.grid_row+1, 1)
         self.grid.addWidget(self.but_status, self.grid_row+1, 2)
         self.grid.addWidget(self.but_wfiles, self.grid_row+1, 3)
+        self.grid.addWidget(self.but_plot,   self.grid_row+1, 4)
         self.grid_row += 3
 
         self.connect(self.but_submit, QtCore.SIGNAL('clicked()'),     self.on_but_submit  )
         self.connect(self.but_status, QtCore.SIGNAL('clicked()'),     self.on_but_status  )
         self.connect(self.but_wfiles, QtCore.SIGNAL('clicked()'),     self.on_but_wfiles  )
+        self.connect(self.but_plot,   QtCore.SIGNAL('clicked()'),     self.on_but_plot    )
         #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         #self.connect(box, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
 
@@ -84,6 +89,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit.setToolTip('Click on this button\nto submit job in batch.')
         self.but_status.setToolTip('Click on this button\nto check the batch job status.\nBatch job status will be\nprinted in the GUI Logger.')
         self.but_wfiles.setToolTip('Click on this button\nto check the files availability.')
+        self.but_plot  .setToolTip('Click on this button\nto plot pedestals.')
         
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -101,12 +107,16 @@ class GUIDark ( QtGui.QWidget ) :
         self.tit_path   .setStyleSheet (cp.styleLabel)
         self.edi_path   .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
         self.edi_path   .setAlignment  (QtCore.Qt.AlignRight)
+
         self.but_submit .setStyleSheet (cp.styleButton) 
         self.but_status .setStyleSheet (cp.styleButton) 
         self.but_wfiles .setStyleSheet (cp.styleButton) 
+        self.but_plot   .setStyleSheet (cp.styleButton) 
+
         self.but_submit .setFixedWidth(width)
         self.but_status .setFixedWidth(width)
         self.but_wfiles .setFixedWidth(width)
+        self.but_plot   .setFixedWidth(width)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -140,6 +150,28 @@ class GUIDark ( QtGui.QWidget ) :
         logger.info('on_but_wfiles', __name__)
         #bjpeds.print_work_files_for_pedestals()
         bjpeds.check_work_files_for_pedestals()
+
+    def on_but_plot(self):
+        logger.info('on_but_plot', __name__)
+        try :
+            cp.imgspewithgui.close()
+            del cp.imgspewithgui
+            #but.setStyleSheet(cp.styleButtonBad)
+        except :
+            arr = bjpeds.get_pedestals_from_file()
+            print arr.shape
+            print arr
+
+            #gg.plotImageAndSpectrum(arr,range=(100,300))
+            #gg.show()
+
+            cp.imgspewithgui = ImgSpeWithGUI(None, arr)
+            #cp.imgspewithgui.setParent(self)
+            #cp.imgspewithgui.set_image_array( arr )
+            cp.imgspewithgui.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
+            cp.imgspewithgui.show()
+            #but.setStyleSheet(cp.styleButtonGood)
+
 
 #-----------------------------
 

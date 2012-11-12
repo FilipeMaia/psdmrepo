@@ -12,7 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
-
+2012-11-11 Mikhail S. Dubrovin
+- add/change modules:
+A         src/ImgSpeButtons.py
+A         src/ImgSpeNavToolBar.py
+A         src/ImgSpeWidget.py
+A         src/ImgSpeWithGUI.py
+	
 2012-11-08 Mikhail S. Dubrovin
 - add/change modules:
 A       src/GUIDark.py

@@ -80,7 +80,7 @@ class GUIFiles ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_show )
 
-        self.list_file_types = ['Dark run', 'Flat field', 'Data', 'Conf.pars']
+        self.list_file_types = ['Dark-run', 'Flat-field', 'Data', 'Conf.pars']
         self.makeTabBar()
         self.guiSelector()
 
