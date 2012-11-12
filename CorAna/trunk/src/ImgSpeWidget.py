@@ -297,16 +297,23 @@ class ImgSpeWidget (QtGui.QWidget) :
                 fig.myYmax = int(max(self.ypress, self.yrelease))
 
                 #print ' Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
-                self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
+                #self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
+                self.processDraw()
 
-        if event.button == 2 : #or event.button == 3 : # middle or right button
-            fig.myXmin = None
-            fig.myXmax = None
-            fig.myYmin = None
-            fig.myYmax = None
-            fig.myZmin = None
-            fig.myZmax = None
-            self.on_draw()
+        elif event.button == 2 : # middle or right button
+            if event.inaxes == fig.myaxesI : 
+                fig.myXmin = None
+                fig.myXmax = None
+                fig.myYmin = None
+                fig.myYmax = None
+                self.processDraw()
+                #self.on_draw()
+
+            elif event.inaxes == fig.myaxesH or event.inaxes == self.fig.mycolbar.ax :
+                fig.myZmin = None
+                fig.myZmax = None
+                self.processDraw()
+                #self.on_draw()
 
             #plt.draw() # redraw the current figure
         fig.myZoomIsOn = False
