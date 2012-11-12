@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-64
+2012-11-11 Andy Salnikov
+- inOpal1kConfigV1 - do not store LUT if data is not there
+
 Tag: V00-00-63
 2012-11-08 Andy Salnikov
 - upgrading to pdsdata V04-05-00
