@@ -81,26 +81,6 @@ class MyNavigationToolbar ( NavigationToolbar ) :
         if fig.myZoomIsOn : fig.myZoomIsOn = False
         else              : fig.myZoomIsOn = True
 
-        #self.canvas.draw()
-        #axes = fig.gca() 
-        #bounds = axes.viewLim.bounds
-        #fig.myXmin = bounds[0]
-        #fig.myXmax = bounds[0] + bounds[2] 
-        #fig.myYmin = bounds[1] + bounds[3]
-        #fig.myYmax = bounds[1]
-        #print 'zoom: Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
-
-    #def ??? subplot(self, *args) :
-    #    print 'Subplot is clicked'
-    #    NavigationToolbar.subplot(self)
-
-    #def back(self, *args) :
-    #    print 'Back is clicked'
-    #    NavigationToolbar.back(self)
-
-    #def forward(self, *args):
-    #    print 'Forward is clicked'
-    #    NavigationToolbar.forward(self)
 
     def pan(self,*args):
         print 'Pan is clicked'
@@ -168,29 +148,29 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         self.cbox_log  = QtGui.QCheckBox("&Log")
         self.cbox_log.setChecked(False)
 
-        self.cboxXIsOn = QtGui.QCheckBox("X min, max:")
-        self.cboxYIsOn = QtGui.QCheckBox("Y min, max:")
-        self.cboxZIsOn = QtGui.QCheckBox("Z min, max:")
+        #self.cboxXIsOn = QtGui.QCheckBox("X min, max:")
+        #self.cboxYIsOn = QtGui.QCheckBox("Y min, max:")
+        self.cboxZIsOn = QtGui.QCheckBox("A min, max:")
 
-        self.editXmin  = QtGui.QLineEdit(self.stringOrNone(self.fig.myXmin))
-        self.editXmax  = QtGui.QLineEdit(self.stringOrNone(self.fig.myXmax))
-        self.editYmin  = QtGui.QLineEdit(self.stringOrNone(self.fig.myYmin))
-        self.editYmax  = QtGui.QLineEdit(self.stringOrNone(self.fig.myYmax))
+        #self.editXmin  = QtGui.QLineEdit(self.stringOrNone(self.fig.myXmin))
+        #self.editXmax  = QtGui.QLineEdit(self.stringOrNone(self.fig.myXmax))
+        #self.editYmin  = QtGui.QLineEdit(self.stringOrNone(self.fig.myYmin))
+        #self.editYmax  = QtGui.QLineEdit(self.stringOrNone(self.fig.myYmax))
         self.editZmin  = QtGui.QLineEdit(self.stringOrNone(self.fig.myZmin))
         self.editZmax  = QtGui.QLineEdit(self.stringOrNone(self.fig.myZmax))
 
         width = 60
-        self.editXmin.setMaximumWidth(width)
-        self.editXmax.setMaximumWidth(width)
-        self.editYmin.setMaximumWidth(width)
-        self.editYmax.setMaximumWidth(width)
+        #self.editXmin.setMaximumWidth(width)
+        #self.editXmax.setMaximumWidth(width)
+        #self.editYmin.setMaximumWidth(width)
+        #self.editYmax.setMaximumWidth(width)
         self.editZmin.setMaximumWidth(width)
         self.editZmax.setMaximumWidth(width)
 
-        self.editXmin.setValidator(QtGui.QIntValidator(0,100000,self))
-        self.editXmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
-        self.editYmin.setValidator(QtGui.QIntValidator(0,100000,self))
-        self.editYmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
+        #self.editXmin.setValidator(QtGui.QIntValidator(0,100000,self))
+        #self.editXmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
+        #self.editYmin.setValidator(QtGui.QIntValidator(0,100000,self))
+        #self.editYmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
         self.editZmin.setValidator(QtGui.QIntValidator(-100000,100000,self))
         self.editZmax.setValidator(QtGui.QIntValidator(-100000,100000,self))
  
@@ -199,14 +179,14 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'), self.processDraw)
         self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'), self.processDraw)
 
-        self.connect(self.cboxXIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
-        self.connect(self.cboxYIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
+        #self.connect(self.cboxXIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
+        #self.connect(self.cboxYIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
         self.connect(self.cboxZIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
 
-        self.connect(self.editXmin, QtCore.SIGNAL('editingFinished ()'), self.processEditXmin)
-        self.connect(self.editXmax, QtCore.SIGNAL('editingFinished ()'), self.processEditXmax)
-        self.connect(self.editYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditYmin)
-        self.connect(self.editYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditYmax)
+        #self.connect(self.editXmin, QtCore.SIGNAL('editingFinished ()'), self.processEditXmin)
+        #self.connect(self.editXmax, QtCore.SIGNAL('editingFinished ()'), self.processEditXmax)
+        #self.connect(self.editYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditYmin)
+        #self.connect(self.editYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditYmax)
         self.connect(self.editZmin, QtCore.SIGNAL('editingFinished ()'), self.processEditZmin)
         self.connect(self.editZmax, QtCore.SIGNAL('editingFinished ()'), self.processEditZmax)
 
@@ -219,17 +199,17 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         hbox.addWidget(self.but_quit)
         #hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
 
-        hboxX = QtGui.QHBoxLayout()
-        hboxX.addWidget(self.cboxXIsOn)
-        hboxX.addWidget(self.editXmin)
-        hboxX.addWidget(self.editXmax)
-        hboxX.addStretch(1)
+        #hboxX = QtGui.QHBoxLayout()
+        #hboxX.addWidget(self.cboxXIsOn)
+        #hboxX.addWidget(self.editXmin)
+        #hboxX.addWidget(self.editXmax)
+        #hboxX.addStretch(1)
 
-        hboxY = QtGui.QHBoxLayout()
-        hboxY.addWidget(self.cboxYIsOn)
-        hboxY.addWidget(self.editYmin)
-        hboxY.addWidget(self.editYmax)
-        hboxY.addStretch(1)
+        #hboxY = QtGui.QHBoxLayout()
+        #hboxY.addWidget(self.cboxYIsOn)
+        #hboxY.addWidget(self.editYmin)
+        #hboxY.addWidget(self.editYmax)
+        #hboxY.addStretch(1)
 
         hboxZ = QtGui.QHBoxLayout()
         hboxZ.addWidget(self.cboxZIsOn)
@@ -242,8 +222,8 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         vbox.addWidget(self.canvas)        # <=== Add figure 
         vbox.addWidget(self.mpl_toolbar)   # <=== Add toolbar
         
-        vbox.addLayout(hboxX)              # <=== Add buttons etc.
-        vbox.addLayout(hboxY)
+        #vbox.addLayout(hboxX)              # <=== Add buttons etc.
+        #vbox.addLayout(hboxY)
         vbox.addLayout(hboxZ)
         vbox.addLayout(hbox)
 
@@ -328,11 +308,11 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
 
 
     def setEditFieldValues(self) :
-        self.editXmin.setText( str(self.intOrNone(self.fig.myXmin)) )
-        self.editXmax.setText( str(self.intOrNone(self.fig.myXmax)) )
+        #self.editXmin.setText( str(self.intOrNone(self.fig.myXmin)) )
+        #self.editXmax.setText( str(self.intOrNone(self.fig.myXmax)) )
 
-        self.editYmin.setText( str(self.intOrNone(self.fig.myYmin)) )
-        self.editYmax.setText( str(self.intOrNone(self.fig.myYmax)) ) 
+        #self.editYmin.setText( str(self.intOrNone(self.fig.myYmin)) )
+        #self.editYmax.setText( str(self.intOrNone(self.fig.myYmax)) ) 
 
         self.editZmin.setText( str(self.intOrNone(self.fig.myZmin)) )
         self.editZmax.setText( str(self.intOrNone(self.fig.myZmax)) )
@@ -342,26 +322,26 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
        
     def setEditFieldColors(self) :
         
-        if self.cboxXIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
-        else                         : self.styleSheet = self.styleSheetGrey
-        self.editXmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        self.editXmax.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #if self.cboxXIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
+        #else                         : self.styleSheet = self.styleSheetGrey
+        #self.editXmin.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #self.editXmax.setStyleSheet('Text-align:left;' + self.styleSheet)
 
-        if self.cboxYIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
-        else                         : self.styleSheet = self.styleSheetGrey
-        self.editYmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        self.editYmax.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #if self.cboxYIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
+        #else                         : self.styleSheet = self.styleSheetGrey
+        #self.editYmin.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #self.editYmax.setStyleSheet('Text-align:left;' + self.styleSheet)
 
         if self.cboxZIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
         else                         : self.styleSheet = self.styleSheetGrey
         self.editZmin.setStyleSheet('Text-align:left;' + self.styleSheet)
         self.editZmax.setStyleSheet('Text-align:left;' + self.styleSheet)
 
-        self.editXmin.setReadOnly( not self.cboxXIsOn.isChecked() )
-        self.editXmax.setReadOnly( not self.cboxXIsOn.isChecked() )
+        #self.editXmin.setReadOnly( not self.cboxXIsOn.isChecked() )
+        #self.editXmax.setReadOnly( not self.cboxXIsOn.isChecked() )
 
-        self.editYmin.setReadOnly( not self.cboxYIsOn.isChecked() )
-        self.editYmax.setReadOnly( not self.cboxYIsOn.isChecked() )
+        #self.editYmin.setReadOnly( not self.cboxYIsOn.isChecked() )
+        #self.editYmax.setReadOnly( not self.cboxYIsOn.isChecked() )
 
         self.editZmin.setReadOnly( not self.cboxZIsOn.isChecked() )
         self.editZmax.setReadOnly( not self.cboxZIsOn.isChecked() )
@@ -445,15 +425,6 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         axes        = event.inaxes # fig.gca() 
                 
         if event.inaxes == fig.myaxesI and event.button == 1 : # Left button
-            #bounds = axes.viewLim.bounds
-            #fig.myXmin = bounds[0] 
-            #fig.myXmax = bounds[0] + bounds[2]  
-            #fig.myYmin = bounds[1] + bounds[3] 
-            #fig.myYmax = bounds[1] 
-
-            #xlims = self.fig.myaxesI.get_xlim()
-            #print ' xlims=', xlims
-            #self.on_draw()
 
             if fig.myZoomIsOn :
                 self.xrelease = event.xdata
@@ -495,20 +466,20 @@ class ImageWithGUI_NTB (QtGui.QMainWindow) :
         else             : return int(value)
 
 
-    def processEditXmin(self):
-        self.fig.myXmin = self.editXmin.displayText()
+    #def processEditXmin(self):
+    #    self.fig.myXmin = self.editXmin.displayText()
 
 
-    def processEditXmax(self):
-        self.fig.myXmax = self.editXmax.displayText()
+    #def processEditXmax(self):
+    #    self.fig.myXmax = self.editXmax.displayText()
 
 
-    def processEditYmin(self):
-        self.fig.myYmin = self.editYmin.displayText()
+    #def processEditYmin(self):
+    #    self.fig.myYmin = self.editYmin.displayText()
 
 
-    def processEditYmax(self):
-        self.fig.myYmax = self.editYmax.displayText()
+    #def processEditYmax(self):
+    #    self.fig.myYmax = self.editYmax.displayText()
 
 
     def processEditZmin(self):
