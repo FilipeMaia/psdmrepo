@@ -118,7 +118,7 @@ def pyext_coms(platform):
 def set_basic_vars(env):
     # Set construction variables which are independant on whether we are using
     # distutils or not.
-    env['PYEXTCPPPATH'] = SCons.Util.CLVar('$PYEXTINCPATH')
+    env['PYEXTCPPPATH'] = env['PYTHON_INCDIR']
 
     env['_PYEXTCPPINCFLAGS'] = '$( ${_concat(INCPREFIX, PYEXTCPPPATH, '\
                                'INCSUFFIX, __env__, RDirs, TARGET, SOURCE)} $)'
@@ -140,7 +140,7 @@ def set_basic_vars(env):
     env['PYEXTCXXCOM'] = pycxx
     env['PYEXTLINKCOM'] = pylink
 
-def _set_configuration_nodistutils(env):
+def set_configuration(env):
     # Set env variables to sensible values when not using distutils
     def_cfg = {'PYEXTCC' : '$SHCC',
                'PYEXTCFLAGS' : '$SHCFLAGS',
@@ -167,51 +167,14 @@ def ifnotset(env, name, value):
     if not env.has_key(name):
         env[name] = value
 
-def set_configuration(env, use_distutils):
-    """Set construction variables which are platform dependants.
-
-    If use_distutils == True, use distutils configuration. Otherwise, use
-    'sensible' default.
-
-    Any variable already defined is untouched."""
-
-    # We define commands as strings so that we can either execute them using
-    # eval (same python for scons and distutils) or by executing them through
-    # the shell.
-    dist_cfg = {'PYEXTCC': ("sysconfig.get_config_var('CC')", False), 
-                'PYEXTCFLAGS': ("sysconfig.get_config_var('CFLAGS')", True), 
-                'PYEXTCCSHARED': ("sysconfig.get_config_var('CCSHARED')", False), 
-                'PYEXTLINKFLAGS': ("sysconfig.get_config_var('LDFLAGS')", True), 
-                'PYEXTLINK': ("sysconfig.get_config_var('LDSHARED')", False), 
-                'PYEXTINCPATH': ("sysconfig.get_python_inc()", False), 
-                'PYEXTSUFFIX': ("sysconfig.get_config_var('SO')", False)}
-
-    from distutils import sysconfig
-
-    # We set the python path even when not using distutils, because we rarely
-    # want to change this, even if not using distutils
-    ifnotset(env, 'PYEXTINCPATH', sysconfig.get_python_inc())
-
-    if use_distutils:
-        for k, (v, should_split) in dist_cfg.items():
-            val = eval(v)
-            if should_split:
-                val = val.split()
-            ifnotset(env, k, val)
-    else:
-        _set_configuration_nodistutils(env)
-
 def generate(env):
     """Add Builders and construction variables for python extensions to an
     Environment."""
 
-    if not env.has_key('PYEXT_USE_DISTUTILS'):
-        env['PYEXT_USE_DISTUTILS'] = False
-
     # This sets all constructions variables used for pyext builders. 
     set_basic_vars(env)
 
-    set_configuration(env, env['PYEXT_USE_DISTUTILS'])
+    set_configuration(env)
 
     # Create the PythonObject builder
     pyobj = createPythonObjectBuilder(env)

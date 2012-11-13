@@ -57,4 +57,4 @@ def generate(env):
     trace ( "Initialized psdm_cplusplus tool", "psdm_python", 2 )
 
 def exists(env):
-    return _qtdir(env) is not None
+    return True

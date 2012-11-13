@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2012-11-12 Andy Salnikov
+- make python-dependent tools (pyext, pycompile) to use python that is 
+  configured in psdm_python tool, not the python which runs scons
+- psdm_python tool updated so that it can be run outside scons to provide
+  configuration for python
+- new script app/psdm-python-config which runs psdm_python tool without
+  scons and prints python config, this is used by the latest sit_setup
+
 Tag: V00-07-00
 2012-10-26 Andy Salnikov
 - switch to python2.7 on RHEL5

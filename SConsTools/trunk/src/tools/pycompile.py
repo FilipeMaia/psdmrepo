@@ -8,6 +8,7 @@ AUTHORS:
 """
 
 import os
+import subprocess
 
 import SCons
 from SCons.Builder import Builder
@@ -32,11 +33,11 @@ class _pyCompile :
         source = str(source[0])
         trace ( "Executing pycompile `%s'" % ( source ), "pyCompile", 3 )
     
-        try :
-            import py_compile
-            py_compile.compile ( source, target, doraise = True )
-        except py_compile.PyCompileError, e :
-            print str(e)
+        # we need to compile it using "standard" python which may be
+        # different from python running SCons
+        cmd = [env['PYTHON_BIN'], '-c', 'import py_compile; py_compile.compile("%s", "%s", doraise=True)' % (source, target)]
+        rc = subprocess.call(cmd)
+        if rc != 0:
             return -1
         
     def strfunction ( self, target, source, env ):

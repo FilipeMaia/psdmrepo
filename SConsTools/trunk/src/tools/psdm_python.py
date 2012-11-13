@@ -2,13 +2,15 @@
 Tool which selects correct python version for PSDM releases.
 """
 import os
+import sys
 from os.path import join as pjoin
 
-from SConsTools.trace import *
-from SConsTools.scons_functions import *
-
-
 def generate(env):
+
+    #**************************************************
+    # This module will also be used outside scons so 
+    # be careful what you use in the code below
+    #**************************************************
     
     if env['SIT_ARCH_OS'] in ['rhel5', 'rhel6']:
         
@@ -31,9 +33,34 @@ def generate(env):
     env['PYTHON_BINDIR'] = pjoin(prefix, "bin")
     env['PYTHON_BIN'] = pjoin(env['PYTHON_BINDIR'], env['PYTHON'])
     
-    env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON_BIN']
+    try:
+        # this will fail if run outside scons, we don't care
+        env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON_BIN']
+    except:
+        pass
     
-    trace ( "Initialized psdm_python tool", "psdm_python", 2 )
+    #trace ( "Initialized psdm_python tool", "psdm_python", 2 )
 
 def exists(env):
-    return _qtdir(env) is not None
+    return True
+
+#
+# This is very special use case for this module outside scons
+#
+if __name__ == '__main__':
+    
+    sit_arch = os.environ['SIT_ARCH']
+    sit_arch_split = sit_arch.split('-')
+    sit_arch_os = sit_arch_split[1]
+    sit_arch_base = '-'.join(sit_arch_split[:3])
+    sit_arch_base_opt = sit_arch_base + '-opt'
+    env = dict(SIT_ARCH=sit_arch, SIT_ARCH_OS=sit_arch_os, SIT_ARCH_BASE=sit_arch_base, SIT_ARCH_BASE_OPT=sit_arch_base_opt)
+    
+    generate(env)
+    
+    if len(sys.argv) > 1:
+        for k in sys.argv[1:]:
+            print env.get(k, '')
+    else:
+        for k, v in env.items():
+            if k.startswith('PYTHON') and type(v) == str: print '%s=%s' % (k, v)
