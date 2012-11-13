@@ -52,17 +52,26 @@ class GUILogger ( QtGui.QWidget ) :
  
         #self.tit_title  = QtGui.QLabel('Logger')
         self.tit_status = QtGui.QLabel('Status:')
+        self.tit_level  = QtGui.QLabel('Verbosity level:')
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_save   = QtGui.QPushButton('Save Log-file') 
+
+        self.list_of_levels = logger.getListOfLevels()
+        self.box_level      = QtGui.QComboBox( self ) 
+        self.box_level.addItems(self.list_of_levels)
+        self.box_level.setCurrentIndex( self.list_of_levels.index(cp.log_level.value()) )
 
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget( self.box_txt )
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
+        self.hboxB.addStretch(4)     
+        self.hboxB.addWidget(self.tit_level)
+        self.hboxB.addWidget(self.box_level)
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.but_close)
         self.hboxB.addWidget(self.but_save)
+        self.hboxB.addWidget(self.but_close)
 
         self.vbox  = QtGui.QVBoxLayout()
         #self.vbox.addWidget(self.tit_title)
@@ -72,7 +81,8 @@ class GUILogger ( QtGui.QWidget ) :
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_save,  QtCore.SIGNAL('clicked()'), self.onSave  )
-
+        self.connect( self.box_level, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
+ 
         self.startGUILog()
 
         self.showToolTips()
@@ -85,8 +95,9 @@ class GUILogger ( QtGui.QWidget ) :
     def showToolTips(self):
         #self           .setToolTip('This GUI is intended for run control and monitoring.')
         self.but_close .setToolTip('Close this window.')
-        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+cp.fname_log)
+        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+self.fname_log)
         #self.but_show  .setToolTip('Show ...')
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -96,33 +107,39 @@ class GUILogger ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
+
     def setStyle(self):
         self.           setStyleSheet (cp.styleBkgd)
-        #self.tit_title .setStyleSheet (cp.styleTitleBold)
+        #self.tit_title.setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
+        self.tit_level .setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_save  .setStyleSheet (cp.styleButton) 
-        #self.but_show  .setStyleSheet (cp.styleButton) 
-        self.box_txt    .setReadOnly(True)
-        self.box_txt    .setStyleSheet (cp.styleWhiteFixed) 
- 
+        self.box_level .setStyleSheet (cp.styleButton) 
+        self.box_txt   .setReadOnly(True)
+        self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
+        #self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
+        #self.titTitle.setBold()
 
-        #self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
-        #self.titTitle .setBold()
 
     def setParent(self,parent) :
         self.parent = parent
+
 
     def resizeEvent(self, e):
         logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
+
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
+
 
     def closeEvent(self, event):
-        logger.info('closeEvent', __name__)
+        logger.debug('closeEvent', __name__)
+        self.saveLogTotalInFile()
 
         try    : cp.guimain.butLogger.setStyleSheet(cp.styleButtonBad)
         except : pass
@@ -132,28 +149,34 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
 
     def onSave(self):
-        logger.info('onSave:', __name__)
-        self.saveLogInFile(cp.dir_work.value() + '/' + cp.fname_log)
+        logger.debug('onSave:', __name__)
+        self.saveLogInFile()
 
 
-    def saveLogInFile(self, fname):
-        #logger.info('saveLogInFile: '+fname, __name__)
-        #if cp.res_save_log : 
-        logger.saveLogInFile(fname)
+    def onBox(self):
+        level_selected = self.box_level.currentText()
+        cp.log_level.setValue( level_selected ) 
+        logger.info('onBox - selected ' + self.tit_level.text() + ' ' + cp.log_level.value(), __name__)
+        logger.setLevel(cp.log_level.value())
+        self.box_txt.setText( logger.getLogContent() )
 
 
-#    def saveGUILogInFile(self, fname):
-#        logger.info('saveGUILogInFile: '+fname, __name__)
-#        doc = self.box_txt.document() # returns QTextDocument
-#        txt = doc.toPlainText()
-#        f=open(fname,'w')
-#        f.write(txt)
-#        f.close() 
+    def saveLogInFile(self):
+        fname_log = cp.dir_work.value() + '/' + self.fname_log
+        logger.debug('saveLogInFile' + fname_log, __name__)
+        logger.saveLogInFile(fname_log)
+
+
+    def saveLogTotalInFile(self):
+        fname_log_total = cp.dir_work.value() + '/' + self.fname_log_total
+        logger.debug('saveLogTotalInFile' + fname_log_total, __name__)
+        if cp.res_save_log : 
+            logger.saveLogTotalInFile(fname_log_total)
 
 
     def getConfirmation(self):
@@ -179,8 +202,9 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def startGUILog(self) :
-        cp.fname_log = logger.getLogFileName()
-        self.setStatus(0, 'Log-file: ' + cp.fname_log)
+        self.fname_log       = logger.getLogFileName()
+        self.fname_log_total = logger.getLogTotalFileName()
+        self.setStatus(0, 'Log-file: ' + self.fname_log)
         self.box_txt.setText( logger.getLogContent() )
         logger.setGUILogger(self)
 

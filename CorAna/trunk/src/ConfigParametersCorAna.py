@@ -90,6 +90,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
         self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Conf.pars',typ='str' )
+        self.log_level         = self.declareParameter( name='LOG_LEVEL_OF_MSGS' ,val_def='debug',typ='str' )
 
 
         # GUIBeamZeroPars.py
@@ -109,6 +110,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Transmission',  typ='str' )
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          typ='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              typ='float' )
+        self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,              typ='float' )
 
         # GUIImgSizePosition.py
         self.col_begin          = self.declareParameter( name='IMG_COL_BEGIN',         val_def=0,              typ='int' )
