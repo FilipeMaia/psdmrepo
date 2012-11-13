@@ -239,40 +239,33 @@ remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
 remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*.*"
 unset_env SIT_REPOS
 
-# if there is no base release or if there is no python link in the base release or 
-# current release then we need to add path to python executable if it can be found in 
-# non-standard location (sw/external); a lot of guessing is involved here
+# We need to make sure that correct python binary is found in the path,
+# recent releases contain a link arch/$SIT_ARCH/bin/python which points 
+# to right place. Check that link in base release or current release,
+# if it exists then nothing needs to be done, it will be in the PATH
 python=""
 if [ "$SIT_RELEASE" != "nobase" -a -x "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin/python" ] ; then
   python="$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/bin/python"
 elif [ -x "./arch/$SIT_ARCH/bin/python" ] ; then
   python="./arch/$SIT_ARCH/bin/python"
-fi
-if [ -z "$python" ] ; then
-  # try to get it from "current" release
-  python="$SIT_RELDIR/current/arch/$SIT_ARCH/bin/python"
-  if [ -x "$python" ] ; then
-    # use distutils to figure out exact location of binary
-    bindir=`"$python" -c "from distutils import sysconfig; print sysconfig.get_config_var('BINDIR')"`
-    prepend_path PATH "$bindir"
-  else
-    # no releases contain python link, try to guess where it should come from
-    # note that we go through all dirs in reverse name order, which may not 
-    # be the same as version order
-    for dir in `/bin/ls -r -1 -d $SIT_ROOT/sw/external/python/* | sort -r` ; do
-      echo "# test $dir/$SIT_ARCH/bin/python"
-      if [ -x "$dir/$SIT_ARCH/bin/python" ] ; then
-        pypath="$dir/$SIT_ARCH/bin"
-        break
-      elif [ -x "$dir/$sit_arch_base-opt/bin/python" ] ; then
-        pypath="$dir/$sit_arch_base-opt/bin"
-        break
-      fi
-    done
-    if [ -n "$pypath" ] ; then
-      prepend_path PATH "$pypath"
-    fi
+else
+  
+  # No python link found in current or base release, this can mean one of two things:
+  # - we are building new full release, just checked it out, no links were made yet
+  # - we are using very old release which does not have python link
+  # If this is a new release then it should have SConsTools/app/psdm-python-config script
+  # which we will run to get the info we need, otherwise do nothing (python should be in the 
+  # PATH already).
+
+  if [ -f SConsTools/app/psdm-python-config ] ; then
+    
+    pypath=`sh SConsTools/app/psdm-python-config PYTHON_BINDIR`
+    # potentially this may need update to LD_LIBRARY_PATH as well,
+    # but for now I know that we build python with correct RPATH
+    test -n "$pypath" && prepend_path PATH "$pypath"
+        
   fi
+      
 fi
 
 # add SIT_ROOT/bin to PATH
