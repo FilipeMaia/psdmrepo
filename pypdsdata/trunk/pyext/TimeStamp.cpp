@@ -47,7 +47,7 @@ namespace {
   PyMethodDef methods[] = {
     { "ticks",    ticks,    METH_NOARGS,
         "self.ticks() -> int\n\n119MHz counter within the fiducial for eventcode which initiated the readout" },
-    { "fiducials", fiducials, METH_NOARGS, "self.fiducials() -> int\n\nReturns the fiducials value (360Hz pulse ID) module 17-bit" },
+    { "fiducials", fiducials, METH_NOARGS, "self.fiducials() -> int\n\nReturns the fiducials value (360Hz pulse ID) modulo 17-bit" },
     { "control",  control,  METH_NOARGS, "self.control() -> int\n\nInternal bits for alternate interpretation of XTC header fields" },
     { "vector",   vector,   METH_NOARGS, "self.vector() -> int\n\n15-bit seed for event-level distribution (events since Configure)" },
     {0, 0, 0, 0}

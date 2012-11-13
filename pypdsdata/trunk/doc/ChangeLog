@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-82
+2012-11-13 Andy Salnikov
+- small fix to docstring
+
 Tag: V00-00-81
 2012-11-08 Andy Salnikov
 - improve printing of bld classes
