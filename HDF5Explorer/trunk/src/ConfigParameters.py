@@ -126,16 +126,6 @@ class ConfigParameters ( object ) :
         self.current_item_name_for_title = 'Current extended item name for title'
 
         # Default parameters for CSpad plots
-
-        self.cspadNWindows   = 1
-        self.cspadNWindowsMax= 8 # Maximal number of windows for CSpad which can be opened
-
-        self.cspadWindowParameters = []
-        for win in range(self.cspadNWindowsMax) :
-            self.cspadWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, True, True, False, 1, 1])
-            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, quad, pair]
-            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10,   11]
-
         self.cspadImageOfPairIsOn = False
         self.cspadImageIsOn       = False
         self.cspadImageQuadIsOn   = False
@@ -184,71 +174,25 @@ class ConfigParameters ( object ) :
         self.imageSpectrumBinWidth= 1 
         self.imageBinWidthIsOn    = True
         self.imageDataset         = 'All'
-       #self.imageSpectrumRange   = None # (15,45)
+        #self.imageSpectrumRange   = None # (15,45)
 
-        # Default parameters for Image plots
+        # Default parameters for CSpad windows
+        self.defaultCspadWindowParameters()
 
-        self.imageNWindows      = 1
-        self.imageNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
+        # Default parameters for Image windows
+        self.defaultImageWindowParameters()
 
-        self.imageWindowParameters = []
-        for win in range(self.imageNWindowsMax) :
-            self.imageWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, False, False, False, 0])
-            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, ImOffset]
-            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10]
+        # Default parameters for Waveform windows
+        self.defaultWaveformWindowParameters()
 
+        # Default parameters for Selection windows
+        self.defaultSelectionWindowParameters()
 
-        # Default parameters for Waveform plots
-        self.waveformWaveformIsOn  = False
-        self.waveformWaveVsEvIsOn  = False
+        # Default parameters for Correlation windows
+        self.defaultCorrelationWindowParameters()
 
-        self.waveformNWindows      = 1
-        self.waveformNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
-
-        self.waveformWindowParameters = []
-        for win in range(self.waveformNWindowsMax) :
-            self.waveformWindowParameters.append(['None', 0, 0, 1000, 0, 1000, 0, None, None, None, None, 0, 1000])
-                        #[dataset, rangeUnitsBits, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4, NEvMin, NEvMax]
-                        #[0,       1,              2,    3,    4,    5,    6,              7,   8,   9,   10,  11,     12]
-
-        #rangeUnitsBits : 1-ALimits, 2-TLimits, 4-AUnits, 8-TUnits, 16-EvRange
-
-
-        # Default parameters for Selection algorithms
-        self.selectionNWindows      = 1
-        self.selectionNWindowsMax   = 10 # Maximal number of windows for selection algorithms
-
-        self.selectionWindowParameters = []
-        for win in range(self.selectionNWindowsMax) :
-            self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None'])
-                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
-
-
-        # Default parameters for Correlation algorithms
-        self.correlationsIsOn         = False
-
-        self.correlationNWindows      = 1
-        self.correlationNWindowsMax   = 10 # Maximal number of windows for selection algorithms
-
-        self.correlationWindowParameters = []
-        for win in range(self.correlationNWindowsMax) :
-            self.correlationWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
-                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
-                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13      14,      15]
-
-
-
-        # Default parameters for CalibCycle algorithms
-        self.calibcycleIsOn          = False
-
-        self.calibcycleNWindows      = 1
-        self.calibcycleNWindowsMax   = 10 # Maximal number of windows for selection algorithms
-
-        self.calibcycleWindowParameters = []
-        for win in range(self.calibcycleNWindowsMax) :
-            self.calibcycleWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
-                                                  #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
-                                                  #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13,     14,      15]
+        # Default parameters for CalibCycle windows
+        self.defaultCalibcycleWindowParameters()
 
         self.projCenterX         = 850
         self.projCenterY         = 850
@@ -312,6 +256,92 @@ class ConfigParameters ( object ) :
 
         self.aveDirName           = '.'
         self.aveFileName          = 'cspad-ave.txt'
+
+    #-------------------
+    #-------------------
+    #-------------------
+
+    # Default parameters for all windows
+    def defaultCspadWindowParameters(self):
+        self.defaultCspadWindowParameters()
+        self.defaultImageWindowParameters()
+        self.defaultWaveformWindowParameters()
+        self.defaultSelectionWindowParameters()
+        self.defaultCorrelationWindowParameters()
+        self.defaultCalibcycleWindowParameters()
+
+
+    def defaultCspadWindowParameters(self):
+        self.cspadNWindows   = 1
+        self.cspadNWindowsMax= 8 # Maximal number of windows for CSpad which can be opened
+
+        self.cspadWindowParameters = []
+        for win in range(self.cspadNWindowsMax) :
+            self.cspadWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, True, True, False, 1, 1])
+            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, quad, pair]
+            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10,   11]
+
+
+    def defaultImageWindowParameters(self):
+        self.imageNWindows      = 1
+        self.imageNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
+
+        self.imageWindowParameters = []
+        for win in range(self.imageNWindowsMax) :
+            self.imageWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, False, False, False, 0])
+            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, ImOffset]
+            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10]
+
+
+    def defaultWaveformWindowParameters(self):
+        self.waveformWaveformIsOn  = False
+        self.waveformWaveVsEvIsOn  = False
+
+        self.waveformNWindows      = 1
+        self.waveformNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
+
+        self.waveformWindowParameters = []
+        for win in range(self.waveformNWindowsMax) :
+            self.waveformWindowParameters.append(['None', 0, 0, 1000, 0, 1000, 0, None, None, None, None, 0, 1000])
+                        #[dataset, rangeUnitsBits, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4, NEvMin, NEvMax]
+                        #[0,       1,              2,    3,    4,    5,    6,              7,   8,   9,   10,  11,     12]
+                        #rangeUnitsBits : 1-ALimits, 2-TLimits, 4-AUnits, 8-TUnits, 16-EvRange
+
+
+    def defaultSelectionWindowParameters(self):
+        self.selectionNWindows      = 1
+        self.selectionNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+
+        self.selectionWindowParameters = []
+        for win in range(self.selectionNWindowsMax) :
+            self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None'])
+                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
+
+    def defaultCorrelationWindowParameters(self):
+        self.correlationsIsOn         = False
+
+        self.correlationNWindows      = 1
+        self.correlationNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+
+        self.correlationWindowParameters = []
+        for win in range(self.correlationNWindowsMax) :
+            self.correlationWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
+                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
+                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13      14,      15]
+
+
+    def defaultCalibcycleWindowParameters(self):
+        self.calibcycleIsOn          = False
+
+        self.calibcycleNWindows      = 1
+        self.calibcycleNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+
+        self.calibcycleWindowParameters = []
+        for win in range(self.calibcycleNWindowsMax) :
+            self.calibcycleWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
+                                                  #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
+                                                  #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13,     14,      15]
+
 
     #-------------------
     #  Public methods --
@@ -571,8 +601,13 @@ class ConfigParameters ( object ) :
             self.list_of_checked_item_names = []
             for line in f :
                 if len(line) == 1 : continue # line is empty
-                key = line.split()[0]
-                val = line.split()[1]
+                #line.rstrip('\n')
+                fields = line.rstrip('\n').split(' ',1)
+                key = fields[0]
+                val = fields[1].strip(' ')
+                #print '  key=', key,
+                #print '  val=', val
+
                 if   key == 'HDF5_FILE_NAME'           : self.dirName,self.fileName = os.path.split(val)
                 elif key == 'N_CHECKED_ITEMS'          : number_of_items = int(val)
                 elif key == 'ITEM_NAME'                : self.list_of_checked_item_names.append(val) 

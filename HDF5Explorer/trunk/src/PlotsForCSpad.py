@@ -125,7 +125,7 @@ class PlotsForCSpad ( object ) :
     def plotCSpad08PairsImage( self, arr1ev, fig ):
         """Plot 2d image of 8 2x1 pairs of ASICs' from input array."""
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             print 'WARNING: plotCSpad08PairsImage(...) - these images are not available for CSPad2x2 ...'
             return
 
@@ -170,7 +170,7 @@ class PlotsForCSpad ( object ) :
         else :
             self.pair = pairNum
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             return self.getImageArrayForMiniElementPair(arr1ev,self.pair)
 
         #print 'getImageArrayForPair(), pair=', self.pair
@@ -188,7 +188,7 @@ class PlotsForCSpad ( object ) :
     def getImageArrayForQuad( self, arr1ev, quadNum=None ):
         """Returns the image array for one quad"""
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             return self.getImageArrayForCSPadMiniElement( arr1ev )
 
         if quadNum == None :
@@ -297,7 +297,7 @@ class PlotsForCSpad ( object ) :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             self.arr2dCSpad = self.getImageArrayForCSPadMiniElement( arr1ev )
 
         else : # For regular CSPad detector
@@ -564,7 +564,7 @@ class PlotsForCSpad ( object ) :
     def plotCSpadQuad08SpectraOf2x1( self, arr1ev, fig ):
         """Amplitude specra from 2d array."""
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             print 'WARNING: plotCSpadQuad08SpectraOf2x1(...) - Spectra are not available for CSPad2x2 ...'
             return
 
@@ -613,7 +613,7 @@ class PlotsForCSpad ( object ) :
     def plotCSpadQuad16Spectra( self, arr1ev, fig ):
         """Amplitude specra from 2d array."""
 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             print 'WARNING: plotCSpadQuad16Spectra(...) - Spectra are not available for CSPad2x2 ...'
             return
 
@@ -689,7 +689,7 @@ class PlotsForCSpad ( object ) :
             return
         
         #For Image 
-        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+        if cs.confcspad.isCSPad2x2 : # For CSpad2x2
             if cp.confpars.cspadPair > 0 : self.pair = 1
             else                         : self.pair = 0            
             self.arr = self.getImageArrayForMiniElementPair(arr1ev,self.pair)

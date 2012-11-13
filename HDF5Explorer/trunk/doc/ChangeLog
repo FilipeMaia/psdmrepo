@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-15
+2012-11-12 Mikhail S. Dubrovin
+- try to resolve multiple problems with persistence:	
+M       src/GUIWhatToDisplay.py     - add initialization of self.indTabOpen in __init__()
+M       src/PlotsForCSpad.py        - change comments 'CSPad Mini' -> 'CsPad2x2' 
+M       src/ConfigParameters.py     - correcltly read string parameters with spaces.
+M       src/PlotsForCorrelations.py - try-except for h5file[ds] 
+M       src/PrintHDF5.py            - try-except for h5file[ds] 
+
 Tag: V00-00-14
 2012-06-01 Mikhail S. Dubrovin
 M       src/GlobalMethods.py

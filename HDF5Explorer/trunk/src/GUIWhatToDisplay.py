@@ -93,6 +93,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.butClose         = QtGui.QPushButton('Quit')
         self.butSave          = QtGui.QPushButton('Save')
 
+        self.indTabOpen  = 0
         self.tabBar      = QtGui.QTabBar()
         self.tabBar.setShape(QtGui.QTabBar.RoundedNorth)
        #self.tabBar.setShape(QtGui.QTabBar.TriangularNorth)
@@ -217,6 +218,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         if  self.isFirstEntry:
             self.isFirstEntry = False
+            #self.tabBar.setCurrentIndex(0)
             self.tabBar.setCurrentIndex(self.indTabOpen)
 
         self.processTabBar()

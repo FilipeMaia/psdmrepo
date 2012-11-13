@@ -94,8 +94,11 @@ class PlotsForCorrelations ( object ) :
             print 'THE YParName=', self.YParName, ' IS NOT SET. THE CORRELATION PLOT', win,' IS IGNORED'
             return
 
-        
-        self.dsY = h5file[self.Ydsname]
+        try    : self.dsY = h5file[self.Ydsname]
+        except :
+            self.printWarningNonAvailable(self.Ydsname)
+            return
+
         print 'dsY.shape=',self.dsY.shape
 
         if self.YParIndex == 'None' :
@@ -122,7 +125,11 @@ class PlotsForCorrelations ( object ) :
         elif self.radioXPar == 1 : # for Time
             self.Xdsname  = printh5.get_item_path_to_last_name(self.Ydsname) + '/time'
             print 'Xdsname =',self.Xdsname 
-            self.dsX = h5file[self.Xdsname]
+            try    : self.dsX = h5file[self.Xdsname]
+            except :
+                self.printWarningNonAvailable(self.Xdsname)
+                return
+
             self.Xarr = 0.000000001 * self.dsX['nanoseconds'] + self.dsX['seconds']
             self.Xarr -= self.Xarr[0]
             print 'Time array :\n', self.Xarr 
@@ -140,7 +147,10 @@ class PlotsForCorrelations ( object ) :
                 print 'THE XParName=', self.XParName, ' IS NOT SET. THE CORRELATION PLOT', win,' IS IGNORED'
                 return
 
-            self.dsX = h5file[self.Xdsname]
+            try    : self.dsX = h5file[self.Xdsname]
+            except :
+                self.printWarningNonAvailable(self.Xdsname)
+                return
 
             if self.XParIndex == 'None' :
                 self.Xarr = self.dsX[self.XParName]
@@ -169,9 +179,10 @@ class PlotsForCorrelations ( object ) :
 
         plt.show()
 
-
-
-
+    def printWarningNonAvailable(self, parname) :
+        print     'WARNING: The parameter ' + parname \
+              + '\n         is not available in current hdf5 file...' \
+              + ' Check settings for this plot.'
 
     def setLabelX( self, parname, parindex='None' ) :
         if parindex == 'None' : xtitle = parname
@@ -200,7 +211,6 @@ class PlotsForCorrelations ( object ) :
         plt.xlabel(self.XTitle)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)
-
 
 
     def plot1DHistogram( self ) :
@@ -253,10 +263,20 @@ class PlotsForCorrelations ( object ) :
         #self.Yarr # is assumed to be available
         XTimedsname  = printh5.get_item_path_to_last_name(self.Xdsname) + '/time'
         YTimedsname  = printh5.get_item_path_to_last_name(self.Ydsname) + '/time'
+
         print 'Xdsname =',self.Xdsname 
         print 'Ydsname =',self.Ydsname 
-        self.dsXT = self.h5file[XTimedsname]
-        self.dsYT = self.h5file[YTimedsname]
+
+        try    : self.dsXT = self.h5file[XTimedsname]
+        except :
+            self.printWarningNonAvailable(XTimedsname)
+            return
+
+        try    : self.dsYT = self.h5file[YTimedsname]
+        except :
+            self.printWarningNonAvailable(YTimedsname)
+            return
+
         self.XTarr = 0.000000001 * self.dsXT['nanoseconds'] + self.dsXT['seconds']
         self.YTarr = 0.000000001 * self.dsYT['nanoseconds'] + self.dsYT['seconds']
         print 'self.XTarr =', self.XTarr

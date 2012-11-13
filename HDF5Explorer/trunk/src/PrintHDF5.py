@@ -375,11 +375,15 @@ def getListOfDatasetParNames(dsname=None):
 
     fname = cp.confpars.dirName+'/'+cp.confpars.fileName
     f = h5py.File(fname, 'r') # open read-only
-    ds = f[dsname]
 
-    for parName in ds.dtype.names :
-        print parName
-        listOfDatasetParNames.append(parName)
+    try :
+        ds = f[dsname]
+
+        for parName in ds.dtype.names :
+            print parName
+            listOfDatasetParNames.append(parName)
+    except :
+        print 'WARNING: The dataset:' + dsname + ' is not available in current hdf5 file... Ignored.' 
 
     f.close()
 
