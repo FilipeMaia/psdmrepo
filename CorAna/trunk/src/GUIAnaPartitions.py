@@ -130,12 +130,13 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
@@ -143,14 +144,14 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
         except : pass # silently ignore
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
     def onApply(self):
-        logger.info('onApply - is already applied...', __name__)
+        logger.debug('onApply - is already applied...', __name__)
 
     def onShow(self):
-        logger.info('onShow - is not implemented yet...', __name__)
+        logger.debug('onShow - is not implemented yet...', __name__)
 
 
     def onEdit(self):

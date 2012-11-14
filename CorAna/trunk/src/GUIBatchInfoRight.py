@@ -143,15 +143,16 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
-        logger.info('closeEvent', __name__)
+        logger.debug('closeEvent', __name__)
         try    : del cp.guibatchinforight # GUIBatchInfoRight
         except : pass # silently ignore
 
@@ -165,7 +166,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         except : pass
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
 #-----------------------------

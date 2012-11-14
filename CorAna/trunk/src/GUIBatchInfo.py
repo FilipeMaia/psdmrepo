@@ -116,15 +116,16 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
-        logger.info('closeEvent', __name__)
+        logger.debug('closeEvent', __name__)
 
         try    : cp.guibatchinfoleft.close()
         except : pass
@@ -136,17 +137,17 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         except : pass
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
     def onSave(self):
         fname = cp.fname_cp.value()
-        logger.info('onSave:', __name__)# - save all configuration parameters in file: ' + fname, __name__)
+        logger.debug('onSave:', __name__)# - save all configuration parameters in file: ' + fname, __name__)
         cp.saveParametersInFile( fname )
 
 
     def onShow(self):
-        logger.info('onShow - is not implemented yet...', __name__)
+        logger.debug('onShow - is not implemented yet...', __name__)
 
 #-----------------------------
 

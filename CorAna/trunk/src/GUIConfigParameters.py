@@ -131,24 +131,25 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
-        logger.info('closeEvent', __name__)
+        logger.debug('closeEvent', __name__)
         try    : del cp.guiconfigparameters 
         except : pass
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
     def onRead(self):
-        logger.info('onRead', __name__)
+        logger.debug('onRead', __name__)
         cp.readParametersFromFile( self.getFileNameFromEditField() )
         self.fnameEdit.setText( cp.fname_cp.value() )
         #self.parent.fnameEdit.setText( cp.fname_cp.value() )
@@ -175,7 +176,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         cp.printParameters()
 
     def onBrowse(self):
-        logger.info('onBrowse', __name__)
+        logger.debug('onBrowse', __name__)
         self.path = self.getFileNameFromEditField()
         self.dname,self.fname = os.path.split(self.path)
         logger.info('dname : %s' % (self.dname), __name__)
@@ -190,7 +191,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
             cp.fname_cp.setValue(self.path)
 
     def onFileEdit(self):
-        logger.info('onFileEdit', __name__)
+        logger.debug('onFileEdit', __name__)
         self.path = self.getFileNameFromEditField()
         cp.fname_cp.setValue(self.path)
         dname,fname = os.path.split(self.path)

@@ -51,6 +51,7 @@ from GUIRun              import *
 from GUIViewResults      import *
 from GUILogger           import *
 from Logger              import logger
+from FileNameManager     import fnm
 
 #---------------------
 #  Class definition --
@@ -166,17 +167,19 @@ class GUIMain ( QtGui.QWidget ) :
         self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', self.name) 
+        #logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', self.name) 
+        #logger.debug('moveEvent', self.name) 
+        pass
 
     def closeEvent(self, event):
-        logger.info('closeEvent', self.name)
+        logger.debug('closeEvent', self.name)
 
         if cp.res_save_log : 
-            logger.saveLogInFile(cp.dir_work.value() + '/' + cp.fname_log)
+            logger.saveLogInFile     ( fnm.log_file() )
+            logger.saveLogTotalInFile( fnm.log_file_total() )
 
         try    : cp.guifiles.close()
         except : pass
@@ -204,14 +207,14 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onExit(self):
-        logger.info('onExit', self.name)
+        logger.debug('onExit', self.name)
         self.close()
         
     def onPrint(self):
-        logger.info('onPrint', self.name)
+        logger.debug('onPrint', self.name)
         
     def onFiles(self):
-        logger.info('onFiles', self.name)
+        logger.debug('onFiles', self.name)
         try :
             cp.guifiles.close()
             self.butFiles.setStyleSheet(cp.styleButton)
@@ -224,7 +227,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onBatchInfo(self):
-        logger.info('onBatchInfo', self.name)
+        logger.debug('onBatchInfo', self.name)
         try :
             cp.guibatchinfo.close()
         except :
@@ -235,12 +238,12 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onSave(self):
-        logger.info('onSave', self.name)
+        logger.debug('onSave', self.name)
         cp.saveParametersInFile( cp.fname_cp.value() )
 
 
     def onAnaSettings(self):    
-        logger.info('onAnaSettings', self.name)
+        logger.debug('onAnaSettings', self.name)
         try :
             cp.guianasettings.close()
         except :
@@ -251,7 +254,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onSystem(self):     
-        logger.info('onSystem', self.name)
+        logger.debug('onSystem', self.name)
         try    :
             cp.guisystemsettings.close()
         except :
@@ -262,7 +265,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onRun (self):       
-        logger.info('onRun', self.name)
+        logger.debug('onRun', self.name)
         try    :
             cp.guirun.close()
         except :
@@ -273,7 +276,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onViewResults(self):
-        logger.info('onViewResults', self.name)
+        logger.debug('onViewResults', self.name)
         try    :
             cp.guiviewresults.close()
         except :
@@ -282,8 +285,9 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guiviewresults.move(self.pos().__add__(QtCore.QPoint(160,230))) # open window with offset w.r.t. parent
             cp.guiviewresults.show()
 
+
     def onLogger (self):       
-        logger.info('onLogger', self.name)
+        logger.debug('onLogger', self.name)
         try    :
             cp.guilogger.onClose()
             #self.butLogger.setStyleSheet(cp.styleButtonBad)
@@ -297,7 +301,7 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onStop(self):       
-        logger.info('onStop - not implemented yet...', self.name)
+        logger.debug('onStop - not implemented yet...', self.name)
                 
 #-----------------------------
 #-----------------------------

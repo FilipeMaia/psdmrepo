@@ -133,12 +133,13 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent')
+        #logger.debug('resizeEvent')
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent')
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent')
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent')

@@ -289,12 +289,13 @@ class GUIFiles ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
@@ -315,15 +316,15 @@ class GUIFiles ( QtGui.QWidget ) :
         except : pass # silently ignore
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
     def onSave(self):
-        logger.info('onSave', __name__)
+        logger.debug('onSave', __name__)
         cp.guiconfigparameters.onWrite()
 
     def onShow(self):
-        logger.info('onShow - is not implemented yet...', __name__)
+        logger.debug('onShow - is not implemented yet...', __name__)
 
 
     def onEditDir(self):
@@ -408,7 +409,7 @@ class GUIFiles ( QtGui.QWidget ) :
 
 
     def on_off_gui_dark(self,but):
-        logger.info('on_off_gui_dark', __name__)
+        logger.debug('on_off_gui_dark', __name__)
         self.tab_bar.setCurrentIndex(0)
         if bjpeds.status_for_pedestals() : but.setStyleSheet(cp.styleButtonGood)
         else                             : but.setStyleSheet(cp.styleButtonBad)
@@ -425,17 +426,17 @@ class GUIFiles ( QtGui.QWidget ) :
 
 
     def on_off_gui_flat(self,but):
-        logger.info('on_off_gui_flat', __name__)
+        logger.debug('on_off_gui_flat', __name__)
         self.tab_bar.setCurrentIndex(1)
 
     def on_off_gui_data(self,but):
-        logger.info('on_off_gui_data', __name__)
+        logger.debug('on_off_gui_data', __name__)
         self.tab_bar.setCurrentIndex(2)
 
 
 
     def onButDirWork(self):
-        logger.info('onButDirWork - Select work directory.', __name__)
+        logger.debug('onButDirWork - Select work directory.', __name__)
         dir0 = cp.dir_work.value()
         path, name = os.path.split(dir0)
         dir = str( QtGui.QFileDialog.getExistingDirectory(self,'Select directory',path) )
@@ -449,7 +450,7 @@ class GUIFiles ( QtGui.QWidget ) :
 
 
     def onButDirResults(self):
-        logger.info('onButDirResults - Select results directory.', __name__)
+        logger.debug('onButDirResults - Select results directory.', __name__)
         dir0 = cp.dir_results.value()
         path, name = os.path.split(dir0)
         dir = str( QtGui.QFileDialog.getExistingDirectory(self,'Select directory',path) )

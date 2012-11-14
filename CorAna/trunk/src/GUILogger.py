@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
+from FileNameManager        import fnm
 
 #from GUILoggerLeft   import *
 #from GUILoggerRight  import *
@@ -60,7 +61,7 @@ class GUILogger ( QtGui.QWidget ) :
         self.box_level      = QtGui.QComboBox( self ) 
         self.box_level.addItems(self.list_of_levels)
         self.box_level.setCurrentIndex( self.list_of_levels.index(cp.log_level.value()) )
-
+        
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget( self.box_txt )
 
@@ -95,7 +96,7 @@ class GUILogger ( QtGui.QWidget ) :
     def showToolTips(self):
         #self           .setToolTip('This GUI is intended for run control and monitoring.')
         self.but_close .setToolTip('Close this window.')
-        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+self.fname_log)
+        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+os.path.basename(self.fname_log))
         #self.but_show  .setToolTip('Show ...')
 
 
@@ -139,7 +140,7 @@ class GUILogger ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        self.saveLogTotalInFile()
+        #self.saveLogTotalInFile() # It will be saved at closing of GUIMain
 
         try    : cp.guimain.butLogger.setStyleSheet(cp.styleButtonBad)
         except : pass
@@ -167,16 +168,14 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def saveLogInFile(self):
-        fname_log = cp.dir_work.value() + '/' + self.fname_log
-        logger.debug('saveLogInFile' + fname_log, __name__)
-        logger.saveLogInFile(fname_log)
+        logger.info('saveLogInFile' + self.fname_log, __name__)
+        logger.saveLogInFile(self.fname_log)
 
 
     def saveLogTotalInFile(self):
-        fname_log_total = cp.dir_work.value() + '/' + self.fname_log_total
-        logger.debug('saveLogTotalInFile' + fname_log_total, __name__)
+        logger.info('saveLogTotalInFile' + self.fname_log_total, __name__)
         if cp.res_save_log : 
-            logger.saveLogTotalInFile(fname_log_total)
+            logger.saveLogTotalInFile(self.fname_log_total)
 
 
     def getConfirmation(self):
@@ -202,9 +201,11 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def startGUILog(self) :
-        self.fname_log       = logger.getLogFileName()
-        self.fname_log_total = logger.getLogTotalFileName()
-        self.setStatus(0, 'Log-file: ' + self.fname_log)
+        self.fname_log       = fnm.log_file()
+        self.fname_log_total = fnm.log_file_total()
+        self.setStatus(0, 'Log-file: ' + os.path.basename(self.fname_log))
+
+        logger.setLevel(cp.log_level.value())
         self.box_txt.setText( logger.getLogContent() )
         logger.setGUILogger(self)
 

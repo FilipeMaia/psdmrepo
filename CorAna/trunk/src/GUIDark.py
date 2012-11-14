@@ -122,12 +122,13 @@ class GUIDark ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        logger.debug('resizeEvent', __name__) 
+        #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        logger.debug('moveEvent', __name__) 
-#        cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #logger.debug('moveEvent', __name__) 
+        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
@@ -135,24 +136,24 @@ class GUIDark ( QtGui.QWidget ) :
         except : pass # silently ignore
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
     def on_but_submit(self):
-        logger.info('on_but_submit', __name__)
+        logger.debug('on_but_submit', __name__)
         bjpeds.submit_batch_for_pedestals()
 
     def on_but_status(self):
-        logger.info('on_but_status', __name__)
+        logger.debug('on_but_status', __name__)
         bjpeds.check_batch_status_for_pedestals()
 
     def on_but_wfiles(self):
-        logger.info('on_but_wfiles', __name__)
+        logger.debug('on_but_wfiles', __name__)
         #bjpeds.print_work_files_for_pedestals()
         bjpeds.check_work_files_for_pedestals()
 
     def on_but_plot(self):
-        logger.info('on_but_plot', __name__)
+        logger.debug('on_but_plot', __name__)
         try :
             cp.imgspewithgui.close()
             del cp.imgspewithgui

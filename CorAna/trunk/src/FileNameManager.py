@@ -43,6 +43,15 @@ class FileNameManager :
         @param fname  the file name for output log file
         """
 #-----------------------------
+#-----------------------------
+
+    def log_file(self) :
+        return cp.dir_work.value() + '/' + logger.getLogFileName()
+
+    def log_file_total(self) :
+        return cp.dir_work.value() + '/' + logger.getLogTotalFileName()
+
+#-----------------------------
 
     def path_dark_xtc(self) :
         return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
