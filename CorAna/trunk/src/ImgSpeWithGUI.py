@@ -49,6 +49,8 @@ import ImgSpeNavToolBar     as imgtb
 import ImgSpeWidget         as imgwidg
 import ImgSpeButtons        as imgbuts
 
+from ConfigParametersCorAna import confpars as cp
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -105,6 +107,7 @@ class ImgSpeWithGUI (QtGui.QWidget) :
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
+
         try    : self.widgimage.close()
         except : pass
 
@@ -114,7 +117,10 @@ class ImgSpeWithGUI (QtGui.QWidget) :
         try    : self.mpl_toolbar.close()
         except : pass
 
-        print 'Close application'
+        try    : del cp.imgspewithgui
+        except : pass
+
+        #print 'Close application'
 
 
 #-----------------------------

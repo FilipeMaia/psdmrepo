@@ -331,6 +331,9 @@ class ImgSpeWidget (QtGui.QWidget) :
         else             : return int(value)
 
 
+    def saveFigure(self, fname='fig.png'):
+        self.fig.savefig(fname)
+
 #-----------------------------
 # Test
 #-----------------------------

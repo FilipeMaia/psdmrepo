@@ -93,6 +93,10 @@ class FileNameManager :
 
     def path_pedestals_tahometer_batch_log(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer-batch-log.txt'
+
+    def path_pedestals_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-plot.png'
+
 #-----------------------------
 
     def  get_list_of_files_pedestals(self) :
@@ -102,6 +106,7 @@ class FileNameManager :
         self.list_of_files_pedestals.append(self.path_pedestals_batch_log())
         self.list_of_files_pedestals.append(self.path_pedestals_ave())
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
+        self.list_of_files_pedestals.append(self.path_pedestals_plot())
         #self.list_of_files_pedestals.append(self.path_tahometer_psana_cfg())
         #self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
         return self.list_of_files_pedestals

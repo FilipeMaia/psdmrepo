@@ -132,11 +132,20 @@ class GUIDark ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
+
+        try    : cp.imgspewithgui.close()
+        except : pass
+
+        try    : del cp.imgspewithgui
+        except : pass
+
         try    : del cp.guidark # GUIDark
         except : pass # silently ignore
 
+
     def onClose(self):
         logger.debug('onClose', __name__)
+
         self.close()
 
     def on_but_submit(self):
@@ -162,14 +171,9 @@ class GUIDark ( QtGui.QWidget ) :
             arr = bjpeds.get_pedestals_from_file()
             print arr.shape
             print arr
-
-            #gg.plotImageAndSpectrum(arr,range=(100,300))
-            #gg.show()
-
             cp.imgspewithgui = ImgSpeWithGUI(None, arr)
             #cp.imgspewithgui.setParent(self)
-            #cp.imgspewithgui.set_image_array( arr )
-            cp.imgspewithgui.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
+            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
             cp.imgspewithgui.show()
             #but.setStyleSheet(cp.styleButtonGood)
 

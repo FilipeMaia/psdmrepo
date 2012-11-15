@@ -31,6 +31,9 @@ import os
 
 from PyQt4 import QtGui, QtCore
 
+from Logger                 import logger
+from FileNameManager        import fnm
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -66,12 +69,13 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.myGridIsOn = False
         self.myLogIsOn  = False
 
-        self.but_draw  = QtGui.QPushButton("&Draw")
-        self.but_quit  = QtGui.QPushButton("&Quit")
-        self.cbox_grid = QtGui.QCheckBox("&Grid")
+        self.but_draw  = QtGui.QPushButton('&Draw')
+        self.but_save  = QtGui.QPushButton('&Save')
+        self.but_quit  = QtGui.QPushButton('&Quit')
+        self.cbox_grid = QtGui.QCheckBox('&Grid')
         self.cbox_grid.setChecked(self.myGridIsOn)
-        #self.cbox_log  = QtGui.QCheckBox("&Log")
-        #self.cbox_log.setChecked(self.myLogIsOn)
+        self.cbox_log  = QtGui.QCheckBox('&Log')
+        self.cbox_log.setChecked(self.myLogIsOn)
 
         #self.cboxXIsOn = QtGui.QCheckBox("X min, max:")
         #self.cboxYIsOn = QtGui.QCheckBox("Y min, max:")
@@ -104,9 +108,10 @@ class ImgSpeButtons (QtGui.QWidget) :
 
  
         self.connect(self.but_draw,  QtCore.SIGNAL('clicked()'),         self.on_but_draw)
+        self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),         self.on_but_save)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),         self.on_but_quit)
         self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_grid)
-        #self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_log)
+        self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_log)
         self.connect(self.cboxZIsOn, QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_z)
         self.connect(self.editZmin,  QtCore.SIGNAL('editingFinished ()'), self.on_edit_zmin)
         self.connect(self.editZmax,  QtCore.SIGNAL('editingFinished ()'), self.on_edit_zmax)
@@ -127,9 +132,10 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.editZmax,  0, 3)
         self.grid.addWidget(self.editNBins, 0, 4)
         self.grid.addWidget(self.cbox_grid, 0, 5)
-        #self.grid.addWidget(self.cbox_log,  0, 6)
+        self.grid.addWidget(self.cbox_log,  0, 6)
         self.grid.addWidget(self.but_draw,  0, 7)
-        self.grid.addWidget(self.but_quit,  0, 8)
+        self.grid.addWidget(self.but_save,  0, 8)
+        self.grid.addWidget(self.but_quit,  0, 9)
 
         #hboxX.addWidget(self.cboxXIsOn)
         #hboxX.addWidget(self.editXmin)
@@ -160,11 +166,11 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.frame.setGeometry(self.rect())
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
-        print 'Close application'
+        #print 'Close application'
         self.parent.close()
            
     def on_but_quit(self):
-        print 'Quit'
+        logger.debug('on_but_quit', __name__ )
         self.close()
      
     def setEditFieldValues(self) :
@@ -241,21 +247,38 @@ class ImgSpeButtons (QtGui.QWidget) :
 
     def on_edit_nbins(self):
         self.fig.myNBins = int(self.editNBins.displayText())
-        print 'self.fig.myNBins = ', self.fig.myNBins
+        logger.info('Set for spectrum the number of bins ='+str(self.fig.myNBins), __name__ )
         self.widgimage.processDraw()
  
 
     def on_but_draw(self):
-        print 'Re-draw image.'
+        logger.debug('on_but_draw', __name__ )
         self.widgimage.processDraw()
 
 
+    def on_but_save(self):
+        logger.debug('on_but_save', __name__ )
+        path = fnm.path_pedestals_plot()
+        #dir, fname = os.path.split(path)
+        path  = str( QtGui.QFileDialog.getSaveFileName(self,
+                                                       caption='Select file to save the plot',
+                                                       directory = path,
+                                                       filter = '*.png, *.eps, *pdf, *.ps'
+                                                       ) )
+        #dname, fname = os.path.split(path)
+        if path == '' :
+            logger.debug('Saving is cancelled.', __name__ )
+            return
+        logger.info('Save plot in file: ' + path, __name__ )
+        self.widgimage.saveFigure(path)
+
+
     def on_cbox_log(self):
-        print 'Not implemented yet.'
+        logger.info('Not implemented yet.', __name__ )
 
 
     def on_cbox_grid(self):
-        #print 'on_cbox_grid'
+        logger.info('On/Off grid.', __name__ )
         self.fig.myGridIsOn = self.cbox_grid.isChecked()
         self.widgimage.processDraw()
         
