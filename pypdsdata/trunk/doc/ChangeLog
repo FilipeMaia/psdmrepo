@@ -6,9 +6,9 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
-Tag: V00-00-83
+Tag: V00-00-84
 2012-11-15 Andy Salnikov
-- upgrading to pdsdata V04-05-00
+- upgrading to pdsdata V05-01-00
 - new class bld BldDataGMDV1
 - new enum in DetInfo
 
