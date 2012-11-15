@@ -118,14 +118,6 @@ function page_specific_init() {
             $('#instrument-'+page1).tabs( 'select', '#instrument-'+page1+'-current-'+page2 );
         }
     }
-    
-    var url = 'https://pswww.slac.stanford.edu/apps/portal/experiment_switch';
-    post_info(
-        'Warning',
-        'This is a development version of the application which may not properly function in production.<br><br>'+
-        'Here is a link to the producton version:'+
-        '<ul><li><a class="link" href="'+url+'">'+url+'</a></li></ul>',
-        {width:520, height:160});
 }
 
 /* --------------------------------------------------------
@@ -533,7 +525,7 @@ HERE;
         for( $station=0; $station < intval($num_stations->value()); $station++ ) {
             array_push(
                 $instrument_tabs,
-                array('name' => $station.': Current Experiment',
+                array('name' => 'Current Experiment'.(intval($num_stations->value()) > 1 ? ", station {$station}" : ''),
                       'id'   => 'instrument-'.$instrument->name().'-current-'.$station,
                       'html' => $html[$station],
                       'class' => 'tab-inline-content'

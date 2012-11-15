@@ -69,8 +69,8 @@ class Config extends DbConnection {
         $now = LusiTime::now();
         $host_str = $this->escape_string(trim($authdb->authRemoteAddr()));
         $this->query($subscribe ?
-            "INSERT INTO subscriber_migration VALUES (NULL,'{$subscriber_str}','{$address_str}','{$by}',{$now->to64()},'{$host_str}')" :
-            "DELETE FROM subscriber_migration WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
+            "INSERT INTO {$this->database}.subscriber_migration VALUES (NULL,'{$subscriber_str}','{$address_str}','{$by}',{$now->to64()},'{$host_str}')" :
+            "DELETE FROM {$this->database}.subscriber_migration WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'"
         );
         $url = ($_SERVER[HTTPS] ? "https://" : "http://" ) . $_SERVER['SERVER_NAME'] . '/apps-dev/portal/DataMigrationMonitor';
 
@@ -136,7 +136,7 @@ HERE
     public function check_if_subscribed4migration($subscriber, $address) {
         $subscriber_str = $this->escape_string(trim($subscriber));
         $address_str = $this->escape_string(trim($address));
-        $result = $this->query("SELECT * FROM subscriber_migration WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'");
+        $result = $this->query("SELECT * FROM {$this->database}.subscriber_migration WHERE subscriber='{$subscriber_str}' AND address='{$address_str}'");
         $nrows = mysql_numrows($result);
         if (!$nrows) return null;
         if ($nrows != 1) throw new DataPortalException(__METHOD__, "duplicate entries for migration subscriber: {$subscriber} ({$address}) in database. Database can be corrupted.");
@@ -153,7 +153,7 @@ HERE
 
     public function get_all_subscribed4migration() {
         $list = array();
-        $result = $this->query("SELECT * FROM subscriber_migration");
+        $result = $this->query("SELECT * FROM {$this->database}.subscriber_migration");
         $nrows = mysql_numrows($result);
         for ($i = 0; $i < $nrows; $i++) {
             $row = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -169,13 +169,12 @@ HERE
         $sql = null;
         if (trim($value) == '') {
             if (!is_null($this->get_policy_param($storage, $attr)))
-                $sql = "DELETE FROM storage_policy WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
+                $sql = "DELETE FROM {$this->database}.storage_policy WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
         } else {
             $value_escaped = $this->escape_string(strtolower(trim($value)));
-            if (is_null($this->get_policy_param($storage, $attr)))
-                $sql = "INSERT INTO storage_policy VALUES ('{$storage_escaped}','{$attr_escaped}','{$value_escaped}')";
-            else
-                $sql = "UPDATE storage_policy SET value='{$value_escaped}' WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
+            $sql = is_null($this->get_policy_param($storage, $attr)) ?
+                "INSERT INTO {$this->database}.storage_policy VALUES ('{$storage_escaped}','{$attr_escaped}','{$value_escaped}')" :
+                "UPDATE {$this->database}.storage_policy SET value='{$value_escaped}' WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'" ;
         }
         $this->query($sql);
     }
@@ -183,7 +182,7 @@ HERE
     public function get_policy_param($storage, $attr) {
         $storage_escaped = $this->escape_string(trim($storage));
         $attr_escaped = $this->escape_string(trim($attr));
-        $sql = "SELECT value FROM storage_policy WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
+        $sql = "SELECT value FROM {$this->database}.storage_policy WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
         $result = $this->query($sql);
         $nrows = mysql_numrows($result);
         if (!$nrows) return null;
@@ -217,7 +216,7 @@ HERE
         $irods_dst_resource = $this->escape_string(trim($request['irods_dst_resource']));
         $requested_time = LusiTime::now();
         $requested_uid = $this->escape_string(trim(AuthDB::instance()->authName()));
-        $sql = "INSERT INTO file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}')";
+        $sql = "INSERT INTO {$this->database}.file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}')";
         $this->query($sql);
         return $this->find_file_restore_request($request);
     }
@@ -253,7 +252,7 @@ HERE
         $irods_filepath     = $this->escape_string(trim($request['irods_filepath']));
         $irods_src_resource = $this->escape_string(trim($request['irods_src_resource']));
         $irods_dst_resource = $this->escape_string(trim($request['irods_dst_resource']));
-        $sql                = "SELECT * FROM file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+        $sql                = "SELECT * FROM {$this->database}.file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
 
         $result = $this->query($sql);
         $nrows  = mysql_numrows($result);
@@ -275,7 +274,7 @@ HERE
         if ($runnum)    $opt .= ( $opt ? ' AND' : ' WHERE' ) . " runnum={$runnum}";
         if ($file_type) $opt .= ( $opt ? ' AND' : ' WHERE' ) . " file_type='" . $this->escape_string(strtolower(trim($file_type))) . "'";
 
-        $result = $this->query("SELECT * FROM file_restore_requests {$opt} ORDER BY requested_time DESC, exper_id, runnum, file_type");
+        $result = $this->query("SELECT * FROM {$this->database}.file_restore_requests {$opt} ORDER BY requested_time DESC, exper_id, runnum, file_type");
 
         for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++) {
             $row = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -302,7 +301,7 @@ HERE
         $irods_filepath     = $this->escape_string(trim($request['irods_filepath']));
         $irods_src_resource = $this->escape_string(trim($request['irods_src_resource']));
         $irods_dst_resource = $this->escape_string(trim($request['irods_dst_resource']));
-        $sql                = "DELETE FROM file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
+        $sql                = "DELETE FROM {$this->database}.file_restore_requests WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_src_resource='{$irods_src_resource}' AND irods_dst_resource='{$irods_dst_resource}'";
         $this->query($sql);
     }
 
@@ -331,7 +330,7 @@ HERE
         $irods_size      = intval($request['irods_size']);
         $registered_time = LusiTime::now();
         $registered_uid  = $this->escape_string(trim(AuthDB::instance()->authName()));
-        $sql             = "INSERT INTO medium_term_storage VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_resource}',{$irods_size},{$registered_time->to64()},'{$registered_uid}')";
+        $sql             = "INSERT INTO {$this->database}.medium_term_storage VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_resource}',{$irods_size},{$registered_time->to64()},'{$registered_uid}')";
         $this->query($sql);
 
         return $this->find_medium_store_file($request);
@@ -350,7 +349,7 @@ HERE
         $runnum         = intval($runnum);
         $file_type      = $this->escape_string(strtoupper(trim($file_type)));
         $irods_filepath = $this->escape_string(trim($irods_filepath));
-        $sql            = "DELETE FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}'";
+        $sql            = "DELETE FROM {$this->database}.medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}'";
         $this->query($sql);
     }
 
@@ -383,7 +382,7 @@ HERE
         $file_type = $this->escape_string(strtoupper(trim($request['file_type'])));
         $irods_filepath = $this->escape_string(trim($request['irods_filepath']));
         $irods_resource = $this->escape_string(trim($request['irods_resource']));
-        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_resource='{$irods_resource}'";
+        $sql = "SELECT * FROM {$this->database}.medium_term_storage WHERE exper_id={$exper_id} AND runnum={$runnum} AND file_type='{$file_type}' AND irods_filepath='{$irods_filepath}' AND irods_resource='{$irods_resource}'";
         $result = $this->query($sql);
         $nrows = mysql_numrows($result);
         if (!$nrows) return null;
@@ -405,7 +404,7 @@ HERE
         $list = array();
         $exper_id = intval($exper_id);
         $file_type_option = is_null($file_type) ? '' : ", AND file_type='" . $this->escape_string(strtoupper(trim($file_type))) . "'";
-        $sql = "SELECT * FROM medium_term_storage WHERE exper_id={$exper_id} {$file_type_option} ORDER BY runnum, file_type, irods_filepath";
+        $sql = "SELECT * FROM {$this->database}.medium_term_storage WHERE exper_id={$exper_id} {$file_type_option} ORDER BY runnum, file_type, irods_filepath";
         $result = $this->query($sql);
         for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++) {
             $row = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -439,7 +438,7 @@ HERE
     public function create_irods_cache($application) {
         $application_escaped = $this->escape_string(trim($application));
         $created_time_64 = LusiTime::now()->to64();
-        $sql = "INSERT INTO irods_cache VALUES (NULL,'{$application_escaped}',{$created_time_64})";
+        $sql = "INSERT INTO {$this->database}.irods_cache VALUES (NULL,'{$application_escaped}',{$created_time_64})";
         $this->query($sql);
         return $this->find_irods_cache_by_('id=(SELECT LAST_INSERT_ID())');
     }
@@ -452,7 +451,7 @@ HERE
      * @return a descriptor object with 3 public members: 'id','application','create_time'
      */
     private function find_irods_cache_by_($condition) {
-        $sql = "SELECT * FROM irods_cache WHERE {$condition}";
+        $sql = "SELECT * FROM {$this->database}.irods_cache WHERE {$condition}";
         $result = $this->query($sql);
         $nrows = mysql_numrows($result);
         if (!$nrows) return null;
@@ -477,7 +476,7 @@ HERE
     public function add_files_irods_cache($cache_id, $exper_id, $file_type, $runs) {
         $file_type_escaped = $this->escape_string(trim($file_type));
         foreach ($runs as $r) {
-            $run_sql = "INSERT INTO irods_type_run VALUES(NULL,{$cache_id},{$exper_id},'{$file_type_escaped}',{$r->run})";
+            $run_sql = "INSERT INTO {$this->database}.irods_type_run VALUES(NULL,{$cache_id},{$exper_id},'{$file_type_escaped}',{$r->run})";
             $this->query($run_sql);
             $run_descriptor = $this->find_irods_type_run_by_('id=(SELECT LAST_INSERT_ID())');
             $run_id = $run_descriptor->id;
@@ -485,7 +484,7 @@ HERE
                 $type_escaped = $this->escape_string(trim($f->type));
                 $name_escaped = $this->escape_string(trim($f->name));
                 $url_escaped = $this->escape_string(trim($f->url));
-                $file_sql = "INSERT INTO irods_file VALUES({$run_id},{$r->run},'{$type_escaped}','{$name_escaped}','{$url_escaped}',";
+                $file_sql = "INSERT INTO {$this->database}.irods_file VALUES({$run_id},{$r->run},'{$type_escaped}','{$name_escaped}','{$url_escaped}',";
                 if ($f->type == 'object') {
                     $checksum = $this->escape_string(trim($f->checksum));
                     $collName = $this->escape_string(trim($f->collName));
@@ -510,7 +509,7 @@ HERE
      * @return array of 5 keys 'id','cache_id','exper_id','file_type','runnum'
      */
     private function find_irods_type_run_by_($condition) {
-        $sql = "SELECT * FROM irods_type_run WHERE {$condition}";
+        $sql = "SELECT * FROM {$this->database}.irods_type_run WHERE {$condition}";
         $result = $this->query($sql);
         $nrows = mysql_numrows($result);
         if (!$nrows) return null;
@@ -527,7 +526,7 @@ HERE
 
     private function find_irods_type_run_ids($condition) {
         $ids = array();
-        $sql = "SELECT id FROM irods_type_run WHERE {$condition}";
+        $sql = "SELECT id FROM {$this->database}.irods_type_run WHERE {$condition}";
         $result = $this->query($sql);
         for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++) {
             $row = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -552,7 +551,7 @@ HERE
      */
     public function irods_files_from_recent_cache($application, $exper_id, $file_type) {
         $application_escaped = $this->escape_string(trim($application));
-        $cache = $this->find_irods_cache_by_("application='{$application_escaped}' AND create_time IN (SELECT MAX(create_time) FROM irods_cache WHERE application='{$application_escaped}')");
+        $cache = $this->find_irods_cache_by_("application='{$application_escaped}' AND create_time IN (SELECT MAX(create_time) FROM {$this->database}.irods_cache WHERE application='{$application_escaped}')");
         if (is_null($cache)) return null;
         return $this->irods_files($cache->id, $exper_id, $file_type);
     }
@@ -579,7 +578,7 @@ HERE
         }
         if ($runs_ids_str == '') return $runs;  // no runs containg the requested type found for the experiment
 
-        $sql = "SELECT * FROM irods_file WHERE run_id IN ({$runs_ids_str}) ORDER BY run, name";
+        $sql = "SELECT * FROM {$this->database}.irods_file WHERE run_id IN ({$runs_ids_str}) ORDER BY run, name";
         $result = $this->query($sql);
         $current_run = null;
         for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++) {
@@ -631,6 +630,69 @@ HERE
         // Otherwise its contents will be lost before we use it.
         //
         unlink($tmpfname);
+    }
+
+    /**
+     * Find and return an application parameter for the current user.
+     * The method will return null if no such parameter is known to the database.
+     *
+     * Note that an array returned by the operation will contain 3 representations
+     * for the update time of teh parameter:
+     * 
+     *   update_time     - human-readable text (seconds resolution)
+     *   update_time_sec - a 32-bit number of seconds since UNIX Epoch
+     *   update_time_64  - a 64-bit number of nano-seconds since UNIX Epoch
+     *
+     * @param string $application
+     * @param string $scope
+     * @param string $parameter
+     * @return array
+     * @throws DataPortalException
+     */
+    public function find_application_parameter ($application, $scope, $parameter) {
+        $uid = AuthDB::instance()->authName() ;
+        $application_escaped = $this->escape_string(trim($application)) ;
+        $scope_escaped      = $this->escape_string(trim($scope)) ;
+        $parameter_escaped  = $this->escape_string(trim($parameter)) ;
+        $sql = "SELECT * FROM {$this->database}.application_config WHERE uid='{$uid}' AND application='{$application_escaped}' AND scope='{$scope_escaped}' AND parameter='{$parameter_escaped}'" ;
+        $result = $this->query($sql) ;
+        $nrows = mysql_numrows($result) ;
+        if (0 == $nrows) return null ;
+        if (1 != $nrows)
+            throw new DataPortalException (
+                __METHOD__ ,
+                "duplicate entries for query {$sql}). Database can be corrupted."
+            ) ;
+        $row = mysql_fetch_array($result, MYSQL_ASSOC) ;
+        $update_time = LusiTime::from64(intval($row['update_time'])) ;
+        $row['update_time']     = $update_time->toStringShort() ;
+        $row['update_time_sec'] = $update_time->sec ;
+        $row['update_time_64']  = $update_time->to64() ;
+        return $row ;
+    }
+
+    /**
+     * Add or update a value of an application parameter in the database. Return
+     * the value description back.
+     * 
+     * @param string $application
+     * @param string $scope
+     * @param string $parameter
+     * @param string $value
+     * @return array
+     */
+    public function save_application_parameter ($application, $scope, $parameter, $value) {
+        $uid               = AuthDB::instance()->authName() ;
+        $application_escaped = $this->escape_string(trim($application)) ;
+        $scope_escaped      = $this->escape_string(trim($scope)) ;
+        $parameter_escaped  = $this->escape_string(trim($parameter)) ;
+        $value_escaped      = $this->escape_string(trim($value)) ;
+        $update_time_64     = LusiTime::now()->to64() ;
+        $sql = is_null($this->find_application_parameter($application, $scope, $parameter)) ?
+            "INSERT INTO {$this->database}.application_config VALUES('{$uid}','{$application_escaped}','{$scope_escaped}','{$parameter_escaped}','{$value_escaped}',{$update_time_64})" :
+            "UPDATE {$this->database}.application_config SET value='{$value_escaped}', update_time={$update_time_64}" ;
+        $this->query($sql) ;
+        return $this->find_application_parameter($application, $scope, $parameter) ;
     }
 }
 

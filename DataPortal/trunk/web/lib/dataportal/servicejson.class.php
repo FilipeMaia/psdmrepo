@@ -25,16 +25,17 @@ class ServiceJSON {
     //   Data members
     // ----------------
 
-    private $method_var = null ;
-    private $authdb     = null ;
-    private $regdb      = null ;
-    private $logbook    = null ;
-    private $configdb   = null ;
-    private $irodsdb    = null ;
-    private $neocaptar  = null ;
-    private $irep       = null ;
-    private $exptimemon = null ;
-    private $sysmon     = null ;
+    private $method_var  = null ;
+    private $authdb      = null ;
+    private $regdb       = null ;
+    private $logbook     = null ;
+    private $logbookauth = null ;
+    private $configdb    = null ;
+    private $irodsdb     = null ;
+    private $neocaptar   = null ;
+    private $irep        = null ;
+    private $exptimemon  = null ;
+    private $sysmon      = null ;
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -197,6 +198,13 @@ class ServiceJSON {
         }
         return $this->logbook ;
     }
+    public function logbookauth () {
+        if (is_null($this->logbookauth)) {
+            require_once 'logbook/logbook.inc.php' ;
+            $this->logbookauth = \LogBook\LogBookAuth::instance() ;
+        }
+        return $this->logbookauth ;
+    }
     public function configdb () {
         if (is_null($this->configdb)) {
             require_once 'dataportal/dataportal.inc.php' ;
@@ -254,15 +262,16 @@ class ServiceJSON {
         ServiceJSON::report_error ($message, $parameters) ;
     }
     public function finish ($parameters=array()) {
-        if (!is_null($this->authdb    )) $this->authdb    ->commit() ;
-        if (!is_null($this->regdb     )) $this->regdb     ->commit() ;
-        if (!is_null($this->logbook   )) $this->logbook   ->commit() ;
-        if (!is_null($this->configdb  )) $this->configdb  ->commit() ;
-        if (!is_null($this->irodsdb   )) $this->irodsdb   ->commit() ;
-        if (!is_null($this->neocaptar )) $this->neocaptar ->commit() ;
-        if (!is_null($this->irep      )) $this->irep      ->commit() ;
-        if (!is_null($this->exptimemon)) $this->exptimemon->commit() ;
-        if (!is_null($this->sysmon    )) $this->sysmon    ->commit() ;
+        if (!is_null($this->authdb     )) $this->authdb    ->commit() ;
+        if (!is_null($this->regdb      )) $this->regdb     ->commit() ;
+        if (!is_null($this->logbook    )) $this->logbook   ->commit() ;
+        if (!is_null($this->logbookauth)) ;
+        if (!is_null($this->configdb   )) $this->configdb  ->commit() ;
+        if (!is_null($this->irodsdb    )) $this->irodsdb   ->commit() ;
+        if (!is_null($this->neocaptar  )) $this->neocaptar ->commit() ;
+        if (!is_null($this->irep       )) $this->irep      ->commit() ;
+        if (!is_null($this->exptimemon )) $this->exptimemon->commit() ;
+        if (!is_null($this->sysmon     )) $this->sysmon    ->commit() ;
         ServiceJSON::report_success ($parameters) ;
     }
 

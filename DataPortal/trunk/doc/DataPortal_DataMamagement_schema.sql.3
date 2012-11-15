@@ -159,27 +159,6 @@ ENGINE = InnoDB
 COMMENT = 'Cached files';
 
 
--- -----------------------------------------------------
--- Table `WEBPORTAL`.`APPLICATION_CONFIG`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `WEBPORTAL`.`APPLICATION_CONFIG` ;
-
-CREATE  TABLE IF NOT EXISTS `WEBPORTAL`.`APPLICATION_CONFIG` (
-
-  `uid`         VARCHAR(32)     NOT NULL ,
-  `application` VARCHAR(255)    NOT NULL ,
-  `scope`       VARCHAR(255)    NOT NULL ,
-  `parameter`   VARCHAR(255)    NOT NULL ,
-  `value`       TEXT            NOT NULL ,
-  `update_time` BIGINT UNSIGNED NOT NULL ,
-
-  UNIQUE KEY  (`uid`, `application`, `scope`, `parameter`)
-)
-ENGINE = InnoDB
-COMMENT = 'Persistent cache for application parameters' ;
-
-
-
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
