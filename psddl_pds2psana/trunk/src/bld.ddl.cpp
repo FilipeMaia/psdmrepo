@@ -152,5 +152,24 @@ double BldDataGMDV0::pulseEnergyFEE() const { return m_xtcObj->pulseEnergyFEE();
 double BldDataGMDV0::transmission() const { return m_xtcObj->transmission(); }
 
 double BldDataGMDV0::transmissionFEE() const { return m_xtcObj->transmissionFEE(); }
+BldDataGMDV1::BldDataGMDV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataGMDV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataGMDV1::~BldDataGMDV1()
+{
+}
+
+
+double BldDataGMDV1::milliJoulesPerPulse() const { return m_xtcObj->milliJoulesPerPulse(); }
+
+double BldDataGMDV1::milliJoulesAverage() const { return m_xtcObj->milliJoulesAverage(); }
+
+double BldDataGMDV1::correctedSumPerPulse() const { return m_xtcObj->correctedSumPerPulse(); }
+
+double BldDataGMDV1::bgValuePerSample() const { return m_xtcObj->bgValuePerSample(); }
+
+double BldDataGMDV1::relativeEnergyPerPulse() const { return m_xtcObj->relativeEnergyPerPulse(); }
 } // namespace Bld
 } // namespace psddl_pds2psana

@@ -106,6 +106,23 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+
+class BldDataGMDV1 : public Psana::Bld::BldDataGMDV1 {
+public:
+  typedef PsddlPds::Bld::BldDataGMDV1 XtcType;
+  typedef Psana::Bld::BldDataGMDV1 PsanaType;
+  BldDataGMDV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataGMDV1();
+  virtual double milliJoulesPerPulse() const;
+  virtual double milliJoulesAverage() const;
+  virtual double correctedSumPerPulse() const;
+  virtual double bgValuePerSample() const;
+  virtual double relativeEnergyPerPulse() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Bld
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_BLD_DDL_H

@@ -435,6 +435,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_GMD:
     if (version == 0) ::storeDataProxy<Bld::BldDataGMDV0>(xtc, evt);
+    if (version == 1) ::storeDataProxy<Bld::BldDataGMDV1>(xtc, evt);
     break;
   case Pds::TypeId::NumberOf:
     break;
