@@ -456,7 +456,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.MecFdi, 42 )
         self.assertEqual ( DetInfo.Detector.MecTimeTool, 43 )
         self.assertEqual ( DetInfo.Detector.MecTargetChamber, 44 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 45 )
+        self.assertEqual ( DetInfo.Detector.FeeHxSpectrometer, 45 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 46 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )

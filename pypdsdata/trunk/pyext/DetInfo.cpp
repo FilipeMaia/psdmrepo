@@ -93,6 +93,7 @@ namespace {
       { "MecFdi",      Pds::DetInfo::MecFdi },
       { "MecTimeTool", Pds::DetInfo::MecTimeTool },
       { "MecTargetChamber", Pds::DetInfo::MecTargetChamber },
+      { "FeeHxSpectrometer", Pds::DetInfo::FeeHxSpectrometer },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };

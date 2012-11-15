@@ -38,6 +38,7 @@
 #include "types/bld/BldDataEBeamV3.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataGMDV0.h"
+#include "types/bld/BldDataGMDV1.h"
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
@@ -467,6 +468,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_GMD :
     if ( not obj ) obj = xtc2obj<BldDataGMDV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataGMDV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

@@ -65,6 +65,7 @@
 #include "types/bld/BldDataEBeamV3.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataGMDV0.h"
+#include "types/bld/BldDataGMDV1.h"
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
@@ -268,6 +269,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::BldDataEBeamV3::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
   pypdsdata::BldDataGMDV0::initType( module );
+  pypdsdata::BldDataGMDV1::initType( module );
   pypdsdata::BldDataIpimbV0::initType( module );
   pypdsdata::BldDataIpimbV1::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
