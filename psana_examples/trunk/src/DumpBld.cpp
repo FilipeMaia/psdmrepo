@@ -50,6 +50,7 @@ DumpBld::DumpBld (const std::string& name)
   m_feeSrc = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
   m_ipimbSrc = configStr("ipimbSource", "BldInfo(NH2-SB1-IPM-01)");
   m_pimSrc = configStr("pimSource", "BldInfo(XCS-DIO-01)");
+  m_gmdSrc = configStr("gmdSource", "BldInfo()");
 }
 
 //--------------
@@ -306,6 +307,44 @@ DumpBld::event(Event& evt, Env& env)
       }
     }
   }
+
+
+  // dump BldDataGMDV0
+  shared_ptr<Psana::Bld::BldDataGMDV0> gmd0 = evt.get(m_gmdSrc);
+  if (gmd0.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataGMDV0:"
+          << "\n  gasType = " << gmd0->gasType()
+          << "\n  pressure = " << gmd0->pressure()
+          << "\n  temperature = " << gmd0->temperature()
+          << "\n  current = " << gmd0->current()
+          << "\n  hvMeshElectron = " << gmd0->hvMeshElectron()
+          << "\n  hvMeshIon = " << gmd0->hvMeshIon()
+          << "\n  hvMultIon = " << gmd0->hvMultIon()
+          << "\n  chargeQ = " << gmd0->chargeQ()
+          << "\n  photonEnergy = " << gmd0->photonEnergy()
+          << "\n  multPulseIntensity = " << gmd0->multPulseIntensity()
+          << "\n  keithleyPulseIntensity = " << gmd0->keithleyPulseIntensity()
+          << "\n  pulseEnergy = " << gmd0->pulseEnergy()
+          << "\n  pulseEnergyFEE = " << gmd0->pulseEnergyFEE()
+          << "\n  transmission = " << gmd0->transmission()
+          << "\n  transmissionFEE = " << gmd0->transmissionFEE();
+    }
+  }
+
+  // dump BldDataGMDV1
+  shared_ptr<Psana::Bld::BldDataGMDV1> gmd1 = evt.get(m_gmdSrc);
+  if (gmd1.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataGMDV1:"
+          << "\n  milliJoulesPerPulse = " << gmd1->milliJoulesPerPulse()
+          << "\n  milliJoulesAverage = " << gmd1->milliJoulesAverage()
+          << "\n  correctedSumPerPulse = " << gmd1->correctedSumPerPulse()
+          << "\n  bgValuePerSample = " << gmd1->bgValuePerSample()
+          << "\n  relativeEnergyPerPulse = " << gmd1->relativeEnergyPerPulse();
+    }
+  }
+
 }
 
 } // namespace psana_examples
