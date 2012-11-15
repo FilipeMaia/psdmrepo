@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIFileBrowser ...
+#  Module GUIHelp ...
 #
 #------------------------------------------------------------------------
 
@@ -30,38 +30,28 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-from FileNameManager        import fnm
-import GlobalUtils          as     gu
+#import GlobalUtils          as     gu
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIFileBrowser ( QtGui.QWidget ) :
-    """GUI File Browser"""
+class GUIHelp ( QtGui.QWidget ) :
+    """GUI Help"""
 
-    def __init__ ( self, parent=None ) :
+    def __init__ ( self, parent=None, msg='No message in GUIHelp...' ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 900, 500)
-        self.setWindowTitle('GUI File Browser')
+        self.setGeometry(100, 100, 730, 200)
+        self.setWindowTitle('GUI Help')
         self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()
- 
         self.tit_status = QtGui.QLabel('Status:')
-        self.tit_file   = QtGui.QLabel('File:')
         self.but_close  = QtGui.QPushButton('Close') 
-
-        self.box_file      = QtGui.QComboBox( self ) 
-        self.makeListOfFiles()
 
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget( self.box_txt )
-
-        self.hboxF = QtGui.QHBoxLayout()
-        self.hboxF.addWidget(self.tit_file)
-        self.hboxF.addWidget(self.box_file)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
@@ -69,16 +59,13 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_close)
 
         self.vbox  = QtGui.QVBoxLayout()
-        #self.vbox.addWidget(self.tit_title)
-        self.vbox.addLayout(self.hboxF)
         self.vbox.addLayout(self.hboxM)
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
-        self.connect( self.box_file, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
  
-        self.startFileBrowser()
+        self.startFileBrowser(msg)
 
         self.showToolTips()
         self.setStyle()
@@ -104,23 +91,9 @@ class GUIFileBrowser ( QtGui.QWidget ) :
     def setStyle(self):
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_status.setStyleSheet (cp.styleTitle)
-        self.tit_file  .setStyleSheet (cp.styleTitle)
-        self.tit_file  .setFixedWidth (25)
-        self.tit_file  .setAlignment  (QtCore.Qt.AlignRight)
-        self.box_file  .setStyleSheet (cp.styleButton) 
         self.but_close .setStyleSheet (cp.styleButton)
         self.box_txt   .setReadOnly   (True)
         self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
-
-
-    def makeListOfFiles(self):        
-        self.list_of_files  = ['Click on this box and select file from pop-up-list']
-        self.list_of_files += fnm.get_list_of_files_pedestals()
-        self.list_of_files += fnm.get_list_of_files_flatfield()
-        self.list_of_files += fnm.get_list_of_files_data()
-        self.box_file.clear()
-        self.box_file.addItems(self.list_of_files)
-        self.box_file.setCurrentIndex( 0 )        
 
 
     def setParent(self,parent) :
@@ -147,7 +120,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 
         self.box_txt.close()
 
-        try    : del cp.guifilebrowser # GUIFileBrowser
+        try    : del cp.guihelp # GUIHelp
         except : pass
 
 
@@ -156,48 +129,12 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.close()
 
 
-    def onBox(self):
-        fname = str( self.box_file.currentText() )
-        logger.info('onBox - selected file: ' + fname, __name__)
-
-        self.list_of_supported = 'cfg', 'txt' 
-        self.str_of_supported = ''
-        for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
+    def startFileBrowser(self, msg) :
+        logger.debug('Start the GUIHelp.',__name__)
+        self.box_txt.setText(msg)
+        self.setStatus(0, 'Status: show help info...')
 
 
-        if self.list_of_files.index(fname) == 0 :
-            self.setStatus(0, 'Waiting for file selection...')
-            self.box_txt.setText('Click on file-box and select the file from pop-up list...')
-
-        elif os.path.lexists(fname) :
-            ext = os.path.splitext(fname)[1].lstrip('.')
-
-            if ext in self.list_of_supported :
-                self.box_txt.setText(gu.get_text_file_content(fname))
-                self.setStatus(0, 'Status: enjoy browsing the selected file...')
-
-            else :
-                self.box_txt.setText('Sorry, but this browser supports text files with extensions:' +
-                                     self.str_of_supported + '\nTry to select another file...')
-                self.setStatus(1, 'Status: ' + ext + '-file is not supported...')
-
-        else :
-            self.box_txt.setText( 'Selected file is not avaliable...\nTry to select another file...')
-            self.setStatus(2, 'Status: WARNING: FILE IS NOT AVAILABLE!')
-
-
-    def startFileBrowser(self) :
-        logger.debug('Start the GUIFileBrowser.',__name__)
-        self.setStatus(0, 'Waiting for file selection...')
-        self.box_txt.setText('Click on file-box and select the file from pop-up list...')
-
-
-    def appendGUILog(self, msg='...'):
-        self.box_txt.append(msg)
-        scrol_bar_v = self.box_txt.verticalScrollBar() # QScrollBar
-        scrol_bar_v.setValue(scrol_bar_v.maximum()) 
-
-        
     def setStatus(self, status_index=0, msg=''):
         list_of_states = ['Good','Warning','Alarm']
         if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
@@ -212,7 +149,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIFileBrowser ()
+    widget = GUIHelp ()
     widget.show()
     app.exec_()
 

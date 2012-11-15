@@ -66,25 +66,25 @@ class ImgSpeWidget (QtGui.QWidget) :
         self.setLayout(vbox)
         #-----------------------------------
         self.initParameters()
+        self.setFrame()
         if self.arr != None : self.on_draw()
 
 
     def initParameters(self):
-        self.setFrame()
-        self.fig.myXmin = None
-        self.fig.myXmax = None
-        self.fig.myYmin = None
-        self.fig.myYmax = None
-        self.fig.myZmin = None
-        self.fig.myZmax = None
-        self.fig.myNBins = 100
+        self.fig.myXmin      = None
+        self.fig.myXmax      = None
+        self.fig.myYmin      = None
+        self.fig.myYmax      = None
+        self.fig.myZmin      = None
+        self.fig.myZmax      = None
+        self.fig.myNBins     = 100
         self.fig.myGridIsOn  = False
         self.fig.myLogIsOn   = False
         self.fig.myZoomIsOn  = False
         self.fig.ntbZoomIsOn = False
 
-        self.xpress = 0
-        self.ypress = 0
+        self.xpress    = 0
+        self.ypress    = 0
         self.xpressabs = 0
         self.ypressabs = 0
 
@@ -120,10 +120,10 @@ class ImgSpeWidget (QtGui.QWidget) :
     def processDraw(self) :
         #fig = event.canvas.figure
         fig = self.fig
-        self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
+        self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax, fig.myNBins)
 
 
-    def on_draw(self, xmin=None, xmax=None, ymin=None, ymax=None, zmin=None, zmax=None):
+    def on_draw(self, xmin=None, xmax=None, ymin=None, ymax=None, zmin=None, zmax=None, nbins=100):
         """Redraws the figure"""
 
         if xmin == None or xmax == None or ymin == None or ymax == None :
@@ -158,7 +158,7 @@ class ImgSpeWidget (QtGui.QWidget) :
         #self.fig.myaxesH = self.fig.add_subplot(212)
         self.fig.myaxesH = self.fig.add_subplot(gs[15:19,:])
         
-        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=self.fig.myNBins, range=h1Range)#, range=(Amin, Amax)) 
+        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=nbins, range=h1Range)#, range=(Amin, Amax)) 
         self.fig.myaxesH.grid(self.fig.myGridIsOn)
         Nmin, Nmax = self.fig.myaxesH.get_ylim() 
         yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))

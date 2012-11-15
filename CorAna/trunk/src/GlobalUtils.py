@@ -303,7 +303,7 @@ def get_current_gm_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
 #----------------------------------
 
 def get_array_from_file(fname) :
-    print 'get_array_from_file:', fname
+    #print 'get_array_from_file:', fname
     return np.loadtxt(fname, dtype=np.float32)
 
 #    

@@ -169,8 +169,8 @@ class GUIDark ( QtGui.QWidget ) :
             #but.setStyleSheet(cp.styleButtonBad)
         except :
             arr = bjpeds.get_pedestals_from_file()
-            print arr.shape
-            print arr
+            if arr == None : return
+            #print arr.shape,'\n', arr
             cp.imgspewithgui = ImgSpeWithGUI(None, arr)
             #cp.imgspewithgui.setParent(self)
             cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))

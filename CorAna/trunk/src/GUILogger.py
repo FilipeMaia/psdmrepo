@@ -54,8 +54,8 @@ class GUILogger ( QtGui.QWidget ) :
         #self.tit_title  = QtGui.QLabel('Logger')
         self.tit_status = QtGui.QLabel('Status:')
         self.tit_level  = QtGui.QLabel('Verbosity level:')
-        self.but_close  = QtGui.QPushButton('Close') 
-        self.but_save   = QtGui.QPushButton('Save Log-file') 
+        self.but_close  = QtGui.QPushButton('&Close') 
+        self.but_save   = QtGui.QPushButton('&Save log-file') 
 
         self.list_of_levels = logger.getListOfLevels()
         self.box_level      = QtGui.QComboBox( self ) 
@@ -94,10 +94,12 @@ class GUILogger ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        #self           .setToolTip('This GUI is intended for run control and monitoring.')
-        self.but_close .setToolTip('Close this window.')
-        self.but_save  .setToolTip('Save current content of the GUI Logger\nin file: '+os.path.basename(self.fname_log))
-        #self.but_show  .setToolTip('Show ...')
+        #self           .setToolTip('This GUI is for browsing log messages')
+        self.box_txt    .setToolTip('Window for log messages')
+        self.but_close  .setToolTip('Close this window')
+        self.but_save   .setToolTip('Save current content of the GUI Logger\nin work directory file: '+os.path.basename(self.fname_log))
+        self.tit_status .setToolTip('The file name, where this log \nwill be saved at the end of session')
+        self.box_level  .setToolTip('Click on this button and \nselect the level of messages \nwhich will be displayed')
 
 
     def setFrame(self):

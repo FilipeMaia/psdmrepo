@@ -45,7 +45,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import ImgSpeNavToolBar     as imgtb
+#import ImgSpeNavToolBar     as imgtb
 import ImgSpeWidget         as imgwidg
 import ImgSpeButtons        as imgbuts
 
@@ -69,14 +69,14 @@ class ImgSpeWithGUI (QtGui.QWidget) :
 
         self.widgimage   = imgwidg.ImgSpeWidget(parent, arr)
         self.widgbuts    = imgbuts.ImgSpeButtons(self, self.widgimage)
-        self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
+        #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  
         #---------------------
 
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
         #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
         vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas 
-        vbox.addWidget(self.mpl_toolbar)                # <=== Add toolbar
+        #vbox.addWidget(self.mpl_toolbar)                # <=== Add toolbar
         vbox.addWidget(self.widgbuts)                   # <=== Add buttons         
         self.setLayout(vbox)
         #self.show()
@@ -114,8 +114,8 @@ class ImgSpeWithGUI (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-        try    : self.mpl_toolbar.close()
-        except : pass
+        #try    : self.mpl_toolbar.close()
+        #except : pass
 
         try    : del cp.imgspewithgui
         except : pass

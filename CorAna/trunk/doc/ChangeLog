@@ -12,9 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
+
+2012-11-15 Mikhail S. Dubrovin
+- add modules:
+A         src/GUIHelp.py
+
 2012-11-14 Mikhail S. Dubrovin
 - add/change modules:
-A       src/GUIFileBrowser.py
+A         src/GUIFileBrowser.py
 
 2012-11-11 Mikhail S. Dubrovin
 - add/change modules:

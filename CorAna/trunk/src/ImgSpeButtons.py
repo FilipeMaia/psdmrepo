@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Plots for any 'image' record in the EventeDisplay project.
+"""Buttons for interactive plot of the image and spectrum for 2-d array
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -33,6 +33,8 @@ from PyQt4 import QtGui, QtCore
 
 from Logger                 import logger
 from FileNameManager        import fnm
+from ConfigParametersCorAna import confpars as cp
+from GUIHelp                import *
 
 #---------------------
 #  Class definition --
@@ -40,7 +42,7 @@ from FileNameManager        import fnm
 
 #class ImgSpeButtons (QtGui.QMainWindow) :
 class ImgSpeButtons (QtGui.QWidget) :
-    """A set of buttons for figure control."""
+    """Buttons for interactive plot of the image and spectrum for 2-d array."""
 
     #----------------
     #  Constructor --
@@ -55,102 +57,55 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.parent    = parent
         self.fig       = widgimage.fig
 
-        self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
-        self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
-
-        self.myXmin = None
-        self.myXmax = None
-        self.myYmin = None
-        self.myYmax = None
-        self.myZmin = None
-        self.myZmax = None
-        self.myNBins = 100
-        self.myZoomIsOn = False
-        self.myGridIsOn = False
-        self.myLogIsOn  = False
-
-        self.but_draw  = QtGui.QPushButton('&Draw')
+        self.but_reset = QtGui.QPushButton('&Reset')
+        self.but_help  = QtGui.QPushButton('&Help')
         self.but_save  = QtGui.QPushButton('&Save')
-        self.but_quit  = QtGui.QPushButton('&Quit')
+        self.but_quit  = QtGui.QPushButton('&Close')
         self.cbox_grid = QtGui.QCheckBox('&Grid')
-        self.cbox_grid.setChecked(self.myGridIsOn)
         self.cbox_log  = QtGui.QCheckBox('&Log')
-        self.cbox_log.setChecked(self.myLogIsOn)
+        self.cbox_grid.setChecked(self.fig.myGridIsOn)
+        self.cbox_log .setChecked(self.fig.myLogIsOn)
+        self.tit_nbins = QtGui.QLabel('N bins:')
+        self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
 
-        #self.cboxXIsOn = QtGui.QCheckBox("X min, max:")
-        #self.cboxYIsOn = QtGui.QCheckBox("Y min, max:")
-        self.cboxZIsOn = QtGui.QCheckBox("&A min, max:")
-
-        #self.editXmin  = QtGui.QLineEdit(self.stringOrNone(self.myXmin))
-        #self.editXmax  = QtGui.QLineEdit(self.stringOrNone(self.myXmax))
-        #self.editYmin  = QtGui.QLineEdit(self.stringOrNone(self.myYmin))
-        #self.editYmax  = QtGui.QLineEdit(self.stringOrNone(self.myYmax))
-        self.editZmin  = QtGui.QLineEdit(self.stringOrNone(self.myZmin))
-        self.editZmax  = QtGui.QLineEdit(self.stringOrNone(self.myZmax))
-        self.editNBins = QtGui.QLineEdit(self.stringOrNone(self.myNBins))
-
-        width = 60
-        #self.editXmin.setMaximumWidth(width)
-        #self.editXmax.setMaximumWidth(width)
-        #self.editYmin.setMaximumWidth(width)
-        #self.editYmax.setMaximumWidth(width)
-        self.editZmin .setMaximumWidth(width)
-        self.editZmax .setMaximumWidth(width)
-        self.editNBins.setMaximumWidth(width)
-
-        #self.editXmin.setValidator(QtGui.QIntValidator(0,100000,self))
-        #self.editXmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
-        #self.editYmin.setValidator(QtGui.QIntValidator(0,100000,self))
-        #self.editYmax.setValidator(QtGui.QIntValidator(0,100000,self)) 
-        self.editZmin.setValidator(QtGui.QIntValidator(-100000,100000,self))
-        self.editZmax.setValidator(QtGui.QIntValidator(-100000,100000,self))
-        self.editNBins.setValidator(QtGui.QIntValidator(1,1000,self))
-
+        width = 50
+        self.edi_nbins.setFixedWidth(width)
+        self.but_reset.setFixedWidth(width)
+        self.but_help .setFixedWidth(width)
+        self.but_save .setFixedWidth(width)
+        self.but_quit .setFixedWidth(width)
+        self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
  
-        self.connect(self.but_draw,  QtCore.SIGNAL('clicked()'),         self.on_but_draw)
-        self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),         self.on_but_save)
-        self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),         self.on_but_quit)
-        self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_grid)
-        self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_log)
-        self.connect(self.cboxZIsOn, QtCore.SIGNAL('stateChanged(int)'), self.on_cbox_z)
-        self.connect(self.editZmin,  QtCore.SIGNAL('editingFinished ()'), self.on_edit_zmin)
-        self.connect(self.editZmax,  QtCore.SIGNAL('editingFinished ()'), self.on_edit_zmax)
-        self.connect(self.editNBins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
-
-        #self.connect(self.cboxXIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
-        #self.connect(self.cboxYIsOn, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxes)
-        #self.connect(self.editXmin, QtCore.SIGNAL('editingFinished ()'), self.processEditXmin)
-        #self.connect(self.editXmax, QtCore.SIGNAL('editingFinished ()'), self.processEditXmax)
-        #self.connect(self.editYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditYmin)
-        #self.connect(self.editYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditYmax)
+        self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
+        self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
+        self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
+        self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
+        self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_grid)
+        self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_log)
+        self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
 
         # Layout with box sizers
-        # 
-        self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.cboxZIsOn, 0, 1)
-        self.grid.addWidget(self.editZmin,  0, 2)
-        self.grid.addWidget(self.editZmax,  0, 3)
-        self.grid.addWidget(self.editNBins, 0, 4)
-        self.grid.addWidget(self.cbox_grid, 0, 5)
-        self.grid.addWidget(self.cbox_log,  0, 6)
-        self.grid.addWidget(self.but_draw,  0, 7)
-        self.grid.addWidget(self.but_save,  0, 8)
-        self.grid.addWidget(self.but_quit,  0, 9)
-
-        #hboxX.addWidget(self.cboxXIsOn)
-        #hboxX.addWidget(self.editXmin)
-        #hboxX.addWidget(self.editXmax)
-        #hboxY.addWidget(self.cboxYIsOn)
-        #hboxY.addWidget(self.editYmin)
-        #hboxY.addWidget(self.editYmax)
-        #hboxZ.addWidget(self.cboxZIsOn)
-        #hboxZ.addWidget(self.editZmin)
-        #hboxZ.addWidget(self.editZmax)
-
+        self.grid = QtGui.QGridLayout() 
+        self.grid.addWidget(self.but_help,  0, 0)
+        self.grid.addWidget(self.tit_nbins, 0, 1)
+        self.grid.addWidget(self.edi_nbins, 0, 2)
+        self.grid.addWidget(self.cbox_grid, 0, 3)
+        self.grid.addWidget(self.cbox_log,  0, 4)
+        self.grid.addWidget(self.but_reset, 0, 6)
+        self.grid.addWidget(self.but_save,  0, 7)
+        self.grid.addWidget(self.but_quit,  0, 8)
         self.setLayout(self.grid)
 
-        self.setEditFieldValues()
+        self.showToolTips()
 
+    def showToolTips(self):
+        self.but_reset.setToolTip('Reset original view') 
+        self.but_quit .setToolTip('Quit this GUI') 
+        self.but_save .setToolTip('Save the figure in file') 
+        self.but_help .setToolTip('Click on this button\nand get help') 
+        self.cbox_grid.setToolTip('On/Off grid') 
+        self.cbox_log .setToolTip('Log/Linear scale') 
+        self.edi_nbins.setToolTip('Edit the number of bins\nfor spectrum [1-1000]')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -167,27 +122,35 @@ class ImgSpeButtons (QtGui.QWidget) :
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         #print 'Close application'
-        self.parent.close()
+        try    : cp.guihelp.close()
+        except : pass
+
+        try    : self.parent.close()
+        except : pass
            
     def on_but_quit(self):
         logger.debug('on_but_quit', __name__ )
         self.close()
+
      
-    def setEditFieldValues(self) :
+    #def setEditFieldValues(self) :
         #self.editXmin.setText( str(self.intOrNone(self.myXmin)) )
         #self.editXmax.setText( str(self.intOrNone(self.myXmax)) )
 
         #self.editYmin.setText( str(self.intOrNone(self.myYmin)) )
         #self.editYmax.setText( str(self.intOrNone(self.myYmax)) ) 
 
-        self.editZmin.setText( str(self.intOrNone(self.myZmin)) )
-        self.editZmax.setText( str(self.intOrNone(self.myZmax)) )
+        #self.editZmin.setText( str(self.intOrNone(self.myZmin)) )
+        #self.editZmax.setText( str(self.intOrNone(self.myZmax)) )
 
-        self.setEditFieldColors()
+        #self.setEditFieldColors()
 
        
-    def setEditFieldColors(self) :
+    #def setEditFieldColors(self) :
         
+        #self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
+        #self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
+
         #if self.cboxXIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
         #else                         : self.styleSheet = self.styleSheetGrey
         #self.editXmin.setStyleSheet('Text-align:left;' + self.styleSheet)
@@ -198,20 +161,20 @@ class ImgSpeButtons (QtGui.QWidget) :
         #self.editYmin.setStyleSheet('Text-align:left;' + self.styleSheet)
         #self.editYmax.setStyleSheet('Text-align:left;' + self.styleSheet)
 
-        if self.cboxZIsOn.isChecked():
-            self.styleSheet = self.styleSheetWhite
-            self.fig.myZmin = self.myZmin
-            self.fig.myZmax = self.myZmax
-        else :
-            self.styleSheet = self.styleSheetGrey
-            self.fig.myZmin = None
-            self.fig.myZmax = None
+        #if self.cboxZIsOn.isChecked():
+        #    self.styleSheet = self.styleSheetWhite
+        #    self.fig.myZmin = self.myZmin
+        #    self.fig.myZmax = self.myZmax
+        #else :
+        #    self.styleSheet = self.styleSheetGrey
+        #    self.fig.myZmin = None
+        #    self.fig.myZmax = None
 
-        self.editZmin.setText(str(self.fig.myZmin))
-        self.editZmax.setText(str(self.fig.myZmax))
+        #self.editZmin.setText(str(self.fig.myZmin))
+        #self.editZmax.setText(str(self.fig.myZmax))
             
-        self.editZmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        self.editZmax.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #self.editZmin.setStyleSheet('Text-align:left;' + self.styleSheet)
+        #self.editZmax.setStyleSheet('Text-align:left;' + self.styleSheet)
 
         #self.editXmin.setReadOnly( not self.cboxXIsOn.isChecked() )
         #self.editXmax.setReadOnly( not self.cboxXIsOn.isChecked() )
@@ -219,12 +182,12 @@ class ImgSpeButtons (QtGui.QWidget) :
         #self.editYmin.setReadOnly( not self.cboxYIsOn.isChecked() )
         #self.editYmax.setReadOnly( not self.cboxYIsOn.isChecked() )
 
-        self.editZmin.setReadOnly( not self.cboxZIsOn.isChecked() )
-        self.editZmax.setReadOnly( not self.cboxZIsOn.isChecked() )
+        #self.editZmin.setReadOnly( not self.cboxZIsOn.isChecked() )
+        #self.editZmax.setReadOnly( not self.cboxZIsOn.isChecked() )
 
 
-    def on_cbox_z(self):
-        self.setEditFieldColors()
+    #def on_cbox_z(self):
+    #    self.setEditFieldColors()
 
 
     def stringOrNone(self,value):
@@ -237,23 +200,24 @@ class ImgSpeButtons (QtGui.QWidget) :
         else             : return int(value)
 
 
-    def on_edit_zmin(self):
-        self.fig.myZmin = self.myZmin = self.editZmin.displayText()
+    #def on_edit_zmin(self):
+    #    self.fig.myZmin = self.editZmin.displayText()
 
 
-    def on_edit_zmax(self):
-        self.fig.myZmax = self.myZmax = self.editZmax.displayText()
+    #def on_edit_zmax(self):
+    #    self.fig.myZmax = self.editZmax.displayText()
 
 
     def on_edit_nbins(self):
-        self.fig.myNBins = int(self.editNBins.displayText())
+        self.fig.myNBins = int(self.edi_nbins.displayText())
         logger.info('Set for spectrum the number of bins ='+str(self.fig.myNBins), __name__ )
         self.widgimage.processDraw()
  
 
-    def on_but_draw(self):
-        logger.debug('on_but_draw', __name__ )
-        self.widgimage.processDraw()
+    def on_but_reset(self):
+        logger.debug('on_but_reset', __name__ )
+        self.widgimage.initParameters()
+        self.widgimage.on_draw()
 
 
     def on_but_save(self):
@@ -265,7 +229,6 @@ class ImgSpeButtons (QtGui.QWidget) :
                                                        directory = path,
                                                        filter = '*.png, *.eps, *pdf, *.ps'
                                                        ) )
-        #dname, fname = os.path.split(path)
         if path == '' :
             logger.debug('Saving is cancelled.', __name__ )
             return
@@ -275,12 +238,54 @@ class ImgSpeButtons (QtGui.QWidget) :
 
     def on_cbox_log(self):
         logger.info('Not implemented yet.', __name__ )
+        self.fig.myLogIsOn = self.cbox_log.isChecked()
+        self.widgimage.processDraw()
 
 
     def on_cbox_grid(self):
         logger.info('On/Off grid.', __name__ )
         self.fig.myGridIsOn = self.cbox_grid.isChecked()
         self.widgimage.processDraw()
+
+
+    def on_but_help(self):
+        logger.debug('on_but_help - is not implemented yet...', __name__ )
+        try :
+            cp.guihelp.close()
+        except :
+            cp.guihelp = GUIHelp(None,self.help_message())
+            cp.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
+            cp.guihelp.show()
+
+
+    def help_message(self):
+        msg  = 'Mouse control functions:'
+        msg += '\nZoom-in image: left mouse button click on image, move mouse and release in another image position.'
+        msg += '\nReset image: middle mouse button click on image.'
+        msg += '\nSet minimal amplitude: left mouse button click on histogram or color bar scale.' 
+        msg += '\nSet maximal amplitude: right mouse button click on histogram or color bar scale.' 
+        msg += '\nReset amplitude limits to default: middle mouse button click on histogram or color bar.'
+        msg += '\nReset image and histogram to default: click on "Reset" button.'
+        return msg
+
+    def popup_confirmation_box(self):
+        """Pop-up box for help"""
+        msg = QtGui.QMessageBox(self, windowTitle='Help for interactive plot',
+            text='This is a help',
+            #standardButtons=QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
+            standardButtons=QtGui.QMessageBox.Close)
+
+        msg.setDefaultButton(msg.Close)
+        clicked = msg.exec_()
+
+        #if   clicked == QtGui.QMessageBox.Save :
+        #    logger.debug('Saving is requested', __name__)
+        #elif clicked == QtGui.QMessageBox.Discard :
+        #    logger.debug('Discard is requested', __name__)
+        #else :
+        #    logger.debug('Cancel is requested', __name__)
+        #return clicked
+
         
 #-----------------------------
 
