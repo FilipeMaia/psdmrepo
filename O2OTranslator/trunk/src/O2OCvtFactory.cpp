@@ -33,6 +33,7 @@
 #include "H5DataTypes/BldDataEBeamV3.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/BldDataGMDV0.h"
+#include "H5DataTypes/BldDataGMDV1.h"
 #include "H5DataTypes/BldDataIpimbV0.h"
 #include "H5DataTypes/BldDataIpimbV1.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
@@ -307,6 +308,11 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::BldDataGMDV0> >(
       "Bld::BldDataGMDV0", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_GMD, 0, converter);
+
+  // version for this type is 1
+  converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::BldDataGMDV1> >(
+      "Bld::BldDataGMDV1", chunk_size, compression);
+  ::registerCvt(m_cvtMap, Pds::TypeId::Id_GMD, 1, converter);
 
   // version for this type is 1
   converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::EncoderDataV1> >(
