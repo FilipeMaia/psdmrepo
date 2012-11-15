@@ -404,6 +404,29 @@ public:
   /** Transmission from FEE Gas Detector */
   virtual double transmissionFEE() const = 0;
 };
+
+/** @class BldDataGMDV1
+
+  Gas Monitor Detector data.
+*/
+
+
+class BldDataGMDV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~BldDataGMDV1();
+  /** Shot to shot pulse energy (mJ) */
+  virtual double milliJoulesPerPulse() const = 0;
+  /** Average pulse energy from ION cup current (mJ) */
+  virtual double milliJoulesAverage() const = 0;
+  /** Bg corrected waveform integrated within limits in raw A/D counts */
+  virtual double correctedSumPerPulse() const = 0;
+  /** Avg background value per sample in raw A/D counts */
+  virtual double bgValuePerSample() const = 0;
+  /** Shot by shot pulse energy in arbitrary units */
+  virtual double relativeEnergyPerPulse() const = 0;
+};
 } // namespace Bld
 } // namespace Psana
 #endif // PSANA_BLD_DDL_H

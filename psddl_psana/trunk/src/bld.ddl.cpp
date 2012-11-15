@@ -17,5 +17,8 @@ BldDataPimV1::~BldDataPimV1() {}
 
 BldDataGMDV0::~BldDataGMDV0() {}
 
+
+BldDataGMDV1::~BldDataGMDV1() {}
+
 } // namespace Bld
 } // namespace Psana
