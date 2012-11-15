@@ -441,6 +441,38 @@ private:
   double	_fSpare6;
 };
 #pragma pack(pop)
+
+/** @class BldDataGMDV1
+
+  Gas Monitor Detector data.
+*/
+
+#pragma pack(push,4)
+
+class BldDataGMDV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  /** Shot to shot pulse energy (mJ) */
+  double milliJoulesPerPulse() const { return _fMilliJoulesPerPulse; }
+  /** Average pulse energy from ION cup current (mJ) */
+  double milliJoulesAverage() const { return _fMilliJoulesAverage; }
+  /** Bg corrected waveform integrated within limits in raw A/D counts */
+  double correctedSumPerPulse() const { return _fCorrectedSumPerPulse; }
+  /** Avg background value per sample in raw A/D counts */
+  double bgValuePerSample() const { return _fBgValuePerSample; }
+  /** Shot by shot pulse energy in arbitrary units */
+  double relativeEnergyPerPulse() const { return _fRelativeEnergyPerPulse; }
+  static uint32_t _sizeof()  { return 48; }
+private:
+  double	_fMilliJoulesPerPulse;	/**< Shot to shot pulse energy (mJ) */
+  double	_fMilliJoulesAverage;	/**< Average pulse energy from ION cup current (mJ) */
+  double	_fCorrectedSumPerPulse;	/**< Bg corrected waveform integrated within limits in raw A/D counts */
+  double	_fBgValuePerSample;	/**< Avg background value per sample in raw A/D counts */
+  double	_fRelativeEnergyPerPulse;	/**< Shot by shot pulse energy in arbitrary units */
+  double	_fSpare1;
+};
+#pragma pack(pop)
 } // namespace Bld
 } // namespace PsddlPds
 #endif // PSDDLPDS_BLD_DDL_H
