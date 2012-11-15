@@ -456,5 +456,38 @@
         </pstype>
         
 
+        <!-- ========================================================================= -->
+        
+
+        <pstype name="BldDataGMDV1" type_id="Id_GMD" version="1" pack="4">
+        
+            Gas Monitor Detector data.
+
+            <attribute name="_fMilliJoulesPerPulse" type="double" accessor="milliJoulesPerPulse">
+            Shot to shot pulse energy (mJ)
+            </attribute>
+
+            <attribute name="_fMilliJoulesAverage" type="double" accessor="milliJoulesAverage">
+            Average pulse energy from ION cup current (mJ)
+            </attribute>
+
+            <attribute name="_fCorrectedSumPerPulse" type="double" accessor="correctedSumPerPulse">
+            Bg corrected waveform integrated within limits in raw A/D counts
+            </attribute>
+
+            <attribute name="_fBgValuePerSample" type="double" accessor="bgValuePerSample">
+            Avg background value per sample in raw A/D counts
+            </attribute>
+
+            <attribute name="_fRelativeEnergyPerPulse" type="double" accessor="relativeEnergyPerPulse">
+            Shot by shot pulse energy in arbitrary units
+            </attribute>
+
+            <attribute name="_fSpare1" type="double">
+            </attribute>
+
+        </pstype>
+        
+
     </package>
 </psddl>
