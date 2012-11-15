@@ -110,6 +110,33 @@ class dump_bld (object) :
             print "  fCharge2 =", data.fCharge2
             
 
+        # dump BldDataPhaseCavity
+        data = evt.get(xtc.TypeId.Type.Id_GMD, self.m_src)
+        if data:
+            print "%s: %s" % (data.__class__.__name__, self.m_src)            
+            if type(data) == bld.BldDataGMDV0:
+                print "  strGasType =", repr(data.strGasType)
+                print "  fPressure =", data.fPressure
+                print "  fTemperature =", data.fTemperature
+                print "  fCurrent =", data.fCurrent
+                print "  fHvMeshElectron =", data.fHvMeshElectron
+                print "  fHvMeshIon =", data.fHvMeshIon
+                print "  fHvMultIon =", data.fHvMultIon
+                print "  fChargeQ =", data.fChargeQ
+                print "  fPhotonEnergy =", data.fPhotonEnergy
+                print "  fMultPulseIntensity =", data.fMultPulseIntensity
+                print "  fKeithleyPulseIntensity =", data.fKeithleyPulseIntensity
+                print "  fPulseEnergy =", data.fPulseEnergy
+                print "  fPulseEnergyFEE =", data.fPulseEnergyFEE
+                print "  fTransmission =", data.fTransmission
+                print "  fTransmissionFEE =", data.fTransmissionFEE
+            elif type(data) == bld.BldDataGMDV1:
+                print "  fMilliJoulesPerPulse =", data.fMilliJoulesPerPulse
+                print "  fMilliJoulesAverage =", data.fMilliJoulesAverage
+                print "  fCorrectedSumPerPulse =", data.fCorrectedSumPerPulse
+                print "  fBgValuePerSample =", data.fBgValuePerSample
+                print "  fRelativeEnergyPerPulse =", data.fRelativeEnergyPerPulse
+
     def endjob( self, evt, env ) :
         
         pass
