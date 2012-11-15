@@ -148,6 +148,14 @@ def remove_file(path) :
 
 
 #----------------------------------
+
+def get_text_file_content(path) :
+    f=open(path,'r')
+    text = f.read()
+    f.close() 
+    return text
+
+#----------------------------------
 # assumes: path = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
 def parse_xtc_path(path='.') :
 

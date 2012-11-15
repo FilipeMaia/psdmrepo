@@ -52,6 +52,7 @@ from GUIViewResults      import *
 from GUILogger           import *
 from Logger              import logger
 from FileNameManager     import fnm
+from GUIFileBrowser      import *
 
 #---------------------
 #  Class definition --
@@ -86,6 +87,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.butSave        = QtGui.QPushButton('Save')
         self.butExit        = QtGui.QPushButton('Exit')
         self.butLogger      = QtGui.QPushButton('Logger')
+        self.butFBrowser    = QtGui.QPushButton('File Browser')
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.titControl    )
@@ -97,6 +99,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.vbox.addWidget(self.butViewResults)
         self.vbox.addStretch(1)     
         self.vbox.addWidget(self.butLogger     )
+        self.vbox.addWidget(self.butFBrowser   )
         self.vbox.addStretch(1)     
         self.vbox.addWidget(self.butStop       )
         self.vbox.addWidget(self.butSave       )
@@ -114,6 +117,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
         self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
+        self.connect(self.butFBrowser   ,  QtCore.SIGNAL('clicked()'), self.onFBrowser    )
 
         self.showToolTips()
         self.setStyle()
@@ -162,6 +166,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.butViewResults.setStyleSheet(cp.styleButton)
         self.butStop       .setStyleSheet(cp.styleButton)
         #self.butLogger     .setStyleSheet(cp.styleGreenish)
+        self.butFBrowser   .setStyleSheet(cp.styleButton)
         self.butSave       .setStyleSheet(cp.styleButton)
         self.butExit       .setStyleSheet(cp.styleButton)
         self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
@@ -200,6 +205,9 @@ class GUIMain ( QtGui.QWidget ) :
         except : pass
 
         try    : cp.guilogger.close()
+        except : pass
+
+        try    : cp.guifilebrowser.close()
         except : pass
 
         try    : del cp.guimain
@@ -299,6 +307,15 @@ class GUIMain ( QtGui.QWidget ) :
             logger.info('GUILogger is (re-)started', self.name)
             self.butLogger.setStyleSheet(cp.styleButtonGood)
 
+    def onFBrowser (self):       
+        logger.debug('onFBrowser', self.name)
+        try    :
+            cp.guifilebrowser.close()
+        except :
+            cp.guifilebrowser = GUIFileBrowser()
+            cp.guifilebrowser.setParent(self)
+            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(240,40))) # open window with offset w.r.t. parent
+            cp.guifilebrowser.show()
 
     def onStop(self):       
         logger.debug('onStop - not implemented yet...', self.name)
