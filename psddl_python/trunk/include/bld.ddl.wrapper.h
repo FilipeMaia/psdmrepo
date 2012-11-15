@@ -200,6 +200,21 @@ public:
   double transmissionFEE() const { return o->transmissionFEE(); }
 };
 
+class BldDataGMDV1_Wrapper {
+  shared_ptr<Psana::Bld::BldDataGMDV1> _o;
+  Psana::Bld::BldDataGMDV1* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD };
+  enum { Version = 1 };
+  BldDataGMDV1_Wrapper(shared_ptr<Psana::Bld::BldDataGMDV1> obj) : _o(obj), o(_o.get()) {}
+  BldDataGMDV1_Wrapper(Psana::Bld::BldDataGMDV1* obj) : o(obj) {}
+  double milliJoulesPerPulse() const { return o->milliJoulesPerPulse(); }
+  double milliJoulesAverage() const { return o->milliJoulesAverage(); }
+  double correctedSumPerPulse() const { return o->correctedSumPerPulse(); }
+  double bgValuePerSample() const { return o->bgValuePerSample(); }
+  double relativeEnergyPerPulse() const { return o->relativeEnergyPerPulse(); }
+};
+
   class BldDataFEEGasDetEnergy_Getter : public psddl_python::EventGetter {
   public:
   const char* getTypeName() { return "Psana::Bld::BldDataFEEGasDetEnergy";}
@@ -327,6 +342,19 @@ public:
     object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
       shared_ptr<Psana::Bld::BldDataGMDV0> result = evt.get(source, key, foundSrc);
       return result.get() ? object(BldDataGMDV0_Wrapper(result)) : object();
+    }
+  };
+
+  class BldDataGMDV1_Getter : public psddl_python::EventGetter {
+  public:
+  const char* getTypeName() { return "Psana::Bld::BldDataGMDV1";}
+  const char* getGetterClassName() { return "psddl_python::EventGetter";}
+    int getVersion() {
+      return Psana::Bld::BldDataGMDV1::Version;
+    }
+    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
+      shared_ptr<Psana::Bld::BldDataGMDV1> result = evt.get(source, key, foundSrc);
+      return result.get() ? object(BldDataGMDV1_Wrapper(result)) : object();
     }
   };
 } // namespace Bld

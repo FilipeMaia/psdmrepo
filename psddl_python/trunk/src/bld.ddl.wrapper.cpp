@@ -174,6 +174,19 @@ void createWrappers() {
   ADD_EVENT_GETTER(BldDataGMDV0);
 
 
+#define _CLASS(n, policy) class_<n>(#n, no_init)\
+    .def("milliJoulesPerPulse", &n::milliJoulesPerPulse)\
+    .def("milliJoulesAverage", &n::milliJoulesAverage)\
+    .def("correctedSumPerPulse", &n::correctedSumPerPulse)\
+    .def("bgValuePerSample", &n::bgValuePerSample)\
+    .def("relativeEnergyPerPulse", &n::relativeEnergyPerPulse)\
+
+  _CLASS(psddl_python::Bld::BldDataGMDV1_Wrapper, return_value_policy<return_by_value>());
+  std_vector_class_(BldDataGMDV1_Wrapper);
+#undef _CLASS
+  ADD_EVENT_GETTER(BldDataGMDV1);
+
+
 } // createWrappers()
 } // namespace Bld
 } // namespace psddl_python
