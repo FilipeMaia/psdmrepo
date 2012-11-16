@@ -16,6 +16,7 @@ Tag: V00-00-01
 2012-11-15 Mikhail S. Dubrovin
 - add modules:
 A         src/GUIHelp.py
+A         src/GUIWorkResDirs.py
 
 2012-11-14 Mikhail S. Dubrovin
 - add/change modules:

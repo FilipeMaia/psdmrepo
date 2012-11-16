@@ -158,7 +158,7 @@ class ImgSpeWidget (QtGui.QWidget) :
         #self.fig.myaxesH = self.fig.add_subplot(212)
         self.fig.myaxesH = self.fig.add_subplot(gs[15:19,:])
         
-        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=nbins, range=h1Range)#, range=(Amin, Amax)) 
+        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=nbins, range=h1Range, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
         self.fig.myaxesH.grid(self.fig.myGridIsOn)
         Nmin, Nmax = self.fig.myaxesH.get_ylim() 
         yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
