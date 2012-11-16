@@ -139,10 +139,14 @@ class ImgSpeWidget (QtGui.QWidget) :
             self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
             self.range  = [xmin, xmax, ymax, ymin]
 
-        self.arr2d = self.arrwin
+        #self.arr2d = self.arrwin
 
-        #if self.fig.myLogIsOn : self.arr2d = np.log(self.arrwin)
-        #else :                  self.arr2d =        self.arrwin
+        print 'self.arrwin = ', self.arrwin
+
+        if self.fig.myLogIsOn : self.arr2d = np.log(self.arrwin)
+        else :                  self.arr2d =        self.arrwin
+
+        print 'self.arr2d = ', self.arr2d
 
         self.fig.clear()        
 

@@ -219,8 +219,8 @@ class ConfigParameters :
         f=open(self.fname,'r')
         for line in f :
             if len(line) == 1 : continue # line is empty
-            fields = line.split()
-            self.setParameterValueByName ( name=fields[0], str_val=fields[1] )
+            fields = line.rstrip('\n').split(' ',1)
+            self.setParameterValueByName ( name=fields[0], str_val=fields[1].strip(' ') )
         f.close() 
 
 #---------------------------------------

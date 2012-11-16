@@ -46,17 +46,16 @@ class GUIFiles ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 500, 200)
         self.setWindowTitle('Files')
         self.setFrame()
 
         self.tit_status = QtGui.QLabel     ('Status: ')
-        self.but_close  = QtGui.QPushButton('Close') 
-        self.but_save   = QtGui.QPushButton('Save') 
-        self.but_show   = QtGui.QPushButton('Show Image') 
+        self.but_close  = QtGui.QPushButton('&Close') 
+        self.but_save   = QtGui.QPushButton('&Save') 
+        self.but_show   = QtGui.QPushButton('Show &Image') 
 
         self.hboxW = QtGui.QHBoxLayout()
-   
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
@@ -64,23 +63,21 @@ class GUIFiles ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_show )
 
-        self.list_file_types = ['Dark-run', 'Flat-field', 'Data', 'Conf.pars', 'Work/Results']
+        self.list_file_types = ['Dark run', 'Flat field', 'Data', 'Conf.pars', 'Work/Results']
         self.makeTabBar()
         self.guiSelector()
 
-        self.grid = QtGui.QGridLayout()
-        self.grid_row = 0
-
+        self.vbox = QtGui.QVBoxLayout()   
         #cp.guiworkresdirs = GUIWorkResDirs()
-        #self.grid.addWidget(cp.guiworkresdirs,      self.grid_row+1, 0, 1, 10)
-        self.grid.addWidget(self.tab_bar,           self.grid_row+2, 0, 1, 10)
-        self.grid.addLayout(self.hboxW,             self.grid_row+3, 0, 1, 10)
-        self.grid.addLayout(self.hboxB,             self.grid_row+4, 0, 1, 10)
-        self.setLayout(self.grid)
+        #self.vbox.addWidget(cp.guiworkresdirs)
+        self.vbox.addWidget(self.tab_bar)
+        self.vbox.addLayout(self.hboxW)
+        self.vbox.addLayout(self.hboxB)
+        self.setLayout(self.vbox)
 
-        self.connect( self.but_close,    QtCore.SIGNAL('clicked()'), self.onClose )
-        self.connect( self.but_save,     QtCore.SIGNAL('clicked()'), self.onSave )
-        self.connect( self.but_show ,    QtCore.SIGNAL('clicked()'), self.onShow )
+        self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
+        self.connect( self.but_save,  QtCore.SIGNAL('clicked()'), self.onSave )
+        self.connect( self.but_show,  QtCore.SIGNAL('clicked()'), self.onShow )
 
         self.showToolTips()
         self.setStyle()
@@ -92,7 +89,7 @@ class GUIFiles ( QtGui.QWidget ) :
     def showToolTips(self):
         #msg = 'Edit field'
         self.but_close .setToolTip('Close this window.')
-        self.but_save  .setToolTip('Apply changes to configuration parameters.')
+        self.but_save  .setToolTip('Save all current configuration parameters.')
         self.but_show  .setToolTip('Show ...')
 
 
@@ -104,13 +101,18 @@ class GUIFiles ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         self.frame.setVisible(False)
 
+    def setStyle(self):
+        self.          setStyleSheet (cp.styleBkgd)
+        self.but_close.setStyleSheet (cp.styleButton)
+        self.but_save .setStyleSheet (cp.styleButton)
+        self.but_show .setStyleSheet (cp.styleButton)
+
 
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
         self.tab_bar = QtGui.QTabBar()
 
         #Uses self.list_file_types
-
         self.ind_tab_dark = self.tab_bar.addTab( self.list_file_types[0] )
         self.ind_tab_flat = self.tab_bar.addTab( self.list_file_types[1] )
         self.ind_tab_data = self.tab_bar.addTab( self.list_file_types[2] )
@@ -129,24 +131,29 @@ class GUIFiles ( QtGui.QWidget ) :
         
         logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
 
-        self.tab_bar.setCurrentIndex(self.list_file_types.index(cp.current_file_tab.value()))
-        #self.tab_bar.setCurrentIndex(3)
+        try    :
+            tab_index = self.list_file_types.index(cp.current_file_tab.value())
+        except :
+            tab_index = 3
+            cp.current_file_tab.setValue(self.list_file_types[tab_index])
+        self.tab_bar.setCurrentIndex(tab_index)
 
         self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
 
 
     def guiSelector(self):
+
         try    : self.gui_win.close()
         except : pass
 
         if cp.current_file_tab.value() == self.list_file_types[0] :
-            self.gui_win = cp.guidark = GUIDark()
+            self.gui_win = GUIDark()
             
         if cp.current_file_tab.value() == self.list_file_types[3] :
-            self.gui_win = cp.guiconfigparameters = GUIConfigParameters()
+            self.gui_win = GUIConfigParameters()
 
         if cp.current_file_tab.value() == self.list_file_types[4] :
-            self.gui_win = cp.guiworkresdirs = GUIWorkResDirs()
+            self.gui_win = GUIWorkResDirs()
 
         self.gui_win.setFixedHeight(150)
         self.hboxW.addWidget(self.gui_win)
@@ -157,13 +164,6 @@ class GUIFiles ( QtGui.QWidget ) :
         cp.current_file_tab.setValue( tab_name )
         logger.info(' ---> selected tab: ' + str(tab_ind) + ' - open GUI to work with: ' + tab_name, __name__)
         self.guiSelector()
-
-    def setStyle(self):
-        self.          setStyleSheet (cp.styleBkgd)
-        self.but_close.setStyleSheet (cp.styleButton)
-        self.but_save .setStyleSheet (cp.styleButton)
-        self.but_show .setStyleSheet (cp.styleButton)
-
 
     def setParent(self,parent) :
         self.parent = parent
@@ -180,19 +180,7 @@ class GUIFiles ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.guidark.close()
-        except : pass
-
-        try    : cp.guiflat.close()
-        except : pass
-
-        try    : cp.guidata.close()
-        except : pass
-
-        try    : cp.guiconfigparameters.close()
-        except : pass
-
-        try    : cp.guiworkresdirs.close()
+        try    : self.gui_win.close()
         except : pass
 
         try    : del cp.guifiles # GUIFiles

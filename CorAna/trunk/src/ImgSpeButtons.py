@@ -63,11 +63,10 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.but_quit  = QtGui.QPushButton('&Close')
         self.cbox_grid = QtGui.QCheckBox('&Grid')
         self.cbox_log  = QtGui.QCheckBox('&Log')
-        self.cbox_grid.setChecked(self.fig.myGridIsOn)
-        self.cbox_log .setChecked(self.fig.myLogIsOn)
         self.tit_nbins = QtGui.QLabel('N bins:')
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
-
+        self.set_buttons()
+        
         width = 50
         self.edi_nbins.setFixedWidth(width)
         self.but_reset.setFixedWidth(width)
@@ -207,6 +206,11 @@ class ImgSpeButtons (QtGui.QWidget) :
     #def on_edit_zmax(self):
     #    self.fig.myZmax = self.editZmax.displayText()
 
+    def set_buttons(self) :
+        self.cbox_grid.setChecked(self.fig.myGridIsOn)
+        self.cbox_log .setChecked(self.fig.myLogIsOn)
+        self.edi_nbins.setText(self.stringOrNone(self.fig.myNBins))
+
 
     def on_edit_nbins(self):
         self.fig.myNBins = int(self.edi_nbins.displayText())
@@ -217,6 +221,7 @@ class ImgSpeButtons (QtGui.QWidget) :
     def on_but_reset(self):
         logger.debug('on_but_reset', __name__ )
         self.widgimage.initParameters()
+        self.set_buttons()
         self.widgimage.on_draw()
 
 
@@ -239,6 +244,8 @@ class ImgSpeButtons (QtGui.QWidget) :
     def on_cbox_log(self):
         logger.info('Not implemented yet.', __name__ )
         self.fig.myLogIsOn = self.cbox_log.isChecked()
+        self.fig.myZmin      = None
+        self.fig.myZmax      = None        
         self.widgimage.processDraw()
 
 
