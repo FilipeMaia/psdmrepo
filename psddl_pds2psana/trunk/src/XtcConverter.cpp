@@ -315,7 +315,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 0) ::storeValueType<Psana::Bld::BldDataPhaseCavity, PsddlPds::Bld::BldDataPhaseCavity>(xtc, evt);
     break;
   case Pds::TypeId::Id_PrincetonFrame:
-    if (version == 1) ::storeDataProxyCfg3<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2, PsddlPds::Princeton::ConfigV3>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg4<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2, PsddlPds::Princeton::ConfigV3, PsddlPds::Princeton::ConfigV4>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_PrincetonConfig:
     break;

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-14
+2012-11-16 Andy Salnikov
+- adding configV4 handling for princeton frame
+
 Tag: V00-04-13
 2012-11-15 Andy Salnikov
 - upgrading to pdsdata V05-01-00
