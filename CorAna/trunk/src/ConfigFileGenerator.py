@@ -77,7 +77,7 @@ class ConfigFileGenerator :
 
     def make_psana_cfg_file_for_tahometer (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-tahometer.cfg').path()
-        self.path_out = fnm.path_tahometer_psana_cfg()
+        self.path_out = fnm.path_pedestals_tahometer_psana_cfg()
         self.d_subs   = {'SKIP'           : 'IS_NOT_USED',
                          'EVENTS'         : 'FOR_ALL_EVENTS',
                          }

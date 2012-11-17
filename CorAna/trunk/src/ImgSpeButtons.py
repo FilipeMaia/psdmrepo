@@ -244,8 +244,8 @@ class ImgSpeButtons (QtGui.QWidget) :
     def on_cbox_log(self):
         logger.info('Not implemented yet.', __name__ )
         self.fig.myLogIsOn = self.cbox_log.isChecked()
-        self.fig.myZmin      = None
-        self.fig.myZmax      = None        
+        #self.fig.myZmin      = None
+        #self.fig.myZmax      = None        
         self.widgimage.processDraw()
 
 

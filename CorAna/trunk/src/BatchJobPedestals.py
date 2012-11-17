@@ -45,8 +45,14 @@ class BatchJobPedestals :
         """Constructor.
         @param fname  the file name for output log file
         """
-        self.job_id_str = None
-        self.path_cfg   = fnm.path_pedestals_psana_cfg()
+        self.job_id_ped_str = None
+        self.job_id_tah_str = None
+        #self.path_ped_cfg   = fnm.path_pedestals_psana_cfg()
+
+        self.time_ped_job_submitted = None
+        self.time_tah_job_submitted = None
+
+        self.time_interval_sec      = 100
 
 #-----------------------------
 
@@ -58,23 +64,29 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def submit_batch_for_tahometer_on_dark_xtc(self) :
+    def submit_batch_for_tahometer(self) :
+
+        if self.job_was_recently_submitted(self.time_tah_job_submitted, 'scanner on dark') : return
+        self.time_tah_job_submitted = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_tahometer()
 
-        command      = 'psana -c ' + fnm.path_tahometer_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_pedestals_tahometer_psana_cfg() + ' ' + fnm.path_dark_xtc()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_pedestals_tahometer_batch_log()
 
-        self.job_id_str = gu.batch_job_submit(command, queue, bat_log_file)
+        self.job_id_tah_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
 
         if err != '' : logger.warning( err, __name__) 
         logger.info(out, __name__) 
-        logger.info('Submit batch for tahometer on dark, job Id: ' + self.job_id_str) 
+        logger.info('Submit batch for tahometer on dark, job Id: ' + self.job_id_tah_str) 
 
 #-----------------------------
 
     def submit_batch_for_pedestals(self) :
+
+        if self.job_was_recently_submitted(self.time_ped_job_submitted, 'pedestals') : return
+        self.time_ped_job_submitted = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_pedestals()
 
@@ -82,24 +94,52 @@ class BatchJobPedestals :
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_pedestals_batch_log()
 
-        self.job_id_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        self.job_id_ped_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
 
         if err != '' : logger.warning(err, __name__) 
         logger.info(out, __name__) 
-        logger.info('   Submit batch for pedestals on dark, job Id: ' + self.job_id_str) 
+        logger.info('   Submit batch for pedestals on dark, job Id: ' + self.job_id_ped_str) 
+
+#-----------------------------
+
+    def job_was_recently_submitted(self, t_sub, comment='') :
+
+        if t_sub == None : return False
+
+        if gu.get_time_sec() - t_sub > self.time_interval_sec :
+            return False
+        else :
+            msg = 'Sorry, but '+ comment +' job was already submitted less then ' + \
+            str(self.time_interval_sec) + ' sec ago... Be patient, just relax and wait...'
+            logger.warning(msg, __name__)         
+            return True
 
 #-----------------------------
 
     def check_batch_status_for_pedestals(self) :
 
-        if self.job_id_str == None :
-            logger.info('Batch job was not submitted in this session.', __name__) 
+        if self.job_id_ped_str == None :
+            logger.info('Batch job for pedestals was not submitted in this session.', __name__) 
             return
 
-        #status, nodename = gu.batch_job_status_and_nodename(self.job_id_str, cp.bat_queue.value())
-        #msg = 'Batch job Id: ' + self.job_id_str + ' on node: ' + str(nodename) + ' status: ' + str(status)
-        lines = gu.batch_job_check(self.job_id_str, cp.bat_queue.value())
+        #status, nodename = gu.batch_job_status_and_nodename(self.job_id_ped_str, cp.bat_queue.value())
+        #msg = 'Batch job Id: ' + self.job_id_ped_str + ' on node: ' + str(nodename) + ' status: ' + str(status)
+        lines = gu.batch_job_check(self.job_id_ped_str, cp.bat_queue.value())
         msg = 'Check batch status for pedestals:\n'
+        for line in lines :
+            msg += line
+        logger.info(msg, __name__) 
+
+#-----------------------------
+
+    def check_batch_status_for_pedestals_tahometer(self) :
+
+        if self.job_id_tah_str == None :
+            logger.info('Batch job for scanner on dark was not submitted in this session.', __name__) 
+            return
+
+        lines = gu.batch_job_check(self.job_id_tah_str, cp.bat_queue.value())
+        msg = 'Check batch status for scanner on dark:\n'
         for line in lines :
             msg += line
         logger.info(msg, __name__) 

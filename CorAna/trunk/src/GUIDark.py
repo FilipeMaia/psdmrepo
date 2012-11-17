@@ -228,6 +228,7 @@ class GUIDark ( QtGui.QWidget ) :
         logger.debug('on_but_status - not implemented yet...', __name__)
         if bjpeds.status_for_pedestals() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
+        bjpeds.check_batch_status_for_pedestals_tahometer()
         bjpeds.check_batch_status_for_pedestals()
 
     def on_but_submit(self):
@@ -235,7 +236,8 @@ class GUIDark ( QtGui.QWidget ) :
         bjpeds.submit_batch_for_pedestals()
 
     def on_but_scanner(self):
-        logger.debug('on_but_scanner - not implemented yet', __name__)
+        logger.debug('on_but_scanner', __name__)
+        bjpeds.submit_batch_for_tahometer()
 
     def on_but_wfiles(self):
         logger.debug('on_but_wfiles', __name__)

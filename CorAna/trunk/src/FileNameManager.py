@@ -94,6 +94,9 @@ class FileNameManager :
     def path_pedestals_tahometer_batch_log(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer-batch-log.txt'
 
+    def path_pedestals_tahometer_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer.cfg'
+
     def path_pedestals_plot(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-plot.png'
 
@@ -107,8 +110,8 @@ class FileNameManager :
         self.list_of_files_pedestals.append(self.path_pedestals_ave())
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
         self.list_of_files_pedestals.append(self.path_pedestals_plot())
-        #self.list_of_files_pedestals.append(self.path_tahometer_psana_cfg())
-        #self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
+        self.list_of_files_pedestals.append(self.path_pedestals_tahometer_psana_cfg())
+        self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
         return self.list_of_files_pedestals
 
 #-----------------------------
@@ -125,9 +128,6 @@ class FileNameManager :
     
 #-----------------------------
 
-    def path_tahometer_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'tahometer.cfg'
-
 #-----------------------------
 
 fnm = FileNameManager ()
@@ -141,8 +141,8 @@ if __name__ == "__main__" :
     print 'path_pedestals_ave()       : ', fnm.path_pedestals_ave()
     print 'path_pedestals_rms()       : ', fnm.path_pedestals_rms()
     print 'path_pedestals_batch_log() : ', fnm.path_pedestals_batch_log()
-    print 'path_tahometer_psana_cfg() : ', fnm.path_tahometer_psana_cfg()
-    print 'path_tahometer_batch_log() : ', fnm.path_pedestals_tahometer_batch_log()
+    print 'path_pedestals_tahometer_psana_cfg() : ', fnm.path_pedestals_tahometer_psana_cfg()
+    print 'path_pedestals_tahometer_batch_log() : ', fnm.path_pedestals_tahometer_batch_log()
     print '\n',
     print '\n',
     print 'str_exp_run_dark()   : ', fnm.str_exp_run_dark()

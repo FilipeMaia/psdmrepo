@@ -32,6 +32,7 @@ import sys
 import os
 import random
 import numpy as np
+from math import log10
 
 #import matplotlib
 #matplotlib.use('GTKAgg') # forse Agg rendering to a GTK canvas (backend)
@@ -141,12 +142,12 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         #self.arr2d = self.arrwin
 
-        print 'self.arrwin = ', self.arrwin
+        #print 'self.arrwin = ', self.arrwin
 
-        if self.fig.myLogIsOn : self.arr2d = np.log(self.arrwin)
-        else :                  self.arr2d =        self.arrwin
+        if self.fig.myLogIsOn : self.arr2d = np.log10(self.arrwin)
+        else :                  self.arr2d =          self.arrwin
 
-        print 'self.arr2d = ', self.arr2d
+        #print 'self.arr2d = ', self.arr2d
 
         self.fig.clear()        
 
@@ -155,6 +156,7 @@ class ImgSpeWidget (QtGui.QWidget) :
         zmax = self.intOrNone(zmax)
 
         h1Range = (zmin,zmax)
+
         if zmin==None and zmax==None : h1Range = None
 
         #print 'h1Range = ', h1Range
@@ -169,7 +171,8 @@ class ImgSpeWidget (QtGui.QWidget) :
         if len(yticks)<2 : yticks = [Nmin,Nmax]
         self.fig.myaxesH.set_yticks( yticks )
 
-        zmin,zmax      = self.fig.myaxesH.get_xlim() 
+        zmin, zmax = self.fig.myaxesH.get_xlim() 
+
         coltickslocs   = self.fig.myaxesH.get_xticks()
         self.fig.myaxesH.set_xticklabels('')
         #coltickslabels = self.fig.myaxesH.get_xticklabels()
@@ -182,7 +185,17 @@ class ImgSpeWidget (QtGui.QWidget) :
         self.fig.myaxesI.grid(self.fig.myGridIsOn)
         self.fig.myaxesImage = self.fig.myaxesI.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
 
-        self.fig.myaxesImage.set_clim(zmin,zmax)
+        #print 'coltickslocs =', coltickslocs 
+
+        if self.fig.myLogIsOn :
+            if zmin> 0 : cmin = log10(zmin)
+            else       : cmin = 1
+            cmax = np.log((zmax))
+            coltickslocs = None
+        else : cmin, cmax = zmin, zmax
+        #print 'zmin, zmax, cmin, cmax  =', zmin, zmax, cmin, cmax
+
+        self.fig.myaxesImage.set_clim(cmin,cmax)
         #self.fig.mycolbar = self.fig.colorbar(self.fig.myaxesImage, fraction=0.15, pad=0.1, shrink=1.0, aspect=15, orientation=1, ticks=coltickslocs) #orientation=1,
         self.fig.myaxesC = self.fig.add_subplot(gs[19,:])
         self.fig.mycolbar = self.fig.colorbar(self.fig.myaxesImage, cax=self.fig.myaxesC, orientation=1, ticks=coltickslocs) #orientation=1,
@@ -244,6 +257,9 @@ class ImgSpeWidget (QtGui.QWidget) :
 
     def mousePressOnColorBar(self, event) :
         #print 'PressOnColorBar'
+
+        if self.fig.myLogIsOn : return
+
         lims = self.fig.myaxesImage.get_clim()
         colmin = lims[0]
         colmax = lims[1]
