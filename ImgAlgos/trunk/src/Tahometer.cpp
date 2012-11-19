@@ -115,12 +115,15 @@ Tahometer::endRun(Event& evt, Env& env)
 void 
 Tahometer::endJob(Event& evt, Env& env)
 {
+  double dt_sec = m_time -> getCurrentTimeInterval();
+
   if( m_print_bits & 2 ) {
     MsgLog(name(), info, "===== Summary for " << m_count << " processed events =====");
     //m_time -> stopTime(m_count);
-    double dt_sec = m_time -> getCurrentTimeInterval();
     printTimeIntervalSummary(evt, dt_sec, m_count);
   }
+
+  if( m_print_bits & 8 ) printSummaryForParser(evt, dt_sec, m_count);
 }
 
 //--------------------
@@ -163,16 +166,31 @@ Tahometer::printInputParameters()
 
 //--------------------
 void 
-Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long m_count_dn)
+Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long counter)
 {
   MsgLog( name(), info,  "Run="             << stringRunNumber(evt) 
                      << " Evt="             << stringFromUint(m_count) 
-                     << " Time to process " << stringFromUint(m_count_dn) 
+                     << " Time to process " << stringFromUint(counter) 
                      << " events is "       << dt_sec 
-                     << " sec, or "         << dt_sec/m_count_dn << " sec/event" 
+                     << " sec, or "         << dt_sec/counter << " sec/event" 
 	           //<< " Time="   << stringTimeStamp(evt)
 	           //<< comment.c_str() 
   );
+}
+
+
+//--------------------
+
+void 
+Tahometer::printSummaryForParser(Event& evt, double dt_sec, long counter)
+{
+  cout << "Summary for parser:" << endl;
+  cout << "BATCH_PROCESSING_TIME  " << dt_sec  << endl;
+  cout << "BATCH_NUMBER_OF_EVENTS " << counter << endl;
+  if (counter>0)
+    cout << "BATCH_SEC_PER_EVENT    " << dt_sec/counter << endl;
+  if (dt_sec>0)
+    cout << "BATCH_EVENTS_PER_SEC   " << counter/dt_sec << endl;
 }
 
 //--------------------

@@ -85,7 +85,8 @@ public:
 protected:
   void     printInputParameters();
   void     procEvent(Event& evt, Env& env);
-  void     printTimeIntervalSummary(Event& evt, double dt_sec, long m_count_dn);
+  void     printTimeIntervalSummary(Event& evt, double dt_sec, long counter);
+  void     printSummaryForParser(Event& evt, double dt_sec, long counter);
 
 private:
 
