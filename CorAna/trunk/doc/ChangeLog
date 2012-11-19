@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
+	
+2012-11-19 Mikhail S. Dubrovin
+- change name for modules:
+D         psana-pedestals.cfg
+A         psana-peds.cfg
+D         psana-tahometer.cfg
+A         psana-peds-scan.cfg
+- add modules:
+A         BatchLogParser.py
 
 2012-11-15 Mikhail S. Dubrovin
 - add modules:

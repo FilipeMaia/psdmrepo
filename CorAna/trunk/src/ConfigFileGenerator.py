@@ -60,10 +60,10 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_pedestals (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-pedestals.cfg').path()
+        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds.cfg').path()
         self.path_out = fnm.path_pedestals_psana_cfg()
-        self.d_subs   = {'SKIP'           : str( cp.bat_dark_start.value() ),
-                         'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() ),
+        self.d_subs   = {'SKIP'           : str( cp.bat_dark_start.value() - 1 ),
+                         'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
                          'FILE_AVE'       : fnm.path_pedestals_ave(),
@@ -75,9 +75,9 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def make_psana_cfg_file_for_tahometer (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-tahometer.cfg').path()
-        self.path_out = fnm.path_pedestals_tahometer_psana_cfg()
+    def make_psana_cfg_file_for_peds_scan (self) :
+        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-scan.cfg').path()
+        self.path_out = fnm.path_peds_scan_psana_cfg()
         self.d_subs   = {'SKIP'           : 'IS_NOT_USED',
                          'EVENTS'         : 'FOR_ALL_EVENTS',
                          }
@@ -148,8 +148,8 @@ cfg = ConfigFileGenerator ()
 #
 if __name__ == "__main__" :
 
-    #cfg.make_psana_cfg_file_for_pedestals()
-    cfg.make_psana_cfg_file_for_tahometer()
+    #cfg.make_psana_cfg_file_for_peds()
+    cfg.make_psana_cfg_file_for_peds_scan()
 
     sys.exit ( 'End of test for ConfigFileGenerator' )
 

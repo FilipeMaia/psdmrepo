@@ -80,25 +80,25 @@ class FileNameManager :
 #-----------------------------
 
     def path_pedestals_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals.cfg'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds.cfg'
 
     def path_pedestals_ave(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-ave.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-ave.txt'
 
     def path_pedestals_rms(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-rms.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-rms.txt'
 
     def path_pedestals_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-batch-log.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-batch-log.txt'
 
-    def path_pedestals_tahometer_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer-batch-log.txt'
+    def path_peds_scan_batch_log(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-batch-log.txt'
 
-    def path_pedestals_tahometer_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-tahometer.cfg'
+    def path_peds_scan_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan.cfg'
 
     def path_pedestals_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'pedestals-plot.png'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-plot.png'
 
 #-----------------------------
 
@@ -109,8 +109,8 @@ class FileNameManager :
         self.list_of_files_pedestals.append(self.path_pedestals_batch_log())
         self.list_of_files_pedestals.append(self.path_pedestals_ave())
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
-        self.list_of_files_pedestals.append(self.path_pedestals_tahometer_psana_cfg())
-        self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
+        self.list_of_files_pedestals.append(self.path_peds_scan_psana_cfg())
+        self.list_of_files_pedestals.append(self.path_peds_scan_batch_log())
         self.list_of_files_pedestals.append(self.path_pedestals_plot())
         return self.list_of_files_pedestals
 
@@ -141,8 +141,8 @@ if __name__ == "__main__" :
     print 'path_pedestals_ave()       : ', fnm.path_pedestals_ave()
     print 'path_pedestals_rms()       : ', fnm.path_pedestals_rms()
     print 'path_pedestals_batch_log() : ', fnm.path_pedestals_batch_log()
-    print 'path_pedestals_tahometer_psana_cfg() : ', fnm.path_pedestals_tahometer_psana_cfg()
-    print 'path_pedestals_tahometer_batch_log() : ', fnm.path_pedestals_tahometer_batch_log()
+    print 'path_peds_scan_psana_cfg() : ', fnm.path_peds_scan_psana_cfg()
+    print 'path_peds_scan_batch_log() : ', fnm.path_peds_scan_batch_log()
     print '\n',
     print '\n',
     print 'str_exp_run_dark()   : ', fnm.str_exp_run_dark()

@@ -54,8 +54,8 @@ class BatchLogParser :
 #-----------------------------
 #-----------------------------
 
-    def parse_batch_log_pedestals_tahometer (self) :
-        self.path = fnm.path_pedestals_tahometer_batch_log()
+    def parse_batch_log_peds_scan (self) :
+        self.path = fnm.path_peds_scan_batch_log()
         self.dict   = {'BATCH_PROCESSING_TIME'  : cp.bat_dark_time,
                        'BATCH_NUMBER_OF_EVENTS' : cp.bat_dark_total
                        #'BATCH_SEC_PER_EVENT'    : 
@@ -64,6 +64,9 @@ class BatchLogParser :
 
         self.print_dict()
         self.parse_log_file()
+
+        if  cp.bat_dark_end.value() == cp.bat_dark_end.value_def() :
+            cp.bat_dark_end.setValue(cp.bat_dark_total.value())
 
 #-----------------------------
 #-----------------------------
@@ -85,8 +88,8 @@ class BatchLogParser :
 
         if not os.path.lexists(self.path) :
             logger.debug('The requested file: ' + self.path + ' is not available.', __name__)         
-            for val in self.dict.values() :
-                val.setDefault()
+            #for val in self.dict.values() :
+            #    val.setDefault()
             return
 
         fin  = open(self.path, 'r')
@@ -110,7 +113,7 @@ blp = BatchLogParser ()
 #
 if __name__ == "__main__" :
 
-    blp.parse_batch_log_pedestals_tahometer()
+    blp.parse_batch_log_peds_scan()
 
     sys.exit ( 'End of test for BatchLogParser' )
 

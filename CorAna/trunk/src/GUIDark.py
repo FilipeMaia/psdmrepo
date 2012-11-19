@@ -66,7 +66,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_path    = QtGui.QPushButton('File:')
         self.but_status  = QtGui.QPushButton('Check status')
         self.but_wfiles  = QtGui.QPushButton('Check files')
-        self.but_submit  = QtGui.QPushButton('Submit')
+        self.but_submit  = QtGui.QPushButton('Pedestal')
         self.but_scanner = QtGui.QPushButton('Scanner')
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
@@ -229,16 +229,26 @@ class GUIDark ( QtGui.QWidget ) :
         cp.in_dir_dark .setValue(dname)
         cp.in_file_dark.setValue(fname)
         logger.info('selected file: ' + str(fnm.path_dark_xtc()), __name__ )
+        self.set_default_pars()
+        blp.parse_batch_log_peds_scan()
+        self.set_fields()
 
 
     def on_but_status(self):
         logger.debug('on_but_status - not implemented yet...', __name__)
         if bjpeds.status_for_pedestals() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjpeds.check_batch_status_for_pedestals_tahometer()
+        bjpeds.check_batch_status_for_peds_scan()
         bjpeds.check_batch_status_for_pedestals()
-        blp.parse_batch_log_pedestals_tahometer()
+        blp.parse_batch_log_peds_scan()
         self.set_fields()
+
+
+    def set_default_pars(self):
+        cp.bat_dark_start.setDefault()
+        cp.bat_dark_end  .setDefault()
+        cp.bat_dark_total.setDefault()
+        cp.bat_dark_time .setDefault()
 
 
     def set_fields(self):
@@ -253,7 +263,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_scanner(self):
         logger.debug('on_but_scanner', __name__)
-        bjpeds.submit_batch_for_tahometer()
+        bjpeds.submit_batch_for_peds_scan()
 
     def on_but_wfiles(self):
         logger.debug('on_but_wfiles', __name__)

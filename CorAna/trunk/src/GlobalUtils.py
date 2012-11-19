@@ -39,6 +39,7 @@ import numpy as np
 #import commands # use 'subprocess' instead of 'commands'
 import subprocess # for subprocess.Popen
 
+from Logger import logger
 
 #-----------------------------
 # Imports for other modules --
@@ -143,6 +144,7 @@ def batch_job_status_and_nodename(job_id_str, queue='psnehq') :
 
 def remove_file(path) :
     #print 'remove file: ' + path
+    logger.debug('remove: ' + path, __name__)
     p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
 

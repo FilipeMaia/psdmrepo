@@ -142,7 +142,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         logger.debug('closeEvent', __name__)
         #self.saveLogTotalInFile() # It will be saved at closing of GUIMain
 
-        #try    : cp.guimain.butLogger.setStyleSheet(cp.styleButtonBad)
+        #try    : cp.guimain.butFBrowser.setStyleSheet(cp.styleButtonBad)
         #except : pass
 
         self.box_txt.close()

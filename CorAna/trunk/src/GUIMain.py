@@ -228,7 +228,6 @@ class GUIMain ( QtGui.QWidget ) :
             self.butFiles.setStyleSheet(cp.styleButton)
         except : # AttributeError: #NameError 
             cp.guifiles = GUIFiles()
-            cp.guifiles.setParent(self)
             cp.guifiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
             cp.guifiles.show()
             self.butFiles.setStyleSheet(cp.styleButtonOn)
@@ -256,7 +255,6 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guianasettings.close()
         except :
             cp.guianasettings = GUIAnaSettings()
-            cp.guianasettings.setParent(self)
             cp.guianasettings.move(self.pos().__add__(QtCore.QPoint(160,130))) # open window with offset w.r.t. parent
             cp.guianasettings.show()
 
@@ -267,7 +265,6 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guisystemsettings.close()
         except :
             cp.guisystemsettings = GUISystemSettings()
-            cp.guisystemsettings.setParent(self)
             cp.guisystemsettings.move(self.pos().__add__(QtCore.QPoint(160,160))) # open window with offset w.r.t. parent
             cp.guisystemsettings.show()
 
@@ -278,7 +275,6 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guirun.close()
         except :
             cp.guirun = GUIRun()
-            cp.guirun.setParent(self)
             cp.guirun.move(self.pos().__add__(QtCore.QPoint(160,195))) # open window with offset w.r.t. parent
             cp.guirun.show()
 
@@ -289,7 +285,6 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guiviewresults.close()
         except :
             cp.guiviewresults = GUIViewResults()
-            cp.guiviewresults.setParent(self)
             cp.guiviewresults.move(self.pos().__add__(QtCore.QPoint(160,230))) # open window with offset w.r.t. parent
             cp.guiviewresults.show()
 
@@ -297,15 +292,14 @@ class GUIMain ( QtGui.QWidget ) :
     def onLogger (self):       
         logger.debug('onLogger', self.name)
         try    :
-            cp.guilogger.onClose()
-            #self.butLogger.setStyleSheet(cp.styleButtonBad)
+            cp.guilogger.close()
         except :
             cp.guilogger = GUILogger()
-            cp.guilogger.setParent(self)
             cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,-20))) # open window with offset w.r.t. parent
             cp.guilogger.show()
-            logger.info('GUILogger is (re-)started', self.name)
+            logger.info('GUILogger is open', self.name)
             self.butLogger.setStyleSheet(cp.styleButtonGood)
+
 
     def onFBrowser (self):       
         logger.debug('onFBrowser', self.name)
@@ -313,7 +307,6 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guifilebrowser.close()
         except :
             cp.guifilebrowser = GUIFileBrowser()
-            cp.guifilebrowser.setParent(self)
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(240,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
