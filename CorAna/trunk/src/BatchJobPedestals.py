@@ -53,6 +53,8 @@ class BatchJobPedestals :
         self.time_tah_job_submitted = None
 
         self.time_interval_sec      = 100
+        self.dict_status = {True  : ' is available',
+                            False : ' is not available'}
 
 #-----------------------------
 
@@ -156,8 +158,17 @@ class BatchJobPedestals :
     def check_work_files_for_pedestals(self) :
         logger.info('Check work files for dark run / pedestals:', __name__)         
         for fname in fnm.get_list_of_files_pedestals() :
-            msg = '%s %s' % ( fname.ljust(100), str(os.path.lexists(fname)) )
+            msg = '%s %s' % ( fname.ljust(100), self.dict_status[os.path.lexists(fname)] )
             logger.info(msg)         
+
+#-----------------------------
+
+    def remove_files_pedestals(self) :
+        logger.info('Remove pedestal work files for selected run:', __name__)
+        for fname in fnm.get_list_of_files_pedestals() :
+            if os.path.lexists(fname) :
+                gu.remove_file(fname)
+                logger.info('Removed: ' + fname)
 
 #-----------------------------
 
@@ -165,7 +176,7 @@ class BatchJobPedestals :
         logger.info('Status for pedestals:', __name__)         
         fname  = fnm.path_pedestals_ave()
         status = os.path.lexists(fname)
-        logger.info('The file: ' + fname + ' is available: ' + str(status)) 
+        logger.info(fname + self.dict_status[status]) 
         return status
 
 #-----------------------------
@@ -175,7 +186,7 @@ class BatchJobPedestals :
         if os.path.lexists(fname) :
             return gu.get_array_from_file( fname )
         else :
-            logger.warning('The requested file: ' + fname + ' is not available.', __name__)         
+            logger.warning(fname + ' is not available', __name__)         
             return None
 
 #-----------------------------

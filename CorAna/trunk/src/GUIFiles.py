@@ -180,6 +180,9 @@ class GUIFiles ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
+        try    : cp.guimain.butFiles.setStyleSheet(cp.styleButton)
+        except : pass
+
         try    : self.gui_win.close()
         except : pass
 

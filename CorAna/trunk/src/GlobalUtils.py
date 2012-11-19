@@ -142,7 +142,7 @@ def batch_job_status_and_nodename(job_id_str, queue='psnehq') :
 
 
 def remove_file(path) :
-    print 'remove file: ' + path
+    #print 'remove file: ' + path
     p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
 

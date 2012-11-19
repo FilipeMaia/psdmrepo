@@ -33,6 +33,7 @@ from Logger                 import logger
 from FileNameManager        import fnm
 from BatchJobPedestals      import bjpeds
 from ImgSpeWithGUI          import *
+from BatchLogParser         import blp
 #import GlobalGraphics       as gg
 
 #---------------------
@@ -68,6 +69,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit  = QtGui.QPushButton('Submit')
         self.but_scanner = QtGui.QPushButton('Scanner')
         self.but_plot    = QtGui.QPushButton('Plot')
+        self.but_remove  = QtGui.QPushButton('Remove')
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
@@ -88,7 +90,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_bat_time,  self.grid_row+2, 6)
         self.grid.addWidget(self.but_submit,    self.grid_row+3, 0)
         self.grid.addWidget(self.but_wfiles,    self.grid_row+3, 1, 1, 2)
-        self.grid.addWidget(self.but_plot,      self.grid_row+3, 6)
+        self.grid.addWidget(self.but_plot,      self.grid_row+3, 3)
+        self.grid.addWidget(self.but_remove,    self.grid_row+3, 6)
         self.grid_row += 3
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
@@ -97,6 +100,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.connect(self.but_scanner,   QtCore.SIGNAL('clicked()'),          self.on_but_scanner   )
         self.connect(self.but_wfiles,    QtCore.SIGNAL('clicked()'),          self.on_but_wfiles    )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),          self.on_but_plot      )
+        self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),          self.on_but_remove    )
         self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_start )
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_end   )
 
@@ -119,8 +123,9 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status .setToolTip('Print batch job status \nin the logger')
         self.but_submit .setToolTip('Submit job in batch for pedestals')
         self.but_scanner.setToolTip('Submit job in batch for scanner')
-        self.but_wfiles .setToolTip('List relevant files in the logger \nand check their availability')
+        self.but_wfiles .setToolTip('List pedestal work files \nand check their availability')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
+        self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
         
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -169,11 +174,13 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_scanner.setStyleSheet (cp.styleButton) 
         self.but_wfiles .setStyleSheet (cp.styleButtonOn) 
         self.but_plot   .setStyleSheet (cp.styleButton) 
+        self.but_remove .setStyleSheet (cp.styleButtonBad) 
   
         self.but_path   .setFixedWidth(40)
         self.but_submit .setFixedWidth(width)
         self.but_scanner.setFixedWidth(width)
         self.but_plot   .setFixedWidth(width)
+        self.but_remove .setFixedWidth(width)
         #self.but_wfiles .setFixedWidth(width)
         #self.but_status .setFixedWidth(width)
 
@@ -230,6 +237,15 @@ class GUIDark ( QtGui.QWidget ) :
         else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjpeds.check_batch_status_for_pedestals_tahometer()
         bjpeds.check_batch_status_for_pedestals()
+        blp.parse_batch_log_pedestals_tahometer()
+        self.set_fields()
+
+
+    def set_fields(self):
+        self.edi_bat_start.setText( str( cp.bat_dark_start.value() ) )        
+        self.edi_bat_end  .setText( str( cp.bat_dark_end  .value() ) )        
+        self.edi_bat_total.setText( str( cp.bat_dark_total.value() ) )        
+        self.edi_bat_time .setText( str( cp.bat_dark_time .value() ) )        
 
     def on_but_submit(self):
         logger.debug('on_but_submit', __name__)
@@ -268,6 +284,9 @@ class GUIDark ( QtGui.QWidget ) :
             cp.imgspewithgui.show()
             #but.setStyleSheet(cp.styleButtonGood)
 
+    def on_but_remove(self):
+        logger.debug('on_but_remove', __name__)
+        bjpeds.remove_files_pedestals()
 
 #-----------------------------
 

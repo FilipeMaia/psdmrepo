@@ -112,6 +112,11 @@ class Parameter :
 
 #---------------------
 
+    def setDefault (self) :
+        self._value = self._value_def
+
+#---------------------
+
     def setType ( self, typ='str' ) :
         self._type = typ
 

@@ -104,14 +104,14 @@ class FileNameManager :
 
     def  get_list_of_files_pedestals(self) :
         self.list_of_files_pedestals = []
-        self.list_of_files_pedestals.append(self.path_dark_xtc())
+        #self.list_of_files_pedestals.append(self.path_dark_xtc())
         self.list_of_files_pedestals.append(self.path_pedestals_psana_cfg())
         self.list_of_files_pedestals.append(self.path_pedestals_batch_log())
         self.list_of_files_pedestals.append(self.path_pedestals_ave())
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
-        self.list_of_files_pedestals.append(self.path_pedestals_plot())
         self.list_of_files_pedestals.append(self.path_pedestals_tahometer_psana_cfg())
         self.list_of_files_pedestals.append(self.path_pedestals_tahometer_batch_log())
+        self.list_of_files_pedestals.append(self.path_pedestals_plot())
         return self.list_of_files_pedestals
 
 #-----------------------------
