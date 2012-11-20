@@ -39,7 +39,7 @@ import GlobalUtils          as     gu
 class GUIFileBrowser ( QtGui.QWidget ) :
     """GUI File Browser"""
 
-    def __init__ ( self, parent=None ) :
+    def __init__ ( self, parent=None, list_of_files=['Empty list']) :
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -54,7 +54,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.but_close  = QtGui.QPushButton('Close') 
 
         self.box_file      = QtGui.QComboBox( self ) 
-        self.makeListOfFiles()
+        self.setListOfFiles(list_of_files)
 
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget( self.box_txt )
@@ -113,14 +113,12 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
 
 
-    def makeListOfFiles(self):        
+    def setListOfFiles(self, list):
         self.list_of_files  = ['Click on this box and select file from pop-up-list']
-        self.list_of_files += fnm.get_list_of_files_pedestals()
-        self.list_of_files += fnm.get_list_of_files_flatfield()
-        self.list_of_files += fnm.get_list_of_files_data()
+        self.list_of_files += list
         self.box_file.clear()
         self.box_file.addItems(self.list_of_files)
-        self.box_file.setCurrentIndex( 0 )        
+        self.box_file.setCurrentIndex( 0 )
 
 
     def setParent(self,parent) :
@@ -189,7 +187,13 @@ class GUIFileBrowser ( QtGui.QWidget ) :
     def startFileBrowser(self) :
         logger.debug('Start the GUIFileBrowser.',__name__)
         self.setStatus(0, 'Waiting for file selection...')
-        self.box_txt.setText('Click on file-box and select the file from pop-up list...')
+
+        if len(self.list_of_files) == 2 :
+            self.box_file.setCurrentIndex( 1 )
+            #self.onBox()      
+        else :
+            self.box_file.setCurrentIndex( 0 )
+        #self.box_txt.setText('Click on file-box and select the file from pop-up list...')
 
 
     def appendGUILog(self, msg='...'):

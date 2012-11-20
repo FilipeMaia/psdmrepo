@@ -79,19 +79,23 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUIFiles.py
         self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
-        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/flat',typ='str' )
-        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/blam',typ='str' )
-        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/data',typ='str' )
+        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
         self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',typ='str' )
-        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='flat.xtc',typ='str' )
-        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='blam.xtc',typ='str' )
-        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='data.xtc',typ='str' )
+        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='e167-r0020-s00-c00.xtc',typ='str' )
+        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='e167-r0020-s00-c00.xtc',typ='str' )
+        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='e167-r0020-s00-c00.xtc',typ='str' )
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',    val_def='./work',       typ='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
-        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='my-favor-exp-',typ='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',  val_def='cora-',        typ='str' )
         self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Work/Results', typ='str' )
         self.log_level         = self.declareParameter( name='LOG_LEVEL_OF_MSGS' ,val_def='info',         typ='str' )
 
+        self.dname_blam         = self.declareParameter( name='DIRECTORY_BLAM', val_def='.',typ='str' )
+        self.fname_blam         = self.declareParameter( name='FILE_NAME_BLAM', val_def='blamish.txt',typ='str' )
+        self.dname_flat         = self.declareParameter( name='DIRECTORY_FLAT', val_def='.',typ='str' )
+        self.fname_flat         = self.declareParameter( name='FILE_NAME_FLAT', val_def='flat_field.txt',typ='str' )
 
         # GUIBeamZeroPars.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     typ='float' ) 

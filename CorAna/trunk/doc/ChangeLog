@@ -15,12 +15,14 @@ Tag: V00-00-01
 	
 2012-11-19 Mikhail S. Dubrovin
 - change name for modules:
-D         psana-pedestals.cfg
-A         psana-peds.cfg
-D         psana-tahometer.cfg
-A         psana-peds-scan.cfg
+D         data/scripts/psana-pedestals.cfg
+A         data/scripts/psana-peds.cfg
+D         data/scripts/psana-tahometer.cfg
+A         data/scripts/psana-peds-scan.cfg
 - add modules:
-A         BatchLogParser.py
+A         src/BatchLogParser.py
+A         src/GUIFlatField.py
+A         src/GUIBlamish.py
 
 2012-11-15 Mikhail S. Dubrovin
 - add modules:

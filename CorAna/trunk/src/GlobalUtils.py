@@ -305,8 +305,22 @@ def get_current_gm_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
 #----------------------------------
 
 def get_array_from_file(fname) :
-    #print 'get_array_from_file:', fname
-    return np.loadtxt(fname, dtype=np.float32)
+    if os.path.lexists(fname) :
+        logger.info('Get array from file: ' + fname, __name__)         
+        return np.loadtxt(fname, dtype=np.float32)
+    else :
+        logger.warning(fname + ' is not available', __name__)         
+        return None
+
+#-----------------------------
+
+#    def get_pedestals_from_file(self) :
+#        fname = fnm.path_pedestals_ave()
+#        if os.path.lexists(fname) :
+#            return gu.get_array_from_file( fname )
+#        else :
+#            logger.warning(fname + ' is not available', __name__)         
+#            return None
 
 #    
 #----------------------------------

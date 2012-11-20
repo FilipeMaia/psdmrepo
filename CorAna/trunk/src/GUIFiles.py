@@ -31,6 +31,8 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
 from GUIDark                import *
+from GUIFlatField           import *
+from GUIBlamish             import *
 from GUIWorkResDirs         import *
 from Logger                 import logger
 from BatchJobPedestals      import bjpeds
@@ -63,7 +65,7 @@ class GUIFiles ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_show )
 
-        self.list_file_types = ['Dark run', 'Flat field', 'Data', 'Conf.pars', 'Work/Results']
+        self.list_file_types = ['Dark run', 'Flat field', 'Blamish', 'Data', 'Conf.pars', 'Work/Results']
         self.makeTabBar()
         self.guiSelector()
 
@@ -115,19 +117,21 @@ class GUIFiles ( QtGui.QWidget ) :
         #Uses self.list_file_types
         self.ind_tab_dark = self.tab_bar.addTab( self.list_file_types[0] )
         self.ind_tab_flat = self.tab_bar.addTab( self.list_file_types[1] )
-        self.ind_tab_data = self.tab_bar.addTab( self.list_file_types[2] )
-        self.ind_tab_conf = self.tab_bar.addTab( self.list_file_types[3] )
-        self.ind_tab_work = self.tab_bar.addTab( self.list_file_types[4] )
+        self.ind_tab_blam = self.tab_bar.addTab( self.list_file_types[2] )
+        self.ind_tab_data = self.tab_bar.addTab( self.list_file_types[3] )
+        self.ind_tab_conf = self.tab_bar.addTab( self.list_file_types[4] )
+        self.ind_tab_work = self.tab_bar.addTab( self.list_file_types[5] )
 
         self.tab_bar.setTabTextColor(self.ind_tab_dark, QtGui.QColor('green'))
         self.tab_bar.setTabTextColor(self.ind_tab_flat, QtGui.QColor('red'))
+        self.tab_bar.setTabTextColor(self.ind_tab_blam, QtGui.QColor('gray'))
         self.tab_bar.setTabTextColor(self.ind_tab_data, QtGui.QColor('blue'))
         self.tab_bar.setTabTextColor(self.ind_tab_conf, QtGui.QColor('magenta'))
         self.tab_bar.setTabTextColor(self.ind_tab_work, QtGui.QColor('gray'))
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 
-        self.tab_bar.setTabEnabled(1, False)
-        self.tab_bar.setTabEnabled(2, False)
+        #self.tab_bar.setTabEnabled(1, False)
+        self.tab_bar.setTabEnabled(3, False)
         
         logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
 
@@ -148,12 +152,27 @@ class GUIFiles ( QtGui.QWidget ) :
 
         if cp.current_file_tab.value() == self.list_file_types[0] :
             self.gui_win = GUIDark()
+            self.setStatus(0, 'Status: processing for pedestals')
             
-        if cp.current_file_tab.value() == self.list_file_types[3] :
-            self.gui_win = GUIConfigParameters()
+        if cp.current_file_tab.value() == self.list_file_types[1] :
+            self.gui_win = GUIFlatField()
+            self.setStatus(0, 'Status: set file for flat field')
+
+        if cp.current_file_tab.value() == self.list_file_types[2] :
+            self.gui_win = GUIBlamish()
+            self.setStatus(0, 'Status: set file for blamish mask')
+
+#        if cp.current_file_tab.value() == self.list_file_types[3] :
+#            self.gui_win = GUIData()
+#            self.setStatus(0, 'Status: processing for data')
 
         if cp.current_file_tab.value() == self.list_file_types[4] :
+            self.gui_win = GUIConfigParameters()
+            self.setStatus(0, 'Status: set file for config. pars.')
+
+        if cp.current_file_tab.value() == self.list_file_types[5] :
             self.gui_win = GUIWorkResDirs()
+            self.setStatus(0, 'Status: set work and result dirs.')
 
         self.gui_win.setFixedHeight(150)
         self.hboxW.addWidget(self.gui_win)
@@ -226,6 +245,17 @@ class GUIFiles ( QtGui.QWidget ) :
     def on_off_gui_data(self,but):
         logger.debug('on_off_gui_data', __name__)
         self.tab_bar.setCurrentIndex(2)
+
+
+    def setStatus(self, status_index=0, msg=''):
+        list_of_states = ['Good','Warning','Alarm']
+        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
+
+        #self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
+        self.tit_status.setText(msg)
+
 
 #-----------------------------
 

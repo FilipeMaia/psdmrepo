@@ -125,8 +125,23 @@ class FileNameManager :
     def  get_list_of_files_data(self) :
         self.list_of_files_data = []
         return self.list_of_files_data
-    
+
 #-----------------------------
+
+    def get_list_of_files_total(self) :
+        self.list_of_files_total  = []
+        self.list_of_files_total += fnm.get_list_of_files_pedestals()
+        self.list_of_files_total += fnm.get_list_of_files_flatfield()
+        self.list_of_files_total += fnm.get_list_of_files_data()
+        return self.list_of_files_total
+
+#-----------------------------
+
+    def  path_blam(self) :
+        return cp.dname_blam.value() + '/' + cp.fname_blam.value()
+
+    def  path_flat(self) :
+        return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
 #-----------------------------
 

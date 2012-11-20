@@ -306,7 +306,7 @@ class GUIMain ( QtGui.QWidget ) :
         try    :
             cp.guifilebrowser.close()
         except :
-            cp.guifilebrowser = GUIFileBrowser()
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_total())
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(240,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 

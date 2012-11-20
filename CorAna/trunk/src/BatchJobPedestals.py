@@ -186,12 +186,7 @@ class BatchJobPedestals :
 #-----------------------------
 
     def get_pedestals_from_file(self) :
-        fname = fnm.path_pedestals_ave()
-        if os.path.lexists(fname) :
-            return gu.get_array_from_file( fname )
-        else :
-            logger.warning(fname + ' is not available', __name__)         
-            return None
+        return gu.get_array_from_file( fnm.path_pedestals_ave() )
 
 #-----------------------------
 
