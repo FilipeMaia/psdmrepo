@@ -71,7 +71,7 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
@@ -80,7 +80,7 @@ private:
 
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ImageCont ;
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
 
   // Data members
   hsize_t m_chunk_size ;

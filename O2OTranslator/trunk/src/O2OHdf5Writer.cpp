@@ -77,6 +77,9 @@ namespace {
     attr2.store ( clock.nanoseconds() ) ;
   }
 
+
+  // schema version number for the file structure
+  int _fileSchemaVersion = 2;
 }
 
 //		----------------------------------------
@@ -97,7 +100,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                bool extGroups,
                                const O2OMetaData& metadata,
                                const std::string& finalDir,
-                               const std::string& backupExt )
+                               const std::string& backupExt,
+                               bool fullTimeStamp )
   : O2OXtcScannerI()
   , m_nameFactory(nameFactory)
   , m_overwrite(overwrite)
@@ -108,6 +112,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_metadata(metadata)
   , m_finalDir(finalDir)
   , m_backupExt(backupExt)
+  , m_fullTimeStamp(fullTimeStamp)
   , m_file()
   , m_state()
   , m_groups()
@@ -128,6 +133,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
     
   // we are in bad state, this state should never be popped
   m_state.push(Undefined) ;
+
+  H5DataTypes::XtcClockTimeStamp::storeFullTimeStamp(fullTimeStamp);
 }
 
 //--------------
@@ -152,7 +159,7 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
   LusiTime::Time t(clock.seconds(), clock.nanoseconds());
   
   // store current event time
-  m_eventTime = H5DataTypes::XtcClockTime(clock) ;
+  m_eventTime = H5DataTypes::XtcClockTimeStamp(clock, dgram.seq.stamp()) ;
   
 
   bool skip = false;
@@ -472,6 +479,13 @@ O2OHdf5Writer::openFile()
 
   hdf5pp::File::CreateMode mode = m_overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
   m_file = hdf5pp::File::create ( fileTempl, mode, fcpl, fapl ) ;
+
+  // store schema version for this file
+  m_file.createAttr<uint32_t>(":schema:version").store(::_fileSchemaVersion);
+
+  // add attributes specifying schema features
+  const char* tsFormat = m_fullTimeStamp ? "full" : "short";
+  m_file.createAttr<const char*>(":schema:timestamp-format").store(tsFormat) ;
 
   // add UUID to the file attributes
   uuid_t uuid ;

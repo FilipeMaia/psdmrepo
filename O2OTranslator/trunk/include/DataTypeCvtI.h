@@ -17,13 +17,14 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+#include <boost/utility.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/TypeId.hh"
-#include "H5DataTypes/XtcClockTime.h"
+#include "H5DataTypes/XtcClockTimeStamp.h"
 #include "hdf5pp/Group.h"
 #include "O2OTranslator/O2OXtcSrc.h"
 
@@ -50,7 +51,7 @@
 
 namespace O2OTranslator {
 
-class DataTypeCvtI  {
+class DataTypeCvtI : boost::noncopyable {
 public:
 
   // Destructor
@@ -61,7 +62,7 @@ public:
                          size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTime& time ) = 0 ;
+                         const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
 
   /// method called when the driver makes a new group in the file
   virtual void openGroup( hdf5pp::Group group ) = 0 ;
@@ -73,14 +74,6 @@ protected:
 
   // Default constructor
   DataTypeCvtI () {}
-
-private:
-
-  // Data members
-
-  // Copy constructor and assignment are disabled by default
-  DataTypeCvtI ( const DataTypeCvtI& ) ;
-  DataTypeCvtI& operator = ( const DataTypeCvtI& ) ;
 
 };
 

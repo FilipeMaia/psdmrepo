@@ -70,7 +70,7 @@ public:
                          size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTime& time ) ;
+                         const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver makes a new group in the file
   virtual void openGroup( hdf5pp::Group group ) ;

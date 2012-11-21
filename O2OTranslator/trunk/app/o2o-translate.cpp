@@ -91,6 +91,7 @@ private:
   AppCmdOpt<unsigned int>     m_dgramQSize ;
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
+  AppCmdOptBool               m_shortTimeStamp ;
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<double>           m_l1offset ;
   AppCmdOptNamedValue<XtcInput::MergeMode> m_mergeMode ;
@@ -122,6 +123,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
+  , m_shortTimeStamp (  "short-timestamp",          "only store sends and nanoseconds in time dataset", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
@@ -148,6 +150,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_dgramQSize ) ;
   addOption( m_experiment ) ;
   addOption( m_extGroups ) ;
+  addOption( m_shortTimeStamp ) ;
   addOption( m_instrument ) ;
   addOption( m_l1offset ) ;
   addOption( m_mergeMode ) ;
@@ -224,7 +227,8 @@ O2O_Translate::runApp ()
                                   m_splitMode.value(), m_splitSize.value(),
                                   m_compression.value(), m_extGroups.value(),
                                   metadata, m_tmpDir.value().empty() ? m_tmpDir.value() : outputDir,
-                                  m_backupExt.value() ) ) ;
+                                  m_backupExt.value(),
+                                  not m_shortTimeStamp.value() ) ) ;
 
   // instantiate metadata scanner
   scanners.push_back ( new MetaDataScanner( metadata ) ) ;

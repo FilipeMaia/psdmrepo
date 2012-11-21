@@ -70,7 +70,7 @@ public:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTime& time )
+                              const H5DataTypes::XtcClockTimeStamp& time )
   {
     // this should not happen
     assert ( not m_groups.empty() ) ;
@@ -122,10 +122,6 @@ private:
   // Data members
   std::string m_typeGroupName ;
   std::stack<hdf5pp::Group> m_groups ;
-
-  // Copy constructor and assignment are disabled by default
-  ConfigDataTypeCvt ( const ConfigDataTypeCvt& ) ;
-  ConfigDataTypeCvt operator = ( const ConfigDataTypeCvt& ) ;
 
 };
 

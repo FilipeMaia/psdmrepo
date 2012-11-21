@@ -75,7 +75,7 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
@@ -85,7 +85,7 @@ private:
   typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPadElementV2> > ElementCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CommonModeDataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;
@@ -97,9 +97,6 @@ private:
   CommonModeDataCont* m_cmodeDataCont ;
   XtcClockTimeCont* m_timeCont ;
 
-  // Copy constructor and assignment are disabled by default
-  CsPadElementV2Cvt ( const CsPadElementV2Cvt& ) ;
-  CsPadElementV2Cvt& operator = ( const CsPadElementV2Cvt& ) ;
 };
 
 } // namespace O2OTranslator

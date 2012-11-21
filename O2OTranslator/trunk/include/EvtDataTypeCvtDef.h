@@ -60,16 +60,11 @@ public:
                       hsize_t chunk_size,
                       int deflate )
     : EvtDataTypeCvt<typename H5Type::XtcType>( typeGroupName )
+    , m_chunk_size(chunk_size)
+    , m_deflate(deflate)
     , m_dataCont(0)
     , m_timeCont(0)
   {
-    // make container for data objects
-    CvtDataContFactoryDef<H5Type> dataContFactory( "data", chunk_size, deflate, true ) ;
-    m_dataCont = new DataCont ( dataContFactory ) ;
-
-    // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", chunk_size, deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
   }
 
   // Destructor
@@ -86,11 +81,21 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time )
+                                      const H5DataTypes::XtcClockTimeStamp& time )
   {
     // check data size
     if ( H5Type::xtcSize(data) != size ) {
       throw O2OXTCSizeException ( ERR_LOC, Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
+    }
+
+    if (not m_dataCont) {
+      // make container for data objects
+      CvtDataContFactoryDef<H5Type> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
+      m_dataCont = new DataCont ( dataContFactory ) ;
+
+      // make container for time
+      CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+      m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
     }
     
     m_dataCont->container( group )->append ( H5Type(data) ) ;
@@ -105,10 +110,12 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
 
   // Data members
+  hsize_t m_chunk_size ;
+  int m_deflate ;
   DataCont* m_dataCont ;
   XtcClockTimeCont* m_timeCont ;
 

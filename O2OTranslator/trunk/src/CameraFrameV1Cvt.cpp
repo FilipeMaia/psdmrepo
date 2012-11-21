@@ -73,7 +73,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         size_t size,
                                         const Pds::TypeId& typeId,
                                         const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTime& time )
+                                        const H5DataTypes::XtcClockTimeStamp& time )
 {
   if ( sizeof data + data.data_size() != size ) {
     throw O2OXTCSizeException ( ERR_LOC, "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
@@ -90,7 +90,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_imageCont = new ImageCont ( imgContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
     // separate dataset which indicates that image dimensions are correct

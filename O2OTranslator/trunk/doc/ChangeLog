@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-19-15
+2012-11-21 Andy Salnikov
+- provision for schema numbers and optional features in HDF5 files
+  implemented as attributes of the file
+- time dataset now contains fiducials, ticks, etc
+
 Tag: V00-19-14
 2012-11-15 Andy Salnikov
 - upgrading to pdsdata V05-01-00

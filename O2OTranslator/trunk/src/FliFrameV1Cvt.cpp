@@ -82,7 +82,7 @@ FliFrameV1Cvt<FrameType>::typedConvertSubgroup ( hdf5pp::Group group,
                                         size_t size,
                                         const Pds::TypeId& typeId,
                                         const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTime& time )
+                                        const H5DataTypes::XtcClockTimeStamp& time )
 {
   // find corresponding configuration object
   uint32_t height = 0;
@@ -109,7 +109,7 @@ FliFrameV1Cvt<FrameType>::typedConvertSubgroup ( hdf5pp::Group group,
     m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

@@ -71,14 +71,14 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
 
   // Data members
@@ -86,10 +86,6 @@ private:
   int m_deflate ;
   DataCont* m_dataCont ;
   XtcClockTimeCont* m_timeCont ;
-
-  // Copy constructor and assignment are disabled by default
-  AcqirisTdcDataV1Cvt ( const AcqirisTdcDataV1Cvt& ) ;
-  AcqirisTdcDataV1Cvt& operator = ( const AcqirisTdcDataV1Cvt& ) ;
 
 };
 

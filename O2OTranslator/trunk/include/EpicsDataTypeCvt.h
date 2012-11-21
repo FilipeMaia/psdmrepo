@@ -78,7 +78,7 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
@@ -88,7 +88,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
 
   // PV id is: (src, epics.pvId)
@@ -128,10 +128,6 @@ private:
   Types m_types ;
   PVDataMap m_pvdatamap ;
   PVNameMap m_pvnames ;
-
-  // Copy constructor and assignment are disabled by default
-  EpicsDataTypeCvt ( const EpicsDataTypeCvt& ) ;
-  EpicsDataTypeCvt& operator = ( const EpicsDataTypeCvt& ) ;
 
 };
 

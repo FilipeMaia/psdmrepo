@@ -73,7 +73,7 @@ public:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTime& time )
+                              const H5DataTypes::XtcClockTimeStamp& time )
   {
     hdf5pp::Group group = m_groups.top() ;
     hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
@@ -132,7 +132,7 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) = 0 ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) = 0 ;
@@ -145,10 +145,6 @@ private:
   std::string m_typeGroupName ;
   std::stack<hdf5pp::Group> m_groups ;
   CvtGroupMap m_group2group ;
-
-  // Copy constructor and assignment are disabled by default
-  EvtDataTypeCvt ( const EvtDataTypeCvt& ) ;
-  EvtDataTypeCvt operator = ( const EvtDataTypeCvt& ) ;
 
 };
 

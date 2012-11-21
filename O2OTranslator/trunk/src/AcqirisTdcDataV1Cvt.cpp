@@ -69,7 +69,7 @@ AcqirisTdcDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                             size_t size,
                                             const Pds::TypeId& typeId,
                                             const O2OXtcSrc& src,
-                                            const H5DataTypes::XtcClockTime& time )
+                                            const H5DataTypes::XtcClockTimeStamp& time )
 {
   if ( size % H5Type::xtcSize(data) != 0 ) {
     throw O2OXTCSizeException ( ERR_LOC, "Acqiris::TdcDataV1", H5Type::xtcSize(data), size ) ;
@@ -84,7 +84,7 @@ AcqirisTdcDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

@@ -75,7 +75,7 @@ Gsc16aiDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         size_t size,
                                         const Pds::TypeId& typeId,
                                         const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTime& time )
+                                        const H5DataTypes::XtcClockTimeStamp& time )
 {
   // find corresponding configuration object
   Pds::TypeId cfgTypeId(Pds::TypeId::Id_Gsc16aiConfig, 1);

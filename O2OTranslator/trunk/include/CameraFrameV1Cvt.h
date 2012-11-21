@@ -71,14 +71,14 @@ protected:
                                       size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTime& time ) ;
+                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<const unsigned char> > ImageCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > DimFixFlagCont ;
@@ -91,10 +91,6 @@ private:
   ImageCont* m_imageCont ;
   XtcClockTimeCont* m_timeCont ;
   DimFixFlagCont* m_dimFixFlagCont ;
-
-  // Copy constructor and assignment are disabled by default
-  CameraFrameV1Cvt ( const CameraFrameV1Cvt& ) ;
-  CameraFrameV1Cvt& operator = ( const CameraFrameV1Cvt& ) ;
 
 };
 

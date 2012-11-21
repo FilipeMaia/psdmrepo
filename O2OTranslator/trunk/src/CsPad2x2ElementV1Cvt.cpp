@@ -91,7 +91,7 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                               size_t size,
                                               const Pds::TypeId& typeId,
                                               const O2OXtcSrc& src,
-                                              const H5DataTypes::XtcClockTime& time )
+                                              const H5DataTypes::XtcClockTimeStamp& time )
 {
   // get calibrarion data
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
@@ -122,7 +122,7 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     }
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

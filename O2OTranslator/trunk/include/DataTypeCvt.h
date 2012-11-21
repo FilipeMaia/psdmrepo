@@ -57,7 +57,7 @@ public:
                          size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTime& time )
+                         const H5DataTypes::XtcClockTimeStamp& time )
   {
     const T& typedData = *static_cast<const T*>( data ) ;
     typedConvert ( typedData, size, typeId, src, time ) ;
@@ -75,11 +75,7 @@ private:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTime& time ) = 0 ;
-
-  // Copy constructor and assignment are disabled by default
-  DataTypeCvt ( const DataTypeCvt& ) ;
-  DataTypeCvt operator = ( const DataTypeCvt& ) ;
+                              const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
 
 };
 

@@ -78,7 +78,7 @@ CsPadCalibV1Cvt::convert ( const void* data,
                              size_t size,
                              const Pds::TypeId& typeId,
                              const O2OXtcSrc& src,
-                             const H5DataTypes::XtcClockTime& time ) 
+                             const H5DataTypes::XtcClockTimeStamp& time )
 {
   // this should not happen
   assert ( not m_groups.empty() ) ;

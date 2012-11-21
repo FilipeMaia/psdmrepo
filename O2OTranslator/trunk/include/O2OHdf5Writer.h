@@ -28,7 +28,7 @@
 //-------------------------------
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
-#include "H5DataTypes/XtcClockTime.h"
+#include "H5DataTypes/XtcClockTimeStamp.h"
 #include "LusiTime/Time.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/CalibObjectStore.h"
@@ -84,6 +84,7 @@ public:
    *  @param[in] metadata     Object which keeps metadata (run number, experiment name, etc.)
    *  @param[in] finalDir     If non-empty then move files to this directory after closing
    *  @param[in] backupExt    If non empty then used as backup extension for existing files
+   *  @param[in] fullTimeStamp If true then full timestamp will be stored (including fiducials)
    */
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                   bool overwrite,
@@ -93,7 +94,8 @@ public:
                   bool extGroups,
                   const O2OMetaData& metadata,
                   const std::string& finalDir,
-                  const std::string& backupExt) ;
+                  const std::string& backupExt,
+                  bool fullTimeStamp) ;
 
   // Destructor
   virtual ~O2OHdf5Writer () ;
@@ -146,11 +148,12 @@ private:
   const O2OMetaData& m_metadata ;
   const std::string m_finalDir;
   const std::string m_backupExt;
+  const bool m_fullTimeStamp;
 
   hdf5pp::File m_file ;
   std::stack<State> m_state ;
   std::stack<hdf5pp::Group> m_groups ;
-  H5DataTypes::XtcClockTime m_eventTime ;
+  H5DataTypes::XtcClockTimeStamp m_eventTime ;
   StateCounters m_stateCounters ;
   Pds::TransitionId::Value m_transition;
   ConfigObjectStore m_configStore0;  // This contains only objects from latest Configure
