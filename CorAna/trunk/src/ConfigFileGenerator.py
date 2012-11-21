@@ -78,8 +78,9 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_peds_scan (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-scan.cfg').path()
         self.path_out = fnm.path_peds_scan_psana_cfg()
-        self.d_subs   = {'SKIP'           : 'IS_NOT_USED',
-                         'EVENTS'         : 'FOR_ALL_EVENTS',
+        self.d_subs   = {'SKIP'                 : 'IS_NOT_USED',
+                         'EVENTS'               : 'FOR_ALL_EVENTS',
+                         'FNAME_TIMESTAMP_LIST' : fnm.path_peds_scan_tstamp_list()
                          }
 
         self.print_substitution_dict()

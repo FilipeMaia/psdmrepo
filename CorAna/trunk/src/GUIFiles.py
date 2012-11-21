@@ -48,7 +48,7 @@ class GUIFiles ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(1, 1, 500, 300)
+        self.setGeometry(1, 1, 600, 300)
         self.setWindowTitle('Files')
         self.setFrame()
 

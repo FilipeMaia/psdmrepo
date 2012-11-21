@@ -56,16 +56,20 @@ class BatchLogParser :
 
     def parse_batch_log_peds_scan (self) :
         self.path = fnm.path_peds_scan_batch_log()
-        self.dict   = {'BATCH_PROCESSING_TIME'  : cp.bat_dark_time,
-                       'BATCH_NUMBER_OF_EVENTS' : cp.bat_dark_total
-                       #'BATCH_SEC_PER_EVENT'    : 
-                       #'BATCH_EVENTS_PER_SEC'   : 
+        self.dict   = {'BATCH_FRAME_TIME_INTERVAL_AVE'  : cp.bat_dark_dt_ave,
+                       'BATCH_FRAME_TIME_INTERVAL_RMS'  : cp.bat_dark_dt_rms,
+                       #'BATCH_FRAME_TIME_INDEX_MAX'    : time_ind_max,
+                       #'BATCH_RUN_NUMBER'              : run_num,
+                       #'BATCH_SEC_PER_EVENT'           : rate_sec_per_evt, 
+                       #'BATCH_EVENTS_PER_SEC'          : rate_evt_per_sec,
+                       'BATCH_NUMBER_OF_EVENTS'         : cp.bat_dark_total,
+                       'BATCH_PROCESSING_TIME'          : cp.bat_dark_time
                        }
 
         self.print_dict()
         self.parse_log_file()
 
-        if  cp.bat_dark_end.value() == cp.bat_dark_end.value_def() :
+        if  cp.bat_dark_end.value() == cp.bat_dark_end.value_def() and cp.bat_dark_total.value() != cp.bat_dark_total.value_def():
             cp.bat_dark_end.setValue(cp.bat_dark_total.value())
 
 #-----------------------------

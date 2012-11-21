@@ -91,14 +91,20 @@ class FileNameManager :
     def path_pedestals_batch_log(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-batch-log.txt'
 
+    def path_pedestals_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-plot.png'
+
     def path_peds_scan_batch_log(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-batch-log.txt'
 
     def path_peds_scan_psana_cfg(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan.cfg'
 
-    def path_pedestals_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-plot.png'
+    def path_peds_scan_tstamp_list(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-tstamp-list.txt'
+
+    def path_peds_scan_tstamp_list_tmp(self) :
+        return  self.path_peds_scan_tstamp_list() + '-tmp'
 
 #-----------------------------
 
@@ -111,6 +117,8 @@ class FileNameManager :
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
         self.list_of_files_pedestals.append(self.path_peds_scan_psana_cfg())
         self.list_of_files_pedestals.append(self.path_peds_scan_batch_log())
+        self.list_of_files_pedestals.append(self.path_peds_scan_tstamp_list())
+        self.list_of_files_pedestals.append(self.path_peds_scan_tstamp_list_tmp())
         self.list_of_files_pedestals.append(self.path_pedestals_plot())
         return self.list_of_files_pedestals
 

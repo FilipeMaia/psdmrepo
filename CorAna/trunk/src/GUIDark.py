@@ -153,12 +153,12 @@ class GUIDark ( QtGui.QWidget ) :
         self.edi_bat_start.setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_end  .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_time .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
 
         self.edi_bat_start.setFixedWidth(width)
         self.edi_bat_end  .setFixedWidth(width)
         self.edi_bat_total.setFixedWidth(width)
-        self.edi_bat_time .setFixedWidth(width)
+        self.edi_bat_time .setFixedWidth(140)
 
         self.edi_bat_start.setStyleSheet(cp.styleEdit)
         self.edi_bat_end  .setStyleSheet(cp.styleEdit)
@@ -176,7 +176,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot   .setStyleSheet (cp.styleButton) 
         self.but_remove .setStyleSheet (cp.styleButtonBad) 
   
-        self.but_path   .setFixedWidth(40)
+        self.but_path   .setFixedWidth(width)
         self.but_submit .setFixedWidth(width)
         self.but_scanner.setFixedWidth(width)
         self.but_plot   .setFixedWidth(width)
@@ -242,17 +242,19 @@ class GUIDark ( QtGui.QWidget ) :
 
 
     def set_default_pars(self):
-        cp.bat_dark_start.setDefault()
-        cp.bat_dark_end  .setDefault()
-        cp.bat_dark_total.setDefault()
-        cp.bat_dark_time .setDefault()
+        cp.bat_dark_start .setDefault()
+        cp.bat_dark_end   .setDefault()
+        cp.bat_dark_total .setDefault()
+        cp.bat_dark_time  .setDefault()
+        cp.bat_dark_dt_ave.setDefault()
+        cp.bat_dark_dt_rms.setDefault()
 
 
     def set_fields(self):
         self.edi_bat_start.setText( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_end  .setText( str( cp.bat_dark_end  .value() ) )        
         self.edi_bat_total.setText( str( cp.bat_dark_total.value() ) )        
-        self.edi_bat_time .setText( str( cp.bat_dark_time .value() ) )        
+        self.edi_bat_time .setText( str( cp.bat_dark_dt_ave.value() ) + u'\u00B1' + str( cp.bat_dark_dt_rms.value() ) )        
 
     def on_but_submit(self):
         logger.debug('on_but_submit', __name__)
@@ -294,6 +296,7 @@ class GUIDark ( QtGui.QWidget ) :
     def on_but_remove(self):
         logger.debug('on_but_remove', __name__)
         bjpeds.remove_files_pedestals()
+        self.on_but_status()
 
 #-----------------------------
 
