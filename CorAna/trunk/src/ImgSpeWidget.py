@@ -163,10 +163,19 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         #self.fig.myaxesH = self.fig.add_subplot(212)
         self.fig.myaxesH = self.fig.add_subplot(gs[15:19,:])
-        
-        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=nbins, range=h1Range, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
+
+        if self.fig.myLogIsOn :
+            #logbins=10**np.linspace(zmin, zmax, nbins)        
+            #logbins=10**np.linspace(0.1, 6, nbins)        
+            #print 'logbins: ', logbins
+            #self.fig.myaxesH.hist(self.arrwin.flatten(), bins=logbins )#, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
+            self.fig.myaxesH.set_xscale('log')
+
+        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=nbins, range=h1Range)#, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
+
         self.fig.myaxesH.grid(self.fig.myGridIsOn)
         Nmin, Nmax = self.fig.myaxesH.get_ylim() 
+        print 'Nmin, Nmax =', Nmin, Nmax
         yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
         if len(yticks)<2 : yticks = [Nmin,Nmax]
         self.fig.myaxesH.set_yticks( yticks )
@@ -175,6 +184,7 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         coltickslocs   = self.fig.myaxesH.get_xticks()
         self.fig.myaxesH.set_xticklabels('')
+
         #coltickslabels = self.fig.myaxesH.get_xticklabels()
         #print 'colticks =', coltickslocs#, coltickslabels
  

@@ -48,7 +48,7 @@ class GUIFiles ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 200)
+        self.setGeometry(1, 1, 500, 300)
         self.setWindowTitle('Files')
         self.setFrame()
 
@@ -150,28 +150,31 @@ class GUIFiles ( QtGui.QWidget ) :
         try    : self.gui_win.close()
         except : pass
 
+        try    : del self.gui_win
+        except : pass
+
         if cp.current_file_tab.value() == self.list_file_types[0] :
-            self.gui_win = GUIDark()
+            self.gui_win = GUIDark(self)
             self.setStatus(0, 'Status: processing for pedestals')
             
         if cp.current_file_tab.value() == self.list_file_types[1] :
-            self.gui_win = GUIFlatField()
+            self.gui_win = GUIFlatField(self)
             self.setStatus(0, 'Status: set file for flat field')
 
         if cp.current_file_tab.value() == self.list_file_types[2] :
-            self.gui_win = GUIBlamish()
+            self.gui_win = GUIBlamish(self)
             self.setStatus(0, 'Status: set file for blamish mask')
 
 #        if cp.current_file_tab.value() == self.list_file_types[3] :
-#            self.gui_win = GUIData()
+#            self.gui_win = GUIData(self)
 #            self.setStatus(0, 'Status: processing for data')
 
         if cp.current_file_tab.value() == self.list_file_types[4] :
-            self.gui_win = GUIConfigParameters()
+            self.gui_win = GUIConfigParameters(self)
             self.setStatus(0, 'Status: set file for config. pars.')
 
         if cp.current_file_tab.value() == self.list_file_types[5] :
-            self.gui_win = GUIWorkResDirs()
+            self.gui_win = GUIWorkResDirs(self)
             self.setStatus(0, 'Status: set work and result dirs.')
 
         self.gui_win.setFixedHeight(150)
@@ -193,7 +196,9 @@ class GUIFiles ( QtGui.QWidget ) :
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 
-        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #self.position = self.mapToGlobal(self.pos())
+        #self.position = self.pos()
+        #logger.debug('moveEvent: new pos:' + str(self.position), __name__)
         pass
 
     def closeEvent(self, event):
@@ -205,6 +210,9 @@ class GUIFiles ( QtGui.QWidget ) :
         try    : self.gui_win.close()
         except : pass
 
+        try    : self.tab_bar.close()
+        except : pass
+        
         try    : del cp.guifiles # GUIFiles
         except : pass # silently ignore
 

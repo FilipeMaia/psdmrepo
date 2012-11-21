@@ -69,7 +69,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 20, 150, 500)
+        self.setGeometry(10, 25, 150, 500)
         self.setWindowTitle('Interactive Analysis')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
@@ -126,6 +126,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.onLogger()
 
         cp.guimain = self
+        self.move(10,25)
         
         #print 'End of init'
         
@@ -177,6 +178,9 @@ class GUIMain ( QtGui.QWidget ) :
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', self.name) 
+        #self.position = self.mapToGlobal(self.pos())
+        #self.position = self.pos()
+        #logger.debug('moveEvent - pos:' + str(self.position), __name__)       
         pass
 
     def closeEvent(self, event):
@@ -226,11 +230,11 @@ class GUIMain ( QtGui.QWidget ) :
         try :
             cp.guifiles.close()
             self.butFiles.setStyleSheet(cp.styleButton)
-        except : # AttributeError: #NameError 
+        except :
+            self.butFiles.setStyleSheet(cp.styleButtonOn)
             cp.guifiles = GUIFiles()
             cp.guifiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
             cp.guifiles.show()
-            self.butFiles.setStyleSheet(cp.styleButtonOn)
 
 
     def onBatchInfo(self):
@@ -294,11 +298,10 @@ class GUIMain ( QtGui.QWidget ) :
         try    :
             cp.guilogger.close()
         except :
-            cp.guilogger = GUILogger()
-            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,-20))) # open window with offset w.r.t. parent
-            cp.guilogger.show()
-            logger.info('GUILogger is open', self.name)
             self.butLogger.setStyleSheet(cp.styleButtonGood)
+            cp.guilogger = GUILogger()
+            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,0))) # open window with offset w.r.t. parent
+            cp.guilogger.show()
 
 
     def onFBrowser (self):       
@@ -312,12 +315,18 @@ class GUIMain ( QtGui.QWidget ) :
 
     def onStop(self):       
         logger.debug('onStop - not implemented yet...', self.name)
-                
+
 #-----------------------------
 #-----------------------------
 #-----------------------------
 #-----------------------------
 #-----------------------------
+    #def mousePressEvent(self, event):
+    #    print 'event.x, event.y, event.button =', str(event.x()), str(event.y()), str(event.button())         
+
+    #def mouseReleaseEvent(self, event):
+    #    print 'event.x, event.y, event.button =', str(event.x()), str(event.y()), str(event.button())                
+
 #http://doc.qt.nokia.com/4.6/qt.html#Key-enum
     def keyPressEvent(self, event):
         print 'event.key() = %s' % (event.key())

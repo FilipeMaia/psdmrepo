@@ -120,9 +120,6 @@ class GUIFlatField ( QtGui.QWidget ) :
         try    : cp.imgspewithgui.close()
         except : pass
 
-        try    : del cp.imgspewithgui
-        except : pass
-
         try    : cp.guifilebrowser.close()
         except : pass
 
@@ -155,8 +152,6 @@ class GUIFlatField ( QtGui.QWidget ) :
         logger.debug('on_but_plot', __name__)
         try :
             cp.imgspewithgui.close()
-            del cp.imgspewithgui
-            #but.setStyleSheet(cp.styleButtonBad)
         except :
             arr = gu.get_array_from_file(fnm.path_flat())
             if arr == None : return

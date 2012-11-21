@@ -215,7 +215,7 @@ class ConfigParameters :
 
     def readParametersFromFile ( self, fname=None ) :
         self.setParsFileName(fname)        
-        logger.info('Read configuration parameters from file ' + self.fname)
+        logger.info('Read config. pars from file ' + self.fname, __name__)
 
         if not os.path.exists(self.fname) :
             logger.warning('readParametersFromFile : The file ' + self.fname + ' is not found', __name__)
@@ -240,9 +240,9 @@ def usage() :
 
 def getConfigFileFromInput() :
 
-    msg = 'List of input parameters: '
+    msg = 'Input pars sys.argv: '
     for par in sys.argv :  msg += par
-    logger.info(msg, __name__)
+    logger.debug(msg, __name__)
 
     if len(sys.argv) > 2 : 
         usage()

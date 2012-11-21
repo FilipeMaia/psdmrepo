@@ -121,9 +121,6 @@ class GUIBlamish ( QtGui.QWidget ) :
         try    : cp.imgspewithgui.close()
         except : pass
 
-        try    : del cp.imgspewithgui
-        except : pass
-
         try    : cp.guifilebrowser.close()
         except : pass
             
@@ -155,15 +152,16 @@ class GUIBlamish ( QtGui.QWidget ) :
     def on_but_plot(self):
         logger.debug('on_but_plot', __name__)
         try :
+            logger.debug('try to close', __name__)
             cp.imgspewithgui.close()
-            del cp.imgspewithgui
             #but.setStyleSheet(cp.styleButtonBad)
         except :
+            logger.debug('except and open', __name__)
             arr = gu.get_array_from_file(fnm.path_blam())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.imgspewithgui = ImgSpeWithGUI(None, arr)
-            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20))) # self.parentWidget().pos()
             cp.imgspewithgui.show()
 
 

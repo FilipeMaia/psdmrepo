@@ -204,9 +204,6 @@ class GUIDark ( QtGui.QWidget ) :
         try    : cp.imgspewithgui.close()
         except : pass
 
-        try    : del cp.imgspewithgui
-        except : pass
-
         try    : del cp.guidark # GUIDark
         except : pass # silently ignore
 

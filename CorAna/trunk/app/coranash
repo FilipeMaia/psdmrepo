@@ -60,9 +60,9 @@ class AnalysisShell :
         msg = """CorAnaShell:
          To run this application use command "coranash" without parameters or with a single parameter - the configuration file name. 
          All necessary parameters will be set through the GUIs of this application. 
-         By default all configuration parameters are taken from the file "evtdispconfig". 
+         By default all configuration parameters are taken from the file "confpars.txt". 
          If this file is missing, the default values of parameters will be used at start, 
-         untill the "evtdispconfig" is not created.
+         untill the "confpars.txt" is not created.
         """
 	if len(sys.argv) > 2 : 
             sys.exit(90*'-' + '\n' + msg + '\n' + 90*'-')

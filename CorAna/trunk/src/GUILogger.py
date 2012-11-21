@@ -210,6 +210,7 @@ class GUILogger ( QtGui.QWidget ) :
         logger.setLevel(cp.log_level.value())
         self.box_txt.setText( logger.getLogContent() )
         logger.setGUILogger(self)
+        logger.debug('GUILogger is open', __name__)
 
 
     def appendGUILog(self, msg='...'):
