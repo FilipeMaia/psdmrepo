@@ -10,6 +10,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-24
+2012-11-21 Andy Salnikov
+- get rid of some uses of list:o2o-extra-options configuration options, 
+  list: options do not mix well with the experiment override
+
 Tag: V01-00-23
 2012-10-11 Andy Salnikov
 - improvement on the web page to show status of the controller

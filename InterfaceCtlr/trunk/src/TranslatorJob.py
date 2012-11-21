@@ -310,14 +310,26 @@ class TranslatorJob(object) :
         cmd_list.append(h5name)
 
         # add options files
-        for f in self._get_config('list:o2o-options-file',[]) :
-            cmd_list.append("--options-file")
-            cmd_list.append(f)
+        for f in self._get_config('list:o2o-options-file', []) :
+            cmd_list.append("--options-file="+f)
 
         # calibration data directory
         calibdir = self._get_config('calib-data-dir', '', True)
         if calibdir :
-            cmd_list += ["--calib-dir", calibdir]
+            cmd_list.append("--calib-dir="+calibdir)
+
+        # split mode
+        cmd_list.append("--split-mode="+self._get_config('hdf5-split-mode', 'none'))
+
+        # compression
+        compression = self._get_config('hdf5-compression')
+        if compression is not None:
+            cmd_list.append("--compression="+str(compression))
+
+        # database table for live mode
+        live_table = self._get_config('live-db-table', '', True)
+        if live_table :
+            cmd_list.append("--live-table="+live_table)
 
         # any extra options
         for opt in self._get_config('list:o2o-extra-options',[]) :
