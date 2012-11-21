@@ -184,7 +184,7 @@ Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long counter)
 void 
 Tahometer::printSummaryForParser(Event& evt, double dt_sec, long counter)
 {
-  cout << "Summary for parser:" << endl;
+  cout << "Tahometer: Summary for parser" << endl;
   cout << "BATCH_PROCESSING_TIME  " << dt_sec  << endl;
   cout << "BATCH_NUMBER_OF_EVENTS " << counter << endl;
   if (counter>0)
