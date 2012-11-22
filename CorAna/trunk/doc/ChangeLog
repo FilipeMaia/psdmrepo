@@ -13,6 +13,10 @@ reverse time order.
 
 Tag: V00-00-01
 	
+2012-11-21 Mikhail S. Dubrovin
+- add module(s):
+A       src/GUIMainTB.py
+
 2012-11-19 Mikhail S. Dubrovin
 - change name for modules:
 D         data/scripts/psana-pedestals.cfg
