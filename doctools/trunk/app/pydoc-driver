@@ -34,27 +34,36 @@ functions() {
         tr ' ' '\n' | grep -v '^_' | sort
 }
 
+genhdr() {
+    hdr="$1"
+    lvl="$2"
+    case "$lvl" in
+      1) chr='=';;
+      2) chr='^';;
+      3) chr='~';;
+      4) chr='-';;
+      5) chr='.';;
+      *) chr='_';;
+    esac
+    echo "$hdr" >> $out
+    echo "$hdr" | sed "s/./$chr/g" >> $out
+}
+
 genpkg() {
-    str="Package $1"
-    echo "$str" >> $out
-    echo "$str" | sed 's/./=/g' >> $out
+    genhdr "Package $1" $2
     echo ".. automodule:: $1" >> $out
     echo "" >> $out
 }
 
 genmod() {
-      str="Module $1"
-      echo "$str" >> $out
-      echo "$str" | sed 's/./-/g' >> $out
+      genhdr "Module $1" $2
       echo ".. automodule:: $1" >> $out
       echo "" >> $out
 }
 
 genclass() {
     cls="$1.$2"
-    str="Class $cls"
-    echo "$str" >> $out
-    echo "$str" | sed 's/./^/g' >> $out
+    genhdr "Class $cls" $3
     echo ".. autoclass:: $cls" >> $out
     echo "   :members:" >> $out
     echo "   :undoc-members:" >> $out
@@ -64,9 +73,7 @@ genclass() {
 
 genfun() {
     fun="$1.$2"
-    str="Function $fun"
-    echo "$str" >> $out
-    echo "$str" | sed 's/./^/g' >> $out
+    genhdr "Function $fun" $3
     echo ".. autofunction:: $fun" >> $out
     echo "" >> $out
 }
@@ -148,28 +155,28 @@ for pkg in $packages; do
     echo ".. contents:: Table of Contents" > $out
     echo "" >> $out
 
-    genpkg $pkg >> $out
+    genpkg $pkg 1 >> $out
     
     for class in `classes $pkg`; do
-      genclass $pkg $class >> $out
+      genclass $pkg $class 2 >> $out
     done
 
     for fun in `functions $pkg`; do
-      genfun $pkg $fun >> $out
+      genfun $pkg $fun 2 >> $out
     done
 
     for module in `modules $pkg`; do
     	
       mod="$pkg.$module"
       
-      genmod "$mod" >> $out
+      genmod "$mod" 2 >> $out
       
       for class in `classes $mod`; do
-        genclass $mod $class >> $out
+        genclass $mod $class 3 >> $out
       done
 
       for fun in `functions $mod`; do
-        genfun $mod $fun >> $out
+        genfun $mod $fun 3 >> $out
       done
       
     done

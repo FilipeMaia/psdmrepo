@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2012-08-26 Andy Salnikov
+- fix TOC nesting in pydoc-driver
+
 Tag: V00-00-14
 2012-07-27 Andy Salnikov
 - removed deprecated options from doxygen config file
