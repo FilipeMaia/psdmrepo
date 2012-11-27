@@ -28,7 +28,6 @@
 //------------------------------------
 #include "hdf5pp/Group.h"
 #include "pdsdata/evr/DataV3.hh"
-#include "pdsdata/evr/ConfigV3.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -45,7 +44,6 @@ class EvrDataV3 : boost::noncopyable {
 public:
 
   typedef Pds::EvrData::DataV3 XtcType ;
-  typedef Pds::EvrData::ConfigV3 ConfigXtcType ;
 
   EvrDataV3 () ;
   EvrDataV3 ( const XtcType& data ) ;
@@ -55,6 +53,8 @@ public:
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
+
+  static size_t xtcSize( const XtcType& xtc ) { return xtc.size(); }
 
 protected:
 

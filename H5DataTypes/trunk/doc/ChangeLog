@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-67
+2012-11-27 Andy Salnikov
+- make EvrDataV3 more similar to other data types
+
 Tag: V00-00-66
 2012-11-21 Andy Salnikov
 - new class XtcClockTimeStamp which is an extension of the XtcClockTime
