@@ -44,7 +44,7 @@ class GUIRun ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 100)
+        self.setGeometry(200, 400, 500, 200)
         self.setWindowTitle('Run Control and Monitoring')
         self.setFrame()
  
@@ -70,6 +70,7 @@ class GUIRun ( QtGui.QWidget ) :
         self.vbox.addWidget(self.tit_title)
         self.vbox.addLayout(self.hboxM)
         self.vbox.addLayout(self.hboxB)
+        #self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
@@ -98,7 +99,7 @@ class GUIRun ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumHeight(100)
+        self.setMinimumHeight(200)
 
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)

@@ -47,7 +47,7 @@ class GUISetupInfo ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 500, 630)
         self.setWindowTitle('Setup Info')
         self.setFrame()
  
@@ -102,7 +102,7 @@ class GUISetupInfo ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumHeight(700)
+        self.setMinimumHeight(630)
 
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)

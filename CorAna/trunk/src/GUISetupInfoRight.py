@@ -32,6 +32,7 @@ from ConfigParametersCorAna import confpars as cp
 from GUIKineticMode         import *
 from GUINonKineticMode      import *
 from GUISetupPars           import *
+from GUISetupEnergyAngle    import *
 from Logger                 import logger
 
 #---------------------
@@ -47,7 +48,7 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(20, 40, 400, 500)
         self.setWindowTitle('Setup Info Right Panel')
         self.setFrame()
         self.setMinimumWidth(400) 
@@ -58,7 +59,8 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
 
         self.tit_camera_mode = QtGui.QLabel('CCD Mode:')
    
-        cp.guisetuppars   = GUISetupPars()
+        cp.guisetuppars        = GUISetupPars()
+        cp.guisetupenergyangle = GUISetupEnergyAngle()
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_camera_mode)
@@ -66,6 +68,7 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxW)
         #self.vbox.addWidget(cp.guikineticmode)
         self.vbox.addWidget(cp.guisetuppars)
+        self.vbox.addWidget(cp.guisetupenergyangle)
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
 
@@ -112,7 +115,6 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
 
 
     def guiSelector(self):
-
         try :
             self.gui_win.close()
         except AttributeError :
@@ -136,6 +138,7 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
         self.guiSelector()
  
     def setStyle(self):
+        self.setMinimumHeight(500)
         self.setStyleSheet(cp.styleBkgd)
         self.tit_camera_mode.setStyleSheet(cp.styleTitle)
         

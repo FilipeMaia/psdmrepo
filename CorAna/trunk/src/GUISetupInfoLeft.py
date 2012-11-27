@@ -49,53 +49,27 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(20, 40, 400, 500)
         self.setWindowTitle('Setup Info Left Panel')
         self.setFrame()
  
         self.titDistance   = QtGui.QLabel('Sample-Detector Distance (mm):')
         self.titSetupGeom  = QtGui.QLabel('Experiment Setup Geometry:')
-        self.titPhotonE    = QtGui.QLabel('X-Ray Photon Energy (keV):')
-        self.titNomAngle   = QtGui.QLabel('Nominal Angle:')
-        self.titRealAngle  = QtGui.QLabel('Real Angle:')
 
         cp.guiimgsizeposition = GUIImgSizePosition()
         cp.guibeamzeropars    = GUIBeamZeroPars()
 
         self.ediDistance   = QtGui.QLineEdit  ( str(cp.sample_det_dist.value()) )
-        self.ediPhotonE    = QtGui.QLineEdit  ( str(cp.photon_energy.value()) ) 
-        self.ediNomAngle   = QtGui.QLineEdit  ( str(cp.nominal_angle.value()) ) 
-        self.ediRealAngle  = QtGui.QLineEdit  ( str(cp.real_angle.value()) ) 
-
-        self.ediPhotonE  .setReadOnly( True ) 
-        self.ediNomAngle .setReadOnly( True ) 
-        self.ediRealAngle.setReadOnly( True ) 
 
         self.hboxD = QtGui.QHBoxLayout()
         self.hboxW = QtGui.QHBoxLayout()
-        self.hboxE = QtGui.QHBoxLayout()
-        self.hboxA = QtGui.QHBoxLayout()
-        self.hboxR = QtGui.QHBoxLayout()
 
         self.makeTabBar()
         self.guiSelector()
-        self.guiAnglePanel()
 
         self.hboxD.addWidget(self.titDistance)
-        self.hboxD.addStretch(1)     
+        #self.hboxD.addStretch(1)     
         self.hboxD.addWidget(self.ediDistance)
-
-        self.hboxA.addWidget(self.titNomAngle)
-        self.hboxA.addStretch(1)     
-        self.hboxA.addWidget(self.ediNomAngle)
-
-        self.hboxR.addWidget(self.titRealAngle)
-        self.hboxR.addStretch(1)     
-        self.hboxR.addWidget(self.ediRealAngle)
-
-        self.hboxE.addWidget(self.titPhotonE)
-        self.hboxE.addStretch(1)     
-        self.hboxE.addWidget(self.ediPhotonE)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.titSetupGeom)
@@ -104,9 +78,7 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxW)
         self.vbox.addWidget(cp.guibeamzeropars)
         self.vbox.addWidget(cp.guiimgsizeposition)
-        self.vbox.addLayout(self.hboxE)
-        self.vbox.addLayout(self.hboxA)
-        self.vbox.addLayout(self.hboxR)
+        self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
         
         self.connect( self.ediDistance,  QtCore.SIGNAL('editingFinished()'),        self.onEdiDistance )
@@ -117,24 +89,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
     #-------------------
     #  Public methods --
     #-------------------
-
-    def guiAnglePanel(self):
-        pass
-#        try :
-#            #self.self.ediNomAngle.close()
-#            #self.self.titNomAngle.close()
-#            self.hboxA.removeWidget(self.ediNomAngle)
-#            self.hboxA.removeWidget(self.titNomAngle)
-#            self.hboxA.update()
-#        except AttributeError :
-#            pass
-
-#        if cp.exp_setup_geom.value() == self.list_of_modes[0] :
-#            self.hboxA.setEnabled(False)
-
-#        if cp.exp_setup_geom.value() == self.list_of_modes[1] :
-#            self.hboxA.setEnabled(True)
-
 
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -158,7 +112,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
 
 
     def guiSelector(self):
-
         try :
             self.gui_win.close()
         except AttributeError :
@@ -179,14 +132,7 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
         msg_edit = 'Edit field'
-        msg_info = 'Information field'
-        msg_sele = 'Selection field'
-        
-        #self.boxSetupGeom.setToolTip( msg_sele )
         self.ediDistance .setToolTip( msg_edit )
-        self.ediPhotonE  .setToolTip( msg_info )
-        self.ediNomAngle .setToolTip( msg_info )
-        self.ediRealAngle.setToolTip( msg_info )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -197,29 +143,17 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setMinimumHeight(500)
         self.             setStyleSheet (cp.styleBkgd)
         self.titDistance .setStyleSheet (cp.styleTitle)
-        self.titPhotonE  .setStyleSheet (cp.styleTitle)
-        self.titNomAngle .setStyleSheet (cp.styleTitle)
-        self.titRealAngle.setStyleSheet (cp.styleTitle)
         self.titSetupGeom.setStyleSheet (cp.styleTitle)
 
         self.ediDistance .setStyleSheet(cp.styleEdit) 
-        self.ediPhotonE  .setStyleSheet(cp.styleEditInfo) 
-        self.ediNomAngle .setStyleSheet(cp.styleEditInfo) 
-        self.ediRealAngle.setStyleSheet(cp.styleEditInfo) 
         #self.boxSetupGeom.setStyleSheet(cp.styleBox)
 
         self.ediDistance .setAlignment(QtCore.Qt.AlignRight)
-        self.ediPhotonE  .setAlignment(QtCore.Qt.AlignRight)
-        self.ediNomAngle .setAlignment(QtCore.Qt.AlignRight)
-        self.ediRealAngle.setAlignment(QtCore.Qt.AlignRight)
-
         width = 80
         self.ediDistance .setFixedWidth(width)
-        self.ediPhotonE  .setFixedWidth(width)
-        self.ediNomAngle .setFixedWidth(width)
-        self.ediRealAngle.setFixedWidth(width)
         #self.boxSetupGeom.setFixedWidth(120)
 
     def setParent(self,parent) :
@@ -262,7 +196,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         cp.exp_setup_geom.setValue( tab_name )
         logger.info(' ---> selected tab: ' + str(tab_ind) + ' - setup geometry mode: ' + tab_name, __name__)
         self.guiSelector()
-        self.guiAnglePanel()
 
     def setPopupMenu(self):
         self.popupMenuMode = QtGui.QMenu()
@@ -277,7 +210,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         self.butSetupGeom.setText( self.mode_name + cp.char_expand )
         logger.info(' ---> selected setup geometry mode: ' + self.mode_name, __name__)
         self.guiSelector()
-        self.guiAnglePanel()
 
     def onEdiDistance(self):
         cp.sample_det_dist.setValue( float(self.ediDistance.displayText()) )

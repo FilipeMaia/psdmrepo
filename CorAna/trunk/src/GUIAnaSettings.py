@@ -45,7 +45,7 @@ class GUIAnaSettings ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 500, 630)
         self.setWindowTitle('Analysis Settings')
         self.setFrame()
  
@@ -101,7 +101,7 @@ class GUIAnaSettings ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumHeight(600)
+        self.setMinimumHeight(630)
 
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
