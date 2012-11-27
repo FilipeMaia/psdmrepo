@@ -41,7 +41,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 300, 30)
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
@@ -115,7 +115,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                   setMinimumWidth(400)
+        self.                   setMinimumWidth(300)
         self.                   setStyleSheet (cp.styleBkgd)
         self.tit_ccdset        .setStyleSheet (cp.styleTitle)
         self.tit_ccdset_pixsize.setStyleSheet (cp.styleLabel)

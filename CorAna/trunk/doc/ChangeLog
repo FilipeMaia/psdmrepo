@@ -13,6 +13,20 @@ reverse time order.
 
 Tag: V00-00-01
 	
+2012-11-26 Mikhail S. Dubrovin
+- add/remove modules:
+D       src/GUICCDCorrectionSettings.py
+D       src/GUIBatchPars.py
+D       src/GUIBatchInfoLeft.py
+D       src/GUIBatchInfoRight.py
+D       src/GUIBatchInfo.py
+A  +    src/GUISetupInfoRight.py
+A  +    src/GUISetupPars.py
+A  +    src/GUISetupInfoLeft.py
+A  +    src/GUISetupInfo.py
+A       src/GUIMainTB.py
+A       src/GUIMainSplit.py
+
 2012-11-21 Mikhail S. Dubrovin
 - add module(s):
 A       src/GUIMainTB.py

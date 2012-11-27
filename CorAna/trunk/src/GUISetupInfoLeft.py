@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfoLeft...
+#  Module GUISetupInfoLeft...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI Setup Info Left Panel"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -39,8 +39,8 @@ from Logger              import logger
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfoLeft ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+class GUISetupInfoLeft ( QtGui.QWidget ) :
+    """GUI Setup Info Left Panel"""
 
     #----------------
     #  Constructor --
@@ -50,7 +50,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info Left Panel')
+        self.setWindowTitle('Setup Info Left Panel')
         self.setFrame()
  
         self.titDistance   = QtGui.QLabel('Sample-Detector Distance (mm):')
@@ -249,7 +249,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
         try    : guiimgsizeposition.close()
         except : pass
 
-        try    : del cp.guibatchinfoleft # GUIBatchInfoLeft
+        try    : del cp.guisetupinfoleft # GUISetupInfoLeft
         except : pass # silently ignore
 
     def onClose(self):
@@ -288,7 +288,7 @@ class GUIBatchInfoLeft ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfoLeft ()
+    widget = GUISetupInfoLeft ()
     widget.show()
     app.exec_()
 

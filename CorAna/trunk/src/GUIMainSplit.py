@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIMain...
+#  Module GUIMainSplit...
 #
 #------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ from GUIFileBrowser      import *
 #---------------------
 #  Class definition --
 #---------------------
-class GUIMain ( QtGui.QWidget ) :
+class GUIMainSplit ( QtGui.QWidget ) :
     """Main GUI for the interactive analysis project.
 
     @see BaseClass
@@ -65,65 +65,105 @@ class GUIMain ( QtGui.QWidget ) :
     """
     def __init__ (self, parent=None, app=None) :
 
-        self.name = 'GUIMain'
+        self.name = 'GUIMainSplit'
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 25, 150, 500)
-        self.setWindowTitle('Interactive Analysis')
+        self.setGeometry(10, 25, 1000, 950)
+        self.setWindowTitle('Data Processing Environment')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
         self.setFrame()
  
-        self.titControl     = QtGui.QLabel('Control Panel')
-        self.butFiles       = QtGui.QPushButton('Files')    
-        self.butBatchInfo   = QtGui.QPushButton('Setup Info')    
-        self.butAnaSettings = QtGui.QPushButton('Analysis Settings')
-        self.butSystem      = QtGui.QPushButton('System')
-        self.butRun         = QtGui.QPushButton('Run')
-        self.butViewResults = QtGui.QPushButton('View Results')
+        #self.titControl     = QtGui.QLabel('Control Panel')
+        #self.butFiles       = QtGui.QPushButton('Files')    
+        #self.butBatchInfo   = QtGui.QPushButton('Batch Information')    
+        #self.butAnaSettings = QtGui.QPushButton('Analysis Settings')
+        #self.butSystem      = QtGui.QPushButton('System')
+        #self.butRun         = QtGui.QPushButton('Run')
+        #self.butViewResults = QtGui.QPushButton('View Results')
         self.butStop        = QtGui.QPushButton('Stop')
         self.butSave        = QtGui.QPushButton('Save')
         self.butExit        = QtGui.QPushButton('Exit')
-        self.butLogger      = QtGui.QPushButton('Logger')
         self.butFBrowser    = QtGui.QPushButton('File Browser')
+        #self.butLogger      = QtGui.QPushButton('Logger')
+
+        self.hboxW = QtGui.QHBoxLayout() 
+
+        self.hboxWW= QtGui.QHBoxLayout() 
+        self.hboxWW.addStretch(1)
+        self.hboxWW.addLayout(self.hboxW) 
+        self.hboxWW.addStretch(1)
+
+        #self.vboxW = QtGui.QVBoxLayout() 
+        #self.vboxW.addStretch(1)
+        #self.vboxW.addLayout(self.hboxW) 
+        #self.vboxW.addStretch(1)
+
+        self.list_of_tabs = ['Files', 'Setup Info', 'Analysis Settings', 'System', 'Run', 'View Results']
+        self.makeTabBar()
+        self.guiSelector()
+
+        self.hboxB = QtGui.QHBoxLayout() 
+        #self.hboxB.addWidget(self.butLogger     )
+        self.hboxB.addWidget(self.butFBrowser   )
+        self.hboxB.addStretch(1)     
+        self.hboxB.addWidget(self.butStop       )
+        self.hboxB.addWidget(self.butSave       )
+        self.hboxB.addWidget(self.butExit       )
 
         self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.titControl    )
-        self.vbox.addWidget(self.butFiles      )
-        self.vbox.addWidget(self.butBatchInfo  )
-        self.vbox.addWidget(self.butAnaSettings)
-        self.vbox.addWidget(self.butSystem     )
-        self.vbox.addWidget(self.butRun        )
-        self.vbox.addWidget(self.butViewResults)
-        self.vbox.addStretch(1)     
-        self.vbox.addWidget(self.butLogger     )
-        self.vbox.addWidget(self.butFBrowser   )
-        self.vbox.addStretch(1)     
-        self.vbox.addWidget(self.butStop       )
-        self.vbox.addWidget(self.butSave       )
-        self.vbox.addWidget(self.butExit       )
+        #self.vbox.addWidget(self.titControl    )
+        #self.vbox.addWidget(self.butFiles      )
+        #self.vbox.addWidget(self.butBatchInfo  )
+        #self.vbox.addWidget(self.butAnaSettings)
+        #self.vbox.addWidget(self.butSystem     )
+        #self.vbox.addWidget(self.butRun        )
+        #self.vbox.addWidget(self.butViewResults)
+        #self.vbox.addStretch(2)
+        self.vbox.addLayout(self.hboxB)
+        self.vbox.addWidget(self.tab_bar)
+        self.vbox.addLayout(self.hboxWW)
+        self.vbox.addStretch(1)
 
-        self.setLayout(self.vbox)
+        self.widg_vbox = QtGui.QWidget()        
+        self.widg_vbox.setLayout(self.vbox)
 
-        self.connect(self.butFiles      ,  QtCore.SIGNAL('clicked()'), self.onFiles   )
-        self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
-        self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
-        self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
-        self.connect(self.butRun        ,  QtCore.SIGNAL('clicked()'), self.onRun         )
-        self.connect(self.butViewResults,  QtCore.SIGNAL('clicked()'), self.onViewResults )
+        #self.edi_stub = QtGui.QLineEdit()
+        #self.edi_stub.setMinimumHeight(50)
+
+        cp.guilogger = GUILogger()
+        cp.guilogger.setMinimumHeight(100)
+        cp.guilogger.setMinimumWidth(1000)
+
+        self.splitV = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.splitV.addWidget(self.widg_vbox)
+        self.splitV.addWidget(cp.guilogger)
+
+        self.hbox = QtGui.QHBoxLayout() 
+        self.hbox.addWidget(self.splitV)
+
+        self.setLayout(self.hbox)
+
+        #self.connect(self.butFiles      ,  QtCore.SIGNAL('clicked()'), self.onFiles   )
+        #self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
+        #self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
+        #self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
+        #self.connect(self.butRun        ,  QtCore.SIGNAL('clicked()'), self.onRun         )
+        #self.connect(self.butViewResults,  QtCore.SIGNAL('clicked()'), self.onViewResults )
         self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
-        self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
         self.connect(self.butFBrowser   ,  QtCore.SIGNAL('clicked()'), self.onFBrowser    )
+        #self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
 
         self.showToolTips()
         self.setStyle()
         self.printStyleInfo()
 
-        self.onLogger()
+        #self.onLogger()
+        self.butFBrowser.setStyleSheet(cp.styleButtonBad)
 
         cp.guimain = self
         self.move(10,25)
@@ -158,19 +198,103 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.               setStyleSheet(cp.styleBkgd)
-        self.titControl    .setStyleSheet(cp.styleTitle)
-        self.butFiles      .setStyleSheet(cp.styleButton)
-        self.butBatchInfo  .setStyleSheet(cp.styleButton) 
-        self.butAnaSettings.setStyleSheet(cp.styleButton)
-        self.butSystem     .setStyleSheet(cp.styleButton)
-        self.butRun        .setStyleSheet(cp.styleButton)
-        self.butViewResults.setStyleSheet(cp.styleButton)
+        #self.titControl    .setStyleSheet(cp.styleTitle)
+        #self.butFiles      .setStyleSheet(cp.styleButton)
+        #self.butBatchInfo  .setStyleSheet(cp.styleButton) 
+        #self.butAnaSettings.setStyleSheet(cp.styleButton)
+        #self.butSystem     .setStyleSheet(cp.styleButton)
+        #self.butRun        .setStyleSheet(cp.styleButton)
+        #self.butViewResults.setStyleSheet(cp.styleButton)
         self.butStop       .setStyleSheet(cp.styleButton)
         #self.butLogger     .setStyleSheet(cp.styleGreenish)
         self.butFBrowser   .setStyleSheet(cp.styleButton)
         self.butSave       .setStyleSheet(cp.styleButton)
         self.butExit       .setStyleSheet(cp.styleButton)
-        self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
+        #self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
+
+    def makeTabBar(self,mode=None) :
+        #if mode != None : self.tab_bar.close()
+        self.tab_bar = QtGui.QTabBar()
+
+        #Uses self.list_file_types
+        self.ind_tab_files  = self.tab_bar.addTab( self.list_of_tabs[0] )
+        self.ind_tab_batch  = self.tab_bar.addTab( self.list_of_tabs[1] )
+        self.ind_tab_anaset = self.tab_bar.addTab( self.list_of_tabs[2] )
+        self.ind_tab_system = self.tab_bar.addTab( self.list_of_tabs[3] )
+        self.ind_tab_run    = self.tab_bar.addTab( self.list_of_tabs[4] )
+        self.ind_tab_result = self.tab_bar.addTab( self.list_of_tabs[5] )
+
+        self.tab_bar.setTabTextColor(self.ind_tab_files  , QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_batch  , QtGui.QColor('red'))
+        self.tab_bar.setTabTextColor(self.ind_tab_anaset , QtGui.QColor('gray'))
+        self.tab_bar.setTabTextColor(self.ind_tab_system , QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_run    , QtGui.QColor('magenta'))
+        self.tab_bar.setTabTextColor(self.ind_tab_result , QtGui.QColor('gray'))
+        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+
+        #self.tab_bar.setTabEnabled(1, False)
+        #self.tab_bar.setTabEnabled(3, False)
+        
+        logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
+
+        try    :
+            tab_index = self.list_of_tabs.index(cp.current_file_tab.value())
+        except :
+            tab_index = 0
+            cp.current_tab.setValue(self.list_of_tabs[tab_index])
+
+        #tab_index = 0
+
+        self.tab_bar.setCurrentIndex(tab_index)
+
+        self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
+
+
+    def guiSelector(self):
+
+        try    : self.gui_win.close()
+        except : pass
+
+        try    : del self.gui_win
+        except : pass
+
+        if cp.current_tab.value() == self.list_of_tabs[0] :
+            self.gui_win = GUIFiles(self)
+            #self.setStatus(0, 'Status: processing for pedestals')
+            
+        if cp.current_tab.value() == self.list_of_tabs[1] :
+            self.gui_win = GUISetupInfo(self)
+            #self.setStatus(0, 'Status: set file for flat field')
+
+        if cp.current_tab.value() == self.list_of_tabs[2] :
+            self.gui_win = GUIAnaSettings(self)
+            #self.setStatus(0, 'Status: set file for blamish mask')
+
+        if cp.current_tab.value() == self.list_of_tabs[3] :
+            self.gui_win = GUISystemSettings(self)
+            #self.setStatus(0, 'Status: processing for data')
+
+        if cp.current_tab.value() == self.list_of_tabs[4] :
+            self.gui_win = GUIRun(self)
+            #self.setStatus(0, 'Status: set file for config. pars.')
+
+        if cp.current_tab.value() == self.list_of_tabs[5] :
+            self.gui_win = GUIViewResults(self)
+            #self.setStatus(0, 'Status: set work and result dirs.')
+
+        #self.gui_win.setFixedHeight(700)
+        #self.gui_win.setMinimumWidth(1000)
+        self.hboxW.addWidget(self.gui_win)
+        #self.hboxW.addStretch(1)     
+
+
+    def onTabBar(self):
+        tab_ind  = self.tab_bar.currentIndex()
+        tab_name = str(self.tab_bar.tabText(tab_ind))
+        cp.current_tab.setValue( tab_name )
+        logger.info(' ---> selected tab: ' + str(tab_ind) + ' - open GUI to work with: ' + tab_name, __name__)
+        self.guiSelector()
+
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
@@ -229,9 +353,9 @@ class GUIMain ( QtGui.QWidget ) :
         logger.debug('onFiles', self.name)
         try :
             cp.guifiles.close()
-            self.butFiles.setStyleSheet(cp.styleButton)
+            #self.butFiles.setStyleSheet(cp.styleButton)
         except :
-            self.butFiles.setStyleSheet(cp.styleButtonOn)
+            #self.butFiles.setStyleSheet(cp.styleButtonOn)
             cp.guifiles = GUIFiles()
             cp.guifiles.move(self.pos().__add__(QtCore.QPoint(160,60))) # open window with offset w.r.t. parent
             cp.guifiles.show()
@@ -300,7 +424,7 @@ class GUIMain ( QtGui.QWidget ) :
         except :
             self.butLogger.setStyleSheet(cp.styleButtonGood)
             cp.guilogger = GUILogger()
-            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(200,0))) # open window with offset w.r.t. parent
+            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(800,20))) # open window with offset w.r.t. parent
             cp.guilogger.show()
 
 
@@ -309,8 +433,9 @@ class GUIMain ( QtGui.QWidget ) :
         try    :
             cp.guifilebrowser.close()
         except :
+            self.butFBrowser.setStyleSheet(cp.styleButtonGood)
             cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_total())
-            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(240,40))) # open window with offset w.r.t. parent
+            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(820,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
     def onStop(self):       
@@ -348,7 +473,7 @@ class GUIMain ( QtGui.QWidget ) :
 #
 if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
-    ex  = GUIMain()
+    ex  = GUIMainSplit()
     ex.show()
     app.exec_()
 #-----------------------------

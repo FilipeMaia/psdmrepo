@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfo...
+#  Module GUISetupInfo...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the instrument, experiment, and run number for signal and dark data"""
+"""GUI Setup Info"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -30,15 +30,15 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 
-from GUIBatchInfoLeft   import *
-from GUIBatchInfoRight  import *
+from GUISetupInfoLeft   import *
+from GUISetupInfoRight  import *
 from Logger             import logger
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfo ( QtGui.QWidget ) :
-    """GUI Batch Info Left Panel"""
+class GUISetupInfo ( QtGui.QWidget ) :
+    """GUI Setup Info"""
 
     #----------------
     #  Constructor --
@@ -48,20 +48,20 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info')
+        self.setWindowTitle('Setup Info')
         self.setFrame()
  
-        self.tit_title  = QtGui.QLabel('Batch Information')
+        self.tit_title  = QtGui.QLabel('Setup Info')
         self.tit_status = QtGui.QLabel('Status: ')
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
         self.but_show   = QtGui.QPushButton('Show Image')
-        cp.guibatchinfoleft  = GUIBatchInfoLeft()
-        cp.guibatchinforight = GUIBatchInfoRight()
+        cp.guisetupinfoleft  = GUISetupInfoLeft()
+        cp.guisetupinforight = GUISetupInfoRight()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.guibatchinfoleft)
-        self.hboxM.addWidget(cp.guibatchinforight)
+        self.hboxM.addWidget(cp.guisetupinfoleft)
+        self.hboxM.addWidget(cp.guisetupinforight)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
@@ -102,6 +102,8 @@ class GUIBatchInfo ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setMinimumHeight(700)
+
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
@@ -127,13 +129,13 @@ class GUIBatchInfo ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.guibatchinfoleft.close()
+        try    : cp.guisetupinfoleft.close()
         except : pass
 
-        try    : cp.guibatchinforight.close()
+        try    : cp.guisetupinforight.close()
         except : pass
 
-        try    : del cp.guibatchinfo # GUIBatchInfo
+        try    : del cp.guisetupinfo # GUISetupInfo
         except : pass
 
     def onClose(self):
@@ -154,7 +156,7 @@ class GUIBatchInfo ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfo ()
+    widget = GUISetupInfo ()
     widget.show()
     app.exec_()
 

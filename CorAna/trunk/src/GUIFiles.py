@@ -48,18 +48,19 @@ class GUIFiles ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(1, 1, 600, 300)
+        self.setGeometry(1, 1, 800, 300)
         self.setWindowTitle('Files')
         self.setFrame()
 
-        self.tit_status = QtGui.QLabel     ('Status: ')
+        self.lab_title  = QtGui.QLabel     ('Files')
+        self.lab_status = QtGui.QLabel     ('Status: ')
         self.but_close  = QtGui.QPushButton('&Close') 
         self.but_save   = QtGui.QPushButton('&Save') 
         self.but_show   = QtGui.QPushButton('Show &Image') 
 
         self.hboxW = QtGui.QHBoxLayout()
         self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.tit_status)
+        self.hboxB.addWidget(self.lab_status)
         self.hboxB.addStretch(1)     
         self.hboxB.addWidget(self.but_close)
         self.hboxB.addWidget(self.but_save)
@@ -72,6 +73,7 @@ class GUIFiles ( QtGui.QWidget ) :
         self.vbox = QtGui.QVBoxLayout()   
         #cp.guiworkresdirs = GUIWorkResDirs()
         #self.vbox.addWidget(cp.guiworkresdirs)
+        self.vbox.addWidget(self.lab_title)
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxW)
         self.vbox.addLayout(self.hboxB)
@@ -109,7 +111,16 @@ class GUIFiles ( QtGui.QWidget ) :
         self.but_save .setStyleSheet (cp.styleButton)
         self.but_show .setStyleSheet (cp.styleButton)
 
-
+        self.lab_title.setStyleSheet (cp.styleTitleBold)
+        self.lab_title .setAlignment(QtCore.Qt.AlignCenter)
+        #self.setMinimumWidth (600)
+        #self.setMaximumWidth (700)
+        #self.setMinimumHeight(300)
+        #self.setMaximumHeight(400)
+        #self.setFixedWidth (700)
+        #self.setFixedHeight(400)
+        self.setFixedHeight(300)
+        
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
         self.tab_bar = QtGui.QTabBar()
@@ -257,12 +268,12 @@ class GUIFiles ( QtGui.QWidget ) :
 
     def setStatus(self, status_index=0, msg=''):
         list_of_states = ['Good','Warning','Alarm']
-        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
-        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
-        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
+        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
 
-        #self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
-        self.tit_status.setText(msg)
+        #self.lab_status.setText('Status: ' + list_of_states[status_index] + msg)
+        self.lab_status.setText(msg)
 
 
 #-----------------------------

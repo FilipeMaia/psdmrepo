@@ -102,15 +102,15 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     typ='float' ) 
         self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     typ='float' ) 
         self.x0_pos_in_beam0    = self.declareParameter( name='X0_POS_IN_BEAM_ZERO',      val_def=-59,        typ='int' ) 
-        self.z0_pos_in_beam0    = self.declareParameter( name='Z0_POS_IN_BEAM_ZERO',      val_def=175,        typ='int' ) 
+        self.y0_pos_in_beam0    = self.declareParameter( name='Y0_POS_IN_BEAM_ZERO',      val_def=175,        typ='int' ) 
 
         # GUISpecularPars.py
         self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR', val_def=-1,     typ='float' ) 
         self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR', val_def=-2,     typ='float' ) 
         self.x0_pos_in_specular = self.declareParameter( name='X0_SPEC_IN_SPECULAR',   val_def=-3,     typ='int' ) 
-        self.z0_pos_in_specular = self.declareParameter( name='Z0_SPEC_IN_SPECULAR',   val_def=-4,     typ='int' ) 
+        self.y0_pos_in_specular = self.declareParameter( name='Y0_SPEC_IN_SPECULAR',   val_def=-4,     typ='int' ) 
 
-        # GUIBatchInfoLeft.py
+        # GUISetupInfoLeft.py
         self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=4000.1,          typ='float' )
         self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Transmission',  typ='str' )
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          typ='float' )
@@ -123,7 +123,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',        val_def=1,             typ='int' )
         self.row_end            = self.declareParameter( name='IMG_ROW_END',          val_def=1299,          typ='int' )
         self.x_frame_pos        = self.declareParameter( name='X_FRAME_POS',          val_def=-51,           typ='int' )
-        self.z_frame_pos        = self.declareParameter( name='Z_FRAME_POS',          val_def=183,           typ='int' )
+        self.y_frame_pos        = self.declareParameter( name='Y_FRAME_POS',          val_def=183,           typ='int' )
 
         # GUIKineticMode.py
         self.kin_mode           = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',typ='str' )
@@ -132,7 +132,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.kin_slice_first    = self.declareParameter( name='KINETICS_SLICE_FIRST', val_def=3,             typ='int' )
         self.kin_slice_last     = self.declareParameter( name='KINETICS_SLICE_LAST',  val_def=4,             typ='int' )
 
-        # GUIBatchPars.py
+        # GUISetupPars.py
         self.bat_num           = self.declareParameter( name='BATCH_NUM',             val_def= 1,       typ='int' )
         self.bat_num_max       = self.declareParameter( name='BATCH_NUM_MAX',         val_def= 9,       typ='int' )
         self.bat_data_start    = self.declareParameter( name='BATCH_DATA_START',      val_def= 1,       typ='int' )
@@ -149,7 +149,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_flat_end      = self.declareParameter( name='BATCH_FLAT_END'  ,      val_def=100,      typ='int' )
         self.bat_flat_total    = self.declareParameter( name='BATCH_FLAT_TOTAL',      val_def=-1,       typ='int' )
         self.bat_flat_time     = self.declareParameter( name='BATCH_FLAT_TIME' ,      val_def=-1.0,     typ='float' )
-        self.bat_flux          = self.declareParameter( name='BATCH_FLUX',            val_def=-10.0,    typ='float' )
         self.bat_queue         = self.declareParameter( name='BATCH_QUEUE',           val_def='psfehq', typ='str' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  typ='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  typ='str' )
@@ -201,8 +200,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         # GUICCDCorrectionSettings.py
         self.ccdcorr_blemish         = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  typ='bool' )
         self.ccdcorr_flatfield       = self.declareParameter( name='CCD_CORRECTION_FLATFIELD',     val_def=False,  typ='bool' )
-        self.ccdcorr_distortion      = self.declareParameter( name='CCD_CORRECTION_DISTORTION',    val_def=False,  typ='bool' )
-        self.ccdcorr_parasitic       = self.declareParameter( name='CCD_CORRECTION_PARASITIC',     val_def=False,  typ='bool' )
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   typ='float' )
@@ -210,8 +207,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=123,   typ='float' )
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  typ='float' )
         self.ccdset_ccddain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   typ='float' )
-
-        self.sys_ram_size            = self.declareParameter( name='SYS_AVAILABLE_RAM_SIZE',       val_def=750,   typ='int' )
 
 #-----------------------------
 

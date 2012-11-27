@@ -44,7 +44,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 530, 30)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
@@ -137,7 +137,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def setStyle(self):
         width = 60
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(530)
         self.setStyleSheet(cp.styleBkgd)
         #tit0   .setStyleSheet (cp.styleTitle)
         self.lab_status.setStyleSheet (cp.styleLabel)

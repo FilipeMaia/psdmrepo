@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchPars...
+#  Module GUISetupPars...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets parameters for batch mode"""
+"""GUI sets setup parameters"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -34,8 +34,8 @@ from Logger                 import logger
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchPars ( QtGui.QWidget ) :
-    """GUI sets parameters for batch mode"""
+class GUISetupPars ( QtGui.QWidget ) :
+    """GUI sets setup parameters"""
 
     #----------------
     #  Constructor --
@@ -45,28 +45,18 @@ class GUIBatchPars ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Parameters')
+        self.setWindowTitle('Setup Parameters')
         self.setFrame()
 
-        self.char_expand         = u' \u25BE' # down-head triangle
-
-        self.list_of_queues = ['psnehq','psfehq'] 
-        self.box_bat_queue      = QtGui.QComboBox( self ) 
-        self.box_bat_queue.addItems(self.list_of_queues)
-        self.box_bat_queue.setCurrentIndex( self.list_of_queues.index(cp.bat_queue.value()) )
-  
         #self.tit_bat_num_max     = QtGui.QLabel('Batches To Be Analysied:')
         #self.tit_bat_num         = QtGui.QLabel('View and Edit Batch #')
-        self.tit_bat             = QtGui.QLabel('Batch Parameters:')
+        self.tit_bat             = QtGui.QLabel('Setup Parameters:')
         self.tit_bat_start       = QtGui.QLabel('start')
         self.tit_bat_end         = QtGui.QLabel('end')
         self.tit_bat_time        = QtGui.QLabel('time (sec)')
         self.tit_bat_data        = QtGui.QLabel('data')
         self.tit_bat_dark        = QtGui.QLabel('dark')
         self.tit_bat_flat        = QtGui.QLabel('flat')
-        self.tit_bat_flux        = QtGui.QLabel('flux')
-        self.tit_bat_queue       = QtGui.QLabel('Queue')
-        self.tit_bat_photons     = QtGui.QLabel('mJ/sec')
 
         #self.but_bat_num         = QtGui.QPushButton(str( cp.bat_num       .value() ) + self.char_expand  ) 
         #self.edi_bat_num_max     = QtGui.QLineEdit ( str( cp.bat_num_max   .value() ) )        
@@ -79,14 +69,11 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_flat_start  = QtGui.QLineEdit ( str( cp.bat_flat_start.value() ) )        
         self.edi_bat_flat_end    = QtGui.QLineEdit ( str( cp.bat_flat_end  .value() ) )        
         self.edi_bat_flat_time   = QtGui.QLineEdit ( str( cp.bat_flat_time .value() ) )        
-        self.edi_bat_flux        = QtGui.QLineEdit ( str( cp.bat_flux      .value() ) )        
 
 
         self.edi_bat_data_time.setReadOnly( True ) 
         self.edi_bat_dark_time.setReadOnly( True ) 
         self.edi_bat_flat_time.setReadOnly( True ) 
-        self.edi_bat_flux     .setReadOnly( True ) 
-
 
         self.grid = QtGui.QGridLayout()
         #self.grid.addWidget(self.tit_bat_num_max,                0, 0, 1, 4)
@@ -98,9 +85,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_bat_data   ,                3, 1)
         self.grid.addWidget(self.tit_bat_dark   ,                4, 1)
         self.grid.addWidget(self.tit_bat_flat   ,                5, 1)
-        self.grid.addWidget(self.tit_bat_flux   ,                6, 1)
-        self.grid.addWidget(self.tit_bat_queue  ,                7, 1)
-        self.grid.addWidget(self.tit_bat_photons,                6, 5)
 
         #self.grid.addWidget(self.edi_bat_num_max   ,             0, 4)
         #self.grid.addWidget(self.but_bat_num       ,             1, 4)
@@ -113,8 +97,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_bat_flat_start,             5, 3)
         self.grid.addWidget(self.edi_bat_flat_end  ,             5, 4)
         self.grid.addWidget(self.edi_bat_flat_time ,             5, 5)
-        self.grid.addWidget(self.edi_bat_flux      ,             6, 3, 1, 2)
-        self.grid.addWidget(self.box_bat_queue     ,             7, 3, 1, 2)
 
         self.setLayout(self.grid)
 
@@ -126,7 +108,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.connect( self.edi_bat_dark_end   ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_dark_end   )
         self.connect( self.edi_bat_flat_start ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_flat_start )
         self.connect( self.edi_bat_flat_end   ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_bat_flat_end   )
-        self.connect( self.box_bat_queue,           QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_bat_queue )
   
         self.showToolTips()
         self.setStyle()
@@ -154,8 +135,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_data_time .setToolTip( msg_info )
         self.edi_bat_dark_time .setToolTip( msg_info )
         self.edi_bat_flat_time .setToolTip( msg_info )
-        self.edi_bat_flux      .setToolTip( msg_info )
-        self.box_bat_queue     .setToolTip( msg_info )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -178,9 +157,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.tit_bat_data   .setStyleSheet (cp.styleLabel)
         self.tit_bat_dark   .setStyleSheet (cp.styleLabel)
         self.tit_bat_flat   .setStyleSheet (cp.styleLabel)
-        self.tit_bat_flux   .setStyleSheet (cp.styleLabel)
-        self.tit_bat_queue  .setStyleSheet (cp.styleLabel)
-        self.tit_bat_photons.setStyleSheet (cp.styleLabel)
 
         #self.tit_bat_num_max.setAlignment(QtCore.Qt.AlignRight)
         #self.tit_bat_num    .setAlignment(QtCore.Qt.AlignRight)
@@ -191,9 +167,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.tit_bat_data   .setAlignment(QtCore.Qt.AlignRight)
         self.tit_bat_dark   .setAlignment(QtCore.Qt.AlignRight)
         self.tit_bat_flat   .setAlignment(QtCore.Qt.AlignRight)
-        self.tit_bat_flux   .setAlignment(QtCore.Qt.AlignRight)
-        self.tit_bat_queue  .setAlignment(QtCore.Qt.AlignRight)
-        self.tit_bat_photons.setAlignment(QtCore.Qt.AlignLeft)
 
         #self.edi_bat_num_max   .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_data_start.setAlignment(QtCore.Qt.AlignRight)
@@ -205,8 +178,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_flat_start.setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_flat_end  .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_flat_time .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_flux      .setAlignment(QtCore.Qt.AlignRight)
-        #self.box_bat_queue     .setAlignment(QtCore.Qt.AlignRight)
 
         #self.edi_bat_num_max   .setFixedWidth(60)
         #self.but_bat_num       .setFixedWidth(60)
@@ -219,8 +190,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_flat_start.setFixedWidth(width)
         self.edi_bat_flat_end  .setFixedWidth(width)
         self.edi_bat_flat_time .setFixedWidth(width)
-        #self.edi_bat_flux      .setFixedWidth(width)
-        #self.edi_bat_current   .setFixedWidth(width)
                                
         #self.edi_bat_num_max   .setStyleSheet(cp.styleEdit)
         #self.but_bat_num       .setStyleSheet(cp.styleButton)
@@ -233,8 +202,6 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.edi_bat_flat_start.setStyleSheet(cp.styleEdit)
         self.edi_bat_flat_end  .setStyleSheet(cp.styleEdit)
         self.edi_bat_flat_time .setStyleSheet(cp.styleEditInfo)
-        self.edi_bat_flux      .setStyleSheet(cp.styleEditInfo)
-        self.box_bat_queue     .setStyleSheet(cp.styleButton)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -250,7 +217,7 @@ class GUIBatchPars ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guibatchpars # GUIBatchPars
+        try    : del cp.guisetuppars # GUISetupPars
         except : pass
 
     def onClose(self):
@@ -300,17 +267,12 @@ class GUIBatchPars ( QtGui.QWidget ) :
         self.but_bat_num.setText( str_selected + self.char_expand )
         logger.info(' ---> selected batch number: ' + str_selected, __name__)
 
-    def on_box_bat_queue(self):
-        queue_selected = self.box_bat_queue.currentText()
-        cp.bat_queue.setValue( queue_selected ) 
-        logger.info('on_box_bat_queue - queue_selected: ' + queue_selected, __name__)
-        
 #-----------------------------
 
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchPars ()
+    widget = GUISetupPars ()
     widget.show()
     app.exec_()
 

@@ -41,7 +41,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 350, 30)
         self.setWindowTitle('System Settings Right')
         self.setFrame()
 
@@ -60,6 +60,13 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         elif cp.thickness_type.value() == self.list_thickness_types[2] : self.rad_thickness_attlen.setChecked(True)
         else                                                           : self.rad_thickness_nonorm.setChecked(True)
 
+        self.char_expand         = u' \u25BE' # down-head triangle
+        self.tit_bat_queue = QtGui.QLabel('Queue:')
+        self.list_of_queues = ['psnehq','psfehq'] 
+        self.box_bat_queue      = QtGui.QComboBox( self ) 
+        self.box_bat_queue.addItems(self.list_of_queues)
+        self.box_bat_queue.setCurrentIndex( self.list_of_queues.index(cp.bat_queue.value()) )
+
         self.grid = QtGui.QGridLayout()
 
         self.grid_row = 0
@@ -69,6 +76,8 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.grid.addWidget(self.rad_thickness_attlen, self.grid_row+4, 1, 1, 3)
         self.grid.addWidget(self.edi_thickness_sample, self.grid_row+3, 4)
         self.grid.addWidget(self.edi_thickness_attlen, self.grid_row+4, 4)
+        self.grid.addWidget(self.tit_bat_queue,        self.grid_row+6, 0, 1, 2)
+        self.grid.addWidget(self.box_bat_queue,        self.grid_row+6, 2, 1, 2)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -82,6 +91,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
 
         self.connect(self.edi_thickness_sample, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_thickness_attlen, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.box_bat_queue,        QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_bat_queue )
 
         self.showToolTips()
         self.setStyle()
@@ -92,6 +102,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
 
     def showToolTips(self):
         self.setToolTip('Right pannel of the System Settings GUI')
+        self.box_bat_queue.setToolTip('Select the batch queue')
 
 
     def setFrame(self):
@@ -105,7 +116,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                     setMinimumWidth(450)
+        self.                     setMinimumWidth(350)
         self.                     setStyleSheet (cp.styleBkgd)
 
         self.edi_thickness_sample.setStyleSheet(cp.styleEdit) 
@@ -121,6 +132,11 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.rad_thickness_nonorm.setStyleSheet (cp.styleLabel)
         self.rad_thickness_sample.setStyleSheet (cp.styleLabel)
         self.rad_thickness_attlen.setStyleSheet (cp.styleLabel)
+
+        self.tit_bat_queue       .setStyleSheet (cp.styleTitle)
+        self.tit_bat_queue       .setAlignment(QtCore.Qt.AlignLeft)
+        self.box_bat_queue       .setStyleSheet(cp.styleButton)
+
 
     def setParent(self,parent) :
         self.parent = parent
@@ -171,6 +187,12 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         if self.rad_thickness_sample.isChecked() : cp.thickness_type.setValue( self.list_thickness_types[1] )
         if self.rad_thickness_attlen.isChecked() : cp.thickness_type.setValue( self.list_thickness_types[2] )
         logger.info('onRadioThickness - selected thickness type: ' + cp.thickness_type.value(), __name__ )
+
+
+    def on_box_bat_queue(self):
+        queue_selected = self.box_bat_queue.currentText()
+        cp.bat_queue.setValue( queue_selected ) 
+        logger.info('on_box_bat_queue - queue_selected: ' + queue_selected, __name__)
 
 #-----------------------------
 

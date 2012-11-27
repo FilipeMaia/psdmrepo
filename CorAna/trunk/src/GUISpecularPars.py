@@ -54,39 +54,39 @@ class GUISpecularPars ( QtGui.QWidget ) :
         #self.tit_x0_pos      = QtGui.QLabel('CCD x0 position in beam0 measurement')
         #self.tit_z0_pos      = QtGui.QLabel('CCD z0 position in beam0 measurement')
         self.tit_x0_pos_spec = QtGui.QLabel('CCD x spec in specular measurement')   
-        self.tit_z0_pos_spec = QtGui.QLabel('CCD z spec in specular measurement')   
+        self.tit_y0_pos_spec = QtGui.QLabel('CCD y spec in specular measurement')   
 
 
         self.edi_x_coord     = QtGui.QLineEdit( str( cp.x_coord_specular.value() ) )        
         self.edi_y_coord     = QtGui.QLineEdit( str( cp.y_coord_specular.value() ) )        
         #self.edi_x0_pos      = QtGui.QLineEdit( str( cp.x0_pos_in_beam0.value() ) )        
-        #self.edi_z0_pos      = QtGui.QLineEdit( str( cp.z0_pos_in_beam0.value() ) )        
+        #self.edi_y0_pos      = QtGui.QLineEdit( str( cp.y0_pos_in_beam0.value() ) )        
         self.edi_x0_pos_spec = QtGui.QLineEdit( str( cp.x0_pos_in_specular.value() ) )        
-        self.edi_z0_pos_spec = QtGui.QLineEdit( str( cp.z0_pos_in_specular.value() ) )        
+        self.edi_y0_pos_spec = QtGui.QLineEdit( str( cp.y0_pos_in_specular.value() ) )        
 
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.tit_specular,      0, 0, 1, 9)
         self.grid.addWidget(self.tit_x_coord,       1, 1, 1, 9)
         self.grid.addWidget(self.tit_y_coord,       2, 1, 1, 9)
         #self.grid.addWidget(self.tit_x0_pos ,       3, 1, 1, 9)
-        #self.grid.addWidget(self.tit_z0_pos ,       4, 1, 1, 9)
+        #self.grid.addWidget(self.tit_y0_pos ,       4, 1, 1, 9)
         self.grid.addWidget(self.tit_x0_pos_spec ,  5, 1, 1, 9)
-        self.grid.addWidget(self.tit_z0_pos_spec ,  6, 1, 1, 9)
+        self.grid.addWidget(self.tit_y0_pos_spec ,  6, 1, 1, 9)
 
         self.grid.addWidget(self.edi_x_coord,       1, 10)
         self.grid.addWidget(self.edi_y_coord,       2, 10)
         #self.grid.addWidget(self.edi_x0_pos ,       3, 10)
-        #self.grid.addWidget(self.edi_z0_pos ,       4, 10)
+        #self.grid.addWidget(self.edi_y0_pos ,       4, 10)
         self.grid.addWidget(self.edi_x0_pos_spec ,  5, 10)
-        self.grid.addWidget(self.edi_z0_pos_spec ,  6, 10)
+        self.grid.addWidget(self.edi_y0_pos_spec ,  6, 10)
         self.setLayout(self.grid)
 
         self.connect( self.edi_x_coord,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_x_coord )
         self.connect( self.edi_y_coord,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_y_coord )
         #self.connect( self.edi_x0_pos ,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_x0_pos )
-        #self.connect( self.edi_z0_pos ,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_z0_pos )
+        #self.connect( self.edi_y0_pos ,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_y0_pos )
         self.connect( self.edi_x0_pos_spec , QtCore.SIGNAL('editingFinished ()'), self.on_edi_x0_pos_spec )
-        self.connect( self.edi_z0_pos_spec , QtCore.SIGNAL('editingFinished ()'), self.on_edi_z0_pos_spec )
+        self.connect( self.edi_y0_pos_spec , QtCore.SIGNAL('editingFinished ()'), self.on_edi_y0_pos_spec )
  
         self.showToolTips()
         self.setStyle()
@@ -102,7 +102,7 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.edi_x_coord .setToolTip( msg )
         self.edi_y_coord .setToolTip( msg )
         self.edi_x0_pos_spec  .setToolTip( msg )
-        self.edi_z0_pos_spec  .setToolTip( msg )
+        self.edi_y0_pos_spec  .setToolTip( msg )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -120,16 +120,16 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.tit_x_coord      .setStyleSheet (cp.styleLabel)
         self.tit_y_coord      .setStyleSheet (cp.styleLabel)
         #self.tit_x0_pos       .setStyleSheet (cp.styleLabel) 
-        #self.tit_z0_pos       .setStyleSheet (cp.styleLabel) 
+        #self.tit_y0_pos       .setStyleSheet (cp.styleLabel) 
         self.tit_x0_pos_spec  .setStyleSheet (cp.styleLabel) 
-        self.tit_z0_pos_spec  .setStyleSheet (cp.styleLabel) 
+        self.tit_y0_pos_spec  .setStyleSheet (cp.styleLabel) 
 
         self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
         self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
         #self.edi_x0_pos      .setAlignment(QtCore.Qt.AlignRight)
-        #self.edi_z0_pos      .setAlignment(QtCore.Qt.AlignRight)
+        #self.edi_y0_pos      .setAlignment(QtCore.Qt.AlignRight)
         self.edi_x0_pos_spec .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_z0_pos_spec .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_y0_pos_spec .setAlignment(QtCore.Qt.AlignRight)
 
 
         width = 80
@@ -137,16 +137,16 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.edi_x_coord.setFixedWidth(width)
         self.edi_y_coord.setFixedWidth(width)
         #self.edi_x0_pos      .setFixedWidth(width)
-        #self.edi_z0_pos      .setFixedWidth(width)
+        #self.edi_y0_pos      .setFixedWidth(width)
         self.edi_x0_pos_spec .setFixedWidth(width)
-        self.edi_z0_pos_spec .setFixedWidth(width)
+        self.edi_y0_pos_spec .setFixedWidth(width)
 
         self.edi_x_coord.setStyleSheet(cp.styleEdit) 
         self.edi_y_coord.setStyleSheet(cp.styleEdit) 
         #self.edi_x0_pos      .setStyleSheet(cp.styleEdit) 
-        #self.edi_z0_pos      .setStyleSheet(cp.styleEdit) 
+        #self.edi_y0_pos      .setStyleSheet(cp.styleEdit) 
         self.edi_x0_pos_spec .setStyleSheet(cp.styleEdit) 
-        self.edi_z0_pos_spec .setStyleSheet(cp.styleEdit) 
+        self.edi_y0_pos_spec .setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :
@@ -178,17 +178,17 @@ class GUISpecularPars ( QtGui.QWidget ) :
         cp.x0_pos_in_beam0.setValue( float(self.edi_x0_pos.displayText()) )
         logger.info('Set x0_pos_in_beam0 =' + str(cp.x0_pos_in_beam0.value()), __name__)
 
-    def on_edi_z0_pos(self):
-        cp.z0_pos_in_beam0.setValue( float(self.edi_z0_pos.displayText()) )
-        logger.info('Set z0_pos_in_beam0 =' + str(cp.z0_pos_in_beam0.value()), __name__)
+    def on_edi_y0_pos(self):
+        cp.y0_pos_in_beam0.setValue( float(self.edi_y0_pos.displayText()) )
+        logger.info('Set y0_pos_in_beam0 =' + str(cp.y0_pos_in_beam0.value()), __name__)
 
     def on_edi_x0_pos_spec(self):
         cp.x0_pos_in_specular.setValue( float(self.edi_x0_pos_spec.displayText()) )
         logger.info('Set x0_pos_in_specular =' + str(cp.x0_pos_in_specular.value()), __name__)
 
-    def on_edi_z0_pos_spec(self):
-        cp.z0_pos_in_specular.setValue( float(self.edi_z0_pos_spec.displayText()) )
-        logger.info('Set z0_pos_in_specular =' + str(cp.z0_pos_in_specular.value()), __name__)
+    def on_edi_y0_pos_spec(self):
+        cp.y0_pos_in_specular.setValue( float(self.edi_y0_pos_spec.displayText()) )
+        logger.info('Set y0_pos_in_specular =' + str(cp.y0_pos_in_specular.value()), __name__)
 
 #-----------------------------
 

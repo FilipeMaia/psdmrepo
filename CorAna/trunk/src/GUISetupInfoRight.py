@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBatchInfoRight...
+#  Module GUISetupInfoRight...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets pars"""
+"""GUI Setup Info Right Panel"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -31,14 +31,14 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from GUIKineticMode         import *
 from GUINonKineticMode      import *
-from GUIBatchPars           import *
+from GUISetupPars           import *
 from Logger                 import logger
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBatchInfoRight ( QtGui.QWidget ) :
-    """GUI Batch Info Right Panel"""
+class GUISetupInfoRight ( QtGui.QWidget ) :
+    """GUI Setup Info Right Panel"""
 
     #----------------
     #  Constructor --
@@ -48,7 +48,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 500, 30)
-        self.setWindowTitle('Batch Info Right Panel')
+        self.setWindowTitle('Setup Info Right Panel')
         self.setFrame()
         self.setMinimumWidth(400) 
 
@@ -58,14 +58,14 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
 
         self.tit_camera_mode = QtGui.QLabel('CCD Mode:')
    
-        cp.guibatchpars   = GUIBatchPars()
+        cp.guisetuppars   = GUISetupPars()
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_camera_mode)
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxW)
         #self.vbox.addWidget(cp.guikineticmode)
-        self.vbox.addWidget(cp.guibatchpars)
+        self.vbox.addWidget(cp.guisetuppars)
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
 
@@ -153,7 +153,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guibatchinforight # GUIBatchInfoRight
+        try    : del cp.guisetupinforight # GUISetupInfoRight
         except : pass # silently ignore
 
         try    : cp.guikineticmode.close()
@@ -162,7 +162,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
         try    : cp.guinonkineticmode.close()
         except : pass
 
-        try    : cp.guibatchpars  .close()
+        try    : cp.guisetuppars.close()
         except : pass
 
     def onClose(self):
@@ -174,7 +174,7 @@ class GUIBatchInfoRight ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBatchInfoRight ()
+    widget = GUISetupInfoRight ()
     widget.show()
     app.exec_()
 

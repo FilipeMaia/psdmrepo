@@ -102,6 +102,8 @@ class GUISystemSettings ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setMinimumHeight(300)
+
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)

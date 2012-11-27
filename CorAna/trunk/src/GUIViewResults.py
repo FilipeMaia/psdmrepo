@@ -42,7 +42,7 @@ class GUIViewResults ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 500, 200)
         self.setWindowTitle('View Results')
         self.setFrame()
  
@@ -94,6 +94,8 @@ class GUIViewResults ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
+        self.setMinimumHeight(200)
+
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)

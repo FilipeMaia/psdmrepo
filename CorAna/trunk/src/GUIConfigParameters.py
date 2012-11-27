@@ -47,7 +47,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
         #self.parent = cp.guimain
 
-        self.setGeometry(370, 350, 500, 150)
+        self.setGeometry(370, 350, 530, 150)
         self.setWindowTitle('Configuration Parameters')
         self.setFrame()
         
@@ -110,6 +110,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def setStyle(self):
 
+        self.setMinimumWidth(530)
         #width = 80
         #self.butBrowse .setFixedWidth(width)
         #self.edi_kin_win_size   .setAlignment(QtCore.Qt.AlignRight)

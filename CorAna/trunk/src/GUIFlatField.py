@@ -43,9 +43,12 @@ class GUIFlatField ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 530, 30)
         self.setWindowTitle('Flat field file')
         self.setFrame()
+
+        self.cbx_ccdcorr_flatfield = QtGui.QCheckBox('Use flat field correction', self)
+        self.cbx_ccdcorr_flatfield.setChecked( cp.ccdcorr_flatfield.value() )
 
         self.edi_path = QtGui.QLineEdit( fnm.path_flat() )        
         self.edi_path.setReadOnly( True )   
@@ -56,14 +59,16 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
         #self.grid.addWidget(self.tit_path, self.grid_row,   0)
-        self.grid.addWidget(self.but_path,  self.grid_row,   0)
-        self.grid.addWidget(self.edi_path,  self.grid_row,   1, 1, 6)
-        self.grid.addWidget(self.but_plot,  self.grid_row+1, 0)
-        self.grid.addWidget(self.but_brow,  self.grid_row+1, 1, 1, 2)
+        self.grid.addWidget(self.cbx_ccdcorr_flatfield, self.grid_row,   0, 1, 6)          
+        self.grid.addWidget(self.but_path,              self.grid_row+1, 0)
+        self.grid.addWidget(self.edi_path,              self.grid_row+1, 1, 1, 6)
+        self.grid.addWidget(self.but_plot,              self.grid_row+2, 0)
+        self.grid.addWidget(self.but_brow,              self.grid_row+2, 1, 1, 2)
 
-        self.connect(self.but_path, QtCore.SIGNAL('clicked()'), self.on_but_path )
-        self.connect(self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
-        self.connect(self.but_brow, QtCore.SIGNAL('clicked()'), self.on_but_browser )
+        self.connect(self.cbx_ccdcorr_flatfield, QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
+        self.connect(self.but_path,              QtCore.SIGNAL('clicked()'), self.on_but_path )
+        self.connect(self.but_plot,              QtCore.SIGNAL('clicked()'), self.on_but_plot )
+        self.connect(self.but_brow,              QtCore.SIGNAL('clicked()'), self.on_but_browser )
 
         self.setLayout(self.grid)
 
@@ -90,7 +95,7 @@ class GUIFlatField ( QtGui.QWidget ) :
 
     def setStyle(self):
         width = 60
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(530)
         self.setStyleSheet(cp.styleBkgd)
         self.edi_path.setStyleSheet (cp.styleEditInfo)
         self.edi_path.setAlignment  (QtCore.Qt.AlignRight)
@@ -101,6 +106,20 @@ class GUIFlatField ( QtGui.QWidget ) :
   
         self.but_path.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
+        self.cbx_ccdcorr_flatfield .setStyleSheet (cp.styleLabel)
+
+        self.setButtonState()
+
+
+    def setButtonState(self):
+        self.but_path.setEnabled(cp.ccdcorr_flatfield.value())
+        self.but_plot.setEnabled(cp.ccdcorr_flatfield.value())
+        self.but_brow.setEnabled(cp.ccdcorr_flatfield.value())
+
+        self.but_path.setFlat(not cp.ccdcorr_flatfield.value())
+        self.but_plot.setFlat(not cp.ccdcorr_flatfield.value())
+        self.but_brow.setFlat(not cp.ccdcorr_flatfield.value())
+
     
     def setParent(self,parent) :
         self.parent = parent
@@ -170,6 +189,14 @@ class GUIFlatField ( QtGui.QWidget ) :
             cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
             cp.guifilebrowser.show()
 
+
+    def onCBox(self):
+        #if self.cbx_ccdcorr_flatfield .hasFocus() :
+        par = cp.ccdcorr_flatfield
+        par.setValue( self.cbx_ccdcorr_flatfield.isChecked() )
+        msg = 'onCBox - set status of ccdcorr_flatfield: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
 
 #-----------------------------
 
