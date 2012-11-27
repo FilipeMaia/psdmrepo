@@ -60,6 +60,7 @@
 #include "H5DataTypes/EvrConfigV5.h"
 #include "H5DataTypes/EvrConfigV6.h"
 #include "H5DataTypes/EvrConfigV7.h"
+#include "H5DataTypes/EvrDataV3.h"
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
@@ -339,6 +340,11 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
       "UsdUsb::DataV1", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_UsdUsbData, 1, converter);
 
+  // version for this type is 3
+  converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::EvrDataV3> >(
+      "EvrData::DataV3", chunk_size, compression);
+  ::registerCvt(m_cvtMap, Pds::TypeId::Id_EvrData, 3, converter);
+
   // special converter for CameraFrame type
   converter = make_shared<CameraFrameV1Cvt>("Camera::FrameV1", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_Frame, 1, converter);
@@ -350,10 +356,6 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   // very special converter for Acqiris::TdcDataV1
   converter = make_shared<AcqirisTdcDataV1Cvt>("Acqiris::TdcDataV1", chunk_size, compression);
   ::registerCvt(m_cvtMap, Pds::TypeId::Id_AcqTdcData, 1, converter);
-
-  // very special converter for EvrData::DataV3, it needs two types of data
-  converter = make_shared<EvrDataV3Cvt>("EvrData::DataV3", configStore, chunk_size, compression);
-  ::registerCvt(m_cvtMap, Pds::TypeId::Id_EvrData, 3, converter);
 
   // very special converter for PNCCD::FrameV1, it needs two types of data
   converter = make_shared<PnCCDFrameV1Cvt>("PNCCD::FrameV1", configStore, chunk_size, compression);

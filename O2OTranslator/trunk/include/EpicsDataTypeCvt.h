@@ -15,12 +15,13 @@
 //-----------------
 #include <string>
 #include <map>
+#include <stack>
 #include <utility>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "O2OTranslator/EvtDataTypeCvt.h"
+#include "O2OTranslator/DataTypeCvt.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -30,6 +31,7 @@
 #include "O2OTranslator/CvtDataContFactoryEpics.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/CvtGroupMap.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,7 +58,7 @@ class ConfigObjectStore;
  *  @author Andrei Salnikov
  */
 
-class EpicsDataTypeCvt : public EvtDataTypeCvt<Pds::EpicsPvHeader> {
+class EpicsDataTypeCvt : public DataTypeCvt<Pds::EpicsPvHeader> {
 public:
 
   typedef Pds::EpicsPvHeader XtcType ;
@@ -71,6 +73,19 @@ public:
   virtual ~EpicsDataTypeCvt () ;
 
 protected:
+
+  // typed conversion method
+  virtual void typedConvert ( const XtcType& data,
+                              size_t size,
+                              const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src,
+                              const H5DataTypes::XtcClockTimeStamp& time );
+
+  /// method called when the driver makes a new group in the file
+  virtual void openGroup( hdf5pp::Group group ) ;
+
+  /// method called when the driver closes a group in the file
+  virtual void closeGroup( hdf5pp::Group group );
 
   // typed conversion method
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
@@ -88,6 +103,7 @@ protected:
 
 private:
 
+  typedef std::map<hdf5pp::Group,hdf5pp::Group> Group2Group ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
 
@@ -121,9 +137,12 @@ private:
   typedef std::map<PvId, std::string, _PvIdCmp> PVNameMap;// maps PV id to its name
 
   // Data members
+  const std::string m_typeGroupName ;
   const ConfigObjectStore& m_configStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
+  std::stack<hdf5pp::Group> m_groups ;
+  CvtGroupMap m_group2group ;
   Subgroups m_subgroups ;  // maps top EPICS group (.../Epics::EpicsPv/EpicsArch.0:NoDevice.0) to PV2Group mapping
   Types m_types ;
   PVDataMap m_pvdatamap ;

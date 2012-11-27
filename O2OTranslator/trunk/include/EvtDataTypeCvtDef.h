@@ -59,69 +59,54 @@ public:
   EvtDataTypeCvtDef ( const std::string& typeGroupName,
                       hsize_t chunk_size,
                       int deflate )
-    : EvtDataTypeCvt<typename H5Type::XtcType>( typeGroupName )
-    , m_chunk_size(chunk_size)
-    , m_deflate(deflate)
+    : EvtDataTypeCvt<typename H5Type::XtcType>(typeGroupName, chunk_size, deflate)
     , m_dataCont(0)
-    , m_timeCont(0)
   {
   }
 
   // Destructor
   virtual ~EvtDataTypeCvtDef () {
     delete m_dataCont ;
-    delete m_timeCont ;
   }
 
 protected:
 
+  /// method called to create all necessary data containers
+  virtual void makeContainers(hsize_t chunk_size, int deflate,
+      const Pds::TypeId& typeId, const O2OXtcSrc& src)
+  {
+    // make container for data objects
+    CvtDataContFactoryDef<H5Type> dataContFactory("data", chunk_size, deflate, true);
+    m_dataCont = new DataCont(dataContFactory);
+  }
+
   // typed conversion method
-  virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                                      const XtcType& data,
-                                      size_t size,
-                                      const Pds::TypeId& typeId,
-                                      const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTimeStamp& time )
+  virtual void fillContainers(hdf5pp::Group group,
+                              const XtcType& data,
+                              size_t size,
+                              const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src)
   {
     // check data size
     if ( H5Type::xtcSize(data) != size ) {
       throw O2OXTCSizeException ( ERR_LOC, Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
     }
 
-    if (not m_dataCont) {
-      // make container for data objects
-      CvtDataContFactoryDef<H5Type> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
-      m_dataCont = new DataCont ( dataContFactory ) ;
-
-      // make container for time
-      CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-      m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-    }
-    
-    m_dataCont->container( group )->append ( H5Type(data) ) ;
-    m_timeCont->container( group )->append ( time ) ;
+    H5Type h5data(data);
+    m_dataCont->container(group)->append(h5data);
   }
 
   /// method called when the driver closes a group in the file
-  virtual void closeSubgroup( hdf5pp::Group group ) {
-    m_dataCont->closeGroup( group ) ;
-    m_timeCont->closeGroup( group ) ;
+  virtual void closeContainers(hdf5pp::Group group) {
+    if (m_dataCont) m_dataCont->closeGroup(group);
   }
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
 
   // Data members
-  hsize_t m_chunk_size ;
-  int m_deflate ;
-  DataCont* m_dataCont ;
-  XtcClockTimeCont* m_timeCont ;
-
-  // Copy constructor and assignment are disabled by default
-  EvtDataTypeCvtDef ( const EvtDataTypeCvtDef& ) ;
-  EvtDataTypeCvtDef operator = ( const EvtDataTypeCvtDef& ) ;
+  DataCont* m_dataCont;
 
 };
 

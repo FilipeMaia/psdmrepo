@@ -68,32 +68,31 @@ public:
 
 protected:
 
+  /// method called to create all necessary data containers
+  virtual void makeContainers(hsize_t chunk_size, int deflate,
+      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+
   // typed conversion method
-  virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                                      const XtcType& data,
-                                      size_t size,
-                                      const Pds::TypeId& typeId,
-                                      const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
+  virtual void fillContainers(hdf5pp::Group group,
+                              const XtcType& data,
+                              size_t size,
+                              const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src);
 
   /// method called when the driver closes a group in the file
-  virtual void closeSubgroup( hdf5pp::Group group ) ;
+  virtual void closeContainers(hdf5pp::Group group);
 
 private:
 
   typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> > ElementCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CommonModeDataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
 
   // Data members
   const CalibObjectStore& m_calibStore;
-  hsize_t m_chunk_size ;
-  int m_deflate ;
   ElementCont* m_elementCont ;
   PixelDataCont* m_pixelDataCont ;
   CommonModeDataCont* m_cmodeDataCont ;
-  XtcClockTimeCont* m_timeCont ;
 
 };
 

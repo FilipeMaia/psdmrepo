@@ -54,13 +54,10 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const std::string& typeGroupName,
                                              const ConfigObjectStore& configStore,
                                              hsize_t chunk_size,
                                              int deflate )
-  : EvtDataTypeCvt<Pds::Acqiris::DataDescV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::Acqiris::DataDescV1>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
-  , m_chunk_size(chunk_size)
-  , m_deflate(deflate)
   , m_timestampCont(0)
   , m_waveformCont(0)
-  , m_timeCont(0)
 {
 }
 
@@ -71,17 +68,29 @@ AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 {
   delete m_timestampCont ;
   delete m_waveformCont ;
-  delete m_timeCont ;
+}
+
+/// method called to create all necessary data containers
+void
+AcqirisDataDescV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // create container for timestamps
+  CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", chunk_size, deflate, true ) ;
+  m_timestampCont = new TimestampCont ( tsContFactory ) ;
+
+  // create container for waveforms
+  CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", chunk_size, deflate, true ) ;
+  m_waveformCont = new WaveformCont ( wfContFactory ) ;
 }
 
 // typed conversion method
 void
-AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                             const XtcType& data,
-                                             size_t size,
-                                             const Pds::TypeId& typeId,
-                                             const O2OXtcSrc& src,
-                                             const H5DataTypes::XtcClockTimeStamp& time )
+AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
+    const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src)
 {
   // find corresponding configuration object
   Pds::TypeId cfgTypeId(Pds::TypeId::Id_AcqConfig,1);
@@ -90,24 +99,6 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     MsgLog ( logger, error, "AcqirisDataDescV1Cvt - no configuration object was defined" );
     return ;
   }
-
-  // create all containers if running first time
-  if ( not m_waveformCont ) {
-
-    // create container for timestamps
-    CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate, true ) ;
-    m_timestampCont = new TimestampCont ( tsContFactory ) ;
-
-    // create container for waveforms
-    CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate, true ) ;
-    m_waveformCont = new WaveformCont ( wfContFactory ) ;
-
-    // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-
-  }
-
 
   // get few constants
   const Pds::Acqiris::HorizV1& hconfig = config->horiz() ;
@@ -183,18 +174,15 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   m_timestampCont->container(group,type)->append ( timestamps[0][0], type ) ;
   type = H5DataTypes::AcqirisDataDescV1::waveformType ( *config ) ;
   m_waveformCont->container(group,type)->append ( waveforms[0][0][0], type ) ;
-  m_timeCont->container(group)->append ( time ) ;
-
 
 }
 
 /// method called when the driver closes a group in the file
 void
-AcqirisDataDescV1Cvt::closeSubgroup( hdf5pp::Group group )
+AcqirisDataDescV1Cvt::closeContainers( hdf5pp::Group group )
 {
   if ( m_timestampCont ) m_timestampCont->closeGroup( group ) ;
   if ( m_waveformCont ) m_waveformCont->closeGroup( group ) ;
-  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 
 

@@ -49,13 +49,10 @@ PnCCDFrameV1Cvt::PnCCDFrameV1Cvt ( const std::string& typeGroupName,
                                    const ConfigObjectStore& configStore,
                                    hsize_t chunk_size,
                                    int deflate )
-  : EvtDataTypeCvt<Pds::PNCCD::FrameV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::PNCCD::FrameV1>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
-  , m_chunk_size(chunk_size)
-  , m_deflate(deflate)
   , m_frameCont(0)
   , m_frameDataCont(0)
-  , m_timeCont(0)
 {
 }
 
@@ -66,17 +63,29 @@ PnCCDFrameV1Cvt::~PnCCDFrameV1Cvt ()
 {
   delete m_frameCont ;
   delete m_frameDataCont ;
-  delete m_timeCont ;
+}
+
+// method called to create all necessary data containers
+void
+PnCCDFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // create container for frames
+  CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> frContFactory( "frame", chunk_size, deflate, true ) ;
+  m_frameCont = new FrameCont ( frContFactory ) ;
+
+  // create container for frame data
+  CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 }
 
 // typed conversion method
 void
-PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                        const XtcType& data,
-                                        size_t size,
-                                        const Pds::TypeId& typeId,
-                                        const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTimeStamp& time )
+PnCCDFrameV1Cvt::fillContainers(hdf5pp::Group group,
+    const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src)
 {
   // find corresponding configuration object
   Pds::PNCCD::ConfigV1 config;
@@ -101,24 +110,6 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     }
     config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
   }
-
-  // create all containers if running first time
-  if ( not m_frameCont ) {
-
-    // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> frContFactory( "frame", m_chunk_size, m_deflate, true ) ;
-    m_frameCont = new FrameCont ( frContFactory ) ;
-
-    // create container for frame data
-    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
-    m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
-
-    // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-
-  }
-
 
   // get few constants
   const uint32_t numLinks = config.numLinks() ;
@@ -148,16 +139,14 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   m_frameCont->container(group,type)->append ( frame[0], type ) ;
   type = H5DataTypes::PnCCDFrameV1::stored_data_type ( config ) ;
   m_frameDataCont->container(group,type)->append ( frameData[0][0], type ) ;
-  m_timeCont->container(group)->append ( time ) ;
 }
 
 /// method called when the driver closes a group in the file
 void
-PnCCDFrameV1Cvt::closeSubgroup( hdf5pp::Group group )
+PnCCDFrameV1Cvt::closeContainers( hdf5pp::Group group )
 {
   if ( m_frameCont ) m_frameCont->closeGroup( group ) ;
   if ( m_frameDataCont ) m_frameDataCont->closeGroup( group ) ;
-  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 
 } // namespace O2OTranslator

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-21-00
+2012-11-27 Andy Salnikov
+- another refactoring - everything related to time dataset now happens 
+  in a base converter class EvtDataTypeCvt, subclasses don't need to 
+  deal with time any more (but epics is always a special case).
+
 Tag: V00-20-00
 2012-11-21 Andy Salnikov
 - provision for schema numbers and optional features in HDF5 files

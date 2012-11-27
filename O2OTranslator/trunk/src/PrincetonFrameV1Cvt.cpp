@@ -51,13 +51,10 @@ PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const std::string& typeGroupName,
                                            const ConfigObjectStore& configStore,
                                            hsize_t chunk_size,
                                            int deflate )
-  : EvtDataTypeCvt<Pds::Princeton::FrameV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::Princeton::FrameV1>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
-  , m_chunk_size(chunk_size)
-  , m_deflate(deflate)
   , m_frameCont(0)
   , m_frameDataCont(0)
-  , m_timeCont(0)
 {
 }
 
@@ -68,17 +65,29 @@ PrincetonFrameV1Cvt::~PrincetonFrameV1Cvt ()
 {
   delete m_frameCont ;
   delete m_frameDataCont ;
-  delete m_timeCont ;
+}
+
+// method called to create all necessary data containers
+void
+PrincetonFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // create container for frames
+  CvtDataContFactoryDef<H5DataTypes::PrincetonFrameV1> frContFactory( "frame", chunk_size, deflate, true ) ;
+  m_frameCont = new FrameCont ( frContFactory ) ;
+
+  // create container for frame data
+  CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 }
 
 // typed conversion method
 void
-PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                        const XtcType& data,
-                                        size_t size,
-                                        const Pds::TypeId& typeId,
-                                        const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTimeStamp& time )
+PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
+    const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src)
 {
   // find corresponding configuration object
   uint32_t height = 0;
@@ -112,38 +121,19 @@ PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     return ;
   }
 
-  // create all containers if running first time
-  if ( not m_frameCont ) {
-
-    // create container for frames
-    CvtDataContFactoryDef<H5DataTypes::PrincetonFrameV1> frContFactory( "frame", m_chunk_size, m_deflate, true ) ;
-    m_frameCont = new FrameCont ( frContFactory ) ;
-
-    // create container for frame data
-    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
-    m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
-
-    // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-
-  }
-
   // store the data
   H5DataTypes::PrincetonFrameV1 frame(data);
   m_frameCont->container(group)->append ( frame ) ;
   hdf5pp::Type type = H5DataTypes::PrincetonFrameV1::stored_data_type(height, width) ;
   m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
-  m_timeCont->container(group)->append ( time ) ;
 }
 
 /// method called when the driver closes a group in the file
 void
-PrincetonFrameV1Cvt::closeSubgroup( hdf5pp::Group group )
+PrincetonFrameV1Cvt::closeContainers( hdf5pp::Group group )
 {
   if ( m_frameCont ) m_frameCont->closeGroup( group ) ;
   if ( m_frameDataCont ) m_frameDataCont->closeGroup( group ) ;
-  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 
 } // namespace O2OTranslator

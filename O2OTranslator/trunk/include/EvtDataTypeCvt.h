@@ -26,8 +26,10 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "O2OTranslator/CvtGroupMap.h"
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/CvtGroupMap.h"
+#include "O2OTranslator/CvtDataContainer.h"
+#include "O2OTranslator/CvtDataContFactoryDef.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -57,15 +59,22 @@ class EvtDataTypeCvt : public DataTypeCvt<XtcType> {
 public:
 
   // constructor takes a location where the data will be stored
-  EvtDataTypeCvt ( const std::string& typeGroupName )
+  EvtDataTypeCvt(const std::string& typeGroupName, hsize_t chunk_size, int deflate)
     : DataTypeCvt<XtcType>()
     , m_typeGroupName(typeGroupName)
+    , m_chunk_size(chunk_size)
+    , m_deflate(deflate)
+    , m_groups()
+    , m_group2group()
+    , m_timeCont(0)
+
   {
   }
 
   // Destructor
   virtual ~EvtDataTypeCvt ()
   {
+    delete m_timeCont ;
   }
 
   // typed conversion method
@@ -94,8 +103,22 @@ public:
       m_group2group.insert ( group, src.top(), subgroup ) ;
     }
 
-    // call overloaded method and pass all data
-    this->typedConvertSubgroup ( subgroup, data, size, typeId, src, time ) ;
+    // initialize all containers
+    if (not m_timeCont) {
+
+      // call subclass method to make container for data objects
+      makeContainers(m_chunk_size, m_deflate, typeId, src);
+
+      // make container for time
+      CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+      m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
+    }
+
+    // fill time container with data
+    m_timeCont->container(subgroup)->append(time);
+
+    // call subclass method to fill its containers with data
+    this->fillContainers(subgroup, data, size, typeId, src);
   }
 
   /// method called when the driver makes a new group in the file
@@ -109,7 +132,8 @@ public:
     // tell my subobjects that we are closing all subgroups
     const CvtGroupMap::GroupList& subgroups = m_group2group.groups( group ) ;
     for ( CvtGroupMap::GroupList::const_iterator it = subgroups.begin() ; it != subgroups.end() ; ++ it ) {
-      this->closeSubgroup( *it );
+      if (m_timeCont) m_timeCont->closeGroup(*it);
+      this->closeContainers(*it);
     }
 
     // remove it from the map
@@ -126,25 +150,33 @@ public:
   
 protected:
 
+  /// method called to create all necessary data containers
+  virtual void makeContainers(hsize_t chunk_size, int deflate,
+      const Pds::TypeId& typeId, const O2OXtcSrc& src) = 0;
+
   // typed conversion method
-  virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                                      const XtcType& data,
-                                      size_t size,
-                                      const Pds::TypeId& typeId,
-                                      const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
+  virtual void fillContainers(hdf5pp::Group group,
+                              const XtcType& data,
+                              size_t size,
+                              const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src) = 0 ;
 
   /// method called when the driver closes a group in the file
-  virtual void closeSubgroup( hdf5pp::Group group ) = 0 ;
+  virtual void closeContainers(hdf5pp::Group group) = 0 ;
 
 private:
 
   typedef std::map<hdf5pp::Group,hdf5pp::Group> Group2Group ;
 
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
+
   // Data members
-  std::string m_typeGroupName ;
+  const std::string m_typeGroupName ;
+  const hsize_t m_chunk_size ;
+  const int m_deflate ;
   std::stack<hdf5pp::Group> m_groups ;
   CvtGroupMap m_group2group ;
+  XtcClockTimeCont* m_timeCont ;
 
 };
 

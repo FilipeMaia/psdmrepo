@@ -62,14 +62,11 @@ CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const std::string& typeGroupName,
                                                const CalibObjectStore& calibStore,
                                                hsize_t chunk_size,
                                                int deflate )
-  : EvtDataTypeCvt<Pds::CsPad2x2::ElementV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::CsPad2x2::ElementV1>(typeGroupName, chunk_size, deflate)
   , m_calibStore(calibStore)
-  , m_chunk_size(chunk_size)
-  , m_deflate(deflate)
   , m_elementCont(0)
   , m_pixelDataCont(0)
   , m_cmodeDataCont(0)
-  , m_timeCont(0)
 {
 }
 
@@ -81,17 +78,39 @@ CsPad2x2ElementV1Cvt::~CsPad2x2ElementV1Cvt ()
   delete m_elementCont ;
   delete m_pixelDataCont ;
   delete m_cmodeDataCont ;
-  delete m_timeCont ;
+}
+
+// method called to create all necessary data containers
+void
+CsPad2x2ElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // create container for frames
+  CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> elContFactory( "element", chunk_size, deflate, true ) ;
+  m_elementCont = new ElementCont ( elContFactory ) ;
+
+  // create container for frame data
+  CvtDataContFactoryTyped<int16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
+
+  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
+  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
+    m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
+  if (cModeCalib) {
+    // create container for common mode data
+    CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
+    m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
+  }
+
 }
 
 // typed conversion method
 void
-CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                              const XtcType& data,
-                                              size_t size,
-                                              const Pds::TypeId& typeId,
-                                              const O2OXtcSrc& src,
-                                              const H5DataTypes::XtcClockTimeStamp& time )
+CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
+    const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src)
 {
   // get calibrarion data
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
@@ -103,29 +122,6 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
   boost::shared_ptr<pdscalibdata::CsPadFilterV1> filterCalib =
     m_calibStore.get<pdscalibdata::CsPadFilterV1>(address);
-
-  // create all containers if running first time
-  if ( not m_elementCont ) {
-
-    // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> elContFactory( "element", m_chunk_size, m_deflate, true ) ;
-    m_elementCont = new ElementCont ( elContFactory ) ;
-
-    // create container for frame data
-    CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
-    m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
-
-    if (cModeCalib.get()) {
-      // create container for common mode data
-      CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate, true ) ;
-      m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
-    }
-
-    // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-
-  }
 
   // get few constants
   const unsigned nSect = 2;
@@ -218,17 +214,15 @@ CsPad2x2ElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     type = H5DataTypes::CsPad2x2ElementV1::cmode_data_type() ;
     m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
   }
-  m_timeCont->container(group)->append ( time ) ;
 }
 
 /// method called when the driver closes a group in the file
 void
-CsPad2x2ElementV1Cvt::closeSubgroup( hdf5pp::Group group )
+CsPad2x2ElementV1Cvt::closeContainers( hdf5pp::Group group )
 {
   if ( m_elementCont ) m_elementCont->closeGroup( group ) ;
   if ( m_pixelDataCont ) m_pixelDataCont->closeGroup( group ) ;
   if ( m_cmodeDataCont ) m_cmodeDataCont->closeGroup( group ) ;
-  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 
 } // namespace O2OTranslator

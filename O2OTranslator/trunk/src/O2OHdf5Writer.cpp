@@ -403,6 +403,13 @@ O2OHdf5Writer::storeConfig0()
 void
 O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
+  if (size == 0) {
+    // sometimes happens
+    MsgLogRoot( error, "O2OHdf5Writer::dataObject -- zero payload size: "
+                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+    return;
+  }
+
   // find this type in the converter map
   O2OCvtFactory::iterator it = m_cvtFactory.find(typeId);
   if (it == m_cvtFactory.end() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {

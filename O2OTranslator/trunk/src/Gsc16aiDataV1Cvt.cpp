@@ -48,13 +48,10 @@ Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const std::string& typeGroupName,
     const ConfigObjectStore& configStore,
     hsize_t chunk_size,
     int deflate)
-  : EvtDataTypeCvt<Pds::Gsc16ai::DataV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::Gsc16ai::DataV1>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
-  , m_chunk_size(chunk_size)
-  , m_deflate(deflate)
   , m_dataCont(0)
   , m_valueCont(0)
-  , m_timeCont(0)
 {
 }
 
@@ -65,17 +62,29 @@ Gsc16aiDataV1Cvt::~Gsc16aiDataV1Cvt ()
 {
   delete m_dataCont ;
   delete m_valueCont ;
-  delete m_timeCont ;
+}
+
+// method called to create all necessary data containers
+void
+Gsc16aiDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
+    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+  // create container for frames
+  DataCont::factory_type dataContFactory( "timestamps", chunk_size, deflate, true ) ;
+  m_dataCont = new DataCont ( dataContFactory ) ;
+
+  // create container for frame data
+  ValueCont::factory_type valueContFactory( "channelValue", chunk_size, deflate, true ) ;
+  m_valueCont = new ValueCont ( valueContFactory ) ;
 }
 
 // typed conversion method
 void
-Gsc16aiDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                        const XtcType& data,
-                                        size_t size,
-                                        const Pds::TypeId& typeId,
-                                        const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTimeStamp& time )
+Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
+    const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src)
 {
   // find corresponding configuration object
   Pds::TypeId cfgTypeId(Pds::TypeId::Id_Gsc16aiConfig, 1);
@@ -89,23 +98,6 @@ Gsc16aiDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     return ;
   }
 
-  // create all containers if running first time
-  if ( not m_dataCont ) {
-
-    // create container for frames
-    DataCont::factory_type dataContFactory( "timestamps", m_chunk_size, m_deflate, true ) ;
-    m_dataCont = new DataCont ( dataContFactory ) ;
-
-    // create container for frame data
-    ValueCont::factory_type valueContFactory( "channelValue", m_chunk_size, m_deflate, true ) ;
-    m_valueCont = new ValueCont ( valueContFactory ) ;
-
-    // make container for time
-    XtcClockTimeCont::factory_type timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
-
-  }
-
   // make data objects
   H5DataTypes::Gsc16aiDataV1 timestampsData(data);
 
@@ -113,16 +105,14 @@ Gsc16aiDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   m_dataCont->container(group)->append(timestampsData) ;
   hdf5pp::Type type = H5DataTypes::Gsc16aiDataV1::stored_data_type(*config);
   m_valueCont->container(group,type)->append(data._channelValue[0], type);
-  m_timeCont->container(group)->append(time);
 }
 
 /// method called when the driver closes a group in the file
 void
-Gsc16aiDataV1Cvt::closeSubgroup( hdf5pp::Group group )
+Gsc16aiDataV1Cvt::closeContainers( hdf5pp::Group group )
 {
   if ( m_dataCont ) m_dataCont->closeGroup( group ) ;
   if ( m_valueCont ) m_valueCont->closeGroup( group ) ;
-  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 
 } // namespace O2OTranslator

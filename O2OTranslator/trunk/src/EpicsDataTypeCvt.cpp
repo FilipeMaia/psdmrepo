@@ -58,10 +58,13 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( const std::string& topGroupName,
                                      const ConfigObjectStore& configStore,
                                      hsize_t chunk_size,
                                      int deflate )
-  : EvtDataTypeCvt<Pds::EpicsPvHeader>( topGroupName )
+  : DataTypeCvt<Pds::EpicsPvHeader>()
+  , m_typeGroupName(topGroupName)
   , m_configStore(configStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
+  , m_groups()
+  , m_group2group()
   , m_subgroups()
   , m_types()
   , m_pvdatamap()
@@ -83,6 +86,64 @@ EpicsDataTypeCvt::~EpicsDataTypeCvt ()
 
 // typed conversion method
 void
+EpicsDataTypeCvt::typedConvert ( const XtcType& data,
+    size_t size,
+    const Pds::TypeId& typeId,
+    const O2OXtcSrc& src,
+    const H5DataTypes::XtcClockTimeStamp& time )
+{
+  hdf5pp::Group group = m_groups.top() ;
+  hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
+  if ( not subgroup.valid() ) {
+
+    // get the name of the group for this object
+    const std::string& grpName = m_typeGroupName + "/" + src.name() ;
+
+    // create separate group
+    if (group.hasChild(grpName)) {
+      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- existing group " << grpName ) ;
+      subgroup = group.openGroup( grpName );
+    } else {
+      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
+      subgroup = group.createGroup( grpName );
+    }
+
+    m_group2group.insert ( group, src.top(), subgroup ) ;
+  }
+
+  // call subclass method to fill its containers with data
+  this->typedConvertSubgroup(subgroup, data, size, typeId, src, time);
+}
+
+/// method called when the driver makes a new group in the file
+void
+EpicsDataTypeCvt::openGroup( hdf5pp::Group group )
+{
+  m_groups.push ( group ) ;
+}
+
+/// method called when the driver closes a group in the file
+void
+EpicsDataTypeCvt::closeGroup( hdf5pp::Group group )
+{
+  // tell my subobjects that we are closing all subgroups
+  const CvtGroupMap::GroupList& subgroups = m_group2group.groups( group ) ;
+  for ( CvtGroupMap::GroupList::const_iterator it = subgroups.begin() ; it != subgroups.end() ; ++ it ) {
+    this->closeSubgroup(*it);
+  }
+
+  // remove it from the map
+  m_group2group.erase( group ) ;
+
+  // remove it from the stack
+  if ( m_groups.empty() ) return ;
+  while ( m_groups.top() != group ) m_groups.pop() ;
+  if ( m_groups.empty() ) return ;
+  m_groups.pop() ;
+}
+
+// typed conversion method
+void
 EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const XtcType& data,
                                         size_t size,
@@ -94,7 +155,7 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   if (size == 0) {
     // Rare form of data damage
-    MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << typeGroupName()) ;
+    MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << m_typeGroupName) ;
     return;
   }
 
