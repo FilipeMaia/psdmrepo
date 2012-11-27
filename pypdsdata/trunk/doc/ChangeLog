@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-85
+2012-11-27 Andy Salnikov
+- fix for BldDataPimV1 class, size of the camera frame subobject was 
+  incorrectly calculated 
+
 Tag: V00-00-84
 2012-11-15 Andy Salnikov
 - upgrading to pdsdata V05-01-00

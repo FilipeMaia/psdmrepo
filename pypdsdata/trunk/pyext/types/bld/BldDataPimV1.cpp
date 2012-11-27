@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <stddef.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -94,8 +95,9 @@ frame( PyObject* self, void* )
   Pds::BldDataPimV1* pdsObj = pypdsdata::BldDataPimV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Camera::FrameV1::PyObject_FromPds(&pdsObj->frame,
-      self, sizeof(pdsObj->frame));
+  pypdsdata::BldDataPimV1* pyobj = static_cast<pypdsdata::BldDataPimV1*>(self);
+  size_t size = pyobj->m_size - offsetof(Pds::BldDataPimV1, frame);
+  return pypdsdata::Camera::FrameV1::PyObject_FromPds(&pdsObj->frame, self, size);
 }
 
 }
