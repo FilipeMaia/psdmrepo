@@ -69,7 +69,7 @@ class GUIMainSplit ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 25, 1000, 950)
+        self.setGeometry(10, 25, 800, 950)
         self.setWindowTitle('Data Processing Environment')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
@@ -135,7 +135,7 @@ class GUIMainSplit ( QtGui.QWidget ) :
 
         cp.guilogger = GUILogger()
         cp.guilogger.setMinimumHeight(100)
-        cp.guilogger.setMinimumWidth(1000)
+        cp.guilogger.setMinimumWidth(850)
 
         self.splitV = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.splitV.addWidget(self.widg_vbox)

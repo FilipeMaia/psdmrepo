@@ -41,7 +41,7 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(20, 40, 370, 30)
         self.setWindowTitle('Analysis Options')
         self.setFrame()
 
@@ -51,7 +51,7 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
         self.edi_ana_opt1        = QtGui.QLineEdit( str( cp.ana_ndelays.value() ) )        
         self.edi_ana_opt2        = QtGui.QLineEdit( str( cp.ana_nslice_delays.value() ) )        
         self.edi_ana_opt3        = QtGui.QLineEdit( str( cp.ana_npix_to_smooth.value() ) )        
-        self.cbx_ana_smooth_norm = QtGui.QCheckBox('use smoothed symmetric norm.,  Npix min:', self)
+        self.cbx_ana_smooth_norm = QtGui.QCheckBox('use smoothed sym. norm., Npix min:', self)
         self.cbx_ana_two_corfuns = QtGui.QCheckBox('Two time correlation function control', self)
         self.cbx_ana_spec_stab   = QtGui.QCheckBox('Check speckle stability', self)
         self.cbx_ana_smooth_norm.setChecked( cp.ana_smooth_norm.value() )
@@ -61,13 +61,13 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
         self.grid.addWidget(self.tit_ana_opts,             0, 0, 1, 8)
         self.grid.addWidget(self.tit_ana_opt1,             1, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt1,             1, 9)
-        self.grid.addWidget(self.tit_ana_opt2,             2, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt2,             2, 9)
-        self.grid.addWidget(self.cbx_ana_smooth_norm,      3, 1, 1, 8)
-        self.grid.addWidget(self.edi_ana_opt3,             3, 9)
-        self.grid.addWidget(self.cbx_ana_two_corfuns,      4, 1, 1, 7)
-        self.grid.addWidget(self.cbx_ana_spec_stab,        5, 1, 1, 7)
+        self.grid.addWidget(self.edi_ana_opt1,             1, 8)
+        self.grid.addWidget(self.tit_ana_opt2,             2, 1, 1, 7)
+        self.grid.addWidget(self.edi_ana_opt2,             2, 8)
+        self.grid.addWidget(self.cbx_ana_smooth_norm,      3, 1, 1, 7)
+        self.grid.addWidget(self.edi_ana_opt3,             3, 8)
+        self.grid.addWidget(self.cbx_ana_two_corfuns,      4, 1, 1, 8)
+        self.grid.addWidget(self.cbx_ana_spec_stab,        5, 1, 1, 8)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -106,7 +106,7 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                    setMinimumWidth(390)
+        self.                    setMinimumWidth(370)
         self.                    setStyleSheet (cp.styleBkgd)
 
         self.tit_ana_opts       .setStyleSheet (cp.styleTitle)
@@ -121,9 +121,9 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
         self.edi_ana_opt2       .setStyleSheet(cp.styleEdit)
         self.edi_ana_opt3       .setStyleSheet(cp.styleEdit) 
 
-        self.edi_ana_opt1       .setFixedWidth(width)
-        self.edi_ana_opt2       .setFixedWidth(width)
-        self.edi_ana_opt3       .setFixedWidth(width) 
+        self.edi_ana_opt1       .setMinimumWidth(width)
+        self.edi_ana_opt2       .setMinimumWidth(width)
+        self.edi_ana_opt3       .setMinimumWidth(width) 
 
         self.edi_ana_opt1       .setAlignment(QtCore.Qt.AlignRight)
         self.edi_ana_opt2       .setAlignment(QtCore.Qt.AlignRight)
@@ -203,7 +203,7 @@ class GUIAnaSettingsOptions ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIAnaSettingsOptions ()
+    widget = GUIAnaSettingsOptions()
     widget.show()
     app.exec_()
 

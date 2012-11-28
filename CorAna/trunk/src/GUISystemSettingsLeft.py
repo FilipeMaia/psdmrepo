@@ -39,11 +39,11 @@ class GUISystemSettingsLeft ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 350, 30)
+        self.setGeometry(200, 400, 350, 150)
         self.setWindowTitle('System Settings Left')
         self.setFrame()
 
-        cp.guiccdsettings            = GUICCDSettings()
+        cp.guiccdsettings = GUICCDSettings()
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addStretch(1) 

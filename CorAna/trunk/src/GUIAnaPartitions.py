@@ -39,7 +39,7 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(200, 400, 370, 30)
         self.setWindowTitle('Log files')
         self.setFrame()
 
@@ -81,7 +81,7 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(380)
         self.setStyleSheet(cp.styleBkgd)
 
     def guiSection(self, title, method, par) :
@@ -100,12 +100,12 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
         but.setToolTip('Click on this button\nand select the file.')
         box.setToolTip('Click on this box\nand select the partitioning method.')
 
-        self.grid.addWidget(tit0, self.grid_row,   0, 1, 9)
+        self.grid.addWidget(tit0, self.grid_row,   0, 1, 8)
         self.grid.addWidget(tit1, self.grid_row+1, 1)
-        self.grid.addWidget(tit2, self.grid_row+2, 1)
-        self.grid.addWidget(box,  self.grid_row+1, 2, 1, 7)
-        self.grid.addWidget(edi,  self.grid_row+2, 2, 1, 8)
-        self.grid.addWidget(but,  self.grid_row+1, 9)
+        self.grid.addWidget(box,  self.grid_row+1, 2, 1, 5)
+        self.grid.addWidget(but,  self.grid_row+1, 7)
+        self.grid.addWidget(tit2, self.grid_row+2, 1, 1, 2)
+        self.grid.addWidget(edi,  self.grid_row+2, 6)
         self.grid_row += 3
 
         tit0   .setStyleSheet (cp.styleTitle)
@@ -116,8 +116,11 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
         but    .setStyleSheet (cp.styleButton) 
         edi    .setAlignment (QtCore.Qt.AlignRight)
 
-        width = 80
-        but    .setFixedWidth(width)
+        width = 60
+        but    .setMinimumWidth(width)
+        edi    .setFixedWidth(width)
+        #box    .setFixedWidth(160)
+        #tit0   .setFixedWidth(200)
 
         self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         self.connect(but, QtCore.SIGNAL('clicked()'),                self.onBut  )

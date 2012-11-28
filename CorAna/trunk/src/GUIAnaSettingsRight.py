@@ -41,7 +41,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(20, 40, 390, 30)
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
@@ -180,7 +180,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                    setMinimumWidth(450)
+        self.                    setFixedWidth(390)
         self.                    setStyleSheet (cp.styleBkgd)
 
         self.tit_res_sets       .setStyleSheet (cp.styleTitle)     

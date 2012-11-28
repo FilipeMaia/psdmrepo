@@ -69,7 +69,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 25, 1000, 300)
+        self.setGeometry(10, 25, 850, 300)
         self.setWindowTitle('Data Processing Environment')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False

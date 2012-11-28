@@ -40,7 +40,7 @@ class GUIAnaSettingsLeft ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 30)
+        self.setGeometry(20, 40, 390, 30)
         self.setWindowTitle('Analysis Settings Left')
         self.setFrame()
 
@@ -104,22 +104,24 @@ class GUIAnaSettingsLeft ( QtGui.QWidget ) :
         try    : cp.guianasettingsoptions.close()
         except : pass
 
-        if cp.ana_type.value() == self.list_ana_types[0] :
-            cp.guianapartitions = GUIAnaPartitions() # Switch between static/dynamic is inside
-            self.gui_win = cp.guianapartitions
+        try    : del cp.guianasettingsoptions
+        except : pass
 
-        if cp.ana_type.value() == self.list_ana_types[1] :
-            cp.guianapartitions = GUIAnaPartitions() # Switch between static/dynamic is inside
-            self.gui_win = cp.guianapartitions
+        if   cp.ana_type.value() == self.list_ana_types[0] :
+            pass
 
-            cp.guianasettingsoptions = GUIAnaSettingsOptions()
+        elif cp.ana_type.value() == self.list_ana_types[1] :
+            cp.guianasettingsoptions = GUIAnaSettingsOptions(self)
+            cp.guianasettingsoptions.setMinimumWidth(380)
             self.hboxS.addWidget(cp.guianasettingsoptions)
 
+        self.gui_win = GUIAnaPartitions(self)
+        self.gui_win.setMinimumWidth(380)
         self.hboxW.addWidget(self.gui_win)
 
 
     def setStyle(self):
-        self.setMinimumWidth(450)
+        self.setFixedWidth(390)
         self.setStyleSheet(cp.styleBkgd)
         self.tit_ana_type.setStyleSheet (cp.styleTitle)
 
@@ -140,9 +142,6 @@ class GUIAnaSettingsLeft ( QtGui.QWidget ) :
         logger.debug('closeEvent', __name__)
         try    : del cp.guianasettingsleft # GUIAnaSettingsLeft
         except : pass # silently ignore
-
-        try    : cp.guianapartitions.close()
-        except : pass
 
         try    : cp.guianasettingsoptions.close()
         except : pass
