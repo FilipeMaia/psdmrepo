@@ -52,8 +52,8 @@ namespace O2OTranslator {
 class AcqirisTdcDataV1Cvt : public EvtDataTypeCvt<Pds::Acqiris::TdcDataV1> {
 public:
 
-  typedef H5DataTypes::AcqirisTdcDataV1 H5Type ;
   typedef Pds::Acqiris::TdcDataV1 XtcType ;
+  typedef H5DataTypes::AcqirisTdcDataV1 H5Type ;
 
   // constructor takes a location where the data will be stored
   AcqirisTdcDataV1Cvt (const std::string& typeGroupName,

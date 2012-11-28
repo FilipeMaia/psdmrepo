@@ -69,15 +69,15 @@ CameraFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // make container for data objects
-  CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> dataContFactory ( "data", chunk_size, deflate, true ) ;
+  DataCont::factory_type dataContFactory ( "data", chunk_size, deflate, true ) ;
   m_dataCont = new DataCont ( dataContFactory ) ;
 
   // get the type for the image
-  CvtDataContFactoryTyped<const unsigned char> imgContFactory( "image", chunk_size, deflate, true ) ;
+  ImageCont::factory_type imgContFactory( "image", chunk_size, deflate, true ) ;
   m_imageCont = new ImageCont ( imgContFactory ) ;
 
   // separate dataset which indicates that image dimensions are correct
-  CvtDataContFactoryTyped<uint16_t> dimFixFlagFactory ( "_dim_fix_flag_201103", 1, deflate ) ;
+  DimFixFlagCont::factory_type dimFixFlagFactory ( "_dim_fix_flag_201103", 1, deflate ) ;
   m_dimFixFlagCont = new DimFixFlagCont(dimFixFlagFactory);
 }
 
@@ -89,13 +89,13 @@ CameraFrameV1Cvt::fillContainers(hdf5pp::Group group,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  if ( sizeof data + data.data_size() != size ) {
-    throw O2OXTCSizeException ( ERR_LOC, "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
+  if ( H5Type::xtcSize(data) != size ) {
+    throw O2OXTCSizeException ( ERR_LOC, "Camera::FrameV1", H5Type::xtcSize(data), size ) ;
   }
 
   // store the data in the containers
-  m_dataCont->container(group)->append ( H5DataTypes::CameraFrameV1(data) ) ;
-  hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
+  m_dataCont->container(group)->append ( H5Type(data) ) ;
+  hdf5pp::Type imgType = H5Type::imageType ( data ) ;
   m_imageCont->container(group,imgType)->append ( *data.data(), imgType ) ;
   
   // do not store anything in the flag container, just create it

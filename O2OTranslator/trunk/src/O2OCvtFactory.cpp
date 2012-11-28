@@ -103,7 +103,6 @@
 #include "O2OTranslator/CsPadCalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2CalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2ElementV1Cvt.h"
-#include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
 #include "O2OTranslator/FliFrameV1Cvt.h"

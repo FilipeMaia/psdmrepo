@@ -56,6 +56,7 @@ class CsPadElementV1Cvt : public EvtDataTypeCvt<Pds::CsPad::ElementV1> {
 public:
 
   typedef Pds::CsPad::ElementV1 XtcType ;
+  typedef H5DataTypes::CsPadElementV1 H5Type ;
 
   // constructor
   CsPadElementV1Cvt ( const std::string& typeGroupName,
@@ -85,7 +86,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPadElementV1> > ElementCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<H5Type> > ElementCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CommonModeDataCont ;
 

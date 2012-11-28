@@ -55,6 +55,7 @@ class TimepixDataV1Cvt : public EvtDataTypeCvt<Pds::Timepix::DataV1> {
 public:
 
   typedef Pds::Timepix::DataV1 XtcType ;
+  typedef H5DataTypes::TimepixDataV2 H5Type ;  // not a mistake, HDF5 data is actually V2
 
   // constructor
   TimepixDataV1Cvt ( const std::string& typeGroupName,
@@ -82,7 +83,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ImageCont ;
 
   // Data members

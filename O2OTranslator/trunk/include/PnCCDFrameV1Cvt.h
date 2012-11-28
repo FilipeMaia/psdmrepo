@@ -56,6 +56,7 @@ class PnCCDFrameV1Cvt : public EvtDataTypeCvt<Pds::PNCCD::FrameV1> {
 public:
 
   typedef Pds::PNCCD::FrameV1 XtcType ;
+  typedef H5DataTypes::PnCCDFrameV1 H5Type ;
 
   // constructor
   PnCCDFrameV1Cvt ( const std::string& typeGroupName,
@@ -84,7 +85,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> > FrameCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<H5Type> > FrameCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > FrameDataCont ;
 
   // Data members

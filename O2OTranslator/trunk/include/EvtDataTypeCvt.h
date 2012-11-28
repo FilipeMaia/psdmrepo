@@ -110,7 +110,7 @@ public:
       makeContainers(m_chunk_size, m_deflate, typeId, src);
 
       // make container for time
-      CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
+      XtcClockTimeCont::factory_type timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
       m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
     }
 

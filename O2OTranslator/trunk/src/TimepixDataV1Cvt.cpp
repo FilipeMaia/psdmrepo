@@ -45,7 +45,7 @@ namespace O2OTranslator {
 TimepixDataV1Cvt::TimepixDataV1Cvt ( const std::string& typeGroupName,
                                      hsize_t chunk_size,
                                      int deflate )
-  : EvtDataTypeCvt<Pds::Timepix::DataV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_dataCont(0)
   , m_imageCont(0)
 {
@@ -66,11 +66,11 @@ TimepixDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> dataContFactory( "data", chunk_size, deflate, true ) ;
+  DataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_dataCont = new DataCont ( dataContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<uint16_t> imageContFactory( "image", chunk_size, deflate, true ) ;
+  ImageCont::factory_type imageContFactory( "image", chunk_size, deflate, true ) ;
   m_imageCont = new ImageCont ( imageContFactory ) ;
 }
 
@@ -92,9 +92,9 @@ TimepixDataV1Cvt::fillContainers(hdf5pp::Group group,
   uint32_t width = data2->width();
 
   // store the data
-  H5DataTypes::TimepixDataV2 tpdata(*data2);
+  H5Type tpdata(*data2);
   m_dataCont->container(group)->append(tpdata);
-  hdf5pp::Type type = H5DataTypes::TimepixDataV2::stored_data_type(height, width) ;
+  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
   m_imageCont->container(group,type)->append(*(uint16_t*)data2->data(), type);
 
   delete [] buf;

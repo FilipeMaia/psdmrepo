@@ -66,7 +66,7 @@ CsPadElementV1Cvt::CsPadElementV1Cvt ( const std::string& typeGroupName,
                                    const CalibObjectStore& calibStore,
                                    hsize_t chunk_size,
                                    int deflate )
-  : EvtDataTypeCvt<Pds::CsPad::ElementV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
   , m_calibStore(calibStore)
   , m_elementCont(0)
@@ -91,11 +91,11 @@ CsPadElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryTyped<H5DataTypes::CsPadElementV1> elContFactory( "element", chunk_size, deflate, true ) ;
+  ElementCont::factory_type elContFactory( "element", chunk_size, deflate, true ) ;
   m_elementCont = new ElementCont ( elContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<int16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  PixelDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
@@ -103,7 +103,7 @@ CsPadElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
   if (cModeCalib) {
     // create container for common mode data
-    CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
+    CommonModeDataCont::factory_type cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
     m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
   }
 }
@@ -158,7 +158,7 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   const unsigned qsize = nSect*ssize;
 
   // make data arrays
-  H5DataTypes::CsPadElementV1 elems[nQuad] ;
+  H5Type elems[nQuad] ;
   int16_t pixelData[nQuad][nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
   float commonMode[nQuad][nSect];
 
@@ -167,7 +167,7 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
 
     // copy frame info
-    elems[iq] = H5DataTypes::CsPadElementV1(*pdselem) ;
+    elems[iq] = H5Type(*pdselem) ;
 
     const int16_t* qdata = (const int16_t*)pdselem->data();
 
@@ -231,12 +231,12 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::CsPadElementV1::stored_type(nQuad);
+  hdf5pp::Type type = H5Type::stored_type(nQuad);
   m_elementCont->container(group,type)->append ( elems[0], type ) ;
-  type = H5DataTypes::CsPadElementV1::stored_data_type(nQuad, nSect) ;
+  type = H5Type::stored_data_type(nQuad, nSect) ;
   m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0][0], type ) ;
   if (m_cmodeDataCont) {
-    type = H5DataTypes::CsPadElementV1::cmode_data_type(nQuad, nSect) ;
+    type = H5Type::cmode_data_type(nQuad, nSect) ;
     m_cmodeDataCont->container(group,type)->append ( commonMode[0][0], type ) ;
   }
 }

@@ -54,6 +54,7 @@ class CameraFrameV1Cvt : public EvtDataTypeCvt<Pds::Camera::FrameV1> {
 public:
 
   typedef Pds::Camera::FrameV1 XtcType ;
+  typedef H5DataTypes::CameraFrameV1 H5Type ;
 
   // constructor takes a location where the data will be stored
   CameraFrameV1Cvt ( const std::string& typeGroupName,
@@ -81,7 +82,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<const unsigned char> > ImageCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > DimFixFlagCont ;
 

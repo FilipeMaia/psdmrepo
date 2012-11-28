@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "H5DataTypes/AcqirisDataDescV1.h"
 #include "pdsdata/acqiris/DataDescV1.hh"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
@@ -56,6 +57,7 @@ class AcqirisDataDescV1Cvt : public EvtDataTypeCvt<Pds::Acqiris::DataDescV1> {
 public:
 
   typedef Pds::Acqiris::DataDescV1 XtcType ;
+  typedef H5DataTypes::AcqirisDataDescV1 H5Type ;
 
   // Default constructor
   AcqirisDataDescV1Cvt ( const std::string& typeGroupName,

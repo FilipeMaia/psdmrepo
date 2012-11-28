@@ -51,7 +51,7 @@ PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const std::string& typeGroupName,
                                            const ConfigObjectStore& configStore,
                                            hsize_t chunk_size,
                                            int deflate )
-  : EvtDataTypeCvt<Pds::Princeton::FrameV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
   , m_frameCont(0)
   , m_frameDataCont(0)
@@ -73,11 +73,11 @@ PrincetonFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryDef<H5DataTypes::PrincetonFrameV1> frContFactory( "frame", chunk_size, deflate, true ) ;
+  FrameCont::factory_type frContFactory( "frame", chunk_size, deflate, true ) ;
   m_frameCont = new FrameCont ( frContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  FrameDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 }
 
@@ -122,9 +122,9 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  H5DataTypes::PrincetonFrameV1 frame(data);
+  H5Type frame(data);
   m_frameCont->container(group)->append ( frame ) ;
-  hdf5pp::Type type = H5DataTypes::PrincetonFrameV1::stored_data_type(height, width) ;
+  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
   m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
 }
 

@@ -58,6 +58,7 @@ class OceanOpticsDataV1Cvt : public EvtDataTypeCvt<Pds::OceanOptics::DataV1> {
 public:
 
   typedef Pds::OceanOptics::DataV1 XtcType ;
+  typedef H5DataTypes::OceanOpticsDataV1 H5Type ;
 
   // Default constructor
   OceanOpticsDataV1Cvt(const std::string& typeGroupName,
@@ -86,7 +87,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::OceanOpticsDataV1> > ObjectCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > ObjectCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CorrectedDataCont ;
 

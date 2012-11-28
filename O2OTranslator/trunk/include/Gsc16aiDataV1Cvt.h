@@ -54,6 +54,7 @@ class Gsc16aiDataV1Cvt : public EvtDataTypeCvt<Pds::Gsc16ai::DataV1> {
 public:
 
   typedef Pds::Gsc16ai::DataV1 XtcType;
+  typedef H5DataTypes::Gsc16aiDataV1 H5Type;
   
   // constructor
   Gsc16aiDataV1Cvt(const std::string& typeGroupName,
@@ -82,7 +83,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::Gsc16aiDataV1> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ValueCont ;
 
   // Data members

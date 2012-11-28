@@ -59,10 +59,10 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const std::string& typeGroupName,
-                                               const CalibObjectStore& calibStore,
-                                               hsize_t chunk_size,
-                                               int deflate )
-  : EvtDataTypeCvt<Pds::CsPad2x2::ElementV1>(typeGroupName, chunk_size, deflate)
+                                             const CalibObjectStore& calibStore,
+                                             hsize_t chunk_size,
+                                             int deflate )
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_calibStore(calibStore)
   , m_elementCont(0)
   , m_pixelDataCont(0)
@@ -86,11 +86,11 @@ CsPad2x2ElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryTyped<H5DataTypes::CsPad2x2ElementV1> elContFactory( "element", chunk_size, deflate, true ) ;
+  ElementCont::factory_type elContFactory( "element", chunk_size, deflate, true ) ;
   m_elementCont = new ElementCont ( elContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<int16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  PixelDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
@@ -98,7 +98,7 @@ CsPad2x2ElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
   if (cModeCalib) {
     // create container for common mode data
-    CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
+    CommonModeDataCont::factory_type cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
     m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
   }
 
@@ -132,7 +132,7 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
   float commonMode[nSect];
 
   // move the data
-  H5DataTypes::CsPad2x2ElementV1 elem(data);
+  H5Type elem(data);
 
   // loop over sections
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
@@ -206,12 +206,12 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::CsPad2x2ElementV1::stored_type();
+  hdf5pp::Type type = H5Type::stored_type();
   m_elementCont->container(group,type)->append ( elem, type ) ;
-  type = H5DataTypes::CsPad2x2ElementV1::stored_data_type() ;
+  type = H5Type::stored_data_type() ;
   m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
   if (m_cmodeDataCont) {
-    type = H5DataTypes::CsPad2x2ElementV1::cmode_data_type() ;
+    type = H5Type::cmode_data_type() ;
     m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
   }
 }

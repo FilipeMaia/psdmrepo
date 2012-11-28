@@ -64,7 +64,7 @@ AcqirisTdcDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // make container for data objects
-  CvtDataContFactoryDef<H5Type> dataContFactory ( "data", chunk_size, deflate, true ) ;
+  DataCont::factory_type dataContFactory ( "data", chunk_size, deflate, true ) ;
   m_dataCont = new DataCont ( dataContFactory ) ;
 }
 

@@ -54,6 +54,7 @@ class TimepixDataV2Cvt : public EvtDataTypeCvt<Pds::Timepix::DataV2> {
 public:
 
   typedef Pds::Timepix::DataV2 XtcType ;
+  typedef H5DataTypes::TimepixDataV2 H5Type ;
 
   // constructor
   TimepixDataV2Cvt ( const std::string& typeGroupName,
@@ -81,7 +82,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::TimepixDataV2> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ImageCont ;
 
   // Data members

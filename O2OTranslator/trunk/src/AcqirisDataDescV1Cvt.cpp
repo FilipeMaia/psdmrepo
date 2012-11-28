@@ -25,7 +25,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/AcqirisDataDescV1.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "pdsdata/acqiris/ConfigV1.hh"
@@ -54,7 +53,7 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const std::string& typeGroupName,
                                              const ConfigObjectStore& configStore,
                                              hsize_t chunk_size,
                                              int deflate )
-  : EvtDataTypeCvt<Pds::Acqiris::DataDescV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
   , m_timestampCont(0)
   , m_waveformCont(0)
@@ -76,11 +75,11 @@ AcqirisDataDescV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for timestamps
-  CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", chunk_size, deflate, true ) ;
+  TimestampCont::factory_type tsContFactory( "timestamps", chunk_size, deflate, true ) ;
   m_timestampCont = new TimestampCont ( tsContFactory ) ;
 
   // create container for waveforms
-  CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", chunk_size, deflate, true ) ;
+  WaveformCont::factory_type wfContFactory( "waveforms", chunk_size, deflate, true ) ;
   m_waveformCont = new WaveformCont ( wfContFactory ) ;
 }
 
@@ -117,7 +116,7 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
 
   // scan the data and fill arrays
   // FIXME: few methods that we need from DataDescV1 declared as non-const
-  Pds::Acqiris::DataDescV1* dd = const_cast<Pds::Acqiris::DataDescV1*>( &data ) ;
+  XtcType* dd = const_cast<XtcType*>( &data ) ;
   for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = dd->nextChannel(hconfig) ) {
 
     // first verify that the shape of the data returned corresponds to the config
@@ -170,9 +169,9 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
 
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::AcqirisDataDescV1::timestampType ( *config ) ;
+  hdf5pp::Type type = H5Type::timestampType ( *config ) ;
   m_timestampCont->container(group,type)->append ( timestamps[0][0], type ) ;
-  type = H5DataTypes::AcqirisDataDescV1::waveformType ( *config ) ;
+  type = H5Type::waveformType ( *config ) ;
   m_waveformCont->container(group,type)->append ( waveforms[0][0][0], type ) ;
 
 }

@@ -49,7 +49,7 @@ PnCCDFrameV1Cvt::PnCCDFrameV1Cvt ( const std::string& typeGroupName,
                                    const ConfigObjectStore& configStore,
                                    hsize_t chunk_size,
                                    int deflate )
-  : EvtDataTypeCvt<Pds::PNCCD::FrameV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
   , m_frameCont(0)
   , m_frameDataCont(0)
@@ -71,11 +71,11 @@ PnCCDFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> frContFactory( "frame", chunk_size, deflate, true ) ;
+  FrameCont::factory_type frContFactory( "frame", chunk_size, deflate, true ) ;
   m_frameCont = new FrameCont ( frContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  FrameDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 }
 
@@ -116,7 +116,7 @@ PnCCDFrameV1Cvt::fillContainers(hdf5pp::Group group,
   const unsigned sizeofData = data.sizeofData(config) ;
 
   // make data arrays
-  H5DataTypes::PnCCDFrameV1 frame[numLinks] ;
+  H5Type frame[numLinks] ;
   uint16_t frameData[numLinks][sizeofData] ;
 
   // move the data
@@ -124,7 +124,7 @@ PnCCDFrameV1Cvt::fillContainers(hdf5pp::Group group,
   for ( unsigned link = 0 ; link != numLinks ; ++ link ) {
 
     // copy frame info
-    frame[link] = H5DataTypes::PnCCDFrameV1(*dd) ;
+    frame[link] = H5Type(*dd) ;
 
     // copy data
     const uint16_t* ddata = dd->data() ;
@@ -135,9 +135,9 @@ PnCCDFrameV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::PnCCDFrameV1::stored_type ( config ) ;
+  hdf5pp::Type type = H5Type::stored_type ( config ) ;
   m_frameCont->container(group,type)->append ( frame[0], type ) ;
-  type = H5DataTypes::PnCCDFrameV1::stored_data_type ( config ) ;
+  type = H5Type::stored_data_type ( config ) ;
   m_frameDataCont->container(group,type)->append ( frameData[0][0], type ) ;
 }
 

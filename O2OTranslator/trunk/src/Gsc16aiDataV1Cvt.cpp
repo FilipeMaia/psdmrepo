@@ -48,7 +48,7 @@ Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const std::string& typeGroupName,
     const ConfigObjectStore& configStore,
     hsize_t chunk_size,
     int deflate)
-  : EvtDataTypeCvt<Pds::Gsc16ai::DataV1>(typeGroupName, chunk_size, deflate)
+  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
   , m_configStore(configStore)
   , m_dataCont(0)
   , m_valueCont(0)
@@ -99,11 +99,11 @@ Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // make data objects
-  H5DataTypes::Gsc16aiDataV1 timestampsData(data);
+  H5Type timestampsData(data);
 
   // store the data
   m_dataCont->container(group)->append(timestampsData) ;
-  hdf5pp::Type type = H5DataTypes::Gsc16aiDataV1::stored_data_type(*config);
+  hdf5pp::Type type = H5Type::stored_data_type(*config);
   m_valueCont->container(group,type)->append(data._channelValue[0], type);
 }
 

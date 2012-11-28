@@ -77,11 +77,11 @@ FliFrameV1Cvt<FrameType>::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  CvtDataContFactoryDef<FrameType> frContFactory( "frame", chunk_size, deflate, true ) ;
+  typename FrameCont::factory_type frContFactory( "frame", chunk_size, deflate, true ) ;
   m_frameCont = new FrameCont ( frContFactory ) ;
 
   // create container for frame data
-  CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", chunk_size, deflate, true ) ;
+  FrameDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
   m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 }
 
@@ -108,9 +108,9 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  FrameType frame(data);
+  H5Type frame(data);
   m_frameCont->container(group)->append ( frame ) ;
-  hdf5pp::Type type = FrameType::stored_data_type(height, width) ;
+  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
   m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
 }
 

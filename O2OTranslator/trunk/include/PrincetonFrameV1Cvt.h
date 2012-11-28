@@ -54,6 +54,7 @@ class PrincetonFrameV1Cvt : public EvtDataTypeCvt<Pds::Princeton::FrameV1> {
 public:
 
   typedef Pds::Princeton::FrameV1 XtcType ;
+  typedef H5DataTypes::PrincetonFrameV1 H5Type ;
 
   // constructor
   PrincetonFrameV1Cvt ( const std::string& typeGroupName,
@@ -82,7 +83,7 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::PrincetonFrameV1> > FrameCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > FrameCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > FrameDataCont ;
 
   // Data members

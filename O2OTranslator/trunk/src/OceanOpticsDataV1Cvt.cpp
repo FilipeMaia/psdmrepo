@@ -71,15 +71,15 @@ OceanOpticsDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
     const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for objects
-  CvtDataContFactoryDef<H5DataTypes::OceanOpticsDataV1> objContFactory( "data", chunk_size, deflate, true ) ;
+  ObjectCont::factory_type objContFactory( "data", chunk_size, deflate, true ) ;
   m_objCont = new ObjectCont ( objContFactory ) ;
 
   // create container for data
-  CvtDataContFactoryTyped<uint16_t> dataContFactory( "spectra", chunk_size, deflate, true ) ;
+  DataCont::factory_type dataContFactory( "spectra", chunk_size, deflate, true ) ;
   m_dataCont = new DataCont ( dataContFactory ) ;
 
   // create container for corrected data
-  CvtDataContFactoryTyped<float> corrDataContFactory( "corrSpectra", chunk_size, deflate, true ) ;
+  CorrectedDataCont::factory_type corrDataContFactory( "corrSpectra", chunk_size, deflate, true ) ;
   m_corrDataCont = new CorrectedDataCont ( corrDataContFactory ) ;
 }
 
@@ -106,11 +106,11 @@ OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // store the data
-  H5DataTypes::OceanOpticsDataV1 obj(data);
+  H5Type obj(data);
   m_objCont->container(group)->append(obj) ;
-  hdf5pp::Type type = H5DataTypes::OceanOpticsDataV1::stored_data_type() ;
+  hdf5pp::Type type = H5Type::stored_data_type() ;
   m_dataCont->container(group,type)->append(*data.data(), type);
-  type = H5DataTypes::OceanOpticsDataV1::stored_corrected_data_type() ;
+  type = H5Type::stored_corrected_data_type() ;
   m_corrDataCont->container(group,type)->append(*corrData, type);
 }
 
