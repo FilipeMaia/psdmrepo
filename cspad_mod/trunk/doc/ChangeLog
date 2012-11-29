@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-05
+2012-11-29 Andy Salnikov
+- add ConfigV4 detection to CsPadPedestals
+
 Tag: V00-05-04
 2012-11-29 Andy Salnikov
 - use Source instead of string as argument to evt.get()
