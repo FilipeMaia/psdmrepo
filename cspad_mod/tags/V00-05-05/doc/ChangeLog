@@ -1,0 +1,81 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package cspad_mod
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-05-05
+2012-11-29 Andy Salnikov
+- add ConfigV4 detection to CsPadPedestals
+
+Tag: V00-05-04
+2012-11-29 Andy Salnikov
+- use Source instead of string as argument to evt.get()
+
+Tag: V00-05-02
+2012-04-23 Andy Salnikov
+- adding pixel gain correction to CsPadCalib module
+
+Tag: V00-05-01
+2012-02-28 Andy Salnikov
+- calibration "class name" was incorrect (ConfigV1 instead of CalibV1)
+  so calibrations were not found.
+
+Tag: V00-05-00
+2012-02-28 Andy Salnikov
+- CsPadPedestals did not always work for cspad2x2 data
+- split CsPadPedestals module into two, one for regular cspad, one for cspad2x2
+
+Tag: V00-04-00
+2012-02-08 Andy Salnikov
+- 2x2 calibrations now live in separate directory, fix calibration
+  classes to look there
+- renamed Mini classes to 2x2
+
+Tag: V00-03-00
+2012-02-06 Andy Salnikov
+- cspad.MiniElementV1 was renamed to cspad2x2.ElementV1, updating client code.
+
+Tag: V00-02-01
+2011-12-14 Andy Salnikov
+- applying patch V00-01-03 to the trunk
+
+Tag: V00-01-03
+2011-12-14 Andy Salnikov
+- fixing few doxygen issues (on branch V00-01-02-patches)
+
+Tag: V00-02-00
+2011-12-10 Andy Salnikov
+- migration to ndarray
+
+Tag: V00-01-02
+2011-10-28 Andy Salnikov
+- CsPadPedestals module now understand 2x2 data and makes pedestals for 
+  those data as well
+- make it work better in presence of multiple cspad detectors
+
+Tag: V00-01-01
+2011-10-05 Andy Salnikov
+- CsPadFilter module now looks for MiniElement too
+
+Tag: V00-01-00
+2011-10-05 Andy Salnikov
+- CsPadFilter module now has parameters that can be used in place
+  of reading calibration files
+
+Tag: V00-00-02
+2011-10-04 Andy Salnikov
+- adding modules for cspad calibration and filtering
+- all supporting stuff (proxies, etc) is also added here
+
+Tag: V00-00-01
+2011-06-27 Andy Salnikov
+- one (and only) new module CsPadPedestals which calculates average
+  and standard deviation values for all pixels
