@@ -79,7 +79,7 @@ CsPadPedestals::beginRun(Event& evt, Env& env)
   // provided in configuration. If there is more than one configuration 
   // object is found then complain and stop.
   
-  std::string src = configStr("source", "DetInfo(:Cspad)");
+  Source src(configStr("source", "DetInfo(:Cspad)"));
   int count = 0;
   
   // need to know segment mask which is availabale in configuration only

@@ -78,7 +78,7 @@ CsPad2x2Pedestals::beginRun(Event& evt, Env& env)
   // provided in configuration. If there is more than one configuration 
   // object is found then complain and stop.
   
-  std::string src = configStr("source", "DetInfo(:Cspad2x2)");
+  Source src(configStr("source", "DetInfo(:Cspad2x2)"));
   int count = 0;
   
   // cspad2x2 data could come with either CsPad2x2::ConfigV1 or CsPad::ConfigV3
