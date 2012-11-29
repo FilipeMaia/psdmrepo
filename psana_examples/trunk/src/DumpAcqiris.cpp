@@ -61,7 +61,7 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
-  Source src = configStr("source", "DetInfo(:Acqiris)");
+  Source src(configStr("source", "DetInfo(:Acqiris)"));
   shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(src, &m_src);
   if (acqConfig.get()) {
     WithMsgLog(name(), info, str) {

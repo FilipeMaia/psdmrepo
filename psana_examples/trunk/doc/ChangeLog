@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-16
+2012-11-28 Andy Salnikov
+- change in Source constructor
+
 Tag: V00-02-15
 2012-11-15 Andy Salnikov
 - add BldDataGMDV0 and BldDataGMDV1 to DumpBld module
