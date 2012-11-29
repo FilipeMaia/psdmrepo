@@ -126,7 +126,7 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
 void 
 CSPadImageProducer::getQuadConfigPars(Env& env)
 {
-  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_str_src);
+  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(Source(m_str_src));
   if (config.get()) {
       for (uint32_t q = 0; q < config->numQuads(); ++ q) {
         m_roiMask[q]         = config->roiMask(q);
@@ -165,7 +165,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_inkey, &m_src); // get m_src here
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(Source(m_str_src), m_inkey, &m_src); // get m_src here
 
   if (data2.get()) {
 

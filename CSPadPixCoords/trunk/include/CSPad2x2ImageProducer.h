@@ -121,7 +121,7 @@ private:
   //std::string m_calibDir;       // i.e. ./calib
   //std::string m_typeGroupName;  // i.e. CsPad::CalibV1
   //Source      m_src;         // Data source set from config file
-  std::string m_str_src;        // i.e. CxiDs1.0:Cspad.0
+  Source      m_str_src;        // i.e. CxiDs1.0:Cspad.0
   Pds::Src    m_actualSrc;
   std::string m_inkey; 
   std::string m_outimgkey;   // i.e. "CSPad:Image"
