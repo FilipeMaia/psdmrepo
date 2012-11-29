@@ -1,6 +1,6 @@
 /**
 
-@defgroup MsgLogger 
+@defgroup MsgLogger C++ Message Logging Facility
 
 Package MsgLogger defines message logging facilities for off-line software.
 It provides easy-to-use interface to a flexible service 
