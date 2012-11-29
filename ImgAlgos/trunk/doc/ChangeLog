@@ -13,6 +13,11 @@ reverse time order.
 
 Tag: V00-00-??
 ==============
+2012-11-28 Mikhail S. Dubrovin
+- Add/modify modules
+A       include/IntensityMonitorsData.h
+A       src/IntensityMonitorsData.cpp
+	
 2012-11-21 Mikhail S. Dubrovin
 - Add/modify modules
 A       include/ImgTimeStampList.h
