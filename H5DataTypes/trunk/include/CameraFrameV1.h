@@ -60,7 +60,9 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static hdf5pp::Type imageType( const Pds::Camera::FrameV1& frame ) ;
+  static size_t xtcSize( const XtcType& frame ) { return sizeof frame + frame.data_size() ; }
+
+  static hdf5pp::Type imageType( const XtcType& frame ) ;
 
 private:
 

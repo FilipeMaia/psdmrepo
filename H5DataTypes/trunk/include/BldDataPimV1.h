@@ -65,7 +65,9 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
+  static size_t xtcSize( const XtcType& data ) { return sizeof data + data.frame.data_size() ; }
+
+  static hdf5pp::Type imageType( const XtcType& data ) ;
 
 protected:
 

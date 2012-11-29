@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 
@@ -63,5 +64,21 @@ BldDataPimV1::native_type()
 
   return type ;
 }
+
+hdf5pp::Type
+BldDataPimV1::imageType( const XtcType& data )
+{
+  const Pds::Camera::FrameV1& frame = data.frame;
+  hdf5pp::Type baseType ;
+  if ( frame.depth_bytes() == 1 ) {
+    baseType = hdf5pp::TypeTraits<uint8_t>::native_type() ;
+  } else if ( frame.depth_bytes() == 2 ) {
+    baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
+  }
+
+  hsize_t dims[] = { frame.height(), frame.width() } ;
+  return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
+}
+
 
 } // namespace H5DataTypes

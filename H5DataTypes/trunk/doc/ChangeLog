@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-68
+2012-11-28 Andy Salnikov
+- add xtcSize() method to CameraFrameV1
+- fix implementation of BldDataPimV1::xtcSize()
+- add BldDataPimV1::imageType() method
+
 Tag: V00-00-67
 2012-11-27 Andy Salnikov
 - make EvrDataV3 more similar to other data types
