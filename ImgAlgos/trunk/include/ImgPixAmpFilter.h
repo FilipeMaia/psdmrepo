@@ -91,7 +91,7 @@ protected:
 private:
 
   Pds::Src    m_actualSrc;
-  std::string m_src;
+  Source      m_src;
   std::string m_key;
   float    m_threshold;
   float    m_xmin;

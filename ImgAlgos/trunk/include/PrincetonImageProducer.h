@@ -91,7 +91,7 @@ protected:
 private:
 
   Pds::Src       m_src;              // source address of the data object
-  std::string    m_str_src;          // string with source name
+  Source         m_str_src;          // string with source name
   std::string    m_key_in;           // string with key for input data
   std::string    m_key_out;          // string with key for output image
   bool           m_subtract_offset;  // true - subtryct, false - do not subtract

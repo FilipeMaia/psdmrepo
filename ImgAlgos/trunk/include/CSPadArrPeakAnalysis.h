@@ -98,7 +98,7 @@ protected:
 
 private:
   Pds::Src    m_src;
-  std::string m_str_src;
+  Source      m_str_src;
   std::string m_key;
   std::string m_fname_root;
   unsigned m_print_bits;

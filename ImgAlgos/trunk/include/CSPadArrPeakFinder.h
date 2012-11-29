@@ -19,7 +19,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psana/Module.h"
+#include "ImgAlgos/CSPadBaseModule.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -95,7 +95,7 @@ struct PeakWork{
   double    peak_amp_x_row2;
 };
 
-class CSPadArrPeakFinder : public Module {
+class CSPadArrPeakFinder : public CSPadBaseModule {
 public:
 
     enum { MaxQuads      = Psana::CsPad::MaxQuadsPerSensor }; // 4
@@ -116,9 +116,6 @@ public:
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
-  
-  /// Method which is called at the beginning of the run
-  virtual void beginRun(Event& evt, Env& env);
   
   /// Method which is called at the beginning of the calibration cycle
   virtual void beginCalibCycle(Event& evt, Env& env);
@@ -185,10 +182,6 @@ protected:
     void printJobSummary();
 
 private:
-  //Source         m_src;              // Data source set from config file
-  Pds::Src       m_src;              // source address of the data object
-  std::string    m_str_src;          // string with source name
-  std::string    m_key;              // string with key name
   std::string    m_key_signal_out;   // string with key for signal cspad array (background subtracted by median algorithm) 
   std::string    m_key_peaks_out;    // string with key for found peaks in selected events
   std::string    m_maskFile_inp;     // [in]  file with mask 
@@ -222,7 +215,6 @@ private:
   unsigned long  m_count_mask_update; // number of events from the last mask update
   unsigned long  m_count_mask_accum;  // number of events from the beginning of the mask statistics accumulation
 
-  unsigned       m_segMask         [MaxQuads];  // segment masks per quadrant
   unsigned       m_stat            [MaxQuads][MaxSectors][NumColumns][NumRows];
   int16_t        m_mask            [MaxQuads][MaxSectors][NumColumns][NumRows];
   float          m_frac_noisy_evts [MaxQuads][MaxSectors][NumColumns][NumRows];

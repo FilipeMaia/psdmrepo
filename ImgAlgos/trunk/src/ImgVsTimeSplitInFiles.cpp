@@ -35,6 +35,7 @@
 #include <iomanip> // for setw, setfill
 #include <sstream> // for stringstream
 #include <cmath> // for sqrt, atan2, etc.
+#include <boost/lexical_cast.hpp>
 
 // This declares this class as psana module
 using namespace ImgAlgos;
@@ -229,7 +230,7 @@ ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
   } 
   else
   {
-    const std::string msg = "Image shape is not defined in the event(...) for source:" + m_str_src + " key:" + m_key;
+    const std::string msg = "Image shape is not defined in the event(...) for source:" + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
     MsgLogRoot(error, msg);
     throw std::runtime_error(msg);
   }

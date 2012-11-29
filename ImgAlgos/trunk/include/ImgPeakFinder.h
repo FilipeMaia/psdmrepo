@@ -122,7 +122,7 @@ private:
   enum{ MARGIN=10, MARGIN1=11 };
 
   Pds::Src    m_src;
-  std::string m_str_src;
+  Source      m_str_src;
   std::string m_key;
   std::string m_peaksKey;
   double   m_thr_low;

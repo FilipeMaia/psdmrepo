@@ -174,8 +174,7 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
     }
   else
     {
-      const std::string msg = "Camera::FrameV1 object is not available in the event(...) for source:" + m_str_src + " key:" + m_key_in;
-      MsgLog(name(), info, msg);       
+      MsgLog(name(), info, "Camera::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
     }
 }
 

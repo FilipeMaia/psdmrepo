@@ -51,9 +51,7 @@ namespace ImgAlgos {
 // Constructors --
 //----------------
 CSPadArrAverage::CSPadArrAverage (const std::string& name)
-  : Module(name)
-  , m_str_src()
-  , m_key()
+  : CSPadBaseModule(name)
   , m_aveFile()
   , m_rmsFile()
   , m_print_bits()
@@ -64,8 +62,6 @@ CSPadArrAverage::CSPadArrAverage (const std::string& name)
   , m_gate_width2()
 {
   // get the values from configuration or use defaults
-  m_str_src = configStr("source",  "DetInfo(:Cspad)");
-  m_key     = configStr("key",     "");                 //"calibrated"
   m_aveFile = configStr("avefile", "cspad-ave.dat");
   m_rmsFile = configStr("rmsfile", "cspad-rms.dat");
   m_nev_stage1  = config("evts_stage1", 1<<31U);
@@ -73,9 +69,6 @@ CSPadArrAverage::CSPadArrAverage (const std::string& name)
   m_gate_width1 = config("gate_width1",      0); 
   m_gate_width2 = config("gate_width2",      0); 
   m_print_bits  = config("print_bits",       0);
-
-  // initialize arrays
-  std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
 
   m_gate_width = 0;
   // resetStatArrays(); // <=== moved to procEvent
@@ -95,72 +88,6 @@ CSPadArrAverage::beginJob(Event& evt, Env& env)
   if( m_print_bits & 1<<0 ) printInputParameters();
 }
 
-/// Method which is called at the beginning of the run
-void 
-CSPadArrAverage::beginRun(Event& evt, Env& env)
-{
-  // Find all configuration objects matching the source address
-  // provided in configuration. If there is more than one configuration 
-  // object is found then complain and stop.
-  
-  std::string src = configStr("source", "DetInfo(:Cspad)");
-  int count = 0;
-  
-  // need to know segment mask which is availabale in configuration only
-  shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_str_src, &m_src);
-  if (config1.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; }
-    ++ count;
-  }
-  
-  shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_str_src, &m_src);
-  if (config2.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
-  if (config3.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
-  if (config4.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); }
-    ++ count;
-  }
-
-  if (not count) {
-    MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
-    terminate();
-    return;
-  }
-  
-  if (count > 1) {
-    MsgLog(name(), error, "Multiple CSPad configuration objects found, use more specific source address. Terminating.");
-    terminate();
-    return;
-  }
-
-  MsgLog(name(), info, "Found CSPad object with address " << m_src);
-  if (m_src.level() != Pds::Level::Source) {
-    MsgLog(name(), error, "Found CSPad configuration object with address not at Source level. Terminating.");
-    terminate();
-    return;
-  }
-
-  const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(m_src);
-  // validate that this is indeed CSPad, should always be true, but
-  // additional protection here should not hurt
-  if (dinfo.device() != Pds::DetInfo::Cspad) {
-    MsgLog(name(), error, "Found CSPad configuration object with invalid address. Terminating.");
-    terminate();
-    return;
-  }
-}
-
-
 
 /// Method which is called at the beginning of the calibration cycle
 void 
@@ -173,7 +100,7 @@ CSPadArrAverage::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadArrAverage::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
   if (data1.get()) {
 
     ++ m_count;
@@ -188,7 +115,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
     }    
   }
   
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
   if (data2.get()) {
 
     ++ m_count;
@@ -334,7 +261,7 @@ CSPadArrAverage::collectStat(unsigned quad, const int16_t* data)
 
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[quad] & (1 << sect)) {
+    if (segMask(quad) & (1 << sect)) {
      
       // beginning of the segment data
       unsigned* stat = &m_stat[quad][sect][0][0];
@@ -368,8 +295,8 @@ CSPadArrAverage::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << m_str_src
-        << "\n key        : " << m_key      
+        << "\n source     : " << source()
+        << "\n key        : " << inputKey()
         << "\n m_aveFile  : " << m_aveFile    
         << "\n m_rmsFile  : " << m_rmsFile    
         << "\n print_bits : " << m_print_bits

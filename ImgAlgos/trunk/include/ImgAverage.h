@@ -112,7 +112,7 @@ protected:
 private:
 
   Pds::Src       m_src;             // source address of the data object
-  std::string    m_str_src;         // string with source name
+  Source         m_str_src;         // string with source name
   std::string    m_key;             // string with key name
   std::string    m_aveFile;
   std::string    m_rmsFile;

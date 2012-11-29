@@ -170,7 +170,7 @@ protected:
 
 private:
   Pds::Src       m_src;              // source address of the data object
-  std::string    m_str_src;          // string with source name
+  Source         m_str_src;          // string with source name
   std::string    m_key;              // string with key name
   std::string    m_key_signal_out;   // string with key for signal cspad array (background subtracted by median algorithm) 
   std::string    m_key_peaks_out;    // string with key for found peaks in selected events

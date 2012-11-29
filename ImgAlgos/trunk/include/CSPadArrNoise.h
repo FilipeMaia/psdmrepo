@@ -18,7 +18,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psana/Module.h"
+#include "ImgAlgos/CSPadBaseModule.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -62,7 +62,7 @@ struct MedianResult {
   double SoN;
 };
 
-class CSPadArrNoise : public Module {
+class CSPadArrNoise : public CSPadBaseModule {
 public:
 
     enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
@@ -81,9 +81,6 @@ public:
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
-  
-  /// Method which is called at the beginning of the run
-  virtual void beginRun(Event& evt, Env& env);
   
   /// Method which is called at the beginning of the calibration cycle
   virtual void beginCalibCycle(Event& evt, Env& env);
@@ -121,10 +118,6 @@ protected:
     void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
 private:
-  //Source         m_src;            // Data source set from config file
-  Pds::Src       m_src;             // source address of the data object
-  std::string    m_str_src;         // string with source name
-  std::string    m_key;             // string with key name
   std::string    m_fracFile;        // [out] file with fraction of noisy events in eac pixel
   std::string    m_maskFile;        // [out] file with mask 
   float          m_rmin;            // radial parameter of the area for median algorithm
@@ -134,7 +127,6 @@ private:
   unsigned       m_print_bits;   
   unsigned long  m_count;  // number of events from the beginning of job
 
-  unsigned       m_segMask[MaxQuads];  // segment masks per quadrant
   unsigned       m_stat   [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_mask   [MaxQuads][MaxSectors][NumColumns][NumRows];
   float          m_status [MaxQuads][MaxSectors][NumColumns][NumRows];

@@ -127,9 +127,8 @@ PnccdImageProducer::event(Event& evt, Env& env)
   }
   else
   {
-      const std::string msg = "PNCCD::FullFrameV1 object is not available in the event(...) for source:" 
-                            + m_str_src + " key:" + m_key_in;
-      MsgLog(name(), warning, msg);       
+      MsgLog(name(), warning, "PNCCD::FullFrameV1 object is not available in the event(...) for source:"
+          << m_str_src << " key:" << m_key_in);
   }
 }
 

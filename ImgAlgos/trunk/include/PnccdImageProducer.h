@@ -71,7 +71,7 @@ protected:
 private:
 
   Pds::Src    m_src;
-  std::string m_str_src;
+  Source      m_str_src;
   std::string m_key_in; 
   std::string m_key_out;
   unsigned    m_print_bits;

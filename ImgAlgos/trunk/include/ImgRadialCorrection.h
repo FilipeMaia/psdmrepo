@@ -111,7 +111,7 @@ private:
 
   //Source      m_source;
   Pds::Src    m_src;
-  std::string m_str_src;
+  Source      m_str_src;
   std::string m_inkey;
   std::string m_outkey;
   double      m_xcenter;

@@ -235,9 +235,8 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
   }
   else
   {
-    const std::string msg = "Princeton::FrameV1 object is not available in the event(...) for source:" 
-                          + m_str_src + " key:" + m_key_in;
-    MsgLog(name(), info, msg);       
+    MsgLog(name(), info, "Princeton::FrameV1 object is not available in the event(...) for source:"
+        << m_str_src << " key:" << m_key_in);
   }
 }
 

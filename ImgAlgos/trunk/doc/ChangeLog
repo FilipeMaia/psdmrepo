@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2012-11-29 Andy Salnikov
+- small-scale refactoring, new base class CSPadBaseModule added which
+  contains code common to many cspad modules; those modules were 
+  re-implmented using CSPadBaseModule instead of Module for base
+- make sure that evt.get() is always called with Source and not string
+
 Tag: V00-00-??
 ==============
 2012-11-28 Mikhail S. Dubrovin

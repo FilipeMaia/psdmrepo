@@ -99,7 +99,7 @@ private:
 
   //Source      m_src;       // Data source set from config file
   Pds::Src    m_src;
-  std::string m_str_src;     // i.e. CxiDs1.0:Cspad.0
+  Source      m_str_src;     // i.e. CxiDs1.0:Cspad.0
   std::string m_key;         // i.e. Image2D
   unsigned    m_eventSave;   // event number starting from 1 to be saved in file
   bool        m_saveAll;     // should be true to save all events in files

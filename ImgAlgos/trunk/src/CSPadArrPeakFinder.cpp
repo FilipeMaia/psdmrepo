@@ -56,9 +56,7 @@ namespace ImgAlgos {
 //----------------
 
 CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
-  : Module(name)
-  , m_str_src()
-  , m_key()
+  : CSPadBaseModule(name)
   , m_key_signal_out()  
   , m_key_peaks_out()  
   , m_maskFile_inp()
@@ -88,8 +86,6 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   , m_count_mask_accum(0)
 {
   // get the values from configuration or use defaults
-  m_str_src           = configStr("source",     "DetInfo(:Cspad)");
-  m_key               = configStr("key",        "");                 //"calibrated"
   m_key_signal_out    = configStr("key_signal_out", "");
   m_key_peaks_out     = configStr("key_peaks_out", "peaks");
   m_maskFile_inp      = configStr("hot_pix_mask_inp_file", ""); // "cspad-pix-mask-in.dat"
@@ -119,7 +115,6 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   m_print_bits        = config   ("print_bits",              0 );
 
   // initialize arrays
-  std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
   std::fill_n(&m_common_mode[0], int(MaxSectors), float(0));
 
   setSelectionMode(); // m_sel_mode_str -> enum m_sel_mode 
@@ -143,8 +138,8 @@ CSPadArrPeakFinder::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source                : " << m_str_src
-        << "\n key                   : " << m_key      
+        << "\n source                : " << source()
+        << "\n key                   : " << inputKey()
         << "\n m_key_signal_out      : " << m_key_signal_out
         << "\n m_key_peaks_out       : " << m_key_peaks_out 
         << "\n m_maskFile_inp        : " << m_maskFile_inp    
@@ -196,73 +191,6 @@ CSPadArrPeakFinder::beginJob(Event& evt, Env& env)
 
   //omp_init_lock(m_lock); // initialization, The initial state is unlocked
 }
-
-/// Method which is called at the beginning of the run
-void 
-CSPadArrPeakFinder::beginRun(Event& evt, Env& env)
-{
-  // Find all configuration objects matching the source address
-  // provided in configuration. If there is more than one configuration 
-  // object is found then complain and stop.
-  
-  //std::string src = configStr("source", "DetInfo(:Cspad)");
-  int count = 0;
-  
-  // need to know segment mask which is availabale in configuration only
-  shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_str_src, &m_src);
-  if (config1.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; makeVectorOfSectorAndIndexInArray(i); }
-    ++ count;
-  }
-  
-  shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_str_src, &m_src);
-  if (config2.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
-  if (config3.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
-  if (config4.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); makeVectorOfSectorAndIndexInArray(i); }
-    ++ count;
-  }
-
-  if (not count) {
-    MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
-    terminate();
-    return;
-  }
-  
-  if (count > 1) {
-    MsgLog(name(), error, "Multiple CSPad configuration objects found, use more specific source address. Terminating.");
-    terminate();
-    return;
-  }
-
-  MsgLog(name(), info, "Found CSPad object with address " << m_src);
-  if (m_src.level() != Pds::Level::Source) {
-    MsgLog(name(), error, "Found CSPad configuration object with address not at Source level. Terminating.");
-    terminate();
-    return;
-  }
-
-  const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(m_src);
-  // validate that this is indeed CSPad, should always be true, but
-  // additional protection here should not hurt
-  if (dinfo.device() != Pds::DetInfo::Cspad) {
-    MsgLog(name(), error, "Found CSPad configuration object with invalid address. Terminating.");
-    terminate();
-    return;
-  }
-}
-
-
 
 /// Method which is called at the beginning of the calibration cycle
 void 
@@ -455,7 +383,7 @@ CSPadArrPeakFinder::procData(Event& evt)
 {
   bool fillArr = m_key_signal_out != "";
 
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
   if (data1.get()) {
 
     ++ m_count;
@@ -478,10 +406,10 @@ CSPadArrPeakFinder::procData(Event& evt)
         //delete [] m_newdata;
       }
     }    
-    if(fillArr) evt.put<Psana::CsPad::DataV1>(newobj, m_src, m_key_signal_out); // put newobj in event 
+    if(fillArr) evt.put<Psana::CsPad::DataV1>(newobj, source(), m_key_signal_out); // put newobj in event
   }
   
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
   if (data2.get()) {
 
     ++ m_count;
@@ -504,7 +432,7 @@ CSPadArrPeakFinder::procData(Event& evt)
         //delete [] m_newdata;
       }
     } 
-    if(fillArr) evt.put<Psana::CsPad::DataV2>(newobj, m_src, m_key_signal_out); // put newobj in event 
+    if(fillArr) evt.put<Psana::CsPad::DataV2>(newobj, source(), m_key_signal_out); // put newobj in event
   }
 }
 
@@ -517,7 +445,7 @@ CSPadArrPeakFinder::fillOutputArr(unsigned quad, int16_t* newdata)
 
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[quad] & (1 << sect)) {
+    if (segMask(quad) & (1 << sect)) {
      
       // beginning of the segment data
       const int16_t* sectData = &m_signal[quad][sect][0][0];
@@ -546,7 +474,7 @@ CSPadArrPeakFinder::makeVectorOfSectorAndIndexInArray(unsigned quad)
 
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[quad] & (1 << sect)) {
+    if (segMask(quad) & (1 << sect)) {
       sectAndIndexInArray.i = sect;
       sectAndIndexInArray.j = ind_in_arr++;
       v_sectAndIndexInArray[quad].push_back(sectAndIndexInArray);
@@ -573,7 +501,7 @@ CSPadArrPeakFinder::collectStatInQuad(unsigned quad, const int16_t* data)
 //======================
 
   //for (int sect = 0; sect < MaxSectors; ++ sect) {
-  //  if (m_segMask[quad] & (1 << sect)) {
+  //  if (segMask(quad) & (1 << sect)) {
 
   //for( vector<TwoIndexes>::const_iterator p  = v_sectAndIndexInArray[quad].begin();
   //                                        p != v_sectAndIndexInArray[quad].end(); p++ ) {
@@ -1133,7 +1061,7 @@ void
 CSPadArrPeakFinder::savePeaksInEvent(Event& evt)
 {
   shared_ptr< std::vector<Peak> >  sppeaks( new std::vector<Peak>(v_peaks) );
-  if( v_peaks.size() > 0 ) evt.put(sppeaks, m_src, m_key_peaks_out);
+  if( v_peaks.size() > 0 ) evt.put(sppeaks, source(), m_key_peaks_out);
 }
 
 

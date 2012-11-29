@@ -20,6 +20,7 @@
 //-----------------
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for stringstream
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -118,7 +119,7 @@ eventCounterSinceConfigure(PSEvt::Event& evt)
 //--------------------
 // Define the shape or throw message that can not do that.
 void 
-defineImageShape(PSEvt::Event& evt, const std::string& str_src, const std::string& str_key, unsigned* shape)
+defineImageShape(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
 {
   boost::shared_ptr< ndarray<double,2> > img = evt.get(str_src, str_key);
   if (img.get()) {
@@ -152,7 +153,7 @@ defineImageShape(PSEvt::Event& evt, const std::string& str_src, const std::strin
   } 
 
   const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t and is not defined in the event(...)\nfor source:" 
-                        + str_src + " key:" + str_key;
+                        + boost::lexical_cast<std::string>(str_src) + " key:" + str_key;
   //MsgLogRoot(error, msg);
   throw std::runtime_error(msg);
 

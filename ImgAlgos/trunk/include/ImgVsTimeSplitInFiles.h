@@ -118,7 +118,7 @@ private:
   // Data members, this is for example purposes only
 
   Pds::Src    m_src;
-  std::string m_str_src;      // i.e. CxiDs1.0:Cspad.0
+  Source      m_str_src;      // i.e. CxiDs1.0:Cspad.0
   std::string m_key;          // i.e. Image2D
   std::string m_fname_prefix; // prefix of the file name
   std::string m_file_type;    // file type "txt" or "bin" 

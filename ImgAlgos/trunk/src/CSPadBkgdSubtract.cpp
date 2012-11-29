@@ -49,16 +49,12 @@ namespace ImgAlgos {
 // Constructors --
 //----------------
 CSPadBkgdSubtract::CSPadBkgdSubtract (const std::string& name)
-  : Module(name)
-  , m_str_src()
-  , m_inkey()
+  : CSPadBaseModule(name, "inputKey")
   , m_outkey()
   , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src     = configStr("source", "DetInfo(:Cspad)");
-  m_inkey       = configStr("inputKey",  "");
   m_outkey      = configStr("outputKey", "bkgd_subtracted");
   m_fname       = configStr("bkgd_fname", "cspad_background.dat");
   m_norm_sector = config("norm_sector", 0); // from 0 to 7
@@ -81,71 +77,6 @@ CSPadBkgdSubtract::beginJob(Event& evt, Env& env)
   getBkgdArray();
   if( m_print_bits & 1 ) printInputParameters();
   if( m_print_bits & 8 ) printBkgdArray();
-}
-
-/// Method which is called at the beginning of the run
-void 
-CSPadBkgdSubtract::beginRun(Event& evt, Env& env)
-{
-  // Find all configuration objects matching the source address
-  // provided in configuration. If there is more than one configuration 
-  // object is found then complain and stop.
-  
-  std::string src = configStr("source", "DetInfo(:Cspad)");
-  int count = 0;
-  
-  // need to know segment mask which is availabale in configuration only
-  shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_str_src, &m_src);
-  if (config1.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; }
-    ++ count;
-  }
-  
-  shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_str_src, &m_src);
-  if (config2.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
-  if (config3.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
-  if (config4.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); }
-    ++ count;
-  }
-
-  if (not count) {
-    MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
-    terminate();
-    return;
-  }
-  
-  if (count > 1) {
-    MsgLog(name(), error, "Multiple CSPad configuration objects found, use more specific source address. Terminating.");
-    terminate();
-    return;
-  }
-
-  MsgLog(name(), info, "Found CSPad object with address " << m_src);
-  if (m_src.level() != Pds::Level::Source) {
-    MsgLog(name(), error, "Found CSPad configuration object with address not at Source level. Terminating.");
-    terminate();
-    return;
-  }
-
-  const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(m_src);
-  // validate that this is indeed CSPad, should always be true, but
-  // additional protection here should not hurt
-  if (dinfo.device() != Pds::DetInfo::Cspad) {
-    MsgLog(name(), error, "Found CSPad configuration object with invalid address. Terminating.");
-    terminate();
-    return;
-  }
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -189,8 +120,8 @@ CSPadBkgdSubtract::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << m_str_src
-        << "\n inkey      : " << m_inkey      
+        << "\n source     : " << source()
+        << "\n inkey      : " << inputKey()
         << "\n outkey     : " << m_outkey      
         << "\n fname      : " << m_fname    
         << "\n norm_sector: " << m_norm_sector 
@@ -254,7 +185,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
 {
   m_norm_factor = 0;
 
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_inkey, &m_src);
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
   if (data1.get()) {
 
     int nQuads = data1->quads_shape()[0];
@@ -269,7 +200,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
     m_norm_factor = ( nQuads ) ? m_norm_factor /= nQuads : 0; 
   }
   
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_inkey, &m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
   if (data2.get()) {
 
     int nQuads = data2->quads_shape()[0];
@@ -293,7 +224,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
 void 
 CSPadBkgdSubtract::subtractBkgd(Event& evt)
 {
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_str_src, m_inkey, &m_src);
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
   if (data1.get()) {
 
     ++ m_count;
@@ -312,10 +243,10 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
 
       newobj->append(new cspad_mod::ElementV1(quad, corrdata, m_common_mode));
     }    
-    evt.put<Psana::CsPad::DataV1>(newobj, m_src, m_outkey); // put newobj in event 
+    evt.put<Psana::CsPad::DataV1>(newobj, source(), m_outkey); // put newobj in event
   }
   
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_str_src, m_inkey, &m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
   if (data2.get()) {
 
     ++ m_count;
@@ -334,7 +265,7 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
 
       newobj->append(new cspad_mod::ElementV2(quad, corrdata, m_common_mode)); 
     } 
-    evt.put<Psana::CsPad::DataV2>(newobj, m_src, m_outkey); // put newobj in event 
+    evt.put<Psana::CsPad::DataV2>(newobj, source(), m_outkey); // put newobj in event
   }
 
   if( m_print_bits & 2 ) printEventId(evt);
@@ -350,7 +281,7 @@ CSPadBkgdSubtract::processQuad(unsigned quad, const int16_t* data, int16_t* corr
 
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[quad] & (1 << sect)) {
+    if (segMask(quad) & (1 << sect)) {
      
       // beginning of the segment data
       const int16_t* sectData = data     + ind_in_arr*SectorSize;
@@ -380,7 +311,7 @@ CSPadBkgdSubtract::normQuadBkgd(unsigned quad, const int16_t* data)
 
   int ind_in_arr = 0;
   for (unsigned sect = 0; sect < MaxSectors; ++ sect) {
-    if ( m_segMask[quad] & (1<<sect) ) {
+    if ( segMask(quad) & (1<<sect) ) {
       if ( sect == m_norm_sector ) {
      
         // beginning of the segment data

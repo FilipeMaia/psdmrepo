@@ -96,7 +96,7 @@ protected:
 private:
 
   Pds::Src        m_src;              // source address of the data object
-  std::string     m_str_src;          // string with source name
+  Source          m_str_src;          // string with source name
   std::string     m_key_in;           // string with key for input data
   std::string     m_key_out;          // string with key for output image
   std::string     m_fname_peds;       // string file name for pedestals 

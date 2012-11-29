@@ -98,7 +98,7 @@ private:
   // Data members, this is for example purposes only
   
   Pds::Src       m_src;
-  std::string    m_str_src;
+  Source         m_str_src;
   std::string    m_key;
   std::string    m_sel_mode_str;
   SELECTION_MODE m_sel_mode;

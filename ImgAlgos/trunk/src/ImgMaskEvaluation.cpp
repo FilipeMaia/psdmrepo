@@ -246,8 +246,7 @@ ImgMaskEvaluation::collectStat(Event& evt)
   } 
   else
   {
-    const std::string msg = "Image is not available in the event(...) for source:" + m_str_src + " key:" + m_key;
-    MsgLog(name(), info, msg);
+    MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
   }
 }
 

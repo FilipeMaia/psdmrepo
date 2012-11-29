@@ -99,7 +99,7 @@ public:
 private:
 
   Pds::Src    m_src;
-  std::string m_str_src;     // i.e. Opal:
+  Source      m_str_src;     // i.e. Opal:
   std::string m_key_in;      // input key
   std::string m_key_out;     // output key
   float       m_sig_rowc;    // signal    band row center coordinate

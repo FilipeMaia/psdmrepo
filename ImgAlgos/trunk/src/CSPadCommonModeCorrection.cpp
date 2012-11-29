@@ -55,27 +55,18 @@ namespace ImgAlgos {
 // Constructors --
 //----------------
 CSPadCommonModeCorrection::CSPadCommonModeCorrection (const std::string& name)
-  : Module(name)
-  , m_str_src()
-  , m_src()
-  , m_inkey()
+  : CSPadBaseModule(name, "inputKey",  "calibrated")
   , m_outkey()
   , m_maxEvents()
   , m_ampThr()
   , m_filter()
-  , m_segMask()
   , m_count(0)
  {
   // get the values from configuration or use defaults
-  m_str_src    = configStr("source",    "DetInfo(:Cspad)"); // "DetInfo()", "CxiDs1.0:Cspad.0", "CxiSc1.0:Cspad2x2.0"
-  m_inkey      = configStr("inputKey",  "calibrated");
   m_outkey     = configStr("outputKey", "cm_subtracted");
   m_maxEvents  = config   ("events",    1<<31U);
   m_ampThr     = config   ("ampthr",    30);
   m_filter     = config   ("filter",    false);
-
-   // initialize arrays
-  std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
  }
 
 //--------------
@@ -89,70 +80,6 @@ CSPadCommonModeCorrection::~CSPadCommonModeCorrection ()
 void 
 CSPadCommonModeCorrection::beginJob(Event& evt, Env& env)
 {
-}
-
-/// Method which is called at the beginning of the run
-void 
-CSPadCommonModeCorrection::beginRun(Event& evt, Env& env)
-{
-  // Find all configuration objects matching the source address
-  // provided in configuration. If there is more than one configuration 
-  // object is found then complain and stop.
-  
-  std::string src = m_str_src;
-
-  int count = 0;
-
-  // need to know segment mask which is availabale in configuration only
-  shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(src, &m_src);
-  if (config1.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; }
-    ++ count;
-  }
-  
-  shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(src, &m_src);
-  if (config2.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config2->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(src, &m_src);
-  if (config3.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config3->roiMask(i); }
-    ++ count;
-  }
-
-  shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(src, &m_src);
-  if (config4.get()) {
-    for (int i = 0; i < MaxQuads; ++i) { m_segMask[i] = config4->roiMask(i); }
-    ++ count;
-  }
-
-  if (not count) {
-    MsgLog(name(), error, "No CsPad configuration objects found, terminating.");
-    terminate();
-    return;
-  }
-  
-  if (count > 1) {
-    MsgLog(name(), error, "Multiple CsPad configuration objects found, use more specific source address. Terminating.");
-    terminate();
-    return;
-  }
-
-  WithMsgLog(name(), info, log) {
-      log <<  "Found CsPad object with address " << m_src << " with masks:";
-      for (int i = 0; i < MaxQuads; ++i) log << " " << m_segMask[i];
-  } 
-
-  const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(m_src);
-  // validate that this is indeed cspad, should always be true, but
-  // additional protection here should not hurt
-  if (dinfo.device() != Pds::DetInfo::Cspad) {
-    MsgLog(name(), error, "Found Cspad configuration object with invalid address. Terminating.");
-    terminate();
-    return;
-  }
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -189,7 +116,7 @@ CSPadCommonModeCorrection::event(Event& evt, Env& env)
 
     const PSEvt::EventKey& key = *it;
 
-    if (key.key() != m_inkey) continue;
+    if (key.key() != inputKey()) continue;
     MsgLog(name(), debug, "Process event for key =" << key.key() );    
 
     getAndProcessDataset(evt, env, key.key());
@@ -209,7 +136,7 @@ CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std:
 {
   // For DataV1, CsPad::ElementV1
 
-    shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src, key, &m_actualSrc);
+    shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), key);
     if (data1.get()) {
   
       ++ m_count;
@@ -228,12 +155,12 @@ CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std:
 
         newobj->append(new cspad_mod::ElementV1(quad, corrdata, common_mode));
       }      
-      evt.put<Psana::CsPad::DataV1>(newobj, m_actualSrc, m_outkey);
+      evt.put<Psana::CsPad::DataV1>(newobj, source(), m_outkey);
     }
 
   // For DataV2, CsPad::ElementV2
 
-    shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, key, &m_actualSrc);
+    shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), key);
     if (data2.get()) {
   
       ++ m_count;
@@ -252,7 +179,7 @@ CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std:
 
         newobj->append(new cspad_mod::ElementV2(quad, corrdata, common_mode));
       }
-      evt.put<Psana::CsPad::DataV2>(newobj, m_actualSrc, m_outkey);
+      evt.put<Psana::CsPad::DataV2>(newobj, source(), m_outkey);
     }
 }
   
@@ -281,7 +208,7 @@ CSPadCommonModeCorrection::processQuad(unsigned qNum, const int16_t* data, int16
   // loop over segments
   int seg = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
-    if (m_segMask[qNum] & (1 << sect)) {
+    if (segMask(qNum) & (1 << sect)) {
 
       double sum  = 0;
       int    npix = 0;

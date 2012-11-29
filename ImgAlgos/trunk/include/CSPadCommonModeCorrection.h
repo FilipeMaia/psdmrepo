@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psana/Module.h"
+#include "ImgAlgos/CSPadBaseModule.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -51,7 +51,7 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class CSPadCommonModeCorrection : public Module {
+class CSPadCommonModeCorrection : public CSPadBaseModule {
 public:
 
   enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor };
@@ -68,9 +68,6 @@ public:
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
-  
-  /// Method which is called at the beginning of the run
-  virtual void beginRun(Event& evt, Env& env);
   
   /// Method which is called at the beginning of the calibration cycle
   virtual void beginCalibCycle(Event& evt, Env& env);
@@ -95,23 +92,13 @@ protected:
 
 private:
 
-  //Source    m_str_src;         // Data source set from config file
-  std::string m_str_src;
-  Pds::Src    m_src; // source address of the data object
-
-  Pds::Src    m_actualSrc;
-  
-  std::string m_inkey;
   std::string m_outkey;
 
   unsigned    m_maxEvents;
   int16_t     m_ampThr;
   bool        m_filter;
 
-  unsigned    m_segMask[MaxQuads];  // segment masks per quadrant
   long        m_count;
-  int16_t     m_average;
-  //int16_t     m_data_corr[MaxQuads][MaxSectors][NumColumns][NumRows];
 };
 
 } // namespace ImgAlgos

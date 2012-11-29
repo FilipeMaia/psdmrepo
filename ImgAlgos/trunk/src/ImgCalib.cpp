@@ -249,8 +249,7 @@ ImgCalib::procEvent(Event& evt, Env& env)
   } 
   else
   {
-    const std::string msg = "Image is not available in the event(...) for source:" + m_str_src + " key:" + m_key_in;
-    MsgLog(name(), info, msg);
+    MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
   }
 }
 

@@ -95,7 +95,7 @@ public:
 private:
 
   Pds::Src    m_src;
-  std::string m_str_src;     // i.e. Opal:
+  Source      m_str_src;     // i.e. Opal:
   std::string m_key_in;      // input key
   unsigned    m_print_bits;
   long        m_count;
