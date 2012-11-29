@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-01
+2012-11-28 Andy Salnikov
+- make EnvObjectStore constructor explicit
+
 Tag: V00-10-00
 2012-09-11 Andy Salnikov
 - classes Env, EnvObjectStore, and EpicsStore now inherit from 

@@ -86,7 +86,7 @@ public:
    *  
    *  @param[in] dict Pointer to proxy dictionary
    */
-  EnvObjectStore(const boost::shared_ptr<PSEvt::ProxyDictI>& dict) : m_dict(dict) {}
+  explicit EnvObjectStore(const boost::shared_ptr<PSEvt::ProxyDictI>& dict) : m_dict(dict) {}
 
   // Destructor
   ~EnvObjectStore() {}
