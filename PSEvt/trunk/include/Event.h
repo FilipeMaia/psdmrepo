@@ -105,7 +105,7 @@ public:
    *  
    *  @param[in] dict Pointer to proxy dictionary
    */
-  Event(const boost::shared_ptr<ProxyDictI>& dict) : m_dict(dict) {}
+  explicit Event(const boost::shared_ptr<ProxyDictI>& dict) : m_dict(dict) {}
 
   //Destructor
   ~Event () {}
@@ -173,20 +173,32 @@ public:
   /**
    *  @brief Get an object from event
    *  
+   *  This method finds and returns object in an event which is not associated
+   *  with any detector device (this is why it does not have source argument).
+   *  It can be used for example to obtain EventId object or other similar types
+   *  of data.
+   *
+   *  Note that if you pass an std::string to get() then this method will be
+   *  called even if string may look like device address. Always use Source
+   *  class as an argument to get() to locate detector data.
+   *
    *  @param[in] key     Optional key to distinguish different objects of the same type.
-   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
-   *                       with the exact source address of the returned object.
    *  @return Shared pointer which can be zero if object not found.
    */
-  GetResultProxy get(const std::string& key=std::string(), Pds::Src* foundSrc=0)
+  GetResultProxy get(const std::string& key=std::string())
   {
-    GetResultProxy pxy = {m_dict, Source(Source::null), key, foundSrc};
+    GetResultProxy pxy = {m_dict, Source(Source::null), key, (Pds::Src*)(0)};
     return pxy;
   }
   
   /**
    *  @brief Get an object from event
    *  
+   *  Find and return data object which was produced by specific device. Device is
+   *  specified as a source object of type Pds::Src. This overloaded function should
+   *  be used if the source is known exactly, for example when Pds::Src object is
+   *  returned via foundSrc pointer from previous call to get() method.
+   *
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
@@ -203,6 +215,12 @@ public:
   /**
    *  @brief Get an object from event
    *  
+   *  Find and return data object which was produced by device. This method accepts
+   *  Source object which allows approximate specification of the device addresses.
+   *  If specified address matches more than one device in the event then one arbitrary
+   *  object is returned. The foundSrc argument can be used to obtain exact address
+   *  of a returned object.
+   *
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
@@ -219,7 +237,9 @@ public:
    *  @brief Check if object (or proxy) of given type exists in the event
    *  
    *  This is optimized version of get() which only checks whether the proxy
-   *  is there but does not ask proxy to do any real work.
+   *  is there but does not ask proxy to do any real work. It is not guaranteed
+   *  that get() will return any data even if exists() returns true, proxy may
+   *  decide that its corresponding data does not exits.
    *  
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if object or proxy exists
@@ -235,7 +255,9 @@ public:
    *  @brief Check if object (or proxy) of given type exists in the event
    *  
    *  This is optimized version of get() which only checks whether the proxy
-   *  is there but does not ask proxy to do any real work.
+   *  is there but does not ask proxy to do any real work. It is not guaranteed
+   *  that get() will return any data even if exists() returns true, proxy may
+   *  decide that its corresponding data does not exits.
    *  
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.

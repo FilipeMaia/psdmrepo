@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2012-11-28 Andy Salnikov
+- work on ticket #177 
+- all constructors of Source class are made explicit
+- comments added to Event class which explain differences between
+  overloaded get() method
+
 Tag: V00-05-00
 2012-09-11 Andy Salnikov
 - Even class now inherits from boost::enable_shared_from_this

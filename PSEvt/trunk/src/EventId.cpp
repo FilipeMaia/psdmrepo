@@ -34,7 +34,7 @@
 
 namespace PSEvt {
 
-/// Standard stream insertion operator
+// Standard stream insertion operator
 std::ostream&
 operator<<(std::ostream& os, const EventId& eid)
 {

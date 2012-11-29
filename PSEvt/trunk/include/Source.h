@@ -69,7 +69,7 @@ public:
   /**
    *  @brief Make source which matches objects without source only.
    */
-  Source (NoSource) : m_src() {}
+  explicit Source (NoSource) : m_src() {}
 
   /**
    *  @brief Make source which matches any source.
@@ -113,11 +113,9 @@ public:
    *    "type" - same as above
    *    "ProcInfo(ipAddr)" - fully or partially specified ProcInfo
    *  
-   *  This is a non-explicit constructor so we allow conversion from std::string. 
-   *  
    *  @throw PSEvt::ExceptionSourceFormat if string is not recognized
    */
-  Source (const std::string& spec) ;
+  explicit Source (const std::string& spec) ;
   
   // Destructor
   ~Source () {}
