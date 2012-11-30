@@ -91,6 +91,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX' , val_def='cora-',        typ='str' )
         self.log_level         = self.declareParameter( name='LOG_LEVEL_OF_MSGS', val_def='info',         typ='str' )
         self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Work/Results', typ='str' )
+
+        # GUIMainTB.py
+        # GUIMainSplit.py
         self.current_tab       = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        typ='str' )
 
         self.dname_blam         = self.declareParameter( name='DIRECTORY_BLAM', val_def='.',typ='str' )
@@ -137,19 +140,19 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_num_max       = self.declareParameter( name='BATCH_NUM_MAX',         val_def= 9,       typ='int' )
         #self.bat_data_is_used  = self.declareParameter( name='BATCH_DATA_IS_USED',    val_def=True,     typ='bool' )
         self.bat_data_start    = self.declareParameter( name='BATCH_DATA_START',      val_def= 1,       typ='int' )
-        self.bat_data_end      = self.declareParameter( name='BATCH_DATA_END'  ,      val_def=100,      typ='int' )
+        self.bat_data_end      = self.declareParameter( name='BATCH_DATA_END'  ,      val_def=-1,       typ='int' )
         self.bat_data_total    = self.declareParameter( name='BATCH_DATA_TOTAL',      val_def=-1,       typ='int' )
         self.bat_data_time     = self.declareParameter( name='BATCH_DATA_TIME' ,      val_def=-1.0,     typ='float' )
         self.bat_dark_is_used  = self.declareParameter( name='BATCH_DARK_IS_USED',    val_def=True,     typ='bool' )
         self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       typ='int' )
-        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=100,      typ='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       typ='int' )
         self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       typ='int' )
         self.bat_dark_time     = self.declareParameter( name='BATCH_DARK_TIME' ,      val_def=-1.0,     typ='float' )
         self.bat_dark_dt_ave   = self.declareParameter( name='BATCH_DARK_DT_AVE',     val_def=-1.0,     typ='float' )
         self.bat_dark_dt_rms   = self.declareParameter( name='BATCH_DARK_DT_RMS',     val_def=0.0,      typ='float' )
         #self.bat_flat_is_used  = self.declareParameter( name='BATCH_FLAT_IS_USED',    val_def=True,     typ='bool' )
         self.bat_flat_start    = self.declareParameter( name='BATCH_FLAT_START',      val_def= 1,       typ='int' )
-        self.bat_flat_end      = self.declareParameter( name='BATCH_FLAT_END'  ,      val_def=100,      typ='int' )
+        self.bat_flat_end      = self.declareParameter( name='BATCH_FLAT_END'  ,      val_def=-1,       typ='int' )
         self.bat_flat_total    = self.declareParameter( name='BATCH_FLAT_TOTAL',      val_def=-1,       typ='int' )
         self.bat_flat_time     = self.declareParameter( name='BATCH_FLAT_TIME' ,      val_def=-1.0,     typ='float' )
         self.bat_queue         = self.declareParameter( name='BATCH_QUEUE',           val_def='psfehq', typ='str' )
@@ -221,6 +224,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleGreenPure = "background-color: rgb(0,   255, 150); color: rgb(0, 0, 0);" # Green
         self.styleBluish    = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
         self.styleWhite     = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
+        self.styleRedBkgd   = "background-color: rgb(255,   0,   0); color: rgb(0, 0, 0);" # Red background
         #self.styleTitle  = "background-color: rgb(239, 235, 231, 255); color: rgb(100, 160, 100);" # Gray bkgd
         #self.styleTitle  = "color: rgb(150, 160, 100);"
         self.styleBlue   = "color: rgb(000, 000, 255);"
@@ -234,6 +238,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleLabel        = self.styleBlue
         self.styleEdit         = self.styleWhite
         self.styleEditInfo     = self.styleGreenish
+        self.styleEditBad      = self.styleRedBkgd
         self.styleButton       = self.styleGray
         self.styleButtonOn     = self.styleBluish
         self.styleButtonClose  = self.stylePink

@@ -68,7 +68,7 @@ class BatchJobPedestals :
 
     def submit_batch_for_peds_scan(self) :
 
-        if self.job_was_recently_submitted(self.time_scan_job_submitted, 'scanner on dark') : return
+        if not self.job_can_be_submitted(self.job_id_scan_str, self.time_scan_job_submitted, 'scan') : return
         self.time_scan_job_submitted = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_peds_scan()
@@ -89,7 +89,7 @@ class BatchJobPedestals :
 
     def submit_batch_for_pedestals(self) :
 
-        if self.job_was_recently_submitted(self.time_peds_job_submitted, 'pedestals') : return
+        if not self.job_can_be_submitted(self.job_id_peds_str, self.time_peds_job_submitted, 'peds') : return        
         self.time_peds_job_submitted = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_pedestals()
@@ -108,6 +108,20 @@ class BatchJobPedestals :
 
 #-----------------------------
 
+    def job_can_be_submitted(self, job_id, t_sub, comment='') :
+        if self.job_was_recently_submitted(t_sub, comment) and \
+           (self.get_batch_job_status(job_id, comment) != 'DONE') :
+
+            msg = 'Batch job can be re-resubmitted when timeout ' \
+                  + str(self.time_interval_sec) + ' sec is expired' \
+                  + ' or the job ' + job_id + ' is DONE'
+            logger.info(msg, __name__)             
+            return False
+        else :
+            return True
+
+#-----------------------------
+
     def job_was_recently_submitted(self, t_sub, comment='') :
 
         if t_sub == None : return False
@@ -122,33 +136,39 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def check_batch_status_for_pedestals(self) :
+    def check_batch_job_for_pedestals(self) :
+        self.check_batch_job(self.job_id_peds_str, 'peds')
 
-        if self.job_id_peds_str == None :
-            logger.info('Batch job for pedestals was not submitted in this session.', __name__) 
+#-----------------------------
+
+    def check_batch_job_for_peds_scan(self) :
+        self.check_batch_job(self.job_id_scan_str, 'scan')
+
+#-----------------------------
+
+    def check_batch_job(self, job_id, comment='') :
+
+        if job_id == None :
+            logger.info('Batch job for ' + comment + ' on dark was not submitted in this session.', __name__) 
             return
 
-        #status, nodename = gu.batch_job_status_and_nodename(self.job_id_peds_str, cp.bat_queue.value())
-        #msg = 'Batch job Id: ' + self.job_id_peds_str + ' on node: ' + str(nodename) + ' status: ' + str(status)
-        lines = gu.batch_job_check(self.job_id_peds_str, cp.bat_queue.value())
-        msg = 'Check batch status for pedestals:\n'
+        lines = gu.batch_job_check(job_id, cp.bat_queue.value())
+        msg = 'Check batch status for ' + comment + ' on dark:\n'
         for line in lines :
             msg += line
         logger.info(msg, __name__) 
 
 #-----------------------------
 
-    def check_batch_status_for_peds_scan(self) :
+    def get_batch_job_status(self, job_id, comment='') :
 
-        if self.job_id_scan_str == None :
-            logger.info('Batch job for scanner on dark was not submitted in this session.', __name__) 
-            return
+        if job_id == None :
+            self.batch_job_status = None
+        else :
+            self.batch_job_status = gu.batch_job_status(job_id, cp.bat_queue.value())
 
-        lines = gu.batch_job_check(self.job_id_scan_str, cp.bat_queue.value())
-        msg = 'Check batch status for scanner on dark:\n'
-        for line in lines :
-            msg += line
-        logger.info(msg, __name__) 
+        logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 
+        return self.batch_job_status
 
 #-----------------------------
 
@@ -176,11 +196,10 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def status_for_pedestals(self) :
-        logger.info('Status for pedestals:', __name__)         
+    def status_for_pedestal_file(self) :
         fname  = fnm.path_pedestals_ave()
         status = os.path.lexists(fname)
-        logger.info(fname + self.dict_status[status]) 
+        logger.info('Status: pedestal file ' + fname + self.dict_status[status], __name__) 
         return status
 
 #-----------------------------
@@ -200,7 +219,7 @@ if __name__ == "__main__" :
 
     #bjpeds.submit_batch_for_pedestals()
     #gu.sleep_sec(5)
-    #bjpeds.check_batch_status_for_pedestals()
+    #bjpeds.check_batch_job_for_pedestals()
 
     #bjpeds.submit_batch_for_peds_scan_on_dark_xtc()
     #bjpeds.print_work_files_for_pedestals()

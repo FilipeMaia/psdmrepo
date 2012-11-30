@@ -144,14 +144,14 @@ class GUIFiles ( QtGui.QWidget ) :
         #self.tab_bar.setTabEnabled(1, False)
         self.tab_bar.setTabEnabled(3, False)
         
-        logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
-
         try    :
             tab_index = self.list_file_types.index(cp.current_file_tab.value())
         except :
             tab_index = 3
             cp.current_file_tab.setValue(self.list_file_types[tab_index])
         self.tab_bar.setCurrentIndex(tab_index)
+
+        logger.info(' make_tab_bar - set mode: ' + cp.current_file_tab.value(), __name__)
 
         self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
 
@@ -242,8 +242,8 @@ class GUIFiles ( QtGui.QWidget ) :
     def on_off_gui_dark(self,but):
         logger.debug('on_off_gui_dark', __name__)
         self.tab_bar.setCurrentIndex(0)
-        if bjpeds.status_for_pedestals() : but.setStyleSheet(cp.styleButtonGood)
-        else                             : but.setStyleSheet(cp.styleButtonBad)
+        if bjpeds.status_for_pedestal_file() : but.setStyleSheet(cp.styleButtonGood)
+        else                                 : but.setStyleSheet(cp.styleButtonBad)
 
 #        try :
 #            cp.guidark.close()

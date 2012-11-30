@@ -218,15 +218,15 @@ class GUIMainTB ( QtGui.QWidget ) :
         #self.tab_bar.setTabEnabled(1, False)
         #self.tab_bar.setTabEnabled(3, False)
         
-        logger.info(' make_tab_bar - set mode: ' + cp.ana_type.value(), __name__)
-
         try    :
-            tab_index = self.list_of_tabs.index(cp.current_file_tab.value())
+            tab_index = self.list_of_tabs.index(cp.current_tab.value())
         except :
             tab_index = 0
             cp.current_tab.setValue(self.list_of_tabs[tab_index])
 
         #tab_index = 0
+
+        logger.info(' make_tab_bar - set mode: ' + cp.current_tab.value(), __name__)
 
         self.tab_bar.setCurrentIndex(tab_index)
 

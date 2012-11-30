@@ -117,8 +117,10 @@ def batch_job_check(job_id_str, queue='psnehq') :
 
 
 def batch_job_status(job_id_str, queue='psnehq') :
-    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
+    err = p.stderr.read() # reads entire file
+    if err != '' : logger.warning('batch_job_status:\n' + err, __name__) 
     status = None
     lines  = p.stdout.readlines() # returns the list of lines in file
     if len(lines)<2 : return None
@@ -128,8 +130,10 @@ def batch_job_status(job_id_str, queue='psnehq') :
 
 
 def batch_job_status_and_nodename(job_id_str, queue='psnehq') :
-    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
+    err = p.stderr.read() # reads entire file
+    if err != '' : logger.warning('batch_job_status_and_nodename:\n' + err, __name__) 
     status = None
     lines  = p.stdout.readlines() # returns the list of lines in file
     if len(lines)<2 : return None, None

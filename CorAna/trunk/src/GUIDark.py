@@ -135,9 +135,11 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit .setToolTip('Submit job in batch for pedestals')
         self.but_scanner.setToolTip('Submit job in batch for scanner')
         self.but_wfiles .setToolTip('List pedestal work files \nand check their availability')
+        self.but_browse .setToolTip('Browse files relevant to this GUI')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
-        
+        self.cbx_dark   .setToolTip('Check this box \nto process and use \ndark run correction')
+
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
@@ -247,10 +249,10 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status - not implemented yet...', __name__)
-        if bjpeds.status_for_pedestals() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjpeds.check_batch_status_for_peds_scan()
-        bjpeds.check_batch_status_for_pedestals()
+        if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
+        else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
+        bjpeds.check_batch_job_for_peds_scan()
+        bjpeds.check_batch_job_for_pedestals()
         blp.parse_batch_log_peds_scan()
         self.set_fields()
 
@@ -272,6 +274,13 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_submit(self):
         logger.debug('on_but_submit', __name__)
+
+        if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+            logger.warning('JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for pedestal avaraging.', __name__)
+            return
+        else :
+            self.edi_bat_end.setStyleSheet(cp.styleEdit)
         bjpeds.submit_batch_for_pedestals()
 
     def on_but_scanner(self):
@@ -290,6 +299,11 @@ class GUIDark ( QtGui.QWidget ) :
     def on_edi_bat_end(self):
         cp.bat_dark_end.setValue( int(self.edi_bat_end.displayText()) )
         logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
+        self.set_fields()
+        if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+        else :
+            self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
     def on_but_browse(self):
         logger.debug('on_but_browse', __name__)
@@ -355,6 +369,13 @@ class GUIDark ( QtGui.QWidget ) :
 
         self.edi_bat_start.setReadOnly( not is_used ) 
         self.edi_bat_end  .setReadOnly( not is_used ) 
+
+        if is_used :
+            self.edi_bat_start.setStyleSheet(cp.styleEdit)
+            self.edi_bat_end  .setStyleSheet(cp.styleEdit)
+        else :
+            self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
+            self.edi_bat_end  .setStyleSheet(cp.styleEditInfo)
 
 #-----------------------------
 
