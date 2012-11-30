@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-86
+2012-11-30 Andy Salnikov
+- fix for PrincetonFrame, forgot to update it for ConfigV4
+
 Tag: V00-00-85
 2012-11-27 Andy Salnikov
 - fix for BldDataPimV1 class, size of the camera frame subobject was 

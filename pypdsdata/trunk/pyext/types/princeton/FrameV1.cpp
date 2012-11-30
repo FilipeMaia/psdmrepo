@@ -26,6 +26,7 @@
 #include "ConfigV1.h"
 #include "ConfigV2.h"
 #include "ConfigV3.h"
+#include "ConfigV4.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../../pdsdata_numpy.h"
@@ -102,8 +103,14 @@ data( PyObject* self, PyObject* args )
     uint32_t binY = config->binY();
     dims[0] = (config->height() + binY - 1) / binY;
     dims[1] = (config->width() + binX - 1) / binX;
+  } else if ( pypdsdata::Princeton::ConfigV4::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV4* config = pypdsdata::Princeton::ConfigV4::pdsObject( configObj );
+    uint32_t binX = config->binX();
+    uint32_t binY = config->binY();
+    dims[0] = (config->height() + binY - 1) / binY;
+    dims[1] = (config->width() + binX - 1) / binX;
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV* object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Princeton.ConfigV* object");
     return 0;
   }
 
