@@ -409,7 +409,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         except :
             self.butLogger.setStyleSheet(cp.styleButtonGood)
             cp.guilogger = GUILogger()
-            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(800,20))) # open window with offset w.r.t. parent
+            cp.guilogger.move(self.pos().__add__(QtCore.QPoint(860,00))) # open window with offset w.r.t. parent
             cp.guilogger.show()
 
 
@@ -420,7 +420,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         except :
             self.butFBrowser.setStyleSheet(cp.styleButtonGood)
             cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_total())
-            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(820,40))) # open window with offset w.r.t. parent
+            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
     def onStop(self):       

@@ -34,6 +34,9 @@ from FileNameManager        import fnm
 from BatchJobPedestals      import bjpeds
 from ImgSpeWithGUI          import *
 from BatchLogParser         import blp
+from GUIFileBrowser         import *
+
+
 #import GlobalGraphics       as gg
 
 #---------------------
@@ -58,6 +61,9 @@ class GUIDark ( QtGui.QWidget ) :
         self.edi_path    = QtGui.QLineEdit( fnm.path_dark_xtc() )        
         self.edi_path.setReadOnly( True )  
 
+        self.cbx_dark = QtGui.QCheckBox('Use dark correction', self)
+        self.cbx_dark.setChecked( cp.bat_dark_is_used.value() )
+
         self.edi_bat_start  = QtGui.QLineEdit ( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_end    = QtGui.QLineEdit ( str( cp.bat_dark_end  .value() ) )        
         self.edi_bat_total  = QtGui.QLineEdit ( str( cp.bat_dark_total.value() ) )        
@@ -68,30 +74,33 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_wfiles  = QtGui.QPushButton('Check files')
         self.but_submit  = QtGui.QPushButton('Pedestal')
         self.but_scanner = QtGui.QPushButton('Scanner')
+        self.but_browse  = QtGui.QPushButton('Browse files')
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
         #self.grid.addWidget(self.tit_path,     self.grid_row,   0)
-        self.grid.addWidget(self.but_path,      self.grid_row,   0)
-        self.grid.addWidget(self.edi_path,      self.grid_row,   1, 1, 6)
-        self.grid.addWidget(self.lab_batch,     self.grid_row+1, 0)
-        self.grid.addWidget(self.lab_status,    self.grid_row+1, 1, 1, 2)
-        self.grid.addWidget(self.lab_start,     self.grid_row+1, 3)
-        self.grid.addWidget(self.lab_end,       self.grid_row+1, 4)
-        self.grid.addWidget(self.lab_total,     self.grid_row+1, 5)
-        self.grid.addWidget(self.lab_time,      self.grid_row+1, 6)
-        self.grid.addWidget(self.but_scanner,   self.grid_row+2, 0)
-        self.grid.addWidget(self.but_status,    self.grid_row+2, 1, 1, 2)
-        self.grid.addWidget(self.edi_bat_start, self.grid_row+2, 3)
-        self.grid.addWidget(self.edi_bat_end,   self.grid_row+2, 4)
-        self.grid.addWidget(self.edi_bat_total, self.grid_row+2, 5)
-        self.grid.addWidget(self.edi_bat_time,  self.grid_row+2, 6)
-        self.grid.addWidget(self.but_submit,    self.grid_row+3, 0)
-        self.grid.addWidget(self.but_wfiles,    self.grid_row+3, 1, 1, 2)
-        self.grid.addWidget(self.but_plot,      self.grid_row+3, 3)
-        self.grid.addWidget(self.but_remove,    self.grid_row+3, 6)
+        self.grid.addWidget(self.cbx_dark,      self.grid_row,   0, 1, 6)
+        self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
+        self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 6)
+        self.grid.addWidget(self.lab_batch,     self.grid_row+2, 0)
+        self.grid.addWidget(self.lab_status,    self.grid_row+2, 1, 1, 2)
+        self.grid.addWidget(self.lab_start,     self.grid_row+2, 3)
+        self.grid.addWidget(self.lab_end,       self.grid_row+2, 4)
+        self.grid.addWidget(self.lab_total,     self.grid_row+2, 5)
+        self.grid.addWidget(self.lab_time,      self.grid_row+2, 6)
+        self.grid.addWidget(self.but_scanner,   self.grid_row+3, 0)
+        self.grid.addWidget(self.but_status,    self.grid_row+3, 1, 1, 2)
+        self.grid.addWidget(self.edi_bat_start, self.grid_row+3, 3)
+        self.grid.addWidget(self.edi_bat_end,   self.grid_row+3, 4)
+        self.grid.addWidget(self.edi_bat_total, self.grid_row+3, 5)
+        self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6)
+        self.grid.addWidget(self.but_submit,    self.grid_row+4, 0)
+        self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
+        self.grid.addWidget(self.but_plot,      self.grid_row+4, 3)
+        self.grid.addWidget(self.but_browse,    self.grid_row+4, 4, 1, 2)
+        self.grid.addWidget(self.but_remove,    self.grid_row+4, 6)
         self.grid_row += 3
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
@@ -99,12 +108,13 @@ class GUIDark ( QtGui.QWidget ) :
         self.connect(self.but_submit,    QtCore.SIGNAL('clicked()'),          self.on_but_submit    )
         self.connect(self.but_scanner,   QtCore.SIGNAL('clicked()'),          self.on_but_scanner   )
         self.connect(self.but_wfiles,    QtCore.SIGNAL('clicked()'),          self.on_but_wfiles    )
+        self.connect(self.but_browse,    QtCore.SIGNAL('clicked()'),          self.on_but_browse    )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),          self.on_but_plot      )
         self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),          self.on_but_remove    )
         self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_start )
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_end   )
-
-
+        self.connect(self.cbx_dark,      QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx           ) 
+ 
         #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         #self.connect(box, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
 
@@ -112,6 +122,7 @@ class GUIDark ( QtGui.QWidget ) :
 
         self.showToolTips()
         self.setStyle()
+        self.setButtonState()
 
     #-------------------
     #  Public methods --
@@ -147,6 +158,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.lab_total .setStyleSheet (cp.styleLabel)
         self.lab_time  .setStyleSheet (cp.styleLabel)
 
+        self.cbx_dark  .setStyleSheet (cp.styleLabel)
+
         self.edi_path   .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
         self.edi_path   .setAlignment  (QtCore.Qt.AlignRight)
 
@@ -173,6 +186,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit .setStyleSheet (cp.styleButton) 
         self.but_scanner.setStyleSheet (cp.styleButton) 
         self.but_wfiles .setStyleSheet (cp.styleButtonOn) 
+        self.but_browse .setStyleSheet (cp.styleButton) 
         self.but_plot   .setStyleSheet (cp.styleButton) 
         self.but_remove .setStyleSheet (cp.styleButtonBad) 
   
@@ -277,6 +291,17 @@ class GUIDark ( QtGui.QWidget ) :
         cp.bat_dark_end.setValue( int(self.edi_bat_end.displayText()) )
         logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
 
+    def on_but_browse(self):
+        logger.debug('on_but_browse', __name__)
+        try    :
+            cp.guifilebrowser.close()
+            self.but_browse.setStyleSheet(cp.styleButtonBad)
+        except :
+            self.but_browse.setStyleSheet(cp.styleButtonGood)
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_pedestals())
+            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
+            cp.guifilebrowser.show()
+
     def on_but_plot(self):
         logger.debug('on_but_plot', __name__)
         try :
@@ -297,6 +322,39 @@ class GUIDark ( QtGui.QWidget ) :
         logger.debug('on_but_remove', __name__)
         bjpeds.remove_files_pedestals()
         self.on_but_status()
+
+    def on_cbx(self):
+        #if self.cbx_dark.hasFocus() :
+        par = cp.bat_dark_is_used
+        par.setValue( self.cbx_dark.isChecked() )
+        msg = 'on_cbx - set status of bat_dark_is_used: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
+
+    def setButtonState(self):
+
+        is_used = cp.bat_dark_is_used.value()
+
+        self.but_path   .setEnabled(is_used)
+        self.but_status .setEnabled(is_used)
+        self.but_submit .setEnabled(is_used)
+        self.but_scanner.setEnabled(is_used)
+        self.but_wfiles .setEnabled(is_used)
+        self.but_browse .setEnabled(is_used)
+        self.but_plot   .setEnabled(is_used)
+        self.but_remove .setEnabled(is_used)
+
+        self.but_path   .setFlat(not is_used)
+        self.but_status .setFlat(not is_used)
+        self.but_submit .setFlat(not is_used)
+        self.but_scanner.setFlat(not is_used)
+        self.but_wfiles .setFlat(not is_used)
+        self.but_browse .setFlat(not is_used)
+        self.but_plot   .setFlat(not is_used)
+        self.but_remove .setFlat(not is_used)
+
+        self.edi_bat_start.setReadOnly( not is_used ) 
+        self.edi_bat_end  .setReadOnly( not is_used ) 
 
 #-----------------------------
 

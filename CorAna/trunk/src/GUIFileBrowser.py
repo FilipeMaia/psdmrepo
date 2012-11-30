@@ -143,6 +143,9 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         try    : cp.guimain.butFBrowser.setStyleSheet(cp.styleButtonBad)
         except : pass
 
+        try    : cp.guidark.but_browse.setStyleSheet(cp.styleButtonBad)
+        except : pass
+
         self.box_txt.close()
 
         try    : del cp.guifilebrowser # GUIFileBrowser

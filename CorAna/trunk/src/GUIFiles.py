@@ -119,7 +119,7 @@ class GUIFiles ( QtGui.QWidget ) :
         #self.setMaximumHeight(400)
         #self.setFixedWidth (700)
         #self.setFixedHeight(400)
-        self.setFixedHeight(300)
+        self.setFixedHeight(330)
         
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -188,7 +188,7 @@ class GUIFiles ( QtGui.QWidget ) :
             self.gui_win = GUIWorkResDirs(self)
             self.setStatus(0, 'Status: set work and result dirs.')
 
-        self.gui_win.setFixedHeight(150)
+        self.gui_win.setFixedHeight(180)
         self.hboxW.addWidget(self.gui_win)
 
     def onTabBar(self):

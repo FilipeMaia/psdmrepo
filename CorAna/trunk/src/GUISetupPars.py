@@ -53,6 +53,7 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.tit_bat             = QtGui.QLabel('Setup Parameters:')
         self.tit_bat_start       = QtGui.QLabel('start')
         self.tit_bat_end         = QtGui.QLabel('end')
+        self.tit_bat_total       = QtGui.QLabel('total')
         self.tit_bat_time        = QtGui.QLabel('time (sec)')
         self.tit_bat_data        = QtGui.QLabel('data')
         self.tit_bat_dark        = QtGui.QLabel('dark')
@@ -62,12 +63,15 @@ class GUISetupPars ( QtGui.QWidget ) :
         #self.edi_bat_num_max     = QtGui.QLineEdit ( str( cp.bat_num_max   .value() ) )        
         self.edi_bat_data_start  = QtGui.QLineEdit ( str( cp.bat_data_start.value() ) )        
         self.edi_bat_data_end    = QtGui.QLineEdit ( str( cp.bat_data_end  .value() ) )        
+        self.edi_bat_data_total  = QtGui.QLineEdit ( str( cp.bat_data_total.value() ) )        
         self.edi_bat_data_time   = QtGui.QLineEdit ( str( cp.bat_data_time .value() ) )        
         self.edi_bat_dark_start  = QtGui.QLineEdit ( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_dark_end    = QtGui.QLineEdit ( str( cp.bat_dark_end  .value() ) )        
+        self.edi_bat_dark_total  = QtGui.QLineEdit ( str( cp.bat_dark_total.value() ) )        
         self.edi_bat_dark_time   = QtGui.QLineEdit ( str( cp.bat_dark_time .value() ) )        
         self.edi_bat_flat_start  = QtGui.QLineEdit ( str( cp.bat_flat_start.value() ) )        
         self.edi_bat_flat_end    = QtGui.QLineEdit ( str( cp.bat_flat_end  .value() ) )        
+        self.edi_bat_flat_total  = QtGui.QLineEdit ( str( cp.bat_flat_total.value() ) )        
         self.edi_bat_flat_time   = QtGui.QLineEdit ( str( cp.bat_flat_time .value() ) )        
 
 
@@ -81,7 +85,8 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_bat        ,                0, 0, 1, 4)
         self.grid.addWidget(self.tit_bat_start  ,                2, 3)
         self.grid.addWidget(self.tit_bat_end    ,                2, 4)
-        self.grid.addWidget(self.tit_bat_time   ,                2, 5)
+        self.grid.addWidget(self.tit_bat_total  ,                2, 5)
+        self.grid.addWidget(self.tit_bat_time   ,                2, 6)
         self.grid.addWidget(self.tit_bat_data   ,                3, 1)
         self.grid.addWidget(self.tit_bat_dark   ,                4, 1)
         self.grid.addWidget(self.tit_bat_flat   ,                5, 1)
@@ -90,13 +95,16 @@ class GUISetupPars ( QtGui.QWidget ) :
         #self.grid.addWidget(self.but_bat_num       ,             1, 4)
         self.grid.addWidget(self.edi_bat_data_start,             3, 3)
         self.grid.addWidget(self.edi_bat_data_end  ,             3, 4)
-        self.grid.addWidget(self.edi_bat_data_time ,             3, 5)
+        self.grid.addWidget(self.edi_bat_data_total,             3, 5)
+        self.grid.addWidget(self.edi_bat_data_time ,             3, 6)
         self.grid.addWidget(self.edi_bat_dark_start,             4, 3)
         self.grid.addWidget(self.edi_bat_dark_end  ,             4, 4)
-        self.grid.addWidget(self.edi_bat_dark_time ,             4, 5)
+        self.grid.addWidget(self.edi_bat_dark_total,             4, 5)
+        self.grid.addWidget(self.edi_bat_dark_time ,             4, 6)
         self.grid.addWidget(self.edi_bat_flat_start,             5, 3)
         self.grid.addWidget(self.edi_bat_flat_end  ,             5, 4)
-        self.grid.addWidget(self.edi_bat_flat_time ,             5, 5)
+        self.grid.addWidget(self.edi_bat_flat_total,             5, 5)
+        self.grid.addWidget(self.edi_bat_flat_time ,             5, 6)
 
         self.setLayout(self.grid)
 
@@ -111,7 +119,8 @@ class GUISetupPars ( QtGui.QWidget ) :
   
         self.showToolTips()
         self.setStyle()
-
+        self.set_fields()
+        
     #-------------------
     #  Public methods --
     #-------------------
@@ -125,16 +134,17 @@ class GUISetupPars ( QtGui.QWidget ) :
         #self.but_bat_num       .setToolTip( msg_sele )
         #self.edi_bat_num_max   .setToolTip( msg_edit )        
         self.edi_bat_data_start.setToolTip( msg_edit )        
-        self.edi_bat_data_end  .setToolTip( msg_edit )        
-        self.edi_bat_data_time .setToolTip( msg_edit )        
         self.edi_bat_dark_start.setToolTip( msg_edit )        
-        self.edi_bat_dark_end  .setToolTip( msg_edit )        
-        self.edi_bat_dark_time .setToolTip( msg_edit )        
         self.edi_bat_flat_start.setToolTip( msg_edit )        
+        self.edi_bat_data_end  .setToolTip( msg_edit )        
+        self.edi_bat_dark_end  .setToolTip( msg_edit )        
         self.edi_bat_flat_end  .setToolTip( msg_edit )        
         self.edi_bat_data_time .setToolTip( msg_info )
         self.edi_bat_dark_time .setToolTip( msg_info )
         self.edi_bat_flat_time .setToolTip( msg_info )
+        self.edi_bat_data_total.setToolTip( msg_info )
+        self.edi_bat_dark_total.setToolTip( msg_info )
+        self.edi_bat_flat_total.setToolTip( msg_info )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -145,7 +155,7 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def setStyle(self):
-        width = 80
+        width = 50
 
         self.                setStyleSheet (cp.styleBkgd)
         #self.tit_bat_num_max.setStyleSheet (cp.styleTitle)
@@ -153,6 +163,7 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.tit_bat        .setStyleSheet (cp.styleTitle)
         self.tit_bat_start  .setStyleSheet (cp.styleLabel)
         self.tit_bat_end    .setStyleSheet (cp.styleLabel)
+        self.tit_bat_total  .setStyleSheet (cp.styleLabel)
         self.tit_bat_time   .setStyleSheet (cp.styleLabel)
         self.tit_bat_data   .setStyleSheet (cp.styleLabel)
         self.tit_bat_dark   .setStyleSheet (cp.styleLabel)
@@ -163,45 +174,63 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.tit_bat        .setAlignment(QtCore.Qt.AlignLeft)
         self.tit_bat_start  .setAlignment(QtCore.Qt.AlignCenter)
         self.tit_bat_end    .setAlignment(QtCore.Qt.AlignCenter)
+        self.tit_bat_total  .setAlignment(QtCore.Qt.AlignCenter)
         self.tit_bat_time   .setAlignment(QtCore.Qt.AlignCenter)
         self.tit_bat_data   .setAlignment(QtCore.Qt.AlignRight)
         self.tit_bat_dark   .setAlignment(QtCore.Qt.AlignRight)
         self.tit_bat_flat   .setAlignment(QtCore.Qt.AlignRight)
 
-        #self.edi_bat_num_max   .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_data_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_data_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_data_time .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_dark_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_dark_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_dark_time .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_flat_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_flat_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_flat_time .setAlignment(QtCore.Qt.AlignRight)
-
         #self.edi_bat_num_max   .setFixedWidth(60)
         #self.but_bat_num       .setFixedWidth(60)
         self.edi_bat_data_start.setFixedWidth(width)
-        self.edi_bat_data_end  .setFixedWidth(width)
-        self.edi_bat_data_time .setFixedWidth(width)
         self.edi_bat_dark_start.setFixedWidth(width)
-        self.edi_bat_dark_end  .setFixedWidth(width)
-        self.edi_bat_dark_time .setFixedWidth(width)
         self.edi_bat_flat_start.setFixedWidth(width)
+        self.edi_bat_data_end  .setFixedWidth(width)
+        self.edi_bat_dark_end  .setFixedWidth(width)
         self.edi_bat_flat_end  .setFixedWidth(width)
-        self.edi_bat_flat_time .setFixedWidth(width)
+        self.edi_bat_data_total.setFixedWidth(width)
+        self.edi_bat_dark_total.setFixedWidth(width)
+        self.edi_bat_flat_total.setFixedWidth(width)
+        self.edi_bat_data_time .setFixedWidth(140)
+        self.edi_bat_dark_time .setFixedWidth(140)
+        self.edi_bat_flat_time .setFixedWidth(140)
                                
         #self.edi_bat_num_max   .setStyleSheet(cp.styleEdit)
         #self.but_bat_num       .setStyleSheet(cp.styleButton)
         self.edi_bat_data_start.setStyleSheet(cp.styleEdit)
-        self.edi_bat_data_end  .setStyleSheet(cp.styleEdit)
-        self.edi_bat_data_time .setStyleSheet(cp.styleEditInfo)
         self.edi_bat_dark_start.setStyleSheet(cp.styleEdit)
-        self.edi_bat_dark_end  .setStyleSheet(cp.styleEdit)
-        self.edi_bat_dark_time .setStyleSheet(cp.styleEditInfo)
         self.edi_bat_flat_start.setStyleSheet(cp.styleEdit)
+        self.edi_bat_data_end  .setStyleSheet(cp.styleEdit)
+        self.edi_bat_dark_end  .setStyleSheet(cp.styleEdit)
         self.edi_bat_flat_end  .setStyleSheet(cp.styleEdit)
+        self.edi_bat_data_total.setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_dark_total.setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_flat_total.setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_data_time .setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_dark_time .setStyleSheet(cp.styleEditInfo)
         self.edi_bat_flat_time .setStyleSheet(cp.styleEditInfo)
+
+        #self.edi_bat_num_max   .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_data_start.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_dark_start.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_flat_start.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_data_end  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_dark_end  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_flat_end  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_data_total.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_dark_total.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_flat_total.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_data_time .setAlignment(QtCore.Qt.AlignLeading)
+        self.edi_bat_dark_time .setAlignment(QtCore.Qt.AlignLeading)
+        self.edi_bat_flat_time .setAlignment(QtCore.Qt.AlignLeading)
+
+
+    def set_fields(self):
+        self.edi_bat_dark_start.setText( str( cp.bat_dark_start.value() ) )        
+        self.edi_bat_dark_end  .setText( str( cp.bat_dark_end  .value() ) )        
+        self.edi_bat_dark_total.setText( str( cp.bat_dark_total.value() ) )        
+        self.edi_bat_dark_time .setText( str( cp.bat_dark_dt_ave.value() ) + u'\u00B1' + str( cp.bat_dark_dt_rms.value() ) )        
+
 
     def setParent(self,parent) :
         self.parent = parent
