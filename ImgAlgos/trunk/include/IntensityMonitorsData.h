@@ -73,7 +73,7 @@ struct Quartet{
 class IntensityMonitorsData : public Module {
 public:
 
-  //enum FILE_MODE {BINARY, TEXT};
+  enum FILE_MODE {BINARY, TEXT};
 
   // Default constructor
   IntensityMonitorsData (const std::string& name) ;
@@ -105,14 +105,18 @@ public:
 
 protected:
 
-  void saveImageInFile(Event& evt);
+  void setFileMode();
   void printInputParameters();
   void printEventRecord(Event& evt, std::string comment=std::string());
   void printSummary(Event& evt, std::string comment=std::string());
   void printSummaryForParser(Event& evt, std::string comment=std::string());
   void openOutputFiles();
   void closeOutputFiles();
+  void makeListOfSources(); 
   void procEvent(Event& evt, Env& env);
+  std::string strOfSources();
+  std::string strRecord(Event& evt, Env& env);
+  float*      arrRecord(Event& evt, Env& env);
   void printDataForSource (Event& evt, Env& env, Source& src);
   Quartet getDataForSource(Event& evt, Env& env, Source& src);
 
@@ -125,14 +129,19 @@ private:
   Source        m_srcIPMMono;    
   Source        m_srcIPM4;       
   Source        m_srcIPM5;       
-
-  std::string   m_fname;        // output file name for time stamp list
+  Source*       m_src_list;
+  int           m_size_of_list;
+  int           m_size_of_arr;
+  std::string   m_file_type;    // file type "txt" or "bin" 
+  FILE_MODE     m_file_mode; 
+  std::string   m_fname;        // output file name for intensity monitors' data
+  std::string   m_fname_header; // output file name for comments in stead of header
   unsigned      m_print_bits;
   long          m_count;
 
   std::string   m_str_run_number;
-
   std::ofstream p_out;
+  std::ofstream p_out_header;
 
 //protected:
 //--------------------

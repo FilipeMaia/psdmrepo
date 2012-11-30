@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 // #include <time.h>
+#include <sstream> // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -57,13 +58,42 @@ IntensityMonitorsData::IntensityMonitorsData (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_srcFEEGasDetE = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
-  m_srcIPM2       = configStr("ipm2",      "BldInfo(XCS-IPM-02)");
-  m_srcIPMMono    = configStr("ipmmono",   "BldInfo(XCS-IPM-mono)");
-  m_srcIPM4       = configStr("ipm4",      "DetInfo(XcsBeamline.1:Ipimb.4)");
-  m_srcIPM5       = configStr("ipm5",      "DetInfo(XcsBeamline.1:Ipimb.5)");
-  m_fname         = configStr("out_file",  "intens-mon-data.txt");
-  m_print_bits    = config   ("print_bits",                    0);
+  m_srcFEEGasDetE = configStr("feeSource",   "BldInfo(FEEGasDetEnergy)");
+  m_srcIPM2       = configStr("ipm2",        "BldInfo(XCS-IPM-02)");
+  m_srcIPMMono    = configStr("ipmmono",     "BldInfo(XCS-IPM-mono)");
+  m_srcIPM4       = configStr("ipm4",        "DetInfo(XcsBeamline.1:Ipimb.4)");
+  m_srcIPM5       = configStr("ipm5",        "DetInfo(XcsBeamline.1:Ipimb.5)");
+  m_file_type     = configStr("file_type",   "txt");
+  m_fname         = configStr("file_data",   "intensity-monitor-data.txt");
+  m_fname_header  = configStr("file_header", "intensity-monitor-comments.txt");
+  m_print_bits    = config   ("print_bits",  0);
+
+  makeListOfSources();
+  setFileMode();
+}
+
+//--------------------
+
+void 
+IntensityMonitorsData::makeListOfSources() 
+{
+  m_size_of_list= 5;
+  m_src_list    = new Source[m_size_of_list];
+  m_src_list[0] = m_srcFEEGasDetE;
+  m_src_list[1] = m_srcIPM2;
+  m_src_list[2] = m_srcIPMMono;
+  m_src_list[3] = m_srcIPM4;
+  m_src_list[4] = m_srcIPM5;
+}
+
+//--------------------
+
+void 
+IntensityMonitorsData::setFileMode()
+{
+  m_file_mode = TEXT;
+  if (m_file_type == "bin") m_file_mode = BINARY;
+  if (m_file_type == "txt") m_file_mode = TEXT;
 }
 
 //--------------------
@@ -80,7 +110,10 @@ IntensityMonitorsData::printInputParameters()
         << "\nIPMMono         : " << m_srcIPMMono   
         << "\nIPM4            : " << m_srcIPM4      
         << "\nIPM5            : " << m_srcIPM5      
-        << "\nfname_prefix    : " << m_fname
+        << "\nfile_type       : " << m_file_type
+        << "\nfile_mode       : " << m_file_mode
+        << "\nfname           : " << m_fname
+        << "\nfname_header    : " << m_fname_header
         << "\nm_print_bits    : " << m_print_bits;
   }
 }
@@ -157,7 +190,7 @@ IntensityMonitorsData::endRun(Event& evt, Env& env)
 void 
 IntensityMonitorsData::endJob(Event& evt, Env& env)
 {
-  //closeOutputFiles();
+  closeOutputFiles();
   if( m_print_bits & 4 ) printSummary(evt, "");
   if( m_print_bits & 8 ) printSummaryForParser(evt);
 }
@@ -167,24 +200,112 @@ IntensityMonitorsData::endJob(Event& evt, Env& env)
 //--------------------
 //--------------------
 
+std::string 
+IntensityMonitorsData::strOfSources()
+{
+  std::stringstream ss;
+  for(int i=0; i<m_size_of_list; i++)
+    ss << m_src_list[i] << " ";
+  ss << "\n";
+  return ss.str();
+}
+
+//--------------------
+
+/// Open temporary output file with time records
+void 
+IntensityMonitorsData::openOutputFiles()
+{
+  if      (m_file_mode == TEXT  ) p_out.open(m_fname.c_str());
+  else if (m_file_mode == BINARY) p_out.open(m_fname.c_str(), ios_base::out | ios_base::binary);
+
+  p_out_header.open(m_fname_header.c_str());
+  if( m_print_bits & 32 ) MsgLog( name(), info, "Open file: " << m_fname_header.c_str());  
+  if( m_print_bits & 32 ) MsgLog( name(), info, "Open file: " << m_fname       .c_str());  
+
+  p_out_header << "Heder for the data file: " << m_fname       .c_str()
+               << "\nNumber of sources: " << m_size_of_list
+               << "\nFour values per source:\n" 
+               << strOfSources();
+}
+
+//--------------------
+
+/// Close temporary output file with time records
+void 
+IntensityMonitorsData::closeOutputFiles()
+{
+  p_out_header << "Number of records in file: " << m_count;
+  p_out_header.close();
+  p_out.close();
+  if( m_print_bits & 32 ) MsgLog( name(), info, "Monitors data is saved in the file: " << m_fname.c_str());  
+  if( m_print_bits & 32 ) MsgLog( name(), info, "Headier       is saved in the file: " << m_fname_header.c_str());  
+}
+
+//--------------------
+
 void 
 IntensityMonitorsData::procEvent(Event& evt, Env& env)
 {  
-  Source src_list[] = {m_srcFEEGasDetE, m_srcIPM2, m_srcIPMMono, m_srcIPM4, m_srcIPM5};
 
-  std::string rec = "";
+  if( m_print_bits & 16 ) // Print all available data for list of sources
+    for(int i=0; i<m_size_of_list; i++) {
+      printDataForSource(evt, env, m_src_list[i]);
+    }
 
-  for(int i=0; i<5; i++) {
-    if( m_print_bits & 16 ) printDataForSource(evt, env, src_list[i]);
-
-    Quartet q = getDataForSource(evt, env, src_list[i]);
-
-    //cout << src_list[i] << ": " << q.v1 << " " << q.v2 << " " << q.v3 << " " << q.v4 << endl; 
-
-    p_out << q.v1 << " " << q.v2 << " " << q.v3 << " " << q.v4 << " ";
+  if (m_file_mode == TEXT) {
+    std::string s = strRecord(evt, env);
+    p_out.write(s.c_str(), s.size());
+    //cout  << s.size() << " " << s;
   }
 
-  p_out << "\n";
+  else if (m_file_mode == BINARY) {
+    float* a = arrRecord(evt, env);
+    // for (int i=0; i<m_size_of_arr; i++) cout << " " << a[i]; cout << endl;
+    p_out.write(reinterpret_cast<const char*>(a), m_size_of_arr*sizeof(float));
+    p_out << "\n";
+  } 
+}
+
+//--------------------
+
+std::string 
+IntensityMonitorsData::strRecord(Event& evt, Env& env)
+{
+  std::stringstream ss;
+  ss << right << std::setw(7) << m_count-1 << "  " << fixed << std::setprecision(5); 
+
+  for(int i=0; i<m_size_of_list; i++) {
+
+      Quartet q = getDataForSource(evt, env, m_src_list[i]);
+      //cout << m_src_list[i] << ": " << q.v1 << " " << q.v2 << " " << q.v3 << " " << q.v4 << endl; 
+      ss << q.v1 << " " 
+         << q.v2 << " " 
+         << q.v3 << " " 
+         << q.v4 << "  ";
+  }
+  ss << "\n";
+  return ss.str();
+}
+
+//--------------------
+
+float*
+IntensityMonitorsData::arrRecord(Event& evt, Env& env)
+{
+  m_size_of_arr = 4*m_size_of_list + 1;
+  float* arr = new float[m_size_of_arr];
+  arr[0] = (float)m_count-1;
+
+  for(int i=0, ibase=0; i<m_size_of_list; i++, ibase+=4) {
+
+      Quartet q = getDataForSource(evt, env, m_src_list[i]);
+      arr[ibase+1] = q.v1;
+      arr[ibase+2] = q.v2;
+      arr[ibase+3] = q.v3;
+      arr[ibase+4] = q.v4;
+  }
+  return arr;
 }
 
 //--------------------
@@ -314,74 +435,6 @@ IntensityMonitorsData::printDataForSource(Event& evt, Env& env, Source& src)
 
 //--------------------
 
-/// Open temporary output file with time records
-void 
-IntensityMonitorsData::openOutputFiles()
-{
-  p_out.open(m_fname.c_str());
-}
-
-//--------------------
-
-/// Close temporary output file with time records
-void 
-IntensityMonitorsData::closeOutputFiles()
-{
-  p_out.close();
-}
-
-//--------------------
-
-/// Evaluate average time and rms between the frames
-//void 
-//IntensityMonitorsData::evaluateMeanTimeBetweenEvents()
-//{
-//  m_t_ave = (m_sumt0) ? m_sumt1/m_sumt0 : 0;
-//  m_t_rms = (m_sumt0) ? std::sqrt(m_sumt2/m_sumt0 - m_t_ave*m_t_ave) : 0;
-//}
-
-//--------------------
-
-/// Saves the time record in temporary output file
-/*
-void 
-IntensityMonitorsData::saveTimeRecord(Event& evt)
-{
-  m_tsec = doubleTime(evt);
-  m_nevt = eventCounterSinceConfigure(evt);
-
-  if(m_count==1) {
-    m_tsec_0    = m_tsec;
-    m_tsec_prev = m_tsec;
-    m_nevt_prev = m_nevt;
-    m_sumt0 = 0;
-    m_sumt1 = 0;
-    m_sumt2 = 0;
-  }
-
-  m_dt = m_tsec-m_tsec_prev;
-  
-  if ( (m_nevt-m_nevt_prev)==1 ) {
-    m_sumt0 ++;
-    m_sumt1 += m_dt;
-    m_sumt2 += m_dt*m_dt;
-  }
-
-  p_out      << std::setw(6) << m_count-1 // Save the event index starting from 0. 
-             << fixed << std::setw(16) << std::setprecision(6) << m_tsec - m_tsec_0
-             << fixed << std::setw(10) << std::setprecision(6) << m_dt
-             << stringTimeStamp(evt,"  %Y%m%d-%H%M%S%f")
-             << std::setw(8) << fiducials(evt)
-             << std::setw(7) << m_nevt
-             << "\n";
-
-  m_tsec_prev = m_tsec;  
-  m_nevt_prev = m_nevt;
-}
-*/
-
-//--------------------
-
 /// Print event record
 void 
 IntensityMonitorsData::printEventRecord(Event& evt, std::string comment)
@@ -416,26 +469,6 @@ IntensityMonitorsData::printSummaryForParser(Event& evt, std::string comment)
   cout << "BATCH_NUMBER_OF_EVENTS        " << m_count << endl;
 }
 
-//--------------------
-
-/// Save metadata in file 
-//void  
-//IntensityMonitorsData::saveMetadataInFile()
-//{
-//  std::string fname = m_fname+"-med.txt";
-//  std::ofstream out(fname.c_str());
-
-//  out << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
-//      << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
-//      << "\nTIME_INDEX_MAX  " << std::setw(8) << m_tind_max
-//      << "\n";
-
-//  out.close();
-//  if( m_print_bits & 16 ) MsgLog( name(), info, "The file with metadata: " << fname << " is created.");
-//}
-
-//--------------------
-//--------------------
 //--------------------
 //--------------------
 
