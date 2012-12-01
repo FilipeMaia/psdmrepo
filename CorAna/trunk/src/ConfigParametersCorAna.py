@@ -157,6 +157,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_flat_time     = self.declareParameter( name='BATCH_FLAT_TIME' ,      val_def=-1.0,     typ='float' )
         self.bat_queue         = self.declareParameter( name='BATCH_QUEUE',           val_def='psfehq', typ='str' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  typ='str' )
+        #self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(XcsBeamline.0:Princeton.0)', typ='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  typ='str' )
 
         # GUIAnaSettingsLeft.py

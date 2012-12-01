@@ -63,7 +63,7 @@ class ImgSpeWithGUI (QtGui.QWidget) :
     def __init__(self, parent=None, arr=None, figsize=(5,10)):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 600)
+        self.setGeometry(20, 40, 500, 600)
         self.setWindowTitle('GUI with plot')
         self.setFrame()
 
@@ -129,7 +129,8 @@ class ImgSpeWithGUI (QtGui.QWidget) :
 
 def get_array2d_for_test() :
     mu, sigma = 200, 25
-    arr = mu + sigma*np.random.standard_normal(size=2400)
+    #arr = mu + sigma*np.random.standard_normal(size=2400)
+    arr = 100*np.random.standard_exponential(size=2400)
     #arr = np.arange(2400)
     arr.shape = (40,60)
     return arr

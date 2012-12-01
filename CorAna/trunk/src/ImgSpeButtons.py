@@ -33,8 +33,8 @@ from PyQt4 import QtGui, QtCore
 
 from Logger                 import logger
 from FileNameManager        import fnm
-from ConfigParametersCorAna import confpars as cp
 from GUIHelp                import *
+#from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -97,6 +97,7 @@ class ImgSpeButtons (QtGui.QWidget) :
 
         self.showToolTips()
 
+
     def showToolTips(self):
         self.but_reset.setToolTip('Reset original view') 
         self.but_quit .setToolTip('Quit this GUI') 
@@ -105,6 +106,7 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.cbox_grid.setToolTip('On/Off grid') 
         self.cbox_log .setToolTip('Log/Linear scale') 
         self.edi_nbins.setToolTip('Edit the number of bins\nfor spectrum [1-1000]')
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -119,74 +121,19 @@ class ImgSpeButtons (QtGui.QWidget) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         #print 'Close application'
-        try    : cp.guihelp.close()
+        try    : self.guihelp.close()
         except : pass
 
         try    : self.parent.close()
         except : pass
            
+
     def on_but_quit(self):
         logger.debug('on_but_quit', __name__ )
         self.close()
-
-     
-    #def setEditFieldValues(self) :
-        #self.editXmin.setText( str(self.intOrNone(self.myXmin)) )
-        #self.editXmax.setText( str(self.intOrNone(self.myXmax)) )
-
-        #self.editYmin.setText( str(self.intOrNone(self.myYmin)) )
-        #self.editYmax.setText( str(self.intOrNone(self.myYmax)) ) 
-
-        #self.editZmin.setText( str(self.intOrNone(self.myZmin)) )
-        #self.editZmax.setText( str(self.intOrNone(self.myZmax)) )
-
-        #self.setEditFieldColors()
-
-       
-    #def setEditFieldColors(self) :
-        
-        #self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
-        #self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
-
-        #if self.cboxXIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
-        #else                         : self.styleSheet = self.styleSheetGrey
-        #self.editXmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        #self.editXmax.setStyleSheet('Text-align:left;' + self.styleSheet)
-
-        #if self.cboxYIsOn.isChecked(): self.styleSheet = self.styleSheetWhite
-        #else                         : self.styleSheet = self.styleSheetGrey
-        #self.editYmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        #self.editYmax.setStyleSheet('Text-align:left;' + self.styleSheet)
-
-        #if self.cboxZIsOn.isChecked():
-        #    self.styleSheet = self.styleSheetWhite
-        #    self.fig.myZmin = self.myZmin
-        #    self.fig.myZmax = self.myZmax
-        #else :
-        #    self.styleSheet = self.styleSheetGrey
-        #    self.fig.myZmin = None
-        #    self.fig.myZmax = None
-
-        #self.editZmin.setText(str(self.fig.myZmin))
-        #self.editZmax.setText(str(self.fig.myZmax))
-            
-        #self.editZmin.setStyleSheet('Text-align:left;' + self.styleSheet)
-        #self.editZmax.setStyleSheet('Text-align:left;' + self.styleSheet)
-
-        #self.editXmin.setReadOnly( not self.cboxXIsOn.isChecked() )
-        #self.editXmax.setReadOnly( not self.cboxXIsOn.isChecked() )
-
-        #self.editYmin.setReadOnly( not self.cboxYIsOn.isChecked() )
-        #self.editYmax.setReadOnly( not self.cboxYIsOn.isChecked() )
-
-        #self.editZmin.setReadOnly( not self.cboxZIsOn.isChecked() )
-        #self.editZmax.setReadOnly( not self.cboxZIsOn.isChecked() )
-
-
-    #def on_cbox_z(self):
-    #    self.setEditFieldColors()
 
 
     def stringOrNone(self,value):
@@ -197,14 +144,6 @@ class ImgSpeButtons (QtGui.QWidget) :
     def intOrNone(self,value):
         if value == None : return None
         else             : return int(value)
-
-
-    #def on_edit_zmin(self):
-    #    self.fig.myZmin = self.editZmin.displayText()
-
-
-    #def on_edit_zmax(self):
-    #    self.fig.myZmax = self.editZmax.displayText()
 
     def set_buttons(self) :
         self.cbox_grid.setChecked(self.fig.myGridIsOn)
@@ -258,11 +197,12 @@ class ImgSpeButtons (QtGui.QWidget) :
     def on_but_help(self):
         logger.debug('on_but_help - is not implemented yet...', __name__ )
         try :
-            cp.guihelp.close()
+            self.guihelp.close()
+            del self.guihelp
         except :
-            cp.guihelp = GUIHelp(None,self.help_message())
-            cp.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
-            cp.guihelp.show()
+            self.guihelp = GUIHelp(None,self.help_message())
+            self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
+            self.guihelp.show()
 
 
     def help_message(self):
@@ -274,6 +214,7 @@ class ImgSpeButtons (QtGui.QWidget) :
         msg += '\nReset amplitude limits to default: middle mouse button click on histogram or color bar.'
         msg += '\nReset image and histogram to default: click on "Reset" button.'
         return msg
+
 
     def popup_confirmation_box(self):
         """Pop-up box for help"""

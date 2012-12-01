@@ -367,15 +367,15 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot   .setFlat(not is_used)
         self.but_remove .setFlat(not is_used)
 
-        self.edi_bat_start.setReadOnly( not is_used ) 
-        self.edi_bat_end  .setReadOnly( not is_used ) 
-
         if is_used :
             self.edi_bat_start.setStyleSheet(cp.styleEdit)
             self.edi_bat_end  .setStyleSheet(cp.styleEdit)
         else :
             self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
             self.edi_bat_end  .setStyleSheet(cp.styleEditInfo)
+
+        self.edi_bat_start.setReadOnly( not is_used ) 
+        self.edi_bat_end  .setReadOnly( not is_used ) 
 
 #-----------------------------
 
