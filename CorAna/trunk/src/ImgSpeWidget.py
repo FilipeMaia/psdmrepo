@@ -143,75 +143,23 @@ class ImgSpeWidget (QtGui.QWidget) :
             self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
             self.range  = [xmin, xmax, ymax, ymin]
 
-        #self.arr2d = self.arrwin
-
-        #print 'self.arrwin = ', self.arrwin
-
-        if self.fig.myLogIsOn : self.arr2d = np.log10(self.arrwin)
-        else :                  self.arr2d =          self.arrwin
-
-        #print 'self.arr2d = ', self.arr2d
-
-        self.fig.clear()        
-
-        gs = gridspec.GridSpec(20, 20)
         zmin = self.intOrNone(zmin)
         zmax = self.intOrNone(zmax)
 
-        if zmin==None and zmax==None : self.range_h1 = None
-        else                         : self.range_h1 = (zmin,zmax)
+        if zmin==None and zmax==None : self.range_his = None
+        else                         : self.range_his = (zmin,zmax)
 
-        #print 'self.range_h1 = ', self.range_h1
+        #print 'self.range_his = ', self.range_his
+        #print 'self.arrwin = ', self.arrwin
 
-        #self.axhis = self.fig.add_subplot(212)
-        self.axhis = self.fig.add_subplot(gs[15:19,:])
+        self.fig.clear()        
+        self.nbins = nbins
 
-        if self.fig.myLogIsOn :
-            #logbins=10**np.linspace(zmin, zmax, nbins)        
-            #logbins=10**np.linspace(0.1, 6, nbins)        
-            #print 'logbins: ', logbins
-            #self.axhis.hist(self.arrwin.flatten(), bins=logbins )#, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
-            self.axhis.set_xscale('log')
-
-        self.axhis.hist(self.arrwin.flatten(), bins=nbins, range=self.range_h1)#, log=self.fig.myLogIsOn)#, range=(Amin, Amax)) 
+        if self.fig.myLogIsOn : self.plots_in_log10_scale()
+        else :                  self.plots_in_linear_scale()
 
         self.axhis.grid(self.fig.myGridIsOn)
-        Nmin, Nmax = self.axhis.get_ylim() 
-        print 'Nmin, Nmax =', Nmin, Nmax
-        yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
-        if len(yticks)<2 : yticks = [Nmin,Nmax]
-        self.axhis.set_yticks( yticks )
-
-        zmin, zmax = self.axhis.get_xlim() 
-
-        coltickslocs   = self.axhis.get_xticks()
-        self.axhis.set_xticklabels('')
-
-        #coltickslabels = self.axhis.get_xticklabels()
-        #print 'colticks =', coltickslocs#, coltickslabels
- 
-        self.fig.myZmin, self.fig.myZmax = zmin, zmax
-        #self.setEditFieldValues()
-
-        self.aximg = self.fig.add_subplot(gs[0:14,:])
         self.aximg.grid(self.fig.myGridIsOn)
-        self.aximshow = self.aximg.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
-
-        #print 'coltickslocs =', coltickslocs 
-
-        if self.fig.myLogIsOn :
-            if zmin> 0 : cmin = log10(zmin)
-            else       : cmin = 1
-            cmax = np.log((zmax))
-            coltickslocs = None
-        else : cmin, cmax = zmin, zmax
-        #print 'zmin, zmax, cmin, cmax  =', zmin, zmax, cmin, cmax
-
-        self.aximshow.set_clim(cmin,cmax)
-        #self.colbar = self.fig.colorbar(self.aximshow, fraction=0.15, pad=0.1, shrink=1.0, aspect=15, orientation=1, ticks=coltickslocs) #orientation=1,
-        self.axcolbar = self.fig.add_subplot(gs[19,:])
-        self.colbar = self.fig.colorbar(self.aximshow, cax=self.axcolbar, orientation=1, ticks=coltickslocs) #orientation=1,
-        #self.colbar.set_clim(zmin,zmax)
 
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
@@ -219,6 +167,85 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         self.canvas.draw()
         #print 'End of on_draw'
+
+    def plots_in_log10_scale(self) :
+        self.arr2d = np.log10(self.arrwin)
+        #self.arr2d = self.arrwin
+
+        if self.range_his == None : 
+            vmin, vmax = np.min(self.arrwin), np.max(self.arrwin)
+        else :
+            vmin, vmax = self.range_his
+
+        self.fig.myZmin, self.fig.myZmax = vmin, vmax 
+
+        if vmin<0.1 : vmin=0.1
+        if vmax<10  : vmax=10
+        log_vmin, log_vmax = int(log10(vmin)), int(log10(vmax))+1
+        #print 'vmin, vmax, log_vmin, log_vmax = ', vmin, vmax, log_vmin, log_vmax
+                        
+        self.axhis = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
+        self.axhis.set_xscale('log')
+        #logbins=10**np.linspace(log_vmin, log_vmax, self.nbins)
+        logbins=np.logspace(log_vmin, log_vmax, self.nbins)
+        #print 'logbins =', logbins        
+        #self.axhis.hist(self.arr2d.flatten(), bins=self.nbins, range=self.range_his)
+        self.axhis.hist(self.arrwin.flatten(), bins=logbins )
+        self.set_hist_yticks()
+
+        self.aximg = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
+        self.aximshow = self.aximg.imshow(self.arr2d, origin='upper', \
+                                          interpolation='nearest', \
+                                          extent=self.range, aspect='auto')
+        self.aximshow.set_clim(log_vmin,log_vmax)
+
+        #self.axcolbar = self.fig.add_axes([0.15, 0.95, 0.78, 0.05])
+        #self.colbar = self.fig.colorbar(self.aximshow, cax=self.axcolbar, \
+        #                                orientation='horizontal')#, ticks=xticks)
+        self.colbar = self.fig.colorbar(self.aximshow, orientation='vertical', \
+                                        fraction=0.1, pad=0.01, shrink=1.0, aspect=20)
+        # fraction - of the 2d plot occupied by the color bar
+        # pad      - is a space between 2d image and color bar
+        # shrink   - factor for the length of the color bar
+        # aspect   - ratio length/width of the color bar
+
+
+    def plots_in_linear_scale(self) :
+        self.arr2d = self.arrwin
+        #print 'self.arr2d = ', self.arr2d
+
+        gs = gridspec.GridSpec(20, 20)
+        self.axhis = self.fig.add_subplot(gs[15:19,:]) # self.fig.add_subplot(212)
+        self.axhis.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
+        self.set_hist_yticks()
+
+        xticks = self.axhis.get_xticks()
+        #print 'xticks =', xticks 
+        self.axhis.set_xticklabels('')
+        cmin, cmax = self.axhis.get_xlim() 
+        self.fig.myZmin, self.fig.myZmax = cmin, cmax 
+        #print 'cmin, cmax, self.range_his =', cmin, cmax, self.range_his
+
+        self.aximg = self.fig.add_subplot(gs[0:14,:])
+        self.aximshow = self.aximg.imshow(self.arr2d, origin='upper', \
+                                          interpolation='nearest', \
+                                          extent=self.range, aspect='auto')
+        self.aximshow.set_clim(cmin,cmax)
+        self.axcolbar = self.fig.add_subplot(gs[19,:])
+        self.colbar = self.fig.colorbar(self.aximshow, cax=self.axcolbar, \
+                                        orientation=1, ticks=xticks)
+                             #fraction=0.15, pad=0.1, shrink=1.0, aspect=15
+        #self.colbar.set_clim(zmin,zmax)
+
+
+    def set_hist_yticks(self) :
+        Nmin, Nmax = self.axhis.get_ylim() 
+        #print 'Nmin, Nmax =', Nmin, Nmax
+        if (Nmax-Nmin)<4 : yticks = np.arange(Nmin,Nmin+4)
+        else             : yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
+        self.axhis.set_yticks( yticks )
+        self.axhis.set_ylabel('N pixels')
+
 
     def processMouseMotion(self, event) :
 
@@ -241,7 +268,7 @@ class ImgSpeWidget (QtGui.QWidget) :
             self.fig.canvas.drawRectangle( rect )            
 
     def processMouseButtonPress(self, event) :
-        print 'MouseButtonPress'
+        #print 'MouseButtonPress'
         #self.fig = event.canvas.figure
 
         if event.inaxes == self.colbar.ax : self.mousePressOnColorBar (event)
@@ -280,7 +307,7 @@ class ImgSpeWidget (QtGui.QWidget) :
 
     def setColorLimits(self, event, colmin, colmax, value) :
 
-        print colmin, colmax, value
+        #print colmin, colmax, value
 
         # left button
         if event.button is 1 :
