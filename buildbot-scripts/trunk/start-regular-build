@@ -85,4 +85,6 @@ fi
 # Send a signal to buildbot
 #
 echo "Sending notification to BuildBot"
-buildbot sendchange --user=$USER --master=$bbot --branch="$rel" --comments="Requesting to build release $rel" /dev/null
+buildbotdir="/reg/g/psdm/sw/external/buildbot/$SIT_ARCH"
+pyextradir="/reg/g/psdm/sw/external/pyextra-python2.7/$SIT_ARCH"
+PYTHONPATH=$buildbotdir/lib/python2.7/site-packages:$pyextradir/lib/python2.7/site-packages $buildbotdir/bin/buildbot sendchange --user=$USER --master=$bbot --branch="$rel" --comments="Requesting to build release $rel" /dev/null
