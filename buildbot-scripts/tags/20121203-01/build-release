@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+usage() {
+
+  echo `basename $0` build_dir release target [options]
+  echo
+  echo "  all options are passed to sit_setup directly"
+
+}
+
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
+
+rels=${1:?Required parameter missing (build directory name)}
+shift
+rel=${1:?Required parameter missing (release name)}
+shift
+target=${1:?Required parameter missing (target name)}
+shift
+
+#
+# directory for the new release
+#
+dir="$rels/$rel"
+cd "$dir"
+
+#
+# setup release
+#
+SIT_RELEASE="$rel"
+export SIT_RELEASE
+source "$SIT_ROOT/bin/sit_setup.sh" "$@"
+
+#
+# run the build
+#
+scons -k $target 
+
