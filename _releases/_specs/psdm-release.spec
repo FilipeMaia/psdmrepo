@@ -6,9 +6,7 @@
 #   relname - full name of the release (ana-0.X.Y)
 #
 
-%if "%{relname}" == ""
-%{error:relname macro is not defined}
-%endif
+%define relname @RELNAME@
 
 %define reltype  %(echo %{relname} | sed 's/\\(.*-\\)*\\(.*\\)/\\1/')
 %define version  %(echo %{relname} | sed 's/\\(.*-\\)*\\(.*\\)/\\2/')
@@ -134,7 +132,7 @@ Current link for PSDM software release %{relname}.
 
 %changelog
 
-* Wed May 23 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
+* Tue Dec 04 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
 - initial release
 - no version numbers defined for this file, it will be used for multiple
   releases
