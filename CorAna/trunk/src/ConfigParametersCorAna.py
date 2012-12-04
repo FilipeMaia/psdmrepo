@@ -159,6 +159,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_data_time     = self.declareParameter( name='BATCH_DATA_TIME' ,      val_def=-1.0,     typ='float' )
         self.bat_data_dt_ave   = self.declareParameter( name='BATCH_DATA_DT_AVE',     val_def=-1.0,     typ='float' )
         self.bat_data_dt_rms   = self.declareParameter( name='BATCH_DATA_DT_RMS',     val_def=0.0,      typ='float' )
+
         self.bat_dark_is_used  = self.declareParameter( name='BATCH_DARK_IS_USED',    val_def=True,     typ='bool' )
         self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       typ='int' )
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       typ='int' )

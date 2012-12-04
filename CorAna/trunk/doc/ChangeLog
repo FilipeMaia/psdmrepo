@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
+
+2012-12-04 Mikhail S. Dubrovin
+- add/remove modules:
+A       data/scripts/psana-data-aver.cfg
+A       data/scripts/psana-peds-aver.cfg
+D       data/scripts/psana-peds.cfg
 	
 2012-12-03 Mikhail S. Dubrovin
 - add/remove modules:

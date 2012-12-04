@@ -32,8 +32,8 @@ import os
 from PyQt4 import QtGui, QtCore
 
 from Logger                 import logger
-from FileNameManager        import fnm
 from GUIHelp                import *
+#from FileNameManager        import fnm
 #from ConfigParametersCorAna import confpars as cp
 
 #---------------------
@@ -48,7 +48,7 @@ class ImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None):
+    def __init__(self, parent=None, widgimage=None, ofname='./fig.png'):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -56,6 +56,8 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.widgimage = widgimage
         self.parent    = parent
         self.fig       = widgimage.fig
+        self.fig       = widgimage.fig
+        self.ofname    = ofname
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -166,7 +168,7 @@ class ImgSpeButtons (QtGui.QWidget) :
 
     def on_but_save(self):
         logger.debug('on_but_save', __name__ )
-        path = fnm.path_pedestals_plot()
+        path = self.ofname
         #dir, fname = os.path.split(path)
         path  = str( QtGui.QFileDialog.getSaveFileName(self,
                                                        caption='Select file to save the plot',

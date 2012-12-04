@@ -103,22 +103,23 @@ class GUIData ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_brow,      self.grid_row+4, 4, 1, 2)
         self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
 
-        self.connect(self.cbx_data,   QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
-        self.connect(self.but_path,   QtCore.SIGNAL('clicked()'), self.on_but_path )
-        self.connect(self.but_plot,   QtCore.SIGNAL('clicked()'), self.on_but_plot )
-        self.connect(self.but_brow,   QtCore.SIGNAL('clicked()'), self.on_but_brow )
-        self.connect(self.but_aver,   QtCore.SIGNAL('clicked()'), self.on_but_aver )
-        self.connect(self.but_scan,   QtCore.SIGNAL('clicked()'), self.on_but_scan )
-        self.connect(self.but_status, QtCore.SIGNAL('clicked()'), self.on_but_status )
-        self.connect(self.but_wfiles, QtCore.SIGNAL('clicked()'), self.on_but_wfiles )
-        self.connect(self.but_remove, QtCore.SIGNAL('clicked()'), self.on_but_remove )
-        self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_start )
-        self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_end   )
+        self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),         self.on_but_path )
+        self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),         self.on_but_plot )
+        self.connect(self.but_brow,      QtCore.SIGNAL('clicked()'),         self.on_but_brow )
+        self.connect(self.but_aver,      QtCore.SIGNAL('clicked()'),         self.on_but_aver )
+        self.connect(self.but_scan,      QtCore.SIGNAL('clicked()'),         self.on_but_scan )
+        self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),         self.on_but_status )
+        self.connect(self.but_wfiles,    QtCore.SIGNAL('clicked()'),         self.on_but_wfiles )
+        self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),         self.on_but_remove )
+        self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_start )
+        self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_end   )
+        self.connect(self.cbx_data,      QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
   
         self.setLayout(self.grid)
 
         self.showToolTips()
         self.setStyle()
+        self.setButtonState()
 
     #-------------------
     #  Public methods --
@@ -146,11 +147,13 @@ class GUIData ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
+
     def setStyle(self):
         width = 60
         self.setMinimumWidth(530)
         self.setStyleSheet(cp.styleBkgd)
 
+        self.cbx_data  .setStyleSheet (cp.styleLabel)
         self.lab_batch .setStyleSheet (cp.styleLabel)
         self.lab_status.setStyleSheet (cp.styleLabel)
         self.lab_start .setStyleSheet (cp.styleLabel)
@@ -176,6 +179,9 @@ class GUIData ( QtGui.QWidget ) :
         self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
 
+        self.edi_bat_total.setReadOnly( True ) 
+        self.edi_bat_time .setReadOnly( True ) 
+
         self.but_path  .setStyleSheet (cp.styleButton)
         self.but_plot  .setStyleSheet (cp.styleButton) 
         self.but_brow  .setStyleSheet (cp.styleButton) 
@@ -191,29 +197,12 @@ class GUIData ( QtGui.QWidget ) :
         self.but_scan  .setFixedWidth (width)
         self.but_aver  .setFixedWidth (width)
         self.but_remove.setFixedWidth(width)
-        self.cbx_data.setStyleSheet (cp.styleLabel)
 
-        self.setButtonState()
+        self.on_but_status()
 
 
-    def setButtonState(self):
-        self.but_path  .setEnabled(cp.is_active_data_gui.value())
-        self.but_plot  .setEnabled(cp.is_active_data_gui.value())
-        self.but_brow  .setEnabled(cp.is_active_data_gui.value())
-        self.but_scan  .setEnabled(cp.is_active_data_gui.value())
-        self.but_aver  .setEnabled(cp.is_active_data_gui.value())
-        self.but_remove.setEnabled(cp.is_active_data_gui.value())
-
-        self.but_path  .setFlat(not cp.is_active_data_gui.value())
-        self.but_plot  .setFlat(not cp.is_active_data_gui.value())
-        self.but_brow  .setFlat(not cp.is_active_data_gui.value())
-        self.but_scan  .setFlat(not cp.is_active_data_gui.value())
-        self.but_aver  .setFlat(not cp.is_active_data_gui.value())
-        self.but_remove.setFlat(not cp.is_active_data_gui.value())
-
-    
-    def setParent(self,parent) :
-        self.parent = parent
+    #def setParent(self,parent) :
+    #    self.parent = parent
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
@@ -257,7 +246,7 @@ class GUIData ( QtGui.QWidget ) :
         cp.in_file_data.setValue(fname)
         logger.info('selected file: ' + str(fnm.path_data_xtc()), __name__ )
         self.set_default_pars()
-        #blp.parse_batch_log_data_scan()
+        blp.parse_batch_log_data_scan()
         self.set_fields()
 
 
@@ -270,52 +259,28 @@ class GUIData ( QtGui.QWidget ) :
         cp.bat_data_dt_rms.setDefault()
 
 
+    def set_fields(self):
+        self.edi_bat_start.setText( str( cp.bat_data_start.value() ) )        
+        self.edi_bat_end  .setText( str( cp.bat_data_end  .value() ) )        
+        self.edi_bat_total.setText( str( cp.bat_data_total.value() ) )        
+        self.edi_bat_time .setText( str( cp.bat_data_dt_ave.value() ) + u'\u00B1' + str( cp.bat_data_dt_rms.value() ) )        
 
-    def on_but_plot(self):
-        logger.debug('on_but_plot', __name__)
-        try :
-            cp.imgspewithgui.close()
-        except :
-            arr = gu.get_array_from_file(fnm.path_flat())
-            if arr == None : return
-            logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr)
-            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            cp.imgspewithgui.show()
-
-
-    def on_but_brow (self):       
-        logger.debug('on_but_brow', __name__)
-        try    :
-            cp.guifilebrowser.close()
-        except :
-            cp.guifilebrowser = GUIFileBrowser(None, [fnm.path_flat()])
-            cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
-            cp.guifilebrowser.show()
-
-
-    def on_cbx(self):
-        #if self.cbx_data .hasFocus() :
-        par = cp.is_active_data_gui
-        par.setValue( self.cbx_data.isChecked() )
-        msg = 'on_cbx - set status of ccdcorr_flatfield: ' + str(par.value())
-        logger.info(msg, __name__ )
-        self.setButtonState()
-
-    def on_but_scan(self):
-        logger.debug('on_but_scan', __name__)
-        bjdata.submit_batch_for_data_scan()
 
     def on_but_aver(self):
         logger.debug('on_but_aver', __name__)
 
-        #if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-        #    self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-        #    logger.warning('JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data avaraging.', __name__)
-        #    return
-        #else :
-        #    self.edi_bat_end.setStyleSheet(cp.styleEdit)
-        #bjdata.submit_batch_for_data_aver()
+        if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+            logger.warning('JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data avaraging.', __name__)
+            return
+        else :
+            self.edi_bat_end.setStyleSheet(cp.styleEdit)
+        bjdata.submit_batch_for_data_aver()
+
+
+    def on_but_scan(self):
+        logger.debug('on_but_scan', __name__)
+        bjdata.submit_batch_for_data_scan()
 
 
     def on_but_status(self):
@@ -324,7 +289,7 @@ class GUIData ( QtGui.QWidget ) :
         else                                  : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjdata.check_batch_job_for_data_scan()
         bjdata.check_batch_job_for_data_aver()
-        #blp.parse_batch_log_data_scan()
+        blp.parse_batch_log_data_scan()
         self.set_fields()
 
 
@@ -335,31 +300,91 @@ class GUIData ( QtGui.QWidget ) :
 
 
     def on_edi_bat_start(self):
+        if(not cp.is_active_data_gui.value()) : return
         cp.bat_data_start.setValue( int(self.edi_bat_start.displayText()) )
         logger.info('Set bat_data_start =' + str(cp.bat_data_start.value()), __name__)
 
 
     def on_edi_bat_end(self):
+        if(not cp.is_active_data_gui.value()) : return
         cp.bat_data_end.setValue( int(self.edi_bat_end.displayText()) )
         logger.info('Set bat_data_end =' + str(cp.bat_data_end.value()), __name__)
         self.set_fields()
+
         if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
             self.edi_bat_end.setStyleSheet(cp.styleEditBad)
         else :
             self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
 
-    def set_fields(self):
-        self.edi_bat_start.setText( str( cp.bat_data_start.value() ) )        
-        self.edi_bat_end  .setText( str( cp.bat_data_end  .value() ) )        
-        self.edi_bat_total.setText( str( cp.bat_data_total.value() ) )        
-        self.edi_bat_time .setText( str( cp.bat_data_dt_ave.value() ) + u'\u00B1' + str( cp.bat_data_dt_rms.value() ) )        
+    def on_but_brow (self):       
+        logger.debug('on_but_brow', __name__)
+        try    :
+            cp.guifilebrowser.close()
+        except :
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_data_aver(), fnm.path_data_ave())
+            cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
+            cp.guifilebrowser.show()
 
 
     def on_but_remove(self):
         logger.debug('on_but_remove', __name__)
         bjdata.remove_files_data_aver()
         self.on_but_status()
+
+
+    def on_but_plot(self):
+        logger.debug('on_but_plot', __name__)
+        try :
+            cp.imgspewithgui.close()
+        except :
+            arr = gu.get_array_from_file(fnm.path_data_ave())
+            if arr == None : return
+            logger.debug('Array shape: ' + str(arr.shape), __name__)
+            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_data_aver_plot())
+            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.imgspewithgui.show()
+
+
+    def on_cbx(self):
+        #if self.cbx_data .hasFocus() :
+        par = cp.is_active_data_gui
+        par.setValue( self.cbx_data.isChecked() )
+        msg = 'on_cbx - set status of ccdcorr_flatfield: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
+
+
+    def setButtonState(self):
+        is_active = cp.is_active_data_gui.value()
+
+        self.but_path  .setEnabled( is_active)
+        self.but_plot  .setEnabled( is_active)
+        self.but_brow  .setEnabled( is_active)
+        self.but_scan  .setEnabled( is_active)
+        self.but_aver  .setEnabled( is_active)
+        self.but_remove.setEnabled( is_active)
+        self.but_status.setEnabled( is_active)
+        self.but_wfiles.setEnabled( is_active) 
+
+        self.but_path  .setFlat(not is_active)
+        self.but_plot  .setFlat(not is_active)
+        self.but_brow  .setFlat(not is_active)
+        self.but_scan  .setFlat(not is_active)
+        self.but_aver  .setFlat(not is_active)
+        self.but_remove.setFlat(not is_active)
+        self.but_status.setFlat(not is_active)
+        self.but_wfiles.setFlat(not is_active) 
+
+        if is_active :
+            self.edi_bat_start.setStyleSheet(cp.styleEdit)
+            self.edi_bat_end  .setStyleSheet(cp.styleEdit)
+        else :
+            self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
+            self.edi_bat_end  .setStyleSheet(cp.styleEditInfo)
+
+        self.edi_bat_start.setReadOnly( not is_active ) 
+        self.edi_bat_end  .setReadOnly( not is_active ) 
 
 
 #-----------------------------

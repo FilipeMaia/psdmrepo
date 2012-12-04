@@ -51,18 +51,18 @@ class GUIDark ( QtGui.QWidget ) :
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
+        self.cbx_dark = QtGui.QCheckBox('Use dark correction', self)
+        self.cbx_dark.setChecked( cp.bat_dark_is_used.value() )
+
+        self.edi_path    = QtGui.QLineEdit( fnm.path_dark_xtc() )        
+        self.edi_path.setReadOnly( True )  
+
         self.lab_status  = QtGui.QLabel('Status')
         self.lab_batch   = QtGui.QLabel('Batch')
         self.lab_start   = QtGui.QLabel('Start')
         self.lab_end     = QtGui.QLabel('End')
         self.lab_total   = QtGui.QLabel('Total')
         self.lab_time    = QtGui.QLabel('Time(sec)')
-
-        self.edi_path    = QtGui.QLineEdit( fnm.path_dark_xtc() )        
-        self.edi_path.setReadOnly( True )  
-
-        self.cbx_dark = QtGui.QCheckBox('Use dark correction', self)
-        self.cbx_dark.setChecked( cp.bat_dark_is_used.value() )
 
         self.edi_bat_start  = QtGui.QLineEdit ( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_end    = QtGui.QLineEdit ( str( cp.bat_dark_end  .value() ) )        
@@ -101,7 +101,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_plot,      self.grid_row+4, 3)
         self.grid.addWidget(self.but_browse,    self.grid_row+4, 4) #, 1, 2)
         self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
-        self.grid_row += 3
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),          self.on_but_status    )
@@ -115,9 +114,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_end   )
         self.connect(self.cbx_dark,      QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx           ) 
  
-        #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
-        #self.connect(box, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
-
         self.setLayout(self.grid)
 
         self.showToolTips()
@@ -154,6 +150,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.setMinimumWidth(530)
         self.setStyleSheet(cp.styleBkgd)
         #tit0   .setStyleSheet (cp.styleTitle)
+
+        self.cbx_dark  .setStyleSheet (cp.styleLabel)
         self.lab_status.setStyleSheet (cp.styleLabel)
         self.lab_batch .setStyleSheet (cp.styleLabel)
         self.lab_start .setStyleSheet (cp.styleLabel)
@@ -161,26 +159,23 @@ class GUIDark ( QtGui.QWidget ) :
         self.lab_total .setStyleSheet (cp.styleLabel)
         self.lab_time  .setStyleSheet (cp.styleLabel)
 
-        self.cbx_dark  .setStyleSheet (cp.styleLabel)
-
         self.edi_path   .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
         self.edi_path   .setAlignment  (QtCore.Qt.AlignRight)
-
-        self.edi_bat_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
-
-        self.edi_bat_start.setFixedWidth(width)
-        self.edi_bat_end  .setFixedWidth(width)
-        self.edi_bat_total.setFixedWidth(width)
-        self.but_browse   .setFixedWidth(width) 
-        self.edi_bat_time .setFixedWidth(140)
 
         self.edi_bat_start.setStyleSheet(cp.styleEdit)
         self.edi_bat_end  .setStyleSheet(cp.styleEdit)
         self.edi_bat_total.setStyleSheet(cp.styleEditInfo)
         self.edi_bat_time .setStyleSheet(cp.styleEditInfo)
+
+        self.edi_bat_start.setFixedWidth(width)
+        self.edi_bat_end  .setFixedWidth(width)
+        self.edi_bat_total.setFixedWidth(width)
+        self.edi_bat_time .setFixedWidth(140)
+
+        self.edi_bat_start.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_end  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
 
         self.edi_bat_total.setReadOnly( True ) 
         self.edi_bat_time .setReadOnly( True ) 
@@ -198,14 +193,15 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_submit .setFixedWidth(width)
         self.but_scanner.setFixedWidth(width)
         self.but_plot   .setFixedWidth(width)
+        self.but_browse .setFixedWidth(width) 
         self.but_remove .setFixedWidth(width)
         #self.but_wfiles .setFixedWidth(width)
         #self.but_status .setFixedWidth(width)
 
         self.on_but_status()
     
-    def setParent(self,parent) :
-        self.parent = parent
+    #def setParent(self,parent) :
+    #    self.parent = parent
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
@@ -220,6 +216,9 @@ class GUIDark ( QtGui.QWidget ) :
         logger.debug('closeEvent', __name__)
 
         try    : cp.imgspewithgui.close()
+        except : pass
+
+        try    : cp.guifilebrowser.close()
         except : pass
 
         try    : del cp.guidark # GUIDark
@@ -249,16 +248,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.set_fields()
 
 
-    def on_but_status(self):
-        logger.debug('on_but_status', __name__)
-        if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjpeds.check_batch_job_for_peds_scan()
-        bjpeds.check_batch_job_for_pedestals()
-        blp.parse_batch_log_peds_scan()
-        self.set_fields()
-
-
     def set_default_pars(self):
         cp.bat_dark_start .setDefault()
         cp.bat_dark_end   .setDefault()
@@ -283,11 +272,22 @@ class GUIDark ( QtGui.QWidget ) :
             return
         else :
             self.edi_bat_end.setStyleSheet(cp.styleEdit)
-        bjpeds.submit_batch_for_pedestals()
+        bjpeds.submit_batch_for_peds_aver()
 
     def on_but_scanner(self):
         logger.debug('on_but_scanner', __name__)
         bjpeds.submit_batch_for_peds_scan()
+
+
+    def on_but_status(self):
+        logger.debug('on_but_status', __name__)
+        if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
+        else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
+        bjpeds.check_batch_job_for_peds_scan()
+        bjpeds.check_batch_job_for_peds_scan()
+        blp.parse_batch_log_peds_scan()
+        self.set_fields()
+
 
     def on_but_wfiles(self):
         logger.debug('on_but_wfiles', __name__)
@@ -295,13 +295,16 @@ class GUIDark ( QtGui.QWidget ) :
         bjpeds.check_work_files_for_pedestals()
 
     def on_edi_bat_start(self):
+        if(not cp.bat_dark_is_used.value()) : return
         cp.bat_dark_start.setValue( int(self.edi_bat_start.displayText()) )
         logger.info('Set bat_dark_start =' + str(cp.bat_dark_start.value()), __name__)
 
     def on_edi_bat_end(self):
+        if(not cp.bat_dark_is_used.value()) : return
         cp.bat_dark_end.setValue( int(self.edi_bat_end.displayText()) )
         logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
         self.set_fields()
+
         if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
             self.edi_bat_end.setStyleSheet(cp.styleEditBad)
         else :
@@ -328,7 +331,7 @@ class GUIDark ( QtGui.QWidget ) :
             arr = bjpeds.get_pedestals_from_file()
             if arr == None : return
             #print arr.shape,'\n', arr
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr)
+            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_peds_aver_plot())
             #cp.imgspewithgui.setParent(self)
             cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
             cp.imgspewithgui.show()

@@ -182,7 +182,7 @@ class GUIBlamish ( QtGui.QWidget ) :
             arr = gu.get_array_from_file(fnm.path_blam())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr)
+            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_blam_plot())
             cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20))) # self.parentWidget().pos()
             cp.imgspewithgui.show()
 

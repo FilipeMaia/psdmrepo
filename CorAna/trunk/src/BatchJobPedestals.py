@@ -47,7 +47,7 @@ class BatchJobPedestals :
         """
         self.job_id_peds_str = None
         self.job_id_scan_str = None
-        #self.path_peds_cfg   = fnm.path_pedestals_psana_cfg()
+        #self.path_peds_cfg   = fnm.path_peds_aver_psana_cfg()
 
         self.time_peds_job_submitted = None
         self.time_scan_job_submitted = None
@@ -58,8 +58,8 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def     make_psana_cfg_file_for_pedestals(self) :
-        cfg.make_psana_cfg_file_for_pedestals()
+    def     make_psana_cfg_file_for_peds_aver(self) :
+        cfg.make_psana_cfg_file_for_peds_aver()
 
     def     make_psana_cfg_file_for_peds_scan(self) :
         cfg.make_psana_cfg_file_for_peds_scan()
@@ -86,16 +86,16 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def submit_batch_for_pedestals(self) :
+    def submit_batch_for_peds_aver(self) :
 
         if not self.job_can_be_submitted(self.job_id_peds_str, self.time_peds_job_submitted, 'peds') : return        
         self.time_peds_job_submitted = gu.get_time_sec()
 
-        self.make_psana_cfg_file_for_pedestals()
+        self.make_psana_cfg_file_for_peds_aver()
 
-        command      = 'psana -c ' + fnm.path_pedestals_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_dark_xtc()
         queue        = cp.bat_queue.value()
-        bat_log_file = fnm.path_pedestals_batch_log()
+        bat_log_file = fnm.path_peds_aver_batch_log()
         if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
         self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
@@ -134,7 +134,7 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def check_batch_job_for_pedestals(self) :
+    def check_batch_job_for_peds_aver(self) :
         self.check_batch_job(self.job_id_peds_str, 'peds')
 
 #-----------------------------
@@ -215,9 +215,9 @@ bjpeds = BatchJobPedestals ()
 #
 if __name__ == "__main__" :
 
-    #bjpeds.submit_batch_for_pedestals()
+    #bjpeds.submit_batch_for_peds_aver()
     #gu.sleep_sec(5)
-    #bjpeds.check_batch_job_for_pedestals()
+    #bjpeds.check_batch_job_for_peds_scan()
 
     #bjpeds.submit_batch_for_peds_scan_on_dark_xtc()
     #bjpeds.print_work_files_for_pedestals()

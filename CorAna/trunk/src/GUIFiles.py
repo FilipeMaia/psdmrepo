@@ -242,31 +242,19 @@ class GUIFiles ( QtGui.QWidget ) :
         logger.debug('onShow - is not implemented yet...', __name__)
 
 
-    def on_off_gui_dark(self,but):
-        logger.debug('on_off_gui_dark', __name__)
-        self.tab_bar.setCurrentIndex(0)
-        if bjpeds.status_for_pedestal_file() : but.setStyleSheet(cp.styleButtonGood)
-        else                                 : but.setStyleSheet(cp.styleButtonBad)
+    #def on_off_gui_dark(self,but):
+    #    logger.debug('on_off_gui_dark', __name__)
+    #    self.tab_bar.setCurrentIndex(0)
+    #    if bjpeds.status_for_pedestal_file() : but.setStyleSheet(cp.styleButtonGood)
+    #    else                                 : but.setStyleSheet(cp.styleButtonBad)
 
-#        try :
-#            cp.guidark.close()
-#            but.setStyleSheet(cp.styleButtonBad)
-#        except : # AttributeError: #NameError 
-#            cp.guidark = GUIDark()
-#            cp.guidark.setParent(self)
-#            cp.guidark.move(self.pos().__add__(QtCore.QPoint(20,82))) # open window with offset w.r.t. parent
-#            cp.guidark.show()
-#            but.setStyleSheet(cp.styleButtonGood)
+    #def on_off_gui_flat(self,but):
+    #    logger.debug('on_off_gui_flat', __name__)
+    #    self.tab_bar.setCurrentIndex(1)
 
-
-    def on_off_gui_flat(self,but):
-        logger.debug('on_off_gui_flat', __name__)
-        self.tab_bar.setCurrentIndex(1)
-
-
-    def on_off_gui_data(self,but):
-        logger.debug('on_off_gui_data', __name__)
-        self.tab_bar.setCurrentIndex(2)
+    #def on_off_gui_data(self,but):
+    #    logger.debug('on_off_gui_data', __name__)
+    #    self.tab_bar.setCurrentIndex(2)
 
 
     def setStatus(self, status_index=0, msg=''):

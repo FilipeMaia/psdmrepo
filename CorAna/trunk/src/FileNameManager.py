@@ -85,28 +85,20 @@ class FileNameManager :
 
 #-----------------------------
 
-    def  path_blam(self) :
+    def path_blam(self) :
         return cp.dname_blam.value() + '/' + cp.fname_blam.value()
 
-    def  path_flat(self) :
+    def path_flat(self) :
         return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
+    def path_flat_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'flat-plot.png'
+
+    def path_blam_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'blam-plot.png'
+
+
 #-----------------------------
-
-    def path_pedestals_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds.cfg'
-
-    def path_pedestals_ave(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-ave.txt'
-
-    def path_pedestals_rms(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-rms.txt'
-
-    def path_pedestals_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-batch-log.txt'
-
-    def path_pedestals_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-plot.png'
 
     def path_peds_scan_batch_log(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-batch-log.txt'
@@ -119,6 +111,23 @@ class FileNameManager :
 
     def path_peds_scan_tstamp_list_tmp(self) :
         return  self.path_peds_scan_tstamp_list() + '-tmp'
+
+
+
+    def path_peds_aver_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds.cfg'
+
+    def path_peds_aver_batch_log(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-batch-log.txt'
+
+    def path_pedestals_ave(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-ave.txt'
+
+    def path_pedestals_rms(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-rms.txt'
+
+    def path_peds_aver_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-aver-plot.png'
 
 #-----------------------------
 
@@ -154,6 +163,9 @@ class FileNameManager :
     def path_data_rms(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-rms.txt'
 
+    def path_data_aver_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-aver-plot.png'
+
 #-----------------------------
 
     def  get_list_of_files_data_aver(self) :
@@ -171,9 +183,8 @@ class FileNameManager :
         self.list_of_files_data_aver.append(fnm.path_data_ave())
         self.list_of_files_data_aver.append(fnm.path_data_rms())
 
+        self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
         return self.list_of_files_data_aver
-
-
 
 #-----------------------------
 
@@ -188,15 +199,17 @@ class FileNameManager :
     def  get_list_of_files_pedestals(self) :
         self.list_of_files_pedestals = []
         #self.list_of_files_pedestals.append(self.path_dark_xtc())
-        self.list_of_files_pedestals.append(self.path_pedestals_psana_cfg())
-        self.list_of_files_pedestals.append(self.path_pedestals_batch_log())
-        self.list_of_files_pedestals.append(self.path_pedestals_ave())
-        self.list_of_files_pedestals.append(self.path_pedestals_rms())
         self.list_of_files_pedestals.append(self.path_peds_scan_psana_cfg())
         self.list_of_files_pedestals.append(self.path_peds_scan_batch_log())
         self.list_of_files_pedestals.append(self.path_peds_scan_tstamp_list())
         self.list_of_files_pedestals.append(self.path_peds_scan_tstamp_list_tmp())
-        self.list_of_files_pedestals.append(self.path_pedestals_plot())
+        
+        self.list_of_files_pedestals.append(self.path_peds_aver_psana_cfg())
+        self.list_of_files_pedestals.append(self.path_peds_aver_batch_log())
+        self.list_of_files_pedestals.append(self.path_pedestals_ave())
+        self.list_of_files_pedestals.append(self.path_pedestals_rms())
+
+        self.list_of_files_pedestals.append(self.path_peds_aver_plot())
         return self.list_of_files_pedestals
 
 #-----------------------------
@@ -204,6 +217,7 @@ class FileNameManager :
     def  get_list_of_files_flatfield(self) :
         self.list_of_files_flatfield = []
         self.list_of_files_flatfield.append(fnm.path_flat())
+        self.list_of_files_flatfield.append(fnm.path_flat_plot())
         return self.list_of_files_flatfield
 
 #-----------------------------
@@ -211,6 +225,7 @@ class FileNameManager :
     def  get_list_of_files_blamish(self) :
         self.list_of_files_blamish = []
         self.list_of_files_blamish.append(fnm.path_blam())
+        self.list_of_files_blamish.append(fnm.path_blam_plot())
         return self.list_of_files_blamish
 
 #-----------------------------
@@ -235,10 +250,10 @@ fnm = FileNameManager ()
 if __name__ == "__main__" :
 
     print 'path_pedestals_xtc()       : ', fnm.path_dark_xtc()
-    print 'path_pedestals_psana_cfg() : ', fnm.path_pedestals_psana_cfg()
+    print 'path_peds_aver_psana_cfg() : ', fnm.path_peds_aver_psana_cfg()
     print 'path_pedestals_ave()       : ', fnm.path_pedestals_ave()
     print 'path_pedestals_rms()       : ', fnm.path_pedestals_rms()
-    print 'path_pedestals_batch_log() : ', fnm.path_pedestals_batch_log()
+    print 'path_peds_aver_batch_log() : ', fnm.path_peds_aver_batch_log()
     print 'path_peds_scan_psana_cfg() : ', fnm.path_peds_scan_psana_cfg()
     print 'path_peds_scan_batch_log() : ', fnm.path_peds_scan_batch_log()
     print '\n',

@@ -178,7 +178,7 @@ class GUIFlatField ( QtGui.QWidget ) :
             arr = gu.get_array_from_file(fnm.path_flat())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr)
+            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_flat_plot())
             cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
             cp.imgspewithgui.show()
 

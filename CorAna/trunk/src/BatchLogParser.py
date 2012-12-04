@@ -73,6 +73,26 @@ class BatchLogParser :
             cp.bat_dark_end.setValue(cp.bat_dark_total.value())
 
 #-----------------------------
+
+    def parse_batch_log_data_scan (self) :
+        self.path = fnm.path_data_scan_batch_log()
+        self.dict   = {'BATCH_FRAME_TIME_INTERVAL_AVE'  : cp.bat_data_dt_ave,
+                       'BATCH_FRAME_TIME_INTERVAL_RMS'  : cp.bat_data_dt_rms,
+                       #'BATCH_FRAME_TIME_INDEX_MAX'    : time_ind_max,
+                       #'BATCH_RUN_NUMBER'              : run_num,
+                       #'BATCH_SEC_PER_EVENT'           : rate_sec_per_evt, 
+                       #'BATCH_EVENTS_PER_SEC'          : rate_evt_per_sec,
+                       'BATCH_NUMBER_OF_EVENTS'         : cp.bat_data_total,
+                       'BATCH_PROCESSING_TIME'          : cp.bat_data_time
+                       }
+
+        self.print_dict()
+        self.parse_log_file()
+
+        if  cp.bat_data_end.value() == cp.bat_data_end.value_def() and cp.bat_data_total.value() != cp.bat_data_total.value_def():
+            cp.bat_data_end.setValue(cp.bat_data_total.value())
+
+#-----------------------------
 #-----------------------------
 #-----------------------------
 #-----------------------------
@@ -118,6 +138,7 @@ blp = BatchLogParser ()
 if __name__ == "__main__" :
 
     blp.parse_batch_log_peds_scan()
+    blp.parse_batch_log_data_scan()
 
     sys.exit ( 'End of test for BatchLogParser' )
 
