@@ -126,7 +126,7 @@ Summary:  Current link for PSDM software release %{relname}.
 Current link for PSDM software release %{relname}.
 
 %files -n %{pkg}-%{reltype}current-%{sit_arch_os}
-%{sit_reldir}/ana-current
+%{sit_reldir}/%{reltype}current
 
 # ================= ChangeLog =========================
 
