@@ -53,6 +53,11 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_config_pars(self) :
+        return cp.fname_cp.value()
+
+#-----------------------------
+
     def path_dark_xtc(self) :
         return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
 
@@ -62,20 +67,29 @@ class FileNameManager :
     def path_data_xtc(self) :
         return cp.in_dir_data.value() + '/' + cp.in_file_data.value()
 
+
+
     def str_exp_run_dark(self) :
-        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_dark_xtc())
-        if experiment == None : return 'exp-run-'
-        else                  : return experiment + '-' + run_str + '-'
+        return self.str_exp_run_for_xtc_path(self.path_dark_xtc())
 
     def str_exp_run_flat(self) :
-        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_flat_xtc())
-        if experiment == None : return 'exp-run-'
-        else                  : return experiment + '-' + run_str + '-'
+        return self.str_exp_run_for_xtc_path(self.path_flat_xtc())
 
     def str_exp_run_data(self) :
+        return self.str_exp_run_for_xtc_path(self.path_data_xtc())
+
+    def str_exp_run_for_xtc_path(self, path) :
         instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_data_xtc())
         if experiment == None : return 'exp-run-'
         else                  : return experiment + '-' + run_str + '-'
+
+#-----------------------------
+
+    def  path_blam(self) :
+        return cp.dname_blam.value() + '/' + cp.fname_blam.value()
+
+    def  path_flat(self) :
+        return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
 #-----------------------------
 
@@ -108,6 +122,69 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_data_scan_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan.cfg'
+
+    def path_data_scan_batch_log(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-scan-batch-log.txt'
+
+    def path_data_scan_monitors_data(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-mons-data.txt'
+
+    def path_data_scan_monitors_commments(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-mons-comments.txt'
+
+    def path_data_scan_tstamp_list(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-tstamp-list.txt'
+
+    def path_data_scan_tstamp_list_tmp(self) :
+        return  self.path_data_scan_tstamp_list() + '-tmp'
+
+
+
+    def path_data_aver_psana_cfg(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver.cfg'
+
+    def path_data_aver_batch_log(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-aver-batch-log.txt'
+
+    def path_data_ave(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-ave.txt'
+
+    def path_data_rms(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-rms.txt'
+
+#-----------------------------
+
+    def  get_list_of_files_data_aver(self) :
+        self.list_of_files_data_aver  = []
+        #self.list_of_files_data_aver.append(fnm.path_data_xtc())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_psana_cfg())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_batch_log())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_monitors_data())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_monitors_commments())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_tstamp_list())
+        self.list_of_files_data_aver.append(fnm.path_data_scan_tstamp_list_tmp())
+
+        self.list_of_files_data_aver.append(fnm.path_data_aver_psana_cfg())
+        self.list_of_files_data_aver.append(fnm.path_data_aver_batch_log())
+        self.list_of_files_data_aver.append(fnm.path_data_ave())
+        self.list_of_files_data_aver.append(fnm.path_data_rms())
+
+        return self.list_of_files_data_aver
+
+
+
+#-----------------------------
+
+    def  get_list_of_files_data(self) :
+        self.list_of_files_data  = []
+        self.list_of_files_data.append(fnm.path_data_xtc())
+        return self.list_of_files_data
+
+
+#-----------------------------
+
     def  get_list_of_files_pedestals(self) :
         self.list_of_files_pedestals = []
         #self.list_of_files_pedestals.append(self.path_dark_xtc())
@@ -126,30 +203,28 @@ class FileNameManager :
 
     def  get_list_of_files_flatfield(self) :
         self.list_of_files_flatfield = []
+        self.list_of_files_flatfield.append(fnm.path_flat())
         return self.list_of_files_flatfield
 
 #-----------------------------
 
-    def  get_list_of_files_data(self) :
-        self.list_of_files_data = []
-        return self.list_of_files_data
+    def  get_list_of_files_blamish(self) :
+        self.list_of_files_blamish = []
+        self.list_of_files_blamish.append(fnm.path_blam())
+        return self.list_of_files_blamish
 
 #-----------------------------
 
     def get_list_of_files_total(self) :
         self.list_of_files_total  = []
+        self.list_of_files_total.append(fnm.path_config_pars())
         self.list_of_files_total += fnm.get_list_of_files_pedestals()
         self.list_of_files_total += fnm.get_list_of_files_flatfield()
-        self.list_of_files_total += fnm.get_list_of_files_data()
+        self.list_of_files_total += fnm.get_list_of_files_blamish()
+        self.list_of_files_total += fnm.get_list_of_files_data_aver()
         return self.list_of_files_total
 
 #-----------------------------
-
-    def  path_blam(self) :
-        return cp.dname_blam.value() + '/' + cp.fname_blam.value()
-
-    def  path_flat(self) :
-        return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
 #-----------------------------
 

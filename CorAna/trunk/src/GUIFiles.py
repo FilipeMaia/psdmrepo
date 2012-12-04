@@ -31,6 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
 from GUIDark                import *
+from GUIData                import *
 from GUIFlatField           import *
 from GUIBlamish             import *
 from GUIWorkResDirs         import *
@@ -142,7 +143,9 @@ class GUIFiles ( QtGui.QWidget ) :
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 
         #self.tab_bar.setTabEnabled(1, False)
-        self.tab_bar.setTabEnabled(3, False)
+        #self.tab_bar.setTabEnabled(2, False)
+        #self.tab_bar.setTabEnabled(3, False)
+        #self.tab_bar.setTabEnabled(4, False)
         
         try    :
             tab_index = self.list_file_types.index(cp.current_file_tab.value())
@@ -176,9 +179,9 @@ class GUIFiles ( QtGui.QWidget ) :
             self.gui_win = GUIBlamish(self)
             self.setStatus(0, 'Status: set file for blamish mask')
 
-#        if cp.current_file_tab.value() == self.list_file_types[3] :
-#            self.gui_win = GUIData(self)
-#            self.setStatus(0, 'Status: processing for data')
+        if cp.current_file_tab.value() == self.list_file_types[3] :
+            self.gui_win = GUIData(self)
+            self.setStatus(0, 'Status: processing for data')
 
         if cp.current_file_tab.value() == self.list_file_types[4] :
             self.gui_win = GUIConfigParameters(self)

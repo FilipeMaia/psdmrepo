@@ -31,10 +31,10 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from BatchJobPedestals      import bjpeds
 from ImgSpeWithGUI          import *
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
+from BatchJobPedestals      import bjpeds
 
 
 #import GlobalGraphics       as gg
@@ -74,7 +74,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_wfiles  = QtGui.QPushButton('Check files')
         self.but_submit  = QtGui.QPushButton('Pedestal')
         self.but_scanner = QtGui.QPushButton('Scanner')
-        self.but_browse  = QtGui.QPushButton('Browse files')
+        self.but_browse  = QtGui.QPushButton('Browse')
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
 
@@ -83,7 +83,7 @@ class GUIDark ( QtGui.QWidget ) :
         #self.grid.addWidget(self.tit_path,     self.grid_row,   0)
         self.grid.addWidget(self.cbx_dark,      self.grid_row,   0, 1, 6)
         self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
-        self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 6)
+        self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
         self.grid.addWidget(self.lab_batch,     self.grid_row+2, 0)
         self.grid.addWidget(self.lab_status,    self.grid_row+2, 1, 1, 2)
         self.grid.addWidget(self.lab_start,     self.grid_row+2, 3)
@@ -95,12 +95,12 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_bat_start, self.grid_row+3, 3)
         self.grid.addWidget(self.edi_bat_end,   self.grid_row+3, 4)
         self.grid.addWidget(self.edi_bat_total, self.grid_row+3, 5)
-        self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6)
+        self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6, 1, 2)
         self.grid.addWidget(self.but_submit,    self.grid_row+4, 0)
         self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
         self.grid.addWidget(self.but_plot,      self.grid_row+4, 3)
-        self.grid.addWidget(self.but_browse,    self.grid_row+4, 4, 1, 2)
-        self.grid.addWidget(self.but_remove,    self.grid_row+4, 6)
+        self.grid.addWidget(self.but_browse,    self.grid_row+4, 4) #, 1, 2)
+        self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
         self.grid_row += 3
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
@@ -131,11 +131,12 @@ class GUIDark ( QtGui.QWidget ) :
     def showToolTips(self):
         #self           .setToolTip('Use this GUI to work with xtc file.')
         self.edi_path   .setToolTip('The path to the xtc file for processing in this GUI')
+        self.but_path   .setToolTip('Push this button and select \nthe xtc file for dark run')
         self.but_status .setToolTip('Print batch job status \nin the logger')
         self.but_submit .setToolTip('Submit job in batch for pedestals')
         self.but_scanner.setToolTip('Submit job in batch for scanner')
         self.but_wfiles .setToolTip('List pedestal work files \nand check their availability')
-        self.but_browse .setToolTip('Browse files relevant to this GUI')
+        self.but_browse .setToolTip('Browse files for this GUI')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
         self.cbx_dark   .setToolTip('Check this box \nto process and use \ndark run correction')
@@ -173,6 +174,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.edi_bat_start.setFixedWidth(width)
         self.edi_bat_end  .setFixedWidth(width)
         self.edi_bat_total.setFixedWidth(width)
+        self.but_browse   .setFixedWidth(width) 
         self.edi_bat_time .setFixedWidth(140)
 
         self.edi_bat_start.setStyleSheet(cp.styleEdit)
@@ -248,7 +250,7 @@ class GUIDark ( QtGui.QWidget ) :
 
 
     def on_but_status(self):
-        logger.debug('on_but_status - not implemented yet...', __name__)
+        logger.debug('on_but_status', __name__)
         if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjpeds.check_batch_job_for_peds_scan()
@@ -312,7 +314,7 @@ class GUIDark ( QtGui.QWidget ) :
             self.but_browse.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_browse.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_pedestals())
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_pedestals(), selected_file=fnm.path_pedestals_ave())
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 

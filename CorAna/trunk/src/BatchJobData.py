@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module BatchJobPedestals...
+#  Module BatchJobData...
 #
 #------------------------------------------------------------------------
 
-"""Deals with batch jobs for pedestals
+"""Deals with batch jobs for data
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -37,19 +37,19 @@ import GlobalUtils            as     gu
 
 #-----------------------------
 
-class BatchJobPedestals :
-    """Deals with batch jobs for pedestals.
+class BatchJobData :
+    """Deals with batch jobs for data.
     """
 
     def __init__ (self) :
         """Constructor.
-        @param fname  the file name for output log file
+        @param fname the file name for ...
         """
-        self.job_id_peds_str = None
-        self.job_id_scan_str = None
-        #self.path_peds_cfg   = fnm.path_pedestals_psana_cfg()
+        self.job_id_data_aver = None
+        self.job_id_data_scan = None
+        #self.path_peds_cfg   = fnm.path_data_aver_psana_cfg()
 
-        self.time_peds_job_submitted = None
+        self.time_aver_job_submitted = None
         self.time_scan_job_submitted = None
 
         self.time_interval_sec      = 100
@@ -58,51 +58,51 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def     make_psana_cfg_file_for_pedestals(self) :
-        cfg.make_psana_cfg_file_for_pedestals()
+    def     make_psana_cfg_file_for_data_scan(self) :
+        cfg.make_psana_cfg_file_for_data_scan()
 
-    def     make_psana_cfg_file_for_peds_scan(self) :
-        cfg.make_psana_cfg_file_for_peds_scan()
+    def     make_psana_cfg_file_for_data_aver(self) :
+        cfg.make_psana_cfg_file_for_data_aver()
 
 #-----------------------------
 
-    def submit_batch_for_peds_scan(self) :
+    def submit_batch_for_data_scan(self) :
 
-        if not self.job_can_be_submitted(self.job_id_scan_str, self.time_scan_job_submitted, 'scan') : return
+        if not self.job_can_be_submitted(self.job_id_data_scan, self.time_scan_job_submitted, 'data scan') : return
         self.time_scan_job_submitted = gu.get_time_sec()
 
-        self.make_psana_cfg_file_for_peds_scan()
+        self.make_psana_cfg_file_for_data_scan()
 
-        command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_data_scan_psana_cfg() + ' ' + fnm.path_data_xtc()
         queue        = cp.bat_queue.value()
-        bat_log_file = fnm.path_peds_scan_batch_log()
+        bat_log_file = fnm.path_data_scan_batch_log()
         if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
-        self.job_id_scan_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        self.job_id_data_scan, out, err = gu.batch_job_submit(command, queue, bat_log_file)
 
         if err != '' : logger.warning( err, __name__) 
         logger.info(out, __name__) 
-        #logger.debug('   Submit batch for scan on dark run, job Id: ' + self.job_id_scan_str, __name__) 
+        #logger.debug('Submit batch for scan on data run, job Id: ' + self.job_id_data_scan, __name__)
 
 #-----------------------------
 
-    def submit_batch_for_pedestals(self) :
+    def submit_batch_for_data_aver(self) :
 
-        if not self.job_can_be_submitted(self.job_id_peds_str, self.time_peds_job_submitted, 'peds') : return        
-        self.time_peds_job_submitted = gu.get_time_sec()
+        if not self.job_can_be_submitted(self.job_id_data_aver, self.time_aver_job_submitted, 'data aver') : return        
+        self.time_aver_job_submitted = gu.get_time_sec()
 
-        self.make_psana_cfg_file_for_pedestals()
+        self.make_psana_cfg_file_for_data_aver()
 
-        command      = 'psana -c ' + fnm.path_pedestals_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_data_aver_psana_cfg() + ' ' + fnm.path_data_xtc()
         queue        = cp.bat_queue.value()
-        bat_log_file = fnm.path_pedestals_batch_log()
+        bat_log_file = fnm.path_data_aver_batch_log()
         if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
-        self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        self.job_id_data_aver, out, err = gu.batch_job_submit(command, queue, bat_log_file)
 
         if err != '' : logger.warning(err, __name__) 
         logger.info(out, __name__) 
-        #logger.debug('   Submit batch for pedestals on dark run, job Id: ' + self.job_id_peds_str, __name__) 
+        #logger.debug('   Submit batch for pedestals on data run, job Id: ' + self.job_id_data_aver, __name__) 
 
 #-----------------------------
 
@@ -134,13 +134,13 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def check_batch_job_for_pedestals(self) :
-        self.check_batch_job(self.job_id_peds_str, 'peds')
+    def check_batch_job_for_data_aver(self) :
+        self.check_batch_job(self.job_id_data_aver, 'data average')
 
 #-----------------------------
 
-    def check_batch_job_for_peds_scan(self) :
-        self.check_batch_job(self.job_id_scan_str, 'scan')
+    def check_batch_job_for_data_scan(self) :
+        self.check_batch_job(self.job_id_data_scan, 'data scan')
 
 #-----------------------------
 
@@ -170,44 +170,44 @@ class BatchJobPedestals :
 
 #-----------------------------
 
-    def print_work_files_for_pedestals(self) :
-        logger.info('Print work files for dark run / pedestals:', __name__)         
-        for fname in fnm.get_list_of_files_pedestals() :
+    def print_work_files_for_data_aver(self) :
+        logger.info('Print work files for data scan / average:', __name__)         
+        for fname in fnm.get_list_of_files_data_aver() :
             logger.info(fname)         
 
 #-----------------------------
 
-    def check_work_files_for_pedestals(self) :
-        logger.info('Check work files for dark run / pedestals:', __name__)         
-        for fname in fnm.get_list_of_files_pedestals() :
+    def check_work_files_for_data_aver(self) :
+        logger.info('Check work files for data scan / average:', __name__)         
+        for fname in fnm.get_list_of_files_data_aver() :
             msg = '%s %s' % ( fname.ljust(100), self.dict_status[os.path.lexists(fname)] )
             logger.info(msg)         
 
 #-----------------------------
 
-    def remove_files_pedestals(self) :
-        logger.info('Remove pedestal work files for selected run:', __name__)
-        for fname in fnm.get_list_of_files_pedestals() :
+    def remove_files_data_aver(self) :
+        logger.info('Remove data_average work files for selected run:', __name__)
+        for fname in fnm.get_list_of_files_data_aver() :
             if os.path.lexists(fname) :
                 gu.remove_file(fname)
                 logger.info('Removed: ' + fname)
 
 #-----------------------------
 
-    def status_for_pedestal_file(self) :
-        fname  = fnm.path_pedestals_ave()
+    def status_for_data_aver_file(self) :
+        fname  = fnm.path_data_ave()
         status = os.path.lexists(fname)
-        logger.info('Status: pedestal file ' + fname + self.dict_status[status], __name__) 
+        logger.info('Status: data file ' + fname + self.dict_status[status], __name__) 
         return status
 
 #-----------------------------
 
-    def get_pedestals_from_file(self) :
-        return gu.get_array_from_file( fnm.path_pedestals_ave() )
+    def get_data_aver_from_file(self) :
+        return gu.get_array_from_file( fnm.path_data_aver() )
 
 #-----------------------------
 
-bjpeds = BatchJobPedestals ()
+bjdata = BatchJobData ()
 
 #-----------------------------
 #
@@ -215,14 +215,14 @@ bjpeds = BatchJobPedestals ()
 #
 if __name__ == "__main__" :
 
-    #bjpeds.submit_batch_for_pedestals()
+    #bjdata.submit_batch_for_data_aver()
     #gu.sleep_sec(5)
-    #bjpeds.check_batch_job_for_pedestals()
+    #bjdata.check_batch_job_for_data_aver()
 
-    #bjpeds.submit_batch_for_peds_scan_on_dark_xtc()
-    #bjpeds.print_work_files_for_pedestals()
-    bjpeds.check_work_files_for_pedestals()
+    #bjdata.submit_batch_for_data_scan_on_data_xtc()
+    #bjdata.print_work_files_for_data_aver()
+    bjdata.check_work_files_for_data_aver()
 
-    sys.exit ( 'End of test for BatchJobPedestals' )
+    sys.exit ( 'End of test for BatchJobData' )
 
 #-----------------------------

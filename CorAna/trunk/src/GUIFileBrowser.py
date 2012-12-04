@@ -39,7 +39,7 @@ import GlobalUtils          as     gu
 class GUIFileBrowser ( QtGui.QWidget ) :
     """GUI File Browser"""
 
-    def __init__ ( self, parent=None, list_of_files=['Empty list']) :
+    def __init__ ( self, parent=None, list_of_files=['Empty list'], selected_file=None) :
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -78,7 +78,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.box_file, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
  
-        self.startFileBrowser()
+        self.startFileBrowser(selected_file)
 
         self.showToolTips()
         self.setStyle()
@@ -161,7 +161,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         fname = str( self.box_file.currentText() )
         logger.info('onBox - selected file: ' + fname, __name__)
 
-        self.list_of_supported = 'cfg', 'txt' 
+        self.list_of_supported = 'cfg', 'txt', 'txt-tmp' 
         self.str_of_supported = ''
         for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
 
@@ -187,11 +187,15 @@ class GUIFileBrowser ( QtGui.QWidget ) :
             self.setStatus(2, 'Status: WARNING: FILE IS NOT AVAILABLE!')
 
 
-    def startFileBrowser(self) :
+    def startFileBrowser(self, selected_file=None) :
         logger.debug('Start the GUIFileBrowser.',__name__)
         self.setStatus(0, 'Waiting for file selection...')
 
-        if len(self.list_of_files) == 2 :
+        if selected_file != None and selected_file in self.list_of_files :
+            index = self.list_of_files.index(selected_file)
+            self.box_file.setCurrentIndex( index )
+
+        elif len(self.list_of_files) == 2 :
             self.box_file.setCurrentIndex( 1 )
             #self.onBox()      
         else :

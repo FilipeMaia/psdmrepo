@@ -77,29 +77,43 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 #        self.str_run_number     = self.declareParameter( name='RUN_NUMBER',        val_def='0015',         typ='str' ) 
 #        self.str_run_number_dark= self.declareParameter( name='RUN_NUMBER_DARK',   val_def='0014',         typ='str' ) 
 
-        # GUIFiles.py
-        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
-        self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
-        self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
-        self.in_dir_data       = self.declareParameter( name='IN_DIRECTORY_DATA', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
-        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',typ='str' )
-        self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='e167-r0020-s00-c00.xtc',typ='str' )
-        self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='e167-r0020-s00-c00.xtc',typ='str' )
-        self.in_file_data      = self.declareParameter( name='IN_FILE_NAME_DATA', val_def='e167-r0020-s00-c00.xtc',typ='str' )
-        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK'   , val_def='./work',       typ='str' )
-        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
-        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX' , val_def='cora-',        typ='str' )
-        self.log_level         = self.declareParameter( name='LOG_LEVEL_OF_MSGS', val_def='info',         typ='str' )
-        self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Work/Results', typ='str' )
-
         # GUIMainTB.py
         # GUIMainSplit.py
         self.current_tab       = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        typ='str' )
 
-        self.dname_blam         = self.declareParameter( name='DIRECTORY_BLAM', val_def='.',typ='str' )
-        self.fname_blam         = self.declareParameter( name='FILE_NAME_BLAM', val_def='blamish.txt',typ='str' )
+        # GUILogger.py
+        self.log_level         = self.declareParameter( name='LOG_LEVEL_OF_MSGS', val_def='info',         typ='str' )
+
+        # GUIFiles.py
+        self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Work/Results', typ='str' )
+
+        # GUIWorkResDirs.py
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK'   , val_def='./work',       typ='str' )
+        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS', val_def='./results',    typ='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX' , val_def='cora-',        typ='str' )
+
+        # GUIDark.py
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',typ='str' )
+
+        # GUIFlatField.py
+        self.ccdcorr_flatfield  = self.declareParameter( name='CCD_CORRECTION_FLATFIELD',     val_def=False,  typ='bool' )
         self.dname_flat         = self.declareParameter( name='DIRECTORY_FLAT', val_def='.',typ='str' )
         self.fname_flat         = self.declareParameter( name='FILE_NAME_FLAT', val_def='flat_field.txt',typ='str' )
+        #self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        #self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='e167-r0020-s00-c00.xtc',typ='str' )
+
+        # GUIBlamish.py
+        self.ccdcorr_blemish    = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  typ='bool' )
+        self.dname_blam         = self.declareParameter( name='DIRECTORY_BLAM', val_def='.',typ='str' )
+        self.fname_blam         = self.declareParameter( name='FILE_NAME_BLAM', val_def='blamish.txt',typ='str' )
+        #self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        #self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='e167-r0020-s00-c00.xtc',typ='str' )
+
+        # GUIData.py
+        self.is_active_data_gui = self.declareParameter( name='IS_ACTIVE_DATA_GUI', val_def=True,  typ='bool' )
+        self.in_dir_data        = self.declareParameter( name='IN_DIRECTORY_DATA',  val_def='/reg/d/psdm/XCS/xcsi0112/xtc',typ='str' )
+        self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0020-s00-c00.xtc',typ='str' )
 
         # GUIBeamZeroPars.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     typ='float' ) 
@@ -143,6 +157,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_data_end      = self.declareParameter( name='BATCH_DATA_END'  ,      val_def=-1,       typ='int' )
         self.bat_data_total    = self.declareParameter( name='BATCH_DATA_TOTAL',      val_def=-1,       typ='int' )
         self.bat_data_time     = self.declareParameter( name='BATCH_DATA_TIME' ,      val_def=-1.0,     typ='float' )
+        self.bat_data_dt_ave   = self.declareParameter( name='BATCH_DATA_DT_AVE',     val_def=-1.0,     typ='float' )
+        self.bat_data_dt_rms   = self.declareParameter( name='BATCH_DATA_DT_RMS',     val_def=0.0,      typ='float' )
         self.bat_dark_is_used  = self.declareParameter( name='BATCH_DARK_IS_USED',    val_def=True,     typ='bool' )
         self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       typ='int' )
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       typ='int' )
@@ -203,10 +219,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',typ='str' )
         self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      typ='float' )
         self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      typ='float' )
-
-        # GUICCDCorrectionSettings.py
-        self.ccdcorr_blemish         = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  typ='bool' )
-        self.ccdcorr_flatfield       = self.declareParameter( name='CCD_CORRECTION_FLATFIELD',     val_def=False,  typ='bool' )
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   typ='float' )
