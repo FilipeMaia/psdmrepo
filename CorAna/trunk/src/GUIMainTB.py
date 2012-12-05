@@ -323,6 +323,9 @@ class GUIMainTB ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
 
+        try    : cp.imgspewithgui.close()
+        except : pass
+
         try    : del cp.guimain
         except : pass
 

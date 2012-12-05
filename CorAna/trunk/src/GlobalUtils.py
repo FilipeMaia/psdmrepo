@@ -303,7 +303,6 @@ def get_current_local_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
 def get_current_gm_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
     return strftime(fmt, gmtime())
 
-
 #----------------------------------
 #----------------------------------
 #----------------------------------
@@ -315,6 +314,23 @@ def get_array_from_file(fname) :
     else :
         logger.warning(fname + ' is not available', __name__)         
         return None
+
+#----------------------------------
+
+def get_text_tuple_from_file(fname) :
+    if not os.path.lexists(fname) :
+        logger.warning(fname + ' is not available', __name__)         
+        return None
+    logger.info('Read text array from file: ' + fname, __name__)         
+
+    t = []    
+    f=open(fname,'r')
+    for line in f :
+        if len(line) == 1 : continue # line is empty
+        fields = line.rstrip('\n').split() #,1)
+        t.append(fields)
+    f.close() 
+    return t
 
 #-----------------------------
 

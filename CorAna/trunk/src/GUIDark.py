@@ -98,8 +98,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6, 1, 2)
         self.grid.addWidget(self.but_submit,    self.grid_row+4, 0)
         self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
-        self.grid.addWidget(self.but_plot,      self.grid_row+4, 3)
-        self.grid.addWidget(self.but_browse,    self.grid_row+4, 4) #, 1, 2)
+        self.grid.addWidget(self.but_browse,    self.grid_row+4, 3) #, 1, 2)
+        self.grid.addWidget(self.but_plot,      self.grid_row+4, 4)
         self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
@@ -215,8 +215,8 @@ class GUIDark ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.imgspewithgui.close()
-        except : pass
+        #try    : cp.imgspewithgui.close()
+        #except : pass
 
         try    : cp.guifilebrowser.close()
         except : pass
@@ -284,7 +284,7 @@ class GUIDark ( QtGui.QWidget ) :
         if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjpeds.check_batch_job_for_peds_scan()
-        bjpeds.check_batch_job_for_peds_scan()
+        bjpeds.check_batch_job_for_peds_aver()
         blp.parse_batch_log_peds_scan()
         self.set_fields()
 

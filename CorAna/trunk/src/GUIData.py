@@ -69,6 +69,7 @@ class GUIData ( QtGui.QWidget ) :
  
         self.but_path   = QtGui.QPushButton('File:')
         self.but_plot   = QtGui.QPushButton('Plot')
+        self.but_tspl   = QtGui.QPushButton('t-Plot')
         self.but_brow   = QtGui.QPushButton('Browse')
         self.but_scan   = QtGui.QPushButton('Scan')
         self.but_aver   = QtGui.QPushButton('Average')
@@ -99,12 +100,14 @@ class GUIData ( QtGui.QWidget ) :
 
         self.grid.addWidget(self.but_aver,      self.grid_row+4, 0)
         self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
-        self.grid.addWidget(self.but_plot,      self.grid_row+4, 3)
-        self.grid.addWidget(self.but_brow,      self.grid_row+4, 4, 1, 2)
+        self.grid.addWidget(self.but_brow,      self.grid_row+4, 3)
+        self.grid.addWidget(self.but_plot,      self.grid_row+4, 4)
+        self.grid.addWidget(self.but_tspl,      self.grid_row+4, 5)
         self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),         self.on_but_path )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),         self.on_but_plot )
+        self.connect(self.but_tspl,      QtCore.SIGNAL('clicked()'),         self.on_but_tspl )
         self.connect(self.but_brow,      QtCore.SIGNAL('clicked()'),         self.on_but_brow )
         self.connect(self.but_aver,      QtCore.SIGNAL('clicked()'),         self.on_but_aver )
         self.connect(self.but_scan,      QtCore.SIGNAL('clicked()'),         self.on_but_scan )
@@ -130,6 +133,7 @@ class GUIData ( QtGui.QWidget ) :
         self.edi_path  .setToolTip('The path to the xtc data file for processing')
         self.but_path  .setToolTip('Push this button and select the xtc data file')
         self.but_plot  .setToolTip('Plot image and spectrum for averaged data image')
+        self.but_tspl  .setToolTip('Plot for time stamps quality check')
         self.but_brow  .setToolTip('Browse files for this procedure')
         self.but_scan  .setToolTip('Scan entire run and \n1) count number of events \n2) save time stamps \n3) save intensity monitors')
         self.but_aver  .setToolTip('Average image for \nselected event range')
@@ -184,6 +188,7 @@ class GUIData ( QtGui.QWidget ) :
 
         self.but_path  .setStyleSheet (cp.styleButton)
         self.but_plot  .setStyleSheet (cp.styleButton) 
+        self.but_tspl  .setStyleSheet (cp.styleButton) 
         self.but_brow  .setStyleSheet (cp.styleButton) 
         self.but_scan  .setStyleSheet (cp.styleButton) 
         self.but_aver  .setStyleSheet (cp.styleButton) 
@@ -193,6 +198,7 @@ class GUIData ( QtGui.QWidget ) :
      
         self.but_path  .setFixedWidth (width)
         self.but_plot  .setFixedWidth (width)
+        self.but_tspl  .setFixedWidth (width)
         self.but_brow  .setFixedWidth (width)
         self.but_scan  .setFixedWidth (width)
         self.but_aver  .setFixedWidth (width)
@@ -216,8 +222,8 @@ class GUIData ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.imgspewithgui.close()
-        except : pass
+        #try    : cp.imgspewithgui.close()
+        #except : pass
 
         try    : cp.guifilebrowser.close()
         except : pass
@@ -321,9 +327,11 @@ class GUIData ( QtGui.QWidget ) :
         logger.debug('on_but_brow', __name__)
         try    :
             cp.guifilebrowser.close()
+            self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
+            self.but_brow.setStyleSheet(cp.styleButtonGood)
             cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_data_aver(), fnm.path_data_ave())
-            cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
+            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40)))
             cp.guifilebrowser.show()
 
 
@@ -344,6 +352,38 @@ class GUIData ( QtGui.QWidget ) :
             cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_data_aver_plot())
             cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
             cp.imgspewithgui.show()
+
+
+    def on_but_tspl(self):
+        logger.debug('on_but_tspl', __name__)
+        try :
+            cp.tsplotwithgui.close()
+        except :
+            self.get_time_stamp_arrays()
+            #cp.tsplotwithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_data_aver_plot())
+            #cp.tsplotwithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            #cp.tsplotwithgui.show()
+
+
+    def get_time_stamp_arrays(self):
+        logger.debug('on_but_tspl', __name__)
+        tup = gu.get_text_tuple_from_file(fnm.path_data_scan_tstamp_list())
+        if tup == None : return
+        #logger.debug('Array shape: ' + str(arr.shape), __name__)
+        #tup[1][:] = ['1', '8.026429', '8.026429', '20120616-080244.698036743', '8255', '1', '1']
+        self.arr_ind_ev = []
+        self.arr_ind_t  = []
+        self.arr_t      = []
+        self.arr_dt     = []
+
+        for rec in tup :
+            ind_ev, t, dt, ind_t = int(rec[0]), float(rec[1]), float(rec[2]), int(rec[6])
+            self.arr_ind_ev.append(ind_ev)
+            self.arr_ind_t .append(ind_t)
+            self.arr_t     .append(t)
+            self.arr_dt    .append(dt)
+            #print 'ind_ev, ind_t, t, dt=', ind_ev, ind_t, t, dt
+        #print 'arr_t=', self.arr_t
 
 
     def on_cbx(self):
