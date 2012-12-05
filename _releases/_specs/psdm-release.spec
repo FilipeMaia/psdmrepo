@@ -70,7 +70,7 @@ find . -maxdepth 1 -wholename . -o -wholename ./arch -o -wholename ./build \
 %install
 . %{sit_root}/bin/sit_setup.sh -a %{sit_arch_base}-opt
 scons install DESTDIR=%{buildroot}/%{instdir}
-ln -sfT %{relname} %{buildroot}/%{sit_reldir}/%{reltype}current
+ln -sfT %{relname} %{buildroot}/%{sit_reldir}/%{reltype}current-%{sit_arch_os}
 
 %clean
 rm -rf %{buildroot}
@@ -126,7 +126,7 @@ Summary:  Current link for PSDM software release %{relname}.
 Current link for PSDM software release %{relname}.
 
 %files -n %{pkg}-%{reltype}current-%{sit_arch_os}
-%{sit_reldir}/%{reltype}current
+%{sit_reldir}/%{reltype}current-%{sit_arch_os}
 
 # ================= ChangeLog =========================
 
