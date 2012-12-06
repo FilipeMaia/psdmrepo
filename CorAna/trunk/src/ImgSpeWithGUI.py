@@ -60,11 +60,11 @@ class ImgSpeWithGUI (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, figsize=(5,10), ofname='./fig.png'):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 500, 600)
-        self.setWindowTitle('GUI with plot')
+        self.setGeometry(20, 40, 600, 700)
+        self.setWindowTitle('Plot for image')
         self.setFrame()
 
         self.widgimage   = imgwidg.ImgSpeWidget(parent, arr)

@@ -53,11 +53,12 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.setWindowTitle('GUI of buttons')
 
         self.setFrame()
-        self.widgimage = widgimage
+
         self.parent    = parent
-        self.fig       = widgimage.fig
-        self.fig       = widgimage.fig
         self.ofname    = ofname
+
+        self.widgimage = widgimage
+        self.fig       = widgimage.fig
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -77,6 +78,10 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.but_quit .setFixedWidth(width)
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
  
+        self.but_help.setStyleSheet (cp.styleButtonGood) 
+        self.but_save.setStyleSheet (cp.styleButtonGood) 
+        self.but_quit.setStyleSheet (cp.styleButtonBad) 
+
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
         self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
@@ -203,18 +208,18 @@ class ImgSpeButtons (QtGui.QWidget) :
             del self.guihelp
         except :
             self.guihelp = GUIHelp(None,self.help_message())
+            self.guihelp.setFixedSize(620,160) 
             self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
             self.guihelp.show()
 
 
     def help_message(self):
         msg  = 'Mouse control functions:'
-        msg += '\nZoom-in image: left mouse button click on image, move mouse and release in another image position.'
-        msg += '\nReset image: middle mouse button click on image.'
-        msg += '\nSet minimal amplitude: left mouse button click on histogram or color bar scale.' 
-        msg += '\nSet maximal amplitude: right mouse button click on histogram or color bar scale.' 
-        msg += '\nReset amplitude limits to default: middle mouse button click on histogram or color bar.'
-        msg += '\nReset image and histogram to default: click on "Reset" button.'
+        msg += '\nZoom-in image: left mouse click, move, and release in another image position.'
+        msg += '\nMiddle mouse button click on image - restores full size image'
+        msg += '\nLeft/right mouse click on histogram or color bar - sets min/max amplitude.' 
+        msg += '\nMiddle mouse click on histogram or color bar - resets amplitude limits to default.'
+        msg += '\n"Reset" button - resets all parameters to default values.'
         return msg
 
 

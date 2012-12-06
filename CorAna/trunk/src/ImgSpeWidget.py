@@ -65,9 +65,9 @@ class ImgSpeWidget (QtGui.QWidget) :
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
-        vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
-        vbox.addWidget(self.canvas)        # <=== Add figure 
-        self.setLayout(vbox)
+        self.vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
+        self.vbox.addWidget(self.canvas)        # <=== Add figure 
+        self.setLayout(self.vbox)
         #-----------------------------------
 
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
@@ -163,8 +163,8 @@ class ImgSpeWidget (QtGui.QWidget) :
         if self.fig.myLogIsOn : self.plots_in_log10_scale()
         else :                  self.plots_in_linear_scale()
 
-        self.axhis.grid(self.fig.myGridIsOn)
-        self.aximg.grid(self.fig.myGridIsOn)
+        self.axhi.grid(self.fig.myGridIsOn)
+        self.axim.grid(self.fig.myGridIsOn)
 
         self.canvas.draw()
         #print 'End of on_draw'
@@ -185,25 +185,26 @@ class ImgSpeWidget (QtGui.QWidget) :
         log_vmin, log_vmax = int(log10(vmin)), int(log10(vmax))+1
         #print 'vmin, vmax, log_vmin, log_vmax = ', vmin, vmax, log_vmin, log_vmax
                         
-        self.axhis = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
-        self.axhis.set_xscale('log')
+        self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
+        self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
+
+        self.axhi.set_xscale('log')
         #logbins=10**np.linspace(log_vmin, log_vmax, self.nbins)
         logbins=np.logspace(log_vmin, log_vmax, self.nbins)
         #print 'logbins =', logbins        
-        #self.axhis.hist(self.arr2d.flatten(), bins=self.nbins, range=self.range_his)
-        self.axhis.hist(self.arrwin.flatten(), bins=logbins )
+        #self.axhi.hist(self.arr2d.flatten(), bins=self.nbins, range=self.range_his)
+        self.axhi.hist(self.arrwin.flatten(), bins=logbins )
         self.set_hist_yticks()
 
-        self.aximg = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
-        self.aximshow = self.aximg.imshow(self.arr2d, origin='upper', \
+        self.imsh = self.axim.imshow(self.arr2d, origin='upper', \
                                           interpolation='nearest', \
                                           extent=self.range, aspect='auto')
-        self.aximshow.set_clim(log_vmin,log_vmax)
+        self.imsh.set_clim(log_vmin,log_vmax)
 
-        #self.axcolbar = self.fig.add_axes([0.15, 0.95, 0.78, 0.05])
-        #self.colbar = self.fig.colorbar(self.aximshow, cax=self.axcolbar, \
+        #self.axcb = self.fig.add_axes([0.15, 0.95, 0.78, 0.05])
+        #self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
         #                                orientation='horizontal')#, ticks=xticks)
-        self.colbar = self.fig.colorbar(self.aximshow, orientation='vertical', \
+        self.colb = self.fig.colorbar(self.imsh, orientation='vertical', \
                                         fraction=0.1, pad=0.01, shrink=1.0, aspect=20)
         # fraction - of the 2d plot occupied by the color bar
         # pad      - is a space between 2d image and color bar
@@ -215,44 +216,76 @@ class ImgSpeWidget (QtGui.QWidget) :
         self.arr2d = self.arrwin
         #print 'self.arr2d = ', self.arr2d
 
-        gs = gridspec.GridSpec(20, 20)
-        self.axhis = self.fig.add_subplot(gs[15:19,:]) # self.fig.add_subplot(212)
-        self.axhis.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
+        #gs = gridspec.GridSpec(20, 20)
+        #self.axhi = self.fig.add_subplot(gs[15:19,:]) # self.fig.add_subplot(212)
+        #self.axim = self.fig.add_subplot(gs[0:14,:])
+        #self.axcb = self.fig.add_subplot(gs[19,:])
+
+        self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
+        self.axhi = self.fig.add_axes([0.15, 0.06, 0.78, 0.21])
+        self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
+
+        self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
         self.set_hist_yticks()
 
-        xticks = self.axhis.get_xticks()
+        xticks = self.axhi.get_xticks()
         #print 'xticks =', xticks 
-        self.axhis.set_xticklabels('')
-        cmin, cmax = self.axhis.get_xlim() 
+        self.axhi.set_xticklabels('')
+        cmin, cmax = self.axhi.get_xlim() 
         self.fig.myZmin, self.fig.myZmax = cmin, cmax 
         #print 'cmin, cmax, self.range_his =', cmin, cmax, self.range_his
 
-        self.aximg = self.fig.add_subplot(gs[0:14,:])
-        self.aximshow = self.aximg.imshow(self.arr2d, origin='upper', \
+        self.imsh = self.axim.imshow(self.arr2d, origin='upper', \
                                           interpolation='nearest', \
                                           extent=self.range, aspect='auto')
-        self.aximshow.set_clim(cmin,cmax)
-        self.axcolbar = self.fig.add_subplot(gs[19,:])
-        self.colbar = self.fig.colorbar(self.aximshow, cax=self.axcolbar, \
+        self.imsh.set_clim(cmin,cmax)
+        self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
                                         orientation=1, ticks=xticks)
                              #fraction=0.15, pad=0.1, shrink=1.0, aspect=15
-        #self.colbar.set_clim(zmin,zmax)
+        #self.colb.set_clim(zmin,zmax)
 
 
     def set_hist_yticks(self) :
-        Nmin, Nmax = self.axhis.get_ylim() 
+        Nmin, Nmax = self.axhi.get_ylim() 
         #print 'Nmin, Nmax =', Nmin, Nmax
         if (Nmax-Nmin)<4 : yticks = np.arange(Nmin,Nmin+4)
         else             : yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
-        self.axhis.set_yticks( yticks )
-        self.axhis.set_ylabel('N pixels')
+        self.axhi.set_yticks( yticks )
+        self.axhi.set_ylabel('N pixels')
+
+
+    def drawVerticalLineThroughCoursor(self, event) :
+        axes   = event.inaxes
+        fb     = self.canvas.figure.bbox
+        bb     = axes.bbox
+        #print bb
+
+        bbx0, bby0, bbh, bbw = bb.x0, bb.y0, bb.height, bb.width
+        fbx0, fby0, fbh, fbw = fb.x0, fb.y0, fb.height, fb.width
+
+        xd = event.xdata
+        yd = event.ydata
+        x = event.x
+        y = event.y
+
+        x0 = bbx0
+        y0 = fbh - bby0 - bbh
+        w  = x - x0
+
+        rect = [x0, y0, w, bbh]
+        self.fig.canvas.drawRectangle( rect )            
+        #self.fig.canvas.draw()
+
 
 
     def processMouseMotion(self, event) :
 
         if self.fig.ntbZoomIsOn : return
 
-        if event.inaxes == self.aximg and self.fig.myZoomIsOn :
+        if event.inaxes == self.axhi :
+            self.drawVerticalLineThroughCoursor(event)
+        
+        if event.inaxes == self.axim and self.fig.myZoomIsOn :
             #print 'processMouseMotion',
             ##print 'event.xdata, event.ydata =', event.xdata, event.ydata
             #print 'event.x, event.y =', event.x, event.y
@@ -268,17 +301,18 @@ class ImgSpeWidget (QtGui.QWidget) :
             rect = [x0, y0, w, h]
             self.fig.canvas.drawRectangle( rect )            
 
+
     def processMouseButtonPress(self, event) :
         #print 'MouseButtonPress'
         #self.fig = event.canvas.figure
 
-        if event.inaxes == self.colbar.ax : self.mousePressOnColorBar (event)
-        if event.inaxes == self.aximg     : self.mousePressOnImage    (event)
-        if event.inaxes == self.axhis     : self.mousePressOnHistogram(event)
+        if event.inaxes == self.colb.ax : self.mousePressOnColorBar (event)
+        if event.inaxes == self.axim    : self.mousePressOnImage    (event)
+        if event.inaxes == self.axhi    : self.mousePressOnHistogram(event)
 
 
     def mousePressOnImage(self, event) :
-        if event.inaxes == self.aximg :
+        if event.inaxes == self.axim :
            #print 'PressOnImage'
            #print 'event.xdata, event.ydata =', event.xdata, event.ydata
             self.xpress    = event.xdata
@@ -289,7 +323,7 @@ class ImgSpeWidget (QtGui.QWidget) :
 
     def mousePressOnHistogram(self, event) :
         #print 'PressOnHistogram'
-        lims = self.axhis.get_xlim()
+        lims = self.axhi.get_xlim()
         self.setColorLimits(event, lims[0], lims[1], event.xdata)
 
 
@@ -298,7 +332,7 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         if self.fig.myLogIsOn : return
 
-        lims = self.aximshow.get_clim()
+        lims = self.imsh.get_clim()
         colmin = lims[0]
         colmax = lims[1]
         range = colmax - colmin
@@ -343,7 +377,7 @@ class ImgSpeWidget (QtGui.QWidget) :
         #figNum  = fig.number 
         #axes     = event.inaxes # fig.gca() 
                 
-        if event.inaxes == self.aximg and event.button == 1 and fig.myZoomIsOn :
+        if event.inaxes == self.axim and event.button == 1 and fig.myZoomIsOn :
 
             self.xrelease = event.xdata
             self.yrelease = event.ydata
@@ -360,7 +394,7 @@ class ImgSpeWidget (QtGui.QWidget) :
                 self.processDraw()
 
         elif event.button == 2 : # middle or right button
-            if event.inaxes == self.aximg : 
+            if event.inaxes == self.axim : 
                 fig.myXmin = None
                 fig.myXmax = None
                 fig.myYmin = None
@@ -368,7 +402,7 @@ class ImgSpeWidget (QtGui.QWidget) :
                 self.processDraw()
                 #self.on_draw()
 
-            elif event.inaxes == self.axhis or event.inaxes == self.colbar.ax :
+            elif event.inaxes == self.axhi or event.inaxes == self.colb.ax :
                 fig.myZmin = None
                 fig.myZmax = None
                 self.processDraw()

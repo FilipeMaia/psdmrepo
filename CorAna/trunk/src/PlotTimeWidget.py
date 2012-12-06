@@ -69,14 +69,14 @@ class PlotTimeWidget (QtGui.QWidget) :
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
-        vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
-        vbox.addWidget(self.canvas)        # <=== Add figure 
-        self.setLayout(vbox)
+        self.vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
+        self.vbox.addWidget(self.canvas)        # <=== Add figure 
+        self.setLayout(self.vbox)
         #-----------------------------------
 
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        #self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
 
         self.setFrame()
         self.initParameters()
@@ -196,21 +196,30 @@ class PlotTimeWidget (QtGui.QWidget) :
 
 
     def processMouseMotion(self, event) :
-        if event.inaxes == self.aximg and self.fig.myZoomIsOn :
-            #print 'processMouseMotion',
-            ##print 'event.xdata, event.ydata =', event.xdata, event.ydata
-            #print 'event.x, event.y =', event.x, event.y
-            height = self.canvas.figure.bbox.height
-            self.xmotion    = event.xdata
-            self.ymotion    = event.ydata
-            x0 = self.xpressabs
-            x1 = event.x
-            y0 = height - self.ypressabs
-            y1 = height - event.y
-            w  = x1 - x0
-            h  = y1 - y0
-            rect = [x0, y0, w, h]
-            self.fig.canvas.drawRectangle( rect )            
+        if event.inaxes == self.axhi or event.inaxes == self.axgr or event.inaxes == self.axti :
+            self.drawVerticalLineThroughCoursor(event)
+
+    def drawVerticalLineThroughCoursor(self, event) :
+        axes   = event.inaxes
+        fb     = self.canvas.figure.bbox
+        bb     = axes.bbox
+        #print bb
+
+        bbx0, bby0, bbh, bbw = bb.x0, bb.y0, bb.height, bb.width
+        fbx0, fby0, fbh, fbw = fb.x0, fb.y0, fb.height, fb.width
+
+        xd = event.xdata
+        yd = event.ydata
+        x = event.x
+        y = event.y
+
+        x0 = bbx0
+        y0 = fbh  - bby0 - bbh -1
+        w  = x - x0
+
+        rect = [x0, y0, w, bbh]
+        self.fig.canvas.drawRectangle( rect )            
+        #self.fig.canvas.draw()
 
 
     def processMouseButtonPress(self, event) :
