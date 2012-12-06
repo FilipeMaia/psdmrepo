@@ -70,7 +70,6 @@ find . -maxdepth 1 -wholename . -o -wholename ./arch -o -wholename ./build \
 %install
 . %{sit_root}/bin/sit_setup.sh -a %{sit_arch_base}-opt
 scons install DESTDIR=%{buildroot}/%{instdir}
-ln -sfT %{relname} %{buildroot}/%{sit_reldir}/%{reltype}current-%{sit_arch_os}
 
 %clean
 rm -rf %{buildroot}
@@ -112,25 +111,30 @@ PSDM software release %{relname}, platform-specific files for debug builds.
 %{instdir}/arch/%{sit_arch_base}-dbg
 %ghost %{instdir}/arch/__pkg_list__.%{sit_arch_base}-dbg
 
-# ================== "Current" subpackage ==================
+# ================== "Latest" subpackage ==================
 
-%package -n %{pkg}-%{reltype}current-%{sit_arch_os}
+%package -n %{pkg}-%{reltype}latest-%{sit_arch_os}
 
 Requires: %{pkg}-%{relname}-%{sit_arch_base}-opt
 Group:    PSDM Analysis Software
 Prefix:   %{prefix}
 
-Summary:  Current link for PSDM software release %{relname}.
+Summary:  Pseudo-package used to install latest release.
 
 %description -n %{pkg}-%{reltype}current-%{sit_arch_os}
-Current link for PSDM software release %{relname}.
+This package is used to install/upgrade to the latest release, it has a
+dependecy on %{pkg}-%{relname}-%{sit_arch_base}-opt package which will get
+updated or installed when you gen new version of this package.
 
 %files -n %{pkg}-%{reltype}current-%{sit_arch_os}
-%{sit_reldir}/%{reltype}current-%{sit_arch_os}
 
 # ================= ChangeLog =========================
 
 %changelog
+
+* Wed Dec 05 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
+- removed current link entirely
+- changed rpm name from -current- to -latest-
 
 * Tue Dec 04 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
 - initial release
