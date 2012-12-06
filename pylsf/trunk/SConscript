@@ -26,6 +26,7 @@ PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
 LIBDIR = "/afs/slac/package/lsf/curr/lib"
 COPYLIBS = "liblsf.so libbat.so"
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 OPTIONAL = True
 
 standardExternalPackage ( pkg, **locals() )
