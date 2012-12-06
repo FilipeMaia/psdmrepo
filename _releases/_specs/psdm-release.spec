@@ -121,12 +121,12 @@ Prefix:   %{prefix}
 
 Summary:  Pseudo-package used to install latest release.
 
-%description -n %{pkg}-%{reltype}current-%{sit_arch_os}
+%description -n %{pkg}-%{reltype}latest-%{sit_arch_os}
 This package is used to install/upgrade to the latest release, it has a
 dependecy on %{pkg}-%{relname}-%{sit_arch_base}-opt package which will get
 updated or installed when you gen new version of this package.
 
-%files -n %{pkg}-%{reltype}current-%{sit_arch_os}
+%files -n %{pkg}-%{reltype}latest-%{sit_arch_os}
 
 # ================= ChangeLog =========================
 
