@@ -317,20 +317,20 @@ def get_array_from_file(fname) :
 
 #----------------------------------
 
-def get_text_tuple_from_file(fname) :
+def get_text_list_from_file(fname) :
     if not os.path.lexists(fname) :
         logger.warning(fname + ' is not available', __name__)         
         return None
-    logger.info('Read text array from file: ' + fname, __name__)         
+    logger.info('Read and return as a 2-d tuple text array from file: ' + fname, __name__)         
 
-    t = []    
+    list_recs = []    
     f=open(fname,'r')
     for line in f :
         if len(line) == 1 : continue # line is empty
         fields = line.rstrip('\n').split() #,1)
-        t.append(fields)
+        list_recs.append(fields)
     f.close() 
-    return t
+    return list_recs
 
 #-----------------------------
 

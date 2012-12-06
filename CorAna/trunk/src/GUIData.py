@@ -32,10 +32,12 @@ from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
 from ImgSpeWithGUI          import *
+from PlotTimeWithGUI        import *
 import GlobalUtils          as     gu
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobData           import bjdata
+from EventTimeRecords       import *
 
 #---------------------
 #  Class definition --
@@ -357,33 +359,12 @@ class GUIData ( QtGui.QWidget ) :
     def on_but_tspl(self):
         logger.debug('on_but_tspl', __name__)
         try :
-            cp.tsplotwithgui.close()
+            cp.plottimewithgui.close()
         except :
-            self.get_time_stamp_arrays()
-            #cp.tsplotwithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_data_aver_plot())
-            #cp.tsplotwithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            #cp.tsplotwithgui.show()
-
-
-    def get_time_stamp_arrays(self):
-        logger.debug('on_but_tspl', __name__)
-        tup = gu.get_text_tuple_from_file(fnm.path_data_scan_tstamp_list())
-        if tup == None : return
-        #logger.debug('Array shape: ' + str(arr.shape), __name__)
-        #tup[1][:] = ['1', '8.026429', '8.026429', '20120616-080244.698036743', '8255', '1', '1']
-        self.arr_ind_ev = []
-        self.arr_ind_t  = []
-        self.arr_t      = []
-        self.arr_dt     = []
-
-        for rec in tup :
-            ind_ev, t, dt, ind_t = int(rec[0]), float(rec[1]), float(rec[2]), int(rec[6])
-            self.arr_ind_ev.append(ind_ev)
-            self.arr_ind_t .append(ind_t)
-            self.arr_t     .append(t)
-            self.arr_dt    .append(dt)
-            #print 'ind_ev, ind_t, t, dt=', ind_ev, ind_t, t, dt
-        #print 'arr_t=', self.arr_t
+            cp.plottimewithgui = PlotTimeWithGUI(None, ifname = fnm.path_data_scan_tstamp_list(),\
+                                 ofname = fnm.path_data_time_plot())
+            cp.plottimewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plottimewithgui.show()
 
 
     def on_cbx(self):

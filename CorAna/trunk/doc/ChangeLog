@@ -13,6 +13,13 @@ reverse time order.
 
 Tag: V00-00-01
 
+2012-12-06 Mikhail S. Dubrovin
+- add/remove modules:
+A         src/EventTimeRecords.py
+A         src/PlotTimeWithGUI.py
+A         src/PlotTimeButtons.py
+A         src/PlotTimeWidget.py
+	
 2012-12-04 Mikhail S. Dubrovin
 - add/remove modules:
 A       data/scripts/psana-data-aver.cfg

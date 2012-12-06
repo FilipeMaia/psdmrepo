@@ -69,6 +69,11 @@ class ImgSpeWidget (QtGui.QWidget) :
         vbox.addWidget(self.canvas)        # <=== Add figure 
         self.setLayout(vbox)
         #-----------------------------------
+
+        self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
+        self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
+        self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+
         self.initParameters()
         self.setFrame()
         if self.arr != None : self.on_draw()
@@ -123,8 +128,8 @@ class ImgSpeWidget (QtGui.QWidget) :
 
     def processDraw(self) :
         #fig = event.canvas.figure
-        fig = self.fig
-        self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax, fig.myNBins)
+        f = self.fig
+        self.on_draw(f.myXmin, f.myXmax, f.myYmin, f.myYmax, f.myZmin, f.myZmax, f.myNBins)
 
 
     def on_draw(self, xmin=None, xmax=None, ymin=None, ymax=None, zmin=None, zmax=None, nbins=100):
@@ -160,10 +165,6 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         self.axhis.grid(self.fig.myGridIsOn)
         self.aximg.grid(self.fig.myGridIsOn)
-
-        self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
-        self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
 
         self.canvas.draw()
         #print 'End of on_draw'

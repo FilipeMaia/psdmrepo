@@ -166,6 +166,9 @@ class FileNameManager :
     def path_data_aver_plot(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-aver-plot.png'
 
+    def path_data_time_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-time-plot.png'
+
 #-----------------------------
 
     def  get_list_of_files_data_aver(self) :
@@ -184,6 +187,7 @@ class FileNameManager :
         self.list_of_files_data_aver.append(fnm.path_data_rms())
 
         self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
+        self.list_of_files_data_aver.append(fnm.path_data_time_plot())
         return self.list_of_files_data_aver
 
 #-----------------------------
