@@ -46,8 +46,8 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import PlotTimeWidget         as imgwidg
-import PlotTimeButtons        as imgbuts
+import PlotTimeWidget   as imgwidg
+import PlotArrayButtons as imgbuts
 
 from ConfigParametersCorAna import confpars as cp
 
@@ -68,7 +68,7 @@ class PlotTime (QtGui.QWidget) :
         self.setFrame()
 
         self.widgimage   = imgwidg.PlotTimeWidget(parent, ifname)
-        self.widgbuts    = imgbuts.PlotTimeButtons(self, self.widgimage, ofname)
+        self.widgbuts    = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
  
         #---------------------
 

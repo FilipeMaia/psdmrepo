@@ -35,7 +35,7 @@ import numpy as np
 from math import log10
 
 #import matplotlib
-#try    : matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 #except : pass
 
 #from   matplotlib.figure import Figure
@@ -70,6 +70,7 @@ class PlotArrayWidget (QtGui.QWidget) :
         self.canvas = self.fig.canvas
         self.vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
         self.vbox.addWidget(self.canvas)        # <=== Add figure 
+        #self.vbox.addStretch(1)
         self.setLayout(self.vbox)
         #-----------------------------------
 

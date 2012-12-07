@@ -67,8 +67,8 @@ class PlotArray (QtGui.QWidget) :
         self.setWindowTitle('Plot for array')
         self.setFrame()
 
-        self.widgimage   = imgwidg.PlotArrayWidget(parent, arr)
-        self.widgbuts    = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
+        self.widgimage = imgwidg.PlotArrayWidget(parent, arr)
+        self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
  
         #---------------------
 
@@ -124,7 +124,7 @@ def get_array_for_test() :
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    w  = PlotArray(arr=get_array_for_test(), ofname='./fig.png')
+    w = PlotArray(arr=get_array_for_test(), ofname='./fig.png')
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()
