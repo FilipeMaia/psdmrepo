@@ -76,6 +76,8 @@ rm -rf %{buildroot}
 rm %{_tmppath}/%{pkg}-%{relname}.filelist
 
 %files -f %{_tmppath}/%{pkg}-%{relname}.filelist
+%dir %{instdir}
+%dir %{instdir}/arch
 
 # ================== Platform-specific subpackage ==================
 
