@@ -137,8 +137,8 @@ class GUIWorkResDirs ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guiworkresdirs # GUIWorkResDirs
-        except : pass # silently ignore
+        #try    : del cp.guiworkresdirs # GUIWorkResDirs
+        #except : pass # silently ignore
 
 
     def onClose(self):

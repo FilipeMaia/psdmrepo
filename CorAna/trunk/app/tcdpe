@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Script coranash...
+#  Script tcdpe...
 #
 #------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ from CorAna.GUIMainTB import GUIMainTB
 #  Application class definition --
 #---------------------------------
 
-class AnalysisShell :
+class TimeCorrelationDataProcessingEnvironment:
 
     def __init__ ( self ) :
         """Constructor : This is a regular stuff for PyQt4"""
@@ -57,8 +57,8 @@ class AnalysisShell :
         sys.exit(app.exec_())
 
     def input_parameters(self):	
-        msg = """CorAnaShell:
-         To run this application use command "coranash" without parameters or with a single parameter - the configuration file name. 
+        msg = """tcdpe (Time Correlation Data Processing Environment):
+         To run this application use command "tcdpe" without parameters or with a single parameter - the configuration file name. 
          All necessary parameters will be set through the GUIs of this application. 
          By default all configuration parameters are taken from the file "confpars.txt". 
          If this file is missing, the default values of parameters will be used at start, 
@@ -75,7 +75,7 @@ class AnalysisShell :
 
 if __name__ == "__main__" :
 
-    app = AnalysisShell()
+    app = TimeCorrelationDataProcessingEnvironment()
     #sys.exit(app.exec_())
     sys.exit('End of application AnalysisShell')
 

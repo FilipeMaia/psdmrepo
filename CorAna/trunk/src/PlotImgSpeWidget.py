@@ -60,8 +60,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
         self.arr = arr        
-        self.fig = plt.figure(num=1, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-       #self.fig = Figure(          figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+
+
+        print 'fig.number =', self.fig.number
+  
 
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
@@ -120,6 +124,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         #print 'PlotImgSpeWidget: closeEvent'
         pass
+        plt.close(self.fig.number)
 
 
     def set_image_array(self,arr):

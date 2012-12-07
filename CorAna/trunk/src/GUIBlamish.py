@@ -31,7 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from PlotImgSpe          import *
+from PlotImgSpe             import *
 import GlobalUtils          as     gu
 from GUIFileBrowser         import *
 
@@ -146,8 +146,8 @@ class GUIBlamish ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
             
-        try    : del cp.guiblamish # GUIBlamish
-        except : pass # silently ignore
+        #try    : del cp.guiblamish # GUIBlamish
+        #except : pass # silently ignore
 
 
     def onClose(self):

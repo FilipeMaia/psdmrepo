@@ -299,23 +299,29 @@ class GUIMainTB ( QtGui.QWidget ) :
             logger.saveLogInFile     ( fnm.log_file() )
             logger.saveLogTotalInFile( fnm.log_file_total() )
 
-        try    : cp.guifiles.close()
+        try    : self.gui_win.close()
         except : pass
 
-        try    : cp.guisetupinfo.close()
+        try    : del self.gui_win
         except : pass
 
-        try    : cp.guianasettings.close()
-        except : pass
+        #try    : cp.guifiles.close()
+        #except : pass
 
-        try    : cp.guisystemsettings.close()
-        except : pass
+        #try    : cp.guisetupinfo.close()
+        #except : pass
 
-        try    : cp.guiviewresults.close()
-        except : pass
+        #try    : cp.guianasettings.close()
+        #except : pass
 
-        try    : cp.guirun.close()
-        except : pass
+        #try    : cp.guisystemsettings.close()
+        #except : pass
+
+        #try    : cp.guiviewresults.close()
+        #except : pass
+
+        #try    : cp.guirun.close()
+        #except : pass
 
         try    : cp.guilogger.close()
         except : pass
@@ -326,8 +332,14 @@ class GUIMainTB ( QtGui.QWidget ) :
         try    : cp.plotimgspe.close()
         except : pass
 
-        try    : del cp.guimain
+        try    : cp.plottime.close()
         except : pass
+
+        try    : cp.plotarray.close()
+        except : pass
+
+        #try    : del cp.guimain
+        #except : pass
 
 
     def onExit(self):

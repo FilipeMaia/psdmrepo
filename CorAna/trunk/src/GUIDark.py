@@ -31,12 +31,10 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from PlotImgSpe          import *
+from PlotImgSpe              import *
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobPedestals      import bjpeds
-
-
 #import GlobalGraphics       as gg
 
 #---------------------
@@ -221,8 +219,8 @@ class GUIDark ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
 
-        try    : del cp.guidark # GUIDark
-        except : pass # silently ignore
+        #try    : del cp.guidark # GUIDark
+        #except : pass # silently ignore
 
 
     def onClose(self):
@@ -325,7 +323,7 @@ class GUIDark ( QtGui.QWidget ) :
         logger.debug('on_but_plot', __name__)
         try :
             cp.plotimgspe.close()
-            del cp.plotimgspe
+            #del cp.plotimgspe
             #but.setStyleSheet(cp.styleButtonBad)
         except :
             arr = bjpeds.get_pedestals_from_file()

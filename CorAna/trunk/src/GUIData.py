@@ -230,8 +230,8 @@ class GUIData ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
 
-        try    : del cp.guidata # GUIData
-        except : pass # silently ignore
+        #try    : del cp.guidata # GUIData
+        #except : pass # silently ignore
 
 
     def onClose(self):

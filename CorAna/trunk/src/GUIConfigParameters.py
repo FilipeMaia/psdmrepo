@@ -142,8 +142,8 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guiconfigparameters 
-        except : pass
+        #try    : del cp.guiconfigparameters 
+        #except : pass
 
     def onClose(self):
         logger.debug('onClose', __name__)
