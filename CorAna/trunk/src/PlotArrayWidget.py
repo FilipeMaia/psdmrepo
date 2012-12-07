@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module PlotTimeWidget...
+#  Module PlotArrayWidget...
 #
 #------------------------------------------------------------------------
 
-"""Plots image and spectrum for 2d numpy array.
+"""Plot array as a graphic and as a histogram.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -35,7 +35,8 @@ import numpy as np
 from math import log10
 
 #import matplotlib
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#try    : matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#except : pass
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -50,24 +51,22 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class PlotTimeWidget (QtGui.QWidget) :
-    """Plots image and spectrum for 2d numpy array."""
+class PlotArrayWidget (QtGui.QWidget) :
+    """Plot array as a graphic and as a histogram"""
 
-    def __init__(self, parent=None, ifname=None, figsize=(10,5)):
+    def __init__(self, parent=None, arr=None, arrx=None, figsize=(10,5)):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
 
-        #print 'figsize=', figsize
+        self.arry    = arr
+        self.set_xarray(arrx)
 
-        self.figsize= figsize
-        self.ifname = ifname
-        self.get_array_from_file()
+        self.parent  = parent
+        self.figsize = figsize
 
         self.fig = plt.figure(figsize=figsize, dpi=100, facecolor='w',edgecolor='w',frameon=True)
-       #self.fig = Figure(          figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
 
         #-----------------------------------
-        #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
         self.vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
         self.vbox.addWidget(self.canvas)        # <=== Add figure 
@@ -108,13 +107,20 @@ class PlotTimeWidget (QtGui.QWidget) :
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
-        #print 'PlotTimeWidget: closeEvent'
+        #print 'PlotArrayWidget: closeEvent'
         pass
 
 
-    def set_image_array(self,arr):
-        self.arr = arr
+    def set_array(self,arr):
+        self.arry = arr
         self.processDraw()
+
+
+    def set_xarray(self,arr):
+        if arr == None :
+            self.arrx = np.arange(self.arry.shape[0])
+        else :
+            self.arrx = arr
 
 
     def initParameters(self) :
@@ -136,11 +142,9 @@ class PlotTimeWidget (QtGui.QWidget) :
 
         self.fig.clear()
 
-        arr = self.arr
-        xarr = arr[:,3]
-        yarr = arr[:,2]
-        iarr = arr[:,0]
-
+        yarr = self.arry
+        xarr = self.arrx
+ 
         if gr_xmin==None : xmin = xarr[1]
         else             : xmin = gr_xmin
 
@@ -149,7 +153,6 @@ class PlotTimeWidget (QtGui.QWidget) :
 
         yarrwin = yarr[int(xmin):int(xmax)]
         xarrwin = xarr[int(xmin):int(xmax)]
-        iarrwin = iarr[int(xmin):int(xmax)]
 
         if gr_ymin==None : ymin = min(yarrwin)
         else             : ymin = gr_ymin
@@ -161,18 +164,10 @@ class PlotTimeWidget (QtGui.QWidget) :
 
         self.axgr = self.fig.add_axes([0.1,  0.64, 0.80, 0.35])
         self.axhi = self.fig.add_axes([0.1,  0.14, 0.35, 0.35])
-        self.axti = self.fig.add_axes([0.55, 0.14, 0.35, 0.35])
 
         self.axhi.xaxis.set_major_locator(MaxNLocator(4))
-        self.axti.xaxis.set_major_locator(MaxNLocator(4))
         self.axhi.yaxis.set_major_locator(MaxNLocator(4))
-        self.axti.yaxis.set_major_locator(MaxNLocator(4))
         self.axgr.yaxis.set_major_locator(MaxNLocator(4))
-
-        self.axti.plot(xarrwin, iarrwin, '-g')
-        self.axti.set_xlabel('Event index')
-        self.axti.set_ylabel('Time index')
-        self.axti.set_xlim(xmin,xmax) 
 
         #ax1.plot(tau, cor1, '-r', tau, cor2, '-g')
         #self.axgr.plot(xarr,    yarr,    '-r')
@@ -180,23 +175,22 @@ class PlotTimeWidget (QtGui.QWidget) :
         self.axgr.set_xlim(xmin,xmax) 
         self.axgr.set_ylim(ymin,ymax) 
 
-        self.axgr.set_xlabel('Time index')
-        self.axgr.set_ylabel('dt(sec)')
+        self.axgr.set_xlabel('Index or x')
+        self.axgr.set_ylabel('Amplitude')
 
         self.axhi.hist(yarrwin, bins=nbins, range=hi_range, log=self.logIsOn)
-        self.axhi.set_xlabel('dt(sec)')
-        self.axhi.set_ylabel('Frames')
+        self.axhi.set_xlabel('Amplitude')
+        self.axhi.set_ylabel('Entries')
 
         self.axgr.grid(self.gridIsOn)
         self.axhi.grid(self.gridIsOn)
-        self.axti.grid(self.gridIsOn)
 
         self.canvas.draw()
         #print 'End of on_draw'
 
 
     def processMouseMotion(self, event) :
-        if event.inaxes == self.axhi or event.inaxes == self.axgr or event.inaxes == self.axti :
+        if event.inaxes == self.axhi or event.inaxes == self.axgr :
             self.drawVerticalLineThroughCoursor(event)
 
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
@@ -231,7 +225,6 @@ class PlotTimeWidget (QtGui.QWidget) :
     def processMouseButtonPress(self, event) :
         #print 'MouseButtonPress'
         if event.inaxes == self.axgr     : self.mousePressOnGraph(event)
-        if event.inaxes == self.axti     : self.mousePressOnGraph(event)
         if event.inaxes == self.axhi     : self.mousePressOnHisto(event)
 
 
@@ -273,7 +266,7 @@ class PlotTimeWidget (QtGui.QWidget) :
             pass
 
         elif event.button == 2 : # middle or right button
-            if event.inaxes == self.axgr or event.inaxes == self.axti : 
+            if event.inaxes == self.axgr : 
                 self.gr_xmin = None
                 self.gr_xmax = None
 
@@ -288,16 +281,6 @@ class PlotTimeWidget (QtGui.QWidget) :
             pass
 
 
-#    def stringOrNone(self,value):
-#        if value == None : return 'None'
-#        else             : return str(value)
-
-
-#    def intOrNone(self,value):
-#        if value == None : return None
-#        else             : return int(value)
-
-
     def saveFigure(self, fname='fig.png'):
         self.fig.savefig(fname)
 
@@ -305,12 +288,12 @@ class PlotTimeWidget (QtGui.QWidget) :
 # Test
 #-----------------------------
 
-def get_array2d_for_test() :
+def get_array_for_test() :
     mu, sigma = 200, 25
     #arr = mu + sigma*np.random.standard_normal(size=2400)
-    arr = 100*np.random.standard_exponential(size=2400)
+    arr = 100*np.random.standard_exponential(size=500)
     #arr = np.arange(2400)
-    arr.shape = (40,60)
+    #arr.shape = (40,60)
     return arr
 
 #-----------------------------
@@ -318,7 +301,7 @@ def get_array2d_for_test() :
 def main():
 
     app = QtGui.QApplication(sys.argv)
-    w = PlotTimeWidget(None, 'work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt', figsize=(10,5))
+    w = PlotArrayWidget(arr=get_array_for_test())
     w.move(QtCore.QPoint(50,50))
     w.show()    
     app.exec_()

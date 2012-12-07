@@ -31,7 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from ImgSpeWithGUI          import *
+from PlotImgSpe          import *
 import GlobalUtils          as     gu
 from GUIFileBrowser         import *
 
@@ -139,7 +139,7 @@ class GUIFlatField ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.imgspewithgui.close()
+        try    : cp.plotimgspe.close()
         except : pass
 
         try    : cp.guifilebrowser.close()
@@ -173,14 +173,14 @@ class GUIFlatField ( QtGui.QWidget ) :
     def on_but_plot(self):
         logger.debug('on_but_plot', __name__)
         try :
-            cp.imgspewithgui.close()
+            cp.plotimgspe.close()
         except :
             arr = gu.get_array_from_file(fnm.path_flat())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_flat_plot())
-            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            cp.imgspewithgui.show()
+            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_flat_plot())
+            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.show()
 
 
     def on_but_browser (self):       

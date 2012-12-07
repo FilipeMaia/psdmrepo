@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module ImgSpeWithGUI...
+#  Module PlotImgSpe...
 #
 #------------------------------------------------------------------------
 
@@ -46,8 +46,8 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 #import ImgSpeNavToolBar     as imgtb
-import ImgSpeWidget         as imgwidg
-import ImgSpeButtons        as imgbuts
+import PlotImgSpeWidget         as imgwidg
+import PlotImgSpeButtons        as imgbuts
 
 from ConfigParametersCorAna import confpars as cp
 
@@ -55,8 +55,8 @@ from ConfigParametersCorAna import confpars as cp
 #  Class definition --
 #---------------------
 
-#class ImgSpeWithGUI (QtGui.QMainWindow) :
-class ImgSpeWithGUI (QtGui.QWidget) :
+#class PlotImgSpe (QtGui.QMainWindow) :
+class PlotImgSpe (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
@@ -67,8 +67,8 @@ class ImgSpeWithGUI (QtGui.QWidget) :
         self.setWindowTitle('Plot for image')
         self.setFrame()
 
-        self.widgimage   = imgwidg.ImgSpeWidget(parent, arr)
-        self.widgbuts    = imgbuts.ImgSpeButtons(self, self.widgimage, ofname)
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
+        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  
         #---------------------
@@ -117,7 +117,7 @@ class ImgSpeWithGUI (QtGui.QWidget) :
         #try    : self.mpl_toolbar.close()
         #except : pass
 
-        try    : del cp.imgspewithgui
+        try    : del cp.plotimgspe
         except : pass
 
         #print 'Close application'
@@ -140,8 +140,8 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    #w  = ImgSpeWithGUI(None, get_array2d_for_test())
-    w  = ImgSpeWithGUI(None)
+    #w  = PlotImgSpe(None, get_array2d_for_test())
+    w  = PlotImgSpe(None)
     w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(50,50))
     w.show()

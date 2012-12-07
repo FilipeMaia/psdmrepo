@@ -31,7 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from ImgSpeWithGUI          import *
+from PlotImgSpe          import *
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobPedestals      import bjpeds
@@ -215,7 +215,7 @@ class GUIDark ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        #try    : cp.imgspewithgui.close()
+        #try    : cp.plotimgspe.close()
         #except : pass
 
         try    : cp.guifilebrowser.close()
@@ -324,17 +324,17 @@ class GUIDark ( QtGui.QWidget ) :
     def on_but_plot(self):
         logger.debug('on_but_plot', __name__)
         try :
-            cp.imgspewithgui.close()
-            del cp.imgspewithgui
+            cp.plotimgspe.close()
+            del cp.plotimgspe
             #but.setStyleSheet(cp.styleButtonBad)
         except :
             arr = bjpeds.get_pedestals_from_file()
             if arr == None : return
             #print arr.shape,'\n', arr
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_peds_aver_plot())
-            #cp.imgspewithgui.setParent(self)
-            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            cp.imgspewithgui.show()
+            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_peds_aver_plot())
+            #cp.plotimgspe.setParent(self)
+            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.show()
             #but.setStyleSheet(cp.styleButtonGood)
 
     def on_but_remove(self):

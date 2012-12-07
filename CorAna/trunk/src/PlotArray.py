@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module PlotTimeWithGUI...
+#  Module PlotArray...
 #
 #------------------------------------------------------------------------
 
-"""Plot for time records.
+"""Plot for array.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -34,8 +34,8 @@ import random
 import numpy as np
 
 # For self-run debugging:
-#import matplotlib
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+import matplotlib
+matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
 import matplotlib.pyplot as plt
 
@@ -46,8 +46,8 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-import PlotTimeWidget         as imgwidg
-import PlotTimeButtons        as imgbuts
+import PlotArrayWidget         as imgwidg
+import PlotArrayButtons        as imgbuts
 
 from ConfigParametersCorAna import confpars as cp
 
@@ -55,20 +55,20 @@ from ConfigParametersCorAna import confpars as cp
 #  Class definition --
 #---------------------
 
-#class PlotTimeWithGUI (QtGui.QMainWindow) :
-class PlotTimeWithGUI (QtGui.QWidget) :
-    """Plot for time records"""
+#class PlotArray (QtGui.QMainWindow) :
+class PlotArray (QtGui.QWidget) :
+    """Plot for array"""
 
 
-    def __init__(self, parent=None, ifname=None, ofname='./fig.png'):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 800, 400)
-        self.setWindowTitle('Plot for time records')
+        self.setWindowTitle('Plot for array')
         self.setFrame()
 
-        self.widgimage   = imgwidg.PlotTimeWidget(parent, ifname)
-        self.widgbuts    = imgbuts.PlotTimeButtons(self, self.widgimage, ofname)
+        self.widgimage   = imgwidg.PlotArrayWidget(parent, arr)
+        self.widgbuts    = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
  
         #---------------------
 
@@ -103,7 +103,7 @@ class PlotTimeWithGUI (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-        try    : del cp.plottimewithgui
+        try    : del cp.plotarray
         except : pass
 
         #print 'Close application'
@@ -113,19 +113,18 @@ class PlotTimeWithGUI (QtGui.QWidget) :
 # Test
 #-----------------------------
 
-def get_array2d_for_test() :
+def get_array_for_test() :
     mu, sigma = 200, 25
-    #arr = mu + sigma*np.random.standard_normal(size=2400)
-    arr = 100*np.random.standard_exponential(size=2400)
+    arr = mu + sigma*np.random.standard_normal(size=500)
+    #arr = 100*np.random.standard_exponential(size=500)
     #arr = np.arange(2400)
-    arr.shape = (40,60)
+    #arr.shape = (40,60)
     return arr
 
 
 def main():
-
     app = QtGui.QApplication(sys.argv)
-    w  = PlotTimeWithGUI(None, 'work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt', './fig.png')
+    w  = PlotArray(arr=get_array_for_test(), ofname='./fig.png')
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()

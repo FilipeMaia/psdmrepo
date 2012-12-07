@@ -31,8 +31,8 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from ImgSpeWithGUI          import *
-from PlotTimeWithGUI        import *
+from PlotImgSpe             import *
+from PlotTime               import *
 import GlobalUtils          as     gu
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
@@ -70,7 +70,7 @@ class GUIData ( QtGui.QWidget ) :
         self.edi_bat_time   = QtGui.QLineEdit ( str( cp.bat_data_time .value() ) )        
  
         self.but_path   = QtGui.QPushButton('File:')
-        self.but_plot   = QtGui.QPushButton('Plot')
+        self.but_plot   = QtGui.QPushButton('img-Plot')
         self.but_tspl   = QtGui.QPushButton('t-Plot')
         self.but_brow   = QtGui.QPushButton('Browse')
         self.but_scan   = QtGui.QPushButton('Scan')
@@ -224,7 +224,7 @@ class GUIData ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        #try    : cp.imgspewithgui.close()
+        #try    : cp.plotimgspe.close()
         #except : pass
 
         try    : cp.guifilebrowser.close()
@@ -346,25 +346,25 @@ class GUIData ( QtGui.QWidget ) :
     def on_but_plot(self):
         logger.debug('on_but_plot', __name__)
         try :
-            cp.imgspewithgui.close()
+            cp.plotimgspe.close()
         except :
             arr = gu.get_array_from_file(fnm.path_data_ave())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.imgspewithgui = ImgSpeWithGUI(None, arr, ofname=fnm.path_data_aver_plot())
-            cp.imgspewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            cp.imgspewithgui.show()
+            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_data_aver_plot())
+            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.show()
 
 
     def on_but_tspl(self):
         logger.debug('on_but_tspl', __name__)
         try :
-            cp.plottimewithgui.close()
+            cp.plottime.close()
         except :
-            cp.plottimewithgui = PlotTimeWithGUI(None, ifname = fnm.path_data_scan_tstamp_list(),\
+            cp.plottime = PlotTime(None, ifname = fnm.path_data_scan_tstamp_list(),\
                                  ofname = fnm.path_data_time_plot())
-            cp.plottimewithgui.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
-            cp.plottimewithgui.show()
+            cp.plottime.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plottime.show()
 
 
     def on_cbx(self):

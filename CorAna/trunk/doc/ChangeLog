@@ -14,12 +14,29 @@ reverse time order.
 Tag: V00-00-01
 
 2012-12-06 Mikhail S. Dubrovin
+
+- Reneme:
+D       src/ImgSpeButtons.py
+D       src/ImgSpeWidget.py
+D       src/ImgSpeWithGUI.py
+
+A         src/PlotImgSpe.py
+A         src/PlotImgSpeButtons.py
+A         src/PlotImgSpeWidget.py
+	
 - add/remove modules:
 A         src/EventTimeRecords.py
+	
 A         src/PlotTimeWithGUI.py
+D         src/PlotTimeWithGUI.py -> PlotTime.py
+A         src/PlotTime.py
 A         src/PlotTimeButtons.py
 A         src/PlotTimeWidget.py
-	
+
+A         src/PlotArrayButtons.py
+A         src/PlotArray.py
+A         src/PlotArrayWidget.py	
+
 2012-12-04 Mikhail S. Dubrovin
 - add/remove modules:
 A       data/scripts/psana-data-aver.cfg

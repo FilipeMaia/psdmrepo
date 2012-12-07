@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module ImgSpeButtons...
+#  Module PlotArrayButtons...
 #
 #------------------------------------------------------------------------
 
-"""Buttons for interactive plot of the image and spectrum for 2-d array
+"""Buttons for plot
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -33,16 +33,14 @@ from PyQt4 import QtGui, QtCore
 
 from Logger                 import logger
 from GUIHelp                import *
-#from FileNameManager        import fnm
-#from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
 #---------------------
 
-#class ImgSpeButtons (QtGui.QMainWindow) :
-class ImgSpeButtons (QtGui.QWidget) :
-    """Buttons for interactive plot of the image and spectrum for 2-d array."""
+#class PlotArrayButtons (QtGui.QMainWindow) :
+class PlotArrayButtons (QtGui.QWidget) :
+    """Buttons for time records plot"""
 
     #----------------
     #  Constructor --
@@ -57,8 +55,13 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ofname    = ofname
 
-        self.widgimage = widgimage
-        self.fig       = widgimage.fig
+        if widgimage == None :
+            self.widgimage          = self
+            self.widgimage.nbins    = 100
+            self.widgimage.gridIsOn = True
+            self.widgimage.logIsOn  = False
+        else :
+            self.widgimage = widgimage
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -67,7 +70,7 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.cbox_grid = QtGui.QCheckBox('&Grid')
         self.cbox_log  = QtGui.QCheckBox('&Log')
         self.tit_nbins = QtGui.QLabel('N bins:')
-        self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
+        self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.widgimage.nbins))
         self.set_buttons()
         
         width = 50
@@ -77,7 +80,7 @@ class ImgSpeButtons (QtGui.QWidget) :
         self.but_save .setFixedWidth(width)
         self.but_quit .setFixedWidth(width)
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
- 
+
         self.but_help.setStyleSheet (cp.styleButtonGood) 
         self.but_save.setStyleSheet (cp.styleButtonGood) 
         self.but_quit.setStyleSheet (cp.styleButtonBad) 
@@ -152,15 +155,16 @@ class ImgSpeButtons (QtGui.QWidget) :
         if value == None : return None
         else             : return int(value)
 
+
     def set_buttons(self) :
-        self.cbox_grid.setChecked(self.fig.myGridIsOn)
-        self.cbox_log .setChecked(self.fig.myLogIsOn)
-        self.edi_nbins.setText(self.stringOrNone(self.fig.myNBins))
+        self.cbox_grid.setChecked(self.widgimage.gridIsOn)
+        self.cbox_log .setChecked(self.widgimage.logIsOn)
+        self.edi_nbins.setText(self.stringOrNone(self.widgimage.nbins))
 
 
     def on_edit_nbins(self):
-        self.fig.myNBins = int(self.edi_nbins.displayText())
-        logger.info('Set for spectrum the number of bins ='+str(self.fig.myNBins), __name__ )
+        self.widgimage.nbins = int(self.edi_nbins.displayText())
+        logger.info('Set for spectrum the number of bins ='+str(self.widgimage.nbins), __name__ )
         self.widgimage.processDraw()
  
 
@@ -188,16 +192,14 @@ class ImgSpeButtons (QtGui.QWidget) :
 
 
     def on_cbox_log(self):
-        logger.info('Not implemented yet.', __name__ )
-        self.fig.myLogIsOn = self.cbox_log.isChecked()
-        self.fig.myZmin    = None
-        self.fig.myZmax    = None        
+        logger.info('On/Off log scale for histogram', __name__ )
+        self.widgimage.logIsOn = self.cbox_log.isChecked()
         self.widgimage.processDraw()
 
 
     def on_cbox_grid(self):
         logger.info('On/Off grid.', __name__ )
-        self.fig.myGridIsOn = self.cbox_grid.isChecked()
+        self.widgimage.gridIsOn = self.cbox_grid.isChecked()
         self.widgimage.processDraw()
 
 
@@ -208,18 +210,18 @@ class ImgSpeButtons (QtGui.QWidget) :
             del self.guihelp
         except :
             self.guihelp = GUIHelp(None,self.help_message())
-            self.guihelp.setFixedSize(620,160) 
-            self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
+            #self.guihelp.setMinimumSize(600,150) 
+            self.guihelp.setFixedSize(610,130) 
+            try   : self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
+            except: self.guihelp.move(self.pos().__add__(QtCore.QPoint(250,60))) 
             self.guihelp.show()
 
 
     def help_message(self):
-        msg  = 'Mouse control functions:'
-        msg += '\nZoom-in image: left mouse click, move, and release in another image position.'
-        msg += '\nMiddle mouse button click on image - restores full size image'
-        msg += '\nLeft/right mouse click on histogram or color bar - sets min/max amplitude.' 
-        msg += '\nMiddle mouse click on histogram or color bar - resets amplitude limits to default.'
-        msg += '\n"Reset" button - resets all parameters to default values.'
+        msg  = 'Mouse control buttons:'
+        msg += '\nLeft/right mouse click on graph or hist window sets min/max limit for both plots.'
+        msg += '\nMiddle mouse button click returns default limits for horizontal axis.'
+        msg += '\n"Reset" button - resets all default parameters/limits.'
         return msg
 
 
@@ -248,7 +250,7 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    w = ImgSpeButtons(None)
+    w = PlotArrayButtons(None)
     w.move(QtCore.QPoint(50,50))
     w.show()
 

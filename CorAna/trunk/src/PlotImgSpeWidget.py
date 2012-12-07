@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module ImgSpeWidget...
+#  Module PlotImgSpeWidget...
 #
 #------------------------------------------------------------------------
 
@@ -44,6 +44,7 @@ except :
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from   matplotlib.ticker import MaxNLocator
 #from   matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt4 import QtGui, QtCore
@@ -52,7 +53,7 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class ImgSpeWidget (QtGui.QWidget) :
+class PlotImgSpeWidget (QtGui.QWidget) :
     """Plots image and spectrum for 2d numpy array."""
 
     def __init__(self, parent=None, arr=None):
@@ -117,7 +118,7 @@ class ImgSpeWidget (QtGui.QWidget) :
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
-        #print 'ImgSpeWidget: closeEvent'
+        #print 'PlotImgSpeWidget: closeEvent'
         pass
 
 
@@ -187,6 +188,9 @@ class ImgSpeWidget (QtGui.QWidget) :
                         
         self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
         self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
+
+        self.axhi.xaxis.set_major_locator(MaxNLocator(5))
+        self.axhi.yaxis.set_major_locator(MaxNLocator(4))
 
         self.axhi.set_xscale('log')
         #logbins=10**np.linspace(log_vmin, log_vmax, self.nbins)
@@ -263,8 +267,8 @@ class ImgSpeWidget (QtGui.QWidget) :
         bbx0, bby0, bbh, bbw = bb.x0, bb.y0, bb.height, bb.width
         fbx0, fby0, fbh, fbw = fb.x0, fb.y0, fb.height, fb.width
 
-        xd = event.xdata
-        yd = event.ydata
+        #xd = event.xdata
+        #yd = event.ydata
         x = event.x
         y = event.y
 
@@ -273,7 +277,30 @@ class ImgSpeWidget (QtGui.QWidget) :
         w  = x - x0
 
         rect = [x0, y0, w, bbh]
-        self.fig.canvas.drawRectangle( rect )            
+        self.line_ver = self.fig.canvas.drawRectangle( rect )            
+        #self.fig.canvas.draw()
+
+
+    def drawHorizontalLineThroughCoursor(self, event) :
+        axes   = event.inaxes
+        fb     = self.canvas.figure.bbox
+        bb     = axes.bbox
+        #print bb
+
+        bbx0, bby0, bbh, bbw = bb.x0, bb.y0, bb.height, bb.width
+        fbx0, fby0, fbh, fbw = fb.x0, fb.y0, fb.height, fb.width
+
+        #xd = event.xdata
+        #yd = event.ydata
+        x = event.x
+        y = event.y
+
+        x0 = bbx0
+        y0 = fbh - bby0 - bbh
+        h  = bbh - (y - bby0)
+
+        rect = [x0, y0, bbw+1, h]
+        self.line_hor = self.fig.canvas.drawRectangle( rect )            
         #self.fig.canvas.draw()
 
 
@@ -282,8 +309,17 @@ class ImgSpeWidget (QtGui.QWidget) :
 
         if self.fig.ntbZoomIsOn : return
 
+        if   event.inaxes == self.axhi :
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+        elif event.inaxes == self.axim :
+            #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+        else :
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
         if event.inaxes == self.axhi :
             self.drawVerticalLineThroughCoursor(event)
+            #self.drawHorizontalLineThroughCoursor(event)
         
         if event.inaxes == self.axim and self.fig.myZoomIsOn :
             #print 'processMouseMotion',
@@ -445,8 +481,8 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    w = ImgSpeWidget(None, get_array2d_for_test())
-    #w = ImgSpeWidget(None)
+    w = PlotImgSpeWidget(None, get_array2d_for_test())
+    #w = PlotImgSpeWidget(None)
     #w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(50,50))
     w.show()    
