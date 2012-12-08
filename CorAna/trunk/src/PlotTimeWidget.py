@@ -64,9 +64,8 @@ class PlotTimeWidget (QtGui.QWidget) :
         self.get_array_from_file()
 
         self.fig = plt.figure(figsize=figsize, dpi=100, facecolor='w',edgecolor='w',frameon=True)
-       #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-
-        print 'fig.number =', self.fig.number
+        #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        #print 'fig.number =', self.fig.number
 
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)

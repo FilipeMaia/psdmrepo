@@ -227,8 +227,8 @@ class GUIFiles ( QtGui.QWidget ) :
         try    : self.tab_bar.close()
         except : pass
         
-        #try    : del cp.guifiles # GUIFiles
-        #except : pass # silently ignore
+        try    : del cp.guifiles # GUIFiles
+        except : pass # silently ignore
 
     def onClose(self):
         logger.debug('onClose', __name__)

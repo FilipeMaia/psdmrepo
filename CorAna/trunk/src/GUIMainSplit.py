@@ -43,16 +43,17 @@ import time   # for sleep(sec)
 from ConfigParametersCorAna import confpars as cp
 
 #from GUIConfigParameters import * 
-from GUIFiles            import *
-from GUISetupInfo        import *
-from GUIAnaSettings      import *
-from GUISystemSettings   import *
-from GUIRun              import *
-from GUIViewResults      import *
-from GUILogger           import *
-from Logger              import logger
-from FileNameManager     import fnm
-from GUIFileBrowser      import *
+from GUIFiles             import *
+from GUISetupInfo         import *
+from GUIAnaSettings       import *
+from GUISystemSettings    import *
+from GUIIntensityMonitors import *
+from GUIRun               import *
+from GUIViewResults       import *
+from GUILogger            import *
+from Logger               import logger
+from FileNameManager      import fnm
+from GUIFileBrowser       import *
 
 #---------------------
 #  Class definition --
@@ -101,7 +102,13 @@ class GUIMainSplit ( QtGui.QWidget ) :
         #self.vboxW.addLayout(self.hboxW) 
         #self.vboxW.addStretch(1)
 
-        self.list_of_tabs = ['Files', 'Setup Info', 'Analysis Settings', 'System', 'Run', 'View Results']
+        self.list_of_tabs = ['Files',
+                             'Setup Info',
+                             'Analysis Settings',
+                             'System',
+                             'Intensity Monitors',
+                             'Run',
+                             'View Results']
         self.makeTabBar()
         self.guiSelector()
 
@@ -221,13 +228,16 @@ class GUIMainSplit ( QtGui.QWidget ) :
         self.ind_tab_batch  = self.tab_bar.addTab( self.list_of_tabs[1] )
         self.ind_tab_anaset = self.tab_bar.addTab( self.list_of_tabs[2] )
         self.ind_tab_system = self.tab_bar.addTab( self.list_of_tabs[3] )
-        self.ind_tab_run    = self.tab_bar.addTab( self.list_of_tabs[4] )
-        self.ind_tab_result = self.tab_bar.addTab( self.list_of_tabs[5] )
+        self.ind_tab_intmon = self.tab_bar.addTab( self.list_of_tabs[4] )
+        self.ind_tab_run    = self.tab_bar.addTab( self.list_of_tabs[5] )
+        self.ind_tab_result = self.tab_bar.addTab( self.list_of_tabs[6] )
+
 
         self.tab_bar.setTabTextColor(self.ind_tab_files  , QtGui.QColor('green'))
         self.tab_bar.setTabTextColor(self.ind_tab_batch  , QtGui.QColor('red'))
         self.tab_bar.setTabTextColor(self.ind_tab_anaset , QtGui.QColor('gray'))
         self.tab_bar.setTabTextColor(self.ind_tab_system , QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_intmon , QtGui.QColor('red'))
         self.tab_bar.setTabTextColor(self.ind_tab_run    , QtGui.QColor('magenta'))
         self.tab_bar.setTabTextColor(self.ind_tab_result , QtGui.QColor('gray'))
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
@@ -272,11 +282,15 @@ class GUIMainSplit ( QtGui.QWidget ) :
             self.gui_win = GUISystemSettings(self)
             #self.setStatus(0, 'Status: processing for data')
 
-        if cp.current_tab.value() == self.list_of_tabs[4] :
+        elif cp.current_tab.value() == self.list_of_tabs[4] :
+            self.gui_win = GUIIntensityMonitors(self)
+            #self.setStatus(0, 'Status: set pars for intensity mons.')
+
+        elif cp.current_tab.value() == self.list_of_tabs[5] :
             self.gui_win = GUIRun(self)
             #self.setStatus(0, 'Status: set file for config. pars.')
 
-        if cp.current_tab.value() == self.list_of_tabs[5] :
+        elif cp.current_tab.value() == self.list_of_tabs[6] :
             self.gui_win = GUIViewResults(self)
             #self.setStatus(0, 'Status: set work and result dirs.')
 
@@ -312,23 +326,23 @@ class GUIMainSplit ( QtGui.QWidget ) :
             logger.saveLogInFile     ( fnm.log_file() )
             logger.saveLogTotalInFile( fnm.log_file_total() )
 
-        try    : cp.guifiles.close()
-        except : pass
+        #try    : cp.guifiles.close()
+        #except : pass
 
-        try    : cp.guisetupinfo.close()
-        except : pass
+        #try    : cp.guisetupinfo.close()
+        #except : pass
 
-        try    : cp.guianasettings.close()
-        except : pass
+        #try    : cp.guianasettings.close()
+        #except : pass
 
-        try    : cp.guisystemsettings.close()
-        except : pass
+        #try    : cp.guisystemsettings.close()
+        #except : pass
 
-        try    : cp.guiviewresults.close()
-        except : pass
+        #try    : cp.guiviewresults.close()
+        #except : pass
 
-        try    : cp.guirun.close()
-        except : pass
+        #try    : cp.guirun.close()
+        #except : pass
 
         try    : cp.guilogger.close()
         except : pass
@@ -336,8 +350,8 @@ class GUIMainSplit ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
 
-        try    : del cp.guimain
-        except : pass
+        #try    : del cp.guimain
+        #except : pass
 
 
     def onExit(self):

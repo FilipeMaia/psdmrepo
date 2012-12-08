@@ -40,7 +40,7 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 370, 30)
-        self.setWindowTitle('Log files')
+        self.setWindowTitle('Analysis parameters')
         self.setFrame()
 
         self.list_ana_types  = ['Static', 'Dynamic']
@@ -143,8 +143,8 @@ class GUIAnaPartitions ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guianapartitions # GUIAnaPartitions
-        except : pass # silently ignore
+        #try    : del cp.guianapartitions # GUIAnaPartitions
+        #except : pass # silently ignore
 
     def onClose(self):
         logger.debug('onClose', __name__)

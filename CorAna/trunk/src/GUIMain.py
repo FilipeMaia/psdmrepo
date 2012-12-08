@@ -43,16 +43,17 @@ import time   # for sleep(sec)
 from ConfigParametersCorAna import confpars as cp
 
 #from GUIConfigParameters import * 
-from GUIFiles            import *
-from GUISetupInfo        import *
-from GUIAnaSettings      import *
-from GUISystemSettings   import *
-from GUIRun              import *
-from GUIViewResults      import *
-from GUILogger           import *
-from Logger              import logger
-from FileNameManager     import fnm
-from GUIFileBrowser      import *
+from GUIFiles             import *
+from GUISetupInfo         import *
+from GUIAnaSettings       import *
+from GUISystemSettings    import *
+from GUIIntensityMonitors import *
+from GUIRun               import *
+from GUIViewResults       import *
+from GUILogger            import *
+from Logger               import logger
+from FileNameManager      import fnm
+from GUIFileBrowser       import *
 
 #---------------------
 #  Class definition --
@@ -81,6 +82,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.butBatchInfo   = QtGui.QPushButton('Setup Info')    
         self.butAnaSettings = QtGui.QPushButton('Analysis Settings')
         self.butSystem      = QtGui.QPushButton('System')
+        self.butIntMon      = QtGui.QPushButton('Intensity Monitors')
         self.butRun         = QtGui.QPushButton('Run')
         self.butViewResults = QtGui.QPushButton('View Results')
         self.butStop        = QtGui.QPushButton('Stop')
@@ -95,6 +97,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.vbox.addWidget(self.butBatchInfo  )
         self.vbox.addWidget(self.butAnaSettings)
         self.vbox.addWidget(self.butSystem     )
+        self.vbox.addWidget(self.butIntMon     )
         self.vbox.addWidget(self.butRun        )
         self.vbox.addWidget(self.butViewResults)
         self.vbox.addStretch(1)     
@@ -111,6 +114,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.butBatchInfo  ,  QtCore.SIGNAL('clicked()'), self.onBatchInfo   )
         self.connect(self.butAnaSettings,  QtCore.SIGNAL('clicked()'), self.onAnaSettings )
         self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
+        self.connect(self.butIntMon     ,  QtCore.SIGNAL('clicked()'), self.onIntMon      )
         self.connect(self.butRun        ,  QtCore.SIGNAL('clicked()'), self.onRun         )
         self.connect(self.butViewResults,  QtCore.SIGNAL('clicked()'), self.onViewResults )
         self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
@@ -163,6 +167,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.butBatchInfo  .setStyleSheet(cp.styleButton) 
         self.butAnaSettings.setStyleSheet(cp.styleButton)
         self.butSystem     .setStyleSheet(cp.styleButton)
+        self.butIntMon     .setStyleSheet(cp.styleButton)
         self.butRun        .setStyleSheet(cp.styleButton)
         self.butViewResults.setStyleSheet(cp.styleButton)
         self.butStop       .setStyleSheet(cp.styleButton)
@@ -200,6 +205,9 @@ class GUIMain ( QtGui.QWidget ) :
         except : pass
 
         try    : cp.guisystemsettings.close()
+        except : pass
+
+        try    : cp.guiintensitymonitors.close()
         except : pass
 
         try    : cp.guiviewresults.close()
@@ -271,6 +279,16 @@ class GUIMain ( QtGui.QWidget ) :
             cp.guisystemsettings = GUISystemSettings()
             cp.guisystemsettings.move(self.pos().__add__(QtCore.QPoint(160,160))) # open window with offset w.r.t. parent
             cp.guisystemsettings.show()
+
+
+    def onIntMon(self):     
+        logger.debug('onIntMon', self.name)
+        try    :
+            cp.guiintensitymonitors.close()
+        except :
+            cp.guiintensitymonitors = GUIIntensityMonitors()
+            cp.guiintensitymonitors.move(self.pos().__add__(QtCore.QPoint(160,160))) # open window with offset w.r.t. parent
+            cp.guiintensitymonitors.show()
 
 
     def onRun (self):       

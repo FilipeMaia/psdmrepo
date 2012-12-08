@@ -62,11 +62,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.arr = arr        
         self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
         #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-
-
-        print 'fig.number =', self.fig.number
+        #print 'fig.number =', self.fig.number
   
-
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas

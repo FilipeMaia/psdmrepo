@@ -28,7 +28,8 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
-
+from copy import deepcopy
+ 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -228,6 +229,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  type='float' )
         self.ccdset_ccddain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   type='float' )
 
+#-----------------------------
+
         imon_names = [ ('BldInfo(FEEGasDetEnergy)',       None ,'str'), \
                        ('BldInfo(XCS-IPM-02)',            None ,'str'), \
                        ('BldInfo(XCS-IPM-mono)',          None ,'str'), \
@@ -235,6 +238,19 @@ class ConfigParametersCorAna ( ConfigParameters ) :
                        ('DetInfo(XcsBeamline.1:Ipimb.5)', None ,'str') ]
 
         self.imon_name_list = self.declareListOfPars( 'IMON_NAMES', imon_names )
+
+#-----------------------------
+
+        imon_cbxs = [ (True, True ,'bool'), \
+                      (True, True ,'bool'), \
+                      (True, True ,'bool'), \
+                      (True, True ,'bool'), \
+                      (True, True ,'bool') ]
+
+        self.imon_ch1_list = self.declareListOfPars( 'IMON_CH1', deepcopy(imon_cbxs) )
+        self.imon_ch2_list = self.declareListOfPars( 'IMON_CH2', deepcopy(imon_cbxs) )
+        self.imon_ch3_list = self.declareListOfPars( 'IMON_CH3', deepcopy(imon_cbxs) )
+        self.imon_ch4_list = self.declareListOfPars( 'IMON_CH4', deepcopy(imon_cbxs) )
 
 #-----------------------------
 
