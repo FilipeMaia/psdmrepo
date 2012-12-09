@@ -55,19 +55,16 @@ from ConfigParametersCorAna import confpars as cp
 #  Class definition --
 #---------------------
 
-#class PlotArray (QtGui.QMainWindow) :
 class PlotArray (QtGui.QWidget) :
     """Plot for array"""
 
-
-    def __init__(self, parent=None, arr=None, ofname='./fig.png'):
-        #QtGui.QMainWindow.__init__(self, parent)
+    def __init__(self, parent=None, arr=None, ofname='./fig.png', title=''):
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 800, 400)
         self.setWindowTitle('Plot for array')
         self.setFrame()
 
-        self.widgimage = imgwidg.PlotArrayWidget(parent, arr)
+        self.widgimage = imgwidg.PlotArrayWidget(parent, arr, title=title)
         self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
  
         #---------------------
@@ -111,8 +108,8 @@ class PlotArray (QtGui.QWidget) :
 
         #print 'Close application'
 
-    def set_array(self, arr) :
-        self.widgimage.set_array(arr)
+    def set_array(self, arr, title='') :
+        self.widgimage.set_array(arr, title)
 
 #-----------------------------
 # Test

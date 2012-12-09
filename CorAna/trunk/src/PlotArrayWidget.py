@@ -54,11 +54,12 @@ from PyQt4 import QtGui, QtCore
 class PlotArrayWidget (QtGui.QWidget) :
     """Plot array as a graphic and as a histogram"""
 
-    def __init__(self, parent=None, arr=None, arrx=None, figsize=(10,5)):
+    def __init__(self, parent=None, arr=None, arrx=None, figsize=(10,5), title=''):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
 
         self.arry    = arr
+        self.title   = title
         self.set_xarray(arrx)
 
         self.parent  = parent
@@ -112,9 +113,11 @@ class PlotArrayWidget (QtGui.QWidget) :
         pass
 
 
-    def set_array(self,arr):
-        self.arry = arr
-        self.processDraw()
+    def set_array(self, arr, title=''):
+        self.arry  = arr
+        self.title = title
+        self.on_draw()
+        #self.processDraw()
 
 
     def set_xarray(self,arr):
@@ -152,6 +155,8 @@ class PlotArrayWidget (QtGui.QWidget) :
         if gr_xmax==None : xmax = xarr[-1] # Last element
         else             : xmax = gr_xmax
 
+        if xmin==xmax : xmax=xmin+1 # protection against equal limits
+
         yarrwin = yarr[int(xmin):int(xmax)]
         xarrwin = xarr[int(xmin):int(xmax)]
 
@@ -161,14 +166,18 @@ class PlotArrayWidget (QtGui.QWidget) :
         if gr_ymax==None : ymax = max(yarrwin)
         else             : ymax = gr_ymax
 
+        if ymin==ymax : ymax=ymin+1 # protection against equal limits
+
         hi_range = (ymin, ymax)
 
-        self.axgr = self.fig.add_axes([0.1,  0.64, 0.80, 0.35])
-        self.axhi = self.fig.add_axes([0.1,  0.14, 0.35, 0.35])
+        self.axgr = self.fig.add_axes([0.1, 0.62, 0.80, 0.32])
+        self.axhi = self.fig.add_axes([0.1, 0.14, 0.35, 0.32])
 
         self.axhi.xaxis.set_major_locator(MaxNLocator(4))
         self.axhi.yaxis.set_major_locator(MaxNLocator(4))
         self.axgr.yaxis.set_major_locator(MaxNLocator(4))
+
+        self.axgr.set_title(self.title, color='b',fontsize=12)
 
         #ax1.plot(tau, cor1, '-r', tau, cor2, '-g')
         #self.axgr.plot(xarr,    yarr,    '-r')

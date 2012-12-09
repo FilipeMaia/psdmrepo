@@ -198,25 +198,51 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def plotIMon(self,imon):
         logger.debug('plotIMon', __name__)
+        arr = self.getArray(imon)
         try :
             cp.plotarray.close()
         except :
-            arr = self.getArray(imon)            
             if arr == None : return
-            cp.plotarray = PlotArray(None, arr, ofname=fnm.path_data_mons_plot())
+            cp.plotarray = PlotArray(None, arr,
+                                     ofname=fnm.path_data_mons_plot(),
+                                     title=self.titleForIMon(imon))
             cp.plotarray.move(self.parentWidget().pos().__add__(QtCore.QPoint(700,300)))
             cp.plotarray.show()
 
 
-
+    def titleForIMon(self,imon):
+        return cp.imon_name_list[imon].value() + \
+               ':  sum of channels: ' + \
+               self.strMaskForIMonChannels(imon) 
+        
 
     def redrawArray(self,imon):
         logger.debug('plotIMon', __name__)
-        arr = self.getArray(imon)            
+        arr = self.getArray(imon)
+        if arr == None : return
         try :
-            cp.plotarray.set_array(arr)
+            cp.plotarray.set_array(arr, title=self.titleForIMon(imon))
         except :
             pass
+
+
+    def boolMaskForIMonChannels(self,imon):
+        return [cp.imon_ch1_list[imon].value(),
+                cp.imon_ch2_list[imon].value(),
+                cp.imon_ch3_list[imon].value(),
+                cp.imon_ch4_list[imon].value()]
+
+
+    def npIntMaskForIMonChannels(self,imon):
+        return np.array(self.boolMaskForIMonChannels(imon),dtype=int)
+
+
+    def strMaskForIMonChannels(self,imon):
+        mask = self.boolMaskForIMonChannels(imon)
+        str = ''
+        for i,v in enumerate(mask) :
+            if v : str += '%s+' % (i+1)
+        return str.rstrip('+')
 
 
     def getArray(self,imon):
@@ -230,12 +256,10 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         #print 'arr_imon:\n', arr_imon
         #print 'arr_imon.shape:', arr_imon.shape
 
-        mask = [cp.imon_ch1_list[imon].value(),
-                cp.imon_ch2_list[imon].value(),
-                cp.imon_ch3_list[imon].value(),
-                cp.imon_ch4_list[imon].value()]
+        #mask = self.maskForIMonChannels(imon)
+        #npmask = np.array(mask,dtype=float)
+        npmask = self.npIntMaskForIMonChannels(imon)
 
-        npmask = np.array(mask,dtype=float)
         size   = arr_imon.shape[0]
         npcol1 = np.ones(size)
 
