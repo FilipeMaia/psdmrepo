@@ -150,7 +150,6 @@ class FileNameManager :
         return  self.path_data_scan_tstamp_list() + '-tmp'
 
 
-
     def path_data_aver_psana_cfg(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver.cfg'
 
@@ -168,6 +167,9 @@ class FileNameManager :
 
     def path_data_time_plot(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-time-plot.png'
+
+    def path_data_mons_plot(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.txt'
 
 #-----------------------------
 
@@ -188,6 +190,7 @@ class FileNameManager :
 
         self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
         self.list_of_files_data_aver.append(fnm.path_data_time_plot())
+        self.list_of_files_data_aver.append(fnm.path_data_mons_plot())
         return self.list_of_files_data_aver
 
 #-----------------------------

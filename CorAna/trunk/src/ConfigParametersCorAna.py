@@ -62,7 +62,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
   
     def initRunTimeParameters( self ) :
         self.char_expand = u' \u25BE' # down-head triangle
-        pass
+
+        self.plotarray_is_on = False
+
 
 
     def declareCorAnaParameters( self ) :

@@ -34,8 +34,8 @@ import random
 import numpy as np
 
 # For self-run debugging:
-import matplotlib
-matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#import matplotlib
+#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
 import matplotlib.pyplot as plt
 
@@ -71,14 +71,14 @@ class PlotArray (QtGui.QWidget) :
         self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
  
         #---------------------
-
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
         #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
         vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas 
         vbox.addWidget(self.widgbuts)                   # <=== Add buttons         
         self.setLayout(vbox)
-
         #---------------------
+        cp.plotarray_is_on = True
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -103,11 +103,16 @@ class PlotArray (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
+
+        cp.plotarray_is_on = False
+
         try    : del cp.plotarray
         except : pass
 
         #print 'Close application'
 
+    def set_array(self, arr) :
+        self.widgimage.set_array(arr)
 
 #-----------------------------
 # Test

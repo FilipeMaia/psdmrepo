@@ -30,7 +30,9 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-
+from FileNameManager        import fnm
+from PlotArray              import *
+import GlobalUtils          as     gu
 #---------------------
 #  Class definition --
 #---------------------
@@ -43,12 +45,13 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.setWindowTitle('GUI for Intensity Monitors')
         self.setFrame()
 
-        self.list_of_fields  = []
+        self.list_of_dicts   = []
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
         self.setTitleBar()
         for i,name in enumerate(cp.imon_name_list) :
+            print i, name.value()
             self.guiSection(name, cp.imon_ch1_list[i],
                                   cp.imon_ch2_list[i],
                                   cp.imon_ch3_list[i],
@@ -83,7 +86,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def setTitleBar(self) :
-        list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4', 'Plot']                               
+        list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4', 'Plot']
         for i,t in enumerate(list_of_titles) : 
             label = QtGui.QLabel(t)
             label.setStyleSheet(cp.styleLabel)
@@ -101,26 +104,29 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         cb1 = QtGui.QCheckBox('   +', self)
         cb2 = QtGui.QCheckBox('   +', self)
         cb3 = QtGui.QCheckBox('   +', self)
-        cb4 = QtGui.QCheckBox('    ', self)
+        cb4 = QtGui.QCheckBox('   =', self)
 
-        cb1.setChecked( cbch1.value() )
-        cb2.setChecked( cbch2.value() )
-        cb3.setChecked( cbch3.value() )
-        cb4.setChecked( cbch4.value() )
+        sec_dict = { 0:(edi,name),
+                     1:(cb1,cbch1),
+                     2:(cb2,cbch2),
+                     3:(cb3,cbch3),
+                     4:(cb4,cbch4),
+                     5:(but,None) }
 
+        self.list_of_dicts.append( sec_dict )
+
+        for col,(fld, par) in sec_dict.iteritems() :
+            self.grid.addWidget(fld, self.grid_row, col)
+            if col>0 and col<5 :
+                fld.setChecked( par.value() )
+                self.connect(fld, QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
+
+        self.grid_row += 1
+        
         edi.setReadOnly( True )  
-
         edi.setToolTip('Edit number in this field\nor click on "Browse"\nto select the file.')
         but.setToolTip('Click on this button\nand select the file.')
         #box.setToolTip('Click on this box\nand select the partitioning method.')
-
-        self.grid.addWidget(edi, self.grid_row, 0)
-        self.grid.addWidget(cb1, self.grid_row, 1)
-        self.grid.addWidget(cb2, self.grid_row, 2)
-        self.grid.addWidget(cb3, self.grid_row, 3)
-        self.grid.addWidget(cb4, self.grid_row, 4)
-        self.grid.addWidget(but, self.grid_row, 5)
-        self.grid_row += 1
 
         edi    .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
         #box    .setStyleSheet (cp.styleButton) 
@@ -132,17 +138,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         edi    .setFixedWidth(250)
         #box    .setFixedWidth(160)
 
-        self.connect(cb1,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-        self.connect(cb2,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-        self.connect(cb3,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-        self.connect(cb4,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
-
         #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
-        #self.connect(but, QtCore.SIGNAL('clicked()'),                self.onBut  )
+        self.connect(but, QtCore.SIGNAL('clicked()'),                self.onBut  )
         #self.connect(box, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
-                                 #   0     1      2      3      4  
-        self.list_of_fields.append( (edi,  cb1,   cb2,   cb3,   cb4,
-                                     name, cbch1, cbch2, cbch3, cbch4 ) )
 
 
     def setParent(self,parent) :
@@ -174,16 +172,89 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def onCBox(self) :
-        for row, fields in enumerate(self.list_of_fields) :            
-            for col in range(4) :
-                cbx, par = fields[col+1], fields[col+1+5]
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+            for col,(cbx, par) in sec_dict.iteritems() :
                 if cbx.hasFocus() : 
-                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx.isChecked(), row+1, col+1)
+                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx.isChecked(), row0+1, col)
                     par.setValue( cbx.isChecked() )
                     logger.info(msg, __name__ )
+
+                    if cp.plotarray_is_on :
+                        self.redrawArray(row0)
                     return
 
 
+    def onBut(self):
+        logger.debug('onBut', __name__)
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+            edi, name = sec_dict[0]
+            but, empt = sec_dict[5]
+            if but.hasFocus() : 
+                msg = 'onBut - click on button %s in row %s, plot for %s' % (str(but.text()), row0+1, name.value())
+                logger.info(msg, __name__ )
+                self.plotIMon(row0)
+                return
+
+
+    def plotIMon(self,imon):
+        logger.debug('plotIMon', __name__)
+        try :
+            cp.plotarray.close()
+        except :
+            arr = self.getArray(imon)            
+            if arr == None : return
+            cp.plotarray = PlotArray(None, arr, ofname=fnm.path_data_mons_plot())
+            cp.plotarray.move(self.parentWidget().pos().__add__(QtCore.QPoint(700,300)))
+            cp.plotarray.show()
+
+
+
+
+    def redrawArray(self,imon):
+        logger.debug('plotIMon', __name__)
+        arr = self.getArray(imon)            
+        try :
+            cp.plotarray.set_array(arr)
+        except :
+            pass
+
+
+    def getArray(self,imon):
+        logger.debug('getArray for imon: '+str(imon), __name__)
+        arr_all = gu.get_array_from_file(fnm.path_data_scan_monitors_data())
+        if arr_all == None : return None
+        logger.debug('Array shape: ' + str(arr_all.shape), __name__)
+
+        ibase    = 1+imon*4
+        arr_imon = arr_all[:,ibase:ibase+4]
+        #print 'arr_imon:\n', arr_imon
+        #print 'arr_imon.shape:', arr_imon.shape
+
+        mask = [cp.imon_ch1_list[imon].value(),
+                cp.imon_ch2_list[imon].value(),
+                cp.imon_ch3_list[imon].value(),
+                cp.imon_ch4_list[imon].value()]
+
+        npmask = np.array(mask,dtype=float)
+        size   = arr_imon.shape[0]
+        npcol1 = np.ones(size)
+
+        X,Y = np.meshgrid(npmask,npcol1)
+        arr_prod = (arr_imon * X)        
+        arr_sum  = arr_prod.sum(1) 
+        
+        #print 'npmask=', npmask
+        #print 'size=', size
+        #print X
+        #print X.shape
+        #print arr_imon
+        #print arr_imon.shape
+        #print arr_prod
+        #print arr_prod.shape
+        return arr_sum
+
+#-----------------------------
+#
 #    def onEdit(self):
 #        logger.debug('onEdit', __name__)
 #        for fields in self.sect_fields :
@@ -193,30 +264,6 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 #                edi.setModified(False)
 #                par.setValue( str(edi.displayText()) )
 #                logger.info('Set parameter = ' + str( par.value()), __name__ )
-#
-#        
-#    def onBut(self):
-#        logger.debug('onBut', __name__)
-#        for fields in self.sect_fields :
-#            but = fields[5]
-#            if but.hasFocus() :
-#                tit = fields[0]
-#                edi = fields[4]
-#                par = fields[7]
-#                #fname = par.value()
-#                dir   = './'
-#                logger.info('Section: ' + str(tit.text()) + ' - browser for file', __name__ )
-#                path  = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',dir) )
-#                dname, fname = os.path.split(path)
-#
-#                if dname == '' or fname == '' :
-#                    logger.warning('Input directiry name or file name is empty... keep file name unchanged...', __name__)
-#                    return
-#
-#                edi.setText (path)
-#                par.setValue(path)
-#                logger.info('selected the file name: ' + str(par.value()), __name__ )
-#
 #
 #    def onBox(self):
 #        for fields in self.sect_fields :
@@ -228,8 +275,6 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 #                method.setValue( method_selected ) 
 #                logger.info('onBox for ' + str(tit.text()) + ' - selected method: ' + method_selected, __name__)
 #
-#
-
 #-----------------------------
 
 if __name__ == "__main__" :

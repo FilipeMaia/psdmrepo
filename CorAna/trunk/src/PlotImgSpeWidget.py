@@ -358,6 +358,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
             self.xpressabs = event.x
             self.ypressabs = event.y
             self.fig.myZoomIsOn = True
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
 
     def mousePressOnHistogram(self, event) :
         #print 'PressOnHistogram'
@@ -427,6 +428,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
                 fig.myYmin = int(min(self.ypress, self.yrelease))
                 fig.myYmax = int(max(self.ypress, self.yrelease))
 
+                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
+                #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.BusyCursor))
                 #print ' Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
                 #self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
                 self.processDraw()
