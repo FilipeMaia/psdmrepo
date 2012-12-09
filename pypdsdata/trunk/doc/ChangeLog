@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-87
+2012-12-08 Andy Salnikov
+- add protection to DataObjectFactory::makeObject for missing payload
+
 Tag: V00-00-86
 2012-11-30 Andy Salnikov
 - fix for PrincetonFrame, forgot to update it for ConfigV4

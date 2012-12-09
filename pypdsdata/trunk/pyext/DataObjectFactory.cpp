@@ -176,6 +176,12 @@ namespace pypdsdata {
 PyObject*
 DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 {
+  // zero-payload data means something is not good
+  // do not throw exception though, just return None
+  if (xtc.sizeofPayload() == 0) {
+    Py_RETURN_NONE;
+  }
+
   PyObject* obj = 0;
   switch ( xtc.contains.id() ) {
 
