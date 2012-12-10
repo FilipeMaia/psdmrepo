@@ -6,14 +6,14 @@
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 
-<link type="text/css" href="css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
-<script type="text/javascript" src="js/Table.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
 
 <style type="text/css">
 body {
@@ -139,7 +139,7 @@ $(function() {
         table5.erase(Table.Status.Loading);
         $.ajax({
             type: 'GET',
-            url: '../portal/TableTestData.php',
+            url: '../portal/ws/TableTestData.php',
             data: {
                 rows: 12,
                 cols: table5.cols()},

@@ -149,7 +149,7 @@ try {
 <head>
 <title>Analyze Data Accumulation for each month of LCLS </title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-<link type="text/css" href="css/common.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 <style>
 #main {
   padding:10px;

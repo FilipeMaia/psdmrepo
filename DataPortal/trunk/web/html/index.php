@@ -954,22 +954,27 @@ HERE;
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 
-<link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/ELog.css" rel="Stylesheet" />
 <link type="text/css" href="css/Exper.css" rel="Stylesheet" />
 <link type="text/css" href="css/Data.css" rel="Stylesheet" />
 <link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/ELog.js"></script>
 <script type="text/javascript" src="js/Exper.js"></script>
 <script type="text/javascript" src="js/Data.js"></script>
 <script type="text/javascript" src="js/Hdf.js"></script>
+
+<script type="text/javascript" src="../portal/js/config.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
 
 <!----------- Window layout styles and supppot actions ----------->
 
@@ -1051,6 +1056,8 @@ HERE;
 </style>
 
 <script type="text/javascript">
+
+var config = new config_create('portal') ;
 
 function resize() {
     var    top_height = 130;

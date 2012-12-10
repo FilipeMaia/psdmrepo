@@ -2,7 +2,7 @@
 <!DOCTYPE html">
 <html>
 <head>
-<link type="text/css" href="css/common.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 </head>
 <body>
 

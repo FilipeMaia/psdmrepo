@@ -148,6 +148,21 @@ function define_class(constructor, base, statics, methods ) {
  *    
  *    Where the default is 'true'.
  *
+ * 3. Hiding columns
+ * 
+ *      hideable: {true|false}
+ *
+ *    Where the default is 'false'.
+ *
+ * 4. Cell content alignment
+ * 
+ *      align: {left|right|center}
+ *
+ *    Where the default is 'left'
+ *
+ * 5. Extra styles for cells. For example:
+ * 
+ *      style: ' white-space: nowrap;'
  * Other parameters/options:
  *
  *   'data'                - data array to be preloaded when creating the table
@@ -189,11 +204,11 @@ define_class( TableCellType_TextURL, TableCellType, {}, {
 );
 
 
-function Table(id,coldef,data,options) {
+function Table(id, coldef, data, options, config_handler) {
 
-    /** 
-     * Constructor
-     */
+    var that = this;
+
+    this.config_handler = config_handler;
 
     // Mandatory parameters of the table
 
@@ -220,7 +235,11 @@ function Table(id,coldef,data,options) {
         size: {cols: 0, rows: 0},
         types: [],
         sorted: [],
-        selectable: []
+        hideable: [],
+        hidden: [],
+        selectable: [],
+        align: [],
+        style: []
     };
     this.header.size  = this.header_size(this.coldef);
 
@@ -228,11 +247,37 @@ function Table(id,coldef,data,options) {
         this.coldef,
         this.header.types,
         this.header.sorted,
+        this.header.hideable,
+        this.header.hidden,
         this.header.selectable,
+        this.header.align,
+        this.header.style,
         0
     );
-    this.header.types  = bottom_columns.types;
-    this.header.sorted = bottom_columns.sorted;
+    this.header.types    = bottom_columns.types;
+    this.header.sorted   = bottom_columns.sorted;
+    this.header.hideable = bottom_columns.hideable;
+    this.header.hidden   = bottom_columns.hidden;
+    this.header.align    = bottom_columns.align;
+    this.header.style    = bottom_columns.style;
+
+    // Override table configuration parameters from the persistent store.
+    // Note that if the store already has a cached value then we're going to use
+    // the one immediatelly. Otherwise the delayed loader will kick in
+    // when a transcation to load from an external source will finish.
+    // In case if there is not such parameter in teh external source we will
+    // push our current state to that store for future uses.
+
+    if (this.config_handler) {
+        var persistent_state = this.config_handler.load (
+            function (persistent_state) { that.load_state(persistent_state) ; } ,
+            function ()                 { that.save_state() ; }
+        ) ;
+        if (persistent_state != null) {
+            this.header.hidden = persistent_state.hidden;
+            this.sorted        = persistent_state.sorted;
+        }
+    }
 }
 define_class( Table, null, {
 
@@ -318,7 +363,7 @@ define_class( Table, null, {
          */
 
         var that = this;
-        var html = '<table><tbody>';
+        var html = '<table><thead>';
 
         // Draw header
 
@@ -330,6 +375,7 @@ define_class( Table, null, {
             }
             html += '</tr>';
         }
+        html += '</thead><tbody>';
 
         // Draw data rows (if available)
 
@@ -350,7 +396,12 @@ define_class( Table, null, {
                         }
                         selector = ' id="'+j+' '+i+'"';
                     }
-                    html += '<td class="'+classes+'" '+selector+'>'+this.header.types[j].to_string(row[j])+'</td>';
+                    var styles = '' ;
+                    if( this.header.style[j] != '' ) styles='style="'+this.header.style[j]+'"';
+                    html += '<td class="'+classes+'" '+selector+' align="'+this.header.align[j]+'" valign="top" '+styles+' >';
+                    if(this.header.hidden[j]) html += '&nbsp;';
+                    else                      html += this.header.types[j].to_string(row[j]);
+                    html += '</td>';
                 }
                 html += '</tr>';
             }
@@ -358,7 +409,7 @@ define_class( Table, null, {
             if( this.text_when_empty )
                 html +=
                     '<tr>'+
-                    '<td class="table_cell" colspan='+this.cols()+' rowspan=1 >'+this.text_when_empty+'</td>'+
+                    '<td class="table_cell" colspan='+this.cols()+' rowspan=1 valign="top" >'+this.text_when_empty+'</td>'+
                     '</tr>';
         }
         html += '</tbody></table>';
@@ -370,6 +421,7 @@ define_class( Table, null, {
             that.sorted.column  = column;
             that.sort_data();
             that.display();
+            that.save_state();
         });
         for( var i in this.header.types ) {
             this.header.types[i].after_sort(); 
@@ -382,6 +434,12 @@ define_class( Table, null, {
             that.header.types[col_idx].select_action(that.data[row_idx][col_idx]);
             $('#'+that.id).find('.table_cell_selectable_selected').removeClass('table_cell_selectable_selected');
             $(this).addClass('table_cell_selectable_selected');
+        });
+        $('#'+this.id).find('.table_column_hider').find('input[type="checkbox"]').change(function() {
+            var col_idx = parseInt(this.name);
+            that.header.hidden[col_idx] = !this.checked;
+            that.display();
+            that.save_state();
         });
     },
 
@@ -414,9 +472,23 @@ define_class( Table, null, {
                     for( var i in sort_sign_classes) sort_sign += ' '+sort_sign_classes[i];
                     sort_sign += '" name="'+col.number+'">'+'</span>';
                 }
+                if( this.header.hideable[col.number] )
+                    classes += ' table_column_hider';
             }
-            html += '<td class="'+classes+'" rowspan='+rowspan+' colspan='+colspan+' '+align+' >'+
-                '<div style="float:left;">'+col.name+'</div><div style="float:left;">'+sort_sign+'</div><div style="clear:both;"></div></td>';
+            var col_html = '<div style="float:left;">'+col.name+'</div><div style="float:left;">'+sort_sign+'</div><div style="clear:both;"></div>';
+            
+            html += '<td class="'+classes+'" rowspan='+rowspan+' colspan='+colspan+' '+align+' >';
+            if(( rowspan + level == this.header.size.rows ) && this.header.hideable[col.number] ) {
+                if( this.header.hidden[col.number] ) {
+                    html += '<div style="float:left;"><input type="checkbox" name="'+col.number+'" title="check to expand the column: '+col.name+'"/></div>';
+                } else {
+                    html += '<div style="float:left;"><input type="checkbox" name="'+col.number+'" checked="checked" title="uncheck to hide the column"/></div>';
+                    html += col_html;
+                }
+            } else {
+                html += col_html;
+            }
+            html += '</td>';
         }
 
         // And to optimize things we stop walking the header when the level drops
@@ -458,7 +530,7 @@ define_class( Table, null, {
         return {rows: rows2return, cols: cols2return};
     },
 
-    column_types: function(coldef, types, sorted, selectable, next_column_number) {
+    column_types: function(coldef, types, sorted, hideable, hidden, selectable, align, style, next_column_number) {
 
         /**
          * Traverse colum definition and return types for the bottom-most
@@ -468,10 +540,14 @@ define_class( Table, null, {
         for( var i in coldef ) {
             var col = coldef[i];
             if( col.coldef ) {
-                var child          = this.column_types(col.coldef, types, sorted, selectable, next_column_number);
+                var child          = this.column_types(col.coldef, types, sorted, hideable, hidden, selectable, align, style, next_column_number);
                 types              = child.types;
                 sorted             = child.sorted;
+                hideable           = child.hideable;
+                hidden             = child.hidden;
                 selectable         = child.selectable;
+                align              = child.align;
+                style              = child.style;
                 next_column_number = child.next_column_number;
             } else {
                 if(col.type) {
@@ -486,16 +562,40 @@ define_class( Table, null, {
                     types.push(Table.Types.Text);
                 }
                 sorted.push    (col.sorted     !== undefined ? col.sorted     : true);
-                selectable.push(col.selectable !== undefined ? col.selectable : false );
+                hideable.push  (col.hideable   !== undefined ? col.hideable   : false);
+                hidden.push    (false);
+                selectable.push(col.selectable !== undefined ? col.selectable : false);
+                align.push     (col.align      !== undefined ? col.align      : 'left');
+                style.push     (col.style      !== undefined ? col.style      : '');
                 col.number = next_column_number++;
             }
         }
         return {
             types:              types,
             sorted:             sorted,
+            hideable:           hideable,
+            hidden:             hidden,
             selectable:         selectable,
+            align:              align,
+            style:              style,
             next_column_number: next_column_number
         };
+    },
+
+    load_state: function (persistent_state) {
+        this.header.hidden = persistent_state.hidden ;
+        this.sorted        = persistent_state.sorted ;
+        this.display() ;
+    } ,
+
+    save_state: function () {
+        if (this.config_handler) {
+            var persistent_state = {
+                hidden: this.header.hidden,
+                sorted: this.sorted
+            } ;
+            this.config_handler.save(persistent_state) ;
+        }
     }}
 );
 
@@ -506,15 +606,20 @@ function Attributes_HTML(attr) {
         if(attr.classes)  html += ' class="'+attr.classes+'"';
         if(attr.name)     html += ' name="'+attr.name+'"';
         if(attr.value)    html += ' value="'+attr.value+'"';
-        if(attr.title)    html += ' title="'+attr.title+'"';
+        if(attr['size'])  html += ' size="'+attr['size']+'"';
         if(attr.disabled) html += ' disabled="disabled"';
         if(attr.checked)  html += ' checked="checked"';
         if(attr.onclick)  html += ' onclick="'+attr.onclick+'"';
+        if(attr.title)    html += ' title="'+attr.title+'"';
     }
     return html;
 }
 function TextInput_HTML(attr) {
     var html = '<input type="text"'+Attributes_HTML(attr)+'/>';
+    return html;
+}
+function TextArea_HTML(attr,rows,cols) {
+    var html = '<textarea rows="'+rows+'" cols="'+cols+'" '+Attributes_HTML(attr)+'/></textarea>';
     return html;
 }
 function Checkbox_HTML(attr) {
@@ -523,5 +628,15 @@ function Checkbox_HTML(attr) {
 }
 function Button_HTML(name,attr) {
     var html = '<button '+Attributes_HTML(attr)+'>'+name+'</button>';
+    return html;
+}
+function Select_HTML(options, selected, attr) {
+    var html = '<select '+Attributes_HTML(attr)+'>';
+    for( var i in options ) {
+        var opt = options[i];
+        var selected_opt = opt == selected ? ' selected="selected" ' : '';
+        html += '<option name="'+opt+'" '+selected_opt+'>'+opt+'</option>';
+    }
+    html += '</select>';
     return html;
 }

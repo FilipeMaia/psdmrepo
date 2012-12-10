@@ -7,7 +7,6 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use DataPortal\DataPortal;
 
@@ -15,7 +14,6 @@ use RegDB\RegDB;
 use RegDB\RegDBException;
 
 use LogBook\LogBook;
-use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
 
@@ -573,9 +571,7 @@ HERE;
 
 <?php
 
-} catch( AuthDBException  $e ) { print $e->toHtml();
-} catch( RegDBException   $e ) { print $e->toHtml();
-} catch( LogBookException $e ) { print $e->toHtml();
-}
+} catch( Exception  $e ) { print '<pre>'.print_r($e, true).'</pre>'; }
+
 
 ?>

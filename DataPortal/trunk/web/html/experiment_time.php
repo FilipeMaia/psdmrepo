@@ -330,9 +330,23 @@ function page_specific_init() {
     load_shift(initial_shift,0);
 }
     
-function report_error(msg) {
-    alert(msg);
+function report_error (msg, on_cancel) {
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'
+    ) ;
+    $('#popupdialogs').dialog({
+        resizable: true,
+        modal: true,
+        buttons: {
+            Cancel: function() {
+                $(this).dialog('close') ;
+                if (on_cancel) on_cancel() ;
+            }
+        },
+        title: 'Error'
+    }) ;
 }
+
 function save_comment(gap_begin_time_64,instr_name,comment,system) {
     $.ajax({
         type: 'POST',

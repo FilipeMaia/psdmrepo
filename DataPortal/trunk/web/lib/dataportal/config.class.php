@@ -690,7 +690,7 @@ HERE
         $update_time_64     = LusiTime::now()->to64() ;
         $sql = is_null($this->find_application_parameter($application, $scope, $parameter)) ?
             "INSERT INTO {$this->database}.application_config VALUES('{$uid}','{$application_escaped}','{$scope_escaped}','{$parameter_escaped}','{$value_escaped}',{$update_time_64})" :
-            "UPDATE {$this->database}.application_config SET value='{$value_escaped}', update_time={$update_time_64}" ;
+            "UPDATE {$this->database}.application_config SET value='{$value_escaped}', update_time={$update_time_64} WHERE uid='{$uid}' AND application='{$application_escaped}' AND scope='{$scope_escaped}' AND parameter='{$parameter_escaped}'" ;
         $this->query($sql) ;
         return $this->find_application_parameter($application, $scope, $parameter) ;
     }

@@ -33,22 +33,16 @@ require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use DataPortal\Config;
-use DataPortal\DataPortalException;
 
 use LogBook\LogBook;
-use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
 
 use FileMgr\FileMgrIrodsWs;
-use FileMgr\FileMgrException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
 class TableView {
     
@@ -321,6 +315,7 @@ try {
     $experiments = array();
     if( $active_filter ) {
         foreach( $regdb->instrument_names() as $instrument_name ) {
+            if( $regdb->find_instrument_by_name($instrument_name)->is_location()) continue;
             $experiment_switch = $regdb->last_experiment_switch( $instrument_name );
             if( !is_null( $experiment_switch )) {
                 $exper_id = $experiment_switch['exper_id'];
@@ -479,11 +474,6 @@ try {
     $regdb->commit();
     $logbook->commit();
     
-} catch( AuthDBException     $e ) { print $e->toHtml(); }
-  catch( DataPortalException $e ) { print $e->toHtml(); }
-  catch( LogBookException    $e ) { print $e->toHtml(); }
-  catch( LusiTimeException   $e ) { print $e->toHtml(); }
-  catch( FileMgrException    $e ) { print $e->toHtml(); }
-  catch( RegDBException      $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { print '<pre style="padding:10px; border-top:solid 1px maroon; color:maroon;">'.print_r($e,true).'</pre>'; }
   
 ?>

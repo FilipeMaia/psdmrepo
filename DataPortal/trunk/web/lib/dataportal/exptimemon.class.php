@@ -541,7 +541,7 @@ class ExpTimeMon extends DbConnection {
         $instrument_names = array();
         $experiments = array();
         foreach( LogBook::instance()->regdb()->instruments() as $instrument ) {
-            if( !$instrument->is_location()) {
+            if( !$instrument->is_location() && !$instrument->is_mobile()) {
                 array_push( $instrument_names, $instrument->name());
                 $experiments[$instrument->name()] = array();
                 foreach( LogBook::instance()->experiments_for_instrument($instrument->name()) as $experiment ) {

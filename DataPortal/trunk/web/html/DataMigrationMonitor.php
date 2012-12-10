@@ -5,29 +5,26 @@ require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
 
 use DataPortal\Config;
-use DataPortal\DataPortalException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
 $refresh_interval_sec = 5;
 
 try {
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
-	$config  = Config::instance();
-	$config->begin();
+    $config  = Config::instance();
+    $config->begin();
 
-	$regdb = RegDB::instance();
-	$regdb->begin();
+    $regdb = RegDB::instance();
+    $regdb->begin();
 
-	$subscriber    = $authdb->authName();
-	$address       = $subscriber.'@slac.stanford.edu';
-	$is_subscribed = !is_null( $config->check_if_subscribed4migration ( $subscriber, $address ));
+    $subscriber    = $authdb->authName();
+    $address       = $subscriber.'@slac.stanford.edu';
+    $is_subscribed = !is_null( $config->check_if_subscribed4migration ( $subscriber, $address ));
 
 ?>
 <!DOCTYPE html"> 
@@ -109,81 +106,81 @@ var refresh_enabled = false;
 var refresh_timer = null;
 
 function request_update() {
-	$('#search_submit_button').button('disable');
-	var params = {};
-	if(  $('#file_filter_form').find('input[name="active"]'   ).attr('checked')) params.active = '';
-	if(  $('#file_filter_form').find('input[name="recent"]'   ).attr('checked')) params.recent = '';
-	params.instrument = $( '#file_filter_form').find('select[name="instrument"]').val();
-	if( !$('#file_filter_form').find('input[name="archived"]' ).attr('checked')) params.skip_non_archived = '';
-	if( !$('#file_filter_form').find('input[name="local"]'    ).attr('checked')) params.skip_non_local    = '';
-	if( !$('#file_filter_form').find('input[name="migrated"]' ).attr('checked')) params.skip_non_migrated = '';
-	switch( $( '#file_filter_form').find('select[name="ignore"]').val()) {
-	case '1h': params.ignore_1h = ''; break;
-	case '1d': params.ignore_1d = ''; break;
-	case '1w': params.ignore_1w = ''; break;
-	}
-	var jqXHR = $.get(
-		'../portal/ws/DataMigrationMonitorImpl.php', params,
-		function(data) {
-			$('#search_result').html(data);
-		},
-		'HTML'
-	).error( function () {
-		alert('failed because of: '+jqXHR.statusText); }
-	).complete( function() {
-		if( refresh_enabled ) {
-	    	refresh_timer = window.setTimeout( 'request_update()', refresh_interval );
-	    	return;
-		}
-		if( refresh_timer != null ) {
-	        window.clearTimeout(refresh_timer);
-	        refresh_timer = null;
-		}
-		$('#search_submit_button').button('enable'); }
-	);
+    $('#search_submit_button').button('disable');
+    var params = {};
+    if(  $('#file_filter_form').find('input[name="active"]'   ).attr('checked')) params.active = '';
+    if(  $('#file_filter_form').find('input[name="recent"]'   ).attr('checked')) params.recent = '';
+    params.instrument = $( '#file_filter_form').find('select[name="instrument"]').val();
+    if( !$('#file_filter_form').find('input[name="archived"]' ).attr('checked')) params.skip_non_archived = '';
+    if( !$('#file_filter_form').find('input[name="local"]'    ).attr('checked')) params.skip_non_local    = '';
+    if( !$('#file_filter_form').find('input[name="migrated"]' ).attr('checked')) params.skip_non_migrated = '';
+    switch( $( '#file_filter_form').find('select[name="ignore"]').val()) {
+    case '1h': params.ignore_1h = ''; break;
+    case '1d': params.ignore_1d = ''; break;
+    case '1w': params.ignore_1w = ''; break;
+    }
+    var jqXHR = $.get(
+        '../portal/ws/DataMigrationMonitorImpl.php', params,
+        function(data) {
+            $('#search_result').html(data);
+        },
+        'HTML'
+    ).error( function () {
+        alert('failed because of: '+jqXHR.statusText); }
+    ).complete( function() {
+        if( refresh_enabled ) {
+            refresh_timer = window.setTimeout( 'request_update()', refresh_interval );
+            return;
+        }
+        if( refresh_timer != null ) {
+            window.clearTimeout(refresh_timer);
+            refresh_timer = null;
+        }
+        $('#search_submit_button').button('enable'); }
+    );
 }
 
 $(function() {
 
-	$('#unsubscribe_button').button().click(function() {
-		var params = {};
-		var jqXHR = $.get(
-			'../portal/ws/DataMigrationSubscriptionToggle.php', params,
-			function(data) {
-				$('#subscribe_area'  ).removeClass('hidden').addClass('visible');
-				$('#unsubscribe_area').removeClass('visible').addClass('hidden');
-			},
-			'HTML'
-		).error( function () {
-			alert('failed because of: '+jqXHR.statusText); }
-		).complete( function() {}
-		);
-	});
-	$('#subscribe_button').button().click(function() {
-		var params = {};
-		var jqXHR = $.get(
-			'../portal/ws/DataMigrationSubscriptionToggle.php', params,
-			function(data) {
-				$('#subscribe_area'  ).removeClass('visible').addClass('hidden');
-				$('#unsubscribe_area').removeClass('hidden').addClass('visible');
-			},
-			'HTML'
-		).error( function () {
-			alert('failed because of: '+jqXHR.statusText); }
-		).complete( function() {}
-		);
-	});
-	$('#search_submit_button').button().click(function() {
-		request_update();
-	});
-	$('#automatic_search_checkbox').change(function() {
-		if( $(this).attr('checked')) {
-			refresh_enabled = true;
-			request_update();
-		} else {
-			refresh_enabled = false;
-		}
-	});
+    $('#unsubscribe_button').button().click(function() {
+        var params = {};
+        var jqXHR = $.get(
+            '../portal/ws/DataMigrationSubscriptionToggle.php', params,
+            function(data) {
+                $('#subscribe_area'  ).removeClass('hidden').addClass('visible');
+                $('#unsubscribe_area').removeClass('visible').addClass('hidden');
+            },
+            'HTML'
+        ).error( function () {
+            alert('failed because of: '+jqXHR.statusText); }
+        ).complete( function() {}
+        );
+    });
+    $('#subscribe_button').button().click(function() {
+        var params = {};
+        var jqXHR = $.get(
+            '../portal/ws/DataMigrationSubscriptionToggle.php', params,
+            function(data) {
+                $('#subscribe_area'  ).removeClass('visible').addClass('hidden');
+                $('#unsubscribe_area').removeClass('hidden').addClass('visible');
+            },
+            'HTML'
+        ).error( function () {
+            alert('failed because of: '+jqXHR.statusText); }
+        ).complete( function() {}
+        );
+    });
+    $('#search_submit_button').button().click(function() {
+        request_update();
+    });
+    $('#automatic_search_checkbox').change(function() {
+        if( $(this).attr('checked')) {
+            refresh_enabled = true;
+            request_update();
+        } else {
+            refresh_enabled = false;
+        }
+    });
 });
 
 </script>
@@ -211,9 +208,9 @@ $(function() {
           <select name="instrument">
             <option value="" >any</option>
 <?php
-	foreach( $regdb->instruments() as $instrument )
-		if( !$instrument->is_location())
-			print <<<HERE
+    foreach( $regdb->instruments() as $instrument )
+        if( !$instrument->is_location())
+            print <<<HERE
             <option value="{$instrument->name()}" >{$instrument->name()}</option>
 
 HERE;
@@ -269,10 +266,9 @@ HERE;
 
 <?php
 
-	$config->commit();
-	$regdb->commit();
+    $config->commit();
+    $regdb->commit();
 
-} catch( DataPortalException $e ) { print $e->toHtml(); }
-  catch( RegDBException      $e ) { print $e->toHtml(); }
+} catch( Exception $e ) { print '<pre style="padding:10px; border-top:solid 1px maroon; color:maroon;">'.print_r($e,true).'</pre>'; }
 
 ?>

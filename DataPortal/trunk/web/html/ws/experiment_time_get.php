@@ -6,20 +6,13 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
-use AuthDB\AuthDB;
-use AuthDB\AuthDBException;
-
 use DataPortal\ExpTimeMon;
-use DataPortal\DataPortalException;
 
 use LogBook\LogBook;
-use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
-use LusiTime\LusiTimeException;
 
 use RegDB\RegDB;
-use RegDB\RegDBException;
 
 /**
  * This service will return a data structure representing LCLS beam
@@ -349,11 +342,6 @@ try {
         'systems'                     => $systems
     ));
 
-} catch( AuthDBException     $e ) { report_error( $e->toHtml()); }
-  catch( DataPortalException $e ) { report_error( $e->toHtml()); }
-  catch( LogBookException    $e ) { report_error( $e->toHtml()); }
-  catch( LusiTimeException   $e ) { report_error( $e->toHtml()); }
-  catch( RegDBException      $e ) { report_error( $e->toHtml()); }
-  catch( Exception           $e ) { report_error( "{$e}" );      }
+} catch( Exception $e ) { report_error( '<pre>'.print_r($e, true).'</pre>'); }
   
 ?>
