@@ -43,6 +43,11 @@ class RegDBInstrument {
     	return !is_null( $is_location_param ) && ( $is_location_param->value() != '0' );
     }
 
+    public function is_mobile () {
+        $is_mobile_param = $this->find_param_by_name ('isMobile');
+    	return !is_null( $is_mobile_param ) && ( $is_mobile_param->value() != '0' );
+    }
+
     /* =============
      *   MODIFIERS
      * =============

@@ -642,7 +642,13 @@ HERE;
             $groups['xcscom12'] = True;
             $groups['xcsc0112'] = True;
         }
-        
+
+        /* In-house commissionning, in-house, etc.
+         */
+        if( is_null( $instr ) || ( $instr == 'MOB' )) {
+            $groups['ps-mob'] = True;
+        }
+
         /* Add groups which aren't really experiment or instrument specific.
          */
         $groups['ps-data'] = True;
