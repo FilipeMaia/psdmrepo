@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2012-12-10 Igor Gaponenko
+- Table.js migration
+- table configuration saving on the server
+- bug fixes
+
 Tag: V00-02-01
 2012-10-12 Igor Gaponenko
 - Migrated the following Web services to use the new PHP framework:

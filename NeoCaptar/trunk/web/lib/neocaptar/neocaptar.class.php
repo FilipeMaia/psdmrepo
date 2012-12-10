@@ -673,10 +673,8 @@ class NeoCaptar {
     public function find_cables_by_dict_connector_id($dict_connector_id) {
         $dict_connector = $this->find_dict_connector_by_id($dict_connector_id);
         if( is_null($dict_connector)) return array();
-        $cable_type_escaped     = $this->connection->escape_string(trim($dict_connector->cable()->name()));
         $connector_type_escaped = $this->connection->escape_string(trim($dict_connector->name()));
         return $this->find_cables_by_(
-            "cable_type='{$cable_type_escaped}' AND ".
             "(origin_conntype='{$connector_type_escaped}' OR destination_conntype='{$connector_type_escaped}')");
 
     }

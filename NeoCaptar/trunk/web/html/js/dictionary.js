@@ -244,9 +244,24 @@ function p_appl_dictionary() {
     };
 
 
+    this.show_cable_info = function(cable_name) {
+        var cable = this.cables()[cable_name];
+        report_info_table(
+            'Cable Type Info',
+            [ { name: 'name'  },
+              { name: 'created'  },
+              { name: 'by user' },
+              { name: 'description' }],
+            [ [ cable_name,
+                cable.created_time,
+                cable.created_uid,
+                '<div style="width:420px; overflow:auto;"><pre>'+cable.documentation+'</pre></div>' ]]
+        );
+    };
     this.cable2url = function(name) {
-        if(this.cable_is_not_known(name)) return name;
-        var html = '<a href="'+this.cables()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
+        var html = this.cable_is_not_known(name) ?
+            '<a href="javascript:report_error(\'no such cable found in the Dictionary\')">'+name+'</a>' :
+            '<a href="javascript:dict.show_cable_info(\''+name+'\')" title="click the link to get the external documentation">'+name+'</a>';
         return html;
     };
     this.connector2url = function(name) {
@@ -272,9 +287,9 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-types-cables');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-cable-delete').
                             button().
@@ -285,34 +300,54 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the cable?',
                                     function() { that.delete_cable(id); },
                                     null
-                                ); }); }}},
-            {   name:       'cable type',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'cable type', selectable: true,
+                type: {
                     select_action : function(cable_name) {
-                        that.display_connectors( cable_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_connectors( cable_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-cable-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_cable_id(id);
-                            }); }}},
-            {   name: 'DOCUMENTATION LINK', sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'description', hideable: true, sorted: false,
                 type: {
                     after_sort: function() {
+                        for( var cable_name in that.cables()) {
+                            var cable = that.cables()[cable_name];
+                            elem.find('#cable-documentation-'+cable.id).val(cable.documentation);
+                        }
                         elem.find('.cable-documentation-save').
                             button().
                             click(function() {
                                 var id = this.name;
                                 that.save_cable_documentation(id, elem.find('#cable-documentation-'+id).val());
-                            }); }}}
-            ];
+                            });
+                    }
+                }
+            }
+        ];
 
         var rows = [];
 
@@ -335,19 +370,33 @@ function p_appl_dictionary() {
                         classes: 'dict-table-cable-search',
                         title:   'search all uses of this cable' }),
 
-                    TextInput_HTML({
-                        id:    'cable-documentation-'+cable.id,
-                        value: cable.documentation })+(
                     this.can_manage() ?
-                        Button_HTML('save', {
-                            name:    cable.id,
-                            classes: 'cable-documentation-save',
-                            title:   'edit documentation URL for the cable' }) : ' ' )
+                        '<div style="float:left;">'+
+                            TextArea_HTML({
+                                id:      'cable-documentation-'+cable.id,
+                                name:    cable_name,
+                            classes: 'description' },
+                            4,
+                            36)+
+                        '</div>'+
+                        '<div style="float:left; margin-left:5px;">'+
+                            Button_HTML('save', {
+                                name:    cable.id,
+                                classes: 'cable-documentation-save',
+                                title:   'edit description for the cable' })+
+                        '</div>'+
+                        '<div style="clear:both;">' :
+                        '<div style="width:256px; overflow:auto;"><pre>'+cable.documentation+'</pre></div>'
                 ]
             );
         }
-        this.table_cables = new Table('dictionary-types-cables',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_cables = new Table(
+            'dictionary-types-cables',  hdr, rows,
+            { default_sort_column: 1, selected_col: 1 },
+            config.handler('dict', 'table_cables')
+        );
         this.table_cables.display();
+
         if( selected_cable_name !== undefined )
             this.table_cables.select(1, selected_cable_name);
 
@@ -364,9 +413,9 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-types-connectors');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-connector-delete').
                             button().
@@ -377,33 +426,53 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the connector?',
                                     function() { that.delete_connector(id); },
                                     null
-                                ); }); }}},
-            {   name:       'connector type',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'connector type', selectable: true,
+                type: {
                     select_action : function(connector_name) {
-                        that.display_connectors_reverse(connector_name); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_connectors_reverse(connector_name);
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-connector-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_connector_id(id);
-                            }); }}},
-            {   name: 'DOCUMENTATION LINK', sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'description', hideable: true, sorted: false,
                 type: {
                     after_sort: function() {
+                        for( var connector_name in that.connectors(cable_name)) {
+                            var connector = that.connectors(cable_name)[connector_name];
+                            elem.find('#connector-documentation-'+connector.id).val(connector.documentation);
+                        }
                         elem.find('.connector-documentation-save').
                             button().
                             click(function() {
                                 var id = this.name;
                                 that.save_connector_documentation(id, elem.find('#connector-documentation-'+id).val());
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -428,19 +497,32 @@ function p_appl_dictionary() {
                             classes: 'dict-table-connector-search',
                             title:   'search all uses of this connector' }),
 
-                    TextInput_HTML({
-                        id:    'connector-documentation-'+connector.id,
-                        value: connector.documentation })+(
                     this.can_manage() ?
-                        Button_HTML('save', {
-                            name:    connector.id,
-                            classes: 'connector-documentation-save',
-                            title:   'edit documentation URL for the connector' }) : ' ' )
+                        '<div style="float:left;">'+
+                            TextArea_HTML({
+                                id:      'connector-documentation-'+connector.id,
+                                name:    connector_name,
+                            classes: 'description' },
+                            4,
+                            36)+
+                        '</div>'+
+                        '<div style="float:left; margin-left:5px;">'+
+                            Button_HTML('save', {
+                                name:    connector.id,
+                                classes: 'connector-documentation-save',
+                                title:   'edit description for the connector' })+
+                        '</div>'+
+                        '<div style="clear:both;">' :
+                        '<div style="width:256px; overflow:auto;"><pre>'+connector.documentation+'</pre></div>'
                     ]
                 );
             }
         }
-        this.table_connectors = new Table('dictionary-types-connectors', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_connectors = new Table(
+            'dictionary-types-connectors', hdr, rows,
+            { default_sort_column: 1, selected_col: 1 },
+            config.handler('dict', 'table_connectors')
+        );
         this.table_connectors.display();
 
         if(this.can_manage()) {
@@ -461,9 +543,8 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-types-connectors-reverse');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-connector-delete').
                             button().
@@ -474,33 +555,53 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the connector?',
                                     function() { that.delete_connector(id); },
                                     null
-                                ); }); }}},
-            {   name:       'connector type',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'connector type', selectable: true,
+                type: {
                     select_action : function(connector_name) {
-                        that.display_cables_reverse( connector_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_cables_reverse( connector_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-connector-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_connector_id(id);
-                            }); }}},
-            {   name: 'DOCUMENTATION LINK', sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'description', hideable: true, sorted: false,
                 type: {
                     after_sort: function() {
+                        for( var connector_name in that.connectors_reverse()) {
+                            var connector = that.connectors_reverse()[connector_name];
+                            elem.find('#connector-documentation-'+connector.id).val(connector.documentation);
+                        }
                         elem.find('.connector-documentation-save').
                             button().
                             click(function() {
                                 var id = this.name;
                                 that.save_connector_documentation(id, elem.find('#connector-documentation-'+id).val());
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -524,19 +625,34 @@ function p_appl_dictionary() {
                         classes: 'dict-table-connector-search',
                         title:   'search all uses of this connector' }),
 
-                    TextInput_HTML({
-                        id:    'connector-documentation-'+connector.id,
-                        value: connector.documentation })+(
+
                     this.can_manage() ?
-                        Button_HTML('save', {
-                            name:    connector.id,
-                            classes: 'connector-documentation-save',
-                            title:   'edit documentation URL for the connector' }) : ' ' )
+                        '<div style="float:left;">'+
+                            TextArea_HTML({
+                                id:      'connector-documentation-'+connector.id,
+                                name:    connector_name,
+                            classes: 'description' },
+                            4,
+                            36)+
+                        '</div>'+
+                        '<div style="float:left; margin-left:5px;">'+
+                            Button_HTML('save', {
+                                name:    connector.id,
+                                classes: 'connector-documentation-save',
+                                title:   'edit description for the connector' })+
+                        '</div>'+
+                        '<div style="clear:both;">' :
+                        '<div style="width:256px; overflow:auto;"><pre>'+connector.documentation+'</pre></div>'
                 ]
             );
         }
-        this.table_connectors_reverse = new Table('dictionary-types-connectors-reverse', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_connectors_reverse = new Table(
+            'dictionary-types-connectors-reverse', hdr, rows,
+            { default_sort_column: 1, selected_col: 1},
+            config.handler('dict', 'table_connectors_reverse')
+        );
         this.table_connectors_reverse.display();
+
         if( selected_connector_name !== undefined )
             this.table_connectors_reverse.select(1,selected_connector_name);
 
@@ -553,9 +669,9 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-types-cables-reverse');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-cable-delete').
                             button().
@@ -566,33 +682,53 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the cable?',
                                     function() { that.delete_cable(id); },
                                     null
-                                ); }); }}},
-            {   name:       'cable type',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'cable type', selectable: true,
+                type: {
                     select_action : function(selected_cable_name) {
-                        that.display_cables( selected_cable_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_cables( selected_cable_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-cable-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_cable_id(id);
-                            }); }}},
-            {   name: 'DOCUMENTATION LINK', sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'description', hideable: true, sorted: false,
                 type: {
                     after_sort: function() {
+                        for( var cable_name in that.cables_reverse(connector_name)) {
+                            var cable = that.cables_reverse(connector_name)[cable_name];
+                            elem.find('#cable-documentation-'+cable.id).val(cable.documentation);
+                        }
                         elem.find('.cable-documentation-save').
                             button().
                             click(function() {
                                 var id = this.name;
                                 that.save_cable_documentation(id, elem.find('#cable-documentation-'+id).val());
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -617,19 +753,34 @@ function p_appl_dictionary() {
                             classes: 'dict-table-cable-search',
                             title:   'search all uses of this cable' }),
 
-                    TextInput_HTML({
-                        id:    'cable-documentation-'+cable.id,
-                        value: cable.documentation })+(
+
                     this.can_manage() ?
-                        Button_HTML('save', {
-                            name:    cable.id,
-                            classes: 'cable-documentation-save',
-                            title:   'edit documentation URL for the cable' }) : ' ' )
+                        '<div style="float:left;">'+
+                            TextArea_HTML({
+                                id:      'cable-documentation-'+cable.id,
+                                name:    cable_name,
+                            classes: 'description' },
+                            4,
+                            36)+
+                        '</div>'+
+                        '<div style="float:left; margin-left:5px;">'+
+                            Button_HTML('save', {
+                                name:    cable.id,
+                                classes: 'cable-documentation-save',
+                                title:   'edit description for the cable' })+
+                        '</div>'+
+                        '<div style="clear:both;">' :
+                        '<div style="width:256px; overflow:auto;"><pre>'+cable.documentation+'</pre></div>'
                     ]
                 );
             }
         }
-        this.table_cables_reverse = new Table('dictionary-types-cables-reverse',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_cables_reverse = new Table(
+            'dictionary-types-cables-reverse',
+            hdr, rows,
+            { default_sort_column: 1, selected_col: 1},
+            config.handler('dict', 'table_cables_reverse')
+        );
         this.table_cables_reverse.display();
 
         if(this.can_manage()) {
@@ -716,12 +867,15 @@ function p_appl_dictionary() {
         var html = '<a href="'+this.pinlists()[name].documentation+'" target="_blank" title="click the link to get the external documentation">'+name+'</a>';
         return html;
     };
+
+    this.pinlist_table = null;
+
     this.display_pinlists = function() {
         var elem_pinlists = $('#dictionary-pinlists-pinlists');
         var hdr = [
-            {   name:   'DELETE',
-                sorted: false,
-                type:   {
+
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem_pinlists.find('.dict-table-pinlist-delete').
                             button().
@@ -732,21 +886,32 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the pinlist?',
                                     function() { that.delete_pinlist(pinlist_id); },
                                     null
-                                ); }); }}},
-            {   name:   'pinlists' },
-            {   name:   'created' },
-            {   name:   'by user' },
-            {   name:   'USAGE',
-                sorted: false,
-                type:   {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'pinlists' },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem_pinlists.find('.dict-table-pinlist-search').
                             button().
                             click(function() {
                                 var pinlist_id = this.name;
                                 global_search_cables_by_dict_pinlist_id(pinlist_id);
-                            }); }}},
-            {   name: 'DOCUMENTATION LINK', sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'DOCUMENTATION LINK', hideable: true, sorted: false,
                 type: {
                     after_sort: function() {
                         elem_pinlists.find('.pinlist-documentation-save').
@@ -754,9 +919,12 @@ function p_appl_dictionary() {
                             click(function() {this
                                 var id = this.name;
                                 that.save_pinlist_documentation(id, elem_pinlists.find('#pinlist-documentation-'+id).val());
-                            }); }}},
-            {   name: 'cable type',
-                sorted: false,
+                            });
+                    }
+                }
+            },
+
+            {   name: 'cable type', sorted: false,
                 type: {
                     after_sort: function() {
                         elem_pinlists.find('.pinlist-cable').change(function() {
@@ -764,9 +932,11 @@ function p_appl_dictionary() {
                             var cable = this.value;
                             that.save_pinlist_cable(pinlist_id, cable);
                         });
-                    }}},
-            {   name: 'origin conn',
-                sorted: false,
+                    }
+                }
+            },
+
+            {   name: 'origin conn', sorted: false,
                 type: {
                     after_sort: function() {
                         elem_pinlists.find('.pinlist-origin-connector').change(function() {
@@ -774,9 +944,11 @@ function p_appl_dictionary() {
                             var connector = this.value;
                             that.save_pinlist_origin_connector(pinlist_id, connector);
                         });
-                    }}},
-            {   name: 'destination conn',
-                sorted: false,
+                    }
+                }
+            },
+
+            {   name: 'destination conn', sorted: false,
                 type: {
                     after_sort: function() {
                         elem_pinlists.find('.pinlist-destination-connector').change(function() {
@@ -784,7 +956,9 @@ function p_appl_dictionary() {
                             var connector = this.value;
                             that.save_pinlist_destination_connector(pinlist_id, connector);
                         });
-                    }}}
+                    }
+                }
+            }
         ];
 
         var cables = [''];
@@ -842,8 +1016,12 @@ function p_appl_dictionary() {
                 ]
             );
         }
-        var table = new Table('dictionary-pinlists-pinlists', hdr, rows, {default_sort_column: 1});
-        table.display();
+        this.pinlist_table = new Table(
+            'dictionary-pinlists-pinlists', hdr, rows,
+            {default_sort_column: 1},
+            config.handler('dict', 'pinlist_table')
+        );
+        this.pinlist_table.display();
 
         if(this.can_manage())
             $('#dictionary-pinlists').find('input[name="pinlist2add"]').removeAttr('disabled');
@@ -934,16 +1112,16 @@ function p_appl_dictionary() {
     };
 
     this.table_locations = null;
-    this.table_racks     = null;
+    this.table_racks = null;
 
     this.display_locations = function() {
 
         var elem = $('#dictionary-locations-locations');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-location-delete').
                             button().
@@ -954,24 +1132,36 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the location?',
                                     function() { that.delete_location_element('location',id); },
                                     null
-                                ); }); }}},
-            {   name:       'location',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'location', selectable: true,
+                type:{
                     select_action : function(location_name) {
-                        that.display_racks( location_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_racks( location_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-location-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_location_id(id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -997,7 +1187,11 @@ function p_appl_dictionary() {
                 ]
             );
         }
-        this.table_locations = new Table('dictionary-locations-locations',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_locations = new Table(
+            'dictionary-locations-locations',  hdr, rows,
+            {default_sort_column: 1, selected_col: 1},
+            config.handler('dict', 'table_locations')
+        );
         this.table_locations.display();
 
         this.display_racks( this.table_locations.selected_object());
@@ -1011,9 +1205,8 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-locations-racks');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-rack-delete').
                             button().
@@ -1024,20 +1217,30 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the rack?',
                                     function() { that.delete_location_element('rack',id); },
                                     null
-                                ); }); }}},
-            {   name:       'rack' },
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'rack' },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-rack-search').
                             button().
                             click(function() {
                                 var id = this.name;
                                 global_search_cables_by_dict_rack_id(id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -1065,7 +1268,11 @@ function p_appl_dictionary() {
                 );
             }
         }
-        this.table_racks = new Table('dictionary-locations-racks', hdr, rows, {default_sort_column: 1});
+        this.table_racks = new Table(
+            'dictionary-locations-racks', hdr, rows,
+            {default_sort_column: 1},
+            config.handler('dict', 'table_racks')
+        );
         this.table_racks.display();
 
         if(this.can_manage()) {
@@ -1132,12 +1339,13 @@ function p_appl_dictionary() {
         this.web_service_GET(url, params, handle_data_and_display);
     };
 
+    this.table_routings = null;
+
     this.display_routings = function() {
        var elem = $('#dictionary-routings-routings');
         var hdr = [
-            {   name:   'DELETE',
-                sorted: false,
-                type:   {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-routing-delete').
                             button().
@@ -1148,20 +1356,29 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the routing?',
                                     function() { that.delete_routing(routing_id); },
                                     null
-                                ); }); }}},
-            {   name:   'routings' },
-            {   name:   'created' },
-            {   name:   'by user' },
-            {   name:   'USAGE',
-                sorted: false,
-                type:   {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'routings' },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-routing-search').
                             button().
                             click(function() {
                                 var routing_id = this.name;
                                 global_search_cables_by_dict_routing_id(routing_id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
         var rows = [];
         for( var name in this.routings()) {
@@ -1184,8 +1401,12 @@ function p_appl_dictionary() {
                 ]
             );
         }
-        var table = new Table('dictionary-routings-routings', hdr, rows, {default_sort_column: 1});
-        table.display();
+        this.table_routings = new Table(
+            'dictionary-routings-routings', hdr, rows,
+            {default_sort_column: 1},
+            config.handler('dict', 'table_routings')
+        );
+        this.table_routings.display();
 
         if(this.can_manage())
             $('#dictionary-routings').find('input[name="routing2add"]').removeAttr('disabled');
@@ -1322,9 +1543,8 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-devices-locations');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-location-delete').
                             button().
@@ -1335,24 +1555,36 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the location?',
                                     function() { that.delete_device_element('location',device_location_id); },
                                     null
-                                ); }); }}},
-            {   name:       'device location',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'device location', selectable: true,
+                type: {
                     select_action : function(location_name) {
-                        that.display_device_regions( location_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_device_regions( location_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-location-search').
                             button().
                             click(function() {
                                 var device_location_id = this.name;
                                 global_search_cables_by_dict_device_location_id(device_location_id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -1378,7 +1610,11 @@ function p_appl_dictionary() {
                 ]
             );
         }
-        this.table_device_locations = new Table('dictionary-devices-locations',  hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_device_locations = new Table(
+            'dictionary-devices-locations',  hdr, rows,
+            {default_sort_column: 1, selected_col: 1},
+            config.handler('dict', 'table_device_locations')
+        );
         this.table_device_locations.display();
 
         this.display_device_regions( this.table_device_locations.selected_object());
@@ -1392,9 +1628,8 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-devices-regions');
 
         var hdr = [
-            {   name:       'DELETE',
-                sorted:     false,
-                type:       {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-region-delete').
                             button().
@@ -1405,24 +1640,35 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the region?',
                                     function() { that.delete_device_element('region',device_region_id); },
                                     null
-                                ); }); }}},
-            {   name:       'device region',
-                selectable: true,
-                type:       {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'device region', selectable: true,
+                type: {
                     select_action : function(region_name) {
-                        that.display_device_components( location_name, region_name ); }}},
-            {   name:       'created' },
-            {   name:       'by user' },
-            {   name:       'USAGE',
-                sorted:     false,
-                type:       {
+                        that.display_device_components( location_name, region_name );
+                    }
+                }
+            },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-region-search').
                             button().
                             click(function() {
                                 var device_region_id = this.name;
                                 global_search_cables_by_dict_device_region_id(device_region_id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -1450,7 +1696,11 @@ function p_appl_dictionary() {
                 );
             }
         }
-        this.table_device_regions = new Table('dictionary-devices-regions', hdr, rows, {default_sort_column: 1, selected_col: 1});
+        this.table_device_regions = new Table(
+            'dictionary-devices-regions', hdr, rows,
+            {default_sort_column: 1, selected_col: 1},
+            config.handler('dict', 'table_device_regions')
+        );
         this.table_device_regions.display();
 
         this.display_device_components(location_name, this.table_device_regions.selected_object());
@@ -1467,9 +1717,8 @@ function p_appl_dictionary() {
         var elem = $('#dictionary-devices-components');
 
         var hdr = [
-            {   name:   'DELETE',
-                sorted: false,
-                type:   {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-component-delete').
                             button().
@@ -1480,20 +1729,27 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the component?',
                                     function() { that.delete_device_element('component',device_component_id); },
                                     null
-                                ); }); }}},
-            {   name:   'device component' },
-            {   name:   'created' },
-            {   name:   'by user' },
-            {   name:   'USAGE',
-                sorted: false,
-                type:   {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'device component' },
+            {   name: 'created', hideable: true },
+            {   name: 'by user', hideable: true },
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-device-component-search').
                             button().
                             click(function() {
                                 var device_component_id = this.name;
                                 global_search_cables_by_dict_device_component_id(device_component_id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
 
         var rows = [];
@@ -1521,7 +1777,11 @@ function p_appl_dictionary() {
                 );
             }
         }
-        this.table_device_components = new Table('dictionary-devices-components', hdr, rows, {default_sort_column: 1});
+        this.table_device_components = new Table(
+            'dictionary-devices-components', hdr, rows,
+            {default_sort_column: 1},
+            config.handler('dict', 'table_device_components')
+        );
         this.table_device_components.display();
 
         if(this.can_manage()) {
@@ -1587,12 +1847,14 @@ function p_appl_dictionary() {
         }
         this.web_service_GET(url, params, handle_data_and_display);
     };
+    
+    this.table_instrs = null;
+
     this.display_instrs = function() {
         var elem = $('#dictionary-instrs-instrs');
         var hdr = [
-            {   name:   'DELETE',
-                sorted: false,
-                type:   {
+            {   name: 'DELETE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-instr-delete').
                             button().
@@ -1603,20 +1865,30 @@ function p_appl_dictionary() {
                                     'Are you sure you want to delete the instruction?',
                                     function() { that.delete_instr_element('instr',instr_id); },
                                     null
-                                ); }); }}},
-            {   name:   'instructions' },
-            {   name:   'created' },
-            {   name:   'by user' },
-            {   name:   'USAGE',
-                sorted: false,
-                type:   {
+                                );
+                            });
+                    }
+                }
+            },
+
+            {   name: 'instructions' },
+
+            {   name: 'created', hideable: true },
+
+            {   name: 'by user', hideable: true },
+
+            {   name: 'USAGE', hideable: true, sorted: false,
+                type: {
                     after_sort: function() {
                         elem.find('.dict-table-instr-search').
                             button().
                             click(function() {
                                 var instr_id = this.name;
                                 global_search_cables_by_dict_instr_id(instr_id);
-                            }); }}}
+                            });
+                    }
+                }
+            }
         ];
         var rows = [];
         for( var name in this.instrs()) {
@@ -1639,8 +1911,12 @@ function p_appl_dictionary() {
                 ]
             );
         }
-        var table = new Table('dictionary-instrs-instrs', hdr, rows, {default_sort_column: 1});
-        table.display();
+        this.table_instrs = new Table(
+            'dictionary-instrs-instrs', hdr, rows,
+            {default_sort_column: 1},
+            config.handler('dict', 'table_instrs')
+        );
+        this.table_instrs.display();
 
         if(this.can_manage())
             $('#dictionary-instrs').find('input[name="instr2add"]').removeAttr('disabled');

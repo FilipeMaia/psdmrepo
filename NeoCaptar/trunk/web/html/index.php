@@ -22,11 +22,11 @@ $required_field_html = '<span style="color:red; font-size:110%; font-weight:bold
 
 try {
 
-	$authdb = AuthDB::instance();
-	$authdb->begin();
+    $authdb = AuthDB::instance();
+    $authdb->begin();
 
     $neocaptar = NeoCaptar::instance();
-	$neocaptar->begin();
+    $neocaptar->begin();
 
 ?>
 
@@ -45,19 +45,23 @@ try {
 
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/neocaptar.css" rel="Stylesheet" />
-<link type="text/css" href="css/Table.css" rel="Stylesheet" />
+
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/projects.js"></script>
 <script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/search.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
-<script type="text/javascript" src="js/Table.js"></script>
+
+<script type="text/javascript" src="../portal/js/config.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
 
 
 <!-- Window layout styles and support actions -->
@@ -308,63 +312,56 @@ div.v-item:hover {
 
 <script type="text/javascript">
 
+var config = new config_create('neocaptar') ;
 
 /* ------------------------------------------------
  *          VERTICAL SPLITTER MANAGEMENT
  * ------------------------------------------------
  */
 function resize() {
-	$('#p-left').height($(window).height()-125-5);
-	$('#p-splitter').height($(window).height()-125-5);
-	$('#p-center').height($(window).height()-125-5);
-    /*
-	$('#p-left').height($(window).height()-125-20);
-	$('#p-splitter').height($(window).height()-125-20);
-	$('#p-center').height($(window).height()-125-20);
-    */
+    $('#p-left').height($(window).height()-125-5);
+    $('#p-splitter').height($(window).height()-125-5);
+    $('#p-center').height($(window).height()-125-5);
 }
 
 /* Get mouse position relative to the document.
  */
 function getMousePosition(e) {
 
-	var posx = 0;
-	var posy = 0;
-	if (!e) var e = window.event;
-	if (e.pageX || e.pageY) 	{
-		posx = e.pageX;
-		posy = e.pageY;
-	}
-	else if (e.clientX || e.clientY) 	{
-		posx = e.clientX + document.body.scrollLeft
-			+ document.documentElement.scrollLeft;
-		posy = e.clientY + document.body.scrollTop
-			+ document.documentElement.scrollTop;
-	}
-	return {'x': posx, 'y': posy };
+    var posx = 0;
+    var posy = 0;
+    if (!e) var e = window.event;
+    if (e.pageX || e.pageY) {
+        posx = e.pageX;
+        posy = e.pageY;
+    } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft+document.documentElement.scrollLeft;
+        posy = e.clientY + document.body.scrollTop +document.documentElement.scrollTop;
+    }
+    return {'x': posx, 'y': posy };
 }
 
 function move_split(e) {
-	var pos = getMousePosition(e);
-	$('#p-left').css('width', pos['x']);
-	$('#p-splitter').css('left', pos['x']);
-	$('#p-center').css('margin-left', pos['x']+3);
+    var pos = getMousePosition(e);
+    $('#p-left'    ).css('width',       pos['x']);
+    $('#p-splitter').css('left',        pos['x']);
+    $('#p-center'  ).css('margin-left', pos['x']+3);
 }
 
 $(function() {
 
-	resize();
+    resize();
 
-	var mouse_down = false;
+    var mouse_down = false;
 
-	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
+    $('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
 
-	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
-	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
+    $('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
+    $('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
 
-	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
-	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
-	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
+    $('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
+    $('#p-splitter').mouseup   (function(e) { mouse_down = false; });
+    $('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
 });
 
 /* ---------------------------------------------
@@ -396,20 +393,20 @@ function auth_timer_event() {
     var seconds = auth_webauth_token_expiration - now;
     if( seconds <= 0 ) {
         $('#popupdialogs').html(
-        	'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-        	'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
-        	'of the browser to renew your credentials.</p>'
+            '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+            'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
+            'of the browser to renew your credentials.</p>'
         );
         $('#popupdialogs').dialog({
-        	resizable: false,
-        	modal: true,
-        	buttons: {
-        		'Ok': function() {
-        			$(this).dialog('close');
-        			refresh_page();
-        		}
-        	},
-        	title: 'Session Expiration Notification'
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Ok': function() {
+                    $(this).dialog('close');
+                    refresh_page();
+                }
+            },
+            title: 'Session Expiration Notification'
         });
         return;
     }
@@ -431,30 +428,30 @@ function auth_timer_event() {
 }
 
 function logout() {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-    	'This will log yout out from the current WebAuth session. Are you sure?</p>'
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog('close');
-	            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            refresh_page();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-			}
-		},
-		title: 'Session Logout Warning'
-	});
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+        'This will log yout out from the current WebAuth session. Are you sure?</p>'
+     );
+    $('#popupdialogs').dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                $( this ).dialog('close');
+                document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+                refresh_page();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+            }
+        },
+        title: 'Session Logout Warning'
+    });
 }
 
 $(function() {
-	auth_timer_restart();
+    auth_timer_restart();
 });
 
 /* ----------------------------------------------
@@ -464,13 +461,13 @@ $(function() {
 var current_tab = '';
 
 function set_current_tab( tab ) {
-	current_tab = tab;
+    current_tab = tab;
 }
 
 function set_context(app) {
-	var ctx = app.full_name+' :';
-	if(app.context) ctx += ' '+app.context;
-	$('#p-context').html(ctx);
+    var ctx = app.full_name+' :';
+    if(app.context) ctx += ' '+app.context;
+    $('#p-context').html(ctx);
 }
 
 /* ----------------------------------------------
@@ -478,115 +475,115 @@ function set_context(app) {
  * ----------------------------------------------
  */
 function show_email( user, addr ) {
-	$('#popupdialogs').html( '<p>'+addr+'</p>' );
-	$('#popupdialogs').dialog({
-		modal: true,
-		title: 'e-mail: '+user
-	});
+    $('#popupdialogs').html( '<p>'+addr+'</p>' );
+    $('#popupdialogs').dialog({
+        modal: true,
+        title: 'e-mail: '+user
+    });
 }
 
 function printer_friendly() {
-	if( current_application != null ) {
-		var wa_id = current_application.name;
-		if(current_application.context != '') wa_id += '-'+current_application.context;
-		$('#p-center .application-workarea#'+wa_id).printElement({
-			leaveOpen: true,
-			printMode: 'popup',
-			printBodyOptions: {
-            	styleToAdd:'font-size:10px;'
+    if( current_application != null ) {
+        var wa_id = current_application.name;
+        if(current_application.context != '') wa_id += '-'+current_application.context;
+        $('#p-center .application-workarea#'+wa_id).printElement({
+            leaveOpen: true,
+            printMode: 'popup',
+            printBodyOptions: {
+                styleToAdd:'font-size:10px;'
             }
-		});
-	}	
+        });
+    }    
 }
 
 function ask_yes_no( title, msg, on_yes, on_cancel ) {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog('close');
-				if(on_yes) on_yes();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-				if(on_cancel) on_cancel();
-			}
-		},
-		title: title
-	});
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+     );
+    $('#popupdialogs').dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Yes": function() {
+                $( this ).dialog('close');
+                if(on_yes) on_yes();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+                if(on_cancel) on_cancel();
+            }
+        },
+        title: title
+    });
 }
 
 function ask_for_input( title, msg, on_ok, on_cancel ) {
-	$('#popupdialogs-varable-size').html(
+    $('#popupdialogs-varable-size').html(
 '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'+
 '<div><textarea rows=4 cols=60></textarea/>'
-	 );
-	$('#popupdialogs-varable-size').dialog({
-		resizable: true,
-		modal: true,
+     );
+    $('#popupdialogs-varable-size').dialog({
+        resizable: true,
+        modal: true,
         width:  470,
         height: 300,
-		buttons: {
-			"Ok": function() {
+        buttons: {
+            "Ok": function() {
                 var user_input = $('#popupdialogs-varable-size').find('textarea').val();
-				$( this ).dialog('close');
-				if(on_ok) on_ok(user_input);
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-				if(on_cancel) on_cancel();
-			}
-		},
-		title: title
-	});
+                $( this ).dialog('close');
+                if(on_ok) on_ok(user_input);
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+                if(on_cancel) on_cancel();
+            }
+        },
+        title: title
+    });
 }
 
 function report_error( msg, on_cancel ) {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			Cancel: function() {
-				$(this).dialog('close');
-				if(on_cancel) on_cancel();
-			}
-		},
-		title: 'Error'
-	});
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>'
+     );
+    $('#popupdialogs').dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            Cancel: function() {
+                $(this).dialog('close');
+                if(on_cancel) on_cancel();
+            }
+        },
+        title: 'Error'
+    });
 }
 
 function report_info( title, msg ) {
-	$('#infodialogs').html(msg);
-	$('#infodialogs').dialog({
-		resizable: true,
-		modal: true,
-		title: title
-	});
+    $('#infodialogs').html(msg);
+    $('#infodialogs').dialog({
+        resizable: true,
+        modal: true,
+        title: title
+    });
 }
 function report_info_table( title, hdr, rows ) {
     var table = new Table('infodialogs', hdr, rows);
     table.display();
-	$('#infodialogs').dialog({
+    $('#infodialogs').dialog({
         width: 720,
         height: 800,
-		resizable: true,
-		modal: true,
-		title: title
-	});
+        resizable: true,
+        modal: true,
+        title: title
+    });
 }
 function report_action( title, msg ) {
-	return $('#infodialogs').
+    return $('#infodialogs').
         html(msg).
         dialog({
-    		resizable: true,
-        	modal: true,
+            resizable: true,
+            modal: true,
             buttons: {
                 Cancel: function() {
                     $(this).dialog('close');
@@ -597,23 +594,23 @@ function report_action( title, msg ) {
 }
 
 function edit_dialog( title, msg, on_save, on_cancel ) {
-	$('#editdialogs').html(msg);
-	$('#editdialogs').dialog({
-		resizable: true,
+    $('#editdialogs').html(msg);
+    $('#editdialogs').dialog({
+        resizable: true,
         width: 640,
-		modal: true,
-		buttons: {
-			Save: function() {
-				$(this).dialog('close');
-				if( on_save != null ) on_save();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-				if( on_cancel != null ) on_cancel();
-			}
-		},
-		title: title
-	});
+        modal: true,
+        buttons: {
+            Save: function() {
+                $(this).dialog('close');
+                if( on_save != null ) on_save();
+            },
+            Cancel: function() {
+                $(this).dialog('close');
+                if( on_cancel != null ) on_cancel();
+            }
+        },
+        title: title
+    });
 }
 
 /* ------------------------------------------------------
@@ -642,10 +639,10 @@ function global_get_projmanagers() {
     return global_projmanagers;
 }
 var applications = {
-	'p-appl-projects'   : projects,
-	'p-appl-dictionary' : dict,
-	'p-appl-search'     : search,
-	'p-appl-admin'      : admin
+    'p-appl-projects'   : projects,
+    'p-appl-dictionary' : dict,
+    'p-appl-search'     : search,
+    'p-appl-admin'      : admin
 };
 
 var current_application = null;
@@ -660,12 +657,12 @@ $known_apps = array(
     'admin' => True
 );
 if( isset( $_GET['app'] )) {
-	$app_path = explode( ':', strtolower(trim($_GET['app'])));
-	$app = $app_path[0];
-	if( array_key_exists( $app, $known_apps )) {
-		echo "select_app = '{$app}';";
-		echo "select_app_context = '".(count($app_path) > 1 ? $app_path[1] : "")."';";
-	}
+    $app_path = explode( ':', strtolower(trim($_GET['app'])));
+    $app = $app_path[0];
+    if( array_key_exists( $app, $known_apps )) {
+        echo "select_app = '{$app}';";
+        echo "select_app_context = '".(count($app_path) > 1 ? $app_path[1] : "")."';";
+    }
 }
 ?>
 var select_params = {
@@ -689,34 +686,34 @@ if( isset( $_GET['cable_id'] )) {
  */
 function m_item_selected(item) {
 
-	if( current_application == applications[item.id] ) return;
-	if(( current_application != null ) && ( current_application != applications[item.id] )) {
-		current_application.if_ready2giveup( function() {
-			m_item_selected_impl(item);
-		});
-		return;
-	}
-	m_item_selected_impl(item);
+    if( current_application == applications[item.id] ) return;
+    if(( current_application != null ) && ( current_application != applications[item.id] )) {
+        current_application.if_ready2giveup( function() {
+            m_item_selected_impl(item);
+        });
+        return;
+    }
+    m_item_selected_impl(item);
 }
 
 function m_item_selected_impl(item) {
 
-	current_application = applications[item.id];
+    current_application = applications[item.id];
 
-	$('.m-select').removeClass('m-select');
-	$(item).addClass('m-select');
-	$('#p-left > #v-menu .visible').removeClass('visible').addClass('hidden');
-	$('#p-left > #v-menu > #'+current_application.name).removeClass('hidden').addClass('visible');
+    $('.m-select').removeClass('m-select');
+    $(item).addClass('m-select');
+    $('#p-left > #v-menu .visible').removeClass('visible').addClass('hidden');
+    $('#p-left > #v-menu > #'+current_application.name).removeClass('hidden').addClass('visible');
 
-	$('#p-center .application-workarea.visible').removeClass('visible').addClass('hidden');
-	var wa_id = current_application.name;
-	if(current_application.context != '') wa_id += '-'+current_application.context;
-	$('#p-center .application-workarea#'+wa_id).removeClass('hidden').addClass('visible');
+    $('#p-center .application-workarea.visible').removeClass('visible').addClass('hidden');
+    var wa_id = current_application.name;
+    if(current_application.context != '') wa_id += '-'+current_application.context;
+    $('#p-center .application-workarea#'+wa_id).removeClass('hidden').addClass('visible');
 
-	current_application.select_default();
-	v_item_selected($('#v-menu > #'+current_application.name).children('.v-item#'+current_application.context));
-	
-	set_context(current_application);
+    current_application.select_default();
+    v_item_selected($('#v-menu > #'+current_application.name).children('.v-item#'+current_application.context));
+    
+    set_context(current_application);
 }
 
 /* Event handler for vertical menu item (actual commands) selections:
@@ -728,69 +725,69 @@ function m_item_selected_impl(item) {
  */
 function v_item_selected(item) {
 
- 	var item = $(item);
-	if($(item).hasClass('v-select')) return;
+     var item = $(item);
+    if($(item).hasClass('v-select')) return;
 
-	if( current_application.context != item.attr('id')) {
-		current_application.if_ready2giveup( function() {
-			v_item_selected_impl(item);
-		});
-		return;
-	}
-	v_item_selected_impl(item);
+    if( current_application.context != item.attr('id')) {
+        current_application.if_ready2giveup( function() {
+            v_item_selected_impl(item);
+        });
+        return;
+    }
+    v_item_selected_impl(item);
 }
 
 function v_item_selected_impl(item) {
 
-	$('#'+current_application.name).find('.v-item.v-select').each(function(){
-		$(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-		$(this).removeClass('v-select');
-	});
+    $('#'+current_application.name).find('.v-item.v-select').each(function(){
+        $(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+        $(this).removeClass('v-select');
+    });
 
-	$(item).children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-	$(item).addClass('v-select');
+    $(item).children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+    $(item).addClass('v-select');
 
-	/* Hide the older work area
-	 */
-	var wa_id = current_application.name;
-	if(current_application.context != '') wa_id += '-'+current_application.context;
-	$('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
+    /* Hide the older work area
+     */
+    var wa_id = current_application.name;
+    if(current_application.context != '') wa_id += '-'+current_application.context;
+    $('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
 
-	current_application.select(item.attr('id'));
+    current_application.select(item.attr('id'));
 
-	/* display the new work area
-	 */
-	wa_id = current_application.name;
-	if(current_application.context != '') wa_id += '-'+current_application.context;
-	$('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
+    /* display the new work area
+     */
+    wa_id = current_application.name;
+    if(current_application.context != '') wa_id += '-'+current_application.context;
+    $('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
 
-	set_context(current_application);
+    set_context(current_application);
 }
 
 $(function() {
 
-	$('.m-item' ).click(function() { m_item_selected (this); });
-	$('.v-item' ).click(function() { v_item_selected (this); });
+    $('.m-item' ).click(function() { m_item_selected (this); });
+    $('.v-item' ).click(function() { v_item_selected (this); });
 
-	$('#p-search-text').keyup(function(e) { if(($(this).val() != '') && (e.keyCode == 13)) global_simple_search(); });
+    $('#p-search-text').keyup(function(e) { if(($(this).val() != '') && (e.keyCode == 13)) global_simple_search(); });
 
     // Make sure the dictionaries are loaded
     //
     dict.init();
     admin.init();
 
-	// Finally, activate the selected application.
-	//
-	for(var id in applications) {
-		var application = applications[id];
-		if(application.name == select_app) {
-			$('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
-			if( '' == select_app_context ) {
-				v_item_selected($('#v-menu > #'+select_app+' > #'+application.default_context));
-				application.select_default();
+    // Finally, activate the selected application.
+    //
+    for(var id in applications) {
+        var application = applications[id];
+        if(application.name == select_app) {
+            $('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
+            if( '' == select_app_context ) {
+                v_item_selected($('#v-menu > #'+select_app+' > #'+application.default_context));
+                application.select_default();
             } else {
-				v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context));
-				application.select(select_app_context);			
+                v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context));
+                application.select(select_app_context);            
             }
             switch(application.name) {
             case 'projects':
@@ -808,8 +805,8 @@ $(function() {
                 }
                 break;
             }
-		}
-	}
+        }
+    }
 });
 
 /* ------------------------------------------------------
@@ -817,16 +814,16 @@ $(function() {
  * ------------------------------------------------------
  */
 function global_switch_context(application_name, context_name) {
-	for(var id in applications) {
-		var application = applications[id];
-		if(application.name == application_name) {
-			$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-			v_item_selected($('#v-menu > #'+application_name).children('.v-item#'+context_name));
+    for(var id in applications) {
+        var application = applications[id];
+        if(application.name == application_name) {
+            $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
+            v_item_selected($('#v-menu > #'+application_name).children('.v-item#'+context_name));
             if( context_name != null) application.select(context_name);
             else application.select_default();
-			return application;
-		}
-	}
+            return application;
+        }
+    }
     return null;
 }
 function global_simple_search                      ()            { global_switch_context('search',  'cables').simple_search($('#p-search-text').val()); }
@@ -1209,9 +1206,9 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#cables2connectors">Cable Type View</a></li>
-		  <li><a href="#connectors2cables">Connector Type View</a></li>
-	    </ul>
+          <li><a href="#cables2connectors">Cable Type View</a></li>
+          <li><a href="#connectors2cables">Connector Type View</a></li>
+        </ul>
 
         <div id="cables2connectors" >
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
@@ -1422,10 +1419,10 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#administrators">Administrators</a></li>
-		  <li><a href="#projmanagers">Project Managers</a></li>
-		  <li><a href="#others">Other Users</a></li>
-	    </ul>
+          <li><a href="#administrators">Administrators</a></li>
+          <li><a href="#projmanagers">Project Managers</a></li>
+          <li><a href="#others">Other Users</a></li>
+        </ul>
 
         <div id="administrators" >
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
@@ -1482,11 +1479,11 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#myself">On my project(s)</a></li>
-		  <li><a href="#administrators">Sent to administrators</a></li>
-		  <li><a href="#others">Sent to other users</a></li>
-		  <li><a href="#pending">Pending</a></li>
-	    </ul>
+          <li><a href="#myself">On my project(s)</a></li>
+          <li><a href="#administrators">Sent to administrators</a></li>
+          <li><a href="#others">Sent to other users</a></li>
+          <li><a href="#pending">Pending</a></li>
+        </ul>
 
         <div id="myself" >
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
@@ -1576,10 +1573,10 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#cablenumbers">Prefixes</a></li>
-		  <li><a href="#orphan">Orphan Numbers</a></li>
-		  <li><a href="#reserved">Reserved Numbers</a></li>
-	    </ul>
+          <li><a href="#cablenumbers">Prefixes</a></li>
+          <li><a href="#orphan">Orphan Numbers</a></li>
+          <li><a href="#reserved">Reserved Numbers</a></li>
+        </ul>
 
         <div id="cablenumbers" >
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
@@ -1667,9 +1664,9 @@ HERE;
 
       <div id="tabs" style="font-size:12px;">
         <ul>
-		  <li><a href="#ranges">Ranges</a></li>
-		  <li><a href="#allocations">Allocated Numbers</a></li>
-	    </ul>
+          <li><a href="#ranges">Ranges</a></li>
+          <li><a href="#allocations">Allocated Numbers</a></li>
+        </ul>
 
         <div id="ranges" >
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
@@ -1710,8 +1707,8 @@ HERE;
 
 <?php
 
-	$authdb->commit();
-	$neocaptar->commit();
+    $authdb->commit();
+    $neocaptar->commit();
 
 } catch( AuthDBException    $e ) { print $e->toHtml(); }
   catch( LusiTimeException  $e ) { print $e->toHtml(); }
