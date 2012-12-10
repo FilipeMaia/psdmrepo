@@ -48,7 +48,7 @@ function p_appl_admin () {
         this.init() ;
         this.access_load() ;
         this.notify_load() ;
-        this.slacidnumbers_load() ;
+        this.slacid_load() ;
     } ;
     
     /* ----------------------------------------
@@ -60,9 +60,9 @@ function p_appl_admin () {
         if(this.initialized) return ;
         this.initialized = true ;
 
-        $('#admin-access-reload'       ).button().click(function () { that.access_load       () ; }) ;
-        $('#admin-notifications-reload').button().click(function () { that.notify_load       () ; }) ;
-        $('#admin-slacidnumbers-reload').button().click(function () { that.slacidnumbers_load() ; }) ;
+        $('#admin-access-reload'       ).button().click(function () { that.access_load() ; }) ;
+        $('#admin-notifications-reload').button().click(function () { that.notify_load() ; }) ;
+        $('#admin-slacid-reload'       ).button().click(function () { that.slacid_load() ; }) ;
 
         var administrator2add = $('#admin-access').find('input[name="administrator2add"]') ;
         administrator2add.
@@ -100,18 +100,18 @@ function p_appl_admin () {
                submit_pending.attr('disabled', 'disabled') ;
                delete_pending.attr('disabled', 'disabled') ;
         }
-        var slacidnumbers_ranges_edit   = $('#admin-slacidnumbers').find('#ranges').find('button[name="edit"]'  ).button().button('disable') ;
-        var slacidnumbers_ranges_save   = $('#admin-slacidnumbers').find('#ranges').find('button[name="save"]'  ).button().button('disable') ;
-        var slacidnumbers_ranges_cancel = $('#admin-slacidnumbers').find('#ranges').find('button[name="cancel"]').button().button('disable') ;
+        var slacid_ranges_edit   = $('#admin-slacid-ranges').find('#ranges').find('button[name="edit"]'  ).button().button('disable') ;
+        var slacid_ranges_save   = $('#admin-slacid-ranges').find('#ranges').find('button[name="save"]'  ).button().button('disable') ;
+        var slacid_ranges_cancel = $('#admin-slacid-ranges').find('#ranges').find('button[name="cancel"]').button().button('disable') ;
 
         if (this.can_manage_access()) {
-            slacidnumbers_ranges_edit.click  (function () { that.slacidnumbers_ranges_edit       () ; }) ;
-            slacidnumbers_ranges_save.click  (function () { that.slacidnumbers_ranges_edit_save  () ; }) ;
-            slacidnumbers_ranges_cancel.click(function () { that.slacidnumbers_ranges_edit_cancel() ; }) ;
+            slacid_ranges_edit.click  (function () { that.slacid_ranges_edit       () ; }) ;
+            slacid_ranges_save.click  (function () { that.slacid_ranges_edit_save  () ; }) ;
+            slacid_ranges_cancel.click(function () { that.slacid_ranges_edit_cancel() ; }) ;
         }
         $('#admin-access'       ).find('#tabs').tabs() ;
         $('#admin-notifications').find('#tabs').tabs() ;
-        $('#admin-slacidnumbers').find('#tabs').tabs() ;
+        $('#admin-slacid'       ).find('#tabs').tabs() ;
 
         this.reload_timer_event() ;
     } ;
@@ -123,10 +123,10 @@ function p_appl_admin () {
         this.reload_timer = window.setTimeout('admin.reload_timer_event()', 60000) ;
     } ;
     this.reload_timer_event = function () {
-        if (!this.slacidnumber_editing()) {
+        if (!this.slacid_range_editing) {
             this.access_load() ;
             this.notify_load() ;
-            this.slacidnumbers_load() ;
+            this.slacid_load() ;
         }
         this.reload_timer_restart() ;
     } ;
@@ -213,64 +213,40 @@ function p_appl_admin () {
 
         elem.find('button[name="delete"]').button() ;
     } ;
-
     this.access_display = function () {
         this.access_display_users('admin-access-ADMINISTRATOR', this.access.ADMINISTRATOR, true, true) ;
         this.access_display_users('admin-access-EDITOR',        this.access.EDITOR,        false, true) ;
         this.access_display_users('admin-access-OTHER',         this.access.OTHER,         false, false) ;
     } ;
-
     this.access_load = function () {
-        var params = {} ;
-        var jqXHR = $.get('../irep/ws/access_get.php',params,function (data) {
-            if(data.status != 'success') { report_error(data.message, null) ; return ; }
-            that.access = data.access ;
-            that.access_display() ;
-        },
-        'JSON').error(function () {
-            report_error('failed to load access control info because of: '+jqXHR.statusText, null) ;
-            return ;
-        }) ;
+        this.access_action (
+            '../irep/ws/access_get.php' ,
+            {}
+        ) ;
     } ;
-
     this.access_create_user = function (uid,role) {
-        var params = {uid:uid,role:role} ;
-        var jqXHR = $.get('../irep/ws/access_new.php',params,function (data) {
-            if(data.status != 'success') { report_error(data.message, null) ; return ; }
-            that.access = data.access ;
-            that.access_display() ;
-            that.notify_load() ;
-        },
-        'JSON').error(function () {
-            report_error('failed to add a new user to the access control list because of: '+jqXHR.statusText, null) ;
-            return ;
-        }) ;
+        this.access_action (
+            '../irep/ws/access_new.php' ,
+            {uid: uid, role: role}
+        ) ;
     } ;
-
     this.access_delete_user = function (uid) {
-        var params = {uid:uid} ;
-        var jqXHR = $.get('../irep/ws/access_delete.php',params,function (data) {
-            if(data.status != 'success') { report_error(data.message, null) ; return ; }
-            that.access = data.access ;
-            that.access_display() ;
-            that.notify_load() ;
-        },
-        'JSON').error(function () {
-            report_error('failed to delete this user from the access control list because of: '+jqXHR.statusText, null) ;
-            return ;
-        }) ;
+        this.access_action (
+            '../irep/ws/access_delete.php' ,
+            {uid: uid}
+        ) ;
     } ;
     this.access_toggle_priv = function (uid,name) {
-        var params = {uid:uid, name:name} ;
-        var jqXHR = $.get('../irep/ws/access_toggle_priv.php',params,function (data) {
-            if(data.status != 'success') { report_error(data.message, null) ; return ; }
+        this.access_action (
+            '../irep/ws/access_toggle_priv.php' ,
+            {uid: uid, name: name}
+        ) ;
+    } ;
+    this.access_action = function (url, params) {
+        web_service_GET(url, params, function (data) {
             that.access = data.access ;
             that.access_display() ;
             that.notify_load() ;
-        },
-        'JSON').error(function () {
-            report_error('failed to togle the privilege state because of: '+jqXHR.statusText, null) ;
-            return ;
         }) ;
     } ;
 
@@ -412,102 +388,93 @@ function p_appl_admin () {
         this.notify_display_other() ;
         this.notify_display_pending() ;
     } ;
-
-    this.notify_action = function (url,params) {
-        var jqXHR = $.get(url,params,function (data) {
-            if(data.status != 'success') { report_error(data.message, null) ; return ; }
-
+    this.notify_load = function () {
+        this.notify_action(
+            '../irep/ws/notify_get.php' ,
+            {}
+        ) ;
+    } ;
+    this.notify_save = function (recipient, uid, event_name, enabled) {
+        this.notify_action (
+            '../irep/ws/notify_save.php' ,
+            {   recipient:  recipient ,
+                uid:        uid ,
+                event_name: event_name ,
+                enabled:    enabled ? 1 : 0
+            }
+        ) ;
+    } ;
+    this.notify_schedule_save = function (recipient, policy) {
+        this.notify_action(
+            '../irep/ws/notify_save.php' ,
+            {   recipient:  recipient ,
+                policy:     policy
+            }
+        ) ;
+    } ;
+    this.notify_pending_submit = function (idx) {
+        var params = {action: 'submit'} ;
+        if (idx != undefined) params.id = this.notify_pending[idx].id ;
+        this.notify_action (
+            '../irep/ws/notify_queue.php' ,
+            params
+        ) ;
+    } ;
+    this.notify_pending_delete = function (idx) {
+        var params = {action: 'delete'} ;
+        if (idx != undefined) params.id = this.notify_pending[idx].id ;
+        this.notify_action (
+            '../irep/ws/notify_queue.php' ,
+            params
+        ) ;
+    } ;
+    this.notify_action = function (url, params) {
+        web_service_GET(url, params, function (data) {
             that.notify_access      = data.access ;
             that.notify_event_types = data.event_types ;
             that.notify_schedule    = data.schedule ;
             that.notify             = data.notify ;
             that.notify_pending     = data.pending ;
-
             that.notify_display() ;
-        },
-        'JSON').error(function () {
-            report_error('failed to load noditications list because of: '+jqXHR.statusText, null) ;
-            return ;
         }) ;
-    } ;
-    this.notify_load = function () {
-        this.notify_action(
-            '../irep/ws/notify_get.php',
-            {}
-        ) ;
-    } ;
-    this.notify_save = function (recipient, uid, event_name, enabled) {
-        this.notify_action(
-            '../irep/ws/notify_save.php',
-            {   recipient:  recipient,
-                uid:        uid,
-                event_name: event_name,
-                enabled:    enabled ? 1 : 0 }
-        ) ;
-    } ;
-    this.notify_schedule_save = function (recipient, policy) {
-        this.notify_action(
-            '../irep/ws/notify_save.php',
-            {   recipient:  recipient,
-                policy:     policy }
-        ) ;
-    } ;
-    this.notify_pending_submit = function (idx) {
-        var params = { action: 'submit' } ;
-        if( idx != undefined) params.id = this.notify_pending[idx].id ;
-        this.notify_action(
-            '../irep/ws/notify_queue.php',
-            params
-        ) ;
-    } ;
-    this.notify_pending_delete = function (idx) {
-        var params = { action: 'delete' } ;
-        if( idx != undefined) params.id = this.notify_pending[idx].id ;
-        this.notify_action(
-            '../irep/ws/notify_queue.php',
-            params
-        ) ;
     } ;
 
     /* ------------------
      *   SLACid numbers
      * ------------------
      */
-    this.slacidnumber_range = null;
-    this.slacidnumber_ranges_editing = false;
-    this.slacidnumber_editing = function() {
-        return this.slacidnumber_ranges_editing;
-    };
+    this.slacid_range = null;
+    this.slacid_range_editing = false;
 
-    this.slacidnumbers_ranges_edit_tools = function(edit_mode) {
-        var ranges_elem = $('#admin-slacidnumbers').find('#ranges');
-        var slacidnumbers_ranges_edit   = ranges_elem.find('button[name="edit"]'  );
-        var slacidnumbers_ranges_save   = ranges_elem.find('button[name="save"]'  );
-        var slacidnumbers_ranges_cancel = ranges_elem.find('button[name="cancel"]');
+    this.slacid_range_edit_tools = function (edit_mode) {
+        var ranges_elem = $('#admin-slacid-ranges').find('#ranges');
+        var edit   = ranges_elem.find('button[name="edit"]'  );
+        var save   = ranges_elem.find('button[name="save"]'  );
+        var cancel = ranges_elem.find('button[name="cancel"]');
         if( !this.can_manage_access()) return;
-        slacidnumbers_ranges_edit.button  (edit_mode ? 'disable' : 'enable');
-        slacidnumbers_ranges_save.button  (edit_mode ? 'enable'  : 'disable');
-        slacidnumbers_ranges_cancel.button(edit_mode ? 'enable'  : 'disable');
+        edit.button  (edit_mode ? 'disable' : 'enable');
+        save.button  (edit_mode ? 'enable'  : 'disable');
+        cancel.button(edit_mode ? 'enable'  : 'disable');
     };
     function count_elements_in_array(obj) {
         var size = 0;
         for( var key in obj ) size++;
         return size;
     }
-    this.slacidnumber_ranges_display = function(edit_mode) {
-        this.slacidnumber_ranges_editing = edit_mode;
-        this.slacidnumbers_ranges_edit_tools(edit_mode);
-        var ranges_elem = $('#admin-slacidnumbers').find('#ranges');
+    this.slacid_ranges_display = function(edit_mode) {
+        this.slacid_range_editing = edit_mode;
+        this.slacid_range_edit_tools(edit_mode);
+        var ranges_elem = $('#admin-slacid-ranges').find('#ranges');
         var rows = [];
-        for( var r in this.slacidnumber_range ) {
-            var range = this.slacidnumber_range[r];
+        for( var r in this.slacid_range ) {
+            var range = this.slacid_range[r];
             if( edit_mode && this.can_manage_access())
                 rows.push([
                     '',
-                    TextInput_HTML({ classes: 'first', name: ''+range.id, value: range.first, size: 6 }),
-                    TextInput_HTML({ classes: 'last',  name: ''+range.id, value: range.last,  size: 6 }),
-                    '',
-                    '',
+                    TextInput_HTML({ classes: 'first', name: ''+range.id, value: range.first, size: 6 }) ,
+                    TextInput_HTML({ classes: 'last',  name: ''+range.id, value: range.last,  size: 6 }) ,
+                    '' ,
+                    '' ,
                     ''
                 ]);
             else
@@ -515,7 +482,7 @@ function p_appl_admin () {
                     this.can_manage_access() ?
                         Button_HTML('X', {
                             name:    range.id,
-                            classes: 'admin-slacidnumbers-range-delete',
+                            classes: 'admin-slacid-range-delete',
                             title:   'delete this range' }) : ' ',
                     range.first,
                     range.last,
@@ -523,7 +490,7 @@ function p_appl_admin () {
                     count_elements_in_array(range.available),
                     Button_HTML('search', {
                             name:    range.id,
-                            classes: 'admin-slacidnumbers-range-search',
+                            classes: 'admin-slacid-range-search',
                             title:   'search all equipment associated with this range' })
                 ]);
         }
@@ -537,87 +504,76 @@ function p_appl_admin () {
                 ''
             ]);
 
-        var table = new Table('admin-slacidnumbers-ranges-table', [
-            { name: 'DELETE', sorted: false,
-              type: { after_sort: function() {
-                            ranges_elem.find('.admin-slacidnumbers-range-delete').
+        var table = new Table('admin-slacid-ranges-table', [
+            { name: 'DELETE', sorted: false ,
+              type: { after_sort: function () {
+                            ranges_elem.find('.admin-slacid-range-delete').
                                 button().
-                                click(function() {
-                                    var id = this.name;
-                                    that.slacidnumbers_range_delete(id); });
-                            ranges_elem.find('.admin-slacidnumbers-range-search').
+                                click(function () {
+                                    var id = this.name ;
+                                    that.slacid_range_delete(id) ; }) ;
+                            ranges_elem.find('.admin-slacid-range-search').
                                 button().
-                                click(function() {
-                                    var id = this.name;
-                                    global_search_equipment_by_slacidnumber_range(id); });
-                      }}},
-            { name: 'first' },
-            { name: 'last' },
-            { name: '# total' },
-            { name: '# available' },
-            { name: 'in use', sorted: false }],
+                                click(function () {
+                                    var id = this.name ;
+                                    global_search_equipment_by_slacid_range(id) ; }) ;
+                      }}} ,
+            { name: 'first' } ,
+            { name: 'last' } ,
+            { name: '# total' } ,
+            { name: '# available' } ,
+            { name: 'in use', sorted: false }] ,
             rows
-        );
-        table.display();
-    };
-    this.slacidnumbers_ranges_edit = function() {
-        this.slacidnumber_ranges_display(true);
-    };
-    this.slacidnumbers_range_delete = function(id) {
-        var params = { range_id:id };
-        var jqXHR = $.get('../irep/ws/slacidnumber_range_delete.php', params, function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.slacidnumber_range = data.range;
-            that.slacidnumber_ranges_display(false);
-        },
-        'JSON').error(function () {
-            report_error('failed to delete SLACid number range because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.slacidnumbers_ranges_edit_save = function() {
-        var params = {range:''};
-        var firsts = $('#admin-slacidnumbers-ranges-table').find('.first');
-        var lasts  = $('#admin-slacidnumbers-ranges-table').find('.last');
-        if(firsts.length != lasts.length) {
-            report_error('slacidnumbers_ranges_edit_save: implementation error, please contact developers');
-            return;
+        ) ;
+        table.display() ;
+    } ;
+    this.slacid_ranges_edit = function() {
+        this.slacid_ranges_display(true) ;
+    } ;
+    this.slacid_range_delete = function(id) {
+        this.slacid_action (
+            '../irep/ws/slacid_range_delete.php',
+            {range_id: id}
+        ) ;
+    } ;
+    this.slacid_ranges_edit_save = function () {
+        var params = {ranges: ''} ;
+        var firsts = $('#admin-slacid-ranges-table').find('.first') ;
+        var lasts  = $('#admin-slacid-ranges-table').find('.last') ;
+        if (firsts.length != lasts.length) {
+            report_error('slacid_ranges_edit_save: implementation error, please contact developers') ;
+            return ;
         }
-        for( var i=0; i < firsts.length; i++) {
-            var first = firsts[i];
-            var last  = lasts [i];
-            if( first.name != last.name) {
-                report_error('slacidnumbers_ranges_edit_save: internal implementation error');
-                return;
+        for (var i=0; i < firsts.length; i++) {
+            var first = firsts[i] ;
+            var last  = lasts [i] ;
+            if (first.name != last.name) {
+                report_error('slacid_ranges_edit_save: internal implementation error') ;
+                return ;
             }
-            params.range += (params.range != '' ? ',' : '')+first.name+':'+first.value+':'+last.value;
+            params.ranges += (params.ranges != '' ? ',' : '')+first.name+':'+first.value+':'+last.value ;
         }
-        var jqXHR = $.get('../irep/ws/slacidnumber_range_save.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-                that.slacidnumber_range = data.range;
-                that.slacidnumber_ranges_display(false);
-        },
-        'JSON').error(function () {
-            report_error('failed to save updated SLACid number ranges because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
-    this.slacidnumbers_ranges_edit_cancel = function() {
-        this.slacidnumber_ranges_display(false);
-    };
+        this.slacid_action (
+            '../irep/ws/slacid_range_save.php' ,
+            params
+        ) ;
+    } ;
+    this.slacid_ranges_edit_cancel = function() {
+        this.slacid_ranges_display(false);
+    } ;
 
-    this.slacidnumbers_load = function() {
-        var params = {};
-        var jqXHR = $.get('../irep/ws/slacidnumber_get.php',params,function(data) {
-            if(data.status != 'success') { report_error(data.message, null); return; }
-            that.slacidnumber_range = data.range;
-            that.slacidnumber_ranges_display(false);
-        },
-        'JSON').error(function () {
-            report_error('failed to load SLACid numbers info because of: '+jqXHR.statusText, null);
-            return;
-        });
-    };
+    this.slacid_load = function () {
+        this.slacid_action (
+            '../irep/ws/slacid_get.php' ,
+            {}
+        ) ;
+    } ;
+    this.slacid_action = function (url, params) {
+        web_service_GET(url, params, function (data) {
+            that.slacid_range = data.range ;
+            that.slacid_ranges_display(false) ;
+        }) ;
+    } ;
     return this ;
 }
 var admin = new p_appl_admin() ;

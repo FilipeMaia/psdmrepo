@@ -60,6 +60,38 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `IREP`.`DICT_MODEL_ATTACHMENT`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`DICT_MODEL_ATTACHMENT` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`DICT_MODEL_ATTACHMENT` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `model_id` INT NOT NULL ,
+
+  `rank`     INT NOT NULL ,
+
+  `name`             TEXT            NOT NULL ,
+  `document_type`    VARCHAR(255)    NOT NULL ,
+  `document_size`    BIGINT UNSIGNED NOT NULL ,
+  `document`         LONGBLOB        NOT NULL ,
+  `document_preview` LONGBLOB ,
+
+  `create_time`   BIGINT UNSIGNED NOT NULL ,
+  `create_uid`    VARCHAR(32)     NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  CONSTRAINT `DICT_MODEL_ATTACHMENT_FK_1`
+    FOREIGN KEY (`model_id` )
+    REFERENCES `IREP`.`DICT_MODEL` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `IREP`.`DICT_LOCATION`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `IREP`.`DICT_LOCATION` ;
@@ -79,6 +111,71 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `IREP`.`DICT_STATUS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`DICT_STATUS` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`DICT_STATUS` (
+
+  `id`            INT              NOT NULL AUTO_INCREMENT ,
+  `name`          VARCHAR(255)     NOT NULL ,
+
+  `is_locked`     ENUM('YES','NO') NOT NULL ,
+
+  `create_time`   BIGINT UNSIGNED  NOT NULL ,
+  `create_uid`    VARCHAR(32)      NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE KEY `name` (`name`)
+
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `IREP`.`DICT_STATUS2`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`DICT_STATUS2` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`DICT_STATUS2` (
+
+  `id`            INT              NOT NULL AUTO_INCREMENT ,
+  `status_id`     INT              NOT NULL ,
+
+  `name`          VARCHAR(255)     NOT NULL ,
+  `is_locked`     ENUM('YES','NO') NOT NULL ,
+
+  `create_time`   BIGINT UNSIGNED  NOT NULL ,
+  `create_uid`    VARCHAR(32)      NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE KEY `name` (`status_id`,`name`) ,
+
+
+  CONSTRAINT `DICT_STATUS2_FK_1`
+    FOREIGN KEY (`status_id` )
+    REFERENCES `IREP`.`DICT_STATUS` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+INSERT INTO IREP.DICT_STATUS VALUES(NULL,'Unknown','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS2 VALUES(NULL,(SELECT LAST_INSERT_ID()),'','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS VALUES(NULL,'Good','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS2 VALUES(NULL,(SELECT LAST_INSERT_ID()),'','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS VALUES(NULL,'Bad','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS2 VALUES(NULL,(SELECT LAST_INSERT_ID()),'','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS VALUES(NULL,'Salvaged','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS2 VALUES(NULL,(SELECT LAST_INSERT_ID()),'','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS VALUES(NULL,'Lost','YES',0,'gapon') ;
+INSERT INTO IREP.DICT_STATUS2 VALUES(NULL,(SELECT LAST_INSERT_ID()),'','YES',0,'gapon') ;
+
+
+-- -----------------------------------------------------
 -- Table `IREP`.`EQUIPMENT`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `IREP`.`EQUIPMENT` ;
@@ -87,11 +184,12 @@ CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT` (
 
   `id` INT NOT NULL AUTO_INCREMENT ,
 
-  `status` ENUM('Unknown') NOT NULL ,
+  `status`  VARCHAR(255) NOT NULL ,
+  `status2` VARCHAR(255) NOT NULL ,
 
-  `equipment`    VARCHAR(255) NOT NULL ,
   `manufacturer` VARCHAR(255) NOT NULL ,
   `model`        VARCHAR(255) NOT NULL ,
+  `serial`       VARCHAR(255) NOT NULL ,
 
   `description` TEXT NOT NULL ,
 
@@ -100,9 +198,43 @@ CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT` (
   `location`      VARCHAR(255) NOT NULL ,
   `custodian_uid` VARCHAR(32)  NOT NULL ,
 
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE KEY `serial` (`manufacturer`, `model`, `serial`) ,
+  UNIQUE KEY `slacid` (`slacid`) ,
+
 )
 ENGINE = InnoDB ;
+
+
+-- -----------------------------------------------------
+-- Table `IREP`.`EQUIPMENT_ATTACHMENT`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`EQUIPMENT_ATTACHMENT` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT_ATTACHMENT` (
+
+  `id`           INT             NOT NULL AUTO_INCREMENT ,
+  `equipment_id` INT             NOT NULL ,
+
+  `name`             TEXT            NOT NULL ,
+  `document_type`    VARCHAR(255)    NOT NULL ,
+  `document_size`    BIGINT UNSIGNED NOT NULL ,
+  `document`         LONGBLOB        NOT NULL ,
+  `document_preview` LONGBLOB ,
+
+  `create_time`   BIGINT UNSIGNED NOT NULL ,
+  `create_uid`    VARCHAR(32)     NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  CONSTRAINT `EQUIPMENT_ATTACHMENT_FK_1`
+    FOREIGN KEY (`equipment_id` )
+    REFERENCES `IREP`.`EQUIPMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -193,11 +325,11 @@ INSERT INTO `IREP`.`USER_PRIV` VALUES ('gapon', 'YES') ;
 
 
 -- -----------------------------------------------------
--- Table `IREP`.`SLACIDNUMBER_RANGE`
+-- Table `IREP`.`SLACID_RANGE`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `IREP`.`SLACIDNUMBER_RANGE` ;
+DROP TABLE IF EXISTS `IREP`.`SLACID_RANGE` ;
 
-CREATE  TABLE IF NOT EXISTS `IREP`.`SLACIDNUMBER_RANGE` (
+CREATE  TABLE IF NOT EXISTS `IREP`.`SLACID_RANGE` (
 
   `id`    INT          NOT NULL AUTO_INCREMENT ,
   `first` INT UNSIGNED NOT NULL ,
@@ -209,27 +341,27 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `IREP`.`SLACIDNUMBER_ALLOCATED`
+-- Table `IREP`.`SLACID_ALLOCATED`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `IREP`.`SLACIDNUMBER_ALLOCATED` ;
+DROP TABLE IF EXISTS `IREP`.`SLACID_ALLOCATED` ;
 
-CREATE  TABLE IF NOT EXISTS `IREP`.`SLACIDNUMBER_ALLOCATED` (
+CREATE  TABLE IF NOT EXISTS `IREP`.`SLACID_ALLOCATED` (
 
   `range_id`         INT             NOT NULL ,
-  `slacidnumber`     INT UNSIGNED    NOT NULL ,
+  `slacid`           INT UNSIGNED    NOT NULL ,
   `equipment_id`     INT             NOT NULL ,
   `allocated_time`   BIGINT UNSIGNED NOT NULL ,
   `allocated_by_uid` VARCHAR(32)     NOT NULL ,
 
-  UNIQUE KEY `slacidnumber` (`range_id`,`slacidnumber`,`equipment_id`) ,
+  UNIQUE KEY `slacid` (`range_id`,`slacid`,`equipment_id`) ,
 
-  CONSTRAINT `SLACIDNUMBER_ALLOCATED_FK_1`
+  CONSTRAINT `SLACID_ALLOCATED_FK_1`
     FOREIGN KEY (`range_id` )
-    REFERENCES `IREP`.`SLACIDNUMBER_RANGE` (`id` )
+    REFERENCES `IREP`.`SLACID_RANGE` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE ,
 
-  CONSTRAINT `SLACIDNUMBER_ALLOCATED_FK_2`
+  CONSTRAINT `SLACID_ALLOCATED_FK_2`
     FOREIGN KEY (`equipment_id` )
     REFERENCES `IREP`.`EQUIPMENT` (`id` )
     ON DELETE CASCADE
@@ -353,13 +485,6 @@ CREATE  TABLE IF NOT EXISTS `IREP`.`NOTIFY_QUEUE_EQUIPMENT` (
     ON UPDATE CASCADE
 )
 ENGINE = InnoDB;
-
-
-
-
-
-
-
 
 
 SET SQL_MODE=@OLD_SQL_MODE ;

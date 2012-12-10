@@ -12,283 +12,6 @@ require_once( 'irep.inc.php' );
  */
 class IrepUtils {
 
-    /**
-     * Return an array representation a dictionary of cables and connectors. The array is
-     * suitable for exporting by Web services.
-     *
-     * @param Irep $irep 
-     */
-    public static function dict_types2array($irep) {
-        $types = array(
-            'cable'     => array(),
-            'connector' => array()
-        );
-        foreach( $irep->dict_cables() as $cable ) {
-
-            $connectors = array();
-            foreach( $cable->connectors() as $connector ) {
-                $connectors[$connector->name()] = array(
-                    'id'            => $connector->id(),
-                    'documentation' => $connector->documentation(),
-                    'created_time'  => $connector->created_time()->toStringShort(),
-                    'created_uid'   => $connector->created_uid()
-                );
-            }
-            $types['cable'][$cable->name()] = array(
-                'id'            => $cable->id(),
-                'documentation' => $cable->documentation(),
-                'created_time'  => $cable->created_time()->toStringShort(),
-                'created_uid'   => $cable->created_uid(),
-                'connector'     => $connectors
-            );
-        }
-        foreach( $irep->dict_connectors() as $connector ) {
-
-            $cables = array();
-            foreach( $connector->cables() as $cable ) {
-                $cables[$cable->name()] = array(
-                    'id'            => $cable->id(),
-                    'documentation' => $cable->documentation(),
-                    'created_time'  => $cable->created_time()->toStringShort(),
-                    'created_uid'   => $cable->created_uid()
-                );
-            }
-            $types['connector'][$connector->name()] = array(
-                'id'            => $connector->id(),
-                'documentation' => $connector->documentation(),
-                'created_time'  => $connector->created_time()->toStringShort(),
-                'created_uid'   => $connector->created_uid(),
-                'cable'         => $cables
-            );
-        }
-        return $types;
-    }
-
-    /**
-     * Return an array representation a dictionary of pinlists. The array is
-     * suitable for exporting by Web services.
-     *
-     * @param Irep $irep 
-     */
-    public static function dict_pinlists2array($irep) {
-        $pinlists = array();
-        foreach( $irep->dict_pinlists() as $pinlist ) {
-            $pinlists[$pinlist->name()] = array(
-                'id'                    => $pinlist->id(),
-                'documentation'         => $pinlist->documentation(),
-                'created_time'          => $pinlist->created_time()->toStringShort(),
-                'created_uid'           => $pinlist->created_uid(),
-                'cable'                 => $pinlist->cable(),
-                'origin_connector'      => $pinlist->origin_connector(),
-                'destination_connector' => $pinlist->destination_connector()
-            );
-        }
-        return $pinlists;
-    }
-
-    /**
-     * Return an array representation a dictionary of locations. The array is
-     * suitable for exporting by Web services.
-     *
-     * @param Irep $irep 
-     */
-    public static function dict_locations2array($irep) {
-        $locations = array();
-        foreach( $irep->dict_locations() as $location ) {
-
-            $racks = array();
-            foreach( $location->racks() as $rack ) {
-
-                $racks[$rack->name()] = array(
-                    'id'           => $rack->id(),
-                    'created_time' => $rack->created_time()->toStringShort(),
-                    'created_uid'  => $rack->created_uid()
-                );
-            }
-            $locations[$location->name()] = array(
-                'id'           => $location->id(),
-                'created_time' => $location->created_time()->toStringShort(),
-                'created_uid'  => $location->created_uid(),
-                'rack'         => $racks
-            );
-        }
-        return $locations;
-    }
-
-    /**
-     * Return an array representation a dictionary of device name components.
-     * The array is suitable for exporting by Web services.
-     *
-     * @param Irep $irep
-     */
-    public static function dict_devices2array($irep) {
-        $locations = array();
-        foreach( $irep->dict_device_locations() as $location ) {
-
-            $regions = array();
-            foreach( $location->regions() as $region ) {
-
-                $components = array();
-                foreach( $region->components() as $component ) {
-                    $components[$component->name()] = array(
-                        'id'            => $component->id(),
-                        'created_time'  => $component->created_time()->toStringShort(),
-                        'created_uid'   => $component->created_uid()
-                    );
-                }
-                $regions[$region->name()] = array(
-                    'id'           => $region->id(),
-                    'created_time' => $region->created_time()->toStringShort(),
-                    'created_uid'  => $region->created_uid(),
-                    'component'    => $components
-                );
-            }
-            $locations[$location->name()] = array(
-                'id'           => $location->id(),
-                'created_time' => $location->created_time()->toStringShort(),
-                'created_uid'  => $location->created_uid(),
-                'region'       => $regions
-            );
-        }
-        return $locations;
-    }
-
-    /**
-     * Return an array representation a dictionary of routings. The array is
-     * suitable for exporting by Web services.
-     *
-     * @param Irep $irep 
-     */
-    public static function dict_routings2array($irep) {
-        $routings = array();
-        foreach( $irep->dict_routings() as $routing ) {
-            $routings[$routing->name()] = array(
-                'id'           => $routing->id(),
-                'created_time' => $routing->created_time()->toStringShort(),
-                'created_uid'  => $routing->created_uid()
-            );
-        }
-        return $routings;
-    }
-
-    /**
-     * Return an array representation a dictionary of instructions. The array is
-     * suitable for exporting by Web services.
-     *
-     * @param Irep $irep 
-     */
-    public static function dict_instrs2array($irep) {
-        $instrs = array();
-        foreach( $irep->dict_instrs() as $instr ) {
-            $instrs[$instr->name()] = array(
-                'id'           => $instr->id(),
-                'created_time' => $instr->created_time()->toStringShort(),
-                'created_uid'  => $instr->created_uid()
-            );
-        }
-        return $instrs;
-    }
-
-    /**
-     * Return an array representation of a project. The array is suitable for
-     * exporting by Web services.
-     *
-     * @param IrepProject $p project
-     * @return array
-     */
-    public static function project2array($p) {
-        return array (
-            'id'               => $p->id(),
-            'owner'            => $p->owner(),
-            'comanager'        => $p->comanagers(),
-            'title'            => $p->title(),
-            'job'              => $p->job(),
-            'description'      => $p->description(),
-            'created_sec'      => $p->created_time()->sec,
-            'created'          => $p->created_time()->toStringDay(),
-            'due_sec'          => $p->due_time()->sec,
-            'due'              => $p->due_time()->toStringDay(),
-            'modified_sec'     => $p->modified_time()->sec,
-            'modified'         => $p->modified_time()->toStringShort(),
-            'status'           => $p->status()
-        );
-    }
-        
-    /**
-     * Return an array representation of a cable. The array is suitable for
-     * exporting by Web services.
-     *
-     * [ Note that the project identifier is an optional parameter. If none
-     *   is provided then each cable will be asked for its owner project's
-     *   identifier. ]
-     *
-     * @param IrepCable $c cable
-     * @param integer $project_id an optional identifier of a project
-     * @return array
-     */
-    public static function cable2array($c,$project_id=null) {
-        $last_event = $c->history_last_entry();
-        return array (
-            'id'           => $c->id(),
-            'project_id'   => $c->project()->id(),
-            'project_title'=> $c->project()->title(),
-            'status'       => $c->status(),
-            'job'          => $c->project()->job(),
-            'cable'        => $c->cable(),
-            'revision'     => $c->revision(),
-            'description'  => $c->description(),
-            'device'           => $c->device(),
-            'device_location'  => $c->device_location(),
-            'device_region'    => $c->device_region(),
-            'device_component' => $c->device_component(),
-            'device_counter'   => $c->device_counter(),
-            'device_suffix'    => $c->device_suffix(),
-            'func'         => $c->func(),
-            'cable_type'   => $c->cable_type(),
-            'length'       => $c->length(),
-            'routing'      => $c->routing(),
-            'origin'       => array (
-                'name'     => $c->origin_name(),
-                'loc'      => $c->origin_loc(),
-                'rack'     => $c->origin_rack(),
-                'ele'      => $c->origin_ele(),
-                'side'     => $c->origin_side(),
-                'slot'     => $c->origin_slot(),
-                'conn'     => $c->origin_conn(),
-                'pinlist'  => $c->origin_pinlist(),
-                'station'  => $c->origin_station(),
-                'conntype' => $c->origin_conntype(),
-                'instr'    => $c->origin_instr()
-            ),
-            'destination'  => array (
-                'name'     => $c->destination_name(),
-                'loc'      => $c->destination_loc(),
-                'rack'     => $c->destination_rack(),
-                'ele'      => $c->destination_ele(),
-                'side'     => $c->destination_side(),
-                'slot'     => $c->destination_slot(),
-                'conn'     => $c->destination_conn(),
-                'pinlist'  => $c->destination_pinlist(),
-                'station'  => $c->destination_station(),
-                'conntype' => $c->destination_conntype(),
-                'instr'    => $c->destination_instr()
-            ),
-            'proj'         => array (
-                'id'       => is_null($project_id) ? $c->project()->id() : $project_id
-            ),
-            'modified'     => is_null($last_event) ?
-                              array(
-                                  'time'    => '',
-                                  'time_64' => 0,
-                                  'uid'     => ''
-                              ) :
-                              array(
-                                  'time'    => $last_event->event_time()->toStringShort(),
-                                  'time_64' => $last_event->event_time()->to64(),
-                                  'uid'     => $last_event->event_uid()
-                              )
-        );
-    }
 
     public static function event2array($e) {
         return array (
@@ -302,95 +25,180 @@ class IrepUtils {
         );
     }
 
+
     /**
-     * Return an array representation of a cable number prefixes.
+     * Return an array representation of a dictionary of manufactures and
+     * related models. The array is suitable for exporting by Web services.
+     *
+     * @param Irep $irep
+     */
+    public static function manufacturers2array ($irep) {
+        $manufacturers = array () ;
+        foreach ($irep->manufacturers() as $manufacturer) {
+            $models = array () ;
+            foreach ($manufacturer->models() as $model) {
+                $attachment = $model->default_attachment() ;
+                array_push (
+                    $models ,
+                    array (
+                        'id'                 => $model->id() ,
+                        'name'               => $model->name() ,
+                        'url'                => $model->url() ,
+                        'created_time'       => $model->created_time()->toStringShort() ,
+                        'created_time_sec'   => $model->created_time()->sec ,
+                        'created_uid'        => $model->created_uid() ,
+                        'default_attachment' => is_null($attachment) ?
+                            array (
+                                'is_available'        => 0) :
+                            array (
+                                'is_available'        => 1 ,
+                                'id'                  => $attachment->id() ,
+                                'name'                => $attachment->name() ,
+                                'document_type'       => $attachment->document_type() ,
+                                'document_size_bytes' => $attachment->document_size() ,
+                                'create_time'         => $attachment->create_time()->toStringShort() ,
+                                'create_uid'          => $attachment->create_uid() ,
+                                'rank'                => $attachment->rank())
+                    )
+                ) ;
+            }
+            array_push (
+                $manufacturers ,
+                array (
+                    'id'               => $manufacturer->id() ,
+                    'name'             => $manufacturer->name() ,
+                    'url'              => $manufacturer->url() ,
+                    'created_time'     => $manufacturer->created_time()->toStringShort() ,
+                    'created_time_sec' => $manufacturer->created_time()->sec ,
+                    'created_uid'      => $manufacturer->created_uid() ,
+                    'model'            => $models
+                )
+            ) ;
+        }
+        return array ('manufacturer' => $manufacturers) ;
+    }
+
+    /**
+     * Return an array representation of a dictionary of statuses and
+     * related sub-statuses. The array is suitable for exporting by Web services.
+     *
+     * @param Irep $irep
+     * @return array()
+     */
+    public static function statuses2array ($irep) {
+        $statuses = array () ;
+        foreach ($irep->statuses() as $status) {
+            $statuses2 = array () ;
+            foreach ($status->statuses2() as $status2)
+                array_push (
+                    $statuses2 ,
+                    array (
+                        'id'               => $status2->id() ,
+                        'name'             => $status2->name() ,
+                        'is_locked'        => $status2->is_locked() ? 1 : 0 ,
+                        'created_time'     => $status2->created_time()->toStringShort() ,
+                        'created_time_sec' => $status2->created_time()->sec ,
+                        'created_uid'      => $status2->created_uid()
+
+                    )
+                ) ;
+            array_push (
+                $statuses ,
+                array (
+                    'id'               => $status->id() ,
+                    'name'             => $status->name() ,
+                    'is_locked'        => $status->is_locked() ? 1 : 0 ,
+                    'created_time'     => $status->created_time()->toStringShort() ,
+                    'created_time_sec' => $status->created_time()->sec ,
+                    'created_uid'      => $status->created_uid() ,
+                    'status2'          => $statuses2
+                )
+            ) ;
+        }
+        return array ('cable_status' => $statuses) ;
+    }
+
+    /**
+     * Return an array representation of a dictionary of locations.
      * The array is suitable for exporting by Web services.
      *
      * @param Irep $irep
-     * @return array 
      */
-    public static function cablenumber_prefixes2array($irep) {
-        $result = array();
-        foreach( $irep->cablenumber_prefixes() as $p )
-            array_push(
-                $result,
+    public static function locations2array ($irep) {
+        $locations = array () ;
+        foreach ($irep->locations() as $location) {
+            array_push (
+                $locations ,
                 array (
-                    'name'     => $p->name(),
-                    'location' => $p->locations(),
-                    'range'    => $p->ranges()));
-        return $result;
+                    'id'               => $location->id() ,
+                    'name'             => $location->name() ,
+                    'created_time'     => $location->created_time()->toStringShort() ,
+                    'created_time_sec' => $location->created_time()->sec ,
+                    'created_uid'      => $location->created_uid()
+                )
+            ) ;
+        }
+        return array ('location' => $locations) ;
     }
 
     /**
-     * Return an array representation of a cable number ranges associated
-     * with a prefix. The array is suitable for exporting by Web services.
+     * Return an array representation of equipment.
+     * The array is suitable for exporting by Web services.
      *
-     * @param IrepCableNumberPrefix $prefix
+     * @param IrepEquipment $equipment
      * @return array
      */
-    public static function cablenumber_ranges2array($prefix) {
-        return $prefix->ranges();
-    }
+    public static function equipment2array ($equipment_list) {
+        $equipment = array() ;
+        foreach ($equipment_list as $e) {
+            $last_history_event = $e->last_history_event() ;
+            $attachments = array () ;
+            foreach ($e->attachments() as $a)
+                array_push (
+                    $attachments ,
+                        array (
+                            'id'                  => $a->id() ,
+                            'name'                => $a->name() ,
+                            'document_type'       => $a->document_type() ,
+                            'document_size_bytes' => $a->document_size() ,
+                            'create_time'         => $a->create_time()->toStringShort() ,
+                            'create_uid'          => $a->create_uid())) ;
+            array_push (
+                $equipment ,
+                array (
+                    'id'                => $e->id() ,
+                    'status'            => $e->status() ,
+                    'status2'           => $e->status2() ,
+                    'manufacturer'      => $e->manufacturer() ,
+                    'model'             => $e->model() ,
+                    'serial'            => $e->serial() ,
+                    'description'       => $e->description() ,
+                    'attachment'        => $attachments ,
+                    'slacid'            => $e->slacid() ,
+                    'pc'                => $e->pc() ,
+                    'location'          => $e->location() ,
+                    'custodian'         => $e->custodian() ,
+                    'modified_time'     => $last_history_event->event_time()->toStringShort() ,
+                    'modified_time_sec' => $last_history_event->event_time()->sec ,
+                    'modified_uid'      => $last_history_event->event_uid()
+                )
+            ) ;
+        }
+        return array ('equipment' => $equipment) ;
 
-    /**
-     * Return an array representing orphan cables.
-     *
-     * @param Irep $irep
-     * @return type 
-     */
-    public static function cablenumber_orphant2array($irep) {
-        return $irep->find_orphant_cables();
     }
-
-    /**
-     * Return an array representing reserved cables.
-     *
-     * @param Irep $irep
-     * @return type 
-     */
-    public static function cablenumber_reserved2array($irep) {
-        return $irep->find_reserved_cables();
-    }
-    /**
-     * Return an array representation of a job number allocation. The array
-     * is suitable for exporting by Web services.
-     *
-     * @param IrepJobNumberAlloc $c
-     * @return array 
-     */
-    public static function jobnumber2array($c) {
-        return array (
-            'id'                           => $c->id(),
-            'owner'                        => $c->owner(),
-            'prefix'                       => $c->prefix(),
-            'first'                        => $c->first(),
-            'last'                         => $c->last(),
-            'num_in_use'                   => $c->num_in_use(),
-            'num_available'                => $c->num_available(),
-            'next_available'               => is_null($c->next_available        ()) ? '' : $c->next_available              (),
-            'recently_allocated'           => is_null($c->recently_allocated    ()) ? '' : $c->recently_allocated          (),
-            'recently_allocated_name'      => is_null($c->recently_allocated    ()) ? '' : sprintf("%3s%03d",$c->prefix(),$c->recently_allocated()),
-            'recent_allocation_time'       => is_null($c->recent_allocation_time()) ? '' : $c->recent_allocation_time      ()->toStringShort(),
-            'recent_allocation_uid'        => is_null($c->recent_allocation_uid ()) ? '' : $c->recent_allocation_uid       ()
-        );
-    }
-    /**
-     *
-     * Return an array representation of a job number. The array
-     * is suitable for exporting by Web services.
-     *
-     * @param IrepJobNumberAlloc $c
-     * @return array 
-     */
-    public static function jobnumber_allocation2array($c) {
-        return array (
-            'jobnumber_id'                 => $c->jobnumber_id(),
-            'jobnumber_name'               => $c->jobnumber_name(),
-            'owner'                        => $c->allocation()->owner(),
-            'num_cables'                   => $c->num_cables(),
-            'allocated_time'               => $c->allocated_time()->toStringShort(),
-            'project_title'                => $c->allocation()->irep()->find_project_by_id($c->project_id())->title()
-        );
+    public static function equipment_history2array ($equipment) {
+        $history = array () ;
+        foreach ($equipment->history() as $e)
+            array_push (
+                $history ,
+                array (
+                    'event_time' => $e->event_time()->toStringShort() ,
+                    'event_time_sec' => $e->event_time()->sec ,
+                    'event_uid' => $e->event_uid() ,
+                    'event' => $e->event() ,
+                    'comments' => $e->comments())) ;
+        return $history ;
     }
 
     /**
@@ -489,11 +297,8 @@ class IrepUtils {
             );
             $extra = $entry->extra();
             switch($event_type->scope()) {
-                case 'PROJECT':
-                    $event['project_id'] = is_null($extra) ? '0' : $extra['project_id'];
-                    break;
-                case 'CABLE':
-                    $event['cable_id'] =  is_null($extra) ? '0' : $extra['cable_id'];
+                case 'EQUIPMENT':
+                    $event['equipment_id'] = is_null($extra) ? '0' : $extra['project_id'];
                     break;
             }
             array_push($pending, $event);

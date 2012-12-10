@@ -13,7 +13,7 @@ use Irep\IrepException ;
 use LusiTime\LusiTimeException ;
 
 
-$document_title = 'PCDS Inventory And Repar Database:' ;
+$document_title = 'PCDS Inventory And Repair Database:' ;
 $document_subtitle = 'Electronic Equipment' ;
 
 $required_field_html = '<span style="color:red ; font-size:110% ; font-weight:bold ;"> * </span>' ;
@@ -39,23 +39,26 @@ try {
 <title><?php echo $document_title ?></title>
 <meta http-equiv="Content-Type" content="text/html ; charset=ISO-8859-1">
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/irep.css" rel="Stylesheet" />
-<link type="text/css" href="css/Table.css" rel="Stylesheet" />
 
-<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+
+<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/equipment.js"></script>
 <script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
-<script type="text/javascript" src="js/Table.js"></script>
 
+<script type="text/javascript" src="../portal/js/config.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
 
 <!-- Window layout styles and support actions -->
 
@@ -65,7 +68,7 @@ body {
   margin: 0 ;
   padding: 0 ;
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;
-  font-size: 11px ;
+  font-size: 13px ;
 }
 #p-top {
   position: absolute ;
@@ -300,11 +303,78 @@ div.v-item:hover {
   font-size: 11px ;
 }
 
+#equipment-inventory-controls-left {
+  margin-right: 20px;
+/*
+  border-right: 1px solid silver;
+  border-bottom: 1px solid #C0C0C1;
+  background-color: #F0F0F0;
+  padding: 10px;
+*/
+}
+
+.inventory-form-elem {
+  width:100%;
+}
+
+.equipment-grid-cell {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  /*
+  padding: 5px;
+  */
+  padding-top: 5px;
+  background-color: #f2f2f2;
+  border: 1px solid #c8c8c8;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+  /*
+  border: 1px solid #b0b0b0;
+  border-top:1px solid #b0b0b0;
+  border-right:1px solid #b0b0b0;
+  */
+}
+.equipment-grid-cell pre {
+  margin: 0px;
+}
+
+span.toggler {
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  cursor: pointer;
+}
+
+div.visible {
+  display: block;
+}
+
+div.hidden {
+  display: none;
+}
+
+button.visible {
+  display: block;
+}
+
+button.hidden {
+  display: none;
+}
+
+span.form_element_info {
+  color: maroon;
+}
 </style>
 
 
 <script type="text/javascript">
 
+var config = new config_create('irep') ;
 
 /* ------------------------------------------------
  *          VERTICAL SPLITTER MANAGEMENT
@@ -542,7 +612,7 @@ function report_error (msg, on_cancel) {
         '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'
     ) ;
     $('#popupdialogs').dialog({
-        resizable: false,
+        resizable: true,
         modal: true,
         buttons: {
             Cancel: function() {
@@ -607,6 +677,22 @@ function edit_dialog (title, msg, on_save, on_cancel) {
         title: title
     }) ;
 }
+
+function web_service_GET (url, params, on_success, on_failure) {
+    var jqXHR = $.get(url, params, function (data) {
+        if (data.status != 'success') {
+            if (on_failure) on_failure(data.message) ;
+            else            report_error(data.message, null) ;
+            return ;
+        }
+        if (on_success) on_success(data) ;
+    },
+    'JSON').error(function () {
+        var message = 'Web service request to '+url+' failed because of: '+jqXHR.statusText ;
+        if (on_failure) on_failure(message) ;
+        else            report_error(message, null) ;
+    }) ;
+} ;
 
 /* ------------------------------------------------------
  *             APPLICATION INITIALIZATION
@@ -805,11 +891,14 @@ function global_switch_context(application_name, context_name) {
     }
     return null ;
 }
-function global_simple_search                            ()   { global_switch_context('equipment', 'inventory').simple_search($('#p-search-text').val()) ; }
-function global_search_equipment_by_id                   (id) { global_switch_context('equipment', 'inventory').search_equipment_by_id(id) ; }
-function global_search_equipment_by_dict_location_id     (id) { global_switch_context('equipment', 'inventory').search_equipment_by_dict_location_id(id) ; }
-function global_search_equipment_by_dict_manifacturer_id (id) { global_switch_context('equipment', 'inventory').search_equipment_by_dict_manifacturer_id(id) ; }
-function global_search_equipment_by_dict_model           (id) { global_switch_context('equipment', 'inventory').search_equipment_by_dict_model(id) ; }
+function global_simple_search                    ()   { global_switch_context('equipment', 'inventory').simple_search($('#p-search-text').val()) ; }
+function global_search_equipment_by_id           (id) { global_switch_context('equipment', 'inventory').search_equipment_by(id) ; }
+function global_search_equipment_by_location     (id) { global_switch_context('equipment', 'inventory').search_equipment_by_location(id) ; }
+function global_search_equipment_by_manufacturer (id) { global_switch_context('equipment', 'inventory').search_equipment_by_manufacturer(id) ; }
+function global_search_equipment_by_model        (id) { global_switch_context('equipment', 'inventory').search_equipment_by_model(id) ; }
+function global_search_equipment_by_slacid_range (id) { global_switch_context('equipment', 'inventory').search_equipment_by_slacid_range(id) ; }
+function global_search_equipment_by_status       (id) { global_switch_context('equipment', 'inventory').search_equipment_by_status(id) ; }
+function global_search_equipment_by_status2      (id) { global_switch_context('equipment', 'inventory').search_equipment_by_status2(id) ; }
 
 function global_export_equipment(search_params,outformat) {
     search_params.format = outformat ;
@@ -871,13 +960,13 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
         <div style="float:left ; margin-left:10px ;" >
           <table><tbody>
             <tr>
-              <td>&nbsp ;</td>
+              <td>&nbsp;</td>
               <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td></tr>
             <tr>
-              <td>User:&nbsp ;</td>
+              <td>User:&nbsp;</td>
               <td><b><?php echo $authdb->authName()?></b></td></tr>
             <tr>
-              <td>Session expires in:&nbsp ;</td>
+              <td>Session expires in:&nbsp;</td>
               <td id="auth_expiration_info"><b>00:00.00</b></td></tr>
           </tbody></table>
         </div>
@@ -921,14 +1010,19 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
     </div>
 
     <div id="dictionary" class="hidden">
-      <div class="v-item" id="manifacturers">
+      <div class="v-item" id="manufacturers">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left ;"></div>
-        <div style="float:left ;" >Manufacturers and Models</div>
+        <div style="float:left ;" >Manufacturers/Models</div>
         <div style="clear:both ;"></div>
       </div>
       <div class="v-item" id="locations">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left ;"></div>
         <div style="float:left ;" >Locations</div>
+        <div style="clear:both ;"></div>
+      </div>
+      <div class="v-item" id="statuses">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left ;"></div>
+        <div style="float:left ;" >Statuses</div>
         <div style="clear:both ;"></div>
       </div>
     </div>
@@ -966,8 +1060,39 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
         -- the selected equipment.
         -->
       <div id="equipment-inventory-controls">
-        <div style="float:left ;">
-          Here be the controls.
+        <div id="equipment-inventory-controls-left" style="float:left ;">
+          <form id="equipment-inventory-form">
+            <table><tbody>
+              <tr>
+                 <td><b>Manufacturer:</b></td>
+                  <td><select name="manufacturer" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Model:</b></td>
+                  <td><select name="model" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Serial number:</b></td>
+                  <td><input type="text" name="serial" size="10" class="inventory-form-elem"  style="padding:2px ;" value="" /></td>
+              </tr>
+              <tr><td><b>Location:</b></td>
+                  <td><select name="location" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Custodian:</b></td>
+                  <td><select name="custodian" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Property Control #:</b></td>
+                  <td><input type="text" name="pc"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
+              </tr>
+              <tr><td><b>Status:</b></td>
+                  <td><select name="status" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Sub-status:</b></td>
+                  <td><select name="status2" class="inventory-form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>SLAC ID:</b></td>
+                  <td><input type="text" name="slacid"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
+              </tr>
+            </tbody></table>
+          </form>
         </div>
         <div style="float:left ; margin-left:20px ;">
           <button name="search" title="refresh the list">Search</button>
@@ -975,38 +1100,71 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
         </div>
       </div>
       <div style="clear:both ;"></div>
-      <div style="float:right ;" id="equipment-inventory-info">&nbsp ;</div>
+      <div style="float:right ;" id="equipment-inventory-info">&nbsp;</div>
       <div style="clear:both ;"></div>
 
-      <!-- The table to display equipment selection -->
-      <div id="equipment-inventory-display">
-        Here be the table with a list of equipment. And perhaps sorting controls.
-      </div>
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+          <li><a href="#results">Search Results</a></li>
+        </ul>
 
+        <div id="results" >
+          <div style=" border:solid 1px #b0b0b0; padding:20px;" >
+            <div style="float:left;">
+              <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="../irep/img/EXCEL_icon.gif" /></button>
+            </div>
+            <div style="float:left; margin-left:20px;">
+              <center><b>&nbsp;</b></center>
+              <div id="view">
+                <input type="radio" id="view_table" name="view" checked="checked" ><label for="view_table" title="view as a table" ><img src="../irep/img/table.png" /></label>
+                <input type="radio" id="view_grid"  name="view"                   ><label for="view_grid"  title="view as a grid"  ><img src="../irep/img/stock_table_borders.png" /></label>
+              </div>
+            </div>
+            <div style="float:left; margin-left:20px;">
+                <center><b>&nbsp;</b></center>
+                <input type="checkbox" id="option_model_image"        ><label for="option_model_image"       > display images of models</label><br>
+                <input type="checkbox" id="option_attachment_preview" ><label for="option_attachment_preview"> preview attachments     </label>
+            </div>
+            <div style="clear:both ;"></div>
+            <div id="equipment-inventory-table" style="margin-top:10px;" ></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="equipment-add" class="application-workarea hidden">
 <?php
-    if ($irep->can_edit_inventory())
-        print <<<HERE
+    if ($irep->can_edit_inventory()) {
+?>
       <div style="margin-bottom:20px ; border-bottom:1px dashed #c0c0c0 ;">
         <div style="float:left ;">
           <div style="margin-bottom:10px ; width:480px ;">
-            When making a clone of an existing equipment record make sure the SLAC Property Control Number (PC)
-            of the new equipment differs from the original one. All other attributes of the original equipment
+            When making a clone of an existing equipment record make sure the  serial number, Property Control (PC) number,
+            and a SLAC ID of the new equipment differ from the original one. All other attributes of the original equipment
             will be copied into the new one. The copied equipment will all be put into the 'Unknown' state.
           </div>
           <form id="equipment-add-form">
             <table><tbody>
-              <tr><td><b>Manifacturer:</b></td>
-                  <td><input type="text" name="manifacturer" size="16" class="equipment-add-form-element" style="padding:2px ;" value="" /></td></tr>
-              <tr><td>&nbsp ;</td></tr>
-              <tr><td><b>Model:{$required_field_html}</b></td>
-                  <td><input type="text" name="model" size="5" class="equipment-add-form-element" style="padding:2px ;" value="" /></td></tr>
-              <tr><td><b>Property Control #:{$required_field_html}</b></td>
-                  <td><input type="text" name="property_control_number"  size="50" class="equipment-add-form-element" style="padding:2px ;" value="" /></td></tr>
-              <tr><td><b>Descr: </b></td>
-                  <td colspan="4"><textarea cols=54 rows=4 name="description" class="equipment-add-form-element" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td></tr>
+              <tr><td><b>Manufacturer:<?php echo $required_field_html; ?></b></td>
+                  <td><select name="manufacturer" class="equipment-add-form-element" ></select>
+                      <span class="form_element_info"></span></td></tr>
+              <tr><td><b>Model:<?php echo $required_field_html; ?></b></td>
+                  <td><select name="model" class="equipment-add-form-element" ></select>
+                      <span class="form_element_info"></span></td></tr>
+              <tr><td><b>Serial number:</b></td>
+                  <td><input type="text" name="serial" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" /></td></tr>
+              <tr><td><b>Property Control #:</b></td>
+                  <td><input type="text" name="pc"  size="20" style="padding:2px ;" value="" /></td></tr>
+              <tr><td><b>SLAC ID:<?php echo $required_field_html; ?></b></td>
+                  <td><input type="text" name="slacid" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" />
+                      <span class="form_element_info"></span></td></tr>
+              <tr><td><b>Location:</b></td>
+                  <td><select name="location"></select></td></tr>
+              <tr><td><b>Custodian:</b></td>
+                  <td><input type="text" name="custodian" size="20" style="padding:2px ;" value='' />
+                  ( known custodians: <select name="custodian"></select> )</td></tr>
+              <tr><td><b>Description: </b></td>
+                  <td colspan="4"><textarea cols=54 rows=4 name="description" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td></tr>
             </tbody></table>
           </form>
         </div>
@@ -1015,49 +1173,49 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
             <button id="equipment-add-save">Create</button>
             <button id="equipment-add-reset">Reset Form</button>
           </div>
-          <div style="margin-top:5px ;" id="equipment-add-info" >&nbsp ;</div>
+          <div style="margin-top:5px ;" id="equipment-add-info" >&nbsp;</div>
         </div>
         <div style="clear:both ;"></div>
       </div>
-      {$required_field_html} required feild
-HERE;
-      else {
-          $admin_access_href = "javascript:global_switch_context('admin','access')" ;
-        print <<<HERE
-<br><br>
-<center>
-  <span style="color: red ; font-size: 175% ; font-weight: bold ; font-family: Times, sans-serif ;">
-    A c c e s s &nbsp ; E r r o r
-  </span>
-</center>
-<div style="margin: 10px 10% 10px 10% ; padding: 10px ; font-size: 125% ; font-family: Times, sans-serif ; border-top: 1px solid #b0b0b0 ;">
-  We're sorry! Your SLAC UNIX account <b>{$authdb->authName()}</b> has no sufficient permissions for this operation.
-  Normally we assign this task to authorized <a href="{$admin_access_href}">database editors</a>.
-  Please contact administrators of this application if you think you need to add/edit equipment records.
-  A list of administrators can be found in the <a href="{$admin_access_href}">Access Control</a> section of the <a href="{$admin_access_href}">Admin</a> tab of this application.
-</div>
-HERE;
-      }
+      <?php echo $required_field_html; ?> required field
+<?php
+    } else {
+        $admin_access_href = "javascript:global_switch_context('admin','access')" ;
+?>
+      <br><br>
+      <center>
+        <span style="color: red ; font-size: 175% ; font-weight: bold ; font-family: Times, sans-serif ;">
+          A c c e s s &nbsp; E r r o r
+        </span>
+      </center>
+      <div style="margin: 10px 10% 10px 10% ; padding: 10px ; font-size: 125% ; font-family: Times, sans-serif ; border-top: 1px solid #b0b0b0 ;">
+        We're sorry! Your SLAC UNIX account <b><?php echo $authdb->authName(); ?></b> has no sufficient permissions for this operation.
+        Normally we assign this task to authorized <a href="<?php echo $admin_access_href; ?>">database editors</a>.
+        Please contact administrators of this application if you think you need to add/edit equipment records.
+        A list of administrators can be found in the <a href="<?php echo $admin_access_href; ?>">Access Control</a> section of the <a href="<?php echo $admin_access_href; ?>">Admin</a> tab of this application.
+      </div>
+<?php
+    }
 ?>
     </div>
 
-    <div id="dictionary-manifacturers" class="application-workarea hidden">
-      <div><button id="dictionary-manifacturers-reload" title="reload the dictionary from the database">Reload</button></div>
+    <div id="dictionary-manufacturers" class="application-workarea hidden">
+      <div><button id="dictionary-manufacturers-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left ;">
         <div style="margin-top:20px ;">
-          <div style="float:left ; "><input type="text" size="12" name="manifacturer2add" title="fill in new manifacturer name, then press RETURN to save" /></div>
-              <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new manifacturer here</div>
+          <div style="float:left ; "><input type="text" size="12" name="manufacturer2add" title="fill in new manufacturer name, then press RETURN to save" /></div>
+              <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new manufacturer here</div>
           <div style="clear:both ; "></div>
         </div>
-        <div id="dictionary-manifacturers-manifacturers"></div>
+        <div id="dictionary-manufacturers-manufacturers"></div>
       </div>
       <div style="float:left ; margin-left:20px ;">
         <div style="margin-top:20px ;">
           <div style="float:left ; "><input type="text" size="12" name="model2add" title="fill in new model name, then press RETURN to save" /></div>
-          <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new rack here</div>
+          <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new model here</div>
           <div style="clear:both ; "></div>
         </div>
-        <div id="dictionary-manifacturers-models"></div>
+        <div id="dictionary-manufacturers-models"></div>
       </div>
       <div style="clear:both ; "></div>
     </div>
@@ -1071,6 +1229,27 @@ HERE;
           <div style="clear:both ; "></div>
         </div>
         <div id="dictionary-locations-locations"></div>
+      </div>
+      <div style="clear:both ; "></div>
+    </div>
+
+    <div id="dictionary-statuses" class="application-workarea hidden">
+      <div><button id="dictionary-statuses-reload" title="reload the dictionary from the database">Reload</button></div>
+      <div style="float:left ;">
+        <div style="margin-top:20px ;">
+          <div style="float:left ; "><input type="text" size="12" name="status2add" title="fill in new status name, then press RETURN to save" /></div>
+              <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new status here</div>
+          <div style="clear:both ; "></div>
+        </div>
+        <div id="dictionary-statuses-statuses"></div>
+      </div>
+      <div style="float:left ; margin-left:20px ;">
+        <div style="margin-top:20px ;">
+          <div style="float:left ; "><input type="text" size="12" name="status22add" title="fill in new sub-status name, then press RETURN to save" /></div>
+          <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new sub-status here</div>
+          <div style="clear:both ; "></div>
+        </div>
+        <div id="dictionary-statuses-statuses2"></div>
       </div>
       <div style="clear:both ; "></div>
     </div>
@@ -1225,26 +1404,25 @@ HERE;
       </div>
     </div>
 
-    <div id="admin-slacidnumbers" class="application-workarea hidden">
-      <div style="float:left ;" ><button id="admin-slacidnumbers-reload" title="reload from the database">Reload</button></div>
+    <div id="admin-slacid" class="application-workarea hidden">
+      <div style="float:left ;" ><button id="admin-slacid-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both ; "></div>
       <div style="margin-top:20px ; margin-bottom:20px ; ">
         <p>PCDS is allocated a set of "official" SLACid numbers which are managed by
-        this application. A unique number is generated each time
-        a new equipment gets registered in the Inventory database.
-        The current section is designed for configuring a generator of numbers and monitoring
-        the allocation of the numbers.</p>
+        this application. Each time a new equipment is being registered in the Inventory its proposed
+        SLAC ID number will be validated to make sure it falls into one of the ranges.</p>
       </div>
 
       <div id="tabs" style="font-size:12px ;">
         <ul>
-          <li><a href="#slacidnumbers">Ranges</a></li>
+          <li><a href="#admin-slacid-ranges">Ranges</a></li>
         </ul>
 
-        <div id="slacidnumbers" >
+        <div id="admin-slacid-ranges" >
           <div style="font-size:11px ; border:solid 1px #b0b0b0 ; padding:10px ; padding-left:20px ; padding-bottom:20px ;" >
             <div style="margin-bottom:10px ; ">
-              <p>This page is meant to be used by administrators to configure the generator/allocator of numbers.</p>
+              <p>This page is meant to be used by administrators to manage known ranges.
+                 Ranges can't overlap and they must be non-empty.</p>
             </div>
             <div id="ranges">
               <div style="margin-bottom:10px ;">
@@ -1252,7 +1430,7 @@ HERE;
                 <button name="save">Save</button>
                 <button name="cancel">Cancel</button>
               </div>
-              <div id="admin-slacidnumbers-ranges-table"></div>
+              <div id="admin-slacid-ranges-table"></div>
             </div>
           </div>
         </div>
