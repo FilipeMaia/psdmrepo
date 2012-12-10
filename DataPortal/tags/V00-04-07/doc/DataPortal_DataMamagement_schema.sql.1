@@ -1,0 +1,53 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+
+CREATE SCHEMA IF NOT EXISTS `WEBPORTAL` ;
+USE `REGDB`;
+
+-- -----------------------------------------------------
+-- Table `WEBPORTAL`.`FILE_RESTORE_REQUESTS`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `WEBPORTAL`.`FILE_RESTORE_REQUESTS` ;
+
+CREATE  TABLE IF NOT EXISTS `WEBPORTAL`.`FILE_RESTORE_REQUESTS` (
+  `exper_id` INT NOT NULL ,
+  `runnum`   INT NOT NULL ,
+  `file_type` TEXT NOT NULL ,
+  `irods_filepath` TEXT NOT NULL ,
+  `irods_src_resource` TEXT NOT NULL ,
+  `irods_dst_resource` TEXT NOT NULL ,
+  `requested_time` BIGINT UNSIGNED NOT NULL ,
+  `requested_uid` VARCHAR(32) NOT NULL ,
+  CONSTRAINT `FILE_RESTORE_REQUESTS_FK_1`
+    FOREIGN KEY (`exper_id` )
+    REFERENCES `REGDB`.`EXPERIMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `WEBPORTAL`.`MEDIUM_TERM_STORAGE`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `WEBPORTAL`.`MEDIUM_TERM_STORAGE` ;
+
+CREATE  TABLE IF NOT EXISTS `WEBPORTAL`.`MEDIUM_TERM_STORAGE` (
+  `exper_id` INT NOT NULL ,
+  `runnum`   INT NOT NULL ,
+  `file_type` TEXT NOT NULL ,
+  `irods_filepath` TEXT NOT NULL ,
+  `irods_resource` TEXT NOT NULL ,
+  `irods_size` BIGINT UNSIGNED NOT NULL ,
+  `registered_time` BIGINT UNSIGNED NOT NULL ,
+  `registered_uid` VARCHAR(32) NOT NULL ,
+  CONSTRAINT `MEDIUM_TERM_STORAGE_FK_1`
+    FOREIGN KEY (`exper_id` )
+    REFERENCES `REGDB`.`EXPERIMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
