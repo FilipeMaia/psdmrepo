@@ -19,6 +19,10 @@ if( isset( $_GET['instr'] )) {
         die( "instrument name can't be empty" );
     }
 }
+$station = 0;
+if( isset( $_GET['station'] )) {
+    $station = intval(trim( $_GET['station'] ));
+}
 
 function experiment2json( $experiment ) {
 
@@ -62,8 +66,8 @@ function experiment2json( $experiment ) {
 try {
     RegDB::instance()->begin();
 
-    $last_switch = RegDB::instance()->last_experiment_switch( $instr ) or
-        die( "no current experiment for instrument: {$instr}" );
+    $last_switch = RegDB::instance()->last_experiment_switch( $instr, $station ) or
+        die( "no current experiment for instrument: {$instr}:{$station}" );
 
     $last_experiment = RegDB::instance()->find_experiment_by_id( $last_switch['exper_id'] ) or
         die( "failed to find experiment for id=".$last_switch['exper_id'] );

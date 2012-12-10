@@ -25,17 +25,17 @@ class LogBookAuth {
     public function authType        () { return AuthDb::instance()->authName(); }
     public function isAuthenticated () { return LogBookAuth::instance()->authName() != ''; }
 
-    public function canRead            ($exper_id) { return $this->can($exper_id, 'read'); }
-    public function canPostNewMessages ($exper_id) { return $this->can($exper_id, 'post'); }
-    public function canEditMessages    ($exper_id) { return $this->can($exper_id, 'edit'); }
-    public function canDeleteMessages  ($exper_id) { return $this->can($exper_id, 'delete'); }
-    public function canManageShifts    ($exper_id) { return $this->can($exper_id, 'manage_shifts' ); }
+    public function canRead            ($exper_id, $user=null) { return $this->can($exper_id, $user, 'read'); }
+    public function canPostNewMessages ($exper_id, $user=null) { return $this->can($exper_id, $user, 'post'); }
+    public function canEditMessages    ($exper_id, $user=null) { return $this->can($exper_id, $user, 'edit'); }
+    public function canDeleteMessages  ($exper_id, $user=null) { return $this->can($exper_id, $user, 'delete'); }
+    public function canManageShifts    ($exper_id, $user=null) { return $this->can($exper_id, $user, 'manage_shifts' ); }
 
-    private function can( $exper_id, $priv ) {
+    private function can( $exper_id, $user, $priv ) {
         if( !$this->isAuthenticated()) return false;
         AuthDb::instance()->begin();
         return AuthDb::instance()->hasPrivilege(
-            LogBookAuth::instance()->authName(), $exper_id, 'LogBook', $priv );
+            is_null($user) ? LogBookAuth::instance()->authName() : trim($user), $exper_id, 'LogBook', $priv );
     }
 
     public static function reporErrorHtml( $message, $link=null ) {
