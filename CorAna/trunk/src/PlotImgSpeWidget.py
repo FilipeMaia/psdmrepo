@@ -75,6 +75,10 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
         self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        self.canvas.mpl_connect('axes_leave_event',     self.processAxesLeaveEvent)
+        self.canvas.mpl_connect('axes_enter_event',     self.processAxesEnterEvent)
+        self.canvas.mpl_connect('figure_leave_event',   self.processFigureLeaveEvent)
+
 
         self.initParameters()
         self.setFrame()
@@ -163,7 +167,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.fig.clear()        
         self.nbins = nbins
 
-        if self.fig.myLogIsOn : self.plots_in_log10_scale()
+        #if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_xhist()
+        if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_yhist()
         else :                  self.plots_in_linear_scale()
 
         self.axhi.grid(self.fig.myGridIsOn)
@@ -172,7 +177,51 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.canvas.draw()
         #print 'End of on_draw'
 
-    def plots_in_log10_scale(self) :
+
+    def plots_in_log10_scale_for_img_and_yhist(self) :
+        self.arr2d = np.log10(self.arrwin)
+        #self.arr2d = self.arrwin
+
+        if self.range_his == None : 
+            vmin, vmax = np.min(self.arrwin), np.max(self.arrwin)
+        else :
+            vmin, vmax = self.range_his
+
+        self.fig.myZmin, self.fig.myZmax = vmin, vmax 
+
+        if vmin<0.1 : vmin=0.1
+        if vmax<10  : vmax=10
+        log_vmin, log_vmax = log10(vmin), log10(vmax)
+        if log_vmax == log_vmin : log_vmax = log_vmin + 0.1
+
+
+        #print 'vmin, vmax, log_vmin, log_vmax = ', vmin, vmax, log_vmin, log_vmax
+                        
+        self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
+        self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
+
+        self.axhi.xaxis.set_major_locator(MaxNLocator(5))
+        self.axhi.yaxis.set_major_locator(MaxNLocator(4))
+
+        self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his, log=True)
+
+        self.imsh = self.axim.imshow(self.arr2d, origin='upper', \
+                                          interpolation='nearest', \
+                                          extent=self.range, aspect='auto')
+        self.imsh.set_clim(log_vmin,log_vmax)
+
+        #self.axcb = self.fig.add_axes([0.15, 0.95, 0.78, 0.05])
+        #self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
+        #                                orientation='horizontal')#, ticks=xticks)
+        self.colb = self.fig.colorbar(self.imsh, orientation='vertical', \
+                                        fraction=0.1, pad=0.01, shrink=1.0, aspect=20)
+        # fraction - of the 2d plot occupied by the color bar
+        # pad      - is a space between 2d image and color bar
+        # shrink   - factor for the length of the color bar
+        # aspect   - ratio length/width of the color bar
+
+
+    def plots_in_log10_scale_for_img_and_xhist(self) :
         self.arr2d = np.log10(self.arrwin)
         #self.arr2d = self.arrwin
 
@@ -186,6 +235,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         if vmin<0.1 : vmin=0.1
         if vmax<10  : vmax=10
         log_vmin, log_vmax = int(log10(vmin)), int(log10(vmax))+1
+        if log_vmax == log_vmin : log_vmax = log_vmin + 1
         #print 'vmin, vmax, log_vmin, log_vmax = ', vmin, vmax, log_vmin, log_vmax
                         
         self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
@@ -260,6 +310,30 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.axhi.set_ylabel('N pixels')
 
 
+    def drawXCoordinateOfCoursor(self, event) :
+        axes = event.inaxes
+        #xmin, xmax = axes.get_xlim()
+        #ymin, ymax = axes.get_ylim()
+        x, y = event.xdata, event.ydata
+        s = '%6.1f' % (event.xdata)
+        try : self.curstext.remove()
+        except : pass
+        self.curstext = axes.text(x, y, s, fontsize=10) #, ha='center')
+        self.canvas.draw()
+
+
+    def drawXYCoordinateOfCoursor(self, event) :
+        axes = event.inaxes
+        #xmin, xmax = axes.get_xlim()
+        #ymin, ymax = axes.get_ylim()
+        x, y = event.xdata, event.ydata
+        s = '%d, %d' % (event.xdata, event.ydata)
+        try : self.curstext.remove()
+        except : pass
+        self.curstext = axes.text(x, y, s, fontsize=10) #, ha='center')
+        self.canvas.draw()
+
+
     def drawVerticalLineThroughCoursor(self, event) :
         axes   = event.inaxes
         fb     = self.canvas.figure.bbox
@@ -306,27 +380,48 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #self.fig.canvas.draw()
 
 
+    def processAxesEnterEvent(self, event) :
+        #print 'AxesEnterEvent'
+        if event.inaxes == self.axhi :
+            #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
+            #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
+
+        elif event.inaxes == self.axim :
+            #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+
+
+
+    def processAxesLeaveEvent(self, event) :
+        #print 'AxesLeaveEvent'
+        try : self.curstext.remove()
+        except : pass
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
+
+    def processFigureLeaveEvent(self, event) :
+        #print 'FigureLeaveEvent'
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
 
     def processMouseMotion(self, event) :
 
         if self.fig.ntbZoomIsOn : return
 
-        if   event.inaxes == self.axhi :
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
-        elif event.inaxes == self.axim :
-            #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
-        else :
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-
         if event.inaxes == self.axhi :
+            self.drawXCoordinateOfCoursor(event)
             self.drawVerticalLineThroughCoursor(event)
             #self.drawHorizontalLineThroughCoursor(event)
-        
+
+        if event.inaxes == self.axim :
+            self.drawXYCoordinateOfCoursor(event)
+
         if event.inaxes == self.axim and self.fig.myZoomIsOn :
             #print 'processMouseMotion',
             ##print 'event.xdata, event.ydata =', event.xdata, event.ydata
             #print 'event.x, event.y =', event.x, event.y
+
             height = self.canvas.figure.bbox.height
             self.xmotion    = event.xdata
             self.ymotion    = event.ydata

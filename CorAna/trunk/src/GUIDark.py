@@ -260,6 +260,15 @@ class GUIDark ( QtGui.QWidget ) :
         self.edi_bat_end  .setText( str( cp.bat_dark_end  .value() ) )        
         self.edi_bat_total.setText( str( cp.bat_dark_total.value() ) )        
         self.edi_bat_time .setText( str( cp.bat_dark_dt_ave.value() ) + u'\u00B1' + str( cp.bat_dark_dt_rms.value() ) )        
+        self.set_style_for_edi_bat_end()
+
+
+    def set_style_for_edi_bat_end(self):
+        if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+        else :
+            self.edi_bat_end.setStyleSheet(cp.styleEdit)
+
 
     def on_but_submit(self):
         logger.debug('on_but_submit', __name__)
@@ -303,10 +312,6 @@ class GUIDark ( QtGui.QWidget ) :
         logger.info('Set bat_dark_end =' + str(cp.bat_dark_end.value()), __name__)
         self.set_fields()
 
-        if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
-            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-        else :
-            self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
     def on_but_browse(self):
         logger.debug('on_but_browse', __name__)

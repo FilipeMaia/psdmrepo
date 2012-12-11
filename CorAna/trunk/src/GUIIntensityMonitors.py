@@ -50,12 +50,17 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
         self.setTitleBar()
-        for i,name in enumerate(cp.imon_name_list) :
-            print i, name.value()
-            self.guiSection(name, cp.imon_ch1_list[i],
-                                  cp.imon_ch2_list[i],
-                                  cp.imon_ch3_list[i],
-                                  cp.imon_ch4_list[i])
+
+        self.rad_nonorm = QtGui.QRadioButton('No norm.')
+        self.rad_sele_grp = QtGui.QButtonGroup()
+        self.rad_sele_grp.addButton(self.rad_nonorm)
+        self.connect(self.rad_nonorm, QtCore.SIGNAL('clicked()'), self.onRadio)
+
+        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max) in enumerate(cp.imon_pars_list) :
+            #print i, name.value(), ch1.value(), ch2.value(), ch3.value(), ch4.value()
+            self.guiSection(name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max) 
+
+        self.grid.addWidget(self.rad_nonorm, self.grid_row, 6, 1, 3)
 
         self.setLayout(self.grid)
 
@@ -86,16 +91,20 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def setTitleBar(self) :
-        list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4', 'Plot']
+        list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
+                          'Plot', 'Norm', 'Select', 'Imin', 'Imax']
         for i,t in enumerate(list_of_titles) : 
             label = QtGui.QLabel(t)
             label.setStyleSheet(cp.styleLabel)
             label.setFixedHeight(10)
+            if i==5 : label.setFixedWidth(80)
+            if i==6 : label.setFixedWidth(50)
+            if i==7 : label.setFixedWidth(50)
             self.grid.addWidget(label, self.grid_row, i)
         self.grid_row += 1
 
 
-    def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None) :
+    def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None, norm=None, sele=None, sele_min=None, sele_max=None) :
         edi      = QtGui.QLineEdit( str(name.value()) )        
         but      = QtGui.QPushButton('Browse')
         #box      = QtGui.QComboBox( self ) 
@@ -106,37 +115,59 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         cb3 = QtGui.QCheckBox('   +', self)
         cb4 = QtGui.QCheckBox('   =', self)
 
+        rad = QtGui.QRadioButton('    ')
+        if norm.value() : rad.setChecked(True)
+
+        self.rad_sele_grp.addButton(rad)
+
+        cbs = QtGui.QCheckBox('', self)
+        mis = QtGui.QLineEdit( str(sele_min.value()) )        
+        mas = QtGui.QLineEdit( str(sele_max.value()) )        
+
         sec_dict = { 0:(edi,name),
                      1:(cb1,cbch1),
                      2:(cb2,cbch2),
                      3:(cb3,cbch3),
                      4:(cb4,cbch4),
-                     5:(but,None) }
+                     5:(but,None),
+                     6:(rad,norm),
+                     7:(cbs,sele),
+                     8:(mis,sele_min),
+                     9:(mas,sele_max)
+                     }
 
         self.list_of_dicts.append( sec_dict )
 
         for col,(fld, par) in sec_dict.iteritems() :
             self.grid.addWidget(fld, self.grid_row, col)
-            if col>0 and col<5 :
+            if col>0 and col<5 or col==7 :
                 fld.setChecked( par.value() )
                 self.connect(fld, QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
 
         self.grid_row += 1
-        
+        self.connect(rad, QtCore.SIGNAL('clicked()'), self.onRadio)
+
+
         edi.setReadOnly( True )  
         edi.setToolTip('Edit number in this field\nor click on "Browse"\nto select the file.')
         but.setToolTip('Click on this button\nand select the file.')
         #box.setToolTip('Click on this box\nand select the partitioning method.')
 
-        edi    .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
+        edi    .setStyleSheet (cp.styleEditInfo) # cp.styleEdit
         #box    .setStyleSheet (cp.styleButton) 
         but    .setStyleSheet (cp.styleButton) 
         edi    .setAlignment (QtCore.Qt.AlignLeft)
+        mis    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
+        mas    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
+        #cbs    .setStyleSheet (cp.styleCBox)
+        #cbs    .initStyleOption (QtGui.QStyleOptionButton.CE_CheckBox)
+        #cbs    .setPalette(QtGui.QPalette(QtGui.QColor(255, 255, 255)))
 
         width = 60
         but    .setFixedWidth(width)
-        edi    .setFixedWidth(250)
-        #box    .setFixedWidth(160)
+        edi    .setFixedWidth(230)
+        mis    .setFixedWidth(width)
+        mas    .setFixedWidth(width)
 
         #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         self.connect(but, QtCore.SIGNAL('clicked()'),                self.onBut  )
@@ -157,8 +188,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        #try    : del cp.guiintensitymonitors # GUIIntensityMonitors
-        #except : pass # silently ignore
+        try    : del cp.guiintensitymonitors # GUIIntensityMonitors
+        except : pass # silently ignore
 
     def onClose(self):
         logger.debug('onClose', __name__)
@@ -182,6 +213,16 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                     if cp.plotarray_is_on :
                         self.redrawArray(row0)
                     return
+
+
+    def onRadio(self): 
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+            rad, par = sec_dict[6]
+            if rad.isChecked() :
+                par.setValue(True)
+                logger.info('onRadio in row:' + str(row0), __name__)
+            else               :
+                par.setValue(False)
 
 
     def onBut(self):

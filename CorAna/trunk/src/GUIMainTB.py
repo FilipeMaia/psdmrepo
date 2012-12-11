@@ -471,19 +471,23 @@ class GUIMainTB ( QtGui.QWidget ) :
 
 #http://doc.qt.nokia.com/4.6/qt.html#Key-enum
     def keyPressEvent(self, event):
-        print 'event.key() = %s' % (event.key())
+        #print 'event.key() = %s' % (event.key())
         if event.key() == QtCore.Qt.Key_Escape:
-    #        self.close()
+            #self.close()
             self.SHowIsOn = False    
+            pass
 
         if event.key() == QtCore.Qt.Key_B:
-            print 'event.key() = %s' % (QtCore.Qt.Key_B)
+            #print 'event.key() = %s' % (QtCore.Qt.Key_B)
+            pass
 
         if event.key() == QtCore.Qt.Key_Return:
-            print 'event.key() = Return'
+            #print 'event.key() = Return'
+            pass
 
         if event.key() == QtCore.Qt.Key_Home:
-            print 'event.key() = Home'
+            #print 'event.key() = Home'
+            pass
 
 #-----------------------------
 #  In case someone decides to run this module

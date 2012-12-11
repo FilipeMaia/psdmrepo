@@ -60,7 +60,7 @@ class PlotArray (QtGui.QWidget) :
 
     def __init__(self, parent=None, arr=None, ofname='./fig.png', title=''):
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 800, 400)
+        self.setGeometry(20, 40, 800, 600)
         self.setWindowTitle('Plot for array')
         self.setFrame()
 

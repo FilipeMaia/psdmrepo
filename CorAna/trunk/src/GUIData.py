@@ -272,6 +272,14 @@ class GUIData ( QtGui.QWidget ) :
         self.edi_bat_end  .setText( str( cp.bat_data_end  .value() ) )        
         self.edi_bat_total.setText( str( cp.bat_data_total.value() ) )        
         self.edi_bat_time .setText( str( cp.bat_data_dt_ave.value() ) + u'\u00B1' + str( cp.bat_data_dt_rms.value() ) )        
+        self.set_style_for_edi_bat_end()
+
+
+    def set_style_for_edi_bat_end(self):
+        if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+        else :
+            self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
 
     def on_but_aver(self):
@@ -318,11 +326,6 @@ class GUIData ( QtGui.QWidget ) :
         cp.bat_data_end.setValue( int(self.edi_bat_end.displayText()) )
         logger.info('Set bat_data_end =' + str(cp.bat_data_end.value()), __name__)
         self.set_fields()
-
-        if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-        else :
-            self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
 
     def on_but_brow (self):       
@@ -381,6 +384,7 @@ class GUIData ( QtGui.QWidget ) :
 
         self.but_path  .setEnabled( is_active)
         self.but_plot  .setEnabled( is_active)
+        self.but_tspl  .setEnabled( is_active)
         self.but_brow  .setEnabled( is_active)
         self.but_scan  .setEnabled( is_active)
         self.but_aver  .setEnabled( is_active)
@@ -390,6 +394,7 @@ class GUIData ( QtGui.QWidget ) :
 
         self.but_path  .setFlat(not is_active)
         self.but_plot  .setFlat(not is_active)
+        self.but_tspl  .setFlat(not is_active) 
         self.but_brow  .setFlat(not is_active)
         self.but_scan  .setFlat(not is_active)
         self.but_aver  .setFlat(not is_active)

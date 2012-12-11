@@ -90,7 +90,26 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_log)
         self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
 
-        # Layout with box sizers
+        #self.setGridLayout()        
+        self.setHBoxLayout()        
+        self.showToolTips()
+
+
+    def setHBoxLayout(self):
+        self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addWidget(self.but_help)
+        self.hbox.addWidget(self.tit_nbins)
+        self.hbox.addWidget(self.edi_nbins)
+        self.hbox.addWidget(self.cbox_grid)
+        self.hbox.addWidget(self.cbox_log)
+        self.hbox.addWidget(self.but_reset)
+        self.hbox.addStretch(1)
+        self.hbox.addWidget(self.but_save)
+        self.hbox.addWidget(self.but_quit)
+        self.setLayout(self.hbox)
+
+
+    def setGridLayout(self):
         self.grid = QtGui.QGridLayout() 
         self.grid.addWidget(self.but_help,  0, 0)
         self.grid.addWidget(self.tit_nbins, 0, 1)
@@ -101,8 +120,6 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.but_save,  0, 7)
         self.grid.addWidget(self.but_quit,  0, 8)
         self.setLayout(self.grid)
-
-        self.showToolTips()
 
 
     def showToolTips(self):

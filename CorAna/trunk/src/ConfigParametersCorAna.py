@@ -256,6 +256,59 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 #-----------------------------
 
+        imon_norm_cbx = [ (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool') ]
+
+        self.imon_norm_cbx_list = self.declareListOfPars( 'IMON_NORM_CBX', imon_norm_cbx )
+
+#-----------------------------
+
+        imon_sele_cbx = [ (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool'), \
+                          (False, False ,'bool') ]
+
+        self.imon_sele_cbx_list = self.declareListOfPars( 'IMON_SELE_CBX', imon_sele_cbx )
+
+#-----------------------------
+
+        imon_sele_min = [ (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float') ]
+
+        self.imon_sele_min_list = self.declareListOfPars( 'IMON_SELE_MIN', imon_sele_min )
+
+#-----------------------------
+
+        imon_sele_max= [ (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float'), \
+                         (-1, -1 ,'float') ]
+
+        self.imon_sele_max_list = self.declareListOfPars( 'IMON_SELE_MAX', imon_sele_max )
+
+#-----------------------------
+
+        self.imon_pars_list = zip( self.imon_name_list,
+                                   self.imon_ch1_list,
+                                   self.imon_ch2_list,
+                                   self.imon_ch3_list,
+                                   self.imon_ch4_list,
+                                   self.imon_norm_cbx_list,
+                                   self.imon_sele_cbx_list,
+                                   self.imon_sele_min_list,
+                                   self.imon_sele_max_list )
+        #print self.imon_pars_list
+
+#-----------------------------
+
     def defineStyles( self ) :
         self.styleYellowish = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
@@ -285,6 +338,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleButtonGood   = self.styleGreenPure
         self.styleButtonBad    = self.stylePink
         self.styleBox          = self.styleGray
+        self.styleCBox         = self.styleYellowish
         self.styleStatusGood   = self.styleGreen
         self.styleStatusWarning= self.styleYellow
         self.styleStatusAlarm  = self.styleRed

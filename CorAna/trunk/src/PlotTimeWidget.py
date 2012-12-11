@@ -78,6 +78,9 @@ class PlotTimeWidget (QtGui.QWidget) :
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
         self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        self.canvas.mpl_connect('axes_leave_event',     self.processAxesLeaveEvent)
+        self.canvas.mpl_connect('axes_enter_event',     self.processAxesEnterEvent)
+        self.canvas.mpl_connect('figure_leave_event',   self.processFigureLeaveEvent)
 
         self.setFrame()
         self.initParameters()
@@ -197,15 +200,43 @@ class PlotTimeWidget (QtGui.QWidget) :
         #print 'End of on_draw'
 
 
-    def processMouseMotion(self, event) :
+    def processAxesEnterEvent(self, event) :
+        #print 'AxesEnterEvent'
         if event.inaxes == self.axhi or event.inaxes == self.axgr or event.inaxes == self.axti :
-            self.drawVerticalLineThroughCoursor(event)
-
             #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
             #QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.SizeAllCursor))
-        else :
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
+
+    def processAxesLeaveEvent(self, event) :
+        #print 'AxesLeaveEvent'
+        try : self.curstext.remove()
+        except : pass
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
+
+    def processFigureLeaveEvent(self, event) :
+        #print 'FigureLeaveEvent'
+        QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+
+
+    def processMouseMotion(self, event) :
+        if event.inaxes == self.axhi or event.inaxes == self.axgr or event.inaxes == self.axti :
+            self.drawXCoordinateOfCoursor(event)
+            self.drawVerticalLineThroughCoursor(event)
+
+
+    def drawXCoordinateOfCoursor(self, event) :
+        axes = event.inaxes
+        #xmin, xmax = axes.get_xlim()
+        #ymin, ymax = axes.get_ylim()
+        x, y = event.xdata, event.ydata
+        s = '%6.1f' % (event.xdata)
+        try : self.curstext.remove()
+        except : pass
+        self.curstext = axes.text(x, y, s) #, ha='center')
+        self.canvas.draw()
+
 
     def drawVerticalLineThroughCoursor(self, event) :
         axes   = event.inaxes
