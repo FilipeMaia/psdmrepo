@@ -127,6 +127,19 @@ class IrepUtils {
     public static function locations2array ($irep) {
         $locations = array () ;
         foreach ($irep->locations() as $location) {
+            $rooms = array () ;
+            foreach ($location->rooms() as $room) {
+                array_push (
+                    $rooms ,
+                    array (
+                        'id'               => $room->id() ,
+                        'name'             => $room->name() ,
+                        'created_time'     => $room->created_time()->toStringShort() ,
+                        'created_time_sec' => $room->created_time()->sec ,
+                        'created_uid'      => $room->created_uid()
+                    )
+                ) ;
+            }
             array_push (
                 $locations ,
                 array (
@@ -134,7 +147,8 @@ class IrepUtils {
                     'name'             => $location->name() ,
                     'created_time'     => $location->created_time()->toStringShort() ,
                     'created_time_sec' => $location->created_time()->sec ,
-                    'created_uid'      => $location->created_uid()
+                    'created_uid'      => $location->created_uid() ,
+                    'room'             => $rooms
                 )
             ) ;
         }

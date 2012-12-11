@@ -65,11 +65,22 @@ require_once 'irep/irep.inc.php' ;
 
     $locations = array () ;
     foreach($SVC->irep()->locations() as $location) {
+        $rooms = array () ;
+        foreach ($location->rooms() as $room) {
+            array_push (
+                $rooms ,
+                array (
+                    'id'   => $room->id() ,
+                    'name' => $room->name()
+                )
+            ) ;
+        }
         array_push (
             $locations ,
             array (
                 'id'   => $location->id() ,
-                'name' => $location->name()
+                'name' => $location->name() ,
+                'room' => $rooms
             )
         ) ;
     }

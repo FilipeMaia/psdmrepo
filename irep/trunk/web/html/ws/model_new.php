@@ -5,7 +5,7 @@
  * 
  * Parameters:
  * 
- *   <manufacturer_id> <name>
+ *   <manufacturer_name> <model_name>
  */
 
 require_once 'dataportal/dataportal.inc.php' ;

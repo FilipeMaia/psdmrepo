@@ -111,6 +111,34 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `IREP`.`DICT_ROOM`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`DICT_ROOM` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`DICT_ROOM` (
+
+  `id`           INT             NOT NULL AUTO_INCREMENT ,
+  `location_id`  INT             NOT NULL ,
+
+  `name`         VARCHAR(255)    NOT NULL ,
+  `created_time` BIGINT UNSIGNED NOT NULL ,
+  `created_uid`  VARCHAR(32)     NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE KEY `name` (`name`,`location_id`) ,
+
+  CONSTRAINT `DICT_ROOM_FK_1`
+    FOREIGN KEY (`location_id` )
+    REFERENCES `IREP`.`DICT_LOCATION` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+
+-- -----------------------------------------------------
 -- Table `IREP`.`DICT_STATUS`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `IREP`.`DICT_STATUS` ;

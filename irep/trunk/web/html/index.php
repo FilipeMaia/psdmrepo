@@ -894,6 +894,7 @@ function global_switch_context(application_name, context_name) {
 function global_simple_search                    ()   { global_switch_context('equipment', 'inventory').simple_search($('#p-search-text').val()) ; }
 function global_search_equipment_by_id           (id) { global_switch_context('equipment', 'inventory').search_equipment_by(id) ; }
 function global_search_equipment_by_location     (id) { global_switch_context('equipment', 'inventory').search_equipment_by_location(id) ; }
+function global_search_equipment_by_room         (id) { global_switch_context('equipment', 'inventory').search_equipment_by_room(id) ; }
 function global_search_equipment_by_manufacturer (id) { global_switch_context('equipment', 'inventory').search_equipment_by_manufacturer(id) ; }
 function global_search_equipment_by_model        (id) { global_switch_context('equipment', 'inventory').search_equipment_by_model(id) ; }
 function global_search_equipment_by_slacid_range (id) { global_switch_context('equipment', 'inventory').search_equipment_by_slacid_range(id) ; }
@@ -1209,7 +1210,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
         </div>
         <div id="dictionary-manufacturers-manufacturers"></div>
       </div>
-      <div style="float:left ; margin-left:20px ;">
+      <div style="float:left; margin-left:20px;">
         <div style="margin-top:20px ;">
           <div style="float:left ; "><input type="text" size="12" name="model2add" title="fill in new model name, then press RETURN to save" /></div>
           <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new model here</div>
@@ -1229,6 +1230,14 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           <div style="clear:both ; "></div>
         </div>
         <div id="dictionary-locations-locations"></div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="margin-top:20px ;">
+          <div style="float:left ; "><input type="text" size="12" name="room2add" title="fill in new room name, then press RETURN to save" /></div>
+              <div style="float:left ; padding-top:4px ; color:maroon ;">  &larr; add new room here</div>
+          <div style="clear:both ; "></div>
+        </div>
+        <div id="dictionary-locations-rooms"></div>
       </div>
       <div style="clear:both ; "></div>
     </div>

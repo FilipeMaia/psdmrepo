@@ -388,6 +388,13 @@ function p_appl_dictionary () {
                 if (name == '') { return ; }
                 if (e.keyCode == 13) { that.location_create(name) ; $(this).val('') ; return ; }}) ;
 
+        var room2add = $('#dictionary-locations').find('input[name="room2add"]') ;
+        room2add.
+            keyup(function (e) {
+                var name = $(this).val() ;
+                if (name == '') { return ; }
+                if (e.keyCode == 13) { that.room_create(name) ; $(this).val('') ; return ; }}) ;
+
         this.location_load() ;
     } ;
 
@@ -413,7 +420,13 @@ function p_appl_dictionary () {
                       }}
             }) ;
         hdr.push (
-            {   name: 'location' } ,
+            {   name: 'location', selectable: true ,
+                type: {
+                    select_action : function (location_name) {
+                        that.room_display() ;
+                    }
+                }
+            } ,
             {   name: 'created', hideable: true } ,
             {   name: 'by user', hideable: true } ,
             {   name: 'in use', hideable: true, sorted: false }
@@ -444,6 +457,80 @@ function p_appl_dictionary () {
             config.handler('dict', 'table_location')
         ) ;
         this.table_location.display() ;
+        
+        this.room_display(); 
+        
+        if (this.can_manage()) {
+            var input = $('#dictionary-locations').find('input[name="room2add"]') ;
+            if (this.table_location.selected_object() == null)
+                input.attr('disabled', 'disabled') ;
+            else
+                input.removeAttr('disabled') ;
+        }
+    } ;
+
+    this.table_room = null ;
+
+    this.room_display = function () {
+        var elem = $('#dictionary-locations-rooms') ;
+        var hdr = [] ;
+        if (this.can_manage()) hdr.push (
+            {   name: 'DELETE', hideable: true, sorted: false ,
+                type: {
+                    after_sort: function () {
+                        elem.find('.dict-room-delete').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                that.room_delete(id) ; }) ;
+                        elem.find('.dict-room-search').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                global_search_equipment_by_room(id) ; }) ;
+                      }}}) ;
+        hdr.push (
+            {   name: 'room' } ,
+            {   name: 'created', hideable: true } ,
+            {   name: 'by user', hideable: true } ,
+            {   name: 'in use', hideable: true, sorted: false }
+        ) ;
+        var rows = [] ;
+ 
+        var location_name = this.table_location.selected_object() ;
+        if (location_name != null) {
+            for (var i in this.location) {
+                var location = this.location[i] ;
+                if (location.name == location_name) {
+                    for (var j in location.room) {
+                        var room = location.room[j] ;
+                        var row = [] ;
+                        if (this.can_manage()) row.push (
+                            Button_HTML('X', {
+                                name:    room.id,
+                                classes: 'dict-room-delete',
+                                title:   'delete this room from the list' })) ;
+                        row.push(
+                            room.name ,
+                            room.created_time ,
+                            room.created_uid ,
+                            Button_HTML('search', {
+                                name:    room.id,
+                                classes: 'dict-room-search',
+                                title:   'search for all equipment of this room' })
+                        ) ;
+                        rows.push(row) ;
+                    }
+                    break ;
+                }
+            }
+        }
+        this.table_room = new Table (
+            'dictionary-locations-rooms', hdr, rows ,
+            {},
+            config.handler('dict', 'table_room')
+        ) ;
+        this.table_room.display() ;
     } ;
     this.location_load = function () {
         this.location_action (
@@ -473,6 +560,30 @@ function p_appl_dictionary () {
         web_service_GET(url, params, function (data) {
             that.location = data.location ;
             that.location_display() ;
+        }) ;
+    } ;
+    this.room_create = function (name) {
+        this.room_action (
+            '../irep/ws/room_new.php' ,
+            {location_name: this.table_location.selected_object(), room_name: name}
+        ) ;
+    } ;
+    this.room_delete = function (id) {
+        ask_yes_no (
+            'Confirm Room Deletion' ,
+            'Are you sure you want to delete this room from the Dictionary?' ,
+            function () {
+                that.room_action (
+                    '../irep/ws/room_delete.php' ,
+                    {id: id}
+                ) ;
+            }
+        ) ;
+    } ;
+    this.room_action = function (url, params) {
+        web_service_GET(url, params, function (data) {
+            that.location = data.location ;
+            that.room_display() ;
         }) ;
     } ;
 

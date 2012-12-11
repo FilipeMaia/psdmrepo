@@ -20,7 +20,8 @@
  *      [<manufacturer> || <manufacturer_id>]
  *      [<model>        || <model_id>]
  *      [<serial>]
- *      [<location>     || <location_id>]
+ *      [<location> || <location_id>]
+ *      [<room>     || <room_id>]
  *      [<custodian>]
  */
 
@@ -107,6 +108,17 @@ require_once 'irep/irep.inc.php' ;
             $location_name = $location->name() ;
         } else {
             $SVC->abort("conflicting parameters for a location") ;
+        }
+    }
+    $room_id   = $SVC->optional_int('room_id', 0) ;
+    $room_name = $SVC->optional_str('room', '') ;
+    if ($room_id) {
+        if ($room_name == '') {
+            $room = $SVC->irep()->find_room_by_id($room_id) ;
+            if (is_null($room)) $SVC->abort("no room found for id: {$room_id}") ;
+            $room_name = $room->name() ;
+        } else {
+            $SVC->abort("conflicting parameters for a room") ;
         }
     }
     $custodian = $SVC->optional_str('custodian', '') ;

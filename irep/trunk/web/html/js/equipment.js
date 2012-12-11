@@ -75,6 +75,9 @@ function p_appl_equipment () {
     this.search_equipment_by_location = function (id) {
         this.equipment_search_impl({location_id: id}) ;
     } ;
+    this.search_equipment_by_room = function (id) {
+        this.equipment_search_impl({room_id: id}) ;
+    } ;
     this.search_equipment_by_model = function (id) {
         this.equipment_search_impl({model_id: id}) ;
     } ;
@@ -335,6 +338,18 @@ function p_appl_equipment () {
                                 var id = this.name ;
                                 that.equipment_history(id) ;
                             }) ;
+                        elem.find('.equipment-inventory-print').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                that.equipment_print(id) ;
+                            }) ;
+                        elem.find('.equipment-inventory-link').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                that.equipment_link(id) ;
+                            }) ;
                     }
                 }
             } ,
@@ -368,7 +383,15 @@ function p_appl_equipment () {
                 Button_HTML('H', {
                     name:    e.id,
                     classes: 'equipment-inventory-history',
-                    title:   'show a history of this equipment' }) ,
+                    title:   'show a history of this equipment' }) +
+                Button_HTML('P', {
+                    name:    e.id,
+                    classes: 'equipment-inventory-print',
+                    title:   'print a summary page on this equipment' }) +
+                Button_HTML('url', {
+                    name:    e.id,
+                    classes: 'equipment-inventory-link',
+                    title:   'persistent URL for this equipment' }) ,
 
                 e.manufacturer ,
                 e.model ,
@@ -923,6 +946,9 @@ attachment_html +
         $('#'+panelId).remove() ;
         this.tabs.tabs('refresh') ;
         delete that.equipment_history[panelId] ;
+    } ;
+    this.equipment_print = function (id) {
+        alert('here be the print action') ;
     } ;
     this.equipment_search = function () {
         var form_elem = $('#equipment-inventory-form') ;

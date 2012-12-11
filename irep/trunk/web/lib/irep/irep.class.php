@@ -449,9 +449,9 @@ class Irep extends DbConnection {
         $this->query($sql) ;
     }
 
-    /* -------------
-     *   Locations
-     * -------------
+    /* ---------------------
+     *   Locations & rooms
+     * ---------------------
      */
     public function locations () {
         $list = array () ;
@@ -496,6 +496,29 @@ class Irep extends DbConnection {
     public function delete_location ($id) {
         $id = intval($id) ;
         $sql = "DELETE FROM {$this->database}.dict_location WHERE id={$id}" ;
+        $this->query($sql) ;
+    }
+    public function find_room_by_id ($id) {
+        $id = intval($id) ;
+        return $this->find_room_by_("id={$id}") ;
+    }
+    private function find_room_by_ ($condition='') {
+        $conditions_opt = $condition ? " WHERE {$condition}" : '' ;
+        $sql = "SELECT * FROM {$this->database}.dict_room {$conditions_opt}" ;
+        $result = $this->query($sql) ;
+        $nrows = mysql_numrows( $result ) ;
+        if (!$nrows) return null ;
+        if (1 != $nrows)
+            throw new IrepException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt. Query: {$sql}") ;
+        $attr = mysql_fetch_array( $result, MYSQL_ASSOC) ;
+        return new IrepRoom (
+            $this->find_location_by_id($attr['location_id']) ,
+            $attr) ;
+    }
+    public function delete_room ($id) {
+        $id = intval($id) ;
+        $sql = "DELETE FROM {$this->database}.dict_room WHERE id={$id}" ;
         $this->query($sql) ;
     }
 
