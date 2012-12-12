@@ -68,7 +68,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.setStyle()
 
         self.initRadio()
-        self.setEdiFields()
+        self.setStyleEdiFields()
 
     #-------------------
     #  Public methods --
@@ -224,7 +224,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                     logger.info(msg, __name__ )
 
                     if col == 7 :
-                        self.setEdiFieldsForRow(row0)
+                        self.setStyleEdiFieldsForRow(row0)
 
                     elif cp.plotarray_is_on :
                         self.redrawArray(row0)                        
@@ -233,12 +233,12 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
 
-    def setEdiFields(self):
+    def setStyleEdiFields(self):
         for row0, sec_dict in enumerate(self.list_of_dicts) :                        
-            self.setEdiFieldsForRow(row0)
+            self.setStyleEdiFieldsForRow(row0)
 
 
-    def setEdiFieldsForRow(self, row):
+    def setStyleEdiFieldsForRow(self, row):
         sec_dict = self.list_of_dicts[row]
         rad, par_rad = sec_dict[6]
         cbx, par_cbx = sec_dict[7]
@@ -246,8 +246,22 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
             edi, par = sec_dict[col]
             is_selected = cbx.isChecked() or rad.isChecked()
             edi.setReadOnly(not is_selected)
-            if is_selected : edi.setStyleSheet (cp.styleEdit)
-            else           : edi.setStyleSheet (cp.styleEditInfo)
+            if is_selected :
+                edi.setStyleSheet (cp.styleEdit)
+                self.checkEdiLimits(row)
+
+            else :
+                edi.setStyleSheet (cp.styleEditInfo)
+
+
+
+    def checkEdiLimits(self, row):
+        sec_dict = self.list_of_dicts[row]
+        mis, par_mis = sec_dict[8]
+        mas, par_mas = sec_dict[9]
+        if par_mis.value() >= par_mas.value() :
+            mis.setStyleSheet (cp.styleEditBad)
+            mas.setStyleSheet (cp.styleEditBad)
 
 
     def initRadio(self): 
@@ -272,7 +286,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
         if not isOn : logger.info('onRadio - Normalization is OFF', __name__)
 
-        self.setEdiFields()
+        self.setStyleEdiFields()
 
 
 #-----------------------------
@@ -290,6 +304,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                     msg = 'row:' + str(row0) + ' set ' + \
                           self.list_of_titles[col] + ' = ' + str(par.value())
                     logger.info(msg, __name__ )
+
+                    self.setStyleEdiFieldsForRow(row0)
 
 #-----------------------------
 
