@@ -366,14 +366,14 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot   .setEnabled(is_used)
         self.but_remove .setEnabled(is_used)
 
-        self.but_path   .setFlat(not is_used)
-        self.but_status .setFlat(not is_used)
-        self.but_submit .setFlat(not is_used)
-        self.but_scanner.setFlat(not is_used)
-        self.but_wfiles .setFlat(not is_used)
-        self.but_browse .setFlat(not is_used)
-        self.but_plot   .setFlat(not is_used)
-        self.but_remove .setFlat(not is_used)
+        #self.but_path   .setFlat(not is_used)
+        #self.but_status .setFlat(not is_used)
+        #self.but_submit .setFlat(not is_used)
+        #self.but_scanner.setFlat(not is_used)
+        #self.but_wfiles .setFlat(not is_used)
+        #self.but_browse .setFlat(not is_used)
+        #self.but_plot   .setFlat(not is_used)
+        #self.but_remove .setFlat(not is_used)
 
         if is_used :
             self.edi_bat_start.setStyleSheet(cp.styleEdit)

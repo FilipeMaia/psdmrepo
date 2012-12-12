@@ -120,9 +120,9 @@ class GUIBlamish ( QtGui.QWidget ) :
         self.but_plot.setEnabled(cp.ccdcorr_blemish.value())
         self.but_brow.setEnabled(cp.ccdcorr_blemish.value())
 
-        self.but_path.setFlat(not cp.ccdcorr_blemish.value())
-        self.but_plot.setFlat(not cp.ccdcorr_blemish.value())
-        self.but_brow.setFlat(not cp.ccdcorr_blemish.value())
+        #self.but_path.setFlat(not cp.ccdcorr_blemish.value())
+        #self.but_plot.setFlat(not cp.ccdcorr_blemish.value())
+        #self.but_brow.setFlat(not cp.ccdcorr_blemish.value())
 
     
     def setParent(self,parent) :

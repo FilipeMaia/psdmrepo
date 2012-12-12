@@ -41,7 +41,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 600,300)
+        self.setGeometry(100, 200, 850,300)
         self.setWindowTitle('GUI for Intensity Monitors')
         self.setFrame()
 
@@ -67,6 +67,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        self.initRadio()
+        self.setEdiFields()
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -91,9 +94,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def setTitleBar(self) :
-        list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
-                          'Plot', 'Norm', 'Select', 'Imin', 'Imax']
-        for i,t in enumerate(list_of_titles) : 
+        self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
+                               'Plot', 'Norm', 'Select', 'Imin', 'Imax']
+        for i,t in enumerate(self.list_of_titles) : 
             label = QtGui.QLabel(t)
             label.setStyleSheet(cp.styleLabel)
             label.setFixedHeight(10)
@@ -104,7 +107,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.grid_row += 1
 
 
-    def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None, norm=None, sele=None, sele_min=None, sele_max=None) :
+    def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None,
+                   norm=None, sele=None, sele_min=None, sele_max=None) :
         edi      = QtGui.QLineEdit( str(name.value()) )        
         but      = QtGui.QPushButton('Browse')
         #box      = QtGui.QComboBox( self ) 
@@ -159,6 +163,13 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         edi    .setAlignment (QtCore.Qt.AlignLeft)
         mis    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
         mas    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
+
+        #mas.setObjectName('mas')
+        #mas.setStyleSheet('QLineEdit#mas          {color: blue; background-color: yellow;}' +
+        #                  'QLineEdit#mas[readOnly="true"] {color: black; background-color: green;}' )
+
+
+
         #cbs    .setStyleSheet (cp.styleCBox)
         #cbs    .initStyleOption (QtGui.QStyleOptionButton.CE_CheckBox)
         #cbs    .setPalette(QtGui.QPalette(QtGui.QColor(255, 255, 255)))
@@ -169,9 +180,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         mis    .setFixedWidth(width)
         mas    .setFixedWidth(width)
 
-        #self.connect(edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
-        self.connect(but, QtCore.SIGNAL('clicked()'),                self.onBut  )
-        #self.connect(box, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
+        self.connect(but, QtCore.SIGNAL('clicked()'),         self.onBut  )
+        self.connect(mis, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(mas, QtCore.SIGNAL('editingFinished()'), self.onEdit )
 
 
     def setParent(self,parent) :
@@ -204,26 +215,83 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def onCBox(self) :
         for row0, sec_dict in enumerate(self.list_of_dicts) :                        
-            for col,(cbx, par) in sec_dict.iteritems() :
+            for col in [1,2,3,4,7] :
+                cbx, par = sec_dict[col]
                 if cbx.hasFocus() : 
-                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx.isChecked(), row0+1, col)
-                    par.setValue( cbx.isChecked() )
+                    cbx_status = cbx.isChecked()
+                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx_status, row0+1, col)
+                    par.setValue( cbx_status )
                     logger.info(msg, __name__ )
 
-                    if cp.plotarray_is_on :
-                        self.redrawArray(row0)
+                    if col == 7 :
+                        self.setEdiFieldsForRow(row0)
+
+                    elif cp.plotarray_is_on :
+                        self.redrawArray(row0)                        
                     return
 
 
-    def onRadio(self): 
+
+
+    def setEdiFields(self):
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+            self.setEdiFieldsForRow(row0)
+
+
+    def setEdiFieldsForRow(self, row):
+        sec_dict = self.list_of_dicts[row]
+        rad, par_rad = sec_dict[6]
+        cbx, par_cbx = sec_dict[7]
+        for col in [8,9] :
+            edi, par = sec_dict[col]
+            is_selected = cbx.isChecked() or rad.isChecked()
+            edi.setReadOnly(not is_selected)
+            if is_selected : edi.setStyleSheet (cp.styleEdit)
+            else           : edi.setStyleSheet (cp.styleEditInfo)
+
+
+    def initRadio(self): 
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+            rad, par = sec_dict[6]
+            if par.value :
+                rad.setChecked(True)
+                return
+        self.rad_nonorm.setChecked(True)
+
+
+    def onRadio(self):
+        isOn = False
         for row0, sec_dict in enumerate(self.list_of_dicts) :                        
             rad, par = sec_dict[6]
             if rad.isChecked() :
                 par.setValue(True)
+                isOn = True
                 logger.info('onRadio in row:' + str(row0), __name__)
             else               :
                 par.setValue(False)
 
+        if not isOn : logger.info('onRadio - Normalization is OFF', __name__)
+
+        self.setEdiFields()
+
+
+#-----------------------------
+
+    def onEdit(self):
+        logger.debug('onEdit', __name__)
+        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+
+            for col in [8,9] :
+                edi, par = sec_dict[col]
+
+                if edi.isModified() :            
+                    edi.setModified(False)
+                    par.setValue( str(edi.displayText()) )
+                    msg = 'row:' + str(row0) + ' set ' + \
+                          self.list_of_titles[col] + ' = ' + str(par.value())
+                    logger.info(msg, __name__ )
+
+#-----------------------------
 
     def onBut(self):
         logger.debug('onBut', __name__)
@@ -319,17 +387,6 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         return arr_sum
 
 #-----------------------------
-#
-#    def onEdit(self):
-#        logger.debug('onEdit', __name__)
-#        for fields in self.sect_fields :
-#            edi = fields[4]
-#            par = fields[7]
-#            if edi.isModified() :            
-#                edi.setModified(False)
-#                par.setValue( str(edi.displayText()) )
-#                logger.info('Set parameter = ' + str( par.value()), __name__ )
-#
 #    def onBox(self):
 #        for fields in self.sect_fields :
 #            box = fields[3]
@@ -345,8 +402,13 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
+
     widget = GUIIntensityMonitors ()
     widget.show()
+
+    #app.setStyleSheet('QLineEdit {color:  blue; background-color: yellow;}' +
+    #                  'QLineEdit:[readOnly="true"] {color: black; background-color: green;}' )
+
     app.exec_()
 
 #-----------------------------

@@ -102,14 +102,26 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.edi_path.setStyleSheet (cp.styleEditInfo)
         self.edi_path.setAlignment  (QtCore.Qt.AlignRight)
 
-        self.but_path.setStyleSheet (cp.styleButton)
+        #self.but_path.setStyleSheet (cp.styleButton)
         self.but_plot.setStyleSheet (cp.styleButton) 
         self.but_brow.setStyleSheet (cp.styleButton) 
-  
+
+        self.but_path.setObjectName('but_path')
+        self.but_path.setStyleSheet('QPushButton#but_path:pressed  {color: black; background-color: green;}' +
+                                    'QPushButton#but_path:disabled {color: white; background-color: pink;}' +
+                                    'QPushButton                   {color:  blue; background-color: yellow;}')
+
         self.but_path.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
         self.but_brow.setFixedWidth(width)
-        self.cbx_use .setStyleSheet (cp.styleLabel)
+
+        #self.cbx_style = "light: blue; background-color: rgb(100, 255, 220); color: rgb(255, 0, 0);" # Yellowish
+        #self.cbx_use .setStyleSheet (self.cbx_style )
+        
+        #pal = QtGui.QPalette()
+        #pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
+        #self.cbx_use .setPalette(pal)
+
 
         self.setButtonState()
 
@@ -119,9 +131,9 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.but_plot.setEnabled(cp.ccdcorr_flatfield.value())
         self.but_brow.setEnabled(cp.ccdcorr_flatfield.value())
 
-        self.but_path.setFlat(not cp.ccdcorr_flatfield.value())
-        self.but_plot.setFlat(not cp.ccdcorr_flatfield.value())
-        self.but_brow.setFlat(not cp.ccdcorr_flatfield.value())
+        #self.but_path.setFlat(not cp.ccdcorr_flatfield.value())
+        #self.but_plot.setFlat(not cp.ccdcorr_flatfield.value())
+        #self.but_brow.setFlat(not cp.ccdcorr_flatfield.value())
 
     
     def setParent(self,parent) :
