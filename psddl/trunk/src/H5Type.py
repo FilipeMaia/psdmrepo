@@ -76,11 +76,11 @@ class H5Type ( object ) :
 
     def __str__(self):
         
-        return "<H5Type(name=%s, version=%d, datasets=%s)>" % (self.name, self.version, self.datasets)
+        return "<H5Type(name=%s, version=%s, datasets=%s)>" % (self.name, self.version, self.datasets)
 
     def __repr__(self):
         
-        return "<H5Type(name=%s, version=%d, datasets=%s)>" % (self.name, self.version, self.datasets)
+        return "<H5Type(name=%s, version=%s, datasets=%s)>" % (self.name, self.version, self.datasets)
 
 
 #

@@ -58,7 +58,7 @@ class H5Attribute ( object ) :
         
         self.name = kw.get('name')         # attribute name
         self._type = kw.get('type', None)   # optional type
-        self.method = kw.get('method', None)   # corresponding method name in pstype, default is the same as name
+        self.method = kw.get('method', self.name)   # corresponding method name in pstype, default is the same as name
         self.rank = kw.get('rank', 0)      # attribute data type
 
     #-------------------
@@ -67,11 +67,11 @@ class H5Attribute ( object ) :
 
     def __str__(self):
         
-        return "<H5Attribute(name=%s, type=%s, rank=%d)>" % (self.name, self.type.name, self.rank)
+        return "<H5Attribute(name=%s, type=%s, rank=%s, method=%s)>" % (self.name, self.type.name, self.rank, self.method)
 
     def __repr__(self):
         
-        return "<H5Attribute(name=%s, type=%s, rank=%d)>" % (self.name, self.type.name, self.rank)
+        return "<H5Attribute(name=%s, type=%s, rank=%s, method=%s)>" % (self.name, self.type.name, self.rank, self.method)
 
     @property
     def type(self):

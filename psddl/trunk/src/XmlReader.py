@@ -324,7 +324,7 @@ class XmlReader ( object ) :
         type = H5Type(schemaname,
                       package = pkg,
                       pstype = pstype,
-                      version = typeel.get('version'),
+                      version = int(typeel.get('version')),
                       included = included,
                       location = self.location[-1] )
         pstype.h5schemas.append(type)
@@ -378,8 +378,8 @@ class XmlReader ( object ) :
         # make attribute
         attr = H5Attribute(name = aname, 
                            type = atype,
-                           method = elem.get('method'),
-                           rank = elem.get('rank'))
+                           method = elem.get('method') or aname,
+                           rank = int(elem.get('rank', 0)))
         ds.attributes.append(attr)
 
         # loop over sub-elements
