@@ -103,7 +103,7 @@
 
             <method name="value" type="int32_t">
                 Lower 24 bits of encoder_count as signed integer value.
-                <expr lang="C++" value="int({self}._encoder_count &lt;&lt; 8)/256;"/>
+                <expr lang="C++" value="int({self}.encoder_count() &lt;&lt; 8)/256;"/>
             </method>
 
         </pstype>
@@ -126,7 +126,7 @@
             <method name="value" type="int32_t">
                 Lower 24 bits of encoder_count as signed integer value.
                 <arg name="i" type="uint32_t"/>
-                <expr lang="C++" value="int({self}._encoder_count[i] &lt;&lt; 8)/256;"/>
+                <expr lang="C++" value="int({self}.encoder_count()[i] &lt;&lt; 8)/256;"/>
             </method>
 
         </pstype>

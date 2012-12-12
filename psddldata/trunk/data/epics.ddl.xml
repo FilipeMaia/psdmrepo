@@ -2,10 +2,10 @@
 <!DOCTYPE psddl SYSTEM "psddl.dtd">
 
 <psddl>
-	<package name="Epics">
-	
-	Package containing definitions for EPICS data types.
-	
+    <package name="Epics">
+    
+    Package containing definitions for EPICS data types.
+    
 
         <const name="iXtcVersion" value="1"/>
 
@@ -29,60 +29,60 @@
         <enum name="DbrTypes">
             Enum specifying type of DBR structures.
             <enum-const name="DBR_STRING" value="0"/>
-			<enum-const name="DBR_SHORT" value="1"/>
-			<enum-const name="DBR_FLOAT" value="2"/>
-			<enum-const name="DBR_ENUM" value="3"/>
-			<enum-const name="DBR_CHAR" value="4"/>
-			<enum-const name="DBR_LONG" value="5"/>
-			<enum-const name="DBR_DOUBLE" value="6"/>
-			<enum-const name="DBR_STS_STRING" value="7"/>
-			<enum-const name="DBR_STS_SHORT" value="8"/>
-			<enum-const name="DBR_STS_FLOAT" value="9"/>
-			<enum-const name="DBR_STS_ENUM" value="10"/>
-			<enum-const name="DBR_STS_CHAR" value="11"/>
-			<enum-const name="DBR_STS_LONG" value="12"/>
-			<enum-const name="DBR_STS_DOUBLE" value="13"/>
-			<enum-const name="DBR_TIME_STRING" value="14"/>
-			<enum-const name="DBR_TIME_INT" value="15"/>
-			<enum-const name="DBR_TIME_SHORT" value="15"/>
-			<enum-const name="DBR_TIME_FLOAT" value="16"/>
-			<enum-const name="DBR_TIME_ENUM" value="17"/>
-			<enum-const name="DBR_TIME_CHAR" value="18"/>
-			<enum-const name="DBR_TIME_LONG" value="19"/>
-			<enum-const name="DBR_TIME_DOUBLE" value="20"/>
-			<enum-const name="DBR_GR_STRING" value="21"/>
-			<enum-const name="DBR_GR_SHORT" value="22"/>
-			<enum-const name="DBR_GR_FLOAT" value="23"/>
-			<enum-const name="DBR_GR_ENUM" value="24"/>
-			<enum-const name="DBR_GR_CHAR" value="25"/>
-			<enum-const name="DBR_GR_LONG" value="26"/>
-			<enum-const name="DBR_GR_DOUBLE" value="27"/>
-			<enum-const name="DBR_CTRL_STRING" value="28"/>
-			<enum-const name="DBR_CTRL_SHORT" value="29"/>
-			<enum-const name="DBR_CTRL_FLOAT" value="30"/>
-			<enum-const name="DBR_CTRL_ENUM" value="31"/>
-			<enum-const name="DBR_CTRL_CHAR" value="32"/>
-			<enum-const name="DBR_CTRL_LONG" value="33"/>
-			<enum-const name="DBR_CTRL_DOUBLE" value="34"/>
+            <enum-const name="DBR_SHORT" value="1"/>
+            <enum-const name="DBR_FLOAT" value="2"/>
+            <enum-const name="DBR_ENUM" value="3"/>
+            <enum-const name="DBR_CHAR" value="4"/>
+            <enum-const name="DBR_LONG" value="5"/>
+            <enum-const name="DBR_DOUBLE" value="6"/>
+            <enum-const name="DBR_STS_STRING" value="7"/>
+            <enum-const name="DBR_STS_SHORT" value="8"/>
+            <enum-const name="DBR_STS_FLOAT" value="9"/>
+            <enum-const name="DBR_STS_ENUM" value="10"/>
+            <enum-const name="DBR_STS_CHAR" value="11"/>
+            <enum-const name="DBR_STS_LONG" value="12"/>
+            <enum-const name="DBR_STS_DOUBLE" value="13"/>
+            <enum-const name="DBR_TIME_STRING" value="14"/>
+            <enum-const name="DBR_TIME_INT" value="15"/>
+            <enum-const name="DBR_TIME_SHORT" value="15"/>
+            <enum-const name="DBR_TIME_FLOAT" value="16"/>
+            <enum-const name="DBR_TIME_ENUM" value="17"/>
+            <enum-const name="DBR_TIME_CHAR" value="18"/>
+            <enum-const name="DBR_TIME_LONG" value="19"/>
+            <enum-const name="DBR_TIME_DOUBLE" value="20"/>
+            <enum-const name="DBR_GR_STRING" value="21"/>
+            <enum-const name="DBR_GR_SHORT" value="22"/>
+            <enum-const name="DBR_GR_FLOAT" value="23"/>
+            <enum-const name="DBR_GR_ENUM" value="24"/>
+            <enum-const name="DBR_GR_CHAR" value="25"/>
+            <enum-const name="DBR_GR_LONG" value="26"/>
+            <enum-const name="DBR_GR_DOUBLE" value="27"/>
+            <enum-const name="DBR_CTRL_STRING" value="28"/>
+            <enum-const name="DBR_CTRL_SHORT" value="29"/>
+            <enum-const name="DBR_CTRL_FLOAT" value="30"/>
+            <enum-const name="DBR_CTRL_ENUM" value="31"/>
+            <enum-const name="DBR_CTRL_CHAR" value="32"/>
+            <enum-const name="DBR_CTRL_LONG" value="33"/>
+            <enum-const name="DBR_CTRL_DOUBLE" value="34"/>
         </enum>
 
-		<!-- ========================================================================= -->
-		
-		<pstype name="epicsTimeStamp">
+        <!-- ========================================================================= -->
+        
+        <pstype name="epicsTimeStamp">
 
            EPICS timestamp type, includes seconds and nanoseconds.
            EPICS epoch corresponds to 1990-01-01 00:00:00Z.
-			
+            
             <tag name="value-type"/>
         
-			<attribute name="_secPastEpoch" type="uint32_t" accessor="sec">
+            <attribute name="_secPastEpoch" type="uint32_t" accessor="sec">
             Seconds since Jan 1, 1990 00:00 UTC
-			</attribute>
-			
-			<attribute name="_nsec" type="uint32_t" accessor="nsec">
-			Nanoseconds within second.
-			</attribute>
-			
+            </attribute>
+            
+            <attribute name="_nsec" type="uint32_t" accessor="nsec">
+            Nanoseconds within second.
+            </attribute>
+            
             <ctor>
                 Default constructor
                 <tag name="inline"/>
@@ -96,17 +96,17 @@
         </pstype>
 
 
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
-		<pstype name="dbr_time_string">
-		
+        <pstype name="dbr_time_string">
+        
             <tag name="value-type"/>
         
-		    <const name="DBR_TYPE_ID" value="DBR_TIME_STRING"/>
-		    
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
-			<attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+            <const name="DBR_TYPE_ID" value="DBR_TIME_STRING"/>
+            
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
 
             <ctor>
                 Constructor which takes values for every attribute
@@ -118,62 +118,16 @@
 
         </pstype>
 
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
-		<pstype name="dbr_time_short">
+        <pstype name="dbr_time_short">
         
             <tag name="value-type"/>
         
             <const name="DBR_TYPE_ID" value="DBR_TIME_SHORT"/>
             
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
-            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
-			<attribute name="RISC_pad" type="int16_t"/>
-
-            <ctor>
-                Constructor which takes values for every attribute
-                <tag name="inline"/>
-                <arg name="status"      dest="_status"/>
-                <arg name="severity"    dest="_severity"/>
-                <arg name="stamp"       dest="_stamp"/>
-                <attr-init dest="RISC_pad" value="0"/>
-            </ctor>
-
-        </pstype>
-
-		<!-- ========================================================================= -->
-
-		<pstype name="dbr_time_float">
-        
-            <tag name="value-type"/>
-        
-            <const name="DBR_TYPE_ID" value="DBR_TIME_FLOAT"/>
-            
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
-            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
-
-            <ctor>
-                Constructor which takes values for every attribute
-                <tag name="inline"/>
-                <arg name="status"      dest="_status"/>
-                <arg name="severity"    dest="_severity"/>
-                <arg name="stamp"       dest="_stamp"/>
-            </ctor>
-
-        </pstype>
-
-		<!-- ========================================================================= -->
-		
-		<pstype name="dbr_time_enum">
-        
-            <tag name="value-type"/>
-        
-            <const name="DBR_TYPE_ID" value="DBR_TIME_ENUM"/>
-            
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
             <attribute name="RISC_pad" type="int16_t"/>
 
@@ -188,16 +142,62 @@
 
         </pstype>
 
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
-		<pstype name="dbr_time_char">
+        <pstype name="dbr_time_float">
+        
+            <tag name="value-type"/>
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_FLOAT"/>
+            
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+            </ctor>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+        
+        <pstype name="dbr_time_enum">
+        
+            <tag name="value-type"/>
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_ENUM"/>
+            
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+            <attribute name="RISC_pad" type="int16_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_time_char">
         
             <tag name="value-type"/>
         
             <const name="DBR_TYPE_ID" value="DBR_TIME_CHAR"/>
             
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
             <attribute name="RISC_pad0" type="int16_t"/>
             <attribute name="RISC_pad1" type="uint8_t"/>
@@ -214,16 +214,16 @@
 
         </pstype>
 
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
-		<pstype name="dbr_time_long">
+        <pstype name="dbr_time_long">
         
             <tag name="value-type"/>
         
             <const name="DBR_TYPE_ID" value="DBR_TIME_LONG"/>
             
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
 
             <ctor>
@@ -236,16 +236,16 @@
 
         </pstype>
 
-		<!-- ========================================================================= -->
+        <!-- ========================================================================= -->
 
-		<pstype name="dbr_time_double">
+        <pstype name="dbr_time_double">
         
             <tag name="value-type"/>
         
             <const name="DBR_TYPE_ID" value="DBR_TIME_DOUBLE"/>
             
-			<attribute name="_status" type="int16_t" accessor="status"/>
-			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
             <attribute name="RISC_pad" type="int32_t"/>
 
@@ -306,14 +306,14 @@
                 <arg name="status"      dest="_status"/>
                 <arg name="severity"    dest="_severity"/>
                 <arg name="units"       dest="_units"/>
-	            <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
-	            <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
-	            <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
-	            <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
-	            <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
-	            <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
-	            <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
-	            <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+                <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+                <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+                <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+                <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+                <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+                <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+                <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+                <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
             </ctor>
 
         </pstype>
@@ -504,89 +504,89 @@
 
         </pstype>
 
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvHeader">
 
             Base class for EPICS data types stored in XTC files.
 
-			<attribute name="_iPvId" type="int16_t" accessor="pvId">
-			PV ID number assigned by DAQ.
-			</attribute>
-			<attribute name="_iDbrType" type="int16_t" accessor="dbrType">
-			DBR structure type.
-			</attribute>
-			<attribute name="_iNumElements" type="int16_t" accessor="numElements">
-			Number of elements in EPICS DBR structure
-			</attribute>
-			
-			<method name="print">
-			Dumps the content of PV to standard output.
-			</method>
-			
-			<method name="isCtrl" type="uint8_t">
-				Returns 1 if PV is one of CTRL types, 0 otherwise.
+            <attribute name="_iPvId" type="int16_t" accessor="pvId">
+            PV ID number assigned by DAQ.
+            </attribute>
+            <attribute name="_iDbrType" type="int16_t" accessor="dbrType">
+            DBR structure type.
+            </attribute>
+            <attribute name="_iNumElements" type="int16_t" accessor="numElements">
+            Number of elements in EPICS DBR structure
+            </attribute>
+            
+            <method name="print">
+            Dumps the content of PV to standard output.
+            </method>
+            
+            <method name="isCtrl" type="uint8_t">
+                Returns 1 if PV is one of CTRL types, 0 otherwise.
                 <expr lang="C++" value="_iDbrType &gt;= DBR_CTRL_STRING and _iDbrType &lt;= DBR_CTRL_DOUBLE"/>
-			</method>
-			
-			<method name="isTime" type="uint8_t">
-				Returns 1 if PV is one of TIME types, 0 otherwise.
+            </method>
+            
+            <method name="isTime" type="uint8_t">
+                Returns 1 if PV is one of TIME types, 0 otherwise.
                 <expr lang="C++" value="_iDbrType &gt;= DBR_TIME_STRING and _iDbrType &lt;= DBR_TIME_DOUBLE"/>
-			</method>
-			
-			<method name="status" type="uint16_t">
-				Returns status value for the PV.
-			</method>
-			
-			<method name="severity" type="uint16_t">
-				Returns severity value for the PV.
-			</method>
-			
+            </method>
+            
+            <method name="status" type="uint16_t">
+                Returns status value for the PV.
+            </method>
+            
+            <method name="severity" type="uint16_t">
+                Returns severity value for the PV.
+            </method>
+            
         </pstype>
         
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
 
             Base class for all CTRL-type PV values.
 
-			<attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName">
-			PV name.
-			</attribute>
+            <attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName">
+            PV name.
+            </attribute>
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeHeader" base="EpicsPvHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeHeader" base="EpicsPvHeader">
 
             Base class for all TIME-type PV values.
 
-			<method name="stamp" type="epicsTimeStamp">
+            <method name="stamp" type="epicsTimeStamp">
             EPICS timestamp value.
-			</method>
+            </method>
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
-		
-			<attribute name="_dbr" type="dbr_sts_string" accessor="dbr"/>
-			<attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
-			
-			<method name="value" type="string">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
+        
+            <attribute name="_dbr" type="dbr_sts_string" accessor="dbr"/>
+            <attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
+            
+            <method name="value" type="string">
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data(i)"/>
-			</method>
+            </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlShort" base="EpicsPvCtrlHeader">
-			<attribute name="_dbr" type="dbr_ctrl_short" accessor="dbr"/>
-			<attribute name="_data" type="int16_t" shape="{self}.numElements()" accessor="data"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlShort" base="EpicsPvCtrlHeader">
+            <attribute name="_dbr" type="dbr_ctrl_short" accessor="dbr"/>
+            <attribute name="_data" type="int16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int16_t">
                 <arg name="i" type="uint32_t"/>
@@ -594,12 +594,12 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlFloat" base="EpicsPvCtrlHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlFloat" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
-			<attribute name="_dbr" type="dbr_ctrl_float" accessor="dbr"/>
-			<attribute name="_data" type="float" shape="{self}.numElements()" accessor="data"/>
+            <attribute name="_dbr" type="dbr_ctrl_float" accessor="dbr"/>
+            <attribute name="_data" type="float" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="float">
                 <arg name="i" type="uint32_t"/>
@@ -607,11 +607,11 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlEnum" base="EpicsPvCtrlHeader">
-			<attribute name="_dbr" type="dbr_ctrl_enum" accessor="dbr"/>
-			<attribute name="_data" type="uint16_t" shape="{self}.numElements()" accessor="data"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlEnum" base="EpicsPvCtrlHeader">
+            <attribute name="_dbr" type="dbr_ctrl_enum" accessor="dbr"/>
+            <attribute name="_data" type="uint16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint16_t">
                 <arg name="i" type="uint32_t"/>
@@ -619,11 +619,11 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlChar" base="EpicsPvCtrlHeader">
-			<attribute name="_dbr" type="dbr_ctrl_char" accessor="dbr"/>
-			<attribute name="_data" type="uint8_t" shape="{self}.numElements()" accessor="data"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlChar" base="EpicsPvCtrlHeader">
+            <attribute name="_dbr" type="dbr_ctrl_char" accessor="dbr"/>
+            <attribute name="_data" type="uint8_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint8_t">
                 <arg name="i" type="uint32_t"/>
@@ -631,12 +631,12 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlLong" base="EpicsPvCtrlHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlLong" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
-			<attribute name="_dbr" type="dbr_ctrl_long" accessor="dbr"/>
-			<attribute name="_data" type="int32_t" shape="{self}.numElements()" accessor="data"/>
+            <attribute name="_dbr" type="dbr_ctrl_long" accessor="dbr"/>
+            <attribute name="_data" type="int32_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int32_t">
                 <arg name="i" type="uint32_t"/>
@@ -644,12 +644,12 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvCtrlDouble" base="EpicsPvCtrlHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvCtrlDouble" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
-			<attribute name="_dbr" type="dbr_ctrl_double" accessor="dbr"/>
-			<attribute name="_data" type="double" shape="{self}.numElements()" accessor="data"/>
+            <attribute name="_dbr" type="dbr_ctrl_double" accessor="dbr"/>
+            <attribute name="_data" type="double" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="double">
                 <arg name="i" type="uint32_t"/>
@@ -657,9 +657,9 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeString" base="EpicsPvTimeHeader">
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeString" base="EpicsPvTimeHeader">
             <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_string" accessor="dbr"/>
             <attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
@@ -670,10 +670,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeShort" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeShort" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_short" accessor="dbr"/>
             <attribute name="_data" type="int16_t" shape="{self}.numElements()" accessor="data"/>
 
@@ -683,10 +683,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeFloat" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeFloat" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_float" accessor="dbr"/>
             <attribute name="_data" type="float" shape="{self}.numElements()" accessor="data"/>
 
@@ -696,10 +696,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeEnum" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeEnum" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_enum" accessor="dbr"/>
             <attribute name="_data" type="uint16_t" shape="{self}.numElements()" accessor="data"/>
 
@@ -709,10 +709,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeChar" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeChar" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_char" accessor="dbr"/>
             <attribute name="_data" type="uint8_t" shape="{self}.numElements()" accessor="data"/>
 
@@ -722,10 +722,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeLong" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t"/>
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeLong" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_long" accessor="dbr"/>
             <attribute name="_data" type="int32_t" shape="{self}.numElements()" accessor="data"/>
 
@@ -735,10 +735,10 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="EpicsPvTimeDouble" base="EpicsPvTimeHeader">
-			<attribute name="pad0" type="int16_t" />
+        <!-- ========================================================================= -->
+        
+        <pstype name="EpicsPvTimeDouble" base="EpicsPvTimeHeader">
+            <attribute name="pad0" type="int16_t" />
             <attribute name="_dbr" type="dbr_time_double" accessor="dbr"/>
             <attribute name="_data" type="double" shape="{self}.numElements()" accessor="data"/>
 
@@ -748,33 +748,33 @@
             </method>
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="PvConfigV1" pack="4">
+        <!-- ========================================================================= -->
+        
+        <pstype name="PvConfigV1" pack="4">
 
             <const name="iMaxPvDescLength" value="64"/>
 
-			<attribute name="iPvId" type="int16_t" accessor="pvId"/>
-			<attribute name="sPvDesc" type="char" shape="iMaxPvDescLength" accessor="description" shape_method="None"/>
-			<attribute name="_pad0" type="int16_t"/>			
-			<attribute name="fInterval" type="float" accessor="interval"/>
+            <attribute name="iPvId" type="int16_t" accessor="pvId"/>
+            <attribute name="sPvDesc" type="char" shape="iMaxPvDescLength" accessor="description" shape_method="None"/>
+            <attribute name="_pad0" type="int16_t"/>            
+            <attribute name="fInterval" type="float" accessor="interval"/>
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		<pstype name="ConfigV1" version="1" type_id="Id_EpicsConfig" pack="4">
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_EpicsConfig" pack="4">
 
             <tag name="config-type"/>
 
-			<attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
+            <attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
 
-			<attribute name="_pvControls" type="PvConfigV1" shape="{self}._iNumPv" accessor="pvControls"/>
+            <attribute name="_pvControls" type="PvConfigV1" shape="{self}._iNumPv" accessor="pvControls"/>
 
         </pstype>
         
-		<!-- ========================================================================= -->
-		
-		
-	</package>
+        <!-- ========================================================================= -->
+        
+        
+    </package>
 </psddl>
