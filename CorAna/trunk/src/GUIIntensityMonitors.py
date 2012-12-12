@@ -168,8 +168,6 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         #mas.setStyleSheet('QLineEdit#mas          {color: blue; background-color: yellow;}' +
         #                  'QLineEdit#mas[readOnly="true"] {color: black; background-color: green;}' )
 
-
-
         #cbs    .setStyleSheet (cp.styleCBox)
         #cbs    .initStyleOption (QtGui.QStyleOptionButton.CE_CheckBox)
         #cbs    .setPalette(QtGui.QPalette(QtGui.QColor(255, 255, 255)))
@@ -214,73 +212,83 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def onCBox(self) :
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
             for col in [1,2,3,4,7] :
                 cbx, par = sec_dict[col]
                 if cbx.hasFocus() : 
                     cbx_status = cbx.isChecked()
-                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx_status, row0+1, col)
+                    msg = 'onCBox - set status %s of checkbox in row:%s col:%s' % (cbx_status, row, col)
                     par.setValue( cbx_status )
                     logger.info(msg, __name__ )
 
                     if col == 7 :
-                        self.setStyleEdiFieldsForRow(row0)
+                        self.setStyleEdiFieldsForRow(row)
 
                     elif cp.plotarray_is_on :
-                        self.redrawArray(row0)                        
+                        self.redrawArray(row)               
                     return
 
 
-
-
     def setStyleEdiFields(self):
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
-            self.setStyleEdiFieldsForRow(row0)
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
+            self.setStyleEdiFieldsForRow(row)
 
 
     def setStyleEdiFieldsForRow(self, row):
         sec_dict = self.list_of_dicts[row]
         rad, par_rad = sec_dict[6]
         cbx, par_cbx = sec_dict[7]
+
+        is_selected = cbx.isChecked() or rad.isChecked()
+
         for col in [8,9] :
             edi, par = sec_dict[col]
-            is_selected = cbx.isChecked() or rad.isChecked()
             edi.setReadOnly(not is_selected)
             if is_selected :
                 edi.setStyleSheet (cp.styleEdit)
-                self.checkEdiLimits(row)
-
             else :
                 edi.setStyleSheet (cp.styleEditInfo)
 
+        if is_selected : self.checkEdiLimits(row)
 
 
     def checkEdiLimits(self, row):
         sec_dict = self.list_of_dicts[row]
         mis, par_mis = sec_dict[8]
         mas, par_mas = sec_dict[9]
-        if par_mis.value() >= par_mas.value() :
+        Imin, Imax = par_mis.value(), par_mas.value()
+        if Imin >= Imax :
+            logger.warning('Check limits: Imin:' + str(Imin) + ' >= Imax:' + str(Imax), __name__)
             mis.setStyleSheet (cp.styleEditBad)
+            mas.setStyleSheet (cp.styleEditBad)
+
+        if par_mis.value() == par_mis.value_def() :
+            logger.warning('Imin is equal to the default value: ' + str(par_mis.value()), __name__)
+            mis.setStyleSheet (cp.styleEditBad)
+
+        if par_mas.value() == par_mas.value_def() :
+            logger.warning('Imax is equal to the default value: ' + str(par_mas.value()), __name__)
             mas.setStyleSheet (cp.styleEditBad)
 
 
     def initRadio(self): 
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
             rad, par = sec_dict[6]
-            if par.value :
+            if par.value() :
                 rad.setChecked(True)
+                print 'initRadio: row' + str(row) + ' status:' + str(par.value())
                 return
         self.rad_nonorm.setChecked(True)
 
 
     def onRadio(self):
         isOn = False
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
             rad, par = sec_dict[6]
             if rad.isChecked() :
                 par.setValue(True)
                 isOn = True
-                logger.info('onRadio in row:' + str(row0), __name__)
+                logger.info('onRadio in row:' + str(row), __name__)
             else               :
                 par.setValue(False)
 
@@ -289,11 +297,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.setStyleEdiFields()
 
 
-#-----------------------------
-
     def onEdit(self):
         logger.debug('onEdit', __name__)
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
 
             for col in [8,9] :
                 edi, par = sec_dict[col]
@@ -301,23 +307,22 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                 if edi.isModified() :            
                     edi.setModified(False)
                     par.setValue( str(edi.displayText()) )
-                    msg = 'row:' + str(row0) + ' set ' + \
+                    msg = 'row:' + str(row) + ' set ' + \
                           self.list_of_titles[col] + ' = ' + str(par.value())
                     logger.info(msg, __name__ )
 
-                    self.setStyleEdiFieldsForRow(row0)
+                    self.setStyleEdiFieldsForRow(row)
 
-#-----------------------------
 
     def onBut(self):
         logger.debug('onBut', __name__)
-        for row0, sec_dict in enumerate(self.list_of_dicts) :                        
+        for row, sec_dict in enumerate(self.list_of_dicts) :                        
             edi, name = sec_dict[0]
             but, empt = sec_dict[5]
             if but.hasFocus() : 
-                msg = 'onBut - click on button %s in row %s, plot for %s' % (str(but.text()), row0+1, name.value())
+                msg = 'onBut - click on button %s in row %s, plot for %s' % (str(but.text()), row, name.value())
                 logger.info(msg, __name__ )
-                self.plotIMon(row0)
+                self.plotIMon(row)
                 return
 
 

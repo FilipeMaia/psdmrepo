@@ -276,21 +276,21 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 #-----------------------------
 
-        imon_sele_min = [ (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float') ]
+        imon_sele_min = [ (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float') ]
 
         self.imon_sele_min_list = self.declareListOfPars( 'IMON_SELE_MIN', imon_sele_min )
 
 #-----------------------------
 
-        imon_sele_max= [ (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float'), \
-                         (-1, -1 ,'float') ]
+        imon_sele_max = [ (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float'), \
+                          (-1., -1. ,'float') ]
 
         self.imon_sele_max_list = self.declareListOfPars( 'IMON_SELE_MAX', imon_sele_max )
 

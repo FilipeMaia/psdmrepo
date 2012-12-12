@@ -83,7 +83,22 @@ class Parameter :
         if val == None :
             self._value = self._value_def
         else :
-            self._value = val
+            if   self._type == 'str' :
+                self._value = str( val )
+        
+            elif self._type == 'int' :
+                self._value = int( val )
+        
+            elif self._type == 'long' :
+                self._value = long( val )
+        
+            elif self._type == 'float' :
+                self._value = float( val )
+        
+            elif self._type == 'bool' :
+                self._value = bool( val )
+            else : 
+                self._value = val
 
 #---------------------
 
