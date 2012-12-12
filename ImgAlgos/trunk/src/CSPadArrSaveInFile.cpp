@@ -207,7 +207,7 @@ CSPadArrSaveInFile::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << source()
+        << "\n source     : " << sourceConfigured()
         << "\n key        : " << inputKey()
         << "\n m_outFile  : " << m_outFile    
         << "\n print_bits : " << m_print_bits

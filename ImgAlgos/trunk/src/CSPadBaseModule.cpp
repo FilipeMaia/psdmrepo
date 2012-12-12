@@ -75,24 +75,28 @@ CSPadBaseModule::beginRun(Event& evt, Env& env)
   // need to know segment mask which is availabale in configuration only
   shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_str_src, &m_src);
   if (config1.get()) {
+    MsgLog(name(), debug, "Found CsPad::ConfigV1 object with address " << m_src);
     for (int i = 0; i < Psana::CsPad::MaxQuadsPerSensor; ++i) { m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff; }
     ++ count;
   }
 
   shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_str_src, &m_src);
   if (config2.get()) {
+    MsgLog(name(), debug, "Found CsPad::ConfigV2 object with address " << m_src);
     for (int i = 0; i < Psana::CsPad::MaxQuadsPerSensor; ++i) { m_segMask[i] = config2->roiMask(i); }
     ++ count;
   }
 
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_str_src, &m_src);
   if (config3.get()) {
+    MsgLog(name(), debug, "Found CsPad::ConfigV3 object with address " << m_src);
     for (int i = 0; i < Psana::CsPad::MaxQuadsPerSensor; ++i) { m_segMask[i] = config3->roiMask(i); }
     ++ count;
   }
 
   shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_str_src, &m_src);
   if (config4.get()) {
+    MsgLog(name(), debug, "Found CsPad::ConfigV4 object with address " << m_src);
     for (int i = 0; i < Psana::CsPad::MaxQuadsPerSensor; ++i) { m_segMask[i] = config4->roiMask(i); }
     ++ count;
   }

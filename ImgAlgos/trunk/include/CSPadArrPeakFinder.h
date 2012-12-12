@@ -117,6 +117,9 @@ public:
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
   
+  /// Method which is called at the beginning of the run
+  virtual void beginRun(Event& evt, Env& env);
+
   /// Method which is called at the beginning of the calibration cycle
   virtual void beginCalibCycle(Event& evt, Env& env);
   

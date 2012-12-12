@@ -402,7 +402,7 @@ CSPadArrNoise::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source            : " << source()
+        << "\n source            : " << sourceConfigured()
         << "\n key               : " << inputKey()
         << "\n m_fracFile        : " << m_fracFile    
         << "\n m_maskFile        : " << m_maskFile    

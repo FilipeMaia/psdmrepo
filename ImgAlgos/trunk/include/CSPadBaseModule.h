@@ -83,8 +83,11 @@ public:
 
 protected:
 
-  /// Returns the source address of cspad device
+  /// Returns the source address of cspad device which was found
   const Pds::Src& source() const { return m_src; }
+
+  /// Returns the source address of cspad device as specified in configuration (or constructor)
+  const Source& sourceConfigured() const { return m_str_src; }
 
   /// Returns the source address of cspad device
   const std::string& inputKey() const { return m_key; }

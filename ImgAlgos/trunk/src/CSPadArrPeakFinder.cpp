@@ -138,7 +138,7 @@ CSPadArrPeakFinder::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source                : " << source()
+        << "\n source                : " << sourceConfigured()
         << "\n key                   : " << inputKey()
         << "\n m_key_signal_out      : " << m_key_signal_out
         << "\n m_key_peaks_out       : " << m_key_peaks_out 
@@ -190,6 +190,19 @@ CSPadArrPeakFinder::beginJob(Event& evt, Env& env)
   m_time = new TimeInterval();
 
   //omp_init_lock(m_lock); // initialization, The initial state is unlocked
+}
+
+/// Method which is called at the beginning of the run
+void
+CSPadArrPeakFinder::beginRun(Event& evt, Env& env)
+{
+  // call base class method
+  CSPadBaseModule::beginRun(evt, env);
+
+  // fill segments array
+  for (int i = 0; i < MaxQuads; ++i) {
+    makeVectorOfSectorAndIndexInArray(i);
+  }
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -386,6 +399,8 @@ CSPadArrPeakFinder::procData(Event& evt)
   shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
   if (data1.get()) {
 
+    MsgLog(name(), debug, "Found CsPad::DataV1 object with address " << source() << " and key \"" << inputKey() << "\"");
+
     ++ m_count;
     //setCollectionMode();
     shared_ptr<cspad_mod::DataV1> newobj(new cspad_mod::DataV1());
@@ -411,6 +426,8 @@ CSPadArrPeakFinder::procData(Event& evt)
   
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
   if (data2.get()) {
+
+    MsgLog(name(), debug, "Found CsPad::DataV2 object with address " << source() << " and key \"" << inputKey() << "\"");
 
     ++ m_count;
     //setCollectionMode();

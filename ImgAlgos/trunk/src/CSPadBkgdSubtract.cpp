@@ -120,7 +120,7 @@ CSPadBkgdSubtract::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << source()
+        << "\n source     : " << sourceConfigured()
         << "\n inkey      : " << inputKey()
         << "\n outkey     : " << m_outkey      
         << "\n fname      : " << m_fname    

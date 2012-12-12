@@ -295,7 +295,7 @@ CSPadArrAverage::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : " << source()
+        << "\n source     : " << sourceConfigured()
         << "\n key        : " << inputKey()
         << "\n m_aveFile  : " << m_aveFile    
         << "\n m_rmsFile  : " << m_rmsFile    

@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2012-12-11 Andy Salnikov
+- bug fix for my last changes:
+  - CSPadArrPeakFinder::beginRun() method did a bit more that others
+  - source address printed at the beingJob() should be using configured
+    source instead of discovered source
+
 Tag: V00-01-00
 2012-11-29 Andy Salnikov
 - small-scale refactoring, new base class CSPadBaseModule added which
