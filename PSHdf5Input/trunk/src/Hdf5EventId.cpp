@@ -60,6 +60,20 @@ Hdf5EventId::run() const
   return m_run;
 }
 
+// Returns fiducials counter for the event.
+unsigned
+Hdf5EventId::fiducials() const
+{
+  return 0;
+}
+
+// Returns event counter since Configure.
+unsigned
+Hdf5EventId::vector() const
+{
+  return 0;
+}
+
 /// check if two event IDs refer to the same event
 bool
 Hdf5EventId::operator==(const EventId& other) const

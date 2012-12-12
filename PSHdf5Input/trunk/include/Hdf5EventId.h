@@ -72,6 +72,25 @@ public:
    */
   virtual int run() const;
 
+  /**
+   *  @brief Returns fiducials counter for the event.
+   *
+   *  Note that MCC sends fiducials as 17-bit number which overflows
+   *  frequently (fiducials clock runs at 360Hz) so this number is
+   *  not unique. In some cases (e.g. when reading from old HDF5
+   *  files) fiducials is not know, 0 will be returned in this case.
+   */
+  virtual unsigned fiducials() const;
+
+  /**
+   *  @brief Returns event counter since Configure.
+   *
+   *  Note that counter is saved as 15-bits integer and will overflow
+   *  frequently. In some cases (e.g. when reading from old HDF5
+   *  files) counter is not know, 0 will be returned  in this case.
+   */
+  virtual unsigned vector() const;
+
   /// check if two event IDs refer to the same event
   virtual bool operator==(const EventId& other) const;
 
