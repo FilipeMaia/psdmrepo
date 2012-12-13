@@ -66,6 +66,7 @@ def print_all_files_in_dir(dirname) :
         print fname
     print '\n'
 
+
 def print_list_of_files_in_dir(dirname, path_or_fname) :
     dname, fname = os.path.split(path_or_fname)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
     print 'print_list_of_files_in_dir():  directory:' + dirname + '  fname:' + fname
@@ -77,12 +78,52 @@ def print_list_of_files_in_dir(dirname, path_or_fname) :
 
 #----------------------------------
 
-def subproc(command_seq) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
-    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE, stderr=subprocess.PIPE) #, stdin=subprocess.STDIN
+def subproc(command_seq, env=None) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
+    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) #, stdin=subprocess.STDIN
     p.wait()
     out = p.stdout.read() # reads entire file
     err = p.stderr.read() # reads entire file
     return out, err
+
+
+#----------------------------------
+
+def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', tag='TAG1', run='825',
+                              msg='EMPTY MESSAGE', fname_text=None, fname_att=None) :
+    #pypath = os.getenv('PYTHONPATH')
+    my_env = os.environ
+    pypath = my_env.get('PYTHONPATH', '')
+    my_env['PYTHONPATH'] = pypath + \
+                  ':/reg/g/pcds/pds/grabber/lib/python2.7/site-packages/' 
+    command_seq = ['/reg/g/pcds/pds/grabber/bin/LogBookPost_self.py',
+                   '-i', inst,
+                   '-e', expt,
+                   '-r', run,
+                   '-t', tag
+                   ]
+
+    if msg != None :
+        command_seq.append('-m')
+        command_seq.append(msg)
+
+    if fname_text != None :
+        command_seq.append('-f')
+        command_seq.append(fname_text)
+
+    if fname_att != None :
+        command_seq.append('-a')
+        command_seq.append(fname_att)
+
+    #print 'my_env for PYTHONPATH: ', my_env['PYTHONPATH']
+    #print 'command_seq: ', command_seq
+    logger.debug(' command_seq: ', command_seq, __name__) 
+    out, err = subproc(command_seq, env=my_env)
+    #print 'out:\n', out
+    #print 'err:\n', err
+    if err != '' : return err + '\n' + out
+    else         : return out
+
+#----------------------------------
 
 
 #def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') : # for example, command ='ls -l'
@@ -359,13 +400,13 @@ if __name__ == "__main__" :
 
     pwd = get_pwd()
     print 'pwd =', pwd
-    print_all_files_in_dir(pwd)
+    #print_all_files_in_dir(pwd)
 
-    command = 'ls -l'
-    job_id_str, out, err = batch_job_submit(command, 'psnehq', 'log-ls.txt') 
-    print 'err =', err
-    print 'out =', out
-    print 'job_id_str =', job_id_str
+    #command = 'ls -l'
+    #job_id_str, out, err = batch_job_submit(command, 'psnehq', 'log-ls.txt') 
+    #print 'err =', err
+    #print 'out =', out
+    #print 'job_id_str =', job_id_str
 
     #sleep(5) # sleep time in sec
     #print batch_job_status(job_id_str, 'psnehq')
@@ -379,6 +420,8 @@ if __name__ == "__main__" :
     #print_parsed_path(path)
     #print 'parse_xtc_path(): ', parse_xtc_path()
     #print 'parse_xtc_path(path): ', parse_xtc_path(path)
+
+    send_msg_with_att_to_elog(fname_att='../../work/cora-xcsi0112-r0015-data-time-plot.png')
 
     sys.exit ( "End of test" )
 

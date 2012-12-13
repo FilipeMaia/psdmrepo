@@ -336,7 +336,7 @@ class GUIData ( QtGui.QWidget ) :
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
             cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_data_aver(), fnm.path_data_ave())
-            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40)))
+            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
 
@@ -355,7 +355,7 @@ class GUIData ( QtGui.QWidget ) :
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_data_aver_plot())
-            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140)))
             cp.plotimgspe.show()
 
 
@@ -365,8 +365,8 @@ class GUIData ( QtGui.QWidget ) :
             cp.plottime.close()
         except :
             cp.plottime = PlotTime(None, ifname = fnm.path_data_scan_tstamp_list(),\
-                                 ofname = fnm.path_data_time_plot())
-            cp.plottime.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+                                   ofname = fnm.path_data_time_plot())
+            cp.plottime.move(cp.guimain.pos().__add__(QtCore.QPoint(760,160)))
             cp.plottime.show()
 
 

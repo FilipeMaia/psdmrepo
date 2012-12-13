@@ -96,13 +96,13 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
     def setTitleBar(self) :
         self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
                                'Plot', 'Norm', 'Select', 'Imin', 'Imax']
+        list_of_sizes       = [280, 50, 50, 50, 50, 80, 50, 50, 60, 60]
+
         for i,t in enumerate(self.list_of_titles) : 
             label = QtGui.QLabel(t)
             label.setStyleSheet(cp.styleLabel)
             label.setFixedHeight(10)
-            if i==5 : label.setFixedWidth(80)
-            if i==6 : label.setFixedWidth(50)
-            if i==7 : label.setFixedWidth(50)
+            label.setFixedWidth(list_of_sizes[i])
             self.grid.addWidget(label, self.grid_row, i)
         self.grid_row += 1
 
@@ -336,7 +336,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
             cp.plotarray = PlotArray(None, arr,
                                      ofname=fnm.path_data_mons_plot(),
                                      title=self.titleForIMon(imon))
-            cp.plotarray.move(self.parentWidget().pos().__add__(QtCore.QPoint(700,300)))
+            cp.plotarray.move(self.parentWidget().pos().__add__(QtCore.QPoint(850,20)))
             cp.plotarray.show()
 
 

@@ -47,6 +47,8 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.setWindowTitle('Flat field file')
         self.setFrame()
 
+        self.parent = parent
+
         self.cbx_use = QtGui.QCheckBox('Use flat field correction', self)
         self.cbx_use.setChecked( cp.ccdcorr_flatfield.value() )
 
@@ -191,7 +193,7 @@ class GUIFlatField ( QtGui.QWidget ) :
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_flat_plot())
-            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget()
             cp.plotimgspe.show()
 
 
@@ -201,7 +203,7 @@ class GUIFlatField ( QtGui.QWidget ) :
             cp.guifilebrowser.close()
         except :
             cp.guifilebrowser = GUIFileBrowser(None, [fnm.path_flat()])
-            cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
+            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120))) # self.parentWidget()
             cp.guifilebrowser.show()
 
 

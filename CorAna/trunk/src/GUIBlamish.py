@@ -183,7 +183,7 @@ class GUIBlamish ( QtGui.QWidget ) :
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_blam_plot())
-            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20))) # self.parentWidget().pos()
+            cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget().pos()
             cp.plotimgspe.show()
 
 
@@ -193,7 +193,7 @@ class GUIBlamish ( QtGui.QWidget ) :
             cp.guifilebrowser.close()
         except :
             cp.guifilebrowser = GUIFileBrowser(None, [fnm.path_blam()])
-            cp.guifilebrowser.move(self.parentWidget().pos().__add__(QtCore.QPoint(240,40)))
+            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
 

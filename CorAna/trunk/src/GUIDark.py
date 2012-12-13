@@ -31,7 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from PlotImgSpe              import *
+from PlotImgSpe             import *
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobPedestals      import bjpeds
@@ -321,7 +321,7 @@ class GUIDark ( QtGui.QWidget ) :
         except :
             self.but_browse.setStyleSheet(cp.styleButtonGood)
             cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_pedestals(), selected_file=fnm.path_pedestals_ave())
-            cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
+            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
     def on_but_plot(self):
@@ -336,7 +336,7 @@ class GUIDark ( QtGui.QWidget ) :
             #print arr.shape,'\n', arr
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
-            cp.plotimgspe.move(self.parentWidget().pos().__add__(QtCore.QPoint(400,20)))
+            cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
             #but.setStyleSheet(cp.styleButtonGood)
 
