@@ -42,7 +42,8 @@ import matplotlib.pyplot as plt
 #from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 #from matplotlib.figure import Figure
 
-from IPython.Shell import IPShellEmbed
+from IPython.config.loader import Config
+from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
 #-----------------------------
 # Imports for other modules --
@@ -285,11 +286,16 @@ class pyana_plotter (object) :
         if data_cspad:  print "data_cspad: ", data_cspad
         else:           del data_cspad
         
-        ipshell = IPShellEmbed(argv=['','-pylab', '-pi1','In \\# >> ','-po','Out \\#: '], 
-                               banner='--------- Dropping into iPython ---------',
-                               exit_msg='--------- Leaving iPython -------------')
-        
-        ipshell("\nType 'whos' to see the workspace. " \
+        #argv=['','-pylab', '-pi1','In \\# >> ','-po','Out \\#: ']
+        cfg = Config()
+        prompt_config = cfg.PromptManager
+        prompt_config.in_template = 'In \\# >> '
+        prompt_config.in2_template = '   ... '
+        prompt_config.out_template = 'Out \\#: '
+        ipshell = InteractiveShellEmbed(config=cfg,
+                      banner1='--------- Dropping into iPython ---------',
+                      exit_msg='--------- Leaving iPython -------------')
+        ipshell("\nType 'whos' to see the workspace. " 
                 "\nHit Ctrl-D to exit iPython and continue the analysis program.")
         
         

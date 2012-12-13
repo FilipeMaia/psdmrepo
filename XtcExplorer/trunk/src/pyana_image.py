@@ -296,7 +296,7 @@ class  pyana_image ( object ) :
                 # get the directory from this (for the alignment)
                 calibdir = '/'.join(os.path.split(pedestalsfile)[0].split('/')[0:-1])
             except OSError, e:
-                logging.debug( "Calibration directory not found \n "%e )
+                logging.debug( "Calibration directory not found: %s", e)
                 
                 
             # pick out the device name from the address

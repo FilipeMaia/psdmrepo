@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Dec-13 salnikov V00-01-39
+	- replaced IPShellEmbed with InteractiveShellEmbed
+
 2012-Oct-23 salnikov V00-01-38
 	- tag all latest Ingrid's changes, get it into release
 
