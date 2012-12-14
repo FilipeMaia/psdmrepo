@@ -231,6 +231,16 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  type='float' )
         self.ccdset_ccddain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   type='float' )
 
+        self.elog_post_cbx_state = self.declareParameter( name='ELOG_POST_CBX_STATE',     val_def=True,        type='bool' )
+        self.elog_post_rad       = self.declareParameter( name='ELOG_POST_RAD_STATE',     val_def='Default',   type='str' )
+        self.elog_post_ins       = self.declareParameter( name='ELOG_POST_INSTRUMENT',    val_def='AMO',       type='str' )
+        self.elog_post_exp       = self.declareParameter( name='ELOG_POST_EXPERIMENT',    val_def='amodaq09',  type='str' )
+        self.elog_post_run       = self.declareParameter( name='ELOG_POST_RUN',           val_def='825',       type='str' )
+        self.elog_post_tag       = self.declareParameter( name='ELOG_POST_TAG',           val_def='TAG1',      type='str' )
+        self.elog_post_res       = self.declareParameter( name='ELOG_POST_RESPONCE',      val_def='None',      type='str' )
+        self.elog_post_msg       = self.declareParameter( name='ELOG_POST_MESSAGE',       val_def='EMPTY MSG', type='str' )
+        self.elog_post_att       = self.declareParameter( name='ELOG_POST_ATTACHED_FILE', val_def='None',      type='str' )
+        
 #-----------------------------
 
         imon_names = [ ('BldInfo(FEEGasDetEnergy)',       None ,'str'), \
