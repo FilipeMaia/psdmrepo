@@ -39,35 +39,40 @@ from GUIELogPostingFields import *
 class GUIELogPostingDialog(QtGui.QDialog) :
     def __init__(self, parent=None, fname=None):
         QtGui.QDialog.__init__(self,parent)
-        self.setGeometry(20, 40, 500, 200)
+        #self.setGeometry(20, 40, 500, 200)
         self.setWindowTitle('Send message to ELog')
         self.setFrame()
  
         #self.setModal(True)
-        self.widg_pars = GUIELogPostingFields(self,att_fname=fname)
+        self.widg_pars = GUIELogPostingFields(parent=self,att_fname=fname)
         self.but_canc  = QtGui.QPushButton('&Cancel') 
         self.but_send  = QtGui.QPushButton('&Send to ELog') 
-
-        self.hbox  = QtGui.QHBoxLayout()
-        self.hbox.addStretch(1)
-        self.hbox.addWidget(self.but_canc)
-        self.hbox.addWidget(self.but_send)
-
-        self.vbox  = QtGui.QVBoxLayout()
-        self.vbox.addWidget(self.widg_pars)
-        self.vbox.addLayout(self.hbox)
-        self.setLayout(self.vbox)
 
         self.connect( self.but_canc, QtCore.SIGNAL('clicked()'), self.onCancel )
         self.connect( self.but_send, QtCore.SIGNAL('clicked()'), self.onSend )
 
-        #self.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addStretch(1)
+        self.hbox.addWidget(self.but_canc)
+        self.hbox.addWidget(self.but_send)
+
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addWidget(self.widg_pars)
+        self.vbox.addLayout(self.hbox)
+        self.setLayout(self.vbox)
+
+        self.but_canc.setFocusPolicy(QtCore.Qt.NoFocus)
+        #self.but_send.setFocusPolicy(QtCore.Qt.NoFocus)
+        #self.but_send.setFocus()
 
         self.setStyle()
-        self.but_send.setFocus(False)
-        self.but_canc.setFocus(False)
+        self.showToolTips()
 
 #-----------------------------  
+
+    def showToolTips(self):
+        self.but_send.setToolTip('Mouse click on this button or Alt-S \nor "Enter" submits message to ELog')
+        self.but_canc.setToolTip('Mouse click on this button \nor Alt-C cancels submission...')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -78,7 +83,7 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumWidth(400)
+        self.setFixedWidth(500)
         self.setStyleSheet(cp.styleBkgd)
         self.but_canc.setStyleSheet(cp.styleButton)
         self.but_send.setStyleSheet(cp.styleButton)
@@ -111,8 +116,8 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         list_of_fields = self.widg_pars.getListOfFields()
 
         logger.info('onSend: Send to ELod the massege with parameters:', __name__)        
-        for (label, edi, par, val_loc) in list_of_fields :
-            msg = str(label.text()) + ' ' + val_loc
+        for [label, edi, par, loc_par] in list_of_fields :
+            msg = str(label.text()) + ' ' + loc_par.value()
             logger.info(msg, __name__)        
             print msg       
 

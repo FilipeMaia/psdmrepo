@@ -39,8 +39,33 @@ from FileNameManager        import fnm
 #---------------------
 #  Class definition --
 #---------------------
+class LocalParameter () :
+    _val=None
+
+    def __init__ ( self, val=None ) :
+        self._val = val
+
+    def setValue ( self, val ) :    
+        self._val = val
+
+    def getValue (self) :    
+        return self._val
+
+    def value (self) :    
+        return self._val
+
+
+
 class GUIELogPostingFields ( QtGui.QWidget ) :
     """GUI sets fields for ELog posting"""
+
+    ins = LocalParameter ()
+    exp = LocalParameter ()
+    run = LocalParameter ()
+    tag = LocalParameter ()
+    res = LocalParameter ()
+    msg = LocalParameter ()
+    att = LocalParameter ()
 
     def __init__ ( self, parent=None, att_fname=None ) :
         QtGui.QWidget.__init__(self, parent)
@@ -48,6 +73,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.setWindowTitle('Fields for ELog posting')
         self.setFrame()
 
+        self.parent    = parent
         self.att_input = str(att_fname)
 
         #self.cbx_use = QtGui.QCheckBox('Use default fields for ELog posting', self)
@@ -79,18 +105,22 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.edi_msg = QtGui.QLineEdit( cp.elog_post_msg.value() )
         self.edi_att = QtGui.QLineEdit( cp.elog_post_att.value() )
 
-        self.setFieldsDefault()
+        self.setFieldsSaved()
 
-        self.list_of_fields = {
-            (self.lab_ins, self.edi_ins, cp.elog_post_ins, self.ins), 
-            (self.lab_exp, self.edi_exp, cp.elog_post_exp, self.exp),
-            (self.lab_run, self.edi_run, cp.elog_post_run, self.run), 
-            (self.lab_tag, self.edi_tag, cp.elog_post_tag, self.tag),
-            (self.lab_res, self.edi_res, cp.elog_post_res, self.res),
-            (self.lab_msg, self.edi_msg, cp.elog_post_msg, self.msg),
-            (self.lab_att, self.edi_att, cp.elog_post_att, self.att) }
+        self.list_of_fields = [
+            [self.lab_ins, self.edi_ins, cp.elog_post_ins, self.ins], 
+            [self.lab_exp, self.edi_exp, cp.elog_post_exp, self.exp],
+            [self.lab_run, self.edi_run, cp.elog_post_run, self.run], 
+            [self.lab_tag, self.edi_tag, cp.elog_post_tag, self.tag],
+            [self.lab_res, self.edi_res, cp.elog_post_res, self.res],
+            [self.lab_msg, self.edi_msg, cp.elog_post_msg, self.msg],
+            [self.lab_att, self.edi_att, cp.elog_post_att, self.att] ]
+
+        print 'self.list_of_fields\n',self.list_of_fields
+
+
                              
-        for (label, edi, par, val_loc) in self.list_of_fields :
+        for [label, edi, par, loc_par] in self.list_of_fields :
            self.connect(edi, QtCore.SIGNAL('editingFinished ()'), self.onEdit) 
 
         #self.edi_path = QtGui.QLineEdit( fnm.path_blam() )        
@@ -139,6 +169,9 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.setCheckedRadioButton()
         self.setFields()
 
+#        self.getParent().but_send.setFocus()
+#    def getParent(self):
+#        return self.parent
 
     #-------------------
     #  Public methods --
@@ -193,7 +226,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         #self.but_brow.setFixedWidth(width)
         #self.cbx_use .setStyleSheet (cp.styleLabel)
 
-        for (label, edi, par, val_loc) in self.list_of_fields :
+        for [label, edi, par, loc_par] in self.list_of_fields :
             label.setStyleSheet(cp.styleLabel)
             label.setFixedWidth(width_com)
             label.setAlignment(QtCore.Qt.AlignLeft)
@@ -203,7 +236,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
 #        .setAlignment(QtCore.Qt.AlignRight)
 
-        for (label, edi, par, val_loc) in self.list_of_fields :
+        for [label, edi, par, loc_par] in self.list_of_fields :
             edi.setFixedWidth(width_edi)
 
         self.edi_msg.setMinimumWidth(width_edi_long)
@@ -225,6 +258,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         for rad in self.list_of_rad :
             if rad.isChecked() :
                 rad_txt = str(rad.text()) 
+                cp.elog_post_rad.setValue(rad_txt)
                 print 'Set fields for ' + rad_txt
                 if   rad_txt == 'Data'    : self.setFieldsData() 
                 elif rad_txt == 'Dark'    : self.setFieldsDark()
@@ -238,7 +272,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
 
     def setFieldsStyle(self):
-        for (label, edi, par, val_loc)  in self.list_of_fields :
+        for [label, edi, par, loc_par]  in self.list_of_fields :
             if edi == self.edi_tag or edi == self.edi_msg or edi == self.edi_res :
                 edi.setReadOnly(False)
                 edi.setStyleSheet (cp.styleEdit)
@@ -252,75 +286,79 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
 
     def setFieldsData(self):
-        self.ins, self.exp, run_str, run_num = gu.parse_xtc_path(fnm.path_data_xtc())
-        self.run = str(run_num)
-        #self.att = fnm.path_data_time_plot(self)
-        self.tag = cp.elog_post_tag.value()
-        self.msg = cp.elog_post_msg.value()
-        self.att = self.att_input
+        ins, exp, run, num = gu.parse_xtc_path(fnm.path_data_xtc())
+        self.ins.setValue(str(ins))
+        self.exp.setValue(str(exp))
+        self.run.setValue(str(num))
+        #self.att.setValue(fnm.path_data_time_plot(self))
+        self.tag.setValue(cp.elog_post_tag.value())
+        self.msg.setValue(cp.elog_post_msg.value())
+        self.att.setValue(self.att_input)
 
 
     def setFieldsDark(self):
-        self.ins, self.exp, run_str, run_num = gu.parse_xtc_path(fnm.path_dark_xtc())
-        self.run = str(run_num)
-        #self.att = fnm.path_data_time_plot(self)
-        self.tag = cp.elog_post_tag.value()
-        self.msg = cp.elog_post_msg.value()
-        self.att = self.att_input
+        ins, exp, run, num = gu.parse_xtc_path(fnm.path_dark_xtc())
+        self.ins.setValue(str(ins))
+        self.exp.setValue(str(exp))
+        self.run.setValue(str(num))
+        #self.att.setValue(fnm.path_data_time_plot(self))
+        self.tag.setValue(cp.elog_post_tag.value())
+        self.msg.setValue(cp.elog_post_msg.value())
+        self.att.setValue(self.att_input)
 
 
     def setFieldsEdit(self):
         self.is_read_only = False
-        #self.ins = cp.elog_post_ins.value() 
-        #self.exp = cp.elog_post_exp.value()
-        #self.run = cp.elog_post_run.value()
-        #self.tag = cp.elog_post_tag.value()
-        #self.res = cp.elog_post_res.value()
-        #self.msg = cp.elog_post_msg.value()
-        #self.att = cp.elog_post_att.value()
-        self.att = self.att_input
+        #self.ins.setValue( cp.elog_post_ins.value() ) 
+        #self.exp.setValue( cp.elog_post_exp.value() )
+        #self.run.setValue( cp.elog_post_run.value() )
+        #self.tag.setValue( cp.elog_post_tag.value() )
+        #self.res.setValue( cp.elog_post_res.value() )
+        #self.msg.setValue( cp.elog_post_msg.value() )
+        #self.att.setValue( cp.elog_post_att.value() )
+        self.att .setValue( self.att_input )
 
 
     def setFieldsSaved(self):
-        self.ins = cp.elog_post_ins.value() 
-        self.exp = cp.elog_post_exp.value()
-        self.run = cp.elog_post_run.value()
-        self.tag = cp.elog_post_tag.value()
-        self.res = cp.elog_post_res.value()
-        self.msg = cp.elog_post_msg.value()
-        #self.att = cp.elog_post_att.value()
-        self.att = self.att_input
+        self.ins.setValue( cp.elog_post_ins.value() )
+        self.exp.setValue( cp.elog_post_exp.value() )
+        self.run.setValue( cp.elog_post_run.value() )
+        self.tag.setValue( cp.elog_post_tag.value() )
+        self.res.setValue( cp.elog_post_res.value() )
+        self.msg.setValue( cp.elog_post_msg.value() )
+        self.att.setValue( cp.elog_post_att.value() )
+        self.att.setValue( self.att_input )
 
 
     def setFieldsDefault(self):
-        self.ins = cp.elog_post_ins.value_def() 
-        self.exp = cp.elog_post_exp.value_def()
-        self.run = cp.elog_post_run.value_def()
-        self.tag = cp.elog_post_tag.value_def()
-        self.res = cp.elog_post_res.value_def()
-        self.msg = cp.elog_post_msg.value_def()
-        #self.att = cp.elog_post_att.value_def()
-        self.att = self.att_input
+        self.ins.setValue( cp.elog_post_ins.value_def() ) 
+        self.exp.setValue( cp.elog_post_exp.value_def() )
+        self.run.setValue( cp.elog_post_run.value_def() )
+        self.tag.setValue( cp.elog_post_tag.value_def() )
+        self.res.setValue( cp.elog_post_res.value_def() )
+        self.msg.setValue( cp.elog_post_msg.value_def() )
+        self.att.setValue( cp.elog_post_att.value_def() )
+        self.att.setValue( self.att_input )
 
 
     def updateFields(self):
-        self.edi_ins.setText( self.ins ) 
-        self.edi_exp.setText( self.exp )
-        self.edi_run.setText( self.run )
-        self.edi_tag.setText( self.tag )
-        self.edi_res.setText( self.res )
-        self.edi_msg.setText( self.msg )
-        self.edi_att.setText( self.att )
+        self.edi_ins.setText( self.ins.value() ) 
+        self.edi_exp.setText( self.exp.value() )
+        self.edi_run.setText( self.run.value() )
+        self.edi_tag.setText( self.tag.value() )
+        self.edi_res.setText( self.res.value() )
+        self.edi_msg.setText( self.msg.value() )
+        self.edi_att.setText( self.att.value() )
 
 
     def updateConfigPars(self):
-        cp.elog_post_ins.setValue(self.ins) 
-        cp.elog_post_exp.setValue(self.exp)
-        cp.elog_post_run.setValue(self.run)
-        cp.elog_post_tag.setValue(self.tag)
-        cp.elog_post_res.setValue(self.res)
-        cp.elog_post_msg.setValue(self.msg)
-        cp.elog_post_att.setValue(self.att)
+        cp.elog_post_ins.setValue( self.ins.value() ) 
+        cp.elog_post_exp.setValue( self.exp.value() )
+        cp.elog_post_run.setValue( self.run.value() )
+        cp.elog_post_tag.setValue( self.tag.value() )
+        cp.elog_post_res.setValue( self.res.value() )
+        cp.elog_post_msg.setValue( self.msg.value() )
+        cp.elog_post_att.setValue( self.att.value() )
 
     
     def setParent(self,parent) :
@@ -355,11 +393,11 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
     def onEdit(self):
         logger.debug('onEdit', __name__)
-        for (label, edi, par, val_loc)  in self.list_of_fields :
+        for [label, edi, par, loc_par]  in self.list_of_fields :
             if  edi.isModified() :            
                 edi.setModified(False)
-                val_loc = str(edi.displayText())
-                msg = 'Set the local value of ' + str(label.text()) + ' ' + val_loc
+                loc_par.setValue(str(edi.displayText()))
+                msg = 'Set the local value of ' + str(label.text()) + ' ' + loc_par.value() + ' ' + self.tag.value()
                 logger.info(msg, __name__ )
                 print msg
 

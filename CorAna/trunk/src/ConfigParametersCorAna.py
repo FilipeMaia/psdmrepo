@@ -231,7 +231,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  type='float' )
         self.ccdset_ccddain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   type='float' )
 
-        self.elog_post_cbx_state = self.declareParameter( name='ELOG_POST_CBX_STATE',     val_def=True,        type='bool' )
+        # GUIELogPostingDialog.py 
+        # GUIELogPostingFields.py 
+        #self.elog_post_cbx_state = self.declareParameter( name='ELOG_POST_CBX_STATE',     val_def=True,        type='bool' )
         self.elog_post_rad       = self.declareParameter( name='ELOG_POST_RAD_STATE',     val_def='Default',   type='str' )
         self.elog_post_ins       = self.declareParameter( name='ELOG_POST_INSTRUMENT',    val_def='AMO',       type='str' )
         self.elog_post_exp       = self.declareParameter( name='ELOG_POST_EXPERIMENT',    val_def='amodaq09',  type='str' )

@@ -169,7 +169,7 @@ class FileNameManager :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-time-plot.png'
 
     def path_data_mons_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.png'
 
 #-----------------------------
 
