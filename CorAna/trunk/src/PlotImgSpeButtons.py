@@ -33,6 +33,8 @@ from PyQt4 import QtGui, QtCore
 
 from Logger                 import logger
 from GUIHelp                import *
+from GUIELogPostingDialog   import *
+
 #from FileNameManager        import fnm
 #from ConfigParametersCorAna import confpars as cp
 
@@ -63,6 +65,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
         self.but_save  = QtGui.QPushButton('&Save')
+        self.but_elog  = QtGui.QPushButton(u'\u2192 &ELog')
         self.but_quit  = QtGui.QPushButton('&Close')
         self.cbox_grid = QtGui.QCheckBox('&Grid')
         self.cbox_log  = QtGui.QCheckBox('&Log')
@@ -70,11 +73,12 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
         self.set_buttons()
         
-        width = 50
+        width = 60
         self.edi_nbins.setFixedWidth(width)
         self.but_reset.setFixedWidth(width)
         self.but_help .setFixedWidth(width)
         self.but_save .setFixedWidth(width)
+        self.but_elog .setFixedWidth(width)
         self.but_quit .setFixedWidth(width)
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
  
@@ -85,6 +89,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
         self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
+        self.connect(self.but_elog,  QtCore.SIGNAL('clicked()'),          self.on_but_elog)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
         self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_grid)
         self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_log)
@@ -105,6 +110,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.hbox.addWidget(self.but_reset)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.but_save)
+        self.hbox.addWidget(self.but_elog)
         self.hbox.addWidget(self.but_quit)
         self.setLayout(self.hbox)
 
@@ -126,6 +132,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset.setToolTip('Reset original view') 
         self.but_quit .setToolTip('Quit this GUI') 
         self.but_save .setToolTip('Save the figure in file') 
+        self.but_elog .setToolTip('Send figure to ELog') 
         self.but_help .setToolTip('Click on this button\nand get help') 
         self.cbox_grid.setToolTip('On/Off grid') 
         self.cbox_log .setToolTip('Log/Linear scale') 
@@ -204,8 +211,18 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.widgimage.saveFigure(path)
 
 
+    def on_but_elog(self):
+        logger.info('Send message to ELog:', __name__ )
+        path = self.ofname
+        logger.info('1. Save plot in file: ' + path, __name__ )
+        self.widgimage.saveFigure(path)
+        logger.info('2. Submit message with plot to ELog', __name__ )
+        wdialog = GUIELogPostingDialog (self, fname=path)
+        resp=wdialog.exec_()
+         
+
     def on_cbox_log(self):
-        logger.info('Not implemented yet.', __name__ )
+        logger.info('Set log10 scale', __name__ )
         self.fig.myLogIsOn = self.cbox_log.isChecked()
         self.fig.myZmin    = None
         self.fig.myZmax    = None        

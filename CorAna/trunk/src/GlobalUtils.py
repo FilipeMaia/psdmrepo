@@ -88,8 +88,8 @@ def subproc(command_seq, env=None) : # for example, command_seq=['bsub', '-q', c
 
 #----------------------------------
 
-def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', tag='TAG1', run='825',
-                              msg='EMPTY MESSAGE', fname_text=None, fname_att=None) :
+def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', run='825', tag='TAG1',
+                              msg='EMPTY MESSAGE', fname_text=None, fname_att=None, resp=None) :
     #pypath = os.getenv('PYTHONPATH')
     my_env = os.environ
     pypath = my_env.get('PYTHONPATH', '')
@@ -102,22 +102,36 @@ def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', tag='TAG1', run='825'
                    '-t', tag
                    ]
 
-    if msg != None :
+    if msg != None and msg != 'None' :
         command_seq.append('-m')
         command_seq.append(msg)
 
-    if fname_text != None :
+    if fname_text != None and fname_text != 'None' :
         command_seq.append('-f')
         command_seq.append(fname_text)
 
-    if fname_att != None :
+    if fname_att != None and fname_att != 'None' :
         command_seq.append('-a')
         command_seq.append(fname_att)
 
+    if resp != None and resp != 'None' :
+        command_seq.append('-???')
+        command_seq.append(resp)
+
+
     #print 'my_env for PYTHONPATH: ', my_env['PYTHONPATH']
     #print 'command_seq: ', command_seq
-    logger.debug(' command_seq: ', command_seq, __name__) 
-    out, err = subproc(command_seq, env=my_env)
+
+    str_command_seq = ''
+    for v in command_seq : str_command_seq += v + ' '
+
+    logger.info('command_seq: ' + str_command_seq, __name__) 
+
+    #==================
+    out, err = '', ''
+    #out, err = subproc(command_seq, env=my_env)
+    #==================
+
     #print 'out:\n', out
     #print 'err:\n', err
     if err != '' : return err + '\n' + out

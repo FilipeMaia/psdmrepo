@@ -93,34 +93,40 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #logger.debug('moveEvent', __name__) 
-        #cp.posGUIMain = (self.pos().x(),self.pos().y())
         pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        print 'closeEvent'
+        #print 'closeEvent'
         try    : self.widg_pars.close()
         except : pass
 
     def onCancel(self):
         logger.debug('onCancel', __name__)
-        #print 'onCancel'
         self.reject()
         #self.close()
 
     def onSend(self):
         logger.debug('onSend', __name__)
-        #print 'onSend'
         self.widg_pars.updateConfigPars()
         list_of_fields = self.widg_pars.getListOfFields()
 
-        logger.info('onSend: Send to ELod the massege with parameters:', __name__)        
+        logger.debug('Send to ELod the massege with parameters:', __name__)        
         for [label, edi, par, loc_par] in list_of_fields :
             msg = str(label.text()) + ' ' + loc_par.value()
-            logger.info(msg, __name__)        
-            print msg       
+            logger.debug(msg, __name__)        
 
+        ins = self.widg_pars.ins.value()
+        exp = self.widg_pars.exp.value()
+        run = self.widg_pars.run.value()
+        tag = self.widg_pars.tag.value()
+        res = self.widg_pars.res.value()
+        msg = self.widg_pars.msg.value()
+        att = self.widg_pars.att.value()
+        msg = '"' + msg + '"'
+
+        out = gu.send_msg_with_att_to_elog(ins, exp, run, tag, msg, fname_att=att, resp=res)
+        logger.info('Sending post to ELog response:\n' + out, __name__)  
 
         self.accept()
         #self.close()

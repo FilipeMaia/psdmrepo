@@ -54,7 +54,7 @@ class LocalParameter () :
     def value (self) :    
         return self._val
 
-
+#---------------------
 
 class GUIELogPostingFields ( QtGui.QWidget ) :
     """GUI sets fields for ELog posting"""
@@ -116,29 +116,16 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
             [self.lab_msg, self.edi_msg, cp.elog_post_msg, self.msg],
             [self.lab_att, self.edi_att, cp.elog_post_att, self.att] ]
 
-        print 'self.list_of_fields\n',self.list_of_fields
-
-
-                             
         for [label, edi, par, loc_par] in self.list_of_fields :
            self.connect(edi, QtCore.SIGNAL('editingFinished ()'), self.onEdit) 
 
-        #self.edi_path = QtGui.QLineEdit( fnm.path_blam() )        
-        #self.edi_path.setReadOnly( True )   
-        #self.but_path = QtGui.QPushButton('File:')
-        #self.but_plot = QtGui.QPushButton('Plot')
-        #self.but_brow = QtGui.QPushButton('Browse')
-
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
-        #self.grid.addWidget(self.tit_path, self.grid_row,   0)
-        #self.grid.addWidget(self.cbx_use, self.grid_row,   0, 1, 8)
-
         for col,rad in enumerate(self.list_of_rad) :
             self.grid.addWidget(rad, self.grid_row, col*2, 1, 2)
 
-        self.grid.addWidget(self.lab_ins, self.grid_row+1, 0, 1, 2)
-        self.grid.addWidget(self.edi_ins, self.grid_row+2, 0, 1, 2)
+        self.grid.addWidget(self.lab_ins, self.grid_row+1, 1, 1, 2)
+        self.grid.addWidget(self.edi_ins, self.grid_row+2, 1, 1, 2)
         self.grid.addWidget(self.lab_exp, self.grid_row+1, 2, 1, 2)
         self.grid.addWidget(self.edi_exp, self.grid_row+2, 2, 1, 2)
         self.grid.addWidget(self.lab_run, self.grid_row+1, 4, 1, 2)
@@ -151,27 +138,12 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_att, self.grid_row+3, 1, 1, 7)
         self.grid.addWidget(self.lab_msg, self.grid_row+4, 0)
         self.grid.addWidget(self.edi_msg, self.grid_row+4, 1, 1, 7)
-
-        #self.grid.addWidget(self.but_path, self.grid_row+1, 0)
-        #self.grid.addWidget(self.edi_path, self.grid_row+1, 1)
-        #self.grid.addWidget(self.but_plot, self.grid_row+2, 0)
-        #self.grid.addWidget(self.but_brow, self.grid_row+2, 1)
-
-        #self.connect(self.cbx_use,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
-        #self.connect(self.but_path, QtCore.SIGNAL('clicked()'), self.on_but_path )
-        #self.connect(self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
-
         self.setLayout(self.grid)
 
         self.showToolTips()
-
         self.setStyle()
         self.setCheckedRadioButton()
         self.setFields()
-
-#        self.getParent().but_send.setFocus()
-#    def getParent(self):
-#        return self.parent
 
     #-------------------
     #  Public methods --
@@ -179,11 +151,6 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
     def showToolTips(self):
         #self        .setToolTip('Use this GUI to work with xtc file.')
-        #self.edi_path.setToolTip('The path to the blamish mask file')
-        #self.but_path.setToolTip('Push this button and select the blamish mask file')
-        #self.but_plot.setToolTip('Plot image and spectrum for blamish file')
-        #self.but_brow.setToolTip('Browse blamish file')
-        #self.cbx_use .setToolTip('Check box \nto set and use \nblamish mask correction')
         self.edi_ins.setToolTip('Instrument')
         self.edi_exp.setToolTip('Experiment')
         self.edi_run.setToolTip('Run number')
@@ -191,7 +158,6 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.edi_res.setToolTip('Responce on message number.\nCan be used for accumulation of \nmessages in one branch of ELog.')
         self.edi_msg.setToolTip('Message for posting in ELog')
         self.edi_att.setToolTip('Attached file')
-        #self.rad_grp.setToolTip('Fast substitution of \nparameters for posting in ELog.')
         for rad in self.list_of_rad :
             rad.setToolTip('Fast substitution of \nparameters for posting \nin ELog using ' + str(rad.text()))
 
@@ -209,22 +175,11 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.setMinimumWidth(400)
         self.setStyleSheet(cp.styleBkgd)
 
+        width_edi_short =  40
         width_edi       =  80
         width_edi_long  = 420
         width_com       =  80
         width_com_short =  34
-
-        #self.edi_path.setStyleSheet (cp.styleEditInfo)
-        #self.edi_path.setAlignment  (QtCore.Qt.AlignRight)
-
-        #self.but_path.setStyleSheet (cp.styleButton)
-        #self.but_plot.setStyleSheet (cp.styleButton) 
-        #self.but_brow.setStyleSheet (cp.styleButton) 
-   
-        #self.but_path.setFixedWidth(width)
-        #self.but_plot.setFixedWidth(width)
-        #self.but_brow.setFixedWidth(width)
-        #self.cbx_use .setStyleSheet (cp.styleLabel)
 
         for [label, edi, par, loc_par] in self.list_of_fields :
             label.setStyleSheet(cp.styleLabel)
@@ -234,11 +189,13 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.lab_att.setFixedWidth(width_com_short)
         self.lab_msg.setFixedWidth(width_com_short)
 
-#        .setAlignment(QtCore.Qt.AlignRight)
-
         for [label, edi, par, loc_par] in self.list_of_fields :
             edi.setFixedWidth(width_edi)
 
+        self.lab_ins.setFixedWidth(width_edi_short)
+        self.lab_run.setFixedWidth(width_edi_short)
+        self.edi_ins.setFixedWidth(width_edi_short)
+        self.edi_run.setFixedWidth(width_edi_short)
         self.edi_msg.setMinimumWidth(width_edi_long)
         self.edi_att.setMinimumWidth(width_edi_long)
 
@@ -259,7 +216,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
             if rad.isChecked() :
                 rad_txt = str(rad.text()) 
                 cp.elog_post_rad.setValue(rad_txt)
-                print 'Set fields for ' + rad_txt
+                logger.debug('Set fields for ' + rad_txt, __name__)
                 if   rad_txt == 'Data'    : self.setFieldsData() 
                 elif rad_txt == 'Dark'    : self.setFieldsDark()
                 elif rad_txt == 'Saved'   : self.setFieldsSaved()
@@ -282,7 +239,9 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
                 else                 : edi.setStyleSheet (cp.styleEdit)
 
         self.edi_res.setReadOnly(True)
+        self.edi_att.setReadOnly(True)
         self.edi_res.setStyleSheet(cp.styleEditInfo)
+        self.edi_att.setStyleSheet(cp.styleEditInfo)
 
 
     def setFieldsData(self):
@@ -290,7 +249,6 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.ins.setValue(str(ins))
         self.exp.setValue(str(exp))
         self.run.setValue(str(num))
-        #self.att.setValue(fnm.path_data_time_plot(self))
         self.tag.setValue(cp.elog_post_tag.value())
         self.msg.setValue(cp.elog_post_msg.value())
         self.att.setValue(self.att_input)
@@ -301,7 +259,6 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.ins.setValue(str(ins))
         self.exp.setValue(str(exp))
         self.run.setValue(str(num))
-        #self.att.setValue(fnm.path_data_time_plot(self))
         self.tag.setValue(cp.elog_post_tag.value())
         self.msg.setValue(cp.elog_post_msg.value())
         self.att.setValue(self.att_input)
@@ -369,21 +326,10 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
     def moveEvent(self, e):
-        #logger.debug('moveEvent', __name__) 
-        #cp.posGUIMain = (self.pos().x(),self.pos().y())
         pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-
-        #try    : cp.plotimgspe.close()
-        #except : pass
-
-        #try    : cp.guifilebrowser.close()
-        #except : pass
-            
-        #try    : del cp.guielogpostingfields # GUIELogPostingFields
-        #except : pass # silently ignore
 
 
     def onClose(self):
@@ -397,9 +343,10 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
             if  edi.isModified() :            
                 edi.setModified(False)
                 loc_par.setValue(str(edi.displayText()))
-                msg = 'Set the local value of ' + str(label.text()) + ' ' + loc_par.value() + ' ' + self.tag.value()
+                msg = 'Set the local value of ' + str(label.text()) +\
+                      ' ' + loc_par.value()
                 logger.info(msg, __name__ )
-                print msg
+                #print msg
 
 
     def onCBox(self):

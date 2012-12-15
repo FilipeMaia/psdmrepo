@@ -129,7 +129,7 @@ class PlotArrayButtons (QtGui.QWidget) :
         self.but_reset.setToolTip('Reset original view') 
         self.but_quit .setToolTip('Quit this GUI') 
         self.but_save .setToolTip('Save the figure in file') 
-        self.but_save .setToolTip('Send figure to ELog') 
+        self.but_elog .setToolTip('Send figure to ELog') 
         self.but_help .setToolTip('Click on this button\nand get help') 
         self.cbox_grid.setToolTip('On/Off grid') 
         self.cbox_log .setToolTip('Log/Linear scale') 
@@ -210,7 +210,7 @@ class PlotArrayButtons (QtGui.QWidget) :
 
 
     def on_but_elog(self):
-        logger.info('on_but_elog', __name__ )
+        logger.info('Send message to ELog:', __name__ )
         path = self.ofname
         logger.info('1. Save plot in file: ' + path, __name__ )
         self.widgimage.saveFigure(path)
