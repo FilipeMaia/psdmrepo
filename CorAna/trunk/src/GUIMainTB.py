@@ -71,8 +71,11 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
+        cp.setIcons()
+
         self.setGeometry(10, 25, 850, 300)
         self.setWindowTitle('Data Processing Environment')
+        self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
@@ -92,8 +95,15 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butELog        = QtGui.QPushButton(u'GUI \u2192 &ELog')
         self.butLogger      = QtGui.QPushButton('Logger')
         self.butFBrowser    = QtGui.QPushButton('File Browser')
-        #self.butELog.setIcon(cp.icon_mail_forward)
-        
+
+        self.butELog    .setIcon(cp.icon_mail_forward)
+        self.butFile    .setIcon(cp.icon_save)
+        self.butExit    .setIcon(cp.icon_exit)
+        self.butLogger  .setIcon(cp.icon_logger)
+        self.butFBrowser.setIcon(cp.icon_browser)
+        self.butSave    .setIcon(cp.icon_save)
+        self.butStop    .setIcon(cp.icon_stop)
+
         self.hboxW = QtGui.QHBoxLayout() 
 
         self.vboxW = QtGui.QVBoxLayout() 

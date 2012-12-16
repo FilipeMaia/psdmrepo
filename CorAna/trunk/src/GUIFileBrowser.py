@@ -45,6 +45,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 
         self.setGeometry(200, 400, 900, 500)
         self.setWindowTitle('GUI File Browser')
+        self.setWindowIcon(cp.icon_browser)
         self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()

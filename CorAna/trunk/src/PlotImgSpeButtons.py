@@ -71,15 +71,20 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.cbox_log  = QtGui.QCheckBox('&Log')
         self.tit_nbins = QtGui.QLabel('N bins:')
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
+
         self.set_buttons()
-        
+
+        self.but_elog.setIcon(cp.icon_mail_forward)
+        self.but_save.setIcon(cp.icon_save)
+        self.but_quit.setIcon(cp.icon_exit)
+
         width = 60
         self.edi_nbins.setFixedWidth(width)
         self.but_reset.setFixedWidth(width)
         self.but_help .setFixedWidth(width)
-        self.but_save .setFixedWidth(width)
-        self.but_elog .setFixedWidth(width)
-        self.but_quit .setFixedWidth(width)
+        #self.but_save .setFixedWidth(width)
+        #self.but_elog .setFixedWidth(width)
+        #self.but_quit .setFixedWidth(width)
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
  
         self.but_help.setStyleSheet (cp.styleButtonGood) 

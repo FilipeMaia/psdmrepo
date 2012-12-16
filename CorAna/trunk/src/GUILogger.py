@@ -47,6 +47,8 @@ class GUILogger ( QtGui.QWidget ) :
 
         self.setGeometry(200, 400, 900, 500)
         self.setWindowTitle('GUI Logger')
+        self.setWindowIcon(cp.icon_logger)
+
         self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()
