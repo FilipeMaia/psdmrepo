@@ -47,7 +47,10 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         self.widg_pars = GUIELogPostingFields(parent=self,att_fname=fname)
         self.but_canc  = QtGui.QPushButton('&Cancel') 
         self.but_send  = QtGui.QPushButton('&Send to ELog') 
-
+        #self.but_canc.setIcon(cp.icon_button_cancel)
+        #self.but_send.setIcon(cp.icon_mail_forward)
+        #self.setWindowIcon(cp.icon_mail_forward)
+        
         self.connect( self.but_canc, QtCore.SIGNAL('clicked()'), self.onCancel )
         self.connect( self.but_send, QtCore.SIGNAL('clicked()'), self.onSend )
 

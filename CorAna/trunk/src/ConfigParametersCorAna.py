@@ -37,6 +37,9 @@ from copy import deepcopy
 from ConfigParameters import * # ConfigParameters
 from Logger import logger
 
+from PyQt4 import QtGui        # for icons only...
+import AppDataPath as apputils # for icons
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -58,6 +61,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.readParametersFromFile ( fname )
         self.initRunTimeParameters()
         self.defineStyles()
+        self.setIcons()
 
   
     def initRunTimeParameters( self ) :
@@ -65,8 +69,19 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         self.plotarray_is_on = False
 
+#-----------------------------
 
+    def setIcons(self) :
+        path_icon_button_ok     = apputils.AppDataPath('CorAna/icons/button_ok.gif').path()
+        self.icon_button_ok     = QtGui.QIcon(path_icon_button_ok)
+        path_icon_button_cancel = apputils.AppDataPath('CorAna/icons/button_cancel.gif').path()
+        self.icon_button_cancel = QtGui.QIcon(path_icon_button_cancel)
+        path_icon_mail_forward  = apputils.AppDataPath('CorAna/icons/mail-forward.gif').path()
+        self.icon_mail_forward  = QtGui.QIcon(path_icon_mail_forward)
 
+#-----------------------------
+
+        
     def declareCorAnaParameters( self ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
 

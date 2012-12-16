@@ -54,6 +54,7 @@ from GUILogger            import *
 from Logger               import logger
 from FileNameManager      import fnm
 from GUIFileBrowser       import *
+from GUIELogPostingDialog import *
 
 #---------------------
 #  Class definition --
@@ -87,9 +88,12 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butStop        = QtGui.QPushButton('Stop')
         self.butSave        = QtGui.QPushButton('Save')
         self.butExit        = QtGui.QPushButton('Exit')
+        self.butFile        = QtGui.QPushButton(u'GUI \u2192 &File')
+        self.butELog        = QtGui.QPushButton(u'GUI \u2192 &ELog')
         self.butLogger      = QtGui.QPushButton('Logger')
         self.butFBrowser    = QtGui.QPushButton('File Browser')
-
+        #self.butELog.setIcon(cp.icon_mail_forward)
+        
         self.hboxW = QtGui.QHBoxLayout() 
 
         self.vboxW = QtGui.QVBoxLayout() 
@@ -119,6 +123,8 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.hboxB = QtGui.QHBoxLayout() 
         self.hboxB.addWidget(self.butLogger     )
         self.hboxB.addWidget(self.butFBrowser   )
+        self.hboxB.addWidget(self.butFile       )
+        self.hboxB.addWidget(self.butELog       )
         self.hboxB.addStretch(1)     
         self.hboxB.addWidget(self.butStop       )
         self.hboxB.addWidget(self.butSave       )
@@ -148,6 +154,8 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
+        self.connect(self.butELog       ,  QtCore.SIGNAL('clicked()'), self.onELog        )
+        self.connect(self.butFile       ,  QtCore.SIGNAL('clicked()'), self.onFile        )
         self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
         self.connect(self.butFBrowser   ,  QtCore.SIGNAL('clicked()'), self.onFBrowser    )
 
@@ -177,8 +185,14 @@ class GUIMainTB ( QtGui.QWidget ) :
 
 
     def showToolTips(self):
-        self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters.') 
+        self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters') 
         self.butExit.setToolTip('Close all windows and \nexit this program') 
+        self.butStop.setToolTip('Not implemented yet...')
+        self.butFile.setToolTip('Save current GUI image in PNG file')
+        self.butELog.setToolTip('1. Save current GUI image in PNG file\n'\
+                                '2. Submit PNG file with msg in ELog')
+        self.butLogger.setToolTip('On/Off logger widow')
+        self.butFBrowser.setToolTip('On/Off file browser')
 
 
     def setFrame(self):
@@ -203,6 +217,8 @@ class GUIMainTB ( QtGui.QWidget ) :
         #self.butFBrowser   .setStyleSheet(cp.styleButton)
         self.butSave       .setStyleSheet(cp.styleButton)
         self.butExit       .setStyleSheet(cp.styleButton)
+        self.butELog       .setStyleSheet(cp.styleButton)
+        self.butFile       .setStyleSheet(cp.styleButton)
         #self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
 
     def makeTabBar(self,mode=None) :
@@ -388,6 +404,36 @@ class GUIMainTB ( QtGui.QWidget ) :
             cp.guisetupinfo.move(self.pos().__add__(QtCore.QPoint(160,90))) # open window with offset w.r.t. parent
             cp.guisetupinfo.show()
 
+
+    def onFile(self):
+        logger.debug('onFile', self.name)
+        path  = fnm.path_gui_image()
+        #dir, fname = os.path.split(path)
+        path  = str( QtGui.QFileDialog.getSaveFileName(self,
+                                                       caption='Select file to save the GUI',
+                                                       directory = path,
+                                                       filter = '*.png'
+                                                       ) )
+        if path == '' :
+            logger.debug('Saving is cancelled.', self.name)
+            return
+        logger.info('Save GUI image in file: ' + path, self.name)
+        pixmap = QtGui.QPixmap.grabWidget(self)
+        status = pixmap.save(path, 'PNG')
+        logger.info('Save status: '+str(status), self.name)
+
+
+    def onELog(self):
+        logger.debug('onELog', self.name)
+        pixmap = QtGui.QPixmap.grabWidget(self)
+        fname  = fnm.path_gui_image()
+        status = pixmap.save(fname, 'PNG')
+        logger.info('1. Save GUI image in file: ' + fname + ' status: '+str(status), self.name)
+        if not status : return
+        logger.info('2. Send GUI image in ELog: ', fname)
+        wdialog = GUIELogPostingDialog (self, fname=fname)
+        resp=wdialog.exec_()
+  
 
     def onSave(self):
         logger.debug('onSave', self.name)

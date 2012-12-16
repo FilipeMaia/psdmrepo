@@ -31,7 +31,8 @@ import os
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-import GlobalUtils            as   gu
+import GlobalUtils          as     gu
+
 #-----------------------------
 
 class FileNameManager :
@@ -42,7 +43,7 @@ class FileNameManager :
         """Constructor.
         @param fname  the file name for output log file
         """
-#-----------------------------
+
 #-----------------------------
 
     def log_file(self) :
@@ -170,6 +171,9 @@ class FileNameManager :
 
     def path_data_mons_plot(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.png'
+
+    def path_gui_image(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'gui-image.png'
 
 #-----------------------------
 
