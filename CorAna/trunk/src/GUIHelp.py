@@ -44,6 +44,7 @@ class GUIHelp ( QtGui.QWidget ) :
 
         self.setGeometry(100, 100, 730, 200)
         self.setWindowTitle('GUI Help')
+        self.setWindowIcon(cp.icon_help)
         self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()

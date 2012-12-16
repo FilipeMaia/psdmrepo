@@ -36,7 +36,7 @@ from GUIHelp                import *
 from GUIELogPostingDialog   import *
 
 #from FileNameManager        import fnm
-#from ConfigParametersCorAna import confpars as cp
+from ConfigParametersCorAna import confpars as cp
 
 #---------------------
 #  Class definition --
@@ -65,7 +65,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
         self.but_save  = QtGui.QPushButton('&Save')
-        self.but_elog  = QtGui.QPushButton(u'\u2192 &ELog')
+        self.but_elog  = QtGui.QPushButton('&ELog') #u'\u2192 &ELog'
         self.but_quit  = QtGui.QPushButton('&Close')
         self.cbox_grid = QtGui.QCheckBox('&Grid')
         self.cbox_log  = QtGui.QCheckBox('&Log')
@@ -74,14 +74,17 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
         self.set_buttons()
 
-        self.but_elog.setIcon(cp.icon_mail_forward)
-        self.but_save.setIcon(cp.icon_save)
-        self.but_quit.setIcon(cp.icon_exit)
+        self.but_elog .setIcon(cp.icon_mail_forward)
+        self.but_save .setIcon(cp.icon_save)
+        self.but_quit .setIcon(cp.icon_exit)
+        self.but_help .setIcon(cp.icon_help)
+        self.but_reset.setIcon(cp.icon_reset)
+
 
         width = 60
         self.edi_nbins.setFixedWidth(width)
-        self.but_reset.setFixedWidth(width)
-        self.but_help .setFixedWidth(width)
+        #self.but_reset.setFixedWidth(width)
+        #self.but_help .setFixedWidth(width)
         #self.but_save .setFixedWidth(width)
         #self.but_elog .setFixedWidth(width)
         #self.but_quit .setFixedWidth(width)
@@ -103,6 +106,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         #self.setGridLayout()        
         self.setHBoxLayout()        
         self.showToolTips()
+        self.setFixedHeight(50)
 
 
     def setHBoxLayout(self):

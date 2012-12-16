@@ -104,15 +104,18 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.icon_home          = QtGui.QIcon(base_dir + 'actions/gohome.png')
         self.icon_redo          = QtGui.QIcon(base_dir + 'actions/redo.png')
         self.icon_undo          = QtGui.QIcon(base_dir + 'actions/undo.png')
+        self.icon_reload        = QtGui.QIcon(base_dir + 'actions/reload.png')
         self.icon_exit          = QtGui.QIcon(base_dir + 'actions/exit.png')
         self.icon_stop          = QtGui.QIcon(base_dir + 'actions/stop.png')
         self.icon_save          = QtGui.QIcon(base_dir + 'stock/stock-save.png')
-        self.icon_help          = QtGui.QIcon(base_dir + 'actions/help.png')
         self.icon_edit          = QtGui.QIcon(base_dir + 'actions/edit.png')
         self.icon_browser       = QtGui.QIcon(base_dir + 'actions/fileopen.png')
-        self.icon_monitor       = QtGui.QIcon(base_dir + 'apps/gnome-monitor.png')
+        self.icon_monitor       = QtGui.QIcon(base_dir + 'apps/icon-monitor.png')
+        self.icon_unknown       = QtGui.QIcon(base_dir + 'apps/icon-unknown.png')
         self.icon_logviewer     = QtGui.QIcon(base_dir + '../32x32/apps/logviewer.png')
         self.icon_logger        = self.icon_edit
+        self.icon_help          = self.icon_unknown
+        self.icon_reset         = self.icon_reload
 
 #-----------------------------
 
