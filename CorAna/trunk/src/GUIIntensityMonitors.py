@@ -91,7 +91,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         #self.setMinimumWidth(380)
         #self.setMinimumHeight(300)
         self.setStyleSheet(cp.styleBkgd)
-
+        self.rad_nonorm.setStyleSheet(cp.styleLabel)
 
     def setTitleBar(self) :
         self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',

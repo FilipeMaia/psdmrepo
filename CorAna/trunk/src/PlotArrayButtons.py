@@ -91,9 +91,10 @@ class PlotArrayButtons (QtGui.QWidget) :
         #self.but_quit .setFixedWidth(width)
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
 
-        self.but_help.setStyleSheet (cp.styleButtonGood) 
-        self.but_save.setStyleSheet (cp.styleButtonGood) 
-        self.but_quit.setStyleSheet (cp.styleButtonBad) 
+        self.but_help .setStyleSheet (cp.styleButtonGood) 
+        self.but_reset.setStyleSheet (cp.styleButton) 
+        self.but_save .setStyleSheet (cp.styleButton) 
+        self.but_quit .setStyleSheet (cp.styleButtonBad) 
 
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)

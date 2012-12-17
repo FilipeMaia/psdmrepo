@@ -241,6 +241,13 @@ class FileNameManager :
 
 #-----------------------------
 
+    def  get_list_of_files_service(self) :
+        self.list_of_files_service = []
+        self.list_of_files_service.append(fnm.path_gui_image())
+        return self.list_of_files_service
+
+#-----------------------------
+
     def get_list_of_files_total(self) :
         self.list_of_files_total  = []
         self.list_of_files_total.append(fnm.path_config_pars())
@@ -248,6 +255,7 @@ class FileNameManager :
         self.list_of_files_total += fnm.get_list_of_files_flatfield()
         self.list_of_files_total += fnm.get_list_of_files_blamish()
         self.list_of_files_total += fnm.get_list_of_files_data_aver()
+        self.list_of_files_total += fnm.get_list_of_files_service()
         return self.list_of_files_total
 
 #-----------------------------

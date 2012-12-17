@@ -88,7 +88,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         #self.butSystem      = QtGui.QPushButton('System')
         #self.butRun         = QtGui.QPushButton('Run')
         #self.butViewResults = QtGui.QPushButton('View Results')
-        self.butStop        = QtGui.QPushButton('Stop')
+        #self.butStop        = QtGui.QPushButton('Stop')
         self.butSave        = QtGui.QPushButton('Save')
         self.butExit        = QtGui.QPushButton('Exit')
         self.butFile        = QtGui.QPushButton(u'GUI \u2192 &File')
@@ -102,7 +102,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butLogger  .setIcon(cp.icon_logger)
         self.butFBrowser.setIcon(cp.icon_browser)
         self.butSave    .setIcon(cp.icon_save)
-        self.butStop    .setIcon(cp.icon_stop)
+        #self.butStop    .setIcon(cp.icon_stop)
 
         self.hboxW = QtGui.QHBoxLayout() 
 
@@ -136,7 +136,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.butFile       )
         self.hboxB.addWidget(self.butELog       )
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.butStop       )
+        #self.hboxB.addWidget(self.butStop       )
         self.hboxB.addWidget(self.butSave       )
         self.hboxB.addWidget(self.butExit       )
 
@@ -161,7 +161,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         #self.connect(self.butSystem     ,  QtCore.SIGNAL('clicked()'), self.onSystem      )
         #self.connect(self.butRun        ,  QtCore.SIGNAL('clicked()'), self.onRun         )
         #self.connect(self.butViewResults,  QtCore.SIGNAL('clicked()'), self.onViewResults )
-        self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
+        #self.connect(self.butStop       ,  QtCore.SIGNAL('clicked()'), self.onStop        )
         self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
         self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
         self.connect(self.butELog       ,  QtCore.SIGNAL('clicked()'), self.onELog        )
@@ -197,12 +197,12 @@ class GUIMainTB ( QtGui.QWidget ) :
     def showToolTips(self):
         self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters') 
         self.butExit.setToolTip('Close all windows and \nexit this program') 
-        self.butStop.setToolTip('Not implemented yet...')
         self.butFile.setToolTip('Save current GUI image in PNG file')
         self.butELog.setToolTip('1. Save current GUI image in PNG file\n'\
                                 '2. Submit PNG file with msg in ELog')
         self.butLogger.setToolTip('On/Off logger widow')
         self.butFBrowser.setToolTip('On/Off file browser')
+        #self.butStop.setToolTip('Not implemented yet...')
 
 
     def setFrame(self):
@@ -222,7 +222,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         #self.butSystem     .setStyleSheet(cp.styleButton)
         #self.butRun        .setStyleSheet(cp.styleButton)
         #self.butViewResults.setStyleSheet(cp.styleButton)
-        self.butStop       .setStyleSheet(cp.styleButton)
+        #self.butStop       .setStyleSheet(cp.styleButton)
         #self.butLogger     .setStyleSheet(cp.styleGreenish)
         #self.butFBrowser   .setStyleSheet(cp.styleButton)
         self.butSave       .setStyleSheet(cp.styleButton)
