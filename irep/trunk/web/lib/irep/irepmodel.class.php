@@ -32,17 +32,18 @@ class IrepModel {
     public function manufacturer () { return $this->manufacturer ; }
     public function id           () { return                intval($this->attr['id']) ; }
     public function name         () { return                  trim($this->attr['name']) ; }
-    public function url          () { return                  trim($this->attr['url']) ; }
+    public function description  () { return                  trim($this->attr['description']) ; }
     public function created_time () { return LusiTime::from64(trim($this->attr['created_time'])) ; }
     public function created_uid  () { return                  trim($this->attr['created_uid']) ; }
     
     /* Operations
      */
-    public function update_url ($url) {
-        $url_escaped = $this->manufacturer()->irep()->escape_string(trim($url)) ;
-        $sql = "UPDATE {$this->manufacturer()->irep()->database}.dict_model url='{$url_escaped}' WHERE id={$this->id()}" ;
+    public function update_description ($description) {
+        $description = trim($description) ;
+        $description_escaped = $this->manufacturer()->irep()->escape_string($description) ;
+        $sql = "UPDATE {$this->manufacturer()->irep()->database}.dict_model SET description='{$description_escaped}' WHERE id={$this->id()}" ;
         $this->manufacturer()->irep()->query($sql) ;
-        $this->attr['url'] = trim($url) ;
+        $this->attr['description'] = $description ;
     }
     public function attachments () {
         $list = array () ;

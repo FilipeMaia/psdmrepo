@@ -84,6 +84,7 @@ require_once 'irep/irep.inc.php' ;
             )
         ) ;
     }
+    $tags = $SVC->irep()->known_equipment_tags() ;
 
     $SVC->finish(
         array (
@@ -92,7 +93,8 @@ require_once 'irep/irep.inc.php' ;
                 'manufacturer' => $all_manufacturers ,
                 'model'        => $all_models ,
                 'location'     => $locations ,
-                'custodian'    => $SVC->irep()->known_custodians()
+                'custodian'    => $SVC->irep()->known_custodians() ,
+                'tag'          => $tags
             )
         )
     ) ;

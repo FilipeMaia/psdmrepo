@@ -394,12 +394,12 @@ class Irep extends DbConnection {
                     mysql_fetch_array( $result, MYSQL_ASSOC))) ;
         return $list ;
     }
-    public function add_manufacturer ($name, $url='') {
+    public function add_manufacturer ($name, $description='') {
         $name_escaped = $this->escape_string(trim($name)) ;
-        $url_escaped = $this->escape_string(trim($url)) ;
+        $description_escaped = $this->escape_string(trim($description)) ;
         $created_time = LusiTime::now()->to64() ;
         $created_uid_escaped = $this->escape_string(trim(AuthDB::instance()->authName())) ;
-        $sql = "INSERT INTO {$this->database}.dict_manufacturer VALUES(NULL,'{$name_escaped}','{$url_escaped}',{$created_time},'{$created_uid_escaped}')" ;
+        $sql = "INSERT INTO {$this->database}.dict_manufacturer VALUES(NULL,'{$name_escaped}','{$description_escaped}',{$created_time},'{$created_uid_escaped}')" ;
         $this->query($sql) ;
         return $this->find_manufacturer_by_('id=(SELECT LAST_INSERT_ID())') ;
     }
@@ -595,7 +595,7 @@ class Irep extends DbConnection {
      *   Equipment
      * -------------
      */
-    public function add_equipment ($manufacturer, $model, $serial, $description, $pc, $slacid, $location, $custodian) {
+    public function add_equipment ($manufacturer, $model, $serial, $description, $pc, $slacid, $location, $room, $rack, $elevation, $custodian) {
 
         // Step I: register new equipment to get its identifier. We will need the one
         //         later in order to associate it with the SLAC ID in the SLAC ID registry.
@@ -613,6 +613,9 @@ class Irep extends DbConnection {
         $description_escaped  = $this->escape_string(trim($description)) ;
         $pc_escaped           = $this->escape_string(trim($pc)) ;
         $location_escaped     = $this->escape_string(trim($location)) ;
+        $room_escaped         = $this->escape_string(trim($room)) ;
+        $rack_escaped         = $this->escape_string(trim($rack)) ;
+        $elevation_escaped    = $this->escape_string(trim($elevation)) ;
         $custodian_escaped    = $this->escape_string(trim($custodian)) ;
         $this->query(<<<HERE
 INSERT INTO {$this->database}.equipment VALUES(
@@ -626,6 +629,9 @@ INSERT INTO {$this->database}.equipment VALUES(
     {$slacid} ,
     '{$pc_escaped}' ,
     '{$location_escaped}' ,
+    '{$room_escaped}' ,
+    '{$rack_escaped}' ,
+    '{$elevation_escaped}' ,
     '{$custodian_escaped}'
 )
 HERE
@@ -682,7 +688,7 @@ HERE
                 __METHOD__, "no sub-status exists for ID: {$id}") ;
         return $this->find_equipment_many_by_("(status='{$status2->status()->name()}' AND status2='{$status2->name()}')") ;
     }
-    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian) {
+    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag) {
         $conditions_opt = '' ;
         if ($status != '') {
             $status_escaped = $this->escape_string(trim($status)) ;
@@ -711,6 +717,10 @@ HERE
         if ($custodian != '') {
             $custodian_escaped = $this->escape_string(trim($custodian)) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (custodian LIKE '%{$custodian_escaped}%') " ;
+        }
+        if ($tag != '') {
+            $tag_escaped = $this->escape_string(trim($tag)) ;
+            //$conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (custodian LIKE '%{$tag_escaped}%') " ;
         }
         return $this->find_equipment_many_by_($conditions_opt) ;
     }
@@ -795,9 +805,9 @@ HERE
             mysql_fetch_array( $result, MYSQL_ASSOC)) ;
     }
 
-    /* ----------------
-     *   Aattachments
-     * ----------------
+    /* ---------------
+     *   Attachments
+     * ---------------
      */
     public function find_equipment_attachment_by_id ($id) {
         $id = intval($id) ;
@@ -828,6 +838,22 @@ HERE
             $this->find_model_by_id($attr['model_id']) ,
             $attr) ;
     }
+
+    /* --------
+     *   Tags
+     * --------
+     */
+    public function known_equipment_tags () {
+        $list = array () ;
+        $sql = "SELECT DISTINCT name FROM {$this->database}.equipment_tag ORDER BY name" ;
+        $result = $this->query($sql) ;
+        for ($i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC) ;
+            array_push (
+                $list,
+                $attr['name']) ;
+        }
+        return $list ;    }
 }
 
 ?>

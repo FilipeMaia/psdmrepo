@@ -100,7 +100,8 @@ function p_appl_dictionary () {
                             click(function () {
                                 var id = this.name ;
                                 that.manufacturer_delete(id) ;
-                            }) ;
+                            }
+                        ) ;
                     }
                 }
             }) ;
@@ -114,7 +115,23 @@ function p_appl_dictionary () {
             } ,
             {   name: 'created', hideable: true } ,
             {   name: 'by user', hideable: true } ,
-            {   name: 'documentation url', hideable: true, sorted: false } ,
+            {   name: 'description', hideable: true, sorted: false ,
+                type: {
+                    after_sort: function() {
+                        for (var i in that.manufacturer) {
+                            var manufacturer = that.manufacturer[i] ;
+                            elem.find('#dict-manufacturer-description-'+manufacturer.id).val(manufacturer.description) ;
+                        }
+                        elem.find('.dict-manufacturer-description-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_manufacturer_description(id, elem.find('#dict-manufacturer-description-'+id).val());
+                            }
+                        );
+                    }
+                }
+            } ,
             {   name: 'in use', hideable: true, sorted: false ,
                 type: {
                     after_sort: function () {
@@ -123,7 +140,8 @@ function p_appl_dictionary () {
                             click(function () {
                                 var id = this.name ;
                                 global_search_equipment_by_manufacturer(id) ;
-                            }) ;
+                            }
+                        ) ;
                     }
                 }
             }
@@ -133,7 +151,7 @@ function p_appl_dictionary () {
             var m = this.manufacturer[i] ;
             var row = [] ;
             if (this.can_manage()) row.push (
-                Button_HTML('X', {
+                Button_HTML ('X', {
                     name:    m.id,
                     classes: 'dict-manufacturer-delete',
                     title:   'delete this manufacturer from the list' })) ;
@@ -141,8 +159,23 @@ function p_appl_dictionary () {
                 m.name ,
                 m.created_time ,
                 m.created_uid ,
-                m.url ,
-                Button_HTML('search', {
+                this.can_manage() ?
+                    '<div style="float:left;">' +
+                        TextArea_HTML ({
+                            id:      'dict-manufacturer-description-'+m.id ,
+                            classes: 'description' } ,
+                            4 ,
+                            36) +
+                    '</div>' +
+                    '<div style="float:left; margin-left:5px;">' +
+                        Button_HTML ('save', {
+                            name:    m.id ,
+                            classes: 'dict-manufacturer-description-save' ,
+                            title:   'edit description for the manufacturer' }) +
+                    '</div>' +
+                    '<div style="clear:both;">' :
+                    '<div style="width:256px; overflow:auto;"><pre>'+m.description+'</pre></div>' ,
+                Button_HTML ('search', {
                     name:    m.id,
                     classes: 'dict-manufacturer-search',
                     title:   'search for all equipment of this manufacturer' })
@@ -170,6 +203,7 @@ function p_appl_dictionary () {
     this.table_model = null ;
 
     this.model_display = function () {
+        var manufacturer_name = this.table_manufacturer.selected_object() ;
         var elem = $('#dictionary-manufacturers-models') ;
         var hdr = [] ;
         if (this.can_manage()) hdr.push (
@@ -180,18 +214,46 @@ function p_appl_dictionary () {
                             button().
                             click(function () {
                                 var id = this.name ;
-                                that.model_delete(id) ; }) ;
+                                that.model_delete(id) ;
+                            }
+                        ) ;
                         elem.find('.dict-model-search').
                             button().
                             click(function () {
                                 var id = this.name ;
-                                global_search_equipment_by_model(id) ; }) ;
-                      }}}) ;
+                                global_search_equipment_by_model(id) ;
+                            }
+                        ) ;
+                    }
+                }
+            }
+        ) ;
         hdr.push (
             {   name: 'model' } ,
             {   name: 'created', hideable: true } ,
             {   name: 'by user', hideable: true } ,
-            {   name: 'documentation url', hideable: true, sorted: false } ,
+            {   name: 'description', hideable: true, sorted: false ,
+                type: {
+                    after_sort: function() {
+                        for (var i in that.manufacturer) {
+                            var manufacturer = that.manufacturer[i] ;
+                            if (manufacturer.name == manufacturer_name) {
+                                for (var j in manufacturer.model) {
+                                    var model = manufacturer.model[j] ;
+                                    elem.find('#dict-model-description-'+model.id).val(model.description) ;
+                                }
+                            }
+                        }
+                        elem.find('.dict-model-description-save').
+                            button().
+                            click(function() {
+                                var id = this.name;
+                                that.save_model_description(id, elem.find('#dict-model-description-'+id).val());
+                            }
+                        );
+                    }
+                }
+            } ,
             {   name: 'image', hideable: true, sorted: false ,
                 type: {
                     after_sort: function () {
@@ -199,18 +261,23 @@ function p_appl_dictionary () {
                             button().
                             click(function () {
                                 var attachment_id = this.name ;
-                                that.model_image_delete(attachment_id) ; }) ;
+                                that.model_image_delete(attachment_id) ;
+                            }
+                        ) ;
                         elem.find('.dict-model-image-upload').
                             button().
                             click(function () {
                                 var model_id = this.name ;
-                                that.model_image_upload(model_id) ; }) ;
-                    }}} ,
+                                that.model_image_upload(model_id) ;
+                            }
+                        ) ;
+                    }
+                }
+            } ,
             {   name: 'in use', hideable: true, sorted: false }
         ) ;
         var rows = [] ;
         
-        var manufacturer_name = this.table_manufacturer.selected_object() ;
         if (manufacturer_name != null) {
             for (var i in this.manufacturer) {
                 var manufacturer = this.manufacturer[i] ;
@@ -259,16 +326,36 @@ function p_appl_dictionary () {
                                     ''
                             ;
 
-                        row.push(
+                        row.push (
+
                             model.name ,
                             model.created_time ,
                             model.created_uid ,
-                            model.url ,
+
+                            this.can_manage() ?
+                                '<div style="float:left;">' +
+                                    TextArea_HTML ({
+                                        id:      'dict-model-description-'+model.id ,
+                                        classes: 'description' } ,
+                                        4 ,
+                                        36) +
+                                '</div>' +
+                                '<div style="float:left; margin-left:5px;">' +
+                                    Button_HTML ('save', {
+                                        name:    model.id ,
+                                        classes: 'dict-model-description-save' ,
+                                        title:   'edit description for the model' }) +
+                                '</div>' +
+                                '<div style="clear:both;">' :
+                                '<div style="width:256px; overflow:auto;"><pre>'+model.description+'</pre></div>' ,
+
                             images_html ,
+
                             Button_HTML('search', {
                                 name:    model.id,
                                 classes: 'dict-model-search',
                                 title:   'search for all equipment of this model' })
+
                         ) ;
                         rows.push(row) ;
                     }
@@ -308,6 +395,12 @@ function p_appl_dictionary () {
             }
         ) ;
     } ;
+    this.save_manufacturer_description = function (id,description) {
+        this.manufacturer_action_POST (
+            '../irep/ws/manufacturer_update.php' ,
+            {id: id, description: description}
+        ) ;
+     } ;
     this.model_create = function (name) {
         this.model_action (
             '../irep/ws/model_new.php' ,
@@ -326,6 +419,12 @@ function p_appl_dictionary () {
             }
         ) ;
     } ;
+    this.save_model_description = function (id,description) {
+        this.model_action_POST (
+            '../irep/ws/model_update.php' ,
+            {id: id, description: description}
+        ) ;
+     } ;
     this.model_image_upload = function (model_id) {
         var elem = $('#dict-model-image-upload-'+model_id) ;
         var button = $('button.dict-model-image-upload[name="'+model_id+'"]') ;
@@ -361,13 +460,24 @@ function p_appl_dictionary () {
             that.manufacturer_display() ;
         }) ;
     } ;
+    this.manufacturer_action_POST = function (url, params) {
+        web_service_POST(url, params, function (data) {
+            that.manufacturer = data.manufacturer ;
+            that.manufacturer_display() ;
+        }) ;
+    } ;
     this.model_action = function (url, params) {
         web_service_GET(url, params, function (data) {
             that.manufacturer = data.manufacturer ;
             that.model_display() ;
         }) ;
     } ;
-
+    this.model_action_POST = function (url, params) {
+        web_service_POST(url, params, function (data) {
+            that.manufacturer = data.manufacturer ;
+            that.model_display() ;
+        }) ;
+    } ;
     /* ---------
      * Locations
      * ---------

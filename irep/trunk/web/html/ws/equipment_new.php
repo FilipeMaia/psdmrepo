@@ -6,7 +6,7 @@
  * 
  * Parameters:
  * 
- *   <model_id> <serial> <pc> <slacid> [<location_id>] <custodian> <description>
+ *   <model_id> <serial> <pc> <slacid> <location_id> <room_id> <rack> <elevation> <custodian> <description>
  */
 
 require_once 'dataportal/dataportal.inc.php' ;
@@ -21,7 +21,10 @@ require_once 'irep/irep.inc.php' ;
     $serial      = $SVC->required_str('serial') ;
     $pc          = $SVC->required_str('pc') ;
     $slacid      = $SVC->required_str('slacid') ;
-    $location_id = $SVC->optional_int('location_id', 0) ;
+    $location_id = $SVC->required_int('location_id') ;
+    $room_id     = $SVC->required_int('room_id') ;
+    $rack        = $SVC->required_str('rack') ;
+    $elevation   = $SVC->required_str('elevation') ;
     $custodian   = $SVC->required_str('custodian') ;
     $description = $SVC->required_str('description') ;
 
@@ -34,6 +37,12 @@ require_once 'irep/irep.inc.php' ;
         if (is_null($location)) $SVC->abort("no location found for id: {$location_id}") ;
         $location_name = $location->name() ;
     }
+    $room_name = '' ;
+    if ($room_id) {
+        $room = $SVC->irep()->find_room_by_id($room_id) ;
+        if (is_null($room)) $SVC->abort("no room found for id: {$room_id}") ;
+        $room_name = $room->name() ;
+    }
 
     $equipment = $SVC->irep()->add_equipment (
         $model->manufacturer()->name() ,
@@ -43,6 +52,9 @@ require_once 'irep/irep.inc.php' ;
         $pc ,
         $slacid ,
         $location_name ,
+        $room_name ,
+        $rack ,
+        $elevation ,
         $custodian
     ) ;
 

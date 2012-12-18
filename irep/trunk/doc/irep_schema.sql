@@ -224,6 +224,9 @@ CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT` (
   `slacid`        INT UNSIGNED NOT NULL ,
   `pc_num`        CHAR(7)      NOT NULL ,
   `location`      VARCHAR(255) NOT NULL ,
+  `room`          VARCHAR(255) NOT NULL ,
+  `rack`          VARCHAR(255) NOT NULL ,
+  `elevation`     VARCHAR(255) NOT NULL ,
   `custodian_uid` VARCHAR(32)  NOT NULL ,
 
   PRIMARY KEY (`id`) ,
@@ -257,6 +260,32 @@ CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT_ATTACHMENT` (
   PRIMARY KEY (`id`) ,
 
   CONSTRAINT `EQUIPMENT_ATTACHMENT_FK_1`
+    FOREIGN KEY (`equipment_id` )
+    REFERENCES `IREP`.`EQUIPMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `IREP`.`EQUIPMENT_TAG`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `IREP`.`EQUIPMENT_TAG` ;
+
+CREATE  TABLE IF NOT EXISTS `IREP`.`EQUIPMENT_TAG` (
+
+  `id`           INT             NOT NULL AUTO_INCREMENT ,
+  `equipment_id` INT             NOT NULL ,
+
+  `name`         TEXT            NOT NULL ,
+
+  `create_time`  BIGINT UNSIGNED NOT NULL ,
+  `create_uid`   VARCHAR(32)     NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  CONSTRAINT `EQUIPMENT_TAG_FK_1`
     FOREIGN KEY (`equipment_id` )
     REFERENCES `IREP`.`EQUIPMENT` (`id` )
     ON DELETE CASCADE

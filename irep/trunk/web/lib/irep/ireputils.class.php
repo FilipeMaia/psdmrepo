@@ -43,7 +43,7 @@ class IrepUtils {
                     array (
                         'id'                 => $model->id() ,
                         'name'               => $model->name() ,
-                        'url'                => $model->url() ,
+                        'description'        => $model->description() ,
                         'created_time'       => $model->created_time()->toStringShort() ,
                         'created_time_sec'   => $model->created_time()->sec ,
                         'created_uid'        => $model->created_uid() ,
@@ -67,7 +67,7 @@ class IrepUtils {
                 array (
                     'id'               => $manufacturer->id() ,
                     'name'             => $manufacturer->name() ,
-                    'url'              => $manufacturer->url() ,
+                    'description'      => $manufacturer->description() ,
                     'created_time'     => $manufacturer->created_time()->toStringShort() ,
                     'created_time_sec' => $manufacturer->created_time()->sec ,
                     'created_uid'      => $manufacturer->created_uid() ,
@@ -164,8 +164,10 @@ class IrepUtils {
      */
     public static function equipment2array ($equipment_list) {
         $equipment = array() ;
+
         foreach ($equipment_list as $e) {
             $last_history_event = $e->last_history_event() ;
+
             $attachments = array () ;
             foreach ($e->attachments() as $a)
                 array_push (
@@ -177,6 +179,17 @@ class IrepUtils {
                             'document_size_bytes' => $a->document_size() ,
                             'create_time'         => $a->create_time()->toStringShort() ,
                             'create_uid'          => $a->create_uid())) ;
+
+            $tags = array () ;
+            foreach ($e->tags() as $t)
+                array_push (
+                    $tags ,
+                        array (
+                            'id'          => $t->id() ,
+                            'name'        => $t->name() ,
+                            'create_time' => $t->create_time()->toStringShort() ,
+                            'create_uid'  => $t->create_uid())) ;
+
             array_push (
                 $equipment ,
                 array (
@@ -187,14 +200,18 @@ class IrepUtils {
                     'model'             => $e->model() ,
                     'serial'            => $e->serial() ,
                     'description'       => $e->description() ,
-                    'attachment'        => $attachments ,
                     'slacid'            => $e->slacid() ,
                     'pc'                => $e->pc() ,
                     'location'          => $e->location() ,
+                    'room'              => $e->room() ,
+                    'rack'              => $e->rack() ,
+                    'elevation'         => $e->elevation() ,
                     'custodian'         => $e->custodian() ,
                     'modified_time'     => $last_history_event->event_time()->toStringShort() ,
                     'modified_time_sec' => $last_history_event->event_time()->sec ,
-                    'modified_uid'      => $last_history_event->event_uid()
+                    'modified_uid'      => $last_history_event->event_uid() ,
+                    'attachment'        => $attachments ,
+                    'tag'               => $tags
                 )
             ) ;
         }

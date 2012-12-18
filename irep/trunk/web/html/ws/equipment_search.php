@@ -23,6 +23,7 @@
  *      [<location> || <location_id>]
  *      [<room>     || <room_id>]
  *      [<custodian>]
+ *      [<tag>]
  */
 
 require_once 'dataportal/dataportal.inc.php' ;
@@ -122,6 +123,7 @@ require_once 'irep/irep.inc.php' ;
         }
     }
     $custodian = $SVC->optional_str('custodian', '') ;
+    $tag       = $SVC->optional_str('tag', '') ;
 
     $SVC->finish(\Irep\IrepUtils::equipment2array (
         $SVC->irep()->search_equipment (
@@ -131,7 +133,8 @@ require_once 'irep/irep.inc.php' ;
             $model_name ,
             $serial ,
             $location_name ,
-            $custodian
+            $custodian ,
+            $tag
         )
     )) ;
 }) ;

@@ -317,31 +317,58 @@ div.v-item:hover {
   width:100%;
 }
 
-.equipment-grid-cell {
+div.equipment-grid-cell {
   margin-right: 20px;
   margin-bottom: 20px;
+
+  background-color: #f4f4f4;
   /*
-  padding: 5px;
+  background-color: #f0f0d0;
   */
-  padding-top: 5px;
-  background-color: #f2f2f2;
   border: 1px solid #c8c8c8;
+
   border-radius: 6px;
   -moz-border-radius: 6px;
+  /*
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   -moz-border-radius-bottomleft: 0;
   -moz-border-radius-bottomright: 0;
-  /*
-  border: 1px solid #b0b0b0;
-  border-top:1px solid #b0b0b0;
-  border-right:1px solid #b0b0b0;
   */
 }
-.equipment-grid-cell pre {
-  margin: 0px;
+div.equipment-grid-cell div.header {
+  padding: 2px;
+  background-color: #c0c0c0;
 }
 
+div.equipment-grid-cell div.body {
+}
+div.equipment-grid-cell div.footer {
+  background-color: #c0c0c0;
+}
+
+div.equipment-grid-cell pre {
+  margin: 0px;
+}
+td.equipment-edit-cell {
+  border: 0;
+  padding-right: 20px;
+}
+div.equipment-attachment-edit-entry {
+  padding: 10px;
+}
+div.equipment-attachment-new-edit-entry {
+  padding: 10px;
+}
+div.equipment-tag-edit-entry {
+  padding: 10px;
+}
+div.equipment-tag-new-edit-entry {
+  padding: 10px;
+}
+div.equipment-edit-entry-modified {
+  background-color: #ffdcdc;
+}
 span.toggler {
   background-color: #ffffff;
   border: 1px solid #c0c0c0;
@@ -693,7 +720,21 @@ function web_service_GET (url, params, on_success, on_failure) {
         else            report_error(message, null) ;
     }) ;
 } ;
-
+function web_service_POST (url, params, on_success, on_failure) {
+    var jqXHR = $.post(url, params, function (data) {
+        if (data.status != 'success') {
+            if (on_failure) on_failure(data.message) ;
+            else            report_error(data.message, null) ;
+            return ;
+        }
+        if (on_success) on_success(data) ;
+    },
+    'JSON').error(function () {
+        var message = 'Web service request to '+url+' failed because of: '+jqXHR.statusText ;
+        if (on_failure) on_failure(message) ;
+        else            report_error(message, null) ;
+    }) ;
+} ;
 /* ------------------------------------------------------
  *             APPLICATION INITIALIZATION
  * ------------------------------------------------------
@@ -1092,6 +1133,9 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
                   <td><b>SLAC ID:</b></td>
                   <td><input type="text" name="slacid"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
               </tr>
+              <tr><td><b>Tag:</b></td>
+                  <td><select name="tag" class="inventory-form-elem" ></select></td>
+              </tr>
             </tbody></table>
           </form>
         </div>
@@ -1147,25 +1191,42 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           <form id="equipment-add-form">
             <table><tbody>
               <tr><td><b>Manufacturer:<?php echo $required_field_html; ?></b></td>
-                  <td><select name="manufacturer" class="equipment-add-form-element" ></select>
-                      <span class="form_element_info"></span></td></tr>
+                  <td colspan="3"><select name="manufacturer" class="equipment-add-form-element" ></select>
+                      <span class="form_element_info"></span></td>
+              </tr>
               <tr><td><b>Model:<?php echo $required_field_html; ?></b></td>
-                  <td><select name="model" class="equipment-add-form-element" ></select>
-                      <span class="form_element_info"></span></td></tr>
+                  <td colspan="3"><select name="model" class="equipment-add-form-element" ></select>
+                      <span class="form_element_info"></span></td>
+              </tr>
               <tr><td><b>Serial number:</b></td>
-                  <td><input type="text" name="serial" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" /></td></tr>
+                  <td><input type="text" name="serial" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" /></td>
+              </tr>
               <tr><td><b>Property Control #:</b></td>
                   <td><input type="text" name="pc"  size="20" style="padding:2px ;" value="" /></td></tr>
               <tr><td><b>SLAC ID:<?php echo $required_field_html; ?></b></td>
-                  <td><input type="text" name="slacid" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" />
-                      <span class="form_element_info"></span></td></tr>
+                  <td colspan="3"><input type="text" name="slacid" class="equipment-add-form-element" size="20" style="padding:2px ;" value="" />
+                      <span class="form_element_info"></span></td>
+              </tr>
               <tr><td><b>Location:</b></td>
-                  <td><select name="location"></select></td></tr>
+                  <td><select name="location" class="equipment-add-form-element" ></select></td>
+                  <td><b>Room:</b></td>
+                  <td><select name="room" class="equipment-add-form-element" ></select></td>
+              </tr>
+              <tr><td colspan="2">&nbsp;</td>
+                  <td><b>Rack:</b></td>
+                  <td><input type="text" name="rack" class="equipment-add-form-element" size="20" value="" /></td>
+              </tr>
+              <tr><td colspan="2">&nbsp;</td>
+                  <td><b>Elevation:</b></td>
+                  <td><input type="text" name="elevation" class="equipment-add-form-element" size="20" value="" /></td>
+              </tr>
               <tr><td><b>Custodian:</b></td>
-                  <td><input type="text" name="custodian" size="20" style="padding:2px ;" value='' />
-                  ( known custodians: <select name="custodian"></select> )</td></tr>
+                  <td colspan="3"><input type="text" name="custodian" size="20" style="padding:2px ;" value="" />
+                  ( known custodians: <select name="custodian"></select> )</td>
+              </tr>
               <tr><td><b>Description: </b></td>
-                  <td colspan="4"><textarea cols=54 rows=4 name="description" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td></tr>
+                  <td colspan="3"><textarea cols=54 rows=4 name="description" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td>
+              </tr>
             </tbody></table>
           </form>
         </div>

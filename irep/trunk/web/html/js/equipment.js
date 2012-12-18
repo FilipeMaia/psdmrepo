@@ -161,7 +161,7 @@ function p_appl_equipment () {
                 elements.each(function () {
                     if (!$(this).html()) {
                         var equipment_id = $(this).attr('name') ;
-                        $(this).html('<a class="link" href="../irep/equipment_model_attachments/'+equipment_id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment_id+'" width="76" /></a>') ;
+                        $(this).html('<a class="link" href="../irep/equipment_model_attachments/'+equipment_id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment_id+'" width="102" height="72" /></a>') ;
                     }
                 }) ;
             } else {
@@ -222,6 +222,9 @@ function p_appl_equipment () {
 
         var custodian_elem = form_elem.find('select[name="custodian"]') ;
         var selected_custodian = custodian_elem.val() ;
+
+        var tag_elem = form_elem.find('select[name="tag"]') ;
+        var selected_tag = tag_elem.val() ;
 
         web_service_GET ('../irep/ws/equipment_search_options.php', {}, function (data) {
 
@@ -289,6 +292,14 @@ function p_appl_equipment () {
             }
             custodian_elem.html(html) ;
             custodian_elem.val(selected_custodian) ;
+
+            html = '<option value=""></option>' ;
+            for (var i in data.option.tag) {
+                var tag = data.option.tag[i] ;
+                html += '<option value="'+tag+'">'+tag+'</option>' ;
+            }
+            tag_elem.html(html) ;
+            tag_elem.val(selected_tag) ;
         }) ;
         this.equipment_display() ;
     } ;
@@ -348,7 +359,7 @@ function p_appl_equipment () {
                             button().
                             click(function () {
                                 var id = this.name ;
-                                that.equipment_link(id) ;
+                                that.equipment_url(id) ;
                             }) ;
                     }
                 }
@@ -422,7 +433,7 @@ function p_appl_equipment () {
             var equipment = this.equipment[i] ;
             html +=
 '<div class="equipment-grid-cell" style="float:left;">' +
-'  <div style="padding-left:5px; padding-bottom:5px;">' +
+'  <div class="header">' +
                 (this.can_edit_inventory() ?
                     Button_HTML('D', {
                         name:    equipment.id,
@@ -438,69 +449,93 @@ function p_appl_equipment () {
                     name:    equipment.id,
                     classes: 'equipment-inventory-history',
                     title:   'show a history of this equipment' })+
+                Button_HTML('P', {
+                    name:    equipment.id,
+                    classes: 'equipment-inventory-print',
+                    title:   'print a summary page on this equipment' }) +
+                Button_HTML('url', {
+                    name:    equipment.id,
+                    classes: 'equipment-inventory-link',
+                    title:   'persistent URL for this equipment' }) +
 '  </div>'+
-'  <div style="border-top:solid 1px #c0c0c0;">' +
-'    <div style="float:left;">' +
-'      <table><tbody>'+
-'        <tr><td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Status</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Sub-status</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status2+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >SLAC ID</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.slacid+'</td></tr>' +
-'        <tr><td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Manuf</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.manufacturer+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Model</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.model+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Serial #</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.serial+'</td></tr>' +
-'        <tr><td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >PC #</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.pc+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Location</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.location+'</td>' +
-'            <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Custodian</td>' +
-'            <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.custodian+'</td></tr>' +
-'      </tbody></table>' +
-'    </div>' + (option_model_image ?
-'    <div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" height="70" /></a></div>' :
-'    <div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') +
-'    <div style="clear:both;"></div>' +
-'  </div>' ;
+'  <div class="body">' +
+'    <table><tbody>'+
+'      <tr>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >SLAC ID :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.slacid+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Status :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Sub-status :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status2+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" rowspan="4">' + (option_model_image ?
+'          <div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
+'          <div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') +
+'          </td>' +
+'      </tr>' +
+'      <tr>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Manuf :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.manufacturer+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Model : </td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.model+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Serial # :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.serial+'</td>' +
+'      </tr>' +
+'      <tr>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >PC :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.pc+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Custodian :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.custodian+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Location :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.location+'</td>' +
+'      </tr>' +
+'      <tr>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Room :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.room+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Rack :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.rack+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Elevation :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.elevation+'</td>' +
+'      </tr>' +
+'    </tbody></table>' ;
             if (equipment.description != '') html +=
-'  <div style="margin-top:5px; padding:10px; border-top:solid 1px #c0c0c0;">' +
-'    <pre>'+equipment.description+'</pre>' +
-'  </div>' ;
-            var attachment_html = '' ;
+'    <div style="margin-top:5px; padding:10px; border-top:solid 1px #c0c0c0;">' +
+'      <pre>'+equipment.description+'</pre>' +
+'    </div>' ;
+            var attachments_html = '' ;
 
+            var num_attachments = 0 ;
             for (var j in equipment.attachment) {
                 var a = equipment.attachment[j] ;
-                attachment_html +=
-(attachment_html == '' ?
-'  <div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;">' : '') + 
-'    <div>'+
-'      <div style="float:left;">' +
-'        <span class="toggler equipment-attachment-tgl ui-icon el-l-a-tgl ' + (option_attachment_preview ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e') + '" id="equipment-attachment-tgl-'+a.id+'" onclick="equipment.toggle_attachment('+a.id+')" ></span>' +
-'      </div>' +
-'      <div style="float:left; margin-left:5px;">' +
-'        <a class="link" href="javascript:alert('+a.id+')">'+a.name+'</a>' +
-'        ( type: <b>'+a.document_type+'</b> size: <b>'+a.document_size_bytes+'</b> )' +
-'      </div>' +
-'      <div style="clear:both;"></div>' + (option_attachment_preview ?
-'      <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
-'      <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
-'    </div>' ;
+                attachments_html +=
+'      <div>'+
+'        <div style="float:left;">' +
+'          <span class="toggler equipment-attachment-tgl ui-icon el-l-a-tgl ' + (option_attachment_preview ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e') + '" id="equipment-attachment-tgl-'+a.id+'" onclick="equipment.toggle_attachment('+a.id+')" ></span>' +
+'        </div>' +
+'        <div style="float:left; margin-left:5px;">' +
+'          <a class="link" href="javascript:alert('+a.id+')">'+a.name+'</a>' +
+'          ( <b>type :</b> '+a.document_type+'  <b>size :</b> '+a.document_size_bytes+' )' +
+'        </div>' +
+'        <div style="clear:both;"></div>' + (option_attachment_preview ?
+'        <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
+'        <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
+'      </div>' ;
+                num_attachments++ ;
             }
-            attachment_html +=
-(attachment_html != '' ?
-'  </div>' : '') ;
+            if (num_attachments)
+                html +=
+'    <div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;">' +
+       attachments_html +
+'    </div>' ;
             html +=
-attachment_html +
-'  <div style="margin-top:5px; border-top:solid 1px #c0c0c0;">' + 
+'  </div>' +
+'  <div class="footer">' + 
 '    <table><tbody>'+
-'      <tr><td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Last modified</td>' +
-'          <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_time+'</td>' +
-'          <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >By user</td>' +
-'          <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_uid+'</td></tr>' +
+'      <tr>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Last modified :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_time+'</td>' +
+'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >By :</td>' +
+'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_uid+'</td>' +
+'      </tr>' +
 '    </tbody></table>' +
 '  </div>' +
 '</div>' ;
@@ -527,6 +562,18 @@ attachment_html +
             click(function () {
                 var id = this.name ;
                 that.equipment_history(id) ;
+            }) ;
+        elem.find('.equipment-inventory-print').
+            button().
+            click(function () {
+                var id = this.name ;
+                that.equipment_print(id) ;
+            }) ;
+        elem.find('.equipment-inventory-link').
+            button().
+            click(function () {
+                var id = this.name ;
+                that.equipment_url(id) ;
             }) ;
         this.tabs.tabs('refresh') ;
     } ;
@@ -598,59 +645,140 @@ attachment_html +
         );
         var required_field_html = '<span style="color:red ; font-size:120% ; font-weight:bold ;"> * </span>' ;
         this.tabs.append (
-'<div id="'+panelId+'">'+
-'  <div style="border:solid 1px #b0b0b0; padding:20px;">'+
-'    <div style="float:left; margin-bottom:10px; width:720px;">'+
-'      <b>When editing equipment properties keep in mind the following:</b>'+
-'      <ul>'+
-'        <li>equipment searial number is unique for the given manufacturer and model</li>'+
-'        <li>SLAC Property Control Number (PC) is unique</li>'+
-'        <li>if the desired propertly location is not found in the dictionary and if you do not have'+
-'            the dictionary privilege then contact administrators of this software to register new location'+
-'            in the database</li>'+
-'        <li>when changing a status of the equipment you will always be asked to provide'+
-'            a comment on the operation when saving results of the editing session</li>'+
-'        <li>a custodian can be selected from a list of known one or just added to the database by entering'+
-'            a desired name into the corresponding input field. Note that the name put into the input field'+
-'            will be the final name saved in the end of the editing session.</li>'+
-'    </div>'+
-'    <div style="float:left; padding:5px;">'+
-'      <button name="save"          >Save</button>'+
-'      <button name="save-w-comment">Save w/ Comment</button>'+
-'      <button name="cancel"        >Cancel</button>'+
-'    </div>'+
-'    <div style="clear:both;"></div>'+
-'    <div style="margin-bottom:10px; padding-bottom:10px; border-bottom:dashed 1px #c0c0c0;">'+
-'      <table><tbody>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Status</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><select name="status" class="equipment-edit-element"></select></td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Sub-status</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><select name="status2" class="equipment-edit-element"></select></td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >SLACid</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              >'+equipment.slacid+'</td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Manufacturer</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              >'+equipment.manufacturer+'</td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Model</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              >'+equipment.model+'</td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Serial # '+required_field_html+'</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><input type="text" name="serial" class="equipment-edit-element" size="20" style="padding:2px ;" value="'+equipment.serial+'" /></td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >PC #</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><input type="text" name="pc" class="equipment-edit-element" size="20" style="padding:2px ;" value="'+equipment.pc+'" /></td></tr>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Location</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><select name="location" class="equipment-edit-element"></select></td>'+
-'        <tr><td class="table_cell table_cell_left                   " style="border:0; padding-right:20px;"              >Custodian</td>'+
-'            <td class="table_cell table_cell_right                  " style="border:0; padding-right:20px;"              ><input type="text" name="custodian" class="equipment-edit-element" size="20" style="padding:2px ;" value="" />'+
-'                                                                       ( other known custodians: <select name="known_custodians" class="equipment-edit-element"></select> )</td></tr>'+
-'        <tr><td class="table_cell table_cell_left  table_cell_bottom" style="border:0; padding-right:20px;" valign="top" >Description</td>'+
-'            <td class="table_cell table_cell_right table_cell_bottom" style="border:0; padding-right:20px;" valign="top" colspan="4"><textarea cols=54 rows=4 name="description" class="equipment-edit-element" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td></tr>'+
-'      </tbody></table>'+
-'    </div>'+
-'    '+required_field_html+' required field'+
-'  </div>'+
+'<div id="'+panelId+'">' +
+'  <div style="border:solid 1px #b0b0b0; padding:20px;">' +
+'    <div style="float:left; margin-bottom:10px; width:720px;">' +
+'      <b>When editing equipment properties keep in mind the following:</b>' +
+'      <ul>' +
+'        <li>equipment searial number is unique for the given manufacturer and model</li>' +
+'        <li>SLAC Property Control Number (PC) is unique</li>' +
+'        <li>if the desired propertly location is not found in the dictionary and if you do not have' +
+'            the dictionary privilege then contact administrators of this software to register new location' +
+'            in the database</li>' +
+'        <li>when changing a status of the equipment you will always be asked to provide' +
+'            a comment on the operation when saving results of the editing session</li>' +
+'        <li>a custodian can be selected from a list of known one or just added to the database by entering' +
+'            a desired name into the corresponding input field. Note that the name put into the input field' +
+'            will be the final name saved in the end of the editing session.</li>' +
+'    </div>' +
+'    <div style="float:left; padding:5px; margin-bottom:20px;">' +
+'      <button name="save"          >Save</button>' +
+'      <button name="save-w-comment">Save w/ Comment</button>' +
+'      <button name="cancel"        >Cancel</button>' +
+'    </div>' +
+'    <div style="clear:both;"></div>' +
+
+'    <div id="editor_tabs" style="font-size:12px;">' +
+
+'      <ul>' +
+'        <li><a href="#general_tab">General</a></li>' +
+'        <li><a href="#attachments_tab">Attachments</a></li>' +
+'        <li><a href="#tags_tab">Tags</a></li>' +
+'      </ul>' +
+
+'      <div id="general_tab" >' +
+'        <div style=" border:solid 1px #b0b0b0; padding:20px;" >' +
+
+'          <div style="margin-bottom:10px; padding-bottom:10px; border-bottom:dashed 1px #c0c0c0;">' +
+'            <table><tbody>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Status</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><select name="status" class="equipment-edit-element"></select></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Sub-status</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><select name="status2" class="equipment-edit-element"></select></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >SLACid</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " >'+equipment.slacid+'</td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Manufacturer</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " >'+equipment.manufacturer+'</td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Model</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " >'+equipment.model+'</td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Serial # '+required_field_html+'</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><input type="text" name="serial" class="equipment-edit-element" size="20" style="padding:2px ;" value="'+equipment.serial+'" /></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >PC #</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><input type="text" name="pc" class="equipment-edit-element" size="20" style="padding:2px ;" value="'+equipment.pc+'" /></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Custodian</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " colspan="3">' +
+'                  <input type="text" name="custodian" class="equipment-edit-element" size="20" style="padding:2px ;" value="" />' +
+'                  ( other known custodians: <select name="known_custodians" class="equipment-edit-element"></select> )</td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Location</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><select name="location" class="equipment-edit-element"></select></td>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Room</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><select name="room" class="equipment-edit-element"></select></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " colspan="2" >&nbsp;</td>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Rack (Cabinet)</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><input type="text" name="rack" class="equipment-edit-element" value="" /></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " colspan="2" >&nbsp;</td>' +
+'                <td class="table_cell table_cell_left  equipment-edit-cell " >Elevation (Shelf)</td>' +
+'                <td class="table_cell table_cell_right equipment-edit-cell " ><input type="text" name="elevation" class="equipment-edit-element" value="" /></td>' +
+'              </tr>' +
+'              <tr>' +
+'                <td class="table_cell table_cell_left  table_cell_bottom equipment-edit-cell" valign="top" >Description</td>' +
+'                <td class="table_cell table_cell_right table_cell_bottom equipment-edit-cell" valign="top" colspan="3"><textarea cols=56 rows=4 name="description" class="equipment-edit-element" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td>' +
+'              </tr>' +
+'            </tbody></table>' +
+'          </div>' +
+'          '+required_field_html+' required field' +
+'        </div>' +
+'      </div>' +
+
+'      <div id="attachments_tab" >' +
+'        <div style=" border:solid 1px #b0b0b0; padding:20px; padding-top:30px;" >' +
+'          <div style="margin-bottom:20px; padding-left:10px;">' +
+             Button_HTML('add more attachments', {
+                 name:    equipment.id ,
+                 classes: 'equipment-attachment-add' ,
+                 title:   'click to add an attachment placeholder' }) +
+'          </div>' +
+'          <form enctype="multipart/form-data" action="../irep/ws/equipment_attachment_upload.php" method="post">' +
+'            <input type="hidden" name="equipment_id" value="'+equipment.id+'" />' +
+'            <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />' +
+'            <div class="attachments-new"></div>' +
+'          </form>' +
+'          <div class="attachments"></div>' +
+'        </div>' +
+'      </div>' +
+
+'      <div id="tags_tab" >' +
+'        <div style=" border:solid 1px #b0b0b0; padding:20px; padding-top:30px;" >' +
+'          <div style="margin-bottom:20px; padding-left:10px;">' +
+             Button_HTML('add more tags', {
+                 name:    equipment.id ,
+                 classes: 'equipment-tag-add' ,
+                 title:   'click to add an placeholder for one more tag' }) +
+'          </div>' +
+'          <div class="tags-new"></div>' +
+'          <div class="tags-old"></div>' +
+'        </div>' +
+'      </div>' +
+
+'  </div>' +
 '</div>'
         ) ;
         this.tabs.tabs('refresh') ;
         this.equipment_select_tab(-1) ;
+
+        var panel_elem = $('#'+panelId) ;
+        panel_elem.find('#editor_tabs').tabs() ;
 
         // Make a deep copy of the equipment object to decouple the editing session
         // from the search operations.
@@ -663,7 +791,6 @@ attachment_html +
 
         // Buttons
         //
-        var panel_elem = $('#'+panelId) ;
         panel_elem.find('button[name="save"]').button().click(function () {
             that.equipment_edit_save(panelId, equipment_id, false) ;
         }) ;
@@ -712,15 +839,49 @@ attachment_html +
         }) ;
 
         html = '' ;
+        html2 = '' ;
         var selected_location_id = 0 ;
+        var selected_room_id = 0 ;
         for (var i in option.location) {
             var location = option.location[i] ;
             html += '<option value="'+location.id+'">'+location.name+'</option>' ;
-            if (equipment.location == location.name) selected_location_id = location.id ;
+            if (equipment.location == location.name) {
+                selected_location_id = location.id ;
+                for (var j in location.room) {
+                    var room = location.room[j] ;
+                    html2 += '<option value="'+room.id+'">'+room.name+'</option>' ;
+                    if (equipment.room == room.name) selected_room_id = room.id ;
+                }
+            }
         }
         var location_elem = panel_elem.find('select[name="location"]') ;
         location_elem.html(html) ;
         location_elem.val(selected_location_id) ;
+
+        var room_elem = panel_elem.find('select[name="room"]') ;
+        room_elem.html(html2) ;
+        room_elem.val(selected_room_id) ;
+
+        location_elem.change (function () {
+            var selected_location_id = $(this).val() ;
+            var html2 = '' ;
+            for (var i in option.location) {
+                var location = option.location[i] ;
+                if (selected_location_id == location.id) {
+                    for (var j in location.room) {
+                        var room = location.room[j] ;
+                        html2 += '<option value="'+room.id+'">'+room.name+'</option>' ;
+                    }
+                }
+            }
+            room_elem.html(html2) ;
+        }) ;
+
+        var rack_elem = panel_elem.find('input[name="rack"]') ;
+        rack_elem.val(equipment.rack) ;
+
+        var elevation_elem = panel_elem.find('input[name="elevation"]') ;
+        elevation_elem.val(equipment.elevation) ;
 
         var custodian_input_elem = panel_elem.find('input[name="custodian"]') ;
         custodian_input_elem.val(equipment.custodian) ;
@@ -740,6 +901,153 @@ attachment_html +
         var description_elem = panel_elem.find('textarea[name="description"]') ;
         description_elem.val(equipment.description) ;
 
+        // Attachment management
+
+        html = '' ;
+        for (var i in equipment.attachment) {
+            var a = equipment.attachment[i] ;
+            html +=
+'<div id="'+a.id+'"  class="equipment-attachment-edit-entry" >' +
+'  <div style="float:left; width:72px;">' +
+            Button_HTML('delete', {
+                name:    a.id,
+                classes: 'equipment-attachment-delete visible',
+                title:   'delete this attachment' }) +
+            Button_HTML('un-delete', {
+                name:    a.id,
+                classes: 'equipment-attachment-cancel hidden',
+                title:   'cancel previously made intent to delete this attachment' }) +
+'  </div>' +
+'  <div style="float:left;">' +
+'    <a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a>' +
+'  </div>' +
+'  <div style="float:left; margin-left:10px;">' +
+'    <table><tbody>' +
+'      <tr><td align="right"><b>name :</b></td><td> '+a.name+'</td></tr>' +
+'      <tr><td align="right"><b>type :</b></td><td> '+a.document_type+'</td></tr>' +
+'      <tr><td align="right"><b>size :</b></td><td> '+a.document_size_bytes+'</td></tr>' +
+'      <tr><td align="right"><b>added :</b></td><td> '+a.create_time+'</td></tr>' +
+'      <tr><td align="right"><b>by :</b></td><td> '+a.create_uid+'</td></tr>' +
+'    </tbody></table>' +
+'  </div>' +
+'  <div style="clear:both;"></div>' +
+'</div>' ;
+        }
+
+        var attachments_elem = panel_elem.find('div.attachments') ;
+        attachments_elem.html(html) ;
+
+        this.equipment_new_attachment_counter = 1 ;
+
+        var form_attachments_elem = panel_elem.find('form div.attachments-new') ;
+
+        panel_elem.find('button.equipment-attachment-add').button().click(function () {
+            var html =
+'<div id="'+that.equipment_new_attachment_counter+'" class="equipment-attachment-new-edit-entry" >' +
+'  <div style="float:left; width:72px;">' +
+            Button_HTML('delete', {
+                name:    that.equipment_new_attachment_counter ,
+                classes: 'equipment-attachment-new-cancel',
+                title:   'cancel previously made intent to add this attachment' }) +
+'  </div>' +
+'  <div style="float:left;">' +
+'    <input type="file" name="file2attach_'+that.equipment_new_attachment_counter+'" onchange="equipment.equipment_attachment_added('+panelId+','+that.equipment_new_attachment_counter+')" />' +
+'    <input type="hidden" name="file2attach_'+that.equipment_new_attachment_counter+'" value="" />' +
+'  </div>' +
+'  <div style="clear:both;"></div>' +
+'</div>' ;
+            form_attachments_elem.prepend(html) ;
+            form_attachments_elem.find('button.equipment-attachment-new-cancel[name="'+that.equipment_new_attachment_counter+'"]').button().click(function () {
+                var counter = this.name ;
+                form_attachments_elem.find('div.equipment-attachment-new-edit-entry#'+counter).remove() ;
+            }) ;
+            that.equipment_new_attachment_counter++ ;
+        }) ;
+        attachments_elem.find('button.equipment-attachment-delete').button().click(function () {
+            var attachment_id = this.name ;
+            $(this).removeClass('visible').addClass('hidden') ;
+            attachments_elem.find('button.equipment-attachment-cancel[name="'+attachment_id+'"]').removeClass('hidden').addClass('visible') ;
+            $('div.equipment-attachment-edit-entry#'+attachment_id).addClass('equipment-edit-entry-modified') ;
+//            $('div.equipment-attachment-edit-entry#'+attachment_id).css('background-color','#ffdcdc') ;
+        }) ;
+        attachments_elem.find('button.equipment-attachment-cancel').button().click(function () {
+            var attachment_id = this.name ;
+            $(this).removeClass('visible').addClass('hidden') ;
+            attachments_elem.find('button.equipment-attachment-delete[name="'+attachment_id+'"]').removeClass('hidden').addClass('visible') ;
+            $('div.equipment-attachment-edit-entry#'+attachment_id).removeClass('equipment-edit-entry-modified') ;
+//            $('div.equipment-attachment-edit-entry#'+attachment_id).css('background-color','') ;
+        }) ;
+
+
+        // -----------------
+        //   New tags
+        // -----------------
+
+        var tags_new_elem = panel_elem.find('div.tags-new') ;
+
+        panel_elem.find('button.equipment-tag-add').button().click(function () {
+            tags_new_elem.prepend (
+'<div class="equipment-tag-new-edit-entry" >' +
+'  <div style="float:left; width:72px;">' +
+     Button_HTML('delete', {
+        title:   'cancel previously made intent to add this tag' }) +
+'  </div>' +
+'  <div style="float:left;">' +
+'    <input type="text" value="" />' +
+'  </div>' +
+'  <div style="clear:both;"></div>' +
+'</div>'
+            ) ;
+            var elem = tags_new_elem.find('div.equipment-tag-new-edit-entry').first() ;
+            elem.find('input').change(function () {
+                if ($(this).val() == '') elem.removeClass('equipment-edit-entry-modified') ;
+                else                     elem.addClass   ('equipment-edit-entry-modified') ;
+            }) ;
+            elem.find('button').button().click (function () {
+                elem.remove() ;
+            }) ;
+        }) ;
+
+
+        // -----------------
+        //   Existing tags
+        // -----------------
+
+        var tags_old_elem = panel_elem.find('div.tags-old') ;
+
+        html = '' ;
+        for (var i in equipment.tag) {
+            var t = equipment.tag[i] ;
+            html +=
+'<div id="'+t.id+'" class="equipment-tag-edit-entry" >' +
+'  <div style="float:left; width:72px;">' +
+            Button_HTML('delete', {
+                name:    t.id,
+                classes: 'equipment-tag-delete visible',
+                title:   'delete this tag' }) +
+            Button_HTML('un-delete', {
+                name:    t.id,
+                classes: 'equipment-tag-cancel hidden',
+                title:   'cancel previously made intent to delete this tag' }) +
+'  </div>' +
+'  <div style="margin-left:10px; padding-left:20px; font-weight:bold;">'+t.name+'</div>' +
+'</div>' ;
+        }
+        tags_old_elem.html(html) ;
+        tags_old_elem.find('button.equipment-tag-delete').button().click(function () {
+            var tag_id = this.name ;
+            $(this).removeClass('visible').addClass('hidden') ;
+            tags_old_elem.find('button.equipment-tag-cancel[name="'+tag_id+'"]').removeClass('hidden').addClass('visible') ;
+            $(this).parentsUntil('div.equipment-tag-edit-entry').parent().addClass('equipment-edit-entry-modified') ;
+        }) ;
+        tags_old_elem.find('button.equipment-tag-cancel').button().click(function () {
+            var tag_id = this.name ;
+            $(this).removeClass('visible').addClass('hidden') ;
+            tags_old_elem.find('button.equipment-tag-delete[name="'+tag_id+'"]').removeClass('hidden').addClass('visible') ;
+            $(this).parentsUntil('div.equipment-tag-edit-entry').parent().removeClass('equipment-edit-entry-modified') ;
+        }) ;
+
+
         // Track changes in the edited fields and highlight rows where changes
         // occur.
 
@@ -749,11 +1057,14 @@ attachment_html +
             'serial'           : equipment.serial ,
             'pc'               : equipment.pc ,
             'location'         : equipment.location ,
+            'room'             : equipment.room ,
+            'rack'             : equipment.rack ,
+            'elevation'        : equipment.elevation ,
             'custodian'        : equipment.custodian ,
             'known_custodians' : equipment.custodian ,
             'description'      : equipment.description
         } ;
-        $('div#'+panelId).find('.equipment-edit-element').change(function() {
+        panel_elem.find('.equipment-edit-element').change(function() {
             var name = $(this).attr('name') ;
             // Special processing for locations because they're indexed in <select> with
             // their numeric identifiers not names. Though, we still have names shown in
@@ -772,6 +1083,16 @@ attachment_html +
             $(this).closest('tr').css('background-color', that.equipment_properies_before_edit[name] == val ? '' : '#FFDCDC') ;
         }) ;
     } ;
+    this.equipment_attachment_added = function (panelId, counter) {
+        // 
+        // TODO: I still don't unmderstand why am I getting an HTML DOM element
+        // instead of a number here?
+        //
+        var panel_elem = $('div#'+panelId.id) ;
+        var form_attachments_elem = panel_elem.find('form div.attachments-new') ;
+        var filename = form_attachments_elem.find('input[name="file2attach_'+counter+'"]').val() ;
+        panel_elem.find('div.equipment-attachment-new-edit-entry#'+counter).css('background-color', (filename == '' ? '' : '#ffdcdc')) ;
+    } ;
     this.equipment_edit_save = function (panelId, equipment_id, with_comment) {
         var equipment = this.equipment_by_id[equipment_id] ;
         var panel_elem = $('#'+panelId) ;
@@ -786,7 +1107,7 @@ attachment_html +
     } ;
     this.equipment_edit_save_impl = function (panelId, equipment_id, comment) {
         var equipment                = this.equipment_by_id[equipment_id] ;
-        var panel_elem               = $('#'+panelId) ;
+        var panel_elem               = this.tabs.find('div#'+panelId) ;
         var save_button              = panel_elem.find('button[name="save"]').button() ;
         var save_with_comment_button = panel_elem.find('button[name="save-w-comment"]').button() ;
         var cancel_button            = panel_elem.find('button[name="cancel"]').button() ;
@@ -795,6 +1116,16 @@ attachment_html +
         save_with_comment_button.button('disable') ;
         cancel_button.button('disable') ;
 
+        var tags2add = [] ;
+        panel_elem.find('div.tags-new').children('div.equipment-tag-new-edit-entry').each(function () {
+            var name = $(this).find('input').val() ;
+            if (name != '') tags2add.push(name) ;
+        }) ;
+        var tags2remove = [] ;
+        panel_elem.find('div.tags-old').children('div.equipment-tag-edit-entry.equipment-edit-entry-modified').each(function () {
+            var tag_id = $(this).attr('id') ;
+            tags2remove.push(tag_id) ;
+        }) ;
         var params = {
             equipment_id: equipment_id ,
             status:       panel_elem.find('select[name="status"]').val() ,
@@ -802,9 +1133,14 @@ attachment_html +
             serial:       panel_elem.find('input[name="serial"]').val() ,
             pc:           panel_elem.find('input[name="pc"]').val() ,
             location_id:  panel_elem.find('select[name="location"]').val() ,
+            room_id:      panel_elem.find('select[name="room"]').val() ,
+            rack:         panel_elem.find('input[name="rack"]').val() ,
+            elevation:    panel_elem.find('input[name="elevation"]').val() ,
             custodian:    panel_elem.find('input[name="custodian"]').val() ,
             description:  panel_elem.find('textarea[name="description"]').val() ,
-            comment:      comment
+            comment:      comment ,
+            tags2add:     JSON.stringify(tags2add) ,
+            tags2remove:  JSON.stringify(tags2remove)
         } ;
         var jqXHR = $.post('../irep/ws/equipment_update.php', params, function (data) {
             if (data.status != 'success') {
@@ -950,6 +1286,12 @@ attachment_html +
     this.equipment_print = function (id) {
         alert('here be the print action') ;
     } ;
+    this.equipment_url = function (id) {
+        var url = window.location.href ;
+        var idx = url.indexOf('?') ;
+        url = (idx == -1 ? url  : url.substr(0, idx))+'?equipment_id='+id ;
+        window.open(url,'_blank') ;
+    } ;
     this.equipment_search = function () {
         var form_elem = $('#equipment-inventory-form') ;
         var params = {
@@ -958,9 +1300,10 @@ attachment_html +
             manufacturer_id: form_elem.find('select[name="manufacturer"]').val() ,
             model_id:        form_elem.find('select[name="model"]').val() ,
             serial:          form_elem.find('input[name="serial"]').val() ,
-            pc:          form_elem.find('input[name="pc"]').val() ,
+            pc:              form_elem.find('input[name="pc"]').val() ,
             location_id:     form_elem.find('select[name="location"]').val() ,
-            custodian:       form_elem.find('select[name="custodian"]').val()
+            custodian:       form_elem.find('select[name="custodian"]').val() ,
+            tag:             form_elem.find('select[name="tag"]').val()
         } ;
         this.equipment_search_impl(params) ;
     } ;
@@ -1002,7 +1345,8 @@ attachment_html +
         form_elem.find('input[name="pc"]'           ).val('') ;
         form_elem.find('input[name="slacid"]'       ).val('') ;
         form_elem.find('select[name="location"]'    ).val(0) ;
-        form_elem.find('input[name="custodian"]'    ).val('') ;
+        form_elem.find('select[name="custodian"]'   ).val('') ;
+        form_elem.find('select[name="tag"]'         ).val('') ;
         this.equipment = [] ;
         this.equipment_display() ;
     } ;
@@ -1022,6 +1366,9 @@ attachment_html +
         var pc_elem              = form_elem.find('input[name="pc"]') ;
         var slacid_elem          = form_elem.find('input[name="slacid"]') ;
         var location_elem        = form_elem.find('select[name="location"]') ;
+        var room_elem            = form_elem.find('select[name="room"]') ;
+        var rack_elem            = form_elem.find('input[name="rack"]') ;
+        var elevation_elem       = form_elem.find('input[name="elevation"]') ;
         var custodian_elem       = form_elem.find('input[name="custodian"]') ;
         var custodian_known_elem = form_elem.find('select[name="custodian"]') ;
         var description_elem     = form_elem.find('textarea[name="description"]') ;
@@ -1077,12 +1424,32 @@ attachment_html +
             pc_elem.val('') ;
             slacid_elem.val('') ;
 
-            var html = '<option value="0"></option>' ;
+            var html  = '<option value="0"></option>' ;
             for (var i in data.option.location) {
                 var location = data.option.location[i] ;
                 html += '<option value="'+location.id+'">'+location.name+'</option>' ;
             }
             location_elem.html(html) ;
+
+            var html2 = '<option value="0"></option>' ;
+            room_elem.html(html2) ;
+
+            location_elem.change (function () {
+                var selected_location_id = $(this).val() ;
+                var html2 = '<option value="0"></option>' ;
+                for (var i in data.option.location) {
+                    var location = data.option.location[i] ;
+                    if (selected_location_id == location.id) {
+                        for (var j in location.room) {
+                            var room = location.room[j] ;
+                            html2 += '<option value="'+room.id+'">'+room.name+'</option>' ;
+                        }
+                    }
+                }
+                room_elem.html(html2) ;
+            }) ;
+            rack_elem.val('') ;
+            elevation_elem.val('') ;
 
             custodian_elem.val(global_current_user.uid) ;
             var html = '<option value="'+global_current_user.uid+'"></option>' ;
@@ -1168,6 +1535,9 @@ attachment_html +
             pc:          form_elem.find('input[name="pc"]').val() ,
             slacid:      form_elem.find('input[name="slacid"]').val() ,
             location_id: form_elem.find('select[name="location"]').val() ,
+            room_id:     form_elem.find('select[name="room"]').val() ,
+            rack:        form_elem.find('input[name="rack"]').val() ,
+            elevation:   form_elem.find('input[name="elevation"]').val() ,
             custodian:   form_elem.find('input[name="custodian"]').val() ,
             description: form_elem.find('textarea[name="description"]').val()
         } ;

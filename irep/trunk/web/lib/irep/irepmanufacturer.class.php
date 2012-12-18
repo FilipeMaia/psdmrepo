@@ -35,7 +35,7 @@ class IrepManufacturer {
     public function irep         () { return $this->irep ; }
     public function id           () { return                intval($this->attr['id']) ; }
     public function name         () { return                  trim($this->attr['name']) ; }
-    public function url          () { return                  trim($this->attr['url']) ; }
+    public function description  () { return                  trim($this->attr['description']) ; }
     public function created_time () { return LusiTime::from64(trim($this->attr['created_time'])) ; }
     public function created_uid  () { return                  trim($this->attr['created_uid']) ; }
 
@@ -52,12 +52,12 @@ class IrepManufacturer {
                     mysql_fetch_array( $result, MYSQL_ASSOC))) ;
         return $list ;
     }
-    public function add_model ($name, $url='') {
+    public function add_model ($name, $description='') {
         $name_escaped = $this->irep()->escape_string(trim($name)) ;
-        $url_escaped = $this->irep()->escape_string(trim($url)) ;
+        $description_escaped = $this->irep()->escape_string(trim($description)) ;
         $created_time = LusiTime::now()->to64() ;
         $created_uid_escaped = $this->irep()->escape_string(trim(AuthDB::instance()->authName())) ;
-        $sql = "INSERT INTO {$this->irep()->database}.dict_model VALUES(NULL,{$this->id()},'{$name_escaped}','{$url_escaped}',{$created_time},'{$created_uid_escaped}')" ;
+        $sql = "INSERT INTO {$this->irep()->database}.dict_model VALUES(NULL,{$this->id()},'{$name_escaped}','{$description_escaped}',{$created_time},'{$created_uid_escaped}')" ;
         $this->irep()->query($sql) ;
         return $this->find_model_by_('id=(SELECT LAST_INSERT_ID())') ;
     }
@@ -77,6 +77,16 @@ class IrepManufacturer {
         return new IrepModel (
             $this ,
             mysql_fetch_array( $result, MYSQL_ASSOC)) ;
+    }
+    
+    /* Operations
+     */
+    public function update_description ($description) {
+        $description = trim($description) ;
+        $description_escaped = $this->irep()->escape_string($description) ;
+        $sql = "UPDATE {$this->irep()->database}.dict_manufacturer SET description='{$description_escaped}' WHERE id={$this->id()}" ;
+        $this->irep()->query($sql) ;
+        $this->attr['description'] = $description ;
     }
 }
 ?>
