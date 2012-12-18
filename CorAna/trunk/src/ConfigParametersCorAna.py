@@ -65,57 +65,81 @@ class ConfigParametersCorAna ( ConfigParameters ) :
     def initRunTimeParameters( self ) :
         self.char_expand = u' \u25BE' # down-head triangle
 
+        self.iconsAreLoaded  = False
         self.plotarray_is_on = False
 
 #-----------------------------
 
     def setIcons(self) :
+
+        if self.iconsAreLoaded : return
+
+        self.iconsAreLoaded = True
+
+        path_icon_contents      = apputils.AppDataPath('CorAna/icons/contents.png').path()
+        path_icon_mail_forward  = apputils.AppDataPath('CorAna/icons/mail-forward.png').path()
         path_icon_button_ok     = apputils.AppDataPath('CorAna/icons/button_ok.png').path()
         path_icon_button_cancel = apputils.AppDataPath('CorAna/icons/button_cancel.png').path()
-        path_icon_mail_forward  = apputils.AppDataPath('CorAna/icons/mail-forward.png').path()
-        path_icon_exit          = apputils.AppDataPath('CorAna/icons/exit.png').path()
-        path_icon_contents      = apputils.AppDataPath('CorAna/icons/contents.png').path()
         path_icon_exit          = apputils.AppDataPath('CorAna/icons/exit.png').path()
         path_icon_home          = apputils.AppDataPath('CorAna/icons/home.png').path()
         path_icon_redo          = apputils.AppDataPath('CorAna/icons/redo.png').path()
         path_icon_undo          = apputils.AppDataPath('CorAna/icons/undo.png').path()
+        path_icon_reload        = apputils.AppDataPath('CorAna/icons/reload.png').path()
         path_icon_save          = apputils.AppDataPath('CorAna/icons/save.png').path()
+        path_icon_save_cfg      = apputils.AppDataPath('CorAna/icons/fileexport.png').path()
+        path_icon_edit          = apputils.AppDataPath('CorAna/icons/edit.png').path()
+        path_icon_browser       = apputils.AppDataPath('CorAna/icons/fileopen.png').path()
+        path_icon_monitor       = apputils.AppDataPath('CorAna/icons/icon-monitor.png').path()
+        path_icon_unknown       = apputils.AppDataPath('CorAna/icons/icon-unknown.png').path()
+        path_icon_logviewer     = apputils.AppDataPath('CorAna/icons/logviewer.png').path()
+        path_icon_locked        = apputils.AppDataPath('CorAna/icons/locked-icon.png').path()
+        path_icon_unlocked      = apputils.AppDataPath('CorAna/icons/unlocked-icon.png').path()
 
-        #print 'path_icon_mail_forward =', path_icon_mail_forward
 
-        #self.icon_button_ok     = QtGui.QIcon(path_icon_button_ok)
-        #self.icon_button_cancel = QtGui.QIcon(path_icon_button_cancel)
+        self.icon_contents      = QtGui.QIcon(path_icon_contents )
         self.icon_mail_forward  = QtGui.QIcon(path_icon_mail_forward)
-        #self.icon_contents      = QtGui.QIcon(path_icon_contents )
-        #self.icon_exit          = QtGui.QIcon(path_icon_exit     )
-        #self.icon_home          = QtGui.QIcon(path_icon_home     )
-        #self.icon_redo          = QtGui.QIcon(path_icon_redo     )
-        #self.icon_undo          = QtGui.QIcon(path_icon_undo     )
-        #self.icon_save          = QtGui.QIcon(path_icon_save     )
+        self.icon_button_ok     = QtGui.QIcon(path_icon_button_ok)
+        self.icon_button_cancel = QtGui.QIcon(path_icon_button_cancel)
+        self.icon_exit          = QtGui.QIcon(path_icon_exit     )
+        self.icon_home          = QtGui.QIcon(path_icon_home     )
+        self.icon_redo          = QtGui.QIcon(path_icon_redo     )
+        self.icon_undo          = QtGui.QIcon(path_icon_undo     )
+        self.icon_reload        = QtGui.QIcon(path_icon_reload   )
+        self.icon_save          = QtGui.QIcon(path_icon_save     )
+        self.icon_save_cfg      = QtGui.QIcon(path_icon_save_cfg )
+        self.icon_edit          = QtGui.QIcon(path_icon_edit     )
+        self.icon_browser       = QtGui.QIcon(path_icon_browser  )
+        self.icon_monitor       = QtGui.QIcon(path_icon_monitor  )
+        self.icon_unknown       = QtGui.QIcon(path_icon_unknown  )
+        self.icon_logviewer     = QtGui.QIcon(path_icon_logviewer)
+        self.icon_lock          = QtGui.QIcon(path_icon_locked   )
+        self.icon_unlock        = QtGui.QIcon(path_icon_unlocked )
 
 
-        #base_dir = '/usr/share/icons/Bluecurve/16x16/'
-        #base_dir = '/usr/share/icons/Bluecurve/32x32/'
-        base_dir = '/usr/share/icons/Bluecurve/24x24/'
+        #base_dir = '/usr/share/icons/Bluecurve/24x24/'
+        #self.icon_contents      = QtGui.QIcon(base_dir + 'actions/contents.png')
+        #self.icon_mail_forward  = QtGui.QIcon(base_dir + '../../gnome/24x24/actions/mail-forward.png')
+        #self.icon_button_ok     = QtGui.QIcon(base_dir + 'actions/button_ok.png')
+        #self.icon_button_cancel = QtGui.QIcon(base_dir + 'actions/button_cancel.png')
+        #self.icon_exit          = QtGui.QIcon(base_dir + 'actions/exit.png')
+        #self.icon_home          = QtGui.QIcon(base_dir + 'actions/gohome.png')
+        #self.icon_redo          = QtGui.QIcon(base_dir + 'actions/redo.png')
+        #self.icon_undo          = QtGui.QIcon(base_dir + 'actions/undo.png')
+        #self.icon_reload        = QtGui.QIcon(base_dir + 'actions/reload.png')
+        #self.icon_stop          = QtGui.QIcon(base_dir + 'actions/stop.png')
+        #self.icon_save_cfg      = QtGui.QIcon(base_dir + 'actions/fileexport.png')
+        #self.icon_save          = QtGui.QIcon(base_dir + 'stock/stock-save.png')
+        #self.icon_edit          = QtGui.QIcon(base_dir + 'actions/edit.png')
+        #self.icon_browser       = QtGui.QIcon(base_dir + 'actions/fileopen.png')
+        #self.icon_monitor       = QtGui.QIcon(base_dir + 'apps/icon-monitor.png')
+        #self.icon_unknown       = QtGui.QIcon(base_dir + 'apps/icon-unknown.png')
+        #self.icon_logviewer     = QtGui.QIcon(base_dir + '../32x32/apps/logviewer.png')
 
-        self.icon_contents      = QtGui.QIcon(base_dir + 'actions/contents.png')
-        self.icon_button_ok     = QtGui.QIcon(base_dir + 'actions/button_ok.png')
-        self.icon_button_cancel = QtGui.QIcon(base_dir + 'actions/button_cancel.png')
-        self.icon_home          = QtGui.QIcon(base_dir + 'actions/gohome.png')
-        self.icon_redo          = QtGui.QIcon(base_dir + 'actions/redo.png')
-        self.icon_undo          = QtGui.QIcon(base_dir + 'actions/undo.png')
-        self.icon_reload        = QtGui.QIcon(base_dir + 'actions/reload.png')
-        self.icon_exit          = QtGui.QIcon(base_dir + 'actions/exit.png')
-        self.icon_stop          = QtGui.QIcon(base_dir + 'actions/stop.png')
-        self.icon_save          = QtGui.QIcon(base_dir + 'stock/stock-save.png')
-        self.icon_edit          = QtGui.QIcon(base_dir + 'actions/edit.png')
-        self.icon_browser       = QtGui.QIcon(base_dir + 'actions/fileopen.png')
-        self.icon_monitor       = QtGui.QIcon(base_dir + 'apps/icon-monitor.png')
-        self.icon_unknown       = QtGui.QIcon(base_dir + 'apps/icon-unknown.png')
-        self.icon_logviewer     = QtGui.QIcon(base_dir + '../32x32/apps/logviewer.png')
+
         self.icon_logger        = self.icon_edit
         self.icon_help          = self.icon_unknown
         self.icon_reset         = self.icon_reload
+
 
 #-----------------------------
 

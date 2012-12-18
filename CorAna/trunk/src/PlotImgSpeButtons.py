@@ -73,13 +73,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
 
         self.set_buttons()
-
-        self.but_elog .setIcon(cp.icon_mail_forward)
-        self.but_save .setIcon(cp.icon_save)
-        self.but_quit .setIcon(cp.icon_exit)
-        self.but_help .setIcon(cp.icon_help)
-        self.but_reset.setIcon(cp.icon_reset)
-
+        self.setIcons()
 
         width = 60
         self.edi_nbins.setFixedWidth(width)
@@ -108,6 +102,15 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.setHBoxLayout()        
         self.showToolTips()
         self.setFixedHeight(50)
+
+
+    def setIcons(self) :
+        cp.setIcons()
+        self.but_elog .setIcon(cp.icon_mail_forward)
+        self.but_save .setIcon(cp.icon_save)
+        self.but_quit .setIcon(cp.icon_exit)
+        self.but_help .setIcon(cp.icon_help)
+        self.but_reset.setIcon(cp.icon_reset)
 
 
     def setHBoxLayout(self):

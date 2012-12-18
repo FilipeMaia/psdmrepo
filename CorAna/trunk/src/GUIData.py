@@ -405,9 +405,11 @@ class GUIData ( QtGui.QWidget ) :
         if is_active :
             self.edi_bat_start.setStyleSheet(cp.styleEdit)
             self.edi_bat_end  .setStyleSheet(cp.styleEdit)
+            self.cbx_data.setIcon(cp.icon_unlock) # (QtGui.QIcon())            
         else :
             self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
             self.edi_bat_end  .setStyleSheet(cp.styleEditInfo)
+            self.cbx_data.setIcon(cp.icon_lock)            
 
         self.edi_bat_start.setReadOnly( not is_active ) 
         self.edi_bat_end  .setReadOnly( not is_active ) 

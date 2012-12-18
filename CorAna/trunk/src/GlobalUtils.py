@@ -129,7 +129,7 @@ def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', run='825', tag='TAG1'
 
     #==================
     out, err = 'submission procedure must be uncommented...', 'Responce should be ok, but...'
-    out, err = subproc(command_seq, env=my_env)
+    # out, err = subproc(command_seq, env=my_env)
     #==================
 
     #print 'out:\n', out

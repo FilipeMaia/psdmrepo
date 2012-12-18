@@ -101,7 +101,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butExit    .setIcon(cp.icon_exit)
         self.butLogger  .setIcon(cp.icon_logger)
         self.butFBrowser.setIcon(cp.icon_browser)
-        self.butSave    .setIcon(cp.icon_save)
+        self.butSave    .setIcon(cp.icon_save_cfg)
         #self.butStop    .setIcon(cp.icon_stop)
 
         self.hboxW = QtGui.QHBoxLayout() 
@@ -230,6 +230,11 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butELog       .setStyleSheet(cp.styleButton)
         self.butFile       .setStyleSheet(cp.styleButton)
         #self.titControl    .setAlignment(QtCore.Qt.AlignCenter)
+
+        #self.butSave.setText('')
+        #self.butExit.setText('')
+        #self.butExit.setFlat(True)
+
 
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()

@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
+from FileNameManager        import fnm
 
 #from GUIRunLeft   import *
 #from GUIRunRight  import *
@@ -50,15 +51,15 @@ class GUIRun ( QtGui.QWidget ) :
  
         self.tit_title  = QtGui.QLabel('Run Control and Monitoring')
         self.tit_status = QtGui.QLabel('Status:')
+        self.tit_path   = QtGui.QLabel('Data:')
+        self.tit_flat   = QtGui.QLabel('Flat:')
+        self.tit_blam   = QtGui.QLabel('Blam:')
+
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
 
-        #cp.guisystemsettingsleft  = GUIRunLeft()
-        #cp.guisystemsettingsright = GUIRunRight()
-
-        self.hboxM = QtGui.QHBoxLayout()
-        #self.hboxM.addWidget(cp.guisystemsettingsleft )
-        #self.hboxM.addWidget(cp.guisystemsettingsright)
+        self.edi_path = QtGui.QLineEdit( fnm.path_data_xtc() )        
+        self.edi_path.setReadOnly( True )   
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
@@ -66,12 +67,16 @@ class GUIRun ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_close)
         self.hboxB.addWidget(self.but_apply)
 
-        self.vbox  = QtGui.QVBoxLayout()
-        self.vbox.addWidget(self.tit_title)
-        self.vbox.addLayout(self.hboxM)
-        self.vbox.addLayout(self.hboxB)
-        #self.vbox.addStretch(1)     
-        self.setLayout(self.vbox)
+        self.grid = QtGui.QGridLayout()
+        self.grid_row = 1
+        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 6)          
+        self.grid.addWidget(self.tit_path,      self.grid_row+1, 0)
+        self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
+        self.grid.addWidget(self.tit_flat,      self.grid_row+2, 0)
+        self.grid.addWidget(self.tit_blam,      self.grid_row+3, 0)
+        self.grid.addLayout(self.hboxB,         self.grid_row+5, 0, 1, 8)
+
+        self.setLayout(self.grid)
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
@@ -100,13 +105,19 @@ class GUIRun ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.setMinimumHeight(200)
-
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_apply .setStyleSheet (cp.styleButton) 
         #self.but_show  .setStyleSheet (cp.styleButton) 
+        self.tit_path  .setStyleSheet   (cp.styleLabel)
+        self.tit_flat  .setStyleSheet   (cp.styleLabel)
+        self.tit_blam  .setStyleSheet   (cp.styleLabel)
+
+
+        self.edi_path.setStyleSheet   (cp.styleEditInfo)
+        self.edi_path.setAlignment    (QtCore.Qt.AlignRight)
 
         self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()

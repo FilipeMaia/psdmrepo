@@ -74,14 +74,10 @@ class PlotArrayButtons (QtGui.QWidget) :
         self.cbox_log  = QtGui.QCheckBox('&Log')
         self.tit_nbins = QtGui.QLabel('N bins:')
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.widgimage.nbins))
-        self.set_buttons()
 
-        self.but_elog .setIcon(cp.icon_mail_forward)
-        self.but_save .setIcon(cp.icon_save)
-        self.but_quit .setIcon(cp.icon_exit)
-        self.but_help .setIcon(cp.icon_help)
-        self.but_reset.setIcon(cp.icon_reset)
-                
+        self.set_buttons()
+        self.setIcons()
+
         width = 60
         self.edi_nbins.setFixedWidth(width)
         #self.but_reset.setFixedWidth(width)
@@ -133,6 +129,15 @@ class PlotArrayButtons (QtGui.QWidget) :
         self.showToolTips()
         self.setFixedHeight(50)
 
+
+    def setIcons(self) :
+        cp.setIcons()
+        self.but_elog .setIcon(cp.icon_mail_forward)
+        self.but_save .setIcon(cp.icon_save)
+        self.but_quit .setIcon(cp.icon_exit)
+        self.but_help .setIcon(cp.icon_help)
+        self.but_reset.setIcon(cp.icon_reset)
+                
 
     def showToolTips(self):
         self.but_reset.setToolTip('Reset original view') 

@@ -107,7 +107,8 @@ class GUIFlatField ( QtGui.QWidget ) :
         #self.but_path.setStyleSheet (cp.styleButton)
         self.but_plot.setStyleSheet (cp.styleButton) 
         self.but_brow.setStyleSheet (cp.styleButton) 
-
+        self.cbx_use .setStyleSheet (cp.styleLabel) 
+        
         self.but_path.setObjectName('but_path')
         self.but_path.setStyleSheet('QPushButton#but_path:pressed  {color: black; background-color: green;}' +
                                     'QPushButton#but_path:disabled {color: white; background-color: pink;}' +
