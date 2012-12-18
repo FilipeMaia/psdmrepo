@@ -20,5 +20,6 @@ pkg_ver = "0.13.1"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin("lib", '$PYTHON', "site-packages")
 BINDIR = "bin"
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
 
 standardExternalPackage(pkg, **locals())
