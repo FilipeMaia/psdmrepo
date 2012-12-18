@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# $Id: relupgrade 2521 2011-10-13 19:21:37Z salnikov@SLAC.STANFORD.EDU $
+#
+# Move "current" link to a different release. Takes single argument
+# which is a release name and resets current link to point to that release.
+# If name starts with "ana-" then ana-current link is moved (that works for 
+# any type- prefix).
+
+#
+# various functions definition
+#
+
+# stop on errors
+set -e
+
+usage() {
+
+  cat << EOD
+
+Usage: `basename $0` [options] release
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+    -n          move "newest" link in addition to "current"
+    -r PATH     releases directory, if not specified then 
+                use \$SIT_RELDIR or /reg/g/psdm/sw/releases.
+    
+Move current link to a new release. If release name starts
+with ana- then ana-current link is moved.
+Release name can be any valid release name from \$SIT_RELDIR.
+EOD
+}
+
+# messaging
+err() { echo $* 1>&2 ; exit 1 ; }
+warn() { echo $* 1>&2 ; }
+
+newest=""
+reldir=""
+
+# get the options
+while getopts hdnr: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    n) newest="yes" ;;
+    r) reldir="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# new release name
+release="$1"
+if [ -z "$release" ] ; then
+  usage
+  exit 2
+fi
+
+# check that release dir exists
+test -z "$reldir" && reldir="$SIT_RELDIR"
+test -z "$reldir" && reldir="/reg/g/psdm/sw/releases"
+test -d "$reldir" || err "release directory $reldir does not exist"
+
+
+# check that release exists
+test -d "$reldir/$release" || err "release name $release does not exist in $reldir"
+
+# get the prefix
+pfx=`echo "$release" | sed 's/\(.*-\)*\(.*\)/\1/'`
+
+# move the links
+ln -sfT "$release" "$reldir/${pfx}currents"
+test -n "$newest" && ln -sfT "$release" "$reldir/${pfx}newests"
+
+# make sure it returns good status
+true
