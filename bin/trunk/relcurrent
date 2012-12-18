@@ -72,8 +72,8 @@ test -d "$reldir/$release" || err "release name $release does not exist in $reld
 pfx=`echo "$release" | sed 's/\(.*-\)*\(.*\)/\1/'`
 
 # move the links
-ln -sfT "$release" "$reldir/${pfx}currents"
-test -n "$newest" && ln -sfT "$release" "$reldir/${pfx}newests"
+ln -sfT "$release" "$reldir/${pfx}current"
+test -n "$newest" && ln -sfT "$release" "$reldir/${pfx}newest"
 
 # make sure it returns good status
 true
