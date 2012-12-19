@@ -54,7 +54,10 @@ class GUIData ( QtGui.QWidget ) :
         self.cbx_data = QtGui.QCheckBox('Activate / protect buttons', self)
         self.cbx_data.setChecked( cp.is_active_data_gui.value() )
 
-        self.edi_path = QtGui.QLineEdit( fnm.path_data_xtc() )        
+        self.cbx_all_chunks = QtGui.QCheckBox('Use all xtc chunks', self)
+        self.cbx_all_chunks.setChecked( cp.use_data_xtc_all.value() )
+
+        self.edi_path = QtGui.QLineEdit( fnm.path_data_xtc_cond() )        
         self.edi_path.setReadOnly( True )   
 
         self.lab_status = QtGui.QLabel('Status')
@@ -83,29 +86,32 @@ class GUIData ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
         self.grid.addWidget(self.cbx_data,      self.grid_row,   0, 1, 6)          
+
         self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
         self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
 
-        self.grid.addWidget(self.lab_batch,     self.grid_row+2, 0)
-        self.grid.addWidget(self.lab_status,    self.grid_row+2, 1, 1, 2)
-        self.grid.addWidget(self.lab_start,     self.grid_row+2, 3)
-        self.grid.addWidget(self.lab_end,       self.grid_row+2, 4)
-        self.grid.addWidget(self.lab_total,     self.grid_row+2, 5)
-        self.grid.addWidget(self.lab_time,      self.grid_row+2, 6)
+        self.grid.addWidget(self.cbx_all_chunks,self.grid_row+2, 1, 1, 6)          
 
-        self.grid.addWidget(self.but_scan,      self.grid_row+3, 0)
-        self.grid.addWidget(self.but_status,    self.grid_row+3, 1, 1, 2)
-        self.grid.addWidget(self.edi_bat_start, self.grid_row+3, 3)
-        self.grid.addWidget(self.edi_bat_end,   self.grid_row+3, 4)
-        self.grid.addWidget(self.edi_bat_total, self.grid_row+3, 5)
-        self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6, 1, 2)
+        self.grid.addWidget(self.lab_batch,     self.grid_row+3, 0)
+        self.grid.addWidget(self.lab_status,    self.grid_row+3, 1, 1, 2)
+        self.grid.addWidget(self.lab_start,     self.grid_row+3, 3)
+        self.grid.addWidget(self.lab_end,       self.grid_row+3, 4)
+        self.grid.addWidget(self.lab_total,     self.grid_row+3, 5)
+        self.grid.addWidget(self.lab_time,      self.grid_row+3, 6)
 
-        self.grid.addWidget(self.but_aver,      self.grid_row+4, 0)
-        self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
-        self.grid.addWidget(self.but_brow,      self.grid_row+4, 3)
-        self.grid.addWidget(self.but_plot,      self.grid_row+4, 4)
-        self.grid.addWidget(self.but_tspl,      self.grid_row+4, 5)
-        self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
+        self.grid.addWidget(self.but_scan,      self.grid_row+4, 0)
+        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 1, 2)
+        self.grid.addWidget(self.edi_bat_start, self.grid_row+4, 3)
+        self.grid.addWidget(self.edi_bat_end,   self.grid_row+4, 4)
+        self.grid.addWidget(self.edi_bat_total, self.grid_row+4, 5)
+        self.grid.addWidget(self.edi_bat_time,  self.grid_row+4, 6, 1, 2)
+
+        self.grid.addWidget(self.but_aver,      self.grid_row+5, 0)
+        self.grid.addWidget(self.but_wfiles,    self.grid_row+5, 1, 1, 2)
+        self.grid.addWidget(self.but_brow,      self.grid_row+5, 3)
+        self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
+        self.grid.addWidget(self.but_tspl,      self.grid_row+5, 5)
+        self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),         self.on_but_path )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),         self.on_but_plot )
@@ -119,6 +125,7 @@ class GUIData ( QtGui.QWidget ) :
         self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_start )
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_end   )
         self.connect(self.cbx_data,      QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
+        self.connect(self.cbx_all_chunks,QtCore.SIGNAL('stateChanged(int)'), self.on_cbx_all_chunks ) 
   
         self.setLayout(self.grid)
 
@@ -142,7 +149,8 @@ class GUIData ( QtGui.QWidget ) :
         self.but_status.setToolTip('Print batch job status \nin the logger')
         self.but_wfiles.setToolTip('List work files \nand check their availability')
         self.but_remove.setToolTip('Remove all data work\nfiles for selected run')
-        self.cbx_data  .setToolTip('Check this box \nto process and use \ndata run')
+        self.cbx_data  .setToolTip('Lock / unlock buttons and fields')
+        self.cbx_all_chunks.setToolTip('Switch between using one \nor all chunks of xtc file')
 
            
     def setFrame(self):
@@ -159,34 +167,35 @@ class GUIData ( QtGui.QWidget ) :
         self.setMinimumWidth(530)
         self.setStyleSheet(cp.styleBkgd)
 
-        self.cbx_data  .setStyleSheet (cp.styleLabel)
-        self.lab_batch .setStyleSheet (cp.styleLabel)
-        self.lab_status.setStyleSheet (cp.styleLabel)
-        self.lab_start .setStyleSheet (cp.styleLabel)
-        self.lab_end   .setStyleSheet (cp.styleLabel)
-        self.lab_total .setStyleSheet (cp.styleLabel)
-        self.lab_time  .setStyleSheet (cp.styleLabel)
+        self.cbx_data      .setStyleSheet (cp.styleLabel)
+        self.cbx_all_chunks.setStyleSheet (cp.styleLabel)
+        self.lab_batch     .setStyleSheet (cp.styleLabel)
+        self.lab_status    .setStyleSheet (cp.styleLabel)
+        self.lab_start     .setStyleSheet (cp.styleLabel)
+        self.lab_end       .setStyleSheet (cp.styleLabel)
+        self.lab_total     .setStyleSheet (cp.styleLabel)
+        self.lab_time      .setStyleSheet (cp.styleLabel)
 
-        self.edi_path.setStyleSheet (cp.styleEditInfo)
-        self.edi_path.setAlignment  (QtCore.Qt.AlignRight)
+        self.edi_path      .setStyleSheet (cp.styleEditInfo)
+        self.edi_path      .setAlignment  (QtCore.Qt.AlignRight)
 
-        self.edi_bat_start.setStyleSheet(cp.styleEdit)
-        self.edi_bat_end  .setStyleSheet(cp.styleEdit)
-        self.edi_bat_total.setStyleSheet(cp.styleEditInfo)
-        self.edi_bat_time .setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_start .setStyleSheet(cp.styleEdit)
+        self.edi_bat_end   .setStyleSheet(cp.styleEdit)
+        self.edi_bat_total .setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_time  .setStyleSheet(cp.styleEditInfo)
  
-        self.edi_bat_start.setFixedWidth(width)
-        self.edi_bat_end  .setFixedWidth(width)
-        self.edi_bat_total.setFixedWidth(width)
-        self.edi_bat_time .setFixedWidth(140)
+        self.edi_bat_start .setFixedWidth(width)
+        self.edi_bat_end   .setFixedWidth(width)
+        self.edi_bat_total .setFixedWidth(width)
+        self.edi_bat_time  .setFixedWidth(140)
 
-        self.edi_bat_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
+        self.edi_bat_start .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_end   .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_total .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_time  .setAlignment(QtCore.Qt.AlignLeft)
 
-        self.edi_bat_total.setReadOnly( True ) 
-        self.edi_bat_time .setReadOnly( True ) 
+        self.edi_bat_total .setReadOnly( True ) 
+        self.edi_bat_time  .setReadOnly( True ) 
 
         self.but_path  .setStyleSheet (cp.styleButton)
         self.but_plot  .setStyleSheet (cp.styleButton) 
@@ -249,9 +258,10 @@ class GUIData ( QtGui.QWidget ) :
             logger.info('Input directiry name or file name is empty... keep file path unchanged...')
             return
 
-        self.edi_path  .setText(path)
         cp.in_dir_data .setValue(dname)
         cp.in_file_data.setValue(fname)
+        #self.edi_path.setText(path)
+        self.edi_path.setText( fnm.path_data_xtc_cond() )
         logger.info('selected file: ' + str(fnm.path_data_xtc()), __name__ )
         self.set_default_pars()
         blp.parse_batch_log_data_scan()
@@ -374,10 +384,18 @@ class GUIData ( QtGui.QWidget ) :
         #if self.cbx_data .hasFocus() :
         par = cp.is_active_data_gui
         par.setValue( self.cbx_data.isChecked() )
-        msg = 'on_cbx - set status of ccdcorr_flatfield: ' + str(par.value())
+        msg = 'on_cbx - set status of parameter is_active_data_gui: ' + str(par.value())
         logger.info(msg, __name__ )
         self.setButtonState()
 
+    def on_cbx_all_chunks(self):
+        #if self.cbx_all_chunks .hasFocus() :
+        par = cp.use_data_xtc_all
+        par.setValue( self.cbx_all_chunks.isChecked() )
+        msg = 'on_cbx - set status of parameter use_data_xtc_all: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
+        self.edi_path.setText( fnm.path_data_xtc_cond() )
 
     def setButtonState(self):
         is_active = cp.is_active_data_gui.value()
@@ -392,6 +410,8 @@ class GUIData ( QtGui.QWidget ) :
         self.but_status.setEnabled( is_active)
         self.but_wfiles.setEnabled( is_active) 
 
+        self.cbx_all_chunks.setEnabled( is_active) 
+
         #self.but_path  .setFlat(not is_active)
         #self.but_plot  .setFlat(not is_active)
         #self.but_tspl  .setFlat(not is_active) 
@@ -405,11 +425,11 @@ class GUIData ( QtGui.QWidget ) :
         if is_active :
             self.edi_bat_start.setStyleSheet(cp.styleEdit)
             self.edi_bat_end  .setStyleSheet(cp.styleEdit)
-            self.cbx_data.setIcon(cp.icon_unlock) # (QtGui.QIcon())            
+            #self.cbx_data.setIcon(cp.icon_unlock) # (QtGui.QIcon())            
         else :
             self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
             self.edi_bat_end  .setStyleSheet(cp.styleEditInfo)
-            self.cbx_data.setIcon(cp.icon_lock)            
+            #self.cbx_data.setIcon(cp.icon_lock)            
 
         self.edi_bat_start.setReadOnly( not is_active ) 
         self.edi_bat_end  .setReadOnly( not is_active ) 

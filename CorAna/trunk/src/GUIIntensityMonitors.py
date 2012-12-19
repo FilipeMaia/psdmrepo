@@ -48,8 +48,11 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.list_of_dicts   = []
 
         self.grid = QtGui.QGridLayout()
-        self.grid_row = 0
+        self.grid_row = 1
         self.setTitleBar()
+
+        self.tit_title  = QtGui.QLabel('Intensity Monitors')
+        self.grid.addWidget(self.tit_title, 0,   0, 1, 10)          
 
         self.rad_nonorm = QtGui.QRadioButton('No norm.')
         self.rad_sele_grp = QtGui.QButtonGroup()
@@ -92,7 +95,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         #self.setMinimumHeight(300)
         self.setStyleSheet(cp.styleBkgd)
         self.rad_nonorm.setStyleSheet(cp.styleLabel)
-
+        self.tit_title.setStyleSheet(cp.styleTitleBold)
+        self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
+        
     def setTitleBar(self) :
         self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
                                'Plot', 'Norm', 'Select', 'Imin', 'Imax']

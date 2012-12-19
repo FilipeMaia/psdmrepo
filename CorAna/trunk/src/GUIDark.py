@@ -52,7 +52,10 @@ class GUIDark ( QtGui.QWidget ) :
         self.cbx_dark = QtGui.QCheckBox('Use dark correction', self)
         self.cbx_dark.setChecked( cp.bat_dark_is_used.value() )
 
-        self.edi_path    = QtGui.QLineEdit( fnm.path_dark_xtc() )        
+        self.cbx_all_chunks = QtGui.QCheckBox('Use all xtc chunks', self)
+        self.cbx_all_chunks.setChecked( cp.use_dark_xtc_all.value() )
+
+        self.edi_path    = QtGui.QLineEdit( fnm.path_dark_xtc_cond() )        
         self.edi_path.setReadOnly( True )  
 
         self.lab_status  = QtGui.QLabel('Status')
@@ -80,25 +83,28 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid_row = 1
         #self.grid.addWidget(self.tit_path,     self.grid_row,   0)
         self.grid.addWidget(self.cbx_dark,      self.grid_row,   0, 1, 6)
+
         self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
         self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
-        self.grid.addWidget(self.lab_batch,     self.grid_row+2, 0)
-        self.grid.addWidget(self.lab_status,    self.grid_row+2, 1, 1, 2)
-        self.grid.addWidget(self.lab_start,     self.grid_row+2, 3)
-        self.grid.addWidget(self.lab_end,       self.grid_row+2, 4)
-        self.grid.addWidget(self.lab_total,     self.grid_row+2, 5)
-        self.grid.addWidget(self.lab_time,      self.grid_row+2, 6)
-        self.grid.addWidget(self.but_scanner,   self.grid_row+3, 0)
-        self.grid.addWidget(self.but_status,    self.grid_row+3, 1, 1, 2)
-        self.grid.addWidget(self.edi_bat_start, self.grid_row+3, 3)
-        self.grid.addWidget(self.edi_bat_end,   self.grid_row+3, 4)
-        self.grid.addWidget(self.edi_bat_total, self.grid_row+3, 5)
-        self.grid.addWidget(self.edi_bat_time,  self.grid_row+3, 6, 1, 2)
-        self.grid.addWidget(self.but_submit,    self.grid_row+4, 0)
-        self.grid.addWidget(self.but_wfiles,    self.grid_row+4, 1, 1, 2)
-        self.grid.addWidget(self.but_browse,    self.grid_row+4, 3) #, 1, 2)
-        self.grid.addWidget(self.but_plot,      self.grid_row+4, 4)
-        self.grid.addWidget(self.but_remove,    self.grid_row+4, 7)
+        self.grid.addWidget(self.cbx_all_chunks,self.grid_row+2, 1, 1, 6)
+
+        self.grid.addWidget(self.lab_batch,     self.grid_row+3, 0)
+        self.grid.addWidget(self.lab_status,    self.grid_row+3, 1, 1, 2)
+        self.grid.addWidget(self.lab_start,     self.grid_row+3, 3)
+        self.grid.addWidget(self.lab_end,       self.grid_row+3, 4)
+        self.grid.addWidget(self.lab_total,     self.grid_row+3, 5)
+        self.grid.addWidget(self.lab_time,      self.grid_row+3, 6)
+        self.grid.addWidget(self.but_scanner,   self.grid_row+4, 0)
+        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 1, 2)
+        self.grid.addWidget(self.edi_bat_start, self.grid_row+4, 3)
+        self.grid.addWidget(self.edi_bat_end,   self.grid_row+4, 4)
+        self.grid.addWidget(self.edi_bat_total, self.grid_row+4, 5)
+        self.grid.addWidget(self.edi_bat_time,  self.grid_row+4, 6, 1, 2)
+        self.grid.addWidget(self.but_submit,    self.grid_row+5, 0)
+        self.grid.addWidget(self.but_wfiles,    self.grid_row+5, 1, 1, 2)
+        self.grid.addWidget(self.but_browse,    self.grid_row+5, 3) #, 1, 2)
+        self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
+        self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),          self.on_but_status    )
@@ -111,6 +117,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_start )
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'),  self.on_edi_bat_end   )
         self.connect(self.cbx_dark,      QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx           ) 
+        self.connect(self.cbx_all_chunks,QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx_all_chunks) 
  
         self.setLayout(self.grid)
 
@@ -134,6 +141,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
         self.cbx_dark   .setToolTip('Check this box \nto process and use \ndark run correction')
+        self.cbx_all_chunks.setToolTip('Switch between using one \nor all chunks of xtc file')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -149,34 +157,35 @@ class GUIDark ( QtGui.QWidget ) :
         self.setStyleSheet(cp.styleBkgd)
         #tit0   .setStyleSheet (cp.styleTitle)
 
-        self.cbx_dark  .setStyleSheet (cp.styleLabel)
-        self.lab_status.setStyleSheet (cp.styleLabel)
-        self.lab_batch .setStyleSheet (cp.styleLabel)
-        self.lab_start .setStyleSheet (cp.styleLabel)
-        self.lab_end   .setStyleSheet (cp.styleLabel)
-        self.lab_total .setStyleSheet (cp.styleLabel)
-        self.lab_time  .setStyleSheet (cp.styleLabel)
+        self.cbx_all_chunks.setStyleSheet (cp.styleLabel)
+        self.cbx_dark      .setStyleSheet (cp.styleLabel)
+        self.lab_status    .setStyleSheet (cp.styleLabel)
+        self.lab_batch     .setStyleSheet (cp.styleLabel)
+        self.lab_start     .setStyleSheet (cp.styleLabel)
+        self.lab_end       .setStyleSheet (cp.styleLabel)
+        self.lab_total     .setStyleSheet (cp.styleLabel)
+        self.lab_time      .setStyleSheet (cp.styleLabel)
 
-        self.edi_path   .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
-        self.edi_path   .setAlignment  (QtCore.Qt.AlignRight)
+        self.edi_path      .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
+        self.edi_path      .setAlignment  (QtCore.Qt.AlignRight)
 
-        self.edi_bat_start.setStyleSheet(cp.styleEdit)
-        self.edi_bat_end  .setStyleSheet(cp.styleEdit)
-        self.edi_bat_total.setStyleSheet(cp.styleEditInfo)
-        self.edi_bat_time .setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_start .setStyleSheet(cp.styleEdit)
+        self.edi_bat_end   .setStyleSheet(cp.styleEdit)
+        self.edi_bat_total .setStyleSheet(cp.styleEditInfo)
+        self.edi_bat_time  .setStyleSheet(cp.styleEditInfo)
 
-        self.edi_bat_start.setFixedWidth(width)
-        self.edi_bat_end  .setFixedWidth(width)
-        self.edi_bat_total.setFixedWidth(width)
-        self.edi_bat_time .setFixedWidth(140)
+        self.edi_bat_start .setFixedWidth(width)
+        self.edi_bat_end   .setFixedWidth(width)
+        self.edi_bat_total .setFixedWidth(width)
+        self.edi_bat_time  .setFixedWidth(140)
 
-        self.edi_bat_start.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_end  .setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_total.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_bat_time .setAlignment(QtCore.Qt.AlignLeft)
+        self.edi_bat_start .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_end   .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_total .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_bat_time  .setAlignment(QtCore.Qt.AlignLeft)
 
-        self.edi_bat_total.setReadOnly( True ) 
-        self.edi_bat_time .setReadOnly( True ) 
+        self.edi_bat_total .setReadOnly( True ) 
+        self.edi_bat_time  .setReadOnly( True ) 
 
         self.but_path   .setStyleSheet (cp.styleButton)
         self.but_status .setStyleSheet (cp.styleButton)
@@ -230,16 +239,17 @@ class GUIDark ( QtGui.QWidget ) :
     def on_but_path(self):
         logger.debug('Dark file browser', __name__ )
         path = str(self.edi_path.text())        
-        path  = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )
+        path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )
         dname, fname = os.path.split(path)
 
         if dname == '' or fname == '' :
             logger.info('Input directiry name or file name is empty... keep file path unchanged...')
             return
 
-        self.edi_path.setText(path)
         cp.in_dir_dark .setValue(dname)
         cp.in_file_dark.setValue(fname)
+        #self.edi_path.setText(path)
+        self.edi_path.setText( fnm.path_dark_xtc_cond() )
         logger.info('selected file: ' + str(fnm.path_dark_xtc()), __name__ )
         self.set_default_pars()
         blp.parse_batch_log_peds_scan()
@@ -349,9 +359,18 @@ class GUIDark ( QtGui.QWidget ) :
         #if self.cbx_dark.hasFocus() :
         par = cp.bat_dark_is_used
         par.setValue( self.cbx_dark.isChecked() )
-        msg = 'on_cbx - set status of bat_dark_is_used: ' + str(par.value())
+        msg = 'on_cbx - set status of parameter bat_dark_is_used: ' + str(par.value())
         logger.info(msg, __name__ )
         self.setButtonState()
+
+    def on_cbx_all_chunks(self):
+        #if self.cbx_all_chunks.hasFocus() :
+        par = cp.use_dark_xtc_all
+        par.setValue( self.cbx_all_chunks.isChecked() )
+        msg = 'on_cbx - set status of parameter use_dark_xtc_all: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
+        self.edi_path.setText( fnm.path_dark_xtc_cond() )
 
     def setButtonState(self):
 
@@ -365,7 +384,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_browse .setEnabled(is_used)
         self.but_plot   .setEnabled(is_used)
         self.but_remove .setEnabled(is_used)
-
+        self.cbx_all_chunks.setEnabled(is_used)
+        
         #self.but_path   .setFlat(not is_used)
         #self.but_status .setFlat(not is_used)
         #self.but_submit .setFlat(not is_used)

@@ -62,25 +62,38 @@ class FileNameManager :
     def path_dark_xtc(self) :
         return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
 
-    def path_flat_xtc(self) :
-        return cp.in_dir_flat.value() + '/' + cp.in_file_flat.value()
+    #def path_flat_xtc(self) :
+    #    return cp.in_dir_flat.value() + '/' + cp.in_file_flat.value()
 
     def path_data_xtc(self) :
         return cp.in_dir_data.value() + '/' + cp.in_file_data.value()
 
 
+    def path_dark_xtc_all_chunks(self) :
+        return cp.in_dir_dark.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_dark.value())
+
+    def path_data_xtc_all_chunks(self) :
+        return cp.in_dir_data.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_data.value())
+
+    def path_dark_xtc_cond(self) :
+        if cp.use_dark_xtc_all.value() : return self.path_dark_xtc_all_chunks()
+        else                           : return self.path_dark_xtc()
+
+    def path_data_xtc_cond(self) :
+        if cp.use_data_xtc_all.value() : return self.path_data_xtc_all_chunks()
+        else                           : return self.path_data_xtc()
 
     def str_exp_run_dark(self) :
         return self.str_exp_run_for_xtc_path(self.path_dark_xtc())
 
-    def str_exp_run_flat(self) :
-        return self.str_exp_run_for_xtc_path(self.path_flat_xtc())
+    #def str_exp_run_flat(self) :
+    #    return self.str_exp_run_for_xtc_path(self.path_flat_xtc())
 
     def str_exp_run_data(self) :
         return self.str_exp_run_for_xtc_path(self.path_data_xtc())
 
     def str_exp_run_for_xtc_path(self, path) :
-        instrument, experiment, run_str, run_num = gu.parse_xtc_path(self.path_data_xtc())
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
         if experiment == None : return 'exp-run-'
         else                  : return experiment + '-' + run_str + '-'
 
@@ -136,7 +149,7 @@ class FileNameManager :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan.cfg'
 
     def path_data_scan_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-scan-batch-log.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-batch-log.txt'
 
     def path_data_scan_monitors_data(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-mons-data.txt'
@@ -155,7 +168,7 @@ class FileNameManager :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver.cfg'
 
     def path_data_aver_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-aver-batch-log.txt'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver-batch-log.txt'
 
     def path_data_ave(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-ave.txt'
@@ -164,10 +177,10 @@ class FileNameManager :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-rms.txt'
 
     def path_data_aver_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-aver-plot.png'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver-plot.png'
 
     def path_data_time_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'data-time-plot.png'
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-time-plot.png'
 
     def path_data_mons_plot(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.png'
@@ -278,9 +291,12 @@ if __name__ == "__main__" :
     print '\n',
     print '\n',
     print 'str_exp_run_dark()   : ', fnm.str_exp_run_dark()
-    print 'str_exp_run_flat()   : ', fnm.str_exp_run_flat()
+    #print 'str_exp_run_flat()   : ', fnm.str_exp_run_flat()
     print 'str_exp_run_data()   : ', fnm.str_exp_run_data()
-    
+
+    print 'path_data_xtc_all_chunks() : ', fnm.path_data_xtc_all_chunks()
+    print 'path_dark_xtc_all_chunks() : ', fnm.path_dark_xtc_all_chunks()
+
     sys.exit ( 'End of test for FileNameManager' )
 
 #-----------------------------

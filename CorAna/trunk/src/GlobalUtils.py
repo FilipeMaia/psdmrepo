@@ -240,6 +240,18 @@ def parse_xtc_path(path='.') :
     
 #----------------------------------
 
+def xtc_fname_for_all_chunks(path='e167-r0015-s00-c00.xtc') :
+    """Converts the xtc file name e167-r0015-s00-c00.xtc or complete path
+       path/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc to the wildname:
+       e167-r0015-*.xtc
+    """
+    bname  = os.path.basename(path)
+    fields = bname.split('-')
+    fname_all = fields[0] + '-' + fields[1] + '-*.xtc'
+    return fname_all
+
+#----------------------------------
+
 def print_parsed_path(path) :                       # Output for path:
     print 'print_parsed_path(path): path:',         # path/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
     print 'exists(path)  =', os.path.exists(path)   # True 
@@ -435,7 +447,10 @@ if __name__ == "__main__" :
     #print 'parse_xtc_path(): ', parse_xtc_path()
     #print 'parse_xtc_path(path): ', parse_xtc_path(path)
 
-    send_msg_with_att_to_elog(fname_att='../../work/cora-xcsi0112-r0015-data-time-plot.png')
+    #send_msg_with_att_to_elog(fname_att='../../work/cora-xcsi0112-r0015-data-time-plot.png')
+
+    print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('e168-r0016-s00-c00.xtc')
+    print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc')
 
     sys.exit ( "End of test" )
 

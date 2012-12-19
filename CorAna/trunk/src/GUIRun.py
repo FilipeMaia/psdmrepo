@@ -51,16 +51,24 @@ class GUIRun ( QtGui.QWidget ) :
  
         self.tit_title  = QtGui.QLabel('Run Control and Monitoring')
         self.tit_status = QtGui.QLabel('Status:')
-        self.tit_path   = QtGui.QLabel('Data:')
+        self.tit_data   = QtGui.QLabel('Data:')
+        self.tit_dark   = QtGui.QLabel('Dark:')
         self.tit_flat   = QtGui.QLabel('Flat:')
         self.tit_blam   = QtGui.QLabel('Blam:')
 
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
 
-        self.edi_path = QtGui.QLineEdit( fnm.path_data_xtc() )        
-        self.edi_path.setReadOnly( True )   
+        self.edi_data = QtGui.QLineEdit('Data')        
+        self.edi_dark = QtGui.QLineEdit('Dark')        
+        self.edi_flat = QtGui.QLineEdit('Flat')        
+        self.edi_blam = QtGui.QLineEdit('Blam')        
 
+        self.edi_bat_start  = QtGui.QLineEdit ( 'Start' )        
+        self.edi_bat_end    = QtGui.QLineEdit ( 'End'   )        
+        self.edi_bat_total  = QtGui.QLineEdit ( 'Total' )        
+        self.edi_bat_time   = QtGui.QLineEdit ( 'dt'    )        
+ 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(1)     
@@ -69,11 +77,20 @@ class GUIRun ( QtGui.QWidget ) :
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
-        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 6)          
-        self.grid.addWidget(self.tit_path,      self.grid_row+1, 0)
-        self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
-        self.grid.addWidget(self.tit_flat,      self.grid_row+2, 0)
-        self.grid.addWidget(self.tit_blam,      self.grid_row+3, 0)
+        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 8)          
+        self.grid.addWidget(self.tit_data,      self.grid_row+1, 0)
+        self.grid.addWidget(self.edi_data,      self.grid_row+1, 1, 1, 7)
+        self.grid.addWidget(self.edi_bat_start, self.grid_row+1, 8)
+        self.grid.addWidget(self.edi_bat_end  , self.grid_row+1, 9)
+        self.grid.addWidget(self.edi_bat_total, self.grid_row+1, 10)
+        self.grid.addWidget(self.edi_bat_time , self.grid_row+1, 11)
+
+        self.grid.addWidget(self.tit_dark,      self.grid_row+2, 0)
+        self.grid.addWidget(self.edi_dark,      self.grid_row+2, 1, 1, 7)
+        self.grid.addWidget(self.tit_flat,      self.grid_row+3, 0)
+        self.grid.addWidget(self.edi_flat,      self.grid_row+3, 1, 1, 7)
+        self.grid.addWidget(self.tit_blam,      self.grid_row+4, 0)
+        self.grid.addWidget(self.edi_blam,      self.grid_row+4, 1, 1, 7)
         self.grid.addLayout(self.hboxB,         self.grid_row+5, 0, 1, 8)
 
         self.setLayout(self.grid)
@@ -83,6 +100,7 @@ class GUIRun ( QtGui.QWidget ) :
 
         self.showToolTips()
         self.setStyle()
+        self.setFields()
         self.setStatus()
 
     #-------------------
@@ -104,23 +122,73 @@ class GUIRun ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumHeight(200)
+        self.setMinimumSize(600,300)
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)
         self.but_apply .setStyleSheet (cp.styleButton) 
         #self.but_show  .setStyleSheet (cp.styleButton) 
-        self.tit_path  .setStyleSheet   (cp.styleLabel)
+        self.tit_data  .setStyleSheet   (cp.styleLabel)
+        self.tit_dark  .setStyleSheet   (cp.styleLabel)
         self.tit_flat  .setStyleSheet   (cp.styleLabel)
         self.tit_blam  .setStyleSheet   (cp.styleLabel)
+        self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
 
 
-        self.edi_path.setStyleSheet   (cp.styleEditInfo)
-        self.edi_path.setAlignment    (QtCore.Qt.AlignRight)
+        self.edi_data.setStyleSheet   (cp.styleEditInfo)
+        self.edi_dark.setStyleSheet   (cp.styleEditInfo)
+        self.edi_flat.setStyleSheet   (cp.styleEditInfo)
+        self.edi_blam.setStyleSheet   (cp.styleEditInfo)
+
+        width = 60
+        self.edi_bat_start.setFixedWidth(width)   
+        self.edi_bat_end  .setFixedWidth(width)   
+        self.edi_bat_total.setFixedWidth(width)   
+        self.edi_bat_time .setFixedWidth(140)   
+
+        self.edi_bat_start.setStyleSheet   (cp.styleEditInfo)
+        self.edi_bat_end  .setStyleSheet   (cp.styleEditInfo)
+        self.edi_bat_total.setStyleSheet   (cp.styleEditInfo)
+        self.edi_bat_time .setStyleSheet   (cp.styleEditInfo)
+
+        self.edi_data.setAlignment    (QtCore.Qt.AlignRight)
+        self.edi_dark.setAlignment    (QtCore.Qt.AlignRight)
+        self.edi_flat.setAlignment    (QtCore.Qt.AlignRight)
+        self.edi_blam.setAlignment    (QtCore.Qt.AlignRight)
 
         self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle .setBold()
+
+
+    def setFields(self):
+        self.edi_data.setText( fnm.path_data_xtc_cond() )        
+
+        if cp.bat_dark_is_used.value() : self.edi_dark.setText( fnm.path_pedestals_ave() )
+        else                           : self.edi_dark.setText( 'is not used' )
+
+        if cp.ccdcorr_flatfield.value() : self.edi_flat.setText( fnm.path_flat() )
+        else                            : self.edi_flat.setText( 'is not used' )
+
+        if cp.ccdcorr_blemish.value()   : self.edi_blam.setText( fnm.path_blam() )
+        else                            : self.edi_blam.setText( 'is not used' )
+
+        self.edi_bat_start.setText ( str( cp.bat_data_start.value() ) )        
+        self.edi_bat_end  .setText ( str( cp.bat_data_end  .value() ) )        
+        self.edi_bat_total.setText ( str( cp.bat_data_total.value() ) )        
+        self.edi_bat_time .setText ( str( cp.bat_data_dt_ave.value() ) + u'\u00B1'
+                                     + str( cp.bat_data_dt_rms.value() ) )        
+ 
+        self.edi_bat_start.setReadOnly( True )
+        self.edi_bat_end  .setReadOnly( True )
+        self.edi_bat_total.setReadOnly( True )
+        self.edi_bat_time .setReadOnly( True )
+
+        self.edi_data.setReadOnly( True )   
+        self.edi_dark.setReadOnly( True )   
+        self.edi_flat.setReadOnly( True )   
+        self.edi_blam.setReadOnly( True )   
+
 
     def setParent(self,parent) :
         self.parent = parent

@@ -73,7 +73,7 @@ class BatchJobPedestals :
 
         self.make_psana_cfg_file_for_peds_scan()
 
-        command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_scan_batch_log()
         if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
@@ -93,7 +93,7 @@ class BatchJobPedestals :
 
         self.make_psana_cfg_file_for_peds_aver()
 
-        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_dark_xtc()
+        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
         if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
