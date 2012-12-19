@@ -312,9 +312,11 @@ class XmlReader ( object ) :
     def _parseH5Type(self, typeel, pkg, included):
         """Method which parses definition of h5schema"""
 
+
         # every type must have a name
         schemaname = typeel.get('name')
         if not schemaname: raise ValueError('h5schema element missing name')
+        logging.debug("XmlReader._parseH5Type: new schema: %s", schemaname)
 
         # find corresponding pstype
         pstype = pkg.lookup(schemaname, Type)
@@ -348,8 +350,10 @@ class XmlReader ( object ) :
         dsname = dselem.get('name')
         if not dsname: raise ValueError('h5 dataset element missing name')
 
+        logging.debug("XmlReader._parseH5Dataset: new dataset: %s", dsname)
+
         # make dataset
-        ds = H5Dataset(name = dsname)
+        ds = H5Dataset(name = dsname, parent = h5type, pstype = pstype)
         h5type.datasets.append(ds)
 
         # loop over sub-elements
@@ -370,16 +374,20 @@ class XmlReader ( object ) :
         aname = elem.get('name')
         if not aname: raise ValueError('h5 attribute element is missing name')
 
+        logging.debug("XmlReader._parseH5Attribute: new attribute: %s", aname)
+
         atype = elem.get('type')
         if atype:
-            atype = pstype.lookup(atype, Type)
-            if not atype: raise ValueError('attribute element has unknown type '+attrel.get('type'))
+            atype = pstype.lookup(atype, (Type, Enum))
+            if not atype: raise ValueError('attribute element has unknown type '+elem.get('type'))
 
         # make attribute
         attr = H5Attribute(name = aname, 
+                           parent = ds,
                            type = atype,
                            method = elem.get('method') or aname,
-                           rank = int(elem.get('rank', 0)))
+                           rank = int(elem.get('rank', -1)),
+                           schema_version = int(elem.get('schema_version', 0)))
         ds.attributes.append(attr)
 
         # loop over sub-elements
@@ -480,7 +488,8 @@ class XmlReader ( object ) :
         # constructor type, any string
         ctor_type = ctorel.get('type')
 
-        # may have arguments defined
+        # may have arguments defined as <arg name='argname' type='typename' dest='attrname'/> 
+        # build a list of triplets (argname, argtype, attrname), argtype is a Type/Enum object
         args = []
         for argel in list(ctorel) :
             if argel.tag == "arg" :
@@ -493,6 +502,8 @@ class XmlReader ( object ) :
                 dest = argel.get('dest')
                 args.append((argname, atype, dest))
 
+        # can also specify initialization values for some attributes
+        # like <attr-init dest="attrname" value="value"/>
         attr_init = {}
         for attrel in list(ctorel) :
             if argel.tag == "attr-init" :

@@ -64,6 +64,7 @@ class Enum ( Namespace ) :
         self.comment = kw.get('comment', '')
         
         self.basic = True
+        self.value_type = True
 
     @property
     def external(self):

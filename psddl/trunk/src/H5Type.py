@@ -73,6 +73,9 @@ class H5Type ( object ) :
     #-------------------
     #  Public methods --
     #-------------------
+    
+    def nsName(self):
+        return "ns_{name}_v{version}".format(name=self.name, version=self.version)
 
     def __str__(self):
         

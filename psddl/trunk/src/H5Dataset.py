@@ -58,13 +58,17 @@ class H5Dataset ( object ) :
     def __init__ ( self, **kw ) :
         
         self.name = kw.get('name')          # dataset name
-        self.pstype = kw.get('pstype', None)     # corresponding Type object
+        self.parent = kw.get('parent')      # corresponding H5Type object
+        self.pstype = kw.get('pstype')      # corresponding Type object
         self.attributes = []                # list of H5Attribute objects
         self.tags = kw.get('tags', {}).copy()
 
     #-------------------
     #  Public methods --
     #-------------------
+
+    def className(self):
+        return "dataset_{0}".format(self.name)
 
     def __str__(self):
         

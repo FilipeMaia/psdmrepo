@@ -493,38 +493,14 @@ class CppTypeCodegen ( object ) :
                     
             raise ValueError('No attrubute or bitfield with name %s defined in type %s' % (name, self._type.name))
             
-        args = ctor.args
-        if not args :
-            
-            if 'auto' in ctor.tags:
-                # make one argument per type attribute
-                for attr in self._type.attributes():
-                    if attr.bitfields:
-                        for bf in attr.bitfields:
-                            if bf.accessor:
-                                name = "arg_bf_"+bf.name
-                                type = bf.type
-                                dest = bf
-                                args.append((name, type, dest))
-                    else:
-                        name = "arg_"+attr.name
-                        type = attr.type
-                        dest = attr
-                        args.append((name, type, dest))
-        
-        else:
-            
-            # convert destination names to attribute objects
-            args = [(name, type, name2attr(dest)) for name, type, dest in args]
-
         # map attributes to arguments
         attr2arg = {}
-        for name, type, dest in args:
+        for name, type, dest in ctor.args:
             attr2arg[dest] = name
 
         # argument list for declaration
         arglist = []
-        for argname, argtype, attr in args:
+        for argname, argtype, attr in ctor.args:
             if not argtype: argtype = attr.type
             tname = _typename(argtype)
             if isinstance(attr,Attribute) and attr.shape:
@@ -562,7 +538,7 @@ class CppTypeCodegen ( object ) :
             genDef = False
         else:
             # generate definition only if all destinations are known
-            genDef = None not in [dest for name, type, dest in args]
+            genDef = None not in [dest for name, type, dest in ctor.args]
 
         if not genDef:
             

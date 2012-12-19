@@ -71,6 +71,15 @@ def _typedecl(type):
 def _argdecl(name, type):    
     return _typedecl(type) + ' ' + name
 
+
+def _schemas(pkg):
+    '''generator function for all schemas inside a package'''
+    for ns in pkg.namespaces() :
+        if isinstance(ns, Package) :
+            for schema in _schemas(ns): yield schema        
+        elif isinstance(ns, Type) :
+            for schema in ns.h5schemas: yield schema
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -144,6 +153,15 @@ class DdlHdf5Data ( object ) :
                 headers = [header]
             for header in headers:
                 print >>self.inc, "#include \"%s\"" % header
+
+        # headers for externally implemented schemas or datasets
+        for pkg in model.packages():
+            for schema in _schemas(pkg):
+                if 'external' in schema.tags:
+                    print >>self.inc, "#include \"%s\"" % schema.tags['external']
+                for ds in schema.datasets:
+                    if 'external' in ds.tags:
+                        print >>self.inc, "#include \"%s\"" % ds.tags['external']
 
         if self.top_pkg : 
             ns = "namespace %s {" % self.top_pkg
@@ -270,6 +288,10 @@ class DdlHdf5Data ( object ) :
 
         logging.debug("_genSchema: %s", repr(schema))
 
+        if 'external' in schema.tags:
+            logging.debug("_genSchema: skip schema - external")
+            return
+
         for ds in schema.datasets:
             # generate datasets classes
             self._genDs(ds, schema)
@@ -282,12 +304,17 @@ class DdlHdf5Data ( object ) :
 
     def _genDs(self, ds, schema):
 
+
         logging.debug("_genDs: %s", repr(ds))
         
         logging.debug("_genDs: schema %s", schema)
 
-        ns = T("ns_${name}_v${version}")[schema]
-        dsClassName = T("dataset_${name}")[ds]
+        if 'external' in ds.tags:
+            logging.debug("_genDs: skip dataset - external")
+            return
+
+        ns = schema.nsName()
+        dsClassName = ds.className()
 
         print >>self.inc, "\nnamespace %s {" % ns
         
@@ -298,7 +325,11 @@ class DdlHdf5Data ( object ) :
 
         for attr in ds.attributes:
             if isinstance(attr.type, Enum):
+                # enum types are mapped to uint32 for now, can use shorter
+                # presentation if optimization is necessary
                 attr_type_name = "int32_t"
+            elif not attr.type.basic:
+                attr_type_name = attr._h5ds_typename
             else:
                 attr_type_name = attr.type.name
             if attr.rank > 0 and attr_type_name == 'char': 
@@ -307,6 +338,33 @@ class DdlHdf5Data ( object ) :
                 print >>self.inc, T("  size_t vlen_$name;")(name=attr.name)
                 attr_type_name = attr_type_name +'*'
             print >>self.inc, T("  $type $name;")(type=attr_type_name, name=attr.name)
+
+
+        # if schema contains single dataset and corresponding data type is a value type
+        # then add conversion function from this dataset class to a data type
+        try:
+            if len(schema.datasets) == 1 and schema.pstype.value_type:
+                
+                # find a constructor with some arguments
+                ctors = [ctor for ctor in schema.pstype.ctors if (ctor.args or 'auto' in ctor.tags)]
+                if len(ctors) == 1:
+                    ctor = ctors[0]
+    
+                    # map ctor parameters to dataset attributes
+                    dsattrs = []
+                    for aname, atype, attr in ctor.args:
+                        if not attr.accessor: raise TypeError("Attribute " + attr.name + " does not have access method")
+                        dsattrs += [dsattr.name for dsattr in ds.attributes if dsattr.method == attr.accessor.name]
+                    if len(dsattrs) != len(ctor.args): raise TypeError("Failed to find HDF5 attributes for constructor arguments")
+
+                    typename = schema.pstype.fullName('C++', self.psana_ns)
+                    args = ', '.join(dsattrs)
+                    print >>self.inc, T("  operator $typename() const { return $typename($args); }")(locals())
+
+        except Exception, ex:
+            # if we fail just ignore it
+            logging.debug('_genDs: exception for conv operator: %s', ex)
+
 
         print >>self.inc, "}; // class %s" % dsClassName
         
@@ -347,28 +405,36 @@ class DdlHdf5Data ( object ) :
                 print >>self.cpp, T('  type.insert("$name", offsetof(DsType, $name), $enum_type);')(locals())
             else:
                 type_name = attr.type.name
+                if attr.rank > 0 and type_name == 'char': 
+                    type_name = 'const char*'
                 print >>self.cpp, T('  type.insert_$func<$type_name>("$name", offsetof(DsType, $name));')(locals())
+
+        else:
+
+            # for non-basic type (like composite types) find corresponding h5 schema,
+            # if it has only one dataset then use it here
+            aschema = [sch for sch in attr.type.h5schemas if sch.version == attr.schema_version]
+            if not aschema:
+                raise ValueError('No schema found for attribute %s' % attr.name)
+            aschema = aschema[0]
+            if len(aschema.datasets) != 1:
+                raise ValueError('Attribute schema has number of datasets != 1: %d' % len(aschema.datasets))
+
+            attr_type_name = '::'.join([aschema.nsName(), aschema.datasets[0].className()])
+            attr_type_name = attr.type.parent.fullName('C++') + '::' + attr_type_name
+
+            # remember it for use in other places
+            attr._h5schema = aschema 
+            attr._h5ds = aschema.datasets[0]
+            attr._h5ds_typename = attr_type_name
+
+            name = attr.name
+            print >>self.cpp, T('  type.insert("$name", offsetof(DsType, $name), ${attr_type_name}::${func}_type());')(locals())
 
 
     def _genValueType(self, type, schema):
         """Generate code for value types"""
         
-        # find attribute for a given name
-        def name2attr(name, type):
-            
-            if not name: return None
-            
-            # try attribute name
-            attr = type.localName(name)
-            if isinstance(attr, Attribute): return attr
-            
-            # look for bitfield names also
-            for attr in type.attributes():
-                for bf in attr.bitfields:
-                    if bf.name == name: return bf
-                    
-            raise ValueError('No attrubute or bitfield with name %s defined in type %s' % (name, type.name))
-
         # generator for all HFD5 attributes
         def _schemaAttributes(schema):
             for ds in schema.datasets:
@@ -411,7 +477,7 @@ class DdlHdf5Data ( object ) :
         
         # get all datasets
         for ds in schema.datasets:
-            dsClassName = T("ns_${name}_v${version}")[schema] + T("::dataset_${name}")[ds]
+            dsClassName = '::'.join([schema.nsName(), ds.className()])
             dsName = ds.name
             print >>self.cpp, T("  boost::shared_ptr<$dsClassName> m_ds_$dsName = hdf5pp::Utils::readGroup<$dsClassName>(m_group, \"$dsName\", m_idx);")(locals())
 
@@ -421,39 +487,14 @@ class DdlHdf5Data ( object ) :
         if len(ctors) > 1: raise TypeError("Type " + type.name + " has multiple constructors defined")
         ctor = ctors[0]
 
-        # build a list of arguments to ctor
-        args = ctor.args
-        if not args :
-            
-            if 'auto' in ctor.tags:
-                # make one argument per type attribute
-                for attr in type.attributes():
-                    if attr.bitfields:
-                        for bf in attr.bitfields:
-                            if bf.accessor:
-                                name = "arg_bf_"+bf.name
-                                btype = bf.type
-                                dest = bf
-                                args.append((name, btype, dest))
-                    else:
-                        name = "arg_"+attr.name
-                        atype = attr.type
-                        dest = attr
-                        args.append((name, atype, dest))
-        
-        else:
-            
-            # convert destination names to attribute objects
-            args = [(name, atype, name2attr(dest, type)) for name, atype, dest in args]
-
         # map ctor parameters to schema objects
         dsattrs = []
-        for aname, atype, attr in args:
+        for aname, atype, attr in ctor.args:
             if not attr.accessor: raise TypeError("Attribute " + attr.name + " does not have access method")
             for ds, dsattr in _schemaAttributes(schema):
                 if attr.accessor.name == dsattr.method:
                     dsattrs.append((ds, dsattr))
-        if len(dsattrs) != len(args): raise TypeError("Failed to find HDF5 attributes for constructor arguments in type "+type.name)
+        if len(dsattrs) != len(ctor.args): raise TypeError("Failed to find HDF5 attributes for constructor arguments in type "+type.name)
 
         args = ['m_ds_'+ds.name+'->'+dsattr.name for ds, dsattr in dsattrs]
         print >>self.cpp, "  return boost::make_shared<PsanaType>(%s);" % (', '.join(args),)
@@ -506,7 +547,7 @@ class DdlHdf5Data ( object ) :
 
 
         for ds in schema.datasets:
-            dsClassName = T("ns_${name}_v${version}")[schema] + T("::dataset_${name}")[ds]
+            dsClassName = '::'.join([schema.nsName(), ds.className()])
             dsName = ds.name
             print >>self.inc, T("  mutable boost::shared_ptr<$dsClassName> m_ds_$dsName;")(locals())
             print >>self.inc, T("  void read_ds_$dsName() const;")(locals())
@@ -516,6 +557,17 @@ class DdlHdf5Data ( object ) :
                 print >>self.cpp, T("void $className::read_ds_$dsName() const {")(locals())
             print >>self.cpp, T("  m_ds_$dsName = hdf5pp::Utils::readGroup<$dsClassName>(m_group, \"$dsName\", m_idx);")(locals())
             print >>self.cpp, "}"
+
+            # user-defined data may need local storge as it is returned by reference
+            for attr in ds.attributes:
+                if not attr.type.basic and attr.rank == 0:
+                    typename = attr.type.fullName('C++', self.psana_ns)
+                    attrName = attr.name
+                    print >>self.inc, T("  mutable $typename m_ds_storage_${dsName}_${attrName};")(locals())
+                elif not attr.type.basic and attr.rank > 0:
+                    typename = attr.type.fullName('C++', self.psana_ns)
+                    attrName = attr.name
+                    print >>self.inc, T("  mutable std::vector<$typename> m_ds_storage_${dsName}_${attrName};")(locals())
 
         # explicitely instantiate class with known config types
         for config in type.xtcConfig:
@@ -558,7 +610,9 @@ class DdlHdf5Data ( object ) :
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
                 else:
                     ret_type = T("ndarray<$type, $rank>")(type=ret_type, rank=attr.rank)
-            
+            elif not attr.type.basic:
+                ret_type = T("const ${ret_type}&")(locals())
+                
             meth_name = meth.name
             print >>self.inc, T("  virtual $ret_type $meth_name() const;")(locals())
             if type.xtcConfig:
@@ -566,14 +620,29 @@ class DdlHdf5Data ( object ) :
             else:
                 print >>self.cpp, T("$ret_type $className::$meth_name() const {")(locals())
             print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
-            if attr.rank:
+            if attr.rank and attr.type.basic:
                 if attr.type.name == 'char':
-                    print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
+                    print >>self.cpp, T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
                 else:
                     shape = _interpolate(str(meth.attribute.shape), type)
                     print >>self.cpp, T("  return make_ndarray(m_ds_$name->$attr_name,$shape);")(name=ds.name, attr_name=attr.name, type=ret_type, shape=shape)
+            elif attr.rank and not attr.type.basic:
+                dsName = ds.name
+                attrName = attr.name
+                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                shape = _interpolate(str(meth.attribute.shape), type)
+                print >>self.cpp, T("  if (m_ds_$dsName->vlen_$attrName and not $memberName.data()) {")(locals())
+                print >>self.cpp, T("    $memberName.insert($memberName.end(), m_ds_$dsName->$attrName, m_ds_$dsName->$attrName+m_ds_$dsName->vlen_$attrName);\n  }")(locals())
+                print >>self.cpp, T("  return make_ndarray($memberName.data(),$shape);")(locals())
+            elif not attr.type.basic:
+                dsName = ds.name
+                attrName = attr.name
+                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                ret_type = attr.type.fullName('C++', self.psana_ns)
+                print >>self.cpp, T("  $memberName = $ret_type(m_ds_$dsName->$attrName);")(locals())
+                print >>self.cpp, T("  return $memberName;")(locals())
             else:
-                print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=meth.type.name)
+                print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
             print >>self.cpp, "}"
 
             
@@ -604,23 +673,15 @@ class DdlHdf5Data ( object ) :
             # config objects may be needed 
             cfgNeeded = False
             if body: 
-                cfgNeeded = body.find('{xtc-config}') >= 0
                 body = _interpolate(body, meth.parent)
 
             # default is not inline, can change with a tag
             inline = 'inline' in meth.tags
             
-            configs = [None]
-            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
-            for cfg in configs:
+            template = "Config" if type.xtcConfig else None
+            self._genMethodBody(meth.name, rettype, className, body, meth.args, inline, static=meth.static, doc=meth.comment, template=template)
 
-                args = []
-                if cfg: args = [('cfg', cfg)]
-                args += meth.args
-
-                self._genMethodBody(meth.name, rettype, className, body, args, inline, static=meth.static, doc=meth.comment)
-
-    def _genMethodBody(self, methname, rettype, classname, body, args=[], inline=False, static=False, doc=None):
+    def _genMethodBody(self, methname, rettype, classname, body, args=[], inline=False, static=False, doc=None, template=None):
         """ Generate method, both declaration and definition, given the body of the method"""
         
         # make argument list
@@ -650,7 +711,10 @@ class DdlHdf5Data ( object ) :
             
             # out-of-line method
             print >>self.inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-            print >>self.cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
+            if template:
+                print >>self.cpp, T("template<typename $template>\n$rettype\n$classname<$template>::$methname($argsspec) $const {\n  $body\n}")(locals())
+            else:
+                print >>self.cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
 
 
     def _defaultSchema(self, type):
@@ -666,12 +730,12 @@ class DdlHdf5Data ( object ) :
         # schema instance
         schema = H5Type(type.name, package=type.package, pstype=type, version=0, included=type.included)
         
-        # All non-array attributes of basic types will go into separate dataset.
+        # All non-array attributes of value-types will go into separate dataset.
         # All 1-dim character arrays (strings) are included here too
         # Dataset name is 'data' for event data or 'config' for config types.
         ds = None
         for meth in methods:
-            if (meth.rank == 0 and meth.type.basic) or (meth.rank == 1 and meth.type.name == 'char'):
+            if (meth.rank == 0 and meth.type.value_type) or (meth.rank == 1 and meth.type.name == 'char'):
                 if not ds:
                     dsname = 'data'
                     if "config-type" in type.tags: dsname = 'config' 
@@ -683,7 +747,7 @@ class DdlHdf5Data ( object ) :
 
         # for non-array attributes of user-defined types create individual datasets
         for meth in methods:
-            if meth.rank == 0 and not meth.type.basic:
+            if meth.rank == 0 and not meth.type.value_type:
                 # get/make that type schema
                 if not meth.type.h5schemas:
                     meth.type.h5schemas = [self._defaultSchema(meth.type)]

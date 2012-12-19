@@ -253,31 +253,10 @@ class DdlPds2Psana ( object ) :
             logging.warning('No suitable constructor defined for %s', typename)
             return
 
-        args = []
-        if 'auto' in ctor.tags:
-            # make one argument per type attribule
-            for attr in type.attributes():
-                if attr.bitfields:
-                    for bf in attr.bitfields:
-                        if bf.accessor:
-                            name = "arg_bf_"+bf.name
-                            type = bf.type
-                            dest = bf
-                            args.append((name, type, dest))
-                else:
-                    name = "arg_"+attr.name
-                    type = attr.type
-                    dest = attr
-                    args.append((name, type, dest))
-    
-        else:
-            # convert destination names to attribute objects
-            args = [(name, atype, name2attr(dest, type)) for name, atype, dest in ctor.args]
-
-        logging.debug("_genValueType: ctor args=%s", repr(args))
+        logging.debug("_genValueType: ctor args=%s", repr(ctor.args))
         
         ctor_args = []
-        for aname, atype, dest in args:
+        for aname, atype, dest in ctor.args:
 
             if not atype: atype = dest.type
 
