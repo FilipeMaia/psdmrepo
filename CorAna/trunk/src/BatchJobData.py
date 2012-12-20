@@ -26,18 +26,20 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys
-import os
+#import sys
+#import os
 
-from ConfigParametersCorAna   import confpars as cp
-from Logger                   import logger
-from ConfigFileGenerator      import cfg
-from FileNameManager          import fnm
-import GlobalUtils            as     gu
+from BatchJob import *
+
+#from ConfigParametersCorAna   import confpars as cp
+#from Logger                   import logger
+#from ConfigFileGenerator      import cfg
+#from FileNameManager          import fnm
+#import GlobalUtils            as     gu
 
 #-----------------------------
 
-class BatchJobData :
+class BatchJobData(BatchJob) :
     """Deals with batch jobs for data.
     """
 
@@ -45,16 +47,14 @@ class BatchJobData :
         """Constructor.
         @param fname the file name for ...
         """
+
+        BatchJob.__init__(self)
+
         self.job_id_data_aver = None
         self.job_id_data_scan = None
-        #self.path_peds_cfg   = fnm.path_data_aver_psana_cfg()
 
         self.time_aver_job_submitted = None
         self.time_scan_job_submitted = None
-
-        self.time_interval_sec      = 100
-        self.dict_status = {True  : ' is available',
-                            False : ' is not available'}
 
 #-----------------------------
 
@@ -106,34 +106,6 @@ class BatchJobData :
 
 #-----------------------------
 
-    def job_can_be_submitted(self, job_id, t_sub, comment='') :
-        if self.job_was_recently_submitted(t_sub, comment) and \
-           (self.get_batch_job_status(job_id, comment) != 'DONE') :
-
-            msg = 'Batch job can be re-resubmitted when timeout ' \
-                  + str(self.time_interval_sec) + ' sec is expired' \
-                  + ' or the job ' + job_id + ' is DONE'
-            logger.info(msg, __name__)             
-            return False
-        else :
-            return True
-
-#-----------------------------
-
-    def job_was_recently_submitted(self, t_sub, comment='') :
-
-        if t_sub == None : return False
-
-        if gu.get_time_sec() - t_sub > self.time_interval_sec :
-            return False
-        else :
-            msg = 'Sorry, but '+ comment +' job was already submitted less then ' + \
-            str(self.time_interval_sec) + ' sec ago... Be patient, just relax and wait...'
-            logger.warning(msg, __name__)         
-            return True
-
-#-----------------------------
-
     def check_batch_job_for_data_aver(self) :
         self.check_batch_job(self.job_id_data_aver, 'data average')
 
@@ -143,54 +115,20 @@ class BatchJobData :
         self.check_batch_job(self.job_id_data_scan, 'data scan')
 
 #-----------------------------
-
-    def check_batch_job(self, job_id, comment='') :
-
-        if job_id == None :
-            logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
-            return
-
-        lines = gu.batch_job_check(job_id, cp.bat_queue.value())
-        msg = 'Check batch status for ' + comment + ':\n'
-        for line in lines :
-            msg += line
-        logger.info(msg, __name__) 
-
-#-----------------------------
-
-    def get_batch_job_status(self, job_id, comment='') :
-
-        if job_id == None :
-            self.batch_job_status = None
-        else :
-            self.batch_job_status = gu.batch_job_status(job_id, cp.bat_queue.value())
-
-        logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 
-        return self.batch_job_status
-
 #-----------------------------
 
     def print_work_files_for_data_aver(self) :
-        logger.info('Print work files for data scan / average:', __name__)         
-        for fname in fnm.get_list_of_files_data_aver() :
-            logger.info(fname)         
+        self.print_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 
     def check_work_files_for_data_aver(self) :
-        logger.info('Check work files for data scan / average:', __name__)         
-        for fname in fnm.get_list_of_files_data_aver() :
-            msg = '%s %s' % ( fname.ljust(100), self.dict_status[os.path.lexists(fname)] )
-            logger.info(msg)         
+        self.check_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 
     def remove_files_data_aver(self) :
-        logger.info('Remove data_average work files for selected run:', __name__)
-        for fname in fnm.get_list_of_files_data_aver() :
-            if os.path.lexists(fname) :
-                gu.remove_file(fname)
-                logger.info('Removed: ' + fname)
+        self.remove_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 
