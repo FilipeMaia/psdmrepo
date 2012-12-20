@@ -54,7 +54,7 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.tit_bat_start       = QtGui.QLabel('start')
         self.tit_bat_end         = QtGui.QLabel('end')
         self.tit_bat_total       = QtGui.QLabel('total')
-        self.tit_bat_time        = QtGui.QLabel('time (sec)')
+        self.tit_bat_time        = QtGui.QLabel(u'\u0394t(sec)')
         self.tit_bat_data        = QtGui.QLabel('data')
         self.tit_bat_dark        = QtGui.QLabel('dark')
         self.tit_bat_flat        = QtGui.QLabel('flat')
@@ -226,6 +226,11 @@ class GUISetupPars ( QtGui.QWidget ) :
 
 
     def set_fields(self):
+        self.edi_bat_data_start.setText( str( cp.bat_data_start.value() ) )        
+        self.edi_bat_data_end  .setText( str( cp.bat_data_end  .value() ) )        
+        self.edi_bat_data_total.setText( str( cp.bat_data_total.value() ) )        
+        self.edi_bat_data_time .setText( str( cp.bat_data_dt_ave.value() ) + u'\u00B1' + str( cp.bat_data_dt_rms.value() ) )        
+
         self.edi_bat_dark_start.setText( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_dark_end  .setText( str( cp.bat_dark_end  .value() ) )        
         self.edi_bat_dark_total.setText( str( cp.bat_dark_total.value() ) )        

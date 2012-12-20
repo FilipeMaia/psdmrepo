@@ -31,9 +31,8 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
-
-#from GUIRunLeft   import *
-#from GUIRunRight  import *
+from GUIFileBrowser         import *
+from BatchJobCorAna         import bjcora
 
 #---------------------
 #  Class definition --
@@ -56,8 +55,19 @@ class GUIRun ( QtGui.QWidget ) :
         self.tit_flat   = QtGui.QLabel('Flat:')
         self.tit_blam   = QtGui.QLabel('Blam:')
 
-        self.but_close  = QtGui.QPushButton('Close') 
-        self.but_apply  = QtGui.QPushButton('Save') 
+        self.lab_start  = QtGui.QLabel('Start:')
+        self.lab_end    = QtGui.QLabel('End:')
+        self.lab_total  = QtGui.QLabel('Total:')
+        self.lab_time   = QtGui.QLabel(u'\u0394t(sec):')
+
+
+        #self.but_close  = QtGui.QPushButton('Close') 
+        #self.but_apply  = QtGui.QPushButton('Save') 
+        self.but_run    = QtGui.QPushButton('Run') 
+        self.but_status = QtGui.QPushButton('Check status') 
+        self.but_files  = QtGui.QPushButton('Check files') 
+        self.but_brow   = QtGui.QPushButton('Browse') 
+        self.but_remove = QtGui.QPushButton('Remove') 
 
         self.edi_data = QtGui.QLineEdit('Data')        
         self.edi_dark = QtGui.QLineEdit('Dark')        
@@ -67,36 +77,55 @@ class GUIRun ( QtGui.QWidget ) :
         self.edi_bat_start  = QtGui.QLineEdit ( 'Start' )        
         self.edi_bat_end    = QtGui.QLineEdit ( 'End'   )        
         self.edi_bat_total  = QtGui.QLineEdit ( 'Total' )        
-        self.edi_bat_time   = QtGui.QLineEdit ( 'dt'    )        
+        self.edi_bat_time   = QtGui.QLineEdit ( 'Time'  )        
  
         self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.tit_status)
+        self.hboxB.addWidget(self.but_run)
+        self.hboxB.addWidget(self.but_status)
+        self.hboxB.addWidget(self.but_files)
+        self.hboxB.addWidget(self.but_brow)
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.but_close)
-        self.hboxB.addWidget(self.but_apply)
+        self.hboxB.addWidget(self.but_remove)
+
+        self.hboxS = QtGui.QHBoxLayout()
+        self.hboxS.addWidget(self.tit_status)
+        self.hboxS.addStretch(1)     
+        #self.hboxB.addWidget(self.but_close)
+        #self.hboxB.addWidget(self.but_apply)
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
-        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 8)          
+        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 10)          
         self.grid.addWidget(self.tit_data,      self.grid_row+1, 0)
-        self.grid.addWidget(self.edi_data,      self.grid_row+1, 1, 1, 7)
-        self.grid.addWidget(self.edi_bat_start, self.grid_row+1, 8)
-        self.grid.addWidget(self.edi_bat_end  , self.grid_row+1, 9)
-        self.grid.addWidget(self.edi_bat_total, self.grid_row+1, 10)
-        self.grid.addWidget(self.edi_bat_time , self.grid_row+1, 11)
+        self.grid.addWidget(self.edi_data,      self.grid_row+1, 1, 1,  9)
 
-        self.grid.addWidget(self.tit_dark,      self.grid_row+2, 0)
-        self.grid.addWidget(self.edi_dark,      self.grid_row+2, 1, 1, 7)
-        self.grid.addWidget(self.tit_flat,      self.grid_row+3, 0)
-        self.grid.addWidget(self.edi_flat,      self.grid_row+3, 1, 1, 7)
-        self.grid.addWidget(self.tit_blam,      self.grid_row+4, 0)
-        self.grid.addWidget(self.edi_blam,      self.grid_row+4, 1, 1, 7)
-        self.grid.addLayout(self.hboxB,         self.grid_row+5, 0, 1, 8)
+        self.grid.addWidget(self.lab_start,     self.grid_row+2, 1)
+        self.grid.addWidget(self.edi_bat_start, self.grid_row+2, 2)
+        self.grid.addWidget(self.lab_end,       self.grid_row+2, 3)
+        self.grid.addWidget(self.edi_bat_end,   self.grid_row+2, 4)
+        self.grid.addWidget(self.lab_total,     self.grid_row+2, 5)
+        self.grid.addWidget(self.edi_bat_total, self.grid_row+2, 6)
+        self.grid.addWidget(self.lab_time,      self.grid_row+2, 7)
+        self.grid.addWidget(self.edi_bat_time , self.grid_row+2, 8, 1,  2)
+
+        self.grid.addWidget(self.tit_dark,      self.grid_row+3, 0)
+        self.grid.addWidget(self.edi_dark,      self.grid_row+3, 1, 1,  9)
+        self.grid.addWidget(self.tit_flat,      self.grid_row+4, 0)
+        self.grid.addWidget(self.edi_flat,      self.grid_row+4, 1, 1,  9)
+        self.grid.addWidget(self.tit_blam,      self.grid_row+5, 0)
+        self.grid.addWidget(self.edi_blam,      self.grid_row+5, 1, 1,  9)
+        self.grid.addLayout(self.hboxB,         self.grid_row+7, 0, 1, 10)
+        self.grid.addLayout(self.hboxS,         self.grid_row+8, 0, 1, 10)
 
         self.setLayout(self.grid)
         
-        self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
-        self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave  )
+        #self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose  )
+        #self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave   )
+        self.connect( self.but_run,    QtCore.SIGNAL('clicked()'), self.onRun    )
+        self.connect( self.but_status, QtCore.SIGNAL('clicked()'), self.onStatus )
+        self.connect( self.but_files,  QtCore.SIGNAL('clicked()'), self.onFiles  )
+        self.connect( self.but_brow,   QtCore.SIGNAL('clicked()'), self.onBrow   )
+        self.connect( self.but_remove, QtCore.SIGNAL('clicked()'), self.onRemove )
 
         self.showToolTips()
         self.setStyle()
@@ -109,8 +138,8 @@ class GUIRun ( QtGui.QWidget ) :
 
     def showToolTips(self):
         self           .setToolTip('This GUI is intended for run control and monitoring.')
-        self.but_close .setToolTip('Close this window.')
-        self.but_apply .setToolTip('Apply changes to configuration parameters.')
+        #self.but_close .setToolTip('Close this window.')
+        #self.but_apply .setToolTip('Apply changes to configuration parameters.')
         #self.but_show  .setToolTip('Show ...')
 
     def setFrame(self):
@@ -126,20 +155,31 @@ class GUIRun ( QtGui.QWidget ) :
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
-        self.but_close .setStyleSheet (cp.styleButton)
-        self.but_apply .setStyleSheet (cp.styleButton) 
+        #self.but_close .setStyleSheet (cp.styleButton)
+        #self.but_apply .setStyleSheet (cp.styleButton) 
         #self.but_show  .setStyleSheet (cp.styleButton) 
-        self.tit_data  .setStyleSheet   (cp.styleLabel)
-        self.tit_dark  .setStyleSheet   (cp.styleLabel)
-        self.tit_flat  .setStyleSheet   (cp.styleLabel)
-        self.tit_blam  .setStyleSheet   (cp.styleLabel)
+        self.but_run   .setStyleSheet (cp.styleButton) 
+        self.but_status.setStyleSheet (cp.styleButton)
+        self.but_files .setStyleSheet (cp.styleButton)
+        self.but_brow  .setStyleSheet (cp.styleButton)
+        self.but_remove.setStyleSheet (cp.styleButtonBad)
+
+        self.tit_data  .setStyleSheet (cp.styleLabel)
+        self.tit_dark  .setStyleSheet (cp.styleLabel)
+        self.tit_flat  .setStyleSheet (cp.styleLabel)
+        self.tit_blam  .setStyleSheet (cp.styleLabel)
+
         self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
 
+        self.lab_start .setStyleSheet (cp.styleLabel)
+        self.lab_end   .setStyleSheet (cp.styleLabel)
+        self.lab_total .setStyleSheet (cp.styleLabel)
+        self.lab_time  .setStyleSheet (cp.styleLabel)
 
-        self.edi_data.setStyleSheet   (cp.styleEditInfo)
-        self.edi_dark.setStyleSheet   (cp.styleEditInfo)
-        self.edi_flat.setStyleSheet   (cp.styleEditInfo)
-        self.edi_blam.setStyleSheet   (cp.styleEditInfo)
+        self.edi_data.setStyleSheet (cp.styleEditInfo)
+        self.edi_dark.setStyleSheet (cp.styleEditInfo)
+        self.edi_flat.setStyleSheet (cp.styleEditInfo)
+        self.edi_blam.setStyleSheet (cp.styleEditInfo)
 
         width = 60
         self.edi_bat_start.setFixedWidth(width)   
@@ -214,14 +254,77 @@ class GUIRun ( QtGui.QWidget ) :
         try    : del cp.guirun # GUIRun
         except : pass
 
+
+    def onRun(self):
+        logger.debug('onRun', __name__)
+        if self.isReadyToStartRun() : bjcora.submit_batch_for_cora()
+        else : pass
+
+
+    def isReadyToStartRun(self):
+
+        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
+
+        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+            logger.warning(msg1, __name__)
+            return False
+
+        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
+            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+            self.edi_bat_start.setStyleSheet(cp.styleEditBad)
+            logger.warning(msg1, __name__)
+            return False
+
+        else :
+            self.edi_bat_end.setStyleSheet  (cp.styleEditInfo)
+            self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
+            return True
+
+
+    def onStatus(self):
+        logger.debug('onStatus', __name__)
+
+        if bjcora.status_for_cora_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
+        else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
+        bjcora.check_batch_job_for_cora()
+        #blp.parse_batch_log_data_scan()
+        #self.set_fields()
+
+
+    def onFiles(self):
+        logger.debug('onFiles', __name__)
+        bjcora.check_work_files_cora()
+
+
+    def onBrow(self):
+        logger.debug('onBrowser', __name__)
+        try    :
+            cp.guifilebrowser.close()
+            self.but_brow.setStyleSheet(cp.styleButtonBad)
+        except :
+            self.but_brow.setStyleSheet(cp.styleButtonGood)
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora(), fnm.path_cora_split_psana_cfg())
+            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
+            cp.guifilebrowser.show()
+
+
+    def onRemove(self):
+        logger.debug('onRemove', __name__)
+        bjcora.remove_files_cora()
+        #self.on_but_status()
+
+
     def onClose(self):
         logger.debug('onClose', __name__)
         self.close()
+
 
     def onSave(self):
         fname = cp.fname_cp.value()
         logger.debug('onSave:', __name__)
         cp.saveParametersInFile( fname )
+
 
     def onShow(self):
         logger.debug('onShow - is not implemented yet...', __name__)

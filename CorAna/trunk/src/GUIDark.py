@@ -63,7 +63,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.lab_start   = QtGui.QLabel('Start')
         self.lab_end     = QtGui.QLabel('End')
         self.lab_total   = QtGui.QLabel('Total')
-        self.lab_time    = QtGui.QLabel('Time(sec)')
+        self.lab_time    = QtGui.QLabel(u'\u0394t(sec)')
 
         self.edi_bat_start  = QtGui.QLineEdit ( str( cp.bat_dark_start.value() ) )        
         self.edi_bat_end    = QtGui.QLineEdit ( str( cp.bat_dark_end  .value() ) )        

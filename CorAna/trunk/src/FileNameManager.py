@@ -99,6 +99,17 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_prefix(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() 
+
+    def path_prefix_dark(self) :
+        return self.path_prefix() + self.str_exp_run_dark()
+
+    def path_prefix_data(self) :
+        return self.path_prefix() + self.str_exp_run_data()
+
+#-----------------------------
+
     def path_blam(self) :
         return cp.dname_blam.value() + '/' + cp.fname_blam.value()
 
@@ -106,22 +117,22 @@ class FileNameManager :
         return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
     def path_flat_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'flat-plot.png'
+        return self.path_prefix() + self.str_exp_run_data() + 'flat-plot.png'
 
     def path_blam_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'blam-plot.png'
+        return self.path_prefix() + self.str_exp_run_data() + 'blam-plot.png'
 
 
 #-----------------------------
 
     def path_peds_scan_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-batch-log.txt'
+        return self.path_prefix_dark() + 'peds-scan-batch-log.txt'
 
     def path_peds_scan_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan.cfg'
+        return self.path_prefix_dark() + 'peds-scan.cfg'
 
     def path_peds_scan_tstamp_list(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-scan-tstamp-list.txt'
+        return self.path_prefix_dark() + 'peds-scan-tstamp-list.txt'
 
     def path_peds_scan_tstamp_list_tmp(self) :
         return  self.path_peds_scan_tstamp_list() + '-tmp'
@@ -129,64 +140,84 @@ class FileNameManager :
 
 
     def path_peds_aver_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds.cfg'
+        return self.path_prefix_dark()  + 'peds.cfg'
 
     def path_peds_aver_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-batch-log.txt'
+        return self.path_prefix_dark()  + 'peds-batch-log.txt'
 
     def path_pedestals_ave(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-ave.txt'
+        return self.path_prefix_dark()  + 'peds-ave.txt'
 
     def path_pedestals_rms(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-rms.txt'
+        return self.path_prefix_dark()  + 'peds-rms.txt'
 
     def path_peds_aver_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_dark() + 'peds-aver-plot.png'
+        return self.path_prefix_dark()  + 'peds-aver-plot.png'
 
 #-----------------------------
 
     def path_data_scan_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan.cfg'
+        return self.path_prefix_data()  + 'data-scan.cfg'
 
     def path_data_scan_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-batch-log.txt'
+        return self.path_prefix_data() + 'data-scan-batch-log.txt'
 
     def path_data_scan_monitors_data(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-mons-data.txt'
+        return self.path_prefix_data() + 'data-scan-mons-data.txt'
 
     def path_data_scan_monitors_commments(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-mons-comments.txt'
+        return self.path_prefix_data() + 'data-scan-mons-comments.txt'
 
     def path_data_scan_tstamp_list(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-scan-tstamp-list.txt'
+        return self.path_prefix_data() + 'data-scan-tstamp-list.txt'
 
     def path_data_scan_tstamp_list_tmp(self) :
         return  self.path_data_scan_tstamp_list() + '-tmp'
 
+#-----------------------------
 
     def path_data_aver_psana_cfg(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver.cfg'
+        return self.path_prefix_data() + 'data-aver.cfg'
 
     def path_data_aver_batch_log(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver-batch-log.txt'
+        return self.path_prefix_data() + 'data-aver-batch-log.txt'
 
     def path_data_ave(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-ave.txt'
+        return self.path_prefix_data() + 'data-ave.txt'
 
     def path_data_rms(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-rms.txt'
+        return self.path_prefix_data() + 'data-rms.txt'
 
     def path_data_aver_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-aver-plot.png'
+        return self.path_prefix_data() + 'data-aver-plot.png'
 
     def path_data_time_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-time-plot.png'
+        return self.path_prefix_data() + 'data-time-plot.png'
 
     def path_data_mons_plot(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'data-mons-plot.png'
+        return self.path_prefix_data() + 'data-mons-plot.png'
 
     def path_gui_image(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + self.str_exp_run_data() + 'gui-image.png'
+        return self.path_prefix_data() + 'gui-image.png'
+
+#-----------------------------
+
+    def path_prefix_cora(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix_cora.value() 
+
+    def path_cora_split_psana_cfg(self) :
+        return self.path_prefix_cora() + self.str_exp_run_data() + 'split.cfg'
+
+    def path_cora_split_batch_log(self) :
+        return self.path_prefix_cora() + self.str_exp_run_data() + 'batch-log.cfg'
+
+#-----------------------------
+
+    def  get_list_of_files_cora(self) :
+        self.list_of_files_cora  = []
+        self.list_of_files_cora.append(fnm.path_cora_split_psana_cfg())
+        self.list_of_files_cora.append(fnm.path_cora_split_batch_log())
+        return self.list_of_files_cora
 
 #-----------------------------
 

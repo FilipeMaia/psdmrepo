@@ -125,6 +125,27 @@ class ConfigFileGenerator :
 #-----------------------------
 #-----------------------------
 
+    def make_psana_cfg_file_for_cora_split (self) :
+        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-cora-split.cfg').path()
+        self.path_out = fnm.path_cora_split_psana_cfg()
+        self.d_subs   = {'SKIP'            : str( cp.bat_data_start.value() - 1 ),
+                         'EVENTS'          : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
+                         'IMG_REC_MODULE'  : str( cp.bat_img_rec_mod.value() ),
+                         'DETINFO'         : str( cp.bat_det_info.value() ),
+                         'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() )
+                         #'FILE_AVE'       : fnm.path_data_ave(),
+                         #'FILE_RMS'       : fnm.path_data_rms()
+                         }
+
+        self.print_substitution_dict()
+        self.make_cfg_file()
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
     def print_substitution_dict (self) :
         logger.debug('Substitution dictionary:',__name__)
         for k,v in self.d_subs.iteritems() :
