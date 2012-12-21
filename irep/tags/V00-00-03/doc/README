@@ -1,0 +1,20 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package irep
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+PCDS Inventory and Repair Database for electronic equipment
+
+Detailed description:
+=====================
+
+The package contains database schema, database API, Web services and
+Web applications of the project.
