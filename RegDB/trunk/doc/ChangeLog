@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2012-12-20 Igor Gaponenko
+- added support for FFB auto-translation
+
 Tag: V00-01-04
 2012-12-20 Andy Salnikov
 - make second argument of RegDb.get_experiments() method optional, if not

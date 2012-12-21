@@ -7,7 +7,6 @@ use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 
 use RegDB\RegDB;
-use RegDB\RegDBAuth;
 use RegDB\RegDBException;
 
 /*
@@ -16,6 +15,7 @@ use RegDB\RegDBException;
  * an experiment.
  */
 define('PARAM_NAME','AUTO_TRANSLATE_HDF5');
+define('FFB_PARAM_NAME','FFB_AUTO_TRANSLATE_HDF5');
 
 /* Package the error message into a JSON object and return the one
  * back to a caller. The script's execution will end at this point.
@@ -49,16 +49,18 @@ if( isset( $_POST['exper_id'] )) {
 if( isset( $_POST['autotranslate2hdf5'] )) $autotranslate2hdf5 = intval(trim( $_POST['autotranslate2hdf5'] ));
 else report_error( "missing parameter to specify auto-translation option for HDF5" );
 
+if( isset( $_POST['ffb_autotranslate2hdf5'] )) $ffb_autotranslate2hdf5 = intval(trim( $_POST['ffb_autotranslate2hdf5'] ));
+else report_error( "missing parameter to specify FFB auto-translation option for HDF5" );
 
 try {
-	$regdb = RegDB::instance();
-	$regdb->begin();
+    $regdb = RegDB::instance();
+    $regdb->begin();
 
-	$experiment = $regdb->find_experiment_by_id( $exper_id );
-	if( !$experiment ) report_error( 'no such experiment' );
+    $experiment = $regdb->find_experiment_by_id( $exper_id );
+    if( !$experiment ) report_error( 'no such experiment' );
 
-	LogBookAuth::instance()->canPostNewMessages( $experiment->id()) or
-		 report_error( 'not autorized to manage Auto-Translation of HDF5 files for the experiment' );
+    LogBookAuth::instance()->canPostNewMessages( $experiment->id()) or
+        report_error( 'not autorized to manage Auto-Translation of HDF5 files for the experiment' );
 
     $param = $experiment->find_param_by_name( PARAM_NAME);
     if($autotranslate2hdf5) {
@@ -69,8 +71,17 @@ try {
     } else {
         if(!is_null($param)) $param = $experiment->remove_param(PARAM_NAME);
     }
+    $ffb_param = $experiment->find_param_by_name( FFB_PARAM_NAME);
+    if($ffb_autotranslate2hdf5) {
+        if(is_null($ffb_param)) {
+            $ffb_param = $experiment->set_param(FFB_PARAM_NAME, '1' );
+            if( is_null( $ffb_param )) report_error( 'failed to modify the parameter' );
+        }
+    } else {
+        if(!is_null($ffb_param)) $ffb_param = $experiment->remove_param(FFB_PARAM_NAME);
+    }
 
-	$regdb->commit();
+    $regdb->commit();
 
     report_success();
 

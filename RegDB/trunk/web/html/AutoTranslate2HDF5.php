@@ -4,6 +4,7 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use LogBook\LogBook;
+use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 
 use RegDB\RegDB;
@@ -14,19 +15,19 @@ $tables_html = '';
 $experiments2load = '';
 
 try {
-	$logbook = LogBook::instance();
-	$logbook->begin();
+    $logbook = LogBook::instance();
+    $logbook->begin();
 
-	$regdb = RegDB::instance();
-	$regdb->begin();
+    $regdb = RegDB::instance();
+    $regdb->begin();
 
-	$can_modify = RegDBAuth::instance()->canEdit();
+    $can_modify = RegDBAuth::instance()->canEdit();
 
-	foreach( $logbook->instruments() as $instrument ) {
+    foreach( $logbook->instruments() as $instrument ) {
 
-		if( $instrument->is_location()) continue;
+        if( $instrument->is_location()) continue;
 
-		$tables_html .= <<<HERE
+        $tables_html .= <<<HERE
 <table><tbody>
   <tr>
     <td class="table_hdr">Instrument</td>
@@ -35,22 +36,20 @@ try {
     <td class="table_hdr">#runs</td>
     <td class="table_hdr">#translated</td>
     <td class="table_hdr">Auto-Translate</td>
-HERE;
-        if( $can_modify )
-			$tables_html .= <<<HERE
+    <td class="table_hdr">Auto-Translate (FFB)</td>
     <td class="table_hdr">Actions</td>
     <td class="table_hdr">Comments</td>
-HERE;
-		$tables_html .= <<<HERE
   </tr>
 HERE;
 
-		foreach( $logbook->experiments_for_instrument( $instrument->name()) as $experiment ) {
+        foreach( $logbook->experiments_for_instrument( $instrument->name()) as $experiment ) {
 
-			if( $experiment->is_facility()) continue;
+            if( $experiment->is_facility()) continue;
 
-			$num_runs = $experiment->num_runs();
-			$num_runs_str = '';
+            $is_authorized = $can_modify || LogBookAuth::instance()->canPostNewMessages( $experiment->id());
+
+            $num_runs = $experiment->num_runs();
+            $num_runs_str = '';
             $loading_comment = '';
             if($num_runs) {
                 $num_runs_str = $num_runs;
@@ -60,10 +59,12 @@ HERE;
                 else
                     $experiments2load .= ",{$experiment->id()}";
             }
-			$autotranslate2hdf5 = $experiment->regdb_experiment()->find_param_by_name( 'AUTO_TRANSLATE_HDF5' );
-			$autotranslate2hdf5_str = $autotranslate2hdf5 ? 'checked="checked"' : '';
+            $autotranslate2hdf5 = $experiment->regdb_experiment()->find_param_by_name( 'AUTO_TRANSLATE_HDF5' );
+            $autotranslate2hdf5_str = $autotranslate2hdf5 ? 'checked="checked"' : '';
+            $ffb_autotranslate2hdf5 = $experiment->regdb_experiment()->find_param_by_name( 'FFB_AUTO_TRANSLATE_HDF5' );
+            $ffb_autotranslate2hdf5_str = $ffb_autotranslate2hdf5 ? 'checked="checked"' : '';
 
-			$tables_html .= <<<HERE
+            $tables_html .= <<<HERE
   <tr>
     <td class="table_cell">{$experiment->instrument()->name()}</td>
     <td class="table_cell"><a target="_blank" href="../portal/index.php?exper_id={$experiment->id()}&app=hdf:manage" title="open Web Portal of the Experiment in new window/tab">{$experiment->name()}</a></td>
@@ -71,25 +72,29 @@ HERE;
     <td class="table_cell">{$num_runs_str}</td>
     <td class="table_cell"><span id="num_translated_{$experiment->id()}"}>{$loading_comment}</td>
 HERE;
-			if( $can_modify ) {
-				$tables_html .= <<<HERE
+            if( $is_authorized ) {
+                $tables_html .= <<<HERE
     <td class="table_cell"><input type="checkbox" class="autotranslate2hdf5" name="{$experiment->id()}" value=1 {$autotranslate2hdf5_str} /></td>
+    <td class="table_cell"><input type="checkbox" class="ffb_autotranslate2hdf5" name="{$experiment->id()}" value=1 {$ffb_autotranslate2hdf5_str} /></td>
     <td class="table_cell"><button id="{$experiment->id()}" disabled="disabled">Save</button></td>
     <td class="table_cell table_cell_right"><span id="comment_{$experiment->id()}"}></span></td>
 HERE;
-			} else {
-				$tables_html .= <<<HERE
-    <td class="table_cell table_cell_right"><input type="checkbox" class="autotranslate2hdf5" name="{$experiment->id()}" value=1 disabled="disabled" {$autotranslate2hdf5_str} /></td>
+            } else {
+                $tables_html .= <<<HERE
+    <td class="table_cell"><input type="checkbox" class="autotranslate2hdf5" name="{$experiment->id()}" value=1 disabled="disabled" {$autotranslate2hdf5_str} /></td>
+    <td class="table_cell"><input type="checkbox" class="ffb_autotranslate2hdf5" name="{$experiment->id()}" value=1 disabled="disabled" {$ffb_autotranslate2hdf5_str} /></td>
+    <td class="table_cell">&nbsp;</td>
+    <td class="table_cell table_cell_right">&nbsp;</td>
 HERE;
-			}
-			$tables_html .= <<<HERE
+            }
+            $tables_html .= <<<HERE
   </tr>
 HERE;
-		}
-		$tables_html .= <<<HERE
+        }
+        $tables_html .= <<<HERE
 </tbody><table>
 HERE;
-	}
+    }
     if($experiments2load == '')
         $experiments2load = "var experiments2load=[];\n";
     else
@@ -155,7 +160,10 @@ input.autotranslate2hdf5 {
   padding-left: 2px;
   padding-right: 2px;
 }
-
+input.ffb_autotranslate2hdf5 {
+  padding-left: 2px;
+  padding-right: 2px;
+}
 </style>
 
 <script type="text/javascript">
@@ -185,10 +193,11 @@ function load_hdf5_files(exper_id) {
 
 $(function() {
 
-	$('button').button().click(function() {
+    $('button').button().click(function() {
 
-		var exper_id = this.id;
+        var exper_id = this.id;
         var is_checked = $('input.autotranslate2hdf5[name="'+exper_id+'"]').is(':checked');
+        var ffb_is_checked = $('input.ffb_autotranslate2hdf5[name="'+exper_id+'"]').is(':checked');
 
         $('button#'+exper_id).button('disable');
         $('#comment_'+exper_id).text('saving...');
@@ -198,27 +207,28 @@ $(function() {
             url: '../regdb/ws/SetAutoTranslate2HDF5.php',
             data: {
                 exper_id: exper_id,
-                autotranslate2hdf5: is_checked ? 1 : 0
+                autotranslate2hdf5: is_checked ? 1 : 0,
+                ffb_autotranslate2hdf5: ffb_is_checked ? 1 : 0
             },
-			success: function(data) {
-				if( data.Status != 'success' ) {
-					$('#comment_'+exper_id).text(data.Message);
-					return;
-				}
-				$('#comment_'+exper_id).text('saved');
-			},
-			error: function() {
+            success: function(data) {
+                if( data.Status != 'success' ) {
+                    $('#comment_'+exper_id).text(data.Message);
+                    return;
+                }
+                $('#comment_'+exper_id).text('saved');
+            },
+            error: function() {
                 $('button#'+exper_id).button('enable');
-				$('#comment_'+exper_id).text('failed to submit the request');
-			},
-			dataType: 'json'
-		});
+                $('#comment_'+exper_id).text('failed to submit the request');
+            },
+            dataType: 'json'
+        });
 
-	});
-	$('input.autotranslate2hdf5').change(function() {
-		var name = this.name;
-		$('button#'+name).button('enable');
-	});
+    });
+    $('input.autotranslate2hdf5, input.ffb_autotranslate2hdf5').change(function() {
+        var name = this.name;
+        $('button#'+name).button('enable');
+    });
 
     // Begin asynchronious loading of the number of HDF5 files for each
     // experiment which had at least one run taken.
@@ -235,14 +245,26 @@ $(function() {
   <body>
     <div style="padding-left:20px; padding-right:20px;">
 
-      <h2>View/Modify Auto-Translation Option for HDF5</h2>
-      <p>This tool is mean to view and (if your account has sufficient privileges) to modify
-      values of the experiments' parameter 'AUTO_TRANSLATE_HDF5'. This parameter can be also set
-      when registering an experiment in the <a target="_blank" href="../regdb/">Experiment Registry Database</a>.
-      The 'HDF5' tab of Web Portal of each experiment also allows to view or modify a value of the parameter
-      for the corresponding experiment.
-      </p>
-      <div style="padding-left:20px;"><?php echo $tables_html; ?></div>
+      <h2>View/Modify Auto-Translation Options for HDF5</h2>
+      This tool is mean to view and (if your account has sufficient privileges) to modify
+      values of the following parameters of experiments:
+      <div style="max-width:720px;">
+        <div style="padding:10px;">
+          <span style="font-weight:bold;">AUTO_TRANSLATE_HDF5</span> - automatically translate regular XTC streams of an experiment as they're
+          produced by the DAQ system and migrated to OFFLINE
+        </div>
+        <div style="padding:10px;">
+          <span style="font-weight:bold;">FFB_AUTO_TRANSLATE_HDF5</span> - automatically translate partial XTC files of an experiment as they
+          show up at the special ffb/ directory of the experiment.
+        </div>
+        <div style="margin-top:10px;">
+          The parameters can be also set when registering an experiment in the
+          <a target="_blank" href="../regdb/">Experiment Registry Database</a>.
+          The 'HDF5' tab of Web Portal of each experiment also allows to view or modify values of the parameters
+          for the corresponding experiment.
+        </div>
+      </div>
+      <div style="margin-top:20px; padding-left:10px;"><?php echo $tables_html; ?></div>
     </div>
   </body>
 </html>
