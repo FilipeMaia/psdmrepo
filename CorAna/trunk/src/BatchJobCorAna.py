@@ -71,13 +71,8 @@ class BatchJobCorAna(BatchJob) :
 #        command      = 'psana -c ' + fnm.path_data_scan_psana_cfg() + ' ' + fnm.path_data_xtc_cond()
 #        queue        = cp.bat_queue.value()
 #        bat_log_file = fnm.path_data_scan_batch_log()
-#        if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
 #        self.job_id_data_scan, out, err = gu.batch_job_submit(command, queue, bat_log_file)
-
-#        if err != '' : logger.warning( err, __name__) 
-#        logger.info(out, __name__) 
-#        #logger.debug('Submit batch for scan on data run, job Id: ' + self.job_id_data_scan, __name__)
 
 #-----------------------------
 
@@ -91,13 +86,8 @@ class BatchJobCorAna(BatchJob) :
 #        command      = 'psana -c ' + fnm.path_data_aver_psana_cfg() + ' ' + fnm.path_data_xtc_cond()
 #        queue        = cp.bat_queue.value()
 #        bat_log_file = fnm.path_data_aver_batch_log()
-#        if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
 #        self.job_id_data_aver, out, err = gu.batch_job_submit(command, queue, bat_log_file)
-
-#        if err != '' : logger.warning(err, __name__) 
-#        logger.info(out, __name__) 
-#        #logger.debug('   Submit batch for pedestals on data run, job Id: ' + self.job_id_data_aver, __name__) 
 
 #-----------------------------
 

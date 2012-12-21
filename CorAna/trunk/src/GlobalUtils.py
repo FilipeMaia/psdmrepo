@@ -154,6 +154,9 @@ def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', run='825', tag='TAG1'
 #    return job_id_str
 
 def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
+
+    if os.path.lexists(log_file) : remove_file(log_file)
+
     out, err = subproc(['bsub', '-q', queue, '-o', log_file, command])
     line_fields = out.split(' ')
     if line_fields[0] != 'Job' :
@@ -161,6 +164,9 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
         job_id_str = 'JOB_ID_IS_UNKNOWN'
     else :
         job_id_str = line_fields[1].strip('<').rstrip('>')
+
+    if err != '' : logger.warning( err, __name__) 
+    logger.info(out, __name__) 
 
     return job_id_str, out, err
 

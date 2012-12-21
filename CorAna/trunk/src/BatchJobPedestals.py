@@ -75,13 +75,8 @@ class BatchJobPedestals (BatchJob) :
         command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_scan_batch_log()
-        if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
         self.job_id_scan_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
-
-        if err != '' : logger.warning( err, __name__) 
-        logger.info(out, __name__) 
-        #logger.debug('   Submit batch for scan on dark run, job Id: ' + self.job_id_scan_str, __name__) 
 
 #-----------------------------
 
@@ -95,13 +90,8 @@ class BatchJobPedestals (BatchJob) :
         command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
-        if os.path.lexists(bat_log_file) : gu.remove_file(bat_log_file)
 
         self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
-
-        if err != '' : logger.warning(err, __name__) 
-        logger.info(out, __name__) 
-        #logger.debug('   Submit batch for pedestals on dark run, job Id: ' + self.job_id_peds_str, __name__) 
 
 #-----------------------------
 
