@@ -766,7 +766,7 @@ HERE
             throw new IrepException (
                 __METHOD__, "unknown equipment identifier: {$id}") ;
         $comments = array () ;
-        if ($comment != '') array_push($comments, "Ueer comments: {$comment}") ;
+        if ($comment != '') array_push($comments, "User comments: {$comment}") ;
         foreach ($properties2update as $property => $new_value) {
             $old_value = $equipment->property($property) ;
             array_push($comments, "{$property}: {$old_value} -> {$new_value}") ;
@@ -775,7 +775,7 @@ HERE
         $this->add_history_event($id, 'Modified', $comments) ;
         return $this->find_equipment_by_id($id) ;
     }
-    private function add_history_event ($equipment_id, $event_text, $comments=array()) {
+    public function add_history_event ($equipment_id, $event_text, $comments=array()) {
         $equipment_id  = intval($equipment_id) ;
         $event_time_64 = LusiTime::now()->to64() ;
         $event_uid     = $this->escape_string(trim(AuthDB::instance()->authName())) ;

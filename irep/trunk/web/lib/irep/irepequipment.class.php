@@ -49,7 +49,9 @@ class IrepEquipment {
     public function rack         () { return   trim($this->attr['rack']) ; }
     public function elevation    () { return   trim($this->attr['elevation']) ; }
 
-    /* Properties
+    /* --------------
+     *   Properties
+     * --------------
      */
     public function property ($name) {
         if (!array_key_exists($name, $this->attr))
@@ -64,7 +66,7 @@ class IrepEquipment {
             switch ($property) {
                 case 'slacid':
                     $value_int = intval($value) ;
-                    $sql_options .= "{$property}={$value}" ;
+                    $sql_options .= "{$property}={$value_int}" ;
                     break ;
                 default:
                     $value_escaped = $this->irep()->escape_string(trim($value)) ;
@@ -76,13 +78,15 @@ class IrepEquipment {
             $this->irep()->query("UPDATE {$this->irep()->database}.equipment SET {$sql_options} WHERE id={$this->id()}") ;
     }
 
-    /* Atachments
+    /* --------------
+     *   Atachments
+     * --------------
      */
     public function attachments () {
         $list = array () ;
         $sql = "SELECT id,equipment_id,name,document_type,document_size,create_time,create_uid FROM {$this->irep()->database}.equipment_attachment WHERE equipment_id={$this->id()} ORDER BY create_time" ;
         $result = $this->irep()->query($sql) ;
-        for ($i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++)
+        for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++)
             array_push (
                 $list,
                 new IrepEquipmentAttachment (
@@ -90,8 +94,61 @@ class IrepEquipment {
                     mysql_fetch_array( $result, MYSQL_ASSOC))) ;
         return $list ;
     }
+    public function add_attachment ($file, $uid) {
+        $name_escaped     = $this->irep()->escape_string(trim($file['description'])) ;
+        $type_escaped     = $this->irep()->escape_string(trim($file['type'])) ;
+        $size             = intval($file['size']) ;
+        $document_escaped = $this->irep()->escape_string($file['contents']) ;
+        $now_64           = LusiTime::now()->to64() ;
+        $uid_escaped      = $this->irep()->escape_string(trim($uid)) ;
+        $sql =<<<HERE
+INSERT INTO {$this->irep()->database}.equipment_attachment
+  VALUES (
+    NULL ,
+    {$this->id()} ,
+    '{$name_escaped}' ,
+    '{$type_escaped}' ,
+    {$size} ,
+    '{$document_escaped}' ,
+    NULL ,
+    {$now_64} ,
+    '{$uid_escaped}'
+  )
+HERE;
+        $this->irep()->query($sql) ;
+        $attachment = $this->find_attachment_by_('id IN (SELECT LAST_INSERT_ID())') ;
+        $this->irep()->add_history_event($this->id(), 'Modified', array ("Add attachment: {$attachment->name()}")) ;
+        return $attachment ;
+    }
+    public function find_attachment_by_id ($id) {
+        $id = intval($id) ;
+        return $this->find_attachment_by_("id={$id}") ;
+    }
+    private function find_attachment_by_ ($condition) {
+        $list = array () ;
+        $sql = "SELECT id,equipment_id,name,document_type,document_size,create_time,create_uid FROM {$this->irep()->database}.equipment_attachment WHERE equipment_id={$this->id()} AND {$condition}" ;
+        $result = $this->irep()->query($sql) ;
+        $nrows = mysql_numrows($result) ;
+        if (0 == $nrows) return null ;
+        if (1 != $nrows)
+            throw new IrepException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt. Query: {$sql}") ;
+        return new IrepEquipmentAttachment (
+            $this ,
+            mysql_fetch_array( $result, MYSQL_ASSOC)) ;
+    }
+    public function delete_attachment ($id) {
+        $id = intval($id) ;
+        $attachment = $this->find_attachment_by_id($id) ;
+        if (is_null($attachment)) return ;
+        $sql = "DELETE FROM {$this->irep()->database}.equipment_attachment WHERE id={$id}" ;
+        $this->irep()->query($sql) ;
+        $this->irep()->add_history_event($this->id(), 'Modified', array ("Delete attachment: {$attachment->name()}")) ;
+    }
 
-    /* Tags
+    /* --------
+     *   Tags
+     * --------
      */
     public function tags () {
         $list = array () ;
@@ -105,6 +162,10 @@ class IrepEquipment {
                     mysql_fetch_array( $result, MYSQL_ASSOC))) ;
         return $list ;
     }
+    public function find_tag_by_id ($id) {
+        $id = intval($id) ;
+        return $this->find_tag_by_("id={$id}") ;
+    }
     public function find_tag_by_name ($name) {
         $name_escaped = $this->irep()->escape_string(trim($name)) ;
         return $this->find_tag_by_("name='{$name_escaped}'") ;
@@ -115,19 +176,24 @@ class IrepEquipment {
         $create_uid_escaped = $this->irep()->escape_string(trim(AuthDB::instance()->authName())) ;
         $sql = "INSERT INTO {$this->irep()->database}.equipment_tag VALUES(NULL,{$this->id()},'{$name_escaped}',{$create_time},'{$create_uid_escaped}')" ;
         $this->irep()->query($sql) ;
-        return $this->find_tag_by_('id=(SELECT LAST_INSERT_ID())') ;
+        $tag = $this->find_tag_by_('id=(SELECT LAST_INSERT_ID())') ;
+        $this->irep()->add_history_event($this->id(), 'Modified', array ("Add tag: {$tag->name()}")) ;
+        return $tag ;
     }
     public function delete_tag_by_id ($id) {
+        $tag = $this->find_tag_by_id($id) ;
+        if (is_null($tag)) return ;
         $id = intval($id) ;
         $sql = "DELETE FROM {$this->irep()->database}.equipment_tag WHERE id={$id} AND equipment_id={$this->id()}" ;
         $this->irep()->query($sql) ;
+        $this->irep()->add_history_event($this->id(), 'Modified', array ("Delete tag: {$tag->name()}")) ;
     }
     private function find_tag_by_ ($condition='') {
         $conditions_opt = $condition ? " AND {$condition}" : '' ;
         $sql = "SELECT * FROM {$this->irep()->database}.equipment_tag WHERE equipment_id={$this->id()} {$conditions_opt}" ;
         $result = $this->irep()->query($sql) ;
         $nrows = mysql_numrows( $result ) ;
-        if (!$nrows) return null ;
+        if (0 == $nrows) return null ;
         if (1 != $nrows)
             throw new IrepException (
                 __METHOD__, "inconsistent result returned by the query. Database may be corrupt. Query: {$sql}") ;
@@ -136,7 +202,9 @@ class IrepEquipment {
             mysql_fetch_array( $result, MYSQL_ASSOC)) ;
     }    
 
-    /* History
+    /* -----------
+     *   History
+     * -----------
      */
     public function last_history_event () {
         return $this->irep()->last_history_event($this->id()) ;
