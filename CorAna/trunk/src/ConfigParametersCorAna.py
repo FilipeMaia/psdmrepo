@@ -171,7 +171,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='cora-',        type='str' )
-        self.fname_prefix_cora = self.declareParameter( name='FILE_NAME_PREFIX_CORA', val_def='cora-proc-',   type='str' )
+        self.fname_prefix_cora = self.declareParameter( name='FILE_NAME_PREFIX_CORA', val_def='cora-proc',    type='str' )
 
         # GUIDark.py
         self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )

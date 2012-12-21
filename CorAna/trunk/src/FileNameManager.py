@@ -92,10 +92,18 @@ class FileNameManager :
     def str_exp_run_data(self) :
         return self.str_exp_run_for_xtc_path(self.path_data_xtc())
 
+    def str_run_data(self) :
+        return self.str_run_for_xtc_path(self.path_data_xtc())
+
     def str_exp_run_for_xtc_path(self, path) :
         instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
         if experiment == None : return 'exp-run-'
         else                  : return experiment + '-' + run_str + '-'
+
+    def str_run_for_xtc_path(self, path) :
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
+        if run_str == None : return 'run-'
+        else               : return run_str + '-'
 
 #-----------------------------
 
@@ -206,10 +214,22 @@ class FileNameManager :
         return cp.dir_work.value() + '/' + cp.fname_prefix_cora.value() 
 
     def path_cora_split_psana_cfg(self) :
-        return self.path_prefix_cora() + self.str_exp_run_data() + 'split.cfg'
+        return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'split.cfg'
 
     def path_cora_split_batch_log(self) :
-        return self.path_prefix_cora() + self.str_exp_run_data() + 'batch-log.cfg'
+        return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'batch-log.txt'
+
+    def path_cora_split_med(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'med.txt'
+
+    def path_cora_split_time(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'time.txt'
+
+    def path_cora_split_time_ind(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'time-ind.txt'
+
+    def path_cora_split_files(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'b*.txt'
 
 #-----------------------------
 
@@ -217,6 +237,12 @@ class FileNameManager :
         self.list_of_files_cora  = []
         self.list_of_files_cora.append(fnm.path_cora_split_psana_cfg())
         self.list_of_files_cora.append(fnm.path_cora_split_batch_log())
+        self.list_of_files_cora.append(fnm.path_cora_split_med())
+        self.list_of_files_cora.append(fnm.path_cora_split_time())
+        self.list_of_files_cora.append(fnm.path_cora_split_time_ind())
+        self.list_of_files_cora.append(fnm.path_cora_split_files())
+        #self.list_of_files_cora.append(fnm.)
+
         return self.list_of_files_cora
 
 #-----------------------------

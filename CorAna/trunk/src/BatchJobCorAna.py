@@ -50,9 +50,9 @@ class BatchJobCorAna(BatchJob) :
 
         BatchJob.__init__(self)
 
-        self.job_id_cora = None
+        self.job_id_cora_split = None
 
-        self.time_cora_job_submitted = None
+        self.time_sub1 = None
 
 #-----------------------------
 
@@ -61,18 +61,18 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-    def submit_batch_for_cora(self) :
+    def submit_batch_for_cora_split(self) :
 
-        if not self.job_can_be_submitted(self.job_id_cora, self.time_cora_job_submitted, 'correlation analysis') : return
-        self.time_cora_job_submitted = gu.get_time_sec()
+        if not self.job_can_be_submitted(self.job_id_cora_split, self.time_sub1, 'correlation analysis') : return
+        self.time_sub1 = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_cora_split()
 
-#        command      = 'psana -c ' + fnm.path_data_scan_psana_cfg() + ' ' + fnm.path_data_xtc_cond()
-#        queue        = cp.bat_queue.value()
-#        bat_log_file = fnm.path_data_scan_batch_log()
+        command  = 'psana -c ' + fnm.path_cora_split_psana_cfg() + ' ' + fnm.path_data_xtc_cond()
+        queue    = cp.bat_queue.value()
+        log_file = fnm.path_cora_split_batch_log()
 
-#        self.job_id_data_scan, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        self.job_id_cora_split, out, err = gu.batch_job_submit(command, queue, log_file)
 
 #-----------------------------
 
@@ -91,8 +91,8 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-    def check_batch_job_for_cora(self) :
-        self.check_batch_job(self.job_id_cora, 'correlation analysis')
+    def check_batch_job_for_cora_split(self) :
+        self.check_batch_job(self.job_id_cora_split, 'correlation analysis')
 
 #-----------------------------
 #-----------------------------

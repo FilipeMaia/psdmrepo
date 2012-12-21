@@ -257,7 +257,7 @@ class GUIRun ( QtGui.QWidget ) :
 
     def onRun(self):
         logger.debug('onRun', __name__)
-        if self.isReadyToStartRun() : bjcora.submit_batch_for_cora()
+        if self.isReadyToStartRun() : bjcora.submit_batch_for_cora_split()
         else : pass
 
 
@@ -287,7 +287,7 @@ class GUIRun ( QtGui.QWidget ) :
 
         if bjcora.status_for_cora_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjcora.check_batch_job_for_cora()
+        bjcora.check_batch_job_for_cora_split()
         #blp.parse_batch_log_data_scan()
         #self.set_fields()
 
