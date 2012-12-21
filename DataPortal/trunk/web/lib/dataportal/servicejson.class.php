@@ -143,6 +143,12 @@ class ServiceJSON {
         }
         return (boolean) $val ;
     }
+    public function required_JSON ($name) {
+        $result = json_decode($this->required_str ($name)) ;
+        if (!is_null($result)) return $result ;
+        throw new DataPortalException (
+            __CLASS__.'::'.__METHOD__, "required parameter '{$name}' isn't a JSON object") ;
+    }
 
     public function optional_bool ($name, $default) {
         $result = $this->parse ($name, false, true) ;

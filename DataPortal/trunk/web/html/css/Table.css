@@ -28,7 +28,10 @@ td.table_active_hdr {
 td.table_active_hdr:hover {
    cursor: pointer;
    background-color:#A6C9E2;
- }
+}
+td.table_active_hdr_selected {
+   background-color:#A6C9E2;
+} 
 td.table_hdr_tight {
   padding: 0px 0px 0px 0px;
 }

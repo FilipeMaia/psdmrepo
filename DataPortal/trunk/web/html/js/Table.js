@@ -307,7 +307,10 @@ define_class( Table, null, {
         }},
 
     sort_sign_classes_if: function(condition,forward) {
-        return condition ? ['ui-icon',(forward ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-n')] : []; }
+        return condition ?
+            ['ui-icon', (forward ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-n')] :
+            ['ui-icon', 'ui-icon-triangle-2-n-s'];
+    }
 
 },{
 
@@ -466,7 +469,7 @@ define_class( Table, null, {
             var sort_sign = '';
             if( rowspan + level == this.header.size.rows ) {
                 if( this.header.sorted[col.number] ) {
-                    classes += ' table_active_hdr table_row_sorter';
+                    classes += ' table_active_hdr table_row_sorter'+(this.sorted.column == col.number ? ' table_active_hdr_selected' : '');
                     var sort_sign_classes = Table.sort_sign_classes_if(this.sorted.column == col.number, this.sorted.forward);
                     sort_sign = '<span class="table_sort_sign';
                     for( var i in sort_sign_classes) sort_sign += ' '+sort_sign_classes[i];
@@ -475,7 +478,7 @@ define_class( Table, null, {
                 if( this.header.hideable[col.number] )
                     classes += ' table_column_hider';
             }
-            var col_html = '<div style="float:left;">'+col.name+'</div><div style="float:left;">'+sort_sign+'</div><div style="clear:both;"></div>';
+            var col_html = '<div style="float:left;">'+col.name+'</div>&nbsp;<div style="float:left;">'+sort_sign+'</div><div style="clear:both;"></div>';
             
             html += '<td class="'+classes+'" rowspan='+rowspan+' colspan='+colspan+' '+align+' >';
             if(( rowspan + level == this.header.size.rows ) && this.header.hideable[col.number] ) {

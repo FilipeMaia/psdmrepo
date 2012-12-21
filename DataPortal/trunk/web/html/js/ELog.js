@@ -1590,7 +1590,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
      * @return
      */
     this.refresh = function(inject_deleted_messages, inject_runs, highlighter) {
-        if(that.threads.length) {
+        if(that.threads && that.threads.length) {
 
             var params = {
                 id: this.parent.exp_id,

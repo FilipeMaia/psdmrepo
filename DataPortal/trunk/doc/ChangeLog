@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-08
+2012-12-20 Igor Gaponenko
+- improved sorted in the Table class
+- option parser for JSON objects in the ServiceJSON class
+- a bug fix in the E-Log GUI
+
 Tag: V00-04-07
 2012-12-10 Igor Gaponenko
 - mobile DAQ support
