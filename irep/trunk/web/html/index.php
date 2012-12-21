@@ -354,6 +354,15 @@ td.equipment-edit-cell {
   border: 0;
   padding-right: 20px;
 }
+div.equipment-tag-hdr {
+  margin-left: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+div.equipment-tag {
+  margin-right: 5px;
+  font-style: italic;
+}
 div.equipment-attachment-edit-entry {
   padding: 10px;
 }
@@ -1134,7 +1143,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
                   <td><input type="text" name="slacid"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
               </tr>
               <tr><td><b>Tag:</b></td>
-                  <td><select name="tag" class="inventory-form-elem" ></select></td>
+                  <td><select name="tag" class="inventory-form-elem" disabled></select></td>
               </tr>
             </tbody></table>
           </form>

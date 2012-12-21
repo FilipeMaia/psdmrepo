@@ -199,7 +199,7 @@ function p_appl_admin () {
             rows.push(row) ;
         }
         var hdr = [] ;
-        if(this.can_manage_access()) hdr.push(               { name: 'DELETE',               sorted: false }) ;
+        if(this.can_manage_access()) hdr.push(               { name: 'DELETE',               sorted: false, hideable: true }) ;
         hdr.push(                                            { name: 'UID',                  sorted: false } ,
                                                              { name: 'user',                 sorted: false }) ;
         if(can_edit_inventory && !is_administrator) hdr.push({ name: 'dictionary privilege', sorted: false }) ;
@@ -505,7 +505,7 @@ function p_appl_admin () {
             ]);
 
         var table = new Table('admin-slacid-ranges-table', [
-            { name: 'DELETE', sorted: false ,
+            { name: 'DELETE', sorted: false, hideable: true ,
               type: { after_sort: function () {
                             ranges_elem.find('.admin-slacid-range-delete').
                                 button().
@@ -523,7 +523,8 @@ function p_appl_admin () {
             { name: '# total' } ,
             { name: '# available' } ,
             { name: 'in use', sorted: false }] ,
-            rows
+            rows ,
+            {default_sort_column: 1}
         ) ;
         table.display() ;
     } ;

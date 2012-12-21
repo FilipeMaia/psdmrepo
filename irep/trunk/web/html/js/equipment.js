@@ -318,6 +318,8 @@ function p_appl_equipment () {
         }
     } ;
     this.equipment_display_table = function () {
+        var option_model_image = $('#equipment-inventory').find('#option_model_image').attr('checked') ? true : false ;
+        var option_attachment_preview = $('#equipment-inventory').find('#option_attachment_preview').attr('checked') ? true : false ;
         var elem = $('#equipment-inventory-table') ;
         var hdr = [
             {   name: '<center>STATUS</center>' ,
@@ -371,48 +373,84 @@ function p_appl_equipment () {
             {   name: 'PC #', hideable: true } ,
             {   name: 'location', hideable: true } ,
             {   name: 'custodian', hideable: true } ,
+            {   name: 'tags', hideable: true, sorted: false } ,
+            {   name: 'attachments', hideable: true, sorted: false } ,
             {   name: 'modified', hideable: true, style: ' white-space: nowrap;' } ,
             {   name: 'by user', hideable: true }
         ] ;
+
         var rows = [] ;
         for (var i in this.equipment) {
-            var e = this.equipment[i] ;
+
+            var equipment = this.equipment[i] ;
+
+            var tags_html = '' ;
+            for (var j in equipment.tag) {
+                var t = equipment.tag[j] ;
+                tags_html +=
+'      <div class="equipment-tag">' +
+'        <span>'+t.name+'</span>' +
+'      </div>' ;
+            }
+
+            var attachments_html = '' ;
+            for (var j in equipment.attachment) {
+                var a = equipment.attachment[j] ;
+                attachments_html +=
+'      <div style="padding:5px;">'+
+'        <div style="float:left;">' +
+'          <span class="toggler equipment-attachment-tgl ui-icon el-l-a-tgl ' + (option_attachment_preview ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e') + '" id="equipment-attachment-tgl-'+a.id+'" onclick="equipment.toggle_attachment('+a.id+')" ></span>' +
+'        </div>' +
+'        <div style="float:left; margin-left:5px;">' +
+'          <a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab">'+a.name+'</a>' +
+'          ( <b>type :</b> '+a.document_type+'  <b>size :</b> '+a.document_size_bytes+' )' +
+'        </div>' +
+'        <div style="clear:both;"></div>' + (option_attachment_preview ?
+'        <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
+'        <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
+'      </div>' ;
+            }
             rows.push ([
-                e.status ,
-                e.status2 ,
+                equipment.status ,
+                equipment.status2 ,
                 (this.can_edit_inventory() ?
                     Button_HTML('D', {
-                        name:    e.id,
+                        name:    equipment.id,
                         classes: 'equipment-inventory-delete',
                         title:   'delete this equipment from the database' }) +
                     Button_HTML('E', {
-                        name:    e.id,
+                        name:    equipment.id,
                         classes: 'equipment-inventory-edit',
                         title:   'edit this equipment or change its status' }) :
                     ''
                 ) +
                 Button_HTML('H', {
-                    name:    e.id,
+                    name:    equipment.id,
                     classes: 'equipment-inventory-history',
                     title:   'show a history of this equipment' }) +
                 Button_HTML('P', {
-                    name:    e.id,
+                    name:    equipment.id,
                     classes: 'equipment-inventory-print',
                     title:   'print a summary page on this equipment' }) +
                 Button_HTML('url', {
-                    name:    e.id,
+                    name:    equipment.id,
                     classes: 'equipment-inventory-link',
                     title:   'persistent URL for this equipment' }) ,
 
-                e.manufacturer ,
-                e.model ,
-                e.serial ,
-                e.slacid ,
-                e.pc ,
-                e.location ,
-                e.custodian ,
-                e.modified_time ,
-                e.modified_uid
+                equipment.manufacturer ,
+
+                '<div>'+equipment.model+'</div>'+(option_model_image ?
+                '<div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
+                '<div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') ,
+                equipment.serial ,
+                equipment.slacid ,
+                equipment.pc ,
+                equipment.location ,
+                equipment.custodian ,
+                tags_html ,
+                attachments_html ,
+                equipment.modified_time ,
+                equipment.modified_uid
             ]) ;
         }
         this.equipment_inventory_table = new Table (
@@ -428,12 +466,45 @@ function p_appl_equipment () {
         var elem = $('#equipment-inventory-table') ;
         var option_model_image = $('#equipment-inventory').find('#option_model_image').attr('checked') ? true : false ;
         var option_attachment_preview = $('#equipment-inventory').find('#option_attachment_preview').attr('checked') ? true : false ;
+        var cell_left  = 'class="table_cell table_cell_left  " style="border:0; padding-right:0px;" align="right"' ;
+        var cell_right = 'class="table_cell table_cell_right " style="border:0; padding-right:10px;"' ;
         var html = '' ;
         for (var i in this.equipment) {
             var equipment = this.equipment[i] ;
+
+            var tags_html = '' ;
+            var num_tags = 0 ;
+            for (var j in equipment.tag) {
+                var t = equipment.tag[j] ;
+                tags_html +=
+'      <div style="float:left;" class="equipment-tag">' +
+'        <span>'+t.name+'</span>' +
+'      </div>' ;
+                num_tags++ ;
+            }
+            var attachments_html = '' ;
+            var num_attachments = 0 ;
+            for (var j in equipment.attachment) {
+                var a = equipment.attachment[j] ;
+                attachments_html +=
+'      <div style="padding:5px;">'+
+'        <div style="float:left;">' +
+'          <span class="toggler equipment-attachment-tgl ui-icon el-l-a-tgl ' + (option_attachment_preview ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e') + '" id="equipment-attachment-tgl-'+a.id+'" onclick="equipment.toggle_attachment('+a.id+')" ></span>' +
+'        </div>' +
+'        <div style="float:left; margin-left:5px;">' +
+'          <a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab">'+a.name+'</a>' +
+'          ( <b>type :</b> '+a.document_type+'  <b>size :</b> '+a.document_size_bytes+' )' +
+'        </div>' +
+'        <div style="clear:both;"></div>' + (option_attachment_preview ?
+'        <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
+'        <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
+'      </div>' ;
+                num_attachments++ ;
+            }
             html +=
 '<div class="equipment-grid-cell" style="float:left;">' +
 '  <div class="header">' +
+'    <div style="float:left;">' +
                 (this.can_edit_inventory() ?
                     Button_HTML('D', {
                         name:    equipment.id,
@@ -457,84 +528,71 @@ function p_appl_equipment () {
                     name:    equipment.id,
                     classes: 'equipment-inventory-link',
                     title:   'persistent URL for this equipment' }) +
+'    </div>' ;
+                for(var j=0; j < num_attachments; j++) html += '<div style="float:right; margin-right:2px;"><img src="../irep/img/attachment.png" /></div> ' ;
+                for(var j=0; j < num_tags;        j++) html += '<div style="float:right; font-weight:bold; margin-right:2px;">T</div> ' ;
+                html +=
+'    <div style="clear:both;"></div>' +
 '  </div>'+
 '  <div class="body">' +
 '    <table><tbody>'+
 '      <tr>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >SLAC ID :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.slacid+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Status :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Sub-status :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.status2+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" rowspan="4">' + (option_model_image ?
+'        <td '+cell_left+' >SLAC ID :</td>' +
+'        <td '+cell_right+' >'+equipment.slacid+'</td>' +
+'        <td '+cell_left+' >Status :</td>' +
+'        <td '+cell_right+' >'+equipment.status+'</td>' +
+'        <td '+cell_left+' >Sub-status :</td>' +
+'        <td '+cell_right+' >'+equipment.status2+'</td>' +
+'        <td '+cell_left+' rowspan="4">' + (option_model_image ?
 '          <div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
 '          <div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') +
 '          </td>' +
 '      </tr>' +
 '      <tr>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Manuf :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.manufacturer+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Model : </td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.model+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Serial # :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.serial+'</td>' +
+'        <td '+cell_left+' >Manuf :</td>' +
+'        <td '+cell_right+' >'+equipment.manufacturer+'</td>' +
+'        <td '+cell_left+' >Model : </td>' +
+'        <td '+cell_right+' >'+equipment.model+'</td>' +
+'        <td '+cell_left+' >Serial # :</td>' +
+'        <td '+cell_right+' >'+equipment.serial+'</td>' +
 '      </tr>' +
 '      <tr>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >PC :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.pc+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Custodian :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.custodian+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Location :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.location+'</td>' +
+'        <td '+cell_left+' >PC :</td>' +
+'        <td '+cell_right+' >'+equipment.pc+'</td>' +
+'        <td '+cell_left+' >Custodian :</td>' +
+'        <td '+cell_right+' >'+equipment.custodian+'</td>' +
+'        <td '+cell_left+' >Location :</td>' +
+'        <td '+cell_right+' >'+equipment.location+'</td>' +
 '      </tr>' +
 '      <tr>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Room :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.room+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Rack :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.rack+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;"  align="right" >Elevation :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.elevation+'</td>' +
+'        <td '+cell_left+' >Room :</td>' +
+'        <td '+cell_right+' >'+equipment.room+'</td>' +
+'        <td '+cell_left+' >Rack :</td>' +
+'        <td '+cell_right+' >'+equipment.rack+'</td>' +
+'        <td '+cell_left+' >Elevation :</td>' +
+'        <td '+cell_right+' >'+equipment.elevation+'</td>' +
 '      </tr>' +
-'    </tbody></table>' ;
-            if (equipment.description != '') html +=
+'    </tbody></table>' +
+            (equipment.description != '' ?
 '    <div style="margin-top:5px; padding:10px; border-top:solid 1px #c0c0c0;">' +
 '      <pre>'+equipment.description+'</pre>' +
-'    </div>' ;
-            var attachments_html = '' ;
-
-            var num_attachments = 0 ;
-            for (var j in equipment.attachment) {
-                var a = equipment.attachment[j] ;
-                attachments_html +=
-'      <div>'+
-'        <div style="float:left;">' +
-'          <span class="toggler equipment-attachment-tgl ui-icon el-l-a-tgl ' + (option_attachment_preview ? 'ui-icon-triangle-1-s' : 'ui-icon-triangle-1-e') + '" id="equipment-attachment-tgl-'+a.id+'" onclick="equipment.toggle_attachment('+a.id+')" ></span>' +
-'        </div>' +
-'        <div style="float:left; margin-left:5px;">' +
-'          <a class="link" href="javascript:alert('+a.id+')">'+a.name+'</a>' +
-'          ( <b>type :</b> '+a.document_type+'  <b>size :</b> '+a.document_size_bytes+' )' +
-'        </div>' +
-'        <div style="clear:both;"></div>' + (option_attachment_preview ?
-'        <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
-'        <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
-'      </div>' ;
-                num_attachments++ ;
-            }
-            if (num_attachments)
-                html +=
+'    </div>' : '') +
+            (num_tags ? 
 '    <div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;">' +
-       attachments_html +
-'    </div>' ;
-            html +=
+'      <div style="float:left;" class="equipment-tag-hdr">Tags:</div>' +
+       tags_html +
+'      <div style="clear:both;"></div>' +
+     '</div>' : '') +
+            (num_attachments ?
+'    <div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;">'+attachments_html+'</div>' : '') +
 '  </div>' +
 '  <div class="footer">' + 
 '    <table><tbody>'+
 '      <tr>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >Last modified :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_time+'</td>' +
-'        <td class="table_cell table_cell_left  " style="border:0; padding-right:0px;" >By :</td>' +
-'        <td class="table_cell table_cell_right " style="border:0; padding-right:10px;" >'+equipment.modified_uid+'</td>' +
+'        <td '+cell_left+' >Last modified :</td>' +
+'        <td '+cell_right+' >'+equipment.modified_time+'</td>' +
+'        <td '+cell_left+' >By :</td>' +
+'        <td '+cell_right+' >'+equipment.modified_uid+'</td>' +
 '      </tr>' +
 '    </tbody></table>' +
 '  </div>' +
@@ -584,6 +642,8 @@ function p_appl_equipment () {
         if (tgl.hasClass('ui-icon-triangle-1-e')) {
             tgl.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
             con.removeClass('hidden').addClass('visible') ;
+            if (con.html() == '')
+                con.html('<a class="link" href="../irep/equipment_attachments/'+id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+id+'" /></a>') ;
         } else {
             tgl.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
             con.removeClass('visible').addClass('hidden') ;
@@ -968,14 +1028,14 @@ function p_appl_equipment () {
             $(this).removeClass('visible').addClass('hidden') ;
             attachments_elem.find('button.equipment-attachment-cancel[name="'+attachment_id+'"]').removeClass('hidden').addClass('visible') ;
             $('div.equipment-attachment-edit-entry#'+attachment_id).addClass('equipment-edit-entry-modified') ;
-//            $('div.equipment-attachment-edit-entry#'+attachment_id).css('background-color','#ffdcdc') ;
+            that.tabs.tabs('refresh') ;
         }) ;
         attachments_elem.find('button.equipment-attachment-cancel').button().click(function () {
             var attachment_id = this.name ;
             $(this).removeClass('visible').addClass('hidden') ;
             attachments_elem.find('button.equipment-attachment-delete[name="'+attachment_id+'"]').removeClass('hidden').addClass('visible') ;
             $('div.equipment-attachment-edit-entry#'+attachment_id).removeClass('equipment-edit-entry-modified') ;
-//            $('div.equipment-attachment-edit-entry#'+attachment_id).css('background-color','') ;
+            that.tabs.tabs('refresh') ;
         }) ;
 
 
@@ -1106,6 +1166,15 @@ function p_appl_equipment () {
         this.equipment_edit_save_impl(panelId, equipment_id, '') ;
     } ;
     this.equipment_edit_save_impl = function (panelId, equipment_id, comment) {
+        
+        // This procedure will do two-stage commit
+        //
+        // 1: upload attachments
+        // 2: update other parameters of an equipment and delete attachments which were
+        //    marked as deleted in the 'Attachments' tab.
+        //
+        // Note that the firest stage (if succeeded) can not be reverted.
+        
         var equipment                = this.equipment_by_id[equipment_id] ;
         var panel_elem               = this.tabs.find('div#'+panelId) ;
         var save_button              = panel_elem.find('button[name="save"]').button() ;
@@ -1116,6 +1185,65 @@ function p_appl_equipment () {
         save_with_comment_button.button('disable') ;
         cancel_button.button('disable') ;
 
+        panel_elem.find('form').ajaxSubmit({
+
+            success: function(data) {
+                if (data.status != 'success') {
+                    report_error(data.message) ;
+                    save_button.button('enable') ;
+                    save_with_comment_button.button('enable') ;
+                    cancel_button.button('enable') ;
+                    return ;
+                }
+                that.equipment_edit_save_attributes (
+
+                    equipment.id ,
+                    panel_elem ,
+                    comment ,
+
+                    function (data) {
+
+                        that.equipment_edit_tab_close(panelId) ;
+
+                        // If the modified equipment is still in thej local search set then update
+                        // the set and redisplay the search results table.
+                        //
+                        for(var i in data.equipment) {
+                            var new_equipment = data.equipment[i] ;
+                            if (new_equipment.id == equipment_id) {
+                                for(var j in that.equipment) {
+                                    var equipment = that.equipment[j] ;
+                                    if (equipment.id == equipment_id) {
+                                        that.equipment[j] = new_equipment ;
+                                        that.equipment_by_id[equipment_id] = new_equipment ;
+                                        that.equipment_display() ;
+                                        break ;
+                                    }
+                                }
+                                break ;
+                            }
+                        }
+                    } ,
+
+                    function () {
+                        save_button.button('enable') ;
+                        save_with_comment_button.button('enable') ;
+                        cancel_button.button('enable') ;
+                    }
+                ) ;
+            } ,
+
+            error: function() {
+                report_error('failed to contact the server in order to upload attachment(s)') ;
+                save_button.button('enable') ;
+                save_with_comment_button.button('enable') ;
+                cancel_button.button('enable') ;
+            } ,
+
+            dataType: 'json'
+        }) ;
+    } ;
+    this.equipment_edit_save_attributes = function(equipment_id, panel_elem, comment, on_success, on_error) {
         var tags2add = [] ;
         panel_elem.find('div.tags-new').children('div.equipment-tag-new-edit-entry').each(function () {
             var name = $(this).find('input').val() ;
@@ -1126,50 +1254,39 @@ function p_appl_equipment () {
             var tag_id = $(this).attr('id') ;
             tags2remove.push(tag_id) ;
         }) ;
+        var attachments2remove = [] ;
+        panel_elem.find('div.attachments').children('div.equipment-attachment-edit-entry.equipment-edit-entry-modified').each(function () {
+            var attachment_id = $(this).attr('id') ;
+            attachments2remove.push(attachment_id) ;
+        }) ;
         var params = {
-            equipment_id: equipment_id ,
-            status:       panel_elem.find('select[name="status"]').val() ,
-            status2:      panel_elem.find('select[name="status2"]').val() ,
-            serial:       panel_elem.find('input[name="serial"]').val() ,
-            pc:           panel_elem.find('input[name="pc"]').val() ,
-            location_id:  panel_elem.find('select[name="location"]').val() ,
-            room_id:      panel_elem.find('select[name="room"]').val() ,
-            rack:         panel_elem.find('input[name="rack"]').val() ,
-            elevation:    panel_elem.find('input[name="elevation"]').val() ,
-            custodian:    panel_elem.find('input[name="custodian"]').val() ,
-            description:  panel_elem.find('textarea[name="description"]').val() ,
-            comment:      comment ,
-            tags2add:     JSON.stringify(tags2add) ,
-            tags2remove:  JSON.stringify(tags2remove)
+            equipment_id:       equipment_id ,
+            status:             panel_elem.find('select[name="status"]').val() ,
+            status2:            panel_elem.find('select[name="status2"]').val() ,
+            serial:             panel_elem.find('input[name="serial"]').val() ,
+            pc:                 panel_elem.find('input[name="pc"]').val() ,
+            location_id:        panel_elem.find('select[name="location"]').val() ,
+            room_id:            panel_elem.find('select[name="room"]').val() ,
+            rack:               panel_elem.find('input[name="rack"]').val() ,
+            elevation:          panel_elem.find('input[name="elevation"]').val() ,
+            custodian:          panel_elem.find('input[name="custodian"]').val() ,
+            description:        panel_elem.find('textarea[name="description"]').val() ,
+            comment:            comment ,
+            tags2add:           JSON.stringify(tags2add) ,
+            tags2remove:        JSON.stringify(tags2remove) ,
+            attachments2remove: JSON.stringify(attachments2remove)
         } ;
         var jqXHR = $.post('../irep/ws/equipment_update.php', params, function (data) {
             if (data.status != 'success') {
                 report_error(data.message, null) ;
-                save_button.button('enable') ;
-                save_with_comment_button.button('enable') ;
-                cancel_button.button('enable') ;
-                return ;
-            }
-            that.equipment_edit_tab_close(panelId) ;
-            
-            // If the modified equipment is still in thej local search set then update
-            // the set and redisplay the search results table.
-            //
-            for(var i in data.equipment) {
-                var equipment = data.equipment[i] ;
-                if (equipment.id == equipment_id) {
-                    that.equipment[i] = equipment ;
-                    that.equipment_by_id[equipment.id] = equipment ;
-                    that.equipment_display() ;
-                    break ;
-                }
+                on_error() ;
+            } else {
+                on_success(data) ;
             }
         },
         'JSON').error(function () {
             report_error('saving failed because of: '+jqXHR.statusText, null) ;
-            save_button.button('enable') ;
-            save_with_comment_button.button('enable') ;
-            cancel_button.button('enable') ;
+            on_error() ;
         }) ;
     } ;
     this.equipment_edit_tab_close = function (panelId) {
@@ -1238,8 +1355,8 @@ function p_appl_equipment () {
         //
         var hdr = [
             {   name: 'time', style: ' white-space: nowrap;' } ,
-            {   name: 'user' } ,
             {   name: 'event' } ,
+            {   name: 'user' } ,
             {   name: 'comments', hideable: true, sorted: false }
         ] ;
         rows = [] ;

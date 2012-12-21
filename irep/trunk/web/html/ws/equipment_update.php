@@ -36,8 +36,9 @@ require_once 'irep/irep.inc.php' ;
     $description  = $SVC->required_str('description') ;
     $comment      = $SVC->required_str('comment') ;
 
-    $tags2add     = $SVC->required_JSON('tags2add') ;
-    $tags2remove  = $SVC->required_JSON('tags2remove') ;
+    $tags2add           = $SVC->required_JSON('tags2add') ;
+    $tags2remove        = $SVC->required_JSON('tags2remove') ;
+    $attachments2remove = $SVC->required_JSON('attachments2remove') ;
 
     $equipment = $SVC->irep()->find_equipment_by_id($equipment_id) ;
     if (is_null($equipment)) $SVC->abort("no equipment found for id: {$equipment_id}") ;
@@ -74,8 +75,9 @@ require_once 'irep/irep.inc.php' ;
             $comment
         ) ;
     }
-    foreach ($tags2add    as $tag_name) $equipment->add_tag         ($tag_name) ;
-    foreach ($tags2remove as $tag_id  ) $equipment->delete_tag_by_id($tag_id) ;
+    foreach ($tags2add           as $tag_name)      $equipment->add_tag          ($tag_name) ;
+    foreach ($tags2remove        as $tag_id)        $equipment->delete_tag_by_id ($tag_id) ;
+    foreach ($attachments2remove as $attachment_id) $equipment->delete_attachment($attachment_id) ;
 
     $SVC->finish(\Irep\IrepUtils::equipment2array(array($equipment))) ;
 }) ;
