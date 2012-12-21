@@ -98,16 +98,21 @@ class RegDb ( object ) :
     # ===================
     # Get experiment list
     # ===================
-    def get_experiments(self, instr):
+    def get_experiments(self, instr=None):
         """
         Get a list of currently defined experiments for given instrument name. Returns
         the list of dictionaries, elements will have the same structure as dictionary
-        return by find_experiment_by_id()
+        return by find_experiment_by_id(). If instr is None then experiments for all 
+        instruments are returned.
         """
         
         cursor = self._conn.cursor( True )
-        q = """SELECT i.name AS instr_name, i.descr AS instr_descr, e.* FROM experiment e, instrument i WHERE i.name=%s AND e.instr_id=i.id"""
-        cursor.execute(q,  (instr,))
+        q = """SELECT i.name AS instr_name, i.descr AS instr_descr, e.* FROM experiment e, instrument i WHERE e.instr_id=i.id"""
+        if instr is not None:
+            q += """ AND i.name=%s"""
+            cursor.execute(q,  (instr,))
+        else:
+            cursor.execute(q)
         
         return map(dict, cursor.fetchall())
 
