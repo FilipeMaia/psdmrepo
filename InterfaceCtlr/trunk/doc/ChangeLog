@@ -10,6 +10,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-25
+2012-12-20 Andy Salnikov
+- update ic-auto-translate script to support FFB controller
+- same script now runs automatic submission for both FFB and
+  regular controllers
+
 Tag: V01-00-24
 2012-11-21 Andy Salnikov
 - get rid of some uses of list:o2o-extra-options configuration options, 
