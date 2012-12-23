@@ -44,7 +44,7 @@ class GUIRun ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 500, 200)
+        self.setGeometry(100, 100, 740, 350)
         self.setWindowTitle('Run Control and Monitoring')
         self.setFrame()
  
@@ -78,7 +78,50 @@ class GUIRun ( QtGui.QWidget ) :
         self.edi_bat_end    = QtGui.QLineEdit ( 'End'   )        
         self.edi_bat_total  = QtGui.QLineEdit ( 'Total' )        
         self.edi_bat_time   = QtGui.QLineEdit ( 'Time'  )        
- 
+
+        self.table = QtGui.QTableWidget(1,6,self)
+        self.table.setHorizontalHeaderLabels(['#Parts','#Rows', '#Cols', 'Img size', 'Part size', 'Rest'])
+        self.table.setVerticalHeaderLabels(['Set:'])
+
+        self.table.horizontalHeader().setDefaultSectionSize(60)
+        self.table.horizontalHeader().resizeSection(3,80)
+        self.table.horizontalHeader().resizeSection(4,80)
+
+
+        #self.edi_bat_nparts = QtGui.QLineEdit       (str(cp.bat_img_nparts.value()))        
+        #self.item_nparts    = QtGui.QTableWidget(self.edi_bat_nparts)
+
+        self.item_nparts    = QtGui.QTableWidgetItem(str(cp.bat_img_nparts.value()))
+        self.item_rows      = QtGui.QTableWidgetItem(str(cp.bat_img_rows.value()))
+        self.item_cols      = QtGui.QTableWidgetItem(str(cp.bat_img_cols.value()))
+        self.item_size      = QtGui.QTableWidgetItem(str(cp.bat_img_size.value()))
+        self.item_part_size = QtGui.QTableWidgetItem('y')
+        self.item_rest_size = QtGui.QTableWidgetItem('z')
+
+        item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags)
+        self.item_rows     .setFlags(item_flags)
+        self.item_cols     .setFlags(item_flags)
+        self.item_size     .setFlags(item_flags)
+        self.item_part_size.setFlags(item_flags)
+        self.item_rest_size.setFlags(item_flags)
+
+        self.setTableItems()
+
+        self.table.setItem(0, 0, self.item_nparts)
+        self.table.setItem(0, 1, self.item_rows)
+        self.table.setItem(0, 2, self.item_cols)
+        self.table.setItem(0, 3, self.item_size)
+        self.table.setItem(0, 4, self.item_part_size)
+        self.table.setItem(0, 5, self.item_rest_size)
+        #self.table.setCellWidget(0, 3, self.edi_bat_nparts)
+        
+        self.table.itemClicked.connect(self.onItem)
+        self.table.itemChanged.connect(self.onItemChanged)
+        #self.connect( self.edi_bat_nparts, QtCore.SIGNAL('editingFinished()'), self.onEdiNParts)
+
+        self.hboxT = QtGui.QHBoxLayout()
+        self.hboxT.addWidget(self.table)
+
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.but_run)
         self.hboxB.addWidget(self.but_status)
@@ -115,7 +158,9 @@ class GUIRun ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_blam,      self.grid_row+5, 0)
         self.grid.addWidget(self.edi_blam,      self.grid_row+5, 1, 1,  9)
         self.grid.addLayout(self.hboxB,         self.grid_row+7, 0, 1, 10)
-        self.grid.addLayout(self.hboxS,         self.grid_row+8, 0, 1, 10)
+        self.grid.addLayout(self.hboxT,         self.grid_row+8, 0, 2, 10)
+        self.grid.addLayout(self.hboxS,         self.grid_row+10,0, 1, 10)
+
 
         self.setLayout(self.grid)
         
@@ -151,7 +196,7 @@ class GUIRun ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumSize(600,300)
+        self.setMinimumSize(740,350)
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_title .setStyleSheet (cp.styleTitleBold)
         self.tit_status.setStyleSheet (cp.styleTitle)
@@ -253,6 +298,53 @@ class GUIRun ( QtGui.QWidget ) :
 
         try    : del cp.guirun # GUIRun
         except : pass
+
+
+    def onItem(self, item):
+        print 'Clicked on item: ', str(item.text()) 
+
+    def onItemChanged(self, item):
+        if item == self.item_nparts :
+            s = str(item.text()) 
+            print 'Changed item: ', s
+            cp.bat_img_nparts.setValue(s)
+            self.setTableItems()
+        else :
+            print 'Changed non-allowed item' 
+
+    def onEdiNParts(self) :
+        s = str(self.edi_bat_nparts.text()) 
+        print 'onEdiNParts: ', s
+        cp.bat_img_nparts.setValue(s)
+        self.setTableItems()
+
+
+    def setTableItems(self) :
+
+        #self.item_rows      .setText(str(cp.bat_img_rows.value()))
+        #self.item_cols      .setText(str(cp.bat_img_cols.value()))
+        #self.item_size      .setText(str(cp.bat_img_size.value()))
+        #self.edi_bat_nparts .setText(str(cp.bat_img_nparts.value()))        
+        #self.item_nparts   .setText(str(cp.bat_img_nparts.value())) 
+
+        img_size  = cp.bat_img_size.value()
+        nparts    = cp.bat_img_nparts.value()
+        part_size = int(img_size/nparts)
+        rest_size = img_size%nparts 
+        self.item_part_size .setText(str(part_size))
+        self.item_rest_size .setText(str(rest_size))
+
+        self.item_rows     .setBackgroundColor (cp.colorEditInfo)
+        self.item_cols     .setBackgroundColor (cp.colorEditInfo)
+        self.item_size     .setBackgroundColor (cp.colorEditInfo)
+        self.item_nparts   .setBackgroundColor (cp.colorEdit)
+        self.item_part_size.setBackgroundColor (cp.colorEditInfo)
+
+        if rest_size == 0 :
+            self.item_rest_size.setBackgroundColor (cp.colorEditInfo)
+        else :
+            self.item_rest_size.setBackgroundColor (cp.colorEditBad)
+            self.item_nparts   .setBackgroundColor (cp.colorEditBad)
 
 
     def onRun(self):

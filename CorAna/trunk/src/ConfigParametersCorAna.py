@@ -198,6 +198,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.in_dir_data        = self.declareParameter( name='IN_DIRECTORY_DATA',  val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
         self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0020-s00-c00.xtc',type='str' )
 
+
+
         # GUIBeamZeroPars.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     type='float' ) 
         self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     type='float' ) 
@@ -259,6 +261,12 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         #self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(XcsBeamline.0:Princeton.0)', type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
+
+        # BatchLogParser.py
+        self.bat_img_rows      = self.declareParameter( name='BATCH_IMG_ROWS',      val_def= -1,       type='int' )
+        self.bat_img_cols      = self.declareParameter( name='BATCH_IMG_COLS',      val_def= -1,       type='int' )
+        self.bat_img_size      = self.declareParameter( name='BATCH_IMG_SIZE',      val_def= -1,       type='int' )
+        self.bat_img_nparts    = self.declareParameter( name='BATCH_IMG_NPARTS',    val_def=  8,       type='int' )
 
         # GUIAnaSettingsLeft.py
         self.ana_type          = self.declareParameter( name='ANA_TYPE',              val_def='Static',type='str' )
@@ -436,6 +444,10 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleStatusAlarm  = self.styleRed
         self.styleTitleBold    = self.styleTitle + 'font-size: 18pt; font-family: Courier; font-weight: bold;'
         self.styleWhiteFixed   = self.styleWhite + 'font-family: Fixed;'
+
+        self.colorEditInfo     = QtGui.QColor(100, 255, 200)
+        self.colorEditBad      = QtGui.QColor(255,   0,   0)
+        self.colorEdit         = QtGui.QColor('white')
 
     def printParsDirectly( self ) :
         logger.info('Direct use of parameter:' + self.fname_cp .name() + ' ' + self.fname_cp .value(), __name__ )

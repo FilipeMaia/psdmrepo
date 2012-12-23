@@ -93,6 +93,20 @@ class BatchLogParser :
             cp.bat_data_end.setValue(cp.bat_data_total.value())
 
 #-----------------------------
+
+    def parse_batch_log_data_aver (self) :
+        self.path = fnm.path_data_aver_batch_log()
+        self.dict   = {
+                       'BATCH_IMG_ROWS'                 : cp.bat_img_rows,
+                       'BATCH_IMG_COLS'                 : cp.bat_img_cols,
+                       'BATCH_IMG_SIZE'                 : cp.bat_img_size
+                       #'BATCH_NUMBER_OF_EVENTS'         : cp.bat_data_total,
+                       }
+
+        self.print_dict()
+        self.parse_log_file()
+
+#-----------------------------
 #-----------------------------
 #-----------------------------
 #-----------------------------

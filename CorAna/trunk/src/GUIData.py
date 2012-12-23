@@ -316,6 +316,7 @@ class GUIData ( QtGui.QWidget ) :
         bjdata.check_batch_job_for_data_scan()
         bjdata.check_batch_job_for_data_aver()
         blp.parse_batch_log_data_scan()
+        blp.parse_batch_log_data_aver()
         self.set_fields()
 
 
