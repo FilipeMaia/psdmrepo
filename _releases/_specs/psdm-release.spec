@@ -110,6 +110,7 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     find "$archdir/bin" -type f | while read f ; do
         head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "$f"
     done
+    true
 fi
 
 # ================== Platform-specific subpackage ==================
@@ -143,6 +144,7 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     find "$archdir/bin" -type f | while read f ; do
         head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "$f"
     done
+    true
 fi
 
 # ================== "Latest" subpackage ==================
