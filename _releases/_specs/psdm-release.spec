@@ -108,7 +108,7 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     done 
     # update shebang line in scripts
     find "$archdir/bin" -type f | while read f ; do
-        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "%f"
+        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "$f"
     done
 fi
 
@@ -141,7 +141,7 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     done 
     # update shebang line in scripts
     find "$archdir/bin" -type f | while read f ; do
-        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "%f"
+        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "$f"
     done
 fi
 
