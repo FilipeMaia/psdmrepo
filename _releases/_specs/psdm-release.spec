@@ -101,11 +101,15 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     archdir="$SIT_ROOT/sw/releases/%{relname}/arch/%{sit_arch_base}-opt"
     for dir in bin lib geninc python; do
         # find all symlinks that point to /reg/g/psdm/ and redirect them to new location
-        find $archdir/$dir -lname '/reg/g/psdm/*' | while read link ; do
+        find "$archdir/$dir" -lname '/reg/g/psdm/*' | while read link ; do
             newtrgt=`readlink -n "$link" | sed -n "s%/reg/g/psdm/%$SIT_ROOT/%p"`
             test -n "$newtrgt" && ln -sfT "$newtrgt" "$link"
         done
     done 
+    # update shebang line in scripts
+    find "$archdir/bin" -type f | while read f ; do
+        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "%f"
+    done
 fi
 
 # ================== Platform-specific subpackage ==================
@@ -135,6 +139,10 @@ if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
             test -n "$newtrgt" && ln -sfT "$newtrgt" "$link"
         done
     done 
+    # update shebang line in scripts
+    find "$archdir/bin" -type f | while read f ; do
+        head -1 "$f" | egrep -q '^#!/reg/g/psdm/' && sed -i "1s%#!/reg/g/psdm/%#!$SIT_ROOT/%" "%f"
+    done
 fi
 
 # ================== "Latest" subpackage ==================
