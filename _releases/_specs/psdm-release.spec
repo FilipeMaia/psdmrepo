@@ -96,6 +96,18 @@ PSDM software release %{relname}, platform-specific files for optimized builds.
 %{instdir}/arch/%{sit_arch_base}-opt
 %ghost %{instdir}/arch/__pkg_list__.%{sit_arch_base}-opt
 
+%post -n %{pkg}-%{relname}-%{sit_arch_base}-opt
+if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
+    archdir="$SIT_ROOT/sw/releases/%{relname}/arch/%{sit_arch_base}-opt"
+    for dir in bin lib include geninc python; do
+        # find all symlinks that point to /reg/g/psdm/ and redirect them to new location
+        find $archdir/$dir -lname '/reg/g/psdm/*' | while read link ; do
+            newtrgt=`readlink -n "$link" | sed -n "s%/reg/g/psdm/%$SIT_ROOT/%p"`
+            test -n "$newtrgt" && ln -sfT "$newtrgt" "$link"
+        done
+    done 
+fi
+
 # ================== Platform-specific subpackage ==================
 
 %package -n %{pkg}-%{relname}-%{sit_arch_base}-dbg
@@ -112,6 +124,18 @@ PSDM software release %{relname}, platform-specific files for debug builds.
 %files -n %{pkg}-%{relname}-%{sit_arch_base}-dbg
 %{instdir}/arch/%{sit_arch_base}-dbg
 %ghost %{instdir}/arch/__pkg_list__.%{sit_arch_base}-dbg
+
+%post -n %{pkg}-%{relname}-%{sit_arch_base}-dbg
+if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
+    archdir="$SIT_ROOT/sw/releases/%{relname}/arch/%{sit_arch_base}-dbg"
+    for dir in bin lib include geninc python; do
+        # find all symlinks that point to /reg/g/psdm/ and redirect them to new location
+        find $archdir/$dir -lname '/reg/g/psdm/*' | while read link ; do
+            newtrgt=`readlink -n "$link" | sed -n "s%/reg/g/psdm/%$SIT_ROOT/%p"`
+            test -n "$newtrgt" && ln -sfT "$newtrgt" "$link"
+        done
+    done 
+fi
 
 # ================== "Latest" subpackage ==================
 
@@ -133,6 +157,9 @@ updated or installed when you gen new version of this package.
 # ================= ChangeLog =========================
 
 %changelog
+
+* Tue Dec 25 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
+- added post-install scripts to relocate symlinks in arch/ directory
 
 * Wed Dec 05 2012 Andy Salnikov <salnikov@slac.stanford.edu> 0.0.0-1psdm
 - removed current link entirely
