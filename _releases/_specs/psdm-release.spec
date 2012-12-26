@@ -99,7 +99,7 @@ PSDM software release %{relname}, platform-specific files for optimized builds.
 %post -n %{pkg}-%{relname}-%{sit_arch_base}-opt
 if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     archdir="$SIT_ROOT/sw/releases/%{relname}/arch/%{sit_arch_base}-opt"
-    for dir in bin lib include geninc python; do
+    for dir in bin lib geninc python; do
         # find all symlinks that point to /reg/g/psdm/ and redirect them to new location
         find $archdir/$dir -lname '/reg/g/psdm/*' | while read link ; do
             newtrgt=`readlink -n "$link" | sed -n "s%/reg/g/psdm/%$SIT_ROOT/%p"`
@@ -128,7 +128,7 @@ PSDM software release %{relname}, platform-specific files for debug builds.
 %post -n %{pkg}-%{relname}-%{sit_arch_base}-dbg
 if [ -n "$SIT_ROOT" -a "$SIT_ROOT" != "/reg/g/psdm" ] ; then
     archdir="$SIT_ROOT/sw/releases/%{relname}/arch/%{sit_arch_base}-dbg"
-    for dir in bin lib include geninc python; do
+    for dir in bin lib geninc python; do
         # find all symlinks that point to /reg/g/psdm/ and redirect them to new location
         find $archdir/$dir -lname '/reg/g/psdm/*' | while read link ; do
             newtrgt=`readlink -n "$link" | sed -n "s%/reg/g/psdm/%$SIT_ROOT/%p"`
