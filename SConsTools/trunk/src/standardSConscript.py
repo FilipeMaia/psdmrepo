@@ -157,7 +157,7 @@ def standardPyLib( env, **kw ) :
             basename = os.path.basename(src)
             if basename == "__init__.py" : doinit = False
             pydst = pjoin(pydir,pkg,basename)
-            env.Symlink ( pydst, source=src )
+            env.SymlinkRel ( pydst, source=src )
             pyc = env.PyCompile ( pydst+"c", source=pydst )
             DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( pyc )
 

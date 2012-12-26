@@ -20,6 +20,9 @@ def _fmtList ( lst ):
     return '[' + ','.join(map(str, lst)) + ']'
 
 class _makeSymlink :
+    
+    def __init__(self, relative=False):
+        self._rel = relative
 
     def __call__ ( self, target, source, env ) :
         """Both target and source should be a single file"""
@@ -28,8 +31,11 @@ class _makeSymlink :
         if len(source) != 1 :
             fail ( "unexpected number of sources for symlink: "+str(source) )
     
+        if self._rel:
+            source = target[0].rel_path(source[0])
+        else:
+            source = str(source[0].abspath)
         target = str(target[0])
-        source = str(source[0].abspath)
         trace ( "Executing symlink `%s' -> `%s'" % ( target, source ), "makeSymlink", 3 )
     
         # may need to make a directory for target
@@ -48,20 +54,23 @@ class _makeSymlink :
         except :
             return 'MakeSymlink('+_fmtlist(target)+', '+_fmtlist(source)+')'
 
-def create_builder(env):
+def create_builders(env):
     try:
         builder = env['BUILDERS']['Symlink']
     except KeyError:
         builder = SCons.Builder.Builder(action = _makeSymlink())
         env['BUILDERS']['Symlink'] = builder
-
-    return builder
+    try:
+        builder = env['BUILDERS']['SymlinkRel']
+    except KeyError:
+        builder = SCons.Builder.Builder(action = _makeSymlink(True))
+        env['BUILDERS']['SymlinkRel'] = builder
 
 def generate(env):
     """Add Builders and construction variables for making symlinks."""
 
     # Create the PythonExtension builder
-    create_builder(env)
+    create_builders(env)
 
     trace ( "Initialized symlink tool", "symlink", 2 )
 
