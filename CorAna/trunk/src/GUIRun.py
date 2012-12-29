@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIRun ...
+#  Module GUIRun...
 #
 #------------------------------------------------------------------------
 
-"""GUI for run control."""
+"""GUI sets path to files"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -29,163 +29,61 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 from ConfigParametersCorAna import confpars as cp
+from GUIConfigParameters    import *
+from GUIRunInfo             import *
+from GUIRunSplit            import *
 from Logger                 import logger
-from FileNameManager        import fnm
-from GUIFileBrowser         import *
-from BatchJobCorAna         import bjcora
+from BatchJobPedestals      import bjpeds
 
 #---------------------
 #  Class definition --
 #---------------------
 class GUIRun ( QtGui.QWidget ) :
-    """GUI for run control"""
+    """GUI sets path to files"""
 
+    #----------------
+    #  Constructor --
+    #----------------
     def __init__ ( self, parent=None ) :
-
         QtGui.QWidget.__init__(self, parent)
-
-        self.setGeometry(100, 100, 740, 350)
-        self.setWindowTitle('Run Control and Monitoring')
+        self.setGeometry(1, 1, 800, 600)
+        self.setWindowTitle('Run control')
         self.setFrame()
- 
-        self.tit_title  = QtGui.QLabel('Run Control and Monitoring')
-        self.tit_status = QtGui.QLabel('Status:')
-        self.tit_data   = QtGui.QLabel('Data:')
-        self.tit_dark   = QtGui.QLabel('Dark:')
-        self.tit_flat   = QtGui.QLabel('Flat:')
-        self.tit_blam   = QtGui.QLabel('Blam:')
 
-        self.lab_start  = QtGui.QLabel('Start:')
-        self.lab_end    = QtGui.QLabel('End:')
-        self.lab_total  = QtGui.QLabel('Total:')
-        self.lab_time   = QtGui.QLabel(u'\u0394t(sec):')
-
-
-        #self.but_close  = QtGui.QPushButton('Close') 
-        #self.but_apply  = QtGui.QPushButton('Save') 
-        self.but_run    = QtGui.QPushButton('Run') 
-        self.but_status = QtGui.QPushButton('Check status') 
-        self.but_files  = QtGui.QPushButton('Check files') 
-        self.but_brow   = QtGui.QPushButton('Browse') 
-        self.but_remove = QtGui.QPushButton('Remove') 
-
-        self.edi_data = QtGui.QLineEdit('Data')        
-        self.edi_dark = QtGui.QLineEdit('Dark')        
-        self.edi_flat = QtGui.QLineEdit('Flat')        
-        self.edi_blam = QtGui.QLineEdit('Blam')        
-
-        self.edi_bat_start  = QtGui.QLineEdit ( 'Start' )        
-        self.edi_bat_end    = QtGui.QLineEdit ( 'End'   )        
-        self.edi_bat_total  = QtGui.QLineEdit ( 'Total' )        
-        self.edi_bat_time   = QtGui.QLineEdit ( 'Time'  )        
-
-        self.table = QtGui.QTableWidget(1,6,self)
-        self.table.setHorizontalHeaderLabels(['#Parts','#Rows', '#Cols', 'Img size', 'Part size', 'Rest'])
-        self.table.setVerticalHeaderLabels(['Set:'])
-
-        self.table.horizontalHeader().setDefaultSectionSize(60)
-        self.table.horizontalHeader().resizeSection(3,80)
-        self.table.horizontalHeader().resizeSection(4,80)
-
-
-        #self.edi_bat_nparts = QtGui.QLineEdit       (str(cp.bat_img_nparts.value()))        
-        #self.item_nparts    = QtGui.QTableWidget(self.edi_bat_nparts)
-
-        self.item_nparts    = QtGui.QTableWidgetItem(str(cp.bat_img_nparts.value()))
-        self.item_rows      = QtGui.QTableWidgetItem(str(cp.bat_img_rows.value()))
-        self.item_cols      = QtGui.QTableWidgetItem(str(cp.bat_img_cols.value()))
-        self.item_size      = QtGui.QTableWidgetItem(str(cp.bat_img_size.value()))
-        self.item_part_size = QtGui.QTableWidgetItem('y')
-        self.item_rest_size = QtGui.QTableWidgetItem('z')
-
-        item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags)
-        self.item_rows     .setFlags(item_flags)
-        self.item_cols     .setFlags(item_flags)
-        self.item_size     .setFlags(item_flags)
-        self.item_part_size.setFlags(item_flags)
-        self.item_rest_size.setFlags(item_flags)
-
-        self.setTableItems()
-
-        self.table.setItem(0, 0, self.item_nparts)
-        self.table.setItem(0, 1, self.item_rows)
-        self.table.setItem(0, 2, self.item_cols)
-        self.table.setItem(0, 3, self.item_size)
-        self.table.setItem(0, 4, self.item_part_size)
-        self.table.setItem(0, 5, self.item_rest_size)
-        #self.table.setCellWidget(0, 3, self.edi_bat_nparts)
+        self.lab_title  = QtGui.QLabel     ('Run control')
+        self.lab_status = QtGui.QLabel     ('Status: ')
+        self.but_save   = QtGui.QPushButton('&Save')
         
-        self.table.itemClicked.connect(self.onItem)
-        self.table.itemChanged.connect(self.onItemChanged)
-        #self.connect( self.edi_bat_nparts, QtCore.SIGNAL('editingFinished()'), self.onEdiNParts)
-
-        self.hboxT = QtGui.QHBoxLayout()
-        self.hboxT.addWidget(self.table)
-
+        self.hboxW = QtGui.QHBoxLayout()
         self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.but_run)
-        self.hboxB.addWidget(self.but_status)
-        self.hboxB.addWidget(self.but_files)
-        self.hboxB.addWidget(self.but_brow)
+        self.hboxB.addWidget(self.lab_status)
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.but_remove)
+        self.hboxB.addWidget(self.but_save)
 
-        self.hboxS = QtGui.QHBoxLayout()
-        self.hboxS.addWidget(self.tit_status)
-        self.hboxS.addStretch(1)     
-        #self.hboxB.addWidget(self.but_close)
-        #self.hboxB.addWidget(self.but_apply)
+        self.list_run_types = ['Info', 'Split', 'Process', 'Merge', 'Auto']
+        self.makeTabBar()
+        self.guiSelector()
 
-        self.grid = QtGui.QGridLayout()
-        self.grid_row = 1
-        self.grid.addWidget(self.tit_title,     self.grid_row,   0, 1, 10)          
-        self.grid.addWidget(self.tit_data,      self.grid_row+1, 0)
-        self.grid.addWidget(self.edi_data,      self.grid_row+1, 1, 1,  9)
+        self.vbox = QtGui.QVBoxLayout()   
+        self.vbox.addWidget(self.lab_title)
+        self.vbox.addWidget(self.tab_bar)
+        self.vbox.addLayout(self.hboxW)
+        self.vbox.addLayout(self.hboxB)
+        self.setLayout(self.vbox)
 
-        self.grid.addWidget(self.lab_start,     self.grid_row+2, 1)
-        self.grid.addWidget(self.edi_bat_start, self.grid_row+2, 2)
-        self.grid.addWidget(self.lab_end,       self.grid_row+2, 3)
-        self.grid.addWidget(self.edi_bat_end,   self.grid_row+2, 4)
-        self.grid.addWidget(self.lab_total,     self.grid_row+2, 5)
-        self.grid.addWidget(self.edi_bat_total, self.grid_row+2, 6)
-        self.grid.addWidget(self.lab_time,      self.grid_row+2, 7)
-        self.grid.addWidget(self.edi_bat_time , self.grid_row+2, 8, 1,  2)
-
-        self.grid.addWidget(self.tit_dark,      self.grid_row+3, 0)
-        self.grid.addWidget(self.edi_dark,      self.grid_row+3, 1, 1,  9)
-        self.grid.addWidget(self.tit_flat,      self.grid_row+4, 0)
-        self.grid.addWidget(self.edi_flat,      self.grid_row+4, 1, 1,  9)
-        self.grid.addWidget(self.tit_blam,      self.grid_row+5, 0)
-        self.grid.addWidget(self.edi_blam,      self.grid_row+5, 1, 1,  9)
-        self.grid.addLayout(self.hboxB,         self.grid_row+7, 0, 1, 10)
-        self.grid.addLayout(self.hboxT,         self.grid_row+8, 0, 2, 10)
-        self.grid.addLayout(self.hboxS,         self.grid_row+10,0, 1, 10)
-
-
-        self.setLayout(self.grid)
-        
-        #self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose  )
-        #self.connect( self.but_apply, QtCore.SIGNAL('clicked()'), self.onSave   )
-        self.connect( self.but_run,    QtCore.SIGNAL('clicked()'), self.onRun    )
-        self.connect( self.but_status, QtCore.SIGNAL('clicked()'), self.onStatus )
-        self.connect( self.but_files,  QtCore.SIGNAL('clicked()'), self.onFiles  )
-        self.connect( self.but_brow,   QtCore.SIGNAL('clicked()'), self.onBrow   )
-        self.connect( self.but_remove, QtCore.SIGNAL('clicked()'), self.onRemove )
+        self.connect( self.but_save, QtCore.SIGNAL('clicked()'), self.onSave )
 
         self.showToolTips()
         self.setStyle()
-        self.setFields()
-        self.setStatus()
 
     #-------------------
     #  Public methods --
     #-------------------
 
     def showToolTips(self):
-        self           .setToolTip('This GUI is intended for run control and monitoring.')
-        #self.but_close .setToolTip('Close this window.')
-        #self.but_apply .setToolTip('Apply changes to configuration parameters.')
-        #self.but_show  .setToolTip('Show ...')
+        #msg = 'Edit field'
+        self.but_save  .setToolTip('Save all current configuration parameters.')
+
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -196,84 +94,96 @@ class GUIRun ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumSize(740,350)
-        self.           setStyleSheet (cp.styleBkgd)
-        self.tit_title .setStyleSheet (cp.styleTitleBold)
-        self.tit_status.setStyleSheet (cp.styleTitle)
-        #self.but_close .setStyleSheet (cp.styleButton)
-        #self.but_apply .setStyleSheet (cp.styleButton) 
-        #self.but_show  .setStyleSheet (cp.styleButton) 
-        self.but_run   .setStyleSheet (cp.styleButton) 
-        self.but_status.setStyleSheet (cp.styleButton)
-        self.but_files .setStyleSheet (cp.styleButton)
-        self.but_brow  .setStyleSheet (cp.styleButton)
-        self.but_remove.setStyleSheet (cp.styleButtonBad)
+        self.          setStyleSheet (cp.styleBkgd)
 
-        self.tit_data  .setStyleSheet (cp.styleLabel)
-        self.tit_dark  .setStyleSheet (cp.styleLabel)
-        self.tit_flat  .setStyleSheet (cp.styleLabel)
-        self.tit_blam  .setStyleSheet (cp.styleLabel)
+        self.lab_title.setStyleSheet (cp.styleTitleBold)
+        self.lab_title.setAlignment(QtCore.Qt.AlignCenter)
+        #self.setMinimumWidth (600)
+        #self.setMaximumWidth (700)
+        #self.setMinimumHeight(300)
+        #self.setMaximumHeight(400)
+        #self.setFixedWidth (700)
+        #self.setFixedHeight(400)
+        #self.setFixedHeight(330)
+        #self.setFixedSize(550,350)
+        self.setFixedSize(800,500)
+        
+    def makeTabBar(self,mode=None) :
+        #if mode != None : self.tab_bar.close()
+        self.tab_bar = QtGui.QTabBar()
 
-        self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
+        #Uses self.list_run_types
+        self.ind_tab_info  = self.tab_bar.addTab( self.list_run_types[0] )
+        self.ind_tab_split = self.tab_bar.addTab( self.list_run_types[1] )
+        self.ind_tab_proc  = self.tab_bar.addTab( self.list_run_types[2] )
+        self.ind_tab_merge = self.tab_bar.addTab( self.list_run_types[3] )
+        self.ind_tab_auto  = self.tab_bar.addTab( self.list_run_types[4] )
 
-        self.lab_start .setStyleSheet (cp.styleLabel)
-        self.lab_end   .setStyleSheet (cp.styleLabel)
-        self.lab_total .setStyleSheet (cp.styleLabel)
-        self.lab_time  .setStyleSheet (cp.styleLabel)
+        self.tab_bar.setTabTextColor(self.ind_tab_info , QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_split, QtGui.QColor('red'))
+        self.tab_bar.setTabTextColor(self.ind_tab_proc , QtGui.QColor('gray'))
+        self.tab_bar.setTabTextColor(self.ind_tab_merge, QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_auto , QtGui.QColor('black'))
+        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 
-        self.edi_data.setStyleSheet (cp.styleEditInfo)
-        self.edi_dark.setStyleSheet (cp.styleEditInfo)
-        self.edi_flat.setStyleSheet (cp.styleEditInfo)
-        self.edi_blam.setStyleSheet (cp.styleEditInfo)
+        #self.tab_bar.setTabEnabled(1, False)
+        #self.tab_bar.setTabEnabled(2, False)
+        #self.tab_bar.setTabEnabled(3, False)
+        #self.tab_bar.setTabEnabled(4, False)
+        
+        try    :
+            tab_index = self.list_run_types.index(cp.current_run_tab.value())
+        except :
+            tab_index = 3
+            cp.current_run_tab.setValue(self.list_run_types[tab_index])
+        self.tab_bar.setCurrentIndex(tab_index)
 
-        width = 60
-        self.edi_bat_start.setFixedWidth(width)   
-        self.edi_bat_end  .setFixedWidth(width)   
-        self.edi_bat_total.setFixedWidth(width)   
-        self.edi_bat_time .setFixedWidth(140)   
+        logger.info(' make_tab_bar - set mode: ' + cp.current_run_tab.value(), __name__)
 
-        self.edi_bat_start.setStyleSheet   (cp.styleEditInfo)
-        self.edi_bat_end  .setStyleSheet   (cp.styleEditInfo)
-        self.edi_bat_total.setStyleSheet   (cp.styleEditInfo)
-        self.edi_bat_time .setStyleSheet   (cp.styleEditInfo)
-
-        self.edi_data.setAlignment    (QtCore.Qt.AlignRight)
-        self.edi_dark.setAlignment    (QtCore.Qt.AlignRight)
-        self.edi_flat.setAlignment    (QtCore.Qt.AlignRight)
-        self.edi_blam.setAlignment    (QtCore.Qt.AlignRight)
-
-        self.tit_title .setAlignment(QtCore.Qt.AlignCenter)
-        #self.titTitle .setBold()
+        self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
 
 
-    def setFields(self):
-        self.edi_data.setText( fnm.path_data_xtc_cond() )        
+    def guiSelector(self):
 
-        if cp.bat_dark_is_used.value() : self.edi_dark.setText( fnm.path_pedestals_ave() )
-        else                           : self.edi_dark.setText( 'is not used' )
+        try    : self.gui_win.close()
+        except : pass
 
-        if cp.ccdcorr_flatfield.value() : self.edi_flat.setText( fnm.path_flat() )
-        else                            : self.edi_flat.setText( 'is not used' )
+        try    : del self.gui_win
+        except : pass
 
-        if cp.ccdcorr_blemish.value()   : self.edi_blam.setText( fnm.path_blam() )
-        else                            : self.edi_blam.setText( 'is not used' )
+        if cp.current_run_tab.value() == self.list_run_types[0] :
+            self.gui_win = GUIRunInfo(self)
+            self.setStatus(0, 'Status: run info')
+            
+        if cp.current_run_tab.value() == self.list_run_types[1] :
+            self.gui_win = GUIRunSplit(self)
+            self.setStatus(0, 'Status: split')
 
-        self.edi_bat_start.setText ( str( cp.bat_data_start.value() ) )        
-        self.edi_bat_end  .setText ( str( cp.bat_data_end  .value() ) )        
-        self.edi_bat_total.setText ( str( cp.bat_data_total.value() ) )        
-        self.edi_bat_time .setText ( str( cp.bat_data_dt_ave.value() ) + u'\u00B1'
-                                     + str( cp.bat_data_dt_rms.value() ) )        
- 
-        self.edi_bat_start.setReadOnly( True )
-        self.edi_bat_end  .setReadOnly( True )
-        self.edi_bat_total.setReadOnly( True )
-        self.edi_bat_time .setReadOnly( True )
+        if cp.current_run_tab.value() == self.list_run_types[2] :
+        #    self.gui_win = GUIRunProc(self)
+            self.gui_win = QtGui.QLineEdit( 'Empty' )
+            self.setStatus(0, 'Status: processing for correlations')
 
-        self.edi_data.setReadOnly( True )   
-        self.edi_dark.setReadOnly( True )   
-        self.edi_flat.setReadOnly( True )   
-        self.edi_blam.setReadOnly( True )   
+        if cp.current_run_tab.value() == self.list_run_types[3] :
+        #    self.gui_win = GUIRunMerge(self)
+            self.gui_win = QtGui.QLineEdit( 'Empty' )
+            self.setStatus(0, 'Status: merging')
 
+        if cp.current_run_tab.value() == self.list_run_types[4] :
+        #    self.gui_win = GUIRunAuto(self)
+            self.gui_win = QtGui.QLineEdit( 'Empty' )
+            self.setStatus(0, 'Status: auto run')
+
+        #self.gui_win.setFixedHeight(180)
+        self.gui_win.setFixedHeight(650)
+        self.hboxW.addWidget(self.gui_win)
+
+    def onTabBar(self):
+        tab_ind  = self.tab_bar.currentIndex()
+        tab_name = str(self.tab_bar.tabText(tab_ind))
+        cp.current_run_tab.setValue( tab_name )
+        logger.info(' ---> selected tab: ' + str(tab_ind) + ' - open GUI to work with: ' + tab_name, __name__)
+        self.guiSelector()
 
     def setParent(self,parent) :
         self.parent = parent
@@ -284,151 +194,43 @@ class GUIRun ( QtGui.QWidget ) :
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 
-        #cp.posGUIMain = (self.pos().x(),self.pos().y())
+        #self.position = self.mapToGlobal(self.pos())
+        #self.position = self.pos()
+        #logger.debug('moveEvent: new pos:' + str(self.position), __name__)
         pass
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        #try    : cp.guisystemsettingsleft.close()
-        #except : pass
-
-        #try    : cp.guisystemsettingsright.close()
-        #except : pass
-
-        try    : del cp.guirun # GUIRun
+        try    : cp.guimain.butFiles.setStyleSheet(cp.styleButton)
         except : pass
 
+        try    : self.gui_win.close()
+        except : pass
 
-    def onItem(self, item):
-        print 'Clicked on item: ', str(item.text()) 
-
-    def onItemChanged(self, item):
-        if item == self.item_nparts :
-            s = str(item.text()) 
-            print 'Changed item: ', s
-            cp.bat_img_nparts.setValue(s)
-            self.setTableItems()
-        else :
-            print 'Changed non-allowed item' 
-
-    def onEdiNParts(self) :
-        s = str(self.edi_bat_nparts.text()) 
-        print 'onEdiNParts: ', s
-        cp.bat_img_nparts.setValue(s)
-        self.setTableItems()
-
-
-    def setTableItems(self) :
-
-        #self.item_rows      .setText(str(cp.bat_img_rows.value()))
-        #self.item_cols      .setText(str(cp.bat_img_cols.value()))
-        #self.item_size      .setText(str(cp.bat_img_size.value()))
-        #self.edi_bat_nparts .setText(str(cp.bat_img_nparts.value()))        
-        #self.item_nparts   .setText(str(cp.bat_img_nparts.value())) 
-
-        img_size  = cp.bat_img_size.value()
-        nparts    = cp.bat_img_nparts.value()
-        part_size = int(img_size/nparts)
-        rest_size = img_size%nparts 
-        self.item_part_size .setText(str(part_size))
-        self.item_rest_size .setText(str(rest_size))
-
-        self.item_rows     .setBackgroundColor (cp.colorEditInfo)
-        self.item_cols     .setBackgroundColor (cp.colorEditInfo)
-        self.item_size     .setBackgroundColor (cp.colorEditInfo)
-        self.item_nparts   .setBackgroundColor (cp.colorEdit)
-        self.item_part_size.setBackgroundColor (cp.colorEditInfo)
-
-        if rest_size == 0 :
-            self.item_rest_size.setBackgroundColor (cp.colorEditInfo)
-        else :
-            self.item_rest_size.setBackgroundColor (cp.colorEditBad)
-            self.item_nparts   .setBackgroundColor (cp.colorEditBad)
-
-
-    def onRun(self):
-        logger.debug('onRun', __name__)
-        if self.isReadyToStartRun() : bjcora.submit_batch_for_cora_split()
-        else : pass
-
-
-    def isReadyToStartRun(self):
-
-        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
-
-        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-            logger.warning(msg1, __name__)
-            return False
-
-        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
-            self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-            self.edi_bat_start.setStyleSheet(cp.styleEditBad)
-            logger.warning(msg1, __name__)
-            return False
-
-        else :
-            self.edi_bat_end.setStyleSheet  (cp.styleEditInfo)
-            self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
-            return True
-
-
-    def onStatus(self):
-        logger.debug('onStatus', __name__)
-
-        if bjcora.status_for_cora_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjcora.check_batch_job_for_cora_split()
-        #blp.parse_batch_log_data_scan()
-        #self.set_fields()
-
-
-    def onFiles(self):
-        logger.debug('onFiles', __name__)
-        bjcora.check_work_files_cora()
-
-
-    def onBrow(self):
-        logger.debug('onBrowser', __name__)
-        try    :
-            cp.guifilebrowser.close()
-            self.but_brow.setStyleSheet(cp.styleButtonBad)
-        except :
-            self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora(), fnm.path_cora_split_psana_cfg())
-            cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
-            cp.guifilebrowser.show()
-
-
-    def onRemove(self):
-        logger.debug('onRemove', __name__)
-        bjcora.remove_files_cora()
-        #self.on_but_status()
-
+        try    : self.tab_bar.close()
+        except : pass
+        
+        try    : del cp.guirun # GUIRun
+        except : pass # silently ignore
 
     def onClose(self):
         logger.debug('onClose', __name__)
         self.close()
 
-
     def onSave(self):
-        fname = cp.fname_cp.value()
-        logger.debug('onSave:', __name__)
-        cp.saveParametersInFile( fname )
-
-
-    def onShow(self):
-        logger.debug('onShow - is not implemented yet...', __name__)
+        logger.debug('onSave', __name__)
+        cp.saveParametersInFile( cp.fname_cp.value() )
 
     def setStatus(self, status_index=0, msg=''):
-
         list_of_states = ['Good','Warning','Alarm']
-        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
-        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
-        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
+        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
 
-        self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
+        #self.lab_status.setText('Status: ' + list_of_states[status_index] + msg)
+        self.lab_status.setText(msg)
+
 
 #-----------------------------
 

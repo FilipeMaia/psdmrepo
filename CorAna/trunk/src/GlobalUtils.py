@@ -370,6 +370,14 @@ def get_current_gm_time_tuple():
 
 #----------------------------------
 
+def get_local_time_tuple(t_sec_epoch):
+    return localtime(t_sec_epoch)
+
+def get_gm_time_tuple(t_sec_epoch):
+    return gmtime(t_sec_epoch)
+
+#----------------------------------
+
 def get_current_local_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
     return strftime(fmt, localtime())
 
@@ -377,6 +385,17 @@ def get_current_gm_time_stamp(fmt='%Y-%m-%d %H:%M:%S %Z'):
     return strftime(fmt, gmtime())
 
 #----------------------------------
+
+def get_local_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S %Z'):
+    #return ctime(time_sec)
+    return strftime(fmt, get_local_time_tuple(time_sec))
+
+#----------------------------------
+
+def get_gm_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S %Z'):
+    #return ctime(time_sec)
+    return strftime(fmt, get_gm_time_tuple(time_sec))
+
 #----------------------------------
 #----------------------------------
 

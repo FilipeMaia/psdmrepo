@@ -98,17 +98,17 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
 #    def print_work_files_for_data_aver(self) :
-#        self.print_files_for_list(fnm.get_list_of_files_cora(),'of correlation analysis:')
+#        self.print_files_for_list(fnm.get_list_of_files_cora_split(),'of correlation analysis:')
 
 #-----------------------------
 
     def check_work_files_cora(self) :
-        self.check_files_for_list(fnm.get_list_of_files_cora(),'of correlation analysis:')
+        self.check_files_for_list(fnm.get_list_of_files_cora_split(),'of correlation analysis:')
 
 #-----------------------------
 
     def remove_files_cora(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_cora(),'of correlation analysis:')
+        self.remove_files_for_list(fnm.get_list_of_files_cora_split_all(),'of correlation analysis:')
 
 #-----------------------------
 

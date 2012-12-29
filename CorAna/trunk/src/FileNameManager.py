@@ -233,17 +233,41 @@ class FileNameManager :
 
 #-----------------------------
 
-    def  get_list_of_files_cora(self) :
-        self.list_of_files_cora  = []
-        self.list_of_files_cora.append(fnm.path_cora_split_psana_cfg())
-        self.list_of_files_cora.append(fnm.path_cora_split_batch_log())
-        self.list_of_files_cora.append(fnm.path_cora_split_med())
-        self.list_of_files_cora.append(fnm.path_cora_split_time())
-        self.list_of_files_cora.append(fnm.path_cora_split_time_ind())
-        self.list_of_files_cora.append(fnm.path_cora_split_files())
-        #self.list_of_files_cora.append(fnm.)
+    def get_list_of_files_cora_split_all(self) :
+        return self.get_list_of_files_cora_split() + \
+               self.get_list_of_files_cora_split_work()
 
-        return self.list_of_files_cora
+    def  get_list_of_files_cora_split_work(self) :
+        return self.get_list_of_files_cora_work(format='b%04d.bin')
+
+#-----------------------------
+
+    def  get_list_of_files_cora_result_work(self) :
+        return self.get_list_of_files_cora_work(format='b%04d-result.bin')
+
+#-----------------------------
+
+    def  get_list_of_files_cora_work(self, format='b%04d.bin') :
+        self.list_of_files_cora_work = []
+        for i in range(cp.bat_img_nparts.value()) :
+            suffix = format % (i)
+            fname = self.path_prefix_cora() + '-' + self.str_run_data() + suffix
+            self.list_of_files_cora_work.append(fname)
+        return self.list_of_files_cora_work
+
+#-----------------------------
+
+    def  get_list_of_files_cora_split(self) :
+        self.list_of_files_cora_split = []
+        self.list_of_files_cora_split.append(fnm.path_cora_split_psana_cfg())
+        self.list_of_files_cora_split.append(fnm.path_cora_split_batch_log())
+        self.list_of_files_cora_split.append(fnm.path_cora_split_med())
+        self.list_of_files_cora_split.append(fnm.path_cora_split_time())
+        self.list_of_files_cora_split.append(fnm.path_cora_split_time_ind())
+        #self.list_of_files_cora_split.append(fnm.path_cora_split_files())
+        #self.list_of_files_cora_split.append(fnm.)
+
+        return self.list_of_files_cora_split
 
 #-----------------------------
 
@@ -353,6 +377,12 @@ if __name__ == "__main__" :
 
     print 'path_data_xtc_all_chunks() : ', fnm.path_data_xtc_all_chunks()
     print 'path_dark_xtc_all_chunks() : ', fnm.path_dark_xtc_all_chunks()
+
+
+    #list = fnm.get_list_of_files_cora_split_work()
+    list = fnm.get_list_of_files_cora_result_work()
+    for fname in list : print fname
+
 
     sys.exit ( 'End of test for FileNameManager' )
 
