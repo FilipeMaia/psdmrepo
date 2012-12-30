@@ -12,11 +12,11 @@ Import('*')
 from os.path import join as pjoin
 from SConsTools.standardExternalPackage import standardExternalPackage
 
-pkg = "tcl-tk"
-pkg_ver = "8.5.12"
+#pkg = "tcl-tk"
+#pkg_ver = "8.5.12"
 
-PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
-LIBDIR = "lib"
-LINKLIBS = "libtcl*.so libtk*.so"
+#PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+#LIBDIR = "lib"
+#LINKLIBS = "libtcl*.so libtk*.so"
 
-standardExternalPackage ( pkg, **locals() )
+#standardExternalPackage ( pkg, **locals() )
