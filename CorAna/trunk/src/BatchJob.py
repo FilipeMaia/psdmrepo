@@ -47,8 +47,8 @@ class BatchJob :
         """
 
         self.time_interval_sec      = 100
-        self.dict_status = {True  : ' is available',
-                            False : ' is not available'}
+        self.dict_status = {True  : 'available',
+                            False : 'not available'}
 
 #-----------------------------
 
@@ -106,6 +106,21 @@ class BatchJob :
 
 #-----------------------------
 
+    def get_batch_job_status_and_string(self, job_id, time_sec) :
+
+        if job_id == None :
+            return 'None', 'Batch job was not submitted in this session.'
+
+        time_str = gu.get_local_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S')
+        status = self.get_batch_job_status(job_id)
+
+        msg = 'Job Id: ' + str(job_id) + \
+              ' was submitted at ' + str(time_str) + \
+              '    Status:' + str(status)
+        return status, msg
+
+#-----------------------------
+
     def print_files_for_list(self, list_of_files, comment='') :
         logger.info('Print files for list ' + comment, __name__)         
         for fname in list_of_files :
@@ -116,8 +131,28 @@ class BatchJob :
     def check_files_for_list(self, list_of_files, comment='') :
         logger.info('Check files for list ' + comment, __name__)         
         for fname in list_of_files :
-            msg = '%s %s' % ( fname.ljust(100), self.dict_status[os.path.lexists(fname)] )
+            msg = '%s is %s' % ( fname.ljust(100), self.dict_status[os.path.lexists(fname)] )
             logger.info(msg)         
+
+#-----------------------------
+
+    def status_for_files(self, list_of_files, comment='') :
+        status = True
+        for fname in list_of_files :
+            if not os.path.lexists(fname) :
+                status = False
+                break
+            if os.path.getsize(fname) < 1 :
+                status = False
+                break
+        logger.info('Check file existence and size for the list ' + comment + str(status), __name__)         
+        return status
+
+#-----------------------------
+
+    def status_and_string_for_files(self, list_of_files, comment='') :
+        status = self.status_for_files(list_of_files, comment)
+        return status, 'Files are ' + self.dict_status[status] + '.'
 
 #-----------------------------
 

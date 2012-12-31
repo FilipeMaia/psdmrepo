@@ -43,7 +43,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(50, 100, 850, 500)
+        self.setGeometry(50, 100, 700, 500)
         self.setWindowTitle('System Settings Left')
         self.setFrame()
 
@@ -54,26 +54,28 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
         #print 'self.nparts = ', self.nparts
 
+        self.lab_status = QtGui.QLabel     ('Batch job status: ')
 
         self.but_run    = QtGui.QPushButton('Run') 
         self.but_status = QtGui.QPushButton('Check status') 
-        #self.but_files  = QtGui.QPushButton('Check files') 
         self.but_brow   = QtGui.QPushButton('Browse') 
-        self.but_remove = QtGui.QPushButton('Remove') 
+        self.but_remove = QtGui.QPushButton('Remove files') 
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.but_run)
         self.hboxB.addWidget(self.but_status)
-        #self.hboxB.addWidget(self.but_files)
         self.hboxB.addWidget(self.but_brow)
         self.hboxB.addStretch(1)     
         self.hboxB.addWidget(self.but_remove)
 
+        self.hboxS = QtGui.QHBoxLayout()
+        self.hboxS.addWidget(self.lab_status)
+
         self.connect( self.but_run,    QtCore.SIGNAL('clicked()'), self.onRun    )
         self.connect( self.but_status, QtCore.SIGNAL('clicked()'), self.onStatus )
-        #self.connect( self.but_files,  QtCore.SIGNAL('clicked()'), self.onFiles  )
         self.connect( self.but_brow,   QtCore.SIGNAL('clicked()'), self.onBrow   )
         self.connect( self.but_remove, QtCore.SIGNAL('clicked()'), self.onRemove )
+
 
         self.table = QtGui.QTableWidget(self.nparts+5, 4, self)
         self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)'])
@@ -104,7 +106,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
         for i, fname in enumerate(self.list_of_files) :
 
             file_exists = os.path.exists(fname)
-            item_fname = QtGui.QTableWidgetItem( os.path.basename(fname) )
+            item_fname  = QtGui.QTableWidgetItem( os.path.basename(fname) )
             item_exists = QtGui.QTableWidgetItem( self.dict_status[file_exists] )
             item_ctime  = QtGui.QTableWidgetItem( 'N/A' )
             item_size   = QtGui.QTableWidgetItem( 'N/A' )
@@ -123,11 +125,12 @@ class GUIRunSplit ( QtGui.QWidget ) :
             self.list_of_items.append(row_of_items)
 
 
-        self.setTableItems()
-
+        #self.setTableItems()
+        self.onStatus()
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
+        self.vbox.addLayout(self.hboxS)
         self.vbox.addWidget(self.table)
         #self.vbox.addStretch(1)     
  
@@ -187,6 +190,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.but_brow  .setStyleSheet (cp.styleButton)
         self.but_remove.setStyleSheet (cp.styleButtonBad)
 
+        self.but_status.setFixedWidth(100)
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
@@ -218,6 +222,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
         logger.debug('onRun', __name__)
         if self.isReadyToStartRun() : bjcora.submit_batch_for_cora_split()
         else : pass
+        job_id_str = str(bjcora.get_batch_job_id_cora_split())
+        self.setStatus(0,'Batch job '+ job_id_str + ' is just submitted')
 
 
     def isReadyToStartRun(self):
@@ -244,19 +250,19 @@ class GUIRunSplit ( QtGui.QWidget ) :
     def onStatus(self):
         logger.debug('onStatus', __name__)
 
-        if bjcora.status_for_cora_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                             : self.but_status.setStyleSheet(cp.styleButtonBad)
-        bjcora.check_batch_job_for_cora_split()
-        #blp.parse_batch_log_data_scan()
-        #self.set_fields()
+        bjcora.check_batch_job_for_cora_split() # for record in Logger
+        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
+        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
+        status_str = bstatus_str + '   ' + fstatus_str
 
-        self.onFiles()
+        if fstatus :
+            self.but_status.setStyleSheet(cp.styleButtonGood)
+            self.setStatus(0, status_str)
+        else :
+            self.but_status.setStyleSheet(cp.styleButtonBad)
+            self.setStatus(2, status_str)
+
         self.setTableItems()
-
-
-    def onFiles(self):
-        logger.debug('onFiles', __name__)
-        bjcora.check_work_files_cora()
 
 
     def onBrow(self):
@@ -266,7 +272,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
             self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split(), fnm.path_cora_split_psana_cfg())
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split(), \
+                                               fnm.path_cora_split_psana_cfg())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
@@ -275,7 +282,17 @@ class GUIRunSplit ( QtGui.QWidget ) :
         logger.debug('onRemove', __name__)
         bjcora.remove_files_cora()
         #self.on_but_status()
+        self.onStatus()
 
+
+    def setStatus(self, status_index=0, msg=''):
+        list_of_states = ['Good','Warning','Alarm']
+        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
+
+        #self.lab_status.setText('Status: ' + list_of_states[status_index] + msg)
+        self.lab_status.setText(msg)
 
 #-----------------------------
 

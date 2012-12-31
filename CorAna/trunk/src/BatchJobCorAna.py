@@ -95,6 +95,15 @@ class BatchJobCorAna(BatchJob) :
         self.check_batch_job(self.job_id_cora_split, 'correlation analysis')
 
 #-----------------------------
+
+    def status_for_cora_split_files(self) :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_split_all(), 'of split: ' )
+
+#-----------------------------
+
+    def status_batch_job_for_cora_split(self) :
+        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub1)
+
 #-----------------------------
 
 #    def print_work_files_for_data_aver(self) :
@@ -112,11 +121,8 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-    def status_for_cora_file(self) :
-        fname  = fnm.path_cora_split_psana_cfg() # fnm.path_pedestals_ave()
-        status = os.path.lexists(fname)
-        logger.info('Status: not implemented for final file yet... For now check the file: ' + fname + self.dict_status[status], __name__) 
-        return status
+    def get_batch_job_id_cora_split(self) :
+        return self.job_id_cora_split
 
 #-----------------------------
 

@@ -132,7 +132,8 @@ class ConfigFileGenerator :
                          'EVENTS'          : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE'  : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'         : str( cp.bat_det_info.value() ),
-                         'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() )
+                         'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() ),
+                         'IMG_NPARTS'      : str( cp.bat_img_nparts.value() )
                          #'FILE_AVE'       : fnm.path_data_ave(),
                          #'FILE_RMS'       : fnm.path_data_rms()
                          }

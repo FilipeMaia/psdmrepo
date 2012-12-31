@@ -72,7 +72,6 @@ class GUIDark ( QtGui.QWidget ) :
  
         self.but_path    = QtGui.QPushButton('File:')
         self.but_status  = QtGui.QPushButton('Check status')
-        self.but_wfiles  = QtGui.QPushButton('Check files')
         self.but_submit  = QtGui.QPushButton('Pedestal')
         self.but_scanner = QtGui.QPushButton('Scanner')
         self.but_browse  = QtGui.QPushButton('Browse')
@@ -95,13 +94,12 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_total,     self.grid_row+3, 5)
         self.grid.addWidget(self.lab_time,      self.grid_row+3, 6)
         self.grid.addWidget(self.but_scanner,   self.grid_row+4, 0)
-        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 1, 2)
+        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 2, 2)
         self.grid.addWidget(self.edi_bat_start, self.grid_row+4, 3)
         self.grid.addWidget(self.edi_bat_end,   self.grid_row+4, 4)
         self.grid.addWidget(self.edi_bat_total, self.grid_row+4, 5)
         self.grid.addWidget(self.edi_bat_time,  self.grid_row+4, 6, 1, 2)
         self.grid.addWidget(self.but_submit,    self.grid_row+5, 0)
-        self.grid.addWidget(self.but_wfiles,    self.grid_row+5, 1, 1, 2)
         self.grid.addWidget(self.but_browse,    self.grid_row+5, 3) #, 1, 2)
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
         self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
@@ -110,7 +108,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),          self.on_but_status    )
         self.connect(self.but_submit,    QtCore.SIGNAL('clicked()'),          self.on_but_submit    )
         self.connect(self.but_scanner,   QtCore.SIGNAL('clicked()'),          self.on_but_scanner   )
-        self.connect(self.but_wfiles,    QtCore.SIGNAL('clicked()'),          self.on_but_wfiles    )
         self.connect(self.but_browse,    QtCore.SIGNAL('clicked()'),          self.on_but_browse    )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),          self.on_but_plot      )
         self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),          self.on_but_remove    )
@@ -136,7 +133,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status .setToolTip('Print batch job status \nin the logger')
         self.but_submit .setToolTip('Submit job in batch for pedestals')
         self.but_scanner.setToolTip('Submit job in batch for scanner')
-        self.but_wfiles .setToolTip('List pedestal work files \nand check their availability')
         self.but_browse .setToolTip('Browse files for this GUI')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
@@ -191,7 +187,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status .setStyleSheet (cp.styleButton)
         self.but_submit .setStyleSheet (cp.styleButton) 
         self.but_scanner.setStyleSheet (cp.styleButton) 
-        self.but_wfiles .setStyleSheet (cp.styleButtonOn) 
         self.but_browse .setStyleSheet (cp.styleButton) 
         self.but_plot   .setStyleSheet (cp.styleButton) 
         self.but_remove .setStyleSheet (cp.styleButtonBad) 
@@ -202,7 +197,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot   .setFixedWidth(width)
         self.but_browse .setFixedWidth(width) 
         self.but_remove .setFixedWidth(width)
-        #self.but_wfiles .setFixedWidth(width)
         #self.but_status .setFixedWidth(width)
 
         self.on_but_status()
@@ -298,6 +292,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        bjpeds.check_work_files_for_pedestals()
         if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjpeds.check_batch_job_for_peds_scan()
@@ -305,11 +300,6 @@ class GUIDark ( QtGui.QWidget ) :
         blp.parse_batch_log_peds_scan()
         self.set_fields()
 
-
-    def on_but_wfiles(self):
-        logger.debug('on_but_wfiles', __name__)
-        #bjpeds.print_work_files_for_pedestals()
-        bjpeds.check_work_files_for_pedestals()
 
     def on_edi_bat_start(self):
         if(not cp.bat_dark_is_used.value()) : return
@@ -380,7 +370,6 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status .setEnabled(is_used)
         self.but_submit .setEnabled(is_used)
         self.but_scanner.setEnabled(is_used)
-        self.but_wfiles .setEnabled(is_used)
         self.but_browse .setEnabled(is_used)
         self.but_plot   .setEnabled(is_used)
         self.but_remove .setEnabled(is_used)
@@ -390,7 +379,6 @@ class GUIDark ( QtGui.QWidget ) :
         #self.but_status .setFlat(not is_used)
         #self.but_submit .setFlat(not is_used)
         #self.but_scanner.setFlat(not is_used)
-        #self.but_wfiles .setFlat(not is_used)
         #self.but_browse .setFlat(not is_used)
         #self.but_plot   .setFlat(not is_used)
         #self.but_remove .setFlat(not is_used)

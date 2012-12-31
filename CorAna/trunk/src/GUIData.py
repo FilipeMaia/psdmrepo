@@ -79,7 +79,6 @@ class GUIData ( QtGui.QWidget ) :
         self.but_scan   = QtGui.QPushButton('Scan')
         self.but_aver   = QtGui.QPushButton('Average')
         self.but_status = QtGui.QPushButton('Check status')
-        self.but_wfiles = QtGui.QPushButton('Check files')
         self.but_remove = QtGui.QPushButton('Remove')
 
   
@@ -100,14 +99,13 @@ class GUIData ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_time,      self.grid_row+3, 6)
 
         self.grid.addWidget(self.but_scan,      self.grid_row+4, 0)
-        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 1, 2)
+        self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 2, 2)
         self.grid.addWidget(self.edi_bat_start, self.grid_row+4, 3)
         self.grid.addWidget(self.edi_bat_end,   self.grid_row+4, 4)
         self.grid.addWidget(self.edi_bat_total, self.grid_row+4, 5)
         self.grid.addWidget(self.edi_bat_time,  self.grid_row+4, 6, 1, 2)
 
         self.grid.addWidget(self.but_aver,      self.grid_row+5, 0)
-        self.grid.addWidget(self.but_wfiles,    self.grid_row+5, 1, 1, 2)
         self.grid.addWidget(self.but_brow,      self.grid_row+5, 3)
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
         self.grid.addWidget(self.but_tspl,      self.grid_row+5, 5)
@@ -120,7 +118,6 @@ class GUIData ( QtGui.QWidget ) :
         self.connect(self.but_aver,      QtCore.SIGNAL('clicked()'),         self.on_but_aver )
         self.connect(self.but_scan,      QtCore.SIGNAL('clicked()'),         self.on_but_scan )
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),         self.on_but_status )
-        self.connect(self.but_wfiles,    QtCore.SIGNAL('clicked()'),         self.on_but_wfiles )
         self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),         self.on_but_remove )
         self.connect(self.edi_bat_start, QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_start )
         self.connect(self.edi_bat_end,   QtCore.SIGNAL('editingFinished()'), self.on_edi_bat_end   )
@@ -147,7 +144,6 @@ class GUIData ( QtGui.QWidget ) :
         self.but_scan  .setToolTip('Scan entire run and \n1) count number of events \n2) save time stamps \n3) save intensity monitors')
         self.but_aver  .setToolTip('Average image for \nselected event range')
         self.but_status.setToolTip('Print batch job status \nin the logger')
-        self.but_wfiles.setToolTip('List work files \nand check their availability')
         self.but_remove.setToolTip('Remove all data work\nfiles for selected run')
         self.cbx_data  .setToolTip('Lock / unlock buttons and fields')
         self.cbx_all_chunks.setToolTip('Switch between using one \nor all chunks of xtc file')
@@ -204,7 +200,6 @@ class GUIData ( QtGui.QWidget ) :
         self.but_scan  .setStyleSheet (cp.styleButton) 
         self.but_aver  .setStyleSheet (cp.styleButton) 
         self.but_status.setStyleSheet (cp.styleButton)
-        self.but_wfiles.setStyleSheet (cp.styleButtonOn) 
         self.but_remove.setStyleSheet (cp.styleButtonBad) 
      
         self.but_path  .setFixedWidth (width)
@@ -311,6 +306,7 @@ class GUIData ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        bjdata.check_work_files_for_data_aver()
         if bjdata.status_for_data_aver_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                  : self.but_status.setStyleSheet(cp.styleButtonBad)
         bjdata.check_batch_job_for_data_scan()
@@ -318,12 +314,6 @@ class GUIData ( QtGui.QWidget ) :
         blp.parse_batch_log_data_scan()
         blp.parse_batch_log_data_aver()
         self.set_fields()
-
-
-    def on_but_wfiles(self):
-        logger.debug('on_but_wfiles', __name__)
-        #bjdata.print_work_files_for_data_aver()
-        bjdata.check_work_files_for_data_aver()
 
 
     def on_edi_bat_start(self):
@@ -409,7 +399,6 @@ class GUIData ( QtGui.QWidget ) :
         self.but_aver  .setEnabled( is_active)
         self.but_remove.setEnabled( is_active)
         self.but_status.setEnabled( is_active)
-        self.but_wfiles.setEnabled( is_active) 
 
         self.cbx_all_chunks.setEnabled( is_active) 
 
@@ -421,7 +410,6 @@ class GUIData ( QtGui.QWidget ) :
         #self.but_aver  .setFlat(not is_active)
         #self.but_remove.setFlat(not is_active)
         #self.but_status.setFlat(not is_active)
-        #self.but_wfiles.setFlat(not is_active) 
 
         if is_active :
             self.edi_bat_start.setStyleSheet(cp.styleEdit)

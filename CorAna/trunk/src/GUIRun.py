@@ -51,14 +51,13 @@ class GUIRun ( QtGui.QWidget ) :
         self.setFrame()
 
         self.lab_title  = QtGui.QLabel     ('Run control')
-        self.lab_status = QtGui.QLabel     ('Status: ')
-        self.but_save   = QtGui.QPushButton('&Save')
+        #self.but_save   = QtGui.QPushButton('&Save')
         
         self.hboxW = QtGui.QHBoxLayout()
-        self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.lab_status)
-        self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.but_save)
+        #self.hboxB = QtGui.QHBoxLayout()
+        #self.hboxB.addWidget(self.lab_status)
+        #self.hboxB.addStretch(1)     
+        #self.hboxB.addWidget(self.but_save)
 
         self.list_run_types = ['Info', 'Split', 'Process', 'Merge', 'Auto']
         self.makeTabBar()
@@ -68,10 +67,10 @@ class GUIRun ( QtGui.QWidget ) :
         self.vbox.addWidget(self.lab_title)
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxW)
-        self.vbox.addLayout(self.hboxB)
+        #self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
 
-        self.connect( self.but_save, QtCore.SIGNAL('clicked()'), self.onSave )
+        #self.connect( self.but_save, QtCore.SIGNAL('clicked()'), self.onSave )
 
         self.showToolTips()
         self.setStyle()
@@ -81,8 +80,8 @@ class GUIRun ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        #msg = 'Edit field'
-        self.but_save  .setToolTip('Save all current configuration parameters.')
+        msg = 'Edit field'
+        #self.but_save  .setToolTip('Save all current configuration parameters.')
 
 
     def setFrame(self):
@@ -106,7 +105,7 @@ class GUIRun ( QtGui.QWidget ) :
         #self.setFixedHeight(400)
         #self.setFixedHeight(330)
         #self.setFixedSize(550,350)
-        self.setFixedSize(800,500)
+        self.setFixedSize(750,500)
         
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -153,29 +152,29 @@ class GUIRun ( QtGui.QWidget ) :
 
         if cp.current_run_tab.value() == self.list_run_types[0] :
             self.gui_win = GUIRunInfo(self)
-            self.setStatus(0, 'Status: run info')
+            #self.setStatus(0, 'Status: run info')
             
         if cp.current_run_tab.value() == self.list_run_types[1] :
             self.gui_win = GUIRunSplit(self)
-            self.setStatus(0, 'Status: split')
+            #self.setStatus(0, 'Status: split')
 
         if cp.current_run_tab.value() == self.list_run_types[2] :
         #    self.gui_win = GUIRunProc(self)
             self.gui_win = QtGui.QLineEdit( 'Empty' )
-            self.setStatus(0, 'Status: processing for correlations')
+            #self.setStatus(0, 'Status: processing for correlations')
 
         if cp.current_run_tab.value() == self.list_run_types[3] :
         #    self.gui_win = GUIRunMerge(self)
             self.gui_win = QtGui.QLineEdit( 'Empty' )
-            self.setStatus(0, 'Status: merging')
+            #self.setStatus(0, 'Status: merging')
 
         if cp.current_run_tab.value() == self.list_run_types[4] :
         #    self.gui_win = GUIRunAuto(self)
             self.gui_win = QtGui.QLineEdit( 'Empty' )
-            self.setStatus(0, 'Status: auto run')
+            #self.setStatus(0, 'Status: auto run')
 
         #self.gui_win.setFixedHeight(180)
-        self.gui_win.setFixedHeight(650)
+        self.gui_win.setFixedHeight(400)
         self.hboxW.addWidget(self.gui_win)
 
     def onTabBar(self):
@@ -222,14 +221,13 @@ class GUIRun ( QtGui.QWidget ) :
         logger.debug('onSave', __name__)
         cp.saveParametersInFile( cp.fname_cp.value() )
 
-    def setStatus(self, status_index=0, msg=''):
-        list_of_states = ['Good','Warning','Alarm']
-        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
-        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
-        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
-
+#    def setStatus(self, status_index=0, msg=''):
+#        list_of_states = ['Good','Warning','Alarm']
+#        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
+#        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
+#        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
         #self.lab_status.setText('Status: ' + list_of_states[status_index] + msg)
-        self.lab_status.setText(msg)
+#        self.lab_status.setText(msg)
 
 
 #-----------------------------
