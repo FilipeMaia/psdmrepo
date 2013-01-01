@@ -32,6 +32,7 @@
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
+#include "types/bld/BldDataAcqADCV1.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
@@ -106,6 +107,8 @@
 
 #include "types/opal1k/ConfigV1.h"
 
+#include "types/orca/ConfigV1.h"
+
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
@@ -124,6 +127,7 @@
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
+#include "types/timepix/ConfigV3.h"
 #include "types/timepix/DataV1.h"
 #include "types/timepix/DataV2.h"
 
@@ -414,6 +418,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_TimepixConfig :
     if ( not obj ) obj = xtc2obj<Timepix::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Timepix::ConfigV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Timepix::ConfigV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TimepixData :
@@ -427,11 +432,11 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_OceanOpticsConfig :
-    //if ( not obj ) obj = xtc2obj<OceanOptics::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<OceanOptics::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_OceanOpticsData :
-    //if ( not obj ) obj = xtc2obj<OceanOptics::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<OceanOptics::DataV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EpicsConfig :
@@ -475,6 +480,14 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_GMD :
     if ( not obj ) obj = xtc2obj<BldDataGMDV0, 0>(xtc, parent);
     if ( not obj ) obj = xtc2obj<BldDataGMDV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_SharedAcqADC :
+    if ( not obj ) obj = xtc2obj<BldDataAcqADCV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_OrcaConfig :
+    if ( not obj ) obj = xtc2obj<Orca::ConfigV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

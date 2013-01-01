@@ -97,6 +97,8 @@ namespace {
       { "Id_UsdUsbData",      Pds::TypeId::Id_UsdUsbData },
       { "Id_UsdUsbConfig",    Pds::TypeId::Id_UsdUsbConfig },
       { "Id_GMD",             Pds::TypeId::Id_GMD },
+      { "Id_SharedAcqADC",    Pds::TypeId::Id_SharedAcqADC },
+      { "Id_OrcaConfig",      Pds::TypeId::Id_OrcaConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

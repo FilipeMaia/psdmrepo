@@ -59,6 +59,7 @@
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
+#include "types/bld/BldDataAcqADCV1.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
@@ -159,6 +160,8 @@
 
 #include "types/opal1k/ConfigV1.h"
 
+#include "types/orca/ConfigV1.h"
+
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
@@ -177,6 +180,7 @@
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
+#include "types/timepix/ConfigV3.h"
 #include "types/timepix/DataV1.h"
 #include "types/timepix/DataV2.h"
 
@@ -263,6 +267,7 @@ PyMODINIT_FUNC init_pdsdata()
   PyModule_AddObject( this_module, "andor", module );
 
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python wrapper module for pdsdata/bld" );
+  pypdsdata::BldDataAcqADCV1::initType( module );
   pypdsdata::BldDataEBeamV0::initType( module );
   pypdsdata::BldDataEBeamV1::initType( module );
   pypdsdata::BldDataEBeamV2::initType( module );
@@ -396,16 +401,21 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "lusi", module );
 
-//  module = Py_InitModule3( "_pdsdata.oceanoptics", 0, "The Python wrapper module for pdsdata/oceanoptics" );
-//  pypdsdata::OceanOptics::ConfigV1::initType( module );
-//  pypdsdata::OceanOptics::DataV1::initType( module );
-//  Py_INCREF( module );
-//  PyModule_AddObject( this_module, "oceanoptics", module );
+  module = Py_InitModule3( "_pdsdata.oceanoptics", 0, "The Python wrapper module for pdsdata/oceanoptics" );
+  pypdsdata::OceanOptics::ConfigV1::initType( module );
+  pypdsdata::OceanOptics::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "oceanoptics", module );
 
   module = Py_InitModule3( "_pdsdata.opal1k", 0, "The Python wrapper module for pdsdata/opal1k" );
   pypdsdata::Opal1k::ConfigV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "opal1k", module );
+
+  module = Py_InitModule3( "_pdsdata.orca", 0, "The Python wrapper module for pdsdata/orca" );
+  pypdsdata::Orca::ConfigV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "orca", module );
 
   module = Py_InitModule3( "_pdsdata.pnccd", 0, "The Python wrapper module for pdsdata/pnCCD" );
   pypdsdata::PNCCD::ConfigV1::initType( module );
@@ -438,6 +448,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.timepix", 0, "The Python wrapper module for pdsdata/timepix" );
   pypdsdata::Timepix::ConfigV1::initType( module );
   pypdsdata::Timepix::ConfigV2::initType( module );
+  pypdsdata::Timepix::ConfigV3::initType( module );
   pypdsdata::Timepix::DataV1::initType( module );
   pypdsdata::Timepix::DataV2::initType( module );
   Py_INCREF( module );

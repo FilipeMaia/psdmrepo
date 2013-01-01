@@ -143,6 +143,7 @@ namespace {
       { "Quartz4A150", Pds::DetInfo::Quartz4A150 },
       { "Andor",     Pds::DetInfo::Andor },
       { "USDUSB",    Pds::DetInfo::USDUSB },
+      { "OrcaFl40",  Pds::DetInfo::OrcaFl40 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

@@ -45,4 +45,4 @@ __version__ = "$Revision$"
 # Exported definitions --
 #------------------------
 
-from _pdsdata.oceanoptics import *
+from _pdsdata.orca import *

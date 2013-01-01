@@ -6,6 +6,14 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-88
+2013-01-01 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+  - new package orca with single class ConfigV1
+  - new classes bld/BldDataAcqADCV1, timepix/ConfigV3
+  - new enums in BldInfo, DetInfo, TypeId
+- oceanoptics stuff was commented out, re-enable it
+
 Tag: V00-00-87
 2012-12-08 Andy Salnikov
 - add protection to DataObjectFactory::makeObject for missing payload

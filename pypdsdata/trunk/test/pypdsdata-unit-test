@@ -288,7 +288,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_UsdUsbData, 62 )
         self.assertEqual ( TypeId.Type.Id_UsdUsbConfig, 63 )
         self.assertEqual ( TypeId.Type.Id_GMD, 64 )
-        self.assertEqual ( TypeId.Type.NumberOf, 65 )
+        self.assertEqual ( TypeId.Type.Id_SharedAcqADC, 65 )
+        self.assertEqual ( TypeId.Type.Id_OrcaConfig, 66 )
+        self.assertEqual ( TypeId.Type.NumberOf, 67 )
 
         # chec compressed bitmask
         self.assertEqual ( TypeId.VCompressed, 0x8000 )
@@ -486,7 +488,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Quartz4A150, 24 )
         self.assertEqual ( DetInfo.Device.Andor, 25 )
         self.assertEqual ( DetInfo.Device.USDUSB, 26 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 27 )
+        self.assertEqual ( DetInfo.Device.OrcaFl40, 27 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 28 )
 
         
         o1 = DetInfo(0,0,0,0)
@@ -616,7 +619,22 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.MecXt2Ipm03, 24 )
         self.assertEqual ( BldInfo.Type.MecHxmIpm01, 25 )
         self.assertEqual ( BldInfo.Type.GMD, 26 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 27 )
+        self.assertEqual ( BldInfo.Type.CxiDg1Imb01, 27 )
+        self.assertEqual ( BldInfo.Type.CxiDg2Imb01, 28 )
+        self.assertEqual ( BldInfo.Type.CxiDg2Imb02, 29 )
+        self.assertEqual ( BldInfo.Type.CxiDg4Imb01, 30 )
+        self.assertEqual ( BldInfo.Type.CxiDg1Pim, 31 )
+        self.assertEqual ( BldInfo.Type.CxiDg2Pim, 32 )
+        self.assertEqual ( BldInfo.Type.CxiDg4Pim, 33 )
+        self.assertEqual ( BldInfo.Type.XppMonPim0, 34 )
+        self.assertEqual ( BldInfo.Type.XppMonPim1, 35 )
+        self.assertEqual ( BldInfo.Type.XppSb2Ipm, 36 )
+        self.assertEqual ( BldInfo.Type.XppSb3Ipm, 37 )
+        self.assertEqual ( BldInfo.Type.XppSb3Pim, 38 )
+        self.assertEqual ( BldInfo.Type.XppSb4Pim, 39 )
+        self.assertEqual ( BldInfo.Type.XppEndstation0, 40 )
+        self.assertEqual ( BldInfo.Type.XppEndstation1, 41 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 42 )
 
         o1 = BldInfo(0,0)
         
