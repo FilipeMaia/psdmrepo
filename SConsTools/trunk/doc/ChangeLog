@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-02
+2012-12-31 Andy Salnikov
+- tools/psdm_python.py - python is the same for all architectures
+
 Tag: V00-08-01
 2012-12-25 Andy Salnikov
 - symlinks to python files in release are made relative now

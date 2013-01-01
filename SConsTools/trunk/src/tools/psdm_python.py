@@ -12,17 +12,9 @@ def generate(env):
     # be careful what you use in the code below
     #**************************************************
     
-    if env['SIT_ARCH_OS'] in ['rhel5', 'rhel6']:
-        
-        prefix = pjoin("/reg/g/psdm/sw/external/python/2.7.2", env['SIT_ARCH_BASE_OPT'])
-        version = "2.7"
-        libdir = "lib"
-        
-    elif env['SIT_ARCH_OS'] == 'ubu11':
-        
-        prefix = "/usr"
-        version = "2.7"
-        libdir = 'lib'
+    prefix = pjoin("/reg/g/psdm/sw/external/python/2.7.2", env['SIT_ARCH_BASE_OPT'])
+    version = "2.7"
+    libdir = "lib"
     
     env['PYTHON_PREFIX'] = prefix
     env['PYTHON_VERSION'] = version
