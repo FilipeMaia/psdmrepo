@@ -106,13 +106,13 @@ class BatchJob :
 
 #-----------------------------
 
-    def get_batch_job_status_and_string(self, job_id, time_sec) :
+    def get_batch_job_status_and_string(self, job_id, time_sec, comment='') :
 
         if job_id == None :
             return 'None', 'Batch job was not submitted in this session.'
 
         time_str = gu.get_local_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S')
-        status = self.get_batch_job_status(job_id)
+        status = self.get_batch_job_status(job_id, comment)
 
         msg = 'Job Id: ' + str(job_id) + \
               ' was submitted at ' + str(time_str) + \

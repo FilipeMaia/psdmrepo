@@ -220,10 +220,14 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def onRun(self):
         logger.debug('onRun', __name__)
-        if self.isReadyToStartRun() : bjcora.submit_batch_for_cora_split()
-        else : pass
+        if self.isReadyToStartRun() :
+            self.onRemove()
+            bjcora.submit_batch_for_cora_split()
+        else :
+            pass
         job_id_str = str(bjcora.get_batch_job_id_cora_split())
-        self.setStatus(0,'Batch job '+ job_id_str + ' is just submitted')
+        time_str   = str(bjcora.get_batch_job_cora_split_time_string())
+        self.setStatus(0,'Batch job '+ job_id_str + ' is submitted at ' + time_str)
 
 
     def isReadyToStartRun(self):

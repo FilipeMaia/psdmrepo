@@ -102,7 +102,7 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def status_batch_job_for_cora_split(self) :
-        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub1)
+        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub1, 'split')
 
 #-----------------------------
 
@@ -126,8 +126,8 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-#    def get_data_aver_from_file(self) :
-#        return gu.get_array_from_file( fnm.path_data_aver() )
+    def get_batch_job_cora_split_time_string(self) :
+        return gu.get_local_time_str(self.time_sub1, fmt='%Y-%m-%d %H:%M:%S')
 
 #-----------------------------
 
