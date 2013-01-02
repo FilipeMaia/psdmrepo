@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2013-01-01 Andy Salnikov
+- add optional argument to CompoundType::insert method to specify array size
+
 Tag: V00-03-00
 2012-05-02 Andy Salnikov
 - added utility class Utils with couple of methods to read data from

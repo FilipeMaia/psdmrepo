@@ -60,7 +60,7 @@ public:
   static CompoundType compoundType( size_t size ) ;
 
   // add one more member
-  void insert ( const char* name, size_t offset, const Type& t ) ;
+  void insert ( const char* name, size_t offset, const Type& t, size_t size=0 ) ;
 
   template <typename U>
   void insert_native ( const char* name, size_t offset, size_t size=0 ) {

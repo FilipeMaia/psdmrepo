@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include "hdf5/hdf5.h"
+#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/Exceptions.h"
 
 //-------------------------------
@@ -45,9 +46,13 @@ CompoundType::compoundType( size_t size )
 
 // add one more member
 void
-CompoundType::insert ( const char* name, size_t offset, const Type& t )
+CompoundType::insert ( const char* name, size_t offset, const Type& t, size_t size )
 {
-  herr_t stat = H5Tinsert ( id(), name, offset, t.id() ) ;
+  Type mtype = t;
+  if (size > 0) {
+    mtype = hdf5pp::ArrayType::arrayType(mtype, size);
+  }
+  herr_t stat = H5Tinsert ( id(), name, offset, mtype.id() ) ;
   if ( stat < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Tinsert" ) ;
 }
 
