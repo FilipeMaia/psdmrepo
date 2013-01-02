@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-89
+2013-01-01 Andy Salnikov
+- added forgotten enums/constants to orca/ConfigV1
+
 Tag: V00-00-88
 2013-01-01 Andy Salnikov
 - upgrading to pdsdata V05-03-00

@@ -49,7 +49,14 @@ namespace {
   };
   pypdsdata::EnumType coolingEnum ( "Cooling", coolingEnumValues );
 
-// type-specific methods
+  // list of enums
+  pypdsdata::TypeLib::EnumEntry enums[] = {
+        { "Row_Pixels", Pds::Orca::ConfigV1::Row_Pixels },
+        { "Column_Pixels", Pds::Orca::ConfigV1::Column_Pixels },
+        { 0, 0 }
+  };
+
+  // type-specific methods
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, mode)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, rows)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, cooling)
@@ -85,10 +92,10 @@ pypdsdata::Orca::ConfigV1::initType( PyObject* module )
   type->tp_repr = _repr;
 
   // define class attributes for enums
-  PyObject* tp_dict = PyDict_New();
-  PyDict_SetItemString( tp_dict, "ReadoutMode", readoutModeEnum.type() );
-  PyDict_SetItemString( tp_dict, "Cooling", coolingEnum.type() );
-  type->tp_dict = tp_dict;
+  type->tp_dict = PyDict_New();
+  PyDict_SetItemString( type->tp_dict, "ReadoutMode", ::readoutModeEnum.type() );
+  PyDict_SetItemString( type->tp_dict, "Cooling", ::coolingEnum.type() );
+  pypdsdata::TypeLib::DefineEnums( type->tp_dict, ::enums );
 
   BaseType::initType( "ConfigV1", module );
 }
