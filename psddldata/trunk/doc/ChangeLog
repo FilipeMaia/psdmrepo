@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-15
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- new classes orca.ConfigV1 and timepix.ConfigV3
+- bld.BldDataAcqADCV1 not implemented yet
+
 Tag: V00-03-14
 2012-12-12 Andy Salnikov
 - replace tabs with spaces in XML to get consistent indentation
