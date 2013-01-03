@@ -119,7 +119,7 @@ protected:
 
 private:
 
-  ConfigSvc::ConfigSvc m_config;
+  ConfigSvc m_config;
   
 };
 
