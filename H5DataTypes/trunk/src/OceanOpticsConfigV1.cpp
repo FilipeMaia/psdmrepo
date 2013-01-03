@@ -67,13 +67,10 @@ OceanOpticsConfigV1::stored_type()
 hdf5pp::Type
 OceanOpticsConfigV1::native_type()
 {
-  hdf5pp::ArrayType wlCalibType = hdf5pp::ArrayType::arrayType<double>(4) ;
-  hdf5pp::ArrayType nlCalibType = hdf5pp::ArrayType::arrayType<double>(8) ;
-
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<OceanOpticsConfigV1>() ;
   confType.insert_native<float>("exposureTime", offsetof(OceanOpticsConfigV1, exposureTime));
-  confType.insert("waveLenCalib", offsetof(OceanOpticsConfigV1, waveLenCalib), wlCalibType);
-  confType.insert("nonlinCorrect", offsetof(OceanOpticsConfigV1, nonlinCorrect), nlCalibType);
+  confType.insert_native<double>("waveLenCalib", offsetof(OceanOpticsConfigV1, waveLenCalib), 4);
+  confType.insert_native<double>("nonlinCorrect", offsetof(OceanOpticsConfigV1, nonlinCorrect), 8);
   confType.insert_native<double>("strayLightConstant", offsetof(OceanOpticsConfigV1, strayLightConstant));
 
   return confType ;

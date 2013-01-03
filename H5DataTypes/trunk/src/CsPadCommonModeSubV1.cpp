@@ -73,12 +73,9 @@ CsPadCommonModeSubV1::stored_type()
 hdf5pp::Type
 CsPadCommonModeSubV1::native_type()
 {
-  hdf5pp::ArrayType arrType = 
-    hdf5pp::ArrayType::arrayType<double>(CsPadCommonModeSubV1_Data::DataSize) ;
-
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CsPadCommonModeSubV1_Data>() ;
   type.insert_native<uint32_t>( "mode", offsetof(CsPadCommonModeSubV1_Data,mode) ) ;
-  type.insert( "data", offsetof(CsPadCommonModeSubV1_Data,data), arrType ) ;
+  type.insert_native<double>( "data", offsetof(CsPadCommonModeSubV1_Data,data), CsPadCommonModeSubV1_Data::DataSize ) ;
 
   return type;
 }

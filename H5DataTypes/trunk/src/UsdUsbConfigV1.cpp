@@ -70,12 +70,9 @@ UsdUsbConfigV1::native_type()
   quadModeEnumType.insert ( "X2", Pds::UsdUsb::ConfigV1::X2 ) ;
   quadModeEnumType.insert ( "X4", Pds::UsdUsb::ConfigV1::X4 ) ;
 
-  hdf5pp::ArrayType countModeType = hdf5pp::ArrayType::arrayType(countModeEnumType, NCHANNELS);
-  hdf5pp::ArrayType quadModeType = hdf5pp::ArrayType::arrayType(quadModeEnumType, NCHANNELS);
-
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<UsdUsbConfigV1>() ;
-  type.insert( "counting_mode", offsetof(UsdUsbConfigV1, counting_mode), countModeType ) ;
-  type.insert( "quadrature_mode", offsetof(UsdUsbConfigV1, quadrature_mode), quadModeType ) ;
+  type.insert( "counting_mode", offsetof(UsdUsbConfigV1, counting_mode), countModeEnumType, NCHANNELS ) ;
+  type.insert( "quadrature_mode", offsetof(UsdUsbConfigV1, quadrature_mode), quadModeEnumType, NCHANNELS ) ;
 
   return type;
 }

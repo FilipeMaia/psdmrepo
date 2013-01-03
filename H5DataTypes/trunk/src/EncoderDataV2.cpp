@@ -56,11 +56,9 @@ EncoderDataV2::stored_type()
 hdf5pp::Type
 EncoderDataV2::native_type()
 {
-  hdf5pp::ArrayType countType = hdf5pp::ArrayType::arrayType<uint32_t>(3);  
-
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<EncoderDataV2>() ;
   type.insert_native<uint32_t>( "_33mhz_timestamp", offsetof(EncoderDataV2, _33mhz_timestamp) ) ;
-  type.insert( "encoder_count", offsetof(EncoderDataV2, encoder_count), countType ) ;
+  type.insert_native<uint32_t>( "encoder_count", offsetof(EncoderDataV2, encoder_count), 3 ) ;
 
   return type;
 }

@@ -53,12 +53,9 @@ LusiDiodeFexConfigV1::stored_type()
 hdf5pp::Type
 LusiDiodeFexConfigV1::native_type()
 {
-  hdf5pp::ArrayType baseType = hdf5pp::ArrayType::arrayType<float>(XtcType::NRANGES) ;
-  hdf5pp::ArrayType scaleType = hdf5pp::ArrayType::arrayType<float>(XtcType::NRANGES) ;
-  
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiDiodeFexConfigV1_Data>() ;
-  confType.insert( "base", offsetof(LusiDiodeFexConfigV1_Data, base), baseType );
-  confType.insert( "scale", offsetof(LusiDiodeFexConfigV1_Data, scale), scaleType );
+  confType.insert_native<float>( "base", offsetof(LusiDiodeFexConfigV1_Data, base), XtcType::NRANGES );
+  confType.insert_native<float>( "scale", offsetof(LusiDiodeFexConfigV1_Data, scale), XtcType::NRANGES );
 
   return confType ;
 }

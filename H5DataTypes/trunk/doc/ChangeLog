@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-69
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- new classes OrcaConfigV1 and TimepixConfigV3
+- BldDataAcqADCV1 not implemented yet
+- small-scale refactoring for array data types
+
 Tag: V00-00-68
 2012-11-28 Andy Salnikov
 - add xtcSize() method to CameraFrameV1

@@ -54,10 +54,8 @@ LusiIpmFexV1::stored_type()
 hdf5pp::Type
 LusiIpmFexV1::native_type()
 {
-  hdf5pp::ArrayType chType = hdf5pp::ArrayType::arrayType<float>(LusiIpmFexV1_Data::CHSIZE) ;
-
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<LusiIpmFexV1_Data>() ;
-  type.insert( "channel", offsetof(LusiIpmFexV1_Data, channel), chType ) ;
+  type.insert_native<float>( "channel", offsetof(LusiIpmFexV1_Data, channel), LusiIpmFexV1_Data::CHSIZE ) ;
   type.insert_native<float>( "sum", offsetof(LusiIpmFexV1_Data, sum) ) ;
   type.insert_native<float>( "xpos", offsetof(LusiIpmFexV1_Data, xpos) ) ;
   type.insert_native<float>( "ypos", offsetof(LusiIpmFexV1_Data, ypos) ) ;

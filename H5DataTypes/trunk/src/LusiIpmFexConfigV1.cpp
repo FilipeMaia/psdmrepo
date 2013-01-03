@@ -55,10 +55,8 @@ LusiIpmFexConfigV1::stored_type()
 hdf5pp::Type
 LusiIpmFexConfigV1::native_type()
 {
-  hdf5pp::ArrayType arrType = hdf5pp::ArrayType::arrayType(LusiDiodeFexConfigV1::native_type(), XtcType::NCHANNELS) ;
-
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiIpmFexConfigV1_Data>() ;
-  confType.insert( "diode", offsetof(LusiIpmFexConfigV1_Data, diode), arrType );
+  confType.insert( "diode", offsetof(LusiIpmFexConfigV1_Data, diode), LusiDiodeFexConfigV1::native_type(), XtcType::NCHANNELS );
   confType.insert_native<float>( "xscale", offsetof(LusiIpmFexConfigV1_Data, xscale) );
   confType.insert_native<float>( "yscale", offsetof(LusiIpmFexConfigV1_Data, yscale) );
 

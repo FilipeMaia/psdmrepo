@@ -162,8 +162,6 @@ TimepixConfigV2::native_type()
   trigEnum.insert ( "TriggerMode_ExtNeg", Pds::Timepix::ConfigV2::TriggerMode_ExtNeg ) ;
   trigEnum.insert ( "TriggerMode_Soft", Pds::Timepix::ConfigV2::TriggerMode_Soft ) ;
 
-  hdf5pp::ArrayType pixelThreshType = hdf5pp::ArrayType::arrayType<uint8_t>(XtcType::PixelThreshMax) ;
-
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<TimepixConfigV2>() ;
   confType.insert("readoutSpeed", offsetof(TimepixConfigV2, readoutSpeed), speedEnum);
   confType.insert("triggerMode", offsetof(TimepixConfigV2, triggerMode), trigEnum);
@@ -228,7 +226,7 @@ TimepixConfigV2::native_type()
   confType.insert_native<int32_t>("driverVersion", offsetof(TimepixConfigV2, driverVersion));
   confType.insert_native<uint32_t>("firmwareVersion", offsetof(TimepixConfigV2, firmwareVersion));
   confType.insert_native<uint32_t>("pixelThreshSize", offsetof(TimepixConfigV2, pixelThreshSize));
-  confType.insert("pixelThresh", offsetof(TimepixConfigV2, pixelThresh), pixelThreshType);
+  confType.insert_native<uint8_t>("pixelThresh", offsetof(TimepixConfigV2, pixelThresh), XtcType::PixelThreshMax);
   confType.insert_native<const char*>("chip0Name", offsetof(TimepixConfigV2, chip0Name));
   confType.insert_native<const char*>("chip1Name", offsetof(TimepixConfigV2, chip1Name));
   confType.insert_native<const char*>("chip2Name", offsetof(TimepixConfigV2, chip2Name));
