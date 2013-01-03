@@ -231,7 +231,7 @@ set_env SIT_ARCH "$sit_arch"
 
 # remove all PSDM dirs from PATHs for the moment
 remove_from_path PATH "$SIT_ROOT/bin/*"
-remove_from_path PATH "$SIT_ROOT/sw/.*"
+remove_from_path PATH "$SIT_ROOT/sw/releases/.*"
 remove_from_path PATH "[.]/arch/[^/]*/bin/*"
 remove_from_path LD_LIBRARY_PATH "$SIT_ROOT/sw/.*"
 remove_from_path LD_LIBRARY_PATH "[.]/arch/[^/]*/lib/*"
