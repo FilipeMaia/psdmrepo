@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-16
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- regenerate whole thing from psddldata V00-03-15
+
 Tag: V00-03-15
 2012-11-15 Andy Salnikov
 - upgrading to pdsdata V05-01-00
