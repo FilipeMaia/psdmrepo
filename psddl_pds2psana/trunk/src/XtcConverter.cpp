@@ -45,6 +45,7 @@
 #include "psddl_pds2psana/lusi.ddl.h"
 #include "psddl_pds2psana/oceanoptics.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
+#include "psddl_pds2psana/orca.ddl.h"
 #include "psddl_pds2psana/pnccd.ddl.h"
 #include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
 #include "psddl_pds2psana/princeton.ddl.h"
@@ -437,9 +438,12 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 0) ::storeDataProxy<Bld::BldDataGMDV0>(xtc, evt);
     if (version == 1) ::storeDataProxy<Bld::BldDataGMDV1>(xtc, evt);
     break;
+  case Pds::TypeId::Id_SharedAcqADC:
+    break;
+  case Pds::TypeId::Id_OrcaConfig:
+    break;
   case Pds::TypeId::NumberOf:
     break;
-
   }
 
 }
@@ -594,6 +598,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_TimepixConfig:
     if (version == 1) ::storeCfgObject<Timepix::ConfigV1>(xtc, cfgStore);
     if (version == 2) ::storeCfgObject<Timepix::ConfigV2>(xtc, cfgStore);
+    if (version == 3) ::storeCfgObject<Timepix::ConfigV3>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_TimepixData:
     break;
@@ -630,6 +635,11 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 1) ::storeCfgObject<UsdUsb::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_GMD:
+    break;
+  case Pds::TypeId::Id_SharedAcqADC:
+    break;
+  case Pds::TypeId::Id_OrcaConfig:
+    if (version == 1) ::storeCfgObject<Orca::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::NumberOf:
     break;

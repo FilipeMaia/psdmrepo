@@ -309,6 +309,173 @@ int32_t ConfigV2::chip2ID() const { return m_xtcObj->chip2ID(); }
 int32_t ConfigV2::chip3ID() const { return m_xtcObj->chip3ID(); }
 
 int32_t ConfigV2::chipCount() const { return m_xtcObj->chipCount(); }
+Psana::Timepix::ConfigV3::ReadoutSpeed pds_to_psana(PsddlPds::Timepix::ConfigV3::ReadoutSpeed e)
+{
+  return Psana::Timepix::ConfigV3::ReadoutSpeed(e);
+}
+
+Psana::Timepix::ConfigV3::TimepixMode pds_to_psana(PsddlPds::Timepix::ConfigV3::TimepixMode e)
+{
+  return Psana::Timepix::ConfigV3::TimepixMode(e);
+}
+
+ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Timepix::ConfigV3()
+  , m_xtcObj(xtcPtr)
+{
+}
+ConfigV3::~ConfigV3()
+{
+}
+
+
+Psana::Timepix::ConfigV3::ReadoutSpeed ConfigV3::readoutSpeed() const { return pds_to_psana(m_xtcObj->readoutSpeed()); }
+
+Psana::Timepix::ConfigV3::TimepixMode ConfigV3::timepixMode() const { return pds_to_psana(m_xtcObj->timepixMode()); }
+
+int32_t ConfigV3::timepixSpeed() const { return m_xtcObj->timepixSpeed(); }
+
+int32_t ConfigV3::dac0Ikrum() const { return m_xtcObj->dac0Ikrum(); }
+
+int32_t ConfigV3::dac0Disc() const { return m_xtcObj->dac0Disc(); }
+
+int32_t ConfigV3::dac0Preamp() const { return m_xtcObj->dac0Preamp(); }
+
+int32_t ConfigV3::dac0BufAnalogA() const { return m_xtcObj->dac0BufAnalogA(); }
+
+int32_t ConfigV3::dac0BufAnalogB() const { return m_xtcObj->dac0BufAnalogB(); }
+
+int32_t ConfigV3::dac0Hist() const { return m_xtcObj->dac0Hist(); }
+
+int32_t ConfigV3::dac0ThlFine() const { return m_xtcObj->dac0ThlFine(); }
+
+int32_t ConfigV3::dac0ThlCourse() const { return m_xtcObj->dac0ThlCourse(); }
+
+int32_t ConfigV3::dac0Vcas() const { return m_xtcObj->dac0Vcas(); }
+
+int32_t ConfigV3::dac0Fbk() const { return m_xtcObj->dac0Fbk(); }
+
+int32_t ConfigV3::dac0Gnd() const { return m_xtcObj->dac0Gnd(); }
+
+int32_t ConfigV3::dac0Ths() const { return m_xtcObj->dac0Ths(); }
+
+int32_t ConfigV3::dac0BiasLvds() const { return m_xtcObj->dac0BiasLvds(); }
+
+int32_t ConfigV3::dac0RefLvds() const { return m_xtcObj->dac0RefLvds(); }
+
+int32_t ConfigV3::dac1Ikrum() const { return m_xtcObj->dac1Ikrum(); }
+
+int32_t ConfigV3::dac1Disc() const { return m_xtcObj->dac1Disc(); }
+
+int32_t ConfigV3::dac1Preamp() const { return m_xtcObj->dac1Preamp(); }
+
+int32_t ConfigV3::dac1BufAnalogA() const { return m_xtcObj->dac1BufAnalogA(); }
+
+int32_t ConfigV3::dac1BufAnalogB() const { return m_xtcObj->dac1BufAnalogB(); }
+
+int32_t ConfigV3::dac1Hist() const { return m_xtcObj->dac1Hist(); }
+
+int32_t ConfigV3::dac1ThlFine() const { return m_xtcObj->dac1ThlFine(); }
+
+int32_t ConfigV3::dac1ThlCourse() const { return m_xtcObj->dac1ThlCourse(); }
+
+int32_t ConfigV3::dac1Vcas() const { return m_xtcObj->dac1Vcas(); }
+
+int32_t ConfigV3::dac1Fbk() const { return m_xtcObj->dac1Fbk(); }
+
+int32_t ConfigV3::dac1Gnd() const { return m_xtcObj->dac1Gnd(); }
+
+int32_t ConfigV3::dac1Ths() const { return m_xtcObj->dac1Ths(); }
+
+int32_t ConfigV3::dac1BiasLvds() const { return m_xtcObj->dac1BiasLvds(); }
+
+int32_t ConfigV3::dac1RefLvds() const { return m_xtcObj->dac1RefLvds(); }
+
+int32_t ConfigV3::dac2Ikrum() const { return m_xtcObj->dac2Ikrum(); }
+
+int32_t ConfigV3::dac2Disc() const { return m_xtcObj->dac2Disc(); }
+
+int32_t ConfigV3::dac2Preamp() const { return m_xtcObj->dac2Preamp(); }
+
+int32_t ConfigV3::dac2BufAnalogA() const { return m_xtcObj->dac2BufAnalogA(); }
+
+int32_t ConfigV3::dac2BufAnalogB() const { return m_xtcObj->dac2BufAnalogB(); }
+
+int32_t ConfigV3::dac2Hist() const { return m_xtcObj->dac2Hist(); }
+
+int32_t ConfigV3::dac2ThlFine() const { return m_xtcObj->dac2ThlFine(); }
+
+int32_t ConfigV3::dac2ThlCourse() const { return m_xtcObj->dac2ThlCourse(); }
+
+int32_t ConfigV3::dac2Vcas() const { return m_xtcObj->dac2Vcas(); }
+
+int32_t ConfigV3::dac2Fbk() const { return m_xtcObj->dac2Fbk(); }
+
+int32_t ConfigV3::dac2Gnd() const { return m_xtcObj->dac2Gnd(); }
+
+int32_t ConfigV3::dac2Ths() const { return m_xtcObj->dac2Ths(); }
+
+int32_t ConfigV3::dac2BiasLvds() const { return m_xtcObj->dac2BiasLvds(); }
+
+int32_t ConfigV3::dac2RefLvds() const { return m_xtcObj->dac2RefLvds(); }
+
+int32_t ConfigV3::dac3Ikrum() const { return m_xtcObj->dac3Ikrum(); }
+
+int32_t ConfigV3::dac3Disc() const { return m_xtcObj->dac3Disc(); }
+
+int32_t ConfigV3::dac3Preamp() const { return m_xtcObj->dac3Preamp(); }
+
+int32_t ConfigV3::dac3BufAnalogA() const { return m_xtcObj->dac3BufAnalogA(); }
+
+int32_t ConfigV3::dac3BufAnalogB() const { return m_xtcObj->dac3BufAnalogB(); }
+
+int32_t ConfigV3::dac3Hist() const { return m_xtcObj->dac3Hist(); }
+
+int32_t ConfigV3::dac3ThlFine() const { return m_xtcObj->dac3ThlFine(); }
+
+int32_t ConfigV3::dac3ThlCourse() const { return m_xtcObj->dac3ThlCourse(); }
+
+int32_t ConfigV3::dac3Vcas() const { return m_xtcObj->dac3Vcas(); }
+
+int32_t ConfigV3::dac3Fbk() const { return m_xtcObj->dac3Fbk(); }
+
+int32_t ConfigV3::dac3Gnd() const { return m_xtcObj->dac3Gnd(); }
+
+int32_t ConfigV3::dac3Ths() const { return m_xtcObj->dac3Ths(); }
+
+int32_t ConfigV3::dac3BiasLvds() const { return m_xtcObj->dac3BiasLvds(); }
+
+int32_t ConfigV3::dac3RefLvds() const { return m_xtcObj->dac3RefLvds(); }
+
+int8_t ConfigV3::dacBias() const { return m_xtcObj->dacBias(); }
+
+int8_t ConfigV3::flags() const { return m_xtcObj->flags(); }
+
+int32_t ConfigV3::driverVersion() const { return m_xtcObj->driverVersion(); }
+
+uint32_t ConfigV3::firmwareVersion() const { return m_xtcObj->firmwareVersion(); }
+
+uint32_t ConfigV3::pixelThreshSize() const { return m_xtcObj->pixelThreshSize(); }
+
+ndarray<uint8_t, 1> ConfigV3::pixelThresh() const { return m_xtcObj->pixelThresh(); }
+
+const char* ConfigV3::chip0Name() const { return m_xtcObj->chip0Name(); }
+
+const char* ConfigV3::chip1Name() const { return m_xtcObj->chip1Name(); }
+
+const char* ConfigV3::chip2Name() const { return m_xtcObj->chip2Name(); }
+
+const char* ConfigV3::chip3Name() const { return m_xtcObj->chip3Name(); }
+
+int32_t ConfigV3::chip0ID() const { return m_xtcObj->chip0ID(); }
+
+int32_t ConfigV3::chip1ID() const { return m_xtcObj->chip1ID(); }
+
+int32_t ConfigV3::chip2ID() const { return m_xtcObj->chip2ID(); }
+
+int32_t ConfigV3::chip3ID() const { return m_xtcObj->chip3ID(); }
+
+int32_t ConfigV3::chipCount() const { return m_xtcObj->chipCount(); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Timepix::DataV1()
   , m_xtcObj(xtcPtr)
