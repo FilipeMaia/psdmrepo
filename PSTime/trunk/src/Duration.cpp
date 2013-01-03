@@ -229,15 +229,15 @@ string Duration::strDurationBasic() const
 
     string strD = "P";
 
-    if ( Years      != 0 ) { char charY[4];   sprintf( charY,"%ldY",Years );       strD += charY; }
-    if ( DaysAfterY != 0 ) { char charD[2];   sprintf( charD,"%ldD",DaysAfterY );  strD += charD; }
+    if ( Years      != 0 ) { char charY[8];   snprintf( charY, sizeof charY, "%ldY",Years );       strD += charY; }
+    if ( DaysAfterY != 0 ) { char charD[8];   snprintf( charD, sizeof charD, "%ldD",DaysAfterY );  strD += charD; }
 
            strD += "T";
 
-    if ( HoursAfterD!= 0 ) { char charH[2];   sprintf( charH,"%ldH",HoursAfterD ); strD += charH; }
-    if ( MinsAfterH != 0 ) { char charM[2];   sprintf( charM,"%ldM",MinsAfterH );  strD += charM; }
-    if ( SecsAfterM != 0 ) { char charS[2];   sprintf( charS,"%ldS",SecsAfterM );  strD += charS; }
-    if ( NsecAfterS != 0 ) { char charN[2];   sprintf( charN,"%ldN",NsecAfterS );  strD += charN; }
+    if ( HoursAfterD!= 0 ) { char charH[8];   snprintf( charH, sizeof charH,"%ldH",HoursAfterD ); strD += charH; }
+    if ( MinsAfterH != 0 ) { char charM[8];   snprintf( charM, sizeof charM,"%ldM",MinsAfterH );  strD += charM; }
+    if ( SecsAfterM != 0 ) { char charS[8];   snprintf( charS, sizeof charS,"%ldS",SecsAfterM );  strD += charS; }
+    if ( NsecAfterS != 0 ) { char charN[16];   snprintf( charN, sizeof charN,"%ldN",NsecAfterS );  strD += charN; }
 
     return strD;
 }
