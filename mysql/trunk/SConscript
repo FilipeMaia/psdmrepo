@@ -49,7 +49,8 @@ INCLUDES = " ".join((
   "tilde.h",
   "typelib.h",
   "xmalloc.h" ))
-LIBDIR  = "$LIB_ABI/mysql"
+LIBDIR = "$LIB_ABI"
+if env['SIT_ARCH_OS'].startswith('rhel'): LIBDIR = "$LIB_ABI/mysql"
 PKGLIBS = "mysqlclient"
 LINKLIBS = "libmysqlclient.so*"
 
