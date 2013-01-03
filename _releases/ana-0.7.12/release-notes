@@ -1,2 +1,0 @@
-- upgrade to pdsdata V05-03-00, couple of new data types added
-- fix to SConsTools to correct Python location on non-RHEL platforms
