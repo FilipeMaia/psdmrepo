@@ -79,7 +79,9 @@ def buildEnv () :
     sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
     # LIB_ABI will translate either to lib or lib64 depending on which architecture we are
-    lib_abis = {'x86_64-rhel5': "lib64", 'x86_64-rhel6': "lib64"}
+    lib_abis = {'x86_64-rhel5': "lib64", 
+                'x86_64-rhel6': "lib64", 
+                'x86_64-ubu12': 'lib/x86_64-linux-gnu'}
     lib_abi = lib_abis.get(sit_arch_parts[0]+'-'+sit_arch_parts[1], "lib")
 
     # build all paths    
