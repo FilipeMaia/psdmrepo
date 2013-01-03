@@ -80,6 +80,7 @@
 #include "H5DataTypes/LusiPimImageConfigV1.h"
 #include "H5DataTypes/OceanOpticsConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
+#include "H5DataTypes/OrcaConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
@@ -92,6 +93,7 @@
 #include "H5DataTypes/QuartzConfigV1.h"
 #include "H5DataTypes/TimepixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV2.h"
+#include "H5DataTypes/TimepixConfigV3.h"
 #include "H5DataTypes/UsdUsbConfigV1.h"
 #include "H5DataTypes/UsdUsbDataV1.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
@@ -218,6 +220,7 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
 
   ::registerConfigCvt<H5DataTypes::TimepixConfigV1>(m_cvtMap, "Timepix::ConfigV1", Pds::TypeId::Id_TimepixConfig, 1);
   ::registerConfigCvt<H5DataTypes::TimepixConfigV2>(m_cvtMap, "Timepix::ConfigV2", Pds::TypeId::Id_TimepixConfig, 2);
+  ::registerConfigCvt<H5DataTypes::TimepixConfigV3>(m_cvtMap, "Timepix::ConfigV3", Pds::TypeId::Id_TimepixConfig, 3);
 
   ::registerConfigCvt<H5DataTypes::CsPad2x2ConfigV1>(m_cvtMap, "CsPad2x2::ConfigV1", Pds::TypeId::Id_Cspad2x2Config, 1);
 
@@ -230,6 +233,8 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   ::registerConfigCvt<H5DataTypes::AndorConfigV1>(m_cvtMap, "Andor::ConfigV1", Pds::TypeId::Id_AndorConfig, 1);
 
   ::registerConfigCvt<H5DataTypes::UsdUsbConfigV1>(m_cvtMap, "UsdUsb::ConfigV1", Pds::TypeId::Id_UsdUsbConfig, 1);
+
+  ::registerConfigCvt<H5DataTypes::OrcaConfigV1>(m_cvtMap, "Orca::ConfigV1", Pds::TypeId::Id_OrcaConfig, 1);
 
   // special converter object for CsPad calibration data
   converter.reset(new CsPadCalibV1Cvt("CsPad::CalibV1", metadata, calibStore));

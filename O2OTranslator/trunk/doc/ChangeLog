@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-21-02
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- add conversion for new classes OrcaConfigV1 and TimepixConfigV3
+- BldDataAcqADCV1 not implemented yet
+
 Tag: V00-21-01
 2012-11-27 Andy Salnikov
 - another small refactoring, no API changes
