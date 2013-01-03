@@ -48,6 +48,9 @@ Prefix:     %{prefix}
 %define __find_requires %{S:101}
 %define __find_provides %{nil}
 
+# sit_setup needs bash, /bin/sh on some Linux systems is different
+%define _buildshell  /bin/bash
+
 Summary:    PSDM software release %{relname}
 
 %description
