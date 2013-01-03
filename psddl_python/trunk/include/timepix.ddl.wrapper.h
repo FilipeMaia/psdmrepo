@@ -170,6 +170,90 @@ public:
   int32_t chipCount() const { return o->chipCount(); }
 };
 
+class ConfigV3_Wrapper {
+  shared_ptr<Psana::Timepix::ConfigV3> _o;
+  Psana::Timepix::ConfigV3* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_TimepixConfig };
+  enum { Version = 3 };
+  ConfigV3_Wrapper(shared_ptr<Psana::Timepix::ConfigV3> obj) : _o(obj), o(_o.get()) {}
+  ConfigV3_Wrapper(Psana::Timepix::ConfigV3* obj) : o(obj) {}
+  Psana::Timepix::ConfigV3::ReadoutSpeed readoutSpeed() const { return o->readoutSpeed(); }
+  Psana::Timepix::ConfigV3::TimepixMode timepixMode() const { return o->timepixMode(); }
+  int32_t timepixSpeed() const { return o->timepixSpeed(); }
+  int32_t dac0Ikrum() const { return o->dac0Ikrum(); }
+  int32_t dac0Disc() const { return o->dac0Disc(); }
+  int32_t dac0Preamp() const { return o->dac0Preamp(); }
+  int32_t dac0BufAnalogA() const { return o->dac0BufAnalogA(); }
+  int32_t dac0BufAnalogB() const { return o->dac0BufAnalogB(); }
+  int32_t dac0Hist() const { return o->dac0Hist(); }
+  int32_t dac0ThlFine() const { return o->dac0ThlFine(); }
+  int32_t dac0ThlCourse() const { return o->dac0ThlCourse(); }
+  int32_t dac0Vcas() const { return o->dac0Vcas(); }
+  int32_t dac0Fbk() const { return o->dac0Fbk(); }
+  int32_t dac0Gnd() const { return o->dac0Gnd(); }
+  int32_t dac0Ths() const { return o->dac0Ths(); }
+  int32_t dac0BiasLvds() const { return o->dac0BiasLvds(); }
+  int32_t dac0RefLvds() const { return o->dac0RefLvds(); }
+  int32_t dac1Ikrum() const { return o->dac1Ikrum(); }
+  int32_t dac1Disc() const { return o->dac1Disc(); }
+  int32_t dac1Preamp() const { return o->dac1Preamp(); }
+  int32_t dac1BufAnalogA() const { return o->dac1BufAnalogA(); }
+  int32_t dac1BufAnalogB() const { return o->dac1BufAnalogB(); }
+  int32_t dac1Hist() const { return o->dac1Hist(); }
+  int32_t dac1ThlFine() const { return o->dac1ThlFine(); }
+  int32_t dac1ThlCourse() const { return o->dac1ThlCourse(); }
+  int32_t dac1Vcas() const { return o->dac1Vcas(); }
+  int32_t dac1Fbk() const { return o->dac1Fbk(); }
+  int32_t dac1Gnd() const { return o->dac1Gnd(); }
+  int32_t dac1Ths() const { return o->dac1Ths(); }
+  int32_t dac1BiasLvds() const { return o->dac1BiasLvds(); }
+  int32_t dac1RefLvds() const { return o->dac1RefLvds(); }
+  int32_t dac2Ikrum() const { return o->dac2Ikrum(); }
+  int32_t dac2Disc() const { return o->dac2Disc(); }
+  int32_t dac2Preamp() const { return o->dac2Preamp(); }
+  int32_t dac2BufAnalogA() const { return o->dac2BufAnalogA(); }
+  int32_t dac2BufAnalogB() const { return o->dac2BufAnalogB(); }
+  int32_t dac2Hist() const { return o->dac2Hist(); }
+  int32_t dac2ThlFine() const { return o->dac2ThlFine(); }
+  int32_t dac2ThlCourse() const { return o->dac2ThlCourse(); }
+  int32_t dac2Vcas() const { return o->dac2Vcas(); }
+  int32_t dac2Fbk() const { return o->dac2Fbk(); }
+  int32_t dac2Gnd() const { return o->dac2Gnd(); }
+  int32_t dac2Ths() const { return o->dac2Ths(); }
+  int32_t dac2BiasLvds() const { return o->dac2BiasLvds(); }
+  int32_t dac2RefLvds() const { return o->dac2RefLvds(); }
+  int32_t dac3Ikrum() const { return o->dac3Ikrum(); }
+  int32_t dac3Disc() const { return o->dac3Disc(); }
+  int32_t dac3Preamp() const { return o->dac3Preamp(); }
+  int32_t dac3BufAnalogA() const { return o->dac3BufAnalogA(); }
+  int32_t dac3BufAnalogB() const { return o->dac3BufAnalogB(); }
+  int32_t dac3Hist() const { return o->dac3Hist(); }
+  int32_t dac3ThlFine() const { return o->dac3ThlFine(); }
+  int32_t dac3ThlCourse() const { return o->dac3ThlCourse(); }
+  int32_t dac3Vcas() const { return o->dac3Vcas(); }
+  int32_t dac3Fbk() const { return o->dac3Fbk(); }
+  int32_t dac3Gnd() const { return o->dac3Gnd(); }
+  int32_t dac3Ths() const { return o->dac3Ths(); }
+  int32_t dac3BiasLvds() const { return o->dac3BiasLvds(); }
+  int32_t dac3RefLvds() const { return o->dac3RefLvds(); }
+  int8_t dacBias() const { return o->dacBias(); }
+  int8_t flags() const { return o->flags(); }
+  int32_t driverVersion() const { return o->driverVersion(); }
+  uint32_t firmwareVersion() const { return o->firmwareVersion(); }
+  uint32_t pixelThreshSize() const { return o->pixelThreshSize(); }
+  PyObject* pixelThresh() const { ND_CONVERT(o->pixelThresh(), uint8_t, 1); }
+  const char* chip0Name() const { return o->chip0Name(); }
+  const char* chip1Name() const { return o->chip1Name(); }
+  const char* chip2Name() const { return o->chip2Name(); }
+  const char* chip3Name() const { return o->chip3Name(); }
+  int32_t chip0ID() const { return o->chip0ID(); }
+  int32_t chip1ID() const { return o->chip1ID(); }
+  int32_t chip2ID() const { return o->chip2ID(); }
+  int32_t chip3ID() const { return o->chip3ID(); }
+  int32_t chipCount() const { return o->chipCount(); }
+};
+
 class DataV1_Wrapper {
   shared_ptr<Psana::Timepix::DataV1> _o;
   Psana::Timepix::DataV1* o;
@@ -229,6 +313,19 @@ public:
     object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
       boost::shared_ptr<Psana::Timepix::ConfigV2> result = store.get(source, foundSrc);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
+    }
+  };
+
+  class ConfigV3_Getter : public psddl_python::EnvObjectStoreGetter {
+  public:
+  const char* getTypeName() { return "Psana::Timepix::ConfigV3";}
+  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
+    int getVersion() {
+      return Psana::Timepix::ConfigV3::Version;
+    }
+    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
+      boost::shared_ptr<Psana::Timepix::ConfigV3> result = store.get(source, foundSrc);
+      return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
