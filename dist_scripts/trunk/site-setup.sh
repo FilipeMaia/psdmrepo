@@ -6,9 +6,9 @@
 sit_root=${1:?root directory is not specified}
 
 rpm_version=4.4.2.3
-rpm_release=3psdm
+rpm_release=6psdm
 apt_version=0.5.15lorg3.94a
-apt_release=5psdm
+apt_release=8psdm
 
 # ====================================================================
 
@@ -76,7 +76,7 @@ mkdir -p $sit_root/sw/dist/rpms/tmp
 echo "... Installing RPM"
 $sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/rpm-$os-$proc-$rpm_version-$rpm_release.$proc.rpm
 echo "... Installing APT"
-$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/apt-rpm-$apt_version-$apt_release.$proc.rpm
+$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/common/$proc/apt-rpm-$apt_version-$apt_release.$proc.rpm
 $sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/apt-rpm-$os-$proc-$apt_version-$apt_release.$proc.rpm
 
 echo
