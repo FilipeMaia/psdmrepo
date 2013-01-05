@@ -208,7 +208,7 @@ if [ -z "$sit_arch" -a -z "$comp" ] ; then
     locations=". $SIT_RELDIR/$SIT_RELEASE"
   fi
   
-  for loc in locations; do
+  for loc in $locations; do
     compilers=`/bin/ls -1 $loc/arch 2>/dev/null | grep "$proc-$os" | cut -d- -f3 | sort -u | tr ' ' ','`
     test -n "$compilers" && break
   done
