@@ -18,9 +18,6 @@ set -e
 err() { echo $* 1>&2 ; exit 1 ; }
 warn() { echo $* 1>&2 ; }
 
-# no relocation for now
-test "$sit_root" = "/reg/g/psdm" || err "Relocation not supported, use /reg/g/psdm"
-
 # guess OS, copied from sit_setup.uss
   os=`uname -s`
   if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
@@ -53,6 +50,14 @@ echo "... Download RPM"
 curl http://pswww.slac.stanford.edu/psdm-repo/rpm-$os-$proc-$rpm_version.tar.gz | \
 	tar -C "$sit_root/sw/dist/" -z -x -f -
 
+#  prepare relocation
+if [ "$sit_root" != "/reg/g/psdm" ] ; then
+  export SIT_ROOT=$sit_root
+  export RPMCONFIGDIR="$sit_root/sw/dist/apt-rpm/$os-$proc/lib/rpm"
+  rpmreloc="--relocate /reg/g/psdm=$sit_root"
+  sed -i "s%/reg/g/psdm%$sit_root%g" "$RPMCONFIGDIR/rpmrc"
+fi
+
 # make .rpmmacros
 echo "... Create \$HOME/.rpmmacros"
 if [ -f "$HOME/.rpmmacros" ] ; then
@@ -74,15 +79,17 @@ mkdir -p $sit_root/sw/dist/rpms/tmp
 
 # install RPM and APT
 echo "... Installing RPM"
-$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/rpm-$os-$proc-$rpm_version-$rpm_release.$proc.rpm
+$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh $rpmreloc http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/rpm-$os-$proc-$rpm_version-$rpm_release.$proc.rpm
 echo "... Installing APT"
-$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/common/$proc/apt-rpm-$apt_version-$apt_release.$proc.rpm
-$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/apt-rpm-$os-$proc-$apt_version-$apt_release.$proc.rpm
+$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh $rpmreloc http://pswww.slac.stanford.edu/psdm-repo/common/$proc/apt-rpm-$apt_version-$apt_release.$proc.rpm
+$sit_root/sw/dist/apt-rpm/$os-$proc/bin/rpm -ivh $rpmreloc http://pswww.slac.stanford.edu/psdm-repo/$os/$proc/apt-rpm-$os-$proc-$apt_version-$apt_release.$proc.rpm
 
 echo
 echo "Site setup finished. Please add these lines to .bashrc:"
 echo "============================================================================"
+echo "export SIT_ROOT=$sit_root"
 echo "export PATH=$sit_root/sw/dist/apt-rpm/$os-$proc/bin:\$PATH"
 echo "export APT_CONFIG=$sit_root/sw/dist/apt-rpm/$os-$proc/etc/apt/apt.conf"
+test -n "$RPMCONFIGDIR" && echo "export RPMCONFIGDIR=$RPMCONFIGDIR"
 echo "============================================================================"
 echo "(or equivalent to your .cshrc)"
