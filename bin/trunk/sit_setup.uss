@@ -196,18 +196,29 @@ fi
 
 #
 # Now we need compiler, it's determined from the list of the 
-# architectures in the release. If you need something different, 
-# then override it later via SIT_ARCH
+# architectures in the release. For release look at several places:
+# first in local directory, then in $SIT_RELDIR/$SIT_RELEASE or
+# $SIT_RELDIR/current or ana-current. If nothing is found use gcc.
 #
 if [ -z "$sit_arch" -a -z "$comp" ] ; then
-  pfx="$proc-$os"
-  rel="current"
-  test "$SIT_RELEASE" = "nobase" || rel="$SIT_RELEASE"
-  compilers=`/bin/ls -1 "$SIT_RELDIR/$rel/arch" | grep "$pfx" | cut -d- -f3 | sort -u | tr ' ' ','`
-  if [ -z "$compilers" ] ; then
-    warn "OS or processor type ($os/$proc) are not supported in release \"$rel\""
-    compilers="gcc41,gcc44,gcc45,gcc46,gcc47,CC"
+
+  if [ "$SIT_RELEASE" = "nobase" ] ; then
+    locations=". $SIT_RELDIR/current $SIT_RELDIR/ana-current"
+  else 
+    locations=". $SIT_RELDIR/$SIT_RELEASE"
   fi
+  
+  for loc in locations; do
+    compilers=`/bin/ls -1 $loc/arch 2>/dev/null | grep "$proc-$os" | cut -d- -f3 | sort -u | tr ' ' ','`
+    test -n "$compilers" && break
+  done
+  
+  # use gcc version if we can find it
+  test -n "$compilers" || compilers=`gcc -v 2>&1 | sed -n 's/gcc version \([0-9]*\)\.\([0-9]*\).*/gcc\1\2/p'`
+  # default useless value
+  test -n "$compilers" || compilers="gcc"
+  
+  # let user select one from many options or use first one
   comp=`set_intersect $options $compilers`
   test -z "$comp" && comp=`set_first $compilers`
 fi
@@ -266,6 +277,12 @@ else
         
   fi
       
+fi
+
+# on rhel5 add open MPI library location
+if [ "$os" = "rhel5" ] ; then
+  remove_from_path LD_LIBRARY_PATH "/usr/lib64/openmpi/1.4-gcc/lib"
+  prepend_path LD_LIBRARY_PATH "/usr/lib64/openmpi/1.4-gcc/lib"
 fi
 
 # add SIT_ROOT/bin to PATH
