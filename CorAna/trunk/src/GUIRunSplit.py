@@ -140,10 +140,27 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.setStyle()
         #self.setFields()
         #self.setStatus()
+        
+        self.connectToThread1()
 
+        
     #-------------------
     #  Public methods --
     #-------------------
+
+
+    def connectToThread1(self):
+        self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+
+
+    def disconnectFromThread1(self):
+        self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+
+
+    def updateStatus(self, text):
+        print 'GUIRunSplit: Signal is recieved ' + str(text)
+        self.onStatus()
+
 
     def showToolTips(self):
         msg = 'GUI sets system parameters.'
@@ -205,6 +222,9 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
+
+        self.disconnectFromThread1()
+
         try    : del cp.guirunsplit # GUIRunSplit
         except : pass
 
