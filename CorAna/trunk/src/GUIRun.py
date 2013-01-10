@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""GUI sets path to files"""
+"""GUI control of the entire file processing procedure"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -32,6 +32,7 @@ from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
 from GUIRunInfo             import *
 from GUIRunSplit            import *
+from GUIRunProc             import *
 from Logger                 import logger
 from BatchJobPedestals      import bjpeds
 
@@ -39,7 +40,7 @@ from BatchJobPedestals      import bjpeds
 #  Class definition --
 #---------------------
 class GUIRun ( QtGui.QWidget ) :
-    """GUI sets path to files"""
+    """GUI control of the entire file processing procedure"""
 
     #----------------
     #  Constructor --
@@ -159,8 +160,8 @@ class GUIRun ( QtGui.QWidget ) :
             #self.setStatus(0, 'Status: split')
 
         if cp.current_run_tab.value() == self.list_run_types[2] :
-        #    self.gui_win = GUIRunProc(self)
-            self.gui_win = QtGui.QLineEdit( 'Empty' )
+            self.gui_win = GUIRunProc(self)
+            #self.gui_win = QtGui.QLineEdit( 'Empty' )
             #self.setStatus(0, 'Status: processing for correlations')
 
         if cp.current_run_tab.value() == self.list_run_types[3] :

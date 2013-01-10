@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIRunSplit...
+#  Module GUIRunProc...
 #
 #------------------------------------------------------------------------
 
-"""GUI controls the splitting procedure"""
+"""GUI controls the time correlation processing"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -38,13 +38,13 @@ from BatchJobCorAna         import bjcora
 #---------------------
 #  Class definition --
 #---------------------
-class GUIRunSplit ( QtGui.QWidget ) :
-    """GUI controls the splitting procedure"""
+class GUIRunProc ( QtGui.QWidget ) :
+    """GUI controls the time correlation processing"""
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(50, 100, 700, 500)
-        self.setWindowTitle('Run splitting')
+        self.setWindowTitle('Run processing')
         self.setFrame()
 
         self.dict_status = {True  : 'Yes',
@@ -53,14 +53,12 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.nparts = cp.bat_img_nparts.value()
         #print 'self.nparts = ', self.nparts
 
-        self.lab_status = QtGui.QLabel     ('Batch job status: ')
+        self.lab_status = QtGui.QLabel('Batch job status: ')
         self.hboxS = QtGui.QHBoxLayout()
         self.hboxS.addWidget(self.lab_status)
-
         self.makeButtons()
         self.makeTable()
-        #self.setTableItems()
-        self.onStatus()
+        self.onStatus()        # calls self.setTableItems()
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
@@ -82,7 +80,6 @@ class GUIRunSplit ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
 
-
     def connectToThread1(self):
         try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
         except : pass
@@ -94,7 +91,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
 
     def updateStatus(self, text):
-        print 'GUIRunSplit: Signal is recieved ' + str(text)
+        print 'GUIRunProc: Signal is recieved ' + str(text)
         self.onStatus()
 
 
@@ -134,8 +131,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def makeTable(self):
         """Makes the table for the list of output and log files"""
-        self.table = QtGui.QTableWidget(self.nparts+5, 4, self)
-        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)'])
+        self.table = QtGui.QTableWidget(self.nparts+2, 7, self)
+        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)', 'Submission time', 'Job Id', 'Log'])
         #self.table.setVerticalHeaderLabels([''])
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
@@ -143,32 +140,50 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.table.horizontalHeader().resizeSection(1,60)
         self.table.horizontalHeader().resizeSection(2,150)
         self.table.horizontalHeader().resizeSection(3,120)
+        self.table.horizontalHeader().resizeSection(4,150)
+        self.table.horizontalHeader().resizeSection(5,80)
+        self.table.horizontalHeader().resizeSection(6,40)
 
         self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
 
+        self.list_of_files_work     = fnm.get_list_of_files_cora_proc_work()
+        self.list_of_files_work_log = fnm.get_list_of_files_cora_proc_work_log()
+        self.list_of_files_main     = fnm.get_list_of_files_cora_proc_main()
+        self.list_of_files          = fnm.get_list_of_files_cora_proc_all()
+
         self.row = -1
         self.list_of_items = []
-        self.list_of_files = fnm.get_list_of_files_cora_split_all()
+        self.list_of_work_files = zip(fnm.get_list_of_files_cora_proc_work(), fnm.get_list_of_files_cora_proc_work_log())
 
-        for i, fname in enumerate(self.list_of_files) :
+        for i, (fname,lname) in enumerate(self.list_of_work_files) :
 
             file_exists = os.path.exists(fname)
+            logf_exists = os.path.exists(lname)
             item_fname  = QtGui.QTableWidgetItem( os.path.basename(fname) )
             item_exists = QtGui.QTableWidgetItem( self.dict_status[file_exists] )
             item_ctime  = QtGui.QTableWidgetItem( 'N/A' )
             item_size   = QtGui.QTableWidgetItem( 'N/A' )
+            item_stime  = QtGui.QTableWidgetItem( 'N/A' )
+            item_jobid  = QtGui.QTableWidgetItem( 'N/A' )
+            item_lname  = QtGui.QTableWidgetItem( 'log' ) # os.path.basename(lname) )
 
             item_exists.setTextAlignment(QtCore.Qt.AlignCenter)
             item_ctime .setTextAlignment(QtCore.Qt.AlignCenter)
             item_size  .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            item_stime .setTextAlignment(QtCore.Qt.AlignCenter)
+            item_jobid .setTextAlignment(QtCore.Qt.AlignCenter)
+            item_lname .setTextAlignment(QtCore.Qt.AlignCenter)
 
             self.row += 1
             self.table.setItem(self.row, 0, item_fname)
             self.table.setItem(self.row, 1, item_exists)
             self.table.setItem(self.row, 2, item_ctime)
             self.table.setItem(self.row, 3, item_size)
+            self.table.setItem(self.row, 4, item_stime)
+            self.table.setItem(self.row, 5, item_jobid)
+            self.table.setItem(self.row, 6, item_lname)
             
-            row_of_items = [i, fname, item_fname, item_exists, item_ctime, item_size]
+            row_of_items = [i, fname, item_fname, item_exists, item_ctime, item_size, item_stime, item_jobid, lname, item_lname]
             self.list_of_items.append(row_of_items)
 
             #self.table.setSpan(self.row, 0, 1, 5)            
@@ -178,7 +193,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
     def setTableItems(self) :     
 
         for row_of_items in self.list_of_items :
-            i, fname, item_fname, item_exists, item_ctime, item_size = row_of_items
+            i, fname, item_fname, item_exists, item_ctime, item_size, item_stime, item_jobid, lname, item_lname = row_of_items
 
             item_fname.setCheckState(0)
 
@@ -196,9 +211,21 @@ class GUIRunSplit ( QtGui.QWidget ) :
             item_ctime.setText( ctime_str )
             item_size .setText( str(size_byte) )
 
+            logf_exists = os.path.exists(fname)
+
+            if not logf_exists : 
+                item_stime.setText( 'N/A' )
+                continue
+
+
+
+
+
+
+            
 
     def setStyle(self):
-        self.setMinimumSize(700,500)
+        self.setMinimumSize(960,660)
         self.setStyleSheet(cp.styleBkgd)
 
         self.but_run   .setStyleSheet (cp.styleButton) 
@@ -226,7 +253,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
         self.disconnectFromThread1()
 
-        try    : del cp.guirunsplit # GUIRunSplit
+        try    : del cp.guirunproc # GUIRunProc
         except : pass
 
         #try    : cp.guiccdsettings.close()
@@ -236,7 +263,6 @@ class GUIRunSplit ( QtGui.QWidget ) :
     def onClose(self):
         logger.debug('onClose', __name__)
         self.close()
-
 
 
     def onRun(self):
@@ -324,7 +350,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIRunSplit ()
+    widget = GUIRunProc ()
     widget.show()
     app.exec_()
 

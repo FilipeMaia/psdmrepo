@@ -231,19 +231,11 @@ class FileNameManager :
     def path_cora_split_files(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'b*.txt'
 
-#-----------------------------
+    def path_cora_proc_tau_in(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau-in.txt'
 
-    def get_list_of_files_cora_split_all(self) :
-        return self.get_list_of_files_cora_split() + \
-               self.get_list_of_files_cora_split_work()
-
-    def  get_list_of_files_cora_split_work(self) :
-        return self.get_list_of_files_cora_work(format='b%04d.bin')
-
-#-----------------------------
-
-    def  get_list_of_files_cora_result_work(self) :
-        return self.get_list_of_files_cora_work(format='b%04d-result.bin')
+    def path_cora_proc_tau_out(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau.txt'
 
 #-----------------------------
 
@@ -257,6 +249,13 @@ class FileNameManager :
 
 #-----------------------------
 
+    def  get_list_of_files_cora_split_work(self) :
+        return self.get_list_of_files_cora_work(format='b%04d.bin')
+
+    def get_list_of_files_cora_split_all(self) :
+        return self.get_list_of_files_cora_split() + \
+               self.get_list_of_files_cora_split_work()
+
     def  get_list_of_files_cora_split(self) :
         self.list_of_files_cora_split = []
         self.list_of_files_cora_split.append(fnm.path_cora_split_psana_cfg())
@@ -268,6 +267,29 @@ class FileNameManager :
         #self.list_of_files_cora_split.append(fnm.)
 
         return self.list_of_files_cora_split
+
+#-----------------------------
+
+    def get_list_of_files_cora_proc_work(self) :
+        return self.get_list_of_files_cora_work(format='b%04d-result.bin')
+
+    def get_list_of_files_cora_proc_work_log(self) :
+        return self.get_list_of_files_cora_work(format='b%04d-result.log')
+
+    def get_list_of_files_cora_proc_main(self) :
+        return self.get_list_of_files_cora_proc() + \
+               self.get_list_of_files_cora_proc_work()
+
+    def get_list_of_files_cora_proc_all(self) :
+        return self.get_list_of_files_cora_proc() + \
+               self.get_list_of_files_cora_proc_work() + \
+               self.get_list_of_files_cora_proc_work_log()
+
+    def  get_list_of_files_cora_proc(self) :
+        self.list_of_files_cora_proc = []
+        self.list_of_files_cora_proc.append(fnm.path_cora_proc_tau_in())
+        self.list_of_files_cora_proc.append(fnm.path_cora_proc_tau_out())
+        return self.list_of_files_cora_proc
 
 #-----------------------------
 
@@ -378,11 +400,14 @@ if __name__ == "__main__" :
     print 'path_data_xtc_all_chunks() : ', fnm.path_data_xtc_all_chunks()
     print 'path_dark_xtc_all_chunks() : ', fnm.path_dark_xtc_all_chunks()
 
-
     #list = fnm.get_list_of_files_cora_split_work()
-    list = fnm.get_list_of_files_cora_result_work()
+    print '\nfnm.get_list_of_files_cora_result_work():'    
+    list =   fnm.get_list_of_files_cora_result_work()
     for fname in list : print fname
 
+    print '\nfnm.get_list_of_files_cora_proc_all():'    
+    list =   fnm.get_list_of_files_cora_proc_all()
+    for fname in list : print fname
 
     sys.exit ( 'End of test for FileNameManager' )
 
