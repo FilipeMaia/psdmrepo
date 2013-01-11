@@ -124,19 +124,33 @@ using boost::make_shared;
 
 namespace {
 
-  void registerCvt(O2OTranslator::O2OCvtFactory::CvtMap& cvtMap, Pds::TypeId::Type typeId, int version,
-      const O2OTranslator::O2OCvtFactory::DataTypeCvtPtr& cvt)
+  using O2OTranslator::SrcFilter;
+  using O2OTranslator::O2OCvtFactory;
+
+  void registerCvt(O2OCvtFactory::CvtMap& cvtMap, Pds::TypeId::Type typeId, int version,
+      const O2OCvtFactory::DataTypeCvtPtr& cvt)
   {
     uint32_t typeIdVal =  Pds::TypeId(typeId, version).value() ;
-    cvtMap.insert(O2OTranslator::O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
+    cvtMap.insert(O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
   }
 
 
   template<typename ConfigType>
-  void registerConfigCvt(O2OTranslator::O2OCvtFactory::CvtMap& cvtMap, const std::string& typeGroupName,
-      Pds::TypeId::Type typeId, int version)
+  void registerConfigCvt(O2OCvtFactory::CvtMap& cvtMap, const std::string& typeGroupName,
+      Pds::TypeId::Type typeId, int version, hsize_t chunk_size, int compression)
   {
-    ::registerCvt(cvtMap, typeId, version, make_shared<O2OTranslator::ConfigDataTypeCvt<ConfigType> >(typeGroupName));
+    // For every config type we register two converters - regular config converter
+    // which works for all sources except BLD, and default event data converter for
+    // all BLD sources
+    uint32_t typeIdVal =  Pds::TypeId(typeId, version).value() ;
+    O2OCvtFactory::DataTypeCvtPtr cvt;
+
+    cvt = make_shared<O2OTranslator::ConfigDataTypeCvt<ConfigType> >(typeGroupName, SrcFilter::deny(SrcFilter::BLD));
+    cvtMap.insert(O2OTranslator::O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
+
+    cvt = make_shared<O2OTranslator::EvtDataTypeCvtDef<ConfigType> >(typeGroupName, chunk_size, compression,
+        "config", SrcFilter::allow(SrcFilter::BLD));
+    cvtMap.insert(O2OTranslator::O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
   }
 
 }
@@ -157,84 +171,85 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   // instantiate all factories
   DataTypeCvtPtr converter ;
 
+  hsize_t chunk_size = 16*1024*1024 ;
 
   //
   //  ========================== Converters for config types ===============================
   //
 
-  ::registerConfigCvt<H5DataTypes::AcqirisConfigV1>(m_cvtMap, "Acqiris::ConfigV1", Pds::TypeId::Id_AcqConfig, 1);
+  ::registerConfigCvt<H5DataTypes::AcqirisConfigV1>(m_cvtMap, "Acqiris::ConfigV1", Pds::TypeId::Id_AcqConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::AcqirisTdcConfigV1>(m_cvtMap, "Acqiris::AcqirisTdcConfigV1", Pds::TypeId::Id_AcqTdcConfig, 1);
+  ::registerConfigCvt<H5DataTypes::AcqirisTdcConfigV1>(m_cvtMap, "Acqiris::AcqirisTdcConfigV1", Pds::TypeId::Id_AcqTdcConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::Opal1kConfigV1>(m_cvtMap, "Opal1k::ConfigV1", Pds::TypeId::Id_Opal1kConfig, 1);
+  ::registerConfigCvt<H5DataTypes::Opal1kConfigV1>(m_cvtMap, "Opal1k::ConfigV1", Pds::TypeId::Id_Opal1kConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::PulnixTM6740ConfigV1>(m_cvtMap, "Pulnix::TM6740ConfigV1", Pds::TypeId::Id_TM6740Config, 1);
-  ::registerConfigCvt<H5DataTypes::PulnixTM6740ConfigV2>(m_cvtMap, "Pulnix::TM6740ConfigV2", Pds::TypeId::Id_TM6740Config, 2);
+  ::registerConfigCvt<H5DataTypes::PulnixTM6740ConfigV1>(m_cvtMap, "Pulnix::TM6740ConfigV1", Pds::TypeId::Id_TM6740Config, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::PulnixTM6740ConfigV2>(m_cvtMap, "Pulnix::TM6740ConfigV2", Pds::TypeId::Id_TM6740Config, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::CameraFrameFexConfigV1>(m_cvtMap, "Camera::FrameFexConfigV1", Pds::TypeId::Id_FrameFexConfig, 1);
+  ::registerConfigCvt<H5DataTypes::CameraFrameFexConfigV1>(m_cvtMap, "Camera::FrameFexConfigV1", Pds::TypeId::Id_FrameFexConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::EvrConfigV1>(m_cvtMap, "EvrData::ConfigV1", Pds::TypeId::Id_EvrConfig, 1);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV2>(m_cvtMap, "EvrData::ConfigV2", Pds::TypeId::Id_EvrConfig, 2);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV3>(m_cvtMap, "EvrData::ConfigV3", Pds::TypeId::Id_EvrConfig, 3);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV4>(m_cvtMap, "EvrData::ConfigV4", Pds::TypeId::Id_EvrConfig, 4);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV5>(m_cvtMap, "EvrData::ConfigV5", Pds::TypeId::Id_EvrConfig, 5);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV6>(m_cvtMap, "EvrData::ConfigV6", Pds::TypeId::Id_EvrConfig, 6);
-  ::registerConfigCvt<H5DataTypes::EvrConfigV7>(m_cvtMap, "EvrData::ConfigV7", Pds::TypeId::Id_EvrConfig, 7);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV1>(m_cvtMap, "EvrData::ConfigV1", Pds::TypeId::Id_EvrConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV2>(m_cvtMap, "EvrData::ConfigV2", Pds::TypeId::Id_EvrConfig, 2, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV3>(m_cvtMap, "EvrData::ConfigV3", Pds::TypeId::Id_EvrConfig, 3, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV4>(m_cvtMap, "EvrData::ConfigV4", Pds::TypeId::Id_EvrConfig, 4, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV5>(m_cvtMap, "EvrData::ConfigV5", Pds::TypeId::Id_EvrConfig, 5, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV6>(m_cvtMap, "EvrData::ConfigV6", Pds::TypeId::Id_EvrConfig, 6, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EvrConfigV7>(m_cvtMap, "EvrData::ConfigV7", Pds::TypeId::Id_EvrConfig, 7, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::EvrIOConfigV1>(m_cvtMap, "EvrData::IOConfigV1", Pds::TypeId::Id_EvrIOConfig, 1);
+  ::registerConfigCvt<H5DataTypes::EvrIOConfigV1>(m_cvtMap, "EvrData::IOConfigV1", Pds::TypeId::Id_EvrIOConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::ControlDataConfigV1>(m_cvtMap, "ControlData::ConfigV1", Pds::TypeId::Id_ControlConfig, 1);
-  ::registerConfigCvt<H5DataTypes::ControlDataConfigV2>(m_cvtMap, "ControlData::ConfigV2", Pds::TypeId::Id_ControlConfig, 2);
+  ::registerConfigCvt<H5DataTypes::ControlDataConfigV1>(m_cvtMap, "ControlData::ConfigV1", Pds::TypeId::Id_ControlConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::ControlDataConfigV2>(m_cvtMap, "ControlData::ConfigV2", Pds::TypeId::Id_ControlConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::PnCCDConfigV1>(m_cvtMap, "PNCCD::ConfigV1", Pds::TypeId::Id_pnCCDconfig, 1);
-  ::registerConfigCvt<H5DataTypes::PnCCDConfigV2>(m_cvtMap, "PNCCD::ConfigV2", Pds::TypeId::Id_pnCCDconfig, 2);
+  ::registerConfigCvt<H5DataTypes::PnCCDConfigV1>(m_cvtMap, "PNCCD::ConfigV1", Pds::TypeId::Id_pnCCDconfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::PnCCDConfigV2>(m_cvtMap, "PNCCD::ConfigV2", Pds::TypeId::Id_pnCCDconfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::PrincetonConfigV1>(m_cvtMap, "Princeton::ConfigV1", Pds::TypeId::Id_PrincetonConfig, 1);
-  ::registerConfigCvt<H5DataTypes::PrincetonConfigV2>(m_cvtMap, "Princeton::ConfigV2", Pds::TypeId::Id_PrincetonConfig, 2);
-  ::registerConfigCvt<H5DataTypes::PrincetonConfigV3>(m_cvtMap, "Princeton::ConfigV3", Pds::TypeId::Id_PrincetonConfig, 3);
-  ::registerConfigCvt<H5DataTypes::PrincetonConfigV4>(m_cvtMap, "Princeton::ConfigV4", Pds::TypeId::Id_PrincetonConfig, 4);
+  ::registerConfigCvt<H5DataTypes::PrincetonConfigV1>(m_cvtMap, "Princeton::ConfigV1", Pds::TypeId::Id_PrincetonConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::PrincetonConfigV2>(m_cvtMap, "Princeton::ConfigV2", Pds::TypeId::Id_PrincetonConfig, 2, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::PrincetonConfigV3>(m_cvtMap, "Princeton::ConfigV3", Pds::TypeId::Id_PrincetonConfig, 3, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::PrincetonConfigV4>(m_cvtMap, "Princeton::ConfigV4", Pds::TypeId::Id_PrincetonConfig, 4, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::FccdConfigV1>(m_cvtMap, "FCCD::FccdConfigV1", Pds::TypeId::Id_FccdConfig, 1);
-  ::registerConfigCvt<H5DataTypes::FccdConfigV2>(m_cvtMap, "FCCD::FccdConfigV2", Pds::TypeId::Id_FccdConfig, 2);
+  ::registerConfigCvt<H5DataTypes::FccdConfigV1>(m_cvtMap, "FCCD::FccdConfigV1", Pds::TypeId::Id_FccdConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::FccdConfigV2>(m_cvtMap, "FCCD::FccdConfigV2", Pds::TypeId::Id_FccdConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::IpimbConfigV1>(m_cvtMap, "Ipimb::ConfigV1", Pds::TypeId::Id_IpimbConfig, 1);
-  ::registerConfigCvt<H5DataTypes::IpimbConfigV2>(m_cvtMap, "Ipimb::ConfigV2", Pds::TypeId::Id_IpimbConfig, 2);
+  ::registerConfigCvt<H5DataTypes::IpimbConfigV1>(m_cvtMap, "Ipimb::ConfigV1", Pds::TypeId::Id_IpimbConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::IpimbConfigV2>(m_cvtMap, "Ipimb::ConfigV2", Pds::TypeId::Id_IpimbConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::EncoderConfigV1>(m_cvtMap, "Encoder::ConfigV1", Pds::TypeId::Id_EncoderConfig, 1);
-  ::registerConfigCvt<H5DataTypes::EncoderConfigV2>(m_cvtMap, "Encoder::ConfigV2", Pds::TypeId::Id_EncoderConfig, 2);
+  ::registerConfigCvt<H5DataTypes::EncoderConfigV1>(m_cvtMap, "Encoder::ConfigV1", Pds::TypeId::Id_EncoderConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::EncoderConfigV2>(m_cvtMap, "Encoder::ConfigV2", Pds::TypeId::Id_EncoderConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::LusiDiodeFexConfigV1>(m_cvtMap, "Lusi::DiodeFexConfigV1", Pds::TypeId::Id_DiodeFexConfig, 1);
-  ::registerConfigCvt<H5DataTypes::LusiDiodeFexConfigV2>(m_cvtMap, "Lusi::DiodeFexConfigV2", Pds::TypeId::Id_DiodeFexConfig, 2);
+  ::registerConfigCvt<H5DataTypes::LusiDiodeFexConfigV1>(m_cvtMap, "Lusi::DiodeFexConfigV1", Pds::TypeId::Id_DiodeFexConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::LusiDiodeFexConfigV2>(m_cvtMap, "Lusi::DiodeFexConfigV2", Pds::TypeId::Id_DiodeFexConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::LusiIpmFexConfigV1>(m_cvtMap, "Lusi::IpmFexConfigV1", Pds::TypeId::Id_IpmFexConfig, 1);
-  ::registerConfigCvt<H5DataTypes::LusiIpmFexConfigV2>(m_cvtMap, "Lusi::IpmFexConfigV2", Pds::TypeId::Id_IpmFexConfig, 2);
+  ::registerConfigCvt<H5DataTypes::LusiIpmFexConfigV1>(m_cvtMap, "Lusi::IpmFexConfigV1", Pds::TypeId::Id_IpmFexConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::LusiIpmFexConfigV2>(m_cvtMap, "Lusi::IpmFexConfigV2", Pds::TypeId::Id_IpmFexConfig, 2, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::LusiPimImageConfigV1>(m_cvtMap, "Lusi::PimImageConfigV1", Pds::TypeId::Id_PimImageConfig, 1);
+  ::registerConfigCvt<H5DataTypes::LusiPimImageConfigV1>(m_cvtMap, "Lusi::PimImageConfigV1", Pds::TypeId::Id_PimImageConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::CsPadConfigV1>(m_cvtMap, "CsPad::ConfigV1", Pds::TypeId::Id_CspadConfig, 1);
-  ::registerConfigCvt<H5DataTypes::CsPadConfigV2>(m_cvtMap, "CsPad::ConfigV2", Pds::TypeId::Id_CspadConfig, 2);
-  ::registerConfigCvt<H5DataTypes::CsPadConfigV3>(m_cvtMap, "CsPad::ConfigV3", Pds::TypeId::Id_CspadConfig, 3);
-  ::registerConfigCvt<H5DataTypes::CsPadConfigV4>(m_cvtMap, "CsPad::ConfigV4", Pds::TypeId::Id_CspadConfig, 4);
+  ::registerConfigCvt<H5DataTypes::CsPadConfigV1>(m_cvtMap, "CsPad::ConfigV1", Pds::TypeId::Id_CspadConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::CsPadConfigV2>(m_cvtMap, "CsPad::ConfigV2", Pds::TypeId::Id_CspadConfig, 2, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::CsPadConfigV3>(m_cvtMap, "CsPad::ConfigV3", Pds::TypeId::Id_CspadConfig, 3, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::CsPadConfigV4>(m_cvtMap, "CsPad::ConfigV4", Pds::TypeId::Id_CspadConfig, 4, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::Gsc16aiConfigV1>(m_cvtMap, "Gsc16ai::ConfigV1", Pds::TypeId::Id_Gsc16aiConfig, 1);
+  ::registerConfigCvt<H5DataTypes::Gsc16aiConfigV1>(m_cvtMap, "Gsc16ai::ConfigV1", Pds::TypeId::Id_Gsc16aiConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::TimepixConfigV1>(m_cvtMap, "Timepix::ConfigV1", Pds::TypeId::Id_TimepixConfig, 1);
-  ::registerConfigCvt<H5DataTypes::TimepixConfigV2>(m_cvtMap, "Timepix::ConfigV2", Pds::TypeId::Id_TimepixConfig, 2);
-  ::registerConfigCvt<H5DataTypes::TimepixConfigV3>(m_cvtMap, "Timepix::ConfigV3", Pds::TypeId::Id_TimepixConfig, 3);
+  ::registerConfigCvt<H5DataTypes::TimepixConfigV1>(m_cvtMap, "Timepix::ConfigV1", Pds::TypeId::Id_TimepixConfig, 1, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::TimepixConfigV2>(m_cvtMap, "Timepix::ConfigV2", Pds::TypeId::Id_TimepixConfig, 2, chunk_size, compression);
+  ::registerConfigCvt<H5DataTypes::TimepixConfigV3>(m_cvtMap, "Timepix::ConfigV3", Pds::TypeId::Id_TimepixConfig, 3, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::CsPad2x2ConfigV1>(m_cvtMap, "CsPad2x2::ConfigV1", Pds::TypeId::Id_Cspad2x2Config, 1);
+  ::registerConfigCvt<H5DataTypes::CsPad2x2ConfigV1>(m_cvtMap, "CsPad2x2::ConfigV1", Pds::TypeId::Id_Cspad2x2Config, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::OceanOpticsConfigV1>(m_cvtMap, "OceanOptics::ConfigV1", Pds::TypeId::Id_OceanOpticsConfig, 1);
+  ::registerConfigCvt<H5DataTypes::OceanOpticsConfigV1>(m_cvtMap, "OceanOptics::ConfigV1", Pds::TypeId::Id_OceanOpticsConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::FliConfigV1>(m_cvtMap, "Fli::ConfigV1", Pds::TypeId::Id_FliConfig, 1);
+  ::registerConfigCvt<H5DataTypes::FliConfigV1>(m_cvtMap, "Fli::ConfigV1", Pds::TypeId::Id_FliConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::QuartzConfigV1>(m_cvtMap, "Quartz::ConfigV1", Pds::TypeId::Id_QuartzConfig, 1);
+  ::registerConfigCvt<H5DataTypes::QuartzConfigV1>(m_cvtMap, "Quartz::ConfigV1", Pds::TypeId::Id_QuartzConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::AndorConfigV1>(m_cvtMap, "Andor::ConfigV1", Pds::TypeId::Id_AndorConfig, 1);
+  ::registerConfigCvt<H5DataTypes::AndorConfigV1>(m_cvtMap, "Andor::ConfigV1", Pds::TypeId::Id_AndorConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::UsdUsbConfigV1>(m_cvtMap, "UsdUsb::ConfigV1", Pds::TypeId::Id_UsdUsbConfig, 1);
+  ::registerConfigCvt<H5DataTypes::UsdUsbConfigV1>(m_cvtMap, "UsdUsb::ConfigV1", Pds::TypeId::Id_UsdUsbConfig, 1, chunk_size, compression);
 
-  ::registerConfigCvt<H5DataTypes::OrcaConfigV1>(m_cvtMap, "Orca::ConfigV1", Pds::TypeId::Id_OrcaConfig, 1);
+  ::registerConfigCvt<H5DataTypes::OrcaConfigV1>(m_cvtMap, "Orca::ConfigV1", Pds::TypeId::Id_OrcaConfig, 1, chunk_size, compression);
 
   // special converter object for CsPad calibration data
   converter.reset(new CsPadCalibV1Cvt("CsPad::CalibV1", metadata, calibStore));
@@ -256,8 +271,6 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   //    ===================================  Converters for regular data ======================================
   //
 
-
-  hsize_t chunk_size = 16*1024*1024 ;
 
   // instantiate all factories for event converters
   converter = make_shared<EvtDataTypeCvtDef<H5DataTypes::CameraTwoDGaussianV1> >(

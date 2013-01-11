@@ -24,8 +24,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "O2OTranslator/O2OExceptions.h"
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/O2OExceptions.h"
+#include "O2OTranslator/SrcFilter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -55,10 +56,17 @@ public:
 
   typedef typename H5Type::XtcType XtcType ;
 
-  // constructor takes a location where the data will be stored
-  ConfigDataTypeCvt ( const std::string& typeGroupName )
+  /**
+   *  Constructor for converter.
+   *
+   *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
+   *                            derived from type, should be unique.
+   *  @param[in] srcFilter      Source filter object, default is to allow all sources
+   */
+  ConfigDataTypeCvt ( const std::string& typeGroupName, SrcFilter srcFilter = SrcFilter() )
     : DataTypeCvt<typename H5Type::XtcType>()
     , m_typeGroupName(typeGroupName)
+    , m_srcFilter(srcFilter)
     , m_groups()
   {}
 
@@ -72,6 +80,9 @@ public:
                               const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTimeStamp& time )
   {
+    // filter source
+    if (not m_srcFilter(src.top())) return;
+
     // this should not happen
     assert ( not m_groups.empty() ) ;
 
@@ -121,6 +132,7 @@ private:
 
   // Data members
   std::string m_typeGroupName ;
+  const SrcFilter m_srcFilter;
   std::stack<hdf5pp::Group> m_groups ;
 
 };

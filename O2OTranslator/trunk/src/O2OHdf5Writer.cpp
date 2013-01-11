@@ -34,6 +34,7 @@
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "pdsdata/bld/bldData.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Level.hh"
@@ -371,7 +372,7 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 void
 O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
-  // for Configure and BeginCalibCycle transitions store config objects at Source level
+  // for Configure and BeginCalibCycle transitions store config objects
   MsgLog( logger, debug, "O2OHdf5Writer: store config object " << src.top()
       << " name=" <<  Pds::TypeId::name(typeId.id())
       << " version=" <<  typeId.version() ) ;
@@ -410,6 +411,16 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
     return;
   }
 
+  // Special case for Shared BLD data.
+  if (typeId.id() == Pds::TypeId::Id_SharedIpimb or
+      typeId.id() == Pds::TypeId::Id_SharedPim or
+      typeId.id() == Pds::TypeId::Id_SharedAcqADC) {
+
+    splitSharedObject(data, size, typeId, src);
+    return;
+
+  }
+
   // find this type in the converter map
   O2OCvtFactory::iterator it = m_cvtFactory.find(typeId);
   if (it == m_cvtFactory.end() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
@@ -428,6 +439,77 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
   }
 
 }
+
+
+/*
+ * Special case for Shared BLD data. We split them into their individual
+ * components and store them as regular objects instead of one large
+ * composite object. Components include both configuration and event data
+ * objects so we update config store here as well.
+ */
+void
+O2OHdf5Writer::splitSharedObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+{
+
+  MsgLog( logger, debug, "O2OHdf5Writer:splitSharedObject -- splitting " << Pds::TypeId::name(typeId.id()) << "/" << typeId.version()) ;
+
+  if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 0) {
+
+    const Pds::BldDataIpimbV0* bld = reinterpret_cast<const Pds::BldDataIpimbV0*>(data);
+    Pds::TypeId typeId;
+
+    // config object should be store first as it may be needed by data object
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 1);
+    this->configObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
+    this->dataObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 1);
+    this->dataObject(static_cast<const void*>(&bld->ipimbData), sizeof bld->ipimbData, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
+    this->dataObject(static_cast<const void*>(&bld->ipmFexData), sizeof bld->ipmFexData, typeId, src);
+
+  } else if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 1) {
+
+    const Pds::BldDataIpimbV1* bld = reinterpret_cast<const Pds::BldDataIpimbV1*>(data);
+    Pds::TypeId typeId;
+    boost::shared_ptr<Pds::Xtc> newxtc;
+
+    // config object should be store first as it may be needed by data object
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 2);
+    this->configObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
+    this->dataObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 2);
+    this->dataObject(static_cast<const void*>(&bld->ipimbData), sizeof bld->ipimbData, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
+    this->dataObject(static_cast<const void*>(&bld->ipmFexData), sizeof bld->ipmFexData, typeId, src);
+
+  } else if (typeId.id() == Pds::TypeId::Id_SharedPim and typeId.version() == 1) {
+
+    const Pds::BldDataPimV1* bld = reinterpret_cast<const Pds::BldDataPimV1*>(data);
+    Pds::TypeId typeId;
+    boost::shared_ptr<Pds::Xtc> newxtc;
+
+    // config object should be store first as it may be needed by data object
+    typeId = Pds::TypeId(Pds::TypeId::Id_TM6740Config, 2);
+    this->dataObject(static_cast<const void*>(&bld->camConfig), sizeof bld->camConfig, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_PimImageConfig, 1);
+    this->dataObject(static_cast<const void*>(&bld->pimConfig), sizeof bld->pimConfig, typeId, src);
+
+    typeId = Pds::TypeId(Pds::TypeId::Id_Frame, 1);
+    this->dataObject(static_cast<const void*>(&bld->frame), sizeof bld->frame + bld->frame.data_size(), typeId, src);
+
+  } else {
+
+    MsgLogRoot( error, "O2OHdf5Writer::splitSharedObject -- unexpected type or version of shared BLD data: "
+                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+
+  }
+}
+
 
 // Construct a group name
 std::string
@@ -493,6 +575,8 @@ O2OHdf5Writer::openFile()
   // add attributes specifying schema features
   const char* tsFormat = m_fullTimeStamp ? "full" : "short";
   m_file.createAttr<const char*>(":schema:timestamp-format").store(tsFormat) ;
+  m_file.createAttr<uint32_t> (":schema:bld-shared-split").store(1);
+  m_file.createAttr<uint32_t> (":schema:bld-config-as-evt").store(1);
 
   // add UUID to the file attributes
   uuid_t uuid ;

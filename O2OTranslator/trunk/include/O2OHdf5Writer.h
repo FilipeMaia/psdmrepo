@@ -133,6 +133,9 @@ protected:
   // store all configuration object from special store to a file
   void storeConfig0(); 
 
+  // Method which splits shared BLD data objects
+  void splitSharedObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src);
+
 private:
 
   typedef unsigned StateCounters[NumberOfStates] ;

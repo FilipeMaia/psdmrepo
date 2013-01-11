@@ -30,6 +30,7 @@
 #include "O2OTranslator/CvtGroupMap.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/SrcFilter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -58,12 +59,22 @@ template <typename XtcType>
 class EvtDataTypeCvt : public DataTypeCvt<XtcType> {
 public:
 
-  // constructor takes a location where the data will be stored
-  EvtDataTypeCvt(const std::string& typeGroupName, hsize_t chunk_size, int deflate)
+  /**
+   *  Constructor for converter
+   *
+   *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
+   *                            derived from type, should be unique.
+   *  @param[in] chunk_size     Chunk size in bytes, your best guess
+   *  @param[in] deflate        Compression level, use negative number to disable compression
+   *  @param[in] srcFilter      Source filter object, default is to allow all sources
+   */
+  EvtDataTypeCvt(const std::string& typeGroupName, hsize_t chunk_size, int deflate,
+      SrcFilter srcFilter = SrcFilter())
     : DataTypeCvt<XtcType>()
     , m_typeGroupName(typeGroupName)
     , m_chunk_size(chunk_size)
     , m_deflate(deflate)
+    , m_srcFilter(srcFilter)
     , m_groups()
     , m_group2group()
     , m_timeCont(0)
@@ -84,6 +95,9 @@ public:
                               const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTimeStamp& time )
   {
+    // filter source
+    if (not m_srcFilter(src.top())) return;
+
     hdf5pp::Group group = m_groups.top() ;
     hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
     if ( not subgroup.valid() ) {
@@ -174,6 +188,7 @@ private:
   const std::string m_typeGroupName ;
   const hsize_t m_chunk_size ;
   const int m_deflate ;
+  const SrcFilter m_srcFilter;
   std::stack<hdf5pp::Group> m_groups ;
   CvtGroupMap m_group2group ;
   XtcClockTimeCont* m_timeCont ;

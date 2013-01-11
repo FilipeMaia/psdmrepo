@@ -11,6 +11,17 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-22-00
+2013-01-10 Andy Salnikov
+- implement splitting of the shared BLD data types
+- O2OCvtFactory now instantiates event-type converters for all config types,
+  these converters are only active when data comes from BLD; config-type
+  converters for the same types only accept data coming from non-BLD sources.
+- O2OHdf5Writer::dataObject now checks for shared BLD types and splits them 
+  into their components.
+- ConfigDataTypeCvt and EvtDataTypeCvtDef now take optional arguments of new 
+  type SrcFilter which defines types of data sources to accept or reject
+
 Tag: V00-21-02
 2013-01-02 Andy Salnikov
 - upgrading to pdsdata V05-03-00
