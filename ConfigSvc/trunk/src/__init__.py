@@ -7,7 +7,7 @@ see documentation of :py:mod:`_ConfigSvc`.
 """
 
 import sys
-if sys.platform == 'linux2':
+if sys.platform.startswith('linux'):
     # on Linux with g++ one needs RTLD_GLOBAL for dlopen
     # which Python does not set by default
     import DLFCN

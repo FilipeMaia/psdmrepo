@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2013-01-10 Andy Salnikov
+- in __init__.py fix check for linux platform
+
 Tag: V00-00-11
 2013-01-02 Andy Salnikov
 - bug fix in pyext/ConfigSvcPyHelper class
