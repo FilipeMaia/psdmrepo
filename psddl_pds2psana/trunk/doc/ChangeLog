@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-16
+2013-01-10 Andy Salnikov
+- implement splitting of the shared BLD types (ticket #184)
+
 Tag: V00-04-15
 2013-01-02 Andy Salnikov
 - upgrading to pdsdata V05-03-00

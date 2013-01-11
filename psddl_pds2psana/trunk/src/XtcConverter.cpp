@@ -237,6 +237,31 @@ namespace {
     eStore.store(obj, xtc->src);
   }
 
+
+  /*
+   * Build new Xtc from sub-object of the given xtc. Returned Xtc will reuse old Xtc heared
+   * except for TypeId and payload size but will use new payload.
+   */
+  // "destructor" for cloned xtc
+  void buf_dealloc(Pds::Xtc* xtc) {
+    delete [] reinterpret_cast<char*>(xtc);
+  }
+  boost::shared_ptr<Pds::Xtc>
+  makeXtc(const Pds::Xtc& xtc, Pds::TypeId typeId, const char* payload, size_t payloadSize)
+  {
+    // allocate space for new xtc
+    char* buf = new char[sizeof xtc + payloadSize];
+
+    // copy header, replace typeId and extent size
+    Pds::Xtc* newxtc = new (buf) Pds::Xtc(typeId, xtc.src, xtc.damage);
+    newxtc->extent = sizeof xtc + payloadSize;
+
+    // copy payload
+    std::copy(payload, payload + payloadSize, buf + sizeof xtc);
+
+    return boost::shared_ptr<Pds::Xtc>(newxtc, buf_dealloc);
+  }
+
 }
 
 //		----------------------------------------
@@ -269,6 +294,83 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   const Pds::TypeId& typeId = xtc->contains;
   //uint32_t size = xtc->sizeofPayload();
   
+  /*
+   * Special case for Shared BLD data. We split them into their individual
+   * components and store them as regular objects instead of one large
+   * composite object. Components include both configuration and event data
+   * objects so we update config store here as well.
+   */
+  if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 0) {
+
+    const PsddlPds::Bld::BldDataIpimbV0* bld = reinterpret_cast<const PsddlPds::Bld::BldDataIpimbV0*>(xtc->payload());
+    Pds::TypeId typeId;
+    boost::shared_ptr<Pds::Xtc> newxtc;
+
+    const PsddlPds::Ipimb::DataV1& ipimbData = bld->ipimbData();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipimbData), ipimbData._sizeof());
+    this->convert(newxtc, evt, cfgStore);
+
+    const PsddlPds::Ipimb::ConfigV1& ipimbConfig = bld->ipimbConfig();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipimbConfig), ipimbConfig._sizeof());
+    this->convertConfig(newxtc, cfgStore);
+
+    const PsddlPds::Lusi::IpmFexV1& ipmFexData = bld->ipmFexData();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipmFexData), ipmFexData._sizeof());
+    this->convert(newxtc, evt, cfgStore);
+
+    return;
+
+  } else if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 1) {
+
+    const PsddlPds::Bld::BldDataIpimbV1* bld = reinterpret_cast<const PsddlPds::Bld::BldDataIpimbV1*>(xtc->payload());
+    Pds::TypeId typeId;
+    boost::shared_ptr<Pds::Xtc> newxtc;
+
+    const PsddlPds::Ipimb::DataV2& ipimbData = bld->ipimbData();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 2);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipimbData), ipimbData._sizeof());
+    this->convert(newxtc, evt, cfgStore);
+
+    const PsddlPds::Ipimb::ConfigV2& ipimbConfig = bld->ipimbConfig();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 2);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipimbConfig), ipimbConfig._sizeof());
+    this->convertConfig(newxtc, cfgStore);
+
+    const PsddlPds::Lusi::IpmFexV1& ipmFexData = bld->ipmFexData();
+    typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&ipmFexData), ipmFexData._sizeof());
+    this->convert(newxtc, evt, cfgStore);
+
+    return;
+
+  } else if (typeId.id() == Pds::TypeId::Id_SharedPim and typeId.version() == 1) {
+
+    const PsddlPds::Bld::BldDataPimV1* bld = reinterpret_cast<const PsddlPds::Bld::BldDataPimV1*>(xtc->payload());
+    Pds::TypeId typeId;
+    boost::shared_ptr<Pds::Xtc> newxtc;
+
+    const PsddlPds::Pulnix::TM6740ConfigV2& camConfig = bld->camConfig();
+    typeId = Pds::TypeId(Pds::TypeId::Id_TM6740Config, 2);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&camConfig), camConfig._sizeof());
+    this->convertConfig(newxtc, cfgStore);
+
+    const PsddlPds::Lusi::PimImageConfigV1& pimConfig = bld->pimConfig();
+    typeId = Pds::TypeId(Pds::TypeId::Id_PimImageConfig, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&pimConfig), pimConfig._sizeof());
+    this->convertConfig(newxtc, cfgStore);
+
+    const PsddlPds::Camera::FrameV1& frame = bld->frame();
+    typeId = Pds::TypeId(Pds::TypeId::Id_Frame, 1);
+    newxtc = ::makeXtc(*xtc, typeId, reinterpret_cast<const char*>(&frame), frame._sizeof());
+    this->convert(newxtc, evt, cfgStore);
+
+    return;
+
+  }
+
   int version = typeId.version();
   switch(typeId.id()) {
   case Pds::TypeId::Any:
@@ -365,8 +467,6 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_PimImageConfig:
     break;
   case Pds::TypeId::Id_SharedIpimb:
-    if (version == 0) ::storeDataProxy<Bld::BldDataIpimbV0>(xtc, evt);
-    if (version == 1) ::storeDataProxy<Bld::BldDataIpimbV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_AcqTdcConfig:
     break;
@@ -383,7 +483,6 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 1) ::storeDataProxy<CsPad2x2::ElementV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_SharedPim:
-    if (version == 1) ::storeDataProxy<Bld::BldDataPimV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_Cspad2x2Config:
     break;
