@@ -1,0 +1,144 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ws-client-test...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LUSI programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to 
+interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import urllib
+import urllib2 as u2
+import urllib2_kerberos
+import time
+from pprint import pprint, pformat
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from WSClient.WSApp import WSApp
+from WSClient.WSResource import WSResource
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class WSClientTest ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] method app resource [key=value ...]" )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-b', "--base-uri", 
+                                  default=None, help="specify service base URI" )
+        self._parser.add_option ( '-u', "--user", 
+                                  default=None, help="specify user name" )
+        self._parser.add_option ( '-p', "--password", 
+                                  default=None, help="password to access web service" )
+        self._parser.add_option ( '-f', "--pwd-file", 
+                                  default=None, help="password to access web service" )
+        self._parser.add_option ( '-k', "--kerberos", action="store_true",
+								  default=False, help="use kerberos for authentication" )
+        self._parser.add_option ( '-q', "--request", action="store_true",
+								  default=False, help="dump request" )
+        self._parser.add_option ( '-r', "--reply", action="store_true",
+								  default=False, help="dump reply headers" )
+        self._parser.add_option ( '-d', "--body", action="store_true",
+								  default=False, help="dump reply body" )
+        self._parser.add_option ( '-t', "--time", action="store_true",
+								  default=False, help="print time per request" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check arguments
+        if len(self._args) < 3 :
+            self._parser.error("at least three arguments required")
+            return 2
+        
+        # build parameters
+        parm = None
+        if len(self._args) > 3 :
+            parm = {}
+            for kv in self._args[3:] :
+                k,v = tuple( kv.split('=',2) )
+                parm[k] = v
+        
+        # make resource object
+        app = WSApp( self._args[1],
+                     base_uri = self._options.base_uri,
+                     kerberos=self._options.kerberos,
+                     user=self._options.user,
+                     password=self._options.password,
+                     pwdfile=self._options.pwd_file )
+        res = WSResource( app, self._args[2] )
+
+        t0 = time.time()
+        try :
+            data = res.request( self._args[0], data=parm )
+        except Exception, e:
+            print str(e)
+        else :
+            t1 = time.time()
+            if self._options.request : print "\nrequest uri:", res.uri
+            if self._options.reply : print "\nreply info:\n", res.info, "\ncode:", res.code
+            if self._options.body : print "\nbody type:", type(data)
+            if self._options.body : 
+                if isinstance(data, basestring) :
+                    print "\nbody (text):\n", data
+                else :
+                    print "\nbody (data):\n", pformat(data)
+            if self._options.time : print "\ntime:", t1-t0
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = WSClientTest()
+    rc = app.run()
+    sys.exit(rc)
