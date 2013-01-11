@@ -26,16 +26,8 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-#import sys
-#import os
 
 from BatchJob import *
-
-#from ConfigParametersCorAna   import confpars as cp
-#from Logger                   import logger
-#from ConfigFileGenerator      import cfg
-#from FileNameManager          import fnm
-#import GlobalUtils            as     gu
 
 #-----------------------------
 
@@ -51,8 +43,27 @@ class BatchJobCorAna(BatchJob) :
         BatchJob.__init__(self)
 
         self.job_id_cora_split = None
+        self.time_sub_split    = None
 
-        self.time_sub1 = None
+        self.job_id_cora_merge = None
+        self.time_sub_merge    = None
+
+        self.nparts            = None
+        self.init_list_for_proc()
+        
+#-----------------------------
+
+    def init_list_for_proc(self) :
+        """Creates the empty list for proc. containing ing, jobid and time for all processes"""
+        if cp.bat_img_nparts.value() == self.nparts : return
+        self.nparts = cp.bat_img_nparts.value()
+
+        self.list_for_proc = []
+        for i in range(self.nparts) :
+            self.list_for_proc.append([i, None, None])
+
+        #print 'self.list_for_proc =', self.list_for_proc
+
 
 #-----------------------------
 
@@ -63,8 +74,8 @@ class BatchJobCorAna(BatchJob) :
 
     def submit_batch_for_cora_split(self) :
 
-        if not self.job_can_be_submitted(self.job_id_cora_split, self.time_sub1, 'correlation analysis') : return
-        self.time_sub1 = gu.get_time_sec()
+        if not self.job_can_be_submitted(self.job_id_cora_split, self.time_sub_split, 'cor. ana. split') : return
+        self.time_sub_split = gu.get_time_sec()
 
         self.make_psana_cfg_file_for_cora_split()
 
@@ -76,23 +87,33 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-#    def submit_batch_for_data_aver(self) :
+    def submit_batch_for_cora_proc(self, ind) :
 
-#        if not self.job_can_be_submitted(self.job_id_data_aver, self.time_aver_job_submitted, 'data aver') : return        
-#        self.time_aver_job_submitted = gu.get_time_sec()
+        self.init_list_for_proc()
 
-#        self.make_psana_cfg_file_for_data_aver()
+        i, job_id, time_sub = self.list_for_proc[ind] 
 
-#        command      = 'psana -c ' + fnm.path_data_aver_psana_cfg() + ' ' + fnm.path_data_xtc_cond()
-#        queue        = cp.bat_queue.value()
-#        bat_log_file = fnm.path_data_aver_batch_log()
+        if not self.job_can_be_submitted(job_id, time_sub, 'cor. ana. proc') : return
+        time_sub = gu.get_time_sec()
 
-#        self.job_id_data_aver, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        fname    = fnm.get_list_of_files_cora_split_work()[ind]
+        tname    = fnm.path_cora_proc_tau_in()
+        log_file = fnm.get_list_of_files_cora_proc_work_log()[ind]
+
+        command  = 'corana -f ' + fname # + ' -l ' + log_file
+        if os.path.exists(tname) : command +=   '-t ' + tname
+        queue    = cp.bat_queue.value()
+
+        print 'command  =', command
+        print 'log_file =', log_file, '\n'
+  
+        job_id, out, err = gu.batch_job_submit(command, queue, log_file)
+        self.list_for_proc[ind] = [i, job_id, time_sub]
 
 #-----------------------------
 
     def check_batch_job_for_cora_split(self) :
-        self.check_batch_job(self.job_id_cora_split, 'correlation analysis')
+        self.check_batch_job(self.job_id_cora_split, 'cor. ana. split')
 
 #-----------------------------
 
@@ -102,7 +123,7 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def status_batch_job_for_cora_split(self) :
-        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub1, 'split')
+        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub_split, 'split')
 
 #-----------------------------
 
@@ -116,8 +137,29 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-    def remove_files_cora(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_cora_split_all(),'of correlation analysis:')
+    def remove_files_cora_split(self) :
+        self.remove_files_for_list(fnm.get_list_of_files_cora_split_all(),'of correlation split:')
+
+#-----------------------------
+
+    def remove_files_cora_proc(self, ind=None) :
+
+        if ind == None :
+            self.list_of_files_to_remove = fnm.get_list_of_files_cora_proc_work() + \
+                                           fnm.get_list_of_files_cora_proc_work_log()
+            self.list_of_files_to_remove.append(fnm.path_cora_proc_tau_out()) 
+
+        else :
+            self.list_of_files_to_remove = [fnm.get_list_of_files_cora_proc_work()[ind], \
+                                           fnm.get_list_of_files_cora_proc_work_log()[ind]]
+
+        #print 'self.list_of_files_to_remove =\n', self.list_of_files_to_remove
+        self.remove_files_for_list(self.list_of_files_to_remove,'of correlation proc:')
+
+#-----------------------------
+
+    def remove_files_cora_merge(self) :
+        self.remove_files_for_list(fnm.get_list_of_files_cora_merge(),'of correlation merge:')
 
 #-----------------------------
 
@@ -127,7 +169,18 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def get_batch_job_cora_split_time_string(self) :
-        return gu.get_local_time_str(self.time_sub1, fmt='%Y-%m-%d %H:%M:%S')
+        return gu.get_local_time_str(self.time_sub_split, fmt='%Y-%m-%d %H:%M:%S')
+
+#-----------------------------
+
+    def get_batch_job_id_cora_proc(self, ind) :
+        return self.list_for_proc[ind][1]
+
+#-----------------------------
+
+    def get_batch_job_cora_proc_time_string(self, ind) :
+        time_sub_sec = self.list_for_proc[ind][2] 
+        return gu.get_local_time_str(time_sub_sec, fmt='%Y-%m-%d %H:%M:%S')
 
 #-----------------------------
 

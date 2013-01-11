@@ -174,6 +174,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
             #self.table.setSpan(self.row, 0, 1, 5)            
             #self.table.setItem(self.row, 0, self.title_split)
 
+        self.table.setFixedWidth(self.table.horizontalHeader().length() + 50)
+
 
     def setTableItems(self) :     
 
@@ -305,7 +307,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def onRemove(self):
         logger.debug('onRemove', __name__)
-        bjcora.remove_files_cora()
+        bjcora.remove_files_cora_split()
         #self.on_but_status()
         self.onStatus()
 

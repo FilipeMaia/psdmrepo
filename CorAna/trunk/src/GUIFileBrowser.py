@@ -162,7 +162,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         fname = str( self.box_file.currentText() )
         logger.info('onBox - selected file: ' + fname, __name__)
 
-        self.list_of_supported = 'cfg', 'txt', 'txt-tmp' 
+        self.list_of_supported = 'cfg', 'log', 'txt', 'txt-tmp' 
         self.str_of_supported = ''
         for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
 

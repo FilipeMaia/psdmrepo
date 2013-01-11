@@ -217,7 +217,7 @@ class FileNameManager :
         return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'split.cfg'
 
     def path_cora_split_batch_log(self) :
-        return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'batch-log.txt'
+        return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'split-log.txt'
 
     def path_cora_split_med(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'med.txt'
@@ -236,6 +236,15 @@ class FileNameManager :
 
     def path_cora_proc_tau_out(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau.txt'
+
+
+
+
+    def path_cora_merge_result(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'image-result.txt'
+
+    def path_cora_merge_batch_log(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'merge-log.txt'
 
 #-----------------------------
 
@@ -285,11 +294,23 @@ class FileNameManager :
                self.get_list_of_files_cora_proc_work() + \
                self.get_list_of_files_cora_proc_work_log()
 
+    def get_list_of_files_cora_proc_browser(self) :
+        return self.get_list_of_files_cora_proc() + \
+               self.get_list_of_files_cora_proc_work_log()
+
     def  get_list_of_files_cora_proc(self) :
         self.list_of_files_cora_proc = []
         self.list_of_files_cora_proc.append(fnm.path_cora_proc_tau_in())
         self.list_of_files_cora_proc.append(fnm.path_cora_proc_tau_out())
         return self.list_of_files_cora_proc
+
+#-----------------------------
+
+    def  get_list_of_files_cora_merge(self) :
+        self.list_of_files_cora_merge = []
+        self.list_of_files_cora_merge.append(fnm.path_cora_merge_result())
+        self.list_of_files_cora_merge.append(fnm.path_cora_merge_batch_log())
+        return self.list_of_files_cora_merge
 
 #-----------------------------
 
@@ -401,12 +422,16 @@ if __name__ == "__main__" :
     print 'path_dark_xtc_all_chunks() : ', fnm.path_dark_xtc_all_chunks()
 
     #list = fnm.get_list_of_files_cora_split_work()
-    print '\nfnm.get_list_of_files_cora_result_work():'    
-    list =   fnm.get_list_of_files_cora_result_work()
+    print '\nfnm.get_list_of_files_cora_split_work():'    
+    list =   fnm.get_list_of_files_cora_split_work()
     for fname in list : print fname
 
     print '\nfnm.get_list_of_files_cora_proc_all():'    
     list =   fnm.get_list_of_files_cora_proc_all()
+    for fname in list : print fname
+
+    print '\nfnm.get_list_of_files_cora_merge():'    
+    list =   fnm.get_list_of_files_cora_merge()
     for fname in list : print fname
 
     sys.exit ( 'End of test for FileNameManager' )

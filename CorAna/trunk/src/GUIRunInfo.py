@@ -171,44 +171,29 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.item_data_total = QtGui.QTableWidgetItem('Total')        
         self.item_data_time  = QtGui.QTableWidgetItem('Time' )        
 
-        self.table_info.setItem(0, 0, self.item_data_file)
-        self.table_info.setItem(1, 0, self.item_dark_file)
-        self.table_info.setItem(2, 0, self.item_flat_file)
-        self.table_info.setItem(3, 0, self.item_blam_file)
+        self.setTableInfoItems()
 
-        self.table_info.setItem(0, 1, self.item_data_start)
-        self.table_info.setItem(0, 2, self.item_data_end  )
-        self.table_info.setItem(0, 3, self.item_data_total)
-        self.table_info.setItem(0, 4, self.item_data_time )
+        self.list_of_items1 = [self.item_data_file,  self.item_dark_file, self.item_flat_file,  self.item_blam_file]
+        self.list_of_items2 = [self.item_data_start, self.item_data_end,  self.item_data_total, self.item_data_time]
+        self.list_of_items  = self.list_of_items1 + self.list_of_items2
 
-        self.item_data_file .setBackgroundColor (cp.colorEditInfo)
-        self.item_dark_file .setBackgroundColor (cp.colorEditInfo)
-        self.item_flat_file .setBackgroundColor (cp.colorEditInfo)
-        self.item_blam_file .setBackgroundColor (cp.colorEditInfo)
+        for i, item in enumerate(self.list_of_items1) :
+            self.table_info.setItem(i, 0, item)
+            item.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-        self.item_data_start.setBackgroundColor (cp.colorEditInfo)
-        self.item_data_end  .setBackgroundColor (cp.colorEditInfo)
-        self.item_data_total.setBackgroundColor (cp.colorEditInfo)
-        self.item_data_time .setBackgroundColor (cp.colorEditInfo)
-
-        self.item_data_file.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.item_dark_file.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.item_flat_file.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.item_blam_file.setTextAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        for i, item in enumerate(self.list_of_items2) :
+            self.table_info.setItem(0, i+1, item)
+            item.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 
         item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags)
-        self.item_data_file .setFlags(item_flags)
-        self.item_dark_file .setFlags(item_flags)
-        self.item_flat_file .setFlags(item_flags)
-        self.item_blam_file .setFlags(item_flags)
-                            
-        self.item_data_start.setFlags(item_flags)
-        self.item_data_end  .setFlags(item_flags)
-        self.item_data_total.setFlags(item_flags)
-        self.item_data_time .setFlags(item_flags)
 
-        self.table_info.setFixedSize(700,150)
-        self.setTableInfoItems()
+        for item in self.list_of_items :
+            item.setBackgroundColor (cp.colorEditInfo)
+            item.setFlags(item_flags)
+
+        self.table_info.setFixedSize(self.table_info.horizontalHeader().length()+55,self.table_info.verticalHeader().length()+30)
+        #self.table_info.setFixedSize(685,150)
+        #self.table_info.resize(1,1)
 
 
     def setTableInfoItems(self) :
@@ -271,7 +256,10 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.table.itemClicked.connect(self.onItem)
         self.table.itemChanged.connect(self.onItemChanged)
         #self.connect( self.edi_bat_nparts, QtCore.SIGNAL('editingFinished()'), self.onEdiNParts)
-        self.table.setFixedSize(445,60)
+        #self.table.setFixedSize(445,60)
+
+        self.table.setFixedSize(self.table.horizontalHeader().length() + 42,
+                                self.table.verticalHeader()  .length() + 28)
 
 
     def setTableItems(self) :

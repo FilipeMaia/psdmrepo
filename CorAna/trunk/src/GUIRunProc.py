@@ -51,7 +51,6 @@ class GUIRunProc ( QtGui.QWidget ) :
                             False : 'No' }
 
         self.nparts = cp.bat_img_nparts.value()
-        #print 'self.nparts = ', self.nparts
 
         self.lab_status = QtGui.QLabel('Batch job status: ')
         self.hboxS = QtGui.QHBoxLayout()
@@ -67,22 +66,17 @@ class GUIRunProc ( QtGui.QWidget ) :
         #self.vbox.addStretch(1)     
  
         self.setLayout(self.vbox)
-
         self.showToolTips()
-        self.setStyle()
-        #self.setFields()
-        #self.setStatus()
-        
-        self.connectToThread1()
 
+        #self.connectToThread1()
         
     #-------------------
     #  Public methods --
     #-------------------
 
     def connectToThread1(self):
-        try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
-        except : pass
+        try : self.connect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+        except : print 'connectToThread1 is failed'
 
 
     def disconnectFromThread1(self):
@@ -128,23 +122,33 @@ class GUIRunProc ( QtGui.QWidget ) :
         self.connect( self.but_brow,   QtCore.SIGNAL('clicked()'), self.onBrow   )
         self.connect( self.but_remove, QtCore.SIGNAL('clicked()'), self.onRemove )
 
+        self.setStyle()
+
+    def setStyle(self):
+        self.setStyleSheet(cp.styleBkgd)
+
+        self.but_run   .setStyleSheet (cp.styleButton) 
+        self.but_status.setStyleSheet (cp.styleButton)
+        self.but_brow  .setStyleSheet (cp.styleButton)
+        self.but_remove.setStyleSheet (cp.styleButtonBad)
+
+        self.but_status.setFixedWidth(100)
+
 
     def makeTable(self):
         """Makes the table for the list of output and log files"""
         self.table = QtGui.QTableWidget(self.nparts+2, 7, self)
-        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)', 'Submission time', 'Job Id', 'Log'])
+        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Create time', 'Size(Byte)', 'Submit time', 'Job Id', 'Log'])
         #self.table.setVerticalHeaderLabels([''])
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
-        self.table.horizontalHeader().resizeSection(0,300)
+        self.table.horizontalHeader().resizeSection(0,200)
         self.table.horizontalHeader().resizeSection(1,60)
-        self.table.horizontalHeader().resizeSection(2,150)
-        self.table.horizontalHeader().resizeSection(3,120)
-        self.table.horizontalHeader().resizeSection(4,150)
+        self.table.horizontalHeader().resizeSection(2,90)
+        self.table.horizontalHeader().resizeSection(3,80)
+        self.table.horizontalHeader().resizeSection(4,90)
         self.table.horizontalHeader().resizeSection(5,80)
         self.table.horizontalHeader().resizeSection(6,40)
-
-        self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
 
         self.list_of_files_work     = fnm.get_list_of_files_cora_proc_work()
         self.list_of_files_work_log = fnm.get_list_of_files_cora_proc_work_log()
@@ -159,18 +163,21 @@ class GUIRunProc ( QtGui.QWidget ) :
 
             file_exists = os.path.exists(fname)
             logf_exists = os.path.exists(lname)
-            item_fname  = QtGui.QTableWidgetItem( os.path.basename(fname) )
+            item_fname  = QtGui.QTableWidgetItem( str(os.path.basename(fname)) )
             item_exists = QtGui.QTableWidgetItem( self.dict_status[file_exists] )
             item_ctime  = QtGui.QTableWidgetItem( 'N/A' )
             item_size   = QtGui.QTableWidgetItem( 'N/A' )
             item_stime  = QtGui.QTableWidgetItem( 'N/A' )
             item_jobid  = QtGui.QTableWidgetItem( 'N/A' )
-            item_lname  = QtGui.QTableWidgetItem( 'log' ) # os.path.basename(lname) )
+            item_lname  = QtGui.QTableWidgetItem( 'N/A' ) # os.path.basename(lname) )
 
+            item_fname.setCheckState(QtCore.Qt.Checked) # Unchecked, PartiallyChecked, Checked
+
+            item_fname .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter ) #| QtCore.Qt.AlignAbsolute)
             item_exists.setTextAlignment(QtCore.Qt.AlignCenter)
             item_ctime .setTextAlignment(QtCore.Qt.AlignCenter)
-            item_size  .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-            item_stime .setTextAlignment(QtCore.Qt.AlignCenter)
+            item_size  .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter )
+            item_stime .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter | QtCore.Qt.AlignAbsolute)
             item_jobid .setTextAlignment(QtCore.Qt.AlignCenter)
             item_lname .setTextAlignment(QtCore.Qt.AlignCenter)
 
@@ -189,13 +196,16 @@ class GUIRunProc ( QtGui.QWidget ) :
             #self.table.setSpan(self.row, 0, 1, 5)            
             #self.table.setItem(self.row, 0, self.title_split)
 
+        self.table.setFixedWidth(self.table.horizontalHeader().length() + 50)
+
 
     def setTableItems(self) :     
 
+        self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
+
         for row_of_items in self.list_of_items :
             i, fname, item_fname, item_exists, item_ctime, item_size, item_stime, item_jobid, lname, item_lname = row_of_items
-
-            item_fname.setCheckState(0)
+            #print 'set item i, fname, lname : ', i, fname, lname
 
             file_exists = os.path.exists(fname)
             item_exists.setText( self.dict_status[file_exists] )
@@ -206,35 +216,20 @@ class GUIRunProc ( QtGui.QWidget ) :
                 continue
             
             ctime_sec  = os.path.getctime(fname)
-            ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%Y-%m-%d %H:%M:%S')
+            ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%H:%M:%S') # fmt='%Y-%m-%d %H:%M:%S'
             size_byte  = os.path.getsize(fname)
             item_ctime.setText( ctime_str )
             item_size .setText( str(size_byte) )
 
             logf_exists = os.path.exists(fname)
 
-            if not logf_exists : 
-                item_stime.setText( 'N/A' )
-                continue
-
-
-
-
+            if logf_exists : 
+                item_lname.setText( 'log' )
+            else :
+                item_lname.setText( 'N/A' )
 
 
             
-
-    def setStyle(self):
-        self.setMinimumSize(960,660)
-        self.setStyleSheet(cp.styleBkgd)
-
-        self.but_run   .setStyleSheet (cp.styleButton) 
-        self.but_status.setStyleSheet (cp.styleButton)
-        #self.but_files .setStyleSheet (cp.styleButton)
-        self.but_brow  .setStyleSheet (cp.styleButton)
-        self.but_remove.setStyleSheet (cp.styleButtonBad)
-
-        self.but_status.setFixedWidth(100)
 
 
     def resizeEvent(self, e):
@@ -267,51 +262,67 @@ class GUIRunProc ( QtGui.QWidget ) :
 
     def onRun(self):
         logger.debug('onRun', __name__)
-        if self.isReadyToStartRun() :
-            self.onRemove()
-            bjcora.submit_batch_for_cora_split()
-        else :
-            pass
-        job_id_str = str(bjcora.get_batch_job_id_cora_split())
-        time_str   = str(bjcora.get_batch_job_cora_split_time_string())
-        self.setStatus(0,'Batch job '+ job_id_str + ' is submitted at ' + time_str)
+
+        for row_of_items in self.list_of_items :
+            i, fname, item_fname, item_exists, item_ctime, item_size, item_stime, item_jobid, lname, item_lname = row_of_items
+            status = item_fname.checkState()
+
+            if status == QtCore.Qt.Checked :
+                #print 'i, fname, checkState:   ', i, fname, str(status)
+                if self.isReadyToStartRun(i) :
+                    self.onRemove(i)
+                    bjcora.submit_batch_for_cora_proc(i)
+
+                    job_id_str = str(bjcora.get_batch_job_id_cora_proc(i))
+                    time_str   = str(bjcora.get_batch_job_cora_proc_time_string(i))
+
+                    self.list_of_items[i][6].setText(time_str)
+                    self.list_of_items[i][7].setText(job_id_str)
 
 
-    def isReadyToStartRun(self):
+#    def onRunOld(self):
+#        logger.debug('onRun', __name__)
+#        if self.isReadyToStartRun() :
+#            self.onRemove()
+#            bjcora.submit_batch_for_cora_split()
+#        job_id_str = str(bjcora.get_batch_job_id_cora_split())
+#        time_str   = str(bjcora.get_batch_job_cora_split_time_string())
+#        self.setStatus(0,'Batch job '+ job_id_str + ' is submitted at ' + time_str)
 
-        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
 
-        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-            #self.edi_bat_end.setStyleSheet(cp.styleEditBad)
+    def isReadyToStartRun(self, ind):
+
+        fname = fnm.get_list_of_files_cora_split_work()[ind]
+        if not os.path.exists(fname) :
+            msg1 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' does not exist'
             logger.warning(msg1, __name__)
             return False
 
-        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
-            #self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-            #self.edi_bat_start.setStyleSheet(cp.styleEditBad)
-            logger.warning(msg1, __name__)
+        fsize = os.path.getsize(fname)
+        if fsize < 1 :
+            msg2 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' has wrong size(Byte): ' + str(fsize) 
+            logger.warning(msg2, __name__)
             return False
 
-        else :
-            #self.edi_bat_end.setStyleSheet  (cp.styleEditInfo)
-            #self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
-            return True
+        msg3 = 'The file ' + str(fname) + ' exists and its size(Byte): ' + str(fsize) 
+        logger.info(msg3, __name__)
+        return True
 
 
     def onStatus(self):
         logger.debug('onStatus', __name__)
 
-        bjcora.check_batch_job_for_cora_split() # for record in Logger
-        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
-        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
-        status_str = bstatus_str + '   ' + fstatus_str
+#        bjcora.check_batch_job_for_cora_split() # for record in Logger
+#        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
+#        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
+#        status_str = bstatus_str + '   ' + fstatus_str
 
-        if fstatus :
-            self.but_status.setStyleSheet(cp.styleButtonGood)
-            self.setStatus(0, status_str)
-        else :
-            self.but_status.setStyleSheet(cp.styleButtonBad)
-            self.setStatus(2, status_str)
+#        if fstatus :
+#            self.but_status.setStyleSheet(cp.styleButtonGood)
+#            self.setStatus(0, status_str)
+#        else :
+#            self.but_status.setStyleSheet(cp.styleButtonBad)
+#            self.setStatus(2, status_str)
 
         self.setTableItems()
 
@@ -323,16 +334,16 @@ class GUIRunProc ( QtGui.QWidget ) :
             self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split(), \
-                                               fnm.path_cora_split_psana_cfg())
+
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_proc_browser(), \
+                                               fnm.path_cora_proc_tau_out())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
 
-    def onRemove(self):
-        logger.debug('onRemove', __name__)
-        bjcora.remove_files_cora()
-        #self.on_but_status()
+    def onRemove(self, ind=None):
+        logger.debug('onRemove: ind=' + str(ind), __name__)
+        bjcora.remove_files_cora_proc(ind)
         self.onStatus()
 
 
