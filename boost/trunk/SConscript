@@ -33,11 +33,13 @@ del INCDIR
 LIBDIR = "lib"
 
 # boost packages and their dependencies
-pkgs = {'boost_chrono' : 'boost',
+pkgs = {'boost_chrono' : 'boost_system boost',
         'boost_date_time' : 'boost',
         'boost_filesystem' : 'boost_system boost',
-        'boost_graph' : 'boost',
+        'boost_graph' : 'boost_mpi boost_regex boost',
         'boost_iostreams' : 'boost',
+        'boost_math' : 'boost',
+        'boost_mpi' : 'boost',
         'boost_program_options' : 'boost',
         'boost_python' : 'boost python',
         'boost_random' : 'boost',
@@ -46,9 +48,10 @@ pkgs = {'boost_chrono' : 'boost',
         'boost_signals' : 'boost',
         'boost_system' : 'boost',
         'boost_thread' : 'boost',
+        'boost_timer' : 'boost boost_chrono boost_system',
         'boost_unit_test_framework' : 'boost',
-        'boost_wave' : 'boost',
-        'boost_wserialization' : 'boost',
+        'boost_wave' : 'boost_date_time boost_thread boost_filesystem boost_system boost',
+        'boost_wserialization' : 'boost_serialization boost',
         }
 for pkg, dep in pkgs.iteritems():
     DEPS = dep
