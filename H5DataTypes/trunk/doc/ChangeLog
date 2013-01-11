@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-70
+2013-01-10 Andy Salnikov
+- add standard methods to AcqirisTdcConfigV1 (they were missing because 
+  it does not define normal "config" dataset), these are needed for new 
+  model when config datatypes can be storead as event types if they come 
+  from BLD
+
 Tag: V00-00-69
 2013-01-02 Andy Salnikov
 - upgrading to pdsdata V05-03-00

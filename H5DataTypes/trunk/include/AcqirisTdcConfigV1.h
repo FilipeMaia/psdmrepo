@@ -119,6 +119,10 @@ public:
   typedef Pds::Acqiris::TdcConfigV1 XtcType ;
 
   AcqirisTdcConfigV1 () {}
+  AcqirisTdcConfigV1(const XtcType&) {}
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
   static void store ( const XtcType& config, hdf5pp::Group location ) ;
 

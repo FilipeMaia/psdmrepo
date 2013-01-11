@@ -165,6 +165,18 @@ AcqirisTdcVetoIO::native_type()
   return tdcVetoIOType ;
 }
 
+hdf5pp::Type
+AcqirisTdcConfigV1::stored_type()
+{
+  return native_type();
+}
+
+hdf5pp::Type
+AcqirisTdcConfigV1::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<AcqirisTdcConfigV1>() ;
+  return type;
+}
 
 
 void
