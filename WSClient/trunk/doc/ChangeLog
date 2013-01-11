@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-01-10 Andy Salnikov
+- treat content-type with parameters
+
 Tag: V00-00-03
 2009-09-01 Andy Salnikov
 - changed default base URI to point to pswww

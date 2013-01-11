@@ -104,7 +104,7 @@ class WSResource ( object ) :
         
         # handle json stuff
         data = self.data
-        if self.info['Content-Type'] == 'application/json' :
+        if self.info['Content-Type'].split(';')[0] == 'application/json' :
             data = json.loads(data)
         
         return data
