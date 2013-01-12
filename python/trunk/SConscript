@@ -18,13 +18,15 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
+# Python configuration is determined by SConsTools, check SCons tools psdm_python
+
 python = env['PYTHON']   # python with version number such as python2.7
 PREFIX = env['PYTHON_PREFIX']
 INCDIR = env['PYTHON_INCDIR']
 LIBDIR  = env['PYTHON_LIBDIR']
 BINDIR  = env['PYTHON_BINDIR']
 PKGLIBS = python
-LINKLIBS = "lib"+python+".so*"
+LINKLIBS = ["lib"+python+".so*", 'libtcl8.5.so*', 'libtk8.5.so*']
 LINKBINS = ["python", python]
 
 standardExternalPackage('python', **locals())
