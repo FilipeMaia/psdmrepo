@@ -709,7 +709,8 @@ class Plotter(object):
         self.fig = plt.figure(fignum,figsize)
         self.fig.clf()
 
-        self.fig.set_size_inches(self.w*ncol,self.h*nrow, forward=True)
+        # commented-out because it makes funny redraws with Tk backend
+        #self.fig.set_size_inches(self.w*ncol,self.h*nrow, forward=True)
 
         self.fig.suptitle(self.title)
 
