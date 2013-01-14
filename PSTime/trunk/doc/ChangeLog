@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-01-14 Andy Salnikov
+- changing Time::nsec() to return 32-bit integer instead of time_t which
+  is 64-bit 
+
 Tag: V00-01-04
 2013-01-03 Andy Salnikov
 - fix buffer overflow in Duration class

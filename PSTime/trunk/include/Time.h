@@ -207,7 +207,7 @@ public:
   time_t sec() const {return m_utcSec;}
 
   /// returns nanoseconds value
-  time_t nsec() const {return m_utcNsec;}
+  uint32_t nsec() const {return m_utcNsec;}
 
   /// Returns the Time object content via high-resolution time timespec structure.
   struct timespec getTimeSpec() const;
