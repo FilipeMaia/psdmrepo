@@ -138,16 +138,16 @@ class GUIRunProc ( QtGui.QWidget ) :
     def makeTable(self):
         """Makes the table for the list of output and log files"""
         self.table = QtGui.QTableWidget(self.nparts+2, 7, self)
-        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Create time', 'Size(Byte)', 'Submit time', 'Job Id', 'Log'])
+        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Create time', 'Size(Byte)', 'Subm.time', 'Job Id', 'Log'])
         #self.table.setVerticalHeaderLabels([''])
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
         self.table.horizontalHeader().resizeSection(0,200)
-        self.table.horizontalHeader().resizeSection(1,60)
-        self.table.horizontalHeader().resizeSection(2,90)
+        self.table.horizontalHeader().resizeSection(1,50)
+        self.table.horizontalHeader().resizeSection(2,150)
         self.table.horizontalHeader().resizeSection(3,80)
-        self.table.horizontalHeader().resizeSection(4,90)
-        self.table.horizontalHeader().resizeSection(5,80)
+        self.table.horizontalHeader().resizeSection(4,80)
+        self.table.horizontalHeader().resizeSection(5,70)
         self.table.horizontalHeader().resizeSection(6,40)
 
         self.list_of_files_work     = fnm.get_list_of_files_cora_proc_work()
@@ -198,6 +198,17 @@ class GUIRunProc ( QtGui.QWidget ) :
 
         self.table.setFixedWidth(self.table.horizontalHeader().length() + 50)
 
+        #self.item_fname_header = self.table.horizontalHeaderItem(0)
+        #print 'self.item_fname_header.text(): ', self.item_fname_header.text() 
+        #flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
+        #self.item_fname_header.setFlags(flags)
+        #self.item_fname_header.setCheckState(QtCore.Qt.PartiallyChecked) # Unchecked, PartiallyChecked, Checked
+
+        self.cbx = QtGui.QCheckBox(self.table.horizontalHeader())
+        self.cbx.setGeometry(QtCore.QRect(3, 4, 16, 17)) # (self.table.columnWidth(0)/2)
+
+        self.connect(self.cbx,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox )
+
 
     def setTableItems(self) :     
 
@@ -216,7 +227,7 @@ class GUIRunProc ( QtGui.QWidget ) :
                 continue
             
             ctime_sec  = os.path.getctime(fname)
-            ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%H:%M:%S') # fmt='%Y-%m-%d %H:%M:%S'
+            ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%Y-%m-%d %H:%M:%S')
             size_byte  = os.path.getsize(fname)
             item_ctime.setText( ctime_str )
             item_size .setText( str(size_byte) )
@@ -275,8 +286,9 @@ class GUIRunProc ( QtGui.QWidget ) :
 
                     job_id_str = str(bjcora.get_batch_job_id_cora_proc(i))
                     time_str   = str(bjcora.get_batch_job_cora_proc_time_string(i))
+                    time_str_fields = time_str.split(' ')
 
-                    self.list_of_items[i][6].setText(time_str)
+                    self.list_of_items[i][6].setText(time_str_fields[1])
                     self.list_of_items[i][7].setText(job_id_str)
 
 
@@ -309,20 +321,27 @@ class GUIRunProc ( QtGui.QWidget ) :
         return True
 
 
+
+    def onCBox(self):
+        cbx_status = self.cbx.isChecked()
+        logger.info('onStatus: ' + str(cbx_status), __name__)
+
+
+
     def onStatus(self):
         logger.debug('onStatus', __name__)
+        bstatus_str = ''
+#        bjcora.check_batch_job_for_cora_proc() # for record in Logger
+#        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_proc()
+        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
+        status_str = bstatus_str + '   ' + fstatus_str
 
-#        bjcora.check_batch_job_for_cora_split() # for record in Logger
-#        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
-#        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
-#        status_str = bstatus_str + '   ' + fstatus_str
-
-#        if fstatus :
-#            self.but_status.setStyleSheet(cp.styleButtonGood)
-#            self.setStatus(0, status_str)
-#        else :
-#            self.but_status.setStyleSheet(cp.styleButtonBad)
-#            self.setStatus(2, status_str)
+        if fstatus :
+            self.but_status.setStyleSheet(cp.styleButtonGood)
+            self.setStatus(0, status_str)
+        else :
+            self.but_status.setStyleSheet(cp.styleButtonBad)
+            self.setStatus(2, status_str)
 
         self.setTableItems()
 

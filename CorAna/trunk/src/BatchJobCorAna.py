@@ -115,15 +115,18 @@ class BatchJobCorAna(BatchJob) :
     def check_batch_job_for_cora_split(self) :
         self.check_batch_job(self.job_id_cora_split, 'cor. ana. split')
 
-#-----------------------------
-
     def status_for_cora_split_files(self) :
         return self.status_and_string_for_files(fnm.get_list_of_files_cora_split_all(), 'of split: ' )
 
-#-----------------------------
-
     def status_batch_job_for_cora_split(self) :
         return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub_split, 'split')
+
+#-----------------------------
+
+    def status_for_cora_proc_files(self) :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_proc_check(), 'of proc: ' )
+
+#-----------------------------
 
 #-----------------------------
 

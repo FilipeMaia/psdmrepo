@@ -144,8 +144,6 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.table.horizontalHeader().resizeSection(2,150)
         self.table.horizontalHeader().resizeSection(3,120)
 
-        self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
-
         self.row = -1
         self.list_of_items = []
         self.list_of_files = fnm.get_list_of_files_cora_split_all()
@@ -179,10 +177,12 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def setTableItems(self) :     
 
+        #self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
+
         for row_of_items in self.list_of_items :
             i, fname, item_fname, item_exists, item_ctime, item_size = row_of_items
 
-            item_fname.setCheckState(0)
+            #item_fname.setCheckState(0)
 
             file_exists = os.path.exists(fname)
             item_exists.setText( self.dict_status[file_exists] )

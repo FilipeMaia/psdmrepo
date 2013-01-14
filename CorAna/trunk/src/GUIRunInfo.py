@@ -195,6 +195,10 @@ class GUIRunInfo ( QtGui.QWidget ) :
         #self.table_info.setFixedSize(685,150)
         #self.table_info.resize(1,1)
 
+        #self.table_info.horizontalHeader().setStretchLastSection(True)
+        #self.table_info.verticalHeader().setStretchLastSection(True)
+
+
 
     def setTableInfoItems(self) :
 
@@ -261,6 +265,8 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.table.setFixedSize(self.table.horizontalHeader().length() + 42,
                                 self.table.verticalHeader()  .length() + 28)
 
+        #self.table.horizontalHeader().setStretchLastSection(True)
+        #self.table.verticalHeader().setStretchLastSection(True)
 
     def setTableItems(self) :
 

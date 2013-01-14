@@ -294,6 +294,11 @@ class FileNameManager :
                self.get_list_of_files_cora_proc_work() + \
                self.get_list_of_files_cora_proc_work_log()
 
+    def get_list_of_files_cora_proc_check(self) :
+        return [fnm.path_cora_proc_tau_out()] + \
+               self.get_list_of_files_cora_proc_work() + \
+               self.get_list_of_files_cora_proc_work_log()
+
     def get_list_of_files_cora_proc_browser(self) :
         return self.get_list_of_files_cora_proc() + \
                self.get_list_of_files_cora_proc_work_log()
@@ -434,6 +439,10 @@ if __name__ == "__main__" :
     list =   fnm.get_list_of_files_cora_merge()
     for fname in list : print fname
 
+    print '\nfnm.get_list_of_files_cora_proc_check():' 
+    list =   fnm.get_list_of_files_cora_proc_check()
+    for fname in list : print fname
+    
     sys.exit ( 'End of test for FileNameManager' )
 
 #-----------------------------
