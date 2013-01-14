@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-22-01
+2013-01-14 Andy Salnikov
+- implemented special event-type converter for acqiris config data
+  needsd for storting BDL acqiris data types
+
 Tag: V00-22-00
 2013-01-10 Andy Salnikov
 - implement splitting of the shared BLD data types

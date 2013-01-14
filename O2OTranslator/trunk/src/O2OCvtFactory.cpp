@@ -96,6 +96,7 @@
 #include "H5DataTypes/TimepixConfigV3.h"
 #include "H5DataTypes/UsdUsbConfigV1.h"
 #include "H5DataTypes/UsdUsbDataV1.h"
+#include "O2OTranslator/AcqirisConfigV1Cvt.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
 #include "O2OTranslator/AcqirisTdcDataV1Cvt.h"
 #include "O2OTranslator/CameraFrameV1Cvt.h"
@@ -142,15 +143,14 @@ namespace {
     // For every config type we register two converters - regular config converter
     // which works for all sources except BLD, and default event data converter for
     // all BLD sources
-    uint32_t typeIdVal =  Pds::TypeId(typeId, version).value() ;
     O2OCvtFactory::DataTypeCvtPtr cvt;
 
     cvt = make_shared<O2OTranslator::ConfigDataTypeCvt<ConfigType> >(typeGroupName, SrcFilter::deny(SrcFilter::BLD));
-    cvtMap.insert(O2OTranslator::O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
+    registerCvt(cvtMap, typeId, version, cvt);
 
     cvt = make_shared<O2OTranslator::EvtDataTypeCvtDef<ConfigType> >(typeGroupName, chunk_size, compression,
         "config", SrcFilter::allow(SrcFilter::BLD));
-    cvtMap.insert(O2OTranslator::O2OCvtFactory::CvtMap::value_type(typeIdVal, cvt));
+    registerCvt(cvtMap, typeId, version, cvt);
   }
 
 }
@@ -177,7 +177,14 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
   //  ========================== Converters for config types ===============================
   //
 
-  ::registerConfigCvt<H5DataTypes::AcqirisConfigV1>(m_cvtMap, "Acqiris::ConfigV1", Pds::TypeId::Id_AcqConfig, 1, chunk_size, compression);
+  // very special converters for Acqiris config data
+  {
+    O2OCvtFactory::DataTypeCvtPtr cvt;
+    cvt = make_shared<O2OTranslator::ConfigDataTypeCvt<H5DataTypes::AcqirisConfigV1> >("Acqiris::ConfigV1", SrcFilter::deny(SrcFilter::BLD));
+    registerCvt(m_cvtMap, Pds::TypeId::Id_AcqConfig, 1, cvt);
+    cvt = make_shared<AcqirisConfigV1Cvt>("Acqiris::ConfigV1", chunk_size, compression, SrcFilter::allow(SrcFilter::BLD));
+    registerCvt(m_cvtMap, Pds::TypeId::Id_AcqConfig, 1, cvt);
+  }
 
   ::registerConfigCvt<H5DataTypes::AcqirisTdcConfigV1>(m_cvtMap, "Acqiris::AcqirisTdcConfigV1", Pds::TypeId::Id_AcqTdcConfig, 1, chunk_size, compression);
 
