@@ -57,13 +57,13 @@ class BatchJobCorAna(BatchJob) :
         """Creates the empty list for proc. containing ing, jobid and time for all processes"""
         if cp.bat_img_nparts.value() == self.nparts : return
         self.nparts = cp.bat_img_nparts.value()
+        #print 'self.nparts:', self.nparts
 
         self.list_for_proc = []
         for i in range(self.nparts) :
             self.list_for_proc.append([i, None, None])
 
         #print 'self.list_for_proc =', self.list_for_proc
-
 
 #-----------------------------
 
@@ -104,8 +104,8 @@ class BatchJobCorAna(BatchJob) :
         if os.path.exists(tname) : command +=   '-t ' + tname
         queue    = cp.bat_queue.value()
 
-        print 'command  =', command
-        print 'log_file =', log_file, '\n'
+        #print 'command  =', command
+        #print 'log_file =', log_file, '\n'
   
         job_id, out, err = gu.batch_job_submit(command, queue, log_file)
         self.list_for_proc[ind] = [i, job_id, time_sub]
@@ -113,18 +113,22 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def check_batch_job_for_cora_split(self) :
-        self.check_batch_job(self.job_id_cora_split, 'cor. ana. split')
+        self.check_batch_job(self.job_id_cora_split, 'split')
 
     def status_for_cora_split_files(self) :
         return self.status_and_string_for_files(fnm.get_list_of_files_cora_split_all(), 'of split: ' )
 
     def status_batch_job_for_cora_split(self) :
-        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub_split, 'split')
+        return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub_split)
 
 #-----------------------------
 
     def status_for_cora_proc_files(self) :
         return self.status_and_string_for_files(fnm.get_list_of_files_cora_proc_check(), 'of proc: ' )
+
+    def status_batch_job_for_cora_proc(self, ind) :
+        i, job_id, time_sub =  self.list_for_proc[ind]
+        return self.get_batch_job_status(job_id, '')
 
 #-----------------------------
 
@@ -182,7 +186,9 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def get_batch_job_cora_proc_time_string(self, ind) :
-        time_sub_sec = self.list_for_proc[ind][2] 
+        #print 'ind:', ind
+        time_sub_sec = self.list_for_proc[ind][2]
+        if time_sub_sec == None : return 'Time N/A'
         return gu.get_local_time_str(time_sub_sec, fmt='%Y-%m-%d %H:%M:%S')
 
 #-----------------------------

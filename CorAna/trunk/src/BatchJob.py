@@ -101,7 +101,8 @@ class BatchJob :
         else :
             self.batch_job_status = gu.batch_job_status(job_id, cp.bat_queue.value())
 
-        logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 
+        if comment != '' :
+            logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 
         return self.batch_job_status
 
 #-----------------------------
@@ -145,7 +146,8 @@ class BatchJob :
             if os.path.getsize(fname) < 1 :
                 status = False
                 break
-        logger.info('Check file existence and size for the list ' + comment + str(status), __name__)         
+        if comment != '' :
+            logger.info('Check file existence and size for the list ' + comment + str(status), __name__)         
         return status
 
 #-----------------------------

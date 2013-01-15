@@ -31,6 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from FileNameManager        import fnm
+from BatchJobCorAna         import bjcora
 
 #---------------------
 #  Class definition --
@@ -140,15 +141,17 @@ class GUIRunInfo ( QtGui.QWidget ) :
             logger.info('Changed item: ' + s, __name__)
             cp.bat_img_nparts.setValue(s)
             self.setTableItems()
+            bjcora.init_list_for_proc()
         #else :
         #    print 'Changed non-allowed item: ',  str(item.text())  
 
 
-    def onEdiNParts(self) :
-        s = str(self.edi_bat_nparts.text()) 
-        logger.info('onEdiNParts: ' + s, __name__)
-        cp.bat_img_nparts.setValue(s)
-        self.setTableItems()
+#    def onEdiNParts(self) :
+#        s = str(self.edi_bat_nparts.text()) 
+#        logger.info('onEdiNParts: ' + s, __name__)
+#        cp.bat_img_nparts.setValue(s)
+#        self.setTableItems()
+#        bjcora.init_list_for_proc()
 
 
     def makeTableInfo(self) :

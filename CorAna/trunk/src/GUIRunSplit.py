@@ -85,7 +85,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def connectToThread1(self):
         try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
-        except : pass
+        except : logger.warning('connectToThread1 is failed', __name__)
 
 
     def disconnectFromThread1(self):
@@ -94,7 +94,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
 
     def updateStatus(self, text):
-        print 'GUIRunSplit: Signal is recieved ' + str(text)
+        #print 'GUIRunSplit: Signal is recieved ' + str(text)
         self.onStatus()
 
 
@@ -138,6 +138,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)'])
         #self.table.setVerticalHeaderLabels([''])
 
+        self.table.verticalHeader().hide()
+
         self.table.horizontalHeader().setDefaultSectionSize(60)
         self.table.horizontalHeader().resizeSection(0,300)
         self.table.horizontalHeader().resizeSection(1,60)
@@ -172,7 +174,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
             #self.table.setSpan(self.row, 0, 1, 5)            
             #self.table.setItem(self.row, 0, self.title_split)
 
-        self.table.setFixedWidth(self.table.horizontalHeader().length() + 50)
+        self.table.setFixedWidth(self.table.horizontalHeader().length() + 20)
 
 
     def setTableItems(self) :     
@@ -277,7 +279,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
     def onStatus(self):
         logger.debug('onStatus', __name__)
 
-        bjcora.check_batch_job_for_cora_split() # for record in Logger
+        #bjcora.check_batch_job_for_cora_split() # for record in Logger
         bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
         fstatus, fstatus_str = bjcora.status_for_cora_split_files()
         status_str = bstatus_str + '   ' + fstatus_str
