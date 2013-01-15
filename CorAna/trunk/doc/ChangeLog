@@ -12,30 +12,19 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
-2013-01-10 Mikhail S. Dubrovin
+2013-01-15 Mikhail S. Dubrovin
 - add modules:
-A         src/GUIRunProc.py
-
-2013-01-06 Mikhail S. Dubrovin
-- add modules:
-A         app/tcmt
-A         src/ThreadWorker.py
-	
-2012-12-28 Mikhail S. Dubrovin
-- add modules:
-Adding         src/GUIRunInfo.py
-Adding         src/GUIRunSplit.py
-	
-2012-12-19 Mikhail S. Dubrovin
-- add modules:
-A       src/BatchJob.py - as a base class
-A       src/BatchJobCorAna.py
-A       data/scripts/psana-cora-split.cfg
-
-2012-12-14 Mikhail S. Dubrovin
-- add modules:
-A         src/GUIELogPostingFields.py
-A         src/GUIELogPostingDialog.py
+A         src/GUIRunMerge.py
+A         src/GUIRunProc.py                 2013-01-10
+A         app/tcmt                          2013-01-06
+A         src/ThreadWorker.py               2013-01-06
+A         src/GUIRunInfo.py                 2012-12-28
+A         src/GUIRunSplit.py                2012-12-28
+A         src/BatchJob.py                   2012-12-19 - as a base class
+A         src/BatchJobCorAna.py             2012-12-19
+A         data/scripts/psana-cora-split.cfg 2012-12-19
+A         src/GUIELogPostingFields.py       2012-12-14
+A         src/GUIELogPostingDialog.py       2012-12-14
 
 2012-12-07 Mikhail S. Dubrovin
 - Reneme:
@@ -64,22 +53,13 @@ A         src/PlotArrayWidget.py
 
 2012-12-04 Mikhail S. Dubrovin
 - add/remove modules:
-A       data/scripts/psana-data-aver.cfg
-A       data/scripts/psana-peds-aver.cfg
-D       data/scripts/psana-peds.cfg
-	
-2012-12-03 Mikhail S. Dubrovin
-- add/remove modules:
-A         src/BatchJobData.py
-A         src/GUIData.py
-	
-2012-11-29 Mikhail S. Dubrovin
-- add/remove modules:
-A       data/scripts/psana-data-scan.cfg
-
-2012-11-27 Mikhail S. Dubrovin
-- add/remove modules:
-A       src/GUISetupEnergyAngle.py
+A       data/scripts/psana-data-aver.cfg 2012-12-04
+A       data/scripts/psana-peds-aver.cfg 2012-12-04
+D       data/scripts/psana-peds.cfg      2012-12-04
+A       src/BatchJobData.py              2012-12-03
+A       src/GUIData.py                   2012-12-03
+A       data/scripts/psana-data-scan.cfg 2012-11-29
+A       src/GUISetupEnergyAngle.py       2012-11-27
 
 2012-11-26 Mikhail S. Dubrovin
 - add/remove modules:

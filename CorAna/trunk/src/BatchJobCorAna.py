@@ -112,6 +112,23 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
+    def submit_batch_for_cora_merge(self) :
+
+        if not self.job_can_be_submitted(self.job_id_cora_merge, self.time_sub_merge, 'cor. ana. merge') : return
+        self.time_sub_merge = gu.get_time_sec()
+
+        fname    = fnm.get_list_of_files_cora_proc_work()[0]
+        tname    = fnm.path_cora_merge_tau()
+        log_file = fnm.path_cora_merge_batch_log()
+
+        command  = 'corana_merge -f ' + fname + ' -t ' + tname
+        queue    = cp.bat_queue.value()
+
+        #print 'command =', command
+        self.job_id_cora_merge, out, err = gu.batch_job_submit(command, queue, log_file)
+
+#-----------------------------
+
     def check_batch_job_for_cora_split(self) :
         self.check_batch_job(self.job_id_cora_split, 'split')
 
@@ -132,6 +149,17 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
+    def check_batch_job_for_cora_merge(self) :
+        self.check_batch_job(self.job_id_cora_merge, 'merge')
+
+    def status_for_cora_merge_files(self) :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_merge(), 'of merge: ' )
+
+    def status_batch_job_for_cora_merge(self) :
+        return self.get_batch_job_status_and_string(self.job_id_cora_merge, self.time_sub_merge)
+
+#-----------------------------
+
 #-----------------------------
 
 #    def print_work_files_for_data_aver(self) :
@@ -145,7 +173,7 @@ class BatchJobCorAna(BatchJob) :
 #-----------------------------
 
     def remove_files_cora_split(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_cora_split_all(),'of correlation split:')
+        self.remove_files_for_list(fnm.get_list_of_files_cora_split_all(),'of split:')
 
 #-----------------------------
 
@@ -161,12 +189,12 @@ class BatchJobCorAna(BatchJob) :
                                            fnm.get_list_of_files_cora_proc_work_log()[ind]]
 
         #print 'self.list_of_files_to_remove =\n', self.list_of_files_to_remove
-        self.remove_files_for_list(self.list_of_files_to_remove,'of correlation proc:')
+        self.remove_files_for_list(self.list_of_files_to_remove,'of proc:')
 
 #-----------------------------
 
     def remove_files_cora_merge(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_cora_merge(),'of correlation merge:')
+        self.remove_files_for_list(fnm.get_list_of_files_cora_merge_main(),'of merge:')
 
 #-----------------------------
 
@@ -190,6 +218,16 @@ class BatchJobCorAna(BatchJob) :
         time_sub_sec = self.list_for_proc[ind][2]
         if time_sub_sec == None : return 'Time N/A'
         return gu.get_local_time_str(time_sub_sec, fmt='%Y-%m-%d %H:%M:%S')
+
+#-----------------------------
+
+    def get_batch_job_id_cora_merge(self) :
+        return self.job_id_cora_merge
+
+#-----------------------------
+
+    def get_batch_job_cora_merge_time_string(self) :
+        return gu.get_local_time_str(self.time_sub_merge, fmt='%Y-%m-%d %H:%M:%S')
 
 #-----------------------------
 

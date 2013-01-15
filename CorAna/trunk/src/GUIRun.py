@@ -33,6 +33,7 @@ from GUIConfigParameters    import *
 from GUIRunInfo             import *
 from GUIRunSplit            import *
 from GUIRunProc             import *
+from GUIRunMerge            import *
 from Logger                 import logger
 from BatchJobPedestals      import bjpeds
 
@@ -165,8 +166,8 @@ class GUIRun ( QtGui.QWidget ) :
             #self.setStatus(0, 'Status: processing for correlations')
 
         if cp.current_run_tab.value() == self.list_run_types[3] :
-        #    self.gui_win = GUIRunMerge(self)
-            self.gui_win = QtGui.QLineEdit( 'Empty' )
+            self.gui_win = GUIRunMerge(self)
+            #self.gui_win = QtGui.QLineEdit( 'Empty' )
             #self.setStatus(0, 'Status: merging')
 
         if cp.current_run_tab.value() == self.list_run_types[4] :

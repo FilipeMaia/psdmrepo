@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIRunSplit...
+#  Module GUIRunMerge...
 #
 #------------------------------------------------------------------------
 
-"""GUI controls the splitting procedure"""
+"""GUI controls the merging procedure"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -37,13 +37,13 @@ from BatchJobCorAna         import bjcora
 #---------------------
 #  Class definition --
 #---------------------
-class GUIRunSplit ( QtGui.QWidget ) :
-    """GUI controls the splitting procedure"""
+class GUIRunMerge ( QtGui.QWidget ) :
+    """GUI controls the merging procedure"""
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(50, 100, 700, 500)
-        self.setWindowTitle('Run splitting')
+        self.setWindowTitle('Run merging')
         self.setFrame()
 
         self.dict_status = {True  : 'Yes',
@@ -64,7 +64,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxB)
         self.vbox.addLayout(self.hboxS)
         self.vbox.addWidget(self.table)
-        #self.vbox.addStretch(1)     
+        self.vbox.addStretch(1)     
  
         self.setLayout(self.vbox)
 
@@ -90,7 +90,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
 
     def updateStatus(self, text):
-        #print 'GUIRunSplit: Signal is recieved ' + str(text)
+        #print 'GUIRunMerge: Signal is recieved ' + str(text)
         self.onStatus()
 
 
@@ -130,7 +130,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def makeTable(self):
         """Makes the table for the list of output and log files"""
-        self.table = QtGui.QTableWidget(self.nparts+5, 4, self)
+        self.table = QtGui.QTableWidget(3, 4, self)
         self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)'])
         #self.table.setVerticalHeaderLabels([''])
 
@@ -144,7 +144,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
         self.row = -1
         self.list_of_items = []
-        self.list_of_files = fnm.get_list_of_files_cora_split_all()
+        self.list_of_files = fnm.get_list_of_files_cora_merge()
 
         for i, fname in enumerate(self.list_of_files) :
 
@@ -170,7 +170,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
             #self.table.setSpan(self.row, 0, 1, 5)            
             #self.table.setItem(self.row, 0, self.title_split)
 
-        self.table.setFixedWidth(self.table.horizontalHeader().length() + 20)
+        self.table.setFixedWidth(self.table.horizontalHeader().length() + 4)
+        self.table.setFixedHeight(self.table.verticalHeader().length() + 29)
 
 
     def setTableItems(self) :     
@@ -226,7 +227,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
         self.disconnectFromThread1()
 
-        try    : del cp.guirunsplit # GUIRunSplit
+        try    : del cp.guirunmerge # GUIRunMerge
         except : pass
 
         #try    : cp.guiccdsettings.close()
@@ -238,44 +239,33 @@ class GUIRunSplit ( QtGui.QWidget ) :
         self.close()
 
 
-
     def onRun(self):
         logger.debug('onRun', __name__)
         if self.isReadyToStartRun() :
             self.onRemove()
-            bjcora.submit_batch_for_cora_split()
-            job_id_str = str(bjcora.get_batch_job_id_cora_split())
-            time_str   = str(bjcora.get_batch_job_cora_split_time_string())
+            bjcora.submit_batch_for_cora_merge()
+            job_id_str = str(bjcora.get_batch_job_id_cora_merge())
+            time_str   = str(bjcora.get_batch_job_cora_merge_time_string())
             self.setStatus(0,'Batch job '+ job_id_str + ' is submitted at ' + time_str)
 
 
     def isReadyToStartRun(self):
-
-        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
-
-        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-            #self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-            logger.warning(msg1, __name__)
-            return False
-
-        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
-            #self.edi_bat_end.setStyleSheet(cp.styleEditBad)
-            #self.edi_bat_start.setStyleSheet(cp.styleEditBad)
-            logger.warning(msg1, __name__)
-            return False
-
-        else :
-            #self.edi_bat_end.setStyleSheet  (cp.styleEditInfo)
-            #self.edi_bat_start.setStyleSheet(cp.styleEditInfo)
+        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
+        if fstatus : 
+            logger.info(fstatus_str, __name__)
             return True
+        else :
+            msg = 'JOB IS NOT SUBMITTED !!!' + fstatus_str
+            logger.warning(msg, __name__)
+            return False
 
 
     def onStatus(self):
         logger.debug('onStatus', __name__)
 
-        #bjcora.check_batch_job_for_cora_split() # for record in Logger
-        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
-        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
+        #bjcora.check_batch_job_for_cora_merge() # for record in Logger
+        bstatus, bstatus_str = bjcora.status_batch_job_for_cora_merge()
+        fstatus, fstatus_str = bjcora.status_for_cora_merge_files()
         status_str = bstatus_str + '   ' + fstatus_str
 
         if fstatus :
@@ -295,15 +285,15 @@ class GUIRunSplit ( QtGui.QWidget ) :
             self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split(), \
-                                               fnm.path_cora_split_psana_cfg())
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_merge(), \
+                                                     fnm.path_cora_merge_batch_log())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
 
     def onRemove(self):
         logger.debug('onRemove', __name__)
-        bjcora.remove_files_cora_split()
+        bjcora.remove_files_cora_merge()
         self.onStatus()
 
 
@@ -321,7 +311,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIRunSplit ()
+    widget = GUIRunMerge ()
     widget.show()
     app.exec_()
 

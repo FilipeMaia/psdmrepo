@@ -231,6 +231,8 @@ class FileNameManager :
     def path_cora_split_files(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'b*.txt'
 
+
+
     def path_cora_proc_tau_in(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau-in.txt'
 
@@ -239,9 +241,11 @@ class FileNameManager :
 
 
 
+    def path_cora_merge_tau(self) :
+        return self.path_cora_proc_tau_out()
 
     def path_cora_merge_result(self) :
-        return self.path_prefix_cora() + '-' + self.str_run_data() + 'image-result.txt'
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'image-result.bin'
 
     def path_cora_merge_batch_log(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'merge-log.txt'
@@ -313,9 +317,16 @@ class FileNameManager :
 
     def  get_list_of_files_cora_merge(self) :
         self.list_of_files_cora_merge = []
+        self.list_of_files_cora_merge.append(fnm.path_cora_merge_tau())
         self.list_of_files_cora_merge.append(fnm.path_cora_merge_result())
         self.list_of_files_cora_merge.append(fnm.path_cora_merge_batch_log())
         return self.list_of_files_cora_merge
+
+    def  get_list_of_files_cora_merge_main(self) :
+        self.list_of_files_cora_merge_main = []
+        self.list_of_files_cora_merge_main.append(fnm.path_cora_merge_result())
+        self.list_of_files_cora_merge_main.append(fnm.path_cora_merge_batch_log())
+        return self.list_of_files_cora_merge_main
 
 #-----------------------------
 
