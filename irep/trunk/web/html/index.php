@@ -41,7 +41,7 @@ try {
 
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 
-<link type="text/css" href="css/common.css" rel="Stylesheet" />
+<link type="text/css" href="css/fwk.css" rel="Stylesheet" />
 <link type="text/css" href="css/irep.css" rel="Stylesheet" />
 
 <link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
@@ -52,8 +52,11 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
-<script type="text/javascript" src="js/Utilities.js"></script>
+<script type="text/javascript" src="js/datetime.js"></script>
+<script type="text/javascript" src="js/fwk.js"></script>
+<script type="text/javascript" src="js/ws.js"></script>
 <script type="text/javascript" src="js/equipment.js"></script>
+<script type="text/javascript" src="js/issues.js"></script>
 <script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
 
@@ -63,245 +66,6 @@ try {
 <!-- Window layout styles and support actions -->
 
 <style type="text/css">
-
-body {
-  margin: 0 ;
-  padding: 0 ;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;
-  font-size: 13px ;
-}
-#p-top {
-  position: absolute ;
-  top: 0 ;
-  left: 0 ;
-  width: 100% ;
-  height: 129px ;
-  background-color: #e0e0e0 ;
-}
-#p-top-header {
-  position: absolute ;
-  top: 0 ;
-  left: 0 ;
-  width: 100% ;
-  height: 92px ;
-  background-color: #ffffff ;
-}
-#p-top-title {
-  width: 100% ;
-  height: 61px ;
-}
-#p-context-header {
-  width: 100% ;
-  height: 35px ;
-  background-color: #E0E0E0 ;
-  border-bottom: 2px solid #a0a0a0 ;
-}
-#p-title,
-#p-subtitle {
-  font-family: "Times", serif ;
-  font-size: 32px ;
-  font-weight: bold ;
-  text-align: left ;
-}
-#p-subtitle {
-  margin-left: 10px ;
-  color: #0071bc ;
-}
-#p-login {
-  padding-top:   15px ;
-  padding-right: 10px ;
-  font-size:     11px ;
-  font-family:   Arial, Helvetica, Verdana, Sans-Serif ;
-}
-
-a, a.link {
-  text-decoration: none ;
-  font-weight: bold ;
-  color: #0071bc ;
-}
-a:hover, a.link:hover {
-  color: red ;
-}
-#p-left {
-  position: absolute ;
-  left: 0 ;
-  top: 130px ;
-  width: 200px ;
-  overflow: auto ;
-}
-#p-splitter {
-  position: absolute ;
-  left: 200px ;
-  top: 130px ;
-  width: 1px ;
-  overflow: none ;
-  cursor: e-resize ;
-  border-left: 1px solid #a0a0a0 ;
-  border-right: 1px solid #a0a0a0 ;
-}
-#p-center {
-  position: relative ;
-  top:130px ;
-  margin: 0px 0px 20px 203px ;
-  overflow: auto ;
-  background-color: #ffffff ;
-  border-left: 1px solid #a0a0a0 ;
-}
-
-#p-menu {
-  font-family: Arial, sans-serif ;
-  font-size: 14px ;
-  height: 32px ;
-  width: 100% ;
-  border: 0 ;
-  padding: 0 ;
-}
-
-#p-context {
-  margin-left: 0px ;
-  padding-top: 10px ;
-  padding-left: 10px ;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;
-  font-size: 12px ;
-  font-weight: bold ;
-}
-#p-search {
-  padding-top: 2px ;
-  padding-right: 10px ;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;
-  font-size: 11px ;
-}
-
-div.m-item {
-
-  margin-left: 3px ;
-  margin-top: 5px ;
-
-  padding: 5px ;
-  padding-left: 10px ;
-  padding-right: 10px ;
-
-  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x ;
-
-  color: #0071BC ;
-
-  border-right: 2px solid #a0a0a0 ;
-
-  border-radius: 5px ;
-  border-bottom-left-radius: 0 ;
-  border-bottom-right-radius: 0 ;
-
-  -moz-border-radius: 5px ;
-  -moz-border-radius-bottomleft: 0 ;
-  -moz-border-radius-bottomright: 0 ;
-
-  cursor: pointer ;
-}
-
-div.m-item:hover {
-  background: #d0e5f5 url(/jquery/css/custom-theme/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x ;
-}
-div.m-item-first {
-  margin-left: 0px ;
-  float: left ;
-
-  border-top-left-radius: 0 ;
-
-  -moz-border-radius-topleft: 0 ;
-}
-.m-item-next {
-  float: left ;
-}
-.m-item-last {
-  float: left ;
-}
-.m-item-end {
-  clear: both ;
-}
-div.m-select {
-  font-weight: bold ;
-  background: #e0e0e0 ;
-}
-
-#v-menu {
-  width: 100% ;
-  height: 100% ;
-  background: url('img/menu-bg-gradient-4.png') repeat ;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;
-  font-size: 12px ;
-}
-#menu-title {
-  height: 10px ;
-}
-div.v-item {
-  padding: 4px ;
-  padding-left: 10px ;
-  cursor: pointer ;
-}
-div.v-item:hover {
-  background:#f0f0f0 ;
-}
-.v-select {
-  font-weight: bold ;
-}
-.application-workarea {
-  overflow: auto ;
-  padding: 20px ;
-  /*font-family: Lucida Grande, Lucida Sans, Arial, sans-serif ;*/
-  /*font-size: 75% ;*/
-}
-.section1,
-.section2,
-.section3 {
-  margin: 0.25em 0 0.25em 0 ;
-  padding: 0.25em ;
-  padding-left: 0.5em ;
-
-  /*
-  background-color: #DEF0CD ;
-  */
-  border: 2px solid #a0a0a0 ;
-
-  border-left:0 ;
-  border-top:0 ;
-  border-right:0 ;
-  /*
-  border-radius: 5px ;
-  -moz-border-radius: 5px ;
-  */
-  font-family: "Times", serif ;
-  font-size: 36px ;
-  font-weight: bold ;
-  text-align:left ;
-}
-.section2 {
-  font-size: 28px ;
-}
-.section3 {
-  font-size: 18px ;
-}
-.hidden  { display: none ; }
-.visible { display: block ; }
-
-#popupdialogs {
-  display: none ;
-  font-size: 11px ;
-}
-#popupdialogs-varable-size {
-  display: none ;
-  font-size: 11px ;
-}
-
-#infodialogs {
-  display: none ;
-  padding: 20px ;
-  font-size: 11px ;
-}
-#editdialogs {
-  display: none ;
-  padding: 20px ;
-  font-size: 11px ;
-}
 
 #equipment-inventory-controls-left {
   margin-right: 20px;
@@ -313,7 +77,7 @@ div.v-item:hover {
 */
 }
 
-.inventory-form-elem {
+.form-elem {
   width:100%;
 }
 
@@ -410,344 +174,12 @@ span.form_element_info {
 
 <script type="text/javascript">
 
+/* ----------------------------------------------------------
+ *             APPLICATION-SPECIFIC INITIALIZATION
+ * ----------------------------------------------------------
+ */
 var config = new config_create('irep') ;
 
-/* ------------------------------------------------
- *          VERTICAL SPLITTER MANAGEMENT
- * ------------------------------------------------
- */
-function resize () {
-    $('#p-left').height($(window).height()-125-5) ;
-    $('#p-splitter').height($(window).height()-125-5) ;
-    $('#p-center').height($(window).height()-125-5) ;
-}
-
-/* Get mouse position relative to the document.
- */
-function getMousePosition (e) {
-
-    var posx = 0 ;
-    var posy = 0 ;
-    if (!e) var e = window.event ;
-    if (e.pageX || e.pageY)     {
-        posx = e.pageX ;
-        posy = e.pageY ;
-    }
-    else if (e.clientX || e.clientY)     {
-        posx = e.clientX + document.body.scrollLeft
-            + document.documentElement.scrollLeft ;
-        posy = e.clientY + document.body.scrollTop
-            + document.documentElement.scrollTop ;
-    }
-    return {'x': posx, 'y': posy } ;
-}
-
-function move_split (e) {
-    var pos = getMousePosition(e) ;
-    $('#p-left').css('width', pos['x']) ;
-    $('#p-splitter').css('left', pos['x']) ;
-    $('#p-center').css('margin-left', pos['x']+3) ;
-}
-
-$(function () {
-
-    resize() ;
-
-    var mouse_down = false ;
-
-    $('#p-splitter').mousedown (function(e) { mouse_down = true ; return false ; }) ;
-
-    $('#p-left'    ).mousemove(function(e) { if (mouse_down) move_split(e) ; }) ;
-    $('#p-center'  ).mousemove(function(e) { if (mouse_down) move_split(e) ; }) ;
-
-    $('#p-left'    ).mouseup   (function(e) { mouse_down = false ; }) ;
-    $('#p-splitter').mouseup   (function(e) { mouse_down = false ; }) ;
-    $('#p-center'  ).mouseup   (function(e) { mouse_down = false ; }) ;
-}) ;
-
-/* ---------------------------------------------
- *          AUTHENTICATION MANAGEMENT
- * ---------------------------------------------
- */
-var auth_is_authenticated="<?php echo $authdb->isAuthenticated()?>" ;
-var auth_type="<?php echo $authdb->authType()?>" ;
-var auth_remote_user="<?php echo $authdb->authName()?>" ;
-
-var auth_webauth_token_creation="<?php echo $_SERVER['WEBAUTH_TOKEN_CREATION']?>" ;
-var auth_webauth_token_expiration="<?php echo $_SERVER['WEBAUTH_TOKEN_EXPIRATION']?>" ;
-
-function refresh_page() {
-    window.location = "<?php echo $_SERVER['REQUEST_URI']?>" ;
-}
-
-var auth_timer = null ;
-function auth_timer_restart() {
-    if (auth_is_authenticated && (auth_type == 'WebAuth'))
-        auth_timer = window.setTimeout('auth_timer_event()', 1000) ;
-}
-
-var auth_last_secs = null  ;
-function auth_timer_event() {
-
-    var auth_expiration_info = document.getElementById('auth_expiration_info') ;
-    var now = mktime() ;
-    var seconds = auth_webauth_token_expiration - now ;
-    if (seconds <= 0) {
-        $('#popupdialogs').html(
-            '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+
-            'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
-            'of the browser to renew your credentials.</p>'
-        ) ;
-        $('#popupdialogs').dialog({
-            resizable: false,
-            modal: true,
-            buttons: {
-                'Ok': function() {
-                    $(this).dialog('close') ;
-                    refresh_page() ;
-                }
-            },
-            title: 'Session Expiration Notification'
-        }) ;
-        return ;
-    }
-    var hours_left   = Math.floor(seconds / 3600) ;
-    var minutes_left = Math.floor((seconds % 3600) / 60) ;
-    var seconds_left = Math.floor((seconds % 3600) % 60) ;
-
-    var hours_left_str = hours_left ;
-    if (hours_left < 10) hours_left_str = '0'+hours_left_str ;
-    var minutes_left_str = minutes_left ;
-    if (minutes_left < 10) minutes_left_str = '0'+minutes_left_str ;
-    var seconds_left_str = seconds_left ;
-    if (seconds_left < 10) seconds_left_str = '0'+seconds_left_str ;
-
-    auth_expiration_info.innerHTML=
-        '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>' ;
-
-    auth_timer_restart() ;
-}
-
-function logout () {
-    $('#popupdialogs').html(
-        '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+
-        'This will log yout out from the current WebAuth session. Are you sure?</p>'
-    ) ;
-    $('#popupdialogs').dialog({
-        resizable: false,
-        modal: true,
-        buttons: {
-            "Yes": function() {
-                $(this).dialog('close') ;
-                document.cookie = 'webauth_wpt_krb5= ; expires=Fri, 27 Jul 2001 02:47:11 UTC ; path=/' ;
-                document.cookie = 'webauth_at= ; expires=Fri, 27 Jul 2001 02:47:11 UTC ; path=/' ;
-                refresh_page() ;
-            },
-            Cancel: function() {
-                $(this).dialog('close') ;
-            }
-        },
-        title: 'Session Logout Warning'
-    }) ;
-}
-
-$(function () {
-    auth_timer_restart() ;
-}) ;
-
-/* ----------------------------------------------
- *             CONTEXT MANAGEMENT
- * ----------------------------------------------
- */
-var current_tab = '' ;
-
-function set_current_tab (tab) {
-    current_tab = tab ;
-}
-
-function set_context (app) {
-    var ctx = app.full_name+' :' ;
-    if (app.context) ctx += ' '+app.context ;
-    $('#p-context').html(ctx) ;
-}
-
-/* ----------------------------------------------
- *             UTILITY FUNCTIONS
- * ----------------------------------------------
- */
-function show_email (user, addr) {
-    $('#popupdialogs').html('<p>'+addr+'</p>') ;
-    $('#popupdialogs').dialog({
-        modal: true,
-        title: 'e-mail: '+user
-    }) ;
-}
-
-function printer_friendly () {
-    if (current_application != null) {
-        var wa_id = current_application.name ;
-        if (current_application.context != '') wa_id += '-'+current_application.context ;
-        $('#p-center .application-workarea#'+wa_id).printElement({
-            leaveOpen: true,
-            printMode: 'popup',
-            printBodyOptions: {
-                styleToAdd:'font-size:10px ;'
-            }
-        }) ;
-    }    
-}
-
-function ask_yes_no (title, msg, on_yes, on_cancel) {
-    $('#popupdialogs').html(
-        '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'
-    ) ;
-    $('#popupdialogs').dialog({
-        resizable: false,
-        modal: true,
-        buttons: {
-            "Yes": function() {
-                $(this).dialog('close') ;
-                if (on_yes) on_yes() ;
-            },
-            Cancel: function() {
-                $(this).dialog('close') ;
-                if (on_cancel) on_cancel() ;
-            }
-        },
-        title: title
-    }) ;
-}
-
-function ask_for_input (title, msg, on_ok, on_cancel) {
-    $('#popupdialogs-varable-size').html(
-'<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'+
-'<div><textarea rows=4 cols=60></textarea/>'
-    ) ;
-    $('#popupdialogs-varable-size').dialog({
-        resizable: true,
-        modal: true,
-        width:  470,
-        height: 300,
-        buttons: {
-            "Ok": function() {
-                var user_input = $('#popupdialogs-varable-size').find('textarea').val() ;
-                $(this).dialog('close') ;
-                if (on_ok) on_ok(user_input) ;
-            },
-            Cancel: function() {
-                $(this).dialog('close') ;
-                if (on_cancel) on_cancel() ;
-            }
-        },
-        title: title
-    }) ;
-}
-
-function report_error (msg, on_cancel) {
-    $('#popupdialogs').html(
-        '<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'
-    ) ;
-    $('#popupdialogs').dialog({
-        resizable: true,
-        modal: true,
-        buttons: {
-            Cancel: function() {
-                $(this).dialog('close') ;
-                if (on_cancel) on_cancel() ;
-            }
-        },
-        title: 'Error'
-    }) ;
-}
-
-function report_info (title, msg) {
-    $('#infodialogs').html(msg) ;
-    $('#infodialogs').dialog({
-        resizable: true,
-        modal: true,
-        title: title
-    }) ;
-}
-function report_info_table (title, hdr, rows) {
-    var table = new Table('infodialogs', hdr, rows) ;
-    table.display() ;
-    $('#infodialogs').dialog({
-        width: 720,
-        height: 800,
-        resizable: true,
-        modal: true,
-        title: title
-    }) ;
-}
-function report_action (title, msg) {
-    return $('#infodialogs').
-        html(msg).
-        dialog({
-            resizable: true,
-            modal: true,
-            buttons: {
-                Cancel: function() {
-                    $(this).dialog('close') ;
-                }
-            },
-            title: title
-        }) ;
-}
-
-function edit_dialog (title, msg, on_save, on_cancel) {
-    $('#editdialogs').html(msg) ;
-    $('#editdialogs').dialog({
-        resizable: true,
-        width: 640,
-        modal: true,
-        buttons: {
-            Save: function() {
-                $(this).dialog('close') ;
-                if (on_save != null) on_save() ;
-            },
-            Cancel: function() {
-                $(this).dialog('close') ;
-                if (on_cancel != null) on_cancel() ;
-            }
-        },
-        title: title
-    }) ;
-}
-
-function web_service_GET (url, params, on_success, on_failure) {
-    var jqXHR = $.get(url, params, function (data) {
-        if (data.status != 'success') {
-            if (on_failure) on_failure(data.message) ;
-            else            report_error(data.message, null) ;
-            return ;
-        }
-        if (on_success) on_success(data) ;
-    },
-    'JSON').error(function () {
-        var message = 'Web service request to '+url+' failed because of: '+jqXHR.statusText ;
-        if (on_failure) on_failure(message) ;
-        else            report_error(message, null) ;
-    }) ;
-} ;
-function web_service_POST (url, params, on_success, on_failure) {
-    var jqXHR = $.post(url, params, function (data) {
-        if (data.status != 'success') {
-            if (on_failure) on_failure(data.message) ;
-            else            report_error(data.message, null) ;
-            return ;
-        }
-        if (on_success) on_success(data) ;
-    },
-    'JSON').error(function () {
-        var message = 'Web service request to '+url+' failed because of: '+jqXHR.statusText ;
-        if (on_failure) on_failure(message) ;
-        else            report_error(message, null) ;
-    }) ;
-} ;
-/* ------------------------------------------------------
- *             APPLICATION INITIALIZATION
- * ------------------------------------------------------
- */
 var global_current_user = {
     uid:               '<?php echo $authdb->authName        () ;         ?>' ,
     is_other:           <?php echo $irep->is_other          ()?'1':'0' ; ?>  ,
@@ -770,8 +202,9 @@ function global_get_editors() {
     return global_editors ;
 }
 var applications = {
-    'p-appl-equipment'  : equipment,
-    'p-appl-dictionary' : dict,
+    'p-appl-equipment'  : equipment ,
+    'p-appl-issues'     : issues ,
+    'p-appl-dictionary' : dict ,
     'p-appl-admin'      : admin
 } ;
 
@@ -781,8 +214,9 @@ var select_app         = 'equipment' ;
 var select_app_context = 'inventory' ;
 <?php
 $known_apps = array(
-    'equipment'  => True,
-    'dictionary' => True,
+    'equipment'  => True ,
+    'issues'     => True ,
+    'dictionary' => True ,
     'admin'      => True
 ) ;
 if (isset($_GET['app'])) {
@@ -1027,6 +461,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
     </div>
     <div id="p-menu">
       <div class="m-item m-item-first m-select" id="p-appl-equipment" >Equipment</div>
+      <div class="m-item m-item-next"           id="p-appl-issues"    >Issues</div>
       <div class="m-item m-item-next"           id="p-appl-dictionary">Dictionary</div>
       <div class="m-item m-item-last"           id="p-appl-admin"     >Admin</div>
       <div class="m-item-end"></div>
@@ -1056,6 +491,19 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       <div class="v-item" id="add">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left ;"></div>
         <div class="link" style="float:left ;" >Add New Equipment</div>
+        <div style="clear:both ;"></div>
+      </div>
+    </div>
+
+    <div id="issues" class="visible">
+      <div class="v-item" id="search">
+        <div class="ui-icon ui-icon-triangle-1-s" style="float:left ;"></div>
+        <div style="float:left ;" >Search</div>
+        <div style="clear:both ;"></div>
+      </div>
+      <div class="v-item" id="reports">
+        <div class="ui-icon ui-icon-triangle-1-s" style="float:left ;"></div>
+        <div style="float:left ;" >Reports</div>
         <div style="clear:both ;"></div>
       </div>
     </div>
@@ -1104,46 +552,42 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
 <div id="p-center">
   <div id="application-workarea">
 
-    <!-- An interface for displaying an inventory of all known equipment -->
+    <!-- Inventory of all known equipment -->
     <div id="equipment-inventory" class="application-workarea hidden">
-
-      <!-- Controls for selecting equipment for display and updating the list of
-        -- the selected equipment.
-        -->
       <div id="equipment-inventory-controls">
         <div id="equipment-inventory-controls-left" style="float:left ;">
           <form id="equipment-inventory-form">
             <table><tbody>
               <tr>
                  <td><b>Manufacturer:</b></td>
-                  <td><select name="manufacturer" class="inventory-form-elem" ></select></td>
+                  <td><select name="manufacturer" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>Model:</b></td>
-                  <td><select name="model" class="inventory-form-elem" ></select></td>
+                  <td><select name="model" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>Serial number:</b></td>
-                  <td><input type="text" name="serial" size="10" class="inventory-form-elem"  style="padding:2px ;" value="" /></td>
+                  <td><input type="text" name="serial" size="10" class="form-elem"  style="padding:2px ;" value="" /></td>
               </tr>
               <tr><td><b>Location:</b></td>
-                  <td><select name="location" class="inventory-form-elem" ></select></td>
+                  <td><select name="location" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>Custodian:</b></td>
-                  <td><select name="custodian" class="inventory-form-elem" ></select></td>
+                  <td><select name="custodian" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>Property Control #:</b></td>
-                  <td><input type="text" name="pc"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
+                  <td><input type="text" name="pc"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
               </tr>
               <tr><td><b>Status:</b></td>
-                  <td><select name="status" class="inventory-form-elem" ></select></td>
+                  <td><select name="status" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>Sub-status:</b></td>
-                  <td><select name="status2" class="inventory-form-elem" ></select></td>
+                  <td><select name="status2" class="form-elem" ></select></td>
                   <td>&nbsp;</td>
                   <td><b>SLAC ID:</b></td>
-                  <td><input type="text" name="slacid"  size="5" class="inventory-form-elem" style="padding:2px ;" value="" /></td>
+                  <td><input type="text" name="slacid"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
               </tr>
               <tr><td><b>Tag:</b></td>
-                  <td><select name="tag" class="inventory-form-elem" disabled></select></td>
+                  <td><select name="tag" class="form-elem" disabled></select></td>
               </tr>
             </tbody></table>
           </form>
@@ -1186,6 +630,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       </div>
     </div>
 
+    <!-- New equipment registration dialog -->
     <div id="equipment-add" class="application-workarea hidden">
 <?php
     if ($irep->can_edit_inventory()) {
@@ -1270,6 +715,92 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
 ?>
     </div>
 
+    <!-- Search equipment issues -->
+    <div id="issues-search" class="application-workarea hidden">
+
+      <div id="issues-search-controls">
+        <div id="issues-search-controls-left" style="float:left ;">
+          <form id="issues-search-form">
+            <table><tbody>
+              <tr>
+                 <td><b>Manufacturer:</b></td>
+                  <td><select name="manufacturer" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Model:</b></td>
+                  <td><select name="model" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Serial number:</b></td>
+                  <td><input type="text" name="serial" size="10" class="form-elem"  style="padding:2px ;" value="" /></td>
+              </tr>
+              <tr><td><b>Location:</b></td>
+                  <td><select name="location" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Custodian:</b></td>
+                  <td><select name="custodian" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Property Control #:</b></td>
+                  <td><input type="text" name="pc"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
+              </tr>
+              <tr><td><b>Status:</b></td>
+                  <td><select name="status" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Sub-status:</b></td>
+                  <td><select name="status2" class="form-elem" ></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>SLAC ID:</b></td>
+                  <td><input type="text" name="slacid"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
+              </tr>
+              <tr><td><b>Tag:</b></td>
+                  <td><select name="tag" class="form-elem" disabled></select></td>
+              </tr>
+            </tbody></table>
+          </form>
+        </div>
+        <div style="float:left ; margin-left:20px ;">
+          <button name="search" title="refresh the list">Search</button>
+          <button name="reset"  title="reset the search form to the default state">Reset Form</button>
+        </div>
+      </div>
+      <div style="clear:both ;"></div>
+      <div style="float:right ;" id="issues-search-info">&nbsp;</div>
+      <div style="clear:both ;"></div>
+
+      <div id="tabs" style="font-size:12px;">
+        <ul>
+          <li><a href="#results">Search Results</a></li>
+        </ul>
+
+        <div id="results" >
+          <div style=" border:solid 1px #b0b0b0; padding:20px;" >
+            <div style="float:left;">
+              <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="../irep/img/EXCEL_icon.gif" /></button>
+            </div>
+            <div style="float:left; margin-left:20px;">
+              <center><b>&nbsp;</b></center>
+              <div id="view">
+                <input type="radio" id="view_table" name="view" checked="checked" ><label for="view_table" title="view as a table" ><img src="../irep/img/table.png" /></label>
+                <input type="radio" id="view_grid"  name="view"                   ><label for="view_grid"  title="view as a grid"  ><img src="../irep/img/stock_table_borders.png" /></label>
+              </div>
+            </div>
+            <div style="float:left; margin-left:20px;">
+                <center><b>&nbsp;</b></center>
+                <input type="checkbox" id="option_model_image"        ><label for="option_model_image"       > display images of models</label><br>
+                <input type="checkbox" id="option_attachment_preview" ><label for="option_attachment_preview"> preview attachments     </label>
+            </div>
+            <div style="clear:both ;"></div>
+            <div id="issues-search-table" style="margin-top:10px;" ></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Produce reports on equipment issues -->
+    <div id="issues-reports" class="application-workarea hidden">
+      <p>Sorry, this feature is not implemented in this version of the software!</p>
+    </div>
+
+    <!-- Manufactures (dictionary) -->
     <div id="dictionary-manufacturers" class="application-workarea hidden">
       <div><button id="dictionary-manufacturers-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left ;">
@@ -1291,6 +822,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       <div style="clear:both ; "></div>
     </div>
 
+    <!-- Locations (dictionary) -->
     <div id="dictionary-locations" class="application-workarea hidden">
       <div><button id="dictionary-locations-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left ;">
@@ -1312,6 +844,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       <div style="clear:both ; "></div>
     </div>
 
+    <!-- Statuses (dictionary) -->
     <div id="dictionary-statuses" class="application-workarea hidden">
       <div><button id="dictionary-statuses-reload" title="reload the dictionary from the database">Reload</button></div>
       <div style="float:left ;">
@@ -1333,6 +866,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       <div style="clear:both ; "></div>
     </div>
 
+    <!-- Access control -->
     <div id="admin-access" class="application-workarea hidden">
       <div style="float:left ;" ><button id="admin-access-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both ; "></div>
@@ -1390,6 +924,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       </div>
     </div>
 
+    <!-- E-mail notifications -->
     <div id="admin-notifications" class="application-workarea hidden">
       <div style="float:left ;" ><button id="admin-notifications-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both ; "></div>
@@ -1483,6 +1018,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
       </div>
     </div>
 
+    <!-- SLACid ranges -->
     <div id="admin-slacid" class="application-workarea hidden">
       <div style="float:left ;" ><button id="admin-slacid-reload" title="reload from the database">Reload</button></div>
       <div style="clear:both ; "></div>

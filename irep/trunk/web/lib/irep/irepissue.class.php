@@ -12,84 +12,45 @@ use \AuthDB\AuthDB ;
 
 
 /**
- * Class IrepEquipment is an abstraction for equipment.
+ * Class IrepAction is an abstraction for equipment issue actions.
  *
  * @author gapon
  */
-class IrepEquipment {
+class IrepAction {
 
     /* Data members
      */
-    private $irep ;
+    private $issue ;
 
     public $attr ;
 
     /* Constructor
      */
-    public function __construct ($irep, $attr) {
-        $this->irep = $irep ;
+    public function __construct ($issue, $attr) {
+        $this->issue = $issue ;
         $this->attr = $attr ;
     }
 
     /* Properties
      */
-    public function irep         () { return        $this->irep ; }
-    public function id           () { return intval($this->attr['id']) ; }
-    public function status       () { return   trim($this->attr['status']) ; }
-    public function status2      () { return   trim($this->attr['status2']) ; }
-    public function manufacturer () { return   trim($this->attr['manufacturer']) ; }
-    public function model        () { return   trim($this->attr['model']) ; }
-    public function serial       () { return   trim($this->attr['serial']) ; }
-    public function description  () { return   trim($this->attr['description']) ; }
-    public function slacid       () { return intval($this->attr['slacid']) ; }
-    public function pc           () { return   trim($this->attr['pc']) ; }
-    public function custodian    () { return   trim($this->attr['custodian']) ; }
-    public function location     () { return   trim($this->attr['location']) ; }
-    public function room         () { return   trim($this->attr['room']) ; }
-    public function rack         () { return   trim($this->attr['rack']) ; }
-    public function elevation    () { return   trim($this->attr['elevation']) ; }
+    public function issue       () { return        $this->issue ; }
+    public function id          () { return intval($this->attr['id']) ; }
+    public function description () { return   trim($this->attr['description']) ; }
+    public function action      () { return        $this->attr['action'] ; }
 
-    /* --------------
-     *   Properties
-     * --------------
-     */
-    public function property ($name) {
-        if (!array_key_exists($name, $this->attr))
-            throw new IrepException (
-                __METHOD__, "unknown equipment property: {$name}") ;
-        return $this->attr[$name] ;
-    }
-    public function update($properties2update) {
-        $sql_options = '' ;
-        foreach ($properties2update as $property => $value) {
-            $sql_options .= $sql_options == '' ? '' : ',' ;
-            switch ($property) {
-                case 'slacid':
-                    $value_int = intval($value) ;
-                    $sql_options .= "{$property}={$value_int}" ;
-                    break ;
-                default:
-                    $value_escaped = $this->irep()->escape_string(trim($value)) ;
-                    $sql_options .= "{$property}='{$value_escaped}'" ;
-                    break ;
-             }
-         }
-         if ($sql_options != '')
-            $this->irep()->query("UPDATE {$this->irep()->database}.equipment SET {$sql_options} WHERE id={$this->id()}") ;
-    }
-
-    /* --------------
-     *   Atachments
-     * --------------
+    /* ---------------
+     *   Attachments
+     * ---------------
      */
     public function attachments () {
+        $irep = $this->issue()->equipment()->irep() ;
         $list = array () ;
-        $sql = "SELECT id,equipment_id,name,document_type,document_size,create_time,create_uid FROM {$this->irep()->database}.equipment_attachment WHERE equipment_id={$this->id()} ORDER BY create_time" ;
-        $result = $this->irep()->query($sql) ;
+        $sql = "SELECT id,action_id,name,document_type,document_size,create_time,create_uid FROM {$irep->database}.issue_action_attachment WHERE action_id={$this->id()} ORDER BY create_time" ;
+        $result = $irep->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++)
             array_push (
                 $list,
-                new IrepEquipmentAttachment (
+                new IrepActionAttachment (
                     $this ,
                     mysql_fetch_array( $result, MYSQL_ASSOC))) ;
         return $list ;
@@ -102,7 +63,7 @@ class IrepEquipment {
         $now_64           = LusiTime::now()->to64() ;
         $uid_escaped      = $this->irep()->escape_string(trim($uid)) ;
         $sql =<<<HERE
-INSERT INTO {$this->irep()->database}.equipment_attachment
+INSERT INTO {$this->issue()->equipment()->irep()->database}.issue_action_attachment
   VALUES (
     NULL ,
     {$this->id()} ,
@@ -115,10 +76,8 @@ INSERT INTO {$this->irep()->database}.equipment_attachment
     '{$uid_escaped}'
   )
 HERE;
-        $this->irep()->query($sql) ;
-        $attachment = $this->find_attachment_by_('id IN (SELECT LAST_INSERT_ID())') ;
-        $this->irep()->add_history_event($this->id(), 'Modified', array ("Add attachment: {$attachment->name()}")) ;
-        return $attachment ;
+        $this->issue()->issue()->equipment()->irep()->query($sql) ;
+        return $this->find_attachment_by_('id IN (SELECT LAST_INSERT_ID())') ;
     }
     public function find_attachment_by_id ($id) {
         $id = intval($id) ;
