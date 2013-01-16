@@ -147,6 +147,11 @@ class BatchJobCorAna(BatchJob) :
         i, job_id, time_sub =  self.list_for_proc[ind]
         return self.get_batch_job_status(job_id, '')
 
+    def status_batch_job_for_cora_proc_all(self) :
+        ind = 0
+        i, job_id, time_sub =  self.list_for_proc[ind]
+        return self.get_batch_job_status_and_string(job_id, time_sub)
+
 #-----------------------------
 
     def check_batch_job_for_cora_merge(self) :

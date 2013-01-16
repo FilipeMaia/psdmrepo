@@ -88,13 +88,15 @@ class GUIRunInfo ( QtGui.QWidget ) :
         #self.but_apply .setToolTip('Apply changes to configuration parameters.')
         #self.but_show  .setToolTip('Show ...')
 
+
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
+
 
     def setStyle(self):
         self.setMinimumSize(740,350)
