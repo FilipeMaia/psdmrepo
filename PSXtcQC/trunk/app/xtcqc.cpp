@@ -88,7 +88,7 @@ void iterate_over_dgrams_in_xstream(std::vector<std::string>& v_names)
   boost::shared_ptr<ChunkFileIterI> fileItr =
     boost::make_shared<ChunkFileIterList>(file_names.begin(), file_names.end());
 
-  XtcStreamDgIter dgIter(fileItr, 128*1024*1024);
+  XtcStreamDgIter dgIter(fileItr);
   Pds::Dgram* dg;
   unsigned long long dg_first_byte=0;
   unsigned ndgram=0;

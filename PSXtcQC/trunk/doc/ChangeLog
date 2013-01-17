@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-07
+2013-01-17 Andy Salnikov
+- XtcInput interfaces changed a bit, updating dependencies here
+
+=======
 Tag: V00-00-06
 2012-09-22 Andy Salnikov
 - suppress compilation warnings on RHEL6/gcc4
