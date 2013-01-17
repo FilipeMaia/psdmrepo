@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2013-01-16 Andy Salnikov
+- fix in AppCmdOptSize, _changed flag was not updated
+
 Tag: V00-01-10
 2011-10-24 Andy Salnikov
 - removed include Lusi.h

@@ -159,6 +159,7 @@ AppCmdOptSize::setValue ( const std::string& value ) throw(AppCmdException)
   if ( *eptr != '\0' ) throw AppCmdTypeCvtException ( value, "size" ) ;
 
   _value = tmp ;
+  _changed = true ;
 }
 
 /**
