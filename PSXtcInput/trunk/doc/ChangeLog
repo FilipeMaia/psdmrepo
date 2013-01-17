@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2013-01-16 Andy Salnikov
+- XtcInput interfaces changed, fixing dependencies here
+
 Tag: V00-05-00
 2012-09-11 Andy Salnikov
 - EventId interface defines new methods, implement them here in XtcEventId

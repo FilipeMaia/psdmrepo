@@ -131,14 +131,13 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   }
   
   // start reader thread
-  unsigned dgSizeMB = config("dgSizeMB", 128U);
   std::string liveDbConn = configStr("liveDbConn", "");
   std::string liveTable = configStr("liveTable", "file");
   unsigned liveTimeout = config("liveTimeout", 120U);
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
   m_readerThread.reset( new boost::thread( DgramReader ( fileNames.begin(), fileNames.end(), 
-      *m_dgQueue, dgSizeMB*1048576, merge, liveDbConn, liveTable, liveTimeout, l1offset) ) );
+      *m_dgQueue, merge, liveDbConn, liveTable, liveTimeout, l1offset) ) );
   
   // try to read first event and see if it is a Configure transition
   XtcInput::Dgram dg(m_dgQueue->pop());
