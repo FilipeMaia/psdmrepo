@@ -30,7 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from GUIConfigParameters    import *
-from GUIRunInfo             import *
+from GUIRunInput             import *
 from GUIRunSplit            import *
 from GUIRunProc             import *
 from GUIRunMerge            import *
@@ -62,7 +62,7 @@ class GUIRun ( QtGui.QWidget ) :
         #self.hboxB.addStretch(1)     
         #self.hboxB.addWidget(self.but_save)
 
-        self.list_run_types = ['Info', 'Split', 'Process', 'Merge', 'Auto']
+        self.list_run_types = ['Input', 'Split', 'Process', 'Merge', 'Auto']
         self.makeTabBar()
         self.guiSelector()
 
@@ -154,8 +154,8 @@ class GUIRun ( QtGui.QWidget ) :
         except : pass
 
         if cp.current_run_tab.value() == self.list_run_types[0] :
-            self.gui_win = GUIRunInfo(self)
-            #self.setStatus(0, 'Status: run info')
+            self.gui_win = GUIRunInput(self)
+            #self.setStatus(0, 'Status: run input info')
             
         if cp.current_run_tab.value() == self.list_run_types[1] :
             self.gui_win = GUIRunSplit(self)

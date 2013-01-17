@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIRunInfo ...
+#  Module GUIRunInput ...
 #
 #------------------------------------------------------------------------
 
-"""GUI for run information"""
+"""GUI for run input information"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -36,18 +36,18 @@ from BatchJobCorAna         import bjcora
 #---------------------
 #  Class definition --
 #---------------------
-class GUIRunInfo ( QtGui.QWidget ) :
-    """GUI for run information"""
+class GUIRunInput ( QtGui.QWidget ) :
+    """GUI for run input information"""
 
     def __init__ ( self, parent=None ) :
 
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(100, 10, 740, 350)
-        self.setWindowTitle('Run information')
+        self.setWindowTitle('Run input information')
         self.setFrame()
  
-        self.tit_title  = QtGui.QLabel('Run information')
+        self.tit_title  = QtGui.QLabel('Input information')
         self.tit_status = QtGui.QLabel('Status:')
 
         self.makeTableInfo()
@@ -128,7 +128,7 @@ class GUIRunInfo ( QtGui.QWidget ) :
         #try    : cp.guisystemsettingsright.close()
         #except : pass
 
-        try    : del cp.guiruninfo # GUIRunInfo
+        try    : del cp.guiruninput # GUIRunInput
         except : pass
 
 
@@ -287,6 +287,7 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.item_size     .setBackgroundColor (cp.colorEditInfo)
         self.item_part_size.setBackgroundColor (cp.colorEditInfo)
         self.item_nparts   .setBackgroundColor (cp.colorEdit)
+        self.item_control  .setBackgroundColor (cp.colorEdit)
 
         self.setEditableField()
 
@@ -322,6 +323,7 @@ class GUIRunInfo ( QtGui.QWidget ) :
             logger.info('Changed item: ' + s, __name__)
             cp.bat_img_nparts.setValue(s)
             self.setTableItems()
+            bjcora.remove_files_cora_all()
             bjcora.init_list_for_proc()
 
         self.table.blockSignals(False)
@@ -357,7 +359,7 @@ class GUIRunInfo ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIRunInfo ()
+    widget = GUIRunInput ()
     widget.show()
     app.exec_()
 

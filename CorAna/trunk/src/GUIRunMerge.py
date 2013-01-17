@@ -58,7 +58,6 @@ class GUIRunMerge ( QtGui.QWidget ) :
 
         self.makeButtons()
         self.makeTable()
-        self.onStatus()
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
@@ -71,6 +70,7 @@ class GUIRunMerge ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
         
+        self.onStatus()
         self.connectToThread1()
 
         
@@ -115,7 +115,7 @@ class GUIRunMerge ( QtGui.QWidget ) :
     def makeButtons(self):
         """Makes the horizontal box with buttons"""
         self.but_run    = QtGui.QPushButton('Run') 
-        self.but_status = QtGui.QPushButton('Check status') 
+        self.but_status = QtGui.QPushButton('Status') 
         self.but_brow   = QtGui.QPushButton('Browse') 
         self.but_remove = QtGui.QPushButton('Remove files') 
 

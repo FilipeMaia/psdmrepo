@@ -62,7 +62,6 @@ class GUIRunAuto ( QtGui.QWidget ) :
         self.vboxS.addWidget(self.lab_status_merge)
 
         self.makeButtons()
-        self.onStatus()
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
@@ -74,6 +73,7 @@ class GUIRunAuto ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
         
+        self.onStatus()
         self.connectToThread1()
 
         
@@ -84,12 +84,12 @@ class GUIRunAuto ( QtGui.QWidget ) :
 
     def connectToThread1(self):
         try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
-        except : logger.warning('connectToThread1 is failed', __name__)
+        except : logger.warning('connectToThread1 IS FAILED !!!', __name__)
 
 
     def disconnectFromThread1(self):
         try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
-        except : pass
+        except : logger.warning('connectToThread1 IS FAILED !!!', __name__)
 
 
     def updateStatus(self, text):
@@ -171,126 +171,13 @@ class GUIRunAuto ( QtGui.QWidget ) :
 
 #-----------------------------
 
-    def onStop(self):
-        cp.autoRunStatus = 0            
-        self.killAllBatchJobs()
-        logger.info('Auto-processing IS STOPPED', __name__)
-
-
-    def killAllBatchJobs(self):
-        logger.debug('stopBatchJobs', __name__)
-        bjcora.kill_batch_job_for_cora_split()
-        bjcora.kill_batch_job_for_cora_merge()
-        for i in range(self.nparts) :
-            bjcora.kill_batch_job_for_cora_proc(i)
-
-#-----------------------------
-
     def onRun(self):
         logger.debug('onRun', __name__)
+        bjcora.start_auto_processing()
 
-        if cp.autoRunStatus != 0 :            
-            logger.warning('Auto run procedure is already active in stage '+str(cp.autoRunStatus), __name__)
-
-        else :
-            self.removeWorkFilesBeforeAutoRun()
-            self.onRunSplit()
-
-#-----------------------------
-
-    def updateRunState(self):
-        logger.info('Auto run stage '+str(cp.autoRunStatus), __name__)
-
-        if   cp.autoRunStatus == 1 and self.status_split :            
-            logger.info('updateRunState: Split is completed, begin processing', __name__)
-            self.onRunProc()
-
-        elif cp.autoRunStatus == 2 and self.status_proc : 
-            logger.info('updateRunState: Processing is completed, begin merging', __name__)
-            self.onRunMerge()
-
-        elif cp.autoRunStatus == 3 and self.status_merge : 
-            logger.info('updateRunState: Merging is completed, stop auto-run', __name__)
-            cp.autoRunStatus = 0            
-
-#-----------------------------
-
-    def removeWorkFilesBeforeAutoRun(self):
-        logger.debug('removeFilesBeforeAutoRun', __name__)
-        bjcora.remove_files_cora_split()
-        bjcora.remove_files_cora_merge()
-        for i in range(self.nparts) :
-            bjcora.remove_files_cora_proc(i)
-
-#-----------------------------
-
-    def onRunSplit(self):
-        logger.debug('onRunSplit', __name__)
-        if self.isReadyToStartRunSplit() :
-            bjcora.submit_batch_for_cora_split()
-            cp.autoRunStatus = 1
-
-
-    def isReadyToStartRunSplit(self):
-        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
-        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
-            logger.warning(msg1, __name__)
-            return False
-
-        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
-            logger.warning(msg1, __name__)
-            return False
-
-        else :
-            return True
-
-#-----------------------------
-
-    def onRunProc(self):
-        logger.debug('onRunProc', __name__)
-
-        for i in range(self.nparts) :
-            if self.isReadyToStartRunProc(i) :
-                bjcora.submit_batch_for_cora_proc(i)
-                cp.autoRunStatus = 2
-
-
-    def isReadyToStartRunProc(self, ind):
-
-        fname = fnm.get_list_of_files_cora_split_work()[ind]
-        if not os.path.exists(fname) :
-            msg1 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' does not exist'
-            logger.warning(msg1, __name__)
-            return False
-
-        fsize = os.path.getsize(fname)
-        if fsize < 1 :
-            msg2 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' has wrong size(Byte): ' + str(fsize) 
-            logger.warning(msg2, __name__)
-            return False
-
-        msg3 = 'The file ' + str(fname) + ' exists and its size(Byte): ' + str(fsize) 
-        logger.info(msg3, __name__)
-        return True
-
-#-----------------------------
-
-    def onRunMerge(self):
-        logger.debug('onRunMerge', __name__)
-        if self.isReadyToStartRunMerge() :
-            bjcora.submit_batch_for_cora_merge()
-            cp.autoRunStatus = 3
-
-
-    def isReadyToStartRunMerge(self):
-        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
-        if fstatus : 
-            logger.info(fstatus_str, __name__)
-            return True
-        else :
-            msg = 'JOB IS NOT SUBMITTED !!!' + fstatus_str
-            logger.warning(msg, __name__)
-            return False
+    def onStop(self):
+        logger.debug('onStop', __name__)
+        bjcora.stop_auto_processing()
 
 #-----------------------------
 
@@ -299,8 +186,6 @@ class GUIRunAuto ( QtGui.QWidget ) :
         self.onStatusProc()
         self.onStatusMerge()
 
-        if cp.autoRunStatus : self.updateRunState()
-
 
     def onStatusSplit(self):
         logger.debug('onStatusSplit', __name__)
@@ -308,7 +193,6 @@ class GUIRunAuto ( QtGui.QWidget ) :
         fstatus, fstatus_str = bjcora.status_for_cora_split_files(comment='')
         status_str = '1. SPLIT: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_split, status_str)
-        self.status_split = fstatus
 
 
     def onStatusProc(self):
@@ -317,7 +201,6 @@ class GUIRunAuto ( QtGui.QWidget ) :
         fstatus, fstatus_str = bjcora.status_for_cora_proc_files(comment='')
         status_str = '2. PROC: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_proc, status_str)
-        self.status_proc = fstatus
 
 
     def onStatusMerge(self):
@@ -327,7 +210,6 @@ class GUIRunAuto ( QtGui.QWidget ) :
         status_str = '3. MERGE: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_merge, status_str)
         self.setStatusButton(fstatus)
-        self.status_merge = fstatus
 
 
     def setStatusButton(self, status):

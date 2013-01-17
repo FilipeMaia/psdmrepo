@@ -28,10 +28,11 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 
 from BatchJob import *
+from PyQt4 import QtGui, QtCore # need it in order to use QtCore.QObject for connect
 
 #-----------------------------
 
-class BatchJobCorAna(BatchJob) :
+class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in order to connect to signals
     """Deals with batch jobs for correlation analysis.
     """
 
@@ -41,6 +42,7 @@ class BatchJobCorAna(BatchJob) :
         """
 
         BatchJob.__init__(self)
+        QtCore.QObject.__init__(self, None)
 
         self.job_id_cora_split = None
         self.time_sub_split    = None
@@ -175,8 +177,6 @@ class BatchJobCorAna(BatchJob) :
 
 #-----------------------------
 
-#-----------------------------
-
 #    def print_work_files_for_data_aver(self) :
 #        self.print_files_for_list(fnm.get_list_of_files_cora_split(),'of correlation analysis:')
 
@@ -244,6 +244,162 @@ class BatchJobCorAna(BatchJob) :
     def get_batch_job_cora_merge_time_string(self) :
         return gu.get_local_time_str(self.time_sub_merge, fmt='%Y-%m-%d %H:%M:%S')
 
+#-----------------------------
+
+    def remove_files_cora_all(self):
+        logger.debug('remove_files_cora_all', __name__)
+        self.remove_files_cora_split()
+        self.remove_files_cora_merge()
+        for i in range(self.nparts) :
+            self.remove_files_cora_proc(i)
+
+#-----------------------------
+#-----------------------------
+#----- AUTO-PROCESSING -------
+#-----------------------------
+#-----------------------------
+
+    def connectToThread1(self):
+        try : self.connect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+        except : logger.warning('connectToThread1 IS FAILED !!!', __name__)
+
+
+    def disconnectFromThread1(self):
+        try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+        except : logger.warning('disconnectFromThread1 IS FAILED !!!', __name__)
+
+
+    def updateStatus(self, text):
+        #print 'BatchJobCorAna: Signal is recieved ' + str(text)
+        self.auto_processing_status()
+
+#-----------------------------
+
+    def stop_auto_processing(self) :
+        cp.autoRunStatus = 0            
+        self.kill_all_batch_jobs()
+        logger.info('Auto-processing IS STOPPED', __name__)
+        self.disconnectFromThread1()
+
+
+    def kill_all_batch_jobs(self):
+        logger.debug('kill_all_batch_jobs', __name__)
+        self.kill_batch_job_for_cora_split()
+        self.kill_batch_job_for_cora_merge()
+        for i in range(self.nparts) :
+            self.kill_batch_job_for_cora_proc(i)
+
+#-----------------------------
+
+    def start_auto_processing(self) :
+        if cp.autoRunStatus != 0 :            
+            logger.warning('Auto-processing procedure is already active in stage '+str(cp.autoRunStatus), __name__)
+        else :
+            self.connectToThread1()
+            self.remove_files_cora_all()
+            self.onRunSplit()
+
+#-----------------------------
+
+    def auto_processing_status(self):
+        if cp.autoRunStatus : self.updateRunState()
+
+#-----------------------------
+
+    def updateRunState(self):
+        logger.info('Auto run stage '+str(cp.autoRunStatus), __name__)
+
+        self.status_split, fstatus_str_split = bjcora.status_for_cora_split_files(comment='')
+        self.status_proc,  fstatus_str_proc  = bjcora.status_for_cora_proc_files (comment='')
+        self.status_merge, fstatus_str_merge = bjcora.status_for_cora_merge_files(comment='')
+
+        if   cp.autoRunStatus == 1 and self.status_split :            
+            logger.info('updateRunState: Split is completed, begin processing', __name__)
+            self.onRunProc()
+
+        elif cp.autoRunStatus == 2 and self.status_proc : 
+            logger.info('updateRunState: Processing is completed, begin merging', __name__)
+            self.onRunMerge()
+
+        elif cp.autoRunStatus == 3 and self.status_merge : 
+            logger.info('updateRunState: Merging is completed, stop auto-run', __name__)
+            cp.autoRunStatus = 0            
+            self.disconnectFromThread1()
+        
+#-----------------------------
+
+    def onRunSplit(self):
+        logger.debug('onRunSplit', __name__)
+        if self.isReadyToStartRunSplit() :
+            self.submit_batch_for_cora_split()
+            cp.autoRunStatus = 1
+
+
+    def isReadyToStartRunSplit(self):
+        msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
+        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
+            logger.warning(msg1, __name__)
+            return False
+
+        elif(cp.bat_data_start.value() >= cp.bat_data_end.value()) :
+            logger.warning(msg1, __name__)
+            return False
+
+        else :
+            return True
+
+#-----------------------------
+
+    def onRunProc(self):
+        logger.debug('onRunProc', __name__)
+
+        for i in range(self.nparts) :
+            if self.isReadyToStartRunProc(i) :
+                self.submit_batch_for_cora_proc(i)
+                cp.autoRunStatus = 2
+
+
+    def isReadyToStartRunProc(self, ind):
+
+        fname = fnm.get_list_of_files_cora_split_work()[ind]
+        if not os.path.exists(fname) :
+            msg1 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' does not exist'
+            logger.warning(msg1, __name__)
+            return False
+
+        fsize = os.path.getsize(fname)
+        if fsize < 1 :
+            msg2 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' has wrong size(Byte): ' + str(fsize) 
+            logger.warning(msg2, __name__)
+            return False
+
+        msg3 = 'The file ' + str(fname) + ' exists and its size(Byte): ' + str(fsize) 
+        logger.info(msg3, __name__)
+        return True
+
+#-----------------------------
+
+    def onRunMerge(self):
+        logger.debug('onRunMerge', __name__)
+        if self.isReadyToStartRunMerge() :
+            self.submit_batch_for_cora_merge()
+            cp.autoRunStatus = 3
+
+
+    def isReadyToStartRunMerge(self):
+        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
+        if fstatus : 
+            logger.info(fstatus_str, __name__)
+            return True
+        else :
+            msg = 'JOB IS NOT SUBMITTED !!!' + fstatus_str
+            logger.warning(msg, __name__)
+            return False
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
 #-----------------------------
 
 bjcora = BatchJobCorAna ()

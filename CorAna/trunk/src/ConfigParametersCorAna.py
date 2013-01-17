@@ -169,7 +169,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.current_file_tab  = self.declareParameter( name='CURRENT_FILE_TAB' , val_def='Work/Results', type='str' )
 
         # GUIRun.py
-        self.current_run_tab   = self.declareParameter( name='CURRENT_RUN_TAB' , val_def='Info', type='str' )
+        self.current_run_tab   = self.declareParameter( name='CURRENT_RUN_TAB' , val_def='Input', type='str' )
 
         # GUIWorkResDirs.py
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )

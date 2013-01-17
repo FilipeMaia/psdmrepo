@@ -131,7 +131,7 @@ class BatchJob :
 
         msg = 'Job Id: ' + str(job_id) + \
               ' was submitted at ' + str(time_str) + \
-              '    Status:' + str(status)
+              '    Status: ' + str(status)
         return status, msg
 
 #-----------------------------

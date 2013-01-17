@@ -57,7 +57,6 @@ class GUIRunProc ( QtGui.QWidget ) :
         self.hboxS.addWidget(self.lab_status)
         self.makeButtons()
         self.makeTable()
-        self.onStatus()        # calls self.setTableItems()
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
@@ -68,6 +67,7 @@ class GUIRunProc ( QtGui.QWidget ) :
         self.setLayout(self.vbox)
         self.showToolTips()
 
+        self.onStatus()        # calls self.setTableItems()
         self.connectToThread1()
         
     #-------------------
@@ -110,7 +110,7 @@ class GUIRunProc ( QtGui.QWidget ) :
     def makeButtons(self):
         """Makes the horizontal box with buttons"""
         self.but_run    = QtGui.QPushButton('Run') 
-        self.but_status = QtGui.QPushButton('Check status') 
+        self.but_status = QtGui.QPushButton('Status') 
         self.but_brow   = QtGui.QPushButton('Browse') 
         self.but_remove = QtGui.QPushButton('Remove files') 
 
