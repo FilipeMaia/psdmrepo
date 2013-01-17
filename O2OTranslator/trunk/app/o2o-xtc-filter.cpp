@@ -75,7 +75,6 @@ private:
   // more command line options and arguments
   AppCmdOpt<int>              m_calibIndexOpt ;
   AppCmdOptList<int>          m_eventIndexOpt ;
-  AppCmdOptSize               m_dgramsize ;
   AppCmdOpt<unsigned int>     m_dgramQSize ;
   AppCmdOpt<std::string>      m_liveDbConn;
   AppCmdOpt<std::string>      m_liveTable;
@@ -95,7 +94,6 @@ O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
   : AppUtils::AppBase( appName )
   , m_calibIndexOpt( 'c', "calib-index", "number", "select event from given calib cycle, def: -1", -1 )
   , m_eventIndexOpt( 'e', "event-index", "number", "select event with given index, more than one possible" )
-  , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 128M", 128*1048576ULL )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
   , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
@@ -105,7 +103,6 @@ O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
 {
   addOption( m_calibIndexOpt ) ;
   addOption( m_eventIndexOpt ) ;
-  addOption( m_dgramsize ) ;
   addOption( m_dgramQSize ) ;
   addOption( m_liveDbConn ) ;
   addOption( m_liveTable ) ;
@@ -141,7 +138,7 @@ O2O_XTC_Filter::runApp ()
 
   // start datagram reading thread
   boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue,
-      m_dgramsize.value(), XtcInput::MergeFileName, m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), 0 ) ) ;
+      XtcInput::MergeFileName, m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), 0 ) ) ;
 
   // seen transitions
   Pds::ClockTime transitions[Pds::TransitionId::NumberOf];

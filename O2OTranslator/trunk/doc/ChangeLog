@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-23-00
+2013-01-16 Andy Salnikov
+- XtcInput interfaces changed, fixing dependencies here
+
 Tag: V00-22-01
 2013-01-14 Andy Salnikov
 - implemented special event-type converter for acqiris config data

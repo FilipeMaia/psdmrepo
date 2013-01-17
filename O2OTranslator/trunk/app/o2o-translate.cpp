@@ -119,7 +119,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
   , m_calibDir   ( 'C', "calib-dir",    "path",     "directory with calibration data, def: none", "" )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
-  , m_dgramsize  ( 'g', "datagram-size","size",     "max datagram buffer size. def: 128M", 128*1048576ULL )
+  , m_dgramsize  ( 'g', "datagram-size","size",     "option is ignored and deprecated", 0 )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
@@ -193,6 +193,11 @@ O2O_Translate::runApp ()
   MsgLogRoot( info, "Starting translator process " << start_time ) ;
   MsgLogRoot( info, "Command line: " <<  this->cmdline() ) ;
 
+  // check options
+  if (m_dgramsize.valueChanged()) {
+    MsgLogRoot(warning, "option --" << m_dgramsize.longOption() << " is deprecated and ignored");
+  }
+
   WithMsgLogRoot( info, log ) {
     typedef AppCmdOptList<std::string>::const_iterator Iter ;
     log << "input files or datasets:";
@@ -238,7 +243,7 @@ O2O_Translate::runApp ()
 
   // start datagram reading thread
   boost::thread readerThread( XtcInput::DgramReader ( m_eventData.begin(), m_eventData.end(), 
-      dgqueue, m_dgramsize.value(), m_mergeMode.value(), m_liveDbConn.value(), m_liveTable.value(),
+      dgqueue, m_mergeMode.value(), m_liveDbConn.value(), m_liveTable.value(),
       m_liveTimeout.value(), m_l1offset.value() ) ) ;
 
   uint64_t count = 0 ;

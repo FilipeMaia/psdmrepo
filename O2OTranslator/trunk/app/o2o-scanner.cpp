@@ -171,7 +171,7 @@ O2O_Scanner::runApp ()
   XtcInput::DgramQueue dgqueue( 1 ) ;
 
   // start datagram reading thread
-  boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue, 128*1024*1024,
+  boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue,
           m_mergeMode.value(), m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), m_l1offset.value() ) ) ;
 
   // loop until there are events
