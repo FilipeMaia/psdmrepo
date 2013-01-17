@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/ChunkFileIterI.h"
+#include "XtcInput/DgHeader.h"
 #include "XtcInput/Dgram.h"
 #include "XtcInput/XtcFileName.h"
 
@@ -91,10 +92,19 @@ protected:
 
 private:
 
+  // fill the read-ahead queue
+  void readAhead();
+
+  // add one header to the queue in a correct position
+  void queueHeader(const boost::shared_ptr<DgHeader>& header);
+
+  typedef std::vector<boost::shared_ptr<DgHeader> > HeaderQueue;
+
   boost::shared_ptr<ChunkFileIterI> m_chunkIter;  ///< Iterator over chunk file names
   XtcFileName m_file;                   ///< Name of the current chunk
   boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk
+  HeaderQueue m_headerQueue;            ///< Queue for read-ahead headers
 
 };
 

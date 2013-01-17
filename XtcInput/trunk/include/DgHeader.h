@@ -70,6 +70,15 @@ public:
   /// Returns offset of the next header (if there is any)
   off_t nextOffset() const;
 
+  /// Get transition type
+  Pds::TransitionId::Value transition() const { return m_header.seq.service(); }
+
+  /// Get transition time
+  const Pds::ClockTime& clock() const { return m_header.seq.clock(); }
+
+  /// Get damage
+  Pds::Damage damage() const { return m_header.xtc.damage; }
+
   /// Reads complete datagram into memory
   Dgram::ptr dgram();
 

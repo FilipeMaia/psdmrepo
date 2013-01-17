@@ -78,7 +78,7 @@ private:
 
   static Dgram::ptr makeDgram(size_t payloadSize);
   static int open(std::string fileName);
-  static bool checkDg(Dgram::ptr dg, bool empty, int payload);
+  static bool checkDg(const boost::shared_ptr<DgHeader>& hptr, bool empty, int payload);
 
   // more command line options and arguments
   AppUtils::AppCmdOpt<int> m_timeoutOpt ;
@@ -134,20 +134,20 @@ XtcChunkDgIterTest::test1()
   std::string fname = m_pathArg.value();
   writer1(5, fname);
 
-  XtcChunkDgIter iter(fname, 1024*1024, 0);
-  Dgram::ptr dg;
-  dg = iter.next();
-  if (not checkDg(dg, false, 100)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 110)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 120)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 130)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 140)) return;
-  dg = iter.next();
-  if (not checkDg(dg, true, 0)) return;
+  XtcChunkDgIter iter(fname, 0);
+  boost::shared_ptr<DgHeader> hptr;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 100)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 110)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 120)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 130)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 140)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, true, 0)) return;
 
   unlink(fname.c_str());
 }
@@ -164,20 +164,20 @@ XtcChunkDgIterTest::test2()
   std::string fname = m_pathArg.value() + ".inprogress";
   writer1(5, fname);
 
-  XtcChunkDgIter iter(fname, 1024*1024, 3);
-  Dgram::ptr dg;
-  dg = iter.next();
-  if (not checkDg(dg, false, 100)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 110)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 120)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 130)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 140)) return;
+  XtcChunkDgIter iter(fname, 3);
+  boost::shared_ptr<DgHeader> hptr;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 100)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 110)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 120)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 130)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 140)) return;
   try {
-    dg = iter.next();
+    hptr = iter.next();
     MsgLog("test2", error, "did not receive expected timeout exception");
   } catch (const XTCLiveTimeout& exc) {
   }
@@ -202,16 +202,16 @@ XtcChunkDgIterTest::test3()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 1024*1024, 6);
-  Dgram::ptr dg;
-  dg = iter.next();
-  if (not checkDg(dg, false, 100)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 110)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 120)) return;
-  dg = iter.next();
-  if (not checkDg(dg, true, 0)) return;
+  XtcChunkDgIter iter(fname, 6);
+  boost::shared_ptr<DgHeader> hptr;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 100)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 110)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 120)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, true, 0)) return;
 
   thread.join();
   unlink(finalname.c_str());
@@ -235,16 +235,16 @@ XtcChunkDgIterTest::test4()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 1024*1024, 5);
-  Dgram::ptr dg;
-  dg = iter.next();
-  if (not checkDg(dg, false, 100)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 110)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 120)) return;
-  dg = iter.next();
-  if (not checkDg(dg, true, 0)) return;
+  XtcChunkDgIter iter(fname, 5);
+  boost::shared_ptr<DgHeader> hptr;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 100)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 110)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 120)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, true, 0)) return;
 
   thread.join();
   unlink(finalname.c_str());
@@ -266,16 +266,16 @@ XtcChunkDgIterTest::test5()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 1024*1024, 5);
-  Dgram::ptr dg;
-  dg = iter.next();
-  if (not checkDg(dg, false, 100)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 110)) return;
-  dg = iter.next();
-  if (not checkDg(dg, false, 120)) return;
+  XtcChunkDgIter iter(fname, 5);
+  boost::shared_ptr<DgHeader> hptr;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 100)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 110)) return;
+  hptr = iter.next();
+  if (not checkDg(hptr, false, 120)) return;
   try {
-    dg = iter.next();
+    hptr = iter.next();
     MsgLog("test5", error, "did not receive expected timeout exception");
   } catch (const XTCLiveTimeout& exc) {
   }
@@ -285,19 +285,22 @@ XtcChunkDgIterTest::test5()
 }
 
 bool
-XtcChunkDgIterTest::checkDg(Dgram::ptr dg, bool empty, int payload)
+XtcChunkDgIterTest::checkDg(const boost::shared_ptr<DgHeader>& hptr, bool empty, int payload)
 {
-  if (not empty and not dg) {
+  if (not empty and not hptr) {
     MsgLog("test1", error, "expected non-empty datagram, got empty");
     return false;
   }
-  if (empty and dg) {
+  if (empty and hptr) {
     MsgLog("test1", error, "expected empty datagram, got non-empty");
     return false;
   }
-  if (not empty and dg->xtc.sizeofPayload() != payload) {
-    MsgLog("test1", error, "expected payload size " << payload << ", got " << dg->xtc.sizeofPayload());
-    return false;
+  if (not empty) {
+    Dgram::ptr dg = hptr->dgram();
+    if (dg->xtc.sizeofPayload() != payload) {
+      MsgLog("test1", error, "expected payload size " << payload << ", got " << dg->xtc.sizeofPayload());
+      return false;
+   }
   }
   return true;
 }

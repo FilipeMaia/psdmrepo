@@ -152,9 +152,11 @@ XtcFilterTest::runApp ()
   const int DgSize = 16*1024*1024;
   XtcChunkDgIter dgIter(m_inputArg.value(), DgSize);
 
-  Dgram::ptr dg = dgIter.next();
+  boost::shared_ptr<DgHeader> hptr = dgIter.next();
   char* buffer = new char[DgSize];
-  while (dg) {
+  while (hptr) {
+
+    Dgram::ptr dg = hptr->dgram();
 
     size_t size = filter.filter(dg.get(), buffer);
 
@@ -164,7 +166,7 @@ XtcFilterTest::runApp ()
       write(fd, buffer, size);
     }
 
-    dg = dgIter.next();
+    hptr = dgIter.next();
   }
 
   close(fd);
