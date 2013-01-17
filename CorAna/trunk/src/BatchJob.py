@@ -94,6 +94,20 @@ class BatchJob :
 
 #-----------------------------
 
+    def kill_batch_job(self, job_id, comment='') :
+
+        if job_id == None :
+            #logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
+            return
+
+        lines = gu.batch_job_kill(job_id)
+        msg = 'Kill batch job ' + job_id + ' ' + comment + ':\n'
+        for line in lines :
+            msg += line
+        logger.info(msg, __name__) 
+
+#-----------------------------
+
     def get_batch_job_status(self, job_id, comment='') :
 
         if job_id == None :

@@ -177,6 +177,14 @@ def batch_job_check(job_id_str, queue='psnehq') :
     else         : return out
 
 
+def batch_job_kill(job_id_str) :
+    command = ['kill', job_id_str]
+    #print 'command:', command
+    out, err = subproc(command)
+    if err != '' : return err + '\n' + out
+    else         : return out
+
+
 def batch_job_status(job_id_str, queue='psnehq') :
     p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 

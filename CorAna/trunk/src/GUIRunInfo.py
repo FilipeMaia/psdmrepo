@@ -132,21 +132,6 @@ class GUIRunInfo ( QtGui.QWidget ) :
         except : pass
 
 
-    def onItem(self, item):
-        logger.debug('Clicked on item: ' + str(item.text()) , __name__)
-
-
-    def onItemChanged(self, item):
-        logger.debug('onItemChanged', __name__)
-        if item == self.item_nparts :
-            s = str(item.text()) 
-            logger.info('Changed item: ' + s, __name__)
-            cp.bat_img_nparts.setValue(s)
-            self.setTableItems()
-            bjcora.init_list_for_proc()
-        #else :
-        #    print 'Changed non-allowed item: ',  str(item.text())  
-
 
 #    def onEdiNParts(self) :
 #        s = str(self.edi_bat_nparts.text()) 
@@ -227,13 +212,15 @@ class GUIRunInfo ( QtGui.QWidget ) :
 
 
     def makeTable(self) :
-        self.table = QtGui.QTableWidget(1,6,self)
-        self.table.setHorizontalHeaderLabels(['#Parts','#Rows', '#Cols', 'Img size', 'Part size', 'Rest'])
-        self.table.setVerticalHeaderLabels(['Set:'])
+        self.table = QtGui.QTableWidget(1,7,self)
+        self.table.setHorizontalHeaderLabels(['#Parts', '#Rows', '#Cols', 'Img size', 'Part size', 'Rest', 'Control'])
+        #self.table.setVerticalHeaderLabels(['Set:'])
+        self.table.verticalHeader().hide()
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
         self.table.horizontalHeader().resizeSection(3,80)
         self.table.horizontalHeader().resizeSection(4,80)
+        self.table.horizontalHeader().resizeSection(6,70)
 
         #self.edi_bat_nparts = QtGui.QLineEdit       (str(cp.bat_img_nparts.value()))        
         #self.item_nparts    = QtGui.QTableWidget(self.edi_bat_nparts)
@@ -244,6 +231,7 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.item_size      = QtGui.QTableWidgetItem(str(cp.bat_img_size.value()))
         self.item_part_size = QtGui.QTableWidgetItem('y')
         self.item_rest_size = QtGui.QTableWidgetItem('z')
+        self.item_control   = QtGui.QTableWidgetItem('lock')
 
         item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags)
         self.item_rows     .setFlags(item_flags)
@@ -251,6 +239,9 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.item_size     .setFlags(item_flags)
         self.item_part_size.setFlags(item_flags)
         self.item_rest_size.setFlags(item_flags)
+
+        self.item_control  .setCheckState(QtCore.Qt.Checked) # Unchecked, PartiallyChecked, Checked
+        self.item_control  .setFlags(QtCore.Qt.ItemFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled))
 
         self.setTableItems()
 
@@ -260,18 +251,21 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.table.setItem(0, 3, self.item_size)
         self.table.setItem(0, 4, self.item_part_size)
         self.table.setItem(0, 5, self.item_rest_size)
+        self.table.setItem(0, 6, self.item_control)
         #self.table.setCellWidget(0, 3, self.edi_bat_nparts)
         
-        self.table.itemClicked.connect(self.onItem)
-        self.table.itemChanged.connect(self.onItemChanged)
-        #self.connect( self.edi_bat_nparts, QtCore.SIGNAL('editingFinished()'), self.onEdiNParts)
-        #self.table.setFixedSize(445,60)
 
-        self.table.setFixedSize(self.table.horizontalHeader().length() + 42,
+        #self.table.setFixedSize(445,60)
+        self.table.setFixedSize(self.table.horizontalHeader().length() + 4,
                                 self.table.verticalHeader()  .length() + 28)
 
         #self.table.horizontalHeader().setStretchLastSection(True)
         #self.table.verticalHeader().setStretchLastSection(True)
+
+        self.table.itemChanged.connect(self.onItemChanged)
+        #self.connect( self.edi_bat_nparts, QtCore.SIGNAL('editingFinished()'), self.onEdiNParts)
+
+
 
     def setTableItems(self) :
 
@@ -291,14 +285,47 @@ class GUIRunInfo ( QtGui.QWidget ) :
         self.item_rows     .setBackgroundColor (cp.colorEditInfo)
         self.item_cols     .setBackgroundColor (cp.colorEditInfo)
         self.item_size     .setBackgroundColor (cp.colorEditInfo)
-        self.item_nparts   .setBackgroundColor (cp.colorEdit)
         self.item_part_size.setBackgroundColor (cp.colorEditInfo)
+        self.item_nparts   .setBackgroundColor (cp.colorEdit)
+
+        self.setEditableField()
 
         if rest_size == 0 :
             self.item_rest_size.setBackgroundColor (cp.colorEditInfo)
         else :
             self.item_rest_size.setBackgroundColor (cp.colorEditBad)
-            #self.item_nparts   .setBackgroundColor (cp.colorEditBad)
+ 
+
+    def setEditableField(self) :
+        if self.item_control.checkState() == QtCore.Qt.Checked :
+            self.item_nparts.setBackgroundColor (cp.colorEditInfo)
+            self.item_nparts.setFlags(QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags))
+        else :
+            self.item_nparts.setBackgroundColor (cp.colorEdit)
+            self.item_nparts.setFlags(QtCore.Qt.ItemFlags(QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled))
+ 
+
+    def onItemChanged(self, item):
+        logger.debug('onItemChanged', __name__)
+
+        self.table.blockSignals(True)
+
+        if item == self.item_control :
+            s = str(item.text()) 
+            logger.info('Changed item: ' + s + ' state: ' + str(item.checkState()), __name__)
+            #self.setTableItems()
+            self.setEditableField()
+
+
+        elif item == self.item_nparts :
+            s = str(item.text()) 
+            logger.info('Changed item: ' + s, __name__)
+            cp.bat_img_nparts.setValue(s)
+            self.setTableItems()
+            bjcora.init_list_for_proc()
+
+        self.table.blockSignals(False)
+
 
 
     def onClose(self):

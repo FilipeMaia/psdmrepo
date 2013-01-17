@@ -132,20 +132,27 @@ class BatchJobCorAna(BatchJob) :
     def check_batch_job_for_cora_split(self) :
         self.check_batch_job(self.job_id_cora_split, 'split')
 
-    def status_for_cora_split_files(self) :
-        return self.status_and_string_for_files(fnm.get_list_of_files_cora_split_all(), 'of split: ' )
+    def kill_batch_job_for_cora_split(self) :
+        self.kill_batch_job(self.job_id_cora_split, 'for split')
+
+    def status_for_cora_split_files(self, comment='of split: ') :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_split_all(), comment )
 
     def status_batch_job_for_cora_split(self) :
         return self.get_batch_job_status_and_string(self.job_id_cora_split, self.time_sub_split)
 
 #-----------------------------
 
-    def status_for_cora_proc_files(self) :
-        return self.status_and_string_for_files(fnm.get_list_of_files_cora_proc_check(), 'of proc: ' )
+    def status_for_cora_proc_files(self, comment='of proc: ') :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_proc_check(), comment )
 
     def status_batch_job_for_cora_proc(self, ind) :
         i, job_id, time_sub =  self.list_for_proc[ind]
         return self.get_batch_job_status(job_id, '')
+
+    def kill_batch_job_for_cora_proc(self, ind) :
+        i, job_id, time_sub =  self.list_for_proc[ind]
+        return self.kill_batch_job(job_id, 'for proc')
 
     def status_batch_job_for_cora_proc_all(self) :
         ind = 0
@@ -157,8 +164,11 @@ class BatchJobCorAna(BatchJob) :
     def check_batch_job_for_cora_merge(self) :
         self.check_batch_job(self.job_id_cora_merge, 'merge')
 
-    def status_for_cora_merge_files(self) :
-        return self.status_and_string_for_files(fnm.get_list_of_files_cora_merge(), 'of merge: ' )
+    def kill_batch_job_for_cora_merge(self) :
+        self.kill_batch_job(self.job_id_cora_merge, 'for merge')
+
+    def status_for_cora_merge_files(self, comment='of merge: ' ) :
+        return self.status_and_string_for_files(fnm.get_list_of_files_cora_merge(), comment )
 
     def status_batch_job_for_cora_merge(self) :
         return self.get_batch_job_status_and_string(self.job_id_cora_merge, self.time_sub_merge)

@@ -92,6 +92,10 @@ class GUIRunProc ( QtGui.QWidget ) :
     def showToolTips(self):
         msg = 'GUI sets system parameters.'
         #self.tit_sys_ram_size.setToolTip(msg)
+        self.but_run   .setToolTip('Submit batch job')  
+        self.but_status.setToolTip('Update status info.\nStatus is self-updated by timer')
+        self.but_brow  .setToolTip('Open/close file browser')
+        self.but_remove.setToolTip('Remove output files')
 
 
     def setFrame(self):
@@ -410,7 +414,7 @@ class GUIRunProc ( QtGui.QWidget ) :
         bstatus_str = ''
         #bjcora.check_batch_job_for_cora_proc() # for record in Logger
         #bstatus, bstatus_str = bjcora.status_batch_job_for_cora_proc()
-        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
+        fstatus, fstatus_str = bjcora.status_for_cora_proc_files(comment='')
         #status_str = bstatus_str + '   ' + fstatus_str
         status_str = fstatus_str
 

@@ -100,6 +100,9 @@ class GUIRunAuto ( QtGui.QWidget ) :
     def showToolTips(self):
         msg = 'GUI sets system parameters.'
         #self.tit_sys_ram_size.setToolTip(msg)
+        self.but_run   .setToolTip('Start auto-processing of the data file')
+        self.but_status.setToolTip('Update status info.\nStatus is self-updated by timer.')
+        self.but_stop  .setToolTip('Stop auto-processing')
 
 
     def setFrame(self):
@@ -114,15 +117,18 @@ class GUIRunAuto ( QtGui.QWidget ) :
     def makeButtons(self):
         """Makes the horizontal box with buttons"""
         self.but_run    = QtGui.QPushButton('Run') 
-        self.but_status = QtGui.QPushButton('Check status') 
+        self.but_status = QtGui.QPushButton('Status') 
+        self.but_stop   = QtGui.QPushButton('Stop') 
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.but_run)
         self.hboxB.addWidget(self.but_status)
+        self.hboxB.addWidget(self.but_stop)
         self.hboxB.addStretch(1)     
 
         self.connect( self.but_run,    QtCore.SIGNAL('clicked()'), self.onRun    )
         self.connect( self.but_status, QtCore.SIGNAL('clicked()'), self.onStatus )
+        self.connect( self.but_stop,   QtCore.SIGNAL('clicked()'), self.onStop   )
 
 
     def setStyle(self):
@@ -131,6 +137,7 @@ class GUIRunAuto ( QtGui.QWidget ) :
 
         self.but_run   .setStyleSheet (cp.styleButton) 
         self.but_status.setStyleSheet (cp.styleButton)
+        self.but_stop  .setStyleSheet (cp.styleButton)
 
         self.but_status.setFixedWidth(100)
 
@@ -164,25 +171,64 @@ class GUIRunAuto ( QtGui.QWidget ) :
 
 #-----------------------------
 
+    def onStop(self):
+        cp.autoRunStatus = 0            
+        self.killAllBatchJobs()
+        logger.info('Auto-processing IS STOPPED', __name__)
+
+
+    def killAllBatchJobs(self):
+        logger.debug('stopBatchJobs', __name__)
+        bjcora.kill_batch_job_for_cora_split()
+        bjcora.kill_batch_job_for_cora_merge()
+        for i in range(self.nparts) :
+            bjcora.kill_batch_job_for_cora_proc(i)
+
+#-----------------------------
+
     def onRun(self):
         logger.debug('onRun', __name__)
 
-        #if not self.status_split :
-        #    self.onRunSplit()
+        if cp.autoRunStatus != 0 :            
+            logger.warning('Auto run procedure is already active in stage '+str(cp.autoRunStatus), __name__)
 
-        #if not self.status_proc :
-        #    self.onRunProc()
+        else :
+            self.removeWorkFilesBeforeAutoRun()
+            self.onRunSplit()
 
-        #if not self.status_merge :
-        #    self.onRunMerge()
+#-----------------------------
+
+    def updateRunState(self):
+        logger.info('Auto run stage '+str(cp.autoRunStatus), __name__)
+
+        if   cp.autoRunStatus == 1 and self.status_split :            
+            logger.info('updateRunState: Split is completed, begin processing', __name__)
+            self.onRunProc()
+
+        elif cp.autoRunStatus == 2 and self.status_proc : 
+            logger.info('updateRunState: Processing is completed, begin merging', __name__)
+            self.onRunMerge()
+
+        elif cp.autoRunStatus == 3 and self.status_merge : 
+            logger.info('updateRunState: Merging is completed, stop auto-run', __name__)
+            cp.autoRunStatus = 0            
+
+#-----------------------------
+
+    def removeWorkFilesBeforeAutoRun(self):
+        logger.debug('removeFilesBeforeAutoRun', __name__)
+        bjcora.remove_files_cora_split()
+        bjcora.remove_files_cora_merge()
+        for i in range(self.nparts) :
+            bjcora.remove_files_cora_proc(i)
 
 #-----------------------------
 
     def onRunSplit(self):
         logger.debug('onRunSplit', __name__)
         if self.isReadyToStartRunSplit() :
-            bjcora.remove_files_cora_split()
             bjcora.submit_batch_for_cora_split()
+            cp.autoRunStatus = 1
 
 
     def isReadyToStartRunSplit(self):
@@ -205,8 +251,8 @@ class GUIRunAuto ( QtGui.QWidget ) :
 
         for i in range(self.nparts) :
             if self.isReadyToStartRunProc(i) :
-                bjcora.remove_files_cora_proc(i)
                 bjcora.submit_batch_for_cora_proc(i)
+                cp.autoRunStatus = 2
 
 
     def isReadyToStartRunProc(self, ind):
@@ -232,8 +278,8 @@ class GUIRunAuto ( QtGui.QWidget ) :
     def onRunMerge(self):
         logger.debug('onRunMerge', __name__)
         if self.isReadyToStartRunMerge() :
-            bjcora.remove_files_cora_merge()
             bjcora.submit_batch_for_cora_merge()
+            cp.autoRunStatus = 3
 
 
     def isReadyToStartRunMerge(self):
@@ -253,11 +299,13 @@ class GUIRunAuto ( QtGui.QWidget ) :
         self.onStatusProc()
         self.onStatusMerge()
 
+        if cp.autoRunStatus : self.updateRunState()
+
 
     def onStatusSplit(self):
         logger.debug('onStatusSplit', __name__)
         bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
-        fstatus, fstatus_str = bjcora.status_for_cora_split_files()
+        fstatus, fstatus_str = bjcora.status_for_cora_split_files(comment='')
         status_str = '1. SPLIT: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_split, status_str)
         self.status_split = fstatus
@@ -266,7 +314,7 @@ class GUIRunAuto ( QtGui.QWidget ) :
     def onStatusProc(self):
         logger.debug('onStatusProc', __name__)
         bstatus, bstatus_str = bjcora.status_batch_job_for_cora_proc_all()
-        fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
+        fstatus, fstatus_str = bjcora.status_for_cora_proc_files(comment='')
         status_str = '2. PROC: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_proc, status_str)
         self.status_proc = fstatus
@@ -275,7 +323,7 @@ class GUIRunAuto ( QtGui.QWidget ) :
     def onStatusMerge(self):
         logger.debug('onStatusMerge', __name__)
         bstatus, bstatus_str = bjcora.status_batch_job_for_cora_merge()
-        fstatus, fstatus_str = bjcora.status_for_cora_merge_files()
+        fstatus, fstatus_str = bjcora.status_for_cora_merge_files(comment='')
         status_str = '3. MERGE: ' + bstatus_str + '   ' + fstatus_str
         self.setStatusMessage(fstatus, self.lab_status_merge, status_str)
         self.setStatusButton(fstatus)
