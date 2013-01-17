@@ -65,7 +65,7 @@ public:
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-      size_t maxDgSize, double l1OffsetSec = 0 ) ;
+      double l1OffsetSec = 0 ) ;
 
   // Destructor
   ~XtcStreamMerger () ;

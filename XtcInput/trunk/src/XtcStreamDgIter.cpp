@@ -47,9 +47,8 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize)
+XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter)
   : m_chunkIter(chunkIter)
-  , m_maxDgSize(maxDgSize)
   , m_file()
   , m_dgiter()
   , m_count(0)
@@ -81,17 +80,20 @@ XtcStreamDgIter::next()
 
       // open next xtc file if there is none open
       MsgLog(logger, trace, "processing file: " << m_file) ;
-      m_dgiter = boost::make_shared<XtcChunkDgIter>(m_file.path(), m_maxDgSize, m_chunkIter->liveTimeout());
+      m_dgiter = boost::make_shared<XtcChunkDgIter>(m_file.path(), m_chunkIter->liveTimeout());
       m_count = 0 ;
     }
 
     // try to read next event from it
-    dgram = m_dgiter->next() ;
-    ++ m_count ;
+    boost::shared_ptr<DgHeader> hptr = m_dgiter->next() ;
 
     // if failed to read go to next file
-    if ( not dgram.get() ) {
+    if (not hptr) {
       m_dgiter.reset();
+    } else {
+      // read full datagram
+      dgram = hptr->dgram();
+      ++ m_count ;
     }
 
   }

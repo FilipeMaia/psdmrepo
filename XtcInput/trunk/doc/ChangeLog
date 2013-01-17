@@ -11,6 +11,20 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-01-16 Andy Salnikov
+- preparing for datagram read-ahead and sorting, for now introduce
+  new class DgHeader that will be used in read-ahead
+- split XtcStreamDgIter into three classes: SharedFile, DgHeader and
+  same XtcStreamDgIter. XtcStreamDgIter now returns DgHeader instead 
+  of whole datagram. DgHeader reads datagram when requested. Both
+  XtcStreamDgIter and DgHeader used SharedFile class for reading.
+- maximum datagram size removed from interfaces (constructors), there 
+  is one internal limit on datagram size (256MB) used for checking 
+  against header corruption
+- there are no changes in the order of datagrams yet, all results should
+  be identical to what we had before
+
 Tag: V00-06-06
 2012-10-11 Andy Salnikov
 - if live database contains no info about files then RunFileIterLive 

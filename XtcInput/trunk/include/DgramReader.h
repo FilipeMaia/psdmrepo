@@ -55,12 +55,11 @@ public:
 
   // Default constructor
   template <typename Iter>
-  DgramReader(Iter begin, Iter end, DgramQueue& queue, size_t maxDgSize, MergeMode mode,
+  DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
       double l1OffsetSec = 0 )
     : m_files(begin, end)
     , m_queue( queue )
-    , m_maxDgSize( maxDgSize )
     , m_mode( mode )
     , m_liveDbConn(liveDbConn)
     , m_liveTable(liveTable)

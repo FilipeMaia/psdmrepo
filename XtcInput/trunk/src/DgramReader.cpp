@@ -162,7 +162,7 @@ try {
 
   if (fileIter) {
 
-    XtcMergeIterator iter(fileIter, m_maxDgSize, m_l1OffsetSec);
+    XtcMergeIterator iter(fileIter, m_l1OffsetSec);
     Dgram dg;
     while ( not boost::this_thread::interruption_requested() ) {
 

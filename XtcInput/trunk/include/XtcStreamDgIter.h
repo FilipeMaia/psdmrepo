@@ -64,9 +64,8 @@ public:
    *  Constructor accepts iterator object which iterators over chunks in a stream.
    *
    *  @param[in]  chunkIter Iterator over chunks in a stream
-   *  @param[in]  maxDgSize Maximum allowed datagram size
    */
-  XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, size_t maxDgSize);
+  XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter);
 
   // Destructor
   ~XtcStreamDgIter () ;
@@ -93,7 +92,6 @@ protected:
 private:
 
   boost::shared_ptr<ChunkFileIterI> m_chunkIter;  ///< Iterator over chunk file names
-  size_t m_maxDgSize ;                  ///< Maximum allowed datagram size
   XtcFileName m_file;                   ///< Name of the current chunk
   boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk

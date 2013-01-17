@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -27,7 +28,8 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "XtcInput/Dgram.h"
+#include "XtcInput/DgHeader.h"
+#include "XtcInput/SharedFile.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -60,20 +62,18 @@ public:
    *  then it assumes that file can grow while we are reading it.
    *
    *  @param[in]  path         Path name for XTC file
-   *  @param[in]  maxDgramSize Maximum datagram size, if datagram in file exceeds this size
-   *                     then an exception will be generated
    *  @param[in]  liveTimeout  If non-zero then defines timeout in seconds for reading live
    *                     data files, if zero assumes that files is closed already
    *
    *  @throw FileOpenException Thrown in case file cannot be open.
    */
-  XtcChunkDgIter (const std::string& path, size_t maxDgramSize, unsigned liveTimeout = 0) ;
+  XtcChunkDgIter (const std::string& path, unsigned liveTimeout = 0) ;
 
   // Destructor
   ~XtcChunkDgIter () ;
 
   /**
-   *  @brief Returns next datagram, zero on EOF, throws exceptions for errors
+   *  @brief Returns next datagram header, zero on EOF, throws exceptions for errors
    *
    *  If reading ".inprogress" file stops at EOF and there is no
    *  new data for "live timeout" seconds then XTCLiveTimeout exception
@@ -81,29 +81,19 @@ public:
    *  File is assumed to be closed and does not grow any more when
    *  it is renamed and ".inprogess" extension is dropped.
    *
-   *  @return Shared pointer to datagram object
+   *  @return Shared pointer to datagram header object
    *
    *  @throw XTCReadException Thrown for any read errors
    *  @throw XTCLiveTimeout Thrown for timeout during live data reading
    */
-  Dgram::ptr next() ;
+  boost::shared_ptr<DgHeader> next() ;
 
 protected:
 
-  // Read up to size bytes from a file, if EOF is hit
-  // then check that it is real EOF or wait (in live mode only)
-  // Returns number of bytes read or negative number for errors.
-  ssize_t read(char* buf, size_t size);
-
-  // check that we reached EOF while reading live data
-  bool eof();
-
 private:
 
-  std::string m_path;      ///< Name of the chunk file
-  int m_fd;                ///< File descriptor of the open file
-  size_t m_maxDgramSize ;  ///< Maximum allowed datagram size
-  unsigned m_liveTimeout;  ///< timeout in seconds for reading live data files
+  SharedFile m_file;    ///< Single chunk file
+  off_t      m_off;     ///< offset in file of the next datagram to read
 
 };
 

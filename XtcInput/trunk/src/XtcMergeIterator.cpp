@@ -45,9 +45,8 @@ namespace XtcInput {
 // Constructors --
 //----------------
 XtcMergeIterator::XtcMergeIterator (const boost::shared_ptr<RunFileIterI>& runIter, 
-    size_t maxDgSize, double l1OffsetSec)
+    double l1OffsetSec)
   : m_runIter(runIter)
-  , m_maxDgSize(maxDgSize)
   , m_l1OffsetSec(l1OffsetSec)
 {
 }
@@ -76,7 +75,7 @@ XtcMergeIterator::next()
 
       // open next xtc file if there is none open
       MsgLog(logger, trace, "processing run #" << m_runIter->run()) ;
-      m_dgiter = boost::make_shared<XtcStreamMerger>(fileNameIter, m_maxDgSize, m_l1OffsetSec);
+      m_dgiter = boost::make_shared<XtcStreamMerger>(fileNameIter, m_l1OffsetSec);
     }
 
     // try to read next event from it
