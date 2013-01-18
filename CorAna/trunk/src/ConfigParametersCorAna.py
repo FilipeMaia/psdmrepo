@@ -347,6 +347,16 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 #-----------------------------
 
+        imon_short_names = [ ('FEEGasDetEnergy',       None ,'str'), \
+                             ('XCS-IPM-02',            None ,'str'), \
+                             ('XCS-IPM-mono',          None ,'str'), \
+                             ('Ipimb.4',               None ,'str'), \
+                             ('Ipimb.5',               None ,'str') ]
+
+        self.imon_short_name_list = self.declareListOfPars( 'IMON_SHORT_NAMES', imon_short_names )
+
+#-----------------------------
+
         imon_cbxs = [ (True, True ,'bool'), \
                       (True, True ,'bool'), \
                       (True, True ,'bool'), \
@@ -408,7 +418,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
                                    self.imon_norm_cbx_list,
                                    self.imon_sele_cbx_list,
                                    self.imon_sele_min_list,
-                                   self.imon_sele_max_list )
+                                   self.imon_sele_max_list,
+                                   self.imon_short_name_list )
         #print self.imon_pars_list
 
 #-----------------------------

@@ -59,9 +59,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.rad_sele_grp.addButton(self.rad_nonorm)
         self.connect(self.rad_nonorm, QtCore.SIGNAL('clicked()'), self.onRadio)
 
-        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max) in enumerate(cp.imon_pars_list) :
+        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, short_name) in enumerate(cp.imon_pars_list) :
             #print i, name.value(), ch1.value(), ch2.value(), ch3.value(), ch4.value()
-            self.guiSection(name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max) 
+            self.guiSection(name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, short_name) 
 
         self.grid.addWidget(self.rad_nonorm, self.grid_row, 6, 1, 3)
 
@@ -101,7 +101,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
     def setTitleBar(self) :
         self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
                                'Plot', 'Norm', 'Select', 'Imin', 'Imax']
-        list_of_sizes       = [280, 50, 50, 50, 50, 80, 50, 50, 60, 60]
+        list_of_sizes       = [170, 50, 50, 50, 50, 80, 50, 50, 60, 60]
 
         for i,t in enumerate(self.list_of_titles) : 
             label = QtGui.QLabel(t)
@@ -113,8 +113,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None,
-                   norm=None, sele=None, sele_min=None, sele_max=None) :
-        edi      = QtGui.QLineEdit( str(name.value()) )        
+                   norm=None, sele=None, sele_min=None, sele_max=None, short_name=None) :
+        edi      = QtGui.QLineEdit( str(short_name.value()) )        
         but      = QtGui.QPushButton('Browse')
         #box      = QtGui.QComboBox( self ) 
         #box.addItems(self.list_of_methods)
@@ -133,7 +133,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         mis = QtGui.QLineEdit( str(sele_min.value()) )        
         mas = QtGui.QLineEdit( str(sele_max.value()) )        
 
-        sec_dict = { 0:(edi,name),
+        sec_dict = { 0:(edi,short_name),
                      1:(cb1,cbch1),
                      2:(cb2,cbch2),
                      3:(cb3,cbch3),
@@ -179,7 +179,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
         width = 60
         but    .setFixedWidth(width)
-        edi    .setFixedWidth(230)
+        edi    .setFixedWidth(150)
         mis    .setFixedWidth(width)
         mas    .setFixedWidth(width)
 
@@ -244,7 +244,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         rad, par_rad = sec_dict[6]
         cbx, par_cbx = sec_dict[7]
 
-        is_selected = cbx.isChecked() or rad.isChecked()
+        is_selected = cbx.isChecked() # or rad.isChecked()
 
         for col in [8,9] :
             edi, par = sec_dict[col]
@@ -299,7 +299,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
         if not isOn : logger.info('onRadio - Normalization is OFF', __name__)
 
-        self.setStyleEdiFields()
+        #self.setStyleEdiFields()
 
 
     def onEdit(self):
@@ -346,7 +346,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def titleForIMon(self,imon):
-        return cp.imon_name_list[imon].value() + \
+        return cp.imon_short_name_list[imon].value() + \
                ':  sum of channels: ' + \
                self.strMaskForIMonChannels(imon) 
         

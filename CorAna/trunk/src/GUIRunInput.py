@@ -287,7 +287,7 @@ class GUIRunInput ( QtGui.QWidget ) :
         self.item_size     .setBackgroundColor (cp.colorEditInfo)
         self.item_part_size.setBackgroundColor (cp.colorEditInfo)
         self.item_nparts   .setBackgroundColor (cp.colorEdit)
-        self.item_control  .setBackgroundColor (cp.colorEdit)
+        #self.item_control  .setBackgroundColor (cp.colorEdit)
 
         self.setEditableField()
 
@@ -323,8 +323,8 @@ class GUIRunInput ( QtGui.QWidget ) :
             logger.info('Changed item: ' + s, __name__)
             cp.bat_img_nparts.setValue(s)
             self.setTableItems()
-            bjcora.remove_files_cora_all()
             bjcora.init_list_for_proc()
+            bjcora.remove_files_cora_all()
 
         self.table.blockSignals(False)
 

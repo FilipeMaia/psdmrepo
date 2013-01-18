@@ -144,6 +144,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.setStyle()
         self.setCheckedRadioButton()
         self.setFields()
+        self.setControlLock(True)
 
     #-------------------
     #  Public methods --
@@ -183,22 +184,18 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
         for [label, edi, par, loc_par] in self.list_of_fields :
             label.setStyleSheet(cp.styleLabel)
-            label.setFixedWidth(width_com)
             label.setAlignment(QtCore.Qt.AlignLeft)
+            label.setFixedWidth(width_com)
+            edi  .setFixedWidth(width_edi)
 
         self.lab_att.setFixedWidth(width_com_short)
         self.lab_msg.setFixedWidth(width_com_short)
-
-        for [label, edi, par, loc_par] in self.list_of_fields :
-            edi.setFixedWidth(width_edi)
-
         self.lab_ins.setFixedWidth(width_edi_short)
         self.lab_run.setFixedWidth(width_edi_short)
         self.edi_ins.setFixedWidth(width_edi_short)
         self.edi_run.setFixedWidth(width_edi_short)
         self.edi_msg.setMinimumWidth(width_edi_long)
         self.edi_att.setMinimumWidth(width_edi_long)
-
 
 
     def setCheckedRadioButton(self):
@@ -211,7 +208,6 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
 
     def setFields(self):
-        self.is_read_only = True
         for rad in self.list_of_rad :
             if rad.isChecked() :
                 rad_txt = str(rad.text()) 
@@ -226,22 +222,35 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
                 
                 self.updateFields()
                 self.setFieldsStyle()
+                break;
 
 
     def setFieldsStyle(self):
         for [label, edi, par, loc_par]  in self.list_of_fields :
-            if edi == self.edi_tag or edi == self.edi_msg or edi == self.edi_res :
-                edi.setReadOnly(False)
+            if edi.isReadOnly() :
+                edi.setStyleSheet (cp.styleEditInfo)
+            else                :
                 edi.setStyleSheet (cp.styleEdit)
-            else :
-                edi.setReadOnly( self.is_read_only )
-                if self.is_read_only : edi.setStyleSheet (cp.styleEditInfo)
-                else                 : edi.setStyleSheet (cp.styleEdit)
 
+
+    def setFieldsReadOnlySet1(self):
+        self.edi_ins.setReadOnly(True)
+        self.edi_exp.setReadOnly(True)
+        self.edi_run.setReadOnly(True)
+        self.edi_tag.setReadOnly(False)
         self.edi_res.setReadOnly(True)
+        self.edi_msg.setReadOnly(False)
         self.edi_att.setReadOnly(True)
-        self.edi_res.setStyleSheet(cp.styleEditInfo)
-        self.edi_att.setStyleSheet(cp.styleEditInfo)
+
+
+    def setFieldsReadOnlySet2(self):
+        self.edi_ins.setReadOnly(False)
+        self.edi_exp.setReadOnly(False)
+        self.edi_run.setReadOnly(False)
+        self.edi_tag.setReadOnly(False)
+        self.edi_res.setReadOnly(True )
+        self.edi_msg.setReadOnly(False)
+        self.edi_att.setReadOnly(False)
 
 
     def setFieldsData(self):
@@ -252,7 +261,8 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.tag.setValue(cp.elog_post_tag.value())
         self.msg.setValue(cp.elog_post_msg.value())
         self.att.setValue(self.att_input)
-
+        self.setFieldsReadOnlySet1()
+        
 
     def setFieldsDark(self):
         ins, exp, run, num = gu.parse_xtc_path(fnm.path_dark_xtc())
@@ -262,6 +272,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.tag.setValue(cp.elog_post_tag.value())
         self.msg.setValue(cp.elog_post_msg.value())
         self.att.setValue(self.att_input)
+        self.setFieldsReadOnlySet1()
 
 
     def setFieldsEdit(self):
@@ -273,7 +284,8 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         #self.res.setValue( cp.elog_post_res.value() )
         #self.msg.setValue( cp.elog_post_msg.value() )
         #self.att.setValue( cp.elog_post_att.value() )
-        self.att .setValue( self.att_input )
+        self.att.setValue( self.att_input )
+        self.setFieldsReadOnlySet2()
 
 
     def setFieldsSaved(self):
@@ -285,6 +297,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.msg.setValue( cp.elog_post_msg.value() )
         self.att.setValue( cp.elog_post_att.value() )
         self.att.setValue( self.att_input )
+        self.setFieldsReadOnlySet1()
 
 
     def setFieldsDefault(self):
@@ -296,6 +309,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.msg.setValue( cp.elog_post_msg.value_def() )
         self.att.setValue( cp.elog_post_att.value_def() )
         self.att.setValue( self.att_input )
+        self.setFieldsReadOnlySet1()
 
 
     def updateFields(self):
@@ -360,6 +374,14 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
 
     def getListOfFields(self):
         return self.list_of_fields
+
+
+    def setControlLock(self, isLocked):
+        logger.info('setControlLock state: ' + str(isLocked) , __name__)
+        for rad in self.list_of_rad :
+            rad.setEnabled(not isLocked)
+            #if rad.isChecked() : pass
+            #else               : rad.setEnabled(isLocked)
 
 #-----------------------------
 

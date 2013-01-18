@@ -45,20 +45,24 @@ class GUIELogPostingDialog(QtGui.QDialog) :
  
         #self.setModal(True)
         self.widg_pars = GUIELogPostingFields(parent=self,att_fname=fname)
+        self.cbx_cntl  = QtGui.QCheckBox('&Lock control') 
         self.but_canc  = QtGui.QPushButton('&Cancel') 
         self.but_send  = QtGui.QPushButton('&Send to ELog') 
         #self.but_canc.setIcon(cp.icon_button_cancel)
         #self.but_send.setIcon(cp.icon_mail_forward)
         #self.setWindowIcon(cp.icon_mail_forward)
 
+        self.cbx_cntl.setCheckState(QtCore.Qt.Checked)
         self.but_canc.setIcon(cp.icon_button_cancel)
         self.but_send.setIcon(cp.icon_mail_forward)
         self.setWindowIcon   (cp.icon_mail_forward)
         
-        self.connect( self.but_canc, QtCore.SIGNAL('clicked()'), self.onCancel )
-        self.connect( self.but_send, QtCore.SIGNAL('clicked()'), self.onSend )
+        self.connect( self.cbx_cntl, QtCore.SIGNAL('stateChanged(int)'), self.onCBox)
+        self.connect( self.but_canc, QtCore.SIGNAL('clicked()'),         self.onCancel )
+        self.connect( self.but_send, QtCore.SIGNAL('clicked()'),         self.onSend )
 
         self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addWidget(self.cbx_cntl)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.but_canc)
         self.hbox.addWidget(self.but_send)
@@ -80,7 +84,8 @@ class GUIELogPostingDialog(QtGui.QDialog) :
     def showToolTips(self):
         self.but_send.setToolTip('Mouse click on this button or Alt-S \nor "Enter" submits message to ELog')
         self.but_canc.setToolTip('Mouse click on this button \nor Alt-C cancels submission...')
-
+        self.cbx_cntl.setToolTip('Lock/unlock top row \nof control buttons')
+        
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
@@ -107,6 +112,10 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         #print 'closeEvent'
         try    : self.widg_pars.close()
         except : pass
+
+    def onCBox(self):
+        logger.info('onCBox: control lock state: ' + str(self.cbx_cntl.checkState()), __name__) # cbx_cntl.isChecked()
+        self.widg_pars.setControlLock(self.cbx_cntl.isChecked())
 
     def onCancel(self):
         logger.debug('onCancel', __name__)
