@@ -69,7 +69,9 @@ namespace {
 
             while(true) {
 
-                XtcInput::Dgram::ptr dgram = itr.next();
+                boost::shared_ptr<XtcInput::DgHeader> hptr = itr.next();
+                if (not hptr) break;
+                XtcInput::Dgram::ptr dgram = hptr->dgram();
                 if( !dgram.get()) break;
 
                 if( dgram_num++ < first_dgram_num ) continue;

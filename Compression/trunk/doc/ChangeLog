@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2013-01-17 Andy Salnikov
+- there were changes in XtcInput API, fixing dependencies here
+
 Tag: V00-00-08
 2012-07-24 Andy Salnikov
 - rhel6/gcc44 migration: added missing headers
