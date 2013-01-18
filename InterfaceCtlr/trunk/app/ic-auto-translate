@@ -105,7 +105,7 @@ class IcAutoTranslate ( AppBase ) :
             self.icdb = None
         if self._options.check_ffb:
             self.icdb_ffb_conn = DbConnection(conn_string=self._options.icdb_ffb_conn)
-            self.icdb_ffb = InterfaceDb( self.icdb_conn, self )
+            self.icdb_ffb = InterfaceDb( self.icdb_ffb_conn, self )
         else:
             self.icdb_ffb_conn = None
             self.icdb_ffb = None
@@ -256,7 +256,7 @@ class IcAutoTranslate ( AppBase ) :
     
         # get the list of all started runs from logbook
         all_runs = self._startedRuns(expid)
-        self.trace('found %d finished runs: %s %s', len(all_runs), instr, exper)
+        self.trace('found %d started runs: %s %s', len(all_runs), instr, exper)
     
         # runs that have not been requested yet
         new_runs = all_runs - old_runs
@@ -264,7 +264,7 @@ class IcAutoTranslate ( AppBase ) :
             
             # submit a request
             try:
-                if not self._options.dry_run: self.icdb_ffb.new_fileset(instr, exper, run, 'DATA', paths)
+                if not self._options.dry_run: self.icdb_ffb.new_fileset(instr, exper, run, 'DATA', [], status = 'WAIT_FILES')
                 self.info('Submitted %s %s %d to FFB translator', instr, exper, run)
             except Exception, ex:
                 self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
