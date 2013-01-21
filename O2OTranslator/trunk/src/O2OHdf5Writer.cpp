@@ -618,7 +618,9 @@ O2OHdf5Writer::closeFile()
     // it was not open
     return;
   }
-  
+
+  // close the top group first then file
+  m_groups = std::stack<hdf5pp::Group>();
   m_file.close();
   
   if (not m_finalDir.empty()) {

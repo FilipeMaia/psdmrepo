@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-23-01
+2013-01-21 Andy Salnikov
+- close top group before closing output file
+
 Tag: V00-23-00
 2013-01-16 Andy Salnikov
 - XtcInput interfaces changed, fixing dependencies here
