@@ -56,9 +56,11 @@ SharedFile::SharedFileImpl::SharedFileImpl (const boost::filesystem::path& argPa
     if (liveTimeout > 0 and path.extension() == ".inprogress") {
       path.replace_extension();
       fd = open(path.string().c_str(), O_RDONLY|O_LARGEFILE);
-      if (fd >= 0) liveTimeout = 0;
     }
   }
+
+  // timeout is only used when we read live data
+  if (path.extension() != ".inprogress") liveTimeout = 0;
 
   if (fd < 0) {
     MsgLog( logger, error, "failed to open input XTC file: " << path );

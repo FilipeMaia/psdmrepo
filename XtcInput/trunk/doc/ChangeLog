@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-02
+2013-01-21 Andy Salnikov
+- bug fix in implementation of Shared file, assumed live data even 
+  when file extension was not inprogress
+
 Tag: V00-07-01
 2013-01-17 Andy Salnikov
 - implemented initial algorithm for header sorting in XtcStreamDgIter
