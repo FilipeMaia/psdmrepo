@@ -126,6 +126,7 @@ CorAna::readMetadataFile()
 	else if (key=="NUMBER_OF_IMGS")  inf >> m_nimgs;
         else if (key=="FILE_TYPE")       inf >> m_file_type;
         else if (key=="DATA_TYPE")       inf >> m_data_type;
+        else if (key=="DATA_TYPE_INPUT") inf >> m_data_type_input; // is not used further
         else if (key=="TIME_SEC_AVE")    inf >> m_t_ave;
         else if (key=="TIME_SEC_RMS")    inf >> m_t_rms;
         else if (key=="TIME_INDEX_MAX") {inf >> m_tind_max; m_tind_size = m_tind_max+1;}
@@ -240,10 +241,11 @@ CorAna::readIndTauFromFile()
     m_log << "\nCorAna::readIndTauFromFile(): " << m_fname_tau  << "\n";
 
     unsigned itau;
-    while ( inf.good() )
+    while (inf.good())
     {
       inf >> itau;
-      v_ind_tau.push_back(itau);
+      if (inf.good()) v_ind_tau.push_back(itau);
+      else break;
     }
     inf.close();
     m_npoints_tau = v_ind_tau.size();

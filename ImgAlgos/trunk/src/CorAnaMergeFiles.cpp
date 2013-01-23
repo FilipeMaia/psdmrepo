@@ -42,7 +42,7 @@ namespace ImgAlgos {
 CorAnaMergeFiles::CorAnaMergeFiles(): CorAna ()
 {
   m_timer1 = new TimeInterval();
-  m_log << "CorAnaMergeFiles::CorAnaMergeFiles(): Start merging of blocks vs index -> image vs index of tau" 
+  m_log << "CorAnaMergeFiles::CorAnaMergeFiles(): Start merging of blocks vs index -> image vs index of tau " 
         << m_timer1->strStartTime() << "\n";
 
   openFiles();
@@ -99,16 +99,22 @@ CorAnaMergeFiles::mergeFiles()
         << m_nfiles << " blocks for " 
         << m_npoints_tau << " points in tau in a single image vs tau index \n";
 
-  cor_t* buf = new cor_t [3*m_blk_size]; // 3* stands for gi, gf, and g2 correlators
+  cor_t* buf = new cor_t [m_blk_size]; // the same size for gi, gf, and g2 correlators
 
   for(unsigned itau=0; itau<m_npoints_tau; itau++) {
-    for(unsigned b=0; b<m_nfiles; b++) {
-      p_inp[b].read((char*)buf, 3*m_blk_size*sizeof(cor_t));
-      if(!p_inp[b].good()) {
-        m_log << "CorAnaMergeFiles::mergeFiles(): Something is wrong with input for itau:" << itau << " blk:" << b << "\n";
-	break;
+
+    for(unsigned ig=0; ig<3; ig++) { // loop over gi, gf, and g2 blocks
+
+      for(unsigned b=0; b<m_nfiles; b++) {
+
+	unsigned buf_size = m_blk_size*sizeof(cor_t);
+        p_inp[b].read((char*)buf, buf_size);
+        if(!p_inp[b].good()) {
+          m_log << "CorAnaMergeFiles::mergeFiles(): Input buffer is not good for itau:" << itau << " ig:" << ig  << " blk:" << b << "\n";
+          	break;
+        }
+        p_out.write(reinterpret_cast<const char*>(buf), buf_size); 
       }
-      p_out.write(reinterpret_cast<const char*>(buf), 3*m_blk_size*sizeof(cor_t)); 
     }
   }
 }

@@ -26,6 +26,7 @@
 //-------------------------------
 #include "ImgAlgos/CorAna.h"
 #include "ImgAlgos/TimeInterval.h"
+#include "ImgAlgos/ImgVsTimeSplitInFiles.h" // for data_split_t
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -55,7 +56,8 @@ namespace ImgAlgos {
 class CorAnaData : public CorAna {
 public:
 
-  typedef uint16_t data_t;
+  //typedef uint16_t data_t;
+  typedef ImgVsTimeSplitInFiles::data_split_t data_t;
 
   CorAnaData () ;
   virtual ~CorAnaData () ;

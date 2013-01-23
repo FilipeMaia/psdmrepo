@@ -104,6 +104,7 @@ protected:
   unsigned     m_nimgs;
   std::string  m_file_type;
   std::string  m_data_type;
+  std::string  m_data_type_input;
   double       m_t_ave;   
   double       m_t_rms;   
   unsigned     m_tind_max;

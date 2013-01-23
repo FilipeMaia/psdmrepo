@@ -36,6 +36,7 @@
 #include <sstream> // for stringstream
 #include <cmath> // for sqrt, atan2, etc.
 #include <boost/lexical_cast.hpp>
+//#include <typeinfo> // for typeid(m_data).name()
 
 // This declares this class as psana module
 using namespace ImgAlgos;
@@ -209,7 +210,7 @@ ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
     m_blk_size = m_img_size / m_nfiles_out; 
     m_rst_size = m_img_size % m_nfiles_out;
 
-    m_data = new unsigned [m_img_size];
+    m_data = new data_split_t [m_img_size];
 
     MsgLog( name(), info, "Get image parameters:"
                        << "\n Rows             : " << m_img_rows 
@@ -218,6 +219,7 @@ ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
                        << "\n m_nfiles_out     : " << m_nfiles_out
                        << "\n m_blk_size       : " << m_blk_size
                        << "\n m_rst_size       : " << m_rst_size
+	               << "\n Output data type is data_split_t (uint16_t) with sizeof: " << sizeof(data_split_t)
                        << "\n"  
     );  
 
@@ -252,7 +254,8 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nREST_SIZE       " << m_rst_size
       << "\nNUMBER_OF_IMGS  " << m_count
       << "\nFILE_TYPE       " << m_file_type
-      << "\nDATA_TYPE       " << m_data_type
+    //<< "\nDATA_TYPE_INPUT " << m_data_type
+      << "\nDATA_TYPE       " << "uint16_t" // typeid(m_data).name()
       << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
       << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
       << "\nTIME_INDEX_MAX  " << std::setw(8) << m_tind_max

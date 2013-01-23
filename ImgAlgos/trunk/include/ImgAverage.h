@@ -108,6 +108,7 @@ protected:
   void procStatArrays();
   void saveArrInFile(std::string& fname, double* arr);
   void printEventRecord(Event& evt);
+  void printSummaryForParser(Event& evt);
 
 private:
 

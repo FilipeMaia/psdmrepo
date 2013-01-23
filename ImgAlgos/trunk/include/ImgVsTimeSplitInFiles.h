@@ -67,6 +67,10 @@ namespace ImgAlgos {
 class ImgVsTimeSplitInFiles : public Module {
 public:
 
+  //typedef unsigned data_split_t;
+  typedef uint16_t data_split_t;
+
+
   enum FILE_MODE {BINARY, TEXT};
 
   // Default constructor
@@ -122,7 +126,7 @@ private:
   std::string m_key;          // i.e. Image2D
   std::string m_fname_prefix; // prefix of the file name
   std::string m_file_type;    // file type "txt" or "bin" 
-  std::string m_data_type;    // data type "double", "uint_16t", etc. 
+  std::string m_data_type;    // data type "double", "uint16_t", etc. 
   bool        m_add_tstamp;
   unsigned    m_nfiles_out;
   double      m_ampl_thr;
@@ -138,7 +142,7 @@ private:
   unsigned    m_blk_size;
   unsigned    m_rst_size;
 
-  unsigned*   m_data;         // image data in case if processing is necessary
+  data_split_t*   m_data;         // image data in case if processing is necessary
 
   std::string m_fname_common;
   std::string m_fname_time;
@@ -162,26 +166,28 @@ private:
 
 protected:
 //--------------------
-// Splits the image for blocks and saves the blocks in files
+// Apply threshold correction to the image. 
+// Data is accessible through the smart pointer.
     template <typename T>
     void procImgData(const boost::shared_ptr< ndarray<T,2> >& p_ndarr)
     {
       const T* data = p_ndarr->data();
-      T        athr = static_cast<T>       (m_ampl_thr);
-      unsigned amin = static_cast<unsigned>(m_ampl_min);
+      T            athr = static_cast<T>           (m_ampl_thr);
+      data_split_t amin = static_cast<data_split_t>(m_ampl_min);
       for(unsigned i=0; i<m_img_size; i++)
-	m_data[i] = (data[i] > athr) ? static_cast<unsigned>(data[i]) : amin;
+	m_data[i] = (data[i] > athr) ? static_cast<data_split_t>(data[i]) : amin;
     }
 
 //--------------------
-// Splits the image for blocks and saves the blocks in files
+// Apply threshold correction to the image. 
+// Data is accessible through the pointer.
     template <typename T>
     void procImgData(const T* data)
     {
-      T        athr = static_cast<T>       (m_ampl_thr);
-      unsigned amin = static_cast<unsigned>(m_ampl_min);
+      T            athr = static_cast<T>           (m_ampl_thr);
+      data_split_t amin = static_cast<data_split_t>(m_ampl_min);
       for(unsigned i=0; i<m_img_size; i++)
-	m_data[i] = (data[i] > athr) ? static_cast<unsigned>(data[i]) : amin;
+	m_data[i] = (data[i] > athr) ? static_cast<data_split_t>(data[i]) : amin;
     }
 
 //--------------------
@@ -190,13 +196,13 @@ protected:
     void procSplitAndWriteImgInFiles (const boost::shared_ptr< ndarray<T,2> >& p_ndarr, 
                                   bool print_msg=false) 
     {
-      const T* img_data = p_ndarr->data();               // Access to entire image
+      const T* img_data = p_ndarr->data();             // Access to entire image
 
       procImgData<T>(img_data);
 
       for(unsigned b=0; b<m_nfiles_out; b++){
 
-	const T* p_block_data = &img_data[b*m_blk_size]; // Access to the block 
+	const data_split_t* p_block_data = &m_data[b*m_blk_size]; // Access to the block 
 
 	if (m_file_mode == TEXT) {
 	  std::stringstream ss; 
@@ -207,13 +213,12 @@ protected:
 	} 
 
         else if (m_file_mode == BINARY) {
-	  p_out[b].write(reinterpret_cast<const char*>(p_block_data), m_blk_size*sizeof(T));
+	  p_out[b].write(reinterpret_cast<const char*>(p_block_data), m_blk_size*sizeof(data_split_t));
 	  //p_out[b] <<  "\n";
 	} 
 
         else {
           p_out[b] << " UNKNOWN FILE TYPE:" << m_file_type << " AND MODE:" << m_file_mode;
-
 	}
 
       }

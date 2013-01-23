@@ -153,6 +153,7 @@ ImgAverage::endJob(Event& evt, Env& env)
   procStatArrays();
   save2DArrayInFile<double> ( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
   save2DArrayInFile<double> ( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
+  if( m_print_bits & 16 ) printSummaryForParser(evt);
 }
 
 //--------------------
@@ -284,6 +285,18 @@ ImgAverage::printEventRecord(Event& evt)
                      << " Evt="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
   );
+}
+
+//--------------------
+
+void 
+ImgAverage::printSummaryForParser(Event& evt)
+{
+  cout << "ImgAverage: Summary for parser" << endl;
+  cout << "BATCH_NUMBER_OF_EVENTS " << m_count << endl;
+  cout << "BATCH_IMG_ROWS         " << m_rows  << endl;
+  cout << "BATCH_IMG_COLS         " << m_cols  << endl;
+  cout << "BATCH_IMG_SIZE         " << m_size  << endl;
 }
 
 //--------------------

@@ -123,7 +123,8 @@ CorAnaData::loopProcCorTau()
 
   ofs.close();
 
-  m_log << "\nCorAnaData::loopProcCorTau(): Correlation processing time =" << m_timer1->getCurrentTimeInterval() << "sec\n";
+  m_log << "\nCorAnaData::loopProcCorTau(): Correlation processing time =" << m_timer1->getCurrentTimeInterval() << "sec for "
+        << counter << " intevals in tau.";
 }
 
 //----------------
