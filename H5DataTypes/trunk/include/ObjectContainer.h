@@ -55,6 +55,8 @@ template <typename T>
 class ObjectContainer {
 public:
 
+  typedef T value_type;
+
   /// Provide type at run time
   ObjectContainer ( const std::string& name,
                     hdf5pp::Group& location,

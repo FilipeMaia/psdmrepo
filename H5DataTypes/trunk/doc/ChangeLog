@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-71
+2013-01-23 Andy Salnikov
+- new type XtcDamage for persisting Pds::Damage data
+
 Tag: V00-00-70
 2013-01-10 Andy Salnikov
 - add standard methods to AcqirisTdcConfigV1 (they were missing because 
