@@ -42,10 +42,11 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-TimepixDataV2Cvt::TimepixDataV2Cvt ( const std::string& typeGroupName,
-                                     hsize_t chunk_size,
-                                     int deflate )
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+TimepixDataV2Cvt::TimepixDataV2Cvt ( const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const CvtOptions& cvtOptions )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_dataCont(0)
   , m_imageCont(0)
 {
@@ -62,16 +63,10 @@ TimepixDataV2Cvt::~TimepixDataV2Cvt ()
 
 // method called to create all necessary data containers
 void
-TimepixDataV2Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+TimepixDataV2Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  DataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
-  m_dataCont = new DataCont ( dataContFactory ) ;
-
-  // create container for frame data
-  ImageCont::factory_type imageContFactory( "image", chunk_size, deflate, true ) ;
-  m_imageCont = new ImageCont ( imageContFactory ) ;
+  m_dataCont = makeCont<DataCont>("data", group, true);
 }
 
 // typed conversion method
@@ -87,17 +82,11 @@ TimepixDataV2Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   H5Type tpdata(data);
-  m_dataCont->container(group)->append(tpdata);
-  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  m_imageCont->container(group,type)->append(*(uint16_t*)data.data(), type);
-}
+  m_dataCont->append(tpdata);
 
-/// method called when the driver closes a group in the file
-void
-TimepixDataV2Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_dataCont ) m_dataCont->closeGroup( group ) ;
-  if ( m_imageCont ) m_imageCont->closeGroup( group ) ;
+  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
+  if (not m_imageCont) m_imageCont = makeCont<ImageCont>("image", group, true, type);
+  m_imageCont->append(*(uint16_t*)data.data(), type);
 }
 
 } // namespace O2OTranslator

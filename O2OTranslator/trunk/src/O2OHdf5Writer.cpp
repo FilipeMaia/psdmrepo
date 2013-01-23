@@ -97,8 +97,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                bool overwrite,
                                SplitMode split,
                                hsize_t splitSize,
-                               int compression,
                                bool extGroups,
+                               const CvtOptions& cvtOptions,
                                const O2OMetaData& metadata,
                                const std::string& finalDir,
                                const std::string& backupExt,
@@ -108,7 +108,6 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_overwrite(overwrite)
   , m_split(split)
   , m_splitSize(splitSize)
-  , m_compression(compression)
   , m_extGroups(extGroups)
   , m_metadata(metadata)
   , m_finalDir(finalDir)
@@ -123,7 +122,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_configStore0()
   , m_configStore()
   , m_calibStore()
-  , m_cvtFactory(m_configStore, m_calibStore, m_metadata, m_compression)
+  , m_cvtFactory(m_configStore, m_calibStore, m_metadata, cvtOptions)
   , m_transClock()
   , m_reopen(true)
   , m_serialScan(0)
@@ -309,11 +308,6 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state)
   // switch to new state
   m_state.push(state) ;
   m_groups.push( group ) ;
-
-  // notify all converters
-  for ( O2OCvtFactory::iterator it = m_cvtFactory.begin() ; it != m_cvtFactory.end() ; ++ it ) {
-    it->second->openGroup( group ) ;
-  }
 }
 
 void
@@ -342,10 +336,8 @@ O2OHdf5Writer::closeGroup ( const Pds::Dgram& dgram, State state, bool updateCou
   // store transition time as couple of attributes to this new group
   ::storeClock ( m_groups.top(), dgram.seq.clock(), "end" ) ;
 
-  // notify all converters
-  for ( O2OCvtFactory::iterator it = m_cvtFactory.begin() ; it != m_cvtFactory.end() ; ++ it ) {
-    it->second->closeGroup( m_groups.top() ) ;
-  }
+  // close all converters
+  m_cvtFactory.closeGroup(m_groups.top());
 
   // close the group
   m_groups.top().close() ;
@@ -370,8 +362,14 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object in configure or begincalibcycle transitions
 void
-O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& typeId,
+    const O2OXtcSrc& src, Pds::Damage damage)
 {
+  if (damage.bits() != 0) {
+    // for configuration objects we ignore any kind of damaged data
+    return;
+  }
+
   // for Configure and BeginCalibCycle transitions store config objects
   MsgLog( logger, debug, "O2OHdf5Writer: store config object " << src.top()
       << " name=" <<  Pds::TypeId::name(typeId.id())
@@ -395,14 +393,15 @@ O2OHdf5Writer::storeConfig0()
     src.push(it->first.second);
     const std::vector<char>& data = it->second;
     
-    dataObject(data.data(), data.size(), typeId, src);
+    dataObject(data.data(), data.size(), typeId, src, Pds::Damage(0));
     
   }
 }
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& typeId,
+    const O2OXtcSrc& src, Pds::Damage damage)
 {
   if (size == 0) {
     // sometimes happens
@@ -415,23 +414,23 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
   if (typeId.id() == Pds::TypeId::Id_SharedIpimb or
       typeId.id() == Pds::TypeId::Id_SharedPim or
       typeId.id() == Pds::TypeId::Id_SharedAcqADC) {
-
-    splitSharedObject(data, size, typeId, src);
+    splitSharedObject(data, size, typeId, src, damage);
     return;
-
   }
 
-  // find this type in the converter map
-  O2OCvtFactory::iterator it = m_cvtFactory.find(typeId);
-  if (it == m_cvtFactory.end() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
+  // find this type in the converter map, there is no converter for EpicsConfig,
+  // it is handled internally by regular epics converter
+  const O2OCvtFactory::DataTypeCvtList& cvts = m_cvtFactory.getConverters(m_groups.top(), typeId, src.top());
+  if (cvts.empty() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
     MsgLogRoot( error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
                 << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
   }
 
   // call convert method on every matching converter
-  for ( ; it != m_cvtFactory.end() and it->first == typeId.value(); ++ it) {
+  typedef O2OCvtFactory::DataTypeCvtList::const_iterator iter;
+  for (iter it = cvts.begin(); it != cvts.end(); ++ it) {
     try {
-      it->second->convert( data, size, typeId, src, m_eventTime ) ;
+      (*it)->convert(data, size, typeId, src, m_eventTime, damage);
     } catch (const O2OXTCSizeException& ex) {
       // on size mismatch print an error message but continue
       MsgLog(logger, error, ex.what());
@@ -448,59 +447,81 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
  * objects so we update config store here as well.
  */
 void
-O2OHdf5Writer::splitSharedObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+O2OHdf5Writer::splitSharedObject(const void* fulldata, size_t fullsize, const Pds::TypeId& typeId, const O2OXtcSrc& src, Pds::Damage damage)
 {
 
   MsgLog( logger, debug, "O2OHdf5Writer:splitSharedObject -- splitting " << Pds::TypeId::name(typeId.id()) << "/" << typeId.version()) ;
 
+  // When doing splitting special care needed for determining the size of the
+  // split objects. When data is damaged (and sometimes when it is not) the size
+  // of the XTC container can be different from the size of the data it should
+  // contain. This is why we do gymnastics with sizes and offsets below.
+
+  const char* data = static_cast<const char*>(fulldata);
+
   if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 0) {
 
-    const Pds::BldDataIpimbV0* bld = reinterpret_cast<const Pds::BldDataIpimbV0*>(data);
-    Pds::TypeId typeId;
+    // config object should be stored first as it may be needed by data object
+    Pds::TypeId typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 1);
+    size_t size = std::min(fullsize, sizeof(Pds::Ipimb::ConfigV1));
+    this->configObject(data, size, typeId, src, damage);
+    this->dataObject(data, size, typeId, src, damage);
 
-    // config object should be store first as it may be needed by data object
-    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 1);
-    this->configObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
-    this->dataObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
-
+    data += size;
+    fullsize -= size;
+    size = std::min(fullsize, sizeof(Pds::Ipimb::DataV1));
     typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 1);
-    this->dataObject(static_cast<const void*>(&bld->ipimbData), sizeof bld->ipimbData, typeId, src);
+    this->dataObject(data, size, typeId, src, damage);
 
+    data += size;
+    fullsize -= size;
+    size = fullsize;
     typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
-    this->dataObject(static_cast<const void*>(&bld->ipmFexData), sizeof bld->ipmFexData, typeId, src);
+    this->dataObject(data, size, typeId, src, damage);
 
   } else if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 1) {
 
-    const Pds::BldDataIpimbV1* bld = reinterpret_cast<const Pds::BldDataIpimbV1*>(data);
-    Pds::TypeId typeId;
-    boost::shared_ptr<Pds::Xtc> newxtc;
 
-    // config object should be store first as it may be needed by data object
-    typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 2);
-    this->configObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
-    this->dataObject(static_cast<const void*>(&bld->ipimbConfig), sizeof bld->ipimbConfig, typeId, src);
+    // config object should be stored first as it may be needed by data object
+    Pds::TypeId typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 2);
+    size_t size = std::min(fullsize, sizeof(Pds::Ipimb::ConfigV2));
+    this->configObject(data, size, typeId, src, damage);
+    this->dataObject(data, size, typeId, src, damage);
 
+    data += size;
+    fullsize -= size;
+    size = std::min(fullsize, sizeof(Pds::Ipimb::DataV2));
     typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 2);
-    this->dataObject(static_cast<const void*>(&bld->ipimbData), sizeof bld->ipimbData, typeId, src);
+    this->dataObject(data, size, typeId, src, damage);
 
+    data += size;
+    fullsize -= size;
+    size = fullsize;
     typeId = Pds::TypeId(Pds::TypeId::Id_IpmFex, 1);
-    this->dataObject(static_cast<const void*>(&bld->ipmFexData), sizeof bld->ipmFexData, typeId, src);
+    this->dataObject(data, size, typeId, src, damage);
 
   } else if (typeId.id() == Pds::TypeId::Id_SharedPim and typeId.version() == 1) {
 
-    const Pds::BldDataPimV1* bld = reinterpret_cast<const Pds::BldDataPimV1*>(data);
     Pds::TypeId typeId;
-    boost::shared_ptr<Pds::Xtc> newxtc;
 
-    // config object should be store first as it may be needed by data object
+    // config object should be stored first as it may be needed by data object
     typeId = Pds::TypeId(Pds::TypeId::Id_TM6740Config, 2);
-    this->dataObject(static_cast<const void*>(&bld->camConfig), sizeof bld->camConfig, typeId, src);
+    size_t size = std::min(fullsize, sizeof(Pds::Pulnix::TM6740ConfigV2));
+    this->configObject(data, size, typeId, src, damage);
+    this->dataObject(data, size, typeId, src, damage);
 
+    data += size;
+    fullsize -= size;
+    size = std::min(fullsize, sizeof(Pds::Lusi::PimImageConfigV1));
     typeId = Pds::TypeId(Pds::TypeId::Id_PimImageConfig, 1);
-    this->dataObject(static_cast<const void*>(&bld->pimConfig), sizeof bld->pimConfig, typeId, src);
+    this->configObject(data, size, typeId, src, damage);
+    this->dataObject(data, size, typeId, src, damage);
 
+    data += size;
+    fullsize -= size;
+    size = fullsize;
     typeId = Pds::TypeId(Pds::TypeId::Id_Frame, 1);
-    this->dataObject(static_cast<const void*>(&bld->frame), sizeof bld->frame + bld->frame.data_size(), typeId, src);
+    this->dataObject(data, size, typeId, src, damage);
 
   } else {
 

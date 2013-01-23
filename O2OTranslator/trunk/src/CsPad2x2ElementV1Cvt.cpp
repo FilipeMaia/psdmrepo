@@ -58,11 +58,9 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const std::string& typeGroupName,
-                                             const CalibObjectStore& calibStore,
-                                             hsize_t chunk_size,
-                                             int deflate )
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const hdf5pp::Group& group, const std::string& typeGroupName,
+    const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_calibStore(calibStore)
   , m_elementCont(0)
   , m_pixelDataCont(0)
@@ -82,26 +80,9 @@ CsPad2x2ElementV1Cvt::~CsPad2x2ElementV1Cvt ()
 
 // method called to create all necessary data containers
 void
-CsPad2x2ElementV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+CsPad2x2ElementV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
-  // create container for frames
-  ElementCont::factory_type elContFactory( "element", chunk_size, deflate, true ) ;
-  m_elementCont = new ElementCont ( elContFactory ) ;
-
-  // create container for frame data
-  PixelDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
-  m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
-
-  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
-  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
-    m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
-  if (cModeCalib) {
-    // create container for common mode data
-    CommonModeDataCont::factory_type cmodeContFactory( "common_mode", chunk_size, deflate, true ) ;
-    m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
-  }
-
+  // nothing to do here, we need real data for this
 }
 
 // typed conversion method
@@ -207,22 +188,18 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   hdf5pp::Type type = H5Type::stored_type();
-  m_elementCont->container(group,type)->append ( elem, type ) ;
-  type = H5Type::stored_data_type() ;
-  m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
-  if (m_cmodeDataCont) {
-    type = H5Type::cmode_data_type() ;
-    m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
-  }
-}
+  if (not m_elementCont) m_elementCont = makeCont<ElementCont>("element", group, true, type);
+  m_elementCont->append ( elem, type ) ;
 
-/// method called when the driver closes a group in the file
-void
-CsPad2x2ElementV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_elementCont ) m_elementCont->closeGroup( group ) ;
-  if ( m_pixelDataCont ) m_pixelDataCont->closeGroup( group ) ;
-  if ( m_cmodeDataCont ) m_cmodeDataCont->closeGroup( group ) ;
+  type = H5Type::stored_data_type() ;
+  if (not m_pixelDataCont) m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
+  m_pixelDataCont->append ( pixelData[0][0][0], type ) ;
+
+  if (cModeCalib) {
+    type = H5Type::cmode_data_type() ;
+    if (not m_cmodeDataCont) m_cmodeDataCont = makeCont<CommonModeDataCont>("common_mode", group, true, type);
+    m_cmodeDataCont->append(commonMode[0], type);
+  }
 }
 
 } // namespace O2OTranslator

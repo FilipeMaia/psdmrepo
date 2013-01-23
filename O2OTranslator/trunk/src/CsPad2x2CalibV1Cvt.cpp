@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,6 +30,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "O2OTranslator/O2OXtcSrc.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPad2x2PedestalsV1.h"
@@ -54,14 +56,16 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPad2x2CalibV1Cvt::CsPad2x2CalibV1Cvt (const std::string& typeGroupName,
-                                  const O2OMetaData& metadata,
-                                  CalibObjectStore& calibStore)
+CsPad2x2CalibV1Cvt::CsPad2x2CalibV1Cvt(hdf5pp::Group group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const O2OMetaData& metadata,
+    CalibObjectStore& calibStore)
   : DataTypeCvtI()
   , m_typeGroupName(typeGroupName)
   , m_metadata(metadata)
   , m_calibStore(calibStore)
-  , m_groups()
+  , m_group(group)
 {
 }
 
@@ -78,11 +82,9 @@ CsPad2x2CalibV1Cvt::convert ( const void* data,
                                size_t size,
                                const Pds::TypeId& typeId,
                                const O2OXtcSrc& src,
-                               const H5DataTypes::XtcClockTimeStamp& time )
+                               const H5DataTypes::XtcClockTimeStamp& time,
+                               Pds::Damage damage )
 {
-  // this should not happen
-  assert ( not m_groups.empty() ) ;
-
   {
     // We only accept data from Cspad2x2 devices here
     const Pds::Src& pdssrc = src.top();
@@ -134,17 +136,17 @@ CsPad2x2CalibV1Cvt::convert ( const void* data,
 
   // get the name of the group for this object
   const std::string& grpName = m_typeGroupName + "/" + src.name() ;
-  
-  if ( m_groups.top().hasChild(m_typeGroupName) ) {
-    hdf5pp::Group typeGroup = m_groups.top().openGroup(m_typeGroupName);
+
+  if ( m_group.hasChild(m_typeGroupName) ) {
+    hdf5pp::Group typeGroup = m_group.openGroup(m_typeGroupName);
     if ( typeGroup.hasChild(src.name()) ) {
-      MsgLog(logger, trace, "group " << grpName << " already exists") ;
+      MsgLog("ConfigDataTypeCvt", trace, "group " << grpName << " already exists") ;
       return;
     }
   }
-  
+
   // create separate group
-  hdf5pp::Group grp = m_groups.top().createGroup( grpName );
+  hdf5pp::Group grp = m_group.createGroup( grpName );
 
   // store it in a file
   if (peds.get()) {
@@ -166,23 +168,6 @@ CsPad2x2CalibV1Cvt::convert ( const void* data,
   m_calibStore.add(pixStat, address);
   m_calibStore.add(cmode, address);
   m_calibStore.add(filter, address);
-}
-
-/// method called when the driver makes a new group in the file
-void 
-CsPad2x2CalibV1Cvt::openGroup( hdf5pp::Group group )
-{
-  m_groups.push ( group ) ;
-}
-
-/// method called when the driver closes a group in the file
-void 
-CsPad2x2CalibV1Cvt::closeGroup( hdf5pp::Group group )
-{
-  if ( m_groups.empty() ) return ;
-  while ( m_groups.top() != group ) m_groups.pop() ;
-  if ( m_groups.empty() ) return ;
-  m_groups.pop() ;
 }
 
 } // namespace O2OTranslator

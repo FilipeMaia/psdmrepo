@@ -53,14 +53,24 @@ public:
   virtual ~DataTypeCvt () {}
 
   /// main method of this class
-  virtual void convert ( const void* data, 
-                         size_t size,
-                         const Pds::TypeId& typeId,
-                         const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTimeStamp& time )
+  virtual void convert(const void* data,
+                       size_t size,
+                       const Pds::TypeId& typeId,
+                       const O2OXtcSrc& src,
+                       const H5DataTypes::XtcClockTimeStamp& time,
+                       Pds::Damage damage)
   {
-    const T& typedData = *static_cast<const T*>( data ) ;
-    typedConvert ( typedData, size, typeId, src, time ) ;
+    if (damage.value() == 0 or
+        (typeId.id() == Pds::TypeId::Id_EBeam and damage.bits() == (1 << Pds::Damage::UserDefined))) {
+      // All non-damaged data or BLD Ebeam data with only user damage are passed
+      // to conversion method
+      const T& typedData = *static_cast<const T*>( data ) ;
+      typedConvert(typedData, size, typeId, src, time, damage);
+    } else {
+      // for damaged data we don't want to look at the data so call special
+      // method to fill the gaps
+      fillMissing(typeId, src, time, damage);
+    }
   }
 
 protected:
@@ -71,11 +81,18 @@ protected:
 private:
 
   // typed conversion method
-  virtual void typedConvert ( const T& data,
-                              size_t size,
-                              const Pds::TypeId& typeId,
-                              const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
+  virtual void typedConvert(const T& data,
+                            size_t size,
+                            const Pds::TypeId& typeId,
+                            const O2OXtcSrc& src,
+                            const H5DataTypes::XtcClockTimeStamp& time,
+                            Pds::Damage damage) = 0 ;
+
+  // method called to fill void spaces for missing data
+  virtual void fillMissing(const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src,
+                           const H5DataTypes::XtcClockTimeStamp& time,
+                           Pds::Damage damage) = 0 ;
 
 };
 

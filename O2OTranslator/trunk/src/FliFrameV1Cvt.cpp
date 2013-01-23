@@ -47,12 +47,13 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 template <typename FrameType>
-FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const std::string& typeGroupName,
-                                           const ConfigObjectStore& configStore,
-                                           Pds::TypeId cfgTypeId,
-                                           hsize_t chunk_size,
-                                           int deflate )
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const ConfigObjectStore& configStore,
+    Pds::TypeId cfgTypeId,
+    const CvtOptions& cvtOptions )
+  : Super(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_cfgTypeId(cfgTypeId)
   , m_frameCont(0)
@@ -73,16 +74,10 @@ FliFrameV1Cvt<FrameType>::~FliFrameV1Cvt ()
 // method called to create all necessary data containers
 template <typename FrameType>
 void
-FliFrameV1Cvt<FrameType>::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+FliFrameV1Cvt<FrameType>::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  typename FrameCont::factory_type frContFactory( "frame", chunk_size, deflate, true ) ;
-  m_frameCont = new FrameCont ( frContFactory ) ;
-
-  // create container for frame data
-  FrameDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
-  m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
+  m_frameCont = Super::template makeCont<FrameCont>("frame", group, true);
 }
 
 // typed conversion method
@@ -109,18 +104,10 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
 
   // store the data
   H5Type frame(data);
-  m_frameCont->container(group)->append ( frame ) ;
+  m_frameCont->append ( frame ) ;
   hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
-}
-
-/// method called when the driver closes a group in the file
-template <typename FrameType>
-void
-FliFrameV1Cvt<FrameType>::closeContainers( hdf5pp::Group group )
-{
-  if ( m_frameCont ) m_frameCont->closeGroup( group ) ;
-  if ( m_frameDataCont ) m_frameDataCont->closeGroup( group ) ;
+  if (not m_frameDataCont) m_frameDataCont = Super::template makeCont<FrameDataCont>("data", group, true, type);
+  m_frameDataCont->append(*data.data(), type);
 }
 
 // explicitly instantiate for know types

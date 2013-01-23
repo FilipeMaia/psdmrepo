@@ -22,10 +22,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/CvtOptions.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "O2OTranslator/SrcFilter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -66,12 +64,12 @@ public:
    *  @param[in] dsname         Dataset name, usually it is data, may be changed to anything
    *  @param[in] srcFilter      Source filter object, default is to allow all sources
    */
-  EvtDataTypeCvtDef ( const std::string& typeGroupName,
-                      hsize_t chunk_size,
-                      int deflate,
-                      const std::string& dsname = "data",
-                      SrcFilter srcFilter = SrcFilter())
-    : EvtDataTypeCvt<typename H5Type::XtcType>(typeGroupName, chunk_size, deflate, srcFilter)
+  EvtDataTypeCvtDef ( const hdf5pp::Group& group,
+                      const std::string& typeGroupName,
+                      const Pds::Src& src,
+                      const CvtOptions& cvtOptions,
+                      const std::string& dsname = "data")
+    : EvtDataTypeCvt<typename H5Type::XtcType>(group, typeGroupName, src, cvtOptions)
     , m_dataCont(0)
     , m_dsname(dsname)
   {
@@ -85,12 +83,10 @@ public:
 protected:
 
   /// method called to create all necessary data containers
-  virtual void makeContainers(hsize_t chunk_size, int deflate,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src)
+  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
   {
     // make container for data objects
-    typename DataCont::factory_type dataContFactory(m_dsname, chunk_size, deflate, true);
-    m_dataCont = new DataCont(dataContFactory);
+    m_dataCont = Super::template makeCont<DataCont>(m_dsname, group, true);
   }
 
   // typed conversion method
@@ -106,17 +102,12 @@ protected:
     }
 
     H5Type h5data(data);
-    m_dataCont->container(group)->append(h5data);
-  }
-
-  /// method called when the driver closes a group in the file
-  virtual void closeContainers(hdf5pp::Group group) {
-    if (m_dataCont) m_dataCont->closeGroup(group);
+    m_dataCont->append(h5data);
   }
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
+  typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
 
   // Data members
   DataCont* m_dataCont;

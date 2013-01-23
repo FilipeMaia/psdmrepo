@@ -87,11 +87,14 @@ private:
   AppCmdOptList<std::string>  m_optionsFile ;
   AppCmdOpt<std::string>      m_calibDir ;
   AppCmdOpt<int>              m_compression ;
+  AppCmdOptSize               m_chunkSize ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOpt<unsigned int>     m_dgramQSize ;
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
   AppCmdOptBool               m_shortTimeStamp ;
+  AppCmdOptBool               m_noMissData;
+  AppCmdOptBool               m_noDamageDs;
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<double>           m_l1offset ;
   AppCmdOptNamedValue<XtcInput::MergeMode> m_mergeMode ;
@@ -119,11 +122,14 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
   , m_calibDir   ( 'C', "calib-dir",    "path",     "directory with calibration data, def: none", "" )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
+  , m_chunkSize  ( 'k', "chunk-size",   "size",     "HDF5 chunk size, def: 16M", 16*1024*1024 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "option is ignored and deprecated", 0 )
   , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_shortTimeStamp (  "short-timestamp",          "only store sends and nanoseconds in time dataset", false )
+  , m_noMissData (      "no-missing-data",          "do not fill missing data values", false )
+  , m_noDamageDs (      "no-damage-ds",             "do not store damage dataset", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
@@ -146,11 +152,14 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   setOptionsFile( m_optionsFile ) ;
   addOption( m_calibDir ) ;
   addOption( m_compression ) ;
+  addOption( m_chunkSize ) ;
   addOption( m_dgramsize ) ;
   addOption( m_dgramQSize ) ;
   addOption( m_experiment ) ;
   addOption( m_extGroups ) ;
   addOption( m_shortTimeStamp ) ;
+  addOption( m_noMissData ) ;
+  addOption( m_noDamageDs ) ;
   addOption( m_instrument ) ;
   addOption( m_l1offset ) ;
   addOption( m_mergeMode ) ;
@@ -228,9 +237,12 @@ O2O_Translate::runApp ()
 
   // instantiate XTC scanner, which is also output file writer
   std::vector<O2OXtcScannerI*> scanners ;
+
+  CvtOptions cvtOptions(m_chunkSize.value(), m_compression.value(),
+      not m_noMissData.value(), not m_noDamageDs.value());
   scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
-                                  m_compression.value(), m_extGroups.value(),
+                                  m_extGroups.value(), cvtOptions,
                                   metadata, m_tmpDir.value().empty() ? m_tmpDir.value() : outputDir,
                                   m_backupExt.value(),
                                   not m_shortTimeStamp.value() ) ) ;

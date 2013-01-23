@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -48,7 +49,7 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class O2OMetaData  {
+class O2OMetaData : boost::noncopyable {
 public:
 
   typedef std::map<std::string,std::string> cont_type ;
@@ -95,10 +96,6 @@ private:
   const std::string m_experiment ;
   const std::string m_calibDir ;
   std::map<std::string,std::string> m_extraMetaData ;
-
-  // Copy constructor and assignment are disabled by default
-  O2OMetaData ( const O2OMetaData& ) ;
-  O2OMetaData& operator = ( const O2OMetaData& ) ;
 
 };
 

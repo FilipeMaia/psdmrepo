@@ -15,6 +15,8 @@
 //-----------------
 #include <vector>
 #include <string>
+#include <iosfwd>
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -48,7 +50,7 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class O2OXtcSrc  {
+class O2OXtcSrc : boost::noncopyable {
 public:
 
   // Default constructor
@@ -75,17 +77,14 @@ private:
 
   // Data members
   std::vector<Pds::Src> m_src ;
-
-  // Copy constructor and assignment are disabled by default
-  O2OXtcSrc ( const O2OXtcSrc& ) ;
-  O2OXtcSrc& operator = ( const O2OXtcSrc& ) ;
-
 };
 
 } // namespace O2OTranslator
 
+namespace Pds {
 /// Helper operator to format Pds::Src to a standard stream
 std::ostream&
-operator<<(std::ostream& out, const Pds::Src& src);
+operator<<(std::ostream& out, const Src& src);
+}
 
 #endif // O2OTRANSLATOR_O2OXTCSRC_H

@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-24-00
+2013-01-23 Andy Salnikov
+- significant refactoring of the converter infrastructure:
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/186#comment:5
+- adding _damage and _mask datasets for all event data types
+  except for Epics
+- missing data are mot stored yet, so all masks for now are set to 1
+
 Tag: V00-23-01
 2013-01-21 Andy Salnikov
 - close top group before closing output file

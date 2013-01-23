@@ -44,11 +44,12 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const std::string& typeGroupName,
+Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
     const ConfigObjectStore& configStore,
-    hsize_t chunk_size,
-    int deflate)
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+    const CvtOptions& cvtOptions)
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_dataCont(0)
   , m_valueCont(0)
@@ -66,16 +67,10 @@ Gsc16aiDataV1Cvt::~Gsc16aiDataV1Cvt ()
 
 // method called to create all necessary data containers
 void
-Gsc16aiDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+Gsc16aiDataV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  DataCont::factory_type dataContFactory( "timestamps", chunk_size, deflate, true ) ;
-  m_dataCont = new DataCont ( dataContFactory ) ;
-
-  // create container for frame data
-  ValueCont::factory_type valueContFactory( "channelValue", chunk_size, deflate, true ) ;
-  m_valueCont = new ValueCont ( valueContFactory ) ;
+  m_dataCont = makeCont<DataCont>("timestamps", group, true);
 }
 
 // typed conversion method
@@ -102,17 +97,10 @@ Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
   H5Type timestampsData(data);
 
   // store the data
-  m_dataCont->container(group)->append(timestampsData) ;
+  m_dataCont->append(timestampsData) ;
   hdf5pp::Type type = H5Type::stored_data_type(*config);
-  m_valueCont->container(group,type)->append(data._channelValue[0], type);
-}
-
-/// method called when the driver closes a group in the file
-void
-Gsc16aiDataV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_dataCont ) m_dataCont->closeGroup( group ) ;
-  if ( m_valueCont ) m_valueCont->closeGroup( group ) ;
+  if (not m_valueCont) m_valueCont = makeCont<ValueCont>("channelValue", group, true, type);
+  m_valueCont->append(data._channelValue[0], type);
 }
 
 } // namespace O2OTranslator

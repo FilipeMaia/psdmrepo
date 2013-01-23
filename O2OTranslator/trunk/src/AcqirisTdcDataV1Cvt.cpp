@@ -42,10 +42,9 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-AcqirisTdcDataV1Cvt::AcqirisTdcDataV1Cvt (const std::string& typeGroupName,
-                                    hsize_t chunk_size,
-                                    int deflate )
-  : EvtDataTypeCvt<XtcType>( typeGroupName, chunk_size, deflate )
+AcqirisTdcDataV1Cvt::AcqirisTdcDataV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
+    const Pds::Src& src, const CvtOptions& cvtOptions )
+  : EvtDataTypeCvt<XtcType>( group, typeGroupName, src, cvtOptions )
   , m_dataCont(0)
 {
 }
@@ -60,12 +59,10 @@ AcqirisTdcDataV1Cvt::~AcqirisTdcDataV1Cvt ()
 
 /// method called to create all necessary data containers
 void
-AcqirisTdcDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+AcqirisTdcDataV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // make container for data objects
-  DataCont::factory_type dataContFactory ( "data", chunk_size, deflate, true ) ;
-  m_dataCont = new DataCont ( dataContFactory ) ;
+  m_dataCont = makeCont<DataCont>("data", group, true) ;
 }
 
 // typed conversion method
@@ -84,14 +81,7 @@ AcqirisTdcDataV1Cvt::fillContainers(hdf5pp::Group group,
   
   // store the data in the containers
   H5Type h5data(count, &data);
-  m_dataCont->container(group)->append (h5data) ;
-}
-
-/// method called when the driver closes a group in the file
-void
-AcqirisTdcDataV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_dataCont ) m_dataCont->closeGroup( group ) ;
+  m_dataCont->append (h5data) ;
 }
 
 } // namespace O2OTranslator

@@ -23,9 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/Gsc16aiDataV1.h"
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtDataContFactoryTyped.h"
+#include "O2OTranslator/CvtOptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -57,10 +55,11 @@ public:
   typedef H5DataTypes::Gsc16aiDataV1 H5Type;
   
   // constructor
-  Gsc16aiDataV1Cvt(const std::string& typeGroupName,
+  Gsc16aiDataV1Cvt(const hdf5pp::Group& group,
+      const std::string& typeGroupName,
+      const Pds::Src& src,
       const ConfigObjectStore& configStore,
-      hsize_t chunk_size,
-      int deflate);
+      const CvtOptions& cvtOptions);
 
   // Destructor
   virtual ~Gsc16aiDataV1Cvt () ;
@@ -68,8 +67,7 @@ public:
 protected:
 
   /// method called to create all necessary data containers
-  virtual void makeContainers(hsize_t chunk_size, int deflate,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src);
 
   // typed conversion method
   virtual void fillContainers(hdf5pp::Group group,
@@ -78,13 +76,10 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
-  /// method called when the driver closes a group in the file
-  virtual void closeContainers(hdf5pp::Group group);
-
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ValueCont ;
+  typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
+  typedef H5DataTypes::ObjectContainer<uint16_t> ValueCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;

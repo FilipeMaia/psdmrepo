@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -21,33 +22,34 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "O2OTranslator/O2OPdsDataFwd.h"
+#include "O2OTranslator/O2OXtcSrc.h"
+#include "pdsdata/xtc/Damage.hh"
+#include "pdsdata/xtc/Dgram.hh"
+#include "pdsdata/xtc/TypeId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "O2OTranslator/O2OXtcSrc.h"
 
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
 
+
+namespace O2OTranslator {
+
 /**
- *  Interface for a "visitor" class for XTC scanning.
+ *  @brief Interface for a "visitor" class for XTC scanning.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-namespace O2OTranslator {
-
-class O2OXtcScannerI  {
+class O2OXtcScannerI : boost::noncopyable {
 public:
 
   // Destructor
@@ -66,13 +68,15 @@ public:
   virtual void dataObject ( const void* data, 
                             size_t size, 
                             const Pds::TypeId& typeId, 
-                            const O2OXtcSrc& src ) = 0 ;
+                            const O2OXtcSrc& src,
+                            Pds::Damage damage ) = 0 ;
 
   // visit the data object in configure or begincalibcycle transitions
   virtual void configObject(const void* data,
                             size_t size,
                             const Pds::TypeId& typeId,
-                            const O2OXtcSrc& src) = 0;
+                            const O2OXtcSrc& src,
+                            Pds::Damage damage) = 0;
 
 protected:
 
@@ -80,10 +84,6 @@ protected:
   O2OXtcScannerI () {}
 
 private:
-
-  // Copy constructor and assignment are disabled by default
-  O2OXtcScannerI ( const O2OXtcScannerI& ) ;
-  O2OXtcScannerI& operator = ( const O2OXtcScannerI& ) ;
 
 };
 

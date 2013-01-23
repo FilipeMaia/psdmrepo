@@ -13,8 +13,8 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <stack>
 #include <cassert>
+#include <boost/lexical_cast.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -26,7 +26,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "O2OTranslator/SrcFilter.h"
+#include "O2OTranslator/O2OXtcSrc.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -59,16 +59,30 @@ public:
   /**
    *  Constructor for converter.
    *
+   *  @param[in] group          HDF5 group inside which we create our stuff
    *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
    *                            derived from type, should be unique.
-   *  @param[in] srcFilter      Source filter object, default is to allow all sources
+   *  @param[in] src            Data source
    */
-  ConfigDataTypeCvt ( const std::string& typeGroupName, SrcFilter srcFilter = SrcFilter() )
+  ConfigDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src)
     : DataTypeCvt<typename H5Type::XtcType>()
     , m_typeGroupName(typeGroupName)
-    , m_srcFilter(srcFilter)
-    , m_groups()
-  {}
+    , m_group()
+  {
+    // check if the group already there
+    const std::string& srcName = boost::lexical_cast<std::string>(src);
+    if ( group.hasChild(typeGroupName) ) {
+      hdf5pp::Group typeGroup = group.openGroup(typeGroupName);
+      if (typeGroup.hasChild(srcName)) {
+        m_group = typeGroup.openGroup(srcName);
+        MsgLog("ConfigDataTypeCvt", trace, "group " << typeGroupName << '/' << srcName << " already exists") ;
+        return;
+      }
+    }
+
+    // create separate group
+    m_group = group.createGroup(typeGroupName + "/" + srcName);
+  }
 
   // Destructor
   virtual ~ConfigDataTypeCvt () {}
@@ -78,62 +92,38 @@ public:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTimeStamp& time )
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage )
   {
-    // filter source
-    if (not m_srcFilter(src.top())) return;
-
-    // this should not happen
-    assert ( not m_groups.empty() ) ;
-
     // check data size
-    if ( H5Type::xtcSize(data) != size ) {
+    if (H5Type::xtcSize(data) != size) {
       if ( size == 0 ) {
         MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << m_typeGroupName << ", expected size " <<H5Type::xtcSize(data)) ;
         return;
       }
-      throw O2OXTCSizeException ( ERR_LOC, m_typeGroupName, H5Type::xtcSize(data), size ) ;
+      throw O2OXTCSizeException(ERR_LOC, m_typeGroupName, H5Type::xtcSize(data), size);
     }
     
-    // get the name of the group for this object
-    const std::string& grpName = m_typeGroupName + "/" + src.name() ;
-
-    if ( m_groups.top().hasChild(m_typeGroupName) ) {
-      hdf5pp::Group typeGroup = m_groups.top().openGroup(m_typeGroupName);
-      if ( typeGroup.hasChild(src.name()) ) {
-        MsgLog("ConfigDataTypeCvt", trace, "group " << grpName << " already exists") ;
-        return;
-      }
-    }
-
-    // create separate group
-    hdf5pp::Group grp = m_groups.top().createGroup( grpName );
-
     // store the data
-    H5Type::store ( data, grp ) ;
-  }
-
-  /// method called when the driver makes a new group in the file
-  virtual void openGroup( hdf5pp::Group group ) {
-    m_groups.push ( group ) ;
-  }
-
-  /// method called when the driver closes a group in the file
-  virtual void closeGroup( hdf5pp::Group group ) {
-    if ( m_groups.empty() ) return ;
-    while ( m_groups.top() != group ) m_groups.pop() ;
-    if ( m_groups.empty() ) return ;
-    m_groups.pop() ;
+    H5Type::store(data, m_group);
   }
 
 protected:
 
 private:
 
+  // method called to fill void spaces for missing data
+  virtual void fillMissing(const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src,
+                           const H5DataTypes::XtcClockTimeStamp& time,
+                           Pds::Damage damage)
+  {
+    // For configuration objects we do not do anything if data is missing/damaged
+  }
+
   // Data members
-  std::string m_typeGroupName ;
-  const SrcFilter m_srcFilter;
-  std::stack<hdf5pp::Group> m_groups ;
+  std::string m_typeGroupName;
+  hdf5pp::Group m_group;
 
 };
 

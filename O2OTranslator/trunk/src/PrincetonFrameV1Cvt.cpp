@@ -47,11 +47,12 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const std::string& typeGroupName,
-                                           const ConfigObjectStore& configStore,
-                                           hsize_t chunk_size,
-                                           int deflate )
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const ConfigObjectStore& configStore,
+    const CvtOptions& cvtOptions )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_frameCont(0)
   , m_frameDataCont(0)
@@ -69,16 +70,10 @@ PrincetonFrameV1Cvt::~PrincetonFrameV1Cvt ()
 
 // method called to create all necessary data containers
 void
-PrincetonFrameV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+PrincetonFrameV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  FrameCont::factory_type frContFactory( "frame", chunk_size, deflate, true ) ;
-  m_frameCont = new FrameCont ( frContFactory ) ;
-
-  // create container for frame data
-  FrameDataCont::factory_type dataContFactory( "data", chunk_size, deflate, true ) ;
-  m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
+  m_frameCont = makeCont<FrameCont>("frame", group, true);
 }
 
 // typed conversion method
@@ -123,17 +118,11 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   H5Type frame(data);
-  m_frameCont->container(group)->append ( frame ) ;
-  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
-}
+  m_frameCont->append(frame);
 
-/// method called when the driver closes a group in the file
-void
-PrincetonFrameV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_frameCont ) m_frameCont->closeGroup( group ) ;
-  if ( m_frameDataCont ) m_frameDataCont->closeGroup( group ) ;
+  hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
+  if (not m_frameDataCont) m_frameDataCont = makeCont<FrameDataCont>("data", group, true, type) ;
+  m_frameDataCont->append(*data.data(), type);
 }
 
 } // namespace O2OTranslator

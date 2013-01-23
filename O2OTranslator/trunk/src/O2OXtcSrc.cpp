@@ -98,9 +98,11 @@ O2OXtcSrc::name() const
 
 } // namespace O2OTranslator
 
+namespace Pds {
 /// Helper method to format Pds::Src to a standard stream
 std::ostream&
 operator<<(std::ostream& out, const Pds::Src& src)
 {
   return out << ::toName(src);
+}
 }

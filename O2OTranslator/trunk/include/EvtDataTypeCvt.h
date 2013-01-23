@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <map>
 #include <stack>
+#include <boost/lexical_cast.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -26,11 +27,12 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
+#include "H5DataTypes/ObjectContainer.h"
+#include "H5DataTypes/XtcDamage.h"
+#include "H5DataTypes/XtcClockTimeStamp.h"
 #include "MsgLogger/MsgLogger.h"
-#include "O2OTranslator/CvtGroupMap.h"
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/SrcFilter.h"
+#include "O2OTranslator/CvtOptions.h"
+#include "O2OTranslator/O2OXtcSrc.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -62,30 +64,42 @@ public:
   /**
    *  Constructor for converter
    *
+   *  @param[in] group          HDF5 group inside which we create our stuff
    *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
    *                            derived from type, should be unique.
-   *  @param[in] chunk_size     Chunk size in bytes, your best guess
-   *  @param[in] deflate        Compression level, use negative number to disable compression
-   *  @param[in] srcFilter      Source filter object, default is to allow all sources
+   *  @param[in] src            Data source
+   *  @param[in] cvtOptions     Object holding conversion options
    */
-  EvtDataTypeCvt(const std::string& typeGroupName, hsize_t chunk_size, int deflate,
-      SrcFilter srcFilter = SrcFilter())
+  EvtDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src, const CvtOptions& cvtOptions)
     : DataTypeCvt<XtcType>()
     , m_typeGroupName(typeGroupName)
-    , m_chunk_size(chunk_size)
-    , m_deflate(deflate)
-    , m_srcFilter(srcFilter)
-    , m_groups()
-    , m_group2group()
+    , m_cvtOptions(cvtOptions)
+    , m_group()
     , m_timeCont(0)
-
+    , m_damageCont(0)
+    , m_maskCont(0)
   {
+    // check if the group already there
+    const std::string& srcName = boost::lexical_cast<std::string>(src);
+    if ( group.hasChild(typeGroupName) ) {
+      hdf5pp::Group typeGroup = group.openGroup(typeGroupName);
+      if (typeGroup.hasChild(srcName)) {
+        m_group = typeGroup.openGroup(srcName);
+        MsgLog("ConfigDataTypeCvt", trace, "group " << typeGroupName << '/' << srcName << " already exists") ;
+        return;
+      }
+    }
+
+    // create new group
+    m_group = group.createGroup(typeGroupName + "/" + srcName);
   }
 
   // Destructor
   virtual ~EvtDataTypeCvt ()
   {
-    delete m_timeCont ;
+    delete m_timeCont;
+    delete m_damageCont;
+    delete m_maskCont;
   }
 
   // typed conversion method
@@ -93,80 +107,62 @@ public:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTimeStamp& time )
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage )
   {
-    // filter source
-    if (not m_srcFilter(src.top())) return;
-
-    hdf5pp::Group group = m_groups.top() ;
-    hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
-    if ( not subgroup.valid() ) {
-
-      // get the name of the group for this object
-      const std::string& grpName = m_typeGroupName + "/" + src.name() ;
-
-      // create separate group
-      if (group.hasChild(grpName)) {
-        MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- existing group " << grpName ) ;
-        subgroup = group.openGroup( grpName );
-      } else {
-        MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
-        subgroup = group.createGroup( grpName );
-      }
-
-      m_group2group.insert ( group, src.top(), subgroup ) ;
-    }
-
     // initialize all containers
     if (not m_timeCont) {
 
-      // call subclass method to make container for data objects
-      makeContainers(m_chunk_size, m_deflate, typeId, src);
-
       // make container for time
-      XtcClockTimeCont::factory_type timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-      m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
+      m_timeCont = makeCont<XtcClockTimeCont>( "time", m_group, true);
+
+      // make container for damage array if requested
+      if (m_cvtOptions.storeDamage()) {
+        m_damageCont = makeCont<XtcDamageCont>("_damage", m_group, false);
+      }
+
+      // make container for mask array if needed
+      if (m_cvtOptions.fillMissing()) {
+        m_maskCont = makeCont<MaskCont>("_mask",  m_group, false);
+      }
+
+      // call subclass method to make container for data objects
+      makeContainers(m_group, typeId, src);
+
     }
 
     // fill time container with data
-    m_timeCont->container(subgroup)->append(time);
+    m_timeCont->append(time);
+    if (m_damageCont) m_damageCont->append(damage);
+    if (m_maskCont) m_maskCont->append(uint8_t(damage.bits() == 0));
 
     // call subclass method to fill its containers with data
-    this->fillContainers(subgroup, data, size, typeId, src);
+    this->fillContainers(m_group, data, size, typeId, src);
   }
 
-  /// method called when the driver makes a new group in the file
-  virtual void openGroup( hdf5pp::Group group ) {
-    m_groups.push ( group ) ;
-  }
-
-  /// method called when the driver closes a group in the file
-  virtual void closeGroup( hdf5pp::Group group )
+  // method called to fill void spaces for missing data
+  virtual void fillMissing(const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src,
+                           const H5DataTypes::XtcClockTimeStamp& time,
+                           Pds::Damage damage)
   {
-    // tell my subobjects that we are closing all subgroups
-    const CvtGroupMap::GroupList& subgroups = m_group2group.groups( group ) ;
-    for ( CvtGroupMap::GroupList::const_iterator it = subgroups.begin() ; it != subgroups.end() ; ++ it ) {
-      if (m_timeCont) m_timeCont->closeGroup(*it);
-      this->closeContainers(*it);
-    }
-
-    // remove it from the map
-    m_group2group.erase( group ) ;
-
-    // remove it from the stack
-    if ( m_groups.empty() ) return ;
-    while ( m_groups.top() != group ) m_groups.pop() ;
-    if ( m_groups.empty() ) return ;
-    m_groups.pop() ;
+    // TODO: add implementation here
   }
 
   const std::string& typeGroupName() const { return m_typeGroupName ; }
   
 protected:
 
+  // create container of given type
+  template <typename ContType>
+  ContType* makeCont(const std::string& name, hdf5pp::Group& location, bool shuffle,
+      hdf5pp::Type type = hdf5pp::TypeTraits<typename ContType::value_type>::stored_type())
+  {
+    return new ContType(name, location, type, m_cvtOptions.chunkSize(), m_cvtOptions.compLevel(), shuffle);
+  }
+
   /// method called to create all necessary data containers
-  virtual void makeContainers(hsize_t chunk_size, int deflate,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src) = 0;
+  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src) = 0;
 
   // typed conversion method
   virtual void fillContainers(hdf5pp::Group group,
@@ -175,23 +171,19 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src) = 0 ;
 
-  /// method called when the driver closes a group in the file
-  virtual void closeContainers(hdf5pp::Group group) = 0 ;
-
 private:
 
-  typedef std::map<hdf5pp::Group,hdf5pp::Group> Group2Group ;
-
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTimeStamp> XtcClockTimeCont ;
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcDamage> XtcDamageCont ;
+  typedef H5DataTypes::ObjectContainer<uint8_t> MaskCont ;
 
   // Data members
-  const std::string m_typeGroupName ;
-  const hsize_t m_chunk_size ;
-  const int m_deflate ;
-  const SrcFilter m_srcFilter;
-  std::stack<hdf5pp::Group> m_groups ;
-  CvtGroupMap m_group2group ;
+  const std::string m_typeGroupName ;  ///< Group name for this type
+  const CvtOptions m_cvtOptions;
+  hdf5pp::Group m_group;
   XtcClockTimeCont* m_timeCont ;
+  XtcDamageCont* m_damageCont;
+  MaskCont* m_maskCont;
 
 };
 

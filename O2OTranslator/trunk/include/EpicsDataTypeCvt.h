@@ -15,7 +15,6 @@
 //-----------------
 #include <string>
 #include <map>
-#include <stack>
 #include <utility>
 
 //----------------------
@@ -29,9 +28,6 @@
 #include "pdsdata/epics/EpicsPvData.hh"
 #include "hdf5pp/Group.h"
 #include "O2OTranslator/CvtDataContFactoryEpics.h"
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtGroupMap.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -64,10 +60,12 @@ public:
   typedef Pds::EpicsPvHeader XtcType ;
 
   // Default constructor
-  EpicsDataTypeCvt ( const std::string& topGroupName,
-                     const ConfigObjectStore& configStore,
-                     hsize_t chunk_size,
-                     int deflate ) ;
+  EpicsDataTypeCvt ( hdf5pp::Group group,
+      const std::string& topGroupName,
+      const Pds::Src& src,
+      const ConfigObjectStore& configStore,
+      hsize_t chunk_size,
+      int deflate ) ;
 
   // Destructor
   virtual ~EpicsDataTypeCvt () ;
@@ -79,48 +77,28 @@ protected:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTimeStamp& time );
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage );
 
-  /// method called when the driver makes a new group in the file
-  virtual void openGroup( hdf5pp::Group group ) ;
-
-  /// method called when the driver closes a group in the file
-  virtual void closeGroup( hdf5pp::Group group );
-
-  // typed conversion method
-  virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                                      const XtcType& data,
-                                      size_t size,
-                                      const Pds::TypeId& typeId,
-                                      const O2OXtcSrc& src,
-                                      const H5DataTypes::XtcClockTimeStamp& time ) ;
-
-  /// method called when the driver closes a group in the file
-  virtual void closeSubgroup( hdf5pp::Group group ) ;
+  // method called to fill void spaces for missing data
+  virtual void fillMissing(const Pds::TypeId& typeId,
+                      const O2OXtcSrc& src,
+                      const H5DataTypes::XtcClockTimeStamp& time,
+                      Pds::Damage damage)
+  {
+    // For EPICS we do not do anything if data is missing/damaged
+  }
 
   // get the name of the channel
   std::string pvName (const XtcType& data, const Pds::Src& src) ;
 
+  // get alias name for a Pv, return empty string if none defined
+  std::string aliasName(int pvId, const Pds::Src& src);
+
 private:
 
-  typedef std::map<hdf5pp::Group,hdf5pp::Group> Group2Group ;
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTimeStamp> > XtcClockTimeCont ;
-  typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
-
-  // PV id is: (src, epics.pvId)
-  typedef std::pair<Pds::Src, int> PvId;
-
-  // compare op for PvId
-  struct _PvIdCmp {
-    bool operator()(const PvId& lhs, const PvId& rhs) const {
-      if ( lhs.first.log() < rhs.first.log() ) return true ;
-      if ( lhs.first.log() > rhs.first.log() ) return false ;
-      if ( lhs.first.phy() < rhs.first.phy() ) return true ;
-      if ( lhs.first.phy() > rhs.first.phy() ) return false ;
-      if ( lhs.second < rhs.second ) return true ;
-      return false ;
-    }
-  };
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTimeStamp> XtcClockTimeCont ;
+  typedef H5DataTypes::ObjectContainer<Pds::EpicsPvHeader> DataCont ;
 
   struct _pvdata {
     _pvdata() : timeCont(0), dataCont(0) {}
@@ -131,23 +109,17 @@ private:
 
   typedef std::map<std::string, hdf5pp::Group> PV2Group ; // maps PV name to group
   typedef std::map<std::string, hdf5pp::Type> PV2Type ;   // maps PV name to its HDF5 type
-  typedef std::map<hdf5pp::Group, PV2Group> Subgroups ;   // maps Src group to (PV id -> Group) mapping
-  typedef std::map<hdf5pp::Group, PV2Type> Types ;        // maps Src group to (PV id -> Type) mapping
   typedef std::map<std::string, _pvdata> PVDataMap ;      // maps PV name to containers
-  typedef std::map<PvId, std::string, _PvIdCmp> PVNameMap;// maps PV id to its name
 
   // Data members
   const std::string m_typeGroupName ;
   const ConfigObjectStore& m_configStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
-  std::stack<hdf5pp::Group> m_groups ;
-  CvtGroupMap m_group2group ;
-  Subgroups m_subgroups ;  // maps top EPICS group (.../Epics::EpicsPv/EpicsArch.0:NoDevice.0) to PV2Group mapping
-  Types m_types ;
+  hdf5pp::Group m_group;
+  PV2Group m_subgroups ;
+  PV2Type m_types ;
   PVDataMap m_pvdatamap ;
-  PVNameMap m_pvnames ;
-
 };
 
 } // namespace O2OTranslator

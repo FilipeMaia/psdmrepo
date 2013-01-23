@@ -70,11 +70,13 @@ public:
 
   // visit the data object
   virtual void dataObject ( const void* data, size_t size,
-       const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
+       const Pds::TypeId& typeId, const O2OXtcSrc& src,
+       Pds::Damage damage ) ;
 
   // visit the data object in configure or begincalibcycle transitions
   virtual void configObject(const void* data, size_t size,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+      const Pds::TypeId& typeId, const O2OXtcSrc& src,
+      Pds::Damage damage);
 
 protected:
 
@@ -96,10 +98,6 @@ private:
   LusiTime::Time m_runEndTime ;
   bool m_stored ;
   TransitionClock m_transClock;
-
-  // Copy constructor and assignment are disabled by default
-  MetaDataScanner ( const MetaDataScanner& ) ;
-  MetaDataScanner& operator = ( const MetaDataScanner& ) ;
 
 };
 

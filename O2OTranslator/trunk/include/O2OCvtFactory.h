@@ -14,7 +14,9 @@
 // C/C++ Headers --
 //-----------------
 #include <map>
+#include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -23,6 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "O2OTranslator/CvtOptions.h"
 #include "O2OTranslator/DataTypeCvtI.h"
 
 //------------------------------------
@@ -56,31 +59,53 @@ namespace O2OTranslator {
  *  @author Andy Salnikov
  */
 
-class O2OCvtFactory  {
+class O2OCvtFactory : boost::noncopyable {
 public:
 
   typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
-  typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
-  typedef CvtMap::iterator iterator ;
-  typedef CvtMap::const_iterator const_iterator ;
+  typedef std::vector<DataTypeCvtPtr> DataTypeCvtList;
 
   /**
    *  @brief Constructor instantiates converters for all known data types
    */
   O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& calibStore,
-      const O2OMetaData& metadata, int compression);
+      const O2OMetaData& metadata, const CvtOptions& cvtOptions);
 
-  iterator begin() { return m_cvtMap.begin(); }
-  iterator end() { return m_cvtMap.end(); }
-  const_iterator begin() const { return m_cvtMap.begin(); }
-  const_iterator end() const { return m_cvtMap.end(); }
+  /**
+   *  @brief Return the list of converters for given arguments.
+   *
+   *  Find or create converters (there may be any number of those) for a given
+   *  combination of group, type, and source.
+   */
+  DataTypeCvtList getConverters(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src);
 
-  iterator find(const Pds::TypeId& typeId) { return m_cvtMap.find(typeId.value()); }
-  const_iterator find(const Pds::TypeId& typeId) const { return m_cvtMap.find(typeId.value()); }
+  /**
+   *  @brief Notify factory that the group is about to be closed.
+   *
+   *  When the group is closed all converters associated with the group are
+   *  "closed" as well meaning that they are simply destroyed.
+   */
+  void closeGroup(const hdf5pp::Group& group);
 
 private:
+
+  // Instantiate all converters for given triplet
+  DataTypeCvtList makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src);
+
+  // helper class for ordering (TypeId, Src) combination
+  typedef std::pair<Pds::TypeId, Pds::Src> TypeAndSource;
+  struct TypeAndSourceCmp {
+    bool operator()(const TypeAndSource& lhs, const TypeAndSource& rhs) const;
+  };
+
+  typedef std::map<TypeAndSource, DataTypeCvtList, TypeAndSourceCmp> TypeSrcCvtMap;
+  typedef std::map<hdf5pp::Group, TypeSrcCvtMap> GroupCvtMap;
   
-  CvtMap m_cvtMap ;
+  ConfigObjectStore& m_configStore;
+  CalibObjectStore& m_calibStore;
+  const O2OMetaData& m_metadata;
+  CvtOptions m_cvtOptions;
+  GroupCvtMap m_groupCvtMap;
   
 };
 

@@ -43,11 +43,12 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const std::string& typeGroupName,
-                                           const ConfigObjectStore& configStore,
-                                           hsize_t chunk_size,
-                                           int deflate)
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const ConfigObjectStore& configStore,
+    const CvtOptions& cvtOptions)
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_objCont(0)
   , m_dataCont(0)
@@ -67,20 +68,10 @@ OceanOpticsDataV1Cvt::~OceanOpticsDataV1Cvt ()
 
 // method called to create all necessary data containers
 void
-OceanOpticsDataV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+OceanOpticsDataV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for objects
-  ObjectCont::factory_type objContFactory( "data", chunk_size, deflate, true ) ;
-  m_objCont = new ObjectCont ( objContFactory ) ;
-
-  // create container for data
-  DataCont::factory_type dataContFactory( "spectra", chunk_size, deflate, true ) ;
-  m_dataCont = new DataCont ( dataContFactory ) ;
-
-  // create container for corrected data
-  CorrectedDataCont::factory_type corrDataContFactory( "corrSpectra", chunk_size, deflate, true ) ;
-  m_corrDataCont = new CorrectedDataCont ( corrDataContFactory ) ;
+  m_objCont = makeCont<ObjectCont>("data", group, true) ;
 }
 
 // typed conversion method
@@ -107,20 +98,15 @@ OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   H5Type obj(data);
-  m_objCont->container(group)->append(obj) ;
-  hdf5pp::Type type = H5Type::stored_data_type() ;
-  m_dataCont->container(group,type)->append(*data.data(), type);
-  type = H5Type::stored_corrected_data_type() ;
-  m_corrDataCont->container(group,type)->append(*corrData, type);
-}
+  m_objCont->append(obj) ;
 
-/// method called when the driver closes a group in the file
-void
-OceanOpticsDataV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_objCont ) m_objCont->closeGroup( group ) ;
-  if ( m_dataCont ) m_dataCont->closeGroup( group ) ;
-  if ( m_corrDataCont ) m_corrDataCont->closeGroup( group ) ;
+  hdf5pp::Type type = H5Type::stored_data_type() ;
+  if (not m_dataCont) m_dataCont = makeCont<DataCont>("spectra", group, true, type) ;
+  m_dataCont->append(*data.data(), type);
+
+  type = H5Type::stored_corrected_data_type() ;
+  if (not m_corrDataCont) m_corrDataCont = makeCont<CorrectedDataCont>("corrSpectra", group, true, type);
+  m_corrDataCont->append(*corrData, type);
 }
 
 } // namespace O2OTranslator

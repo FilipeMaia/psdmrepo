@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Damage.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/TypeId.hh"
 #include "H5DataTypes/XtcClockTimeStamp.h"
@@ -62,13 +63,8 @@ public:
                          size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTimeStamp& time ) = 0 ;
-
-  /// method called when the driver makes a new group in the file
-  virtual void openGroup( hdf5pp::Group group ) = 0 ;
-
-  /// method called when the driver closes a group in the file
-  virtual void closeGroup( hdf5pp::Group group ) = 0 ;
+                         const H5DataTypes::XtcClockTimeStamp& time,
+                         Pds::Damage damage) = 0 ;
 
 protected:
 

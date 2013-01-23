@@ -43,6 +43,26 @@ namespace {
     return alias;
   }
 
+  // PV id is: (src, epics.pvId)
+  typedef std::pair<Pds::Src, int> PvId;
+
+  // compare op for PvId
+  struct _PvIdCmp {
+    bool operator()(const PvId& lhs, const PvId& rhs) const {
+      if ( lhs.second < rhs.second ) return true ;
+      if ( lhs.second > rhs.second ) return false ;
+      if ( lhs.first.log() < rhs.first.log() ) return true ;
+      if ( lhs.first.log() > rhs.first.log() ) return false ;
+      if ( lhs.first.phy() < rhs.first.phy() ) return true ;
+      return false ;
+    }
+  };
+
+  typedef std::map<PvId, std::string, _PvIdCmp> PVNameMap;// maps PV id to its name
+
+  // shared mapping from PvId to PV name
+  PVNameMap g_pvnames;
+
 }
 
 //		----------------------------------------
@@ -54,22 +74,34 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-EpicsDataTypeCvt::EpicsDataTypeCvt ( const std::string& topGroupName,
-                                     const ConfigObjectStore& configStore,
-                                     hsize_t chunk_size,
-                                     int deflate )
+EpicsDataTypeCvt::EpicsDataTypeCvt ( hdf5pp::Group group,
+    const std::string& topGroupName,
+    const Pds::Src& src,
+    const ConfigObjectStore& configStore,
+    hsize_t chunk_size,
+    int deflate )
   : DataTypeCvt<Pds::EpicsPvHeader>()
   , m_typeGroupName(topGroupName)
   , m_configStore(configStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
-  , m_groups()
-  , m_group2group()
+  , m_group()
   , m_subgroups()
   , m_types()
   , m_pvdatamap()
-  , m_pvnames()
 {
+  // get the name of the group for this object
+  const std::string& srcName = boost::lexical_cast<std::string>(src);
+  const std::string& grpName = m_typeGroupName + "/" + srcName;
+
+  // create separate group
+  if (group.hasChild(grpName)) {
+    MsgLog(logger, trace, "existing group " << grpName ) ;
+    m_group = group.openGroup( grpName );
+  } else {
+    MsgLog(logger, trace, "creating group " << grpName ) ;
+    m_group = group.createGroup( grpName );
+  }
 }
 
 //--------------
@@ -90,66 +122,8 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
     size_t size,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src,
-    const H5DataTypes::XtcClockTimeStamp& time )
-{
-  hdf5pp::Group group = m_groups.top() ;
-  hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
-  if ( not subgroup.valid() ) {
-
-    // get the name of the group for this object
-    const std::string& grpName = m_typeGroupName + "/" + src.name() ;
-
-    // create separate group
-    if (group.hasChild(grpName)) {
-      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- existing group " << grpName ) ;
-      subgroup = group.openGroup( grpName );
-    } else {
-      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
-      subgroup = group.createGroup( grpName );
-    }
-
-    m_group2group.insert ( group, src.top(), subgroup ) ;
-  }
-
-  // call subclass method to fill its containers with data
-  this->typedConvertSubgroup(subgroup, data, size, typeId, src, time);
-}
-
-/// method called when the driver makes a new group in the file
-void
-EpicsDataTypeCvt::openGroup( hdf5pp::Group group )
-{
-  m_groups.push ( group ) ;
-}
-
-/// method called when the driver closes a group in the file
-void
-EpicsDataTypeCvt::closeGroup( hdf5pp::Group group )
-{
-  // tell my subobjects that we are closing all subgroups
-  const CvtGroupMap::GroupList& subgroups = m_group2group.groups( group ) ;
-  for ( CvtGroupMap::GroupList::const_iterator it = subgroups.begin() ; it != subgroups.end() ; ++ it ) {
-    this->closeSubgroup(*it);
-  }
-
-  // remove it from the map
-  m_group2group.erase( group ) ;
-
-  // remove it from the stack
-  if ( m_groups.empty() ) return ;
-  while ( m_groups.top() != group ) m_groups.pop() ;
-  if ( m_groups.empty() ) return ;
-  m_groups.pop() ;
-}
-
-// typed conversion method
-void
-EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
-                                        const XtcType& data,
-                                        size_t size,
-                                        const Pds::TypeId& typeId,
-                                        const O2OXtcSrc& src,
-                                        const H5DataTypes::XtcClockTimeStamp& time )
+    const H5DataTypes::XtcClockTimeStamp& time,
+    Pds::Damage damage )
 {
   MsgLog(logger,debug, "EpicsDataTypeCvt -- pv id = " << data.iPvId ) ;
 
@@ -162,95 +136,67 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
   // get the name
   const std::string pvname = pvName(data, src.top());
 
+  // is there a subgroup for this PV?
+  hdf5pp::Group subgroup = m_subgroups[pvname] ;
+  if ( not subgroup.valid() ) {
+
+    if (m_group.hasChild(pvname)) {
+
+      MsgLog(logger,trace, "EpicsDataTypeCvt -- opening subgroup " << pvname ) ;
+      subgroup = m_group.openGroup( pvname ) ;
+
+    } else {
+
+      MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
+      subgroup = m_group.createGroup( pvname ) ;
+
+      // there may be an alias defined for this PV
+      const std::string& alias = aliasName(data.iPvId, src.top());
+      if (pvname == alias) {
+        MsgLog(logger, debug, "EpicsDataTypeCvt -- alias is the same as PV name " << alias );
+      } else if (m_group.hasChild(alias)) {
+        MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << alias );
+      } else {
+        try {
+          MsgLog(logger,trace, "EpicsDataTypeCvt -- creating alias " << alias ) ;
+          m_group.makeSoftLink(pvname, alias);
+        } catch (const hdf5pp::Exception& ex) {
+          // complain but continue
+          MsgLog(logger,trace, "EpicsDataTypeCvt -- failed to create alias \"" << alias << "\": " << ex.what()) ;
+        }
+      }
+    }
+
+    m_subgroups[pvname] = subgroup ;
+  }
+
+  // is there a type for this PV?
+  hdf5pp::Type type = m_types[pvname] ;
+  if (not type.valid()) {
+    type = CvtDataContFactoryEpics::stored_type(data);
+    m_types[pvname] = type ;
+  }
+
   // see if there is a structure setup already for this PV
   PVDataMap::iterator pv_it = m_pvdatamap.find(pvname) ;
   if ( pv_it == m_pvdatamap.end() ) {
     // new thing, create all groups/containers
 
     // make container for time
-    XtcClockTimeCont::factory_type timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
-    XtcClockTimeCont* timeCont = new XtcClockTimeCont ( timeContFactory ) ;
+    XtcClockTimeCont* timeCont = new XtcClockTimeCont("time", subgroup,
+        XtcClockTimeCont::value_type::stored_type(), m_chunk_size, m_deflate, true);
 
     // make container for data objects
-    DataCont::factory_type dataContFactory( "data", m_chunk_size, m_deflate, false ) ;
-    DataCont* dataCont = new DataCont ( dataContFactory ) ;
+    DataCont* dataCont = new DataCont("data", subgroup, type, m_chunk_size, m_deflate, false);
 
     // store it all for later use
     _pvdata pv( timeCont, dataCont ) ;
     pv_it = m_pvdatamap.insert( std::make_pair(pvname, pv) ).first ;
   }
 
-  // is there a subgroup for this PV?
-  hdf5pp::Group subgroup = m_subgroups[group][pvname] ;
-  if ( not subgroup.valid() ) {
-    if (group.hasChild(pvname)) {
-
-      MsgLog(logger,trace, "EpicsDataTypeCvt -- opening subgroup " << pvname ) ;
-      subgroup = group.openGroup( pvname ) ;
-
-    } else {
-
-      MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
-      subgroup = group.createGroup( pvname ) ;
-
-      // there may be an alias defined for this PV
-      Pds::TypeId typeId(Pds::TypeId::Id_EpicsConfig, 1);
-      if (const Pds::Epics::ConfigV1* ecfg = m_configStore.find<Pds::Epics::ConfigV1>(typeId, src.top())) {
-        for (int i = 0; i != ecfg->getNumPv(); ++ i) {
-          const Pds::Epics::PvConfigV1& pvcfg = *ecfg->getPvConfig(i);
-          if (pvcfg.iPvId == data.iPvId) {
-            const std::string alias = ::normAliasName(pvcfg.sPvDesc);
-            if (pvname == alias) {
-              MsgLog(logger, debug, "EpicsDataTypeCvt -- alias is the same as PV name " << pvcfg.sPvDesc );
-            } else if (group.hasChild(alias)) {
-              MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << alias );
-            } else {
-              try {
-                MsgLog(logger,trace, "EpicsDataTypeCvt -- creating alias " << alias ) ;
-                group.makeSoftLink(pvname, alias);
-              } catch (const hdf5pp::Exception& ex) {
-                // complain but continue
-                MsgLog(logger,trace, "EpicsDataTypeCvt -- failed to create alias \"" << alias << "\": " << ex.what()) ;
-              }
-              break;
-            }
-          }
-        }
-      }
-
-    }
-    m_subgroups[group][pvname] = subgroup ;
-  }
-
-  // is there a type for this PV?
-  hdf5pp::Type type = m_types[group][pvname] ;
-  if ( not type.valid() ) {
-    type = CvtDataContFactoryEpics::stored_type( data ) ;
-    m_types[group][pvname] = type ;
-  }
-
-  _pvdata& pv = pv_it->second ;
-  pv.timeCont->container(subgroup)->append(time) ;
-  pv.dataCont->container(subgroup,data)->append(data,type) ;
-}
-
-/// method called when the driver closes a group in the file
-void
-EpicsDataTypeCvt::closeSubgroup( hdf5pp::Group group )
-{
-  // close all subgroups
-  PV2Group& pv2group = m_subgroups[group] ;
-  for ( PV2Group::const_iterator it = pv2group.begin() ; it != pv2group.end() ; ++ it ) {
-    PVDataMap::iterator dit = m_pvdatamap.find(it->first) ;
-    if ( dit != m_pvdatamap.end() ) {
-      dit->second.timeCont->closeGroup( it->second ) ;
-      dit->second.dataCont->closeGroup( it->second ) ;
-    }
-  }
-
-  // forget about this group
-  m_subgroups.erase( group ) ;
-  m_types.erase( group ) ;
+  _pvdata& pv = pv_it->second;
+  pv.timeCont->append(time);
+  pv.dataCont->append(data, type);
 }
 
 // get the name of the channel
@@ -259,7 +205,7 @@ EpicsDataTypeCvt::pvName (const XtcType& data, const Pds::Src& src)
 {
   PvId pvid(src, data.iPvId);
 
-  std::string name = m_pvnames[pvid] ;
+  std::string name = g_pvnames[pvid] ;
   if ( name.empty() ) {
 
     if ( dbr_type_is_CTRL(data.iDbrType) ) {
@@ -274,11 +220,29 @@ EpicsDataTypeCvt::pvName (const XtcType& data, const Pds::Src& src)
 
     }
 
-    m_pvnames[pvid] = name ;
+    g_pvnames[pvid] = name ;
   }
 
   return name ;
 }
 
+// get alias name for a Pv, return empty string if none defined
+std::string
+EpicsDataTypeCvt::aliasName(int pvId, const Pds::Src& src)
+{
+  std::string alias;
+
+  Pds::TypeId typeId(Pds::TypeId::Id_EpicsConfig, 1);
+  if (const Pds::Epics::ConfigV1* ecfg = m_configStore.find<Pds::Epics::ConfigV1>(typeId, src)) {
+    for (int i = 0; i != ecfg->getNumPv(); ++ i) {
+      const Pds::Epics::PvConfigV1& pvcfg = *ecfg->getPvConfig(i);
+      if (pvcfg.iPvId == pvId) {
+        alias = ::normAliasName(pvcfg.sPvDesc);
+        break;
+      }
+    }
+  }
+  return alias;
+}
 
 } // namespace O2OTranslator

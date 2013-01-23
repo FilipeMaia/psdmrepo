@@ -49,11 +49,12 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const std::string& typeGroupName,
-                                             const ConfigObjectStore& configStore,
-                                             hsize_t chunk_size,
-                                             int deflate )
-  : EvtDataTypeCvt<XtcType>(typeGroupName, chunk_size, deflate)
+AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const hdf5pp::Group& group,
+    const std::string& typeGroupName,
+    const Pds::Src& src,
+    const ConfigObjectStore& configStore,
+    const CvtOptions& cvtOptions )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_timestampCont(0)
   , m_waveformCont(0)
@@ -71,16 +72,9 @@ AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 
 /// method called to create all necessary data containers
 void
-AcqirisDataDescV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+AcqirisDataDescV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
-  // create container for timestamps
-  TimestampCont::factory_type tsContFactory( "timestamps", chunk_size, deflate, true ) ;
-  m_timestampCont = new TimestampCont ( tsContFactory ) ;
-
-  // create container for waveforms
-  WaveformCont::factory_type wfContFactory( "waveforms", chunk_size, deflate, true ) ;
-  m_waveformCont = new WaveformCont ( wfContFactory ) ;
+  // nothing to do here, types depend on actual data
 }
 
 // typed conversion method
@@ -167,23 +161,14 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
     }
   }
 
-
   // store the data
   hdf5pp::Type type = H5Type::timestampType ( *config ) ;
-  m_timestampCont->container(group,type)->append ( timestamps[0][0], type ) ;
+  if (not m_timestampCont) m_timestampCont = makeCont<TimestampCont>("timestamps", group, true) ;
+  m_timestampCont->append ( timestamps[0][0], type ) ;
   type = H5Type::waveformType ( *config ) ;
-  m_waveformCont->container(group,type)->append ( waveforms[0][0][0], type ) ;
+  if (not m_waveformCont) m_waveformCont = makeCont<WaveformCont>("waveforms", group, true) ;
+  m_waveformCont->append ( waveforms[0][0][0], type ) ;
 
 }
-
-/// method called when the driver closes a group in the file
-void
-AcqirisDataDescV1Cvt::closeContainers( hdf5pp::Group group )
-{
-  if ( m_timestampCont ) m_timestampCont->closeGroup( group ) ;
-  if ( m_waveformCont ) m_waveformCont->closeGroup( group ) ;
-}
-
-
 
 } // namespace O2OTranslator

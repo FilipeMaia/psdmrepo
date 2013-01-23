@@ -40,8 +40,9 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-AcqirisConfigV1Cvt::AcqirisConfigV1Cvt (const std::string& typeGroupName, hsize_t chunk_size, int deflate, SrcFilter srcFilter)
-  : EvtDataTypeCvt<Pds::Acqiris::ConfigV1>(typeGroupName, chunk_size, deflate, srcFilter)
+AcqirisConfigV1Cvt::AcqirisConfigV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
+    const Pds::Src& src, const CvtOptions& cvtOptions)
+  : EvtDataTypeCvt<Pds::Acqiris::ConfigV1>(group, typeGroupName, src, cvtOptions)
   , m_configCont(0)
   , m_horizCont(0)
   , m_trigCont(0)
@@ -62,14 +63,13 @@ AcqirisConfigV1Cvt::~AcqirisConfigV1Cvt ()
 
 /// method called to create all necessary data containers
 void
-AcqirisConfigV1Cvt::makeContainers(hsize_t chunk_size, int deflate,
-    const Pds::TypeId& typeId, const O2OXtcSrc& src)
+AcqirisConfigV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // make containers for data objects
-  m_configCont = new ConfigCont(ConfigCont::factory_type("config", chunk_size, deflate, true));
-  m_horizCont = new HorizCont(HorizCont::factory_type("horiz", chunk_size, deflate, true));
-  m_trigCont = new TrigCont(TrigCont::factory_type("trig", chunk_size, deflate, true));
-  m_vertCont = new VertCont(VertCont::factory_type("vert", chunk_size, deflate, true));
+  m_configCont = makeCont<ConfigCont>("config", group, true);
+  m_horizCont = makeCont<HorizCont>("horiz", group, true);
+  m_trigCont = makeCont<TrigCont>("trig", group, true);
+  // m_vertCont needs actual data to know its type
 }
 
 // typed conversion method
@@ -92,21 +92,13 @@ AcqirisConfigV1Cvt::fillContainers(hdf5pp::Group group,
     vdata[i] = H5DataTypes::AcqirisVertV1( data.vert(i) ) ;
   }
 
-  m_configCont->container(group)->append(cdata);
-  m_horizCont->container(group)->append(hdata);
-  m_trigCont->container(group)->append(tdata);
   hdf5pp::Type vType = hdf5pp::TypeTraits<H5DataTypes::AcqirisVertV1>::native_type(nbrChannels);
-  m_vertCont->container(group, vType)->append(vdata[0], vType);
-}
+  if (not m_vertCont) m_vertCont = makeCont<VertCont>("vert", group, true, vType);
 
-/// method called when the driver closes a group in the file
-void
-AcqirisConfigV1Cvt::closeContainers(hdf5pp::Group group)
-{
-  if (m_configCont) m_configCont->closeGroup(group);
-  if (m_horizCont) m_horizCont->closeGroup(group);
-  if (m_trigCont) m_trigCont->closeGroup(group);
-  if (m_vertCont) m_vertCont->closeGroup(group);
+  m_configCont->append(cdata);
+  m_horizCont->append(hdata);
+  m_trigCont->append(tdata);
+  m_vertCont->append(vdata[0], vType);
 }
 
 } // namespace O2OTranslator

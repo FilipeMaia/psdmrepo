@@ -46,9 +46,10 @@
 
 namespace O2OTranslator {
 
-class O2OFileNameFactory ;
-class O2ODataTypeCvtI ;
-class O2OMetaData ;
+class CvtOptions;
+class O2OFileNameFactory;
+class O2ODataTypeCvtI;
+class O2OMetaData;
 
 /**
  *  Scanner class that sends all data to HDF5 file.
@@ -79,8 +80,8 @@ public:
    *  @param[in] overwrite    If true then allow overwriting of the outpur files
    *  @param[in] split        Output file splitting mode
    *  @param[in] splitSize    Size of the files at which to split
-   *  @param[in] compression  Compression level, give negative number to disable compression
    *  @param[in] extGroups    If true generate extended group names with :NNNN suffix 
+   *  @param[in] cvtOptions   Options passed to converters
    *  @param[in] metadata     Object which keeps metadata (run number, experiment name, etc.)
    *  @param[in] finalDir     If non-empty then move files to this directory after closing
    *  @param[in] backupExt    If non empty then used as backup extension for existing files
@@ -90,8 +91,8 @@ public:
                   bool overwrite,
                   SplitMode split,
                   hsize_t splitSize,
-                  int compression,
                   bool extGroups,
+                  const CvtOptions& cvtOptions,
                   const O2OMetaData& metadata,
                   const std::string& finalDir,
                   const std::string& backupExt,
@@ -110,11 +111,13 @@ public:
 
   // visit the data object
   virtual void dataObject ( const void* data, size_t size,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
+      const Pds::TypeId& typeId, const O2OXtcSrc& src,
+      Pds::Damage damage ) ;
 
   // visit the data object in configure or begincalibcycle transitions
   virtual void configObject(const void* data, size_t size,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+      const Pds::TypeId& typeId, const O2OXtcSrc& src,
+      Pds::Damage damage);
 
 protected:
 
@@ -134,7 +137,8 @@ protected:
   void storeConfig0(); 
 
   // Method which splits shared BLD data objects
-  void splitSharedObject(const void* data, size_t size, const Pds::TypeId& typeId, const O2OXtcSrc& src);
+  void splitSharedObject(const void* data, size_t size, const Pds::TypeId& typeId,
+      const O2OXtcSrc& src, Pds::Damage damage);
 
 private:
 
@@ -146,7 +150,6 @@ private:
   bool m_overwrite ;
   SplitMode m_split;
   hsize_t m_splitSize;
-  int m_compression ;
   bool m_extGroups ;
   const O2OMetaData& m_metadata ;
   const std::string m_finalDir;

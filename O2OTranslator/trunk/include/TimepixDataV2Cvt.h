@@ -23,9 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/TimepixDataV2.h"
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtDataContFactoryTyped.h"
+#include "O2OTranslator/CvtOptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -57,9 +55,10 @@ public:
   typedef H5DataTypes::TimepixDataV2 H5Type ;
 
   // constructor
-  TimepixDataV2Cvt ( const std::string& typeGroupName,
-                     hsize_t chunk_size,
-                     int deflate ) ;
+  TimepixDataV2Cvt ( const hdf5pp::Group& group,
+      const std::string& typeGroupName,
+      const Pds::Src& src,
+      const CvtOptions& cvtOptions ) ;
 
   // Destructor
   virtual ~TimepixDataV2Cvt () ;
@@ -67,8 +66,7 @@ public:
 protected:
 
   /// method called to create all necessary data containers
-  virtual void makeContainers(hsize_t chunk_size, int deflate,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src);
+  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src);
 
   // typed conversion method
   virtual void fillContainers(hdf5pp::Group group,
@@ -77,13 +75,10 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
-  /// method called when the driver closes a group in the file
-  virtual void closeContainers(hdf5pp::Group group);
-
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5Type> > DataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > ImageCont ;
+  typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
+  typedef H5DataTypes::ObjectContainer<uint16_t> ImageCont ;
 
   // Data members
   DataCont* m_dataCont ;
