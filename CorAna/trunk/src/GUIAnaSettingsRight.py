@@ -98,19 +98,19 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         self.grid_row = 0
         self.grid.addWidget(self.tit_lld,           self.grid_row+1, 0, 1, 8)
-        self.grid.addWidget(self.rad_lld_none,      self.grid_row+2, 1, 1, 3)
-        self.grid.addWidget(self.rad_lld_adu,       self.grid_row+3, 1, 1, 3)
-        self.grid.addWidget(self.edi_lld_adu,       self.grid_row+3, 4)
-        self.grid.addWidget(self.rad_lld_rms,       self.grid_row+4, 1, 1, 3)
-        self.grid.addWidget(self.edi_lld_rms,       self.grid_row+4, 4)
+        self.grid.addWidget(self.rad_lld_none,      self.grid_row+2, 1, 1, 4)
+        self.grid.addWidget(self.rad_lld_adu,       self.grid_row+3, 1, 1, 4)
+        self.grid.addWidget(self.edi_lld_adu,       self.grid_row+3, 5)
+        self.grid.addWidget(self.rad_lld_rms,       self.grid_row+4, 1, 1, 4)
+        self.grid.addWidget(self.edi_lld_rms,       self.grid_row+4, 5)
 
         self.grid_row = 4
         self.grid.addWidget(self.tit_mask_set,      self.grid_row+1, 0, 1, 9)
-        self.grid.addWidget(self.rad_mask_none,     self.grid_row+2, 1, 1, 8)
-        self.grid.addWidget(self.rad_mask_new ,     self.grid_row+3, 1, 1, 8)
-        self.grid.addWidget(self.rad_mask_file,     self.grid_row+4, 1, 1, 8)
-        self.grid.addWidget(self.but_mask_poly,     self.grid_row+3, 8, 1, 2)
-        self.grid.addWidget(self.but_browser,       self.grid_row+4, 8, 1, 2)
+        self.grid.addWidget(self.rad_mask_none,     self.grid_row+2, 1, 1, 6)
+        self.grid.addWidget(self.rad_mask_new ,     self.grid_row+3, 1, 1, 6)
+        self.grid.addWidget(self.rad_mask_file,     self.grid_row+4, 1, 1, 6)
+        self.grid.addWidget(self.but_mask_poly,     self.grid_row+3, 7, 1, 3)
+        self.grid.addWidget(self.but_browser,       self.grid_row+4, 7, 1, 3)
         self.grid.addWidget(self.edi_mask_file,     self.grid_row+5, 1, 1, 9)
 
         self.grid_row = 9

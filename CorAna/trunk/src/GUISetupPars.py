@@ -82,7 +82,7 @@ class GUISetupPars ( QtGui.QWidget ) :
         self.grid = QtGui.QGridLayout()
         #self.grid.addWidget(self.tit_bat_num_max,                0, 0, 1, 4)
         #self.grid.addWidget(self.tit_bat_num    ,                1, 0, 1, 4)
-        self.grid.addWidget(self.tit_bat        ,                0, 0, 1, 4)
+        self.grid.addWidget(self.tit_bat        ,                0, 0, 1, 6)
         self.grid.addWidget(self.tit_bat_start  ,                2, 3)
         self.grid.addWidget(self.tit_bat_end    ,                2, 4)
         self.grid.addWidget(self.tit_bat_total  ,                2, 5)
