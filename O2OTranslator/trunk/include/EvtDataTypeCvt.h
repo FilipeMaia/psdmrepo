@@ -17,6 +17,7 @@
 #include <map>
 #include <stack>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -75,9 +76,9 @@ public:
     , m_typeGroupName(typeGroupName)
     , m_cvtOptions(cvtOptions)
     , m_group()
-    , m_timeCont(0)
-    , m_damageCont(0)
-    , m_maskCont(0)
+    , m_timeCont()
+    , m_damageCont()
+    , m_maskCont()
   {
     // check if the group already there
     const std::string& srcName = boost::lexical_cast<std::string>(src);
@@ -95,12 +96,7 @@ public:
   }
 
   // Destructor
-  virtual ~EvtDataTypeCvt ()
-  {
-    delete m_timeCont;
-    delete m_damageCont;
-    delete m_maskCont;
-  }
+  virtual ~EvtDataTypeCvt () {}
 
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
@@ -110,9 +106,66 @@ public:
                               const H5DataTypes::XtcClockTimeStamp& time,
                               Pds::Damage damage )
   {
-    // initialize all containers
-    if (not m_timeCont) {
+    // fill my own containers
+    this->fillTimeDamage(typeId, src, time, damage);
 
+    // call subclass method to fill its containers with data
+    this->fillContainers(m_group, data, size, typeId, src);
+  }
+
+  // method called to fill void spaces for missing data
+  virtual void missingConvert(const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src,
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage)
+  {
+    // if option is not set then skip this stuff altogether
+    if (not m_cvtOptions.fillMissing()) return;
+
+    // fill my own containers
+    this->fillTimeDamage(typeId, src, time, damage);
+
+    // call subclass method to fill its containers with missing stuff
+    this->fillMissing(m_group, typeId, src);
+  }
+
+  const std::string& typeGroupName() const { return m_typeGroupName ; }
+  
+protected:
+
+  // create container of given type
+  template <typename ContType>
+  boost::shared_ptr<ContType>
+  makeCont(const std::string& name, hdf5pp::Group& location, bool shuffle,
+      hdf5pp::Type type = hdf5pp::TypeTraits<typename ContType::value_type>::stored_type())
+  {
+    return boost::make_shared<ContType>(name, location, type, m_cvtOptions.chunkSize(), m_cvtOptions.compLevel(), shuffle);
+  }
+
+  /// method called to create all necessary data containers
+  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src) = 0;
+
+  // typed conversion method
+  virtual void fillContainers(hdf5pp::Group group,
+                              const XtcType& data,
+                              size_t size,
+                              const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src) = 0 ;
+
+  // fill containers for missing data
+  virtual void fillMissing(hdf5pp::Group group,
+                           const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src) = 0;
+
+private:
+
+  // initialize containers
+  void fillTimeDamage(const Pds::TypeId& typeId,
+      const O2OXtcSrc& src,
+      const H5DataTypes::XtcClockTimeStamp& time,
+      Pds::Damage damage)
+  {
+    if (not m_timeCont) {
       // make container for time
       m_timeCont = makeCont<XtcClockTimeCont>( "time", m_group, true);
 
@@ -128,50 +181,19 @@ public:
 
       // call subclass method to make container for data objects
       makeContainers(m_group, typeId, src);
-
     }
 
     // fill time container with data
     m_timeCont->append(time);
     if (m_damageCont) m_damageCont->append(damage);
-    if (m_maskCont) m_maskCont->append(uint8_t(damage.bits() == 0));
-
-    // call subclass method to fill its containers with data
-    this->fillContainers(m_group, data, size, typeId, src);
+    if (m_maskCont) {
+      // mask is OK for no damage or or BLD Ebeam data with only user damage
+      uint8_t mask = damage.bits() == 0 or
+          (typeId.id() == Pds::TypeId::Id_EBeam and damage.bits() == (1 << Pds::Damage::UserDefined));
+      m_maskCont->append(mask);
+    }
   }
 
-  // method called to fill void spaces for missing data
-  virtual void fillMissing(const Pds::TypeId& typeId,
-                           const O2OXtcSrc& src,
-                           const H5DataTypes::XtcClockTimeStamp& time,
-                           Pds::Damage damage)
-  {
-    // TODO: add implementation here
-  }
-
-  const std::string& typeGroupName() const { return m_typeGroupName ; }
-  
-protected:
-
-  // create container of given type
-  template <typename ContType>
-  ContType* makeCont(const std::string& name, hdf5pp::Group& location, bool shuffle,
-      hdf5pp::Type type = hdf5pp::TypeTraits<typename ContType::value_type>::stored_type())
-  {
-    return new ContType(name, location, type, m_cvtOptions.chunkSize(), m_cvtOptions.compLevel(), shuffle);
-  }
-
-  /// method called to create all necessary data containers
-  virtual void makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src) = 0;
-
-  // typed conversion method
-  virtual void fillContainers(hdf5pp::Group group,
-                              const XtcType& data,
-                              size_t size,
-                              const Pds::TypeId& typeId,
-                              const O2OXtcSrc& src) = 0 ;
-
-private:
 
   typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTimeStamp> XtcClockTimeCont ;
   typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcDamage> XtcDamageCont ;
@@ -181,9 +203,9 @@ private:
   const std::string m_typeGroupName ;  ///< Group name for this type
   const CvtOptions m_cvtOptions;
   hdf5pp::Group m_group;
-  XtcClockTimeCont* m_timeCont ;
-  XtcDamageCont* m_damageCont;
-  MaskCont* m_maskCont;
+  boost::shared_ptr<XtcClockTimeCont> m_timeCont ;
+  boost::shared_ptr<XtcDamageCont> m_damageCont;
+  boost::shared_ptr<MaskCont> m_maskCont;
 
 };
 

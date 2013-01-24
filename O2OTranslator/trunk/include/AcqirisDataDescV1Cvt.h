@@ -79,6 +79,11 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
+  // fill containers for missing data
+  virtual void fillMissing(hdf5pp::Group group,
+                           const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src);
+
 private:
 
   typedef H5DataTypes::ObjectContainer<uint64_t> TimestampCont ;
@@ -86,8 +91,9 @@ private:
 
   // Data members
   const ConfigObjectStore& m_configStore;
-  TimestampCont* m_timestampCont ;
-  WaveformCont* m_waveformCont ;
+  boost::shared_ptr<TimestampCont> m_timestampCont ;
+  boost::shared_ptr<WaveformCont> m_waveformCont ;
+  size_t n_miss;
 
 };
 

@@ -70,15 +70,13 @@ public:
                       const CvtOptions& cvtOptions,
                       const std::string& dsname = "data")
     : EvtDataTypeCvt<typename H5Type::XtcType>(group, typeGroupName, src, cvtOptions)
-    , m_dataCont(0)
     , m_dsname(dsname)
+    , m_dataCont()
   {
   }
 
   // Destructor
-  virtual ~EvtDataTypeCvtDef () {
-    delete m_dataCont ;
-  }
+  virtual ~EvtDataTypeCvtDef () {}
 
 protected:
 
@@ -101,8 +99,18 @@ protected:
       throw O2OXTCSizeException ( ERR_LOC, Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
     }
 
+    // this is guaranteed to be called after makeContainers
     H5Type h5data(data);
     m_dataCont->append(h5data);
+  }
+
+  // fill containers for missing data
+  virtual void fillMissing(hdf5pp::Group group,
+                           const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src)
+  {
+    // this is guaranteed to be called after makeContainers
+    m_dataCont->resize(m_dataCont->size() + 1);
   }
 
 private:
@@ -110,8 +118,8 @@ private:
   typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
 
   // Data members
-  DataCont* m_dataCont;
   const std::string m_dsname;  ///< Dataset name
+  boost::shared_ptr<DataCont> m_dataCont;
 
 };
 

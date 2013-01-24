@@ -54,8 +54,9 @@ PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
     const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
-  , m_frameCont(0)
-  , m_frameDataCont(0)
+  , m_frameCont()
+  , m_frameDataCont()
+  , n_miss(0)
 {
 }
 
@@ -64,8 +65,6 @@ PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
 //--------------
 PrincetonFrameV1Cvt::~PrincetonFrameV1Cvt ()
 {
-  delete m_frameCont ;
-  delete m_frameDataCont ;
 }
 
 // method called to create all necessary data containers
@@ -121,8 +120,25 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
   m_frameCont->append(frame);
 
   hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  if (not m_frameDataCont) m_frameDataCont = makeCont<FrameDataCont>("data", group, true, type) ;
+  if (not m_frameDataCont) {
+    m_frameDataCont = makeCont<FrameDataCont>("data", group, true, type) ;
+    if (n_miss) m_frameDataCont->resize(n_miss);
+  }
   m_frameDataCont->append(*data.data(), type);
+}
+
+// fill containers for missing data
+void
+PrincetonFrameV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_frameCont->resize(m_frameCont->size() + 1);
+  if (m_frameDataCont) {
+    m_frameDataCont->resize(m_frameDataCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator

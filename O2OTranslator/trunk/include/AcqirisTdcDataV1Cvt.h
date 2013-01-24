@@ -71,12 +71,17 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
+  // fill containers for missing data
+  virtual void fillMissing(hdf5pp::Group group,
+                           const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src);
+
 private:
 
   typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
 
   // Data members
-  DataCont* m_dataCont ;
+  boost::shared_ptr<DataCont> m_dataCont ;
 
 };
 

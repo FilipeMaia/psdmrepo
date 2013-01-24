@@ -45,7 +45,7 @@ namespace O2OTranslator {
 AcqirisTdcDataV1Cvt::AcqirisTdcDataV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
     const Pds::Src& src, const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<XtcType>( group, typeGroupName, src, cvtOptions )
-  , m_dataCont(0)
+  , m_dataCont()
 {
 }
 
@@ -54,7 +54,6 @@ AcqirisTdcDataV1Cvt::AcqirisTdcDataV1Cvt (const hdf5pp::Group& group, const std:
 //--------------
 AcqirisTdcDataV1Cvt::~AcqirisTdcDataV1Cvt ()
 {
-  delete m_dataCont ;
 }
 
 /// method called to create all necessary data containers
@@ -82,6 +81,15 @@ AcqirisTdcDataV1Cvt::fillContainers(hdf5pp::Group group,
   // store the data in the containers
   H5Type h5data(count, &data);
   m_dataCont->append (h5data) ;
+}
+
+// fill containers for missing data
+void
+AcqirisTdcDataV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_dataCont->resize(m_dataCont->size() + 1);
 }
 
 } // namespace O2OTranslator

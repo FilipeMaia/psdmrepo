@@ -56,8 +56,9 @@ FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const hdf5pp::Group& group,
   : Super(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_cfgTypeId(cfgTypeId)
-  , m_frameCont(0)
-  , m_frameDataCont(0)
+  , m_frameCont()
+  , m_frameDataCont()
+  , n_miss(0)
 {
 }
 
@@ -67,8 +68,6 @@ FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const hdf5pp::Group& group,
 template <typename FrameType>
 FliFrameV1Cvt<FrameType>::~FliFrameV1Cvt ()
 {
-  delete m_frameCont ;
-  delete m_frameDataCont ;
 }
 
 // method called to create all necessary data containers
@@ -106,9 +105,28 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
   H5Type frame(data);
   m_frameCont->append ( frame ) ;
   hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  if (not m_frameDataCont) m_frameDataCont = Super::template makeCont<FrameDataCont>("data", group, true, type);
+  if (not m_frameDataCont) {
+    m_frameDataCont = Super::template makeCont<FrameDataCont>("data", group, true, type);
+    if (n_miss) m_frameDataCont->resize(n_miss);
+  }
   m_frameDataCont->append(*data.data(), type);
 }
+
+// fill containers for missing data
+template <typename FrameType>
+void
+FliFrameV1Cvt<FrameType>::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_frameCont->resize(m_frameCont->size() + 1);
+  if (m_frameDataCont) {
+    m_frameDataCont->resize(m_frameDataCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
+}
+
 
 // explicitly instantiate for know types
 template class FliFrameV1Cvt<H5DataTypes::AndorFrameV1>;

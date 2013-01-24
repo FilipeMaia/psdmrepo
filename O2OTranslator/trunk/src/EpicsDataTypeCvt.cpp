@@ -152,7 +152,9 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
 
       // there may be an alias defined for this PV
       const std::string& alias = aliasName(data.iPvId, src.top());
-      if (pvname == alias) {
+      if (alias.empty()) {
+        // fine, means no alias
+      } else if (pvname == alias) {
         MsgLog(logger, debug, "EpicsDataTypeCvt -- alias is the same as PV name " << alias );
       } else if (m_group.hasChild(alias)) {
         MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << alias );

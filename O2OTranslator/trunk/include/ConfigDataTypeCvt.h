@@ -66,22 +66,10 @@ public:
    */
   ConfigDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src)
     : DataTypeCvt<typename H5Type::XtcType>()
+    , m_group(group)
     , m_typeGroupName(typeGroupName)
-    , m_group()
+    , m_src(src)
   {
-    // check if the group already there
-    const std::string& srcName = boost::lexical_cast<std::string>(src);
-    if ( group.hasChild(typeGroupName) ) {
-      hdf5pp::Group typeGroup = group.openGroup(typeGroupName);
-      if (typeGroup.hasChild(srcName)) {
-        m_group = typeGroup.openGroup(srcName);
-        MsgLog("ConfigDataTypeCvt", trace, "group " << typeGroupName << '/' << srcName << " already exists") ;
-        return;
-      }
-    }
-
-    // create separate group
-    m_group = group.createGroup(typeGroupName + "/" + srcName);
   }
 
   // Destructor
@@ -104,27 +92,40 @@ public:
       throw O2OXTCSizeException(ERR_LOC, m_typeGroupName, H5Type::xtcSize(data), size);
     }
     
+    // check if the group already there
+    const std::string& srcName = boost::lexical_cast<std::string>(m_src);
+    if (m_group.hasChild(m_typeGroupName)) {
+      hdf5pp::Group typeGroup = m_group.openGroup(m_typeGroupName);
+      if (typeGroup.hasChild(srcName)) {
+        MsgLog("ConfigDataTypeCvt", trace, "group " << m_typeGroupName << '/' << srcName << " already exists") ;
+        return;
+      }
+    }
+
+    // create separate group
+    hdf5pp::Group group = m_group.createGroup(m_typeGroupName + "/" + srcName);
+
     // store the data
-    H5Type::store(data, m_group);
+    H5Type::store(data, group);
+  }
+
+  // method called to fill void spaces for missing data
+  virtual void missingConvert(const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src,
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage)
+  {
+    // For configuration objects we do not do anything if data is missing/damaged
   }
 
 protected:
 
 private:
 
-  // method called to fill void spaces for missing data
-  virtual void fillMissing(const Pds::TypeId& typeId,
-                           const O2OXtcSrc& src,
-                           const H5DataTypes::XtcClockTimeStamp& time,
-                           Pds::Damage damage)
-  {
-    // For configuration objects we do not do anything if data is missing/damaged
-  }
-
   // Data members
-  std::string m_typeGroupName;
   hdf5pp::Group m_group;
-
+  std::string m_typeGroupName;
+  Pds::Src m_src;
 };
 
 } // namespace O2OTranslator

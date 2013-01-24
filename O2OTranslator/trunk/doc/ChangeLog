@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-25-00
+2013-01-24 Andy Salnikov
+- implementaion of the aligned datasets by adding zero-filled missing
+  contribution for damaged data objects
+- the whole thing is still driven by the content of datagrams, so 
+  there is still no strong guarantee that all datasets in the same 
+  calibcycle will be aligned, for badly messed-up data we can't 
+  correct everything
+
 Tag: V00-24-00
 2013-01-23 Andy Salnikov
 - significant refactoring of the converter infrastructure:

@@ -61,15 +61,16 @@ public:
                        Pds::Damage damage)
   {
     if (damage.value() == 0 or
+        damage.value() == (1 << Pds::Damage::OutOfOrder) or
         (typeId.id() == Pds::TypeId::Id_EBeam and damage.bits() == (1 << Pds::Damage::UserDefined))) {
-      // All non-damaged data or BLD Ebeam data with only user damage are passed
-      // to conversion method
+      // All non-damaged data, out-of-order data, or BLD Ebeam data with only user
+      // damage are passed to conversion method
       const T& typedData = *static_cast<const T*>( data ) ;
       typedConvert(typedData, size, typeId, src, time, damage);
     } else {
       // for damaged data we don't want to look at the data so call special
       // method to fill the gaps
-      fillMissing(typeId, src, time, damage);
+      missingConvert(typeId, src, time, damage);
     }
   }
 
@@ -89,10 +90,10 @@ private:
                             Pds::Damage damage) = 0 ;
 
   // method called to fill void spaces for missing data
-  virtual void fillMissing(const Pds::TypeId& typeId,
-                           const O2OXtcSrc& src,
-                           const H5DataTypes::XtcClockTimeStamp& time,
-                           Pds::Damage damage) = 0 ;
+  virtual void missingConvert(const Pds::TypeId& typeId,
+                              const O2OXtcSrc& src,
+                              const H5DataTypes::XtcClockTimeStamp& time,
+                              Pds::Damage damage) = 0 ;
 
 };
 

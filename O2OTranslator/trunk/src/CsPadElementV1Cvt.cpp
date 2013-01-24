@@ -70,9 +70,10 @@ CsPadElementV1Cvt::CsPadElementV1Cvt ( const hdf5pp::Group& group,
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
   , m_calibStore(calibStore)
-  , m_elementCont(0)
-  , m_pixelDataCont(0)
-  , m_cmodeDataCont(0)
+  , m_elementCont()
+  , m_pixelDataCont()
+  , m_cmodeDataCont()
+  , n_miss(0)
 {
 }
 
@@ -81,9 +82,6 @@ CsPadElementV1Cvt::CsPadElementV1Cvt ( const hdf5pp::Group& group,
 //--------------
 CsPadElementV1Cvt::~CsPadElementV1Cvt ()
 {
-  delete m_elementCont ;
-  delete m_pixelDataCont ;
-  delete m_cmodeDataCont ;
 }
 
 // method called to create all necessary data containers
@@ -217,17 +215,41 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   hdf5pp::Type type = H5Type::stored_type(nQuad);
-  if (not m_elementCont) m_elementCont = makeCont<ElementCont>("element", group, true, type) ;
+  if (not m_elementCont) {
+    m_elementCont = makeCont<ElementCont>("element", group, true, type) ;
+    if (n_miss) m_elementCont->resize(n_miss);
+  }
   m_elementCont->append ( elems[0], type ) ;
 
   type = H5Type::stored_data_type(nQuad, nSect) ;
-  if (not m_pixelDataCont) m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
+  if (not m_pixelDataCont) {
+    m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
+    if (n_miss) m_pixelDataCont->resize(n_miss);
+  }
   m_pixelDataCont->append ( pixelData[0][0][0][0], type ) ;
 
   if (cModeCalib) {
     type = H5Type::cmode_data_type(nQuad, nSect) ;
-    if (not m_cmodeDataCont) m_cmodeDataCont = makeCont<CommonModeDataCont>("common_mode", group, true);
+    if (not m_cmodeDataCont) {
+      m_cmodeDataCont = makeCont<CommonModeDataCont>("common_mode", group, true, type);
+      if (n_miss) m_cmodeDataCont->resize(n_miss);
+    }
     m_cmodeDataCont->append ( commonMode[0][0], type ) ;
+  }
+}
+
+// fill containers for missing data
+void
+CsPadElementV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  if (m_elementCont) {
+    m_elementCont->resize(m_elementCont->size() + 1);
+    m_pixelDataCont->resize(m_pixelDataCont->size() + 1);
+    m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
+  } else {
+    ++ n_miss;
   }
 }
 

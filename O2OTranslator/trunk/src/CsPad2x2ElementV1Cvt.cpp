@@ -62,9 +62,10 @@ CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const hdf5pp::Group& group, const s
     const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_calibStore(calibStore)
-  , m_elementCont(0)
-  , m_pixelDataCont(0)
-  , m_cmodeDataCont(0)
+  , m_elementCont()
+  , m_pixelDataCont()
+  , m_cmodeDataCont()
+  , n_miss(0)
 {
 }
 
@@ -73,9 +74,6 @@ CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const hdf5pp::Group& group, const s
 //--------------
 CsPad2x2ElementV1Cvt::~CsPad2x2ElementV1Cvt ()
 {
-  delete m_elementCont ;
-  delete m_pixelDataCont ;
-  delete m_cmodeDataCont ;
 }
 
 // method called to create all necessary data containers
@@ -188,17 +186,41 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   hdf5pp::Type type = H5Type::stored_type();
-  if (not m_elementCont) m_elementCont = makeCont<ElementCont>("element", group, true, type);
+  if (not m_elementCont) {
+    m_elementCont = makeCont<ElementCont>("element", group, true, type);
+    if (n_miss) m_elementCont->resize(n_miss);
+  }
   m_elementCont->append ( elem, type ) ;
 
   type = H5Type::stored_data_type() ;
-  if (not m_pixelDataCont) m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
+  if (not m_pixelDataCont) {
+    m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
+    if (n_miss) m_pixelDataCont->resize(n_miss);
+  }
   m_pixelDataCont->append ( pixelData[0][0][0], type ) ;
 
   if (cModeCalib) {
     type = H5Type::cmode_data_type() ;
-    if (not m_cmodeDataCont) m_cmodeDataCont = makeCont<CommonModeDataCont>("common_mode", group, true, type);
+    if (not m_cmodeDataCont) {
+      m_cmodeDataCont = makeCont<CommonModeDataCont>("common_mode", group, true, type);
+      if (n_miss) m_cmodeDataCont->resize(n_miss);
+    }
     m_cmodeDataCont->append(commonMode[0], type);
+  }
+}
+
+// fill containers for missing data
+void
+CsPad2x2ElementV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  if (m_elementCont) {
+    m_elementCont->resize(m_elementCont->size() + 1);
+    m_pixelDataCont->resize(m_pixelDataCont->size() + 1);
+    m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
+  } else {
+    ++ n_miss;
   }
 }
 

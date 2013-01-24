@@ -80,6 +80,11 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
+  // fill containers for missing data
+  virtual void fillMissing(hdf5pp::Group group,
+                           const Pds::TypeId& typeId,
+                           const O2OXtcSrc& src);
+
 private:
 
   typedef H5DataTypes::ObjectContainer<H5Type> ObjectCont ;
@@ -88,9 +93,10 @@ private:
 
   // Data members
   const ConfigObjectStore& m_configStore;
-  ObjectCont* m_objCont ;
-  DataCont* m_dataCont ;
-  CorrectedDataCont* m_corrDataCont ;
+  boost::shared_ptr<ObjectCont> m_objCont ;
+  boost::shared_ptr<DataCont> m_dataCont ;
+  boost::shared_ptr<CorrectedDataCont> m_corrDataCont ;
+  size_t n_miss;
 
 };
 

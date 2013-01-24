@@ -50,9 +50,10 @@ OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const hdf5pp::Group& group,
     const CvtOptions& cvtOptions)
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
-  , m_objCont(0)
-  , m_dataCont(0)
-  , m_corrDataCont(0)
+  , m_objCont()
+  , m_dataCont()
+  , m_corrDataCont()
+  , n_miss(0)
 {
 }
 
@@ -61,9 +62,6 @@ OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const hdf5pp::Group& group,
 //--------------
 OceanOpticsDataV1Cvt::~OceanOpticsDataV1Cvt ()
 {
-  delete m_objCont ;
-  delete m_dataCont ;
-  delete m_corrDataCont ;
 }
 
 // method called to create all necessary data containers
@@ -101,12 +99,33 @@ OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
   m_objCont->append(obj) ;
 
   hdf5pp::Type type = H5Type::stored_data_type() ;
-  if (not m_dataCont) m_dataCont = makeCont<DataCont>("spectra", group, true, type) ;
+  if (not m_dataCont) {
+    m_dataCont = makeCont<DataCont>("spectra", group, true, type) ;
+    if (n_miss) m_dataCont->resize(n_miss);
+  }
   m_dataCont->append(*data.data(), type);
 
   type = H5Type::stored_corrected_data_type() ;
-  if (not m_corrDataCont) m_corrDataCont = makeCont<CorrectedDataCont>("corrSpectra", group, true, type);
+  if (not m_corrDataCont) {
+    m_corrDataCont = makeCont<CorrectedDataCont>("corrSpectra", group, true, type);
+    if (n_miss) m_corrDataCont->resize(n_miss);
+  }
   m_corrDataCont->append(*corrData, type);
+}
+
+// fill containers for missing data
+void
+OceanOpticsDataV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_objCont->resize(m_objCont->size() + 1);
+  if (m_dataCont) {
+    m_dataCont->resize(m_dataCont->size() + 1);
+    m_corrDataCont->resize(m_corrDataCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator

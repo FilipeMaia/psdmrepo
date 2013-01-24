@@ -47,8 +47,9 @@ TimepixDataV2Cvt::TimepixDataV2Cvt ( const hdf5pp::Group& group,
     const Pds::Src& src,
     const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
-  , m_dataCont(0)
-  , m_imageCont(0)
+  , m_dataCont()
+  , m_imageCont()
+  , n_miss(0)
 {
 }
 
@@ -57,8 +58,6 @@ TimepixDataV2Cvt::TimepixDataV2Cvt ( const hdf5pp::Group& group,
 //--------------
 TimepixDataV2Cvt::~TimepixDataV2Cvt ()
 {
-  delete m_dataCont ;
-  delete m_imageCont ;
 }
 
 // method called to create all necessary data containers
@@ -85,8 +84,25 @@ TimepixDataV2Cvt::fillContainers(hdf5pp::Group group,
   m_dataCont->append(tpdata);
 
   hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
-  if (not m_imageCont) m_imageCont = makeCont<ImageCont>("image", group, true, type);
+  if (not m_imageCont) {
+    m_imageCont = makeCont<ImageCont>("image", group, true, type);
+    if (n_miss) m_imageCont->resize(n_miss);
+  }
   m_imageCont->append(*(uint16_t*)data.data(), type);
+}
+
+// fill containers for missing data
+void
+TimepixDataV2Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_dataCont->resize(m_dataCont->size() + 1);
+  if (m_imageCont) {
+    m_imageCont->resize(m_imageCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator

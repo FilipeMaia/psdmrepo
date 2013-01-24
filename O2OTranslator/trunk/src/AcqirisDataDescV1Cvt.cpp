@@ -56,8 +56,9 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const hdf5pp::Group& group,
     const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
-  , m_timestampCont(0)
-  , m_waveformCont(0)
+  , m_timestampCont()
+  , m_waveformCont()
+  , n_miss(0)
 {
 }
 
@@ -66,8 +67,6 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const hdf5pp::Group& group,
 //--------------
 AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 {
-  delete m_timestampCont ;
-  delete m_waveformCont ;
 }
 
 /// method called to create all necessary data containers
@@ -163,12 +162,32 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
 
   // store the data
   hdf5pp::Type type = H5Type::timestampType ( *config ) ;
-  if (not m_timestampCont) m_timestampCont = makeCont<TimestampCont>("timestamps", group, true) ;
+  if (not m_timestampCont) {
+    m_timestampCont = makeCont<TimestampCont>("timestamps", group, true, type) ;
+    if (n_miss) m_timestampCont->resize(n_miss);
+  }
   m_timestampCont->append ( timestamps[0][0], type ) ;
   type = H5Type::waveformType ( *config ) ;
-  if (not m_waveformCont) m_waveformCont = makeCont<WaveformCont>("waveforms", group, true) ;
+  if (not m_waveformCont) {
+    m_waveformCont = makeCont<WaveformCont>("waveforms", group, true, type) ;
+    if (n_miss) m_waveformCont->resize(n_miss);
+  }
   m_waveformCont->append ( waveforms[0][0][0], type ) ;
 
+}
+
+// fill containers for missing data
+void
+AcqirisDataDescV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  if (m_timestampCont) {
+    m_timestampCont->resize(m_timestampCont->size() + 1);
+    m_waveformCont->resize(m_waveformCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator

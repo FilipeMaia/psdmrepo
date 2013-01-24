@@ -81,7 +81,7 @@ protected:
                               Pds::Damage damage );
 
   // method called to fill void spaces for missing data
-  virtual void fillMissing(const Pds::TypeId& typeId,
+  virtual void missingConvert(const Pds::TypeId& typeId,
                       const O2OXtcSrc& src,
                       const H5DataTypes::XtcClockTimeStamp& time,
                       Pds::Damage damage)

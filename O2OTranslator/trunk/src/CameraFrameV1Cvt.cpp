@@ -47,8 +47,10 @@ CameraFrameV1Cvt::CameraFrameV1Cvt (const hdf5pp::Group& group, const std::strin
     const Pds::Src& src, const CvtOptions& cvtOptions )
   : EvtDataTypeCvt<Pds::Camera::FrameV1>( group, typeGroupName, src, cvtOptions )
   , m_imgType()
-  , m_dataCont(0)
-  , m_imageCont(0)
+  , m_dataCont()
+  , m_imageCont()
+  , m_dimFixFlagCont()
+  , n_miss(0)
 {
 }
 
@@ -57,9 +59,6 @@ CameraFrameV1Cvt::CameraFrameV1Cvt (const hdf5pp::Group& group, const std::strin
 //--------------
 CameraFrameV1Cvt::~CameraFrameV1Cvt ()
 {
-  delete m_dataCont ;
-  delete m_imageCont ;
-  delete m_dimFixFlagCont;
 }
 
 // method called to create all necessary data containers
@@ -88,8 +87,25 @@ CameraFrameV1Cvt::fillContainers(hdf5pp::Group group,
   // store the data in the containers
   m_dataCont->append(H5Type(data));
   hdf5pp::Type imgType = H5Type::imageType(data);
-  if (not m_imageCont) m_imageCont = makeCont<ImageCont>("image", group, true, imgType);
+  if (not m_imageCont) {
+    m_imageCont = makeCont<ImageCont>("image", group, true, imgType);
+    if (n_miss) m_imageCont->resize(n_miss);
+  }
   m_imageCont->append(*data.data(), imgType);
+}
+
+// fill containers for missing data
+void
+CameraFrameV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_dataCont->resize(m_dataCont->size() + 1);
+  if (m_imageCont) {
+    m_imageCont->resize(m_imageCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator

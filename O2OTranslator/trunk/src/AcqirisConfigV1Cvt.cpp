@@ -43,10 +43,11 @@ namespace O2OTranslator {
 AcqirisConfigV1Cvt::AcqirisConfigV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
     const Pds::Src& src, const CvtOptions& cvtOptions)
   : EvtDataTypeCvt<Pds::Acqiris::ConfigV1>(group, typeGroupName, src, cvtOptions)
-  , m_configCont(0)
-  , m_horizCont(0)
-  , m_trigCont(0)
-  , m_vertCont(0)
+  , m_configCont()
+  , m_horizCont()
+  , m_trigCont()
+  , m_vertCont()
+  , n_miss(0)
 {
 }
 
@@ -55,10 +56,6 @@ AcqirisConfigV1Cvt::AcqirisConfigV1Cvt (const hdf5pp::Group& group, const std::s
 //--------------
 AcqirisConfigV1Cvt::~AcqirisConfigV1Cvt ()
 {
-  delete m_configCont ;
-  delete m_horizCont ;
-  delete m_trigCont ;
-  delete m_vertCont ;
 }
 
 /// method called to create all necessary data containers
@@ -93,12 +90,32 @@ AcqirisConfigV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   hdf5pp::Type vType = hdf5pp::TypeTraits<H5DataTypes::AcqirisVertV1>::native_type(nbrChannels);
-  if (not m_vertCont) m_vertCont = makeCont<VertCont>("vert", group, true, vType);
+  if (not m_vertCont) {
+    m_vertCont = makeCont<VertCont>("vert", group, true, vType);
+    if (n_miss) m_vertCont->resize(n_miss);
+  }
 
   m_configCont->append(cdata);
   m_horizCont->append(hdata);
   m_trigCont->append(tdata);
   m_vertCont->append(vdata[0], vType);
+}
+
+// fill containers for missing data
+void
+AcqirisConfigV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_configCont->resize(m_configCont->size() + 1);
+  m_horizCont->resize(m_horizCont->size() + 1);
+  m_trigCont->resize(m_trigCont->size() + 1);
+  if (m_vertCont) {
+    m_vertCont->resize(m_vertCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
+
 }
 
 } // namespace O2OTranslator

@@ -51,8 +51,9 @@ Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const hdf5pp::Group& group,
     const CvtOptions& cvtOptions)
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
   , m_configStore(configStore)
-  , m_dataCont(0)
-  , m_valueCont(0)
+  , m_dataCont()
+  , m_valueCont()
+  , n_miss(0)
 {
 }
 
@@ -61,8 +62,6 @@ Gsc16aiDataV1Cvt::Gsc16aiDataV1Cvt (const hdf5pp::Group& group,
 //--------------
 Gsc16aiDataV1Cvt::~Gsc16aiDataV1Cvt ()
 {
-  delete m_dataCont ;
-  delete m_valueCont ;
 }
 
 // method called to create all necessary data containers
@@ -99,8 +98,25 @@ Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
   // store the data
   m_dataCont->append(timestampsData) ;
   hdf5pp::Type type = H5Type::stored_data_type(*config);
-  if (not m_valueCont) m_valueCont = makeCont<ValueCont>("channelValue", group, true, type);
+  if (not m_valueCont) {
+    m_valueCont = makeCont<ValueCont>("channelValue", group, true, type);
+    if (n_miss) m_valueCont->resize(n_miss);
+  }
   m_valueCont->append(data._channelValue[0], type);
+}
+
+// fill containers for missing data
+void
+Gsc16aiDataV1Cvt::fillMissing(hdf5pp::Group group,
+                         const Pds::TypeId& typeId,
+                         const O2OXtcSrc& src)
+{
+  m_dataCont->resize(m_dataCont->size() + 1);
+  if (m_valueCont) {
+    m_valueCont->resize(m_valueCont->size() + 1);
+  } else {
+    ++ n_miss;
+  }
 }
 
 } // namespace O2OTranslator
