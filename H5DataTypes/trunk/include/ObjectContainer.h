@@ -59,7 +59,7 @@ public:
 
   /// Provide type at run time
   ObjectContainer ( const std::string& name,
-                    hdf5pp::Group& location,
+                    hdf5pp::Group location,
                     const hdf5pp::Type& stored_type,
                     hsize_t chunk_size,
                     int deflate,
@@ -122,6 +122,15 @@ public:
     m_dataset.store ( memDspc, fileDspc, &obj, native_type ) ;
 
     m_count = newCount ;
+  }
+
+  /// get current size of this container
+  unsigned long size() const { return m_count; }
+
+  /// set container size, fill with defaults if necessary
+  void resize(unsigned long newSize) {
+    m_dataset.set_extent(newSize);
+    m_count = newSize;
   }
 
   /// get access to data set
