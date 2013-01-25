@@ -25,9 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-using std::cout;
-using std::ostream;
-using std::setw;
+using namespace std;
 
 namespace {
 

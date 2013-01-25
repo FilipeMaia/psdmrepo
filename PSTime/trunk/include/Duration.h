@@ -16,8 +16,6 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
@@ -132,7 +130,7 @@ public:
      * Makes the duration string in the format: PnYnMnDTnHnMnS
      * from the object entity.
      */
-    string strDurationBasic() const; 
+    std::string strDurationBasic() const;
 
 
     /**
