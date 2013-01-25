@@ -140,8 +140,8 @@ class GUIBlamish ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.plotimgspe.close()
-        except : pass
+        #try    : cp.plotimgspe.close()
+        #except : pass
 
         try    : cp.guifilebrowser.close()
         except : pass
@@ -176,6 +176,8 @@ class GUIBlamish ( QtGui.QWidget ) :
         try :
             logger.debug('try to close', __name__)
             cp.plotimgspe.close()
+            try    : del cp.plotimgspe
+            except : pass
             #but.setStyleSheet(cp.styleButtonBad)
         except :
             logger.debug('except and open', __name__)

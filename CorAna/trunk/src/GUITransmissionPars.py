@@ -48,27 +48,20 @@ class GUITransmissionPars ( QtGui.QWidget ) :
         self.setWindowTitle('Transmission parameters')
         self.setFrame()
  
-        self.tit_beam_zero = QtGui.QLabel('Transmission parameters:')
-        self.tit_x_coord   = QtGui.QLabel('x-coordinate in full frame mode')
-        self.tit_y_coord   = QtGui.QLabel('y-coordinate in full frame mode')
-        #self.tit_x0_pos    = QtGui.QLabel('CCD x0 position in beam0 measurement')
-        #self.tit_z0_pos    = QtGui.QLabel('CCD z0 position in beam0 measurement')
+        self.tit_beam_zero = QtGui.QLabel('Transm. beam coords in full frame mode (pix):')
+        self.tit_x_coord   = QtGui.QLabel('x:')
+        self.tit_y_coord   = QtGui.QLabel('y:')
 
         self.edi_x_coord   = QtGui.QLineEdit( str( cp.x_coord_beam0.value() ) )        
         self.edi_y_coord   = QtGui.QLineEdit( str( cp.y_coord_beam0.value() ) )        
-        #self.edi_x0_pos    = QtGui.QLineEdit( str( cp.x0_pos_in_beam0.value() ) )        
-        #self.edi_z0_pos    = QtGui.QLineEdit( str( cp.z0_pos_in_beam0.value() ) )        
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_beam_zero,     0, 0, 1, 9)
-        self.grid.addWidget(self.tit_x_coord,       1, 1, 1, 9)
-        self.grid.addWidget(self.tit_y_coord,       2, 1, 1, 9)
-        #self.grid.addWidget(self.tit_x0_pos ,       3, 1, 1, 9)
-        #self.grid.addWidget(self.tit_z0_pos ,       4, 1, 1, 9)
-        self.grid.addWidget(self.edi_x_coord,       1, 10)
-        self.grid.addWidget(self.edi_y_coord,       2, 10)
-        #self.grid.addWidget(self.edi_x0_pos ,       3, 10)
-        #self.grid.addWidget(self.edi_z0_pos ,       4, 10)
+        self.grid.addWidget(self.tit_beam_zero,     0, 0, 1, 8)
+        self.grid.addWidget(self.tit_x_coord,       1, 2)
+        self.grid.addWidget(self.tit_y_coord,       1, 4)
+
+        self.grid.addWidget(self.edi_x_coord,       1, 3)
+        self.grid.addWidget(self.edi_y_coord,       1, 6)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -78,8 +71,6 @@ class GUITransmissionPars ( QtGui.QWidget ) :
 
         self.connect( self.edi_x_coord,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_x_coord )
         self.connect( self.edi_y_coord,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_y_coord )
-        #self.connect( self.edi_x0_pos ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_x0_pos )
-        #self.connect( self.edi_z0_pos ,     QtCore.SIGNAL('editingFinished ()'), self.on_edi_z0_pos )
  
         self.showToolTips()
         self.setStyle()
@@ -94,8 +85,6 @@ class GUITransmissionPars ( QtGui.QWidget ) :
         self.tit_beam_zero.setToolTip('This section allows to monitor/modify\nthe beam zero parameters\nin transmission mode')
         self.edi_x_coord.setToolTip( msg )
         self.edi_y_coord.setToolTip( msg )
-        #self.edi_x0_pos .setToolTip( msg )
-        #self.edi_z0_pos .setToolTip( msg )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -108,29 +97,24 @@ class GUITransmissionPars ( QtGui.QWidget ) :
     def setStyle(self):
         self.setFixedHeight(150)
 
+        width = 80
+        width_label = 50
+
         self.              setStyleSheet (cp.styleBkgd)
         self.tit_beam_zero.setStyleSheet (cp.styleTitle)
         self.tit_x_coord  .setStyleSheet (cp.styleLabel)
         self.tit_y_coord  .setStyleSheet (cp.styleLabel)
-        #self.tit_x0_pos   .setStyleSheet (cp.styleLabel) 
-        #self.tit_z0_pos   .setStyleSheet (cp.styleLabel) 
-
-        self.edi_x_coord.setAlignment(QtCore.Qt.AlignRight)
-        self.edi_y_coord.setAlignment(QtCore.Qt.AlignRight)
-        #self.edi_x0_pos .setAlignment(QtCore.Qt.AlignRight)
-        #self.edi_z0_pos .setAlignment(QtCore.Qt.AlignRight)
-
-        width = 80
-
-        self.edi_x_coord.setFixedWidth(width)
-        self.edi_y_coord.setFixedWidth(width)
-        #self.edi_x0_pos .setFixedWidth(width)
-        #self.edi_z0_pos .setFixedWidth(width)
-
-        self.edi_x_coord.setStyleSheet(cp.styleEdit) 
-        self.edi_y_coord.setStyleSheet(cp.styleEdit) 
-        #self.edi_x0_pos .setStyleSheet(cp.styleEdit) 
-        #self.edi_z0_pos .setStyleSheet(cp.styleEdit) 
+        self.tit_x_coord  .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_y_coord  .setAlignment(QtCore.Qt.AlignRight)
+        self.tit_x_coord  .setFixedWidth(width_label)
+        self.tit_y_coord  .setFixedWidth(width_label)
+        
+        self.edi_x_coord  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_y_coord  .setAlignment(QtCore.Qt.AlignRight)
+        self.edi_x_coord  .setFixedWidth(width)
+        self.edi_y_coord  .setFixedWidth(width)
+        self.edi_x_coord  .setStyleSheet(cp.styleEdit) 
+        self.edi_y_coord  .setStyleSheet(cp.styleEdit) 
 
 
     def setParent(self,parent) :

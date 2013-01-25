@@ -100,11 +100,10 @@ class PlotArray (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-
         cp.plotarray_is_on = False
 
-        try    : del cp.plotarray
-        except : pass
+        #try    : del cp.plotarray
+        #except : pass
 
         #print 'Close application'
 

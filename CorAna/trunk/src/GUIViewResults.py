@@ -30,7 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
-from GUILoadResults         import *
+from GUIViewControl         import *
 
 #---------------------
 #  Class definition --
@@ -51,10 +51,10 @@ class GUIViewResults ( QtGui.QWidget ) :
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_apply  = QtGui.QPushButton('Save') 
 
-        cp.guiloadresults  = GUILoadResults()
+        cp.guiviewcontrol  = GUIViewControl()
 
         self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget(cp.guiloadresults )
+        self.hboxM.addWidget(cp.guiviewcontrol )
         #self.hboxM.addWidget(cp.guisystemsettingsright)
 
         self.hboxB = QtGui.QHBoxLayout()
@@ -122,7 +122,7 @@ class GUIViewResults ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
-        try    : cp.guiloadresults.close()
+        try    : cp.guiviewcontrol.close()
         except : pass
 
         try    : del cp.guiviewresults # GUIViewResults

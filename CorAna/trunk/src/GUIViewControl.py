@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUILoadResults...
+#  Module GUIViewControl...
 #
 #------------------------------------------------------------------------
 
-"""GUI Load Results"""
+"""GUI View Control"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -35,13 +35,13 @@ from ViewResults            import *
 #---------------------
 #  Class definition --
 #---------------------
-class GUILoadResults ( QtGui.QWidget ) :
-    """GUI Load Results"""
+class GUIViewControl ( QtGui.QWidget ) :
+    """GUI View Control"""
 
     def __init__ ( self, parent=None, fname=None ) :
-        #super(GUILoadResults, self).__init__()
+        #super(GUIViewControl, self).__init__()
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 400)
+        self.setGeometry(200, 400, 500, 150)
         self.setWindowTitle('Load Results')
         self.setFrame()
 
@@ -52,14 +52,15 @@ class GUILoadResults ( QtGui.QWidget ) :
         #print 'self.list_of_tau =', self.list_of_tau
         self.g_ind   = 0
         self.tau_ind = 0
-        self.arr = None
+
+        self.initImgArray()        
         
-        self.tit    = QtGui.QLabel('Load Results')
+        self.tit    = QtGui.QLabel('View Control')
         self.edi    = QtGui.QLineEdit( os.path.basename(cp.res_fname.value()) )        
         self.but    = QtGui.QPushButton('File')
-        self.but_gi = QtGui.QPushButton('<g_i>')
-        self.but_gk = QtGui.QPushButton('<g_k>')
-        self.but_g2 = QtGui.QPushButton('<g_2>')
+        self.but_Ip = QtGui.QPushButton('<Ip>')
+        self.but_If = QtGui.QPushButton('<If>')
+        self.but_I2 = QtGui.QPushButton('<Ip x If>')
         self.but_G2 = QtGui.QPushButton('100 x G2')
 
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
@@ -76,18 +77,18 @@ class GUILoadResults ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi,      self.grid_row+1, 1, 1, 9)
         self.grid.addWidget(self.edi_tau,  self.grid_row+2, 0)
         self.grid.addWidget(self.sli,      self.grid_row+2, 1, 1, 9)
-        self.grid.addWidget(self.but_gi,   self.grid_row+3, 0)
-        self.grid.addWidget(self.but_gk,   self.grid_row+3, 1)
-        self.grid.addWidget(self.but_g2,   self.grid_row+3, 2)
+        self.grid.addWidget(self.but_Ip,   self.grid_row+3, 0)
+        self.grid.addWidget(self.but_If,   self.grid_row+3, 1)
+        self.grid.addWidget(self.but_I2,   self.grid_row+3, 2)
         self.grid.addWidget(self.but_G2,   self.grid_row+3, 3)
 
         self.grid_row += 3
 
         #self.connect(self.edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         self.connect(self.but,    QtCore.SIGNAL('clicked()'),         self.onBut )
-        self.connect(self.but_gi, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_gk, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_g2, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Ip, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_If, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_I2, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_G2, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,    QtCore.SIGNAL('valueChanged(int)'), self.onSlider )
         self.connect(self.sli,    QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
@@ -140,9 +141,9 @@ class GUILoadResults ( QtGui.QWidget ) :
         self.edi_tau.setStyleSheet(cp.styleEditInfo) # cp.styleEditInfo
         self.edi_tau.setReadOnly  (True)
         self.edi_tau.setAlignment (QtCore.Qt.AlignCenter)
-        self.but_gi.setStyleSheet(cp.styleButton)
-        self.but_gk.setStyleSheet(cp.styleButton)
-        self.but_g2.setStyleSheet(cp.styleButton)
+        self.but_Ip.setStyleSheet(cp.styleButton)
+        self.but_If.setStyleSheet(cp.styleButton)
+        self.but_I2.setStyleSheet(cp.styleButton)
         self.but_G2.setStyleSheet(cp.styleButton)
 
 
@@ -159,7 +160,7 @@ class GUILoadResults ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        try    : del cp.guiloadresults # GUILoadResults
+        try    : del cp.guiviewcontrol # GUIViewControl
         except : pass # silently ignore
 
 
@@ -194,22 +195,47 @@ class GUILoadResults ( QtGui.QWidget ) :
         edi.setText (os.path.basename(path))
         par.setValue(path)
         logger.info('selected the file name: ' + str(par.value()), __name__ )
+        self.initImgArray()        
+
+
+    def initImgArray(self) :
+        self.arr = None
+
+
+    def loadImgArray(self):
+        if self.arr == None :         
+            self.arr = self.vr.get_cor_array_from_binary_file()
+
+
+    def setImgArray(self):
+        if self.arr == None : return
+
+        if self.g_ind < 0 :
+            Ip = self.arr[self.tau_ind, 0,...] 
+            If = self.arr[self.tau_ind, 1,...] 
+            I2 = self.arr[self.tau_ind, 2,...] 
+
+            self.arr2d = 100*I2/Ip/If
+        else :
+            self.arr2d = self.arr[self.tau_ind, self.g_ind,...] 
+        #print 'arr2d:\n', self.arr2d 
+
 
 
     def onButView(self):
         logger.info('onButView', __name__)
-        self.arr = self.vr.get_cor_array_from_binary_file()
+        self.loadImgArray()        
 
-        if self.but_gi.hasFocus() :
-            logger.info('<g_i> is selected', __name__)
+        if self.but_Ip.hasFocus() :
+            logger.info('<Ip> is selected', __name__)
             self.g_ind = 0
 
-        if self.but_gk.hasFocus() :
-            logger.info('<g_k> is selected', __name__)
+        if self.but_If.hasFocus() :
+            logger.info('<If> is selected', __name__)
             self.g_ind = 1
 
-        if self.but_g2.hasFocus() :
-            logger.info('<g_2> is selected', __name__)
+        if self.but_I2.hasFocus() :
+            logger.info('<Ip x If> is selected', __name__)
             self.g_ind = 2
 
         if self.but_G2.hasFocus() :
@@ -221,39 +247,28 @@ class GUILoadResults ( QtGui.QWidget ) :
 
 
     def drawPlot(self):
+        self.setImgArray()
         if self.arr == None : return
 
-        self.setImgArray()
         try :
-            cp.plotimgspe.close()
+            cp.plotimgspe_g.close()
+            try    : del cp.plotimgspe_g
+            except : pass
+
         except :
-            cp.plotimgspe = PlotImgSpe(None,self.arr2d) 
-            #self.plotimgspe_g.set_image_array(self.arr2d)
-            #cp.plotimgspe.move(QtCore.QPoint(50,50))
-            cp.plotimgspe.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
-            cp.plotimgspe.show()
+            cp.plotimgspe_g = PlotImgSpe(None,self.arr2d) 
+            cp.plotimgspe_g.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
+            cp.plotimgspe_g.show()
 
 
     def redrawPlot(self):
+        self.setImgArray()
         if self.arr == None : return
 
-        self.setImgArray()
         try :
-            cp.plotimgspe.set_image_array(self.arr2d)
+            cp.plotimgspe_g.set_image_array(self.arr2d)
         except :
             pass
-
-
-    def setImgArray(self):
-        if self.g_ind < 0 :
-            gi = self.arr[self.tau_ind, 0,...] 
-            gk = self.arr[self.tau_ind, 1,...] 
-            g2 = self.arr[self.tau_ind, 2,...] 
-
-            self.arr2d = 100*g2/gi/gk
-        else :
-            self.arr2d = self.arr[self.tau_ind, self.g_ind,...] 
-        #print 'arr2d:\n', self.arr2d 
 
 
     def onSlider(self):
@@ -278,7 +293,7 @@ class GUILoadResults ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUILoadResults ()
+    widget = GUIViewControl ()
     widget.show()
     app.exec_()
 

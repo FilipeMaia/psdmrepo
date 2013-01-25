@@ -103,8 +103,8 @@ class PlotTime (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-        try    : del cp.plottime
-        except : pass
+        #try    : del cp.plottime
+        #except : pass
 
         #print 'Close application'
 

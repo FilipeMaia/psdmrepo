@@ -117,8 +117,8 @@ class PlotImgSpe (QtGui.QWidget) :
         #try    : self.mpl_toolbar.close()
         #except : pass
 
-        try    : del cp.plotimgspe
-        except : pass
+        #try    : del cp.plotimgspe
+        #except : pass
 
         #print 'Close application'
 

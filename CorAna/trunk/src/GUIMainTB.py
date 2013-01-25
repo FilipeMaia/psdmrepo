@@ -380,6 +380,9 @@ class GUIMainTB ( QtGui.QWidget ) :
         try    : cp.plotimgspe.close()
         except : pass
 
+        try    : cp.plotimgspe_g.close()
+        except : pass
+
         try    : cp.plottime.close()
         except : pass
 

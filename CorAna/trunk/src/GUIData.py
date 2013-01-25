@@ -351,6 +351,8 @@ class GUIData ( QtGui.QWidget ) :
         logger.debug('on_but_plot', __name__)
         try :
             cp.plotimgspe.close()
+            try    : del cp.plotimgspe
+            except : pass
         except :
             arr = gu.get_array_from_file(fnm.path_data_ave())
             if arr == None : return
@@ -364,6 +366,8 @@ class GUIData ( QtGui.QWidget ) :
         logger.debug('on_but_tspl', __name__)
         try :
             cp.plottime.close()
+            try    : del cp.plottime
+            except : pass
         except :
             cp.plottime = PlotTime(None, ifname = fnm.path_data_scan_tstamp_list(),\
                                    ofname = fnm.path_data_time_plot())

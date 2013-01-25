@@ -336,6 +336,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         arr = self.getArray(imon)
         try :
             cp.plotarray.close()
+            try    : del cp.plotarray
+            except : pass
         except :
             if arr == None : return
             cp.plotarray = PlotArray(None, arr,

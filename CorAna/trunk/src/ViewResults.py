@@ -66,14 +66,29 @@ class ViewResults :
         logger.info('get_cor_array_from_binary_file: ' + self.fname, __name__)
         self.arr = np.fromfile(self.fname, dtype=np.float32)
 
-        img_rows = cp.bat_img_rows.value()
-        img_cols = cp.bat_img_cols.value()
-        img_size = cp.bat_img_size.value()
+        rows = cp.bat_img_rows.value()
+        cols = cp.bat_img_cols.value()
+        size = cp.bat_img_size.value()
 
         nptau = self.arr.shape[0]/cp.bat_img_size.value()/3
-        self.arr.shape = (nptau, 3, img_rows, img_cols)
+        self.arr.shape = (nptau, 3, rows, cols)
         logger.info('Set arr.shape = ' + str(self.arr.shape), __name__)
         return self.arr
+
+#-----------------------------
+
+    def get_img_array_for_dynamic_partition(self) :
+        logger.info('get_img_array_for_dynamic_partition: ' + self.fname, __name__)
+        #arr = mu + sigma*np.random.standard_normal(size=2400)
+
+        rows = cp.bat_img_rows.value()
+        cols = cp.bat_img_cols.value()
+        size = cp.bat_img_size.value()
+
+        #arr = np.arange(2400)
+        arr = 100*np.random.standard_exponential(size)
+        arr.shape = (rows,cols)
+        return arr
 
 #-----------------------------
 

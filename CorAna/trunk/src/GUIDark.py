@@ -328,8 +328,8 @@ class GUIDark ( QtGui.QWidget ) :
         logger.debug('on_but_plot', __name__)
         try :
             cp.plotimgspe.close()
-            #del cp.plotimgspe
-            #but.setStyleSheet(cp.styleButtonBad)
+            try    : del cp.plotimgspe
+            except : pass
         except :
             arr = bjpeds.get_pedestals_from_file()
             if arr == None : return
