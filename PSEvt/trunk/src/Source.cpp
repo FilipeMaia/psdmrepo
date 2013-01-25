@@ -207,7 +207,7 @@ Source::isExact() const
 std::ostream&
 operator<<(std::ostream& out, const Source& src)
 {
-  return ::operator<<(out, src.src());
+  return operator<<(out, src.src());
 }
 
 } // namespace PSEvt

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-01
+2013-01-25 Andy Salnikov
+- fixing namespace problem for operator<<(std::ostream&, const Pds::Src&)
+
 Tag: V00-06-00
 2012-11-28 Andy Salnikov
 - work on ticket #177 

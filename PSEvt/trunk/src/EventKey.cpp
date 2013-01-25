@@ -153,10 +153,12 @@ EventKey::print(std::ostream& str) const
 
 } // namespace PSEvt
 
+namespace Pds {
 /// Helper method to format Pds::Src to a standard stream
 std::ostream&
 operator<<(std::ostream& out, const Pds::Src& src)
 {
   ::print(out, src);
   return out;
+}
 }

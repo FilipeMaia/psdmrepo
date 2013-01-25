@@ -117,8 +117,10 @@ operator<<(std::ostream& out, const EventKey& key) {
 
 } // namespace PSEvt
 
+namespace Pds {
 /// Helper operator to format Pds::Src to a standard stream
 std::ostream&
 operator<<(std::ostream& out, const Pds::Src& src);
+}
 
 #endif // PSEVT_EVENTKEY_H
