@@ -40,6 +40,8 @@
 using namespace CSPadPixCoords;
 PSANA_MODULE_FACTORY(CSPadImageProducer)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------

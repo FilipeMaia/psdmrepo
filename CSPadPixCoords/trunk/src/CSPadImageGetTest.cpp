@@ -38,6 +38,8 @@
 using namespace CSPadPixCoords;
 PSANA_MODULE_FACTORY(CSPadImageGetTest)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
