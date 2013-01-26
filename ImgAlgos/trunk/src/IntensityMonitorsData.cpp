@@ -42,6 +42,8 @@
 using namespace ImgAlgos;
 PSANA_MODULE_FACTORY(IntensityMonitorsData)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------

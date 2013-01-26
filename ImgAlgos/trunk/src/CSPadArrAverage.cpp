@@ -275,7 +275,7 @@ CSPadArrAverage::collectStat(unsigned quad, const int16_t* data)
       for (int i = 0; i < SectorSize; ++ i) {
 
 	double amp = double(segData[i]);
-	if ( m_gate_width > 0 && abs(amp-ave[i]) > m_gate_width ) continue; // gate_width -> n_rms_gate_width * rms[i]
+	if ( m_gate_width > 0 && std::abs(amp-ave[i]) > m_gate_width ) continue; // gate_width -> n_rms_gate_width * rms[i]
 
         stat[i] ++;
         sum [i] += amp;

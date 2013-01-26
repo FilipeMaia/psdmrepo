@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2013-01-25 Andy Salnikov
+- fixing namespace issues
+
 Tag: V00-01-01
 2012-12-11 Andy Salnikov
 - bug fix for my last changes:

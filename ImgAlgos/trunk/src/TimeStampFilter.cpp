@@ -141,7 +141,7 @@ TimeStampFilter::setInputParameters()
 {
   if( m_str_tsinterval != m_def_tsinterval ) {
       size_t pos = m_str_tsinterval.find_first_of('/');
-      if (pos!=string::npos){
+      if (pos!=std::string::npos){
 	m_str_tstamp_min = m_str_tsinterval.substr(0,pos);
 	m_str_tstamp_max = m_str_tsinterval.substr(pos+1);
 

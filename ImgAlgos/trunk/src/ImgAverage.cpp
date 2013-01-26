@@ -38,6 +38,8 @@ using namespace ImgAlgos;
 
 PSANA_MODULE_FACTORY(ImgAverage)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------

@@ -34,6 +34,8 @@ using namespace ImgAlgos;
 
 PSANA_MODULE_FACTORY(PnccdImageProducer)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------

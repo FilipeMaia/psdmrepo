@@ -39,6 +39,8 @@
 using namespace ImgAlgos;
 PSANA_MODULE_FACTORY(SaveImageInFile)
 
+using namespace std;
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
