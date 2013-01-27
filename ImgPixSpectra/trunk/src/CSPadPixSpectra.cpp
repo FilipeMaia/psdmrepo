@@ -323,7 +323,7 @@ CSPadPixSpectra::saveShapeInFile()
     m_arr_shape_fname = m_arr_fname + ".sha";
     MsgLog(name(), info, "Save the spectral array configuration in file " << m_arr_shape_fname);
     ofstream file; 
-    file.open(m_arr_shape_fname.c_str(),ios_base::out);
+    file.open(m_arr_shape_fname.c_str(), std::ios_base::out);
     file << "NPIXELS  " << m_sizeOfCSPadArr  << "\n";
     file << "NBINS    " << m_nbins           << "\n";
     file << "AMIN     " << m_amin            << "\n";

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-01-26 Andy Salnikov
+- fix namespace issues
+
 2012-02-23 Mikhail S. Dubrovin
 Tag: V00-00-04
 - CSPad2x2PixSpectra was renamed to CSPad2x2PixSpectra
