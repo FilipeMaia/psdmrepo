@@ -599,7 +599,7 @@ public:
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
-  ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
+  ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(const_cast<Pds::DetInfo*>(&_info[0]), MaxInfos); }
   static uint32_t _sizeof()  { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
   std::vector<int> name_shape() const;
