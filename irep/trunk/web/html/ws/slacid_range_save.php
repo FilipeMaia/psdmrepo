@@ -23,21 +23,21 @@
 
 require_once 'dataportal/dataportal.inc.php' ;
 
-\DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
-    $ranges = $SVC->required_str('ranges') ;
-    foreach (explode(',', $ranges) as $range) {
-        $id_first_last = explode(':', $range) ;
-        $range_id = intval($id_first_last[0]) ;
-        $first    = intval($id_first_last[1]) ;
-        $last     = intval($id_first_last[2]) ;
-        if (!$first && !$last) continue ;
+\DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
+    $ranges = $SVC->required_JSON('ranges') ;
+    foreach ($ranges as $range) {
+        $range_id    = intval($range->id) ;
+        $first       = intval($range->first) ;
+        $last        = intval($range->last) ;
+        $description =   trim($range->description) ;
+        if (!$first || !last) continue ;
         if ($last <= $first)
             $SVC->abort("illegal range: last number {$last} must be greater than the first one {$first}") ;
         if (!$range_id) {
-            $SVC->irep()->add_slacid_range($first, $last) ;
+            $SVC->irep()->add_slacid_range($first, $last, $description) ;
         } else {
-            $SVC->irep()->update_slacid_range($range_id, $first, $last) ;
-            }
+            $SVC->irep()->update_slacid_range($range_id, $first, $last, $description) ;
+        }
     }
     $SVC->finish(array('range' => $SVC->irep()->slacid_ranges()));
 }) ;

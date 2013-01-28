@@ -461,7 +461,7 @@ function p_appl_admin () {
         for( var key in obj ) size++;
         return size;
     }
-    this.slacid_ranges_display = function(edit_mode) {
+    this.slacid_ranges_display = function (edit_mode) {
         this.slacid_range_editing = edit_mode;
         this.slacid_range_edit_tools(edit_mode);
         var ranges_elem = $('#admin-slacid-ranges').find('#ranges');
@@ -475,56 +475,65 @@ function p_appl_admin () {
                     TextInput_HTML({ classes: 'last',  name: ''+range.id, value: range.last,  size: 6 }) ,
                     '' ,
                     '' ,
+                    TextArea_HTML ({ classes: 'description', name: ''+range.id }, 4, 36) ,
                     ''
-                ]);
+                ]) ;
             else
                 rows.push([
                     this.can_manage_access() ?
                         Button_HTML('X', {
-                            name:    range.id,
-                            classes: 'admin-slacid-range-delete',
-                            title:   'delete this range' }) : ' ',
-                    range.first,
-                    range.last,
-                    range.last - range.first + 1,
-                    count_elements_in_array(range.available),
+                            name:    range.id ,
+                            classes: 'admin-slacid-range-delete' ,
+                            title:   'delete this range' }) : ' ' ,
+                    range.first ,
+                    range.last ,
+                    range.last - range.first + 1 ,
+                    count_elements_in_array(range.available) ,
+                    '<div style="width:256px; overflow:auto;"><pre>'+range.description+'</pre></div>' ,
                     Button_HTML('search', {
-                            name:    range.id,
-                            classes: 'admin-slacid-range-search',
+                            name:    range.id ,
+                            classes: 'admin-slacid-range-search' ,
                             title:   'search all equipment associated with this range' })
                 ]);
         }
         if( edit_mode && this.can_manage_access())
             rows.push([
-                '',
-                TextInput_HTML({ classes: 'first', name: '0', value: '0', size: 6 }),
-                TextInput_HTML({ classes: 'last',  name: '0', value: '0', size: 6 }),
-                '',
-                '',
+                '' ,
+                TextInput_HTML({ classes: 'first', name: '0', value: '0', size: 6 }) ,
+                TextInput_HTML({ classes: 'last',  name: '0', value: '0', size: 6 }) ,
+                '' ,
+                '' ,
+                TextArea_HTML ({ classes: 'description', name: '0' }, 4, 36) ,
                 ''
             ]);
 
         var table = new Table('admin-slacid-ranges-table', [
             { name: 'DELETE', sorted: false, hideable: true ,
               type: { after_sort: function () {
-                            ranges_elem.find('.admin-slacid-range-delete').
-                                button().
-                                click(function () {
-                                    var id = this.name ;
-                                    that.slacid_range_delete(id) ; }) ;
-                            ranges_elem.find('.admin-slacid-range-search').
-                                button().
-                                click(function () {
-                                    var id = this.name ;
-                                    global_search_equipment_by_slacid_range(id) ; }) ;
+                        ranges_elem.find('.admin-slacid-range-delete').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                that.slacid_range_delete(id) ; }) ;
+                        for (var r in that.slacid_range) {
+                            var range = that.slacid_range[r] ;
+                            ranges_elem.find('.description[name="'+range.id+'"]').val(range.description) ;
+                        }
+                        ranges_elem.find('.admin-slacid-range-search').
+                            button().
+                            click(function () {
+                                var id = this.name ;
+                                global_search_equipment_by_slacid_range(id) ; }) ;
                       }}} ,
             { name: 'first' } ,
             { name: 'last' } ,
             { name: '# total' } ,
             { name: '# available' } ,
+            { name: 'description', hideable: true, sorted: false } ,
             { name: 'in use', sorted: false }] ,
             rows ,
-            {default_sort_column: 1}
+            {default_sort_column: 1} ,
+            config.handler('admin', 'table_slacid_ranges')
         ) ;
         table.display() ;
     } ;
@@ -538,25 +547,33 @@ function p_appl_admin () {
         ) ;
     } ;
     this.slacid_ranges_edit_save = function () {
-        var params = {ranges: ''} ;
-        var firsts = $('#admin-slacid-ranges-table').find('.first') ;
-        var lasts  = $('#admin-slacid-ranges-table').find('.last') ;
+        var ranges = [] ;
+        var ranges_elem  = $('#admin-slacid-ranges-table') ;
+        var firsts       = ranges_elem.find('.first') ;
+        var lasts        = ranges_elem.find('.last') ;
+        var descriptions = ranges_elem.find('.description') ;
         if (firsts.length != lasts.length) {
             report_error('slacid_ranges_edit_save: implementation error, please contact developers') ;
             return ;
         }
         for (var i=0; i < firsts.length; i++) {
-            var first = firsts[i] ;
-            var last  = lasts [i] ;
-            if (first.name != last.name) {
+            var first       = firsts      [i] ;
+            var last        = lasts       [i] ;
+            var description = descriptions[i] ;
+            if ((first.name != last.name) || (first.name != description.name)) {
                 report_error('slacid_ranges_edit_save: internal implementation error') ;
                 return ;
             }
-            params.ranges += (params.ranges != '' ? ',' : '')+first.name+':'+first.value+':'+last.value ;
+            ranges.push({
+                'id':          first.name ,
+                'first':       first.value ,
+                'last':        last.value ,
+                'description': description.value
+            });
         }
-        this.slacid_action (
+        this.slacid_action_POST (
             '../irep/ws/slacid_range_save.php' ,
-            params
+            {'ranges': JSON.stringify(ranges)}
         ) ;
     } ;
     this.slacid_ranges_edit_cancel = function() {
@@ -571,6 +588,12 @@ function p_appl_admin () {
     } ;
     this.slacid_action = function (url, params) {
         web_service_GET(url, params, function (data) {
+            that.slacid_range = data.range ;
+            that.slacid_ranges_display(false) ;
+        }) ;
+    } ;
+    this.slacid_action_POST = function (url, params) {
+        web_service_POST(url, params, function (data) {
             that.slacid_range = data.range ;
             that.slacid_ranges_display(false) ;
         }) ;

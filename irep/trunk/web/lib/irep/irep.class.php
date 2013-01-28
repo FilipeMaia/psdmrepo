@@ -58,13 +58,14 @@ class Irep extends DbConnection {
      */
     public function slacid_ranges () {
         $list = array () ;
-        $result = $this->query("SELECT id,first,last FROM {$this->database}.slacid_range ORDER BY first");
+        $result = $this->query("SELECT * FROM {$this->database}.slacid_range ORDER BY first");
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
             $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
             $range = array (
-                'id'    => intval($attr['id']) ,
-                'first' => intval($attr['first']) ,
-                'last'  => intval($attr['last'])) ;
+                'id'          => intval($attr['id']) ,
+                'first'       => intval($attr['first']) ,
+                'last'        => intval($attr['last']) ,
+                'description' =>   trim($attr['description'])) ;
             $range['available'] = $this->find_available_slacid($range) ;
             array_push($list, $range) ;
         }
@@ -72,7 +73,7 @@ class Irep extends DbConnection {
     }
     public function find_slacid_range_for ($slacid) {
         $slacid = intval($slacid) ;
-        $result = $this->query("SELECT id,first,last FROM {$this->database}.slacid_range WHERE first <= {$slacid} AND {$slacid} <= last") ;
+        $result = $this->query("SELECT * FROM {$this->database}.slacid_range WHERE first <= {$slacid} AND {$slacid} <= last") ;
         $nrows = mysql_numrows($result) ;
         if ($nrows == 0) return null ;
         if ($nrows != 1)
@@ -80,15 +81,16 @@ class Irep extends DbConnection {
         		__METHOD__, "inconsistent result returned by the query. Database may be corrupt.") ;
         $attr = mysql_fetch_array($result, MYSQL_ASSOC) ; 
         $range = array (
-            'id'    => intval($attr['id'] ),
-            'first' => intval($attr['first']) ,
-            'last'  => intval($attr['last'])) ;
+            'id'          => intval($attr['id'] ),
+            'first'       => intval($attr['first']) ,
+            'last'        => intval($attr['last']) ,
+            'description' =>   trim($attr['description'])) ;
         $range['available'] = count($this->find_available_slacid($range)) ;
         return $range ;
     }
     public function find_slacid_range ($id) {
         $id = intval($id) ;
-        $result = $this->query("SELECT id,first,last FROM {$this->database}.slacid_range WHERE id={$id}") ;
+        $result = $this->query("SELECT * FROM {$this->database}.slacid_range WHERE id={$id}") ;
         $nrows = mysql_numrows($result) ;
         if ($nrows == 0) return null ;
         if ($nrows != 1)
@@ -96,9 +98,10 @@ class Irep extends DbConnection {
         		__METHOD__, "inconsistent result returned by the query. Database may be corrupt.") ;
         $attr = mysql_fetch_array($result, MYSQL_ASSOC) ; 
         $range = array (
-            'id'    => intval($attr['id'] ),
-            'first' => intval($attr['first']) ,
-            'last'  => intval($attr['last'])) ;
+            'id'          => intval($attr['id'] ),
+            'first'       => intval($attr['first']) ,
+            'last'        => intval($attr['last']) ,
+            'description' =>   trim($attr['description'])) ;
         $range['available'] = count($this->find_available_slacid($range)) ;
         return $range ;
     }
@@ -140,11 +143,15 @@ class Irep extends DbConnection {
             'allocated_by_uid' => trim($attr['allocated_by_uid'])
         ) ;
     }
-    public function add_slacid_range ($first, $last) {
-        $this->query("INSERT {$this->database}.slacid_range VALUES (NULL,{$first},{$last})") ;
+    public function add_slacid_range ($first, $last, $description) {
+        $description_escaped = $this->escape_string(trim($description)) ;
+        $sql = "INSERT INTO {$this->database}.slacid_range VALUES (NULL,{$first},{$last},'{$description_escaped}')" ;
+        $this->query($sql) ;
     }
-    public function update_slacid_range ($range_id, $first, $last) {
-        $this->query("UPDATE {$this->database}.slacid_range SET first={$first}, last={$last} WHERE id={$range_id}") ;
+    public function update_slacid_range ($range_id, $first, $last, $description) {
+        $description_escaped = $this->escape_string(trim($description)) ;
+        $sql = "UPDATE {$this->database}.slacid_range SET first={$first}, last={$last}, description='{$description_escaped}' WHERE id={$range_id}" ;
+        $this->query($sql) ;
     }
     public function delete_slacid_range ($range_id) {
         $this->query("DELETE FROM {$this->database}.slacid_range WHERE id={$range_id}") ;
