@@ -9,7 +9,7 @@ use LogBook\LogBookException;
 /*
  * This script will process a request for updating existing message.
  */
-$onsuccess = "index.php";
+$onsuccess = "../index.php";
 if( isset( $_POST['onsuccess'] )) {
     $onsuccess = trim( $_POST['onsuccess'] );
 }
@@ -138,7 +138,7 @@ try {
 
     /* Return back to the caller
      */
-    header( "Location: ../{$onsuccess}" );
+    header( "Location: {$onsuccess}" );
     
     LogBook::instance()->commit();
 
