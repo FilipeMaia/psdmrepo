@@ -11,6 +11,17 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-00
+2013-01-29 Andy Salnikov
+- major redesign of ndarray
+- ndarray was a pointer to the data, now it has become smart pointer,
+  this gives us ability to manage the data and to allocate data
+  if necessary
+- data managed by ndarray are not const any more, one can use ndarray
+  interface to change the data
+- more thoughts on constness issues: https://pswww.slac.stanford.edu/trac/psdm/ticket/187
+- unit test extended with new tests
+
 Tag: V00-01-01
 2012-01-12 Andy Salnikov
 - add ndarray::empty() method

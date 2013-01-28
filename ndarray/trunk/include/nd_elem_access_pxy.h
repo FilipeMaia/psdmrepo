@@ -13,11 +13,11 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -52,11 +52,13 @@ class nd_elem_access_pxy  {
 public:
 
   // Default constructor
-  nd_elem_access_pxy (const ElemType* data, const unsigned shape[], const unsigned strides[])
+  nd_elem_access_pxy (const boost::shared_ptr<ElemType>& data,
+                      const unsigned shape[], const unsigned strides[])
     : m_data(data), m_shape(shape), m_strides(strides) {}
 
   nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) const {
-    return nd_elem_access_pxy<ElemType, NDim-1>(m_data + i*m_strides[0], m_shape+1, m_strides+1);
+    boost::shared_ptr<ElemType> ptr(m_data, m_data.get() + i*m_strides[0]);
+    return nd_elem_access_pxy<ElemType, NDim-1>(ptr, m_shape+1, m_strides+1);
   }
 
 private:
@@ -64,7 +66,7 @@ private:
   // ndarray<T,N> can be constructed from this type, needs access to internals
   friend class ndarray<ElemType, NDim>;
 
-  const ElemType* m_data;
+  boost::shared_ptr<ElemType> m_data;
   const unsigned* m_shape;
   const unsigned* m_strides;
 };
@@ -74,17 +76,18 @@ class nd_elem_access_pxy<ElemType, 1> {
 public:
 
   // Default constructor
-  nd_elem_access_pxy (const ElemType* data, const unsigned shape[], const unsigned strides[])
+  nd_elem_access_pxy (const boost::shared_ptr<ElemType>& data,
+                      const unsigned shape[], const unsigned strides[])
     : m_data(data), m_shape(shape), m_strides(strides) {}
 
-  const ElemType& operator[](int i) const { return m_data[i*m_strides[0]]; }
+  const ElemType& operator[](int i) const { return m_data.get()[i*m_strides[0]]; }
 
 private:
 
   // ndarray<T,1> can be constructed from this type, needs access to internals
   friend class ndarray<ElemType, 1>;
 
-  const ElemType* m_data;
+  boost::shared_ptr<ElemType> m_data;
   const unsigned* m_shape;
   const unsigned* m_strides;
 };

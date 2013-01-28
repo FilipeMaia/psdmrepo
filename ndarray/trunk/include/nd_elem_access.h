@@ -59,7 +59,8 @@ class nd_elem_access : protected nd_data<ElemType, NDim> {
 public:
 
   nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) const {
-    return nd_elem_access_pxy<ElemType, NDim-1>(Super::m_data + i*Super::m_strides[0], Super::m_shape+1, Super::m_strides+1);
+    boost::shared_ptr<ElemType> ptr(Super::m_data, Super::m_data.get() + i*Super::m_strides[0]);
+    return nd_elem_access_pxy<ElemType, NDim-1>(ptr, Super::m_shape+1, Super::m_strides+1);
   }
 
 protected:
@@ -78,7 +79,7 @@ class nd_elem_access<ElemType, 1> : protected nd_data<ElemType, 1> {
 
 public:
 
-  const ElemType& operator[](int i) const { return Super::m_data[i*Super::m_strides[0]]; }
+  ElemType& operator[](int i) const { return Super::m_data.get()[i*Super::m_strides[0]]; }
 
 protected:
 

@@ -13,11 +13,11 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -56,7 +56,7 @@ struct nd_data  {
   // Destructor
   ~nd_data () {}
 
-  const ElemType* m_data;          ///< Pointer to the data array
+  boost::shared_ptr<ElemType> m_data;          ///< Pointer to the data array
   unsigned m_shape[NDim];    ///< Array dimensions
   unsigned m_strides[NDim];  ///< Array strides
 };

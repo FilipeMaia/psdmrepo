@@ -49,13 +49,14 @@
  *  size of array are dynamic and can change (for example in assignment).
  *
  *  The type of the array elements is determined by the first template argument
- *  and it can be any regular C++ type of fixed size.
- *
- *  Ndarray is a wrapper around the existing in-memory data arrays, it cannot
- *  be used to create (allocate) new data arrays, existing pre-allocated
- *  memory pointer must be provided to the constructor of ndarray. Ndarray
- *  provides read-only access to the array data, its primary use is for
- *  accessing data in psana framework which are non-modifiable by design.
+ *  and it can be any regular C++ type of fixed size. There is a distinction
+ *  between const and non-const template arguments. If non-const type is
+ *  used for template argument (such as ndarray<int,2>) then the resulting
+ *  ndarray is a modifiable object, one could use its methods to get access to
+ *  array elements and modify them (through non-const references or pointers).
+ *  On the other hand if template argument is a const type (e.g. ndarray<const int,2>)
+ *  then array is non-modifiable, it only returns const pointers and references to
+ *  the data which cannot be used to modify the data.
  *
  *  There are two essential characteristics of every array - array shape and strides.
  *  Array shape defines the size of every dimension of the array; shape is itself
@@ -83,6 +84,64 @@
  *  One can query the strides array with the @c strides() method which returns a pointer
  *  to the 1-dimensional array of @c NDim size.
  *
+ *  Ndarray can be used to either provide access to the already existing data
+ *  (which are not in the form of the ndarray), or to create new objects
+ *  with newly allocated memory for array data. Ndarray transparently supports
+ *  memory management of the data area, in most cases one should not care about
+ *  how memory is allocated or deallocated. There are few different ways to
+ *  construct ndarray instances which determines how ndarray manages its corresponding
+ *  data:
+ *
+ *  1. from raw pointers:
+ *     @code
+ *     int* ptr = new int[100*100];
+ *     unsigned int shape[2] = {100, 100};
+ *     ndarray<int,2> array(ptr, shape);
+ *     //or
+ *     ndarray<int,2> array = make_ndarray(ptr, 100, 100);
+ *     @endcode
+ *
+ *     In this case ndarray does not do anything special with the pointer that is
+ *     passed to it, it is responsibility of the client code to make sure that
+ *     memory is correctly deallocated if necessary and deallocation happens only after
+ *     the last copy of ndarray is destroyed. Because of the potential problems it is
+ *     not recommended anymore to make ndarrays from raw pointers.
+ *
+ *  2. internal memory allocation:
+ *     @code
+ *     unsigned int shape[2] = {100, 100};
+ *     ndarray<int,2> array(shape);
+ *     // or
+ *     ndarray<int,2> array = make_ndarray<int>(100, 100);
+ *     @endcode
+ *
+ *     In this case constructor allocates necessary space to hold array data. This
+ *     space is automatically deallocated when the last copy of the ndarray pointing
+ *     to that array data is destroyed. This is a preferred way to make ndarrays if
+ *     you need to allocate new memory for your data.
+ *
+ *  3. from shared pointer (for advanced users):
+ *     @code
+ *     boost::shared_ptr<int> data = ...;
+ *     unsigned int shape[2] = {100, 100}
+ *     ndarray<int,2> array(data, shape);
+ *     // or
+ *     ndarray<int,2> array = make_ndarray(data, 100, 100);
+ *     @endcode
+ *
+ *     In this case shared pointer defines memory management policy for the data, ndarray
+ *     copies this pointers and shares array data through this pointer with all other
+ *     clients. The memory will be deallocated (if necessary) when last copy of shared
+ *     pointer disappears (including all copies in ndarray instances). Note that
+ *     creating shared pointer for array data needs special care. One cannot just say:
+ *     @code
+ *     // DO NOT DO THIS, BAD THINGS WILL HAPPEN!
+ *     boost::shared_ptr<int> data(new int[100*100]);
+ *     @endcode
+ *     as this will cause incorrect <tt>operator new</tt> be called when data is going to be
+ *     deallocated. Special deleter object (or different way of constructing) is needed
+ *     in this case, check boost.shared_ptr documentation.
+ *
  *  The main method of accessing array elements is a traditional C-like square
  *  bracket syntax:
  *
@@ -99,12 +158,18 @@
  *    int elem = ndarr.at(idx);
  *    @endcode
  *
+ *  One can modify elements of the array if array template type is non-const:
+ *
+ *    @code
+ *    ndarray<int, 3> ndarr(...);
+ *    ndarr[i][j][k] = 1000;
+ *    @endcode
+ *
  *  Additionally ndarray class provides STL-compatible iterators and usual methods
  *  @c begin(), @c end(), @c rbegin(), @c rend(). The iterators can be used with
  *  many standard algorithm. Note that iterators always scan for elements in the
  *  memory order from first (data()) to last (data()+size()) array element
  *  (iterators do not use strides and do not work with disjoint array memory).
- *  Only the const version of iterators are provided as the data in array are read-only.
  *
  *  Method @c size() returns the total number of elements in array.
  *
@@ -114,13 +179,20 @@
  *  provided via regular arguments, here are few examples of their use:
  *
  *    @code
- *    int* data = ...;
  *    // Create 1-dim array of size 1048576
+ *    int* data = ...;
  *    ndarray<int, 1> arr2d = make_ndarray(data, 1048576);
- *    // Create 2-dim array of dimensions 1024x1024
- *    ndarray<int, 2> arr2d = make_ndarray(data, 1024, 1024);
- *    // Create 3-dim array of dimensions 4x512x512
- *    ndarray<int, 3> arr2d = make_ndarray(data, 4, 512, 512);
+ *
+ *    // Create 2-dim array of dimensions 1024x1024, allocate space for it
+ *    ndarray<int, 2> arr2d = make_ndarray<int>(1024, 1024);
+ *
+ *    // Create 3-dim array of dimensions 4x512x512 from shared pointer
+ *    boost::shared_ptr<int> shptr = ...;
+ *    ndarray<int, 3> arr2d = make_ndarray(shptr, 4, 512, 512);
+ *
+ *    // Create non-modifiable array from constant data
+ *    const int* cdata = ...;
+ *    ndarray<const int, 1> arr2d = make_ndarray(cdata, 1048576);
  *    @endcode
  *
  *  This software was developed for the LCLS project.  If you use all or 
@@ -137,49 +209,85 @@ class ndarray : public ndarray_details::nd_elem_access<ElemType, NDim> {
 public:
 
   typedef ElemType element;
-  typedef const ElemType* const_iterator;
-  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+  typedef element* iterator;
+  typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef size_t size_type;
+
+  /**
+   *   Enum defines assumed order of the element in memory. Values are used
+   *   as parameters for constructors and reshape() method. By default methods
+   *   assume C-style memory ordering where last index changes faster. If
+   *   in-memory data has Fortran layout (first index changes faster) than
+   *   one needs to provide Fortran as the last argument to the above methods.
+   *   It is also possible to change strides to any other memory layout
+   *   by using strides() method.
+   */
+  enum Order { C, Fortran };
 
   /// Default constructor makes an empty array
   ndarray ()
   {
-    Super::m_data = 0;
     std::fill_n(Super::m_shape, NDim, 0U);
     std::fill_n(Super::m_strides, NDim, 0U);
   }
 
+
   /**
    *  @brief Constructor that takes pointer to data and shape.
    *
-   *  @param[in] data   Pointer to data array
-   *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
-   */
-  ndarray (const ElemType* data, const unsigned* shape)
-  {
-    Super::m_data = data;
-    std::copy(shape, shape+NDim, Super::m_shape);
-    // calculate strides for standard C layout
-    Super::m_strides[NDim-1] = 1;
-    for (int i = NDim-2; i >= 0; -- i) Super::m_strides[i] = Super::m_strides[i+1] * shape[i+1];
-  }
-
-  /**
-   *  @brief Constructor that takes pointer to data, shape and strides.
+   *  Optional third argument defines memory order of the elements, default is to
+   *  assume C order (last index changes fastest). This argument determines how strides
+   *  are calculated, strides can be changed later with strides() method.
    *
    *  @param[in] data   Pointer to data array
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
-   *  @param[in] strides Pointer to strides array, size of array is NDim, array data will be copied.
+   *  @param[in] order  Memory order of the elements.
    */
-  ndarray (const ElemType* data, const unsigned* shape, const unsigned* strides)
+  ndarray (ElemType* data, const unsigned* shape, Order order = C)
   {
-    Super::m_data = data;
     std::copy(shape, shape+NDim, Super::m_shape);
-    std::copy(strides, strides+NDim, Super::m_strides);
+    _setStrides(order);
+    Super::m_data = boost::shared_ptr<ElemType>(data, _no_delete());
   }
 
   /**
-   *  @brief Constructor from other ndarray.
+   *  @brief Constructor that takes shared pointer to data and shape array.
+   *
+   *  Optional third argument defines memory order of the elements, default is to
+   *  assume C order (last index changes fastest). This argument determines how strides
+   *  are calculated, strides can be changed later with strides() method.
+   *
+   *  @param[in] data   Pointer to data array
+   *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
+   *  @param[in] order  Memory order of the elements.
+   */
+  ndarray (const boost::shared_ptr<ElemType> data, const unsigned* shape, Order order = C)
+  {
+    std::copy(shape, shape+NDim, Super::m_shape);
+    _setStrides(order);
+    Super::m_data = boost::shared_ptr<ElemType>(data, _no_delete());
+  }
+
+  /**
+   *  @brief Constructor that takes shape array and allocates necessary space for data.
+   *
+   *  After allocation the data in array is not initialized and will contain garbage.
+   *  Optional second argument defines memory order of the elements, default is to
+   *  assume C order (last index changes fastest). This argument determines how strides
+   *  are calculated, strides can be changed later with strides() method.
+   *
+   *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
+   *  @param[in] order  Memory order of the elements.
+   */
+  ndarray (const unsigned* shape, Order order = C)
+  {
+    std::copy(shape, shape+NDim, Super::m_shape);
+    _setStrides(order);
+    Super::m_data = boost::shared_ptr<ElemType>(new ElemType[size()], _array_delete());
+  }
+
+  /**
+   *  @brief Copy constructor from other ndarray.
    */
   ndarray (const ndarray& other)
   {
@@ -228,8 +336,8 @@ public:
    *  dimensions. Alternative way to access elements in the array is to use regular
    *  operator[] inherited from nd_elem_access base class.
    */
-  const element& at(unsigned index[]) const {
-    const ElemType* data = Super::m_data;
+  element& at(unsigned index[]) const {
+    element* data = Super::m_data.get();
     for (unsigned i = 0; i != NDim; ++ i) {
       data += index[i]*Super::m_strides[i];
     }
@@ -239,7 +347,7 @@ public:
   /**
    *  Returns pointer to the beginning of the data array.
    */
-  const ElemType* data() const { return Super::m_data; }
+  element* data() const { return Super::m_data.get(); }
 
   /**
    *  @brief Returns shape of the array.
@@ -255,6 +363,35 @@ public:
    */
   const unsigned* strides() const { return Super::m_strides; }
 
+  /**
+   *  @brief Changes strides.
+   *
+   *  If array has a non-conventional memory layout it is possible to change
+   *  the strides.
+   *
+   *  @param[in] strides  Pointer to new strides array, size of array is NDim, array data will be copied.
+   */
+  void strides(const unsigned* strides) const {
+    std::copy(strides, strides+NDim, Super::m_strides);
+  }
+
+  /**
+   *  @brief Changes the shape of the array.
+   *
+   *  No checks are done on the size of the new array.
+   *  Optional second argument defines memory order of the elements, default is to
+   *  assume C order (last index changes fastest). This argument determines how strides
+   *  are calculated, strides can be changed later with strides() method.
+   *
+   *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
+   *  @param[in] order  Memory order of the elements.
+   */
+  void reshape(const unsigned* shape, char order='C') const {
+    std::copy(shape, shape+NDim, Super::m_shape);
+    _setStrides(order);
+  }
+
+
   /// Returns total number of elements in array
   size_type size() const {
     return std::accumulate(Super::m_shape, Super::m_shape+NDim, size_type(1), std::multiplies<size_type>());
@@ -264,14 +401,14 @@ public:
   bool empty() const { return not Super::m_data; }
 
   /// Returns iterator to the beginning of data, iteration is performed in memory order
-  const_iterator begin() const { return Super::m_data; }
+  iterator begin() const { return Super::m_data.get(); }
 
   /// Returns iterator to the end of data
-  const_iterator end() const { return Super::m_data + size(); }
+  iterator end() const { return Super::m_data.get() + size(); }
 
   /// Returns reverse iterators
-  const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
-  const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+  reverse_iterator rbegin() const { return reverse_iterator(end()); }
+  reverse_iterator rend() const { return reverse_iterator(begin()); }
 
   /// swap contents of two arrays
   void swap(ndarray& other) {
@@ -282,45 +419,170 @@ public:
 
 protected:
 
+  // calculate strides from shape array given the assumed ordering
+  void _setStrides(Order order) {
+    if (order == C) {
+      Super::m_strides[NDim-1] = 1;
+      for (int i = int(NDim)-2; i >= 0; -- i) Super::m_strides[i] = Super::m_strides[i+1] * Super::m_shape[i+1];
+    } else {
+      Super::m_strides[0] = 1;
+      for (unsigned i = 1; i < NDim; ++ i) Super::m_strides[i] = Super::m_strides[i-1] * Super::m_shape[i-1];
+    }
+  }
+
 private:
+
+  // special destroyer for non-owned data
+  struct _no_delete {
+    void operator()(ElemType*) const {}
+  };
+
+  // special destroyer for owned array data
+  struct _array_delete {
+    void operator()(ElemType* ptr) const { delete [] ptr; }
+  };
 
 };
 
-/// Helper method to create an instance of 1-dimensional array
+/// @ingroup ndarray
+/// Helper method to create an instance of 1-dimensional array from raw data pointer.
+/// Note there may be potential problems with memory management with raw pointers.
 template <typename ElemType>
 inline
 ndarray<ElemType, 1> 
-make_ndarray(const ElemType* data, unsigned dim0)
+make_ndarray(ElemType* data, unsigned dim0)
 {
   unsigned shape[] = {dim0};
   return ndarray<ElemType, 1>(data, shape);
 }
 
-/// Helper method to create an instance of 2-dimensional array
+/// @ingroup ndarray
+/// Helper method to create an instance of 2-dimensional array from raw data pointer.
+/// Note there may be potential problems with memory management with raw pointers.
 template <typename ElemType>
 inline
 ndarray<ElemType, 2> 
-make_ndarray(const ElemType* data, unsigned dim0, unsigned dim1)
+make_ndarray(ElemType* data, unsigned dim0, unsigned dim1)
 {
   unsigned shape[] = {dim0, dim1};
   return ndarray<ElemType, 2>(data, shape);
 }
 
-/// Helper method to create an instance of 3-dimensional array
+/// @ingroup ndarray
+/// Helper method to create an instance of 3-dimensional array from raw data pointer.
+/// Note there may be potential problems with memory management with raw pointers.
 template <typename ElemType>
 inline
 ndarray<ElemType, 3> 
-make_ndarray(const ElemType* data, unsigned dim0, unsigned dim1, unsigned dim2)
+make_ndarray(ElemType* data, unsigned dim0, unsigned dim1, unsigned dim2)
 {
   unsigned shape[] = {dim0, dim1, dim2};
   return ndarray<ElemType, 3>(data, shape);
 }
 
-/// Helper method to create an instance of 4-dimensional array
+/// @ingroup ndarray
+/// Helper method to create an instance of 4-dimensional array from raw data pointer.
+/// Note there may be potential problems with memory management with raw pointers.
 template <typename ElemType>
 inline
 ndarray<ElemType, 4> 
-make_ndarray(const ElemType* data, unsigned dim0, unsigned dim1, unsigned dim2, unsigned dim3)
+make_ndarray(ElemType* data, unsigned dim0, unsigned dim1, unsigned dim2, unsigned dim3)
+{
+  unsigned shape[] = {dim0, dim1, dim2, dim3};
+  return ndarray<ElemType, 4>(data, shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 1-dimensional array.
+/// Memory for data is allocated internally in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 1>
+make_ndarray(unsigned dim0)
+{
+  unsigned shape[] = {dim0};
+  return ndarray<ElemType, 1>(shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 2-dimensional array.
+/// Memory for data is allocated internally in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 2>
+make_ndarray(unsigned dim0, unsigned dim1)
+{
+  unsigned shape[] = {dim0, dim1};
+  return ndarray<ElemType, 2>(shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 3-dimensional array.
+/// Memory for data is allocated internally in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 3>
+make_ndarray(unsigned dim0, unsigned dim1, unsigned dim2)
+{
+  unsigned shape[] = {dim0, dim1, dim2};
+  return ndarray<ElemType, 3>(shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 4-dimensional array.
+/// Memory for data is allocated internally in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 4>
+make_ndarray(unsigned dim0, unsigned dim1, unsigned dim2, unsigned dim3)
+{
+  unsigned shape[] = {dim0, dim1, dim2, dim3};
+  return ndarray<ElemType, 4>(shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 1-dimensional array from shared pointer.
+/// Shaed pointer defines memory management policy in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 1>
+make_ndarray(const boost::shared_ptr<ElemType>& data, unsigned dim0)
+{
+  unsigned shape[] = {dim0};
+  return ndarray<ElemType, 1>(data, shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 2-dimensional array from shared pointer.
+/// Shaed pointer defines memory management policy in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 2>
+make_ndarray(const boost::shared_ptr<ElemType>& data, unsigned dim0, unsigned dim1)
+{
+  unsigned shape[] = {dim0, dim1};
+  return ndarray<ElemType, 2>(data, shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 3-dimensional array from shared pointer.
+/// Shaed pointer defines memory management policy in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 3>
+make_ndarray(const boost::shared_ptr<ElemType>& data, unsigned dim0, unsigned dim1, unsigned dim2)
+{
+  unsigned shape[] = {dim0, dim1, dim2};
+  return ndarray<ElemType, 3>(data, shape);
+}
+
+/// @ingroup ndarray
+/// Helper method to create an instance of 4-dimensional array from shared pointer.
+/// Shaed pointer defines memory management policy in this case.
+template <typename ElemType>
+inline
+ndarray<ElemType, 4>
+make_ndarray(const boost::shared_ptr<ElemType>& data, unsigned dim0, unsigned dim1, unsigned dim2, unsigned dim3)
 {
   unsigned shape[] = {dim0, dim1, dim2, dim3};
   return ndarray<ElemType, 4>(data, shape);
