@@ -203,6 +203,7 @@ if 'psddl' in packages:
 if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
     docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
+    docTargets.append(env.Command('doc/psana-ref/html/index.html', env.Dir('psana'), "pydoc-driver -p psana -Q doc/psana-ref/html psana _psana"))
 if 'pyana' in packages:
     docTargets.append(env.Command('doc/pyana-ref/html/index.html', env.Dir('pyana'), "pydoc-driver -p pyana -Q doc/pyana-ref/html pyana _pdsdata pypdsdata"))
 env.Alias('doc', docTargets)
