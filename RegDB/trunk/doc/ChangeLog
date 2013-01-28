@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2013-01-28 Igor Gaponenko
+- extended support for experiment names to allow: <instr>c<NN><YYY> and <instr>s<NN><YYY>
+- fixed a bug in the HDF auto-translation requestor Web Service
+
 Tag: V00-01-05
 2012-12-20 Igor Gaponenko
 - added support for FFB auto-translation

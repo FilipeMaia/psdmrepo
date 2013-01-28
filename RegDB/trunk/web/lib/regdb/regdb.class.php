@@ -581,7 +581,7 @@ HERE;
             foreach( $this->experiments_for_instrument( $i ) as $exper ) {
                 $g = $exper->name();
                 if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
-                   ( 1 == preg_match( '/^[a-z]{3}[im][0-9]{4}$/', $g ))) $groups[$g] = True;
+                   ( 1 == preg_match( '/^[a-z]{3}[imcs][0-9]{4}$/', $g ))) $groups[$g] = True;
             }
         }
 
@@ -640,7 +640,6 @@ HERE;
             $groups['ps-xcs'] = True;
             $groups['xcsopr'] = True;
             $groups['xcscom12'] = True;
-            $groups['xcsc0112'] = True;
         }
 
         /* In-house commissionning, in-house, etc.
