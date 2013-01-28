@@ -64,7 +64,6 @@ function elog_create() {
             // such as: fresh initialization, change in the slected context, subcontext, etc.
             //
             if( just_initialized || (prev_context1 != this.context1 )) {
-                this.live_dim_all_highlights();
                 this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
             }
         } else if(this.context1 == 'post') {
@@ -314,18 +313,12 @@ function elog_create() {
         this.live_message_viewer = new elog_message_viewer_create('elog.live_message_viewer', this, 'el-l');
 
         $('#el-l-mctrl').find('select[name="messages"]').change(function() {
-            that.live_message_viewer.dim_day();
-            that.live_dim_all_highlights();
             that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
         });
         $('#el-l-dm-selector').buttonset().change(function() {
-            that.live_message_viewer.dim_day();
-            that.live_dim_all_highlights();
             that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
         });
         $('#el-l-rs-selector').buttonset().change(function() {
-            that.live_message_viewer.dim_day();
-            that.live_dim_all_highlights();
             that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
         });
         $('#el-l-refresh-selector').buttonset().change(function() {
@@ -339,13 +332,11 @@ function elog_create() {
         });
         $('#el-l-refresh').button().click(function() {
             /*
-            that.live_dim_all_highlights();
             that.live_message_viewer.refresh(live_selected_runs(), that.live_highlight);
             */
             //that.live_stop_refresh();
             that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
             //that.live_schedule_refresh();
-            //that.live_start_highlight_timer();
         });
         $('#el-l-refresh-interval').change(function(ev) {
             that.live_stop_refresh();
@@ -354,7 +345,6 @@ function elog_create() {
 
         this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
         this.live_schedule_refresh();
-        this.live_start_highlight_timer();
     };
 
 
@@ -366,41 +356,9 @@ function elog_create() {
         return 1000*parseInt($('#el-l-refresh-interval').val());
     }
 
-    this.live_highlight_interval = 30*1000;
-    this.live_highlighted = new Array();
-    this.live_highlight_timer = null;
     this.live_highlight = function(id) {
-        that.live_highlighted[id] = that.live_highlight_interval;
-        $(id).addClass('el-l-m-highlight');
+        $(id).stop(true,true).effect('highlight', {color:'#ff6666'}, 30000);
     }
-    this.live_start_highlight_timer = function() {
-        this.live_highlight_timer = window.setTimeout('elog.live_highlight_actions()',live_refresh_interval());
-    };
-    this.live_highlight_actions = function() {
-        for(var id in this.live_highlighted) {
-            this.live_highlighted[id] -= live_refresh_interval();
-            if(this.live_highlighted[id] <= 0) {
-                $(id).removeClass('el-l-m-highlight');
-                delete this.live_highlighted[id];
-            }
-        }
-        this.live_start_highlight_timer();
-    };
-    this.live_dim_all_highlights = function() {
-        for(var id in this.live_highlighted) {
-            this.live_highlighted[id] -= live_refresh_interval();
-            $(id).removeClass('el-l-m-highlight');
-            delete this.live_highlighted[id];
-        }
-    };
-    this.live_stop_highlight_timer = function() {
-        this.live_dim_all_highlights();
-        if(this.live_highlight_timer != null) {
-            window.clearTimeout(this.live_highlight_timer);
-            this.live_highlight_timer = null;
-        }
-    };
-
     this.live_refresh_timer = null;
     this.live_schedule_refresh = function() {
         this.live_refresh_timer = window.setTimeout('elog.live_refresh_actions()',live_refresh_interval());
@@ -1249,7 +1207,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         if( that.expand_collapse > 2 ) that.expand_collapse = 2;
     });
     $('#'+this.base+'-collapse').button().click(function() {
-        that.dim_day();
         switch( that.expand_collapse ) {
         default:
         case 1:
@@ -1264,17 +1221,14 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         if( that.expand_collapse < 0 ) that.expand_collapse = 0;
     });
     $('#'+this.base+'-viewattach').button().click(function() {
-        that.dim_day();
         $('.el-l-a-tgl').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
         $('.el-l-a-con').removeClass('el-l-a-hdn').addClass('el-l-a-vis');
     });
     $('#'+this.base+'-hideattach').button().click(function() {
-        that.dim_day();
         $('.el-l-a-tgl').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
         $('.el-l-a-con').removeClass('el-l-a-vis').addClass('el-l-a-hdn');
     });
     $('#'+this.base+'-reverse').button().click(function() {
-        that.dim_day();
         that.days2threads.reverse();
         for(var day_idx = that.days2threads.length-1; day_idx >= 0; day_idx--)
             that.days2threads[day_idx].threads.reverse();
@@ -1286,11 +1240,9 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         var toggler='#'+that.base+'-m-d-tgl-'+idx;
         var container='#'+that.base+'-m-d-con-'+idx;
         if(on) {
-            that.highlight_day(idx);
             $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
             $(container).removeClass('el-l-m-d-hdn').addClass('el-l-m-d-vis');
         } else {
-            that.dim_day();
             $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
             $(container).removeClass('el-l-m-d-vis').addClass('el-l-m-d-hdn');
         }
@@ -1776,8 +1728,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
     };
     this.do_reload = function(params) {
 
-        that.dim_day();
-
         $('#'+this.base+'-ms-updated').html('Searching...');
         $.get('../logbook/ws/Search.php',params,function(data) {
 
@@ -1883,7 +1833,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div style="float:right; margin-right:10px;" id="'+this.base+'-m-d-con-info-'+day_idx+'">'+runs_messages_info+'</div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
-'<div class="el-l-m-d-con el-l-m-d-hdn" id="'+this.base+'-m-d-con-'+day_idx+'" onmouseover="'+this.address+'.highlight_day('+"'"+day_idx+"'"+');">'+
+'<div class="el-l-m-d-con el-l-m-d-hdn" id="'+this.base+'-m-d-con-'+day_idx+'"">'+
 '  <div class="el-d-ctrl" >'+
 '    <button class="el-d-expand" onclick="'+this.address+'.expand_day('+"'"+day_idx+"'"+');" >Expand++</button>'+
 '    <button class="el-d-collapse" onclick="'+this.address+'.collapse_day('+"'"+day_idx+"'"+');" >Collapse--</button>'+
@@ -2793,34 +2743,10 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff; font-size:12px;">'+entry.id+'</div>';
         return html;
     }
-
     function run_sign(num) {
         var html = '<div style="float:right; margin-right:10px;" class="el-l-m-run">'+(num ? '<sup><b>run: '+num+'</b></sup>' : '')+'</div>';
         return html;
     }
-
-    /* ATTENTION: Watch for dependencies! These functiona will call a function from
-     *            the application context.
-     *
-     * TODO: Re-evaluate this code to see if the dependencies are properly
-     *       designed and used.
-     */
-    this.highlight_day = function(idx) {
-        return;
-        if(that.current_day == idx) return;
-        that.current_day = idx;
-        var day = that.days2threads[idx];
-        applications['p-appl-elog'].context3 = '<a class="link" href="#'+this.base+'-m-d-hdr-'+idx+'" title="go to the day header">'+that.days2threads[idx].ymd+'</a>';
-        set_context(applications['p-appl-elog']);
-    };
-
-    this.dim_day = function() {
-        return;
-        if(that.current_day == null) return;
-        that.current_day = null;
-        applications['p-appl-elog'].context3 ='';
-        set_context(applications['p-appl-elog']);
-    };
 }
 
 /**
