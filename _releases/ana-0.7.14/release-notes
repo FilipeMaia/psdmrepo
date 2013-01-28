@@ -1,0 +1,3 @@
+- read-ahead for XTC files implemented, should improve ordering
+  of the resulting datagrams
+- started fixing various psana/python integration issues
