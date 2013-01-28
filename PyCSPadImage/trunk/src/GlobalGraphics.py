@@ -92,7 +92,11 @@ def plotImageAndSpectrum(arr,range=(0,500)) :
 #--------------------------------
 
 def move(x0=200,y0=100) :
-    plt.get_current_fig_manager().window.move(x0, y0)
+    #plt.get_current_fig_manager().window.move(x0, y0)
+    #move_str = '+' + str(x0) + '+' + str(y0)
+    #plt.get_current_fig_manager().window.geometry(move_str)
+    #plt.get_current_fig_manager().window.geometry("+50+50")
+    pass
 
 #--------------------------------
 
@@ -106,9 +110,9 @@ def main() :
 
     arr = getRandomImage()
     #plotImage(arr,range=(100,300))
-    #plotImageAndSpectrum(arr,range=(100,300))
+    plotImageAndSpectrum(arr,range=(100,300))
     #plotHistogram(arr,range=(100,300),figsize=(10,5))
-    plotImage(arr,range=(100,300),figsize=(10,10))
+    #plotImage(arr,range=(100,300),figsize=(10,10))
     move(200,100)
     show()
 

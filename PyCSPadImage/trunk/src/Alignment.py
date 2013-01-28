@@ -93,8 +93,10 @@ def main_alignment_test() :
     #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49812-r0073-Ds1'   # 2012-03-08
     #path_calib = '/reg/d/psdm/CXI/cxi49812/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'           # 2012-03-08    
     #path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49012-r0020-Ds1/'  # 2012-03-14
-    path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'           # 2012-03-14    
+    #path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'           # 2012-03-14    
     #path_calib = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0'            # 2012-03-23 check    
+    path_calib = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-24'       # 2013-01-24
+
 
     #fname, runnum = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',    9 
     #fname, runnum = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5',   80
@@ -103,12 +105,13 @@ def main_alignment_test() :
     #fname, runnum = '/reg/d/psdm/CXI/cxi39112/hdf5/cxi39112-r0009.h5',    9 
     #fname, runnum = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5', 1437
     #fname, runnum = '/reg/d/psdm/CXI/cxi49812/hdf5/cxi49812-r0073.h5',   73
-    fname, runnum = '/reg/d/psdm/CXI/cxi49012/hdf5/cxi49012-r0020-raw.h5', 20
+    #fname, runnum = '/reg/d/psdm/CXI/cxi49012/hdf5/cxi49012-r0020-raw.h5', 20
     #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5',  628
+    fname, runnum = '/reg/d/psdm/xpp/xppcom13/hdf5/xppcom13-r0066.h5', 66
 
-    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
-    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
 
     event   = 1
 
@@ -124,7 +127,7 @@ def main_alignment_test() :
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     #ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=50 )
+    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=10 )
     print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
     #print 'ds1ev = ',ds1ev[1,:]
 
@@ -132,14 +135,14 @@ def main_alignment_test() :
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0008.dat' # shape = (5920, 388)
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
-    ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
     #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xppcom10-r1435.dat' # shape = (5920, 388) low gain
     #ped_fname = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/9-37.data' # shape = (5920, 388)
     #ds1ev  = gm.getCSPadArrayFromFile(ped_fname)
     #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat')
     #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xppcom10-r1442.dat')
 
-    ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
+    #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
     cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True)#, mirror=True)
@@ -150,8 +153,8 @@ def main_alignment_test() :
 
     print 'Plot CSPad image'
     #AmpRange = (0, 800)
-    #AmpRange = (900,  1400)
-    AmpRange = (-10, 40)
+    AmpRange = (1400,  2000)
+    #AmpRange = (-10, 40)
     #AmpRange = (0, 100)
 
     gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
@@ -169,8 +172,8 @@ def main_alignment_test() :
 
 if __name__ == "__main__" :
 
-    #main_alignment_test()
-    main_example_CSpad2x2()
+    main_alignment_test()
+    #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )
 
 #----------------------------------------------
