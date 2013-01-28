@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-11
+2013-01-28 Andy Salnikov
+- updatges related to ndarray constness change
+
 Tag: V00-02-10
 2013-01-26 Andy Salnikov
 - parameterize name of the output file in DdlPythonInterfaces

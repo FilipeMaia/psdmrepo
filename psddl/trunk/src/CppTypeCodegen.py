@@ -377,17 +377,18 @@ class CppTypeCodegen ( object ) :
         if attr.isfixed():
 
             idx0 = "[0]" * len(attr.shape.dims)
-            return T("return make_ndarray(&$name$idx, $shape);")(name=attr.name, idx=idx0, shape=shape)
+            return T("return make_ndarray(const_cast<$type*>(&$name$idx), $shape);")(name=attr.name, idx=idx0, 
+                                                                                    shape=shape, type=_typename(attr.type))
 
         else:
             
             body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  $type* data = ($type*)(((const char*)this)+offset);")(type=_typename(attr.type))
+            body += T("\n  $type* data = ($type*)(((char*)this)+offset);")(type=_typename(attr.type))
             body += T("\n  return make_ndarray(data, $shape);")(shape=shape)
             return body
 
     def _bodyAnyArrray(self, attr):
-        """Makes method body for methods returning ndarray"""
+        """Makes method body for methods returning array (pointer)"""
 
         shape = ', '.join([str(s or 0) for s in attr.shape.dims])
         if attr.isfixed():

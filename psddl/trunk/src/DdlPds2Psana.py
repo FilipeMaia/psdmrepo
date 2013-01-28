@@ -389,7 +389,8 @@ class DdlPds2Psana ( object ) :
                     # attribute is an array accessed through ndarray
                     ndarray = T("ndarray<$type, $rank>")(type=psana_type, rank=len(attr.shape.dims))
                     print >>self.inc, T("  virtual $type $name() const;")(type=ndarray, name=meth.name)
-                    expr = T("$type(&${name}_ndarray_storage_[0], ${name}_ndarray_shape_)")(type=ndarray, name=attr.name)
+                    expr = T("$ndtype(const_cast<$type*>(&${name}_ndarray_storage_[0]), ${name}_ndarray_shape_)")(
+                             ndtype=ndarray, type=psana_type, name=attr.name)
                     print >>self.cpp, T("\n$type $classname::$name() const { return $expr; }")\
                             (type=ndarray, classname=type.name, name=meth.name, expr=expr)
                         
@@ -659,7 +660,7 @@ class DdlPds2Psana ( object ) :
         print >>self.cpp, T("    typedef ndarray<$type, $rank> XtcNDArray;")(type=pdstypename, rank=ndims)
         print >>self.cpp, T("    const XtcNDArray& xtc_ndarr = xtcPtr->$meth($cfg);")(meth=attr.accessor.name, cfg=cfg)
         print >>self.cpp, T("    ${name}_ndarray_storage_.reserve(xtc_ndarr.size());")(locals())
-        print >>self.cpp, "    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
+        print >>self.cpp, "    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
         print >>self.cpp, T("      ${name}_ndarray_storage_.push_back($elem_expr);")(locals())
         print >>self.cpp, "    }"
         print >>self.cpp, "    const unsigned* shape = xtc_ndarr.shape();"
