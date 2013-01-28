@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-16
+2013-01-28 Andy Salnikov
+- updates related to ndarray constness change
+
 Tag: V00-03-15
 2013-01-02 Andy Salnikov
 - upgrading to pdsdata V05-03-00

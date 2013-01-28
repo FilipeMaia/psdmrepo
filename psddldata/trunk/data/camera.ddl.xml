@@ -147,7 +147,7 @@
             <method name="data8" type="uint8_t" rank="2">
                 Returns pixel data array when stored data type is 8-bit (depth() is less than 9).
                 If data type is 16-bit then empty array is returned, use data16() method in this case.
-                <code lang="C++" body="if ({self}._depth &gt; 8) return ndarray&lt;uint8_t, 2&gt;(); return make_ndarray(_int_pixel_data().data(), _height, _width);" />
+                <code lang="C++" body="if ({self}._depth &gt; 8) return ndarray&lt;uint8_t, 2&gt;(); return make_ndarray((uint8_t*)_int_pixel_data().data(), _height, _width);" />
             </method>
 
             <method name="data16" type="uint16_t" rank="2">

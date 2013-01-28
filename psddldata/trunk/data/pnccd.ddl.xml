@@ -111,7 +111,7 @@
 
             <method name="data" type="uint16_t" rank="2">
                 <tag name="inline"/>
-                <expr lang="C++" value="make_ndarray(_data({xtc-config}).data(), 512, 512)"/>
+                <expr lang="C++" value="make_ndarray((uint16_t*)_data({xtc-config}).data(), 512, 512)"/>
             </method>
 
 
