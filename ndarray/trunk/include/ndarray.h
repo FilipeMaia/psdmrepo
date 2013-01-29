@@ -265,7 +265,7 @@ public:
   {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
-    Super::m_data = boost::shared_ptr<ElemType>(data, _no_delete());
+    Super::m_data = data;
   }
 
   /**
@@ -371,7 +371,7 @@ public:
    *
    *  @param[in] strides  Pointer to new strides array, size of array is NDim, array data will be copied.
    */
-  void strides(const unsigned* strides) const {
+  void strides(const unsigned* strides) {
     std::copy(strides, strides+NDim, Super::m_strides);
   }
 

@@ -63,8 +63,9 @@ BOOST_AUTO_TEST_CASE( test_strides_def )
 {
   // default strides
   unsigned dims[3] = {2,3,4};
+  ndarray<int,3> arr(gdata, dims);
   unsigned strides[3] = {12,4,1};
-  ndarray<int,3> arr(gdata, dims, strides);
+  arr.strides(strides);
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[1] ) ;
@@ -79,8 +80,16 @@ BOOST_AUTO_TEST_CASE( test_strides )
 {
   // Fortran-like memory layout
   unsigned dims[3] = {4,3,2};
+  ndarray<int,3> arr(gdata, dims, ndarray<int,3>::Fortran);
+
+  BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[1] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][1][0], gdata[4] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[12] ) ;
+  BOOST_CHECK_EQUAL ( arr[3][2][1], gdata[23] ) ;
+
   unsigned strides[3] = {1, 4, 12};
-  ndarray<int,3> arr(gdata, dims, strides);
+  arr.strides(strides);
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[1] ) ;

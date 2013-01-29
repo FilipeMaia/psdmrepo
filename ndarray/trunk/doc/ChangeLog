@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-01
+2013-01-29 Andy Salnikov
+- fix for test and couple of small bugs
+
 Tag: V01-00-00
 2013-01-29 Andy Salnikov
 - major redesign of ndarray
