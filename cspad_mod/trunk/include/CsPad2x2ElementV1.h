@@ -64,7 +64,7 @@ public:
    *  Common_mode array is copied, caller keeps ownership.
    */
   CsPad2x2ElementV1 (const Psana::CsPad2x2::ElementV1& elem,
-      const int16_t* data,
+      int16_t* data,
       const float* common_mode) ;
 
   // Destructor
@@ -100,9 +100,9 @@ private:
   uint32_t m_seq_count;
   uint32_t m_ticks;
   uint32_t m_fiducials;
-  uint16_t m_sb_temp[Nsbtemp];
+  mutable uint16_t m_sb_temp[Nsbtemp];
   uint32_t m_frame_type;
-  const int16_t* m_data;
+  int16_t* m_data;
   float m_common_mode[2];
   unsigned m_data_shape[3];
 

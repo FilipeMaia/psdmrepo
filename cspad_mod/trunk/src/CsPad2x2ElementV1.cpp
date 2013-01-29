@@ -38,7 +38,7 @@ namespace cspad_mod {
 // Constructors --
 //----------------
 CsPad2x2ElementV1::CsPad2x2ElementV1 (const Psana::CsPad2x2::ElementV1& elem,
-    const int16_t* data,
+    int16_t* data,
     const float* common_mode)
   : Psana::CsPad2x2::ElementV1()
   , m_virtual_channel(elem.virtual_channel())

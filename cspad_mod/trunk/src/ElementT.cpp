@@ -38,7 +38,7 @@ namespace cspad_mod {
 //----------------
 template <typename ElemType>
 ElementT<ElemType>::ElementT (const ElemType& elem,
-    const int16_t* data,
+    int16_t* data,
     const float* common_mode)
   : ElemType()
   , m_virtual_channel(elem.virtual_channel())
