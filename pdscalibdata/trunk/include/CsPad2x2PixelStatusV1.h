@@ -92,7 +92,7 @@ protected:
 private:
 
   // Data members
-  status_t m_status[Size];
+  mutable status_t m_status[Size];
 
 };
 

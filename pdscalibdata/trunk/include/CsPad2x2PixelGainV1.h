@@ -80,7 +80,7 @@ protected:
 private:
 
   // Data members
-  pixelGain_t m_pixelGains[Size];
+  mutable pixelGain_t m_pixelGains[Size];
 
 };
 

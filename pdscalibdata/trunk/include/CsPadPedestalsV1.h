@@ -77,7 +77,7 @@ protected:
 private:
 
   // Data members  
-  pedestal_t m_pedestals[Size];
+  mutable pedestal_t m_pedestals[Size];
 
   // Copy constructor and assignment are disabled by default
   CsPadPedestalsV1 ( const CsPadPedestalsV1& ) ;

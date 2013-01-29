@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-08
+2013-01-28 Andy Salnikov
+- updates related to changes in ndarray constness
+
 Tag: V00-03-07
 2012-11-08 Andy Salnikov
 - for cspad calibrations which read per-pixel data from files improve

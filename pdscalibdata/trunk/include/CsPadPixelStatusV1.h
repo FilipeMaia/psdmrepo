@@ -89,7 +89,7 @@ protected:
 private:
 
   // Data members  
-  status_t m_status[Size];
+  mutable status_t m_status[Size];
 
   // Copy constructor and assignment are disabled by default
   CsPadPixelStatusV1 ( const CsPadPixelStatusV1& ) ;

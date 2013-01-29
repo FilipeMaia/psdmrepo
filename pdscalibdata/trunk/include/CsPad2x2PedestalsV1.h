@@ -80,7 +80,7 @@ protected:
 private:
 
   // Data members
-  pedestal_t m_pedestals[Size];
+  mutable pedestal_t m_pedestals[Size];
 
 };
 

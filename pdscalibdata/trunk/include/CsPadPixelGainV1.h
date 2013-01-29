@@ -78,7 +78,7 @@ protected:
 private:
 
   // Data members  
-  pixelGain_t m_pixelGain[Size];
+  mutable pixelGain_t m_pixelGain[Size];
 
 };
 
