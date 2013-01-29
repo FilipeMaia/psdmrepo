@@ -59,7 +59,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
     typedef ndarray<PsddlPds::Acqiris::VertV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->vert();
     _vert_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
       _vert_ndarray_storage_.push_back(psddl_pds2psana::Acqiris::pds_to_psana(*it));
     }
     const unsigned* shape = xtc_ndarr.shape();
@@ -81,7 +81,7 @@ const Psana::Acqiris::TrigV1& ConfigV1::trig() const { return _trig; }
 
 const Psana::Acqiris::HorizV1& ConfigV1::horiz() const { return _horiz; }
 
-ndarray<Psana::Acqiris::VertV1, 1> ConfigV1::vert() const { return ndarray<Psana::Acqiris::VertV1, 1>(&_vert_ndarray_storage_[0], _vert_ndarray_shape_); }
+ndarray<Psana::Acqiris::VertV1, 1> ConfigV1::vert() const { return ndarray<Psana::Acqiris::VertV1, 1>(const_cast<Psana::Acqiris::VertV1*>(&_vert_ndarray_storage_[0]), _vert_ndarray_shape_); }
 
 uint32_t ConfigV1::nbrChannels() const { return m_xtcObj->nbrChannels(); }
 Psana::Acqiris::TimestampV1 pds_to_psana(PsddlPds::Acqiris::TimestampV1 pds)
@@ -98,7 +98,7 @@ DataDescV1Elem::DataDescV1Elem(const boost::shared_ptr<const XtcType>& xtcPtr, c
     typedef ndarray<PsddlPds::Acqiris::TimestampV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->timestamp(*cfgPtr);
     _timestamps_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
       _timestamps_ndarray_storage_.push_back(psddl_pds2psana::Acqiris::pds_to_psana(*it));
     }
     const unsigned* shape = xtc_ndarr.shape();
@@ -116,7 +116,7 @@ uint32_t DataDescV1Elem::indexFirstPoint() const { return m_xtcObj->indexFirstPo
 
 uint32_t DataDescV1Elem::nbrSegments() const { return m_xtcObj->nbrSegments(); }
 
-ndarray<Psana::Acqiris::TimestampV1, 1> DataDescV1Elem::timestamp() const { return ndarray<Psana::Acqiris::TimestampV1, 1>(&_timestamps_ndarray_storage_[0], _timestamps_ndarray_shape_); }
+ndarray<Psana::Acqiris::TimestampV1, 1> DataDescV1Elem::timestamp() const { return ndarray<Psana::Acqiris::TimestampV1, 1>(const_cast<Psana::Acqiris::TimestampV1*>(&_timestamps_ndarray_storage_[0]), _timestamps_ndarray_shape_); }
 
 ndarray<int16_t, 2> DataDescV1Elem::waveforms() const {
   if (m_cfgPtr0.get()) return m_xtcObj->waveforms(*m_cfgPtr0);
@@ -221,7 +221,7 @@ TdcConfigV1::TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
     typedef ndarray<PsddlPds::Acqiris::TdcChannel, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->channels();
     _channel_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
       _channel_ndarray_storage_.push_back(psddl_pds2psana::Acqiris::pds_to_psana(*it));
     }
     const unsigned* shape = xtc_ndarr.shape();
@@ -231,7 +231,7 @@ TdcConfigV1::TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
     typedef ndarray<PsddlPds::Acqiris::TdcAuxIO, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->auxio();
     _auxIO_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
       _auxIO_ndarray_storage_.push_back(psddl_pds2psana::Acqiris::pds_to_psana(*it));
     }
     const unsigned* shape = xtc_ndarr.shape();
@@ -243,9 +243,9 @@ TdcConfigV1::~TdcConfigV1()
 }
 
 
-ndarray<Psana::Acqiris::TdcChannel, 1> TdcConfigV1::channels() const { return ndarray<Psana::Acqiris::TdcChannel, 1>(&_channel_ndarray_storage_[0], _channel_ndarray_shape_); }
+ndarray<Psana::Acqiris::TdcChannel, 1> TdcConfigV1::channels() const { return ndarray<Psana::Acqiris::TdcChannel, 1>(const_cast<Psana::Acqiris::TdcChannel*>(&_channel_ndarray_storage_[0]), _channel_ndarray_shape_); }
 
-ndarray<Psana::Acqiris::TdcAuxIO, 1> TdcConfigV1::auxio() const { return ndarray<Psana::Acqiris::TdcAuxIO, 1>(&_auxIO_ndarray_storage_[0], _auxIO_ndarray_shape_); }
+ndarray<Psana::Acqiris::TdcAuxIO, 1> TdcConfigV1::auxio() const { return ndarray<Psana::Acqiris::TdcAuxIO, 1>(const_cast<Psana::Acqiris::TdcAuxIO*>(&_auxIO_ndarray_storage_[0]), _auxIO_ndarray_shape_); }
 
 const Psana::Acqiris::TdcVetoIO& TdcConfigV1::veto() const { return _veto; }
 Psana::Acqiris::TdcDataV1_Item::Source pds_to_psana(PsddlPds::Acqiris::TdcDataV1_Item::Source e)
@@ -268,6 +268,6 @@ TdcDataV1::~TdcDataV1()
 }
 
 
-ndarray<Psana::Acqiris::TdcDataV1_Item, 1> TdcDataV1::data() const { return ndarray<Psana::Acqiris::TdcDataV1_Item, 1>(&_data_ndarray_storage_[0], _data_ndarray_shape_); }
+ndarray<Psana::Acqiris::TdcDataV1_Item, 1> TdcDataV1::data() const { return ndarray<Psana::Acqiris::TdcDataV1_Item, 1>(const_cast<Psana::Acqiris::TdcDataV1_Item*>(&_data_ndarray_storage_[0]), _data_ndarray_shape_); }
 } // namespace Acqiris
 } // namespace psddl_pds2psana

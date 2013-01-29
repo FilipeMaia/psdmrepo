@@ -43,7 +43,7 @@ FrameFexConfigV1::FrameFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPt
     typedef ndarray<PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->masked_pixel_coordinates();
     _masked_pixel_coordinates_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
       _masked_pixel_coordinates_ndarray_storage_.push_back(psddl_pds2psana::Camera::pds_to_psana(*it));
     }
     const unsigned* shape = xtc_ndarr.shape();
@@ -69,7 +69,7 @@ uint32_t FrameFexConfigV1::threshold() const { return m_xtcObj->threshold(); }
 
 uint32_t FrameFexConfigV1::number_of_masked_pixels() const { return m_xtcObj->number_of_masked_pixels(); }
 
-ndarray<Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return ndarray<Psana::Camera::FrameCoord, 1>(&_masked_pixel_coordinates_ndarray_storage_[0], _masked_pixel_coordinates_ndarray_shape_); }
+ndarray<Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return ndarray<Psana::Camera::FrameCoord, 1>(const_cast<Psana::Camera::FrameCoord*>(&_masked_pixel_coordinates_ndarray_storage_[0]), _masked_pixel_coordinates_ndarray_shape_); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::FrameV1()
   , m_xtcObj(xtcPtr)
