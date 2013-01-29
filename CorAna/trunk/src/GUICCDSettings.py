@@ -41,7 +41,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 300, 30)
+        self.setGeometry(200, 400, 300, 250)
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
@@ -57,6 +57,13 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_aduphot = QtGui.QLineEdit( str( cp.ccdset_aduphot.value() ) )        
         self.edi_ccdset_ccdeff  = QtGui.QLineEdit( str( cp.ccdset_ccdeff .value() ) )        
         self.edi_ccdset_ccddain = QtGui.QLineEdit( str( cp.ccdset_ccddain.value() ) )        
+
+        self.tit_orient = QtGui.QLabel('CCD orientation (deg):')
+        self.list_of_orient = ['0', '90', '180', '270'] 
+        self.box_orient     = QtGui.QComboBox( self ) 
+        self.box_orient.addItems(self.list_of_orient)
+        self.box_orient.setCurrentIndex( self.list_of_orient.index(cp.ccd_orient.value()) )
+
 
         self.grid = QtGui.QGridLayout()
 
@@ -74,6 +81,9 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_ccdset_ccdeff ,       self.grid_row+5, 4)
         self.grid.addWidget(self.edi_ccdset_ccddain,       self.grid_row+6, 4)
 
+        self.grid.addWidget(self.tit_orient,               self.grid_row+7, 1, 1, 3)
+        self.grid.addWidget(self.box_orient,               self.grid_row+7, 4)
+
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
         self.vbox.addStretch(1)
@@ -85,6 +95,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.connect(self.edi_ccdset_aduphot, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_ccdeff , QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_ccddain, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.box_orient,         QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_orient )
 
         self.showToolTips()
         self.setStyle()
@@ -141,6 +152,11 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_aduphot.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_ccdeff .setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_ccddain.setAlignment(QtCore.Qt.AlignRight) 
+
+        self.tit_orient        .setStyleSheet(cp.styleTitle)
+        self.tit_orient        .setAlignment (QtCore.Qt.AlignLeft)
+        self.box_orient        .setStyleSheet(cp.styleButton)
+
 
     def setParent(self,parent) :
         self.parent = parent
@@ -199,6 +215,11 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.par.setValue( self.edi.displayText() )        
         msg = 'onEdit - set value of ' + self.tit  + ': ' + str( self.par.value())
         logger.info(msg, __name__ )
+
+    def on_box_orient(self):
+        orient_selected = self.box_orient.currentText()
+        cp.ccd_orient.setValue( orient_selected ) 
+        logger.info('on_box_orient - orient_selected: ' + orient_selected, __name__)
 
 #-----------------------------
 

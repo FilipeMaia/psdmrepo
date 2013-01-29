@@ -39,7 +39,7 @@ class GUISystemSettingsLeft ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 350, 150)
+        self.setGeometry(200, 400, 350, 300)
         self.setWindowTitle('System Settings Left')
         self.setFrame()
 

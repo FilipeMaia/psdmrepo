@@ -90,7 +90,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setMinimumSize(600,300)
+        self.setMinimumSize(600,360)
         #self.setMinimumWidth(380)
         #self.setMinimumHeight(300)
         self.setStyleSheet(cp.styleBkgd)

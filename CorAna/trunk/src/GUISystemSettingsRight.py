@@ -41,7 +41,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 350, 30)
+        self.setGeometry(200, 400, 400, 150)
         self.setWindowTitle('System Settings Right')
         self.setFrame()
 
@@ -61,9 +61,9 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         else                                                           : self.rad_thickness_nonorm.setChecked(True)
 
         self.char_expand         = u' \u25BE' # down-head triangle
-        self.tit_bat_queue = QtGui.QLabel('Queue:')
+        self.tit_bat_queue  = QtGui.QLabel('Queue:')
         self.list_of_queues = ['psnehq','psfehq'] 
-        self.box_bat_queue      = QtGui.QComboBox( self ) 
+        self.box_bat_queue  = QtGui.QComboBox( self ) 
         self.box_bat_queue.addItems(self.list_of_queues)
         self.box_bat_queue.setCurrentIndex( self.list_of_queues.index(cp.bat_queue.value()) )
 
@@ -116,7 +116,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
     def setStyle(self):
 
         width = 60
-        self.                     setMinimumWidth(350)
+        self.                     setMinimumWidth(400)
         self.                     setStyleSheet (cp.styleBkgd)
 
         self.edi_thickness_sample.setStyleSheet(cp.styleEdit) 
@@ -125,16 +125,16 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.edi_thickness_sample.setFixedWidth(width)
         self.edi_thickness_attlen.setFixedWidth(width)
 
-        self.edi_thickness_sample.setAlignment(QtCore.Qt.AlignRight) 
-        self.edi_thickness_attlen.setAlignment(QtCore.Qt.AlignRight) 
+        self.edi_thickness_sample.setAlignment (QtCore.Qt.AlignRight) 
+        self.edi_thickness_attlen.setAlignment (QtCore.Qt.AlignRight) 
 
-        self.tit_thickness       .setStyleSheet (cp.styleTitle)
-        self.rad_thickness_nonorm.setStyleSheet (cp.styleLabel)
-        self.rad_thickness_sample.setStyleSheet (cp.styleLabel)
-        self.rad_thickness_attlen.setStyleSheet (cp.styleLabel)
+        self.tit_thickness       .setStyleSheet(cp.styleTitle)
+        self.rad_thickness_nonorm.setStyleSheet(cp.styleLabel)
+        self.rad_thickness_sample.setStyleSheet(cp.styleLabel)
+        self.rad_thickness_attlen.setStyleSheet(cp.styleLabel)
 
-        self.tit_bat_queue       .setStyleSheet (cp.styleTitle)
-        self.tit_bat_queue       .setAlignment(QtCore.Qt.AlignLeft)
+        self.tit_bat_queue       .setStyleSheet(cp.styleTitle)
+        self.tit_bat_queue       .setAlignment (QtCore.Qt.AlignLeft)
         self.box_bat_queue       .setStyleSheet(cp.styleButton)
 
 

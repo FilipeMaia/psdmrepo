@@ -204,21 +204,25 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 
 
-        # GUIBeamZeroPars.py
+        # GUISetupBeamZero.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     type='float' ) 
         self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     type='float' ) 
-        self.x0_pos_in_beam0    = self.declareParameter( name='X0_POS_IN_BEAM_ZERO',      val_def=-59,        type='int' ) 
-        self.y0_pos_in_beam0    = self.declareParameter( name='Y0_POS_IN_BEAM_ZERO',      val_def=175,        type='int' ) 
+        self.x0_pos_in_beam0    = self.declareParameter( name='X_CCD_POS_IN_BEAM_ZERO',   val_def=-59,        type='float' ) 
+        self.y0_pos_in_beam0    = self.declareParameter( name='Y_CCD_POS_IN_BEAM_ZERO',   val_def=175,        type='float' ) 
 
-        # GUISpecularPars.py
-        self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR', val_def=-1,     type='float' ) 
-        self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR', val_def=-2,     type='float' ) 
-        self.x0_pos_in_specular = self.declareParameter( name='X0_SPEC_IN_SPECULAR',   val_def=-3,     type='int' ) 
-        self.y0_pos_in_specular = self.declareParameter( name='Y0_SPEC_IN_SPECULAR',   val_def=-4,     type='int' ) 
+        # GUISetupSpecular.py
+        self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR',    val_def=-1,        type='float' ) 
+        self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR',    val_def=-2,        type='float' ) 
+        self.x0_pos_in_specular = self.declareParameter( name='X_CCD_POS_IN_SPECULAR',    val_def=-3,        type='float' ) 
+        self.y0_pos_in_specular = self.declareParameter( name='Y_CCD_POS_IN_SPECULAR',    val_def=-4,        type='float' ) 
+
+        # GUISetupData.py
+        self.x0_pos_in_data     = self.declareParameter( name='X_CCD_POS_IN_DATA',        val_def=-51,       type='float' )
+        self.y0_pos_in_data     = self.declareParameter( name='Y_CCD_POS_IN_DATA',        val_def=183,       type='float' )
 
         # GUISetupInfoLeft.py
         self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=4000.1,          type='float' )
-        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Transmission',  type='str' )
+        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Baem Zero',     type='str' )
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          type='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              type='float' )
         self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,              type='float' )
@@ -228,8 +232,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.col_end            = self.declareParameter( name='IMG_COL_END',          val_def=1339,          type='int' )
         self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',        val_def=1,             type='int' )
         self.row_end            = self.declareParameter( name='IMG_ROW_END',          val_def=1299,          type='int' )
-        self.x_frame_pos        = self.declareParameter( name='X_FRAME_POS',          val_def=-51,           type='int' )
-        self.y_frame_pos        = self.declareParameter( name='Y_FRAME_POS',          val_def=183,           type='int' )
 
         # GUIKineticMode.py
         self.kin_mode           = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',type='str' )
@@ -315,6 +317,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',type='str' )
         self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      type='float' )
         self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      type='float' )
+        self.ccd_orient              = self.declareParameter( name='CCD_ORIENTATION',              val_def='180',   type='str' )
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   type='float' )

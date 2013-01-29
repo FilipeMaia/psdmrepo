@@ -30,9 +30,9 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 
-from GUIBeamZeroPars     import *
-from GUISpecularPars     import *
-from GUITransmissionPars import *
+from GUISetupSpecular    import *
+from GUISetupBeamZero    import *
+from GUISetupData        import *
 from GUIImgSizePosition  import *
 from Logger              import logger
 
@@ -57,7 +57,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         self.titSetupGeom  = QtGui.QLabel('Experiment Setup Geometry:')
 
         cp.guiimgsizeposition = GUIImgSizePosition()
-        cp.guibeamzeropars    = GUIBeamZeroPars()
 
         self.ediDistance   = QtGui.QLineEdit  ( str(cp.sample_det_dist.value()) )
 
@@ -76,7 +75,7 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxD)
         self.vbox.addLayout(self.hboxW)
-        self.vbox.addWidget(cp.guibeamzeropars)
+        #self.vbox.addWidget(cp.guibeamzeropars)
         self.vbox.addWidget(cp.guiimgsizeposition)
         self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
@@ -94,13 +93,15 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         #if mode != None : self.tab_bar.close()
         self.tab_bar = QtGui.QTabBar()
 
-        self.list_of_modes  = ['Transmission', 'Specular']
+        self.list_of_modes  = ['Beam Zero', 'Specular', 'Data']
 
-        self.ind_tab_bar_transm = self.tab_bar.addTab( self.list_of_modes[0] )
-        self.ind_tab_bar_specul = self.tab_bar.addTab( self.list_of_modes[1] )
+        self.ind_tab_bar_beamzero = self.tab_bar.addTab( self.list_of_modes[0] )
+        self.ind_tab_bar_specul   = self.tab_bar.addTab( self.list_of_modes[1] )
+        self.ind_tab_bar_data     = self.tab_bar.addTab( self.list_of_modes[2] )
 
-        self.tab_bar.setTabTextColor(self.ind_tab_bar_transm,QtGui.QColor('green'))
-        self.tab_bar.setTabTextColor(self.ind_tab_bar_specul,QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_bar_beamzero,QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_bar_specul,  QtGui.QColor('blue'))
+        self.tab_bar.setTabTextColor(self.ind_tab_bar_data,    QtGui.QColor('blue'))
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 
         logger.info(' makeTabBar - set mode: ' + cp.exp_setup_geom.value(), __name__)
@@ -118,12 +119,16 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
             pass
 
         if cp.exp_setup_geom.value() == self.list_of_modes[0] :
-            cp.guitransmissionpars = GUITransmissionPars() # GUIBeamZeroPars()
-            self.gui_win = cp.guitransmissionpars
+            cp.guisetupbeamzero = GUISetupBeamZero()
+            self.gui_win = cp.guisetupbeamzero
 
         if cp.exp_setup_geom.value() == self.list_of_modes[1] :
-            cp.guispecularpars = GUISpecularPars()
-            self.gui_win = cp.guispecularpars
+            cp.guisetupspecular = GUISetupSpecular()
+            self.gui_win = cp.guisetupspecular
+
+        if cp.exp_setup_geom.value() == self.list_of_modes[2] :
+            cp.guisetupdata = GUISetupData()
+            self.gui_win = cp.guisetupdata
 
         self.hboxW.addWidget(self.gui_win)
 
@@ -174,10 +179,13 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         try    : cp.guibeamzeropars.close()
         except : pass
 
-        try    : cp.guitransmissionpars.close()
+        try    : cp.guisetupbeamzero.close()
         except : pass
 
-        try    : cp.guispecularpars.close()
+        try    : cp.guiguisetupspecular.close()
+        except : pass
+
+        try    : cp.guisetupdata.close()
         except : pass
 
         try    : guiimgsizeposition.close()

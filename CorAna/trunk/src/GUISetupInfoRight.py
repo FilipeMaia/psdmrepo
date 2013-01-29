@@ -103,7 +103,7 @@ class GUISetupInfoRight ( QtGui.QWidget ) :
         self.ind_tab_nonkinetic = self.tab_bar.addTab( self.list_of_kin_modes[0] )
         self.ind_tab_kinetic    = self.tab_bar.addTab( self.list_of_kin_modes[1] )
 
-        self.tab_bar.setTabTextColor(self.ind_tab_kinetic,   QtGui.QColor('green'))
+        self.tab_bar.setTabTextColor(self.ind_tab_kinetic,   QtGui.QColor('blue'))
         self.tab_bar.setTabTextColor(self.ind_tab_nonkinetic,QtGui.QColor('blue'))
         self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
 

@@ -14,11 +14,20 @@ reverse time order.
 Tag: V00-00-01
 2013-01-23 Mikhail S. Dubrovin
 - add modules:
+
+2013-01-28
+A       src/GUISetupData.py
+A  +    src/GUISetupBeamZero.py
+A  +    src/GUISetupSpecular.py	
+D       src/GUIBeamZeroPars.py     -> src/GUISetupBeamZero.py
+D       src/GUISpecularPars.py     -> src/GUISetupSpecular.py
+D       src/GUITransmissionPars.py -> src/GUISetupBeamZero.py
+	
 A    +    src/GUIViewControl.py             2013-01-24
 D         src/GUILoadResults.py -> GUIViewControl.py
 A         src/ViewResults.py                2013-01-23
 A         src/GUIRunInput.py                2013-01-17
-D         src/GUIRunInfo.py -> GUIRunInput  2013-01-17
+D         src/GUIRunInfo.py -> GUIRunInput 
 A         src/GUIRunAuto.py                 2013-01-15
 A         src/GUIRunMerge.py                2013-01-15 
 A         src/GUIRunProc.py                 2013-01-10

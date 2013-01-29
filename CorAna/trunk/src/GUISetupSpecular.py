@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUISpecularPars...
+#  Module GUISetupSpecular...
 #
 #------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ from Logger                 import logger
 #---------------------
 #  Class definition --
 #---------------------
-class GUISpecularPars ( QtGui.QWidget ) :
+class GUISetupSpecular ( QtGui.QWidget ) :
     """GUI sets the beam and spec coordinates w.r.t. camera frame for specular mode"""
 
     #----------------
@@ -49,7 +49,7 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.setFrame()
  
         self.tit_specular    = QtGui.QLabel('Specularly Reflected Beam Coords (pix):')
-        self.tit_ccd_pos     = QtGui.QLabel('CCD Position In Specular Meas. (mm)')
+        self.tit_ccd_pos     = QtGui.QLabel('CCD Position In Specular Meas. (mm):')
 
         self.tit_x_coord     = QtGui.QLabel('x:')      
         self.tit_y_coord     = QtGui.QLabel('y:')      
@@ -62,18 +62,23 @@ class GUISpecularPars ( QtGui.QWidget ) :
         self.edi_y0_pos_spec = QtGui.QLineEdit( str( cp.y0_pos_in_specular.value() ) )        
 
         self.grid = QtGui.QGridLayout()
-        self.grid.addWidget(self.tit_specular,      0, 0, 1, 8)
-        self.grid.addWidget(self.tit_x_coord,       1, 2)
-        self.grid.addWidget(self.tit_y_coord,       1, 4)
-        self.grid.addWidget(self.edi_x_coord,       1, 3)
-        self.grid.addWidget(self.edi_y_coord,       1, 5)
+        self.grid.addWidget(self.tit_specular,      2, 0, 1, 8)
+        self.grid.addWidget(self.tit_x_coord,       3, 2)
+        self.grid.addWidget(self.tit_y_coord,       3, 4)
+        self.grid.addWidget(self.edi_x_coord,       3, 3)
+        self.grid.addWidget(self.edi_y_coord,       3, 5)
 
-        self.grid.addWidget(self.tit_ccd_pos,       2, 0, 1, 8)
-        self.grid.addWidget(self.tit_x0_pos_spec ,  3, 2)
-        self.grid.addWidget(self.tit_y0_pos_spec ,  3, 4)
-        self.grid.addWidget(self.edi_x0_pos_spec ,  3, 3)
-        self.grid.addWidget(self.edi_y0_pos_spec ,  3, 5)
-        self.setLayout(self.grid)
+        self.grid.addWidget(self.tit_ccd_pos,       0, 0, 1, 8)
+        self.grid.addWidget(self.tit_x0_pos_spec ,  1, 2)
+        self.grid.addWidget(self.tit_y0_pos_spec ,  1, 4)
+        self.grid.addWidget(self.edi_x0_pos_spec ,  1, 3)
+        self.grid.addWidget(self.edi_y0_pos_spec ,  1, 5)
+
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(self.grid)
+        self.vbox.addStretch(1) 
+
+        self.setLayout(self.vbox)
 
         self.connect( self.edi_x_coord,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_x_coord )
         self.connect( self.edi_y_coord,      QtCore.SIGNAL('editingFinished ()'), self.on_edi_y_coord )
@@ -158,7 +163,7 @@ class GUISpecularPars ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__) 
-        try    : del cp.guispecularpars # GUISpecularPars
+        try    : del cp.guisetupspecular # GUISetupSpecular
         except : pass # silently ignore
 
     def on_edi_x_coord(self):
@@ -190,7 +195,7 @@ class GUISpecularPars ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUISpecularPars ()
+    widget = GUISetupSpecular ()
     widget.show()
     app.exec_()
 
