@@ -22,8 +22,8 @@ public:
   enum { TypeId = Pds::TypeId::Id_OceanOpticsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   float exposureTime() const { return _f32ExposureTime; }
-  ndarray<double, 1> waveLenCalib() const { return make_ndarray(&_lfWaveLenCalibCoeff[0], 4); }
-  ndarray<double, 1> nonlinCorrect() const { return make_ndarray(&_lfNonlinCorrectCoeff[0], 8); }
+  ndarray<double, 1> waveLenCalib() const { return make_ndarray(const_cast<double*>(&_lfWaveLenCalibCoeff[0]), 4); }
+  ndarray<double, 1> nonlinCorrect() const { return make_ndarray(const_cast<double*>(&_lfNonlinCorrectCoeff[0]), 8); }
   double strayLightConstant() const { return _fStrayLightConstant; }
   static uint32_t _sizeof()  { return ((((((4+(8*(4)))+(8*(8)))+8)+4)-1)/4)*4; }
 private:
@@ -74,7 +74,7 @@ public:
   enum { iDataReadSize = 8192 };
   enum { iNumPixels = 3840 };
   enum { iActivePixelIndex = 22 };
-  ndarray<uint16_t, 1> data() const { return make_ndarray(&lu16Spetra[0], iNumPixels); }
+  ndarray<uint16_t, 1> data() const { return make_ndarray(const_cast<uint16_t*>(&lu16Spetra[0]), iNumPixels); }
   uint64_t frameCounter() const { return _u64FrameCounter; }
   uint64_t numDelayedFrames() const { return _u64NumDelayedFrames; }
   uint64_t numDiscardFrames() const { return _u64NumDiscardFrames; }

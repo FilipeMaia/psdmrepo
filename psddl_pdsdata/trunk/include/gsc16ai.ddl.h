@@ -79,9 +79,9 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  ndarray<uint16_t, 1> timestamp() const { return make_ndarray(&_timestamp[0], 3); }
+  ndarray<uint16_t, 1> timestamp() const { return make_ndarray(const_cast<uint16_t*>(&_timestamp[0]), 3); }
   ndarray<uint16_t, 1> channelValue(const Gsc16ai::ConfigV1& cfg) const { ptrdiff_t offset=6;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numChannels()); }
   static uint32_t _sizeof(const Gsc16ai::ConfigV1& cfg)  { return (((((0+(2*(3)))+(2*(cfg.numChannels())))+2)-1)/2)*2; }
 private:

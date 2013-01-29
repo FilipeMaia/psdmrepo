@@ -176,7 +176,7 @@ public:
   /** Configuration for horizontal axis */
   const Acqiris::HorizV1& horiz() const { return _horiz; }
   /** Configuration for vertical axis (one per channel). */
-  ndarray<Acqiris::VertV1, 1> vert() const { return make_ndarray(&_vert[0], MaxChan); }
+  ndarray<Acqiris::VertV1, 1> vert() const { return make_ndarray(const_cast<Acqiris::VertV1*>(&_vert[0]), MaxChan); }
   /** Number of channels calculated from channel bit mask. */
   uint32_t nbrChannels() const;
   static uint32_t _sizeof()  { return ((((((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan)))+4)-1)/4)*4; }
@@ -241,11 +241,11 @@ public:
   uint32_t nbrSegments() const { return _returnedSegments; }
   /** Timestamps, one timestamp per segment. */
   ndarray<Acqiris::TimestampV1, 1> timestamp(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=64;
-  Acqiris::TimestampV1* data = (Acqiris::TimestampV1*)(((const char*)this)+offset);
+  Acqiris::TimestampV1* data = (Acqiris::TimestampV1*)(((char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments()); }
   /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()] */
   ndarray<int16_t, 2> waveforms(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=(64+(16*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint()));
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments(), cfg.horiz().nbrSamples()); }
   uint32_t _sizeof(const Acqiris::ConfigV1& cfg) const { return (((((((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(2*(_extraSize-this->indexFirstPoint())))+4)-1)/4)*4; }
 private:
@@ -452,9 +452,9 @@ public:
   enum { NChannels = 8 /**< Total number of channel configurations. */ };
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
   /** Channel configurations, one object per channel. */
-  ndarray<Acqiris::TdcChannel, 1> channels() const { return make_ndarray(&_channel[0], NChannels); }
+  ndarray<Acqiris::TdcChannel, 1> channels() const { return make_ndarray(const_cast<Acqiris::TdcChannel*>(&_channel[0]), NChannels); }
   /** Axiliary configurations, one object per channel. */
-  ndarray<Acqiris::TdcAuxIO, 1> auxio() const { return make_ndarray(&_auxIO[0], NAuxIO); }
+  ndarray<Acqiris::TdcAuxIO, 1> auxio() const { return make_ndarray(const_cast<Acqiris::TdcAuxIO*>(&_auxIO[0]), NAuxIO); }
   const Acqiris::TdcVetoIO& veto() const { return _veto; }
   static uint32_t _sizeof()  { return ((((((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof()))+4)-1)/4)*4; }
 private:
@@ -573,7 +573,7 @@ public:
   /** Access TDC data items. The data_shape() method should be used to 
             obtain the number of elements. */
   ndarray<Acqiris::TdcDataV1_Item, 1> data() const { ptrdiff_t offset=0;
-  Acqiris::TdcDataV1_Item* data = (Acqiris::TdcDataV1_Item*)(((const char*)this)+offset);
+  Acqiris::TdcDataV1_Item* data = (Acqiris::TdcDataV1_Item*)(((char*)this)+offset);
   return make_ndarray(data, 0); }
   static uint32_t _sizeof()  { return ~uint32_t(0); }
 private:

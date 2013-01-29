@@ -67,7 +67,7 @@ namespace CsPad {
 
 class CsPadDigitalPotsCfg {
 public:
-  ndarray<uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
+  ndarray<uint8_t, 1> pots() const { return make_ndarray(const_cast<uint8_t*>(&_pots[0]), PotsPerQuad); }
   static uint32_t _sizeof()  { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
   uint8_t	_pots[PotsPerQuad];
@@ -114,7 +114,7 @@ private:
 class CsPadGainMapCfg {
 public:
   /** Array with the gain map for single ASIC. */
-  ndarray<uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
+  ndarray<uint16_t, 2> gainMap() const { return make_ndarray(const_cast<uint16_t*>(&_gainMap[0][0]), ColumnsPerASIC, MaxRowsPerASIC); }
   static uint32_t _sizeof()  { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
   uint16_t	_gainMap[ColumnsPerASIC][MaxRowsPerASIC];	/**< Array with the gain map for single ASIC. */
@@ -128,8 +128,8 @@ private:
 
 class ConfigV1QuadReg {
 public:
-  ndarray<uint32_t, 1> shiftSelect() const { return make_ndarray(&_shiftSelect[0], TwoByTwosPerQuad); }
-  ndarray<uint32_t, 1> edgeSelect() const { return make_ndarray(&_edgeSelect[0], TwoByTwosPerQuad); }
+  ndarray<uint32_t, 1> shiftSelect() const { return make_ndarray(const_cast<uint32_t*>(&_shiftSelect[0]), TwoByTwosPerQuad); }
+  ndarray<uint32_t, 1> edgeSelect() const { return make_ndarray(const_cast<uint32_t*>(&_edgeSelect[0]), TwoByTwosPerQuad); }
   uint32_t readClkSet() const { return _readClkSet; }
   uint32_t readClkHold() const { return _readClkHold; }
   uint32_t dataMode() const { return _dataMode; }
@@ -172,8 +172,8 @@ private:
 
 class ConfigV2QuadReg {
 public:
-  ndarray<uint32_t, 1> shiftSelect() const { return make_ndarray(&_shiftSelect[0], TwoByTwosPerQuad); }
-  ndarray<uint32_t, 1> edgeSelect() const { return make_ndarray(&_edgeSelect[0], TwoByTwosPerQuad); }
+  ndarray<uint32_t, 1> shiftSelect() const { return make_ndarray(const_cast<uint32_t*>(&_shiftSelect[0]), TwoByTwosPerQuad); }
+  ndarray<uint32_t, 1> edgeSelect() const { return make_ndarray(const_cast<uint32_t*>(&_edgeSelect[0]), TwoByTwosPerQuad); }
   uint32_t readClkSet() const { return _readClkSet; }
   uint32_t readClkHold() const { return _readClkHold; }
   uint32_t dataMode() const { return _dataMode; }
@@ -445,19 +445,19 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
-  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
+  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(const_cast<uint16_t*>(&_sbtemp[0]), Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
   ndarray<int16_t, 3> data(const CsPad::ConfigV1& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   ndarray<int16_t, 3> data(const CsPad::ConfigV2& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   ndarray<int16_t, 3> data(const CsPad::ConfigV3& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   ndarray<int16_t, 3> data(const CsPad::ConfigV4& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
                 total bit count gives the number of sections active. */
@@ -568,16 +568,16 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
-  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
+  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(const_cast<uint16_t*>(&_sbtemp[0]), Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
   ndarray<int16_t, 3> data(const CsPad::ConfigV2& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   ndarray<int16_t, 3> data(const CsPad::ConfigV3& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   ndarray<int16_t, 3> data(const CsPad::ConfigV4& cfg) const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((const char*)this)+offset);
+  int16_t* data = (int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
                 total bit count gives the number of sections active. */

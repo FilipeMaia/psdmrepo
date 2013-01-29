@@ -30,8 +30,8 @@ public:
     std::copy(arg__base, arg__base+(3), _base);
     std::copy(arg__scale, arg__scale+(3), _scale);
   }
-  ndarray<float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
-  ndarray<float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
+  ndarray<float, 1> base() const { return make_ndarray(const_cast<float*>(&_base[0]), NRANGES); }
+  ndarray<float, 1> scale() const { return make_ndarray(const_cast<float*>(&_scale[0]), NRANGES); }
   static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
@@ -59,8 +59,8 @@ public:
     std::copy(arg__base, arg__base+(16), _base);
     std::copy(arg__scale, arg__scale+(16), _scale);
   }
-  ndarray<float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
-  ndarray<float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
+  ndarray<float, 1> base() const { return make_ndarray(const_cast<float*>(&_base[0]), NRANGES); }
+  ndarray<float, 1> scale() const { return make_ndarray(const_cast<float*>(&_scale[0]), NRANGES); }
   static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
@@ -102,7 +102,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
-  ndarray<Lusi::DiodeFexConfigV1, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
+  ndarray<Lusi::DiodeFexConfigV1, 1> diode() const { return make_ndarray(const_cast<Lusi::DiodeFexConfigV1*>(&_diode[0]), NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
   static uint32_t _sizeof()  { return ((((((0+(Lusi::DiodeFexConfigV1::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
@@ -125,7 +125,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
-  ndarray<Lusi::DiodeFexConfigV2, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
+  ndarray<Lusi::DiodeFexConfigV2, 1> diode() const { return make_ndarray(const_cast<Lusi::DiodeFexConfigV2*>(&_diode[0]), NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
   static uint32_t _sizeof()  { return ((((((0+(Lusi::DiodeFexConfigV2::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
@@ -153,7 +153,7 @@ public:
   {
     std::copy(arg__channel, arg__channel+(4), _channel);
   }
-  ndarray<float, 1> channel() const { return make_ndarray(&_channel[0], NCHANNELS); }
+  ndarray<float, 1> channel() const { return make_ndarray(const_cast<float*>(&_channel[0]), NCHANNELS); }
   float sum() const { return _sum; }
   float xpos() const { return _xpos; }
   float ypos() const { return _ypos; }

@@ -98,14 +98,14 @@ public:
   uint32_t timeStampLo() const { return _timeStampLo; }
   /** Frame data */
   ndarray<uint16_t, 1> _data(const PNCCD::ConfigV1& cfg) const { ptrdiff_t offset=16;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
   /** Frame data */
   ndarray<uint16_t, 1> _data(const PNCCD::ConfigV2& cfg) const { ptrdiff_t offset=16;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
-  ndarray<uint16_t, 2> data(const PNCCD::ConfigV1& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
-  ndarray<uint16_t, 2> data(const PNCCD::ConfigV2& cfg) const { return make_ndarray(_data(cfg).data(), 512, 512); }
+  ndarray<uint16_t, 2> data(const PNCCD::ConfigV1& cfg) const { return make_ndarray((uint16_t*)_data(cfg).data(), 512, 512); }
+  ndarray<uint16_t, 2> data(const PNCCD::ConfigV2& cfg) const { return make_ndarray((uint16_t*)_data(cfg).data(), 512, 512); }
   static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  { return ((((16+(2*((cfg.payloadSizePerLink()-16)/2)))+4)-1)/4)*4; }
   static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  { return ((((16+(2*((cfg.payloadSizePerLink()-16)/2)))+4)-1)/4)*4; }
 private:
@@ -174,7 +174,7 @@ public:
   /** Least significant part of timestamp */
   uint32_t timeStampLo() const { return _timeStampLo; }
   /** Full frame data, image size is 1024x1024. */
-  ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], 1024, 1024); }
+  ndarray<uint16_t, 2> data() const { return make_ndarray(const_cast<uint16_t*>(&_data[0][0]), 1024, 1024); }
   static uint32_t _sizeof()  { return ((((16+(2*(1024)*(1024)))+4)-1)/4)*4; }
 private:
   uint32_t	_specialWord;	/**< Special values */

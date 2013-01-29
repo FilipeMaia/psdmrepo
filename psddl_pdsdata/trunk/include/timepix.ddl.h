@@ -240,7 +240,7 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
-  ndarray<uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
+  ndarray<uint8_t, 1> pixelThresh() const { return make_ndarray(const_cast<uint8_t*>(&_pixelThresh[0]), PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
   const char* chip2Name() const { return _chip2Name; }
@@ -413,7 +413,7 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
-  ndarray<uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
+  ndarray<uint8_t, 1> pixelThresh() const { return make_ndarray(const_cast<uint8_t*>(&_pixelThresh[0]), PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
   const char* chip2Name() const { return _chip2Name; }
@@ -521,7 +521,7 @@ public:
   uint32_t timestamp() const { return _timestamp; }
   uint16_t frameCounter() const { return _frameCounter; }
   uint16_t lostRows() const { return _lostRows; }
-  ndarray<uint16_t, 2> data() const { return make_ndarray(&_data[0][0], Height, Width); }
+  ndarray<uint16_t, 2> data() const { return make_ndarray(const_cast<uint16_t*>(&_data[0][0]), Height, Width); }
   uint32_t width() const { return Width; }
   uint32_t height() const { return Height; }
   uint32_t depth() const { return Depth; }
@@ -557,7 +557,7 @@ public:
   /** lost row count */
   uint16_t lostRows() const { return _lostRows; }
   ndarray<uint16_t, 2> data() const { ptrdiff_t offset=12;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->_height, this->_width); }
   uint32_t depth() const { return Depth; }
   uint32_t depth_bytes() const { return (Depth+7)/8; }

@@ -224,16 +224,16 @@ public:
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
   ndarray<uint16_t, 2> data(const Princeton::ConfigV1& cfg) const { ptrdiff_t offset=8;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
   ndarray<uint16_t, 2> data(const Princeton::ConfigV2& cfg) const { ptrdiff_t offset=8;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
   ndarray<uint16_t, 2> data(const Princeton::ConfigV3& cfg) const { ptrdiff_t offset=8;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
   ndarray<uint16_t, 2> data(const Princeton::ConfigV4& cfg) const { ptrdiff_t offset=8;
-  uint16_t* data = (uint16_t*)(((const char*)this)+offset);
+  uint16_t* data = (uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
   static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
   static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
