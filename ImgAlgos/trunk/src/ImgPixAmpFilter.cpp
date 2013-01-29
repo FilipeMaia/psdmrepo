@@ -61,7 +61,7 @@ ImgPixAmpFilter::ImgPixAmpFilter (const std::string& name)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_src        = configStr("source", "DetInfo(:Cspad)");
+  m_src        = configSrc("source", "DetInfo(:Cspad)");
   m_key        = configStr("key",   "Image2D");
   m_threshold  = config   ("threshold",    10);
   m_xmin       = config   ("xmin",          0);

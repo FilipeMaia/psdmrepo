@@ -60,11 +60,11 @@ IntensityMonitorsData::IntensityMonitorsData (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_srcFEEGasDetE = configStr("feeSource",   "BldInfo(FEEGasDetEnergy)");
-  m_srcIPM2       = configStr("ipm2",        "BldInfo(XCS-IPM-02)");
-  m_srcIPMMono    = configStr("ipmmono",     "BldInfo(XCS-IPM-mono)");
-  m_srcIPM4       = configStr("ipm4",        "DetInfo(XcsBeamline.1:Ipimb.4)");
-  m_srcIPM5       = configStr("ipm5",        "DetInfo(XcsBeamline.1:Ipimb.5)");
+  m_srcFEEGasDetE = configSrc("feeSource",   "BldInfo(FEEGasDetEnergy)");
+  m_srcIPM2       = configSrc("ipm2",        "BldInfo(XCS-IPM-02)");
+  m_srcIPMMono    = configSrc("ipmmono",     "BldInfo(XCS-IPM-mono)");
+  m_srcIPM4       = configSrc("ipm4",        "DetInfo(XcsBeamline.1:Ipimb.4)");
+  m_srcIPM5       = configSrc("ipm5",        "DetInfo(XcsBeamline.1:Ipimb.5)");
   m_file_type     = configStr("file_type",   "txt");
   m_fname         = configStr("file_data",   "intensity-monitor-data.txt");
   m_fname_header  = configStr("file_header", "intensity-monitor-comments.txt");

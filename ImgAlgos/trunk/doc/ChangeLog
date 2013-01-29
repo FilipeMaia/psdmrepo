@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2013-01-28 Andy Salnikov
+- update relates to changes in ndarray constness
+- replace configStr() with configSrc() where possible
+
 Tag: V00-01-02
 2013-01-25 Andy Salnikov
 - fixing namespace issues

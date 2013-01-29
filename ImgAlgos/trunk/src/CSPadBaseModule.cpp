@@ -49,7 +49,7 @@ CSPadBaseModule::CSPadBaseModule (const std::string& name,
 {
   // get the values from configuration or use defaults
   m_key     = configStr(keyName, defKey);
-  m_str_src = configStr(sourceName, defSource);
+  m_str_src = configSrc(sourceName, defSource);
 
   // initialize arrays
   std::fill_n(&m_segMask[0], int(Psana::CsPad::MaxQuadsPerSensor), 0U);

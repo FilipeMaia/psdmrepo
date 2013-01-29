@@ -86,7 +86,7 @@ ImgPeakFinderAB::ImgPeakFinderAB (const std::string& name)
   , m_count_mask_accum(0)
 {
   // get the values from configuration or use defaults
-  m_str_src           = configStr("source",     "DetInfo(:Cspad)");
+  m_str_src           = configSrc("source",     "DetInfo(:Cspad)");
   m_key               = configStr("key",        "");                 //"calibrated"
   m_key_signal_out    = configStr("key_signal_out", "");
   m_key_peaks_out     = configStr("key_peaks_out", "peaks");

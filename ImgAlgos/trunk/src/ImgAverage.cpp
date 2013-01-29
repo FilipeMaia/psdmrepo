@@ -63,7 +63,7 @@ ImgAverage::ImgAverage (const std::string& name)
   , m_gate_width2()
 {
   // get the values from configuration or use defaults
-  m_str_src =  configStr("source",  "DetInfo(:Cspad)");
+  m_str_src =  configSrc("source",  "DetInfo(:Cspad)");
   m_key     =  configStr("key",     "");
   m_aveFile =  configStr("avefile", "img-ave.dat");
   m_rmsFile =  configStr("rmsfile", "img-rms.dat");

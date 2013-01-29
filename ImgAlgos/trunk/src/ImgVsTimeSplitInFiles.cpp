@@ -66,7 +66,7 @@ ImgVsTimeSplitInFiles::ImgVsTimeSplitInFiles (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source", "DetInfo(:Princeton)");
+  m_str_src       = configSrc("source", "DetInfo(:Princeton)");
   m_key           = configStr("key",                 "img");
   m_fname_prefix  = configStr("fname_prefix",     "my-exp");
   m_file_type     = configStr("file_type",           "bin");

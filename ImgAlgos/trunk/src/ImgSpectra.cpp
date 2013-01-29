@@ -63,7 +63,7 @@ ImgSpectra::ImgSpectra (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source", "DetInfo(:Opal1000)");
+  m_str_src       = configSrc("source", "DetInfo(:Opal1000)");
   m_key_in        = configStr("key_in",                "img");
   m_key_out       = configStr("key_out",           "spectra");
   m_sig_rowc      = config   ("sig_band_rowc",          510.);

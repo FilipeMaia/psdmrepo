@@ -111,7 +111,7 @@ protected:
 private:
 
   Pds::Src      m_src;
-  std::string   m_str_src;      // i.e. CxiDs1.0:Cspad.0
+  Source        m_str_src;      // i.e. CxiDs1.0:Cspad.0
   std::string   m_key;          // i.e. Image2D
   std::string   m_fname;        // output file name for time stamp list
   unsigned      m_print_bits;

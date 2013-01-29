@@ -74,7 +74,7 @@ protected:
 
 private:
 
-  mask_t m_mask[Quads][Sectors][Columns][Rows];  
+  mutable mask_t m_mask[Quads][Sectors][Columns][Rows];
 
   // Copy constructor and assignment are disabled by default
   CSPadMaskV1 ( const CSPadMaskV1& ) ;

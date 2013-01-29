@@ -52,7 +52,7 @@ ImgSpectraProc::ImgSpectraProc (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source", "DetInfo(:Opal1000)");
+  m_str_src       = configSrc("source", "DetInfo(:Opal1000)");
   m_key_in        = configStr("key_in",                "img");
   m_print_bits    = config   ("print_bits",               0 );
 }

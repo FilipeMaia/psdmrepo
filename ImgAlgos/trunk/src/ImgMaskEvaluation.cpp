@@ -66,7 +66,7 @@ ImgMaskEvaluation::ImgMaskEvaluation (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src        = configStr("source",  "DetInfo(:Cspad)");
+  m_str_src        = configSrc("source",  "DetInfo(:Cspad)");
   m_key            = configStr("key",     "");
   m_file_mask_satu = configStr("file_mask_satu", "img-mask-satu.dat");
   m_file_mask_nois = configStr("file_mask_nois", "img-mask-nois.dat");

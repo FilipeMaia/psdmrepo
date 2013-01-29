@@ -61,7 +61,7 @@ ImgPeakFilter::ImgPeakFilter (const std::string& name)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_str_src      = configStr("source",         "DetInfo(:Opal1000)");
+  m_str_src      = configSrc("source",         "DetInfo(:Opal1000)");
   m_key          = configStr("key",            "peaks");
   m_sel_mode_str = configStr("selection_mode", "SELECTION_ON");
   m_thr_peak     = config   ("threshold_peak",  0);

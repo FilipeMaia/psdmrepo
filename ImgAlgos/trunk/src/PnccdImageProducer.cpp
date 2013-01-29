@@ -52,7 +52,7 @@ PnccdImageProducer::PnccdImageProducer (const std::string& name)
   , m_key_out()
   , m_print_bits()
  {
-    m_str_src    = configStr("source",    "DetInfo(:pnCCD)");
+    m_str_src    = configSrc("source",    "DetInfo(:pnCCD)");
     m_key_in     = configStr("inkey",     "");
     m_key_out    = configStr("outimgkey", "pnccdimg");
     m_print_bits = config   ("print_bits", 0);

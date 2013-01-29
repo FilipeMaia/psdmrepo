@@ -57,7 +57,7 @@ CameraImageProducer::CameraImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src           = configStr("source", "DetInfo(:Camera)");
+  m_str_src           = configSrc("source", "DetInfo(:Camera)");
   m_key_in            = configStr("key_in",                 "");
   m_key_out           = configStr("key_out",           "image");
   m_subtract_offset   = config   ("subtract_offset",      true);
@@ -156,7 +156,7 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
       const ndarray<uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint8_t,2>, subtract offset=" << offset);
-        ndarray<uint8_t, 2>::const_iterator cit;
+        ndarray<uint8_t, 2>::iterator cit;
         for(cit=data8.begin(); cit!=data8.end(); cit++) { m_data[ind++] = double(int(*cit) - offset); }
 
         save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data8.shape());
@@ -165,7 +165,7 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
       const ndarray<uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint16_t,2>, subtract offset=" << offset);
-        ndarray<uint16_t, 2>::const_iterator cit;
+        ndarray<uint16_t, 2>::iterator cit;
         // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
         for(cit=data16.begin(); cit!=data16.end(); cit++) { m_data[ind++] = double(*cit) - offset; }
 

@@ -55,7 +55,7 @@ CSPadArrPeakAnalysis::CSPadArrPeakAnalysis (const std::string& name)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_str_src    = configStr("source", "DetInfo(:Cspad)");
+  m_str_src    = configSrc("source", "DetInfo(:Cspad)");
   m_key        = configStr("key",   "peaks");
   m_fname_root = configStr("fname_root","file.root");
   m_print_bits = config   ("print_bits",  0);

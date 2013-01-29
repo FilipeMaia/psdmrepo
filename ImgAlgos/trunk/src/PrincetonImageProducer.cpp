@@ -56,7 +56,7 @@ PrincetonImageProducer::PrincetonImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src           = configStr("source", "DetInfo(:Princeton)");
+  m_str_src           = configSrc("source", "DetInfo(:Princeton)");
   m_key_in            = configStr("key_in",                 "");
   m_key_out           = configStr("key_out",           "image");
 //m_subtract_offset   = config   ("subtract_offset",      true);

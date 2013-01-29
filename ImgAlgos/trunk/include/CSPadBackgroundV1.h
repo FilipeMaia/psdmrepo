@@ -77,7 +77,7 @@ protected:
 
 private:
 
-  background_t m_bkgd[Quads][Sectors][Columns][Rows];  
+  mutable background_t m_bkgd[Quads][Sectors][Columns][Rows];
 
   // Copy constructor and assignment are disabled by default
   CSPadBackgroundV1 ( const CSPadBackgroundV1& ) ;

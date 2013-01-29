@@ -59,7 +59,7 @@ ImgTimeStampList::ImgTimeStampList (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source", "DetInfo(:Princeton)");
+  m_str_src       = configSrc("source", "DetInfo(:Princeton)");
   m_key           = configStr("key",                       "");
   m_fname         = configStr("out_file",   "tstamp-list.txt");
   m_print_bits    = config   ("print_bits",                 0);

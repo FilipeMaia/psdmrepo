@@ -73,7 +73,7 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_str_src    = configStr("source",  "DetInfo()");
+  m_str_src    = configSrc("source",  "DetInfo()");
   m_key        = configStr("key",              "");
   m_peaksKey   = configStr("peaksKey",    "peaks");
   m_thr_low    = config   ("threshold_low",    10);
@@ -229,7 +229,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
       if (not data8.empty()) {
         if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint8_t,2>");
 	const unsigned *shape = data8.shape();
-	ndarray<uint8_t, 2>::const_iterator cit;
+	ndarray<uint8_t, 2>::iterator cit;
 	for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
 
         m_ndarr = new ndarray<double,2>(p_data, shape);
@@ -241,7 +241,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
       if (not data16.empty()) {
         if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint16_t,2>");
 	const unsigned *shape = data16.shape();
-	ndarray<uint16_t, 2>::const_iterator cit;
+	ndarray<uint16_t, 2>::iterator cit;
 	// This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
 	for(cit=data16.begin(); cit!=data16.end(); cit++) { p_data[ind++] = double(*cit) - offset; }
 
