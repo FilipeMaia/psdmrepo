@@ -64,7 +64,7 @@ public:
    *  @param[in] nrows   Number of rows (1st index) in the 2D array.
    *  @param[in] ncols   Number of columns (2nd index) in the 2D array.   
    */
-  Image2D (const T* data, size_t nrows, size_t ncols) ;
+  Image2D (T* data, size_t nrows, size_t ncols) ;
 
   // Destructor
   virtual ~Image2D () ;
@@ -97,7 +97,7 @@ public:
   /**
    *  @brief Returns pointer to data array
    */
-  const T* data() { return m_data; }
+  T* data() { return m_data; }
 
   void printImage       (int Nx90=0);
   void printEntireImage (int Nx90=0);
@@ -115,7 +115,7 @@ private:
 //------------------
 
   // Data members
-  const T* m_data;
+  T* m_data;
   size_t   m_nrows;
   size_t   m_ncols;
   size_t   m_nrows_transposed;
