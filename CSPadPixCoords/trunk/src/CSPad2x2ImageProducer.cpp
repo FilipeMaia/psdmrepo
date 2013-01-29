@@ -67,7 +67,7 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   //m_calibDir      = configStr("calibDir",      ""); // if not provided default from env will be used
   //m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
 
-  m_str_src       = configStr("source",        "DetInfo(:Cspad2x2)");
+  m_str_src       = configSrc("source",        "DetInfo(:Cspad2x2)");
   m_inkey         = configStr("inkey",         "");
   m_outimgkey     = configStr("outimgkey",     "Image2D");
   m_tiltIsApplied = config   ("tiltIsApplied", true);

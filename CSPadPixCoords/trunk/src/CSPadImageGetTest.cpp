@@ -60,7 +60,7 @@ CSPadImageGetTest::CSPadImageGetTest (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_str_src       = configStr("source",   "CxiDs1.0:Cspad.0");
+  m_str_src       = configSrc("source",   "CxiDs1.0:Cspad.0");
   m_key           = configStr("key",      "Image2D");
   m_eventSave     = config   ("eventSave", 0);
   m_saveAll       = config   ("saveAll",   false);
