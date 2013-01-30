@@ -69,9 +69,9 @@ DataV1::~DataV1()
 }
 
 
-ndarray<uint16_t, 1> DataV1::timestamp() const { return m_xtcObj->timestamp(); }
+ndarray<const uint16_t, 1> DataV1::timestamp() const { return m_xtcObj->timestamp(); }
 
-ndarray<uint16_t, 1> DataV1::channelValue() const {
+ndarray<const uint16_t, 1> DataV1::channelValue() const {
   if (m_cfgPtr0.get()) return m_xtcObj->channelValue(*m_cfgPtr0);
   throw std::runtime_error("DataV1::channelValue: config object pointer is zero");
 }

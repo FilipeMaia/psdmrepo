@@ -42,7 +42,7 @@ TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcS
   // the size of the data array is unknown and needs to be determined from XTC size
   size_t nItems = xtcSize / PsddlPds::Acqiris::TdcDataV1_Item::_sizeof();
 
-  typedef ndarray<PsddlPds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
+  typedef ndarray<const PsddlPds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
   const XtcNDArray& xtc_ndarr = xtcPtr->data();
   _data_ndarray_storage_.reserve(nItems);
   for (unsigned i = 0; i != nItems; ++ i) {

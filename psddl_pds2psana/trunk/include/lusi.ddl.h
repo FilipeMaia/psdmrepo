@@ -22,7 +22,7 @@ public:
   typedef Psana::Lusi::IpmFexConfigV1 PsanaType;
   IpmFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~IpmFexConfigV1();
-  virtual ndarray<Psana::Lusi::DiodeFexConfigV1, 1> diode() const;
+  virtual ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> diode() const;
   virtual float xscale() const;
   virtual float yscale() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -39,7 +39,7 @@ public:
   typedef Psana::Lusi::IpmFexConfigV2 PsanaType;
   IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~IpmFexConfigV2();
-  virtual ndarray<Psana::Lusi::DiodeFexConfigV2, 1> diode() const;
+  virtual ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> diode() const;
   virtual float xscale() const;
   virtual float yscale() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

@@ -29,9 +29,9 @@ ConfigV1::~ConfigV1()
 }
 
 
-ndarray<uint32_t, 1> ConfigV1::counting_mode() const { return m_xtcObj->counting_mode(); }
+ndarray<const uint32_t, 1> ConfigV1::counting_mode() const { return m_xtcObj->counting_mode(); }
 
-ndarray<uint32_t, 1> ConfigV1::quadrature_mode() const { return m_xtcObj->quadrature_mode(); }
+ndarray<const uint32_t, 1> ConfigV1::quadrature_mode() const { return m_xtcObj->quadrature_mode(); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::UsdUsb::DataV1()
   , m_xtcObj(xtcPtr)

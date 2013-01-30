@@ -16,7 +16,7 @@ public:
   typedef Psana::CsPad2x2::CsPad2x2DigitalPotsCfg PsanaType;
   CsPad2x2DigitalPotsCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPad2x2DigitalPotsCfg();
-  virtual ndarray<uint8_t, 1> pots() const;
+  virtual ndarray<const uint8_t, 1> pots() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -57,7 +57,7 @@ public:
   typedef Psana::CsPad2x2::CsPad2x2GainMapCfg PsanaType;
   CsPad2x2GainMapCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPad2x2GainMapCfg();
-  virtual ndarray<uint16_t, 2> gainMap() const;
+  virtual ndarray<const uint16_t, 2> gainMap() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -145,9 +145,9 @@ public:
   virtual uint32_t seq_count() const;
   virtual uint32_t ticks() const;
   virtual uint32_t fiducials() const;
-  virtual ndarray<uint16_t, 1> sb_temp() const;
+  virtual ndarray<const uint16_t, 1> sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual ndarray<int16_t, 3> data() const;
+  virtual ndarray<const int16_t, 3> data() const;
   virtual float common_mode(uint32_t section) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:

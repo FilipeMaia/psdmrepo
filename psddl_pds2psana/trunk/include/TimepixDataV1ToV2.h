@@ -74,7 +74,7 @@ public:
   virtual uint32_t timestamp() const;
   virtual uint16_t frameCounter() const;
   virtual uint16_t lostRows() const;
-  virtual ndarray<uint16_t, 2> data() const;
+  virtual ndarray<const uint16_t, 2> data() const;
   virtual uint32_t depth() const;
   virtual uint32_t depth_bytes() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

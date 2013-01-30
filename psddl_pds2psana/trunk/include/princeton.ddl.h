@@ -135,7 +135,7 @@ public:
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const;
   virtual float readoutTime() const;
-  virtual ndarray<uint16_t, 2> data() const;
+  virtual ndarray<const uint16_t, 2> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

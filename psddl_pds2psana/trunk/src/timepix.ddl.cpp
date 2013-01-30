@@ -290,7 +290,7 @@ uint32_t ConfigV2::firmwareVersion() const { return m_xtcObj->firmwareVersion();
 
 uint32_t ConfigV2::pixelThreshSize() const { return m_xtcObj->pixelThreshSize(); }
 
-ndarray<uint8_t, 1> ConfigV2::pixelThresh() const { return m_xtcObj->pixelThresh(); }
+ndarray<const uint8_t, 1> ConfigV2::pixelThresh() const { return m_xtcObj->pixelThresh(); }
 
 const char* ConfigV2::chip0Name() const { return m_xtcObj->chip0Name(); }
 
@@ -457,7 +457,7 @@ uint32_t ConfigV3::firmwareVersion() const { return m_xtcObj->firmwareVersion();
 
 uint32_t ConfigV3::pixelThreshSize() const { return m_xtcObj->pixelThreshSize(); }
 
-ndarray<uint8_t, 1> ConfigV3::pixelThresh() const { return m_xtcObj->pixelThresh(); }
+ndarray<const uint8_t, 1> ConfigV3::pixelThresh() const { return m_xtcObj->pixelThresh(); }
 
 const char* ConfigV3::chip0Name() const { return m_xtcObj->chip0Name(); }
 
@@ -492,7 +492,7 @@ uint16_t DataV1::frameCounter() const { return m_xtcObj->frameCounter(); }
 
 uint16_t DataV1::lostRows() const { return m_xtcObj->lostRows(); }
 
-ndarray<uint16_t, 2> DataV1::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 2> DataV1::data() const { return m_xtcObj->data(); }
 
 uint32_t DataV1::width() const { return m_xtcObj->width(); }
 
@@ -521,7 +521,7 @@ uint16_t DataV2::frameCounter() const { return m_xtcObj->frameCounter(); }
 
 uint16_t DataV2::lostRows() const { return m_xtcObj->lostRows(); }
 
-ndarray<uint16_t, 2> DataV2::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 2> DataV2::data() const { return m_xtcObj->data(); }
 
 uint32_t DataV2::depth() const { return m_xtcObj->depth(); }
 

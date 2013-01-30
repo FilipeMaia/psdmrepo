@@ -27,7 +27,7 @@ public:
   virtual uint32_t nbrBanks() const;
   virtual const Psana::Acqiris::TrigV1& trig() const;
   virtual const Psana::Acqiris::HorizV1& horiz() const;
-  virtual ndarray<Psana::Acqiris::VertV1, 1> vert() const;
+  virtual ndarray<const Psana::Acqiris::VertV1, 1> vert() const;
   virtual uint32_t nbrChannels() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -50,8 +50,8 @@ public:
   virtual uint32_t nbrSamplesInSeg() const;
   virtual uint32_t indexFirstPoint() const;
   virtual uint32_t nbrSegments() const;
-  virtual ndarray<Psana::Acqiris::TimestampV1, 1> timestamp() const;
-  virtual ndarray<int16_t, 2> waveforms() const;
+  virtual ndarray<const Psana::Acqiris::TimestampV1, 1> timestamp() const;
+  virtual ndarray<const int16_t, 2> waveforms() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -89,8 +89,8 @@ public:
   typedef Psana::Acqiris::TdcConfigV1 PsanaType;
   TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TdcConfigV1();
-  virtual ndarray<Psana::Acqiris::TdcChannel, 1> channels() const;
-  virtual ndarray<Psana::Acqiris::TdcAuxIO, 1> auxio() const;
+  virtual ndarray<const Psana::Acqiris::TdcChannel, 1> channels() const;
+  virtual ndarray<const Psana::Acqiris::TdcAuxIO, 1> auxio() const;
   virtual const Psana::Acqiris::TdcVetoIO& veto() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -111,7 +111,7 @@ public:
   typedef Psana::Acqiris::TdcDataV1 PsanaType;
   TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcSize);
   virtual ~TdcDataV1();
-  virtual ndarray<Psana::Acqiris::TdcDataV1_Item, 1> data() const;
+  virtual ndarray<const Psana::Acqiris::TdcDataV1_Item, 1> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

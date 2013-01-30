@@ -26,8 +26,8 @@ public:
   virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint8_t output_lookup_table_enabled() const;
   virtual uint32_t number_of_defect_pixels() const;
-  virtual ndarray<uint16_t, 1> output_lookup_table() const;
-  virtual ndarray<Psana::Camera::FrameCoord, 1> defect_pixel_coordinates() const;
+  virtual ndarray<const uint16_t, 1> output_lookup_table() const;
+  virtual ndarray<const Psana::Camera::FrameCoord, 1> defect_pixel_coordinates() const;
   virtual uint16_t output_offset() const;
   virtual uint32_t output_resolution_bits() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

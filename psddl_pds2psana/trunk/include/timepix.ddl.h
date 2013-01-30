@@ -149,7 +149,7 @@ public:
   virtual int32_t driverVersion() const;
   virtual uint32_t firmwareVersion() const;
   virtual uint32_t pixelThreshSize() const;
-  virtual ndarray<uint8_t, 1> pixelThresh() const;
+  virtual ndarray<const uint8_t, 1> pixelThresh() const;
   virtual const char* chip0Name() const;
   virtual const char* chip1Name() const;
   virtual const char* chip2Name() const;
@@ -235,7 +235,7 @@ public:
   virtual int32_t driverVersion() const;
   virtual uint32_t firmwareVersion() const;
   virtual uint32_t pixelThreshSize() const;
-  virtual ndarray<uint8_t, 1> pixelThresh() const;
+  virtual ndarray<const uint8_t, 1> pixelThresh() const;
   virtual const char* chip0Name() const;
   virtual const char* chip1Name() const;
   virtual const char* chip2Name() const;
@@ -260,7 +260,7 @@ public:
   virtual uint32_t timestamp() const;
   virtual uint16_t frameCounter() const;
   virtual uint16_t lostRows() const;
-  virtual ndarray<uint16_t, 2> data() const;
+  virtual ndarray<const uint16_t, 2> data() const;
   virtual uint32_t width() const;
   virtual uint32_t height() const;
   virtual uint32_t depth() const;
@@ -282,7 +282,7 @@ public:
   virtual uint32_t timestamp() const;
   virtual uint16_t frameCounter() const;
   virtual uint16_t lostRows() const;
-  virtual ndarray<uint16_t, 2> data() const;
+  virtual ndarray<const uint16_t, 2> data() const;
   virtual uint32_t depth() const;
   virtual uint32_t depth_bytes() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

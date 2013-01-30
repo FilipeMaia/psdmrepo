@@ -29,7 +29,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    typedef ndarray<PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
+    typedef ndarray<const PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->defect_pixel_coordinates();
     _defectPixels_ndarray_storage_.reserve(xtc_ndarr.size());
     for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
@@ -62,9 +62,9 @@ uint8_t ConfigV1::defect_pixel_correction_enabled() const { return m_xtcObj->def
 
 uint32_t ConfigV1::number_of_defect_pixels() const { return m_xtcObj->number_of_defect_pixels(); }
 
-ndarray<uint16_t, 1> ConfigV1::output_lookup_table() const { return m_xtcObj->output_lookup_table(); }
+ndarray<const uint16_t, 1> ConfigV1::output_lookup_table() const { return m_xtcObj->output_lookup_table(); }
 
-ndarray<Psana::Camera::FrameCoord, 1> ConfigV1::defect_pixel_coordinates() const { return ndarray<Psana::Camera::FrameCoord, 1>(const_cast<Psana::Camera::FrameCoord*>(&_defectPixels_ndarray_storage_[0]), _defectPixels_ndarray_shape_); }
+ndarray<const Psana::Camera::FrameCoord, 1> ConfigV1::defect_pixel_coordinates() const { return ndarray<const Psana::Camera::FrameCoord, 1>(&_defectPixels_ndarray_storage_[0], _defectPixels_ndarray_shape_); }
 
 uint16_t ConfigV1::output_offset() const { return m_xtcObj->output_offset(); }
 

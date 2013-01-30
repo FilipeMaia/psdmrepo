@@ -17,8 +17,8 @@ public:
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
   virtual float exposureTime() const;
-  virtual ndarray<double, 1> waveLenCalib() const;
-  virtual ndarray<double, 1> nonlinCorrect() const;
+  virtual ndarray<const double, 1> waveLenCalib() const;
+  virtual ndarray<const double, 1> nonlinCorrect() const;
   virtual double strayLightConstant() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -34,7 +34,7 @@ public:
   typedef Psana::OceanOptics::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::OceanOptics::ConfigV1>& cfgPtr);
   virtual ~DataV1();
-  virtual ndarray<uint16_t, 1> data() const;
+  virtual ndarray<const uint16_t, 1> data() const;
   virtual uint64_t frameCounter() const;
   virtual uint64_t numDelayedFrames() const;
   virtual uint64_t numDiscardFrames() const;

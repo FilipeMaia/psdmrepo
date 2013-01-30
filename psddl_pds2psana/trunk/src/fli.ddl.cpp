@@ -67,7 +67,7 @@ float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
 
 float FrameV1::temperature() const { return m_xtcObj->temperature(); }
 
-ndarray<uint16_t, 2> FrameV1::data() const {
+ndarray<const uint16_t, 2> FrameV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   throw std::runtime_error("FrameV1::data: config object pointer is zero");
 }

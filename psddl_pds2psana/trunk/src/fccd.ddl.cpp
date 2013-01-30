@@ -66,9 +66,9 @@ uint8_t FccdConfigV2::focusMode() const { return m_xtcObj->focusMode(); }
 
 uint32_t FccdConfigV2::exposureTime() const { return m_xtcObj->exposureTime(); }
 
-ndarray<float, 1> FccdConfigV2::dacVoltages() const { return m_xtcObj->dacVoltages(); }
+ndarray<const float, 1> FccdConfigV2::dacVoltages() const { return m_xtcObj->dacVoltages(); }
 
-ndarray<uint16_t, 1> FccdConfigV2::waveforms() const { return m_xtcObj->waveforms(); }
+ndarray<const uint16_t, 1> FccdConfigV2::waveforms() const { return m_xtcObj->waveforms(); }
 
 uint32_t FccdConfigV2::width() const { return m_xtcObj->width(); }
 

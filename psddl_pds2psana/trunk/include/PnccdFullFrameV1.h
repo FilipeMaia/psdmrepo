@@ -68,7 +68,7 @@ protected:
   /** Least significant part of timestamp */
   virtual uint32_t timeStampLo() const;
   /** Full frame data, image size is 1024x1024. */
-  virtual ndarray<uint16_t, 2> data() const;
+  virtual ndarray<const uint16_t, 2> data() const;
 
 private:
 

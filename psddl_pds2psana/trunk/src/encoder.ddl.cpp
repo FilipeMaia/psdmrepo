@@ -98,7 +98,7 @@ DataV2::~DataV2()
 
 uint32_t DataV2::timestamp() const { return m_xtcObj->timestamp(); }
 
-ndarray<uint32_t, 1> DataV2::encoder_count() const { return m_xtcObj->encoder_count(); }
+ndarray<const uint32_t, 1> DataV2::encoder_count() const { return m_xtcObj->encoder_count(); }
 
 int32_t DataV2::value(uint32_t i) const { return m_xtcObj->value(i); }
 } // namespace Encoder

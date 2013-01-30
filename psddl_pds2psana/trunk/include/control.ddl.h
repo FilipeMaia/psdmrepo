@@ -29,8 +29,8 @@ public:
   virtual const Pds::ClockTime& duration() const;
   virtual uint32_t npvControls() const;
   virtual uint32_t npvMonitors() const;
-  virtual ndarray<Psana::ControlData::PVControl, 1> pvControls() const;
-  virtual ndarray<Psana::ControlData::PVMonitor, 1> pvMonitors() const;
+  virtual ndarray<const Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<const Psana::ControlData::PVMonitor, 1> pvMonitors() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -55,9 +55,9 @@ public:
   virtual uint32_t npvControls() const;
   virtual uint32_t npvMonitors() const;
   virtual uint32_t npvLabels() const;
-  virtual ndarray<Psana::ControlData::PVControl, 1> pvControls() const;
-  virtual ndarray<Psana::ControlData::PVMonitor, 1> pvMonitors() const;
-  virtual ndarray<Psana::ControlData::PVLabel, 1> pvLabels() const;
+  virtual ndarray<const Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<const Psana::ControlData::PVMonitor, 1> pvMonitors() const;
+  virtual ndarray<const Psana::ControlData::PVLabel, 1> pvLabels() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

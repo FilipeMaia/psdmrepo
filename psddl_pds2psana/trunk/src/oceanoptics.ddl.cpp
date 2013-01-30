@@ -21,9 +21,9 @@ ConfigV1::~ConfigV1()
 
 float ConfigV1::exposureTime() const { return m_xtcObj->exposureTime(); }
 
-ndarray<double, 1> ConfigV1::waveLenCalib() const { return m_xtcObj->waveLenCalib(); }
+ndarray<const double, 1> ConfigV1::waveLenCalib() const { return m_xtcObj->waveLenCalib(); }
 
-ndarray<double, 1> ConfigV1::nonlinCorrect() const { return m_xtcObj->nonlinCorrect(); }
+ndarray<const double, 1> ConfigV1::nonlinCorrect() const { return m_xtcObj->nonlinCorrect(); }
 
 double ConfigV1::strayLightConstant() const { return m_xtcObj->strayLightConstant(); }
 Psana::OceanOptics::timespec64 pds_to_psana(PsddlPds::OceanOptics::timespec64 pds)
@@ -45,7 +45,7 @@ DataV1::~DataV1()
 }
 
 
-ndarray<uint16_t, 1> DataV1::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 1> DataV1::data() const { return m_xtcObj->data(); }
 
 uint64_t DataV1::frameCounter() const { return m_xtcObj->frameCounter(); }
 

@@ -29,7 +29,7 @@ IpmFexConfigV1::IpmFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    typedef ndarray<PsddlPds::Lusi::DiodeFexConfigV1, 1> XtcNDArray;
+    typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
     _diode_ndarray_storage_.reserve(xtc_ndarr.size());
     for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
@@ -44,7 +44,7 @@ IpmFexConfigV1::~IpmFexConfigV1()
 }
 
 
-ndarray<Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1::diode() const { return ndarray<Psana::Lusi::DiodeFexConfigV1, 1>(const_cast<Psana::Lusi::DiodeFexConfigV1*>(&_diode_ndarray_storage_[0]), _diode_ndarray_shape_); }
+ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1::diode() const { return ndarray<const Psana::Lusi::DiodeFexConfigV1, 1>(&_diode_ndarray_storage_[0], _diode_ndarray_shape_); }
 
 float IpmFexConfigV1::xscale() const { return m_xtcObj->xscale(); }
 
@@ -54,7 +54,7 @@ IpmFexConfigV2::IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    typedef ndarray<PsddlPds::Lusi::DiodeFexConfigV2, 1> XtcNDArray;
+    typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV2, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
     _diode_ndarray_storage_.reserve(xtc_ndarr.size());
     for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
@@ -69,7 +69,7 @@ IpmFexConfigV2::~IpmFexConfigV2()
 }
 
 
-ndarray<Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2::diode() const { return ndarray<Psana::Lusi::DiodeFexConfigV2, 1>(const_cast<Psana::Lusi::DiodeFexConfigV2*>(&_diode_ndarray_storage_[0]), _diode_ndarray_shape_); }
+ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2::diode() const { return ndarray<const Psana::Lusi::DiodeFexConfigV2, 1>(&_diode_ndarray_storage_[0], _diode_ndarray_shape_); }
 
 float IpmFexConfigV2::xscale() const { return m_xtcObj->xscale(); }
 

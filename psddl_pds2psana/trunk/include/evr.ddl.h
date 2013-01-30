@@ -35,8 +35,8 @@ public:
   virtual ~ConfigV1();
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::PulseConfig, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::PulseConfig, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -56,8 +56,8 @@ public:
   virtual uint32_t opcode() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::PulseConfig, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::PulseConfig, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
   virtual Psana::EvrData::ConfigV2::BeamCode beam() const;
   virtual Psana::EvrData::ConfigV2::RateCode rate() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -79,9 +79,9 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::EventCodeV3, 1> eventcodes() const;
-  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::EventCodeV3, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -103,9 +103,9 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::EventCodeV4, 1> eventcodes() const;
-  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::EventCodeV4, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -130,7 +130,7 @@ public:
   virtual Psana::EvrData::SequencerConfigV1::Source beam_source() const;
   virtual uint32_t length() const;
   virtual uint32_t cycles() const;
-  virtual ndarray<Psana::EvrData::SequencerEntry, 1> entries() const;
+  virtual ndarray<const Psana::EvrData::SequencerEntry, 1> entries() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -148,9 +148,9 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::EventCodeV5, 1> eventcodes() const;
-  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::EventCodeV5, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
   virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -174,9 +174,9 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::EventCodeV5, 1> eventcodes() const;
-  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMapV2, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::EventCodeV5, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMapV2, 1> output_maps() const;
   virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -200,9 +200,9 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual ndarray<Psana::EvrData::EventCodeV6, 1> eventcodes() const;
-  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<Psana::EvrData::OutputMapV2, 1> output_maps() const;
+  virtual ndarray<const Psana::EvrData::EventCodeV6, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMapV2, 1> output_maps() const;
   virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -226,7 +226,7 @@ public:
   DataV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV3();
   virtual uint32_t numFifoEvents() const;
-  virtual ndarray<Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
+  virtual ndarray<const Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -244,7 +244,7 @@ public:
   IOConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~IOConfigV1();
   virtual uint16_t nchannels() const;
-  virtual ndarray<Psana::EvrData::IOChannel, 1> channels() const;
+  virtual ndarray<const Psana::EvrData::IOChannel, 1> channels() const;
   virtual Psana::EvrData::OutputMap::Conn conn() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:

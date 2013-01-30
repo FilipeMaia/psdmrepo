@@ -29,7 +29,7 @@ CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg()
 }
 
 
-ndarray<uint8_t, 1> CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
+ndarray<const uint8_t, 1> CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
 CsPadReadOnlyCfg::CsPadReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::CsPadReadOnlyCfg()
   , m_xtcObj(xtcPtr)
@@ -66,7 +66,7 @@ CsPadGainMapCfg::~CsPadGainMapCfg()
 }
 
 
-ndarray<uint16_t, 2> CsPadGainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
+ndarray<const uint16_t, 2> CsPadGainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
@@ -80,9 +80,9 @@ ConfigV1QuadReg::~ConfigV1QuadReg()
 }
 
 
-ndarray<uint32_t, 1> ConfigV1QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
+ndarray<const uint32_t, 1> ConfigV1QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
 
-ndarray<uint32_t, 1> ConfigV1QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
+ndarray<const uint32_t, 1> ConfigV1QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
 
 uint32_t ConfigV1QuadReg::readClkSet() const { return m_xtcObj->readClkSet(); }
 
@@ -122,9 +122,9 @@ ConfigV2QuadReg::~ConfigV2QuadReg()
 }
 
 
-ndarray<uint32_t, 1> ConfigV2QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
+ndarray<const uint32_t, 1> ConfigV2QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
 
-ndarray<uint32_t, 1> ConfigV2QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
+ndarray<const uint32_t, 1> ConfigV2QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
 
 uint32_t ConfigV2QuadReg::readClkSet() const { return m_xtcObj->readClkSet(); }
 
@@ -482,11 +482,11 @@ uint32_t ElementV1::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t ElementV1::fiducials() const { return m_xtcObj->fiducials(); }
 
-ndarray<uint16_t, 1> ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<const uint16_t, 1> ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-ndarray<int16_t, 3> ElementV1::data() const {
+ndarray<const int16_t, 3> ElementV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
@@ -620,11 +620,11 @@ uint32_t ElementV2::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t ElementV2::fiducials() const { return m_xtcObj->fiducials(); }
 
-ndarray<uint16_t, 1> ElementV2::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<const uint16_t, 1> ElementV2::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV2::frame_type() const { return m_xtcObj->frame_type(); }
 
-ndarray<int16_t, 3> ElementV2::data() const {
+ndarray<const int16_t, 3> ElementV2::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);

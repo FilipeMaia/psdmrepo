@@ -239,7 +239,7 @@ const char* EpicsPvCtrlShort::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_short& EpicsPvCtrlShort::dbr() const { return _dbr; }
 
-ndarray<int16_t, 1> EpicsPvCtrlShort::data() const { return m_xtcObj->data(); }
+ndarray<const int16_t, 1> EpicsPvCtrlShort::data() const { return m_xtcObj->data(); }
 
 int16_t EpicsPvCtrlShort::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -275,7 +275,7 @@ const char* EpicsPvCtrlFloat::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_float& EpicsPvCtrlFloat::dbr() const { return _dbr; }
 
-ndarray<float, 1> EpicsPvCtrlFloat::data() const { return m_xtcObj->data(); }
+ndarray<const float, 1> EpicsPvCtrlFloat::data() const { return m_xtcObj->data(); }
 
 float EpicsPvCtrlFloat::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -311,7 +311,7 @@ const char* EpicsPvCtrlEnum::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_enum& EpicsPvCtrlEnum::dbr() const { return _dbr; }
 
-ndarray<uint16_t, 1> EpicsPvCtrlEnum::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 1> EpicsPvCtrlEnum::data() const { return m_xtcObj->data(); }
 
 uint16_t EpicsPvCtrlEnum::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -347,7 +347,7 @@ const char* EpicsPvCtrlChar::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_char& EpicsPvCtrlChar::dbr() const { return _dbr; }
 
-ndarray<uint8_t, 1> EpicsPvCtrlChar::data() const { return m_xtcObj->data(); }
+ndarray<const uint8_t, 1> EpicsPvCtrlChar::data() const { return m_xtcObj->data(); }
 
 uint8_t EpicsPvCtrlChar::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -383,7 +383,7 @@ const char* EpicsPvCtrlLong::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_long& EpicsPvCtrlLong::dbr() const { return _dbr; }
 
-ndarray<int32_t, 1> EpicsPvCtrlLong::data() const { return m_xtcObj->data(); }
+ndarray<const int32_t, 1> EpicsPvCtrlLong::data() const { return m_xtcObj->data(); }
 
 int32_t EpicsPvCtrlLong::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -419,7 +419,7 @@ const char* EpicsPvCtrlDouble::pvName() const { return m_xtcObj->pvName(); }
 
 const Psana::Epics::dbr_ctrl_double& EpicsPvCtrlDouble::dbr() const { return _dbr; }
 
-ndarray<double, 1> EpicsPvCtrlDouble::data() const { return m_xtcObj->data(); }
+ndarray<const double, 1> EpicsPvCtrlDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvCtrlDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
 
@@ -491,7 +491,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeShort::stamp() const { return pds_to_psa
 
 const Psana::Epics::dbr_time_short& EpicsPvTimeShort::dbr() const { return _dbr; }
 
-ndarray<int16_t, 1> EpicsPvTimeShort::data() const { return m_xtcObj->data(); }
+ndarray<const int16_t, 1> EpicsPvTimeShort::data() const { return m_xtcObj->data(); }
 
 int16_t EpicsPvTimeShort::value(uint32_t i) const { return m_xtcObj->value(i); }
 EpicsPvTimeFloat::EpicsPvTimeFloat(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -525,7 +525,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeFloat::stamp() const { return pds_to_psa
 
 const Psana::Epics::dbr_time_float& EpicsPvTimeFloat::dbr() const { return _dbr; }
 
-ndarray<float, 1> EpicsPvTimeFloat::data() const { return m_xtcObj->data(); }
+ndarray<const float, 1> EpicsPvTimeFloat::data() const { return m_xtcObj->data(); }
 
 float EpicsPvTimeFloat::value(uint32_t i) const { return m_xtcObj->value(i); }
 EpicsPvTimeEnum::EpicsPvTimeEnum(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -559,7 +559,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeEnum::stamp() const { return pds_to_psan
 
 const Psana::Epics::dbr_time_enum& EpicsPvTimeEnum::dbr() const { return _dbr; }
 
-ndarray<uint16_t, 1> EpicsPvTimeEnum::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 1> EpicsPvTimeEnum::data() const { return m_xtcObj->data(); }
 
 uint16_t EpicsPvTimeEnum::value(uint32_t i) const { return m_xtcObj->value(i); }
 EpicsPvTimeChar::EpicsPvTimeChar(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -593,7 +593,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeChar::stamp() const { return pds_to_psan
 
 const Psana::Epics::dbr_time_char& EpicsPvTimeChar::dbr() const { return _dbr; }
 
-ndarray<uint8_t, 1> EpicsPvTimeChar::data() const { return m_xtcObj->data(); }
+ndarray<const uint8_t, 1> EpicsPvTimeChar::data() const { return m_xtcObj->data(); }
 
 uint8_t EpicsPvTimeChar::value(uint32_t i) const { return m_xtcObj->value(i); }
 EpicsPvTimeLong::EpicsPvTimeLong(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -627,7 +627,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeLong::stamp() const { return pds_to_psan
 
 const Psana::Epics::dbr_time_long& EpicsPvTimeLong::dbr() const { return _dbr; }
 
-ndarray<int32_t, 1> EpicsPvTimeLong::data() const { return m_xtcObj->data(); }
+ndarray<const int32_t, 1> EpicsPvTimeLong::data() const { return m_xtcObj->data(); }
 
 int32_t EpicsPvTimeLong::value(uint32_t i) const { return m_xtcObj->value(i); }
 EpicsPvTimeDouble::EpicsPvTimeDouble(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -661,7 +661,7 @@ Psana::Epics::epicsTimeStamp EpicsPvTimeDouble::stamp() const { return pds_to_ps
 
 const Psana::Epics::dbr_time_double& EpicsPvTimeDouble::dbr() const { return _dbr; }
 
-ndarray<double, 1> EpicsPvTimeDouble::data() const { return m_xtcObj->data(); }
+ndarray<const double, 1> EpicsPvTimeDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvTimeDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
 PvConfigV1::PvConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)

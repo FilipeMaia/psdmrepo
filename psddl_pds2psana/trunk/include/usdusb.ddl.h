@@ -16,8 +16,8 @@ public:
   typedef Psana::UsdUsb::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
-  virtual ndarray<uint32_t, 1> counting_mode() const;
-  virtual ndarray<uint32_t, 1> quadrature_mode() const;
+  virtual ndarray<const uint32_t, 1> counting_mode() const;
+  virtual ndarray<const uint32_t, 1> quadrature_mode() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

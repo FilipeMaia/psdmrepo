@@ -80,14 +80,14 @@ uint32_t FrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
 
 uint32_t FrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
-ndarray<uint16_t, 1> FrameV1::_data() const {
+ndarray<const uint16_t, 1> FrameV1::_data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->_data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->_data(*m_cfgPtr1);
   throw std::runtime_error("FrameV1::_data: config object pointer is zero");
 }
 
 
-ndarray<uint16_t, 2> FrameV1::data() const {
+ndarray<const uint16_t, 2> FrameV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   throw std::runtime_error("FrameV1::data: config object pointer is zero");
@@ -162,6 +162,6 @@ uint32_t FullFrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
 
 uint32_t FullFrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
-ndarray<uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
 } // namespace PNCCD
 } // namespace psddl_pds2psana

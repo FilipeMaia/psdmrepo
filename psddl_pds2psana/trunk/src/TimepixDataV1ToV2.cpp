@@ -80,7 +80,7 @@ TimepixDataV1ToV2::lostRows() const
   return m_xtcObj->lostRows();
 }
 
-ndarray<uint16_t, 2>
+ndarray<const uint16_t, 2>
 TimepixDataV1ToV2::data() const
 {
   uint16_t width = m_xtcObj->width();
@@ -89,7 +89,7 @@ TimepixDataV1ToV2::data() const
   if (not m_data) {
 
     // get DataV1 data
-    ndarray<uint16_t, 2> data1 = m_xtcObj->data();
+    ndarray<const uint16_t, 2> data1 = m_xtcObj->data();
 
     // allocate enough space
     m_data = new uint16_t[data1.size()];

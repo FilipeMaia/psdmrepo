@@ -38,8 +38,8 @@ public:
   typedef Psana::Gsc16ai::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Gsc16ai::ConfigV1>& cfgPtr);
   virtual ~DataV1();
-  virtual ndarray<uint16_t, 1> timestamp() const;
-  virtual ndarray<uint16_t, 1> channelValue() const;
+  virtual ndarray<const uint16_t, 1> timestamp() const;
+  virtual ndarray<const uint16_t, 1> channelValue() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

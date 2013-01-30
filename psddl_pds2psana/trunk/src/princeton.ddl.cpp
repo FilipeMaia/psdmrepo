@@ -210,7 +210,7 @@ uint32_t FrameV1::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
 float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-ndarray<uint16_t, 2> FrameV1::data() const {
+ndarray<const uint16_t, 2> FrameV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);

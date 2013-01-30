@@ -146,7 +146,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_short& dbr() const;
-  virtual ndarray<int16_t, 1> data() const;
+  virtual ndarray<const int16_t, 1> data() const;
   virtual int16_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -172,7 +172,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_float& dbr() const;
-  virtual ndarray<float, 1> data() const;
+  virtual ndarray<const float, 1> data() const;
   virtual float value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -198,7 +198,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_enum& dbr() const;
-  virtual ndarray<uint16_t, 1> data() const;
+  virtual ndarray<const uint16_t, 1> data() const;
   virtual uint16_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -224,7 +224,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_char& dbr() const;
-  virtual ndarray<uint8_t, 1> data() const;
+  virtual ndarray<const uint8_t, 1> data() const;
   virtual uint8_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -250,7 +250,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_long& dbr() const;
-  virtual ndarray<int32_t, 1> data() const;
+  virtual ndarray<const int32_t, 1> data() const;
   virtual int32_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -276,7 +276,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_double& dbr() const;
-  virtual ndarray<double, 1> data() const;
+  virtual ndarray<const double, 1> data() const;
   virtual double value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -328,7 +328,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_short& dbr() const;
-  virtual ndarray<int16_t, 1> data() const;
+  virtual ndarray<const int16_t, 1> data() const;
   virtual int16_t value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -353,7 +353,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_float& dbr() const;
-  virtual ndarray<float, 1> data() const;
+  virtual ndarray<const float, 1> data() const;
   virtual float value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -378,7 +378,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_enum& dbr() const;
-  virtual ndarray<uint16_t, 1> data() const;
+  virtual ndarray<const uint16_t, 1> data() const;
   virtual uint16_t value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -403,7 +403,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_char& dbr() const;
-  virtual ndarray<uint8_t, 1> data() const;
+  virtual ndarray<const uint8_t, 1> data() const;
   virtual uint8_t value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -428,7 +428,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_long& dbr() const;
-  virtual ndarray<int32_t, 1> data() const;
+  virtual ndarray<const int32_t, 1> data() const;
   virtual int32_t value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -453,7 +453,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_double& dbr() const;
-  virtual ndarray<double, 1> data() const;
+  virtual ndarray<const double, 1> data() const;
   virtual double value(uint32_t i) const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:

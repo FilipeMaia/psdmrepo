@@ -29,7 +29,7 @@ CsPad2x2DigitalPotsCfg::~CsPad2x2DigitalPotsCfg()
 }
 
 
-ndarray<uint8_t, 1> CsPad2x2DigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
+ndarray<const uint8_t, 1> CsPad2x2DigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
 CsPad2x2ReadOnlyCfg::CsPad2x2ReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::CsPad2x2ReadOnlyCfg()
   , m_xtcObj(xtcPtr)
@@ -66,7 +66,7 @@ CsPad2x2GainMapCfg::~CsPad2x2GainMapCfg()
 }
 
 
-ndarray<uint16_t, 2> CsPad2x2GainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
+ndarray<const uint16_t, 2> CsPad2x2GainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
@@ -192,11 +192,11 @@ uint32_t ElementV1::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t ElementV1::fiducials() const { return m_xtcObj->fiducials(); }
 
-ndarray<uint16_t, 1> ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<const uint16_t, 1> ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-ndarray<int16_t, 3> ElementV1::data() const { return m_xtcObj->data(); }
+ndarray<const int16_t, 3> ElementV1::data() const { return m_xtcObj->data(); }
 
 float ElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
 } // namespace CsPad2x2
