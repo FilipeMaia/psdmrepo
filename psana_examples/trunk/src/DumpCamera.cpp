@@ -71,7 +71,7 @@ DumpCamera::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, ": in beginCalibCycle()");
 
   shared_ptr<Psana::Camera::FrameFexConfigV1> frmConfig = env.configStore().get(m_src);
-  if (not frmConfig.get()) {
+  if (not frmConfig) {
     MsgLog(name(), info, "Camera::FrameFexConfigV1 not found");    
   } else {
     
@@ -86,7 +86,7 @@ DumpCamera::beginCalibCycle(Event& evt, Env& env)
       ::printFrameCoord(str, frmConfig->roiEnd());
       str << "\n  threshold = " << frmConfig->threshold();
       str << "\n  number_of_masked_pixels = " << frmConfig->number_of_masked_pixels();
-      const ndarray<Psana::Camera::FrameCoord, 1>& masked_pixels = frmConfig->masked_pixel_coordinates();
+      const ndarray<const Psana::Camera::FrameCoord, 1>& masked_pixels = frmConfig->masked_pixel_coordinates();
       for (unsigned i = 0; i < masked_pixels.shape()[0]; ++ i) {
         str << "\n    ";
         ::printFrameCoord(str, masked_pixels[i]);
@@ -102,38 +102,34 @@ DumpCamera::event(Event& evt, Env& env)
 {
 
   shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_src);
-  if (frmData.get()) {
+  if (frmData) {
     WithMsgLog(name(), info, str) {
       str << "Camera::FrameV1: width=" << frmData->width()
-          << " height=" << frmData->height()
-          << " depth=" << frmData->depth()
-          << " offset=" << frmData->offset() ;
+          << "\n  height=" << frmData->height()
+          << "\n  depth=" << frmData->depth()
+          << "\n  offset=" << frmData->offset() ;
 
-      const ndarray<uint8_t, 2>& data8 = frmData->data8();
+      const ndarray<const uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
-        str << " data8=[" << int(data8[0][0])
-            << ", " << int(data8[0][1])
-            << ", " << int(data8[0][2]) << ", ...]";
+        str << "\n  data8=" << data8;
       }
 
-      const ndarray<uint16_t, 2>& data16 = frmData->data16();
+      const ndarray<const uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
-        str << " data16=[" << int(data16[0][0])
-            << ", " << int(data16[0][1])
-            << ", " << int(data16[0][2]) << ", ...]";
+        str << "\n  data16=" << data16;
       }
     }
   }
 
   shared_ptr<Psana::Camera::TwoDGaussianV1> gaussData = evt.get(m_src);
-  if (gaussData.get()) {
+  if (gaussData) {
     WithMsgLog(name(), info, str) {
       str << "Camera::TwoDGaussianV1: integral=" << gaussData->integral()
-          << " xmean=" << gaussData->xmean()
-          << " ymean=" << gaussData->ymean()
-          << " major_axis_width=" << gaussData->major_axis_width()
-          << " minor_axis_width=" << gaussData->minor_axis_width()
-          << " major_axis_tilt=" << gaussData->major_axis_tilt();
+          << "\n  xmean=" << gaussData->xmean()
+          << "\n  ymean=" << gaussData->ymean()
+          << "\n  major_axis_width=" << gaussData->major_axis_width()
+          << "\n  minor_axis_width=" << gaussData->minor_axis_width()
+          << "\n  major_axis_tilt=" << gaussData->major_axis_tilt();
     }
   }
 

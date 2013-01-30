@@ -194,7 +194,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V1 config object
   shared_ptr<Psana::EvrData::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV1: npulses = " << config1->npulses()
@@ -209,7 +209,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V2 config object
   shared_ptr<Psana::EvrData::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV2: npulses = " << config2->npulses()
@@ -226,7 +226,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V3 config object
   shared_ptr<Psana::EvrData::ConfigV3> config3 = env.configStore().get(m_src);
-  if (config3.get()) {
+  if (config3) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV3: npulses = " << config3->npulses()
@@ -243,7 +243,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V4 config object
   shared_ptr<Psana::EvrData::ConfigV4> config4 = env.configStore().get(m_src);
-  if (config4.get()) {
+  if (config4) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV4: npulses = " << config4->npulses()
@@ -260,7 +260,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V5 config object
   shared_ptr<Psana::EvrData::ConfigV5> config5 = env.configStore().get(m_src);
-  if (config5.get()) {
+  if (config5) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV5: npulses = " << config5->npulses()
@@ -285,7 +285,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V6 config object
   shared_ptr<Psana::EvrData::ConfigV6> config6 = env.configStore().get(m_src);
-  if (config6.get()) {
+  if (config6) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV6: npulses = " << config6->npulses()
@@ -310,7 +310,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
 
   // Try to get V7 config object
   shared_ptr<Psana::EvrData::ConfigV7> config7 = env.configStore().get(m_src);
-  if (config7.get()) {
+  if (config7) {
 
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV7: npulses = " << config7->npulses()
@@ -334,7 +334,7 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::EvrData::IOConfigV1> iocfg1 = env.configStore().get(m_src);
-  if (iocfg1.get()) {
+  if (iocfg1) {
     
     WithMsgLog(name(), info, str) {
       str << "EvrData::IOConfigV1: nchannels = " << iocfg1->nchannels()
@@ -352,7 +352,7 @@ void
 DumpEvr::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::EvrData::DataV3> data3 = evt.get(m_src);
-  if (data3.get()) {
+  if (data3) {
     
     WithMsgLog(name(), info, str) {
       str << "Encoder::DataV3: numFifoEvents=" << data3->numFifoEvents();

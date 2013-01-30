@@ -61,7 +61,7 @@ DumpEncoder::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Encoder::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "Encoder::ConfigV1:";
@@ -81,7 +81,7 @@ void
 DumpEncoder::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Encoder::DataV1> data1 = evt.get(m_src);
-  if (data1.get()) {
+  if (data1) {
     
     WithMsgLog(name(), info, str) {
       str << "Encoder::DataV1:"
@@ -91,17 +91,12 @@ DumpEncoder::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Encoder::DataV2> data2 = evt.get(m_src);
-  if (data2.get()) {
+  if (data2) {
     
     WithMsgLog(name(), info, str) {
       str << "Encoder::DataV2:"
           << " timestamp = " << data2->timestamp()
-          << " encoder_count =";
-      const ndarray<uint32_t, 1>& counts = data2->encoder_count();
-      for (unsigned i = 0; i != counts.size(); ++ i) {
-        str << " " << counts[i];
-      }
-
+          << " encoder_count = " << data2->encoder_count();
     }
   }
 

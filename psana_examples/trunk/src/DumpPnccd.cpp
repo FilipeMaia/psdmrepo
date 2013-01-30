@@ -61,7 +61,7 @@ DumpPnccd::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::PNCCD::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "PNCCD::ConfigV1:";
@@ -72,7 +72,7 @@ DumpPnccd::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::PNCCD::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "PNCCD::ConfigV2:";
@@ -114,13 +114,9 @@ DumpPnccd::event(Event& evt, Env& env)
         str << "\n    timeStampHi = " << frame.timeStampHi();
         str << "\n    timeStampLo = " << frame.timeStampLo();
 
-        const ndarray<uint16_t, 2> data = frame.data();
+        const ndarray<const uint16_t, 2> data = frame.data();
         str << "\n    frame size = " << data.shape()[0] << 'x' << data.shape()[1];
-        str << "\n    data =";
-        for (int i = 0; i < 10; ++ i) {
-          str << " " << data[0][i];
-        }
-        str << " ...";
+        str << "\n    data = " << data;
       }
     }
   }
@@ -136,13 +132,9 @@ DumpPnccd::event(Event& evt, Env& env)
       str << "\n    timeStampHi = " << frame->timeStampHi();
       str << "\n    timeStampLo = " << frame->timeStampLo();
 
-      const ndarray<uint16_t, 2> data = frame->data();
+      const ndarray<const uint16_t, 2> data = frame->data();
       str << "\n    frame size = " << data.shape()[0] << 'x' << data.shape()[1];
-      str << "\n    data =";
-      for (int i = 0; i < 10; ++ i) {
-        str << " " << data[0][i];
-      }
-      str << " ...";
+      str << "\n    data = " << data;
     }
 
   }

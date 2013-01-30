@@ -61,7 +61,7 @@ DumpIpimb::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), info, "in beginCalibCycle()");
 
   shared_ptr<Psana::Ipimb::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "Ipimb::ConfigV1:";
@@ -85,7 +85,7 @@ DumpIpimb::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Ipimb::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "Ipimb::ConfigV2:";
@@ -117,7 +117,7 @@ void
 DumpIpimb::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Ipimb::DataV1> data1 = evt.get(m_src);
-  if (data1.get()) {
+  if (data1) {
     
     WithMsgLog(name(), info, str) {
       str << "Ipimb::DataV1:"
@@ -138,7 +138,7 @@ DumpIpimb::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Ipimb::DataV2> data2 = evt.get(m_src);
-  if (data2.get()) {
+  if (data2) {
     
     WithMsgLog(name(), info, str) {
       str << "Ipimb::DataV2:"

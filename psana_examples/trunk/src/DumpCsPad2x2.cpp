@@ -67,7 +67,7 @@ DumpCsPad2x2::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::CsPad2x2::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad2x2::ConfigV1:";
@@ -118,7 +118,7 @@ void
 DumpCsPad2x2::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::CsPad2x2::ElementV1> elem1 = evt.get(m_src, m_key);
-  if (elem1.get()) {
+  if (elem1) {
 
     WithMsgLog(name(), info, str) {
       str << "CsPad2x2::ElementV1:";
@@ -133,29 +133,15 @@ DumpCsPad2x2::event(Event& evt, Env& env)
       str << "\n  fiducials = " << elem1->fiducials() ;
       str << "\n  frame_type = " << elem1->frame_type() ;
 
-      str << "\n    sb_temp = [ ";
-      const ndarray<uint16_t, 1>& sb_temp = elem1->sb_temp();
-      std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
-      str << "]";
+      str << "\n    sb_temp = " << elem1->sb_temp();
 
-      const ndarray<int16_t, 3>& data = elem1->data();
-      str << "\n    data_shape = [ ";
-      std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
-      str << "]";
-
+      const ndarray<const int16_t, 3>& data = elem1->data();
       str << "\n    common_mode = [ ";
       for (unsigned i = 0; i != data.shape()[2]; ++ i) {
           str << elem1->common_mode(i) << ' ';
       }
       str << "]";
-
-      str << "\n    data = [";
-      for (unsigned s = 0; s != data.shape()[2]; ++ s) {
-        str << "\n        [ ";
-        for (unsigned i = 0; i < 10; ++ i) str << data[0][i][s] << ' ';
-        str << "... ]";
-      }
-      str << "\n    ]";
+      str << "\n    data = " << data;
     }
   }
 

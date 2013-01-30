@@ -70,7 +70,7 @@ DumpQuartz::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Quartz::ConfigV1> config = env.configStore().get(m_src);
-  if (config.get()) {
+  if (config) {
     
     WithMsgLog(name(), info, str) {
       str << "Psana::Quartz::ConfigV1:";
@@ -84,20 +84,14 @@ DumpQuartz::beginCalibCycle(Event& evt, Env& env)
       str << "\n  output_resolution_bits = " << config->output_resolution_bits();
       str << "\n  defect_pixel_correction_enabled = " << int(config->defect_pixel_correction_enabled());
       str << "\n  output_lookup_table_enabled = " << int(config->output_lookup_table_enabled());
-      
       if (config->output_lookup_table_enabled()) {        
-        const ndarray<uint16_t, 1>& output_lookup_table = config->output_lookup_table();
-        str << "\n  output_lookup_table =";
-        for (unsigned i = 0; i < output_lookup_table.size(); ++ i) {
-          str << ' ' << output_lookup_table[i];
-        }
-        
+        str << "\n  output_lookup_table = " << config->output_lookup_table();
       }
       
       
       if (config->number_of_defect_pixels()) {
         str << "\n  defect_pixel_coordinates =";
-        const ndarray<Psana::Camera::FrameCoord, 1>& coord = config->defect_pixel_coordinates();
+        const ndarray<const Psana::Camera::FrameCoord, 1>& coord = config->defect_pixel_coordinates();
         for (unsigned i = 0; i < coord.size(); ++ i) {
           str << " ";
           printFrameCoord(str, coord[i]);

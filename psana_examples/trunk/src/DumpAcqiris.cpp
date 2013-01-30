@@ -63,7 +63,7 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
 
   Source src(configStr("source", "DetInfo(:Acqiris)"));
   shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(src, &m_src);
-  if (acqConfig.get()) {
+  if (acqConfig) {
     WithMsgLog(name(), info, str) {
       str << "Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()
           << " channelMask=" << acqConfig->channelMask()
@@ -76,7 +76,7 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
            << " nbrSegments=" << h.nbrSegments()
            << " nbrSamples=" << h.nbrSamples();
       
-      const ndarray<Psana::Acqiris::VertV1, 1>& vert = acqConfig->vert();
+      const ndarray<const Psana::Acqiris::VertV1, 1>& vert = acqConfig->vert();
       for (unsigned ch = 0; ch < vert.shape()[0]; ++ ch) {
         const Psana::Acqiris::VertV1& v = vert[ch];
         str << "\n  vert(" << ch << "):"
@@ -97,7 +97,7 @@ DumpAcqiris::event(Event& evt, Env& env)
 
   Pds::Src src;
   shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_src);
-  if (acqData.get()) {
+  if (acqData) {
     
     // find matching config object
     shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_src);
@@ -119,8 +119,8 @@ DumpAcqiris::event(Event& evt, Env& env)
            << "\n  nbrSamplesInSeg=" << elem.nbrSamplesInSeg()
            << "\n  indexFirstPoint=" << elem.indexFirstPoint();
         
-        const ndarray<Psana::Acqiris::TimestampV1, 1>& timestamps = elem.timestamp();
-        const ndarray<int16_t, 2>& waveforms = elem.waveforms();
+        const ndarray<const Psana::Acqiris::TimestampV1, 1>& timestamps = elem.timestamp();
+        const ndarray<const int16_t, 2>& waveforms = elem.waveforms();
 
         // loop over segments
         for (unsigned seg = 0; seg < elem.nbrSegments(); ++ seg) {

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays for array data
+- ndarray has operator<<(ostream) now, use it do dump array data
+
 Tag: V00-02-16
 2012-11-28 Andy Salnikov
 - change in Source constructor

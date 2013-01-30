@@ -61,7 +61,7 @@ DumpFli::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Fli::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "Fli::ConfigV1:";
@@ -92,19 +92,13 @@ void
 DumpFli::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Fli::FrameV1> frame = evt.get(m_src);
-  if (frame.get()) {
+  if (frame) {
     WithMsgLog(name(), info, str) {
       str << "Fli::FrameV1:";
       str << "\n  shotIdStart = " << frame->shotIdStart();
       str << "\n  readoutTime = " << frame->readoutTime();
       str << "\n  temprature = " << frame->temperature();
-
-      const ndarray<uint16_t, 2>& data = frame->data();
-      str << "\n  data =";
-      for (int i = 0; i < 10; ++ i) {
-        str << " " << data[0][i];
-      }
-      str << " ...";
+      str << "\n  data = " << frame->data();
     }
   }
 }

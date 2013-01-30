@@ -77,7 +77,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::ControlData::ConfigV1> config = env.configStore().get(m_src);
-  if (not config.get()) {
+  if (not config) {
     MsgLog(name(), info, "ControlData::ConfigV1 not found");    
   } else {
     
@@ -90,7 +90,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
       str <<  "\n  uses_events = " << (config->uses_events() ? "yes" : "no")
           << "\n  events = " << config->events();
 
-      const ndarray<Psana::ControlData::PVControl, 1>& pvControls = config->pvControls();
+      const ndarray<const Psana::ControlData::PVControl, 1>& pvControls = config->pvControls();
       for (unsigned i = 0; i < pvControls.size(); ++ i) {
         if (i == 0) str << "\n  PV Controls:";
         const Psana::ControlData::PVControl& ctrl = pvControls[i];
@@ -99,7 +99,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
         
       }
 
-      const ndarray<Psana::ControlData::PVMonitor, 1>& pvMonitors = config->pvMonitors();
+      const ndarray<const Psana::ControlData::PVMonitor, 1>& pvMonitors = config->pvMonitors();
       for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
         if (i == 0) str << "\n  PV Monitors:";
         const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
@@ -115,7 +115,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
 
 
   shared_ptr<Psana::ControlData::ConfigV2> config2 = env.configStore().get(m_src);
-  if (not config2.get()) {
+  if (not config2) {
     MsgLog(name(), info, "ControlData::ConfigV2 not found");
   } else {
 
@@ -128,7 +128,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
       str <<  "\n  uses_events = " << (config2->uses_events() ? "yes" : "no")
           << "\n  events = " << config2->events();
 
-      const ndarray<Psana::ControlData::PVControl, 1>& pvControls = config2->pvControls();
+      const ndarray<const Psana::ControlData::PVControl, 1>& pvControls = config2->pvControls();
       for (unsigned i = 0; i < pvControls.size(); ++ i) {
         if (i == 0) str << "\n  PV Controls:";
         const Psana::ControlData::PVControl& ctrl = pvControls[i];
@@ -137,7 +137,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
 
       }
 
-      const ndarray<Psana::ControlData::PVMonitor, 1>& pvMonitors = config2->pvMonitors();
+      const ndarray<const Psana::ControlData::PVMonitor, 1>& pvMonitors = config2->pvMonitors();
       for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
         if (i == 0) str << "\n  PV Monitors:";
         const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
@@ -148,7 +148,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
 
       }
 
-      const ndarray<Psana::ControlData::PVLabel, 1>& pvLabels = config2->pvLabels();
+      const ndarray<const Psana::ControlData::PVLabel, 1>& pvLabels = config2->pvLabels();
       for (unsigned i = 0; i < pvLabels.size(); ++ i) {
         if (i == 0) str << "\n  PV Labels:";
         const Psana::ControlData::PVLabel& lbl = pvLabels[i];

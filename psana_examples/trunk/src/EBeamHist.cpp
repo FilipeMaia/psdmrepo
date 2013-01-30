@@ -70,7 +70,7 @@ void
 EBeamHist::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Bld::BldDataEBeamV1> ebeam = evt.get(m_ebeamSrc);
-  if (ebeam.get()) {
+  if (ebeam) {
     m_ebeamHisto->fill(ebeam->ebeamL3Energy());
     m_chargeHisto->fill(ebeam->ebeamCharge());
   }

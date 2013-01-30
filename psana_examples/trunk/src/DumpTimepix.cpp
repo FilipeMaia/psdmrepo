@@ -66,7 +66,7 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Timepix::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
 
     WithMsgLog(name(), info, str) {
       str << "Timepix::ConfigV1:";
@@ -135,7 +135,7 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Timepix::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
 
     WithMsgLog(name(), info, str) {
       str << "Timepix::ConfigV2:";
@@ -203,12 +203,7 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
       str << "\n  driverVersion = " << config2->driverVersion();
       str << "\n  firmwareVersion = " << config2->firmwareVersion();
       str << "\n  pixelThreshSize = " << config2->pixelThreshSize();
-      const ndarray<uint8_t, 1>& pixelThresh = config2->pixelThresh();
-      str << "\n  pixelThresh = ";
-      for (unsigned i = 0; i < config2->pixelThreshSize() and i < 20; ++ i) {
-        str << int(pixelThresh[i]) << ' ';
-      }
-      str << "...";
+      str << "\n  pixelThresh = " << config2->pixelThresh();
       str << "\n  chip names = " << config2->chip0Name() << " " << config2->chip1Name() << " " << config2->chip2Name() << " " << config2->chip3Name();
       str << "\n  chip IDs   = " << config2->chip0ID() << " " << config2->chip1ID() << " " << config2->chip2ID() << " " << config2->chip3ID();
 
@@ -229,40 +224,26 @@ DumpTimepix::event(Event& evt, Env& env)
   //  to be executed at all.
   // ==============================================================
   shared_ptr<Psana::Timepix::DataV1> data1 = evt.get(m_src);
-  if (data1.get()) {
+  if (data1) {
     WithMsgLog(name(), info, str) {
       str << "Timepix::DataV1:";
 
       str << "\n  timestamp = " << data1->timestamp();
       str << "\n  frameCounter = " << data1->frameCounter();
       str << "\n  lostRows = " << data1->lostRows();
-
-      const ndarray<uint16_t, 2>& img = data1->data();
-      str << "\n  data =";
-      str << " (" << img.shape()[0] << ", " << img.shape()[0] << ")";
-      for (int i = 0; i < 10; ++ i) {
-        str << " " << img[0][i];
-      }
-      str << " ...";
+      str << "\n  data = " << data1->data();
     }
   }
 
   shared_ptr<Psana::Timepix::DataV2> data2 = evt.get(m_src);
-  if (data2.get()) {
+  if (data2) {
     WithMsgLog(name(), info, str) {
       str << "Timepix::DataV2:";
 
       str << "\n  timestamp = " << data2->timestamp();
       str << "\n  frameCounter = " << data2->frameCounter();
       str << "\n  lostRows = " << data2->lostRows();
-
-      const ndarray<uint16_t, 2>& img = data2->data();
-      str << "\n  data =";
-      str << " (" << img.shape()[0] << ", " << img.shape()[0] << ")";
-      for (int i = 0; i < 10; ++ i) {
-        str << " " << img[0][i];
-      }
-      str << " ...";
+      str << "\n  data = " << data2->data();
     }
   }
 }

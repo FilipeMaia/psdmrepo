@@ -61,7 +61,7 @@ DumpPulnix::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Pulnix::TM6740ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "Pulnix::TM6740ConfigV1:";
@@ -80,7 +80,7 @@ DumpPulnix::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Pulnix::TM6740ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "Pulnix::TM6740ConfigV2:";

@@ -61,7 +61,7 @@ DumpFccd::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::FCCD::FccdConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "FCCD::FccdConfigV1:";
@@ -75,7 +75,7 @@ DumpFccd::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::FCCD::FccdConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "FCCD::FccdConfigV2:";

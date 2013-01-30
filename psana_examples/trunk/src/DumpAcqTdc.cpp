@@ -68,14 +68,14 @@ DumpAcqTdc::beginCalibCycle(Event& evt, Env& env)
       
       str << "Acqiris::TdcConfigV1:";
       
-      const ndarray<Psana::Acqiris::TdcChannel, 1>& channels = tdcConfig->channels();
+      const ndarray<const Psana::Acqiris::TdcChannel, 1>& channels = tdcConfig->channels();
       for (int ch = 0; ch < Psana::Acqiris::TdcConfigV1::NChannels; ++ ch) {
         const Psana::Acqiris::TdcChannel& chan = channels[ch];
         str << "\n  channel " << ch << ": slope=" << chan.slope() 
             << " mode=" << chan.mode() << " level=" << chan.level();
       }
 
-      const ndarray<Psana::Acqiris::TdcAuxIO, 1>& auxio = tdcConfig->auxio();
+      const ndarray<const Psana::Acqiris::TdcAuxIO, 1>& auxio = tdcConfig->auxio();
       for (int ch = 0; ch < Psana::Acqiris::TdcConfigV1::NAuxIO; ++ ch) {
         const Psana::Acqiris::TdcAuxIO& chan = auxio[ch];
         str << "\n  auxio " << ch << ": channel=" << chan.channel() 
@@ -97,7 +97,7 @@ DumpAcqTdc::event(Event& evt, Env& env)
   shared_ptr<Psana::Acqiris::TdcDataV1> tdcData = evt.get(m_src);
   if (tdcData.get()) {
   
-    const ndarray<Psana::Acqiris::TdcDataV1_Item, 1>& data = tdcData->data();
+    const ndarray<const Psana::Acqiris::TdcDataV1_Item, 1>& data = tdcData->data();
     for (unsigned i = 0; i < data.shape()[0]; ++ i) {
       
       const Psana::Acqiris::TdcDataV1_Item& item = data[i];

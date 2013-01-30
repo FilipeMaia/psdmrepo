@@ -67,7 +67,7 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_src);
-  if (config1.get()) {
+  if (config1) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV1:";
@@ -90,7 +90,7 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_src);
-  if (config2.get()) {
+  if (config2) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV2:";
@@ -122,7 +122,7 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(m_src);
-  if (config3.get()) {
+  if (config3) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV3:";
@@ -160,7 +160,7 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::CsPad::ConfigV4> config4 = env.configStore().get(m_src);
-  if (config4.get()) {
+  if (config4) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV4:";
@@ -204,7 +204,7 @@ DumpCsPad::event(Event& evt, Env& env)
 {
 
   shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src, m_key);
-  if (data1.get()) {
+  if (data1) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::DataV1:";
@@ -222,30 +222,15 @@ DumpCsPad::event(Event& evt, Env& env)
         str << "\n    ticks = " << el.ticks() ;
         str << "\n    fiducials = " << el.fiducials() ;
         str << "\n    frame_type = " << el.frame_type() ;
+        str << "\n    sb_temp = " << el.sb_temp();
 
-        str << "\n    sb_temp = [ ";
-        const ndarray<uint16_t, 1>& sb_temp = el.sb_temp();
-        std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
-        str << "]";
-
-        const ndarray<int16_t, 3>& data = el.data();
-        str << "\n    data_shape = [ ";
-        std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
-        str << "]";
-
+        const ndarray<const int16_t, 3>& data = el.data();
         str << "\n    common_mode = [ ";
         for (unsigned i = 0; i != data.shape()[0]; ++ i) {
             str << el.common_mode(i) << ' ';
         }
         str << "]";
-
-        str << "\n    data = [";
-        for (unsigned s = 0; s != data.shape()[0]; ++ s) {
-          str << "\n        [ ";
-          for (unsigned i = 0; i < 10; ++ i) str << data[s][0][i] << ' ';
-          str << "... ]";
-        }
-        str << "\n    ]";
+        str << "\n    data = " << data;
       }
 
     }
@@ -253,7 +238,7 @@ DumpCsPad::event(Event& evt, Env& env)
 
 
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, m_key);
-  if (data2.get()) {
+  if (data2) {
     
     WithMsgLog(name(), info, str) {
       str << "CsPad::DataV2:";
@@ -272,29 +257,15 @@ DumpCsPad::event(Event& evt, Env& env)
         str << "\n    fiducials = " << el.fiducials() ;
         str << "\n    frame_type = " << el.frame_type() ;
 
-        str << "\n    sb_temp = [ ";
-        const ndarray<uint16_t, 1>& sb_temp = el.sb_temp();
-        std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
-        str << "]";
+        str << "\n    sb_temp = " << el.sb_temp();
 
-        const ndarray<int16_t, 3>& data = el.data();
-        str << "\n    data_shape = [ ";
-        std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
-        str << "]";
-
+        const ndarray<const int16_t, 3>& data = el.data();
         str << "\n    common_mode = [ ";
         for (unsigned i = 0; i != data.shape()[0]; ++ i) {
             str << el.common_mode(i) << ' ';
         }
         str << "]";
-
-        str << "\n    data = [";
-        for (unsigned s = 0; s != data.shape()[0]; ++ s) {
-          str << "\n        [ ";
-          for (unsigned i = 0; i < 10; ++ i) str << data[s][0][i] << ' ';
-          str << "... ]";
-        }
-        str << "\n    ]";
+        str << "\n    data = " << data;
       }
 
     }

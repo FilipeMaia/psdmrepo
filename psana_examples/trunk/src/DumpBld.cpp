@@ -71,7 +71,7 @@ void
 DumpBld::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Bld::BldDataEBeamV0> ebeam0 = evt.get(m_ebeamSrc);
-  if (ebeam0.get()) {
+  if (ebeam0) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV0:"
           << "\n  damageMask=" << std::showbase << std::hex << ebeam0->damageMask() << std::dec
@@ -85,7 +85,7 @@ DumpBld::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Bld::BldDataEBeamV1> ebeam1 = evt.get(m_ebeamSrc);
-  if (ebeam1.get()) {
+  if (ebeam1) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV1:"
           << "\n  damageMask=" << std::showbase << std::hex << ebeam1->damageMask() << std::dec
@@ -100,7 +100,7 @@ DumpBld::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Bld::BldDataEBeamV2> ebeam2 = evt.get(m_ebeamSrc);
-  if (ebeam2.get()) {
+  if (ebeam2) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV2:"
           << "\n  damageMask=" << std::showbase << std::hex << ebeam2->damageMask() << std::dec
@@ -116,7 +116,7 @@ DumpBld::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Bld::BldDataEBeamV3> ebeam3 = evt.get(m_ebeamSrc);
-  if (ebeam3.get()) {
+  if (ebeam3) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV3:"
           << "\n  damageMask=" << std::showbase << std::hex << ebeam3->damageMask() << std::dec
@@ -134,7 +134,7 @@ DumpBld::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
-  if (cav.get()) {
+  if (cav) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataPhaseCavity:" 
           << "\n  fitTime1=" << cav->fitTime1()
@@ -145,7 +145,7 @@ DumpBld::event(Event& evt, Env& env)
   }
   
   shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
-  if (fee.get()) {
+  if (fee) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataFEEGasDetEnergy:"
           << "\n  f_11_ENRC=" << fee->f_11_ENRC()
@@ -156,7 +156,7 @@ DumpBld::event(Event& evt, Env& env)
   }
 
   shared_ptr<Psana::Bld::BldDataIpimbV0> ipimb0 = evt.get(m_ipimbSrc);
-  if (ipimb0.get()) {
+  if (ipimb0) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataIpimbV0:";
       const Psana::Ipimb::DataV1& ipimbData = ipimb0->ipimbData();
@@ -196,16 +196,12 @@ DumpBld::event(Event& evt, Env& env)
       str << "\n    sum = " << ipmFexData.sum();
       str << "\n    xpos = " << ipmFexData.xpos();
       str << "\n    ypos = " << ipmFexData.ypos();
-      const ndarray<float, 1>& channel = ipmFexData.channel();
-      str << "\n    channel =";
-      for (unsigned i = 0; i < channel.shape()[0]; ++ i) {
-        str << " " << channel[i];
-      }
+      str << "\n    channel = " << ipmFexData.channel();
     }
   }
 
   shared_ptr<Psana::Bld::BldDataIpimbV1> ipimb1 = evt.get(m_ipimbSrc);
-  if (ipimb1.get()) {
+  if (ipimb1) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataIpimbV1:";
       const Psana::Ipimb::DataV2& ipimbData = ipimb1->ipimbData();
@@ -255,16 +251,12 @@ DumpBld::event(Event& evt, Env& env)
       str << "\n    sum = " << ipmFexData.sum();
       str << "\n    xpos = " << ipmFexData.xpos();
       str << "\n    ypos = " << ipmFexData.ypos();
-      const ndarray<float, 1>& channel = ipmFexData.channel();
-      str << "\n    channel =";
-      for (unsigned i = 0; i < channel.shape()[0]; ++ i) {
-        str << " " << channel[i];
-      }
+      str << "\n    channel = " << ipmFexData.channel();
     }
   }
 
   shared_ptr<Psana::Bld::BldDataPimV1> pim1 = evt.get(m_pimSrc);
-  if (pim1.get()) {
+  if (pim1) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataPimV1:";
       const Psana::Pulnix::TM6740ConfigV2& camCfg = pim1->camConfig();
@@ -292,18 +284,14 @@ DumpBld::event(Event& evt, Env& env)
           << "\n    depth=" << frame.depth()
           << "\n    offset=" << frame.offset();
 
-      const ndarray<uint8_t, 2>& data8 = frame.data8();
+      const ndarray<const uint8_t, 2>& data8 = frame.data8();
       if (not data8.empty()) {
-        str << "\n    data8=[" << int(data8[0][0])
-            << ", " << int(data8[0][1])
-            << ", " << int(data8[0][2]) << ", ...]";
+        str << "\n    data8=" << data8;
       }
 
-      const ndarray<uint16_t, 2>& data16 = frame.data16();
+      const ndarray<const uint16_t, 2>& data16 = frame.data16();
       if (not data16.empty()) {
-        str << "\n    data16=[" << int(data16[0][0])
-            << ", " << int(data16[0][1])
-            << ", " << int(data16[0][2]) << ", ...]";
+        str << "\n    data16=" << data16;
       }
     }
   }
@@ -311,7 +299,7 @@ DumpBld::event(Event& evt, Env& env)
 
   // dump BldDataGMDV0
   shared_ptr<Psana::Bld::BldDataGMDV0> gmd0 = evt.get(m_gmdSrc);
-  if (gmd0.get()) {
+  if (gmd0) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataGMDV0:"
           << "\n  gasType = " << gmd0->gasType()
@@ -334,7 +322,7 @@ DumpBld::event(Event& evt, Env& env)
 
   // dump BldDataGMDV1
   shared_ptr<Psana::Bld::BldDataGMDV1> gmd1 = evt.get(m_gmdSrc);
-  if (gmd1.get()) {
+  if (gmd1) {
     WithMsgLog(name(), info, str) {
       str << "Bld::BldDataGMDV1:"
           << "\n  milliJoulesPerPulse = " << gmd1->milliJoulesPerPulse()
