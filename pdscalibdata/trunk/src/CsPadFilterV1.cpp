@@ -109,7 +109,7 @@ CsPadFilterV1::~CsPadFilterV1 ()
 }
 
 bool
-CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData) const
+CsPadFilterV1::filter(const ndarray<const int16_t, 3>& pixelData) const
 {
   if (m_mode == None) return true;
   
@@ -128,7 +128,7 @@ CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData) const
 }
 
 bool
-CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData, const ndarray<uint16_t, 3>& pixelStatus) const
+CsPadFilterV1::filter(const ndarray<const int16_t, 3>& pixelData, const ndarray<const uint16_t, 3>& pixelStatus) const
 {
   if (m_mode == None) return true;
 
@@ -141,8 +141,8 @@ CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData, const ndarray<uint16
   // only take pixels with good status (=0)
   unsigned count = 0;
   int threshold = int(m_data[0]);
-  typedef ndarray<int16_t, 3>::iterator Iter;
-  ndarray<uint16_t, 3>::iterator stat_iter = pixelStatus.begin();
+  typedef ndarray<const int16_t, 3>::iterator Iter;
+  ndarray<const uint16_t, 3>::iterator stat_iter = pixelStatus.begin();
   for (Iter data_iter = pixelData.begin(); data_iter != pixelData.end(); ++ data_iter, ++ stat_iter) {
     if (*stat_iter == 0 and *data_iter > threshold) ++ count;
   }

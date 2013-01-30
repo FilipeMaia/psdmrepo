@@ -83,7 +83,7 @@ public:
    *  @param pixelData    Pixel data from cspad, after pedestal (and 
    *                      optionally common mode) subtraction
    */
-  bool filter(const ndarray<int16_t, 3>& pixelData) const;
+  bool filter(const ndarray<const int16_t, 3>& pixelData) const;
   
   /**
    *  Returns yes/no decision for the given data.
@@ -92,7 +92,7 @@ public:
    *                      optionally common mode) subtraction
    *  @param pixelStatus  Pixel status data
    */
-  bool filter(const ndarray<int16_t, 3>& pixelData, const ndarray<uint16_t, 3>& pixelStatus) const;
+  bool filter(const ndarray<const int16_t, 3>& pixelData, const ndarray<const uint16_t, 3>& pixelStatus) const;
 
 protected:
 
