@@ -175,7 +175,7 @@ public:
   /** Configuration for horizontal axis */
   virtual const Acqiris::HorizV1& horiz() const = 0;
   /** Configuration for vertical axis (one per channel). */
-  virtual ndarray<Acqiris::VertV1, 1> vert() const = 0;
+  virtual ndarray<const Acqiris::VertV1, 1> vert() const = 0;
   /** Number of channels calculated from channel bit mask. */
   virtual uint32_t nbrChannels() const = 0;
 };
@@ -230,9 +230,9 @@ public:
   /** Number of segments. */
   virtual uint32_t nbrSegments() const = 0;
   /** Timestamps, one timestamp per segment. */
-  virtual ndarray<Acqiris::TimestampV1, 1> timestamp() const = 0;
+  virtual ndarray<const Acqiris::TimestampV1, 1> timestamp() const = 0;
   /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()] */
-  virtual ndarray<int16_t, 2> waveforms() const = 0;
+  virtual ndarray<const int16_t, 2> waveforms() const = 0;
 };
 
 /** @class DataDescV1
@@ -412,9 +412,9 @@ public:
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
   virtual ~TdcConfigV1();
   /** Channel configurations, one object per channel. */
-  virtual ndarray<Acqiris::TdcChannel, 1> channels() const = 0;
+  virtual ndarray<const Acqiris::TdcChannel, 1> channels() const = 0;
   /** Axiliary configurations, one object per channel. */
-  virtual ndarray<Acqiris::TdcAuxIO, 1> auxio() const = 0;
+  virtual ndarray<const Acqiris::TdcAuxIO, 1> auxio() const = 0;
   virtual const Acqiris::TdcVetoIO& veto() const = 0;
 };
 
@@ -527,7 +527,7 @@ public:
   virtual ~TdcDataV1();
   /** Access TDC data items. The data_shape() method should be used to 
             obtain the number of elements. */
-  virtual ndarray<Acqiris::TdcDataV1_Item, 1> data() const = 0;
+  virtual ndarray<const Acqiris::TdcDataV1_Item, 1> data() const = 0;
 };
 } // namespace Acqiris
 } // namespace Psana

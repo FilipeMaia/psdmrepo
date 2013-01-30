@@ -137,9 +137,9 @@ public:
   /** Number of PVMonitor objects in this configuration. */
   virtual uint32_t npvMonitors() const = 0;
   /** PVControl configuration objects */
-  virtual ndarray<ControlData::PVControl, 1> pvControls() const = 0;
+  virtual ndarray<const ControlData::PVControl, 1> pvControls() const = 0;
   /** PVMonitor configuration objects */
-  virtual ndarray<ControlData::PVMonitor, 1> pvMonitors() const = 0;
+  virtual ndarray<const ControlData::PVMonitor, 1> pvMonitors() const = 0;
 };
 
 /** @class ConfigV2
@@ -168,11 +168,11 @@ public:
   /** Number of PVLabel objects in this configuration. */
   virtual uint32_t npvLabels() const = 0;
   /** PVControl configuration objects */
-  virtual ndarray<ControlData::PVControl, 1> pvControls() const = 0;
+  virtual ndarray<const ControlData::PVControl, 1> pvControls() const = 0;
   /** PVMonitor configuration objects */
-  virtual ndarray<ControlData::PVMonitor, 1> pvMonitors() const = 0;
+  virtual ndarray<const ControlData::PVMonitor, 1> pvMonitors() const = 0;
   /** PVLabel configuration objects */
-  virtual ndarray<ControlData::PVLabel, 1> pvLabels() const = 0;
+  virtual ndarray<const ControlData::PVLabel, 1> pvLabels() const = 0;
 };
 } // namespace ControlData
 } // namespace Psana

@@ -344,8 +344,8 @@ public:
   virtual ~ConfigV1();
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::PulseConfig, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::PulseConfig, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMap, 1> output_maps() const = 0;
 };
 
 /** @class ConfigV2
@@ -380,8 +380,8 @@ public:
   virtual uint32_t opcode() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::PulseConfig, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::PulseConfig, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMap, 1> output_maps() const = 0;
   virtual EvrData::ConfigV2::BeamCode beam() const = 0;
   virtual EvrData::ConfigV2::RateCode rate() const = 0;
 };
@@ -400,9 +400,9 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::EventCodeV3, 1> eventcodes() const = 0;
-  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::EventCodeV3, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMap, 1> output_maps() const = 0;
 };
 
 /** @class ConfigV4
@@ -419,9 +419,9 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::EventCodeV4, 1> eventcodes() const = 0;
-  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::EventCodeV4, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMap, 1> output_maps() const = 0;
 };
 
 /** @class SequencerEntry
@@ -469,7 +469,7 @@ public:
   virtual EvrData::SequencerConfigV1::Source beam_source() const = 0;
   virtual uint32_t length() const = 0;
   virtual uint32_t cycles() const = 0;
-  virtual ndarray<EvrData::SequencerEntry, 1> entries() const = 0;
+  virtual ndarray<const EvrData::SequencerEntry, 1> entries() const = 0;
 };
 
 /** @class ConfigV5
@@ -488,9 +488,9 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::EventCodeV5, 1> eventcodes() const = 0;
-  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMap, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::EventCodeV5, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMap, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
 };
 
@@ -510,9 +510,9 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::EventCodeV5, 1> eventcodes() const = 0;
-  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMapV2, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::EventCodeV5, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMapV2, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
 };
 
@@ -532,9 +532,9 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual ndarray<EvrData::EventCodeV6, 1> eventcodes() const = 0;
-  virtual ndarray<EvrData::PulseConfigV3, 1> pulses() const = 0;
-  virtual ndarray<EvrData::OutputMapV2, 1> output_maps() const = 0;
+  virtual ndarray<const EvrData::EventCodeV6, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMapV2, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
 };
 
@@ -575,7 +575,7 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~DataV3();
   virtual uint32_t numFifoEvents() const = 0;
-  virtual ndarray<EvrData::FIFOEvent, 1> fifoEvents() const = 0;
+  virtual ndarray<const EvrData::FIFOEvent, 1> fifoEvents() const = 0;
 };
 
 /** @class IOChannel
@@ -599,7 +599,7 @@ public:
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
-  ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(const_cast<Pds::DetInfo*>(&_info[0]), MaxInfos); }
+  ndarray<const Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
   static uint32_t _sizeof()  { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
   std::vector<int> name_shape() const;
@@ -621,7 +621,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~IOConfigV1();
   virtual uint16_t nchannels() const = 0;
-  virtual ndarray<EvrData::IOChannel, 1> channels() const = 0;
+  virtual ndarray<const EvrData::IOChannel, 1> channels() const = 0;
   virtual EvrData::OutputMap::Conn conn() const = 0;
 };
 } // namespace EvrData

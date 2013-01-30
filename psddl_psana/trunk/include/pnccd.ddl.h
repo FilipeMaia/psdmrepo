@@ -83,8 +83,8 @@ public:
   /** Least significant part of timestamp */
   virtual uint32_t timeStampLo() const = 0;
   /** Frame data */
-  virtual ndarray<uint16_t, 1> _data() const = 0;
-  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual ndarray<const uint16_t, 1> _data() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
 };
 
 /** @class FramesV1
@@ -132,7 +132,7 @@ public:
   /** Least significant part of timestamp */
   virtual uint32_t timeStampLo() const = 0;
   /** Full frame data, image size is 1024x1024. */
-  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
 };
 } // namespace PNCCD
 } // namespace Psana

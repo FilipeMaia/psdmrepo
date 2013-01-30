@@ -21,8 +21,8 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
   virtual float exposureTime() const = 0;
-  virtual ndarray<double, 1> waveLenCalib() const = 0;
-  virtual ndarray<double, 1> nonlinCorrect() const = 0;
+  virtual ndarray<const double, 1> waveLenCalib() const = 0;
+  virtual ndarray<const double, 1> nonlinCorrect() const = 0;
   virtual double strayLightConstant() const = 0;
 };
 
@@ -66,7 +66,7 @@ public:
   enum { iNumPixels = 3840 };
   enum { iActivePixelIndex = 22 };
   virtual ~DataV1();
-  virtual ndarray<uint16_t, 1> data() const = 0;
+  virtual ndarray<const uint16_t, 1> data() const = 0;
   virtual uint64_t frameCounter() const = 0;
   virtual uint64_t numDelayedFrames() const = 0;
   virtual uint64_t numDiscardFrames() const = 0;

@@ -105,7 +105,7 @@ public:
   enum { NEncoders = 3 /**< Number of encoders. */ };
   virtual ~DataV2();
   virtual uint32_t timestamp() const = 0;
-  virtual ndarray<uint32_t, 1> encoder_count() const = 0;
+  virtual ndarray<const uint32_t, 1> encoder_count() const = 0;
   /** Lower 24 bits of encoder_count as signed integer value. */
   virtual int32_t value(uint32_t i) const = 0;
 };

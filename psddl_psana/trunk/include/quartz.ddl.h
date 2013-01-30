@@ -59,8 +59,8 @@ public:
   /** correct defective pixels internally */
   virtual uint8_t defect_pixel_correction_enabled() const = 0;
   virtual uint32_t number_of_defect_pixels() const = 0;
-  virtual ndarray<uint16_t, 1> output_lookup_table() const = 0;
-  virtual ndarray<Camera::FrameCoord, 1> defect_pixel_coordinates() const = 0;
+  virtual ndarray<const uint16_t, 1> output_lookup_table() const = 0;
+  virtual ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates() const = 0;
   /** offset/pedestal value in pixel counts */
   virtual uint16_t output_offset() const = 0;
   /** bit-depth of pixel counts */

@@ -67,7 +67,7 @@ namespace CsPad {
 class CsPadDigitalPotsCfg {
 public:
   virtual ~CsPadDigitalPotsCfg();
-  virtual ndarray<uint8_t, 1> pots() const = 0;
+  virtual ndarray<const uint8_t, 1> pots() const = 0;
 };
 
 /** @class CsPadReadOnlyCfg
@@ -106,7 +106,7 @@ class CsPadGainMapCfg {
 public:
   virtual ~CsPadGainMapCfg();
   /** Array with the gain map for single ASIC. */
-  virtual ndarray<uint16_t, 2> gainMap() const = 0;
+  virtual ndarray<const uint16_t, 2> gainMap() const = 0;
 };
 
 /** @class ConfigV1QuadReg
@@ -118,8 +118,8 @@ public:
 class ConfigV1QuadReg {
 public:
   virtual ~ConfigV1QuadReg();
-  virtual ndarray<uint32_t, 1> shiftSelect() const = 0;
-  virtual ndarray<uint32_t, 1> edgeSelect() const = 0;
+  virtual ndarray<const uint32_t, 1> shiftSelect() const = 0;
+  virtual ndarray<const uint32_t, 1> edgeSelect() const = 0;
   virtual uint32_t readClkSet() const = 0;
   virtual uint32_t readClkHold() const = 0;
   virtual uint32_t dataMode() const = 0;
@@ -146,8 +146,8 @@ public:
 class ConfigV2QuadReg {
 public:
   virtual ~ConfigV2QuadReg();
-  virtual ndarray<uint32_t, 1> shiftSelect() const = 0;
-  virtual ndarray<uint32_t, 1> edgeSelect() const = 0;
+  virtual ndarray<const uint32_t, 1> shiftSelect() const = 0;
+  virtual ndarray<const uint32_t, 1> edgeSelect() const = 0;
   virtual uint32_t readClkSet() const = 0;
   virtual uint32_t readClkHold() const = 0;
   virtual uint32_t dataMode() const = 0;
@@ -341,9 +341,9 @@ public:
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
   virtual uint32_t fiducials() const = 0;
-  virtual ndarray<uint16_t, 1> sb_temp() const = 0;
+  virtual ndarray<const uint16_t, 1> sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
-  virtual ndarray<int16_t, 3> data() const = 0;
+  virtual ndarray<const int16_t, 3> data() const = 0;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
                 total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const = 0;
@@ -399,9 +399,9 @@ public:
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
   virtual uint32_t fiducials() const = 0;
-  virtual ndarray<uint16_t, 1> sb_temp() const = 0;
+  virtual ndarray<const uint16_t, 1> sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
-  virtual ndarray<int16_t, 3> data() const = 0;
+  virtual ndarray<const int16_t, 3> data() const = 0;
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
                 total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const = 0;

@@ -33,8 +33,8 @@ public:
     X4,
   };
   virtual ~ConfigV1();
-  virtual ndarray<uint32_t, 1> counting_mode() const = 0;
-  virtual ndarray<uint32_t, 1> quadrature_mode() const = 0;
+  virtual ndarray<const uint32_t, 1> counting_mode() const = 0;
+  virtual ndarray<const uint32_t, 1> quadrature_mode() const = 0;
 };
 
 /** @class DataV1

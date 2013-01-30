@@ -606,7 +606,7 @@ class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlShort();
   virtual const Epics::dbr_ctrl_short& dbr() const = 0;
-  virtual ndarray<int16_t, 1> data() const = 0;
+  virtual ndarray<const int16_t, 1> data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
 };
 
@@ -620,7 +620,7 @@ class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlFloat();
   virtual const Epics::dbr_ctrl_float& dbr() const = 0;
-  virtual ndarray<float, 1> data() const = 0;
+  virtual ndarray<const float, 1> data() const = 0;
   virtual float value(uint32_t i) const = 0;
 };
 
@@ -634,7 +634,7 @@ class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlEnum();
   virtual const Epics::dbr_ctrl_enum& dbr() const = 0;
-  virtual ndarray<uint16_t, 1> data() const = 0;
+  virtual ndarray<const uint16_t, 1> data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
 };
 
@@ -648,7 +648,7 @@ class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlChar();
   virtual const Epics::dbr_ctrl_char& dbr() const = 0;
-  virtual ndarray<uint8_t, 1> data() const = 0;
+  virtual ndarray<const uint8_t, 1> data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
 };
 
@@ -662,7 +662,7 @@ class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlLong();
   virtual const Epics::dbr_ctrl_long& dbr() const = 0;
-  virtual ndarray<int32_t, 1> data() const = 0;
+  virtual ndarray<const int32_t, 1> data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
 };
 
@@ -676,7 +676,7 @@ class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
   virtual ~EpicsPvCtrlDouble();
   virtual const Epics::dbr_ctrl_double& dbr() const = 0;
-  virtual ndarray<double, 1> data() const = 0;
+  virtual ndarray<const double, 1> data() const = 0;
   virtual double value(uint32_t i) const = 0;
 };
 
@@ -706,7 +706,7 @@ class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeShort();
   virtual const Epics::dbr_time_short& dbr() const = 0;
-  virtual ndarray<int16_t, 1> data() const = 0;
+  virtual ndarray<const int16_t, 1> data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
 };
 
@@ -720,7 +720,7 @@ class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeFloat();
   virtual const Epics::dbr_time_float& dbr() const = 0;
-  virtual ndarray<float, 1> data() const = 0;
+  virtual ndarray<const float, 1> data() const = 0;
   virtual float value(uint32_t i) const = 0;
 };
 
@@ -734,7 +734,7 @@ class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeEnum();
   virtual const Epics::dbr_time_enum& dbr() const = 0;
-  virtual ndarray<uint16_t, 1> data() const = 0;
+  virtual ndarray<const uint16_t, 1> data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
 };
 
@@ -748,7 +748,7 @@ class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeChar();
   virtual const Epics::dbr_time_char& dbr() const = 0;
-  virtual ndarray<uint8_t, 1> data() const = 0;
+  virtual ndarray<const uint8_t, 1> data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
 };
 
@@ -762,7 +762,7 @@ class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeLong();
   virtual const Epics::dbr_time_long& dbr() const = 0;
-  virtual ndarray<int32_t, 1> data() const = 0;
+  virtual ndarray<const int32_t, 1> data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
 };
 
@@ -776,7 +776,7 @@ class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeDouble();
   virtual const Epics::dbr_time_double& dbr() const = 0;
-  virtual ndarray<double, 1> data() const = 0;
+  virtual ndarray<const double, 1> data() const = 0;
   virtual double value(uint32_t i) const = 0;
 };
 

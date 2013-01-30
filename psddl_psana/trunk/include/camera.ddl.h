@@ -84,7 +84,7 @@ public:
   /** Count of masked pixels to exclude from processing. */
   virtual uint32_t number_of_masked_pixels() const = 0;
   /** Location of masked pixel coordinates. */
-  virtual ndarray<Camera::FrameCoord, 1> masked_pixel_coordinates() const = 0;
+  virtual ndarray<const Camera::FrameCoord, 1> masked_pixel_coordinates() const = 0;
 };
 
 /** @class FrameV1
@@ -108,13 +108,13 @@ public:
   virtual uint32_t offset() const = 0;
   /** Pixel data as array of bytes, method is for internal use only, use data8() or 
             data16() for access to the data. */
-  virtual ndarray<uint8_t, 1> _int_pixel_data() const = 0;
+  virtual ndarray<const uint8_t, 1> _int_pixel_data() const = 0;
   /** Returns pixel data array when stored data type is 8-bit (depth() is less than 9).
                 If data type is 16-bit then empty array is returned, use data16() method in this case. */
-  virtual ndarray<uint8_t, 2> data8() const = 0;
+  virtual ndarray<const uint8_t, 2> data8() const = 0;
   /** Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).
                 If data type is 8-bit then empty array is returned, use data8() method in this case. */
-  virtual ndarray<uint16_t, 2> data16() const = 0;
+  virtual ndarray<const uint16_t, 2> data16() const = 0;
 };
 
 /** @class TwoDGaussianV1

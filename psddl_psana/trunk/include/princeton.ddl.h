@@ -160,7 +160,7 @@ public:
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
-  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
 };
 
 /** @class InfoV1

@@ -70,8 +70,8 @@ public:
   virtual uint8_t ccdEnable() const = 0;
   virtual uint8_t focusMode() const = 0;
   virtual uint32_t exposureTime() const = 0;
-  virtual ndarray<float, 1> dacVoltages() const = 0;
-  virtual ndarray<uint16_t, 1> waveforms() const = 0;
+  virtual ndarray<const float, 1> dacVoltages() const = 0;
+  virtual ndarray<const uint16_t, 1> waveforms() const = 0;
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
   virtual uint32_t trimmedWidth() const = 0;

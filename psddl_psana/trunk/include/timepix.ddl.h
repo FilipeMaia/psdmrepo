@@ -176,7 +176,7 @@ public:
   virtual int32_t driverVersion() const = 0;
   virtual uint32_t firmwareVersion() const = 0;
   virtual uint32_t pixelThreshSize() const = 0;
-  virtual ndarray<uint8_t, 1> pixelThresh() const = 0;
+  virtual ndarray<const uint8_t, 1> pixelThresh() const = 0;
   virtual const char* chip0Name() const = 0;
   virtual const char* chip1Name() const = 0;
   virtual const char* chip2Name() const = 0;
@@ -274,7 +274,7 @@ public:
   virtual int32_t driverVersion() const = 0;
   virtual uint32_t firmwareVersion() const = 0;
   virtual uint32_t pixelThreshSize() const = 0;
-  virtual ndarray<uint8_t, 1> pixelThresh() const = 0;
+  virtual ndarray<const uint8_t, 1> pixelThresh() const = 0;
   virtual const char* chip0Name() const = 0;
   virtual const char* chip1Name() const = 0;
   virtual const char* chip2Name() const = 0;
@@ -305,7 +305,7 @@ public:
   virtual uint32_t timestamp() const = 0;
   virtual uint16_t frameCounter() const = 0;
   virtual uint16_t lostRows() const = 0;
-  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
   virtual uint32_t depth() const = 0;
@@ -335,7 +335,7 @@ public:
   virtual uint16_t frameCounter() const = 0;
   /** lost row count */
   virtual uint16_t lostRows() const = 0;
-  virtual ndarray<uint16_t, 2> data() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
   virtual uint32_t depth() const = 0;
   virtual uint32_t depth_bytes() const = 0;
 };

@@ -67,8 +67,8 @@ public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~DataV1();
-  virtual ndarray<uint16_t, 1> timestamp() const = 0;
-  virtual ndarray<uint16_t, 1> channelValue() const = 0;
+  virtual ndarray<const uint16_t, 1> timestamp() const = 0;
+  virtual ndarray<const uint16_t, 1> channelValue() const = 0;
 };
 } // namespace Gsc16ai
 } // namespace Psana
