@@ -27,8 +27,8 @@ associate_PyArrayType(uint32_t, PyArray_UINT);
 associate_PyArrayType(float, PyArray_FLOAT);
 associate_PyArrayType(double, PyArray_DOUBLE);
 
-#define ND_CONVERT(value, ctype, ndim) const ndarray<ctype, ndim>& a(value); return psddl_python::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
-#define VEC_CONVERT(value, ctype) const ndarray<ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
+#define ND_CONVERT(value, ctype, ndim) const ndarray<const ctype, ndim>& a(value); return psddl_python::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
+#define VEC_CONVERT(value, ctype) const ndarray<const ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
 #define ADD_ENV_OBJECT_STORE_GETTER(x) EnvObjectStoreGetter::addGetter(new x ## _Getter())
 #define ADD_EVENT_GETTER(x) EventGetter::addGetter(new x ## _Getter())
 
