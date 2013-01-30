@@ -180,7 +180,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
 
         //const int16_t* data = el.data(); // depricated stuff
         int quad                           = el.quad() ;
-        const ndarray<int16_t,3>& data_nda = el.data();
+        const ndarray<const int16_t,3>& data_nda = el.data();
         const int16_t* data = &data_nda[0][0][0];
 
         CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
@@ -245,7 +245,7 @@ CSPadImageProducer::cspad_image_init()
 
 void
 CSPadImageProducer::cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
-//CSPadImageProducer::cspad_image_fill(const ndarray<int16_t,3>& data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+//CSPadImageProducer::cspad_image_fill(const ndarray<const int16_t,3>& data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();

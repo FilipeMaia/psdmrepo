@@ -109,7 +109,7 @@ protected:
   void processEvent(Event& evt, Env& env);
 
   //void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void cspad_image_fill(const ndarray<int16_t,3>& data);
+  void cspad_image_fill(const ndarray<const int16_t,3>& data);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt);
   void printTimeStamp(Event& evt);

@@ -227,7 +227,7 @@ CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
 
     for (unsigned i=0; i<m_n2x1; i++) { m_common_mode[i] = elem1->common_mode(i); }
 
-    const ndarray<int16_t, 3>& data_nda = elem1->data();
+    const ndarray<const int16_t, 3>& data_nda = elem1->data();
     //const int16_t* data = &data_nda[0][0][0];
 
     this -> cspad_image_fill (data_nda);
@@ -237,7 +237,7 @@ CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
 
 //--------------------
 void
-CSPad2x2ImageProducer::cspad_image_fill(const ndarray<int16_t,3>& data)
+CSPad2x2ImageProducer::cspad_image_fill(const ndarray<const int16_t,3>& data)
 {
   std::fill_n(&m_arr_cspad2x2_image[0][0], int(NX_CSPAD2X2*NY_CSPAD2X2), double(0));
 

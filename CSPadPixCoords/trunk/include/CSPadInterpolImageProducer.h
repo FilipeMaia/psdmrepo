@@ -132,7 +132,7 @@ protected:
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt);
   //void cspad_image_interpolated_fill (int16_t* data[], QuadParameters* quadpars[], bool quadIsAvailable[]);
-  void cspad_image_interpolated_fill (ndarray<int16_t, 3> data[], QuadParameters* quadpars[], bool quadIsAvailable[]);
+  void cspad_image_interpolated_fill (ndarray<const int16_t, 3> data[], QuadParameters* quadpars[], bool quadIsAvailable[]);
 
 private:
 

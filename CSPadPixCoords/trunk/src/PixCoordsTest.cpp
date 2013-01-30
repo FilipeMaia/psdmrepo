@@ -163,8 +163,8 @@ PixCoordsTest::event(Event& evt, Env& env)
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
         int quad                           = el.quad() ;
-        const ndarray<int16_t,3>& data_nda = el.data();
-        const int16_t* data = &data_nda[0][0][0];
+        const ndarray<const int16_t,3>& data_nda = el.data();
+        const int16_t* data = data_nda.data();
 
         CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
