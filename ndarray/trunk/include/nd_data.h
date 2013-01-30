@@ -45,20 +45,58 @@ namespace ndarray_details {
  *  @author Andy Salnikov
  */
 
-template <typename ElemType, unsigned NDimT>
+template <typename ElemType, unsigned NDim>
 struct nd_data  {
 
-  enum { NDim = NDimT };
+  typedef unsigned shape_t;
+  typedef int stride_t;
 
-  // Default constructor
-  nd_data () {}
+  /// Default constructor
+  nd_data()
+  {
+    std::fill_n(m_shape, NDim, 0U);
+    std::fill_n(m_strides, NDim, 0U);
+  }
 
-  // Destructor
-  ~nd_data () {}
+  /**
+   *  "Copy" constructor from compatible type
+   */
+  template <typename T>
+  nd_data(const nd_data<T, NDim>& other)
+    : m_data(other.m_data)
+  {
+    std::copy(other.m_shape, other.m_shape+NDim, m_shape);
+    std::copy(other.m_strides, other.m_strides+NDim, m_strides);
+  }
+
+  /**
+   *  Assignment from same type
+   */
+  nd_data& operator=(const nd_data& other)
+  {
+    if (this != &other) {
+      m_data = other.m_data;
+      std::copy(other.m_shape, other.m_shape+NDim, m_shape);
+      std::copy(other.m_strides, other.m_strides+NDim, m_strides);
+    }
+    return *this;
+  }
+
+  /**
+   *  Assignment from compatible type
+   */
+  template <typename T>
+  nd_data& operator=(const nd_data<T, NDim>& other)
+  {
+    m_data = other.m_data;
+    std::copy(other.m_shape, other.m_shape+NDim, m_shape);
+    std::copy(other.m_strides, other.m_strides+NDim, m_strides);
+    return *this;
+  }
 
   boost::shared_ptr<ElemType> m_data;          ///< Pointer to the data array
-  unsigned m_shape[NDim];    ///< Array dimensions
-  unsigned m_strides[NDim];  ///< Array strides
+  shape_t m_shape[NDim];    ///< Array dimensions
+  stride_t m_strides[NDim];  ///< Array strides
 };
 
 } // namespace ndarray_details

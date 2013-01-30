@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-00
+2013-01-30 Andy Salnikov
+- imlemented conversion constructor from ndarray<T, N> to ndarray<const T, N>
+- implemented formatting of ndarrays to ostream a la numpy array
+- strides are made signed to support weird memory ordering
+
 Tag: V01-00-01
 2013-01-29 Andy Salnikov
 - fix for test and couple of small bugs

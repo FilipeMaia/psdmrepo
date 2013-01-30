@@ -49,9 +49,9 @@ BOOST_AUTO_TEST_CASE( test_notown )
   BOOST_CHECK_EQUAL ( arr.shape()[1], 3U ) ;
   BOOST_CHECK_EQUAL ( arr.shape()[2], 4U ) ;
 
-  BOOST_CHECK_EQUAL ( arr.strides()[0], 12U ) ;
-  BOOST_CHECK_EQUAL ( arr.strides()[1], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr.strides()[2], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr.strides()[2], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr[1][2][3], gdata[23] ) ;
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( test_strides_def )
   // default strides
   unsigned dims[3] = {2,3,4};
   ndarray<int,3> arr(gdata, dims);
-  unsigned strides[3] = {12,4,1};
+  int strides[3] = {12,4,1};
   arr.strides(strides);
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( test_strides )
 {
   // Fortran-like memory layout
   unsigned dims[3] = {4,3,2};
-  ndarray<int,3> arr(gdata, dims, ndarray<int,3>::Fortran);
+  ndarray<int,3> arr(gdata, dims, ndns::Fortran);
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[1] ) ;
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( test_strides )
   BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[12] ) ;
   BOOST_CHECK_EQUAL ( arr[3][2][1], gdata[23] ) ;
 
-  unsigned strides[3] = {1, 4, 12};
+  int strides[3] = {1, 4, 12};
   arr.strides(strides);
 
   BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
@@ -110,17 +110,17 @@ BOOST_AUTO_TEST_CASE( test_swap )
   BOOST_CHECK_EQUAL ( arr0.shape()[1], 0U ) ;
   BOOST_CHECK_EQUAL ( arr0.shape()[2], 0U ) ;
 
-  BOOST_CHECK_EQUAL ( arr0.strides()[0], 0U ) ;
-  BOOST_CHECK_EQUAL ( arr0.strides()[1], 0U ) ;
-  BOOST_CHECK_EQUAL ( arr0.strides()[2], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[0], 0 ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[1], 0 ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[2], 0 ) ;
 
   BOOST_CHECK_EQUAL ( arr1.shape()[0], 2U ) ;
   BOOST_CHECK_EQUAL ( arr1.shape()[1], 3U ) ;
   BOOST_CHECK_EQUAL ( arr1.shape()[2], 4U ) ;
 
-  BOOST_CHECK_EQUAL ( arr1.strides()[0], 12U ) ;
-  BOOST_CHECK_EQUAL ( arr1.strides()[1], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr1.strides()[2], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[2], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr1[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr1[1][2][3], gdata[23] ) ;
@@ -131,17 +131,17 @@ BOOST_AUTO_TEST_CASE( test_swap )
   BOOST_CHECK_EQUAL ( arr1.shape()[1], 0U ) ;
   BOOST_CHECK_EQUAL ( arr1.shape()[2], 0U ) ;
 
-  BOOST_CHECK_EQUAL ( arr1.strides()[0], 0U ) ;
-  BOOST_CHECK_EQUAL ( arr1.strides()[1], 0U ) ;
-  BOOST_CHECK_EQUAL ( arr1.strides()[2], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[0], 0 ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[1], 0 ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[2], 0 ) ;
 
   BOOST_CHECK_EQUAL ( arr0.shape()[0], 2U ) ;
   BOOST_CHECK_EQUAL ( arr0.shape()[1], 3U ) ;
   BOOST_CHECK_EQUAL ( arr0.shape()[2], 4U ) ;
 
-  BOOST_CHECK_EQUAL ( arr0.strides()[0], 12U ) ;
-  BOOST_CHECK_EQUAL ( arr0.strides()[1], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr0.strides()[2], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[2], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr0[0][0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr0[1][2][3], gdata[23] ) ;
@@ -219,8 +219,8 @@ BOOST_AUTO_TEST_CASE( test_sub )
 
   BOOST_CHECK_EQUAL ( arr2.shape()[0], 3U ) ;
   BOOST_CHECK_EQUAL ( arr2.shape()[1], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr2.strides()[0], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr2.strides()[1], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr2[0][0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr2[0][1], gdata[1] ) ;
@@ -231,8 +231,8 @@ BOOST_AUTO_TEST_CASE( test_sub )
 
   BOOST_CHECK_EQUAL ( arr2.shape()[0], 3U ) ;
   BOOST_CHECK_EQUAL ( arr2.shape()[1], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr2.strides()[0], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr2.strides()[1], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr2[0][0], gdata[12+0] ) ;
   BOOST_CHECK_EQUAL ( arr2[0][1], gdata[12+1] ) ;
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE( test_sub )
   ndarray<int,1> arr3 = arr1[0][0];
 
   BOOST_CHECK_EQUAL ( arr3.shape()[0], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr3.strides()[0], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr3.strides()[0], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr3[0], gdata[0] ) ;
   BOOST_CHECK_EQUAL ( arr3[1], gdata[1] ) ;
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE( test_sub )
   arr3 = arr1[1][2];
 
   BOOST_CHECK_EQUAL ( arr3.shape()[0], 4U ) ;
-  BOOST_CHECK_EQUAL ( arr3.strides()[0], 1U ) ;
+  BOOST_CHECK_EQUAL ( arr3.strides()[0], 1 ) ;
 
   BOOST_CHECK_EQUAL ( arr3[0], gdata[20] ) ;
   BOOST_CHECK_EQUAL ( arr3[1], gdata[21] ) ;
@@ -259,3 +259,107 @@ BOOST_AUTO_TEST_CASE( test_sub )
 
 }
 
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_copy )
+{
+  unsigned dims[3] = {2,3,4};
+  ndarray<int,3> arr1(gdata, dims);
+
+  ndarray<int,3> arr2(arr1);
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+  arr2 = arr1;
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_copy2 )
+{
+  unsigned dims[3] = {2,3,4};
+  ndarray<const int,3> arr1(gdata, dims);
+
+  ndarray<const int,3> arr2(arr1);
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+  arr2 = arr1;
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_const )
+{
+  unsigned dims[3] = {2,3,4};
+  ndarray<int,3> arr1(gdata, dims);
+
+  ndarray<const int,3> arr2(arr1);
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+  arr2 = arr1;
+
+  BOOST_CHECK_EQUAL ( arr2.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr2.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr2.strides()[0], 12 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[1], 4 ) ;
+  BOOST_CHECK_EQUAL ( arr2.strides()[2], 1 ) ;
+
+  BOOST_CHECK_EQUAL ( arr2[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr2[1][2][3], gdata[23] ) ;
+
+}

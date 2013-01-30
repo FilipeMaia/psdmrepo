@@ -47,6 +47,8 @@ void f1()
   unsigned dims[3] = {2,3,4};
   ndarray<int,3> arr(data, dims);
 
+  cout << arr;
+
   for (unsigned i = 0; i != dims[0]; ++ i) {
     for (unsigned j = 0; j != dims[1]; ++ j) {
       for (unsigned k = 0; k != dims[2]; ++ k) {

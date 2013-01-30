@@ -21,7 +21,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "ndarray/nd_elem_access.h"
+#include "nd_elem_access.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,6 +34,53 @@
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
+
+/// @addtogroup ndarray
+
+/**
+ *  @ingroup ndarray
+ */
+namespace ndns {
+
+  /**
+   *   Enum defines assumed order of the element in memory. Values are used
+   *   as parameters for constructors and reshape() method. By default methods
+   *   assume C-style memory ordering where last index changes faster. If
+   *   in-memory data has Fortran layout (first index changes faster) than
+   *   one needs to provide Fortran as the last argument to the above methods.
+   *   It is also possible to change strides to any other memory layout
+   *   by using strides() method.
+   */
+  enum Order { C, Fortran };
+
+}
+
+/// @addtogroup ndarray_details
+
+/**
+ *  @ingroup ndarray_details
+ */
+namespace ndarray_details {
+
+  // special destroyer for non-owned data
+  template <typename ElemType>
+  struct _no_delete {
+    void operator()(ElemType*) const {}
+  };
+
+  // special destroyer for owned array data
+  template <typename ElemType>
+  struct _array_delete {
+    void operator()(ElemType* ptr) const { delete [] ptr; }
+  };
+
+  // some template magic to drop const from type decl
+  template <typename T>
+  struct unconst { typedef T type; };
+  template <typename T>
+  struct unconst<const T> { typedef T type; };
+
+}
 
 /// @addtogroup ndarray
 
@@ -89,7 +136,7 @@
  *  with newly allocated memory for array data. Ndarray transparently supports
  *  memory management of the data area, in most cases one should not care about
  *  how memory is allocated or deallocated. There are few different ways to
- *  construct ndarray instances which determines how ndarray manages its corresponding
+ *  construct ndarray instances which determine how ndarray manages its corresponding
  *  data:
  *
  *  1. from raw pointers:
@@ -212,25 +259,12 @@ public:
   typedef element* iterator;
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef size_t size_type;
-
-  /**
-   *   Enum defines assumed order of the element in memory. Values are used
-   *   as parameters for constructors and reshape() method. By default methods
-   *   assume C-style memory ordering where last index changes faster. If
-   *   in-memory data has Fortran layout (first index changes faster) than
-   *   one needs to provide Fortran as the last argument to the above methods.
-   *   It is also possible to change strides to any other memory layout
-   *   by using strides() method.
-   */
-  enum Order { C, Fortran };
+  typedef unsigned shape_t;
+  typedef int stride_t;
+  typedef ndarray<typename ndarray_details::unconst<ElemType>::type, NDim> nonconst_ndarray;
 
   /// Default constructor makes an empty array
-  ndarray ()
-  {
-    std::fill_n(Super::m_shape, NDim, 0U);
-    std::fill_n(Super::m_strides, NDim, 0U);
-  }
-
+  ndarray () {}
 
   /**
    *  @brief Constructor that takes pointer to data and shape.
@@ -243,11 +277,11 @@ public:
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
    *  @param[in] order  Memory order of the elements.
    */
-  ndarray (ElemType* data, const unsigned* shape, Order order = C)
+  ndarray (ElemType* data, const shape_t* shape, ndns::Order order = ndns::C)
   {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
-    Super::m_data = boost::shared_ptr<ElemType>(data, _no_delete());
+    Super::m_data = boost::shared_ptr<ElemType>(data, ndarray_details::_no_delete<ElemType>());
   }
 
   /**
@@ -261,7 +295,7 @@ public:
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
    *  @param[in] order  Memory order of the elements.
    */
-  ndarray (const boost::shared_ptr<ElemType> data, const unsigned* shape, Order order = C)
+  ndarray (const boost::shared_ptr<ElemType>& data, const shape_t* shape, ndns::Order order = ndns::C)
   {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
@@ -279,25 +313,20 @@ public:
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
    *  @param[in] order  Memory order of the elements.
    */
-  ndarray (const unsigned* shape, Order order = C)
+  ndarray (const shape_t* shape, ndns::Order order = ndns::C)
   {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
-    Super::m_data = boost::shared_ptr<ElemType>(new ElemType[size()], _array_delete());
+    Super::m_data = boost::shared_ptr<ElemType>(new ElemType[size()], ndarray_details::_array_delete<ElemType>());
   }
 
   /**
-   *  @brief Copy constructor from other ndarray.
-   */
-  ndarray (const ndarray& other)
-  {
-    Super::m_data = other.Super::m_data;
-    std::copy(other.Super::m_shape, other.Super::m_shape+NDim, Super::m_shape);
-    std::copy(other.Super::m_strides, other.Super::m_strides+NDim, Super::m_strides);
-  }
-
-  /**
-   *  @brief Constructor from other nd_elem_access_pxy.
+   *  @brief Constructor from nd_elem_access_pxy instance.
+   *
+   *  This constructor is used for slicing of the original ndarray, proxy
+   *  is returned from operator[] and you can make ndarray which is a slice
+   *  of the original array from that proxy object. Both original array and
+   *  this new instance will share the data.
    */
   ndarray (const ndarray_details::nd_elem_access_pxy<ElemType, NDim>& pxy)
   {
@@ -306,20 +335,35 @@ public:
     std::copy(pxy.m_strides, pxy.m_strides+NDim, Super::m_strides);
   }
 
-  // Destructor
-  ~ndarray () {}
-
-  /// Assignment operator
-  ndarray& operator=(const ndarray& other)
+  /**
+   *  @brief Copy constructor from other ndarray.
+   *
+   *  If the template argument (ElemType) is a const type (like <tt>const int</tt> then
+   *  this constructor makes const ndarray from non-const, so for example one can write
+   *  code which converts non-const array to const:
+   *
+   *  @code
+   *  ndarray<int,3> arr1 = ...;
+   *  ndarray<const int,3> arr2(arr1);
+   *  @endcode
+   *
+   *  If template argument (ElemType) is non-const type then this is a regular copy
+   *  constructor. It does not actually copy array data, in both cases data is shared
+   *  between original array and new instance.
+   */
+  ndarray(const nonconst_ndarray& other)
+    : Super(other)
   {
-    if (this == &other) return *this;
-    Super::m_data = other.Super::m_data;
-    std::copy(other.Super::m_shape, other.Super::m_shape+NDim, Super::m_shape);
-    std::copy(other.Super::m_strides, other.Super::m_strides+NDim, Super::m_strides);
+  }
+
+  /// Assignment operator, data is never copied.
+  ndarray& operator=(const nonconst_ndarray& other)
+  {
+    Super::operator=(other);
     return *this;
   }
 
-  /// Assignment from nd_elem_access_pxy
+  /// Assignment from nd_elem_access_pxy.
   ndarray& operator=(const ndarray_details::nd_elem_access_pxy<ElemType, NDim>& pxy)
   {
     Super::m_data = pxy.m_data;
@@ -336,7 +380,7 @@ public:
    *  dimensions. Alternative way to access elements in the array is to use regular
    *  operator[] inherited from nd_elem_access base class.
    */
-  element& at(unsigned index[]) const {
+  element& at(shape_t index[]) const {
     element* data = Super::m_data.get();
     for (unsigned i = 0; i != NDim; ++ i) {
       data += index[i]*Super::m_strides[i];
@@ -354,14 +398,14 @@ public:
    *
    *  Returns an array (or pointer to its first element) of the ndarray dimensions.
    */
-  const unsigned* shape() const { return Super::m_shape; }
+  const shape_t* shape() const { return Super::m_shape; }
 
   /**
    *  @brief Returns array strides.
    *
    *  Returns an array (or pointer to its first element) of the ndarray strides.
    */
-  const unsigned* strides() const { return Super::m_strides; }
+  const stride_t* strides() const { return Super::m_strides; }
 
   /**
    *  @brief Changes strides.
@@ -371,7 +415,7 @@ public:
    *
    *  @param[in] strides  Pointer to new strides array, size of array is NDim, array data will be copied.
    */
-  void strides(const unsigned* strides) {
+  void strides(const stride_t* strides) {
     std::copy(strides, strides+NDim, Super::m_strides);
   }
 
@@ -386,7 +430,7 @@ public:
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
    *  @param[in] order  Memory order of the elements.
    */
-  void reshape(const unsigned* shape, char order='C') const {
+  void reshape(const shape_t* shape, char order='C') const {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
   }
@@ -417,11 +461,23 @@ public:
     std::swap_ranges(Super::m_strides, Super::m_strides+NDim, other.Super::m_strides);
   }
 
+  /**
+   *  Make a deep copy of the array data, returns modifiable array.
+   *
+   *  Note that this does not work with disjoint arrays, use on your own risk.
+   */
+  nonconst_ndarray copy() const {
+    nonconst_ndarray res(shape());
+    res.strides(strides());
+    std::copy(begin(), end(), res.begin());
+    return res;
+  }
+
 protected:
 
   // calculate strides from shape array given the assumed ordering
-  void _setStrides(Order order) {
-    if (order == C) {
+  void _setStrides(ndns::Order order) {
+    if (order == ndns::C) {
       Super::m_strides[NDim-1] = 1;
       for (int i = int(NDim)-2; i >= 0; -- i) Super::m_strides[i] = Super::m_strides[i+1] * Super::m_shape[i+1];
     } else {
@@ -431,16 +487,6 @@ protected:
   }
 
 private:
-
-  // special destroyer for non-owned data
-  struct _no_delete {
-    void operator()(ElemType*) const {}
-  };
-
-  // special destroyer for owned array data
-  struct _array_delete {
-    void operator()(ElemType* ptr) const { delete [] ptr; }
-  };
 
 };
 
@@ -587,5 +633,7 @@ make_ndarray(const boost::shared_ptr<ElemType>& data, unsigned dim0, unsigned di
   unsigned shape[] = {dim0, dim1, dim2, dim3};
   return ndarray<ElemType, 4>(data, shape);
 }
+
+#include "nd_format.h"
 
 #endif // NDARRAY_NDARRAY_H

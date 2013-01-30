@@ -51,9 +51,12 @@ template <typename ElemType, unsigned NDim>
 class nd_elem_access_pxy  {
 public:
 
+  typedef unsigned shape_t;
+  typedef int stride_t;
+
   // Default constructor
   nd_elem_access_pxy (const boost::shared_ptr<ElemType>& data,
-                      const unsigned shape[], const unsigned strides[])
+                      const shape_t shape[], const stride_t strides[])
     : m_data(data), m_shape(shape), m_strides(strides) {}
 
   nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) const {
@@ -67,17 +70,20 @@ private:
   friend class ndarray<ElemType, NDim>;
 
   boost::shared_ptr<ElemType> m_data;
-  const unsigned* m_shape;
-  const unsigned* m_strides;
+  const shape_t* m_shape;
+  const stride_t* m_strides;
 };
 
 template <typename ElemType>
 class nd_elem_access_pxy<ElemType, 1> {
 public:
 
+  typedef unsigned shape_t;
+  typedef int stride_t;
+
   // Default constructor
   nd_elem_access_pxy (const boost::shared_ptr<ElemType>& data,
-                      const unsigned shape[], const unsigned strides[])
+                      const shape_t shape[], const stride_t strides[])
     : m_data(data), m_shape(shape), m_strides(strides) {}
 
   const ElemType& operator[](int i) const { return m_data.get()[i*m_strides[0]]; }
@@ -88,8 +94,8 @@ private:
   friend class ndarray<ElemType, 1>;
 
   boost::shared_ptr<ElemType> m_data;
-  const unsigned* m_shape;
-  const unsigned* m_strides;
+  const shape_t* m_shape;
+  const stride_t* m_strides;
 };
 
 } // namespace ndarray_details
