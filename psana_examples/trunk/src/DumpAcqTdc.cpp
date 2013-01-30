@@ -62,7 +62,7 @@ DumpAcqTdc::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Acqiris::TdcConfigV1> tdcConfig = env.configStore().get(m_src);
-  if (tdcConfig.get()) {
+  if (tdcConfig) {
 
     WithMsgLog(name(), info, str) {
       
@@ -95,7 +95,7 @@ void
 DumpAcqTdc::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Acqiris::TdcDataV1> tdcData = evt.get(m_src);
-  if (tdcData.get()) {
+  if (tdcData) {
   
     const ndarray<const Psana::Acqiris::TdcDataV1_Item, 1>& data = tdcData->data();
     for (unsigned i = 0; i < data.shape()[0]; ++ i) {
