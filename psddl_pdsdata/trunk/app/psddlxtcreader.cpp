@@ -136,7 +136,7 @@ public:
     printf("*** Processing Control config object\n");    
     
     printf( "Control PV Number = %d, Monitor PV Number = %d\n", config.npvControls(), config.npvMonitors() );
-    const ndarray<ControlData::PVControl,1>& pvControls = config.pvControls();
+    const ndarray<const ControlData::PVControl,1>& pvControls = config.pvControls();
     for(unsigned int iPvControl=0; iPvControl < pvControls.size(); iPvControl++) {
       const ControlData::PVControl& pvControlCur = pvControls[iPvControl];
       if (pvControlCur.array())
@@ -146,7 +146,7 @@ public:
       printf( "%lf\n", pvControlCur.value() );
     }
     
-    const ndarray<ControlData::PVMonitor,1>& pvMonitors = config.pvMonitors();
+    const ndarray<const ControlData::PVMonitor,1>& pvMonitors = config.pvMonitors();
     for(unsigned int iPvMonitor=0; iPvMonitor < pvMonitors.size(); iPvMonitor++) {
       const ControlData::PVMonitor& pvMonitorCur = pvMonitors[iPvMonitor];
       if (pvMonitorCur.array())
@@ -274,7 +274,7 @@ public:
     eventCount++;    
 
     printf( "# of Fifo Events: %u\n", data.numFifoEvents() );
-    const ndarray<EvrData::FIFOEvent, 1>& fifoEvents = data.fifoEvents();
+    const ndarray<const EvrData::FIFOEvent, 1>& fifoEvents = data.fifoEvents();
     for ( unsigned int iEventIndex=0; iEventIndex < fifoEvents.size(); iEventIndex++ ) {
       const EvrData::FIFOEvent& event = fifoEvents[iEventIndex];
       //printf( "[%02u] Event Code %u  TimeStampHigh 0x%x  TimeStampLow 0x%x\n",

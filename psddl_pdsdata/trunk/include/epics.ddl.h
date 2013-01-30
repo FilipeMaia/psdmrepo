@@ -618,8 +618,8 @@ private:
 class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_short& dbr() const { return _dbr; }
-  ndarray<int16_t, 1> data() const { ptrdiff_t offset=98;
-  int16_t* data = (int16_t*)(((char*)this)+offset);
+  ndarray<const int16_t, 1> data() const { ptrdiff_t offset=98;
+  const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int16_t value(uint32_t i) const;
   uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_short::_sizeof()))+(2*(this->numElements())))+2)-1)/2)*2; }
@@ -637,8 +637,8 @@ private:
 class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_float& dbr() const { return _dbr; }
-  ndarray<float, 1> data() const { ptrdiff_t offset=120;
-  float* data = (float*)(((char*)this)+offset);
+  ndarray<const float, 1> data() const { ptrdiff_t offset=120;
+  const float* data = (const float*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   float value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_float::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
@@ -657,8 +657,8 @@ private:
 class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_enum& dbr() const { return _dbr; }
-  ndarray<uint16_t, 1> data() const { ptrdiff_t offset=492;
-  uint16_t* data = (uint16_t*)(((char*)this)+offset);
+  ndarray<const uint16_t, 1> data() const { ptrdiff_t offset=492;
+  const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint16_t value(uint32_t i) const;
   uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_enum::_sizeof()))+(2*(this->numElements())))+2)-1)/2)*2; }
@@ -676,8 +676,8 @@ private:
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_char& dbr() const { return _dbr; }
-  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=92;
-  uint8_t* data = (uint8_t*)(((char*)this)+offset);
+  ndarray<const uint8_t, 1> data() const { ptrdiff_t offset=92;
+  const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint8_t value(uint32_t i) const;
   uint32_t _sizeof() const { return ((((((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_char::_sizeof()))+(1*(this->numElements())))+2)-1)/2)*2; }
@@ -695,8 +695,8 @@ private:
 class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_long& dbr() const { return _dbr; }
-  ndarray<int32_t, 1> data() const { ptrdiff_t offset=116;
-  int32_t* data = (int32_t*)(((char*)this)+offset);
+  ndarray<const int32_t, 1> data() const { ptrdiff_t offset=116;
+  const int32_t* data = (const int32_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int32_t value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_long::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
@@ -715,8 +715,8 @@ private:
 class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_double& dbr() const { return _dbr; }
-  ndarray<double, 1> data() const { ptrdiff_t offset=152;
-  double* data = (double*)(((char*)this)+offset);
+  ndarray<const double, 1> data() const { ptrdiff_t offset=152;
+  const double* data = (const double*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   double value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_double::_sizeof()))+(8*(this->numElements())))+8)-1)/8)*8; }
@@ -758,8 +758,8 @@ private:
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_short& dbr() const { return _dbr; }
-  ndarray<int16_t, 1> data() const { ptrdiff_t offset=24;
-  int16_t* data = (int16_t*)(((char*)this)+offset);
+  ndarray<const int16_t, 1> data() const { ptrdiff_t offset=24;
+  const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int16_t value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_short::_sizeof()))+(2*(this->numElements())))+4)-1)/4)*4; }
@@ -778,8 +778,8 @@ private:
 class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_float& dbr() const { return _dbr; }
-  ndarray<float, 1> data() const { ptrdiff_t offset=20;
-  float* data = (float*)(((char*)this)+offset);
+  ndarray<const float, 1> data() const { ptrdiff_t offset=20;
+  const float* data = (const float*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   float value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_float::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
@@ -798,8 +798,8 @@ private:
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_enum& dbr() const { return _dbr; }
-  ndarray<uint16_t, 1> data() const { ptrdiff_t offset=24;
-  uint16_t* data = (uint16_t*)(((char*)this)+offset);
+  ndarray<const uint16_t, 1> data() const { ptrdiff_t offset=24;
+  const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint16_t value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_enum::_sizeof()))+(2*(this->numElements())))+4)-1)/4)*4; }
@@ -818,8 +818,8 @@ private:
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_char& dbr() const { return _dbr; }
-  ndarray<uint8_t, 1> data() const { ptrdiff_t offset=24;
-  uint8_t* data = (uint8_t*)(((char*)this)+offset);
+  ndarray<const uint8_t, 1> data() const { ptrdiff_t offset=24;
+  const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   uint8_t value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_char::_sizeof()))+(1*(this->numElements())))+4)-1)/4)*4; }
@@ -838,8 +838,8 @@ private:
 class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_long& dbr() const { return _dbr; }
-  ndarray<int32_t, 1> data() const { ptrdiff_t offset=20;
-  int32_t* data = (int32_t*)(((char*)this)+offset);
+  ndarray<const int32_t, 1> data() const { ptrdiff_t offset=20;
+  const int32_t* data = (const int32_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   int32_t value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_long::_sizeof()))+(4*(this->numElements())))+4)-1)/4)*4; }
@@ -858,8 +858,8 @@ private:
 class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_double& dbr() const { return _dbr; }
-  ndarray<double, 1> data() const { ptrdiff_t offset=24;
-  double* data = (double*)(((char*)this)+offset);
+  ndarray<const double, 1> data() const { ptrdiff_t offset=24;
+  const double* data = (const double*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
   double value(uint32_t i) const;
   uint32_t _sizeof() const { return (((((((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_double::_sizeof()))+(8*(this->numElements())))+8)-1)/8)*8; }

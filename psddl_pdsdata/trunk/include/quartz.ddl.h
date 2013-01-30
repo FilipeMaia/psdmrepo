@@ -59,11 +59,11 @@ public:
   /** correct defective pixels internally */
   uint8_t defect_pixel_correction_enabled() const { return uint8_t((this->_outputOptions>>13) & 0x1); }
   uint32_t number_of_defect_pixels() const { return _defectPixelCount; }
-  ndarray<uint16_t, 1> output_lookup_table() const { ptrdiff_t offset=12;
-  uint16_t* data = (uint16_t*)(((char*)this)+offset);
+  ndarray<const uint16_t, 1> output_lookup_table() const { ptrdiff_t offset=12;
+  const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, Output_LUT_Size*this->output_lookup_table_enabled()); }
-  ndarray<Camera::FrameCoord, 1> defect_pixel_coordinates() const { ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
-  Camera::FrameCoord* data = (Camera::FrameCoord*)(((char*)this)+offset);
+  ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates() const { ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
+  const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
   return make_ndarray(data, this->_defectPixelCount); }
   /** offset/pedestal value in pixel counts */
   uint16_t output_offset() const;

@@ -84,8 +84,8 @@ public:
   /** Count of masked pixels to exclude from processing. */
   uint32_t number_of_masked_pixels() const { return _masked_pixel_count; }
   /** Location of masked pixel coordinates. */
-  ndarray<Camera::FrameCoord, 1> masked_pixel_coordinates() const { ptrdiff_t offset=28;
-  Camera::FrameCoord* data = (Camera::FrameCoord*)(((char*)this)+offset);
+  ndarray<const Camera::FrameCoord, 1> masked_pixel_coordinates() const { ptrdiff_t offset=28;
+  const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
   return make_ndarray(data, this->_masked_pixel_count); }
   uint32_t _sizeof() const { return ((((((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count)))+4)-1)/4)*4; }
 private:
@@ -119,15 +119,15 @@ public:
   uint32_t offset() const { return _offset; }
   /** Pixel data as array of bytes, method is for internal use only, use data8() or 
             data16() for access to the data. */
-  ndarray<uint8_t, 1> _int_pixel_data() const { ptrdiff_t offset=16;
-  uint8_t* data = (uint8_t*)(((char*)this)+offset);
+  ndarray<const uint8_t, 1> _int_pixel_data() const { ptrdiff_t offset=16;
+  const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
   return make_ndarray(data, this->_width*this->_height*((this->_depth+7)/8)); }
   /** Returns pixel data array when stored data type is 8-bit (depth() is less than 9).
                 If data type is 16-bit then empty array is returned, use data16() method in this case. */
-  ndarray<uint8_t, 2> data8() const;
+  ndarray<const uint8_t, 2> data8() const;
   /** Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).
                 If data type is 8-bit then empty array is returned, use data8() method in this case. */
-  ndarray<uint16_t, 2> data16() const;
+  ndarray<const uint16_t, 2> data16() const;
   uint32_t _sizeof() const { return ((((16+(1*(this->_width*this->_height*((this->_depth+7)/8))))+4)-1)/4)*4; }
 private:
   uint32_t	_width;	/**< Number of pixels in a row. */

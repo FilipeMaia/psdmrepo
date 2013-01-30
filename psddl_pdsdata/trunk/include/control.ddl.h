@@ -137,12 +137,12 @@ public:
   /** Number of PVMonitor objects in this configuration. */
   uint32_t npvMonitors() const { return _npvMonitors; }
   /** PVControl configuration objects */
-  ndarray<ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=24;
-  ControlData::PVControl* data = (ControlData::PVControl*)(((char*)this)+offset);
+  ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=24;
+  const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->_npvControls); }
   /** PVMonitor configuration objects */
-  ndarray<ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->_npvControls));
-  ControlData::PVMonitor* data = (ControlData::PVMonitor*)(((char*)this)+offset);
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->_npvControls));
+  const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
   return make_ndarray(data, this->_npvMonitors); }
   uint32_t _sizeof() const { return (((((24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+4)-1)/4)*4; }
 private:
@@ -180,16 +180,16 @@ public:
   /** Number of PVLabel objects in this configuration. */
   uint32_t npvLabels() const { return _npvLabels; }
   /** PVControl configuration objects */
-  ndarray<ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=28;
-  ControlData::PVControl* data = (ControlData::PVControl*)(((char*)this)+offset);
+  ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=28;
+  const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->_npvControls); }
   /** PVMonitor configuration objects */
-  ndarray<ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->_npvControls));
-  ControlData::PVMonitor* data = (ControlData::PVMonitor*)(((char*)this)+offset);
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->_npvControls));
+  const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
   return make_ndarray(data, this->_npvMonitors); }
   /** PVLabel configuration objects */
-  ndarray<ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->_npvControls)))+(52*(this->_npvMonitors));
-  ControlData::PVLabel* data = (ControlData::PVLabel*)(((char*)this)+offset);
+  ndarray<const ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->_npvControls)))+(52*(this->_npvMonitors));
+  const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);
   return make_ndarray(data, this->_npvLabels); }
   uint32_t _sizeof() const { return ((((((28+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+(ControlData::PVLabel::_sizeof()*(this->_npvLabels)))+4)-1)/4)*4; }
 private:

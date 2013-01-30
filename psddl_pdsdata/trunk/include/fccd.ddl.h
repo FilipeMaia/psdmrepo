@@ -73,8 +73,8 @@ public:
   uint8_t ccdEnable() const { return _ccdEnable; }
   uint8_t focusMode() const { return _focusMode; }
   uint32_t exposureTime() const { return _exposureTime; }
-  ndarray<float, 1> dacVoltages() const { return make_ndarray(const_cast<float*>(&_dacVoltage[0]), NVoltages); }
-  ndarray<uint16_t, 1> waveforms() const { return make_ndarray(const_cast<uint16_t*>(&_waveform[0]), NWaveforms); }
+  ndarray<const float, 1> dacVoltages() const { return make_ndarray(&_dacVoltage[0], NVoltages); }
+  ndarray<const uint16_t, 1> waveforms() const { return make_ndarray(&_waveform[0], NWaveforms); }
   uint32_t width() const;
   uint32_t height() const;
   uint32_t trimmedWidth() const;

@@ -67,7 +67,7 @@ namespace CsPad2x2 {
 
 class CsPad2x2DigitalPotsCfg {
 public:
-  ndarray<uint8_t, 1> pots() const { return make_ndarray(const_cast<uint8_t*>(&_pots[0]), PotsPerQuad); }
+  ndarray<const uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
   static uint32_t _sizeof()  { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
   uint8_t	_pots[PotsPerQuad];
@@ -114,7 +114,7 @@ private:
 class CsPad2x2GainMapCfg {
 public:
   /** Array with the gain map for single ASIC. */
-  ndarray<uint16_t, 2> gainMap() const { return make_ndarray(const_cast<uint16_t*>(&_gainMap[0][0]), ColumnsPerASIC, MaxRowsPerASIC); }
+  ndarray<const uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
   static uint32_t _sizeof()  { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
   uint16_t	_gainMap[ColumnsPerASIC][MaxRowsPerASIC];	/**< Array with the gain map for single ASIC. */
@@ -244,10 +244,10 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
-  ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(const_cast<uint16_t*>(&_sbtemp[0]), Nsbtemp); }
+  ndarray<const uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
-  ndarray<int16_t, 3> data() const { ptrdiff_t offset=32;
-  int16_t* data = (int16_t*)(((char*)this)+offset);
+  ndarray<const int16_t, 3> data() const { ptrdiff_t offset=32;
+  const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, ColumnsPerASIC,  MaxRowsPerASIC*2,  2); }
   /** Common mode value for a given section, section number can be 0 or 1.
                 Will return 0 for data read from XTC, may be non-zero after calibration. */

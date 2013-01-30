@@ -344,11 +344,11 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=8;
-  EvrData::PulseConfig* data = (EvrData::PulseConfig*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=8;
+  const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=8+(24*(this->_npulses));
-  EvrData::OutputMap* data = (EvrData::OutputMap*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=8+(24*(this->_npulses));
+  const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   uint32_t _sizeof() const { return (((((8+(EvrData::PulseConfig::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs)))+4)-1)/4)*4; }
 private:
@@ -389,11 +389,11 @@ public:
   uint32_t opcode() const { return _opcode; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=12;
-  EvrData::PulseConfig* data = (EvrData::PulseConfig*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=12;
+  const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=12+(24*(this->_npulses));
-  EvrData::OutputMap* data = (EvrData::OutputMap*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=12+(24*(this->_npulses));
+  const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   EvrData::ConfigV2::BeamCode beam() const;
   EvrData::ConfigV2::RateCode rate() const;
@@ -420,14 +420,14 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::EventCodeV3, 1> eventcodes() const { ptrdiff_t offset=12;
-  EvrData::EventCodeV3* data = (EvrData::EventCodeV3*)(((char*)this)+offset);
+  ndarray<const EvrData::EventCodeV3, 1> eventcodes() const { ptrdiff_t offset=12;
+  const EvrData::EventCodeV3* data = (const EvrData::EventCodeV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
-  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(16*(this->_neventcodes));
-  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(16*(this->_neventcodes));
+  const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(16*(this->_neventcodes)))+(16*(this->_npulses));
-  EvrData::OutputMap* data = (EvrData::OutputMap*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(16*(this->_neventcodes)))+(16*(this->_npulses));
+  const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   uint32_t _sizeof() const { return ((((((12+(EvrData::EventCodeV3::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs)))+4)-1)/4)*4; }
 private:
@@ -454,14 +454,14 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::EventCodeV4, 1> eventcodes() const { ptrdiff_t offset=12;
-  EvrData::EventCodeV4* data = (EvrData::EventCodeV4*)(((char*)this)+offset);
+  ndarray<const EvrData::EventCodeV4, 1> eventcodes() const { ptrdiff_t offset=12;
+  const EvrData::EventCodeV4* data = (const EvrData::EventCodeV4*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
-  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(24*(this->_neventcodes));
-  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(24*(this->_neventcodes));
+  const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
-  EvrData::OutputMap* data = (EvrData::OutputMap*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
+  const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   uint32_t _sizeof() const { return ((((((12+(EvrData::EventCodeV4::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs)))+4)-1)/4)*4; }
 private:
@@ -525,8 +525,8 @@ public:
   EvrData::SequencerConfigV1::Source beam_source() const { return Source((this->_source>>8) & 0xff); }
   uint32_t length() const { return _length; }
   uint32_t cycles() const { return _cycles; }
-  ndarray<EvrData::SequencerEntry, 1> entries() const { ptrdiff_t offset=12;
-  EvrData::SequencerEntry* data = (EvrData::SequencerEntry*)(((char*)this)+offset);
+  ndarray<const EvrData::SequencerEntry, 1> entries() const { ptrdiff_t offset=12;
+  const EvrData::SequencerEntry* data = (const EvrData::SequencerEntry*)(((char*)this)+offset);
   return make_ndarray(data, this->_length); }
   uint32_t _sizeof() const { return ((((12+(EvrData::SequencerEntry::_sizeof()*(this->_length)))+4)-1)/4)*4; }
 private:
@@ -552,14 +552,14 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
-  EvrData::EventCodeV5* data = (EvrData::EventCodeV5*)(((char*)this)+offset);
+  ndarray<const EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
+  const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
-  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
-  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
+  const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
-  EvrData::OutputMap* data = (EvrData::OutputMap*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
+  const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   const EvrData::SequencerConfigV1& seq_config() const { ptrdiff_t offset=((12+(40*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
   return *(const EvrData::SequencerConfigV1*)(((const char*)this)+offset); }
@@ -590,14 +590,14 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
-  EvrData::EventCodeV5* data = (EvrData::EventCodeV5*)(((char*)this)+offset);
+  ndarray<const EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
+  const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
-  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
-  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
+  const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
-  EvrData::OutputMapV2* data = (EvrData::OutputMapV2*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
+  const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   const EvrData::SequencerConfigV1& seq_config() const { ptrdiff_t offset=((12+(40*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
   return *(const EvrData::SequencerConfigV1*)(((const char*)this)+offset); }
@@ -628,14 +628,14 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
-  ndarray<EvrData::EventCodeV6, 1> eventcodes() const { ptrdiff_t offset=12;
-  EvrData::EventCodeV6* data = (EvrData::EventCodeV6*)(((char*)this)+offset);
+  ndarray<const EvrData::EventCodeV6, 1> eventcodes() const { ptrdiff_t offset=12;
+  const EvrData::EventCodeV6* data = (const EvrData::EventCodeV6*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
-  ndarray<EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(44*(this->_neventcodes));
-  EvrData::PulseConfigV3* data = (EvrData::PulseConfigV3*)(((char*)this)+offset);
+  ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(44*(this->_neventcodes));
+  const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
-  ndarray<EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(44*(this->_neventcodes)))+(16*(this->_npulses));
-  EvrData::OutputMapV2* data = (EvrData::OutputMapV2*)(((char*)this)+offset);
+  ndarray<const EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(44*(this->_neventcodes)))+(16*(this->_npulses));
+  const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
   const EvrData::SequencerConfigV1& seq_config() const { ptrdiff_t offset=((12+(44*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
   return *(const EvrData::SequencerConfigV1*)(((const char*)this)+offset); }
@@ -686,8 +686,8 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   uint32_t numFifoEvents() const { return _u32NumFifoEvents; }
-  ndarray<EvrData::FIFOEvent, 1> fifoEvents() const { ptrdiff_t offset=4;
-  EvrData::FIFOEvent* data = (EvrData::FIFOEvent*)(((char*)this)+offset);
+  ndarray<const EvrData::FIFOEvent, 1> fifoEvents() const { ptrdiff_t offset=4;
+  const EvrData::FIFOEvent* data = (const EvrData::FIFOEvent*)(((char*)this)+offset);
   return make_ndarray(data, this->_u32NumFifoEvents); }
   uint32_t _sizeof() const { return ((((4+(EvrData::FIFOEvent::_sizeof()*(this->_u32NumFifoEvents)))+4)-1)/4)*4; }
 private:
@@ -716,7 +716,7 @@ public:
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
-  ndarray<Pds::DetInfo, 1> infos() const { return make_ndarray(const_cast<Pds::DetInfo*>(&_info[0]), MaxInfos); }
+  ndarray<const Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
   static uint32_t _sizeof()  { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
   std::vector<int> name_shape() const;
@@ -738,8 +738,8 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   uint16_t nchannels() const { return _nchannels; }
-  ndarray<EvrData::IOChannel, 1> channels() const { ptrdiff_t offset=4;
-  EvrData::IOChannel* data = (EvrData::IOChannel*)(((char*)this)+offset);
+  ndarray<const EvrData::IOChannel, 1> channels() const { ptrdiff_t offset=4;
+  const EvrData::IOChannel* data = (const EvrData::IOChannel*)(((char*)this)+offset);
   return make_ndarray(data, this->_nchannels); }
   EvrData::OutputMap::Conn conn() const;
   uint32_t _sizeof() const { return ((((4+(EvrData::IOChannel::_sizeof()*(this->_nchannels)))+4)-1)/4)*4; }

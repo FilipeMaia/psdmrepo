@@ -33,8 +33,8 @@ public:
     X2,
     X4,
   };
-  ndarray<uint32_t, 1> counting_mode() const { return make_ndarray(const_cast<uint32_t*>(&_count_mode[0]), NCHANNELS); }
-  ndarray<uint32_t, 1> quadrature_mode() const { return make_ndarray(const_cast<uint32_t*>(&_quad_mode[0]), NCHANNELS); }
+  ndarray<const uint32_t, 1> counting_mode() const { return make_ndarray(&_count_mode[0], NCHANNELS); }
+  ndarray<const uint32_t, 1> quadrature_mode() const { return make_ndarray(&_quad_mode[0], NCHANNELS); }
   static uint32_t _sizeof()  { return (((((0+(4*(NCHANNELS)))+(4*(NCHANNELS)))+4)-1)/4)*4; }
 private:
   uint32_t	_count_mode[NCHANNELS];

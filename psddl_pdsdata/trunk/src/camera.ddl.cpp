@@ -5,13 +5,13 @@
 
 namespace PsddlPds {
 namespace Camera {
-ndarray<uint8_t, 2>
+ndarray<const uint8_t, 2>
 FrameV1::data8() const {
-  if (this->_depth > 8) return ndarray<uint8_t, 2>(); return make_ndarray((uint8_t*)_int_pixel_data().data(), _height, _width);
+  if (this->_depth > 8) return ndarray<const uint8_t, 2>(); return make_ndarray(_int_pixel_data().data(), _height, _width);
 }
-ndarray<uint16_t, 2>
+ndarray<const uint16_t, 2>
 FrameV1::data16() const {
-  if (this->_depth <= 8) return ndarray<uint16_t, 2>(); return make_ndarray((uint16_t*)_int_pixel_data().data(), _height, _width);
+  if (this->_depth <= 8) return ndarray<const uint16_t, 2>(); return make_ndarray((const uint16_t*)_int_pixel_data().data(), _height, _width);
 }
 TwoDGaussianV1::TwoDGaussianV1()
 {
