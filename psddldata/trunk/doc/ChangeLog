@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays everywhere
+
 Tag: V00-03-16
 2013-01-28 Andy Salnikov
 - updates related to ndarray constness change

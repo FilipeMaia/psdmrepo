@@ -108,7 +108,7 @@
             <method name="nonlinerCorrected" type="double">
                 <arg name="iPixel" type="uint32_t"/>
                 <code lang="C++" body="double fRawValue = (double) ({self}.lu16Spetra[iPixel] ^ 0x2000); 
-                    ndarray&lt;double, 1&gt; corr = {xtc-config}.nonlinCorrect();
+                    const ndarray&lt;const double, 1&gt;&amp; corr = {xtc-config}.nonlinCorrect();
                     return fRawValue / (
                      corr[0] + fRawValue * 
                     (corr[1] + fRawValue * 
