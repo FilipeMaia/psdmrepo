@@ -75,7 +75,6 @@ class GUISetupInfoLeft ( QtGui.QWidget ) :
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxD)
         self.vbox.addLayout(self.hboxW)
-        #self.vbox.addWidget(cp.guibeamzeropars)
         self.vbox.addWidget(cp.guiimgsizeposition)
         self.vbox.addStretch(1)     
         self.setLayout(self.vbox)

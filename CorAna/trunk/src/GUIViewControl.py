@@ -63,6 +63,12 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_I2 = QtGui.QPushButton('<Ip x If>')
         self.but_G2 = QtGui.QPushButton('100 x G2')
 
+        self.but_X  = QtGui.QPushButton('X')
+        self.but_Y  = QtGui.QPushButton('Y')
+        self.but_R  = QtGui.QPushButton('R')
+        self.but_T  = QtGui.QPushButton('Theta')
+        self.but_Q  = QtGui.QPushButton('Q')
+
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
         self.sli.setRange(0, self.list_of_tau.shape[0]-1)
@@ -81,8 +87,13 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_If,   self.grid_row+3, 1)
         self.grid.addWidget(self.but_I2,   self.grid_row+3, 2)
         self.grid.addWidget(self.but_G2,   self.grid_row+3, 3)
+        self.grid.addWidget(self.but_X,    self.grid_row+4, 0)
+        self.grid.addWidget(self.but_Y,    self.grid_row+4, 1)
+        self.grid.addWidget(self.but_R,    self.grid_row+4, 2)
+        self.grid.addWidget(self.but_T,    self.grid_row+4, 3)
+        self.grid.addWidget(self.but_Q,    self.grid_row+4, 4)
 
-        self.grid_row += 3
+        self.grid_row += 4
 
         #self.connect(self.edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         self.connect(self.but,    QtCore.SIGNAL('clicked()'),         self.onBut )
@@ -90,6 +101,11 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_If, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_I2, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_G2, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_X,  QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Y,  QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_R,  QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_T,  QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Q,  QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,    QtCore.SIGNAL('valueChanged(int)'), self.onSlider )
         self.connect(self.sli,    QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
  
@@ -141,11 +157,17 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.edi_tau.setStyleSheet(cp.styleEditInfo) # cp.styleEditInfo
         self.edi_tau.setReadOnly  (True)
         self.edi_tau.setAlignment (QtCore.Qt.AlignCenter)
+
         self.but_Ip.setStyleSheet(cp.styleButton)
         self.but_If.setStyleSheet(cp.styleButton)
         self.but_I2.setStyleSheet(cp.styleButton)
         self.but_G2.setStyleSheet(cp.styleButton)
 
+        self.but_X .setStyleSheet(cp.styleButton)
+        self.but_Y .setStyleSheet(cp.styleButton)
+        self.but_R .setStyleSheet(cp.styleButton)
+        self.but_T .setStyleSheet(cp.styleButton)
+        self.but_Q .setStyleSheet(cp.styleButton)
 
 
     def resizeEvent(self, e):
@@ -216,8 +238,28 @@ class GUIViewControl ( QtGui.QWidget ) :
             I2 = self.arr[self.tau_ind, 2,...] 
 
             self.arr2d = 100*I2/Ip/If
-        else :
+
+        elif self.g_ind < 3 :
             self.arr2d = self.arr[self.tau_ind, self.g_ind,...] 
+
+        elif self.g_ind == 3 :
+            self.arr2d, y_map = self.vr.xy_maps_for_direct_beam_data()
+
+        elif self.g_ind == 4 :
+            x_map, self.arr2d = self.vr.xy_maps_for_direct_beam_data()
+
+        elif self.g_ind == 5 :
+            self.arr2d = self.vr.r_map_for_direct_beam_data()
+
+        elif self.g_ind == 6 :
+            self.arr2d = self.vr.theta_map_for_direct_beam_data()
+
+        elif self.g_ind == 7 :
+            self.arr2d = self.vr.q_map_for_direct_beam_data()
+
+        else :
+            logger.warning('Request for non-implemented plot ...', __name__)
+
         #print 'arr2d:\n', self.arr2d 
 
 
@@ -242,8 +284,31 @@ class GUIViewControl ( QtGui.QWidget ) :
             logger.info('G2 is selected', __name__)
             self.g_ind = -1
 
+
+        if self.but_X.hasFocus() :
+            logger.info('X is selected', __name__)
+            self.g_ind = 3
+
+        if self.but_Y.hasFocus() :
+            logger.info('Y is selected', __name__)
+            self.g_ind = 4
+
+        if self.but_R.hasFocus() :
+            logger.info('R is selected', __name__)
+            self.g_ind = 5
+
+        if self.but_T.hasFocus() :
+            logger.info('Theta is selected', __name__)
+            self.g_ind = 6
+
+        if self.but_Q.hasFocus() :
+            logger.info('Q is selected', __name__)
+            self.g_ind = 7
+
+
         self.drawPlot()
   
+
 
 
     def drawPlot(self):
