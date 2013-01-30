@@ -147,7 +147,7 @@ CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std:
       for (int iq = 0; iq != nQuads; ++ iq) {
         
         const CsPad::ElementV1& quad = data1->quads(iq); // get quad object
-        const ndarray<int16_t, 3>& data = quad.data();   // process event for this quad
+        const ndarray<const int16_t, 3>& data = quad.data();   // process event for this quad
 
         int16_t* corrdata = new int16_t[data.size()];    // allocate memory for corrected quad-array
         float common_mode[8];                            // should be supplied for all 8 sections
@@ -171,7 +171,7 @@ CSPadCommonModeCorrection::getAndProcessDataset(Event& evt, Env& env, const std:
       for (int iq = 0; iq != nQuads; ++ iq) {
         
         const CsPad::ElementV2& quad = data2->quads(iq); // get quad object  
-        const ndarray<int16_t, 3>& data = quad.data();   // process event for this quad
+        const ndarray<const int16_t, 3>& data = quad.data();   // process event for this quad
 
         int16_t* corrdata = new int16_t[data.size()];    // allocate memory for corrected quad-array
         float common_mode[8];                            // should be supplied for all 8 sections

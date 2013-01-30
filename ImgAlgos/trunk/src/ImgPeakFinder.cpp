@@ -225,11 +225,11 @@ ImgPeakFinder::getAndProcImage(Event& evt)
     double *p_data = &m_data_arr[0];
     unsigned ind = 0;
 
-      const ndarray<uint8_t, 2>& data8 = frmData->data8();
+      const ndarray<const uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
-        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint8_t,2>");
+        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<const uint8_t,2>");
 	const unsigned *shape = data8.shape();
-	ndarray<uint8_t, 2>::iterator cit;
+	ndarray<const uint8_t, 2>::iterator cit;
 	for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
 
         m_ndarr = new ndarray<double,2>(p_data, shape);
@@ -237,11 +237,11 @@ ImgPeakFinder::getAndProcImage(Event& evt)
         return procImage(evt);
       }
 
-      const ndarray<uint16_t, 2>& data16 = frmData->data16();
+      const ndarray<const uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
-        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<uint16_t,2>");
+        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<const uint16_t,2>");
 	const unsigned *shape = data16.shape();
-	ndarray<uint16_t, 2>::iterator cit;
+	ndarray<const uint16_t, 2>::iterator cit;
 	// This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
 	for(cit=data16.begin(); cit!=data16.end(); cit++) { p_data[ind++] = double(*cit) - offset; }
 

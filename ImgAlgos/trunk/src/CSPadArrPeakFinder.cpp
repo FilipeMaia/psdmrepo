@@ -410,7 +410,7 @@ CSPadArrPeakFinder::procData(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
+      const ndarray<const int16_t, 3>& data = quad.data();
 
       collectStatInQuad(quad.quad(), data.data());
 
@@ -438,7 +438,7 @@ CSPadArrPeakFinder::procData(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
+      const ndarray<const int16_t, 3>& data = quad.data();
 
       collectStatInQuad(quad.quad(), data.data());
 

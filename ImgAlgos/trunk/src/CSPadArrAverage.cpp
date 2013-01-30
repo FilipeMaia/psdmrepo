@@ -110,7 +110,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
+      const ndarray<const int16_t, 3>& data = quad.data();
       collectStat(quad.quad(), data.data());
     }    
   }
@@ -125,7 +125,7 @@ CSPadArrAverage::event(Event& evt, Env& env)
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<int16_t, 3>& data = quad.data();
+      const ndarray<const int16_t, 3>& data = quad.data();
       collectStat(quad.quad(), data.data());
     } 
   }

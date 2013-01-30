@@ -192,7 +192,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       double quad_norm_factor = normQuadBkgd(quad.quad(), data.data());
       if( quad_norm_factor > 0 ) m_norm_factor += quad_norm_factor; 
@@ -207,7 +207,7 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       double quad_norm_factor = normQuadBkgd(quad.quad(), data.data());
       if( quad_norm_factor > 0 ) m_norm_factor += quad_norm_factor; 
@@ -235,7 +235,7 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       int16_t* corrdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
       //int16_t* corrdata = &m_corrdata[iq][0][0][0];        // allocate memory for corrected quad-array 
@@ -257,7 +257,7 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       int16_t* corrdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
       //int16_t* corrdata = &m_corrdata[iq][0][0][0];        // allocate memory for corrected quad-array 

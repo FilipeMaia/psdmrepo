@@ -118,7 +118,7 @@ PnccdImageProducer::event(Event& evt, Env& env)
   shared_ptr<Psana::PNCCD::FullFrameV1> frame = evt.get(m_str_src, m_key_in, &m_src);
   if (frame) {
 
-      const ndarray<uint16_t, 2> data = frame->data();
+      const ndarray<uint16_t, 2> data = frame->data().copy();
 
       if( m_print_bits & 2 ) {
         for (int i=0; i<10; ++i) cout << " " << data[0][i];

@@ -211,14 +211,14 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
   shared_ptr<Psana::Princeton::FrameV1> frame = evt.get(m_str_src, m_key_in, &m_src);
   if (frame.get()) {
 
-      const ndarray<uint16_t, 2>& data = frame->data();
+      const ndarray<uint16_t, 2>& data = frame->data().copy();
 
       /*
       // copy data with type changing 
       if(m_count == 1) 
         m_data = new double [data.size()];
       unsigned ind = 0;
-      ndarray<uint16_t, 2>::const_iterator cit;
+      ndarray<const uint16_t, 2>::const_iterator cit;
       for(cit=data.begin(); cit!=data.end(); cit++) { m_data[ind++] = double(*cit); }
       save2DArrayInEvent<double>   (evt, m_src, m_key_out, m_data, data.shape());
       */

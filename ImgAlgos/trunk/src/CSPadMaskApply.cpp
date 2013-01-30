@@ -209,7 +209,7 @@ CSPadMaskApply::applyMask(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
 
       const CsPad::ElementV1& quad = data1->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       int16_t* corrdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
       //int16_t* corrdata = &m_corrdata[iq][0][0][0];        // allocate memory for corrected quad-array 
@@ -231,7 +231,7 @@ CSPadMaskApply::applyMask(Event& evt)
     for (int iq = 0; iq != nQuads; ++ iq) {
       
       const CsPad::ElementV2& quad = data2->quads(iq); // get quad object 
-      const ndarray<int16_t,3>& data = quad.data();    // get data for quad
+      const ndarray<const int16_t,3>& data = quad.data();    // get data for quad
 
       int16_t* corrdata = new int16_t[data.size()];  // allocate memory for corrected quad-array 
       //int16_t* corrdata = &m_corrdata[iq][0][0][0];        // allocate memory for corrected quad-array 

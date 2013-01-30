@@ -153,19 +153,19 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
       int offset = (m_subtract_offset) ? frmData->offset() : 0;
       unsigned ind = 0;
 
-      const ndarray<uint8_t, 2>& data8 = frmData->data8();
+      const ndarray<const uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
-        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint8_t,2>, subtract offset=" << offset);
-        ndarray<uint8_t, 2>::iterator cit;
+        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint8_t,2>, subtract offset=" << offset);
+        ndarray<const uint8_t, 2>::iterator cit;
         for(cit=data8.begin(); cit!=data8.end(); cit++) { m_data[ind++] = double(int(*cit) - offset); }
 
         save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data8.shape());
       }
 
-      const ndarray<uint16_t, 2>& data16 = frmData->data16();
+      const ndarray<const uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
-        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<uint16_t,2>, subtract offset=" << offset);
-        ndarray<uint16_t, 2>::iterator cit;
+        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>, subtract offset=" << offset);
+        ndarray<const uint16_t, 2>::iterator cit;
         // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
         for(cit=data16.begin(); cit!=data16.end(); cit++) { m_data[ind++] = double(*cit) - offset; }
 
