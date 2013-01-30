@@ -227,13 +227,13 @@ CameraPixSpectra::event(Event& evt, Env& env)
         this -> arrayInit();
       }
 
-      const ndarray<uint8_t,2>& data8 = frmData->data8();
+      const ndarray<const uint8_t,2>& data8 = frmData->data8();
       if (not data8.empty()) {
           const uint8_t *p_data = &data8[0][0];
           this -> arrayFill8 (p_data);
       }
 
-      const ndarray<uint16_t,2>& data16 = frmData->data16();
+      const ndarray<const uint16_t,2>& data16 = frmData->data16();
       if (not data16.empty()){
           const uint16_t *p_data = &data16[0][0];
           this -> arrayFill (p_data);
@@ -246,14 +246,14 @@ CameraPixSpectra::event(Event& evt, Env& env)
           << " depth="                 << frmData->depth()
           << " offset="                << frmData->offset() ;
 
-      const ndarray<uint8_t,2>& data8 = frmData->data8();
+      const ndarray<const uint8_t,2>& data8 = frmData->data8();
       if (not data8.empty()) {
         str << " data8=["  << int(data8[0][0])
             << ", "        << int(data8[0][1])
             << ", "        << int(data8[0][2]) << ", ...]";
       }
 
-      const ndarray<uint16_t,2>& data16 = frmData->data16();
+      const ndarray<const uint16_t,2>& data16 = frmData->data16();
       if (not data16.empty()) {
         str << " data16=[" << int(data16[0][0])
             << ", "        << int(data16[0][1])
@@ -267,7 +267,7 @@ CameraPixSpectra::event(Event& evt, Env& env)
   shared_ptr<Psana::Princeton::FrameV1> frame = evt.get(m_src);
   if (frame.get()) {
 
-    const ndarray<uint16_t,2>& data = frame->data();
+    const ndarray<const uint16_t,2>& data = frame->data();
     const uint16_t *p_data = &data[0][0];
     this -> arrayFill (p_data);
 
@@ -277,7 +277,7 @@ CameraPixSpectra::event(Event& evt, Env& env)
       str << "\n  shotIdStart = " << frame->shotIdStart();
       str << "\n  readoutTime = " << frame->readoutTime();
 
-    const ndarray<uint16_t,2>& data = frame->data();
+    const ndarray<const uint16_t,2>& data = frame->data();
       str << "\n  data =";
       for (int i = 0; i < 10; ++ i) {
         str << " " << data[0][i];

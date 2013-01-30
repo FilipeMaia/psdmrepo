@@ -130,7 +130,7 @@ CSPad2x2PixSpectra::event(Event& evt, Env& env)
       const Psana::CsPad2x2::ElementV1& el = *el_cspad2x2;
       
       //const int16_t* data = el.data(); // depricated
-      const ndarray<int16_t,3>& data_nda = el.data();
+      const ndarray<const int16_t,3>& data_nda = el.data();
       const int16_t* data = &data_nda[0][0][0];
 
       const unsigned* dshape = data_nda.shape();

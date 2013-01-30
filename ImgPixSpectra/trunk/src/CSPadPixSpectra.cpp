@@ -193,7 +193,7 @@ CSPadPixSpectra::loopOverQuads(shared_ptr<CSPadDataType> data)
         const Psana::CsPad::ElementV2& el = data->quads(q);
 
         int quad                           = el.quad() ;
-        const ndarray<int16_t,3>& data_nda = el.data();
+        const ndarray<const int16_t,3>& data_nda = el.data();
         const int16_t* data = &data_nda[0][0][0];
 
           //cout << "     q = " << q << " quad =" << quad << endl;
