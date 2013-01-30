@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-01-30 Andy Salnikov
+- now returning ndarray<const T,N> for array data
+
 Tag: V00-02-11
 2013-01-28 Andy Salnikov
 - updatges related to ndarray constness change

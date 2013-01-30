@@ -255,7 +255,7 @@ class CppTypeCodegen ( object ) :
             elif attr.type.value_type :
                 
                 # return ndarray
-                rettype = "ndarray<%s, %d>" % (_typename(attr.type), len(attr.shape.dims))
+                rettype = "ndarray<const %s, %d>" % (_typename(attr.type), len(attr.shape.dims))
                 body = self._bodyNDArrray(attr)
 
             else:
@@ -310,7 +310,7 @@ class CppTypeCodegen ( object ) :
             else:
                 type = _typename(type)
                 if meth.rank > 0:
-                    type = "ndarray<%s, %d>" % (type, meth.rank)
+                    type = "ndarray<const %s, %d>" % (type, meth.rank)
 
             # make method body
             body = meth.code.get("C++")
@@ -377,13 +377,12 @@ class CppTypeCodegen ( object ) :
         if attr.isfixed():
 
             idx0 = "[0]" * len(attr.shape.dims)
-            return T("return make_ndarray(const_cast<$type*>(&$name$idx), $shape);")(name=attr.name, idx=idx0, 
-                                                                                    shape=shape, type=_typename(attr.type))
+            return T("return make_ndarray(&$name$idx, $shape);")(name=attr.name, idx=idx0, shape=shape)
 
         else:
             
             body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  $type* data = ($type*)(((char*)this)+offset);")(type=_typename(attr.type))
+            body += T("\n  const $type* data = (const $type*)(((char*)this)+offset);")(type=_typename(attr.type))
             body += T("\n  return make_ndarray(data, $shape);")(shape=shape)
             return body
 

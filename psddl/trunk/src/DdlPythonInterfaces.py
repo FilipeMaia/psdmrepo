@@ -419,7 +419,7 @@ class DdlPythonInterfaces ( object ) :
             elif attr.type.value_type :
                 
                 # return ndarray
-                rettype = "ndarray<%s, %d>" % (attr.type.fullName('C++', self.psana_ns), len(attr.shape.dims))
+                rettype = "ndarray<const %s, %d>" % (attr.type.fullName('C++', self.psana_ns), len(attr.shape.dims))
 
             else:
 
@@ -471,7 +471,7 @@ class DdlPythonInterfaces ( object ) :
             else:
                 method_type = _typename(method_type)
                 if method.rank > 0:
-                    method_type = "ndarray<%s, %d>" % (method_type, method.rank)
+                    method_type = "ndarray<const %s, %d>" % (method_type, method.rank)
 
             # config objects may be needed 
             cfgNeeded = False
@@ -503,6 +503,8 @@ class DdlPythonInterfaces ( object ) :
             index = ctype_ndim.find(", ")
             ctype = ctype_ndim[:index]
             ndim = int(ctype_ndim[index + 2:])
+            index = ctype.find('const ')
+            if index == 0: ctype = ctype[6:]
             if "::" in ctype:
                 if ndim > 1:
                     print "WARNING: cannot generate ndarray<%s, %d>, so generating one-dimensional vector<%s> instead" % (ctype, ndim, ctype)

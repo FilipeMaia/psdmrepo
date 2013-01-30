@@ -370,7 +370,7 @@ class DdlPds2Psana ( object ) :
                         rettype = "const char*"
                         args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
                     else:
-                        rettype = T("ndarray<$type, $rank>")(type=rettype, rank=len(attr.shape.dims))
+                        rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=len(attr.shape.dims))
                 self._genFwdMeth(meth.name, rettype, type, cfgNeeded, args=args)
             
             else:
@@ -387,9 +387,9 @@ class DdlPds2Psana ( object ) :
                 elif attr.type.value_type:
                     
                     # attribute is an array accessed through ndarray
-                    ndarray = T("ndarray<$type, $rank>")(type=psana_type, rank=len(attr.shape.dims))
+                    ndarray = T("ndarray<const $type, $rank>")(type=psana_type, rank=len(attr.shape.dims))
                     print >>self.inc, T("  virtual $type $name() const;")(type=ndarray, name=meth.name)
-                    expr = T("$ndtype(const_cast<$type*>(&${name}_ndarray_storage_[0]), ${name}_ndarray_shape_)")(
+                    expr = T("$ndtype(&${name}_ndarray_storage_[0], ${name}_ndarray_shape_)")(
                              ndtype=ndarray, type=psana_type, name=attr.name)
                     print >>self.cpp, T("\n$type $classname::$name() const { return $expr; }")\
                             (type=ndarray, classname=type.name, name=meth.name, expr=expr)
@@ -431,7 +431,7 @@ class DdlPds2Psana ( object ) :
             elif rettype.basic and not isinstance(rettype, Enum):
                 rettype = rettype.fullName('C++')
                 if meth.rank > 0:
-                    rettype = T("ndarray<$type, $rank>")(type=rettype, rank=meth.rank)
+                    rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=meth.rank)
             else:
                 cvt = True
                 rettype = rettype.fullName('C++', self.psana_ns)
@@ -657,7 +657,7 @@ class DdlPds2Psana ( object ) :
             
         # ndarray initialization
         print >>self.cpp, "  {"
-        print >>self.cpp, T("    typedef ndarray<$type, $rank> XtcNDArray;")(type=pdstypename, rank=ndims)
+        print >>self.cpp, T("    typedef ndarray<const $type, $rank> XtcNDArray;")(type=pdstypename, rank=ndims)
         print >>self.cpp, T("    const XtcNDArray& xtc_ndarr = xtcPtr->$meth($cfg);")(meth=attr.accessor.name, cfg=cfg)
         print >>self.cpp, T("    ${name}_ndarray_storage_.reserve(xtc_ndarr.size());")(locals())
         print >>self.cpp, "    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
