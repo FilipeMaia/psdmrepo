@@ -57,11 +57,11 @@ ElementT<ElemType>::ElementT (const ElemType& elem,
   , m_common_mode()
 {
   // copy sb_temp array
-  const ndarray<uint16_t, 1>& sb_temp = elem.sb_temp();
+  const ndarray<const uint16_t, 1>& sb_temp = elem.sb_temp();
   std::copy(sb_temp.begin(), sb_temp.end(), m_sb_temp);
 
   // copy data shape
-  const ndarray<int16_t, 3>& edata = elem.data();
+  const ndarray<const int16_t, 3>& edata = elem.data();
   std::copy(edata.shape(), edata.shape()+3, m_data_shape);
 
   // copy common_mode array

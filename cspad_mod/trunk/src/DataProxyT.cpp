@@ -95,7 +95,7 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
     int iq = elem.quad();
 
     // data array
-    const ndarray<int16_t, 3>& data = elem.data();
+    const ndarray<const int16_t, 3>& data = elem.data();
 
     uint32_t sMask = elem.sectionMask();
 

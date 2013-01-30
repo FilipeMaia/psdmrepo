@@ -91,7 +91,7 @@ DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, cons
   // loop over sections
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
 
-    const ndarray<int16_t, 3>& data = obj->data();
+    const ndarray<const int16_t, 3>& data = obj->data();
 
     // start of pixel data
     const int16_t* sdata = data.data() + sect;

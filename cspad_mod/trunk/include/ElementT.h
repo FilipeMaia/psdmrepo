@@ -84,9 +84,9 @@ public:
   virtual uint32_t seq_count() const { return m_seq_count; }
   virtual uint32_t ticks() const { return m_ticks; }
   virtual uint32_t fiducials() const { return m_fiducials; }
-  virtual ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(m_sb_temp, Nsbtemp); }
+  virtual ndarray<const uint16_t, 1> sb_temp() const { return make_ndarray(m_sb_temp, Nsbtemp); }
   virtual uint32_t frame_type() const { return m_frame_type; }
-  virtual ndarray<int16_t, 3> data() const { return ndarray<int16_t, 3>(m_data, m_data_shape); }
+  virtual ndarray<const int16_t, 3> data() const { return ndarray<const int16_t, 3>(m_data, m_data_shape); }
   /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte,
                                 total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const { return m_sectionMask; }
@@ -107,7 +107,7 @@ private:
   uint32_t m_seq_count;
   uint32_t m_ticks;
   uint32_t m_fiducials;
-  mutable uint16_t m_sb_temp[Nsbtemp];
+  uint16_t m_sb_temp[Nsbtemp];
   uint32_t m_frame_type;
   int16_t* m_data;
   uint32_t m_sectionMask;

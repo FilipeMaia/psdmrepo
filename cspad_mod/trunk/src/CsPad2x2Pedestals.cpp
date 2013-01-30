@@ -135,7 +135,7 @@ CsPad2x2Pedestals::event(Event& evt, Env& env)
     ++ m_count;
     
     // process statistics for 2x2
-    const ndarray<int16_t, 3>& data = data1->data();
+    const ndarray<const int16_t, 3>& data = data1->data();
     collectStat(data.data());
     
   }
