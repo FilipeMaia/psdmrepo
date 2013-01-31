@@ -73,6 +73,15 @@ def plotImage(arr,range=(0,500),figsize=(12,5)) :
 
 #--------------------------------
 
+def plotImageLarge(arr,range=(0,500),figsize=(12,10)) :
+    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    axim = fig.add_axes([0.04,  0.02, 0.99, 0.96])
+    axes1 = axim.imshow(arr, interpolation='nearest', aspect='auto') #,extent=self.XYRange, origin='lower'
+    colb1 = fig.colorbar(axes1, pad=0.005, fraction=0.09, shrink=1, aspect=40)
+    axes1.set_clim(range[0],range[1])
+
+#--------------------------------
+
 def plotImageAndSpectrum(arr,range=(0,500)) :
     fig  = plt.figure(figsize=(15,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
     fig.canvas.set_window_title('Image And Spectrum ' + u'\u03C6')
@@ -93,8 +102,8 @@ def plotImageAndSpectrum(arr,range=(0,500)) :
 
 def move(x0=200,y0=100) :
     #plt.get_current_fig_manager().window.move(x0, y0)
-    #move_str = '+' + str(x0) + '+' + str(y0)
-    #plt.get_current_fig_manager().window.geometry(move_str)
+    move_str = '+' + str(x0) + '+' + str(y0)
+    plt.get_current_fig_manager().window.geometry(move_str)
     #plt.get_current_fig_manager().window.geometry("+50+50")
     pass
 
