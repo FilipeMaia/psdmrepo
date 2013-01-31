@@ -91,6 +91,10 @@ class PlotImgSpe (QtGui.QWidget) :
         self.widgimage.set_image_array(arr)
 
 
+    def set_image_array_new(self,arr):
+        self.widgimage.set_image_array_new(arr)
+
+
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 

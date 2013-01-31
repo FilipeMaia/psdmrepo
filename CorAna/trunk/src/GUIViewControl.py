@@ -53,21 +53,27 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.g_ind   = 0
         self.tau_ind = 0
 
-        self.initImgArray()        
+        self.initCorArray()        
         
-        self.tit    = QtGui.QLabel('View Control')
-        self.edi    = QtGui.QLineEdit( os.path.basename(cp.res_fname.value()) )        
-        self.but    = QtGui.QPushButton('File')
-        self.but_Ip = QtGui.QPushButton('<Ip>')
-        self.but_If = QtGui.QPushButton('<If>')
-        self.but_I2 = QtGui.QPushButton('<Ip x If>')
-        self.but_G2 = QtGui.QPushButton('100 x G2')
+        self.tit       = QtGui.QLabel('View Control')
+        self.edi       = QtGui.QLineEdit( os.path.basename(cp.res_fname.value()) )        
+        self.but       = QtGui.QPushButton('File')
+        self.but_close = QtGui.QPushButton('Close')
+        self.but_Ip    = QtGui.QPushButton('<Ip>')
+        self.but_If    = QtGui.QPushButton('<If>')
+        self.but_I2    = QtGui.QPushButton('<Ip x If>')
+        self.but_G2    = QtGui.QPushButton('100 x G2')
+   
+        self.but_X     = QtGui.QPushButton('X')
+        self.but_Y     = QtGui.QPushButton('Y')
+        self.but_R     = QtGui.QPushButton('R')
+        self.but_P     = QtGui.QPushButton('Phi')
+        self.but_Q     = QtGui.QPushButton('Q')
 
-        self.but_X  = QtGui.QPushButton('X')
-        self.but_Y  = QtGui.QPushButton('Y')
-        self.but_R  = QtGui.QPushButton('R')
-        self.but_T  = QtGui.QPushButton('Theta')
-        self.but_Q  = QtGui.QPushButton('Q')
+        self.but_P_st  = QtGui.QPushButton('Phi-stat')
+        self.but_Q_st  = QtGui.QPushButton('Q-stat')
+        self.but_P_dy  = QtGui.QPushButton('Phi-dyna')
+        self.but_Q_dy  = QtGui.QPushButton('Q-dyna')
 
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
@@ -87,27 +93,37 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_If,   self.grid_row+3, 1)
         self.grid.addWidget(self.but_I2,   self.grid_row+3, 2)
         self.grid.addWidget(self.but_G2,   self.grid_row+3, 3)
+        self.grid.addWidget(self.but_close,self.grid_row+3, 4)
         self.grid.addWidget(self.but_X,    self.grid_row+4, 0)
         self.grid.addWidget(self.but_Y,    self.grid_row+4, 1)
         self.grid.addWidget(self.but_R,    self.grid_row+4, 2)
-        self.grid.addWidget(self.but_T,    self.grid_row+4, 3)
+        self.grid.addWidget(self.but_P,    self.grid_row+4, 3)
         self.grid.addWidget(self.but_Q,    self.grid_row+4, 4)
+        self.grid.addWidget(self.but_P_st, self.grid_row+5, 1)
+        self.grid.addWidget(self.but_Q_st, self.grid_row+5, 2)
+        self.grid.addWidget(self.but_P_dy, self.grid_row+5, 3)
+        self.grid.addWidget(self.but_Q_dy, self.grid_row+5, 4)
 
         self.grid_row += 4
 
         #self.connect(self.edi, QtCore.SIGNAL('editingFinished()'),        self.onEdit )
-        self.connect(self.but,    QtCore.SIGNAL('clicked()'),         self.onBut )
-        self.connect(self.but_Ip, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_If, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_I2, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_G2, QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_X,  QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_Y,  QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_R,  QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_T,  QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.but_Q,  QtCore.SIGNAL('clicked()'),         self.onButView )
-        self.connect(self.sli,    QtCore.SIGNAL('valueChanged(int)'), self.onSlider )
-        self.connect(self.sli,    QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
+        self.connect(self.but,      QtCore.SIGNAL('clicked()'),         self.onBut     )
+        self.connect(self.but_close,QtCore.SIGNAL('clicked()'),         self.onButClose)
+        self.connect(self.but_Ip,   QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_If,   QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_I2,   QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_G2,   QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_X,    QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Y,    QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_R,    QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_P,    QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Q,    QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_P_st, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Q_st, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_P_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_Q_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.sli,      QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
+        self.connect(self.sli,      QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
  
         self.setLayout(self.grid)
 
@@ -158,16 +174,21 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.edi_tau.setReadOnly  (True)
         self.edi_tau.setAlignment (QtCore.Qt.AlignCenter)
 
-        self.but_Ip.setStyleSheet(cp.styleButton)
-        self.but_If.setStyleSheet(cp.styleButton)
-        self.but_I2.setStyleSheet(cp.styleButton)
-        self.but_G2.setStyleSheet(cp.styleButton)
+        self.but_close.setStyleSheet(cp.styleButtonBad)
+        self.but_Ip   .setStyleSheet(cp.styleButton)
+        self.but_If   .setStyleSheet(cp.styleButton)
+        self.but_I2   .setStyleSheet(cp.styleButton)
+        self.but_G2   .setStyleSheet(cp.styleButton)
 
-        self.but_X .setStyleSheet(cp.styleButton)
-        self.but_Y .setStyleSheet(cp.styleButton)
-        self.but_R .setStyleSheet(cp.styleButton)
-        self.but_T .setStyleSheet(cp.styleButton)
-        self.but_Q .setStyleSheet(cp.styleButton)
+        self.but_X    .setStyleSheet(cp.styleButton)
+        self.but_Y    .setStyleSheet(cp.styleButton)
+        self.but_R    .setStyleSheet(cp.styleButton)
+        self.but_P    .setStyleSheet(cp.styleButton)
+        self.but_Q    .setStyleSheet(cp.styleButton)
+        self.but_P_st .setStyleSheet(cp.styleButton)
+        self.but_Q_st .setStyleSheet(cp.styleButton)
+        self.but_P_dy .setStyleSheet(cp.styleButton)
+        self.but_Q_dy .setStyleSheet(cp.styleButton)
 
 
     def resizeEvent(self, e):
@@ -217,26 +238,27 @@ class GUIViewControl ( QtGui.QWidget ) :
         edi.setText (os.path.basename(path))
         par.setValue(path)
         logger.info('selected the file name: ' + str(par.value()), __name__ )
-        self.initImgArray()        
+        self.initCorArray()        
 
 
-    def initImgArray(self) :
+    def initCorArray(self) :
         self.arr = None
 
 
-    def loadImgArray(self):
+    def loadCorArray(self):
         if self.arr == None :         
             self.arr = self.vr.get_cor_array_from_binary_file()
 
 
     def setImgArray(self):
-        if self.arr == None : return
+
+        if self.g_ind < 3 and self.arr == None :
+            self.loadCorArray()
 
         if self.g_ind < 0 :
             Ip = self.arr[self.tau_ind, 0,...] 
             If = self.arr[self.tau_ind, 1,...] 
             I2 = self.arr[self.tau_ind, 2,...] 
-
             self.arr2d = 100*I2/Ip/If
 
         elif self.g_ind < 3 :
@@ -252,10 +274,22 @@ class GUIViewControl ( QtGui.QWidget ) :
             self.arr2d = self.vr.r_map_for_direct_beam_data()
 
         elif self.g_ind == 6 :
-            self.arr2d = self.vr.theta_map_for_direct_beam_data()
+            self.arr2d = self.vr.phi_map_for_direct_beam_data()
 
         elif self.g_ind == 7 :
             self.arr2d = self.vr.q_map_for_direct_beam_data()
+
+        elif self.g_ind == 8 :
+            self.arr2d = self.vr.phi_map_for_direct_beam_data_stat_bins()
+
+        elif self.g_ind == 9 :
+            self.arr2d = self.vr.q_map_for_direct_beam_data_stat_bins()
+
+        elif self.g_ind == 10 :
+            self.arr2d = self.vr.phi_map_for_direct_beam_data_dyna_bins()
+
+        elif self.g_ind == 11 :
+            self.arr2d = self.vr.q_map_for_direct_beam_data_dyna_bins()
 
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
@@ -266,7 +300,6 @@ class GUIViewControl ( QtGui.QWidget ) :
 
     def onButView(self):
         logger.info('onButView', __name__)
-        self.loadImgArray()        
 
         if self.but_Ip.hasFocus() :
             logger.info('<Ip> is selected', __name__)
@@ -284,7 +317,6 @@ class GUIViewControl ( QtGui.QWidget ) :
             logger.info('G2 is selected', __name__)
             self.g_ind = -1
 
-
         if self.but_X.hasFocus() :
             logger.info('X is selected', __name__)
             self.g_ind = 3
@@ -297,7 +329,7 @@ class GUIViewControl ( QtGui.QWidget ) :
             logger.info('R is selected', __name__)
             self.g_ind = 5
 
-        if self.but_T.hasFocus() :
+        if self.but_P.hasFocus() :
             logger.info('Theta is selected', __name__)
             self.g_ind = 6
 
@@ -305,6 +337,21 @@ class GUIViewControl ( QtGui.QWidget ) :
             logger.info('Q is selected', __name__)
             self.g_ind = 7
 
+        if self.but_P_st.hasFocus() :
+            logger.info('Phi static is selected', __name__)
+            self.g_ind = 8
+
+        if self.but_Q_st.hasFocus() :
+            logger.info('Q static is selected', __name__)
+            self.g_ind = 9
+
+        if self.but_P_dy.hasFocus() :
+            logger.info('Phi dynamic is selected', __name__)
+            self.g_ind = 10
+
+        if self.but_Q_dy.hasFocus() :
+            logger.info('Q dynamic is selected', __name__)
+            self.g_ind = 11
 
         self.drawPlot()
   
@@ -313,27 +360,30 @@ class GUIViewControl ( QtGui.QWidget ) :
 
     def drawPlot(self):
         self.setImgArray()
-        if self.arr == None : return
-
         try :
-            cp.plotimgspe_g.close()
-            try    : del cp.plotimgspe_g
-            except : pass
-
+            self.redrawPlotResetLimits()
         except :
             cp.plotimgspe_g = PlotImgSpe(None,self.arr2d) 
             cp.plotimgspe_g.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
             cp.plotimgspe_g.show()
 
 
+    def redrawPlotResetLimits(self):
+        self.setImgArray()
+        cp.plotimgspe_g.set_image_array_new(self.arr2d)
+
+
     def redrawPlot(self):
         self.setImgArray()
-        if self.arr == None : return
+        cp.plotimgspe_g.set_image_array(self.arr2d)
 
-        try :
-            cp.plotimgspe_g.set_image_array(self.arr2d)
-        except :
-            pass
+
+    def onButClose(self):
+        logger.info('onButClose', __name__)
+        try    : cp.plotimgspe_g.close()
+        except : pass
+        try    : del cp.plotimgspe_g
+        except : pass
 
 
     def onSlider(self):

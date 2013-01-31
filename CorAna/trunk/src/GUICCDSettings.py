@@ -50,13 +50,13 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.tit_ccdset_adcsatu = QtGui.QLabel('ADC saturation level [ADU]')
         self.tit_ccdset_aduphot = QtGui.QLabel('ADU per photon')
         self.tit_ccdset_ccdeff  = QtGui.QLabel('CCD efficiency')
-        self.tit_ccdset_ccddain = QtGui.QLabel('CCD gain')
+        self.tit_ccdset_ccdgain = QtGui.QLabel('CCD gain')
 
         self.edi_ccdset_pixsize = QtGui.QLineEdit( str( cp.ccdset_pixsize.value() ) )        
         self.edi_ccdset_adcsatu = QtGui.QLineEdit( str( cp.ccdset_adcsatu.value() ) )        
         self.edi_ccdset_aduphot = QtGui.QLineEdit( str( cp.ccdset_aduphot.value() ) )        
         self.edi_ccdset_ccdeff  = QtGui.QLineEdit( str( cp.ccdset_ccdeff .value() ) )        
-        self.edi_ccdset_ccddain = QtGui.QLineEdit( str( cp.ccdset_ccddain.value() ) )        
+        self.edi_ccdset_ccdgain = QtGui.QLineEdit( str( cp.ccdset_ccdgain.value() ) )        
 
         self.tit_orient = QtGui.QLabel('CCD orientation (deg):')
         self.list_of_orient = ['0', '90', '180', '270'] 
@@ -73,13 +73,13 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_ccdset_adcsatu,       self.grid_row+3, 1, 1, 3)
         self.grid.addWidget(self.tit_ccdset_aduphot,       self.grid_row+4, 1, 1, 3)
         self.grid.addWidget(self.tit_ccdset_ccdeff ,       self.grid_row+5, 1, 1, 3)
-        self.grid.addWidget(self.tit_ccdset_ccddain,       self.grid_row+6, 1, 1, 3)
+        self.grid.addWidget(self.tit_ccdset_ccdgain,       self.grid_row+6, 1, 1, 3)
 
         self.grid.addWidget(self.edi_ccdset_pixsize,       self.grid_row+2, 4)
         self.grid.addWidget(self.edi_ccdset_adcsatu,       self.grid_row+3, 4)
         self.grid.addWidget(self.edi_ccdset_aduphot,       self.grid_row+4, 4)
         self.grid.addWidget(self.edi_ccdset_ccdeff ,       self.grid_row+5, 4)
-        self.grid.addWidget(self.edi_ccdset_ccddain,       self.grid_row+6, 4)
+        self.grid.addWidget(self.edi_ccdset_ccdgain,       self.grid_row+6, 4)
 
         self.grid.addWidget(self.tit_orient,               self.grid_row+7, 1, 1, 3)
         self.grid.addWidget(self.box_orient,               self.grid_row+7, 4)
@@ -94,7 +94,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.connect(self.edi_ccdset_adcsatu, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_aduphot, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_ccdeff , QtCore.SIGNAL('editingFinished()'), self.onEdit )
-        self.connect(self.edi_ccdset_ccddain, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_ccdset_ccdgain, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.box_orient,         QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_orient )
 
         self.showToolTips()
@@ -112,7 +112,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_adcsatu.setToolTip(msg)
         self.edi_ccdset_aduphot.setToolTip(msg)
         self.edi_ccdset_ccdeff .setToolTip(msg)
-        self.edi_ccdset_ccddain.setToolTip(msg)
+        self.edi_ccdset_ccdgain.setToolTip(msg)
 
 
     def setFrame(self):
@@ -133,27 +133,27 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.tit_ccdset_adcsatu.setStyleSheet (cp.styleLabel)
         self.tit_ccdset_aduphot.setStyleSheet (cp.styleLabel)
         self.tit_ccdset_ccdeff .setStyleSheet (cp.styleLabel)
-        self.tit_ccdset_ccddain.setStyleSheet (cp.styleLabel)
+        self.tit_ccdset_ccdgain.setStyleSheet (cp.styleLabel)
 
         self.edi_ccdset_pixsize.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_adcsatu.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_aduphot.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_ccdeff .setStyleSheet(cp.styleEdit)
-        self.edi_ccdset_ccddain.setStyleSheet(cp.styleEdit)
+        self.edi_ccdset_ccdgain.setStyleSheet(cp.styleEdit)
 
         self.edi_ccdset_pixsize.setFixedWidth(width)
         self.edi_ccdset_adcsatu.setFixedWidth(width)
         self.edi_ccdset_aduphot.setFixedWidth(width)
         self.edi_ccdset_ccdeff .setFixedWidth(width)
-        self.edi_ccdset_ccddain.setFixedWidth(width)
+        self.edi_ccdset_ccdgain.setFixedWidth(width)
 
         self.edi_ccdset_pixsize.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_adcsatu.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_aduphot.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_ccdeff .setAlignment(QtCore.Qt.AlignRight) 
-        self.edi_ccdset_ccddain.setAlignment(QtCore.Qt.AlignRight) 
+        self.edi_ccdset_ccdgain.setAlignment(QtCore.Qt.AlignRight) 
 
-        self.tit_orient        .setStyleSheet(cp.styleTitle)
+        self.tit_orient        .setStyleSheet(cp.styleLabel)
         self.tit_orient        .setAlignment (QtCore.Qt.AlignLeft)
         self.box_orient        .setStyleSheet(cp.styleButton)
 
@@ -204,10 +204,10 @@ class GUICCDSettings ( QtGui.QWidget ) :
             self.par = cp.ccdset_ccdeff
             self.tit = 'ccdset_ccdeff'
 
-        elif self.edi_ccdset_ccddain.isModified() :            
-            self.edi = self.edi_ccdset_ccddain
-            self.par = cp.ccdset_ccddain
-            self.tit = 'ccdset_ccddain'
+        elif self.edi_ccdset_ccdgain.isModified() :            
+            self.edi = self.edi_ccdset_ccdgain
+            self.par = cp.ccdset_ccdgain
+            self.tit = 'ccdset_ccdgain'
 
         else : return # no-modification
 

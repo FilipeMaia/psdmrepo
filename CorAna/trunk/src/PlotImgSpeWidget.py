@@ -133,6 +133,11 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.processDraw()
 
 
+    def set_image_array_new(self,arr):
+        self.arr = arr
+        self.on_draw()
+
+
     def processDraw(self) :
         #fig = event.canvas.figure
         f = self.fig
