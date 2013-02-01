@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-02
+2013-01-31 Andy Salnikov
+- add method EnvObjectStore::proxyDict() to get access to internal
+  proxy dictionary, nedded for Python wrapper
+
 Tag: V00-10-01
 2012-11-28 Andy Salnikov
 - make EnvObjectStore constructor explicit
