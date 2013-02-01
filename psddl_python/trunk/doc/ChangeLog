@@ -11,6 +11,12 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-01-31 Andy Salnikov
+- simplify getter and getter map
+- fix the names of the classes
+- classes are created inside correct module structure
+
 Tag: V00-02-00
 2013-01-30 Andy Salnikov
 - switching to const ndarrays for array data
