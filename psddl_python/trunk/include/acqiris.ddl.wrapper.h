@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class VertV1_Wrapper {
   shared_ptr<Psana::Acqiris::VertV1> _o;
@@ -236,189 +236,171 @@ public:
   vector<Psana::Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Psana::Acqiris::TdcDataV1_Item); }
 };
 
-  class VertV1_Getter : public psddl_python::EventGetter {
+  class VertV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::VertV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::VertV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::VertV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::VertV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::VertV1";}
+    int getVersion() const { return Psana::Acqiris::VertV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::VertV1> result = boost::static_pointer_cast<Psana::Acqiris::VertV1>(vdata);
       return result.get() ? object(VertV1_Wrapper(result)) : object();
     }
   };
 
-  class HorizV1_Getter : public psddl_python::EventGetter {
+  class HorizV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::HorizV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::HorizV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::HorizV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::HorizV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::HorizV1";}
+    int getVersion() const { return Psana::Acqiris::HorizV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::HorizV1> result = boost::static_pointer_cast<Psana::Acqiris::HorizV1>(vdata);
       return result.get() ? object(HorizV1_Wrapper(result)) : object();
     }
   };
 
-  class TrigV1_Getter : public psddl_python::EventGetter {
+  class TrigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TrigV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::TrigV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TrigV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TrigV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::TrigV1";}
+    int getVersion() const { return Psana::Acqiris::TrigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TrigV1> result = boost::static_pointer_cast<Psana::Acqiris::TrigV1>(vdata);
       return result.get() ? object(TrigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Acqiris::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Acqiris::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::ConfigV1";}
+    int getVersion() const { return Psana::Acqiris::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::ConfigV1> result = boost::static_pointer_cast<Psana::Acqiris::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TimestampV1_Getter : public psddl_python::EventGetter {
+  class TimestampV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TimestampV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::TimestampV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TimestampV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TimestampV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::TimestampV1";}
+    int getVersion() const { return Psana::Acqiris::TimestampV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TimestampV1> result = boost::static_pointer_cast<Psana::Acqiris::TimestampV1>(vdata);
       return result.get() ? object(TimestampV1_Wrapper(result)) : object();
     }
   };
 
-  class DataDescV1Elem_Getter : public psddl_python::EventGetter {
+  class DataDescV1Elem_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::DataDescV1Elem";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::DataDescV1Elem::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::DataDescV1Elem> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::DataDescV1Elem);}
+    const char* getTypeName() const { return "Psana::Acqiris::DataDescV1Elem";}
+    int getVersion() const { return Psana::Acqiris::DataDescV1Elem::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::DataDescV1Elem> result = boost::static_pointer_cast<Psana::Acqiris::DataDescV1Elem>(vdata);
       return result.get() ? object(DataDescV1Elem_Wrapper(result)) : object();
     }
   };
 
-  class DataDescV1_Getter : public psddl_python::EventGetter {
+  class DataDescV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::DataDescV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::DataDescV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::DataDescV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::DataDescV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::DataDescV1";}
+    int getVersion() const { return Psana::Acqiris::DataDescV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::DataDescV1> result = boost::static_pointer_cast<Psana::Acqiris::DataDescV1>(vdata);
       return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcChannel_Getter : public psddl_python::EventGetter {
+  class TdcChannel_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcChannel";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcChannel> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcChannel);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcChannel";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcChannel> result = boost::static_pointer_cast<Psana::Acqiris::TdcChannel>(vdata);
       return result.get() ? object(TdcChannel_Wrapper(result)) : object();
     }
   };
 
-  class TdcAuxIO_Getter : public psddl_python::EventGetter {
+  class TdcAuxIO_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcAuxIO";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcAuxIO> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcAuxIO);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcAuxIO";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcAuxIO> result = boost::static_pointer_cast<Psana::Acqiris::TdcAuxIO>(vdata);
       return result.get() ? object(TdcAuxIO_Wrapper(result)) : object();
     }
   };
 
-  class TdcVetoIO_Getter : public psddl_python::EventGetter {
+  class TdcVetoIO_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcVetoIO";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcVetoIO> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcVetoIO);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcVetoIO";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcVetoIO> result = boost::static_pointer_cast<Psana::Acqiris::TdcVetoIO>(vdata);
       return result.get() ? object(TdcVetoIO_Wrapper(result)) : object();
     }
   };
 
-  class TdcConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class TdcConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Acqiris::TdcConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Acqiris::TdcConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcConfigV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcConfigV1";}
+    int getVersion() const { return Psana::Acqiris::TdcConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcConfigV1> result = boost::static_pointer_cast<Psana::Acqiris::TdcConfigV1>(vdata);
       return result.get() ? object(TdcConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1_Item_Getter : public psddl_python::EventGetter {
+  class TdcDataV1_Item_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1_Item";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcDataV1_Item> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1_Item);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1_Item";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcDataV1_Item> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1_Item>(vdata);
       return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Common_Getter : public psddl_python::EventGetter {
+  class TdcDataV1Common_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Common";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcDataV1Common> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Common);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Common";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcDataV1Common> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Common>(vdata);
       return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Channel_Getter : public psddl_python::EventGetter {
+  class TdcDataV1Channel_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Channel";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcDataV1Channel> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Channel);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Channel";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcDataV1Channel> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Channel>(vdata);
       return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1Marker_Getter : public psddl_python::EventGetter {
+  class TdcDataV1Marker_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1Marker";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcDataV1Marker> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Marker);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Marker";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcDataV1Marker> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Marker>(vdata);
       return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1_Getter : public psddl_python::EventGetter {
+  class TdcDataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Acqiris::TdcDataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Acqiris::TdcDataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Acqiris::TdcDataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1);}
+    const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1";}
+    int getVersion() const { return Psana::Acqiris::TdcDataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Acqiris::TdcDataV1> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1>(vdata);
       return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
     }
   };

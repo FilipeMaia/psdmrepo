@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class TM6740ConfigV1_Wrapper {
   shared_ptr<Psana::Pulnix::TM6740ConfigV1> _o;
@@ -59,28 +59,24 @@ public:
   uint8_t output_resolution_bits() const { return o->output_resolution_bits(); }
 };
 
-  class TM6740ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class TM6740ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Pulnix::TM6740ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Pulnix::TM6740ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Pulnix::TM6740ConfigV1);}
+    const char* getTypeName() const { return "Psana::Pulnix::TM6740ConfigV1";}
+    int getVersion() const { return Psana::Pulnix::TM6740ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Pulnix::TM6740ConfigV1> result = boost::static_pointer_cast<Psana::Pulnix::TM6740ConfigV1>(vdata);
       return result.get() ? object(TM6740ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TM6740ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class TM6740ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Pulnix::TM6740ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Pulnix::TM6740ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Pulnix::TM6740ConfigV2);}
+    const char* getTypeName() const { return "Psana::Pulnix::TM6740ConfigV2";}
+    int getVersion() const { return Psana::Pulnix::TM6740ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Pulnix::TM6740ConfigV2> result = boost::static_pointer_cast<Psana::Pulnix::TM6740ConfigV2>(vdata);
       return result.get() ? object(TM6740ConfigV2_Wrapper(result)) : object();
     }
   };

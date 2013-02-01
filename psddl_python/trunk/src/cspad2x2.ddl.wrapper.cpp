@@ -6,48 +6,52 @@
 namespace psddl_python {
 namespace CsPad2x2 {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.CsPad2x2", 0, "The Python wrapper module for CsPad2x2 types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "CsPad2x2", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("pots", &n::pots)\
 
-  _CLASS(psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper, "CsPad2x2DigitalPotsCfg", return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2DigitalPotsCfg_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(CsPad2x2DigitalPotsCfg);
+  ADD_GETTER(CsPad2x2DigitalPotsCfg);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("shiftTest", &n::shiftTest)\
     .def("version", &n::version)\
 
-  _CLASS(psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper, "CsPad2x2ReadOnlyCfg", return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2ReadOnlyCfg_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(CsPad2x2ReadOnlyCfg);
+  ADD_GETTER(CsPad2x2ReadOnlyCfg);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("adcThreshold", &n::adcThreshold)\
     .def("pixelCountThreshold", &n::pixelCountThreshold)\
 
-  _CLASS(psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper, "ProtectionSystemThreshold", return_value_policy<return_by_value>());
   std_vector_class_(ProtectionSystemThreshold_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(ProtectionSystemThreshold);
+  ADD_GETTER(ProtectionSystemThreshold);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("gainMap", &n::gainMap)\
 
-  _CLASS(psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper, "CsPad2x2GainMapCfg", return_value_policy<return_by_value>());
   std_vector_class_(CsPad2x2GainMapCfg_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(CsPad2x2GainMapCfg);
+  ADD_GETTER(CsPad2x2GainMapCfg);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("shiftSelect", &n::shiftSelect)\
     .def("edgeSelect", &n::edgeSelect)\
     .def("readClkSet", &n::readClkSet)\
@@ -73,13 +77,13 @@ void createWrappers() {
     .def("dp", &n::dp, policy)\
     .def("gm", &n::gm, policy)\
 
-  _CLASS(psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper, "ConfigV1QuadReg", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1QuadReg_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1QuadReg);
+  ADD_GETTER(ConfigV1QuadReg);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("concentratorVersion", &n::concentratorVersion)\
     .def("protectionThreshold", &n::protectionThreshold, policy)\
     .def("protectionEnable", &n::protectionEnable)\
@@ -94,13 +98,13 @@ void createWrappers() {
     .def("numAsicsRead", &n::numAsicsRead)\
     .def("numAsicsStored", &n::numAsicsStored)\
 
-  _CLASS(psddl_python::CsPad2x2::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("virtual_channel", &n::virtual_channel)\
     .def("lane", &n::lane)\
     .def("tid", &n::tid)\
@@ -115,10 +119,10 @@ void createWrappers() {
     .def("data", &n::data)\
     .def("common_mode", &n::common_mode)\
 
-  _CLASS(psddl_python::CsPad2x2::ElementV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::CsPad2x2::ElementV1_Wrapper, "ElementV1", return_value_policy<return_by_value>());
   std_vector_class_(ElementV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(ElementV1);
+  ADD_GETTER(ElementV1);
 
 
 } // createWrappers()

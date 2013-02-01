@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::Timepix::ConfigV1> _o;
@@ -290,67 +290,57 @@ public:
   uint32_t depth_bytes() const { return o->depth_bytes(); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Timepix::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Timepix::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Timepix::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Timepix::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Timepix::ConfigV1";}
+    int getVersion() const { return Psana::Timepix::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Timepix::ConfigV1> result = boost::static_pointer_cast<Psana::Timepix::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Timepix::ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Timepix::ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Timepix::ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Timepix::ConfigV2);}
+    const char* getTypeName() const { return "Psana::Timepix::ConfigV2";}
+    int getVersion() const { return Psana::Timepix::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Timepix::ConfigV2> result = boost::static_pointer_cast<Psana::Timepix::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV3_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV3_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Timepix::ConfigV3";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Timepix::ConfigV3::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Timepix::ConfigV3> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Timepix::ConfigV3);}
+    const char* getTypeName() const { return "Psana::Timepix::ConfigV3";}
+    int getVersion() const { return Psana::Timepix::ConfigV3::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Timepix::ConfigV3> result = boost::static_pointer_cast<Psana::Timepix::ConfigV3>(vdata);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::EventGetter {
+  class DataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Timepix::DataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Timepix::DataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Timepix::DataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Timepix::DataV1);}
+    const char* getTypeName() const { return "Psana::Timepix::DataV1";}
+    int getVersion() const { return Psana::Timepix::DataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Timepix::DataV1> result = boost::static_pointer_cast<Psana::Timepix::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV2_Getter : public psddl_python::EventGetter {
+  class DataV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Timepix::DataV2";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Timepix::DataV2::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Timepix::DataV2> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Timepix::DataV2);}
+    const char* getTypeName() const { return "Psana::Timepix::DataV2";}
+    int getVersion() const { return Psana::Timepix::DataV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Timepix::DataV2> result = boost::static_pointer_cast<Psana::Timepix::DataV2>(vdata);
       return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
   };

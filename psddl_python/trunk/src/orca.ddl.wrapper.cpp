@@ -6,19 +6,23 @@
 namespace psddl_python {
 namespace Orca {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Orca", 0, "The Python wrapper module for Orca types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Orca", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("mode", &n::mode)\
     .def("cooling", &n::cooling)\
     .def("defect_pixel_correction_enabled", &n::defect_pixel_correction_enabled)\
     .def("rows", &n::rows)\
 
-  _CLASS(psddl_python::Orca::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Orca::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
 } // createWrappers()

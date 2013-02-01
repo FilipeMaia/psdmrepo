@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Quartz {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Quartz", 0, "The Python wrapper module for Quartz types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Quartz", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("black_level", &n::black_level)\
     .def("gain_percent", &n::gain_percent)\
     .def("output_resolution", &n::output_resolution)\
@@ -24,10 +28,10 @@ void createWrappers() {
     .def("output_offset", &n::output_offset)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(psddl_python::Quartz::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Quartz::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
 } // createWrappers()

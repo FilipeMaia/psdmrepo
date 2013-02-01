@@ -18,7 +18,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class PVControl_Wrapper {
   shared_ptr<Psana::ControlData::PVControl> _o;
@@ -96,58 +96,54 @@ public:
   vector<Psana::ControlData::PVLabel> pvLabels() const { VEC_CONVERT(o->pvLabels(), Psana::ControlData::PVLabel); }
 };
 
-  class PVControl_Getter : public psddl_python::EventGetter {
+  class PVControl_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::ControlData::PVControl";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::ControlData::PVControl> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVControl);}
+    const char* getTypeName() const { return "Psana::ControlData::PVControl";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::ControlData::PVControl> result = boost::static_pointer_cast<Psana::ControlData::PVControl>(vdata);
       return result.get() ? object(PVControl_Wrapper(result)) : object();
     }
   };
 
-  class PVMonitor_Getter : public psddl_python::EventGetter {
+  class PVMonitor_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::ControlData::PVMonitor";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::ControlData::PVMonitor> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVMonitor);}
+    const char* getTypeName() const { return "Psana::ControlData::PVMonitor";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::ControlData::PVMonitor> result = boost::static_pointer_cast<Psana::ControlData::PVMonitor>(vdata);
       return result.get() ? object(PVMonitor_Wrapper(result)) : object();
     }
   };
 
-  class PVLabel_Getter : public psddl_python::EventGetter {
+  class PVLabel_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::ControlData::PVLabel";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::ControlData::PVLabel> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVLabel);}
+    const char* getTypeName() const { return "Psana::ControlData::PVLabel";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::ControlData::PVLabel> result = boost::static_pointer_cast<Psana::ControlData::PVLabel>(vdata);
       return result.get() ? object(PVLabel_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::ControlData::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::ControlData::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::ControlData::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::ConfigV1);}
+    const char* getTypeName() const { return "Psana::ControlData::ConfigV1";}
+    int getVersion() const { return Psana::ControlData::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::ControlData::ConfigV1> result = boost::static_pointer_cast<Psana::ControlData::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::ControlData::ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::ControlData::ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::ControlData::ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::ConfigV2);}
+    const char* getTypeName() const { return "Psana::ControlData::ConfigV2";}
+    int getVersion() const { return Psana::ControlData::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::ControlData::ConfigV2> result = boost::static_pointer_cast<Psana::ControlData::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };

@@ -6,25 +6,29 @@
 namespace psddl_python {
 namespace ControlData {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.ControlData", 0, "The Python wrapper module for ControlData types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "ControlData", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("name", &n::name)\
     .def("index", &n::index)\
     .def("value", &n::value)\
     .def("array", &n::array)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(Psana::ControlData::PVControl, return_value_policy<copy_const_reference>());
-  _CLASS(psddl_python::ControlData::PVControl_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::ControlData::PVControl, "PVControl", return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::ControlData::PVControl_Wrapper, "PVControl", return_value_policy<return_by_value>());
   std_vector_class_(Psana::ControlData::PVControl);
   std_vector_class_(PVControl_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(PVControl);
+  ADD_GETTER(PVControl);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("name", &n::name)\
     .def("index", &n::index)\
     .def("loValue", &n::loValue)\
@@ -32,28 +36,28 @@ void createWrappers() {
     .def("array", &n::array)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(Psana::ControlData::PVMonitor, return_value_policy<copy_const_reference>());
-  _CLASS(psddl_python::ControlData::PVMonitor_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::ControlData::PVMonitor, "PVMonitor", return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::ControlData::PVMonitor_Wrapper, "PVMonitor", return_value_policy<return_by_value>());
   std_vector_class_(Psana::ControlData::PVMonitor);
   std_vector_class_(PVMonitor_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(PVMonitor);
+  ADD_GETTER(PVMonitor);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("name", &n::name)\
     .def("value", &n::value)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(Psana::ControlData::PVLabel, return_value_policy<copy_const_reference>());
-  _CLASS(psddl_python::ControlData::PVLabel_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::ControlData::PVLabel, "PVLabel", return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::ControlData::PVLabel_Wrapper, "PVLabel", return_value_policy<return_by_value>());
   std_vector_class_(Psana::ControlData::PVLabel);
   std_vector_class_(PVLabel_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(PVLabel);
+  ADD_GETTER(PVLabel);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("events", &n::events)\
     .def("uses_duration", &n::uses_duration)\
     .def("uses_events", &n::uses_events)\
@@ -63,13 +67,13 @@ void createWrappers() {
     .def("pvControls", &n::pvControls)\
     .def("pvMonitors", &n::pvMonitors)\
 
-  _CLASS(psddl_python::ControlData::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::ControlData::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("events", &n::events)\
     .def("uses_duration", &n::uses_duration)\
     .def("uses_events", &n::uses_events)\
@@ -81,10 +85,10 @@ void createWrappers() {
     .def("pvMonitors", &n::pvMonitors)\
     .def("pvLabels", &n::pvLabels)\
 
-  _CLASS(psddl_python::ControlData::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::ControlData::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
 } // createWrappers()

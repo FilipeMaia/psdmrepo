@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::Encoder::ConfigV1> _o;
@@ -77,54 +77,46 @@ public:
   int32_t value(uint32_t i) const { return o->value(i); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Encoder::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Encoder::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Encoder::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Encoder::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Encoder::ConfigV1";}
+    int getVersion() const { return Psana::Encoder::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Encoder::ConfigV1> result = boost::static_pointer_cast<Psana::Encoder::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Encoder::ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Encoder::ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Encoder::ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Encoder::ConfigV2);}
+    const char* getTypeName() const { return "Psana::Encoder::ConfigV2";}
+    int getVersion() const { return Psana::Encoder::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Encoder::ConfigV2> result = boost::static_pointer_cast<Psana::Encoder::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::EventGetter {
+  class DataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Encoder::DataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Encoder::DataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Encoder::DataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Encoder::DataV1);}
+    const char* getTypeName() const { return "Psana::Encoder::DataV1";}
+    int getVersion() const { return Psana::Encoder::DataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Encoder::DataV1> result = boost::static_pointer_cast<Psana::Encoder::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV2_Getter : public psddl_python::EventGetter {
+  class DataV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Encoder::DataV2";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Encoder::DataV2::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Encoder::DataV2> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Encoder::DataV2);}
+    const char* getTypeName() const { return "Psana::Encoder::DataV2";}
+    int getVersion() const { return Psana::Encoder::DataV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Encoder::DataV2> result = boost::static_pointer_cast<Psana::Encoder::DataV2>(vdata);
       return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
   };

@@ -25,7 +25,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class BldDataFEEGasDetEnergy_Wrapper {
   shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> _o;
@@ -215,145 +215,123 @@ public:
   double relativeEnergyPerPulse() const { return o->relativeEnergyPerPulse(); }
 };
 
-  class BldDataFEEGasDetEnergy_Getter : public psddl_python::EventGetter {
+  class BldDataFEEGasDetEnergy_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataFEEGasDetEnergy";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataFEEGasDetEnergy::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataFEEGasDetEnergy);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataFEEGasDetEnergy";}
+    int getVersion() const { return Psana::Bld::BldDataFEEGasDetEnergy::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> result = boost::static_pointer_cast<Psana::Bld::BldDataFEEGasDetEnergy>(vdata);
       return result.get() ? object(BldDataFEEGasDetEnergy_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV0_Getter : public psddl_python::EventGetter {
+  class BldDataEBeamV0_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV0";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataEBeamV0::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataEBeamV0> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataEBeamV0);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataEBeamV0";}
+    int getVersion() const { return Psana::Bld::BldDataEBeamV0::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataEBeamV0> result = boost::static_pointer_cast<Psana::Bld::BldDataEBeamV0>(vdata);
       return result.get() ? object(BldDataEBeamV0_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV1_Getter : public psddl_python::EventGetter {
+  class BldDataEBeamV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataEBeamV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataEBeamV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataEBeamV1);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataEBeamV1";}
+    int getVersion() const { return Psana::Bld::BldDataEBeamV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataEBeamV1> result = boost::static_pointer_cast<Psana::Bld::BldDataEBeamV1>(vdata);
       return result.get() ? object(BldDataEBeamV1_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV2_Getter : public psddl_python::EventGetter {
+  class BldDataEBeamV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV2";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataEBeamV2::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataEBeamV2> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataEBeamV2);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataEBeamV2";}
+    int getVersion() const { return Psana::Bld::BldDataEBeamV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataEBeamV2> result = boost::static_pointer_cast<Psana::Bld::BldDataEBeamV2>(vdata);
       return result.get() ? object(BldDataEBeamV2_Wrapper(result)) : object();
     }
   };
 
-  class BldDataEBeamV3_Getter : public psddl_python::EventGetter {
+  class BldDataEBeamV3_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataEBeamV3";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataEBeamV3::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataEBeamV3> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataEBeamV3);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataEBeamV3";}
+    int getVersion() const { return Psana::Bld::BldDataEBeamV3::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataEBeamV3> result = boost::static_pointer_cast<Psana::Bld::BldDataEBeamV3>(vdata);
       return result.get() ? object(BldDataEBeamV3_Wrapper(result)) : object();
     }
   };
 
-  class BldDataPhaseCavity_Getter : public psddl_python::EventGetter {
+  class BldDataPhaseCavity_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataPhaseCavity";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataPhaseCavity::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataPhaseCavity> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataPhaseCavity);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataPhaseCavity";}
+    int getVersion() const { return Psana::Bld::BldDataPhaseCavity::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataPhaseCavity> result = boost::static_pointer_cast<Psana::Bld::BldDataPhaseCavity>(vdata);
       return result.get() ? object(BldDataPhaseCavity_Wrapper(result)) : object();
     }
   };
 
-  class BldDataIpimbV0_Getter : public psddl_python::EventGetter {
+  class BldDataIpimbV0_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataIpimbV0";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataIpimbV0::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataIpimbV0> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataIpimbV0);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataIpimbV0";}
+    int getVersion() const { return Psana::Bld::BldDataIpimbV0::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataIpimbV0> result = boost::static_pointer_cast<Psana::Bld::BldDataIpimbV0>(vdata);
       return result.get() ? object(BldDataIpimbV0_Wrapper(result)) : object();
     }
   };
 
-  class BldDataIpimbV1_Getter : public psddl_python::EventGetter {
+  class BldDataIpimbV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataIpimbV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataIpimbV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataIpimbV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataIpimbV1);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataIpimbV1";}
+    int getVersion() const { return Psana::Bld::BldDataIpimbV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataIpimbV1> result = boost::static_pointer_cast<Psana::Bld::BldDataIpimbV1>(vdata);
       return result.get() ? object(BldDataIpimbV1_Wrapper(result)) : object();
     }
   };
 
-  class BldDataPimV1_Getter : public psddl_python::EventGetter {
+  class BldDataPimV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataPimV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataPimV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataPimV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataPimV1);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataPimV1";}
+    int getVersion() const { return Psana::Bld::BldDataPimV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataPimV1> result = boost::static_pointer_cast<Psana::Bld::BldDataPimV1>(vdata);
       return result.get() ? object(BldDataPimV1_Wrapper(result)) : object();
     }
   };
 
-  class BldDataGMDV0_Getter : public psddl_python::EventGetter {
+  class BldDataGMDV0_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataGMDV0";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataGMDV0::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataGMDV0> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataGMDV0);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataGMDV0";}
+    int getVersion() const { return Psana::Bld::BldDataGMDV0::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataGMDV0> result = boost::static_pointer_cast<Psana::Bld::BldDataGMDV0>(vdata);
       return result.get() ? object(BldDataGMDV0_Wrapper(result)) : object();
     }
   };
 
-  class BldDataGMDV1_Getter : public psddl_python::EventGetter {
+  class BldDataGMDV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Bld::BldDataGMDV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Bld::BldDataGMDV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Bld::BldDataGMDV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Bld::BldDataGMDV1);}
+    const char* getTypeName() const { return "Psana::Bld::BldDataGMDV1";}
+    int getVersion() const { return Psana::Bld::BldDataGMDV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Bld::BldDataGMDV1> result = boost::static_pointer_cast<Psana::Bld::BldDataGMDV1>(vdata);
       return result.get() ? object(BldDataGMDV1_Wrapper(result)) : object();
     }
   };

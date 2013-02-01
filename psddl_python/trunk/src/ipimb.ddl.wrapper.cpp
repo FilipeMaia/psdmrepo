@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Ipimb {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Ipimb", 0, "The Python wrapper module for Ipimb types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Ipimb", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("triggerCounter", &n::triggerCounter)\
     .def("serialID", &n::serialID)\
     .def("chargeAmpRange", &n::chargeAmpRange)\
@@ -25,13 +29,13 @@ void createWrappers() {
     .def("trigDelay", &n::trigDelay)\
     .def("diodeGain", &n::diodeGain)\
 
-  _CLASS(psddl_python::Ipimb::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Ipimb::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("triggerCounter", &n::triggerCounter)\
     .def("serialID", &n::serialID)\
     .def("chargeAmpRange", &n::chargeAmpRange)\
@@ -49,13 +53,13 @@ void createWrappers() {
     .def("adcDelay", &n::adcDelay)\
     .def("diodeGain", &n::diodeGain)\
 
-  _CLASS(psddl_python::Ipimb::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Ipimb::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("triggerCounter", &n::triggerCounter)\
     .def("config0", &n::config0)\
     .def("config1", &n::config1)\
@@ -70,13 +74,13 @@ void createWrappers() {
     .def("channel2Volts", &n::channel2Volts)\
     .def("channel3Volts", &n::channel3Volts)\
 
-  _CLASS(psddl_python::Ipimb::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Ipimb::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("config0", &n::config0)\
     .def("config1", &n::config1)\
     .def("config2", &n::config2)\
@@ -99,10 +103,10 @@ void createWrappers() {
     .def("channel3psVolts", &n::channel3psVolts)\
     .def("triggerCounter", &n::triggerCounter)\
 
-  _CLASS(psddl_python::Ipimb::DataV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Ipimb::DataV2_Wrapper, "DataV2", return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV2);
+  ADD_GETTER(DataV2);
 
 
 } // createWrappers()

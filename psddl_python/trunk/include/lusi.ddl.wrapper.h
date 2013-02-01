@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class DiodeFexConfigV1_Wrapper {
   shared_ptr<Psana::Lusi::DiodeFexConfigV1> _o;
@@ -111,93 +111,79 @@ public:
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 
-  class DiodeFexConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class DiodeFexConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::DiodeFexConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Lusi::DiodeFexConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Lusi::DiodeFexConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexConfigV1);}
+    const char* getTypeName() const { return "Psana::Lusi::DiodeFexConfigV1";}
+    int getVersion() const { return Psana::Lusi::DiodeFexConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::DiodeFexConfigV1> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexConfigV1>(vdata);
       return result.get() ? object(DiodeFexConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class DiodeFexConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class DiodeFexConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::DiodeFexConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Lusi::DiodeFexConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Lusi::DiodeFexConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexConfigV2);}
+    const char* getTypeName() const { return "Psana::Lusi::DiodeFexConfigV2";}
+    int getVersion() const { return Psana::Lusi::DiodeFexConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::DiodeFexConfigV2> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexConfigV2>(vdata);
       return result.get() ? object(DiodeFexConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class DiodeFexV1_Getter : public psddl_python::EventGetter {
+  class DiodeFexV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::DiodeFexV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Lusi::DiodeFexV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Lusi::DiodeFexV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexV1);}
+    const char* getTypeName() const { return "Psana::Lusi::DiodeFexV1";}
+    int getVersion() const { return Psana::Lusi::DiodeFexV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::DiodeFexV1> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexV1>(vdata);
       return result.get() ? object(DiodeFexV1_Wrapper(result)) : object();
     }
   };
 
-  class IpmFexConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class IpmFexConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::IpmFexConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Lusi::IpmFexConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Lusi::IpmFexConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexConfigV1);}
+    const char* getTypeName() const { return "Psana::Lusi::IpmFexConfigV1";}
+    int getVersion() const { return Psana::Lusi::IpmFexConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::IpmFexConfigV1> result = boost::static_pointer_cast<Psana::Lusi::IpmFexConfigV1>(vdata);
       return result.get() ? object(IpmFexConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class IpmFexConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class IpmFexConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::IpmFexConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Lusi::IpmFexConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Lusi::IpmFexConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexConfigV2);}
+    const char* getTypeName() const { return "Psana::Lusi::IpmFexConfigV2";}
+    int getVersion() const { return Psana::Lusi::IpmFexConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::IpmFexConfigV2> result = boost::static_pointer_cast<Psana::Lusi::IpmFexConfigV2>(vdata);
       return result.get() ? object(IpmFexConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class IpmFexV1_Getter : public psddl_python::EventGetter {
+  class IpmFexV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::IpmFexV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Lusi::IpmFexV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Lusi::IpmFexV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexV1);}
+    const char* getTypeName() const { return "Psana::Lusi::IpmFexV1";}
+    int getVersion() const { return Psana::Lusi::IpmFexV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::IpmFexV1> result = boost::static_pointer_cast<Psana::Lusi::IpmFexV1>(vdata);
       return result.get() ? object(IpmFexV1_Wrapper(result)) : object();
     }
   };
 
-  class PimImageConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class PimImageConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Lusi::PimImageConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Lusi::PimImageConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Lusi::PimImageConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::PimImageConfigV1);}
+    const char* getTypeName() const { return "Psana::Lusi::PimImageConfigV1";}
+    int getVersion() const { return Psana::Lusi::PimImageConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Lusi::PimImageConfigV1> result = boost::static_pointer_cast<Psana::Lusi::PimImageConfigV1>(vdata);
       return result.get() ? object(PimImageConfigV1_Wrapper(result)) : object();
     }
   };

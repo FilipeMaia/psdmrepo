@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Encoder {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Encoder", 0, "The Python wrapper module for Encoder types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Encoder", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("chan_num", &n::chan_num)\
     .def("count_mode", &n::count_mode)\
     .def("quadrature_mode", &n::quadrature_mode)\
@@ -17,13 +21,13 @@ void createWrappers() {
     .def("input_rising", &n::input_rising)\
     .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(psddl_python::Encoder::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("chan_mask", &n::chan_mask)\
     .def("count_mode", &n::count_mode)\
     .def("quadrature_mode", &n::quadrature_mode)\
@@ -31,32 +35,32 @@ void createWrappers() {
     .def("input_rising", &n::input_rising)\
     .def("ticks_per_sec", &n::ticks_per_sec)\
 
-  _CLASS(psddl_python::Encoder::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("encoder_count", &n::encoder_count)\
     .def("value", &n::value)\
 
-  _CLASS(psddl_python::Encoder::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("encoder_count", &n::encoder_count)\
     .def("value", &n::value)\
 
-  _CLASS(psddl_python::Encoder::DataV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Encoder::DataV2_Wrapper, "DataV2", return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV2);
+  ADD_GETTER(DataV2);
 
 
 } // createWrappers()

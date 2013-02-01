@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class epicsTimeStamp_Wrapper {
   shared_ptr<Psana::Epics::epicsTimeStamp> _o;
@@ -464,345 +464,343 @@ public:
   boost::python::list pvControls_list() { boost::python::list l; const int n = pvControls_shape()[0]; for (int i = 0; i < n; i++) l.append(pvControls(i)); return l; }
 };
 
-  class epicsTimeStamp_Getter : public psddl_python::EventGetter {
+  class epicsTimeStamp_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::epicsTimeStamp";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::epicsTimeStamp> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::epicsTimeStamp);}
+    const char* getTypeName() const { return "Psana::Epics::epicsTimeStamp";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::epicsTimeStamp> result = boost::static_pointer_cast<Psana::Epics::epicsTimeStamp>(vdata);
       return result.get() ? object(epicsTimeStamp_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_string_Getter : public psddl_python::EventGetter {
+  class dbr_time_string_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_string";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_string> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_string);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_string";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_string> result = boost::static_pointer_cast<Psana::Epics::dbr_time_string>(vdata);
       return result.get() ? object(dbr_time_string_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_short_Getter : public psddl_python::EventGetter {
+  class dbr_time_short_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_short";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_short> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_short);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_short";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_short> result = boost::static_pointer_cast<Psana::Epics::dbr_time_short>(vdata);
       return result.get() ? object(dbr_time_short_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_float_Getter : public psddl_python::EventGetter {
+  class dbr_time_float_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_float";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_float> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_float);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_float";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_float> result = boost::static_pointer_cast<Psana::Epics::dbr_time_float>(vdata);
       return result.get() ? object(dbr_time_float_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_enum_Getter : public psddl_python::EventGetter {
+  class dbr_time_enum_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_enum";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_enum> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_enum);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_enum";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_enum> result = boost::static_pointer_cast<Psana::Epics::dbr_time_enum>(vdata);
       return result.get() ? object(dbr_time_enum_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_char_Getter : public psddl_python::EventGetter {
+  class dbr_time_char_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_char";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_char> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_char);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_char";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_char> result = boost::static_pointer_cast<Psana::Epics::dbr_time_char>(vdata);
       return result.get() ? object(dbr_time_char_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_long_Getter : public psddl_python::EventGetter {
+  class dbr_time_long_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_long";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_long> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_long);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_long";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_long> result = boost::static_pointer_cast<Psana::Epics::dbr_time_long>(vdata);
       return result.get() ? object(dbr_time_long_Wrapper(result)) : object();
     }
   };
 
-  class dbr_time_double_Getter : public psddl_python::EventGetter {
+  class dbr_time_double_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_time_double";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_time_double> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_double);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_time_double";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_time_double> result = boost::static_pointer_cast<Psana::Epics::dbr_time_double>(vdata);
       return result.get() ? object(dbr_time_double_Wrapper(result)) : object();
     }
   };
 
-  class dbr_sts_string_Getter : public psddl_python::EventGetter {
+  class dbr_sts_string_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_sts_string";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_sts_string> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_sts_string);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_sts_string";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_sts_string> result = boost::static_pointer_cast<Psana::Epics::dbr_sts_string>(vdata);
       return result.get() ? object(dbr_sts_string_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_short_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_short_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_short";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_short> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_short);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_short";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_short> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_short>(vdata);
       return result.get() ? object(dbr_ctrl_short_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_float_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_float_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_float";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_float> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_float);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_float";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_float> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_float>(vdata);
       return result.get() ? object(dbr_ctrl_float_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_enum_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_enum_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_enum";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_enum> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_enum);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_enum";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_enum> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_enum>(vdata);
       return result.get() ? object(dbr_ctrl_enum_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_char_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_char_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_char";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_char> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_char);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_char";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_char> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_char>(vdata);
       return result.get() ? object(dbr_ctrl_char_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_long_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_long_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_long";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_long> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_long);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_long";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_long> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_long>(vdata);
       return result.get() ? object(dbr_ctrl_long_Wrapper(result)) : object();
     }
   };
 
-  class dbr_ctrl_double_Getter : public psddl_python::EventGetter {
+  class dbr_ctrl_double_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::dbr_ctrl_double";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::dbr_ctrl_double> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_double);}
+    const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_double";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::dbr_ctrl_double> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_double>(vdata);
       return result.get() ? object(dbr_ctrl_double_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvHeader_Getter : public psddl_python::EventGetter {
+  class EpicsPvHeader_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvHeader";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvHeader> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvHeader);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvHeader";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvHeader>(vdata);
       return result.get() ? object(EpicsPvHeader_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlHeader_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlHeader_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlHeader";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlHeader> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlHeader);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlHeader";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlHeader>(vdata);
       return result.get() ? object(EpicsPvCtrlHeader_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeHeader_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeHeader_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeHeader";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeHeader> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeHeader);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeHeader";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeHeader>(vdata);
       return result.get() ? object(EpicsPvTimeHeader_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlString_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlString_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlString";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlString> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlString);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlString";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlString> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlString>(vdata);
       return result.get() ? object(EpicsPvCtrlString_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlShort_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlShort_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlShort";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlShort> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlShort);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlShort";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlShort> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlShort>(vdata);
       return result.get() ? object(EpicsPvCtrlShort_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlFloat_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlFloat_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlFloat";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlFloat> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlFloat);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlFloat";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlFloat> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlFloat>(vdata);
       return result.get() ? object(EpicsPvCtrlFloat_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlEnum_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlEnum_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlEnum";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlEnum> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlEnum);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlEnum";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlEnum> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlEnum>(vdata);
       return result.get() ? object(EpicsPvCtrlEnum_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlChar_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlChar_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlChar";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlChar> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlChar);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlChar";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlChar> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlChar>(vdata);
       return result.get() ? object(EpicsPvCtrlChar_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlLong_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlLong_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlLong";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlLong> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlLong);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlLong";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlLong> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlLong>(vdata);
       return result.get() ? object(EpicsPvCtrlLong_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvCtrlDouble_Getter : public psddl_python::EventGetter {
+  class EpicsPvCtrlDouble_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvCtrlDouble";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvCtrlDouble> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlDouble);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlDouble";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvCtrlDouble> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlDouble>(vdata);
       return result.get() ? object(EpicsPvCtrlDouble_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeString_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeString_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeString";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeString> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeString);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeString";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeString> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeString>(vdata);
       return result.get() ? object(EpicsPvTimeString_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeShort_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeShort_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeShort";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeShort> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeShort);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeShort";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeShort> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeShort>(vdata);
       return result.get() ? object(EpicsPvTimeShort_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeFloat_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeFloat_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeFloat";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeFloat> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeFloat);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeFloat";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeFloat> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeFloat>(vdata);
       return result.get() ? object(EpicsPvTimeFloat_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeEnum_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeEnum_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeEnum";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeEnum> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeEnum);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeEnum";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeEnum> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeEnum>(vdata);
       return result.get() ? object(EpicsPvTimeEnum_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeChar_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeChar_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeChar";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeChar> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeChar);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeChar";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeChar> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeChar>(vdata);
       return result.get() ? object(EpicsPvTimeChar_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeLong_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeLong_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeLong";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeLong> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeLong);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeLong";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeLong> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeLong>(vdata);
       return result.get() ? object(EpicsPvTimeLong_Wrapper(result)) : object();
     }
   };
 
-  class EpicsPvTimeDouble_Getter : public psddl_python::EventGetter {
+  class EpicsPvTimeDouble_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::EpicsPvTimeDouble";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Epics::EpicsPvTimeDouble> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeDouble);}
+    const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeDouble";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::EpicsPvTimeDouble> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeDouble>(vdata);
       return result.get() ? object(EpicsPvTimeDouble_Wrapper(result)) : object();
     }
   };
 
-  class PvConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class PvConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::PvConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Epics::PvConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::PvConfigV1);}
+    const char* getTypeName() const { return "Psana::Epics::PvConfigV1";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::PvConfigV1> result = boost::static_pointer_cast<Psana::Epics::PvConfigV1>(vdata);
       return result.get() ? object(PvConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Epics::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Epics::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Epics::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Epics::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Epics::ConfigV1";}
+    int getVersion() const { return Psana::Epics::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Epics::ConfigV1> result = boost::static_pointer_cast<Psana::Epics::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };

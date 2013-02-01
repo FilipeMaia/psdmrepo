@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Timepix {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Timepix", 0, "The Python wrapper module for Timepix types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Timepix", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("readoutSpeed", &n::readoutSpeed)\
     .def("triggerMode", &n::triggerMode)\
     .def("shutterTimeout", &n::shutterTimeout)\
@@ -70,13 +74,13 @@ void createWrappers() {
     .def("dac3BiasLvds", &n::dac3BiasLvds)\
     .def("dac3RefLvds", &n::dac3RefLvds)\
 
-  _CLASS(psddl_python::Timepix::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Timepix::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("readoutSpeed", &n::readoutSpeed)\
     .def("triggerMode", &n::triggerMode)\
     .def("timepixSpeed", &n::timepixSpeed)\
@@ -150,13 +154,13 @@ void createWrappers() {
     .def("chip3ID", &n::chip3ID)\
     .def("chipCount", &n::chipCount)\
 
-  _CLASS(psddl_python::Timepix::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Timepix::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("readoutSpeed", &n::readoutSpeed)\
     .def("timepixMode", &n::timepixMode)\
     .def("timepixSpeed", &n::timepixSpeed)\
@@ -232,13 +236,13 @@ void createWrappers() {
     .def("chip3ID", &n::chip3ID)\
     .def("chipCount", &n::chipCount)\
 
-  _CLASS(psddl_python::Timepix::ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Timepix::ConfigV3_Wrapper, "ConfigV3", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV3);
+  ADD_GETTER(ConfigV3);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("frameCounter", &n::frameCounter)\
     .def("lostRows", &n::lostRows)\
@@ -248,13 +252,13 @@ void createWrappers() {
     .def("depth", &n::depth)\
     .def("depth_bytes", &n::depth_bytes)\
 
-  _CLASS(psddl_python::Timepix::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Timepix::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("timestamp", &n::timestamp)\
@@ -264,10 +268,10 @@ void createWrappers() {
     .def("depth", &n::depth)\
     .def("depth_bytes", &n::depth_bytes)\
 
-  _CLASS(psddl_python::Timepix::DataV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Timepix::DataV2_Wrapper, "DataV2", return_value_policy<return_by_value>());
   std_vector_class_(DataV2_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV2);
+  ADD_GETTER(DataV2);
 
 
 } // createWrappers()

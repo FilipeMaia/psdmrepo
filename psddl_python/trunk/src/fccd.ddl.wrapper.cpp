@@ -6,23 +6,27 @@
 namespace psddl_python {
 namespace FCCD {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.FCCD", 0, "The Python wrapper module for FCCD types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "FCCD", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(psddl_python::FCCD::FccdConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::FCCD::FccdConfigV1_Wrapper, "FccdConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(FccdConfigV1);
+  ADD_GETTER(FccdConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("outputMode", &n::outputMode)\
     .def("ccdEnable", &n::ccdEnable)\
     .def("focusMode", &n::focusMode)\
@@ -34,10 +38,10 @@ void createWrappers() {
     .def("trimmedWidth", &n::trimmedWidth)\
     .def("trimmedHeight", &n::trimmedHeight)\
 
-  _CLASS(psddl_python::FCCD::FccdConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::FCCD::FccdConfigV2_Wrapper, "FccdConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(FccdConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(FccdConfigV2);
+  ADD_GETTER(FccdConfigV2);
 
 
 } // createWrappers()

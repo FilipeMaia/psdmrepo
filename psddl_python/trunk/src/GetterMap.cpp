@@ -1,97 +1,133 @@
-#include <cassert>
-#include <stdio.h>
-#include <string.h>
-#include <psddl_python/GetterMap.h>
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id: GetterMap.cpp 5266 2013-01-31 20:14:36Z salnikov@SLAC.STANFORD.EDU $
+//
+// Description:
+//      Class GetterMap...
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_python/GetterMap.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+#include <iostream>
+#include <cstring>
+#include <boost/lexical_cast.hpp>
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace {
+  const char logger[] = "GetterMap";
+}
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
+
 
 namespace psddl_python {
 
-  GetterMap envObjectStoreGetterMap("Psana::EnvObjectStore");
-  GetterMap eventGetterMap("Psana::Event");
+GetterMap&
+GetterMap::instance()
+{
+  static GetterMap singleton;
+  return singleton;
+}
 
-  void GetterMap::printTables() {
-    printf("*** getterMap:\n");
-    map<string, Getter*>::const_iterator it;
-    for (it = getterMap.begin(); it != getterMap.end(); it++) {
-      string typeName = it->first;
-      printf("'%s' -> %p\n", it->first.c_str(), it->second);
+
+void GetterMap::printTables()
+{
+  WithMsgLog(logger, info, str) {
+    str << "*** getterMap:\n";
+    for (GetterNameMap::const_iterator it = m_getterNameMap.begin(); it != m_getterNameMap.end(); ++ it) {
+      str << it->first << " -> " << it->second << '\n';
     }
 
-    printf("*** versionMax:\n");
-    map<string, int>::const_iterator vit;
-    for (vit = versionMax.begin(); vit != versionMax.end(); vit++) {
-      string typeName = vit->first;
-      int maxVersion = vit->second;
-      int minVersion = versionMin[typeName];
-      printf("'%s' -> [%d..%d]\n", typeName.c_str(), minVersion, maxVersion);
-    }
-
-    printf("*** versionMin:\n");
-    for (vit = versionMin.begin(); vit != versionMin.end(); vit++) {
-      string typeName = vit->first;
-      int minVersion = vit->second;
-      int maxVersion = versionMax[typeName];
-      printf("'%s' -> [%d..%d]\n", typeName.c_str(), minVersion, maxVersion);
-    }
-  }
-
-  void GetterMap::addGetter(Getter* getter) {
-
-    // Add the mapping for the original name (with version).
-    // E.g. "BldDataEBeamV0" or "TdcDataV1_Item"
-    string typeName(getter->getTypeName());
-    getterMap[typeName] = getter;
-    const int version = getter->getVersion();
-    if (version == -1) {
-      return;
-    }
-
-    // This getter has a version. See if we find it embedded in the type name.
-
-    static char vpart[64];
-    sprintf(vpart, "V%d", version);
-    const size_t vpos = typeName.rfind(vpart);
-    if (vpos == string::npos) {
-      if (version != 0) {
-        fprintf(stderr, "%s::addGetter(%s): version is %d but no V%d found in class name\n",
-                m_className, typeName.c_str(), version, version);
+    str << "*** templates:\n";
+    for (TemplateMap::const_iterator it = m_templateMap.begin(); it != m_templateMap.end(); ++ it) {
+      str << it->first << " ->";
+      const NameList& names = it->second;
+      for (NameList::const_iterator nit = names.begin(); nit != names.end(); ++ nit) {
+        str << ' ' << *nit;
       }
-      return;
-    }
-    string prefix = typeName.substr(0, vpos).c_str();
-    int vpartlen = strlen(vpart);
-    string suffix = typeName.substr(vpos + vpartlen);
-
-    string _template = prefix + "V%d" + suffix;
-
-    typeName = prefix + suffix;
-    //printf("%s::addGetter generated template '%s' from '%s'\n", m_className, _template.c_str(), typeName.c_str());
-    if (templateMap.find(typeName) == templateMap.end()) {
-      templateMap[typeName] = _template;
-      versionMin[typeName] = version;
-      versionMax[typeName] = version;
-    } else if (version < versionMin[typeName]) {
-      versionMin[typeName] = version;
-    } else if (version > versionMax[typeName]) {
-      versionMax[typeName] = version;
-    }
-  }
-
-  // Return template for versionless type name, if one exists.
-  const char* GetterMap::getTemplate(const string& typeName, int* pVersionMin, int* pVersionMax) {
-    if (templateMap.find(typeName) == templateMap.end()) {
-      return NULL;
-    }
-    const string& _template = templateMap[typeName];
-    *pVersionMin = versionMin[typeName];
-    *pVersionMax = versionMax[typeName];
-    return _template.c_str();
-  }
-
-  Getter* GetterMap::getGetter(const string& typeName) {
-    if (getterMap.find(typeName) != getterMap.end()) {
-      return getterMap[typeName];
-    } else {
-      return NULL;
+      str << '\n';
     }
   }
 }
+
+void GetterMap::addGetter(const boost::shared_ptr<Getter>& getter)
+{
+  // Add mapping trom typeinfo to getter
+  m_getterTypeMap.insert(std::make_pair(std::tr1::cref(getter->typeinfo()), getter));
+
+  // Add the mapping for the original name (with version).
+  // E.g. "BldDataEBeamV0" or "TdcDataV1_Item"
+  m_getterNameMap.insert(std::make_pair(getter->getTypeName(), getter));
+
+  const int version = getter->getVersion();
+  if (version == -1) {
+    return;
+  }
+
+  // This getter has a version. See if we find it embedded in the type name.
+  std::string typeName(getter->getTypeName());
+  std::string vpart = "V";
+  vpart += boost::lexical_cast<std::string>(version);
+  const size_t vpos = typeName.rfind(vpart);
+  if (vpos == std::string::npos) {
+    if (version != 0) {
+      MsgLog(logger, error, "GetterMap::addGetter(" << typeName  << "): version is "
+          << version << " but no V" << version << " found in class name");
+    }
+    return;
+  }
+
+  // strip version from type name, store original name for this name
+  typeName.erase(vpos, vpart.size());
+  m_templateMap[typeName].push_back(getter->getTypeName());
+}
+
+// Return template for versionless type name, if one exists.
+const GetterMap::NameList&
+GetterMap::getTemplate(const std::string& typeName) const
+{
+  TemplateMap::const_iterator it = m_templateMap.find(typeName);
+  if (it == m_templateMap.end()) return m_emptyNameList;
+  return it->second;
+}
+
+boost::shared_ptr<Getter>
+GetterMap::getGetter(const std::type_info& type) const
+{
+  boost::shared_ptr<Getter> res;
+  GetterTypeMap::const_iterator it = m_getterTypeMap.find(std::tr1::cref(type));
+  if (it != m_getterTypeMap.end()) {
+    res = it->second;
+  }
+  return res;
+}
+
+boost::shared_ptr<Getter>
+GetterMap::getGetter(const std::string& typeName) const
+{
+  boost::shared_ptr<Getter> res;
+  GetterNameMap::const_iterator it = m_getterNameMap.find(typeName);
+  if (it != m_getterNameMap.end()) {
+    res = it->second;
+  }
+  return res;
+}
+
+} // namespace psddl_python

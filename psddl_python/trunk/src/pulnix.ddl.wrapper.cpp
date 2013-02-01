@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Pulnix {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Pulnix", 0, "The Python wrapper module for Pulnix types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Pulnix", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref", &n::vref)\
@@ -21,13 +25,13 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(psddl_python::Pulnix::TM6740ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Pulnix::TM6740ConfigV1_Wrapper, "TM6740ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV1);
+  ADD_GETTER(TM6740ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("gain_a", &n::gain_a)\
     .def("gain_b", &n::gain_b)\
     .def("vref_a", &n::vref_a)\
@@ -39,10 +43,10 @@ void createWrappers() {
     .def("lookuptable_mode", &n::lookuptable_mode)\
     .def("output_resolution_bits", &n::output_resolution_bits)\
 
-  _CLASS(psddl_python::Pulnix::TM6740ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Pulnix::TM6740ConfigV2_Wrapper, "TM6740ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(TM6740ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(TM6740ConfigV2);
+  ADD_GETTER(TM6740ConfigV2);
 
 
 } // createWrappers()

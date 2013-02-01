@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Andor {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Andor", 0, "The Python wrapper module for Andor types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Andor", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -30,22 +34,22 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(psddl_python::Andor::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Andor::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("shotIdStart", &n::shotIdStart)\
     .def("readoutTime", &n::readoutTime)\
     .def("temperature", &n::temperature)\
     .def("data", &n::data)\
 
-  _CLASS(psddl_python::Andor::FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Andor::FrameV1_Wrapper, "FrameV1", return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(FrameV1);
+  ADD_GETTER(FrameV1);
 
 
 } // createWrappers()

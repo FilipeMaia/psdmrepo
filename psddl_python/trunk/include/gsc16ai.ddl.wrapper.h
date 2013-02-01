@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::Gsc16ai::ConfigV1> _o;
@@ -52,28 +52,24 @@ public:
   PyObject* channelValue() const { ND_CONVERT(o->channelValue(), uint16_t, 1); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Gsc16ai::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Gsc16ai::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Gsc16ai::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Gsc16ai::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Gsc16ai::ConfigV1";}
+    int getVersion() const { return Psana::Gsc16ai::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Gsc16ai::ConfigV1> result = boost::static_pointer_cast<Psana::Gsc16ai::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::EventGetter {
+  class DataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Gsc16ai::DataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Gsc16ai::DataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Gsc16ai::DataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Gsc16ai::DataV1);}
+    const char* getTypeName() const { return "Psana::Gsc16ai::DataV1";}
+    int getVersion() const { return Psana::Gsc16ai::DataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Gsc16ai::DataV1> result = boost::static_pointer_cast<Psana::Gsc16ai::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };

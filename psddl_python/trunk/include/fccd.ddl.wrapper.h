@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class FccdConfigV1_Wrapper {
   shared_ptr<Psana::FCCD::FccdConfigV1> _o;
@@ -54,28 +54,24 @@ public:
   uint32_t trimmedHeight() const { return o->trimmedHeight(); }
 };
 
-  class FccdConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class FccdConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::FCCD::FccdConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::FCCD::FccdConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::FCCD::FccdConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::FCCD::FccdConfigV1);}
+    const char* getTypeName() const { return "Psana::FCCD::FccdConfigV1";}
+    int getVersion() const { return Psana::FCCD::FccdConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::FCCD::FccdConfigV1> result = boost::static_pointer_cast<Psana::FCCD::FccdConfigV1>(vdata);
       return result.get() ? object(FccdConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FccdConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class FccdConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::FCCD::FccdConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::FCCD::FccdConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::FCCD::FccdConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::FCCD::FccdConfigV2);}
+    const char* getTypeName() const { return "Psana::FCCD::FccdConfigV2";}
+    int getVersion() const { return Psana::FCCD::FccdConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::FCCD::FccdConfigV2> result = boost::static_pointer_cast<Psana::FCCD::FccdConfigV2>(vdata);
       return result.get() ? object(FccdConfigV2_Wrapper(result)) : object();
     }
   };

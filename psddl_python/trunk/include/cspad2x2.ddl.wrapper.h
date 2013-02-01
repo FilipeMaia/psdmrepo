@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class CsPad2x2DigitalPotsCfg_Wrapper {
   shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> _o;
@@ -135,78 +135,74 @@ public:
   float common_mode(uint32_t section) const { return o->common_mode(section); }
 };
 
-  class CsPad2x2DigitalPotsCfg_Getter : public psddl_python::EventGetter {
+  class CsPad2x2DigitalPotsCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::CsPad2x2DigitalPotsCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2DigitalPotsCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>(vdata);
       return result.get() ? object(CsPad2x2DigitalPotsCfg_Wrapper(result)) : object();
     }
   };
 
-  class CsPad2x2ReadOnlyCfg_Getter : public psddl_python::EventGetter {
+  class CsPad2x2ReadOnlyCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::CsPad2x2ReadOnlyCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2ReadOnlyCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>(vdata);
       return result.get() ? object(CsPad2x2ReadOnlyCfg_Wrapper(result)) : object();
     }
   };
 
-  class ProtectionSystemThreshold_Getter : public psddl_python::EventGetter {
+  class ProtectionSystemThreshold_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::ProtectionSystemThreshold";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ProtectionSystemThreshold);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ProtectionSystemThreshold";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold> result = boost::static_pointer_cast<Psana::CsPad2x2::ProtectionSystemThreshold>(vdata);
       return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
     }
   };
 
-  class CsPad2x2GainMapCfg_Getter : public psddl_python::EventGetter {
+  class CsPad2x2GainMapCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::CsPad2x2GainMapCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2GainMapCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2GainMapCfg>(vdata);
       return result.get() ? object(CsPad2x2GainMapCfg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1QuadReg_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1QuadReg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::ConfigV1QuadReg";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV1QuadReg);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV1QuadReg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV1QuadReg>(vdata);
       return result.get() ? object(ConfigV1QuadReg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::CsPad2x2::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad2x2::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV1);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV1";}
+    int getVersion() const { return Psana::CsPad2x2::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ConfigV1> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ElementV1_Getter : public psddl_python::EventGetter {
+  class ElementV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad2x2::ElementV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::CsPad2x2::ElementV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad2x2::ElementV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ElementV1);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ElementV1";}
+    int getVersion() const { return Psana::CsPad2x2::ElementV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ElementV1> result = boost::static_pointer_cast<Psana::CsPad2x2::ElementV1>(vdata);
       return result.get() ? object(ElementV1_Wrapper(result)) : object();
     }
   };

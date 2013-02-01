@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Princeton {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Princeton", 0, "The Python wrapper module for Princeton types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Princeton", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -26,13 +30,13 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(psddl_python::Princeton::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Princeton::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -50,13 +54,13 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(psddl_python::Princeton::ConfigV2_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Princeton::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV2);
+  ADD_GETTER(ConfigV2);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -74,13 +78,13 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(psddl_python::Princeton::ConfigV3_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Princeton::ConfigV3_Wrapper, "ConfigV3", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV3_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV3);
+  ADD_GETTER(ConfigV3);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("width", &n::width)\
     .def("height", &n::height)\
     .def("orgX", &n::orgX)\
@@ -101,33 +105,33 @@ void createWrappers() {
     .def("numPixelsY", &n::numPixelsY)\
     .def("numPixels", &n::numPixels)\
 
-  _CLASS(psddl_python::Princeton::ConfigV4_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Princeton::ConfigV4_Wrapper, "ConfigV4", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV4_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV4);
+  ADD_GETTER(ConfigV4);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("shotIdStart", &n::shotIdStart)\
     .def("readoutTime", &n::readoutTime)\
     .def("data", &n::data)\
 
-  _CLASS(psddl_python::Princeton::FrameV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Princeton::FrameV1_Wrapper, "FrameV1", return_value_policy<return_by_value>());
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(FrameV1);
+  ADD_GETTER(FrameV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("temperature", &n::temperature)\
     .def("_sizeof", &n::_sizeof)\
 
-  _CLASS(Psana::Princeton::InfoV1, return_value_policy<copy_const_reference>());
-  _CLASS(psddl_python::Princeton::InfoV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(Psana::Princeton::InfoV1, "InfoV1", return_value_policy<copy_const_reference>());
+  _CLASS(psddl_python::Princeton::InfoV1_Wrapper, "InfoV1", return_value_policy<return_by_value>());
   std_vector_class_(Psana::Princeton::InfoV1);
   std_vector_class_(InfoV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(InfoV1);
+  ADD_GETTER(InfoV1);
 
 
 } // createWrappers()

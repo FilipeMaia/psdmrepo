@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class FrameCoord_Wrapper {
   shared_ptr<Psana::Camera::FrameCoord> _o;
@@ -91,64 +91,56 @@ public:
   double major_axis_tilt() const { return o->major_axis_tilt(); }
 };
 
-  class FrameCoord_Getter : public psddl_python::EventGetter {
+  class FrameCoord_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Camera::FrameCoord";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Camera::FrameCoord> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameCoord);}
+    const char* getTypeName() const { return "Psana::Camera::FrameCoord";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Camera::FrameCoord> result = boost::static_pointer_cast<Psana::Camera::FrameCoord>(vdata);
       return result.get() ? object(FrameCoord_Wrapper(result)) : object();
     }
   };
 
-  class FrameFccdConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class FrameFccdConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Camera::FrameFccdConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Camera::FrameFccdConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Camera::FrameFccdConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameFccdConfigV1);}
+    const char* getTypeName() const { return "Psana::Camera::FrameFccdConfigV1";}
+    int getVersion() const { return Psana::Camera::FrameFccdConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Camera::FrameFccdConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFccdConfigV1>(vdata);
       return result.get() ? object(FrameFccdConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameFexConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class FrameFexConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Camera::FrameFexConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Camera::FrameFexConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Camera::FrameFexConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameFexConfigV1);}
+    const char* getTypeName() const { return "Psana::Camera::FrameFexConfigV1";}
+    int getVersion() const { return Psana::Camera::FrameFexConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Camera::FrameFexConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFexConfigV1>(vdata);
       return result.get() ? object(FrameFexConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::EventGetter {
+  class FrameV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Camera::FrameV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Camera::FrameV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Camera::FrameV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameV1);}
+    const char* getTypeName() const { return "Psana::Camera::FrameV1";}
+    int getVersion() const { return Psana::Camera::FrameV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Camera::FrameV1> result = boost::static_pointer_cast<Psana::Camera::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
     }
   };
 
-  class TwoDGaussianV1_Getter : public psddl_python::EventGetter {
+  class TwoDGaussianV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Camera::TwoDGaussianV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Camera::TwoDGaussianV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Camera::TwoDGaussianV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Camera::TwoDGaussianV1);}
+    const char* getTypeName() const { return "Psana::Camera::TwoDGaussianV1";}
+    int getVersion() const { return Psana::Camera::TwoDGaussianV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Camera::TwoDGaussianV1> result = boost::static_pointer_cast<Psana::Camera::TwoDGaussianV1>(vdata);
       return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();
     }
   };

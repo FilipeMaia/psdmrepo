@@ -3,11 +3,11 @@
 
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>
+#include <boost/make_shared.hpp>
 #include <psddl_python/vector_indexing_suite_nocopy.hpp>
 #include <numpy/arrayobject.h>
 
-#include "EventGetter.h"
-#include "EnvObjectStoreGetter.h"
+#include "psddl_python/GetterMap.h"
 
 namespace psddl_python {
   extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);
@@ -29,7 +29,6 @@ associate_PyArrayType(double, PyArray_DOUBLE);
 
 #define ND_CONVERT(value, ctype, ndim) const ndarray<const ctype, ndim>& a(value); return psddl_python::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
 #define VEC_CONVERT(value, ctype) const ndarray<const ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
-#define ADD_ENV_OBJECT_STORE_GETTER(x) EnvObjectStoreGetter::addGetter(new x ## _Getter())
-#define ADD_EVENT_GETTER(x) EventGetter::addGetter(new x ## _Getter())
+#define ADD_GETTER(x) psddl_python::GetterMap::instance().addGetter(boost::make_shared<x ## _Getter>())
 
 #endif // PSANA_DDLWRAPPER_H

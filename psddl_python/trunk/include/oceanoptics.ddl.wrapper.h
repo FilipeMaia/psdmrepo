@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::OceanOptics::ConfigV1> _o;
@@ -68,38 +68,34 @@ public:
   double nonlinerCorrected(uint32_t iPixel) const { return o->nonlinerCorrected(iPixel); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::OceanOptics::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::OceanOptics::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::OceanOptics::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::ConfigV1);}
+    const char* getTypeName() const { return "Psana::OceanOptics::ConfigV1";}
+    int getVersion() const { return Psana::OceanOptics::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::OceanOptics::ConfigV1> result = boost::static_pointer_cast<Psana::OceanOptics::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class timespec64_Getter : public psddl_python::EventGetter {
+  class timespec64_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::OceanOptics::timespec64";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::OceanOptics::timespec64> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::timespec64);}
+    const char* getTypeName() const { return "Psana::OceanOptics::timespec64";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::OceanOptics::timespec64> result = boost::static_pointer_cast<Psana::OceanOptics::timespec64>(vdata);
       return result.get() ? object(timespec64_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::EventGetter {
+  class DataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::OceanOptics::DataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::OceanOptics::DataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::OceanOptics::DataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::DataV1);}
+    const char* getTypeName() const { return "Psana::OceanOptics::DataV1";}
+    int getVersion() const { return Psana::OceanOptics::DataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::OceanOptics::DataV1> result = boost::static_pointer_cast<Psana::OceanOptics::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };

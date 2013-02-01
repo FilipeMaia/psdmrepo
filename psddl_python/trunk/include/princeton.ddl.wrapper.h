@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::Princeton::ConfigV1> _o;
@@ -154,80 +154,68 @@ public:
   uint32_t _sizeof() const { return o->_sizeof(); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Princeton::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Princeton::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Princeton::ConfigV1";}
+    int getVersion() const { return Psana::Princeton::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::ConfigV1> result = boost::static_pointer_cast<Psana::Princeton::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Princeton::ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Princeton::ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV2);}
+    const char* getTypeName() const { return "Psana::Princeton::ConfigV2";}
+    int getVersion() const { return Psana::Princeton::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::ConfigV2> result = boost::static_pointer_cast<Psana::Princeton::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV3_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV3_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::ConfigV3";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Princeton::ConfigV3::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Princeton::ConfigV3> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV3);}
+    const char* getTypeName() const { return "Psana::Princeton::ConfigV3";}
+    int getVersion() const { return Psana::Princeton::ConfigV3::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::ConfigV3> result = boost::static_pointer_cast<Psana::Princeton::ConfigV3>(vdata);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV4_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV4_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::ConfigV4";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Princeton::ConfigV4::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Princeton::ConfigV4> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV4);}
+    const char* getTypeName() const { return "Psana::Princeton::ConfigV4";}
+    int getVersion() const { return Psana::Princeton::ConfigV4::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::ConfigV4> result = boost::static_pointer_cast<Psana::Princeton::ConfigV4>(vdata);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::EventGetter {
+  class FrameV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::FrameV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Princeton::FrameV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Princeton::FrameV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::FrameV1);}
+    const char* getTypeName() const { return "Psana::Princeton::FrameV1";}
+    int getVersion() const { return Psana::Princeton::FrameV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::FrameV1> result = boost::static_pointer_cast<Psana::Princeton::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
     }
   };
 
-  class InfoV1_Getter : public psddl_python::EventGetter {
+  class InfoV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Princeton::InfoV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Princeton::InfoV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Princeton::InfoV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::InfoV1);}
+    const char* getTypeName() const { return "Psana::Princeton::InfoV1";}
+    int getVersion() const { return Psana::Princeton::InfoV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::InfoV1> result = boost::static_pointer_cast<Psana::Princeton::InfoV1>(vdata);
       return result.get() ? object(InfoV1_Wrapper(result)) : object();
     }
   };

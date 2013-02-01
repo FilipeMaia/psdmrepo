@@ -6,10 +6,14 @@
 namespace psddl_python {
 namespace Gsc16ai {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.Gsc16ai", 0, "The Python wrapper module for Gsc16ai types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "Gsc16ai", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("voltageRange", &n::voltageRange)\
     .def("firstChan", &n::firstChan)\
     .def("lastChan", &n::lastChan)\
@@ -21,20 +25,20 @@ void createWrappers() {
     .def("timeTagEnable", &n::timeTagEnable)\
     .def("numChannels", &n::numChannels)\
 
-  _CLASS(psddl_python::Gsc16ai::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Gsc16ai::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("timestamp", &n::timestamp)\
     .def("channelValue", &n::channelValue)\
 
-  _CLASS(psddl_python::Gsc16ai::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::Gsc16ai::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
 } // createWrappers()

@@ -6,28 +6,32 @@
 namespace psddl_python {
 namespace UsdUsb {
 
-void createWrappers() {
+void createWrappers(PyObject* module) {
   _import_array();
+  PyObject* submodule = Py_InitModule3( "psana.UsdUsb", 0, "The Python wrapper module for UsdUsb types");
+  Py_INCREF(submodule);
+  PyModule_AddObject(module, "UsdUsb", submodule);
+  scope mod = object(handle<>(borrowed(submodule)));
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("counting_mode", &n::counting_mode)\
     .def("quadrature_mode", &n::quadrature_mode)\
 
-  _CLASS(psddl_python::UsdUsb::ConfigV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::UsdUsb::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
 #undef _CLASS
-  ADD_ENV_OBJECT_STORE_GETTER(ConfigV1);
+  ADD_GETTER(ConfigV1);
 
 
-#define _CLASS(n, policy) class_<n>(#n, no_init)\
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("digital_in", &n::digital_in)\
     .def("timestamp", &n::timestamp)\
     .def("value", &n::value)\
 
-  _CLASS(psddl_python::UsdUsb::DataV1_Wrapper, return_value_policy<return_by_value>());
+  _CLASS(psddl_python::UsdUsb::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);
 #undef _CLASS
-  ADD_EVENT_GETTER(DataV1);
+  ADD_GETTER(DataV1);
 
 
 } // createWrappers()

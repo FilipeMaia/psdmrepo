@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
   shared_ptr<Psana::Andor::ConfigV1> _o;
@@ -63,28 +63,24 @@ public:
   PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
 };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Andor::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::Andor::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::Andor::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Andor::ConfigV1);}
+    const char* getTypeName() const { return "Psana::Andor::ConfigV1";}
+    int getVersion() const { return Psana::Andor::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Andor::ConfigV1> result = boost::static_pointer_cast<Psana::Andor::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::EventGetter {
+  class FrameV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::Andor::FrameV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::Andor::FrameV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::Andor::FrameV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::Andor::FrameV1);}
+    const char* getTypeName() const { return "Psana::Andor::FrameV1";}
+    int getVersion() const { return Psana::Andor::FrameV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Andor::FrameV1> result = boost::static_pointer_cast<Psana::Andor::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
     }
   };

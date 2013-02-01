@@ -17,7 +17,7 @@ using boost::python::api::object;
 using boost::shared_ptr;
 using std::vector;
 
-extern void createWrappers();
+void createWrappers(PyObject* module);
 
 class CsPadDigitalPotsCfg_Wrapper {
   shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> _o;
@@ -306,160 +306,148 @@ public:
   boost::python::list quads_list() { boost::python::list l; const int n = quads_shape()[0]; for (int i = 0; i < n; i++) l.append(quads(i)); return l; }
 };
 
-  class CsPadDigitalPotsCfg_Getter : public psddl_python::EventGetter {
+  class CsPadDigitalPotsCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::CsPadDigitalPotsCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::CsPadDigitalPotsCfg);}
+    const char* getTypeName() const { return "Psana::CsPad::CsPadDigitalPotsCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> result = boost::static_pointer_cast<Psana::CsPad::CsPadDigitalPotsCfg>(vdata);
       return result.get() ? object(CsPadDigitalPotsCfg_Wrapper(result)) : object();
     }
   };
 
-  class CsPadReadOnlyCfg_Getter : public psddl_python::EventGetter {
+  class CsPadReadOnlyCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::CsPadReadOnlyCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::CsPadReadOnlyCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::CsPadReadOnlyCfg);}
+    const char* getTypeName() const { return "Psana::CsPad::CsPadReadOnlyCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::CsPadReadOnlyCfg> result = boost::static_pointer_cast<Psana::CsPad::CsPadReadOnlyCfg>(vdata);
       return result.get() ? object(CsPadReadOnlyCfg_Wrapper(result)) : object();
     }
   };
 
-  class ProtectionSystemThreshold_Getter : public psddl_python::EventGetter {
+  class ProtectionSystemThreshold_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ProtectionSystemThreshold";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::ProtectionSystemThreshold> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ProtectionSystemThreshold);}
+    const char* getTypeName() const { return "Psana::CsPad::ProtectionSystemThreshold";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ProtectionSystemThreshold> result = boost::static_pointer_cast<Psana::CsPad::ProtectionSystemThreshold>(vdata);
       return result.get() ? object(ProtectionSystemThreshold_Wrapper(result)) : object();
     }
   };
 
-  class CsPadGainMapCfg_Getter : public psddl_python::EventGetter {
+  class CsPadGainMapCfg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::CsPadGainMapCfg";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::CsPadGainMapCfg> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::CsPadGainMapCfg);}
+    const char* getTypeName() const { return "Psana::CsPad::CsPadGainMapCfg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::CsPadGainMapCfg> result = boost::static_pointer_cast<Psana::CsPad::CsPadGainMapCfg>(vdata);
       return result.get() ? object(CsPadGainMapCfg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1QuadReg_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1QuadReg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV1QuadReg";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV1QuadReg> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV1QuadReg);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV1QuadReg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV1QuadReg> result = boost::static_pointer_cast<Psana::CsPad::ConfigV1QuadReg>(vdata);
       return result.get() ? object(ConfigV1QuadReg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2QuadReg_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2QuadReg_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV2QuadReg";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV2QuadReg> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV2QuadReg);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV2QuadReg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV2QuadReg> result = boost::static_pointer_cast<Psana::CsPad::ConfigV2QuadReg>(vdata);
       return result.get() ? object(ConfigV2QuadReg_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV1";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::CsPad::ConfigV1::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV1> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV1);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV1";}
+    int getVersion() const { return Psana::CsPad::ConfigV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV1> result = boost::static_pointer_cast<Psana::CsPad::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV2";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::CsPad::ConfigV2::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV2> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV2);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV2";}
+    int getVersion() const { return Psana::CsPad::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV2> result = boost::static_pointer_cast<Psana::CsPad::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV3_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV3_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV3";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::CsPad::ConfigV3::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV3> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV3);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV3";}
+    int getVersion() const { return Psana::CsPad::ConfigV3::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV3> result = boost::static_pointer_cast<Psana::CsPad::ConfigV3>(vdata);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV4_Getter : public psddl_python::EnvObjectStoreGetter {
+  class ConfigV4_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ConfigV4";}
-  const char* getGetterClassName() { return "psddl_python::EnvObjectStoreGetter";}
-    int getVersion() {
-      return Psana::CsPad::ConfigV4::Version;
-    }
-    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {
-      boost::shared_ptr<Psana::CsPad::ConfigV4> result = store.get(source, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ConfigV4);}
+    const char* getTypeName() const { return "Psana::CsPad::ConfigV4";}
+    int getVersion() const { return Psana::CsPad::ConfigV4::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ConfigV4> result = boost::static_pointer_cast<Psana::CsPad::ConfigV4>(vdata);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class ElementV1_Getter : public psddl_python::EventGetter {
+  class ElementV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ElementV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::ElementV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ElementV1);}
+    const char* getTypeName() const { return "Psana::CsPad::ElementV1";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ElementV1> result = boost::static_pointer_cast<Psana::CsPad::ElementV1>(vdata);
       return result.get() ? object(ElementV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::EventGetter {
+  class DataV1_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::DataV1";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::CsPad::DataV1::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::DataV1> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::DataV1);}
+    const char* getTypeName() const { return "Psana::CsPad::DataV1";}
+    int getVersion() const { return Psana::CsPad::DataV1::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::DataV1> result = boost::static_pointer_cast<Psana::CsPad::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();
     }
   };
 
-  class ElementV2_Getter : public psddl_python::EventGetter {
+  class ElementV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::ElementV2";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::ElementV2> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::ElementV2);}
+    const char* getTypeName() const { return "Psana::CsPad::ElementV2";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::ElementV2> result = boost::static_pointer_cast<Psana::CsPad::ElementV2>(vdata);
       return result.get() ? object(ElementV2_Wrapper(result)) : object();
     }
   };
 
-  class DataV2_Getter : public psddl_python::EventGetter {
+  class DataV2_Getter : public psddl_python::Getter {
   public:
-  const char* getTypeName() { return "Psana::CsPad::DataV2";}
-  const char* getGetterClassName() { return "psddl_python::EventGetter";}
-    int getVersion() {
-      return Psana::CsPad::DataV2::Version;
-    }
-    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {
-      shared_ptr<Psana::CsPad::DataV2> result = evt.get(source, key, foundSrc);
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad::DataV2);}
+    const char* getTypeName() const { return "Psana::CsPad::DataV2";}
+    int getVersion() const { return Psana::CsPad::DataV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad::DataV2> result = boost::static_pointer_cast<Psana::CsPad::DataV2>(vdata);
       return result.get() ? object(DataV2_Wrapper(result)) : object();
     }
   };
