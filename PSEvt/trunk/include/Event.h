@@ -312,6 +312,16 @@ public:
     return result;
   }
   
+  /**
+   *  @brief Get access to proxy dictionary.
+   *
+   *  This method exposes underlying proxy dictionary object. It should
+   *  not be used by ordinary clients but it could be useful for code
+   *  which implements additional services based on event (such as
+   *  Python wrappers).
+   */
+  const boost::shared_ptr<ProxyDictI>& proxyDict() const { return m_dict; }
+
 protected:
 
 private:

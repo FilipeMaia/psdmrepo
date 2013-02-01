@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2013-01-31 Andy Salnikov
+- add method Event::proxyDict() to get access to internal
+  proxy dictionary, needed for Python wrapper
+
 Tag: V00-06-01
 2013-01-25 Andy Salnikov
 - fixing namespace problem for operator<<(std::ostream&, const Pds::Src&)
