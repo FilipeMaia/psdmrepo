@@ -211,13 +211,19 @@ class DdlPythonInterfaces ( object ) :
         print >>self.inc, "using boost::shared_ptr;"
         print >>self.inc, "using std::vector;"
         print >>self.inc, ""
-        print >>self.inc, "extern void createWrappers();"
+        print >>self.inc, "void createWrappers(PyObject* module);"
 
         print >>self.cpp, T("namespace $name {")[self.pkg]
         print >>self.cpp, ""
-        print >>self.cpp, "void createWrappers() {"
+        print >>self.cpp, "void createWrappers(PyObject* module) {"
         print >>self.cpp, "  _import_array();"
 
+        # create sub-module for everything inside
+        print >>self.cpp, T('  PyObject* submodule = Py_InitModule3( "psana.$name", 0, "The Python wrapper module for $name types");')[self.pkg]
+        print >>self.cpp, '  Py_INCREF(submodule);'
+        print >>self.cpp, T('  PyModule_AddObject(module, "$name", submodule);')[self.pkg]
+        print >>self.cpp, '  scope mod = object(handle<>(borrowed(submodule)));'
+        
         # loop over packages and types
         for ns in self.pkg.namespaces() :
             if isinstance(ns, Package) :
@@ -247,19 +253,8 @@ class DdlPythonInterfaces ( object ) :
 
         self.codegen(type)
 
-    def _getGetterClassForType(self, type):
-        if re.match(r'.*(Data|DataDesc|Element)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "psddl_python::EventGetter"
-        elif re.match(r'.*(Config)[A-Za-z]*V[1-9][0-9]*', type.name):
-            return "psddl_python::EnvObjectStoreGetter"
-        else:
-            # Guess what type of Getter to use
-            return "psddl_python::EventGetter";
-
     def _createGetterClass(self, type):
-        getter_class = self._getGetterClassForType(type)
-        if not getter_class:
-            return
+
         type_name = type.name
         psana_type_name = type.fullName('C++', self.psana_ns)
         namespace_prefix = self.namespace_prefix()
@@ -271,24 +266,16 @@ class DdlPythonInterfaces ( object ) :
         print >>self.py, '%s.%s = "Psana::%s::%s"' % (self.pkg.name, type.name, self.pkg.name, type.name)
 
         print >>self.inc, ''
-        print >> self.inc, T('  class ${type_name}_Getter : public ${getter_class} {')(locals())
+        print >> self.inc, T('  class ${type_name}_Getter : public psddl_python::Getter {')(locals())
         print >> self.inc, '  public:'
-        print >> self.inc, T('  const char* getTypeName() { return "${psana_type_name}";}')(locals())
-        print >> self.inc, T('  const char* getGetterClassName() { return "${getter_class}";}')(locals())
+        print >> self.inc, T('    const std::type_info& typeinfo() const { return typeid(${psana_type_name});}')(locals())
+        print >> self.inc, T('    const char* getTypeName() const { return "${psana_type_name}";}')(locals())
         if type.version is not None:
-            print >> self.inc, '    int getVersion() {'
-            print >> self.inc, T('      return ${psana_type_name}::Version;')(locals())
-            print >> self.inc, '    }'
-        if getter_class == "psddl_python::EventGetter":
-            print >> self.inc, T('    object get(PSEvt::Event& evt, PSEvt::Source& source, const std::string& key, Pds::Src* foundSrc) {')(locals())
-            print >> self.inc, T('      shared_ptr<${psana_type_name}> result = evt.get(source, key, foundSrc);')(locals())
-            print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
-            print >> self.inc, '    }'
-        elif getter_class == "psddl_python::EnvObjectStoreGetter":
-            print >> self.inc, T('    object get(PSEnv::EnvObjectStore& store, const PSEvt::Source& source, Pds::Src* foundSrc) {')(locals())
-            print >> self.inc, T('      boost::shared_ptr<${psana_type_name}> result = store.get(source, foundSrc);')(locals())
-            print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
-            print >> self.inc, '    }'
+            print >> self.inc, T('    int getVersion() const { return ${psana_type_name}::Version; }')(locals())
+        print >> self.inc, T('    object convert(const boost::shared_ptr<void>& vdata) const {')(locals())
+        print >> self.inc, T('      shared_ptr<${psana_type_name}> result = boost::static_pointer_cast<${psana_type_name}>(vdata);')(locals())
+        print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
+        print >> self.inc, '    }'
         print >> self.inc, '  };'
 
     def codegen(self, type):
@@ -331,7 +318,7 @@ class DdlPythonInterfaces ( object ) :
         access = self._access("public", access)
         print >>self.inc, T("  $name(shared_ptr<$wrapped> obj) : _o(obj), o(_o.get()) {}")(locals())
         print >>self.inc, T("  $name($wrapped* obj) : o(obj) {}")(locals())
-        print >>self.cpp, T("\n#define _CLASS(n, policy) class_<n>(#n, no_init)\\")(locals())
+        print >>self.cpp, T("\n#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\\")(locals())
 
         # generate methods (for public methods and abstract class methods only)
         for method in type.methods(): 
@@ -349,19 +336,16 @@ class DdlPythonInterfaces ( object ) :
 
         # export classes to Python via boost _class
         print >>self.cpp, ""
+        cname = type.name
         if not abstract:
-            print >>self.cpp, T('  _CLASS($wrapped, return_value_policy<copy_const_reference>());')(locals())
-        print >>self.cpp, T('  _CLASS($prefix$name, return_value_policy<return_by_value>());')(locals())
+            print >>self.cpp, T('  _CLASS($wrapped, "$cname", return_value_policy<copy_const_reference>());')(locals())
+        print >>self.cpp, T('  _CLASS($prefix$name, "$cname", return_value_policy<return_by_value>());')(locals())
         if not abstract:
             print >>self.cpp, T('  std_vector_class_($wrapped);')(locals())
         print >>self.cpp, T('  std_vector_class_($name);')(locals())
         print >>self.cpp, '#undef _CLASS';
 
-        getter_class = self._getGetterClassForType(type)
-        if getter_class == "psddl_python::EventGetter":
-            print >>self.cpp, T('  ADD_EVENT_GETTER($type_name);')(type_name=type.name)
-        elif getter_class == "psddl_python::EnvObjectStoreGetter":
-            print >>self.cpp, T('  ADD_ENV_OBJECT_STORE_GETTER($type_name);')(type_name=type.name)
+        print >>self.cpp, T('  ADD_GETTER($type_name);')(type_name=type.name)
         print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
