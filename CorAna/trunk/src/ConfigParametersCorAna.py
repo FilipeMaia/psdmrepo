@@ -279,7 +279,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         self.ana_stat_meth_q   = self.declareParameter( name='ANA_STATIC_METHOD_Q',       val_def='evenly-spaced',type='str' )
         self.ana_stat_meth_phi = self.declareParameter( name='ANA_STATIC_METHOD_PHI',     val_def='evenly-spaced',type='str' )
-        self.ana_dyna_meth_q   = self.declareParameter( name='ANA_DYNAMIC_METHOD_Q',      val_def='non-evenly-spaced',type='str' )
+        self.ana_dyna_meth_q   = self.declareParameter( name='ANA_DYNAMIC_METHOD_Q',      val_def='evenly-spaced',type='str' )
         self.ana_dyna_meth_phi = self.declareParameter( name='ANA_DYNAMIC_METHOD_PHI',    val_def='evenly-spaced',type='str' )
 
         self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def='1',type='str' )

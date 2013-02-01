@@ -70,10 +70,13 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_P     = QtGui.QPushButton('Phi')
         self.but_Q     = QtGui.QPushButton('Q')
 
-        self.but_P_st  = QtGui.QPushButton('Phi-stat')
-        self.but_Q_st  = QtGui.QPushButton('Q-stat')
-        self.but_P_dy  = QtGui.QPushButton('Phi-dyna')
-        self.but_Q_dy  = QtGui.QPushButton('Q-dyna')
+        self.but_P_st  = QtGui.QPushButton('Phi stat')
+        self.but_Q_st  = QtGui.QPushButton('Q stat')
+        self.but_QP_st = QtGui.QPushButton('Q-Phi stat')
+
+        self.but_P_dy  = QtGui.QPushButton('Phi dyna')
+        self.but_Q_dy  = QtGui.QPushButton('Q dyna')
+        self.but_QP_dy = QtGui.QPushButton('Q-Phi stat')
 
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
@@ -99,10 +102,12 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_R,    self.grid_row+4, 2)
         self.grid.addWidget(self.but_P,    self.grid_row+4, 3)
         self.grid.addWidget(self.but_Q,    self.grid_row+4, 4)
-        self.grid.addWidget(self.but_P_st, self.grid_row+5, 1)
-        self.grid.addWidget(self.but_Q_st, self.grid_row+5, 2)
+        self.grid.addWidget(self.but_P_st, self.grid_row+5, 0)
+        self.grid.addWidget(self.but_Q_st, self.grid_row+5, 1)
+        self.grid.addWidget(self.but_QP_st,self.grid_row+5, 2)
         self.grid.addWidget(self.but_P_dy, self.grid_row+5, 3)
         self.grid.addWidget(self.but_Q_dy, self.grid_row+5, 4)
+        self.grid.addWidget(self.but_QP_dy,self.grid_row+5, 5)
 
         self.grid_row += 4
 
@@ -120,8 +125,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_Q,    QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_P_st, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_Q_st, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_QP_st,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_P_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_Q_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_QP_dy,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,      QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,      QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
  
@@ -187,8 +194,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_Q    .setStyleSheet(cp.styleButton)
         self.but_P_st .setStyleSheet(cp.styleButton)
         self.but_Q_st .setStyleSheet(cp.styleButton)
+        self.but_QP_st.setStyleSheet(cp.styleButton)
         self.but_P_dy .setStyleSheet(cp.styleButton)
         self.but_Q_dy .setStyleSheet(cp.styleButton)
+        self.but_QP_dy.setStyleSheet(cp.styleButton)
 
 
     def resizeEvent(self, e):
@@ -291,6 +300,12 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 11 :
             self.arr2d = self.vr.q_map_for_direct_beam_data_dyna_bins()
 
+        elif self.g_ind == 12 :
+            self.arr2d = self.vr.q_phi_map_for_direct_beam_data_stat_bins()
+
+        elif self.g_ind == 13 :
+            self.arr2d = self.vr.q_phi_map_for_direct_beam_data_dyna_bins()
+
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
 
@@ -353,16 +368,22 @@ class GUIViewControl ( QtGui.QWidget ) :
             logger.info('Q dynamic is selected', __name__)
             self.g_ind = 11
 
+        if self.but_QP_st.hasFocus() :
+            logger.info('Q-Phi static is selected', __name__)
+            self.g_ind = 12
+
+        if self.but_QP_dy.hasFocus() :
+            logger.info('Q-Phi dynamic is selected', __name__)
+            self.g_ind = 13
+
         self.drawPlot()
   
 
-
-
     def drawPlot(self):
-        self.setImgArray()
         try :
             self.redrawPlotResetLimits()
         except :
+            #self.setImgArray()
             cp.plotimgspe_g = PlotImgSpe(None,self.arr2d) 
             cp.plotimgspe_g.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
             cp.plotimgspe_g.show()

@@ -62,19 +62,21 @@ def valueToIndex(V,VRange) :
 
 def valueToIndexProtected(V,VRange) :
     Vmin, Vmax, Nbins = VRange
+    Nbins1 = int(Nbins)-1
     factor = float(Nbins) / float(Vmax-Vmin)
     indarr = np.int32( factor * (V-Vmin) )
-    return np.select([V<Vmin,V>Vmax], [-10,-5], default=indarr)
+    #return np.select([V<Vmin,V>Vmax], [0,Nbins-1], default=indarr)
+    return np.select([indarr<0, indarr>Nbins1], [0,Nbins1], default=indarr)
 
 def q_map_partitions(map, nbins) :
     q_min = map.min()
     q_max = map.max()
-    return valueToIndex(map, [q_min, q_max, nbins])
+    return valueToIndexProtected(map, [q_min, q_max, nbins])
 
 def phi_map_partitions(map, nbins) :
     phi_min = -180.
     phi_max =  180.
-    return valueToIndex(map, [phi_min, phi_max, nbins])
+    return valueToIndexProtected(map, [phi_min, phi_max, nbins])
  
 #-----------------------------
 
@@ -133,11 +135,17 @@ class ViewResults :
         sp.ana_dyna_meth_q   = cp.ana_dyna_meth_q  .value()
         sp.ana_dyna_meth_phi = cp.ana_dyna_meth_phi.value()
 
-        sp.ana_stat_part_q   = cp.ana_stat_part_q  .value()
-        sp.ana_stat_part_phi = cp.ana_stat_part_phi.value()                           
-        sp.ana_dyna_part_q   = cp.ana_dyna_part_q  .value()
-        sp.ana_dyna_part_phi = cp.ana_dyna_part_phi.value()
+        if  sp.ana_stat_meth_q   == cp.ana_stat_meth_q  .value_def() : # 'evenly_spaced'
+            sp.ana_stat_part_q   = int(cp.ana_stat_part_q  .value())
 
+        if  sp.ana_stat_meth_phi == cp.ana_stat_meth_phi.value_def() :
+            sp.ana_stat_part_phi = int(cp.ana_stat_part_phi.value())                           
+
+        if  sp.ana_dyna_meth_q   == cp.ana_dyna_meth_q  .value_def() :
+            sp.ana_dyna_part_q   = int(cp.ana_dyna_part_q  .value())
+
+        if  sp.ana_dyna_meth_phi == cp.ana_dyna_meth_phi.value_def() :
+            sp.ana_dyna_part_phi = int(cp.ana_dyna_part_phi.value())
 
 #-----------------------------
 
@@ -284,13 +292,21 @@ class ViewResults :
         return sp.q_map_db_stat
 
 
-#-----------------------------
-
     def phi_map_for_direct_beam_data_stat_bins(sp) :
         sp.phi_map_db = sp.phi_map_for_direct_beam_data()
         sp.phi_map_db_stat = phi_map_partitions(sp.phi_map_db, sp.ana_stat_part_phi)
         return sp.phi_map_db_stat
-  
+
+
+    def q_phi_map_for_direct_beam_data_stat_bins(sp) :
+        sp.q_phi_map_db_stat = sp.  q_map_for_direct_beam_data_stat_bins() * sp.ana_stat_part_phi \
+                             + sp.phi_map_for_direct_beam_data_stat_bins()#* sp.ana_stat_part_q 
+        #-----
+        len = sp.ana_stat_part_q * sp.ana_stat_part_phi
+        bins_stat = sp.bincount(sp.q_phi_map_db_stat, minlength=len)
+        #-----
+        return sp.q_phi_map_db_stat
+
 #-----------------------------
 
     def q_map_for_direct_beam_data_dyna_bins(sp) :
@@ -299,14 +315,34 @@ class ViewResults :
         return sp.q_map_db_dyna
 
 
-#-----------------------------
-
     def phi_map_for_direct_beam_data_dyna_bins(sp) :
         sp.phi_map_db = sp.phi_map_for_direct_beam_data()
         sp.phi_map_db_dyna = phi_map_partitions(sp.phi_map_db, sp.ana_dyna_part_phi)
         return sp.phi_map_db_dyna
+
   
+    def q_phi_map_for_direct_beam_data_dyna_bins(sp) :
+        sp.q_phi_map_db_dyna = sp.  q_map_for_direct_beam_data_dyna_bins() * sp.ana_dyna_part_phi \
+                             + sp.phi_map_for_direct_beam_data_dyna_bins() # * sp.ana_dyna_part_q
+        #-----
+        len = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
+        bin_statistics = sp.bincount(sp.q_phi_map_db_dyna, minlength=len)
+        #-----
+        return sp.q_phi_map_db_dyna
+
 #-----------------------------
+
+#-----------------------------
+
+    def bincount(sp, map_bins, map_intens=None, minlength=None) :
+        weights = map_intens
+        if map_intens != None : weights.flatten() 
+
+        bin_count = np.bincount(map_bins.flatten(), weights, minlength)
+        print 'bin_count:\n',      bin_count
+        print 'bin_count.shape =', bin_count.shape
+        
+        return bin_count
 
 #-----------------------------
 
