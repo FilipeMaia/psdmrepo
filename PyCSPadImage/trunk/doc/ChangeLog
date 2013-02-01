@@ -11,7 +11,19 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+#---------------------
+2012-02-01 Mikhail S. Dubrovin
+Tag: V00-00-09
+- Add module for cspad coordinates and image production without data base:
+A       src/CSPadPixCoordsWODB.py	
+	
+#---------------------
 
+2012-01-31 Mikhail S. Dubrovin
+Tag: V00-00-08
+M       src/GlobalGraphics.py
+
+#---------------------
 2012-06-29 Mikhail S. Dubrovin
 Tag: V00-00-07
 - Change names fro CSpad Mini -> 2x2
