@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02
+2013-02-04 Andy Salnikov
+- Ipimb::Config::diodeGain() method was renamed to capacitorValue, fixing
+  the code which used it
+
 Tag: V00-03-01
 2013-01-30 Andy Salnikov
 - removed unnecessary .get() on smart pointers
