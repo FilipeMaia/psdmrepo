@@ -89,11 +89,30 @@ class ViewResults :
         @param fname the file name with results
         """
 
+        sp.x_map = None
+        sp.y_map = None
+        sp.r_map = None
+        sp.q_map = None
+        sp.phi_map = None
+
+        sp.q_map_stat = None
+        sp.phi_map_stat = None
+        sp.q_phi_map_stat = None
+
+        sp.q_map_dyna = None
+        sp.phi_map_dyna = None
+        sp.q_phi_map_dyna = None
+
+        sp.counts_stat = None
+        sp.counts_dyna = None
+
+        sp.cor_arr = None
+
+
         sp.set_file_name(fname)
         sp.set_parameters()
         sp.evaluate_parameters()
         sp.print_parameters()
-
         sp.ccd_pixel_coordinates()
         #q_map = sp.q_map_for_direct_beam_data()
 
@@ -244,101 +263,155 @@ class ViewResults :
         #print 'X_ccd_pix:\n', sp.X_ccd_pix
         #print 'Y_ccd_pix:\n', sp.Y_ccd_pix
 
-        sp.x_map_db, sp.y_map_db = sp.xy_maps_for_direct_beam_data()
+        sp.x_map, sp.y_map = sp.get_xy_maps()
 
 #-----------------------------
 
-    def xy_maps_for_direct_beam_data(sp) :
+    def get_xy_maps(sp) :
+        """Set map x, y for direct beam or reflected beam modes"""
+        # MAKE HERE SELECTION OF THE X,Y MAPS FOR MODE !!!
+        if sp.x_map != None and sp.y_map != None : return sp.x_map, sp.y_map 
+        x_map, y_map = sp.get_xy_maps_for_direct_beam_data()
+        #sp.x_map, sp.y_map = sp.get_xy_maps_for_reflected_beam_data()
+        return x_map, y_map
+
+#-----------------------------
+
+    def get_xy_maps_for_direct_beam_data(sp) :
         x_db_pix = sp.x_coord_beam0 + (sp.x0_pos_in_data - sp.x0_pos_in_beam0) / sp.ccd_pixsize
         y_db_pix = sp.y_coord_beam0 + (sp.y0_pos_in_data - sp.y0_pos_in_beam0) / sp.ccd_pixsize
         return sp.X_ccd_pix - x_db_pix, sp.Y_ccd_pix - y_db_pix  
 
 #-----------------------------
 
-    def rphi_maps_for_direct_beam_data(sp) :
-        sp.r_map_db, sp.phi_map_db = cart2polar(sp.x_map_db, sp.y_map_db)
-        return sp.r_map_db, sp.phi_map_db
+    def get_rphi_maps(sp) :
+        if sp.r_map != None and sp.phi_map != None : return sp.r_map, sp.phi_map 
+        sp.r_map, sp.phi_map = cart2polar(sp.x_map, sp.y_map)
+        return sp.r_map, sp.phi_map
   
 #-----------------------------
 
-    def r_map_for_direct_beam_data(sp) :
-        t0 = gu.get_time_sec()
-        sp.r_map_db  = cart2r(sp.x_map_db, sp.y_map_db)
-        #print 'r_map_db consumed time: ', gu.get_time_sec()-t0 # < 0.04sec for 1300x1340 img  
-        return sp.r_map_db
+    def get_r_map(sp) :
+        if sp.r_map != None : return sp.r_map
+        sp.r_map = cart2r(sp.x_map, sp.y_map)
+        return sp.r_map
   
 #-----------------------------
 
-    def q_map_for_direct_beam_data(sp) :
-        t0 = gu.get_time_sec()
-        sp.r_map_db = sp.r_map_for_direct_beam_data()
-        sp.q_map_db = sp.factor * np.sin(0.5*np.arctan2(sp.r_map_db, sp.distance_pix))
-        #print 'q_map_db consumed time: ', gu.get_time_sec()-t0 # < 0.4sec for 1300x1340 img  
-        return sp.q_map_db
+    def get_q_map(sp) :
+        if sp.q_map != None : return sp.q_map
+        r_map = sp.get_r_map()
+        sp.q_map = sp.factor * np.sin(0.5*np.arctan2(r_map, sp.distance_pix))
+        return sp.q_map
   
 #-----------------------------
 
-    def phi_map_for_direct_beam_data(sp) :
-        t0 = gu.get_time_sec()
-        sp.phi_map_db  = cart2phi(sp.x_map_db, sp.y_map_db)
-        #print 'phi_map_db consumed time: ', gu.get_time_sec()-t0 # < 0.02sec for 1300x1340 img  
-        return sp.phi_map_db
+    def get_phi_map(sp) :
+        if sp.phi_map != None : return sp.phi_map
+        sp.phi_map = cart2phi(sp.x_map, sp.y_map)
+        return sp.phi_map
   
 #-----------------------------
 
-    def q_map_for_direct_beam_data_stat_bins(sp) :
-        sp.q_map_db = sp.q_map_for_direct_beam_data()
-        sp.q_map_db_stat = q_map_partitions(sp.q_map_db, sp.ana_stat_part_q)
-        return sp.q_map_db_stat
+    def get_q_map_for_stat_bins(sp) :
+        if sp.q_map_stat != None : return sp.q_map_stat
+        sp.q_map_stat = q_map_partitions(sp.get_q_map(), sp.ana_stat_part_q)
+        return sp.q_map_stat
 
 
-    def phi_map_for_direct_beam_data_stat_bins(sp) :
-        sp.phi_map_db = sp.phi_map_for_direct_beam_data()
-        sp.phi_map_db_stat = phi_map_partitions(sp.phi_map_db, sp.ana_stat_part_phi)
-        return sp.phi_map_db_stat
+    def get_phi_map_for_stat_bins(sp) :
+        if sp.phi_map_stat != None : return sp.phi_map_stat
+        sp.phi_map_stat = phi_map_partitions(sp.get_phi_map(), sp.ana_stat_part_phi)
+        return sp.phi_map_stat
 
 
-    def q_phi_map_for_direct_beam_data_stat_bins(sp) :
-        sp.q_phi_map_db_stat = sp.  q_map_for_direct_beam_data_stat_bins() * sp.ana_stat_part_phi \
-                             + sp.phi_map_for_direct_beam_data_stat_bins()#* sp.ana_stat_part_q 
-        #-----
+    def get_q_phi_map_for_stat_bins(sp) :
+        if sp.q_phi_map_stat != None : return sp.q_phi_map_stat
+        sp.q_phi_map_stat = sp.get_q_map_for_stat_bins() * sp.ana_stat_part_phi \
+                          + sp.get_phi_map_for_stat_bins()#* sp.ana_stat_part_q 
+        return sp.q_phi_map_stat
+
+
+    def get_counts_for_stat_bins(sp) :
+        if sp.counts_stat != None : return sp.counts_stat
         len = sp.ana_stat_part_q * sp.ana_stat_part_phi
-        bins_stat = sp.bincount(sp.q_phi_map_db_stat, minlength=len)
-        #-----
-        return sp.q_phi_map_db_stat
+        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), length=len)
+        return sp.counts_stat
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
+    def get_1oIp_map_for_stat_bins_itau(sp, itau) :
+        sp.norm_Ip_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
+        return sp.norm_Ip_map
+
+    def get_1oIf_map_for_stat_bins_itau(sp, itau) :
+        sp.norm_If_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_If_for_itau(itau))
+        return sp.norm_If_map
 
 #-----------------------------
 
-    def q_map_for_direct_beam_data_dyna_bins(sp) :
-        sp.q_map_db = sp.q_map_for_direct_beam_data()
-        sp.q_map_db_dyna = q_map_partitions(sp.q_map_db, sp.ana_dyna_part_q)
-        return sp.q_map_db_dyna
+    def get_norm_factor_map_for_stat_bins_itau(sp, intensity_map) :
+
+        counts = sp.get_counts_for_stat_bins()
+        len = sp.ana_stat_part_q * sp.ana_stat_part_phi
+        q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
+        intens = sp.bincount(q_phi_map_stat, intensity_map, len)
+        intens_prot = np.select([intens<0.000001], [-1.], default=intens)
+        normf = np.select([intens_prot<0.000001], [0.], default=counts/intens_prot)
+        
+        #norm_facotr_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
+        #norm_facotr_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
+        #norm_facotr_map = np.array(map(lambda i : normf[i], q_phi_map_stat)) # 0.26sec
+        norm_facotr_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
+        norm_facotr_map.shape = (sp.rows,sp.cols)
+        
+        return norm_facotr_map # sp.get_random_img()
+
+#-----------------------------
+
+    def get_q_map_for_dyna_bins(sp) :
+        if sp.q_map_dyna != None : return sp.q_map_dyna
+        sp.q_map_dyna = q_map_partitions(sp.get_q_map(), sp.ana_dyna_part_q)
+        return sp.q_map_dyna
 
 
-    def phi_map_for_direct_beam_data_dyna_bins(sp) :
-        sp.phi_map_db = sp.phi_map_for_direct_beam_data()
-        sp.phi_map_db_dyna = phi_map_partitions(sp.phi_map_db, sp.ana_dyna_part_phi)
-        return sp.phi_map_db_dyna
+    def get_phi_map_for_dyna_bins(sp) :
+        if sp.phi_map_dyna != None : return sp.phi_map_dyna
+        sp.phi_map_dyna = phi_map_partitions(sp.get_phi_map(), sp.ana_dyna_part_phi)
+        return sp.phi_map_dyna
 
   
-    def q_phi_map_for_direct_beam_data_dyna_bins(sp) :
-        sp.q_phi_map_db_dyna = sp.  q_map_for_direct_beam_data_dyna_bins() * sp.ana_dyna_part_phi \
-                             + sp.phi_map_for_direct_beam_data_dyna_bins() # * sp.ana_dyna_part_q
-        #-----
+    def get_q_phi_map_for_dyna_bins(sp) :
+        if sp.q_phi_map_dyna != None : return sp.q_phi_map_dyna
+        sp.q_phi_map_dyna = sp.get_q_map_for_dyna_bins() * sp.ana_dyna_part_phi \
+                          + sp.get_phi_map_for_dyna_bins() # * sp.ana_dyna_part_q
+        return sp.q_phi_map_dyna
+
+
+    def get_counts_for_dyna_bins(sp) :
+        if sp.counts_dyna != None : return sp.counts_dyna
         len = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
-        bin_statistics = sp.bincount(sp.q_phi_map_db_dyna, minlength=len)
-        #-----
-        return sp.q_phi_map_db_dyna
+        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), length=len)
+        return sp.counts_dyna
+
+
+#    def get_Ip_for_dyna_bins_itau(sp, itau) :
+#        len = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
+#        intens_map
+#        sp.intens_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), minlength=len)
+#        return sp.counts_dyna
 
 #-----------------------------
 
 #-----------------------------
 
-    def bincount(sp, map_bins, map_intens=None, minlength=None) :
-        weights = map_intens
-        if map_intens != None : weights.flatten() 
+    def bincount(sp, map_bins, map_intens=None, length=None) :
+        if map_intens == None : weights = None
+        else                  : weights = map_intens.flatten() 
 
-        bin_count = np.bincount(map_bins.flatten(), weights, minlength)
+        bin_count = np.bincount(map_bins.flatten(), weights, length)
         print 'bin_count:\n',      bin_count
         print 'bin_count.shape =', bin_count.shape
         
@@ -347,6 +420,7 @@ class ViewResults :
 #-----------------------------
 
     def set_file_name(sp, fname=None) :
+        sp.cor_arr = None
         if fname == None : sp.fname = cp.res_fname.value()
         else :             sp.fname = fname
 
@@ -358,24 +432,52 @@ class ViewResults :
 
 
     def get_cor_array_from_binary_file(sp) :
+        if sp.cor_arr != None : return sp.cor_arr
         logger.info('get_cor_array_from_binary_file: ' + sp.fname, __name__)
-        sp.arr = np.fromfile(sp.fname, dtype=np.float32)
 
-        nptau = sp.arr.shape[0]/cp.bat_img_size.value()/3
-        sp.arr.shape = (nptau, 3, sp.rows, sp.cols)
-        logger.info('Set arr.shape = ' + str(sp.arr.shape), __name__)
-        return sp.arr
+        sp.cor_arr = np.fromfile(sp.fname, dtype=np.float32)
+        nptau = sp.cor_arr.shape[0]/cp.bat_img_size.value()/3
+        sp.cor_arr.shape = (nptau, 3, sp.rows, sp.cols)
+        logger.info('Set arr.shape = ' + str(sp.cor_arr.shape), __name__)
+        return sp.cor_arr
 
 #-----------------------------
 
-    def get_img_array_for_dynamic_partition(sp) :
-        logger.info('get_img_array_for_dynamic_partition: ' + sp.fname, __name__)
-        #arr = mu + sigma*np.random.standard_normal(size=2400)
 
+#-----------------------------
+
+    def get_Ip_for_itau(sp,itau) :
+        return sp.get_cor_array_from_binary_file()[itau, 0,...]
+
+#-----------------------------
+
+    def get_If_for_itau(sp,itau) :
+        return sp.get_cor_array_from_binary_file()[itau, 1,...]
+
+#-----------------------------
+
+    def get_I2_for_itau(sp,itau) :
+        return sp.get_cor_array_from_binary_file()[itau, 2,...]
+
+#-----------------------------
+
+    def get_g2_for_itau(sp,itau) :
+        cor_arr = sp.get_cor_array_from_binary_file()
+        Ip = cor_arr[itau, 0,...] 
+        If = cor_arr[itau, 1,...] 
+        I2 = cor_arr[itau, 2,...] 
+        sp.g2_for_itau = 100*I2/Ip/If
+        return sp.g2_for_itau
+
+#-----------------------------
+
+    def get_random_img(sp) :
+        logger.info('get_random_img: ' + sp.fname, __name__)
+        #arr = mu + sigma*np.random.standard_normal(size=2400)
         #arr = np.arange(2400)
-        arr = 100*np.random.standard_exponential(sp.size)
-        arr.shape = (sp.rows,sp.cols)
-        return arr
+        sp.arr2d = 100*np.random.standard_exponential(sp.size)
+        sp.arr2d.shape = (sp.rows,sp.cols)
+        return sp.arr2d
 
 #-----------------------------
 

@@ -78,6 +78,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_Q_dy  = QtGui.QPushButton('Q dyna')
         self.but_QP_dy = QtGui.QPushButton('Q-Phi stat')
 
+        self.but_1oIp  = QtGui.QPushButton('1/<Ip>')
+        self.but_1oIf  = QtGui.QPushButton('1/<If>')
+
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
         self.sli.setRange(0, self.list_of_tau.shape[0]-1)
@@ -108,6 +111,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_P_dy, self.grid_row+5, 3)
         self.grid.addWidget(self.but_Q_dy, self.grid_row+5, 4)
         self.grid.addWidget(self.but_QP_dy,self.grid_row+5, 5)
+        self.grid.addWidget(self.but_1oIp, self.grid_row+6, 0)
+        self.grid.addWidget(self.but_1oIf, self.grid_row+6, 1)
 
         self.grid_row += 4
 
@@ -129,6 +134,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_P_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_Q_dy, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_QP_dy,QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_1oIp, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_1oIf, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,      QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,      QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
  
@@ -198,6 +205,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_P_dy .setStyleSheet(cp.styleButton)
         self.but_Q_dy .setStyleSheet(cp.styleButton)
         self.but_QP_dy.setStyleSheet(cp.styleButton)
+        self.but_1oIp .setStyleSheet(cp.styleButton)
+        self.but_1oIf .setStyleSheet(cp.styleButton)
 
 
     def resizeEvent(self, e):
@@ -251,70 +260,78 @@ class GUIViewControl ( QtGui.QWidget ) :
 
 
     def initCorArray(self) :
-        self.arr = None
-
-
-    def loadCorArray(self):
-        if self.arr == None :         
-            self.arr = self.vr.get_cor_array_from_binary_file()
+        self.vr.set_file_name()
 
 
     def setImgArray(self):
 
-        if self.g_ind < 3 and self.arr == None :
-            self.loadCorArray()
+        t0 = gu.get_time_sec()
 
-        if self.g_ind < 0 :
-            Ip = self.arr[self.tau_ind, 0,...] 
-            If = self.arr[self.tau_ind, 1,...] 
-            I2 = self.arr[self.tau_ind, 2,...] 
-            self.arr2d = 100*I2/Ip/If
+        if self.g_ind == -1 :
+            self.arr2d = self.vr.get_g2_for_itau(self.tau_ind)
 
-        elif self.g_ind < 3 :
-            self.arr2d = self.arr[self.tau_ind, self.g_ind,...] 
+        elif self.g_ind == 0 :
+            self.arr2d = self.vr.get_Ip_for_itau(self.tau_ind)
+
+        elif self.g_ind == 1 :
+            self.arr2d = self.vr.get_If_for_itau(self.tau_ind)
+
+        elif self.g_ind == 2 :
+            self.arr2d = self.vr.get_I2_for_itau(self.tau_ind)
 
         elif self.g_ind == 3 :
-            self.arr2d, y_map = self.vr.xy_maps_for_direct_beam_data()
+            self.arr2d, y_map = self.vr.get_xy_maps()
 
         elif self.g_ind == 4 :
-            x_map, self.arr2d = self.vr.xy_maps_for_direct_beam_data()
+            x_map, self.arr2d = self.vr.get_xy_maps()
 
         elif self.g_ind == 5 :
-            self.arr2d = self.vr.r_map_for_direct_beam_data()
+            self.arr2d = self.vr.get_r_map()
 
         elif self.g_ind == 6 :
-            self.arr2d = self.vr.phi_map_for_direct_beam_data()
+            self.arr2d = self.vr.get_phi_map()
 
         elif self.g_ind == 7 :
-            self.arr2d = self.vr.q_map_for_direct_beam_data()
+            self.arr2d = self.vr.get_q_map()
 
         elif self.g_ind == 8 :
-            self.arr2d = self.vr.phi_map_for_direct_beam_data_stat_bins()
+            self.arr2d = self.vr.get_phi_map_for_stat_bins()
 
         elif self.g_ind == 9 :
-            self.arr2d = self.vr.q_map_for_direct_beam_data_stat_bins()
+            self.arr2d = self.vr.get_q_map_for_stat_bins()
 
         elif self.g_ind == 10 :
-            self.arr2d = self.vr.phi_map_for_direct_beam_data_dyna_bins()
+            self.arr2d = self.vr.get_phi_map_for_dyna_bins()
 
         elif self.g_ind == 11 :
-            self.arr2d = self.vr.q_map_for_direct_beam_data_dyna_bins()
+            self.arr2d = self.vr.get_q_map_for_dyna_bins()
 
         elif self.g_ind == 12 :
-            self.arr2d = self.vr.q_phi_map_for_direct_beam_data_stat_bins()
+            self.arr2d = self.vr.get_q_phi_map_for_stat_bins()
 
         elif self.g_ind == 13 :
-            self.arr2d = self.vr.q_phi_map_for_direct_beam_data_dyna_bins()
+            self.arr2d = self.vr.get_q_phi_map_for_dyna_bins()
 
+        elif self.g_ind == 14 :
+            self.arr2d = self.vr.get_1oIp_map_for_stat_bins_itau(self.tau_ind)
+
+        elif self.g_ind == 15 :
+            self.arr2d = self.vr.get_1oIf_map_for_stat_bins_itau(self.tau_ind)
+    
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
 
+        print 'Get map consumed time: ', gu.get_time_sec()-t0 # < 0.04sec for 1300x1340 img  
         #print 'arr2d:\n', self.arr2d 
-
+        print 'arr2d.shape =', self.arr2d.shape 
 
 
     def onButView(self):
         logger.info('onButView', __name__)
+
+        if self.but_G2.hasFocus() :
+            logger.info('G2 is selected', __name__)
+            self.g_ind = -1
 
         if self.but_Ip.hasFocus() :
             logger.info('<Ip> is selected', __name__)
@@ -327,10 +344,6 @@ class GUIViewControl ( QtGui.QWidget ) :
         if self.but_I2.hasFocus() :
             logger.info('<Ip x If> is selected', __name__)
             self.g_ind = 2
-
-        if self.but_G2.hasFocus() :
-            logger.info('G2 is selected', __name__)
-            self.g_ind = -1
 
         if self.but_X.hasFocus() :
             logger.info('X is selected', __name__)
@@ -345,7 +358,7 @@ class GUIViewControl ( QtGui.QWidget ) :
             self.g_ind = 5
 
         if self.but_P.hasFocus() :
-            logger.info('Theta is selected', __name__)
+            logger.info('Phi is selected', __name__)
             self.g_ind = 6
 
         if self.but_Q.hasFocus() :
@@ -375,6 +388,15 @@ class GUIViewControl ( QtGui.QWidget ) :
         if self.but_QP_dy.hasFocus() :
             logger.info('Q-Phi dynamic is selected', __name__)
             self.g_ind = 13
+
+        if self.but_1oIp.hasFocus() :
+            logger.info('1/<Ip> is selected', __name__)
+            self.g_ind = 14
+
+        if self.but_1oIf.hasFocus() :
+            logger.info('1/<If> is selected', __name__)
+            self.g_ind = 15
+
 
         self.drawPlot()
   
