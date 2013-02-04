@@ -13,7 +13,7 @@ reverse time order.
 
 Tag: V00-04-01
 2013-02-04 Andy Salnikov
-- upgrading to pdsdata V05-03-00
+- upgrading to pdsdata V06-01-02
 - new classes cspad2x2.ConfigV2 and cspad2x2.ConfigV2QuadReg
 - method ipimb.ConfigV{1,2}.diodeGain() renamed to capacitorValue()
 
