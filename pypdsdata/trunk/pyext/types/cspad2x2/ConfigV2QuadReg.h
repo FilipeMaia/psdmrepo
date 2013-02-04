@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H
-#define PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H
+#ifndef PYPDSDATA_CSPAD2X2_CONFIGV2QUADREG_H
+#define PYPDSDATA_CSPAD2X2_CONFIGV2QUADREG_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadProtectionSystemThreshold.
+//	Class ConfigV2QuadReg.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad2x2/ProtectionSystem.hh"
+#include "pdsdata/cspad2x2/ConfigV2QuadReg.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -46,10 +46,10 @@ namespace CsPad2x2 {
  *  @author Andrei Salnikov
  */
 
-class CsPadProtectionSystemThreshold : public PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad2x2::ProtectionSystemThreshold> {
+class ConfigV2QuadReg : public PdsDataType<ConfigV2QuadReg, Pds::CsPad2x2::ConfigV2QuadReg> {
 public:
 
-  typedef PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad2x2::ProtectionSystemThreshold> BaseType;
+  typedef PdsDataType<ConfigV2QuadReg, Pds::CsPad2x2::ConfigV2QuadReg> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -59,4 +59,4 @@ public:
 } // namespace CsPad2x2
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_CSPAD2X2_CSPADPROTECTIONSYSTEMTHRESHOLD_H
+#endif // PYPDSDATA_CSPAD2X2_CONFIGV2QUADREG_H

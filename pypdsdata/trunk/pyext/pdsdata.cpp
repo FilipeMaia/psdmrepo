@@ -98,6 +98,8 @@
 
 #include "types/cspad2x2/ConfigV1.h"
 #include "types/cspad2x2/ConfigV1QuadReg.h"
+#include "types/cspad2x2/ConfigV2.h"
+#include "types/cspad2x2/ConfigV2QuadReg.h"
 #include "types/cspad2x2/CsPad2x2DigitalPotsCfg.h"
 #include "types/cspad2x2/CsPad2x2GainMapCfg.h"
 #include "types/cspad2x2/CsPad2x2ReadOnlyCfg.h"
@@ -318,6 +320,8 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.cspad2x2", 0, "The Python wrapper module for pdsdata/cspad2x2" );
   pypdsdata::CsPad2x2::ConfigV1::initType( module );
   pypdsdata::CsPad2x2::ConfigV1QuadReg::initType( module );
+  pypdsdata::CsPad2x2::ConfigV2::initType( module );
+  pypdsdata::CsPad2x2::ConfigV2QuadReg::initType( module );
   pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::initType( module );
   pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::initType( module );
   pypdsdata::CsPad2x2::CsPadProtectionSystemThreshold::initType( module );

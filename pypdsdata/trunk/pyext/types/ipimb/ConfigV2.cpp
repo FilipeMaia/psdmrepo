@@ -61,7 +61,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigPsDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, adcDelay)
-  PyObject* diodeGain(PyObject* self, PyObject* args);
+  PyObject* capacitorValue(PyObject* self, PyObject* args);
   PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
@@ -80,8 +80,11 @@ namespace {
     { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
     { "trigPsDelay",         trigPsDelay,         METH_NOARGS, "self.trigPsDelay() -> int\n\nReturns integer number" },
     { "adcDelay",            adcDelay,            METH_NOARGS, "self.adcDelay() -> int\n\nReturns integer number" },
-    { "diodeGain",           diodeGain,           METH_VARARGS, 
-        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
+    { "capacitorValue",      capacitorValue,      METH_VARARGS,
+        "self.capacitorValue(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
+    { "diodeGain",           capacitorValue,      METH_VARARGS,
+        "self.diodeGain(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3), "
+        "this is an alias for capacitorValue() method" },
     {0, 0, 0, 0}
    };
 
@@ -112,21 +115,21 @@ pypdsdata::Ipimb::ConfigV2::initType( PyObject* module )
 namespace {
 
 PyObject*
-diodeGain( PyObject* self, PyObject* args )
+capacitorValue( PyObject* self, PyObject* args )
 {
   const Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
   if ( not obj ) return 0;
 
   // parse args
   unsigned index ;
-  if ( not PyArg_ParseTuple( args, "I:Ipimb_ConfigV2_diodeGain", &index ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "I:Ipimb.ConfigV2.capacitorValue()", &index ) ) return 0;
 
   if ( index >= 4 ) {
-    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in Ipimb.ConfigV2.diodeGain()");
+    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in Ipimb.ConfigV2.capacitorValue()");
     return 0;
   }
   
-  return capacitorValueEnum.Enum_FromLong((obj->chargeAmpRange() >> (4*index)) & 0xf);
+  return capacitorValueEnum.Enum_FromLong(obj->capacitorValue(index));
 }
 
 PyObject*

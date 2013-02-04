@@ -76,6 +76,8 @@ namespace {
         { "XppSb4Pim",       Pds::BldInfo::XppSb4Pim },
         { "XppEndstation0",  Pds::BldInfo::XppEndstation0 },
         { "XppEndstation1",  Pds::BldInfo::XppEndstation1 },
+        { "MecXt2Pim02",     Pds::BldInfo::MecXt2Pim02 },
+        { "MecXt2Pim03",     Pds::BldInfo::MecXt2Pim03 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
