@@ -107,7 +107,7 @@ class ViewResults :
         sp.counts_dyna = None
 
         sp.cor_arr = None
-
+        sp.g2_vs_itau_arr = None
 
         sp.set_file_name(fname)
         sp.set_parameters()
@@ -166,6 +166,11 @@ class ViewResults :
         if  sp.ana_dyna_meth_phi == cp.ana_dyna_meth_phi.value_def() :
             sp.ana_dyna_part_phi = int(cp.ana_dyna_part_phi.value())
 
+        sp.npart_stat = sp.ana_stat_part_q * sp.ana_stat_part_phi
+        sp.npart_dyna = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
+        
+
+
 #-----------------------------
 
     def evaluate_parameters(sp) :
@@ -215,6 +220,9 @@ class ViewResults :
         logger.info('ana_stat_part_phi = ' + str(sp.ana_stat_part_phi), __name__)
         logger.info('ana_dyna_part_q   = ' + str(sp.ana_dyna_part_q  ), __name__)
         logger.info('ana_dyna_part_phi = ' + str(sp.ana_dyna_part_phi), __name__)
+
+        logger.info('npart_stat        = ' + str(sp.npart_stat   ), __name__)
+        logger.info('npart_dyna        = ' + str(sp.npart_dyna   ), __name__)
                                                                    
         logger.info('Evaluated parameters:', __name__)
         logger.info('sp.wavelength   = ' + str(sp.wavelength     ), __name__)
@@ -284,6 +292,16 @@ class ViewResults :
 
 #-----------------------------
 
+    def get_x_map(sp) :
+        return sp.x_map
+
+#-----------------------------
+
+    def get_y_map(sp) :
+        return sp.y_map
+
+#-----------------------------
+
     def get_rphi_maps(sp) :
         if sp.r_map != None and sp.phi_map != None : return sp.r_map, sp.phi_map 
         sp.r_map, sp.phi_map = cart2polar(sp.x_map, sp.y_map)
@@ -334,40 +352,8 @@ class ViewResults :
 
     def get_counts_for_stat_bins(sp) :
         if sp.counts_stat != None : return sp.counts_stat
-        len = sp.ana_stat_part_q * sp.ana_stat_part_phi
-        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), length=len)
+        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), length=sp.npart_stat)
         return sp.counts_stat
-
-#-----------------------------
-#-----------------------------
-#-----------------------------
-
-    def get_1oIp_map_for_stat_bins_itau(sp, itau) :
-        sp.norm_Ip_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
-        return sp.norm_Ip_map
-
-    def get_1oIf_map_for_stat_bins_itau(sp, itau) :
-        sp.norm_If_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_If_for_itau(itau))
-        return sp.norm_If_map
-
-#-----------------------------
-
-    def get_norm_factor_map_for_stat_bins_itau(sp, intensity_map) :
-
-        counts = sp.get_counts_for_stat_bins()
-        len = sp.ana_stat_part_q * sp.ana_stat_part_phi
-        q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
-        intens = sp.bincount(q_phi_map_stat, intensity_map, len)
-        intens_prot = np.select([intens<0.000001], [-1.], default=intens)
-        normf = np.select([intens_prot<0.000001], [0.], default=counts/intens_prot)
-        
-        #norm_facotr_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
-        #norm_facotr_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
-        #norm_facotr_map = np.array(map(lambda i : normf[i], q_phi_map_stat)) # 0.26sec
-        norm_facotr_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
-        norm_facotr_map.shape = (sp.rows,sp.cols)
-        
-        return norm_facotr_map # sp.get_random_img()
 
 #-----------------------------
 
@@ -392,18 +378,82 @@ class ViewResults :
 
     def get_counts_for_dyna_bins(sp) :
         if sp.counts_dyna != None : return sp.counts_dyna
-        len = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
-        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), length=len)
+        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), length=sp.npart_dyna)
         return sp.counts_dyna
 
+#-----------------------------
 
-#    def get_Ip_for_dyna_bins_itau(sp, itau) :
-#        len = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
-#        intens_map
-#        sp.intens_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), minlength=len)
-#        return sp.counts_dyna
+    def get_1oIp_map_for_stat_bins_itau(sp, itau) :
+        sp.Ip_normf_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
+        return sp.Ip_normf_map
+
+    def get_1oIf_map_for_stat_bins_itau(sp, itau) :
+        sp.If_normf_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_If_for_itau(itau))
+        return sp.If_normf_map
 
 #-----------------------------
+
+    def get_norm_factor_map_for_stat_bins_itau(sp, intensity_map) :
+        q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
+        counts = sp.get_counts_for_stat_bins()
+        intens = sp.bincount(q_phi_map_stat, intensity_map, sp.npart_stat)
+        intens_prot = np.select([intens<=0.], [-1.], default=intens)
+        normf = np.select([intens_prot<=0.], [0.], default=counts/intens_prot)
+
+        #norm_facotr_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
+        #norm_facotr_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
+        #norm_facotr_map = np.array(map(lambda i : normf[i], q_phi_map_stat)) # 0.26sec
+        norm_facotr_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
+        norm_facotr_map.shape = (sp.rows,sp.cols)        
+        return norm_facotr_map # sp.get_random_img()
+
+#-----------------------------
+
+    def get_g2_map_for_itau(sp, itau) :
+        Ip_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
+        If_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
+        I2_map       = sp.get_I2_for_itau(itau)
+        sp.g2_map = I2_map * Ip_normf_map * If_normf_map
+        return sp.g2_map
+
+
+    def get_g2_for_dyna_bins_itau(sp, itau) :
+        q_phi_map_dyna = sp.get_q_phi_map_for_dyna_bins()
+        g2_map         = sp.get_g2_map_for_itau(itau)
+        intens_dyna    = sp.bincount(q_phi_map_dyna, g2_map, sp.npart_dyna)
+        counts         = sp.get_counts_for_dyna_bins()
+        counts_prot    = np.select([counts==0], [-1], default=counts) 
+        sp.g2_for_dyna_bins = np.select([counts_prot<0], [0], default=intens_dyna/counts_prot)
+        return sp.g2_for_dyna_bins
+
+
+    def get_g2_map_for_dyna_bins_itau(sp, itau) :
+        q_phi_map_dyna          = sp.get_q_phi_map_for_dyna_bins()
+        g2_for_dyna_bins        = sp.get_g2_for_dyna_bins_itau(itau)
+        sp.g2_map_for_dyna_bins = np.array([g2_for_dyna_bins[i] for i in q_phi_map_dyna])
+        return sp.g2_map_for_dyna_bins
+        #return sp.get_random_img()
+
+
+    def get_g2_vs_itau_arr(sp) :
+        if sp.g2_vs_itau_arr != None : return sp.g2_vs_itau_arr        
+        sp.list_of_tau = sp.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
+        #print 'sp.list_of_tau = ', sp.list_of_tau
+
+        g2_vs_itau = []
+        for itau, tau in enumerate(sp.list_of_tau) :
+            g2_for_dyna_bins = sp.get_g2_for_dyna_bins_itau(itau)
+            g2_vs_itau.append(g2_for_dyna_bins)
+
+            msg = 'get_g2_vs_itau_arr: itau=' + str(itau) + \
+                  '  tau='                    + str(tau) + \
+                  '  <g2>='                   + str(g2_for_dyna_bins.mean()) 
+            logger.info(msg, __name__)
+            print msg
+        
+        sp.g2_vs_itau_arr = np.array(g2_vs_itau)
+
+        return sp.g2_vs_itau_arr
 
 #-----------------------------
 
@@ -412,15 +462,16 @@ class ViewResults :
         else                  : weights = map_intens.flatten() 
 
         bin_count = np.bincount(map_bins.flatten(), weights, length)
-        print 'bin_count:\n',      bin_count
-        print 'bin_count.shape =', bin_count.shape
-        
+        #print 'bin_count:\n',      bin_count
+        #print 'bin_count.shape =', bin_count.shape
         return bin_count
 
 #-----------------------------
 
     def set_file_name(sp, fname=None) :
         sp.cor_arr = None
+        sp.g2_vs_itau_arr = None
+
         if fname == None : sp.fname = cp.res_fname.value()
         else :             sp.fname = fname
 
@@ -442,32 +493,34 @@ class ViewResults :
         return sp.cor_arr
 
 #-----------------------------
-
-
 #-----------------------------
 
     def get_Ip_for_itau(sp,itau) :
-        return sp.get_cor_array_from_binary_file()[itau, 0,...]
+        cor_array = sp.get_cor_array_from_binary_file()
+        return cor_array[itau, 0,...]
 
 #-----------------------------
 
     def get_If_for_itau(sp,itau) :
-        return sp.get_cor_array_from_binary_file()[itau, 1,...]
+        cor_array = sp.get_cor_array_from_binary_file()
+        return cor_array[itau, 1,...]
 
 #-----------------------------
 
     def get_I2_for_itau(sp,itau) :
-        return sp.get_cor_array_from_binary_file()[itau, 2,...]
+        cor_array = sp.get_cor_array_from_binary_file()
+        return cor_array[itau, 2,...]
 
 #-----------------------------
 
-    def get_g2_for_itau(sp,itau) :
+    def get_g2_raw_for_itau(sp,itau) :
+        """Returns g2 raw map without normalization for preliminary plot"""
         cor_arr = sp.get_cor_array_from_binary_file()
         Ip = cor_arr[itau, 0,...] 
         If = cor_arr[itau, 1,...] 
         I2 = cor_arr[itau, 2,...] 
-        sp.g2_for_itau = 100*I2/Ip/If
-        return sp.g2_for_itau
+        sp.g2_raw_for_itau = 100*I2/Ip/If
+        return sp.g2_raw_for_itau
 
 #-----------------------------
 
