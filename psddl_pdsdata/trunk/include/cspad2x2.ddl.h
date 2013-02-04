@@ -122,7 +122,7 @@ private:
 
 /** @class ConfigV1QuadReg
 
-  Configuration data for single quadrant.
+  Configuration data for single "quadrant" which for 2x2 means a single 2x2.
 */
 
 
@@ -184,7 +184,7 @@ private:
 
 /** @class ConfigV1
 
-  Configuration data for complete CsPad device.
+  Configuration data for 2x2 CsPad device.
 */
 
 
@@ -219,6 +219,125 @@ private:
   uint32_t	_AsicMask;
   uint32_t	_roiMask;
   CsPad2x2::ConfigV1QuadReg	_quad;
+};
+
+/** @class ConfigV2QuadReg
+
+  Configuration data for single "quadrant" which for 2x2 means a single 2x2.
+*/
+
+
+class ConfigV2QuadReg {
+public:
+  uint32_t shiftSelect() const { return _shiftSelect; }
+  uint32_t edgeSelect() const { return _edgeSelect; }
+  uint32_t readClkSet() const { return _readClkSet; }
+  uint32_t readClkHold() const { return _readClkHold; }
+  uint32_t dataMode() const { return _dataMode; }
+  uint32_t prstSel() const { return _prstSel; }
+  uint32_t acqDelay() const { return _acqDelay; }
+  uint32_t intTime() const { return _intTime; }
+  uint32_t digDelay() const { return _digDelay; }
+  uint32_t ampIdle() const { return _ampIdle; }
+  uint32_t injTotal() const { return _injTotal; }
+  uint32_t rowColShiftPer() const { return _rowColShiftPer; }
+  uint32_t ampReset() const { return _ampReset; }
+  uint32_t digCount() const { return _digCount; }
+  uint32_t digPeriod() const { return _digPeriod; }
+  uint32_t PeltierEnable() const { return _PeltierEnable; }
+  uint32_t kpConstant() const { return _kpConstant; }
+  uint32_t kiConstant() const { return _kiConstant; }
+  uint32_t kdConstant() const { return _kdConstant; }
+  uint32_t humidThold() const { return _humidThold; }
+  uint32_t setPoint() const { return _setPoint; }
+  /** bias tuning is used, but not written;
+            2 bits per nibble, C2,C1,I5,I2;
+            bit order rc00rc00rc00rc */
+  uint32_t biasTuning() const { return _biasTuning; }
+  /** pMOS and nMOS Displacement and Main;
+            used but not written and not in GUI yet;
+            hard-wired to zero in GUI;
+            2 bits per nibble, bit order pd00pm00nd00nm */
+  uint32_t pdpmndnmBalance() const { return _pdpmndnmBalance; }
+  /** read-only configuration */
+  const CsPad2x2::CsPad2x2ReadOnlyCfg& ro() const { return _readOnly; }
+  const CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const { return _digitalPots; }
+  /** Gain map. */
+  const CsPad2x2::CsPad2x2GainMapCfg& gm() const { return _gainMap; }
+  static uint32_t _sizeof()  { return ((((((92+(CsPad2x2::CsPad2x2ReadOnlyCfg::_sizeof()))+(CsPad2x2::CsPad2x2DigitalPotsCfg::_sizeof()))+(CsPad2x2::CsPad2x2GainMapCfg::_sizeof()))+4)-1)/4)*4; }
+private:
+  uint32_t	_shiftSelect;
+  uint32_t	_edgeSelect;
+  uint32_t	_readClkSet;
+  uint32_t	_readClkHold;
+  uint32_t	_dataMode;
+  uint32_t	_prstSel;
+  uint32_t	_acqDelay;
+  uint32_t	_intTime;
+  uint32_t	_digDelay;
+  uint32_t	_ampIdle;
+  uint32_t	_injTotal;
+  uint32_t	_rowColShiftPer;
+  uint32_t	_ampReset;
+  uint32_t	_digCount;
+  uint32_t	_digPeriod;
+  uint32_t	_PeltierEnable;
+  uint32_t	_kpConstant;
+  uint32_t	_kiConstant;
+  uint32_t	_kdConstant;
+  uint32_t	_humidThold;
+  uint32_t	_setPoint;
+  uint32_t	_biasTuning;	/**< bias tuning is used, but not written;
+            2 bits per nibble, C2,C1,I5,I2;
+            bit order rc00rc00rc00rc */
+  uint32_t	_pdpmndnmBalance;	/**< pMOS and nMOS Displacement and Main;
+            used but not written and not in GUI yet;
+            hard-wired to zero in GUI;
+            2 bits per nibble, bit order pd00pm00nd00nm */
+  CsPad2x2::CsPad2x2ReadOnlyCfg	_readOnly;	/**< read-only configuration */
+  CsPad2x2::CsPad2x2DigitalPotsCfg	_digitalPots;
+  CsPad2x2::CsPad2x2GainMapCfg	_gainMap;	/**< Gain map. */
+};
+
+/** @class ConfigV2
+
+  Configuration data for 2x2 CsPad device.
+*/
+
+
+class ConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  uint32_t concentratorVersion() const { return _concentratorVersion; }
+  const CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const { return _protectionThreshold; }
+  uint32_t protectionEnable() const { return _protectionEnable; }
+  uint32_t inactiveRunMode() const { return _inactiveRunMode; }
+  uint32_t activeRunMode() const { return _activeRunMode; }
+  uint32_t runTriggerDelay() const { return _runTriggerDelay; }
+  uint32_t tdi() const { return _testDataIndex; }
+  uint32_t payloadSize() const { return _payloadPerQuad; }
+  uint32_t badAsicMask() const { return _badAsicMask; }
+  uint32_t asicMask() const { return _AsicMask; }
+  uint32_t roiMask() const { return _roiMask; }
+  const CsPad2x2::ConfigV2QuadReg& quad() const { return _quad; }
+  uint32_t numAsicsRead() const;
+  /** Number of ASICs in given quadrant */
+  uint32_t numAsicsStored() const;
+  static uint32_t _sizeof()  { return ((((((((((((((4+(CsPad2x2::ProtectionSystemThreshold::_sizeof()))+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad2x2::ConfigV2QuadReg::_sizeof()))+4)-1)/4)*4; }
+private:
+  uint32_t	_concentratorVersion;
+  CsPad2x2::ProtectionSystemThreshold	_protectionThreshold;
+  uint32_t	_protectionEnable;
+  uint32_t	_inactiveRunMode;
+  uint32_t	_activeRunMode;
+  uint32_t	_runTriggerDelay;
+  uint32_t	_testDataIndex;
+  uint32_t	_payloadPerQuad;
+  uint32_t	_badAsicMask;
+  uint32_t	_AsicMask;
+  uint32_t	_roiMask;
+  CsPad2x2::ConfigV2QuadReg	_quad;
 };
 
 /** @class ElementV1

@@ -13,6 +13,14 @@ uint32_t
 ConfigV1::numAsicsStored() const {
   return __builtin_popcount(this->roiMask())*2;
 }
+uint32_t
+ConfigV2::numAsicsRead() const {
+  return 4;
+}
+uint32_t
+ConfigV2::numAsicsStored() const {
+  return __builtin_popcount(this->roiMask())*2;
+}
 float
 ElementV1::common_mode(uint32_t section) const {
   return 0;
