@@ -44,6 +44,7 @@
 #include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/ControlDataConfigV2.h"
 #include "H5DataTypes/CsPad2x2ConfigV1.h"
+#include "H5DataTypes/CsPad2x2ConfigV2.h"
 #include "H5DataTypes/CsPadConfigV1.h"
 #include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/CsPadConfigV3.h"
@@ -616,6 +617,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       ::makeConfigCvt<CsPad2x2ConfigV1>(cvts, group, "CsPad2x2::ConfigV1", src, m_cvtOptions);
+      break;
+    case 2:
+      ::makeConfigCvt<CsPad2x2ConfigV2>(cvts, group, "CsPad2x2::ConfigV2", src, m_cvtOptions);
       break;
     }
     // special converter object for CsPad calibration data
