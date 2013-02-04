@@ -73,8 +73,8 @@
             <attribute name="_trigDelay" type="uint32_t" accessor="trigDelay">
             </attribute>
 
-            <method name="diodeGain" type="CapacitorValue">
-                nReturns CapacitorValue enum for given channel number (0..3).
+            <method name="capacitorValue" type="CapacitorValue">
+                Returns CapacitorValue enum for given channel number (0..3).
                 <tag name="inline"/>
                 <arg name="ch" type="uint32_t"/>
                 <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*2)) &amp; 0x3)" />
@@ -149,8 +149,8 @@
             <attribute name="_adcDelay" type="uint32_t" accessor="adcDelay">
             </attribute>
 
-            <method name="diodeGain" type="CapacitorValue">
-                nReturns CapacitorValue enum for given channel number (0..3).
+            <method name="capacitorValue" type="CapacitorValue">
+                Returns CapacitorValue enum for given channel number (0..3).
                 <tag name="inline"/>
                 <arg name="ch" type="uint32_t"/>
                 <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf)" />

@@ -126,7 +126,7 @@
 
         <pstype name="ConfigV1QuadReg">
         
-            Configuration data for single quadrant.
+            Configuration data for single "quadrant" which for 2x2 means a single 2x2.
         
             <attribute name="_shiftSelect" type="uint32_t" accessor="shiftSelect">
             </attribute>
@@ -208,7 +208,7 @@
         
         <pstype name="ConfigV1" version="1" type_id="Id_Cspad2x2Config">
         
-            Configuration data for complete CsPad device.
+            Configuration data for 2x2 CsPad device.
         
             <tag name="config-type"/>
         
@@ -243,6 +243,157 @@
             </attribute>
 
             <attribute name="_quad" type="ConfigV1QuadReg" accessor="quad">
+            </attribute>
+
+            <method name="numAsicsRead" type="uint32_t">
+                <expr lang="C++" value="4"/>
+            </method>
+            
+            <method name="numAsicsStored" type="uint32_t">
+                Number of ASICs in given quadrant
+                <expr lang="C++" value="__builtin_popcount({self}.roiMask())*2"/>
+            </method>
+            
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+
+        <pstype name="ConfigV2QuadReg">
+        
+            Configuration data for single "quadrant" which for 2x2 means a single 2x2.
+        
+            <attribute name="_shiftSelect" type="uint32_t" accessor="shiftSelect">
+            </attribute>
+
+            <attribute name="_edgeSelect" type="uint32_t" accessor="edgeSelect">
+            </attribute>
+
+            <attribute name="_readClkSet" type="uint32_t" accessor="readClkSet">
+            </attribute>
+
+            <attribute name="_readClkHold" type="uint32_t" accessor="readClkHold">
+            </attribute>
+
+            <attribute name="_dataMode" type="uint32_t" accessor="dataMode">
+            </attribute>
+
+            <attribute name="_prstSel" type="uint32_t" accessor="prstSel">
+            </attribute>
+
+            <attribute name="_acqDelay" type="uint32_t" accessor="acqDelay">
+            </attribute>
+
+            <attribute name="_intTime" type="uint32_t" accessor="intTime">
+            </attribute>
+
+            <attribute name="_digDelay" type="uint32_t" accessor="digDelay">
+            </attribute>
+
+            <attribute name="_ampIdle" type="uint32_t" accessor="ampIdle">
+            </attribute>
+
+            <attribute name="_injTotal" type="uint32_t" accessor="injTotal">
+            </attribute>
+
+            <attribute name="_rowColShiftPer" type="uint32_t" accessor="rowColShiftPer">
+            </attribute>
+
+            <attribute name="_ampReset" type="uint32_t" accessor="ampReset">
+            </attribute>
+
+            <attribute name="_digCount" type="uint32_t" accessor="digCount">
+            </attribute>
+
+            <attribute name="_digPeriod" type="uint32_t" accessor="digPeriod">
+            </attribute>
+
+            <attribute name="_PeltierEnable" type="uint32_t" accessor="PeltierEnable">
+            </attribute>
+
+            <attribute name="_kpConstant" type="uint32_t" accessor="kpConstant">
+            </attribute>
+
+            <attribute name="_kiConstant" type="uint32_t" accessor="kiConstant">
+            </attribute>
+
+            <attribute name="_kdConstant" type="uint32_t" accessor="kdConstant">
+            </attribute>
+
+            <attribute name="_humidThold" type="uint32_t" accessor="humidThold">
+            </attribute>
+
+            <attribute name="_setPoint" type="uint32_t" accessor="setPoint">
+            </attribute>
+
+            <attribute name="_biasTuning" type="uint32_t" accessor="biasTuning">
+            bias tuning is used, but not written;
+            2 bits per nibble, C2,C1,I5,I2;
+            bit order rc00rc00rc00rc
+            </attribute>
+
+            <attribute name="_pdpmndnmBalance" type="uint32_t" accessor="pdpmndnmBalance">
+            pMOS and nMOS Displacement and Main;
+            used but not written and not in GUI yet;
+            hard-wired to zero in GUI;
+            2 bits per nibble, bit order pd00pm00nd00nm
+            </attribute>
+
+            <attribute name="_readOnly" type="CsPad2x2ReadOnlyCfg" accessor="ro">
+            read-only configuration
+            </attribute>
+
+            <attribute name="_digitalPots" type="CsPad2x2DigitalPotsCfg" accessor="dp">
+            </attribute>
+
+            <attribute name="_gainMap" type="CsPad2x2GainMapCfg" accessor="gm">
+            Gain map.
+            </attribute>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV2" version="2" type_id="Id_Cspad2x2Config">
+        
+            Configuration data for 2x2 CsPad device.
+        
+            <tag name="config-type"/>
+        
+            <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
+            </attribute>
+
+            <attribute name="_protectionThreshold" type="ProtectionSystemThreshold" accessor="protectionThreshold">
+            </attribute>
+
+            <attribute name="_protectionEnable" type="uint32_t" accessor="protectionEnable">
+            </attribute>
+
+            <attribute name="_inactiveRunMode" type="uint32_t" accessor="inactiveRunMode">
+            </attribute>
+
+            <attribute name="_activeRunMode" type="uint32_t" accessor="activeRunMode">
+            </attribute>
+
+            <attribute name="_runTriggerDelay" type="uint32_t" accessor="runTriggerDelay">
+            </attribute>
+
+            <attribute name="_testDataIndex" type="uint32_t" accessor="tdi">
+            </attribute>
+
+            <attribute name="_payloadPerQuad" type="uint32_t" accessor="payloadSize">
+            </attribute>
+
+            <attribute name="_badAsicMask" type="uint32_t" accessor="badAsicMask">
+            </attribute>
+
+            <attribute name="_AsicMask" type="uint32_t" accessor="asicMask">
+            </attribute>
+
+            <attribute name="_roiMask" type="uint32_t" accessor="roiMask">
+            </attribute>
+
+            <attribute name="_quad" type="ConfigV2QuadReg" accessor="quad">
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
