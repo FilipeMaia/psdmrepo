@@ -24,6 +24,12 @@ ConfigV1QuadReg::~ConfigV1QuadReg() {}
 ConfigV1::~ConfigV1() {}
 
 
+ConfigV2QuadReg::~ConfigV2QuadReg() {}
+
+
+ConfigV2::~ConfigV2() {}
+
+
 ElementV1::~ElementV1() {}
 
 } // namespace CsPad2x2

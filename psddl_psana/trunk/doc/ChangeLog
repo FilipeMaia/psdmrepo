@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2013-02-04 Andy Salnikov
+- upgrading to pdsdata V06-01-02
+- regenerate whole thing from psddldata V00-04-01
+
 Tag: V00-04-00
 2013-01-30 Andy Salnikov
 - switching to const ndarrays for array data

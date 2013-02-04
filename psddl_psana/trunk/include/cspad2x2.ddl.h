@@ -111,7 +111,7 @@ public:
 
 /** @class ConfigV1QuadReg
 
-  Configuration data for single quadrant.
+  Configuration data for single "quadrant" which for 2x2 means a single 2x2.
 */
 
 
@@ -148,7 +148,7 @@ public:
 
 /** @class ConfigV1
 
-  Configuration data for complete CsPad device.
+  Configuration data for 2x2 CsPad device.
 */
 
 
@@ -168,6 +168,80 @@ public:
   virtual uint32_t asicMask() const = 0;
   virtual uint32_t roiMask() const = 0;
   virtual const CsPad2x2::ConfigV1QuadReg& quad() const = 0;
+  virtual uint32_t numAsicsRead() const = 0;
+  /** Number of ASICs in given quadrant */
+  virtual uint32_t numAsicsStored() const = 0;
+};
+
+/** @class ConfigV2QuadReg
+
+  Configuration data for single "quadrant" which for 2x2 means a single 2x2.
+*/
+
+
+class ConfigV2QuadReg {
+public:
+  virtual ~ConfigV2QuadReg();
+  virtual uint32_t shiftSelect() const = 0;
+  virtual uint32_t edgeSelect() const = 0;
+  virtual uint32_t readClkSet() const = 0;
+  virtual uint32_t readClkHold() const = 0;
+  virtual uint32_t dataMode() const = 0;
+  virtual uint32_t prstSel() const = 0;
+  virtual uint32_t acqDelay() const = 0;
+  virtual uint32_t intTime() const = 0;
+  virtual uint32_t digDelay() const = 0;
+  virtual uint32_t ampIdle() const = 0;
+  virtual uint32_t injTotal() const = 0;
+  virtual uint32_t rowColShiftPer() const = 0;
+  virtual uint32_t ampReset() const = 0;
+  virtual uint32_t digCount() const = 0;
+  virtual uint32_t digPeriod() const = 0;
+  virtual uint32_t PeltierEnable() const = 0;
+  virtual uint32_t kpConstant() const = 0;
+  virtual uint32_t kiConstant() const = 0;
+  virtual uint32_t kdConstant() const = 0;
+  virtual uint32_t humidThold() const = 0;
+  virtual uint32_t setPoint() const = 0;
+  /** bias tuning is used, but not written;
+            2 bits per nibble, C2,C1,I5,I2;
+            bit order rc00rc00rc00rc */
+  virtual uint32_t biasTuning() const = 0;
+  /** pMOS and nMOS Displacement and Main;
+            used but not written and not in GUI yet;
+            hard-wired to zero in GUI;
+            2 bits per nibble, bit order pd00pm00nd00nm */
+  virtual uint32_t pdpmndnmBalance() const = 0;
+  /** read-only configuration */
+  virtual const CsPad2x2::CsPad2x2ReadOnlyCfg& ro() const = 0;
+  virtual const CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const = 0;
+  /** Gain map. */
+  virtual const CsPad2x2::CsPad2x2GainMapCfg& gm() const = 0;
+};
+
+/** @class ConfigV2
+
+  Configuration data for 2x2 CsPad device.
+*/
+
+
+class ConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~ConfigV2();
+  virtual uint32_t concentratorVersion() const = 0;
+  virtual const CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const = 0;
+  virtual uint32_t protectionEnable() const = 0;
+  virtual uint32_t inactiveRunMode() const = 0;
+  virtual uint32_t activeRunMode() const = 0;
+  virtual uint32_t runTriggerDelay() const = 0;
+  virtual uint32_t tdi() const = 0;
+  virtual uint32_t payloadSize() const = 0;
+  virtual uint32_t badAsicMask() const = 0;
+  virtual uint32_t asicMask() const = 0;
+  virtual uint32_t roiMask() const = 0;
+  virtual const CsPad2x2::ConfigV2QuadReg& quad() const = 0;
   virtual uint32_t numAsicsRead() const = 0;
   /** Number of ASICs in given quadrant */
   virtual uint32_t numAsicsStored() const = 0;

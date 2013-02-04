@@ -38,8 +38,8 @@ public:
   virtual uint16_t errors() const = 0;
   virtual uint16_t calStrobeLength() const = 0;
   virtual uint32_t trigDelay() const = 0;
-  /** nReturns CapacitorValue enum for given channel number (0..3). */
-  virtual Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const = 0;
+  /** Returns CapacitorValue enum for given channel number (0..3). */
+  virtual Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const = 0;
 };
 
 /** @class ConfigV2
@@ -78,8 +78,8 @@ public:
   virtual uint32_t trigDelay() const = 0;
   virtual uint32_t trigPsDelay() const = 0;
   virtual uint32_t adcDelay() const = 0;
-  /** nReturns CapacitorValue enum for given channel number (0..3). */
-  virtual Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const = 0;
+  /** Returns CapacitorValue enum for given channel number (0..3). */
+  virtual Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const = 0;
 };
 
 /** @class DataV1
