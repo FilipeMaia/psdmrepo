@@ -38,76 +38,74 @@
 
 namespace H5DataTypes {
 
-CsPad2x2DigitalPotsCfg_Data&
-CsPad2x2DigitalPotsCfg_Data::operator=(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o)
+CsPad2x2DigitalPotsCfg_Data::CsPad2x2DigitalPotsCfg_Data(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o)
 {
   std::copy(o.pots, o.pots+PotsPerQuad, this->pots);
-  return *this;
 }
 
-CsPad2x2ReadOnlyCfg_Data&
-CsPad2x2ReadOnlyCfg_Data::operator=(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o)
+CsPad2x2ReadOnlyCfg_Data::CsPad2x2ReadOnlyCfg_Data(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o)
+  : shiftTest(o.shiftTest)
+  , version(o.version)
 {
-  this->shiftTest = o.shiftTest;
-  this->version = o.version;
-  return *this;
 }
 
-CsPad2x2GainMapCfg_Data&
-CsPad2x2GainMapCfg_Data::operator=(const Pds::CsPad2x2::CsPad2x2GainMapCfg& src)
+CsPad2x2GainMapCfg_Data::CsPad2x2GainMapCfg_Data(const Pds::CsPad2x2::CsPad2x2GainMapCfg& src)
 {
   size_t size = ColumnsPerASIC * MaxRowsPerASIC;
   const uint16_t* srcmap = &src._gainMap[0][0];
   std::copy(srcmap, srcmap+size, &gainMap[0][0]);
-  return *this;
 }
 
-CsPad2x2ConfigV1QuadReg_Data&
-CsPad2x2ConfigV1QuadReg_Data::operator=(const Pds::CsPad2x2::ConfigV1QuadReg& src)
+CsPad2x2ConfigV1QuadReg_Data::CsPad2x2ConfigV1QuadReg_Data(const Pds::CsPad2x2::ConfigV1QuadReg& src)
+  : shiftSelect(src.shiftSelect()[0])
+  , edgeSelect(src.edgeSelect()[0])
+  , readClkSet(src.readClkSet())
+  , readClkHold(src.readClkHold())
+  , dataMode(src.dataMode())
+  , prstSel(src.prstSel())
+  , acqDelay(src.acqDelay())
+  , intTime(src.intTime())
+  , digDelay(src.digDelay())
+  , ampIdle(src.ampIdle())
+  , injTotal(src.injTotal())
+  , rowColShiftPer(src.rowColShiftPer())
+  , ampReset(src.ampReset())
+  , digCount(src.digCount())
+  , digPeriod(src.digPeriod())
+  , PeltierEnable(src.PeltierEnable())
+  , kpConstant(src.kpConstant())
+  , kiConstant(src.kiConstant())
+  , kdConstant(src.kdConstant())
+  , humidThold(src.humidThold())
+  , setPoint(src.setPoint())
+  , readOnly(src.ro())
+  , digitalPots(src.dp())
+  , gainMap(*src.gm())
 {
-  this->shiftSelect    = src.shiftSelect()[0];
-  this->edgeSelect     = src.edgeSelect()[0];
-  this->readClkSet     = src.readClkSet();
-  this->readClkHold    = src.readClkHold();
-  this->dataMode       = src.dataMode();
-  this->prstSel        = src.prstSel();
-  this->acqDelay       = src.acqDelay();
-  this->intTime        = src.intTime();
-  this->digDelay       = src.digDelay();
-  this->ampIdle        = src.ampIdle();
-  this->injTotal       = src.injTotal();
-  this->rowColShiftPer = src.rowColShiftPer();
-  this->readOnly       = src.ro();
-  this->digitalPots    = src.dp();
-  this->gainMap        = *src.gm();
-
-  return *this;
 }
 
-CsPad2x2ProtectionSystemThreshold_Data&
-CsPad2x2ProtectionSystemThreshold_Data::operator=(const Pds::CsPad2x2::ProtectionSystemThreshold& o)
+CsPad2x2ProtectionSystemThreshold_Data::CsPad2x2ProtectionSystemThreshold_Data(const Pds::CsPad2x2::ProtectionSystemThreshold& o)
+  : adcThreshold(o.adcThreshold)
+  , pixelCountThreshold(o.pixelCountThreshold)
 {
-  this->adcThreshold = o.adcThreshold;
-  this->pixelCountThreshold = o.pixelCountThreshold;
-  return *this;
 }
 
 
 CsPad2x2ConfigV1::CsPad2x2ConfigV1 ( const XtcType& data )
+  : quad(*data.quad())
+  , testDataIndex(data.tdi())
+  , protectionThreshold(*data.protectionThreshold())
+  , protectionEnable(data.protectionEnable())
+  , inactiveRunMode(data.inactiveRunMode())
+  , activeRunMode(data.activeRunMode())
+  , payloadSize(data.payloadSize())
+  , badAsicMask(data.badAsicMask())
+  , asicMask(data.asicMask())
+  , roiMask(data.roiMask())
+  , numAsicsRead(data.numAsicsRead())
+  , numAsicsStored(data.numAsicsStored())
+  , concentratorVersion(data.concentratorVersion())
 {
-  m_data.quad           = *data.quad();
-  m_data.testDataIndex  = data.tdi();
-  m_data.protectionThreshold = *data.protectionThreshold();
-  m_data.protectionEnable = data.protectionEnable();
-  m_data.inactiveRunMode = data.inactiveRunMode();
-  m_data.activeRunMode  = data.activeRunMode();
-  m_data.payloadSize    = data.payloadSize();
-  m_data.badAsicMask    = data.badAsicMask();
-  m_data.asicMask       = data.asicMask();
-  m_data.roiMask        = data.roiMask();
-  m_data.numAsicsRead   = data.numAsicsRead();
-  m_data.numAsicsStored = data.numAsicsStored();
-  m_data.concentratorVersion = data.concentratorVersion();
 }
 
 hdf5pp::Type
@@ -163,20 +161,20 @@ CsPad2x2ConfigV1::native_type()
   protSysType.insert_native<uint32_t>( "adcThreshold", offsetof(CsPad2x2ProtectionSystemThreshold_Data, adcThreshold) ) ;
   protSysType.insert_native<uint32_t>( "pixelCountThreshold", offsetof(CsPad2x2ProtectionSystemThreshold_Data, pixelCountThreshold) ) ;
   
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPad2x2ConfigV1_Data>() ;
-  confType.insert("quad", offsetof(CsPad2x2ConfigV1_Data, quad), quadType ) ;
-  confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPad2x2ConfigV1_Data, testDataIndex) ) ;
-  confType.insert("protectionThreshold", offsetof(CsPad2x2ConfigV1_Data, protectionThreshold), protSysType ) ;
-  confType.insert_native<uint32_t>( "protectionEnable", offsetof(CsPad2x2ConfigV1_Data, protectionEnable) ) ;
-  confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPad2x2ConfigV1_Data, inactiveRunMode) ) ;
-  confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPad2x2ConfigV1_Data, activeRunMode) ) ;
-  confType.insert_native<uint32_t>( "payloadSize", offsetof(CsPad2x2ConfigV1_Data, payloadSize) ) ;
-  confType.insert_native<uint32_t>( "badAsicMask", offsetof(CsPad2x2ConfigV1_Data, badAsicMask) ) ;
-  confType.insert_native<uint32_t>( "asicMask", offsetof(CsPad2x2ConfigV1_Data, asicMask) ) ;
-  confType.insert_native<uint32_t>( "roiMask", offsetof(CsPad2x2ConfigV1_Data, roiMask) ) ;
-  confType.insert_native<uint32_t>( "numAsicsRead", offsetof(CsPad2x2ConfigV1_Data, numAsicsRead) ) ;
-  confType.insert_native<uint32_t>( "numAsicsStored", offsetof(CsPad2x2ConfigV1_Data, numAsicsStored) ) ;
-  confType.insert_native<uint32_t>( "concentratorVersion", offsetof(CsPad2x2ConfigV1_Data, concentratorVersion) ) ;
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPad2x2ConfigV1>() ;
+  confType.insert("quad", offsetof(CsPad2x2ConfigV1, quad), quadType ) ;
+  confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPad2x2ConfigV1, testDataIndex) ) ;
+  confType.insert("protectionThreshold", offsetof(CsPad2x2ConfigV1, protectionThreshold), protSysType ) ;
+  confType.insert_native<uint32_t>( "protectionEnable", offsetof(CsPad2x2ConfigV1, protectionEnable) ) ;
+  confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPad2x2ConfigV1, inactiveRunMode) ) ;
+  confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPad2x2ConfigV1, activeRunMode) ) ;
+  confType.insert_native<uint32_t>( "payloadSize", offsetof(CsPad2x2ConfigV1, payloadSize) ) ;
+  confType.insert_native<uint32_t>( "badAsicMask", offsetof(CsPad2x2ConfigV1, badAsicMask) ) ;
+  confType.insert_native<uint32_t>( "asicMask", offsetof(CsPad2x2ConfigV1, asicMask) ) ;
+  confType.insert_native<uint32_t>( "roiMask", offsetof(CsPad2x2ConfigV1, roiMask) ) ;
+  confType.insert_native<uint32_t>( "numAsicsRead", offsetof(CsPad2x2ConfigV1, numAsicsRead) ) ;
+  confType.insert_native<uint32_t>( "numAsicsStored", offsetof(CsPad2x2ConfigV1, numAsicsStored) ) ;
+  confType.insert_native<uint32_t>( "concentratorVersion", offsetof(CsPad2x2ConfigV1, concentratorVersion) ) ;
 
   return confType ;
 }

@@ -38,23 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Ipimb::ConfigV2
 //
-struct IpimbConfigV2_Data  {
-  uint64_t triggerCounter;
-  uint64_t serialID;
-  uint16_t chargeAmpRange;
-  uint16_t calibrationRange;
-  uint32_t resetLength;
-  uint16_t resetDelay;
-  float chargeAmpRefVoltage;
-  float calibrationVoltage;
-  float diodeBias;
-  uint16_t status;
-  uint16_t errors;
-  uint16_t calStrobeLength;
-  uint32_t trigDelay;
-  uint32_t trigPsDelay;
-  uint32_t adcDelay;
-};
 
 class IpimbConfigV2  {
 public:
@@ -74,7 +57,22 @@ public:
 
 private:
 
-  IpimbConfigV2_Data m_data ;
+  uint64_t triggerCounter;
+  uint64_t serialID;
+  uint16_t chargeAmpRange;
+  uint16_t calibrationRange;
+  uint8_t capacitorValue[4];
+  uint32_t resetLength;
+  uint16_t resetDelay;
+  float chargeAmpRefVoltage;
+  float calibrationVoltage;
+  float diodeBias;
+  uint16_t status;
+  uint16_t errors;
+  uint16_t calStrobeLength;
+  uint32_t trigDelay;
+  uint32_t trigPsDelay;
+  uint32_t adcDelay;
 
 };
 

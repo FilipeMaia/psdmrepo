@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_CSPAD2X2CONFIGV1_H
-#define H5DATATYPES_CSPAD2X2CONFIGV1_H
+#ifndef H5DATATYPES_CSPAD2X2CONFIGV2_H
+#define H5DATATYPES_CSPAD2X2CONFIGV2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPad2x2ConfigV1.
+//	Class CsPad2x2ConfigV2.
 //
 //------------------------------------------------------------------------
 
@@ -18,13 +18,13 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/cspad2x2/ConfigV1.hh"
+#include "pdsdata/cspad2x2/ConfigV2.hh"
+#include "H5DataTypes/CsPad2x2ConfigV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,43 +37,9 @@
 namespace H5DataTypes {
   
 //
-// Helper type for Pds::CsPad2x2::CsPad2x2DigitalPotsCfg
+// Helper type for Pds::CsPad2x2::ConfigV2QuadReg
 //
-struct CsPad2x2DigitalPotsCfg_Data  {
-  enum { PotsPerQuad = Pds::CsPad2x2::PotsPerQuad };
-  uint8_t         pots[PotsPerQuad];
-
-  CsPad2x2DigitalPotsCfg_Data() {}
-  CsPad2x2DigitalPotsCfg_Data(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o);
-};
-
-//
-// Helper type for Pds::CsPad2x2::CsPad2x2ReadOnlyCfg
-//
-struct CsPad2x2ReadOnlyCfg_Data  {
-  uint32_t        shiftTest;
-  uint32_t        version;
-
-  CsPad2x2ReadOnlyCfg_Data() {}
-  CsPad2x2ReadOnlyCfg_Data(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o);
-};
-
-//
-// Helper type for Pds::CsPad2x2::CsPad2x2GainMapCfg
-//
-struct CsPad2x2GainMapCfg_Data  {
-  enum { ColumnsPerASIC = Pds::CsPad2x2::ColumnsPerASIC };
-  enum { MaxRowsPerASIC = Pds::CsPad2x2::MaxRowsPerASIC };
-  uint16_t gainMap[ColumnsPerASIC][MaxRowsPerASIC];
-
-  CsPad2x2GainMapCfg_Data() {}
-  CsPad2x2GainMapCfg_Data(const Pds::CsPad2x2::CsPad2x2GainMapCfg& o);
-};
-
-//
-// Helper type for Pds::CsPad2x2::ConfigV1QuadReg
-//
-struct CsPad2x2ConfigV1QuadReg_Data  {
+struct CsPad2x2ConfigV2QuadReg_Data  {
   uint32_t                  shiftSelect;
   uint32_t                  edgeSelect;
   uint32_t                  readClkSet;
@@ -95,35 +61,26 @@ struct CsPad2x2ConfigV1QuadReg_Data  {
   uint32_t                  kdConstant;
   uint32_t                  humidThold;
   uint32_t                  setPoint;
+  uint32_t                  biasTuning;
+  uint32_t                  pdpmndnmBalance;
   CsPad2x2ReadOnlyCfg_Data  readOnly;
   CsPad2x2DigitalPotsCfg_Data digitalPots;
   CsPad2x2GainMapCfg_Data   gainMap;
 
-  CsPad2x2ConfigV1QuadReg_Data() {}
-  CsPad2x2ConfigV1QuadReg_Data(const Pds::CsPad2x2::ConfigV1QuadReg& o);
+  CsPad2x2ConfigV2QuadReg_Data() {}
+  CsPad2x2ConfigV2QuadReg_Data(const Pds::CsPad2x2::ConfigV2QuadReg& o);
 };
 
 //
-// Helper type for Pds::CsPad2x2::ProtectionSystemThreshold
+// Helper type for Pds::CsPad2x2::ConfigV2
 //
-struct CsPad2x2ProtectionSystemThreshold_Data  {
-  uint32_t adcThreshold;
-  uint32_t pixelCountThreshold;
-
-  CsPad2x2ProtectionSystemThreshold_Data() {}
-  CsPad2x2ProtectionSystemThreshold_Data(const Pds::CsPad2x2::ProtectionSystemThreshold& o);
-};
-
-//
-// Helper type for Pds::CsPad2x2::ConfigV1
-//
-class CsPad2x2ConfigV1  {
+class CsPad2x2ConfigV2  {
 public:
 
-  typedef Pds::CsPad2x2::ConfigV1 XtcType ;
+  typedef Pds::CsPad2x2::ConfigV2 XtcType ;
 
-  CsPad2x2ConfigV1 () {}
-  CsPad2x2ConfigV1 ( const XtcType& data ) ;
+  CsPad2x2ConfigV2 () {}
+  CsPad2x2ConfigV2 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -135,12 +92,13 @@ public:
 
 private:
 
-  CsPad2x2ConfigV1QuadReg_Data quad;
+  CsPad2x2ConfigV2QuadReg_Data quad;
   uint32_t          testDataIndex;
   CsPad2x2ProtectionSystemThreshold_Data protectionThreshold;
   uint32_t          protectionEnable;
   uint32_t          inactiveRunMode;
   uint32_t          activeRunMode;
+  uint32_t          runTriggerDelay;
   uint32_t          payloadSize;
   uint32_t          badAsicMask;
   uint32_t          asicMask;
@@ -153,4 +111,4 @@ private:
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPAD2X2CONFIGV1_H
+#endif // H5DATATYPES_CSPAD2X2CONFIGV2_H
