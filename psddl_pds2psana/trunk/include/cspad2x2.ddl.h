@@ -130,6 +130,75 @@ private:
 };
 
 
+class ConfigV2QuadReg : public Psana::CsPad2x2::ConfigV2QuadReg {
+public:
+  typedef PsddlPds::CsPad2x2::ConfigV2QuadReg XtcType;
+  typedef Psana::CsPad2x2::ConfigV2QuadReg PsanaType;
+  ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2QuadReg();
+  virtual uint32_t shiftSelect() const;
+  virtual uint32_t edgeSelect() const;
+  virtual uint32_t readClkSet() const;
+  virtual uint32_t readClkHold() const;
+  virtual uint32_t dataMode() const;
+  virtual uint32_t prstSel() const;
+  virtual uint32_t acqDelay() const;
+  virtual uint32_t intTime() const;
+  virtual uint32_t digDelay() const;
+  virtual uint32_t ampIdle() const;
+  virtual uint32_t injTotal() const;
+  virtual uint32_t rowColShiftPer() const;
+  virtual uint32_t ampReset() const;
+  virtual uint32_t digCount() const;
+  virtual uint32_t digPeriod() const;
+  virtual uint32_t PeltierEnable() const;
+  virtual uint32_t kpConstant() const;
+  virtual uint32_t kiConstant() const;
+  virtual uint32_t kdConstant() const;
+  virtual uint32_t humidThold() const;
+  virtual uint32_t setPoint() const;
+  virtual uint32_t biasTuning() const;
+  virtual uint32_t pdpmndnmBalance() const;
+  virtual const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ro() const;
+  virtual const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const;
+  virtual const Psana::CsPad2x2::CsPad2x2GainMapCfg& gm() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  psddl_pds2psana::CsPad2x2::CsPad2x2ReadOnlyCfg _readOnly;
+  psddl_pds2psana::CsPad2x2::CsPad2x2DigitalPotsCfg _digitalPots;
+  psddl_pds2psana::CsPad2x2::CsPad2x2GainMapCfg _gainMap;
+};
+
+
+class ConfigV2 : public Psana::CsPad2x2::ConfigV2 {
+public:
+  typedef PsddlPds::CsPad2x2::ConfigV2 XtcType;
+  typedef Psana::CsPad2x2::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual uint32_t concentratorVersion() const;
+  virtual const Psana::CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const;
+  virtual uint32_t protectionEnable() const;
+  virtual uint32_t inactiveRunMode() const;
+  virtual uint32_t activeRunMode() const;
+  virtual uint32_t runTriggerDelay() const;
+  virtual uint32_t tdi() const;
+  virtual uint32_t payloadSize() const;
+  virtual uint32_t badAsicMask() const;
+  virtual uint32_t asicMask() const;
+  virtual uint32_t roiMask() const;
+  virtual const Psana::CsPad2x2::ConfigV2QuadReg& quad() const;
+  virtual uint32_t numAsicsRead() const;
+  virtual uint32_t numAsicsStored() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  psddl_pds2psana::CsPad2x2::ProtectionSystemThreshold _protectionThreshold;
+  psddl_pds2psana::CsPad2x2::ConfigV2QuadReg _quad;
+};
+
+
 class ElementV1 : public Psana::CsPad2x2::ElementV1 {
 public:
   typedef PsddlPds::CsPad2x2::ElementV1 XtcType;

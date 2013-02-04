@@ -164,6 +164,109 @@ const Psana::CsPad2x2::ConfigV1QuadReg& ConfigV1::quad() const { return _quad; }
 uint32_t ConfigV1::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
 
 uint32_t ConfigV1::numAsicsStored() const { return m_xtcObj->numAsicsStored(); }
+ConfigV2QuadReg::ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::CsPad2x2::ConfigV2QuadReg()
+  , m_xtcObj(xtcPtr)
+  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2DigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
+  , _gainMap(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2GainMapCfg>(xtcPtr, &xtcPtr->gm()))
+{
+}
+ConfigV2QuadReg::~ConfigV2QuadReg()
+{
+}
+
+
+uint32_t ConfigV2QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
+
+uint32_t ConfigV2QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
+
+uint32_t ConfigV2QuadReg::readClkSet() const { return m_xtcObj->readClkSet(); }
+
+uint32_t ConfigV2QuadReg::readClkHold() const { return m_xtcObj->readClkHold(); }
+
+uint32_t ConfigV2QuadReg::dataMode() const { return m_xtcObj->dataMode(); }
+
+uint32_t ConfigV2QuadReg::prstSel() const { return m_xtcObj->prstSel(); }
+
+uint32_t ConfigV2QuadReg::acqDelay() const { return m_xtcObj->acqDelay(); }
+
+uint32_t ConfigV2QuadReg::intTime() const { return m_xtcObj->intTime(); }
+
+uint32_t ConfigV2QuadReg::digDelay() const { return m_xtcObj->digDelay(); }
+
+uint32_t ConfigV2QuadReg::ampIdle() const { return m_xtcObj->ampIdle(); }
+
+uint32_t ConfigV2QuadReg::injTotal() const { return m_xtcObj->injTotal(); }
+
+uint32_t ConfigV2QuadReg::rowColShiftPer() const { return m_xtcObj->rowColShiftPer(); }
+
+uint32_t ConfigV2QuadReg::ampReset() const { return m_xtcObj->ampReset(); }
+
+uint32_t ConfigV2QuadReg::digCount() const { return m_xtcObj->digCount(); }
+
+uint32_t ConfigV2QuadReg::digPeriod() const { return m_xtcObj->digPeriod(); }
+
+uint32_t ConfigV2QuadReg::PeltierEnable() const { return m_xtcObj->PeltierEnable(); }
+
+uint32_t ConfigV2QuadReg::kpConstant() const { return m_xtcObj->kpConstant(); }
+
+uint32_t ConfigV2QuadReg::kiConstant() const { return m_xtcObj->kiConstant(); }
+
+uint32_t ConfigV2QuadReg::kdConstant() const { return m_xtcObj->kdConstant(); }
+
+uint32_t ConfigV2QuadReg::humidThold() const { return m_xtcObj->humidThold(); }
+
+uint32_t ConfigV2QuadReg::setPoint() const { return m_xtcObj->setPoint(); }
+
+uint32_t ConfigV2QuadReg::biasTuning() const { return m_xtcObj->biasTuning(); }
+
+uint32_t ConfigV2QuadReg::pdpmndnmBalance() const { return m_xtcObj->pdpmndnmBalance(); }
+
+const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ConfigV2QuadReg::ro() const { return _readOnly; }
+
+const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& ConfigV2QuadReg::dp() const { return _digitalPots; }
+
+const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV2QuadReg::gm() const { return _gainMap; }
+ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::CsPad2x2::ConfigV2()
+  , m_xtcObj(xtcPtr)
+  , _protectionThreshold(boost::shared_ptr<const PsddlPds::CsPad2x2::ProtectionSystemThreshold>(xtcPtr, &xtcPtr->protectionThreshold()))
+  , _quad(boost::shared_ptr<const PsddlPds::CsPad2x2::ConfigV2QuadReg>(xtcPtr, &xtcPtr->quad()))
+{
+}
+ConfigV2::~ConfigV2()
+{
+}
+
+
+uint32_t ConfigV2::concentratorVersion() const { return m_xtcObj->concentratorVersion(); }
+
+const Psana::CsPad2x2::ProtectionSystemThreshold& ConfigV2::protectionThreshold() const { return _protectionThreshold; }
+
+uint32_t ConfigV2::protectionEnable() const { return m_xtcObj->protectionEnable(); }
+
+uint32_t ConfigV2::inactiveRunMode() const { return m_xtcObj->inactiveRunMode(); }
+
+uint32_t ConfigV2::activeRunMode() const { return m_xtcObj->activeRunMode(); }
+
+uint32_t ConfigV2::runTriggerDelay() const { return m_xtcObj->runTriggerDelay(); }
+
+uint32_t ConfigV2::tdi() const { return m_xtcObj->tdi(); }
+
+uint32_t ConfigV2::payloadSize() const { return m_xtcObj->payloadSize(); }
+
+uint32_t ConfigV2::badAsicMask() const { return m_xtcObj->badAsicMask(); }
+
+uint32_t ConfigV2::asicMask() const { return m_xtcObj->asicMask(); }
+
+uint32_t ConfigV2::roiMask() const { return m_xtcObj->roiMask(); }
+
+const Psana::CsPad2x2::ConfigV2QuadReg& ConfigV2::quad() const { return _quad; }
+
+uint32_t ConfigV2::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
+
+uint32_t ConfigV2::numAsicsStored() const { return m_xtcObj->numAsicsStored(); }
 ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ElementV1()
   , m_xtcObj(xtcPtr)
