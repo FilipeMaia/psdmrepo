@@ -27,7 +27,7 @@ void createWrappers(PyObject* module) {
     .def("errors", &n::errors)\
     .def("calStrobeLength", &n::calStrobeLength)\
     .def("trigDelay", &n::trigDelay)\
-    .def("diodeGain", &n::diodeGain)\
+    .def("capacitorValue", &n::capacitorValue)\
 
   _CLASS(psddl_python::Ipimb::ConfigV1_Wrapper, "ConfigV1", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV1_Wrapper);
@@ -51,7 +51,7 @@ void createWrappers(PyObject* module) {
     .def("trigDelay", &n::trigDelay)\
     .def("trigPsDelay", &n::trigPsDelay)\
     .def("adcDelay", &n::adcDelay)\
-    .def("diodeGain", &n::diodeGain)\
+    .def("capacitorValue", &n::capacitorValue)\
 
   _CLASS(psddl_python::Ipimb::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
   std_vector_class_(ConfigV2_Wrapper);

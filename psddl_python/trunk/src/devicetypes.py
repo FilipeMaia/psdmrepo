@@ -105,6 +105,8 @@ CsPad2x2.ConfigQuadReg = "Psana::CsPad2x2::ConfigQuadReg"
 CsPad2x2.ConfigV1QuadReg = "Psana::CsPad2x2::ConfigV1QuadReg"
 CsPad2x2.Config = "Psana::CsPad2x2::Config"
 CsPad2x2.ConfigV1 = "Psana::CsPad2x2::ConfigV1"
+CsPad2x2.ConfigV2QuadReg = "Psana::CsPad2x2::ConfigV2QuadReg"
+CsPad2x2.ConfigV2 = "Psana::CsPad2x2::ConfigV2"
 CsPad2x2.Element = "Psana::CsPad2x2::Element"
 CsPad2x2.ElementV1 = "Psana::CsPad2x2::ElementV1"
 

@@ -112,6 +112,64 @@ public:
   uint32_t numAsicsStored() const { return o->numAsicsStored(); }
 };
 
+class ConfigV2QuadReg_Wrapper {
+  shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> _o;
+  Psana::CsPad2x2::ConfigV2QuadReg* o;
+public:
+  ConfigV2QuadReg_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2QuadReg_Wrapper(Psana::CsPad2x2::ConfigV2QuadReg* obj) : o(obj) {}
+  uint32_t shiftSelect() const { return o->shiftSelect(); }
+  uint32_t edgeSelect() const { return o->edgeSelect(); }
+  uint32_t readClkSet() const { return o->readClkSet(); }
+  uint32_t readClkHold() const { return o->readClkHold(); }
+  uint32_t dataMode() const { return o->dataMode(); }
+  uint32_t prstSel() const { return o->prstSel(); }
+  uint32_t acqDelay() const { return o->acqDelay(); }
+  uint32_t intTime() const { return o->intTime(); }
+  uint32_t digDelay() const { return o->digDelay(); }
+  uint32_t ampIdle() const { return o->ampIdle(); }
+  uint32_t injTotal() const { return o->injTotal(); }
+  uint32_t rowColShiftPer() const { return o->rowColShiftPer(); }
+  uint32_t ampReset() const { return o->ampReset(); }
+  uint32_t digCount() const { return o->digCount(); }
+  uint32_t digPeriod() const { return o->digPeriod(); }
+  uint32_t PeltierEnable() const { return o->PeltierEnable(); }
+  uint32_t kpConstant() const { return o->kpConstant(); }
+  uint32_t kiConstant() const { return o->kiConstant(); }
+  uint32_t kdConstant() const { return o->kdConstant(); }
+  uint32_t humidThold() const { return o->humidThold(); }
+  uint32_t setPoint() const { return o->setPoint(); }
+  uint32_t biasTuning() const { return o->biasTuning(); }
+  uint32_t pdpmndnmBalance() const { return o->pdpmndnmBalance(); }
+  const CsPad2x2ReadOnlyCfg_Wrapper ro() const { return CsPad2x2ReadOnlyCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg*>(&o->ro())); }
+  const CsPad2x2DigitalPotsCfg_Wrapper dp() const { return CsPad2x2DigitalPotsCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg*>(&o->dp())); }
+  const CsPad2x2GainMapCfg_Wrapper gm() const { return CsPad2x2GainMapCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2GainMapCfg*>(&o->gm())); }
+};
+
+class ConfigV2_Wrapper {
+  shared_ptr<Psana::CsPad2x2::ConfigV2> _o;
+  Psana::CsPad2x2::ConfigV2* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_Cspad2x2Config };
+  enum { Version = 2 };
+  ConfigV2_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV2> obj) : _o(obj), o(_o.get()) {}
+  ConfigV2_Wrapper(Psana::CsPad2x2::ConfigV2* obj) : o(obj) {}
+  uint32_t concentratorVersion() const { return o->concentratorVersion(); }
+  const ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper(const_cast<Psana::CsPad2x2::ProtectionSystemThreshold*>(&o->protectionThreshold())); }
+  uint32_t protectionEnable() const { return o->protectionEnable(); }
+  uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
+  uint32_t activeRunMode() const { return o->activeRunMode(); }
+  uint32_t runTriggerDelay() const { return o->runTriggerDelay(); }
+  uint32_t tdi() const { return o->tdi(); }
+  uint32_t payloadSize() const { return o->payloadSize(); }
+  uint32_t badAsicMask() const { return o->badAsicMask(); }
+  uint32_t asicMask() const { return o->asicMask(); }
+  uint32_t roiMask() const { return o->roiMask(); }
+  const ConfigV2QuadReg_Wrapper quad() const { return ConfigV2QuadReg_Wrapper(const_cast<Psana::CsPad2x2::ConfigV2QuadReg*>(&o->quad())); }
+  uint32_t numAsicsRead() const { return o->numAsicsRead(); }
+  uint32_t numAsicsStored() const { return o->numAsicsStored(); }
+};
+
 class ElementV1_Wrapper {
   shared_ptr<Psana::CsPad2x2::ElementV1> _o;
   Psana::CsPad2x2::ElementV1* o;
@@ -193,6 +251,27 @@ public:
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ConfigV1> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
+    }
+  };
+
+  class ConfigV2QuadReg_Getter : public psddl_python::Getter {
+  public:
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV2QuadReg);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV2QuadReg";}
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV2QuadReg>(vdata);
+      return result.get() ? object(ConfigV2QuadReg_Wrapper(result)) : object();
+    }
+  };
+
+  class ConfigV2_Getter : public psddl_python::Getter {
+  public:
+    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV2);}
+    const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV2";}
+    int getVersion() const { return Psana::CsPad2x2::ConfigV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::CsPad2x2::ConfigV2> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV2>(vdata);
+      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 

@@ -40,7 +40,7 @@ public:
   uint16_t errors() const { return o->errors(); }
   uint16_t calStrobeLength() const { return o->calStrobeLength(); }
   uint32_t trigDelay() const { return o->trigDelay(); }
-  Psana::Ipimb::ConfigV1::CapacitorValue diodeGain(uint32_t ch) const { return o->diodeGain(ch); }
+  Psana::Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const { return o->capacitorValue(ch); }
 };
 
 class ConfigV2_Wrapper {
@@ -66,7 +66,7 @@ public:
   uint32_t trigDelay() const { return o->trigDelay(); }
   uint32_t trigPsDelay() const { return o->trigPsDelay(); }
   uint32_t adcDelay() const { return o->adcDelay(); }
-  Psana::Ipimb::ConfigV2::CapacitorValue diodeGain(uint32_t ch) const { return o->diodeGain(ch); }
+  Psana::Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const { return o->capacitorValue(ch); }
 };
 
 class DataV1_Wrapper {

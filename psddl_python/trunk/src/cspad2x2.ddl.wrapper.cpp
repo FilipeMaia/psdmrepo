@@ -105,6 +105,62 @@ void createWrappers(PyObject* module) {
 
 
 #define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
+    .def("shiftSelect", &n::shiftSelect)\
+    .def("edgeSelect", &n::edgeSelect)\
+    .def("readClkSet", &n::readClkSet)\
+    .def("readClkHold", &n::readClkHold)\
+    .def("dataMode", &n::dataMode)\
+    .def("prstSel", &n::prstSel)\
+    .def("acqDelay", &n::acqDelay)\
+    .def("intTime", &n::intTime)\
+    .def("digDelay", &n::digDelay)\
+    .def("ampIdle", &n::ampIdle)\
+    .def("injTotal", &n::injTotal)\
+    .def("rowColShiftPer", &n::rowColShiftPer)\
+    .def("ampReset", &n::ampReset)\
+    .def("digCount", &n::digCount)\
+    .def("digPeriod", &n::digPeriod)\
+    .def("PeltierEnable", &n::PeltierEnable)\
+    .def("kpConstant", &n::kpConstant)\
+    .def("kiConstant", &n::kiConstant)\
+    .def("kdConstant", &n::kdConstant)\
+    .def("humidThold", &n::humidThold)\
+    .def("setPoint", &n::setPoint)\
+    .def("biasTuning", &n::biasTuning)\
+    .def("pdpmndnmBalance", &n::pdpmndnmBalance)\
+    .def("ro", &n::ro, policy)\
+    .def("dp", &n::dp, policy)\
+    .def("gm", &n::gm, policy)\
+
+  _CLASS(psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper, "ConfigV2QuadReg", return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2QuadReg_Wrapper);
+#undef _CLASS
+  ADD_GETTER(ConfigV2QuadReg);
+
+
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
+    .def("concentratorVersion", &n::concentratorVersion)\
+    .def("protectionThreshold", &n::protectionThreshold, policy)\
+    .def("protectionEnable", &n::protectionEnable)\
+    .def("inactiveRunMode", &n::inactiveRunMode)\
+    .def("activeRunMode", &n::activeRunMode)\
+    .def("runTriggerDelay", &n::runTriggerDelay)\
+    .def("tdi", &n::tdi)\
+    .def("payloadSize", &n::payloadSize)\
+    .def("badAsicMask", &n::badAsicMask)\
+    .def("asicMask", &n::asicMask)\
+    .def("roiMask", &n::roiMask)\
+    .def("quad", &n::quad, policy)\
+    .def("numAsicsRead", &n::numAsicsRead)\
+    .def("numAsicsStored", &n::numAsicsStored)\
+
+  _CLASS(psddl_python::CsPad2x2::ConfigV2_Wrapper, "ConfigV2", return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV2_Wrapper);
+#undef _CLASS
+  ADD_GETTER(ConfigV2);
+
+
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("virtual_channel", &n::virtual_channel)\
     .def("lane", &n::lane)\
     .def("tid", &n::tid)\
