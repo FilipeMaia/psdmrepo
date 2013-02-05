@@ -124,10 +124,41 @@ public:
   uint32_t numPixelsY() const { return o->numPixelsY(); }
   uint32_t numPixels() const { return o->numPixels(); }
 };
+
+class ConfigV5_Wrapper {
+  shared_ptr<Psana::Princeton::ConfigV5> _o;
+  Psana::Princeton::ConfigV5* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
+  enum { Version = 5 };
+  ConfigV5_Wrapper(shared_ptr<Psana::Princeton::ConfigV5> obj) : _o(obj), o(_o.get()) {}
+  ConfigV5_Wrapper(Psana::Princeton::ConfigV5* obj) : o(obj) {}
+  uint32_t width() const { return o->width(); }
+  uint32_t height() const { return o->height(); }
+  uint32_t orgX() const { return o->orgX(); }
+  uint32_t orgY() const { return o->orgY(); }
+  uint32_t binX() const { return o->binX(); }
+  uint32_t binY() const { return o->binY(); }
+  float exposureTime() const { return o->exposureTime(); }
+  float coolingTemp() const { return o->coolingTemp(); }
+  uint16_t gainIndex() const { return o->gainIndex(); }
+  uint16_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
+  uint32_t maskedHeight() const { return o->maskedHeight(); }
+  uint32_t kineticHeight() const { return o->kineticHeight(); }
+  float vsSpeed() const { return o->vsSpeed(); }
+  int16_t infoReportInterval() const { return o->infoReportInterval(); }
+  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
+  uint32_t numDelayShots() const { return o->numDelayShots(); }
+  uint32_t frameSize() const { return o->frameSize(); }
+  uint32_t numPixelsX() const { return o->numPixelsX(); }
+  uint32_t numPixelsY() const { return o->numPixelsY(); }
+  uint32_t numPixels() const { return o->numPixels(); }
+};
 class ConfigV1;
 class ConfigV2;
 class ConfigV3;
 class ConfigV4;
+class ConfigV5;
 
 class FrameV1_Wrapper {
   shared_ptr<Psana::Princeton::FrameV1> _o;
@@ -139,6 +170,25 @@ public:
   FrameV1_Wrapper(Psana::Princeton::FrameV1* obj) : o(obj) {}
   uint32_t shotIdStart() const { return o->shotIdStart(); }
   float readoutTime() const { return o->readoutTime(); }
+  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
+};
+class ConfigV1;
+class ConfigV2;
+class ConfigV3;
+class ConfigV4;
+class ConfigV5;
+
+class FrameV2_Wrapper {
+  shared_ptr<Psana::Princeton::FrameV2> _o;
+  Psana::Princeton::FrameV2* o;
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonFrame };
+  enum { Version = 2 };
+  FrameV2_Wrapper(shared_ptr<Psana::Princeton::FrameV2> obj) : _o(obj), o(_o.get()) {}
+  FrameV2_Wrapper(Psana::Princeton::FrameV2* obj) : o(obj) {}
+  uint32_t shotIdStart() const { return o->shotIdStart(); }
+  float readoutTime() const { return o->readoutTime(); }
+  float temperature() const { return o->temperature(); }
   PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
 };
 
@@ -198,6 +248,17 @@ public:
     }
   };
 
+  class ConfigV5_Getter : public psddl_python::Getter {
+  public:
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV5);}
+    const char* getTypeName() const { return "Psana::Princeton::ConfigV5";}
+    int getVersion() const { return Psana::Princeton::ConfigV5::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::ConfigV5> result = boost::static_pointer_cast<Psana::Princeton::ConfigV5>(vdata);
+      return result.get() ? object(ConfigV5_Wrapper(result)) : object();
+    }
+  };
+
   class FrameV1_Getter : public psddl_python::Getter {
   public:
     const std::type_info& typeinfo() const { return typeid(Psana::Princeton::FrameV1);}
@@ -206,6 +267,17 @@ public:
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::FrameV1> result = boost::static_pointer_cast<Psana::Princeton::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
+    }
+  };
+
+  class FrameV2_Getter : public psddl_python::Getter {
+  public:
+    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::FrameV2);}
+    const char* getTypeName() const { return "Psana::Princeton::FrameV2";}
+    int getVersion() const { return Psana::Princeton::FrameV2::Version; }
+    object convert(const boost::shared_ptr<void>& vdata) const {
+      shared_ptr<Psana::Princeton::FrameV2> result = boost::static_pointer_cast<Psana::Princeton::FrameV2>(vdata);
+      return result.get() ? object(FrameV2_Wrapper(result)) : object();
     }
   };
 

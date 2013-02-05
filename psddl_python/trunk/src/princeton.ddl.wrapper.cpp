@@ -112,6 +112,34 @@ void createWrappers(PyObject* module) {
 
 
 #define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
+    .def("width", &n::width)\
+    .def("height", &n::height)\
+    .def("orgX", &n::orgX)\
+    .def("orgY", &n::orgY)\
+    .def("binX", &n::binX)\
+    .def("binY", &n::binY)\
+    .def("exposureTime", &n::exposureTime)\
+    .def("coolingTemp", &n::coolingTemp)\
+    .def("gainIndex", &n::gainIndex)\
+    .def("readoutSpeedIndex", &n::readoutSpeedIndex)\
+    .def("maskedHeight", &n::maskedHeight)\
+    .def("kineticHeight", &n::kineticHeight)\
+    .def("vsSpeed", &n::vsSpeed)\
+    .def("infoReportInterval", &n::infoReportInterval)\
+    .def("exposureEventCode", &n::exposureEventCode)\
+    .def("numDelayShots", &n::numDelayShots)\
+    .def("frameSize", &n::frameSize)\
+    .def("numPixelsX", &n::numPixelsX)\
+    .def("numPixelsY", &n::numPixelsY)\
+    .def("numPixels", &n::numPixels)\
+
+  _CLASS(psddl_python::Princeton::ConfigV5_Wrapper, "ConfigV5", return_value_policy<return_by_value>());
+  std_vector_class_(ConfigV5_Wrapper);
+#undef _CLASS
+  ADD_GETTER(ConfigV5);
+
+
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("shotIdStart", &n::shotIdStart)\
     .def("readoutTime", &n::readoutTime)\
     .def("data", &n::data)\
@@ -120,6 +148,18 @@ void createWrappers(PyObject* module) {
   std_vector_class_(FrameV1_Wrapper);
 #undef _CLASS
   ADD_GETTER(FrameV1);
+
+
+#define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
+    .def("shotIdStart", &n::shotIdStart)\
+    .def("readoutTime", &n::readoutTime)\
+    .def("temperature", &n::temperature)\
+    .def("data", &n::data)\
+
+  _CLASS(psddl_python::Princeton::FrameV2_Wrapper, "FrameV2", return_value_policy<return_by_value>());
+  std_vector_class_(FrameV2_Wrapper);
+#undef _CLASS
+  ADD_GETTER(FrameV2);
 
 
 #define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
