@@ -353,7 +353,8 @@ class ViewResults :
 
     def get_counts_for_stat_bins(sp) :
         if sp.counts_stat != None : return sp.counts_stat
-        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), length=sp.npart_stat)
+        weights = sp.get_mask_total() # Apply mask for bin counts
+        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), weights, length=sp.npart_stat)
         return sp.counts_stat
 
 #-----------------------------
@@ -379,25 +380,35 @@ class ViewResults :
 
     def get_counts_for_dyna_bins(sp) :
         if sp.counts_dyna != None : return sp.counts_dyna
-        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), length=sp.npart_dyna)
+        weights = sp.get_mask_total() # Apply mask for bin counts
+        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), weights, length=sp.npart_dyna)
         return sp.counts_dyna
 
 #-----------------------------
 
     def get_1oIp_map_for_stat_bins_itau(sp, itau) :
-        sp.Ip_normf_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
+        sp.Ip_normf_map = sp.get_norm_factor_map_masked_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
         return sp.Ip_normf_map
 
     def get_1oIf_map_for_stat_bins_itau(sp, itau) :
-        sp.If_normf_map = sp.get_norm_factor_map_for_stat_bins_itau(sp.get_If_for_itau(itau))
+        sp.If_normf_map = sp.get_norm_factor_map_masked_for_stat_bins_itau(sp.get_If_for_itau(itau))
         return sp.If_normf_map
 
 #-----------------------------
 
-    def get_norm_factor_map_for_stat_bins_itau(sp, intensity_map) :
+    def get_norm_factor_map_masked_for_stat_bins_itau(sp, intens_map) :
+        """Apply mask to the input and output mask to get correct normalization and output, respectively."""
+        intens_map_masked = intens_map * sp.get_mask_total() # Apply mask for bin counts
+        norm_factor_map = sp.get_norm_factor_map_for_stat_bins_itau(intens_map_masked)
+        return norm_factor_map * sp.get_mask_total() # Apply mask for intensity map
+
+#-----------------------------
+
+    def get_norm_factor_map_for_stat_bins_itau(sp, intens_map) :
         q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
         counts = sp.get_counts_for_stat_bins()
-        intens = sp.bincount(q_phi_map_stat, intensity_map, sp.npart_stat)
+
+        intens = sp.bincount(q_phi_map_stat, intens_map, sp.npart_stat)
         intens_prot = np.select([intens<=0.], [-1.], default=intens)
         normf = np.select([intens_prot<=0.], [0.], default=counts/intens_prot)
 
@@ -414,7 +425,7 @@ class ViewResults :
         Ip_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
         If_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
         I2_map       = sp.get_I2_for_itau(itau)
-        sp.g2_map = I2_map * Ip_normf_map * If_normf_map
+        sp.g2_map = I2_map * Ip_normf_map * If_normf_map # mask is already applied to normf
         return sp.g2_map
 
 
@@ -432,6 +443,7 @@ class ViewResults :
         q_phi_map_dyna          = sp.get_q_phi_map_for_dyna_bins()
         g2_for_dyna_bins        = sp.get_g2_for_dyna_bins_itau(itau)
         sp.g2_map_for_dyna_bins = np.array([g2_for_dyna_bins[i] for i in q_phi_map_dyna])
+        sp.g2_map_for_dyna_bins*= sp.get_mask_total() # Apply mask to the map
         return sp.g2_map_for_dyna_bins
         #return sp.get_random_img()
 
@@ -458,9 +470,9 @@ class ViewResults :
 
 #-----------------------------
 
-    def bincount(sp, map_bins, map_intens=None, length=None) :
-        if map_intens == None : weights = None
-        else                  : weights = map_intens.flatten() 
+    def bincount(sp, map_bins, map_weights=None, length=None) :
+        if map_weights == None : weights = None
+        else                   : weights = map_weights.flatten() 
 
         bin_count = np.bincount(map_bins.flatten(), weights, length)
         #print 'bin_count:\n',      bin_count
@@ -546,8 +558,8 @@ class ViewResults :
     def get_mask_image_limits(sp) :
         cols_span = sp.col_end - sp.col_begin
         rows_span = sp.row_end - sp.row_begin
-        arr1 = np.ones((rows_span, cols_span), dtype=np.uint16)
-        sp.mask_image_limits = np.zeros((sp.rows,sp.cols), dtype=np.uint16)
+        arr1 = np.ones((rows_span, cols_span), dtype=np.uint8)
+        sp.mask_image_limits = np.zeros((sp.rows,sp.cols), dtype=np.uint8)
         sp.mask_image_limits[sp.row_begin:sp.row_begin+rows_span, sp.col_begin:sp.col_begin+cols_span] += arr1[0:rows_span, 0:cols_span]
         return sp.mask_image_limits
         #return sp.get_random_img()
@@ -560,10 +572,11 @@ class ViewResults :
 
     def get_mask_total(sp) :
         if sp.mask_total != None : return sp.mask_total
-        mask_image_limits = sp.get_mask_image_limits()
-        #mask_blemish      = sp.get_mask_blemish()
-        sp.mask_total = mask_image_limits #* mask_blemish
 
+        sp.mask_total = sp.get_mask_image_limits()
+        if cp.ccdcorr_blemish.value() :
+            sp.mask_total *= sp.get_mask_blemish()
+ 
         return sp.mask_total
 
 #-----------------------------

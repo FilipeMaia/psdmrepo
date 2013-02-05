@@ -69,6 +69,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.plotarray_is_on = False
         self.autoRunStatus   = 0 # 0=inctive, 1=split, 2=process, 3=merge
 
+        #self.plotimgspe      = None
+        self.plotimgspe_g    = None
+
 #-----------------------------
 
     def setIcons(self) :
