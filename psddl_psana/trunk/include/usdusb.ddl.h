@@ -49,12 +49,13 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { Encoder_Inputs = 4 };
   enum { Analog_Inputs = 4 };
-  enum { Digital_Inputs = 4 };
+  enum { Digital_Inputs = 8 };
   virtual ~DataV1();
   virtual uint8_t digital_in() const = 0;
   virtual uint32_t timestamp() const = 0;
-  /** Lower 24 bits of encoder_count as signed integer value. */
-  virtual int32_t value(uint32_t i) const = 0;
+  virtual ndarray<const uint16_t, 1> analog_in() const = 0;
+  /** Return lower 24 bits of _count array as signed integer values. */
+  virtual ndarray<const int32_t, 1> encoder_count() const = 0;
 };
 } // namespace UsdUsb
 } // namespace Psana
