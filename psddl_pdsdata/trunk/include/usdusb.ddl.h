@@ -53,11 +53,12 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { Encoder_Inputs = 4 };
   enum { Analog_Inputs = 4 };
-  enum { Digital_Inputs = 4 };
+  enum { Digital_Inputs = 8 };
   uint8_t digital_in() const { return _din; }
   uint32_t timestamp() const { return _timestamp; }
-  /** Lower 24 bits of encoder_count as signed integer value. */
-  int32_t value(uint32_t i) const;
+  ndarray<const uint16_t, 1> analog_in() const { return make_ndarray(&_ain[0], Analog_Inputs); }
+  /** Return lower 24 bits of _count array as signed integer values. */
+  ndarray<const int32_t, 1> encoder_count() const;
   static uint32_t _sizeof()  { return ((((((((((0+(1*(6)))+1)+1)+4)+(4*(Encoder_Inputs)))+(1*(4)))+(2*(Analog_Inputs)))+4)-1)/4)*4; }
 private:
   uint8_t	_header[6];
