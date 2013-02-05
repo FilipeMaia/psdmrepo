@@ -42,7 +42,7 @@
         
             <const name="Encoder_Inputs" value="4"/>
             <const name="Analog_Inputs" value="4"/>
-            <const name="Digital_Inputs" value="4"/>
+            <const name="Digital_Inputs" value="8"/>
         
             <attribute name="_header" type="uint8_t" shape="6">
             </attribute>
@@ -62,13 +62,15 @@
             <attribute name="_status" type="uint8_t" shape="4">
             </attribute>
 
-            <attribute name="_ain" type="uint16_t" shape="Analog_Inputs">
+            <attribute name="_ain" type="uint16_t" shape="Analog_Inputs" accessor="analog_in">
             </attribute>
 
-            <method name="value" type="int32_t">
-                Lower 24 bits of encoder_count as signed integer value.
-                <arg name="i" type="uint32_t"/>
-                <expr lang="C++" value="int({self}._count[i] &lt;&lt; 8)/256;"/>
+            <method name="encoder_count" type="int32_t" rank="1">
+                Return lower 24 bits of _count array as signed integer values.
+                <code lang="C++" body="unsigned shape[1]={Encoder_Inputs};
+                ndarray&lt;int32_t,1&gt; res(shape);
+                for (unsigned i=0; i!=Encoder_Inputs; ++i) res[i]=int({self}._count[i] &lt;&lt; 8)/256;
+                return res;"/>
             </method>
 
         </pstype>
