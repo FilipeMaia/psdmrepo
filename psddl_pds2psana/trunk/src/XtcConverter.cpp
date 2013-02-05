@@ -186,6 +186,18 @@ namespace {
     return false;
   }
 
+  template<typename FinalType, typename XtcConfigType1, typename XtcConfigType2, typename XtcConfigType3, typename XtcConfigType4, typename XtcConfigType5>
+  bool
+  storeDataProxyCfg5(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
+  {
+    if (storeDataProxyCfg<FinalType, XtcConfigType1>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType2>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType3>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType4>(xtc, evt, cfgStore)) return true;
+    if (storeDataProxyCfg<FinalType, XtcConfigType5>(xtc, evt, cfgStore)) return true;
+    return false;
+  }
+
   template<typename PsanaType, typename XtcType>
   void 
   storeValueType(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt)
@@ -418,7 +430,10 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 0) ::storeValueType<Psana::Bld::BldDataPhaseCavity, PsddlPds::Bld::BldDataPhaseCavity>(xtc, evt);
     break;
   case Pds::TypeId::Id_PrincetonFrame:
-    if (version == 1) ::storeDataProxyCfg4<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2, PsddlPds::Princeton::ConfigV3, PsddlPds::Princeton::ConfigV4>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg5<Princeton::FrameV1, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2,
+        PsddlPds::Princeton::ConfigV3, PsddlPds::Princeton::ConfigV4, PsddlPds::Princeton::ConfigV5>(xtc, evt, cfgStore);
+    if (version == 2) ::storeDataProxyCfg5<Princeton::FrameV2, PsddlPds::Princeton::ConfigV1, PsddlPds::Princeton::ConfigV2,
+        PsddlPds::Princeton::ConfigV3, PsddlPds::Princeton::ConfigV4, PsddlPds::Princeton::ConfigV5>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_PrincetonConfig:
     break;
@@ -613,6 +628,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     if (version == 2) ::storeCfgObject<Princeton::ConfigV2>(xtc, cfgStore);
     if (version == 3) ::storeCfgObject<Princeton::ConfigV3>(xtc, cfgStore);
     if (version == 4) ::storeCfgObject<Princeton::ConfigV4>(xtc, cfgStore);
+    if (version == 5) ::storeCfgObject<Princeton::ConfigV5>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_EvrData:
     break;
