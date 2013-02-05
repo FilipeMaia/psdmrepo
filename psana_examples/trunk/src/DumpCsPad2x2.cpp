@@ -50,7 +50,7 @@ DumpCsPad2x2::DumpCsPad2x2 (const std::string& name)
   : Module(name)
 {
   m_key = configStr("inputKey", "");
-  m_src = configStr("source", "DetInfo(:Cspad2x2)");
+  m_src = configSrc("source", "DetInfo(:Cspad2x2)");
 }
 
 //--------------
@@ -110,6 +110,55 @@ DumpCsPad2x2::beginCalibCycle(Event& evt, Env& env)
       str << "\n    setPoint = " << quad.setPoint();
     }
     
+  }
+
+  shared_ptr<Psana::CsPad2x2::ConfigV2> config2 = env.configStore().get(m_src);
+  if (config2) {
+
+    WithMsgLog(name(), info, str) {
+      str << "CsPad2x2::ConfigV2:";
+      str << "\n  concentratorVersion = " << config2->concentratorVersion();
+      str << "\n  protectionEnable = " << config2->protectionEnable();
+      str << "\n  protectionThreshold:";
+      str << "\n    adcThreshold= " << config2->protectionThreshold().adcThreshold()
+          << "\n    pixelCountThreshold= " << config2->protectionThreshold().pixelCountThreshold();
+      str << "\n  inactiveRunMode = " << config2->inactiveRunMode();
+      str << "\n  activeRunMode = " << config2->activeRunMode();
+      str << "\n  runTriggerDelay = " << config2->runTriggerDelay();
+      str << "\n  tdi = " << config2->tdi();
+      str << "\n  payloadSize = " << config2->payloadSize();
+      str << "\n  badAsicMask1 = " << config2->badAsicMask();
+      str << "\n  asicMask = " << config2->asicMask();
+      str << "\n  numAsicsRead = " << config2->numAsicsRead();
+      str << "\n  roiMask = " << config2->roiMask();
+      str << "\n  numAsicsStored = " << config2->numAsicsStored();
+      const Psana::CsPad2x2::ConfigV2QuadReg& quad = config2->quad();
+      str << "\n  quad:";
+      str << "\n    shiftSelect = " << quad.shiftSelect();
+      str << "\n    edgeSelect = " << quad.edgeSelect();
+      str << "\n    readClkSet = " << quad.readClkSet();
+      str << "\n    readClkHold = " << quad.readClkHold();
+      str << "\n    dataMode = " << quad.dataMode();
+      str << "\n    prstSel = " << quad.prstSel();
+      str << "\n    acqDelay = " << quad.acqDelay();
+      str << "\n    intTime = " << quad.intTime();
+      str << "\n    digDelay = " << quad.digDelay();
+      str << "\n    ampIdle = " << quad.ampIdle();
+      str << "\n    injTotal = " << quad.injTotal();
+      str << "\n    rowColShiftPer = " << quad.rowColShiftPer();
+      str << "\n    ampReset = " << quad.ampReset();
+      str << "\n    digCount = " << quad.digCount();
+      str << "\n    digPeriod = " << quad.digPeriod();
+      str << "\n    biasTuning = " << quad.biasTuning();
+      str << "\n    pdpmndnmBalance = " << quad.pdpmndnmBalance();
+      str << "\n    PeltierEnable = " << quad.PeltierEnable();
+      str << "\n    kpConstant = " << quad.kpConstant();
+      str << "\n    kiConstant = " << quad.kiConstant();
+      str << "\n    kdConstant = " << quad.kdConstant();
+      str << "\n    humidThold = " << quad.humidThold();
+      str << "\n    setPoint = " << quad.setPoint();
+    }
+
   }
 }
 

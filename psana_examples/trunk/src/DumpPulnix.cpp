@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpPulnix::DumpPulnix (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Tm6740)");
+  m_src = configSrc("source", "DetInfo(:Tm6740)");
 }
 
 //--------------

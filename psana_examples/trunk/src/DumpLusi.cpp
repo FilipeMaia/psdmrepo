@@ -44,8 +44,8 @@ namespace psana_examples {
 DumpLusi::DumpLusi (const std::string& name)
   : Module(name)
 {
-  m_ipimbSrc = configStr("ipimbSource", "DetInfo(:Ipimb)");
-  m_tmSrc = configStr("tmSource", "DetInfo(:Tm6740)");
+  m_ipimbSrc = configSrc("ipimbSource", "DetInfo(:Ipimb)");
+  m_tmSrc = configSrc("tmSource", "DetInfo(:Tm6740)");
 }
 
 //--------------

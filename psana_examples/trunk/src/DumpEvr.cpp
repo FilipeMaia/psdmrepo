@@ -176,7 +176,7 @@ namespace psana_examples {
 DumpEvr::DumpEvr (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Evr)");
+  m_src = configSrc("source", "DetInfo(:Evr)");
 }
 
 //--------------

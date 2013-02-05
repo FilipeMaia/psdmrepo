@@ -49,7 +49,7 @@ DumpTimepix::DumpTimepix (const std::string& name)
   , m_src()
 {
   // get the values from configuration or use defaults
-  m_src = configStr("source", "DetInfo(:Timepix)");
+  m_src = configSrc("source", "DetInfo(:Timepix)");
 }
 
 //--------------
@@ -206,6 +206,85 @@ DumpTimepix::beginCalibCycle(Event& evt, Env& env)
       str << "\n  pixelThresh = " << config2->pixelThresh();
       str << "\n  chip names = " << config2->chip0Name() << " " << config2->chip1Name() << " " << config2->chip2Name() << " " << config2->chip3Name();
       str << "\n  chip IDs   = " << config2->chip0ID() << " " << config2->chip1ID() << " " << config2->chip2ID() << " " << config2->chip3ID();
+
+    }
+
+  }
+
+  shared_ptr<Psana::Timepix::ConfigV3> config3 = env.configStore().get(m_src);
+  if (config3) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Timepix::ConfigV3:";
+
+      str << "\n  readoutSpeed = " << int(config3->readoutSpeed());
+      str << "\n  timepixMode = " << int(config3->timepixMode());
+      str << "\n  timepixSpeed = " << config3->timepixSpeed();
+      str << "\n  dac0Ikrum = " << config3->dac0Ikrum();
+      str << "\n  dac0Disc = " << config3->dac0Disc();
+      str << "\n  dac0Preamp = " << config3->dac0Preamp();
+      str << "\n  dac0BufAnalogA = " << config3->dac0BufAnalogA();
+      str << "\n  dac0BufAnalogB = " << config3->dac0BufAnalogB();
+      str << "\n  dac0Hist = " << config3->dac0Hist();
+      str << "\n  dac0ThlFine = " << config3->dac0ThlFine();
+      str << "\n  dac0ThlCourse = " << config3->dac0ThlCourse();
+      str << "\n  dac0Vcas = " << config3->dac0Vcas();
+      str << "\n  dac0Fbk = " << config3->dac0Fbk();
+      str << "\n  dac0Gnd = " << config3->dac0Gnd();
+      str << "\n  dac0Ths = " << config3->dac0Ths();
+      str << "\n  dac0BiasLvds = " << config3->dac0BiasLvds();
+      str << "\n  dac0RefLvds = " << config3->dac0RefLvds();
+      str << "\n  dac1Ikrum = " << config3->dac1Ikrum();
+      str << "\n  dac1Disc = " << config3->dac1Disc();
+      str << "\n  dac1Preamp = " << config3->dac1Preamp();
+      str << "\n  dac1BufAnalogA = " << config3->dac1BufAnalogA();
+      str << "\n  dac1BufAnalogB = " << config3->dac1BufAnalogB();
+      str << "\n  dac1Hist = " << config3->dac1Hist();
+      str << "\n  dac1ThlFine = " << config3->dac1ThlFine();
+      str << "\n  dac1ThlCourse = " << config3->dac1ThlCourse();
+      str << "\n  dac1Vcas = " << config3->dac1Vcas();
+      str << "\n  dac1Fbk = " << config3->dac1Fbk();
+      str << "\n  dac1Gnd = " << config3->dac1Gnd();
+      str << "\n  dac1Ths = " << config3->dac1Ths();
+      str << "\n  dac1BiasLvds = " << config3->dac1BiasLvds();
+      str << "\n  dac1RefLvds = " << config3->dac1RefLvds();
+      str << "\n  dac2Ikrum = " << config3->dac2Ikrum();
+      str << "\n  dac2Disc = " << config3->dac2Disc();
+      str << "\n  dac2Preamp = " << config3->dac2Preamp();
+      str << "\n  dac2BufAnalogA = " << config3->dac2BufAnalogA();
+      str << "\n  dac2BufAnalogB = " << config3->dac2BufAnalogB();
+      str << "\n  dac2Hist = " << config3->dac2Hist();
+      str << "\n  dac2ThlFine = " << config3->dac2ThlFine();
+      str << "\n  dac2ThlCourse = " << config3->dac2ThlCourse();
+      str << "\n  dac2Vcas = " << config3->dac2Vcas();
+      str << "\n  dac2Fbk = " << config3->dac2Fbk();
+      str << "\n  dac2Gnd = " << config3->dac2Gnd();
+      str << "\n  dac2Ths = " << config3->dac2Ths();
+      str << "\n  dac2BiasLvds = " << config3->dac2BiasLvds();
+      str << "\n  dac2RefLvds = " << config3->dac2RefLvds();
+      str << "\n  dac3Ikrum = " << config3->dac3Ikrum();
+      str << "\n  dac3Disc = " << config3->dac3Disc();
+      str << "\n  dac3Preamp = " << config3->dac3Preamp();
+      str << "\n  dac3BufAnalogA = " << config3->dac3BufAnalogA();
+      str << "\n  dac3BufAnalogB = " << config3->dac3BufAnalogB();
+      str << "\n  dac3Hist = " << config3->dac3Hist();
+      str << "\n  dac3ThlFine = " << config3->dac3ThlFine();
+      str << "\n  dac3ThlCourse = " << config3->dac3ThlCourse();
+      str << "\n  dac3Vcas = " << config3->dac3Vcas();
+      str << "\n  dac3Fbk = " << config3->dac3Fbk();
+      str << "\n  dac3Gnd = " << config3->dac3Gnd();
+      str << "\n  dac3Ths = " << config3->dac3Ths();
+      str << "\n  dac3BiasLvds = " << config3->dac3BiasLvds();
+      str << "\n  dac3RefLvds = " << config3->dac3RefLvds();
+      str << "\n  dacBias = " << int(config3->dacBias());
+      str << "\n  flags = " << int(config3->flags());
+      str << "\n  chipCount = " << config3->chipCount();
+      str << "\n  driverVersion = " << config3->driverVersion();
+      str << "\n  firmwareVersion = " << config3->firmwareVersion();
+      str << "\n  pixelThreshSize = " << config3->pixelThreshSize();
+      str << "\n  pixelThresh = " << config3->pixelThresh();
+      str << "\n  chip names = " << config3->chip0Name() << " " << config3->chip1Name() << " " << config3->chip2Name() << " " << config3->chip3Name();
+      str << "\n  chip IDs   = " << config3->chip0ID() << " " << config3->chip1ID() << " " << config3->chip2ID() << " " << config3->chip3ID();
 
     }
 

@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpFccd::DumpFccd (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Fccd)");
+  m_src = configSrc("source", "DetInfo(:Fccd)");
 }
 
 //--------------

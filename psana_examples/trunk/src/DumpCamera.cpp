@@ -54,7 +54,7 @@ namespace psana_examples {
 DumpCamera::DumpCamera (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo()");
+  m_src = configSrc("source", "DetInfo()");
 }
 
 //--------------

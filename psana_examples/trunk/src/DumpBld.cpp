@@ -45,12 +45,12 @@ namespace psana_examples {
 DumpBld::DumpBld (const std::string& name)
   : Module(name)
 {
-  m_ebeamSrc = configStr("eBeamSource", "BldInfo(EBeam)");
-  m_cavSrc = configStr("phaseCavSource", "BldInfo(PhaseCavity)");
-  m_feeSrc = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
-  m_ipimbSrc = configStr("ipimbSource", "BldInfo(NH2-SB1-IPM-01)");
-  m_pimSrc = configStr("pimSource", "BldInfo(XCS-DIO-01)");
-  m_gmdSrc = configStr("gmdSource", "BldInfo()");
+  m_ebeamSrc = configSrc("eBeamSource", "BldInfo(EBeam)");
+  m_cavSrc = configSrc("phaseCavSource", "BldInfo(PhaseCavity)");
+  m_feeSrc = configSrc("feeSource", "BldInfo(FEEGasDetEnergy)");
+  m_ipimbSrc = configSrc("ipimbSource", "BldInfo(NH2-SB1-IPM-01)");
+  m_pimSrc = configSrc("pimSource", "BldInfo(XCS-DIO-01)");
+  m_gmdSrc = configSrc("gmdSource", "BldInfo()");
 }
 
 //--------------

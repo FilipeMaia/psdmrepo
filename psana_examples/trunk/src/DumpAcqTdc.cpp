@@ -45,7 +45,7 @@ DumpAcqTdc::DumpAcqTdc (const std::string& name)
   : Module(name)
 {
   // get the values from configuration or use defaults
-  m_src = configStr("source", "DetInfo(:AcqTDC.0)");
+  m_src = configSrc("source", "DetInfo(:AcqTDC.0)");
 }
 
 //--------------

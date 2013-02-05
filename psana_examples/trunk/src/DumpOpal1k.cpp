@@ -53,7 +53,7 @@ namespace psana_examples {
 DumpOpal1k::DumpOpal1k (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Opal1000)");
+  m_src = configSrc("source", "DetInfo(:Opal1000)");
 }
 
 //--------------

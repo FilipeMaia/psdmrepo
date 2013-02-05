@@ -60,7 +60,7 @@ namespace psana_examples {
 DumpControl::DumpControl (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "ProcInfo()");
+  m_src = configSrc("source", "ProcInfo()");
 }
 
 //--------------

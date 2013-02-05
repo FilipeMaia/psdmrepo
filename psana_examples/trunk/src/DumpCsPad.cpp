@@ -50,7 +50,7 @@ DumpCsPad::DumpCsPad (const std::string& name)
   : Module(name)
 {
   m_key = configStr("inputKey", "");
-  m_src = configStr("source", "DetInfo(:Cspad)");
+  m_src = configSrc("source", "DetInfo(:Cspad)");
 }
 
 //--------------

@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpPnccd::DumpPnccd (const std::string& name)
   : Module(name)
 {
-    m_src = configStr("source", "DetInfo(:pnCCD)");
+    m_src = configSrc("source", "DetInfo(:pnCCD)");
 }
 
 //--------------

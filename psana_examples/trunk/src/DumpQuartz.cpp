@@ -53,7 +53,7 @@ namespace psana_examples {
 DumpQuartz::DumpQuartz (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Quartz4A150)");
+  m_src = configSrc("source", "DetInfo(:Quartz4A150)");
 }
 
 //--------------

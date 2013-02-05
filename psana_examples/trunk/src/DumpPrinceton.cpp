@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpPrinceton::DumpPrinceton (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Princeton)");
+  m_src = configSrc("source", "DetInfo(:Princeton)");
 }
 
 //--------------
@@ -109,7 +109,7 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
   if (config3) {
     
     WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV2:";
+      str << "Princeton::ConfigV3:";
       str << "\n  width = " << config3->width();
       str << "\n  height = " << config3->height();
       str << "\n  orgX = " << config3->orgX();
@@ -132,7 +132,7 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
   if (config4) {
 
     WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV2:";
+      str << "Princeton::ConfigV4:";
       str << "\n  width = " << config4->width();
       str << "\n  height = " << config4->height();
       str << "\n  orgX = " << config4->orgX();
@@ -153,19 +153,65 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
     }
 
   }
+
+  shared_ptr<Psana::Princeton::ConfigV5> config5 = env.configStore().get(m_src);
+  if (config5) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Princeton::ConfigV5:";
+      str << "\n  width = " << config5->width();
+      str << "\n  height = " << config5->height();
+      str << "\n  orgX = " << config5->orgX();
+      str << "\n  orgY = " << config5->orgY();
+      str << "\n  binX = " << config5->binX();
+      str << "\n  binY = " << config5->binY();
+      str << "\n  exposureTime = " << config5->exposureTime();
+      str << "\n  coolingTemp = " << config5->coolingTemp();
+      str << "\n  gainIndex = " << config5->gainIndex();
+      str << "\n  readoutSpeedIndex = " << config5->readoutSpeedIndex();
+      str << "\n  maskedHeight = " << config5->maskedHeight();
+      str << "\n  kineticHeight = " << config5->kineticHeight();
+      str << "\n  vsSpeed = " << config5->vsSpeed();
+      str << "\n  infoReportInterval = " << config5->infoReportInterval();
+      str << "\n  exposureEventCode = " << config5->exposureEventCode();
+      str << "\n  numDelayShots = " << config5->numDelayShots();
+      str << "\n  frameSize = " << config5->frameSize();
+      str << "\n  numPixels = " << config5->numPixels();
+    }
+
+  }
 }
 
 // Method which is called with event data
 void 
 DumpPrinceton::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::Princeton::FrameV1> frame = evt.get(m_src);
-  if (frame) {
+  shared_ptr<Psana::Princeton::FrameV1> frame1 = evt.get(m_src);
+  if (frame1) {
     WithMsgLog(name(), info, str) {
       str << "Princeton::FrameV1:";
-      str << "\n  shotIdStart = " << frame->shotIdStart();
-      str << "\n  readoutTime = " << frame->readoutTime();
-      str << "\n  data = " << frame->data();
+      str << "\n  shotIdStart = " << frame1->shotIdStart();
+      str << "\n  readoutTime = " << frame1->readoutTime();
+      str << "\n  data = " << frame1->data();
+    }
+  }
+
+  shared_ptr<Psana::Princeton::FrameV2> frame2 = evt.get(m_src);
+  if (frame2) {
+    WithMsgLog(name(), info, str) {
+      str << "Princeton::FrameV2:";
+      str << "\n  shotIdStart = " << frame2->shotIdStart();
+      str << "\n  readoutTime = " << frame2->readoutTime();
+      str << "\n  temperature = " << frame2->temperature();
+      str << "\n  data = " << frame2->data();
+    }
+  }
+
+  shared_ptr<Psana::Princeton::InfoV1> info1 = evt.get(m_src);
+  if (info1) {
+    WithMsgLog(name(), info, str) {
+      str << "Princeton::InfoV1:";
+      str << "\n  temperature = " << info1->temperature();
     }
   }
 }

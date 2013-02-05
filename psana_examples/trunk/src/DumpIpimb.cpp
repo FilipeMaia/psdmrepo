@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpIpimb::DumpIpimb (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Ipimb)");
+  m_src = configSrc("source", "DetInfo(:Ipimb)");
 }
 
 //--------------

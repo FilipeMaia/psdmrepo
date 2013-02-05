@@ -44,7 +44,7 @@ namespace psana_examples {
 DumpEncoder::DumpEncoder (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Encoder)");
+  m_src = configSrc("source", "DetInfo(:Encoder)");
 }
 
 //--------------

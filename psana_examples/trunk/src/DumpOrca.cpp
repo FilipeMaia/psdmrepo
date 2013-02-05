@@ -3,17 +3,17 @@
 // 	$Id$
 //
 // Description:
-//	Class EBeamHist...
+//	Class DumpOrca...
 //
 // Author List:
-//      Andrei Salnikov
+//      Andy Salnikov
 //
 //------------------------------------------------------------------------
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "psana_examples/EBeamHist.h"
+#include "psana_examples/DumpOrca.h"
 
 //-----------------
 // C/C++ Headers --
@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "psddl_psana/bld.ddl.h"
+#include "psddl_psana/orca.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -31,7 +31,7 @@
 
 // This declares this class as psana module
 using namespace psana_examples;
-PSANA_MODULE_FACTORY(EBeamHist)
+PSANA_MODULE_FACTORY(DumpOrca)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -42,38 +42,46 @@ namespace psana_examples {
 //----------------
 // Constructors --
 //----------------
-EBeamHist::EBeamHist (const std::string& name)
+DumpOrca::DumpOrca (const std::string& name)
   : Module(name)
-  , m_ebeamHisto(0)
-  , m_chargeHisto(0)
+  , m_src()
 {
-  m_ebeamSrc = configSrc("eBeamSource", "BldInfo(EBeam)");
+  // get the values from configuration or use defaults
+  m_src = configSrc("source", "DetInfo(:OrcaFl40)");
 }
 
 //--------------
 // Destructor --
 //--------------
-EBeamHist::~EBeamHist ()
+DumpOrca::~DumpOrca ()
 {
 }
 
-// Method which is called once at the beginning of the job
+/// Method which is called at the beginning of the calibration cycle
 void 
-EBeamHist::beginJob(Event& evt, Env& env)
+DumpOrca::beginCalibCycle(Event& evt, Env& env)
 {
-  m_ebeamHisto = env.hmgr().hist1i("ebeamHisto", "ebeamL3Energy value", Axis(1000, 13000, 16000));
-  m_chargeHisto = env.hmgr().hist1i("echargeHisto", "ebeamCharge value", Axis(250, 0, 0.25));
-}
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
-// Method which is called with event data
-void 
-EBeamHist::event(Event& evt, Env& env)
-{
-  shared_ptr<Psana::Bld::BldDataEBeamV1> ebeam = evt.get(m_ebeamSrc);
-  if (ebeam) {
-    m_ebeamHisto->fill(ebeam->ebeamL3Energy());
-    m_chargeHisto->fill(ebeam->ebeamCharge());
+  shared_ptr<Psana::Orca::ConfigV1> config1 = env.configStore().get(m_src);
+  if (config1) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Orca::ConfigV1:";
+      str << "\n  mode = " << int(config1->mode());
+      str << "\n  rows = " << config1->rows();
+      str << "\n  cooling = " << int(config1->cooling());
+      str << "\n  defect_pixel_correction_enabled = " << int(config1->defect_pixel_correction_enabled());
+    }
+
   }
+}
+
+/// Method which is called with event data, this is the only required 
+/// method, all other methods are optional
+void 
+DumpOrca::event(Event& evt, Env& env)
+{
 }
 
 } // namespace psana_examples
