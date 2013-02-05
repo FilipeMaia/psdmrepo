@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2013-02-05 Andy Salnikov
+- upgrading to pdsdata V06-01-04
+- new classes princeton.ConfigV5, princeton.FrameV2
+
 Tag: V00-04-01
 2013-02-04 Andy Salnikov
 - upgrading to pdsdata V06-01-02
