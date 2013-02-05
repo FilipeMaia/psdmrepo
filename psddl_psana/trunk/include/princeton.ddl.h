@@ -143,6 +143,43 @@ public:
   virtual uint32_t numPixels() const = 0;
 };
 
+/** @class ConfigV5
+
+  
+*/
+
+
+class ConfigV5 {
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 5 /**< XTC type version number */ };
+  virtual ~ConfigV5();
+  virtual uint32_t width() const = 0;
+  virtual uint32_t height() const = 0;
+  virtual uint32_t orgX() const = 0;
+  virtual uint32_t orgY() const = 0;
+  virtual uint32_t binX() const = 0;
+  virtual uint32_t binY() const = 0;
+  virtual float exposureTime() const = 0;
+  virtual float coolingTemp() const = 0;
+  virtual uint16_t gainIndex() const = 0;
+  virtual uint16_t readoutSpeedIndex() const = 0;
+  virtual uint32_t maskedHeight() const = 0;
+  virtual uint32_t kineticHeight() const = 0;
+  virtual float vsSpeed() const = 0;
+  virtual int16_t infoReportInterval() const = 0;
+  virtual uint16_t exposureEventCode() const = 0;
+  virtual uint32_t numDelayShots() const = 0;
+  /** Total size in bytes of the Frame object */
+  virtual uint32_t frameSize() const = 0;
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsX() const = 0;
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsY() const = 0;
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixels() const = 0;
+};
+
 /** @class FrameV1
 
   
@@ -152,6 +189,7 @@ class ConfigV1;
 class ConfigV2;
 class ConfigV3;
 class ConfigV4;
+class ConfigV5;
 
 class FrameV1 {
 public:
@@ -160,6 +198,28 @@ public:
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
+  virtual ndarray<const uint16_t, 2> data() const = 0;
+};
+
+/** @class FrameV2
+
+  
+*/
+
+class ConfigV1;
+class ConfigV2;
+class ConfigV3;
+class ConfigV4;
+class ConfigV5;
+
+class FrameV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~FrameV2();
+  virtual uint32_t shotIdStart() const = 0;
+  virtual float readoutTime() const = 0;
+  virtual float temperature() const = 0;
   virtual ndarray<const uint16_t, 2> data() const = 0;
 };
 

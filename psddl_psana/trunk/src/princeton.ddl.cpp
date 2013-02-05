@@ -18,7 +18,13 @@ ConfigV3::~ConfigV3() {}
 ConfigV4::~ConfigV4() {}
 
 
+ConfigV5::~ConfigV5() {}
+
+
 FrameV1::~FrameV1() {}
+
+
+FrameV2::~FrameV2() {}
 
 } // namespace Princeton
 } // namespace Psana
