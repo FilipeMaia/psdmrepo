@@ -21,5 +21,9 @@ uint32_t
 ConfigV4::frameSize() const {
   return sizeof(FrameV1) + this->numPixels()*2;
 }
+uint32_t
+ConfigV5::frameSize() const {
+  return sizeof(FrameV1) + this->numPixels()*2;
+}
 } // namespace Princeton
 } // namespace PsddlPds
