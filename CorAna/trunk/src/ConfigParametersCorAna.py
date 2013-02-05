@@ -189,12 +189,12 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         #self.in_dir_flat       = self.declareParameter( name='IN_DIRECTORY_FLAT', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
         #self.in_file_flat      = self.declareParameter( name='IN_FILE_NAME_FLAT', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
-        # GUIBlamish.py
+        # GUIBlemish.py
         self.ccdcorr_blemish    = self.declareParameter( name='CCD_CORRECTION_BLEMISH',       val_def=False,  type='bool' )
-        self.dname_blam         = self.declareParameter( name='DIRECTORY_BLAM', val_def='.',type='str' )
-        self.fname_blam         = self.declareParameter( name='FILE_NAME_BLAM', val_def='blamish.txt',type='str' )
-        #self.in_dir_blam       = self.declareParameter( name='IN_DIRECTORY_BLAM', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
-        #self.in_file_blam      = self.declareParameter( name='IN_FILE_NAME_BLAM', val_def='e167-r0020-s00-c00.xtc',type='str' )
+        self.dname_blem         = self.declareParameter( name='DIRECTORY_BLEM', val_def='.',type='str' )
+        self.fname_blem         = self.declareParameter( name='FILE_NAME_BLEM', val_def='blemish.txt',type='str' )
+        #self.in_dir_blem       = self.declareParameter( name='IN_DIRECTORY_BLEM', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
+        #self.in_file_blem      = self.declareParameter( name='IN_FILE_NAME_BLEM', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
         # GUIData.py
         self.use_data_xtc_all   = self.declareParameter( name='USE_DATA_XTC_ALL_CHUNKS', val_def=True,  type='bool' )

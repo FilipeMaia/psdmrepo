@@ -145,7 +145,7 @@ class GUIRunInput ( QtGui.QWidget ) :
 
         self.table_info = QtGui.QTableWidget(4,5,self)
         self.table_info.setHorizontalHeaderLabels(['File name', 'Start', 'End', 'Total', u'\u0394t(sec):'])
-        self.table_info.setVerticalHeaderLabels  (['Data:', 'Dark:', 'Flat:', 'Blam:'])
+        self.table_info.setVerticalHeaderLabels  (['Data:', 'Dark:', 'Flat:', 'Blem:'])
 
         self.table_info.horizontalHeader().setDefaultSectionSize(60)
         self.table_info.horizontalHeader().resizeSection(0,300)
@@ -154,7 +154,7 @@ class GUIRunInput ( QtGui.QWidget ) :
         self.item_data_file  = QtGui.QTableWidgetItem('Data')        
         self.item_dark_file  = QtGui.QTableWidgetItem('Dark')        
         self.item_flat_file  = QtGui.QTableWidgetItem('Flat')        
-        self.item_blam_file  = QtGui.QTableWidgetItem('Blam')        
+        self.item_blem_file  = QtGui.QTableWidgetItem('Blem')        
 
         self.item_data_start = QtGui.QTableWidgetItem('Start')        
         self.item_data_end   = QtGui.QTableWidgetItem('End'  )        
@@ -163,7 +163,7 @@ class GUIRunInput ( QtGui.QWidget ) :
 
         self.setTableInfoItems()
 
-        self.list_of_items1 = [self.item_data_file,  self.item_dark_file, self.item_flat_file,  self.item_blam_file]
+        self.list_of_items1 = [self.item_data_file,  self.item_dark_file, self.item_flat_file,  self.item_blem_file]
         self.list_of_items2 = [self.item_data_start, self.item_data_end,  self.item_data_total, self.item_data_time]
         self.list_of_items  = self.list_of_items1 + self.list_of_items2
 
@@ -200,8 +200,8 @@ class GUIRunInput ( QtGui.QWidget ) :
         if cp.ccdcorr_flatfield.value() : self.item_flat_file.setText( os.path.basename(fnm.path_flat()) )
         else                            : self.item_flat_file.setText( 'is not used' )
 
-        if cp.ccdcorr_blemish.value()   : self.item_blam_file.setText( os.path.basename(fnm.path_blam()) )
-        else                            : self.item_blam_file.setText( 'is not used' )
+        if cp.ccdcorr_blemish.value()   : self.item_blem_file.setText( os.path.basename(fnm.path_blem()) )
+        else                            : self.item_blem_file.setText( 'is not used' )
 
         self.item_data_start.setText ( str( cp.bat_data_start.value() ) )        
         self.item_data_end  .setText ( str( cp.bat_data_end  .value() ) )        

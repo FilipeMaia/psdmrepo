@@ -33,7 +33,7 @@ from GUIConfigParameters    import *
 from GUIDark                import *
 from GUIData                import *
 from GUIFlatField           import *
-from GUIBlamish             import *
+from GUIBlemish             import *
 from GUIWorkResDirs         import *
 from Logger                 import logger
 from BatchJobPedestals      import bjpeds
@@ -67,7 +67,7 @@ class GUIFiles ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_show )
 
-        self.list_file_types = ['Dark run', 'Flat field', 'Blamish', 'Data', 'Conf.pars', 'Work/Results']
+        self.list_file_types = ['Dark run', 'Flat field', 'Blemish', 'Data', 'Conf.pars', 'Work/Results']
         self.makeTabBar()
         self.guiSelector()
 
@@ -131,14 +131,14 @@ class GUIFiles ( QtGui.QWidget ) :
         #Uses self.list_file_types
         self.ind_tab_dark = self.tab_bar.addTab( self.list_file_types[0] )
         self.ind_tab_flat = self.tab_bar.addTab( self.list_file_types[1] )
-        self.ind_tab_blam = self.tab_bar.addTab( self.list_file_types[2] )
+        self.ind_tab_blem = self.tab_bar.addTab( self.list_file_types[2] )
         self.ind_tab_data = self.tab_bar.addTab( self.list_file_types[3] )
         self.ind_tab_conf = self.tab_bar.addTab( self.list_file_types[4] )
         self.ind_tab_work = self.tab_bar.addTab( self.list_file_types[5] )
 
         self.tab_bar.setTabTextColor(self.ind_tab_dark, QtGui.QColor('green'))
         self.tab_bar.setTabTextColor(self.ind_tab_flat, QtGui.QColor('red'))
-        self.tab_bar.setTabTextColor(self.ind_tab_blam, QtGui.QColor('gray'))
+        self.tab_bar.setTabTextColor(self.ind_tab_blem, QtGui.QColor('gray'))
         self.tab_bar.setTabTextColor(self.ind_tab_data, QtGui.QColor('blue'))
         self.tab_bar.setTabTextColor(self.ind_tab_conf, QtGui.QColor('magenta'))
         self.tab_bar.setTabTextColor(self.ind_tab_work, QtGui.QColor('gray'))
@@ -178,8 +178,8 @@ class GUIFiles ( QtGui.QWidget ) :
             self.setStatus(0, 'Status: set file for flat field')
 
         if cp.current_file_tab.value() == self.list_file_types[2] :
-            self.gui_win = GUIBlamish(self)
-            self.setStatus(0, 'Status: set file for blamish mask')
+            self.gui_win = GUIBlemish(self)
+            self.setStatus(0, 'Status: set file for blemish mask')
 
         if cp.current_file_tab.value() == self.list_file_types[3] :
             self.gui_win = GUIData(self)

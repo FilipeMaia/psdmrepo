@@ -38,7 +38,7 @@ from ViewResults            import *
 class GUIViewControl ( QtGui.QWidget ) :
     """GUI View Control"""
 
-    def __init__ ( self, parent=None, fname=None ) :
+    def __init__ ( self, parent=None, fname=None, title='' ) :
         #super(GUIViewControl, self).__init__()
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 500, 150)
@@ -51,6 +51,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.list_of_tau = self.vr.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
         #print 'self.list_of_tau =', self.list_of_tau
         self.g_ind   = 0
+        self.g_title = title
         self.tau_ind = 0
 
         self.initCorArray()        
@@ -62,28 +63,27 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_Ip    = QtGui.QPushButton('<Ip>')
         self.but_If    = QtGui.QPushButton('<If>')
         self.but_I2    = QtGui.QPushButton('<Ip x If>')
-        self.but_g2raw = QtGui.QPushButton('100*g2 raw')
-   
+        self.but_g2raw = QtGui.QPushButton('g2 raw')
         self.but_X     = QtGui.QPushButton('X')
         self.but_Y     = QtGui.QPushButton('Y')
         self.but_R     = QtGui.QPushButton('R')
         self.but_P     = QtGui.QPushButton('Phi')
         self.but_Q     = QtGui.QPushButton('Q')
-
         self.but_P_st  = QtGui.QPushButton('Phi stat')
         self.but_Q_st  = QtGui.QPushButton('Q stat')
         self.but_QP_st = QtGui.QPushButton('Q-Phi stat')
-
         self.but_P_dy  = QtGui.QPushButton('Phi dyna')
         self.but_Q_dy  = QtGui.QPushButton('Q dyna')
         self.but_QP_dy = QtGui.QPushButton('Q-Phi stat')
-
         self.but_1oIp  = QtGui.QPushButton('1/<Ip> stat')
         self.but_1oIf  = QtGui.QPushButton('1/<If> stat')
-
         self.but_g2map = QtGui.QPushButton('g2 map')
         self.but_g2dy  = QtGui.QPushButton('g2 dyna')
         self.but_g2tau = QtGui.QPushButton('g2 vs tau')
+
+        self.but_mask_img_lims = QtGui.QPushButton('Mask img lims')
+        self.but_mask_blemish  = QtGui.QPushButton('Mask blemish')
+        self.but_mask_total    = QtGui.QPushButton('Mask total')
 
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
@@ -120,6 +120,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_g2map,self.grid_row+6, 2)
         self.grid.addWidget(self.but_g2dy, self.grid_row+6, 3)
         self.grid.addWidget(self.but_g2tau,self.grid_row+6, 4)
+        self.grid.addWidget(self.but_mask_img_lims,self.grid_row+7, 1)
+        self.grid.addWidget(self.but_mask_blemish, self.grid_row+7, 2)
+        self.grid.addWidget(self.but_mask_total,   self.grid_row+7, 4)
 
         self.grid_row += 4
 
@@ -146,6 +149,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_g2map,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_g2dy ,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_g2tau,QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_mask_img_lims,QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_mask_blemish, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_mask_total,   QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,      QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,      QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
  
@@ -203,7 +209,6 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_If   .setStyleSheet(cp.styleButton)
         self.but_I2   .setStyleSheet(cp.styleButton)
         self.but_g2raw.setStyleSheet(cp.styleButton)
-
         self.but_X    .setStyleSheet(cp.styleButton)
         self.but_Y    .setStyleSheet(cp.styleButton)
         self.but_R    .setStyleSheet(cp.styleButton)
@@ -220,6 +225,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_g2map.setStyleSheet(cp.styleButton)
         self.but_g2dy .setStyleSheet(cp.styleButton)
         self.but_g2tau.setStyleSheet(cp.styleButton)
+        self.but_mask_img_lims.setStyleSheet(cp.styleButton)
+        self.but_mask_blemish .setStyleSheet(cp.styleButton)
+        self.but_mask_total   .setStyleSheet(cp.styleButton)
 
 
     def resizeEvent(self, e):
@@ -298,41 +306,55 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 17 : self.arr2d = self.vr.get_g2_map_for_itau(self.tau_ind)
         elif self.g_ind == 18 : self.arr2d = self.vr.get_g2_map_for_dyna_bins_itau(self.tau_ind)
         elif self.g_ind == 19 : self.arr2d = self.vr.get_g2_vs_itau_arr()
+        elif self.g_ind == 20 : self.arr2d = self.vr.get_mask_image_limits()
+        elif self.g_ind == 21 : self.arr2d = self.vr.get_mask_blemish()
+        elif self.g_ind == 22 : self.arr2d = self.vr.get_mask_total()
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
 
-        logger.info('Get map consumed time (sec): ' + str(gu.get_time_sec()-t0) , __name__)
+        msg = 'Get map consumed time: %8.3f sec' % (gu.get_time_sec()-t0)
+        logger.info(msg, __name__)
         logger.info('arr2d.shape: ' + str(self.arr2d.shape) , __name__)
         #print 'arr2d:\n', self.arr2d 
 
 
-    def selectedOption(self, ind, msg ):
-        logger.info(msg, __name__)
-        self.g_ind = ind
+    def selectedOption(self, ind, title, show_tau=False):
+        logger.info(title + 'is selected', __name__)
+        self.g_ind      = ind
+        self.g_title    = title
+        self.g_show_tau = show_tau
+
+
+    def getTitle(self):      
+        if self.g_show_tau : return self.g_title + self.stringTau()
+        else               : return self.g_title
 
 
     def onButView(self):
         logger.info('onButView', __name__)
-        if   self.but_Ip   .hasFocus() : self.selectedOption(  0, '<Ip> map is selected')
-        elif self.but_If   .hasFocus() : self.selectedOption(  1, '<If> map is selected')
-        elif self.but_I2   .hasFocus() : self.selectedOption(  2, '<Ip x If> map is selected')
-        elif self.but_g2raw.hasFocus() : self.selectedOption(  3, 'g2 raw map is selected')
-        elif self.but_X    .hasFocus() : self.selectedOption(  4, 'X map is selected')
-        elif self.but_Y    .hasFocus() : self.selectedOption(  5, 'Y map is selected')
-        elif self.but_R    .hasFocus() : self.selectedOption(  6, 'R map is selected')
-        elif self.but_P    .hasFocus() : self.selectedOption(  7, 'Phi map is selected')
-        elif self.but_Q    .hasFocus() : self.selectedOption(  8, 'Q map is selected' )
-        elif self.but_P_st .hasFocus() : self.selectedOption(  9, 'Phi map for static bins is selected')
-        elif self.but_Q_st .hasFocus() : self.selectedOption( 10, 'Q map for static bins is selected')
-        elif self.but_P_dy .hasFocus() : self.selectedOption( 11, 'Phi map for dynamic bins is selected')
-        elif self.but_Q_dy .hasFocus() : self.selectedOption( 12, 'Q map for dynamic bins is selected')
-        elif self.but_QP_st.hasFocus() : self.selectedOption( 13, 'Q-Phi map for static bins is selected')
-        elif self.but_QP_dy.hasFocus() : self.selectedOption( 14, 'Q-Phi map for dynamic bins is selected')
-        elif self.but_1oIp .hasFocus() : self.selectedOption( 15, '1/<Ip> normalization map for static bins is selected')
-        elif self.but_1oIf .hasFocus() : self.selectedOption( 16, '1/<If> normalization map for static bins is selected')
-        elif self.but_g2map.hasFocus() : self.selectedOption( 17, 'g2 map is selected')
-        elif self.but_g2dy .hasFocus() : self.selectedOption( 18, 'g2 map for dynamic bins is selected')
-        elif self.but_g2tau.hasFocus() : self.selectedOption( 19, 'g2 vs itau is selected')
+        if   self.but_Ip   .hasFocus() : self.selectedOption(  0, '<Ip> map, ',   show_tau=True)
+        elif self.but_If   .hasFocus() : self.selectedOption(  1, '<If> map, ',   show_tau=True)
+        elif self.but_I2   .hasFocus() : self.selectedOption(  2, '<Ip x If>, ',  show_tau=True)
+        elif self.but_g2raw.hasFocus() : self.selectedOption(  3, 'g2 raw map, ', show_tau=True)
+        elif self.but_X    .hasFocus() : self.selectedOption(  4, 'X map')
+        elif self.but_Y    .hasFocus() : self.selectedOption(  5, 'Y map')
+        elif self.but_R    .hasFocus() : self.selectedOption(  6, 'R map')
+        elif self.but_P    .hasFocus() : self.selectedOption(  7, 'Phi map')
+        elif self.but_Q    .hasFocus() : self.selectedOption(  8, 'Q map' )
+        elif self.but_P_st .hasFocus() : self.selectedOption(  9, 'Phi map for static bins')
+        elif self.but_Q_st .hasFocus() : self.selectedOption( 10, 'Q map for static bins')
+        elif self.but_P_dy .hasFocus() : self.selectedOption( 11, 'Phi map for dynamic bins')
+        elif self.but_Q_dy .hasFocus() : self.selectedOption( 12, 'Q map for dynamic bins')
+        elif self.but_QP_st.hasFocus() : self.selectedOption( 13, 'Q-Phi map for static bins')
+        elif self.but_QP_dy.hasFocus() : self.selectedOption( 14, 'Q-Phi map for dynamic bins')
+        elif self.but_1oIp .hasFocus() : self.selectedOption( 15, '1/<Ip> norm. map for static bins, ', show_tau=True)
+        elif self.but_1oIf .hasFocus() : self.selectedOption( 16, '1/<If> norm. map for static bins, ', show_tau=True)
+        elif self.but_g2map.hasFocus() : self.selectedOption( 17, 'g2 map, ',                           show_tau=True)
+        elif self.but_g2dy .hasFocus() : self.selectedOption( 18, 'g2 map for dynamic bins, ',          show_tau=True)
+        elif self.but_g2tau.hasFocus() : self.selectedOption( 19, 'g2 vs itau')
+        elif self.but_mask_img_lims.hasFocus() : self.selectedOption( 20, 'Mask image limits')
+        elif self.but_mask_blemish .hasFocus() : self.selectedOption( 21, 'Mask blemish')
+        elif self.but_mask_total   .hasFocus() : self.selectedOption( 22, 'Mask total')
         else :
             logger.warning('Request for non-implemented button ...', __name__)
 
@@ -344,19 +366,19 @@ class GUIViewControl ( QtGui.QWidget ) :
             self.redrawPlotResetLimits()
         except :
             #self.setImgArray()
-            cp.plotimgspe_g = PlotImgSpe(None,self.arr2d) 
+            cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle()) 
             cp.plotimgspe_g.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
             cp.plotimgspe_g.show()
 
 
     def redrawPlotResetLimits(self):
         self.setImgArray()
-        cp.plotimgspe_g.set_image_array_new(self.arr2d)
+        cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle())
 
 
     def redrawPlot(self):
         self.setImgArray()
-        cp.plotimgspe_g.set_image_array(self.arr2d)
+        cp.plotimgspe_g.set_image_array(self.arr2d, self.getTitle())
 
 
     def onButClose(self):
@@ -365,6 +387,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         except : pass
         try    : del cp.plotimgspe_g
         except : pass
+
+
+    def stringTau(self):
+        return 'tau(%d)=%d' % (self.tau_ind, self.tau_val) 
 
 
     def onSlider(self):
@@ -379,13 +405,12 @@ class GUIViewControl ( QtGui.QWidget ) :
         #print 'onSliderReleased'
         self.tau_ind = self.sli.value()
         self.tau_val = self.list_of_tau[self.tau_ind]
-        value_str = str( 'tau(' + str(self.tau_ind) + ')=' + str(self.tau_val) )
-        logger.info('onSliderReleased: ' + value_str , __name__)
+        logger.info('onSliderReleased: ' + self.stringTau() , __name__)
 
-        if self.g_ind == 15 or self.g_ind == 16 or self.g_ind == 18 :
-            self.redrawPlotResetLimits()
-        else :
-            self.redrawPlot()            
+        #if self.g_ind == 15 or self.g_ind == 16 or self.g_ind == 18 :
+        #    self.redrawPlotResetLimits()
+        #else :
+        self.redrawPlot()            
 
 #-----------------------------
 

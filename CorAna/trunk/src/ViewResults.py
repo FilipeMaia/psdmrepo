@@ -108,6 +108,7 @@ class ViewResults :
 
         sp.cor_arr = None
         sp.g2_vs_itau_arr = None
+        sp.mask_total = None
 
         sp.set_file_name(fname)
         sp.set_parameters()
@@ -493,7 +494,6 @@ class ViewResults :
         return sp.cor_arr
 
 #-----------------------------
-#-----------------------------
 
     def get_Ip_for_itau(sp,itau) :
         cor_array = sp.get_cor_array_from_binary_file()
@@ -519,7 +519,7 @@ class ViewResults :
         Ip = cor_arr[itau, 0,...] 
         If = cor_arr[itau, 1,...] 
         I2 = cor_arr[itau, 2,...] 
-        sp.g2_raw_for_itau = 100*I2/Ip/If
+        sp.g2_raw_for_itau = I2/Ip/If
         return sp.g2_raw_for_itau
 
 #-----------------------------
@@ -539,5 +539,35 @@ class ViewResults :
         logger.info('get_list_of_tau_from_file: ' + fname_tau, __name__)
         return np.loadtxt(fname_tau, dtype=np.uint16)
 
+#-----------------------------
+#--------- MASKS -------------
+#-----------------------------
+
+    def get_mask_image_limits(sp) :
+        cols_span = sp.col_end - sp.col_begin
+        rows_span = sp.row_end - sp.row_begin
+        arr1 = np.ones((rows_span, cols_span), dtype=np.uint16)
+        sp.mask_image_limits = np.zeros((sp.rows,sp.cols), dtype=np.uint16)
+        sp.mask_image_limits[sp.row_begin:sp.row_begin+rows_span, sp.col_begin:sp.col_begin+cols_span] += arr1[0:rows_span, 0:cols_span]
+        return sp.mask_image_limits
+        #return sp.get_random_img()
+
+
+    def get_mask_blemish(sp) :
+        sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
+        return sp.mask_blemish
+
+
+    def get_mask_total(sp) :
+        if sp.mask_total != None : return sp.mask_total
+        mask_image_limits = sp.get_mask_image_limits()
+        #mask_blemish      = sp.get_mask_blemish()
+        sp.mask_total = mask_image_limits #* mask_blemish
+
+        return sp.mask_total
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
 #-----------------------------
 

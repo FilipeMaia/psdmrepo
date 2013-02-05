@@ -118,8 +118,8 @@ class FileNameManager :
 
 #-----------------------------
 
-    def path_blam(self) :
-        return cp.dname_blam.value() + '/' + cp.fname_blam.value()
+    def path_blem(self) :
+        return cp.dname_blem.value() + '/' + cp.fname_blem.value()
 
     def path_flat(self) :
         return cp.dname_flat.value() + '/' + cp.fname_flat.value()
@@ -127,8 +127,8 @@ class FileNameManager :
     def path_flat_plot(self) :
         return self.path_prefix() + self.str_exp_run_data() + 'flat-plot.png'
 
-    def path_blam_plot(self) :
-        return self.path_prefix() + self.str_exp_run_data() + 'blam-plot.png'
+    def path_blem_plot(self) :
+        return self.path_prefix() + self.str_exp_run_data() + 'blem-plot.png'
 
 
 #-----------------------------
@@ -386,11 +386,11 @@ class FileNameManager :
 
 #-----------------------------
 
-    def  get_list_of_files_blamish(self) :
-        self.list_of_files_blamish = []
-        self.list_of_files_blamish.append(fnm.path_blam())
-        self.list_of_files_blamish.append(fnm.path_blam_plot())
-        return self.list_of_files_blamish
+    def  get_list_of_files_blemish(self) :
+        self.list_of_files_blemish = []
+        self.list_of_files_blemish.append(fnm.path_blem())
+        self.list_of_files_blemish.append(fnm.path_blem_plot())
+        return self.list_of_files_blemish
 
 #-----------------------------
 
@@ -406,7 +406,7 @@ class FileNameManager :
         self.list_of_files_total.append(fnm.path_config_pars())
         self.list_of_files_total += fnm.get_list_of_files_pedestals()
         self.list_of_files_total += fnm.get_list_of_files_flatfield()
-        self.list_of_files_total += fnm.get_list_of_files_blamish()
+        self.list_of_files_total += fnm.get_list_of_files_blemish()
         self.list_of_files_total += fnm.get_list_of_files_data_aver()
         self.list_of_files_total += fnm.get_list_of_files_service()
         return self.list_of_files_total

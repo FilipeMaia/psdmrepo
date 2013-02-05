@@ -60,8 +60,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
         self.arr = arr        
-        self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-        #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
+        #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
         #print 'fig.number =', self.fig.number
   
         #-----------------------------------
@@ -160,8 +160,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
             self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
             self.range  = [xmin, xmax, ymax, ymin]
 
-        zmin = self.intOrNone(zmin)
-        zmax = self.intOrNone(zmax)
+        zmin = self.floatOrNone(zmin)
+        zmax = self.floatOrNone(zmax)
 
         if zmin==None and zmax==None : self.range_his = None
         else                         : self.range_his = (zmin,zmax)
@@ -560,9 +560,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         else             : return str(value)
 
 
-    def intOrNone(self,value):
+    def floatOrNone(self,value):
         if value == None : return None
-        else             : return int(value)
+        else             : return float(value) # return int(value)
 
 
     def saveFigure(self, fname='fig.png'):

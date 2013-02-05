@@ -276,7 +276,7 @@ class GUIMainSplit ( QtGui.QWidget ) :
 
         if cp.current_tab.value() == self.list_of_tabs[2] :
             self.gui_win = GUIAnaSettings(self)
-            #self.setStatus(0, 'Status: set file for blamish mask')
+            #self.setStatus(0, 'Status: set file for blemish mask')
 
         if cp.current_tab.value() == self.list_of_tabs[3] :
             self.gui_win = GUISystemSettings(self)

@@ -60,11 +60,11 @@ class PlotImgSpe (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png'):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 600, 700)
-        self.setWindowTitle('Plot for image')
+        self.setWindowTitle(title)
         self.setFrame()
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
@@ -87,12 +87,14 @@ class PlotImgSpe (QtGui.QWidget) :
         #---------------------
 
 
-    def set_image_array(self,arr):
+    def set_image_array(self,arr,title='Plot 2d array'):
         self.widgimage.set_image_array(arr)
+        self.setWindowTitle(title)
 
 
-    def set_image_array_new(self,arr):
+    def set_image_array_new(self,arr,title='Plot 2d array'):
         self.widgimage.set_image_array_new(arr)
+        self.setWindowTitle(title)
 
 
     def setFrame(self):

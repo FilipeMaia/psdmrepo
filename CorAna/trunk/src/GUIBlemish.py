@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUIBlamish...
+#  Module GUIBlemish...
 #
 #------------------------------------------------------------------------
 
-"""GUI sets the blamish file"""
+"""GUI sets the blemish file"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -39,19 +39,19 @@ from GUIFileBrowser         import *
 #---------------------
 #  Class definition --
 #---------------------
-class GUIBlamish ( QtGui.QWidget ) :
-    """GUI sets the blamish file"""
+class GUIBlemish ( QtGui.QWidget ) :
+    """GUI sets the blemish file"""
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(200, 400, 530, 30)
-        self.setWindowTitle('Blamish file')
+        self.setWindowTitle('Blemish file')
         self.setFrame()
 
         self.cbx_use = QtGui.QCheckBox('Use blemish correction', self)
         self.cbx_use.setChecked( cp.ccdcorr_blemish.value() )
 
-        self.edi_path = QtGui.QLineEdit( fnm.path_blam() )        
+        self.edi_path = QtGui.QLineEdit( fnm.path_blem() )        
         self.edi_path.setReadOnly( True )   
         self.but_path = QtGui.QPushButton('File:')
         self.but_plot = QtGui.QPushButton('Plot')
@@ -82,11 +82,11 @@ class GUIBlamish ( QtGui.QWidget ) :
 
     def showToolTips(self):
         #self           .setToolTip('Use this GUI to work with xtc file.')
-        self.edi_path   .setToolTip('The path to the blamish mask file')
-        self.but_path   .setToolTip('Push this button and select the blamish mask file')
-        self.but_plot   .setToolTip('Plot image and spectrum for blamish file')
-        self.but_brow   .setToolTip('Browse blamish file')
-        self.cbx_use    .setToolTip('Check box \nto set and use \nblamish mask correction')
+        self.edi_path   .setToolTip('The path to the blemish mask file')
+        self.but_path   .setToolTip('Push this button and select the blemish mask file')
+        self.but_plot   .setToolTip('Plot image and spectrum for blemish file')
+        self.but_brow   .setToolTip('Browse blemish file')
+        self.cbx_use    .setToolTip('Check box \nto set and use \nblemish mask correction')
         
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -146,7 +146,7 @@ class GUIBlamish ( QtGui.QWidget ) :
         try    : cp.guifilebrowser.close()
         except : pass
             
-        #try    : del cp.guiblamish # GUIBlamish
+        #try    : del cp.guiblemish # GUIBlemish
         #except : pass # silently ignore
 
 
@@ -156,7 +156,7 @@ class GUIBlamish ( QtGui.QWidget ) :
 
 
     def on_but_path(self):
-        logger.debug('Blamish file browser', __name__ )
+        logger.debug('Blemish file browser', __name__ )
         path = str(self.edi_path.text())        
         path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )
         dname, fname = os.path.split(path)
@@ -166,9 +166,9 @@ class GUIBlamish ( QtGui.QWidget ) :
             return
 
         self.edi_path.setText(path)
-        cp.dname_blam.setValue(dname)
-        cp.fname_blam.setValue(fname)
-        logger.info('selected file: ' + str(fnm.path_blam()), __name__ )
+        cp.dname_blem.setValue(dname)
+        cp.fname_blem.setValue(fname)
+        logger.info('selected file: ' + str(fnm.path_blem()), __name__ )
 
 
     def on_but_plot(self):
@@ -181,10 +181,10 @@ class GUIBlamish ( QtGui.QWidget ) :
             #but.setStyleSheet(cp.styleButtonBad)
         except :
             logger.debug('except and open', __name__)
-            arr = gu.get_array_from_file(fnm.path_blam())
+            arr = gu.get_array_from_file(fnm.path_blem())
             if arr == None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
-            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_blam_plot())
+            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_blem_plot())
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget().pos()
             cp.plotimgspe.show()
 
@@ -194,7 +194,7 @@ class GUIBlamish ( QtGui.QWidget ) :
         try    :
             cp.guifilebrowser.close()
         except :
-            cp.guifilebrowser = GUIFileBrowser(None, [fnm.path_blam()])
+            cp.guifilebrowser = GUIFileBrowser(None, [fnm.path_blem()])
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 
@@ -213,7 +213,7 @@ class GUIBlamish ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIBlamish ()
+    widget = GUIBlemish ()
     widget.show()
     app.exec_()
 
