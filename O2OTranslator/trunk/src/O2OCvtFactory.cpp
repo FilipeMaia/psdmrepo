@@ -88,6 +88,9 @@
 #include "H5DataTypes/PrincetonConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV3.h"
 #include "H5DataTypes/PrincetonConfigV4.h"
+#include "H5DataTypes/PrincetonConfigV5.h"
+#include "H5DataTypes/PrincetonFrameV1.h"
+#include "H5DataTypes/PrincetonFrameV2.h"
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
@@ -113,7 +116,7 @@
 #include "O2OTranslator/Gsc16aiDataV1Cvt.h"
 #include "O2OTranslator/OceanOpticsDataV1Cvt.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
-#include "O2OTranslator/PrincetonFrameV1Cvt.h"
+#include "O2OTranslator/PrincetonFrameCvt.h"
 #include "O2OTranslator/TimepixDataV1Cvt.h"
 #include "O2OTranslator/TimepixDataV2Cvt.h"
 #include "pdsdata/xtc/TypeId.hh"
@@ -367,7 +370,11 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Princeton::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<PrincetonFrameV1Cvt>(group, "Princeton::FrameV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV1>  >(group, "Princeton::FrameV1", src, m_configStore, m_cvtOptions));
+      break;
+    case 2:
+      // very special converter for Princeton::FrameV2, it needs two types of data
+      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV2>  >(group, "Princeton::FrameV2", src, m_configStore, m_cvtOptions));
       break;
     }
     break;
@@ -385,6 +392,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     case 4:
       ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV4", src, m_cvtOptions);
+      break;
+    case 5:
+      ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV5", src, m_cvtOptions);
       break;
     }
     break;

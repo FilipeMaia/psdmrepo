@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class PrincetonFrameV1Cvt...
+//	Class PrincetonFrameCvt...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,11 +13,13 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/PrincetonFrameV1Cvt.h"
+#include "O2OTranslator/PrincetonFrameCvt.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "H5DataTypes/PrincetonFrameV1.h"
+#include "H5DataTypes/PrincetonFrameV2.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
@@ -25,6 +27,7 @@
 #include "pdsdata/princeton/ConfigV2.hh"
 #include "pdsdata/princeton/ConfigV3.hh"
 #include "pdsdata/princeton/ConfigV4.hh"
+#include "pdsdata/princeton/ConfigV5.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -35,7 +38,7 @@
 //-----------------------------------------------------------------------
 
 namespace {
-  const char logger[] = "PrincetonFrameV1Cvt" ;
+  const char logger[] = "PrincetonFrameCvt" ;
 }
 
 //    ----------------------------------------
@@ -47,7 +50,8 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
+template <typename H5DataType>
+PrincetonFrameCvt<H5DataType>::PrincetonFrameCvt ( const hdf5pp::Group& group,
     const std::string& typeGroupName,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
@@ -63,21 +67,24 @@ PrincetonFrameV1Cvt::PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
 //--------------
 // Destructor --
 //--------------
-PrincetonFrameV1Cvt::~PrincetonFrameV1Cvt ()
+template <typename H5DataType>
+PrincetonFrameCvt<H5DataType>::~PrincetonFrameCvt ()
 {
 }
 
 // method called to create all necessary data containers
+template <typename H5DataType>
 void
-PrincetonFrameV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+PrincetonFrameCvt<H5DataType>::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for frames
-  m_frameCont = makeCont<FrameCont>("frame", group, true);
+  m_frameCont = this->template makeCont<FrameCont>("frame", group, true);
 }
 
 // typed conversion method
+template <typename H5DataType>
 void
-PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
+PrincetonFrameCvt<H5DataType>::fillContainers(hdf5pp::Group group,
     const XtcType& data,
     size_t size,
     const Pds::TypeId& typeId,
@@ -90,6 +97,7 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_PrincetonConfig, 2);
   Pds::TypeId cfgTypeId3(Pds::TypeId::Id_PrincetonConfig, 3);
   Pds::TypeId cfgTypeId4(Pds::TypeId::Id_PrincetonConfig, 4);
+  Pds::TypeId cfgTypeId5(Pds::TypeId::Id_PrincetonConfig, 5);
   if (const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(cfgTypeId1, src.top())) {
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
@@ -110,8 +118,13 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
     uint32_t binY = config->binY();
     height = (config->height() + binY - 1) / binY;
     width = (config->width() + binX - 1) / binX;
+  } else if (const Pds::Princeton::ConfigV5* config = m_configStore.find<Pds::Princeton::ConfigV5>(cfgTypeId5, src.top())) {
+    uint32_t binX = config->binX();
+    uint32_t binY = config->binY();
+    height = (config->height() + binY - 1) / binY;
+    width = (config->width() + binX - 1) / binX;
   } else {
-    MsgLog ( logger, error, "PrincetonFrameV1Cvt - no configuration object was defined" );
+    MsgLog ( logger, error, "PrincetonFrameCvt - no configuration object was defined" );
     return ;
   }
 
@@ -121,15 +134,16 @@ PrincetonFrameV1Cvt::fillContainers(hdf5pp::Group group,
 
   hdf5pp::Type type = H5Type::stored_data_type(height, width) ;
   if (not m_frameDataCont) {
-    m_frameDataCont = makeCont<FrameDataCont>("data", group, true, type) ;
+    m_frameDataCont = this->template makeCont<FrameDataCont>("data", group, true, type) ;
     if (n_miss) m_frameDataCont->resize(n_miss);
   }
   m_frameDataCont->append(*data.data(), type);
 }
 
 // fill containers for missing data
+template <typename H5DataType>
 void
-PrincetonFrameV1Cvt::fillMissing(hdf5pp::Group group,
+PrincetonFrameCvt<H5DataType>::fillMissing(hdf5pp::Group group,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src)
 {
@@ -140,5 +154,8 @@ PrincetonFrameV1Cvt::fillMissing(hdf5pp::Group group,
     ++ n_miss;
   }
 }
+
+template class PrincetonFrameCvt<H5DataTypes::PrincetonFrameV1>;
+template class PrincetonFrameCvt<H5DataTypes::PrincetonFrameV2>;
 
 } // namespace O2OTranslator

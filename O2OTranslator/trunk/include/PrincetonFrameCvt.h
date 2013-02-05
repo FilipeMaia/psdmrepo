@@ -6,7 +6,7 @@
 // 	$Id$
 //
 // Description:
-//	Class PrincetonFrameV1Cvt.
+//	Class PrincetonFrameCvt.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/PrincetonFrameV1.h"
 #include "O2OTranslator/CvtOptions.h"
 
 //------------------------------------
@@ -38,7 +37,10 @@ namespace O2OTranslator {
 class ConfigObjectStore;
 
 /**
- *  Special converter class for Pds::Princeton::FrameV1 XTC class
+ *  Special converter class for Princeton frame XTC class,
+ *  this converter works for both FrameV1 and FrameV2 classes.
+ *  Its template argument should be either H5DataTypes::PrincetonFrameV1
+ *  or H5DataTypes::PrincetonFrameV2
  *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -47,22 +49,22 @@ class ConfigObjectStore;
  *
  *  @author Andrei Salnikov
  */
-
-class PrincetonFrameV1Cvt : public EvtDataTypeCvt<Pds::Princeton::FrameV1> {
+template <typename H5DataType>
+class PrincetonFrameCvt : public EvtDataTypeCvt<typename H5DataType::XtcType> {
 public:
 
-  typedef Pds::Princeton::FrameV1 XtcType ;
-  typedef H5DataTypes::PrincetonFrameV1 H5Type ;
+  typedef typename H5DataType::XtcType XtcType ;
+  typedef H5DataType H5Type ;
 
   // constructor
-  PrincetonFrameV1Cvt ( const hdf5pp::Group& group,
+  PrincetonFrameCvt ( const hdf5pp::Group& group,
                         const std::string& typeGroupName,
                         const Pds::Src& src,
                         const ConfigObjectStore& configStore,
                         const CvtOptions& cvtOptions ) ;
 
   // Destructor
-  virtual ~PrincetonFrameV1Cvt () ;
+  virtual ~PrincetonFrameCvt () ;
 
 protected:
 
