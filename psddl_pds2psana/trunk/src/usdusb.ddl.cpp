@@ -46,6 +46,8 @@ uint8_t DataV1::digital_in() const { return m_xtcObj->digital_in(); }
 
 uint32_t DataV1::timestamp() const { return m_xtcObj->timestamp(); }
 
-int32_t DataV1::value(uint32_t i) const { return m_xtcObj->value(i); }
+ndarray<const uint16_t, 1> DataV1::analog_in() const { return m_xtcObj->analog_in(); }
+
+ndarray<const int32_t, 1> DataV1::encoder_count() const { return m_xtcObj->encoder_count(); }
 } // namespace UsdUsb
 } // namespace psddl_pds2psana
