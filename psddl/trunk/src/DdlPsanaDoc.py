@@ -395,7 +395,7 @@ class DdlPsanaDoc ( object ) :
             elif meth.attribute.type.value_type :
                 
                 # return ndarray
-                typename = T("ndarray<$type, $rank>")(type=_typename(meth.attribute.type), rank=len(meth.attribute.shape.dims))
+                typename = T("ndarray<const $type, $rank>")(type=_typename(meth.attribute.type), rank=len(meth.attribute.shape.dims))
 
             else:
 
@@ -410,7 +410,7 @@ class DdlPsanaDoc ( object ) :
 
             typename = _typedecl(meth.type)
             if meth.rank > 0:
-                typename = T("ndarray<$type, $rank>")(type=typename, rank=meth.rank)
+                typename = T("ndarray<const $type, $rank>")(type=typename, rank=meth.rank)
             
         return typename
 
