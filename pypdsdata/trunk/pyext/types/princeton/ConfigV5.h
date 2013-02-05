@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_PRINCETON_CONFIGV2_H
-#define PYPDSDATA_PRINCETON_CONFIGV2_H
+#ifndef PYPDSDATA_PRINCETON_CONFIGV5_H
+#define PYPDSDATA_PRINCETON_CONFIGV5_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ConfigV2.
+//	Class ConfigV5.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/princeton/ConfigV2.hh"
+#include "pdsdata/princeton/ConfigV5.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -46,10 +46,10 @@ namespace Princeton {
  *  @author Andrei Salnikov
  */
 
-class ConfigV2 : public PdsDataType<ConfigV2,Pds::Princeton::ConfigV2> {
+class ConfigV5 : public PdsDataType<ConfigV5,Pds::Princeton::ConfigV5> {
 public:
 
-  typedef PdsDataType<ConfigV2,Pds::Princeton::ConfigV2> BaseType;
+  typedef PdsDataType<ConfigV5,Pds::Princeton::ConfigV5> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -62,4 +62,4 @@ public:
 } // namespace Princeton
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_PRINCETON_CONFIGV2_H
+#endif // PYPDSDATA_PRINCETON_CONFIGV5_H

@@ -54,6 +54,9 @@ public:
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
+  // Dump object info to a stream
+  void print(std::ostream& out) const;
+
 };
 
 } // namespace Princeton

@@ -49,7 +49,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV4, numDelayShots)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV4, size)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV4, frameSize)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",             width,             METH_NOARGS, "self.width() -> int\n\nReturns frame width" },
@@ -62,7 +61,7 @@ namespace {
     { "kineticHeight",     kineticHeight,     METH_NOARGS, "self.kineticHeight() -> int\n\nReturns integer number" },
     { "vsSpeed",           vsSpeed,           METH_NOARGS, "self.vsSpeed() -> float\n\nReturns floating number" },
     { "exposureTime",      exposureTime,      METH_NOARGS, "self.exposureTime() -> float\n\nReturns exposure time" },
-    { "coolingTemp",       coolingTemp,       METH_NOARGS, "self.coolingTemp() -> float\n\nReturns integer number" },
+    { "coolingTemp",       coolingTemp,       METH_NOARGS, "self.coolingTemp() -> float\n\nReturns floating number" },
     { "gainIndex",         gainIndex,         METH_NOARGS, "self.gainIndex() -> int\n\nReturns integer number" },
     { "readoutSpeedIndex", readoutSpeedIndex, METH_NOARGS, "self.readoutSpeedIndex() -> int\n\nReturns integer number" },
     { "exposureEventCode", exposureEventCode, METH_NOARGS, "self.exposureEventCode() -> int\n\nReturns integer number" },
@@ -86,32 +85,20 @@ pypdsdata::Princeton::ConfigV4::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV4", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Princeton::ConfigV4::print(std::ostream& out) const
 {
-  Pds::Princeton::ConfigV4* obj = pypdsdata::Princeton::ConfigV4::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "princeton.ConfigV4(width=" << obj->width()
-      << ", height=" << obj->height()
-      << ", orgX=" << obj->orgX()
-      << ", orgY=" << obj->orgY()
-      << ", binX=" << obj->binX()
-      << ", binY=" << obj->binY()
-      << ", exposureEventCode=" << obj->exposureEventCode()
-      << ", numDelayShots=" << obj->numDelayShots()
+  out << "princeton.ConfigV4(width=" << m_obj->width()
+      << ", height=" << m_obj->height()
+      << ", orgX=" << m_obj->orgX()
+      << ", orgY=" << m_obj->orgY()
+      << ", binX=" << m_obj->binX()
+      << ", binY=" << m_obj->binY()
+      << ", exposureEventCode=" << m_obj->exposureEventCode()
+      << ", numDelayShots=" << m_obj->numDelayShots()
       << ", ...)";
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

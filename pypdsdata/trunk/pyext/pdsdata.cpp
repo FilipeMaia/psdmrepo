@@ -172,7 +172,9 @@
 #include "types/princeton/ConfigV2.h"
 #include "types/princeton/ConfigV3.h"
 #include "types/princeton/ConfigV4.h"
+#include "types/princeton/ConfigV5.h"
 #include "types/princeton/FrameV1.h"
+#include "types/princeton/FrameV2.h"
 #include "types/princeton/InfoV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
@@ -433,7 +435,9 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Princeton::ConfigV2::initType( module );
   pypdsdata::Princeton::ConfigV3::initType( module );
   pypdsdata::Princeton::ConfigV4::initType( module );
+  pypdsdata::Princeton::ConfigV5::initType( module );
   pypdsdata::Princeton::FrameV1::initType( module );
+  pypdsdata::Princeton::FrameV2::initType( module );
   pypdsdata::Princeton::InfoV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "princeton", module );

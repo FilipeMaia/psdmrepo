@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class FrameV1...
+//	Class FrameV2...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "FrameV1.h"
+#include "FrameV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -38,18 +38,20 @@
 namespace {
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, shotIdStart)
-  FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, readoutTime)
+  FUN0_WRAPPER(pypdsdata::Princeton::FrameV2, shotIdStart)
+  FUN0_WRAPPER(pypdsdata::Princeton::FrameV2, readoutTime)
+  FUN0_WRAPPER(pypdsdata::Princeton::FrameV2, temperature)
   PyObject* data( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     { "shotIdStart",    shotIdStart,    METH_NOARGS, "self.shotIdStart() -> int\n\nReturns integer number" },
     { "readoutTime",    readoutTime,    METH_NOARGS, "self.readoutTime() -> float\n\nReturns floating number" },
+    { "temperature",    temperature,    METH_NOARGS, "self.temperature() -> float\n\nReturns floating number" },
     { "data",           data,           METH_VARARGS, "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns 2-dim array of integer numbers" },
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Princeton::FrameV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Princeton::FrameV2 class.";
 
 }
 
@@ -58,19 +60,19 @@ namespace {
 //		----------------------------------------
 
 void
-pypdsdata::Princeton::FrameV1::initType( PyObject* module )
+pypdsdata::Princeton::FrameV2::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
 
-  BaseType::initType( "FrameV1", module );
+  BaseType::initType( "FrameV2", module );
 }
 
 void
-pypdsdata::Princeton::FrameV1::print(std::ostream& out) const
+pypdsdata::Princeton::FrameV2::print(std::ostream& out) const
 {
-  out << "princeton.FrameV1(shotIdStart=" << m_obj->shotIdStart()
+  out << "princeton.FrameV2(shotIdStart=" << m_obj->shotIdStart()
       << ", readoutTime=" << m_obj->readoutTime()
       << ", ...)";
 }
@@ -80,19 +82,19 @@ namespace {
 PyObject*
 data( PyObject* self, PyObject* args )
 {
-  Pds::Princeton::FrameV1* obj = pypdsdata::Princeton::FrameV1::pdsObject( self );
+  Pds::Princeton::FrameV2* obj = pypdsdata::Princeton::FrameV2::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:Princeton.FrameV1.data", &configObj ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "O:Princeton.FrameV2.data", &configObj ) ) return 0;
 
   // dimensions
   npy_intp dims[2] = { 0, 0 };
 
   // get dimensions from config object
-  if ( pypdsdata::Princeton::ConfigV1::Object_TypeCheck( configObj ) ) {
-    Pds::Princeton::ConfigV1* config = pypdsdata::Princeton::ConfigV1::pdsObject( configObj );
+  if ( pypdsdata::Princeton::ConfigV2::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV2* config = pypdsdata::Princeton::ConfigV2::pdsObject( configObj );
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
     dims[0] = (config->height() + binY - 1) / binY;

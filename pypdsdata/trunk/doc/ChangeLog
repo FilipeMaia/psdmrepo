@@ -6,6 +6,12 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-91
+2013-02-05 Andy Salnikov
+- upgrading to pdsdata V06-01-04
+- new classes Princeton::ConfigV5 and Princeton::FrameV2
+- general cleanup in princeton classes
+
 Tag: V00-00-90
 2013-02-04 Andy Salnikov
 - upgrading to pdsdata V06-01-02
