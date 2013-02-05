@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2013-02-05 Andy Salnikov
+- in psana-module!cpp template use COnfigSrc() isntead of configStr() 
+  to get source address from configuration
+
 Tag: V00-00-25
 2012-08-04 Andy Salnikov
 - fix few typos in templates, removed @see

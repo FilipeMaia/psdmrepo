@@ -53,7 +53,7 @@ $class::$class (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_src = configStr("source", "DetInfo(:Acqiris)");
+  m_src = configSrc("source", "DetInfo(:Acqiris)");
   m_maxEvents = config("events", 32U);
   m_filter = config("filter", false);
 }
