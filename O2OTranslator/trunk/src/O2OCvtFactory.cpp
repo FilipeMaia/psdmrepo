@@ -394,7 +394,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV4", src, m_cvtOptions);
       break;
     case 5:
-      ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV5", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV5>(cvts, group, "Princeton::ConfigV5", src, m_cvtOptions);
       break;
     }
     break;
