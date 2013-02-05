@@ -26,7 +26,8 @@ void createWrappers(PyObject* module) {
 #define _CLASS(n, NAME, policy) class_<n>(NAME, no_init)\
     .def("digital_in", &n::digital_in)\
     .def("timestamp", &n::timestamp)\
-    .def("value", &n::value)\
+    .def("analog_in", &n::analog_in)\
+    .def("encoder_count", &n::encoder_count)\
 
   _CLASS(psddl_python::UsdUsb::DataV1_Wrapper, "DataV1", return_value_policy<return_by_value>());
   std_vector_class_(DataV1_Wrapper);

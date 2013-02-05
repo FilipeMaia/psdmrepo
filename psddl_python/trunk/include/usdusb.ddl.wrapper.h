@@ -41,7 +41,8 @@ public:
   DataV1_Wrapper(Psana::UsdUsb::DataV1* obj) : o(obj) {}
   uint8_t digital_in() const { return o->digital_in(); }
   uint32_t timestamp() const { return o->timestamp(); }
-  int32_t value(uint32_t i) const { return o->value(i); }
+  PyObject* analog_in() const { ND_CONVERT(o->analog_in(), uint16_t, 1); }
+  PyObject* encoder_count() const { ND_CONVERT(o->encoder_count(), int32_t, 1); }
 };
 
   class ConfigV1_Getter : public psddl_python::Getter {
