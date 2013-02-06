@@ -85,8 +85,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_g2map         = QtGui.QPushButton('g2 map')
         self.but_g2dy          = QtGui.QPushButton('g2 dyna')
         self.but_g2tau         = QtGui.QPushButton('g2 vs tau')
+        self.but_g2tau_gr      = QtGui.QPushButton('g2(tau)')
         self.but_mask_img_lims = QtGui.QPushButton('Image lims')
         self.but_mask_blemish  = QtGui.QPushButton('Blemish')
+        self.but_mask_hotpix   = QtGui.QPushButton('Hot pixels')
         self.but_mask_total    = QtGui.QPushButton('Total')
 
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
@@ -129,6 +131,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.tit_mask,         self.grid_row+6, 0)
         self.grid.addWidget(self.but_mask_img_lims,self.grid_row+6, 1)
         self.grid.addWidget(self.but_mask_blemish, self.grid_row+6, 2)
+        self.grid.addWidget(self.but_mask_hotpix,  self.grid_row+6, 3)
         self.grid.addWidget(self.but_mask_total,   self.grid_row+6, 6)
 
         self.grid.addWidget(self.tit_calc,         self.grid_row+7, 0)
@@ -137,6 +140,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_g2map,        self.grid_row+7, 3)
         self.grid.addWidget(self.but_g2dy,         self.grid_row+7, 4)
         self.grid.addWidget(self.but_g2tau,        self.grid_row+7, 5)
+        self.grid.addWidget(self.but_g2tau_gr,     self.grid_row+7, 6)
 
         self.grid_row += 4
 
@@ -163,8 +167,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_g2map,        QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_g2dy ,        QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_g2tau,        QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_g2tau_gr,     QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_img_lims,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_blemish, QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_mask_hotpix,  QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_total,   QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,              QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,              QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
@@ -251,8 +257,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_g2map        .setStyleSheet(cp.styleButton)
         self.but_g2dy         .setStyleSheet(cp.styleButton)
         self.but_g2tau        .setStyleSheet(cp.styleButton)
+        self.but_g2tau_gr     .setStyleSheet(cp.styleButton)
         self.but_mask_img_lims.setStyleSheet(cp.styleButton)
         self.but_mask_blemish .setStyleSheet(cp.styleButton)
+        self.but_mask_hotpix  .setStyleSheet(cp.styleButton)
         self.but_mask_total   .setStyleSheet(cp.styleButton)
 
 
@@ -332,9 +340,16 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 17 : self.arr2d = self.vr.get_g2_map_for_itau(self.tau_ind)
         elif self.g_ind == 18 : self.arr2d = self.vr.get_g2_map_for_dyna_bins_itau(self.tau_ind)
         elif self.g_ind == 19 : self.arr2d = self.vr.get_g2_vs_itau_arr()
-        elif self.g_ind == 20 : self.arr2d = self.vr.get_mask_image_limits()
-        elif self.g_ind == 21 : self.arr2d = self.vr.get_mask_blemish()
-        elif self.g_ind == 22 : self.arr2d = self.vr.get_mask_total()
+        elif self.g_ind == 20 :
+            self.arr2d         = self.vr.get_random_img()
+            q_average_for_dyna = self.vr.get_q_average_for_dyna_bins()
+
+        elif self.g_ind == 30 : self.arr2d = self.vr.get_mask_image_limits()
+        elif self.g_ind == 31 : self.arr2d = self.vr.get_mask_blemish()
+        elif self.g_ind == 32 : self.arr2d = self.vr.get_mask_hotpix()
+        elif self.g_ind == 33 : self.arr2d = self.vr.get_mask_total()
+
+
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
 
@@ -378,9 +393,12 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.but_g2map        .hasFocus() : self.selectedOption( 17, 'g2 map, ',                           show_tau=True)
         elif self.but_g2dy         .hasFocus() : self.selectedOption( 18, 'g2 map for dynamic bins, ',          show_tau=True)
         elif self.but_g2tau        .hasFocus() : self.selectedOption( 19, 'g2 vs itau')
-        elif self.but_mask_img_lims.hasFocus() : self.selectedOption( 20, 'Mask image limits')
-        elif self.but_mask_blemish .hasFocus() : self.selectedOption( 21, 'Mask blemish')
-        elif self.but_mask_total   .hasFocus() : self.selectedOption( 22, 'Mask total')
+        elif self.but_g2tau_gr     .hasFocus() : self.selectedOption( 20, 'g2(tau) for dynamic bins')
+
+        elif self.but_mask_img_lims.hasFocus() : self.selectedOption( 30, 'Mask image limits')
+        elif self.but_mask_blemish .hasFocus() : self.selectedOption( 31, 'Mask blemish')
+        elif self.but_mask_hotpix  .hasFocus() : self.selectedOption( 32, 'Mask hot pixels')
+        elif self.but_mask_total   .hasFocus() : self.selectedOption( 33, 'Mask total')
         else :
             logger.warning('Request for non-implemented button ...', __name__)
 

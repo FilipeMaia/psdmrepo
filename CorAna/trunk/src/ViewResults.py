@@ -105,6 +105,7 @@ class ViewResults :
 
         sp.counts_stat = None
         sp.counts_dyna = None
+        sp.q_average_dyna = None
 
         sp.cor_arr = None
         sp.g2_vs_itau_arr = None
@@ -384,6 +385,18 @@ class ViewResults :
         sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), weights, length=sp.npart_dyna)
         return sp.counts_dyna
 
+
+    def get_q_average_for_dyna_bins(sp) :
+        if sp.q_average_dyna != None : return sp.q_average_dyna
+
+        q_map_masked      = sp.get_q_map() * sp.get_mask_total()
+        sum_q_dyna        = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), q_map_masked, length=sp.npart_dyna)
+        counts_dyna       = sp.get_counts_for_dyna_bins()
+        counts_dyna_prot  = np.select([counts_dyna<=0.], [-1.], counts_dyna)
+        sp.q_average_dyna = np.select([counts_dyna_prot<=0.], [0.], default=sum_q_dyna/counts_dyna)
+        print 'get_q_average_for_dyna_bins():\n', sp.q_average_dyna
+        return sp.q_average_dyna
+
 #-----------------------------
 
     def get_1oIp_map_for_stat_bins_itau(sp, itau) :
@@ -537,10 +550,19 @@ class ViewResults :
 #-----------------------------
 
     def get_random_img(sp) :
-        logger.info('get_random_img: ' + sp.fname, __name__)
+        logger.info('get_random_img(): standard_exponential', __name__)
         #arr = mu + sigma*np.random.standard_normal(size=2400)
         #arr = np.arange(2400)
         sp.arr2d = 100*np.random.standard_exponential(sp.size)
+        sp.arr2d.shape = (sp.rows,sp.cols)
+        return sp.arr2d
+
+
+    def get_random_binomial_img(sp) :
+        logger.info('get_random_binomial_img()', __name__)
+        ntrials = 1
+        p = 0.99 # probability of success (1)
+        sp.arr2d = np.random.binomial(ntrials, p, sp.size)
         sp.arr2d.shape = (sp.rows,sp.cols)
         return sp.arr2d
 
@@ -568,6 +590,14 @@ class ViewResults :
     def get_mask_blemish(sp) :
         sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
         return sp.mask_blemish
+
+
+    def get_mask_hotpix(sp) :
+        #sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix())
+        #return sp.mask_hotpix
+        print 'get_mask_hotpix IS NOT IMPLEMENTED YET! get random binomial for now...'
+        #return sp.get_random_img()
+        return sp.get_random_binomial_img()
 
 
     def get_mask_total(sp) :
