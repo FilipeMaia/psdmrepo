@@ -16,7 +16,6 @@ part of it, please give an appropriate acknowledgment.
 import numpy as np
 
 from pypdsdata.xtc import TypeId
-from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import IpimbData
@@ -108,10 +107,7 @@ class  pyana_ipimb ( object ) :
             self.data[source] = IpimbData( source ) 
 
             # just for information:
-            if self.psana:
-                config = env.getConfig(Ipimb.Config, source)
-            else:
-                config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
+            config = env.getConfig( TypeId.Type.Id_IpimbConfig , source )
             if config is not None:
                 print "IPIMB %s configuration info: "%source
                 print "   Trigger counter:     0x%lx" % config.triggerCounter()
@@ -169,21 +165,14 @@ class  pyana_ipimb ( object ) :
             # -------------------------------------------
 
             # try Shared IPIMB first
-            if self.psana:
-                ipm = evt.get(Bld.BldDataIpimb, source )
-            else:
-                ipm = evt.get(TypeId.Type.Id_SharedIpimb, source )
+            ipm = evt.get(TypeId.Type.Id_SharedIpimb, source )
             if ipm is not None:
                 ipm_raw = ipm.ipimbData
                 ipm_fex = ipm.ipmFexData
             else: 
                 # try to get the other data types for IPIMBs 
-                if self.psana:
-                    ipm_raw = evt.get(Ipimb.Data, source )
-                    ipm_fex = evt.get(Lusi.IpmFex, source )
-                else:
-                    ipm_raw = evt.get(TypeId.Type.Id_IpimbData, source )
-                    ipm_fex = evt.get(TypeId.Type.Id_IpmFex, source )
+                ipm_raw = evt.get(TypeId.Type.Id_IpimbData, source )
+                ipm_fex = evt.get(TypeId.Type.Id_IpmFex, source )
 
             # --------------------------------------------------------------
             # filter???

@@ -38,7 +38,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pypdsdata import xtc
-from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import ScanData
@@ -147,10 +146,7 @@ class pyana_scan (object) :
         print "Begin calibcycle ", self.n_ccls
 
         # control.ConfigV1 element
-        if self.psana:
-            ctrl_config = env.getConfig(ControlData.ConfigV1, "");
-        else:
-            ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        ctrl_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
 
         nControls = ctrl_config.npvControls()
         for ic in range (0, nControls ):
@@ -211,20 +207,14 @@ class pyana_scan (object) :
             to edit this code.
             """
             if scalar.find("Ipimb")>=0 :
-                if self.psana:
-                    ipmFex = evt.get(Lusi.IpmFex, scalar )
-                else:
-                    ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
+                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
                 if ipmFex :
                     self.evts_scalars[scalar].append(ipmFex.sum)
                 #else:
                 #    self.evts_scalars[scalar].append(-99.0)
                     
             elif scalar.find("EBeam")>= 0 :
-                if self.psana:
-                    ebeam = evt.get(Bld.BldDataEBeam, "");
-                else:
-                    ebeam = evt.getEBeam()
+                ebeam = evt.get(xtc.TypeId.Type.Id_EBeam);
                 if ebeam:
                     if self.psana:
                         self.evts_scalars[scalar].append(ebeam.ebeamL3Energy())
@@ -235,7 +225,7 @@ class pyana_scan (object) :
 
             elif scalar.find("FEEGasDetEnergy")>= 0 :
                 if self.psana:
-                    energy = evt.get(Bld.BldDataFEEGasDetEnergy, "");
+                    energy = evt.get(xtc.TypeId.Type.Id_FEEGasDetEnergy);
                     if energy:
                         fee_energy_array = []
                         fee_energy_array.append(energy.f_11_ENRC())
@@ -254,10 +244,7 @@ class pyana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif scalar.find("PhaseCavity")>= 0 :
-                if self.psana:
-                    pc = evt.get(Bld.BldDataPhaseCavity, "");
-                else:
-                    pc = evt.getPhaseCavity()
+                pc = evt.get(xtc.TypeId.Type.Id_PhaseCavity);
                 if pc:
                     if self.psana:
                         val = (pc.charge1() - pc.charge2()) / (pc.fitTime1() - pc.fitTime2())
@@ -268,10 +255,7 @@ class pyana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif ( scalar.find("IPM")>= 0 or scalar.find("DIO")>= 0 ):
-                if self.psana:
-                    ipm = evt.get(Bld.BldDataIpimb, scalar )
-                else:
-                    ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar )
+                ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar)
                 if ipm:
                     if self.psana:
                         self.evts_scalars[scalar].append( ipm.ipmFexData().sum )

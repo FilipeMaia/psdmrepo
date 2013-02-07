@@ -37,7 +37,6 @@ import numpy as np
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
-from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import WaveformData
@@ -155,11 +154,7 @@ class pyana_waveform (object) :
 
         self.data = {}
         for source in self.sources:
-            if self.psana:
-                detsrc = source.split('|')[0].split('-')[0]
-                cfg = env.getConfig(Acqiris.ConfigV1, detsrc)
-            else:
-                cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
+            cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source)
 
             nch = cfg.nbrChannels() 
             nsmp = cfg.horiz().nbrSamples()
@@ -239,7 +234,7 @@ class pyana_waveform (object) :
 
             if self.psana:
                 detsrc = source.split('|')[0].split('-')[0]
-                acqData = evt.get(Acqiris.DataDesc, detsrc)
+                acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, detsrc)
             else:
                 acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
 

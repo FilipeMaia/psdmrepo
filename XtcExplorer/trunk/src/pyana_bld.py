@@ -7,7 +7,6 @@ import numpy as np
 import logging
 
 from pypdsdata import xtc
-from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions 
 from utilities import BldData
@@ -138,10 +137,7 @@ class  pyana_bld ( object ) :
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
-            if self.psana:
-                ebeam = evt.get(Bld.BldDataEBeam, "");
-            else:
-                ebeam = evt.getEBeam()
+            ebeam = evt.get(xtc.TypeId.Type.Id_EBeam);
             self.hadEB = True
             if ebeam :
                 if self.psana:
@@ -180,28 +176,33 @@ class  pyana_bld ( object ) :
             
         if self.do_GasDet :
             # returns array of 4 numbers obtained from the bld.BldDataFEEGasDetEnergy object
-            if self.psana:
-                fee_energy_array = evt.get(Bld.BldDataFEEGasDetEnergy, "");
-            else:
-                fee_energy_array = evt.getFeeGasDet()
+            fee_energy = evt.get(xtc.TypeId.Type.Id_FEEGasDetEnergy)
+            if fee_energy is not None:
+                if self.psana:
+                    fee_energy = [fee_energy.f_11_ENRC(),
+                                        fee_energy.f_12_ENRC(),
+                                        fee_energy.f_21_ENRC(),
+                                        fee_energy.f_22_ENRC()]
+                else:
+                    fee_energy = [fee_energy.f_11_ENRC,
+                                        fee_energy.f_12_ENRC,
+                                        fee_energy.f_21_ENRC,
+                                        fee_energy.f_22_ENRC]
 
-            if fee_energy_array is None :
+            if fee_energy is None :
                 if self.n_shots < 2 :
                     print "No Gas Detector data object found in shot#%d"%self.n_shots
                 if self.hadGD:
                     print "No Gas Detector data object found in shot#%d" % self.n_shots
                     self.GD_energies.append( [0.0,0.0,0.0,0.0] )
             else :
-                # fee_energy_array is a 4-number vector
-                self.GD_energies.append( fee_energy_array )
+                # fee_energy is a 4-number vector
+                self.GD_energies.append( fee_energy )
 
             
         if self.do_PC:
             # PhaseCavity object (of type bld.BldDataPhaseCavity)
-            if self.psana:
-                pc = evt.get(Bld.BldDataPhaseCavity, "");
-            else:
-                pc = evt.getPhaseCavity()
+            pc = evt.get(xtc.TypeId.Type.Id_PhaseCavity);
             if pc :
                 if self.psana:
                     self.PC_ftime1.append( pc.fitTime1() )
@@ -225,7 +226,7 @@ class  pyana_bld ( object ) :
 
 
         if self.do_ipimb : # BldDataIpimb / SharedIpimb
-            ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb )
+            ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb)
             if ipm :
                 self.IPM_raw_channels.append( [ipm.ipimbData.channel0Volts(),
                                                ipm.ipimbData.channel1Volts(),

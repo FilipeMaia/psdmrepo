@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from pypdsdata import encoder
 from pypdsdata import xtc
-from psddl_python.devicetypes import *
 
 from utilities import PyanaOptions
 from utilities import EncoderData
@@ -79,19 +78,20 @@ class  pyana_encoder ( object ) :
         for source in self.sources :
             self.data[source] = EncoderData( source ) 
 
-            if self.psana:
-                config = env.getConfig(Encoder.Config, source)
-            else:
-                config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
+            config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
 
             message = "%s configuration (%s): \n"%(source, type(config).__name__ )
 
             try: # only for ConfigV2
                 # look for populated channel in the bitmap
-                self.channel[source] = 0 
-                while ( (config._chan_mask & (1<<self.channel[source]))==0 ):
+                self.channel[source] = 0
+                if self.psana: 
+                    chan_mask = config.chan_mask() 
+                else:
+                    chan_mask = config._chan_mask
+                message += "  Channel mask = 0x%x \n"          % chan_mask
+                while ( (chan_mask & (1<<self.channel[source]))==0 ):
                     self.channel[source]+=1
-                message += "  Channel mask = 0x%x \n"          % config._chan_mask
                 message += "  Channel number = %d \n"          % self.channel[source]
             except:
                 pass
@@ -129,10 +129,7 @@ class  pyana_encoder ( object ) :
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 
-            if self.psana:
-                encoder = evt.get(Encoder.Data, source )
-            else:
-                encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
+            encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
             if encoder:
                 if 'DataV1' in type(encoder).__name__:
                     self.values[source].append( encoder.value() )
@@ -158,6 +155,8 @@ class  pyana_encoder ( object ) :
                 self.values[source].append( -1 )
                 self.counts[source].append( -1 )
                 self.timestmps[source].append( -1 )
+                
+            print self.counts[source]
 
         # ----------------- Plotting ---------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :

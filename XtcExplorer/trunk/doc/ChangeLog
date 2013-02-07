@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-Feb-06 salnikov V00-02-00
+	- improved psana compatibility 
+
 2013-Jan-14 salnikov V00-01-40
 	- commented out piece of code which caused picture resizing and
 	  redrawing which looked funny with Tk backend 
