@@ -93,6 +93,25 @@ ndarray<const uint16_t, 2> FrameV1::data() const {
   throw std::runtime_error("FrameV1::data: config object pointer is zero");
 }
 
+FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::PNCCD::FullFrameV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+FullFrameV1::~FullFrameV1()
+{
+}
+
+
+uint32_t FullFrameV1::specialWord() const { return m_xtcObj->specialWord(); }
+
+uint32_t FullFrameV1::frameNumber() const { return m_xtcObj->frameNumber(); }
+
+uint32_t FullFrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
+
+uint32_t FullFrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
+
+ndarray<const uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
 FramesV1::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr)
   : Psana::PNCCD::FramesV1()
   , m_xtcObj(xtcPtr)
@@ -144,24 +163,5 @@ std::vector<int> FramesV1::frame_shape() const
   return shape;
 }
 
-FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::PNCCD::FullFrameV1()
-  , m_xtcObj(xtcPtr)
-{
-}
-FullFrameV1::~FullFrameV1()
-{
-}
-
-
-uint32_t FullFrameV1::specialWord() const { return m_xtcObj->specialWord(); }
-
-uint32_t FullFrameV1::frameNumber() const { return m_xtcObj->frameNumber(); }
-
-uint32_t FullFrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
-
-uint32_t FullFrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
-
-ndarray<const uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
 } // namespace PNCCD
 } // namespace psddl_pds2psana
