@@ -12,6 +12,7 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-02
+2013-02-06 Andy Salnikov
 - added method PyDataType::PyDataType_new() which is a generic implementation
   for tp_new for classes that don't need anything special
 - PyDataType::initType() now has optional third parameter, if set it provides
