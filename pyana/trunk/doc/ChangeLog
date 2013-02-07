@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-57
+2013-02-06 Andy Salnikov
+- added python wrappers for frame classes (princeton.FrameV2,
+  fli.FrameV1, andor.FrameV1)
+
 Tag: V00-00-56
 2012-11-08 Andy Salnikov
 - better check for user-defined damage

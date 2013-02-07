@@ -25,6 +25,8 @@ from pypdsdata import cspad
 from pypdsdata import gsc16ai
 from pypdsdata import pnccd
 from pypdsdata import princeton
+from pypdsdata import fli
+from pypdsdata import andor
 
 _log = logging.getLogger("pyana.event")
 
@@ -276,10 +278,14 @@ class Event(object):
             wrapper = self._wrapPnCcdData
         elif typeId == xtc.TypeId.Type.Id_PrincetonFrame:
             wrapper = self._wrapPrincetonData
+        elif typeId == xtc.TypeId.Type.Id_FliFrame:
+            wrapper = self._wrapFliData
+        elif typeId == xtc.TypeId.Type.Id_AndorFrame:
+            wrapper = self._wrapAndorData
         elif typeId == xtc.TypeId.Type.Id_CspadElement:
             wrapper = self._wrapCsPadQuads
 
-        if wrapper:
+        if wrapper is not None:
             return wrapper(obj, typeId, xtcObj.contains.version(), xtcObj.src)
         else:
             # no need to wrap
@@ -336,7 +342,27 @@ class Event(object):
         cfg = self.m_env.getPrincetonConfig(address=src)
         if not cfg : raise Error("cannot find Princeton config for address %s" % src )
 
-        return princeton.FrameV1( obj, cfg )
+        if typeVersion == 1: return princeton.FrameV1( obj, cfg )
+        if typeVersion == 2: return princeton.FrameV2( obj, cfg )
+        return obj
+
+    def _wrapFliData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Fli data"""
+
+        cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_FliConfig, address=src)
+        if not cfg : raise Error("cannot find Fli config for address %s" % src )
+
+        if typeVersion == 1: return fli.FrameV1( obj, cfg )
+        return obj
+
+    def _wrapAndorData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Andor data"""
+
+        cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_AndorConfig, address=src)
+        if not cfg : raise Error("cannot find Andor config for address %s" % src )
+
+        if typeVersion == 1: return andor.FrameV1( obj, cfg )
+        return obj
 
     def _wrapCsPadQuads(self, obj, typeId, typeVersion, src):
         """ Wrapper method for cspad data"""
