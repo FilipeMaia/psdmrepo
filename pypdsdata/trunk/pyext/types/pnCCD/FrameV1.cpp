@@ -199,11 +199,13 @@ _repr( PyObject *self )
   if(not obj) return 0;
 
   std::ostringstream str;
+  const uint16_t* data = obj->data();
   str << "pnccd.FrameV1(specialWord=" << obj->specialWord()
       << ", frameNumber=" << obj->frameNumber()
       << ", timeStampHi=" << obj->timeStampHi()
       << ", timeStampLo=" << obj->timeStampLo()
-      << ", ...)";
+      << ", data=" << data[0] << " " << data[1] << " " << data[2]
+      << " ...)";
 
   return PyString_FromString( str.str().c_str() );
 }

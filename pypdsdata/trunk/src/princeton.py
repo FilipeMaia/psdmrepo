@@ -54,8 +54,8 @@ class FrameV1(object):
     """
     
     def __init__(self, frame, cfg):
-        """ Constructor takes list of :py:class:`_pdsdata.princeton.FrameV1` and 
-        one `_pdsdata.princeton.ConfigV1` object """
+        """ Constructor takes instances of :py:class:`_pdsdata.princeton.FrameV1` and 
+        princeton.ConfigV*  object """
         self.__frame = frame
         self.__cfg = cfg
     
@@ -72,6 +72,46 @@ class FrameV1(object):
         Returns floating number
         """
         return self.__frame.readoutTime()
+    
+    def data(self):
+        """self.data() -> numpy.ndarray
+
+        Returns 2-dim array of integer numbers
+        """
+        return self.__frame.data(self.__cfg)
+
+class FrameV2(object):
+    """
+    This is a wrapper for :py:class:`_pdsdata.princeton.FrameV2` which removes the need to pass 
+    configuration objects to several methods.
+    """
+    
+    def __init__(self, frame, cfg):
+        """ Constructor takes instances of :py:class:`_pdsdata.princeton.FrameV2` and 
+        princeton.ConfigV* object """
+        self.__frame = frame
+        self.__cfg = cfg
+    
+    def shotIdStart(self):
+        """self.shotIdStart() -> int
+        
+        Returns integer number
+        """
+        return self.__frame.shotIdStart()
+
+    def readoutTime(self):
+        """self.shotIdStart() -> float
+        
+        Returns floating number
+        """
+        return self.__frame.readoutTime()
+    
+    def temperature(self):
+        """self.temperature() -> float
+        
+        Returns floating number
+        """
+        return self.__frame.temperature()
     
     def data(self):
         """self.data() -> numpy.ndarray

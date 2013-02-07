@@ -46,3 +46,43 @@ __version__ = "$Revision$"
 #------------------------
 
 from _pdsdata.fli import *
+
+class FrameV1(object):
+    """
+    This is a wrapper for :py:class:`_pdsdata.fli.FrameV1` which removes the need to pass 
+    configuration objects to several methods.
+    """
+    
+    def __init__(self, frame, cfg):
+        """ Constructor takes instance of :py:class:`_pdsdata.fli.FrameV1` and 
+        one `_pdsdata.fli.ConfigV1` object """
+        self.__frame = frame
+        self.__cfg = cfg
+    
+    def shotIdStart(self):
+        """self.shotIdStart() -> int
+        
+        Returns integer number
+        """
+        return self.__frame.shotIdStart()
+
+    def readoutTime(self):
+        """self.shotIdStart() -> float
+        
+        Returns floating number
+        """
+        return self.__frame.readoutTime()
+    
+    def temperature(self):
+        """self.temperature() -> float
+        
+        Returns floating number
+        """
+        return self.__frame.temperature()
+    
+    def data(self):
+        """self.data() -> numpy.ndarray
+
+        Returns 2-dim array of integer numbers
+        """
+        return self.__frame.data(self.__cfg)

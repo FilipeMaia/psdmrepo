@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-92
+2013-02-06 Andy Salnikov
+- added python wrappers for frame classes (princeton.FrameV2,
+  fli.FrameV1, andor.FrameV1)
+
 Tag: V00-00-91
 2013-02-05 Andy Salnikov
 - upgrading to pdsdata V06-01-04
