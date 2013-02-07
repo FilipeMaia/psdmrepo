@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2013-02-06 Andy Salnikov
+- removed _import_array() from generated code
+
 Tag: V00-05-00
 2013-02-06 Andy Salnikov
 - big changes in python generator, see details in psddl_python

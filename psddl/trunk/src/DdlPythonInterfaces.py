@@ -229,7 +229,6 @@ class DdlPythonInterfaces ( object ) :
 
 
         print >>self.cpp, "void createWrappers(PyObject* module) {"
-        print >>self.cpp, "  _import_array();"
 
         # create sub-module for everything inside
         print >>self.cpp, T('  PyObject* submodule = Py_InitModule3( "psana.$name", 0, "The Python wrapper module for $name types");')[self.pkg]
