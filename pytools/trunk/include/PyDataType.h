@@ -84,12 +84,17 @@ struct PyDataType : PyObject {
 
 protected:
 
-  /// Initialize Python type and register it in a module
-  static void initType( const char* name, PyObject* module );
+  /// Initialize Python type and register it in a module, if modname is not provided
+  /// then module name is used
+  static void initType( const char* name, PyObject* module, const char* modname = 0 );
 
+  /// DEfault implementation of __new__ can be used by subclasses that need it
+  static PyObject* PyDataType_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds);
+  
   // standard Python deallocation function
   static void PyDataType_dealloc( PyObject* self );
 
+  
   // repr() function
   static PyObject* repr( PyObject *self )  {
     std::ostringstream str;
@@ -165,6 +170,13 @@ PyDataType<ConcreteType, CppType>::typeObject()
 }
 
 template <typename ConcreteType, typename CppType>
+PyObject* 
+PyDataType<ConcreteType, CppType>::PyDataType_new(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
+{
+  return subtype->tp_alloc(subtype, 1);
+}
+
+template <typename ConcreteType, typename CppType>
 void
 PyDataType<ConcreteType, CppType>::PyDataType_dealloc( PyObject* self )
 {
@@ -197,15 +209,17 @@ PyDataType<ConcreteType, CppType>::PyObject_FromCpp( const CppType& obj )
 /// Initialize Python type and register it in a module
 template <typename ConcreteType, typename CppType>
 void
-PyDataType<ConcreteType, CppType>::initType(const char* name, PyObject* module)
+PyDataType<ConcreteType, CppType>::initType(const char* name, PyObject* module, const char* modname)
 {
   static std::string typeName;
 
   // perfix type name with module name
-  const char* modname = PyModule_GetName(module);
+  if (not modname) {
+    modname = PyModule_GetName(module);
+  }
   if ( modname ) {
     typeName = modname;
-    typeName += '.';
+    if (not typeName.empty()) typeName += '.';
   }
   typeName += name;
 

@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+- added method PyDataType::PyDataType_new() which is a generic implementation
+  for tp_new for classes that don't need anything special
+- PyDataType::initType() now has optional third parameter, if set it provides
+  module name, if not then module name is taken from the module itself
+- new header make_pyshared.h which defines pyshared_ptr class (just an alias
+  for boost shared_ptr<PyObject>) and make_pyshared() function which creates
+  pyshared_ptr isntances. Do not instantiate pyshared_ptr directly, always use 
+  make_pyshared()!
+
 Tag: V00-00-01
 2013-01-31 Andy Salnikov
 - moved class PyDataType here from psana_python
