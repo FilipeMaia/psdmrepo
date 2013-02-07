@@ -54,60 +54,6 @@ public:
   boost::python::list pvMonitors() const { return detail::ndToList(m_obj->pvMonitors()); }
   boost::python::list pvLabels() const { return detail::ndToList(m_obj->pvLabels()); }
 };
-
-  class PVControl_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVControl);}
-    const char* getTypeName() const { return "Psana::ControlData::PVControl";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::ControlData::PVControl> result = boost::static_pointer_cast<Psana::ControlData::PVControl>(vdata);
-      return result.get() ? object(*result) : object();
-    }
-  };
-
-  class PVMonitor_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVMonitor);}
-    const char* getTypeName() const { return "Psana::ControlData::PVMonitor";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::ControlData::PVMonitor> result = boost::static_pointer_cast<Psana::ControlData::PVMonitor>(vdata);
-      return result.get() ? object(*result) : object();
-    }
-  };
-
-  class PVLabel_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVLabel);}
-    const char* getTypeName() const { return "Psana::ControlData::PVLabel";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::ControlData::PVLabel> result = boost::static_pointer_cast<Psana::ControlData::PVLabel>(vdata);
-      return result.get() ? object(*result) : object();
-    }
-  };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::ConfigV1);}
-    const char* getTypeName() const { return "Psana::ControlData::ConfigV1";}
-    int getVersion() const { return Psana::ControlData::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_ControlConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::ControlData::ConfigV1> result = boost::static_pointer_cast<Psana::ControlData::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::ConfigV2);}
-    const char* getTypeName() const { return "Psana::ControlData::ConfigV2";}
-    int getVersion() const { return Psana::ControlData::ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_ControlConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::ControlData::ConfigV2> result = boost::static_pointer_cast<Psana::ControlData::ConfigV2>(vdata);
-      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
-    }
-  };
 } // namespace ControlData
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_CONTROL_DDL_WRAPPER_H

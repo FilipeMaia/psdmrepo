@@ -13,9 +13,9 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"
 #include <typeinfo>
 #include <boost/shared_ptr.hpp>
-#include <boost/python.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -69,15 +69,6 @@ public:
   virtual int pdsTypeId() const { return -1; }
 
   /**
-   *  @brief Return name of the corresponding C++ type.
-   *
-   *  There should be no assumptions about the names of the classes
-   *  except for the uniqueness. This method is likely to disappear
-   *  in the future when we switch to type-based system
-   */
-  virtual const char* getTypeName() const = 0;
-
-  /**
    *  @brief Get the type version.
    *
    *  This method will disappear at some point, it is only necessary
@@ -90,7 +81,7 @@ public:
    *
    *  @param[in] vdata  Void pointer to C++ data.
    */
-  virtual boost::python::object convert(const boost::shared_ptr<void>& vdata) const = 0;
+  virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const = 0;
 
 };
 

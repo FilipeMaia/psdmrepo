@@ -3,24 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/gsc16ai.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Gsc16ai {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Gsc16ai::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_DataV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Gsc16ai::DataV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Gsc16ai", 0, "The Python wrapper module for Gsc16ai types");
   Py_INCREF(submodule);
@@ -37,18 +34,18 @@ void createWrappers(PyObject* module) {
     .def("autocalibEnable", &psddl_python::Gsc16ai::ConfigV1_Wrapper::autocalibEnable)
     .def("timeTagEnable", &psddl_python::Gsc16ai::ConfigV1_Wrapper::timeTagEnable)
     .def("numChannels", &psddl_python::Gsc16ai::ConfigV1_Wrapper::numChannels)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Gsc16ai::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Gsc16ai::ConfigV1, psddl_python::Gsc16ai::ConfigV1_Wrapper> >(Pds::TypeId::Id_Gsc16aiConfig, 1));
 
   class_<psddl_python::Gsc16ai::DataV1_Wrapper>("DataV1", no_init)
     .def("timestamp", &psddl_python::Gsc16ai::DataV1_Wrapper::timestamp)
     .def("channelValue", &psddl_python::Gsc16ai::DataV1_Wrapper::channelValue)
-    .def("__typeid__", &method_typeid_DataV1)
+    .def("__typeid__", &method_typeid<Psana::Gsc16ai::DataV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Gsc16ai::DataV1, psddl_python::Gsc16ai::DataV1_Wrapper> >(Pds::TypeId::Id_Gsc16aiData, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

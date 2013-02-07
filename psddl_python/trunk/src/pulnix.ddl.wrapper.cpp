@@ -3,24 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/pulnix.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Pulnix {
 
 namespace {
-PyObject* method_typeid_TM6740ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Pulnix::TM6740ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_TM6740ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Pulnix::TM6740ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Pulnix", 0, "The Python wrapper module for Pulnix types");
   Py_INCREF(submodule);
@@ -37,10 +34,10 @@ void createWrappers(PyObject* module) {
     .def("vertical_binning", &psddl_python::Pulnix::TM6740ConfigV1_Wrapper::vertical_binning)
     .def("lookuptable_mode", &psddl_python::Pulnix::TM6740ConfigV1_Wrapper::lookuptable_mode)
     .def("output_resolution_bits", &psddl_python::Pulnix::TM6740ConfigV1_Wrapper::output_resolution_bits)
-    .def("__typeid__", &method_typeid_TM6740ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Pulnix::TM6740ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<TM6740ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Pulnix::TM6740ConfigV1, psddl_python::Pulnix::TM6740ConfigV1_Wrapper> >(Pds::TypeId::Id_TM6740Config, 1));
 
   class_<psddl_python::Pulnix::TM6740ConfigV2_Wrapper>("TM6740ConfigV2", no_init)
     .def("gain_a", &psddl_python::Pulnix::TM6740ConfigV2_Wrapper::gain_a)
@@ -53,10 +50,10 @@ void createWrappers(PyObject* module) {
     .def("vertical_binning", &psddl_python::Pulnix::TM6740ConfigV2_Wrapper::vertical_binning)
     .def("lookuptable_mode", &psddl_python::Pulnix::TM6740ConfigV2_Wrapper::lookuptable_mode)
     .def("output_resolution_bits", &psddl_python::Pulnix::TM6740ConfigV2_Wrapper::output_resolution_bits)
-    .def("__typeid__", &method_typeid_TM6740ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::Pulnix::TM6740ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<TM6740ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Pulnix::TM6740ConfigV2, psddl_python::Pulnix::TM6740ConfigV2_Wrapper> >(Pds::TypeId::Id_TM6740Config, 2));
 
   {
     PyObject* unvlist = PyList_New(2);

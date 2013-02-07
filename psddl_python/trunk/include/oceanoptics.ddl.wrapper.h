@@ -53,40 +53,6 @@ public:
   double durationOfFrame() const { return m_obj->durationOfFrame(); }
   double nonlinerCorrected(uint32_t iPixel) const { return m_obj->nonlinerCorrected(iPixel); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::ConfigV1);}
-    const char* getTypeName() const { return "Psana::OceanOptics::ConfigV1";}
-    int getVersion() const { return Psana::OceanOptics::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_OceanOpticsConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::OceanOptics::ConfigV1> result = boost::static_pointer_cast<Psana::OceanOptics::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class timespec64_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::timespec64);}
-    const char* getTypeName() const { return "Psana::OceanOptics::timespec64";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::OceanOptics::timespec64> result = boost::static_pointer_cast<Psana::OceanOptics::timespec64>(vdata);
-      return result.get() ? object(*result) : object();
-    }
-  };
-
-  class DataV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::DataV1);}
-    const char* getTypeName() const { return "Psana::OceanOptics::DataV1";}
-    int getVersion() const { return Psana::OceanOptics::DataV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_OceanOpticsData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::OceanOptics::DataV1> result = boost::static_pointer_cast<Psana::OceanOptics::DataV1>(vdata);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace OceanOptics
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_OCEANOPTICS_DDL_WRAPPER_H

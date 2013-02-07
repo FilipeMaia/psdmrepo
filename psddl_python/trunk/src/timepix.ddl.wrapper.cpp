@@ -3,42 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/timepix.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Timepix {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Timepix::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Timepix::ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV3() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Timepix::ConfigV3), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DataV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Timepix::DataV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DataV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Timepix::DataV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Timepix", 0, "The Python wrapper module for Timepix types");
   Py_INCREF(submodule);
@@ -104,10 +83,10 @@ void createWrappers(PyObject* module) {
     .def("dac3Ths", &psddl_python::Timepix::ConfigV1_Wrapper::dac3Ths)
     .def("dac3BiasLvds", &psddl_python::Timepix::ConfigV1_Wrapper::dac3BiasLvds)
     .def("dac3RefLvds", &psddl_python::Timepix::ConfigV1_Wrapper::dac3RefLvds)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Timepix::ConfigV1, psddl_python::Timepix::ConfigV1_Wrapper> >(Pds::TypeId::Id_TimepixConfig, 1));
 
   class_<psddl_python::Timepix::ConfigV2_Wrapper>("ConfigV2", no_init)
     .def("readoutSpeed", &psddl_python::Timepix::ConfigV2_Wrapper::readoutSpeed)
@@ -182,10 +161,10 @@ void createWrappers(PyObject* module) {
     .def("chip2ID", &psddl_python::Timepix::ConfigV2_Wrapper::chip2ID)
     .def("chip3ID", &psddl_python::Timepix::ConfigV2_Wrapper::chip3ID)
     .def("chipCount", &psddl_python::Timepix::ConfigV2_Wrapper::chipCount)
-    .def("__typeid__", &method_typeid_ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Timepix::ConfigV2, psddl_python::Timepix::ConfigV2_Wrapper> >(Pds::TypeId::Id_TimepixConfig, 2));
 
   class_<psddl_python::Timepix::ConfigV3_Wrapper>("ConfigV3", no_init)
     .def("readoutSpeed", &psddl_python::Timepix::ConfigV3_Wrapper::readoutSpeed)
@@ -262,10 +241,10 @@ void createWrappers(PyObject* module) {
     .def("chip2ID", &psddl_python::Timepix::ConfigV3_Wrapper::chip2ID)
     .def("chip3ID", &psddl_python::Timepix::ConfigV3_Wrapper::chip3ID)
     .def("chipCount", &psddl_python::Timepix::ConfigV3_Wrapper::chipCount)
-    .def("__typeid__", &method_typeid_ConfigV3)
+    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV3>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV3_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Timepix::ConfigV3, psddl_python::Timepix::ConfigV3_Wrapper> >(Pds::TypeId::Id_TimepixConfig, 3));
 
   class_<psddl_python::Timepix::DataV1_Wrapper>("DataV1", no_init)
     .def("timestamp", &psddl_python::Timepix::DataV1_Wrapper::timestamp)
@@ -276,10 +255,10 @@ void createWrappers(PyObject* module) {
     .def("height", &psddl_python::Timepix::DataV1_Wrapper::height)
     .def("depth", &psddl_python::Timepix::DataV1_Wrapper::depth)
     .def("depth_bytes", &psddl_python::Timepix::DataV1_Wrapper::depth_bytes)
-    .def("__typeid__", &method_typeid_DataV1)
+    .def("__typeid__", &method_typeid<Psana::Timepix::DataV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Timepix::DataV1, psddl_python::Timepix::DataV1_Wrapper> >(Pds::TypeId::Id_TimepixData, 1));
 
   class_<psddl_python::Timepix::DataV2_Wrapper>("DataV2", no_init)
     .def("width", &psddl_python::Timepix::DataV2_Wrapper::width)
@@ -290,10 +269,10 @@ void createWrappers(PyObject* module) {
     .def("data", &psddl_python::Timepix::DataV2_Wrapper::data)
     .def("depth", &psddl_python::Timepix::DataV2_Wrapper::depth)
     .def("depth_bytes", &psddl_python::Timepix::DataV2_Wrapper::depth_bytes)
-    .def("__typeid__", &method_typeid_DataV2)
+    .def("__typeid__", &method_typeid<Psana::Timepix::DataV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Timepix::DataV2, psddl_python::Timepix::DataV2_Wrapper> >(Pds::TypeId::Id_TimepixData, 2));
 
   {
     PyObject* unvlist = PyList_New(2);

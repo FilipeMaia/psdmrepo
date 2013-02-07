@@ -3,42 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/camera.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Camera {
 
 namespace {
-PyObject* method_typeid_FrameCoord() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Camera::FrameCoord), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_FrameFccdConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Camera::FrameFccdConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_FrameFexConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Camera::FrameFexConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_FrameV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Camera::FrameV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_TwoDGaussianV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Camera::TwoDGaussianV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Camera", 0, "The Python wrapper module for Camera types");
   Py_INCREF(submodule);
@@ -47,16 +26,16 @@ void createWrappers(PyObject* module) {
   class_<Psana::Camera::FrameCoord>("FrameCoord", no_init)
     .def("column", &Psana::Camera::FrameCoord::column)
     .def("row", &Psana::Camera::FrameCoord::row)
-    .def("__typeid__", &method_typeid_FrameCoord)
+    .def("__typeid__", &method_typeid<Psana::Camera::FrameCoord>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameCoord_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Camera::FrameCoord> >(-1, -1));
 
   class_<psddl_python::Camera::FrameFccdConfigV1_Wrapper>("FrameFccdConfigV1", no_init)
-    .def("__typeid__", &method_typeid_FrameFccdConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Camera::FrameFccdConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameFccdConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Camera::FrameFccdConfigV1, psddl_python::Camera::FrameFccdConfigV1_Wrapper> >(Pds::TypeId::Id_FrameFccdConfig, 1));
 
   class_<psddl_python::Camera::FrameFexConfigV1_Wrapper>("FrameFexConfigV1", no_init)
     .def("forwarding", &psddl_python::Camera::FrameFexConfigV1_Wrapper::forwarding)
@@ -67,10 +46,10 @@ void createWrappers(PyObject* module) {
     .def("threshold", &psddl_python::Camera::FrameFexConfigV1_Wrapper::threshold)
     .def("number_of_masked_pixels", &psddl_python::Camera::FrameFexConfigV1_Wrapper::number_of_masked_pixels)
     .def("masked_pixel_coordinates", &psddl_python::Camera::FrameFexConfigV1_Wrapper::masked_pixel_coordinates)
-    .def("__typeid__", &method_typeid_FrameFexConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Camera::FrameFexConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameFexConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Camera::FrameFexConfigV1, psddl_python::Camera::FrameFexConfigV1_Wrapper> >(Pds::TypeId::Id_FrameFexConfig, 1));
 
   class_<psddl_python::Camera::FrameV1_Wrapper>("FrameV1", no_init)
     .def("width", &psddl_python::Camera::FrameV1_Wrapper::width)
@@ -80,10 +59,10 @@ void createWrappers(PyObject* module) {
     .def("_int_pixel_data", &psddl_python::Camera::FrameV1_Wrapper::_int_pixel_data)
     .def("data8", &psddl_python::Camera::FrameV1_Wrapper::data8)
     .def("data16", &psddl_python::Camera::FrameV1_Wrapper::data16)
-    .def("__typeid__", &method_typeid_FrameV1)
+    .def("__typeid__", &method_typeid<Psana::Camera::FrameV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Camera::FrameV1, psddl_python::Camera::FrameV1_Wrapper> >(Pds::TypeId::Id_Frame, 1));
 
   class_<psddl_python::Camera::TwoDGaussianV1_Wrapper>("TwoDGaussianV1", no_init)
     .def("integral", &psddl_python::Camera::TwoDGaussianV1_Wrapper::integral)
@@ -92,10 +71,10 @@ void createWrappers(PyObject* module) {
     .def("major_axis_width", &psddl_python::Camera::TwoDGaussianV1_Wrapper::major_axis_width)
     .def("minor_axis_width", &psddl_python::Camera::TwoDGaussianV1_Wrapper::minor_axis_width)
     .def("major_axis_tilt", &psddl_python::Camera::TwoDGaussianV1_Wrapper::major_axis_tilt)
-    .def("__typeid__", &method_typeid_TwoDGaussianV1)
+    .def("__typeid__", &method_typeid<Psana::Camera::TwoDGaussianV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<TwoDGaussianV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Camera::TwoDGaussianV1, psddl_python::Camera::TwoDGaussianV1_Wrapper> >(Pds::TypeId::Id_TwoDGaussian, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

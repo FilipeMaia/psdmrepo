@@ -90,64 +90,6 @@ public:
   boost::python::list frame_shape() const { boost::python::list res; const vector<int>& sh=m_obj->frame_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
   boost::python::list frame_list() { boost::python::list l; const int n = m_obj->frame_shape()[0]; for (int i = 0; i < n; i++) l.append(frame(i)); return l; }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::PNCCD::ConfigV1);}
-    const char* getTypeName() const { return "Psana::PNCCD::ConfigV1";}
-    int getVersion() const { return Psana::PNCCD::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_pnCCDconfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::PNCCD::ConfigV1> result = boost::static_pointer_cast<Psana::PNCCD::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::PNCCD::ConfigV2);}
-    const char* getTypeName() const { return "Psana::PNCCD::ConfigV2";}
-    int getVersion() const { return Psana::PNCCD::ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_pnCCDconfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::PNCCD::ConfigV2> result = boost::static_pointer_cast<Psana::PNCCD::ConfigV2>(vdata);
-      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
-    }
-  };
-
-  class FrameV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::PNCCD::FrameV1);}
-    const char* getTypeName() const { return "Psana::PNCCD::FrameV1";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::PNCCD::FrameV1> result = boost::static_pointer_cast<Psana::PNCCD::FrameV1>(vdata);
-      return result.get() ? object(FrameV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FullFrameV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::PNCCD::FullFrameV1);}
-    const char* getTypeName() const { return "Psana::PNCCD::FullFrameV1";}
-    int getVersion() const { return Psana::PNCCD::FullFrameV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_pnCCDframe; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::PNCCD::FullFrameV1> result = boost::static_pointer_cast<Psana::PNCCD::FullFrameV1>(vdata);
-      return result.get() ? object(FullFrameV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FramesV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::PNCCD::FramesV1);}
-    const char* getTypeName() const { return "Psana::PNCCD::FramesV1";}
-    int getVersion() const { return Psana::PNCCD::FramesV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_pnCCDframe; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::PNCCD::FramesV1> result = boost::static_pointer_cast<Psana::PNCCD::FramesV1>(vdata);
-      return result.get() ? object(FramesV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace PNCCD
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_PNCCD_DDL_WRAPPER_H

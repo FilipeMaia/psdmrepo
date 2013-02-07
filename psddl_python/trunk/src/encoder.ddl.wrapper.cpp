@@ -3,36 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/encoder.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Encoder {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Encoder::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Encoder::ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DataV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Encoder::DataV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DataV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Encoder::DataV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Encoder", 0, "The Python wrapper module for Encoder types");
   Py_INCREF(submodule);
@@ -45,10 +30,10 @@ void createWrappers(PyObject* module) {
     .def("input_num", &psddl_python::Encoder::ConfigV1_Wrapper::input_num)
     .def("input_rising", &psddl_python::Encoder::ConfigV1_Wrapper::input_rising)
     .def("ticks_per_sec", &psddl_python::Encoder::ConfigV1_Wrapper::ticks_per_sec)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Encoder::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Encoder::ConfigV1, psddl_python::Encoder::ConfigV1_Wrapper> >(Pds::TypeId::Id_EncoderConfig, 1));
 
   class_<psddl_python::Encoder::ConfigV2_Wrapper>("ConfigV2", no_init)
     .def("chan_mask", &psddl_python::Encoder::ConfigV2_Wrapper::chan_mask)
@@ -57,28 +42,28 @@ void createWrappers(PyObject* module) {
     .def("input_num", &psddl_python::Encoder::ConfigV2_Wrapper::input_num)
     .def("input_rising", &psddl_python::Encoder::ConfigV2_Wrapper::input_rising)
     .def("ticks_per_sec", &psddl_python::Encoder::ConfigV2_Wrapper::ticks_per_sec)
-    .def("__typeid__", &method_typeid_ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::Encoder::ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Encoder::ConfigV2, psddl_python::Encoder::ConfigV2_Wrapper> >(Pds::TypeId::Id_EncoderConfig, 2));
 
   class_<psddl_python::Encoder::DataV1_Wrapper>("DataV1", no_init)
     .def("timestamp", &psddl_python::Encoder::DataV1_Wrapper::timestamp)
     .def("encoder_count", &psddl_python::Encoder::DataV1_Wrapper::encoder_count)
     .def("value", &psddl_python::Encoder::DataV1_Wrapper::value)
-    .def("__typeid__", &method_typeid_DataV1)
+    .def("__typeid__", &method_typeid<Psana::Encoder::DataV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Encoder::DataV1, psddl_python::Encoder::DataV1_Wrapper> >(Pds::TypeId::Id_EncoderData, 1));
 
   class_<psddl_python::Encoder::DataV2_Wrapper>("DataV2", no_init)
     .def("timestamp", &psddl_python::Encoder::DataV2_Wrapper::timestamp)
     .def("encoder_count", &psddl_python::Encoder::DataV2_Wrapper::encoder_count)
     .def("value", &psddl_python::Encoder::DataV2_Wrapper::value)
-    .def("__typeid__", &method_typeid_DataV2)
+    .def("__typeid__", &method_typeid<Psana::Encoder::DataV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Encoder::DataV2, psddl_python::Encoder::DataV2_Wrapper> >(Pds::TypeId::Id_EncoderData, 2));
 
   {
     PyObject* unvlist = PyList_New(2);

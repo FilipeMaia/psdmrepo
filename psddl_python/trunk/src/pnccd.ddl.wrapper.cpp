@@ -3,42 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/pnccd.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace PNCCD {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::PNCCD::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::PNCCD::ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_FrameV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::PNCCD::FrameV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_FullFrameV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::PNCCD::FullFrameV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_FramesV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::PNCCD::FramesV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.PNCCD", 0, "The Python wrapper module for PNCCD types");
   Py_INCREF(submodule);
@@ -47,10 +26,10 @@ void createWrappers(PyObject* module) {
   class_<psddl_python::PNCCD::ConfigV1_Wrapper>("ConfigV1", no_init)
     .def("numLinks", &psddl_python::PNCCD::ConfigV1_Wrapper::numLinks)
     .def("payloadSizePerLink", &psddl_python::PNCCD::ConfigV1_Wrapper::payloadSizePerLink)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::PNCCD::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::PNCCD::ConfigV1, psddl_python::PNCCD::ConfigV1_Wrapper> >(Pds::TypeId::Id_pnCCDconfig, 1));
 
   class_<psddl_python::PNCCD::ConfigV2_Wrapper>("ConfigV2", no_init)
     .def("numLinks", &psddl_python::PNCCD::ConfigV2_Wrapper::numLinks)
@@ -65,10 +44,10 @@ void createWrappers(PyObject* module) {
     .def("timingFName", &psddl_python::PNCCD::ConfigV2_Wrapper::timingFName)
     .def("info_shape", &psddl_python::PNCCD::ConfigV2_Wrapper::info_shape)
     .def("timingFName_shape", &psddl_python::PNCCD::ConfigV2_Wrapper::timingFName_shape)
-    .def("__typeid__", &method_typeid_ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::PNCCD::ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::PNCCD::ConfigV2, psddl_python::PNCCD::ConfigV2_Wrapper> >(Pds::TypeId::Id_pnCCDconfig, 2));
 
   class_<psddl_python::PNCCD::FrameV1_Wrapper>("FrameV1", no_init)
     .def("specialWord", &psddl_python::PNCCD::FrameV1_Wrapper::specialWord)
@@ -77,10 +56,10 @@ void createWrappers(PyObject* module) {
     .def("timeStampLo", &psddl_python::PNCCD::FrameV1_Wrapper::timeStampLo)
     .def("_data", &psddl_python::PNCCD::FrameV1_Wrapper::_data)
     .def("data", &psddl_python::PNCCD::FrameV1_Wrapper::data)
-    .def("__typeid__", &method_typeid_FrameV1)
+    .def("__typeid__", &method_typeid<Psana::PNCCD::FrameV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::PNCCD::FrameV1, psddl_python::PNCCD::FrameV1_Wrapper> >(-1, -1));
 
   class_<psddl_python::PNCCD::FullFrameV1_Wrapper>("FullFrameV1", no_init)
     .def("specialWord", &psddl_python::PNCCD::FullFrameV1_Wrapper::specialWord)
@@ -88,20 +67,20 @@ void createWrappers(PyObject* module) {
     .def("timeStampHi", &psddl_python::PNCCD::FullFrameV1_Wrapper::timeStampHi)
     .def("timeStampLo", &psddl_python::PNCCD::FullFrameV1_Wrapper::timeStampLo)
     .def("data", &psddl_python::PNCCD::FullFrameV1_Wrapper::data)
-    .def("__typeid__", &method_typeid_FullFrameV1)
+    .def("__typeid__", &method_typeid<Psana::PNCCD::FullFrameV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FullFrameV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::PNCCD::FullFrameV1, psddl_python::PNCCD::FullFrameV1_Wrapper> >(Pds::TypeId::Id_pnCCDframe, 1));
 
   class_<psddl_python::PNCCD::FramesV1_Wrapper>("FramesV1", no_init)
     .def("frame", &psddl_python::PNCCD::FramesV1_Wrapper::frame, return_value_policy<return_by_value, return_internal_reference<> >())
     .def("numLinks", &psddl_python::PNCCD::FramesV1_Wrapper::numLinks)
     .def("frame_shape", &psddl_python::PNCCD::FramesV1_Wrapper::frame_shape)
     .def("frame_list", &psddl_python::PNCCD::FramesV1_Wrapper::frame_list)
-    .def("__typeid__", &method_typeid_FramesV1)
+    .def("__typeid__", &method_typeid<Psana::PNCCD::FramesV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FramesV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::PNCCD::FramesV1, psddl_python::PNCCD::FramesV1_Wrapper> >(Pds::TypeId::Id_pnCCDframe, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

@@ -3,18 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/orca.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Orca {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Orca::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Orca", 0, "The Python wrapper module for Orca types");
   Py_INCREF(submodule);
@@ -25,10 +28,10 @@ void createWrappers(PyObject* module) {
     .def("cooling", &psddl_python::Orca::ConfigV1_Wrapper::cooling)
     .def("defect_pixel_correction_enabled", &psddl_python::Orca::ConfigV1_Wrapper::defect_pixel_correction_enabled)
     .def("rows", &psddl_python::Orca::ConfigV1_Wrapper::rows)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Orca::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Orca::ConfigV1, psddl_python::Orca::ConfigV1_Wrapper> >(Pds::TypeId::Id_OrcaConfig, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

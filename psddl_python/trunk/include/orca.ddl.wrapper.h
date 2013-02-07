@@ -31,18 +31,6 @@ public:
   int8_t defect_pixel_correction_enabled() const { return m_obj->defect_pixel_correction_enabled(); }
   uint32_t rows() const { return m_obj->rows(); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Orca::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Orca::ConfigV1";}
-    int getVersion() const { return Psana::Orca::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_OrcaConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Orca::ConfigV1> result = boost::static_pointer_cast<Psana::Orca::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace Orca
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_ORCA_DDL_WRAPPER_H

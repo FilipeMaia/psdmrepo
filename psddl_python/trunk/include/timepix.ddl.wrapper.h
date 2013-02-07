@@ -280,66 +280,6 @@ public:
   uint32_t depth() const { return m_obj->depth(); }
   uint32_t depth_bytes() const { return m_obj->depth_bytes(); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Timepix::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Timepix::ConfigV1";}
-    int getVersion() const { return Psana::Timepix::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TimepixConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Timepix::ConfigV1> result = boost::static_pointer_cast<Psana::Timepix::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Timepix::ConfigV2);}
-    const char* getTypeName() const { return "Psana::Timepix::ConfigV2";}
-    int getVersion() const { return Psana::Timepix::ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TimepixConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Timepix::ConfigV2> result = boost::static_pointer_cast<Psana::Timepix::ConfigV2>(vdata);
-      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV3_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Timepix::ConfigV3);}
-    const char* getTypeName() const { return "Psana::Timepix::ConfigV3";}
-    int getVersion() const { return Psana::Timepix::ConfigV3::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TimepixConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Timepix::ConfigV3> result = boost::static_pointer_cast<Psana::Timepix::ConfigV3>(vdata);
-      return result.get() ? object(ConfigV3_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Timepix::DataV1);}
-    const char* getTypeName() const { return "Psana::Timepix::DataV1";}
-    int getVersion() const { return Psana::Timepix::DataV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TimepixData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Timepix::DataV1> result = boost::static_pointer_cast<Psana::Timepix::DataV1>(vdata);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Timepix::DataV2);}
-    const char* getTypeName() const { return "Psana::Timepix::DataV2";}
-    int getVersion() const { return Psana::Timepix::DataV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TimepixData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Timepix::DataV2> result = boost::static_pointer_cast<Psana::Timepix::DataV2>(vdata);
-      return result.get() ? object(DataV2_Wrapper(result)) : object();
-    }
-  };
 } // namespace Timepix
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_TIMEPIX_DDL_WRAPPER_H

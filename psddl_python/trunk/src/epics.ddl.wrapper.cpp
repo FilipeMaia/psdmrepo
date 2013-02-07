@@ -3,216 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/epics.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Epics {
 
 namespace {
-PyObject* method_typeid_epicsTimeStamp() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::epicsTimeStamp), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_dbr_time_string() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_string), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_short() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_short), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_float() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_float), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_enum() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_enum), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_char() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_char), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_long() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_long), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_time_double() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_time_double), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_sts_string() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_sts_string), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_short() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_short), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_float() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_float), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_enum() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_enum), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_char() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_char), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_long() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_long), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_dbr_ctrl_double() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::dbr_ctrl_double), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvHeader() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvHeader), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlHeader() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlHeader), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeHeader() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeHeader), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlString() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlString), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlShort() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlShort), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlFloat() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlFloat), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlEnum() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlEnum), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlChar() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlChar), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlLong() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlLong), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvCtrlDouble() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvCtrlDouble), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeString() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeString), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeShort() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeShort), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeFloat() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeFloat), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeEnum() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeEnum), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeChar() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeChar), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeLong() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeLong), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_EpicsPvTimeDouble() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::EpicsPvTimeDouble), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_PvConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::PvConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Epics::ConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Epics", 0, "The Python wrapper module for Epics types");
   Py_INCREF(submodule);
@@ -221,81 +26,81 @@ void createWrappers(PyObject* module) {
   class_<Psana::Epics::epicsTimeStamp>("epicsTimeStamp", no_init)
     .def("sec", &Psana::Epics::epicsTimeStamp::sec)
     .def("nsec", &Psana::Epics::epicsTimeStamp::nsec)
-    .def("__typeid__", &method_typeid_epicsTimeStamp)
+    .def("__typeid__", &method_typeid<Psana::Epics::epicsTimeStamp>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<epicsTimeStamp_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::epicsTimeStamp> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_string>("dbr_time_string", no_init)
     .def("status", &Psana::Epics::dbr_time_string::status)
     .def("severity", &Psana::Epics::dbr_time_string::severity)
     .def("stamp", &Psana::Epics::dbr_time_string::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_string)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_string>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_string_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_string> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_short>("dbr_time_short", no_init)
     .def("status", &Psana::Epics::dbr_time_short::status)
     .def("severity", &Psana::Epics::dbr_time_short::severity)
     .def("stamp", &Psana::Epics::dbr_time_short::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_short)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_short>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_short_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_short> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_float>("dbr_time_float", no_init)
     .def("status", &Psana::Epics::dbr_time_float::status)
     .def("severity", &Psana::Epics::dbr_time_float::severity)
     .def("stamp", &Psana::Epics::dbr_time_float::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_float)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_float>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_float_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_float> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_enum>("dbr_time_enum", no_init)
     .def("status", &Psana::Epics::dbr_time_enum::status)
     .def("severity", &Psana::Epics::dbr_time_enum::severity)
     .def("stamp", &Psana::Epics::dbr_time_enum::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_enum)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_enum>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_enum_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_enum> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_char>("dbr_time_char", no_init)
     .def("status", &Psana::Epics::dbr_time_char::status)
     .def("severity", &Psana::Epics::dbr_time_char::severity)
     .def("stamp", &Psana::Epics::dbr_time_char::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_char)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_char>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_char_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_char> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_long>("dbr_time_long", no_init)
     .def("status", &Psana::Epics::dbr_time_long::status)
     .def("severity", &Psana::Epics::dbr_time_long::severity)
     .def("stamp", &Psana::Epics::dbr_time_long::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_long)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_long>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_long_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_long> >(-1, -1));
 
   class_<Psana::Epics::dbr_time_double>("dbr_time_double", no_init)
     .def("status", &Psana::Epics::dbr_time_double::status)
     .def("severity", &Psana::Epics::dbr_time_double::severity)
     .def("stamp", &Psana::Epics::dbr_time_double::stamp, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_dbr_time_double)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_time_double>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_time_double_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_double> >(-1, -1));
 
   class_<Psana::Epics::dbr_sts_string>("dbr_sts_string", no_init)
     .def("status", &Psana::Epics::dbr_sts_string::status)
     .def("severity", &Psana::Epics::dbr_sts_string::severity)
-    .def("__typeid__", &method_typeid_dbr_sts_string)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_sts_string>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_sts_string_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_sts_string> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_short>("dbr_ctrl_short", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_short::status)
@@ -310,10 +115,10 @@ void createWrappers(PyObject* module) {
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_short::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_short::lower_ctrl_limit)
     .def("units_shape", &Psana::Epics::dbr_ctrl_short::units_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_short)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_short>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_short_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_short> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_float>("dbr_ctrl_float", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_float::status)
@@ -329,10 +134,10 @@ void createWrappers(PyObject* module) {
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_float::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_float::lower_ctrl_limit)
     .def("units_shape", &Psana::Epics::dbr_ctrl_float::units_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_float)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_float>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_float_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_float> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_enum>("dbr_ctrl_enum", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_enum::status)
@@ -340,10 +145,10 @@ void createWrappers(PyObject* module) {
     .def("no_str", &Psana::Epics::dbr_ctrl_enum::no_str)
     .def("strings", &Psana::Epics::dbr_ctrl_enum::strings)
     .def("strings_shape", &Psana::Epics::dbr_ctrl_enum::strings_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_enum)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_enum>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_enum_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_enum> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_char>("dbr_ctrl_char", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_char::status)
@@ -358,10 +163,10 @@ void createWrappers(PyObject* module) {
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_char::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_char::lower_ctrl_limit)
     .def("units_shape", &Psana::Epics::dbr_ctrl_char::units_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_char)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_char>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_char_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_char> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_long>("dbr_ctrl_long", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_long::status)
@@ -376,10 +181,10 @@ void createWrappers(PyObject* module) {
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_long::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_long::lower_ctrl_limit)
     .def("units_shape", &Psana::Epics::dbr_ctrl_long::units_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_long)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_long>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_long_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_long> >(-1, -1));
 
   class_<Psana::Epics::dbr_ctrl_double>("dbr_ctrl_double", no_init)
     .def("status", &Psana::Epics::dbr_ctrl_double::status)
@@ -395,10 +200,10 @@ void createWrappers(PyObject* module) {
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_double::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_double::lower_ctrl_limit)
     .def("units_shape", &Psana::Epics::dbr_ctrl_double::units_shape)
-    .def("__typeid__", &method_typeid_dbr_ctrl_double)
+    .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_double>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<dbr_ctrl_double_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_double> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvHeader_Wrapper>("EpicsPvHeader", no_init)
     .def("pvId", &psddl_python::Epics::EpicsPvHeader_Wrapper::pvId)
@@ -409,25 +214,25 @@ void createWrappers(PyObject* module) {
     .def("isTime", &psddl_python::Epics::EpicsPvHeader_Wrapper::isTime)
     .def("status", &psddl_python::Epics::EpicsPvHeader_Wrapper::status)
     .def("severity", &psddl_python::Epics::EpicsPvHeader_Wrapper::severity)
-    .def("__typeid__", &method_typeid_EpicsPvHeader)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvHeader>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvHeader_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvHeader, psddl_python::Epics::EpicsPvHeader_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlHeader_Wrapper>("EpicsPvCtrlHeader", no_init)
     .def("pvName", &psddl_python::Epics::EpicsPvCtrlHeader_Wrapper::pvName)
     .def("pvName_shape", &psddl_python::Epics::EpicsPvCtrlHeader_Wrapper::pvName_shape)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlHeader)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlHeader>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlHeader_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlHeader, psddl_python::Epics::EpicsPvCtrlHeader_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeHeader_Wrapper>("EpicsPvTimeHeader", no_init)
     .def("stamp", &psddl_python::Epics::EpicsPvTimeHeader_Wrapper::stamp)
-    .def("__typeid__", &method_typeid_EpicsPvTimeHeader)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeHeader>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeHeader_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeHeader, psddl_python::Epics::EpicsPvTimeHeader_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlString_Wrapper>("EpicsPvCtrlString", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlString_Wrapper::dbr, return_value_policy<copy_const_reference>())
@@ -435,64 +240,64 @@ void createWrappers(PyObject* module) {
     .def("value", &psddl_python::Epics::EpicsPvCtrlString_Wrapper::value)
     .def("data_shape", &psddl_python::Epics::EpicsPvCtrlString_Wrapper::data_shape)
     .def("data_list", &psddl_python::Epics::EpicsPvCtrlString_Wrapper::data_list)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlString)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlString>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlString_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlString, psddl_python::Epics::EpicsPvCtrlString_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlShort_Wrapper>("EpicsPvCtrlShort", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlShort_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlShort_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlShort_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlShort)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlShort>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlShort_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlShort, psddl_python::Epics::EpicsPvCtrlShort_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlFloat_Wrapper>("EpicsPvCtrlFloat", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlFloat_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlFloat_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlFloat_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlFloat)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlFloat>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlFloat_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlFloat, psddl_python::Epics::EpicsPvCtrlFloat_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlEnum_Wrapper>("EpicsPvCtrlEnum", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlEnum_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlEnum_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlEnum_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlEnum)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlEnum>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlEnum_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlEnum, psddl_python::Epics::EpicsPvCtrlEnum_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlChar_Wrapper>("EpicsPvCtrlChar", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlChar_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlChar_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlChar_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlChar)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlChar>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlChar_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlChar, psddl_python::Epics::EpicsPvCtrlChar_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlLong_Wrapper>("EpicsPvCtrlLong", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlLong_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlLong_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlLong_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlLong)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlLong>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlLong_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlLong, psddl_python::Epics::EpicsPvCtrlLong_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvCtrlDouble_Wrapper>("EpicsPvCtrlDouble", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvCtrlDouble_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvCtrlDouble_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvCtrlDouble_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvCtrlDouble)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlDouble>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvCtrlDouble_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvCtrlDouble, psddl_python::Epics::EpicsPvCtrlDouble_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeString_Wrapper>("EpicsPvTimeString", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeString_Wrapper::dbr, return_value_policy<copy_const_reference>())
@@ -500,83 +305,83 @@ void createWrappers(PyObject* module) {
     .def("value", &psddl_python::Epics::EpicsPvTimeString_Wrapper::value)
     .def("data_shape", &psddl_python::Epics::EpicsPvTimeString_Wrapper::data_shape)
     .def("data_list", &psddl_python::Epics::EpicsPvTimeString_Wrapper::data_list)
-    .def("__typeid__", &method_typeid_EpicsPvTimeString)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeString>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeString_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeString, psddl_python::Epics::EpicsPvTimeString_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeShort_Wrapper>("EpicsPvTimeShort", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeShort_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeShort_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeShort_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeShort)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeShort>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeShort_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeShort, psddl_python::Epics::EpicsPvTimeShort_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeFloat_Wrapper>("EpicsPvTimeFloat", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeFloat_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeFloat_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeFloat_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeFloat)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeFloat>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeFloat_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeFloat, psddl_python::Epics::EpicsPvTimeFloat_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeEnum_Wrapper>("EpicsPvTimeEnum", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeEnum_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeEnum_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeEnum_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeEnum)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeEnum>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeEnum_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeEnum, psddl_python::Epics::EpicsPvTimeEnum_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeChar_Wrapper>("EpicsPvTimeChar", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeChar_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeChar_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeChar_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeChar)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeChar>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeChar_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeChar, psddl_python::Epics::EpicsPvTimeChar_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeLong_Wrapper>("EpicsPvTimeLong", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeLong_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeLong_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeLong_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeLong)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeLong>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeLong_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeLong, psddl_python::Epics::EpicsPvTimeLong_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::EpicsPvTimeDouble_Wrapper>("EpicsPvTimeDouble", no_init)
     .def("dbr", &psddl_python::Epics::EpicsPvTimeDouble_Wrapper::dbr, return_value_policy<copy_const_reference>())
     .def("data", &psddl_python::Epics::EpicsPvTimeDouble_Wrapper::data)
     .def("value", &psddl_python::Epics::EpicsPvTimeDouble_Wrapper::value)
-    .def("__typeid__", &method_typeid_EpicsPvTimeDouble)
+    .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeDouble>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<EpicsPvTimeDouble_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::EpicsPvTimeDouble, psddl_python::Epics::EpicsPvTimeDouble_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::PvConfigV1_Wrapper>("PvConfigV1", no_init)
     .def("pvId", &psddl_python::Epics::PvConfigV1_Wrapper::pvId)
     .def("description", &psddl_python::Epics::PvConfigV1_Wrapper::description)
     .def("interval", &psddl_python::Epics::PvConfigV1_Wrapper::interval)
-    .def("__typeid__", &method_typeid_PvConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Epics::PvConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<PvConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::PvConfigV1, psddl_python::Epics::PvConfigV1_Wrapper> >(-1, -1));
 
   class_<psddl_python::Epics::ConfigV1_Wrapper>("ConfigV1", no_init)
     .def("numPv", &psddl_python::Epics::ConfigV1_Wrapper::numPv)
     .def("pvControls", &psddl_python::Epics::ConfigV1_Wrapper::pvControls, return_value_policy<return_by_value, return_internal_reference<> >())
     .def("pvControls_shape", &psddl_python::Epics::ConfigV1_Wrapper::pvControls_shape)
     .def("pvControls_list", &psddl_python::Epics::ConfigV1_Wrapper::pvControls_list)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Epics::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Epics::ConfigV1, psddl_python::Epics::ConfigV1_Wrapper> >(Pds::TypeId::Id_EpicsConfig, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

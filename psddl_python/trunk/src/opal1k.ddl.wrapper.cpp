@@ -3,18 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/opal1k.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Opal1k {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Opal1k::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Opal1k", 0, "The Python wrapper module for Opal1k types");
   Py_INCREF(submodule);
@@ -34,10 +37,10 @@ void createWrappers(PyObject* module) {
     .def("defect_pixel_coordinates", &psddl_python::Opal1k::ConfigV1_Wrapper::defect_pixel_coordinates)
     .def("output_offset", &psddl_python::Opal1k::ConfigV1_Wrapper::output_offset)
     .def("output_resolution_bits", &psddl_python::Opal1k::ConfigV1_Wrapper::output_resolution_bits)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Opal1k::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Opal1k::ConfigV1, psddl_python::Opal1k::ConfigV1_Wrapper> >(Pds::TypeId::Id_Opal1kConfig, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

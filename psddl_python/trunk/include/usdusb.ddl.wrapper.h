@@ -41,30 +41,6 @@ public:
   PyObject* analog_in() const { return detail::ndToNumpy(m_obj->analog_in(), m_obj); }
   PyObject* encoder_count() const { return detail::ndToNumpy(m_obj->encoder_count(), m_obj); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::UsdUsb::ConfigV1);}
-    const char* getTypeName() const { return "Psana::UsdUsb::ConfigV1";}
-    int getVersion() const { return Psana::UsdUsb::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_UsdUsbConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::UsdUsb::ConfigV1> result = boost::static_pointer_cast<Psana::UsdUsb::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::UsdUsb::DataV1);}
-    const char* getTypeName() const { return "Psana::UsdUsb::DataV1";}
-    int getVersion() const { return Psana::UsdUsb::DataV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_UsdUsbData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::UsdUsb::DataV1> result = boost::static_pointer_cast<Psana::UsdUsb::DataV1>(vdata);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace UsdUsb
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_USDUSB_DDL_WRAPPER_H

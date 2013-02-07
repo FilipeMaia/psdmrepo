@@ -69,54 +69,6 @@ public:
   PyObject* encoder_count() const { return detail::ndToNumpy(m_obj->encoder_count(), m_obj); }
   int32_t value(uint32_t i) const { return m_obj->value(i); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Encoder::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Encoder::ConfigV1";}
-    int getVersion() const { return Psana::Encoder::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_EncoderConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Encoder::ConfigV1> result = boost::static_pointer_cast<Psana::Encoder::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Encoder::ConfigV2);}
-    const char* getTypeName() const { return "Psana::Encoder::ConfigV2";}
-    int getVersion() const { return Psana::Encoder::ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_EncoderConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Encoder::ConfigV2> result = boost::static_pointer_cast<Psana::Encoder::ConfigV2>(vdata);
-      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Encoder::DataV1);}
-    const char* getTypeName() const { return "Psana::Encoder::DataV1";}
-    int getVersion() const { return Psana::Encoder::DataV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_EncoderData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Encoder::DataV1> result = boost::static_pointer_cast<Psana::Encoder::DataV1>(vdata);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Encoder::DataV2);}
-    const char* getTypeName() const { return "Psana::Encoder::DataV2";}
-    int getVersion() const { return Psana::Encoder::DataV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_EncoderData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Encoder::DataV2> result = boost::static_pointer_cast<Psana::Encoder::DataV2>(vdata);
-      return result.get() ? object(DataV2_Wrapper(result)) : object();
-    }
-  };
 } // namespace Encoder
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_ENCODER_DDL_WRAPPER_H

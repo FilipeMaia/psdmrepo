@@ -3,42 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/control.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace ControlData {
 
 namespace {
-PyObject* method_typeid_PVControl() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::ControlData::PVControl), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_PVMonitor() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::ControlData::PVMonitor), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_PVLabel() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::ControlData::PVLabel), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::ControlData::ConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::ControlData::ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.ControlData", 0, "The Python wrapper module for ControlData types");
   Py_INCREF(submodule);
@@ -49,10 +28,10 @@ void createWrappers(PyObject* module) {
     .def("index", &Psana::ControlData::PVControl::index)
     .def("value", &Psana::ControlData::PVControl::value)
     .def("array", &Psana::ControlData::PVControl::array)
-    .def("__typeid__", &method_typeid_PVControl)
+    .def("__typeid__", &method_typeid<Psana::ControlData::PVControl>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<PVControl_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVControl> >(-1, -1));
 
   class_<Psana::ControlData::PVMonitor>("PVMonitor", no_init)
     .def("name", &Psana::ControlData::PVMonitor::name)
@@ -60,18 +39,18 @@ void createWrappers(PyObject* module) {
     .def("loValue", &Psana::ControlData::PVMonitor::loValue)
     .def("hiValue", &Psana::ControlData::PVMonitor::hiValue)
     .def("array", &Psana::ControlData::PVMonitor::array)
-    .def("__typeid__", &method_typeid_PVMonitor)
+    .def("__typeid__", &method_typeid<Psana::ControlData::PVMonitor>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<PVMonitor_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVMonitor> >(-1, -1));
 
   class_<Psana::ControlData::PVLabel>("PVLabel", no_init)
     .def("name", &Psana::ControlData::PVLabel::name)
     .def("value", &Psana::ControlData::PVLabel::value)
-    .def("__typeid__", &method_typeid_PVLabel)
+    .def("__typeid__", &method_typeid<Psana::ControlData::PVLabel>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<PVLabel_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVLabel> >(-1, -1));
 
   class_<psddl_python::ControlData::ConfigV1_Wrapper>("ConfigV1", no_init)
     .def("events", &psddl_python::ControlData::ConfigV1_Wrapper::events)
@@ -82,10 +61,10 @@ void createWrappers(PyObject* module) {
     .def("npvMonitors", &psddl_python::ControlData::ConfigV1_Wrapper::npvMonitors)
     .def("pvControls", &psddl_python::ControlData::ConfigV1_Wrapper::pvControls)
     .def("pvMonitors", &psddl_python::ControlData::ConfigV1_Wrapper::pvMonitors)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::ControlData::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::ControlData::ConfigV1, psddl_python::ControlData::ConfigV1_Wrapper> >(Pds::TypeId::Id_ControlConfig, 1));
 
   class_<psddl_python::ControlData::ConfigV2_Wrapper>("ConfigV2", no_init)
     .def("events", &psddl_python::ControlData::ConfigV2_Wrapper::events)
@@ -98,10 +77,10 @@ void createWrappers(PyObject* module) {
     .def("pvControls", &psddl_python::ControlData::ConfigV2_Wrapper::pvControls)
     .def("pvMonitors", &psddl_python::ControlData::ConfigV2_Wrapper::pvMonitors)
     .def("pvLabels", &psddl_python::ControlData::ConfigV2_Wrapper::pvLabels)
-    .def("__typeid__", &method_typeid_ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::ControlData::ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::ControlData::ConfigV2, psddl_python::ControlData::ConfigV2_Wrapper> >(Pds::TypeId::Id_ControlConfig, 2));
 
   {
     PyObject* unvlist = PyList_New(2);

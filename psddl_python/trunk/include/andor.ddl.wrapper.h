@@ -59,30 +59,6 @@ public:
   float temperature() const { return m_obj->temperature(); }
   PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Andor::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Andor::ConfigV1";}
-    int getVersion() const { return Psana::Andor::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_AndorConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Andor::ConfigV1> result = boost::static_pointer_cast<Psana::Andor::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FrameV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Andor::FrameV1);}
-    const char* getTypeName() const { return "Psana::Andor::FrameV1";}
-    int getVersion() const { return Psana::Andor::FrameV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_AndorFrame; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Andor::FrameV1> result = boost::static_pointer_cast<Psana::Andor::FrameV1>(vdata);
-      return result.get() ? object(FrameV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace Andor
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_ANDOR_DDL_WRAPPER_H

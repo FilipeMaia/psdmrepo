@@ -11,6 +11,13 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2013-02-07 Andy Salnikov
+- converters' convert() method now return PyObject instead of boost object
+- getTypeName() method is not needed in converters, removed
+- replace generated converter classes with couple of template classes
+- __typeid__ method implementation is also made template
+
 Tag: V00-04-00
 2013-02-06 Andy Salnikov
 - lots of changes everywhere:

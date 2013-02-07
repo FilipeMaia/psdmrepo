@@ -3,30 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/oceanoptics.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace OceanOptics {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::OceanOptics::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_timespec64() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::OceanOptics::timespec64), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DataV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::OceanOptics::DataV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.OceanOptics", 0, "The Python wrapper module for OceanOptics types");
   Py_INCREF(submodule);
@@ -37,18 +28,18 @@ void createWrappers(PyObject* module) {
     .def("waveLenCalib", &psddl_python::OceanOptics::ConfigV1_Wrapper::waveLenCalib)
     .def("nonlinCorrect", &psddl_python::OceanOptics::ConfigV1_Wrapper::nonlinCorrect)
     .def("strayLightConstant", &psddl_python::OceanOptics::ConfigV1_Wrapper::strayLightConstant)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::OceanOptics::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::OceanOptics::ConfigV1, psddl_python::OceanOptics::ConfigV1_Wrapper> >(Pds::TypeId::Id_OceanOpticsConfig, 1));
 
   class_<Psana::OceanOptics::timespec64>("timespec64", no_init)
     .def("tv_sec", &Psana::OceanOptics::timespec64::tv_sec)
     .def("tv_nsec", &Psana::OceanOptics::timespec64::tv_nsec)
-    .def("__typeid__", &method_typeid_timespec64)
+    .def("__typeid__", &method_typeid<Psana::OceanOptics::timespec64>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<timespec64_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::OceanOptics::timespec64> >(-1, -1));
 
   class_<psddl_python::OceanOptics::DataV1_Wrapper>("DataV1", no_init)
     .def("data", &psddl_python::OceanOptics::DataV1_Wrapper::data)
@@ -64,10 +55,10 @@ void createWrappers(PyObject* module) {
     .def("numSpectraUnused", &psddl_python::OceanOptics::DataV1_Wrapper::numSpectraUnused)
     .def("durationOfFrame", &psddl_python::OceanOptics::DataV1_Wrapper::durationOfFrame)
     .def("nonlinerCorrected", &psddl_python::OceanOptics::DataV1_Wrapper::nonlinerCorrected)
-    .def("__typeid__", &method_typeid_DataV1)
+    .def("__typeid__", &method_typeid<Psana::OceanOptics::DataV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::OceanOptics::DataV1, psddl_python::OceanOptics::DataV1_Wrapper> >(Pds::TypeId::Id_OceanOpticsData, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

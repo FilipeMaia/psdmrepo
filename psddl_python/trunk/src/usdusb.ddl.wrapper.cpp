@@ -3,24 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/usdusb.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace UsdUsb {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::UsdUsb::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_DataV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::UsdUsb::DataV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.UsdUsb", 0, "The Python wrapper module for UsdUsb types");
   Py_INCREF(submodule);
@@ -29,20 +26,20 @@ void createWrappers(PyObject* module) {
   class_<psddl_python::UsdUsb::ConfigV1_Wrapper>("ConfigV1", no_init)
     .def("counting_mode", &psddl_python::UsdUsb::ConfigV1_Wrapper::counting_mode)
     .def("quadrature_mode", &psddl_python::UsdUsb::ConfigV1_Wrapper::quadrature_mode)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::UsdUsb::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::UsdUsb::ConfigV1, psddl_python::UsdUsb::ConfigV1_Wrapper> >(Pds::TypeId::Id_UsdUsbConfig, 1));
 
   class_<psddl_python::UsdUsb::DataV1_Wrapper>("DataV1", no_init)
     .def("digital_in", &psddl_python::UsdUsb::DataV1_Wrapper::digital_in)
     .def("timestamp", &psddl_python::UsdUsb::DataV1_Wrapper::timestamp)
     .def("analog_in", &psddl_python::UsdUsb::DataV1_Wrapper::analog_in)
     .def("encoder_count", &psddl_python::UsdUsb::DataV1_Wrapper::encoder_count)
-    .def("__typeid__", &method_typeid_DataV1)
+    .def("__typeid__", &method_typeid<Psana::UsdUsb::DataV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DataV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::UsdUsb::DataV1, psddl_python::UsdUsb::DataV1_Wrapper> >(Pds::TypeId::Id_UsdUsbData, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

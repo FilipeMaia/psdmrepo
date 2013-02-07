@@ -3,24 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/fli.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Fli {
 
 namespace {
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Fli::ConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_FrameV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Fli::FrameV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Fli", 0, "The Python wrapper module for Fli types");
   Py_INCREF(submodule);
@@ -43,20 +40,20 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &psddl_python::Fli::ConfigV1_Wrapper::numPixelsX)
     .def("numPixelsY", &psddl_python::Fli::ConfigV1_Wrapper::numPixelsY)
     .def("numPixels", &psddl_python::Fli::ConfigV1_Wrapper::numPixels)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Fli::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Fli::ConfigV1, psddl_python::Fli::ConfigV1_Wrapper> >(Pds::TypeId::Id_FliConfig, 1));
 
   class_<psddl_python::Fli::FrameV1_Wrapper>("FrameV1", no_init)
     .def("shotIdStart", &psddl_python::Fli::FrameV1_Wrapper::shotIdStart)
     .def("readoutTime", &psddl_python::Fli::FrameV1_Wrapper::readoutTime)
     .def("temperature", &psddl_python::Fli::FrameV1_Wrapper::temperature)
     .def("data", &psddl_python::Fli::FrameV1_Wrapper::data)
-    .def("__typeid__", &method_typeid_FrameV1)
+    .def("__typeid__", &method_typeid<Psana::Fli::FrameV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<FrameV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Fli::FrameV1, psddl_python::Fli::FrameV1_Wrapper> >(Pds::TypeId::Id_FliFrame, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

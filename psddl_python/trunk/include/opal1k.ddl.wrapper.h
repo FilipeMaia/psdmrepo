@@ -42,18 +42,6 @@ public:
   uint16_t output_offset() const { return m_obj->output_offset(); }
   uint32_t output_resolution_bits() const { return m_obj->output_resolution_bits(); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Opal1k::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Opal1k::ConfigV1";}
-    int getVersion() const { return Psana::Opal1k::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_Opal1kConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Opal1k::ConfigV1> result = boost::static_pointer_cast<Psana::Opal1k::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace Opal1k
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_OPAL1K_DDL_WRAPPER_H

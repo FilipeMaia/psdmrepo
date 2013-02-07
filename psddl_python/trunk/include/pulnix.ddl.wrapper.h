@@ -55,30 +55,6 @@ public:
   Psana::Pulnix::TM6740ConfigV2::LookupTable lookuptable_mode() const { return m_obj->lookuptable_mode(); }
   uint8_t output_resolution_bits() const { return m_obj->output_resolution_bits(); }
 };
-
-  class TM6740ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Pulnix::TM6740ConfigV1);}
-    const char* getTypeName() const { return "Psana::Pulnix::TM6740ConfigV1";}
-    int getVersion() const { return Psana::Pulnix::TM6740ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TM6740Config; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Pulnix::TM6740ConfigV1> result = boost::static_pointer_cast<Psana::Pulnix::TM6740ConfigV1>(vdata);
-      return result.get() ? object(TM6740ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class TM6740ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Pulnix::TM6740ConfigV2);}
-    const char* getTypeName() const { return "Psana::Pulnix::TM6740ConfigV2";}
-    int getVersion() const { return Psana::Pulnix::TM6740ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TM6740Config; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Pulnix::TM6740ConfigV2> result = boost::static_pointer_cast<Psana::Pulnix::TM6740ConfigV2>(vdata);
-      return result.get() ? object(TM6740ConfigV2_Wrapper(result)) : object();
-    }
-  };
 } // namespace Pulnix
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_PULNIX_DDL_WRAPPER_H

@@ -72,64 +72,6 @@ public:
   double minor_axis_width() const { return m_obj->minor_axis_width(); }
   double major_axis_tilt() const { return m_obj->major_axis_tilt(); }
 };
-
-  class FrameCoord_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameCoord);}
-    const char* getTypeName() const { return "Psana::Camera::FrameCoord";}
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Camera::FrameCoord> result = boost::static_pointer_cast<Psana::Camera::FrameCoord>(vdata);
-      return result.get() ? object(*result) : object();
-    }
-  };
-
-  class FrameFccdConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameFccdConfigV1);}
-    const char* getTypeName() const { return "Psana::Camera::FrameFccdConfigV1";}
-    int getVersion() const { return Psana::Camera::FrameFccdConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_FrameFccdConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Camera::FrameFccdConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFccdConfigV1>(vdata);
-      return result.get() ? object(FrameFccdConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FrameFexConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameFexConfigV1);}
-    const char* getTypeName() const { return "Psana::Camera::FrameFexConfigV1";}
-    int getVersion() const { return Psana::Camera::FrameFexConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_FrameFexConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Camera::FrameFexConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFexConfigV1>(vdata);
-      return result.get() ? object(FrameFexConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FrameV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameV1);}
-    const char* getTypeName() const { return "Psana::Camera::FrameV1";}
-    int getVersion() const { return Psana::Camera::FrameV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_Frame; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Camera::FrameV1> result = boost::static_pointer_cast<Psana::Camera::FrameV1>(vdata);
-      return result.get() ? object(FrameV1_Wrapper(result)) : object();
-    }
-  };
-
-  class TwoDGaussianV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::TwoDGaussianV1);}
-    const char* getTypeName() const { return "Psana::Camera::TwoDGaussianV1";}
-    int getVersion() const { return Psana::Camera::TwoDGaussianV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_TwoDGaussian; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Camera::TwoDGaussianV1> result = boost::static_pointer_cast<Psana::Camera::TwoDGaussianV1>(vdata);
-      return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace Camera
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_CAMERA_DDL_WRAPPER_H

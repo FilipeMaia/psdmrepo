@@ -3,54 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/lusi.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace Lusi {
 
 namespace {
-PyObject* method_typeid_DiodeFexConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::DiodeFexConfigV1), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_DiodeFexConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::DiodeFexConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_DiodeFexV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::DiodeFexV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_IpmFexConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::IpmFexConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_IpmFexConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::IpmFexConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_IpmFexV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::IpmFexV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_PimImageConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::Lusi::PimImageConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.Lusi", 0, "The Python wrapper module for Lusi types");
   Py_INCREF(submodule);
@@ -59,61 +26,61 @@ void createWrappers(PyObject* module) {
   class_<Psana::Lusi::DiodeFexConfigV1>("DiodeFexConfigV1", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV1::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV1::scale)
-    .def("__typeid__", &method_typeid_DiodeFexConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DiodeFexConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV1> >(Pds::TypeId::Id_DiodeFexConfig, 1));
 
   class_<Psana::Lusi::DiodeFexConfigV2>("DiodeFexConfigV2", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV2::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV2::scale)
-    .def("__typeid__", &method_typeid_DiodeFexConfigV2)
+    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DiodeFexConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV2> >(Pds::TypeId::Id_DiodeFexConfig, 2));
 
   class_<Psana::Lusi::DiodeFexV1>("DiodeFexV1", no_init)
     .def("value", &Psana::Lusi::DiodeFexV1::value)
-    .def("__typeid__", &method_typeid_DiodeFexV1)
+    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<DiodeFexV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexV1> >(Pds::TypeId::Id_DiodeFex, 1));
 
   class_<psddl_python::Lusi::IpmFexConfigV1_Wrapper>("IpmFexConfigV1", no_init)
     .def("diode", &psddl_python::Lusi::IpmFexConfigV1_Wrapper::diode)
     .def("xscale", &psddl_python::Lusi::IpmFexConfigV1_Wrapper::xscale)
     .def("yscale", &psddl_python::Lusi::IpmFexConfigV1_Wrapper::yscale)
-    .def("__typeid__", &method_typeid_IpmFexConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<IpmFexConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Lusi::IpmFexConfigV1, psddl_python::Lusi::IpmFexConfigV1_Wrapper> >(Pds::TypeId::Id_IpmFexConfig, 1));
 
   class_<psddl_python::Lusi::IpmFexConfigV2_Wrapper>("IpmFexConfigV2", no_init)
     .def("diode", &psddl_python::Lusi::IpmFexConfigV2_Wrapper::diode)
     .def("xscale", &psddl_python::Lusi::IpmFexConfigV2_Wrapper::xscale)
     .def("yscale", &psddl_python::Lusi::IpmFexConfigV2_Wrapper::yscale)
-    .def("__typeid__", &method_typeid_IpmFexConfigV2)
+    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<IpmFexConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::Lusi::IpmFexConfigV2, psddl_python::Lusi::IpmFexConfigV2_Wrapper> >(Pds::TypeId::Id_IpmFexConfig, 2));
 
   class_<Psana::Lusi::IpmFexV1>("IpmFexV1", no_init)
     .def("channel", &Psana::Lusi::IpmFexV1::channel)
     .def("sum", &Psana::Lusi::IpmFexV1::sum)
     .def("xpos", &Psana::Lusi::IpmFexV1::xpos)
     .def("ypos", &Psana::Lusi::IpmFexV1::ypos)
-    .def("__typeid__", &method_typeid_IpmFexV1)
+    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<IpmFexV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::IpmFexV1> >(Pds::TypeId::Id_IpmFex, 1));
 
   class_<Psana::Lusi::PimImageConfigV1>("PimImageConfigV1", no_init)
     .def("xscale", &Psana::Lusi::PimImageConfigV1::xscale)
     .def("yscale", &Psana::Lusi::PimImageConfigV1::yscale)
-    .def("__typeid__", &method_typeid_PimImageConfigV1)
+    .def("__typeid__", &method_typeid<Psana::Lusi::PimImageConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<PimImageConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::PimImageConfigV1> >(Pds::TypeId::Id_PimImageConfig, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

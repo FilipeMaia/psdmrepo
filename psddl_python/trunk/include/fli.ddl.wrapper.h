@@ -56,30 +56,6 @@ public:
   float temperature() const { return m_obj->temperature(); }
   PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Fli::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Fli::ConfigV1";}
-    int getVersion() const { return Psana::Fli::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_FliConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Fli::ConfigV1> result = boost::static_pointer_cast<Psana::Fli::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class FrameV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Fli::FrameV1);}
-    const char* getTypeName() const { return "Psana::Fli::FrameV1";}
-    int getVersion() const { return Psana::Fli::FrameV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_FliFrame; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Fli::FrameV1> result = boost::static_pointer_cast<Psana::Fli::FrameV1>(vdata);
-      return result.get() ? object(FrameV1_Wrapper(result)) : object();
-    }
-  };
 } // namespace Fli
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_FLI_DDL_WRAPPER_H

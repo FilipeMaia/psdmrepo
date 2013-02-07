@@ -115,54 +115,6 @@ public:
   float channel3psVolts() const { return m_obj->channel3psVolts(); }
   uint64_t triggerCounter() const { return m_obj->triggerCounter(); }
 };
-
-  class ConfigV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Ipimb::ConfigV1);}
-    const char* getTypeName() const { return "Psana::Ipimb::ConfigV1";}
-    int getVersion() const { return Psana::Ipimb::ConfigV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_IpimbConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Ipimb::ConfigV1> result = boost::static_pointer_cast<Psana::Ipimb::ConfigV1>(vdata);
-      return result.get() ? object(ConfigV1_Wrapper(result)) : object();
-    }
-  };
-
-  class ConfigV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Ipimb::ConfigV2);}
-    const char* getTypeName() const { return "Psana::Ipimb::ConfigV2";}
-    int getVersion() const { return Psana::Ipimb::ConfigV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_IpimbConfig; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Ipimb::ConfigV2> result = boost::static_pointer_cast<Psana::Ipimb::ConfigV2>(vdata);
-      return result.get() ? object(ConfigV2_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV1_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Ipimb::DataV1);}
-    const char* getTypeName() const { return "Psana::Ipimb::DataV1";}
-    int getVersion() const { return Psana::Ipimb::DataV1::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_IpimbData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Ipimb::DataV1> result = boost::static_pointer_cast<Psana::Ipimb::DataV1>(vdata);
-      return result.get() ? object(DataV1_Wrapper(result)) : object();
-    }
-  };
-
-  class DataV2_Converter : public psddl_python::Converter {
-  public:
-    const std::type_info* typeinfo() const { return &typeid(Psana::Ipimb::DataV2);}
-    const char* getTypeName() const { return "Psana::Ipimb::DataV2";}
-    int getVersion() const { return Psana::Ipimb::DataV2::Version; }
-    int pdsTypeId() const { return Pds::TypeId::Id_IpimbData; }
-    object convert(const boost::shared_ptr<void>& vdata) const {
-      shared_ptr<Psana::Ipimb::DataV2> result = boost::static_pointer_cast<Psana::Ipimb::DataV2>(vdata);
-      return result.get() ? object(DataV2_Wrapper(result)) : object();
-    }
-  };
 } // namespace Ipimb
 } // namespace psddl_python
 #endif // PSDDL_PYTHON_IPIMB_DDL_WRAPPER_H

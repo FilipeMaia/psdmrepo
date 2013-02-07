@@ -3,66 +3,21 @@
 #include <boost/make_shared.hpp>
 #include "psddl_python/cspad2x2.ddl.wrapper.h" // inc_python
 #include "psddl_python/ConverterMap.h"
+#include "psddl_python/ConverterBoostDef.h"
+#include "psddl_python/ConverterBoostDefWrap.h"
 
 namespace psddl_python {
 namespace CsPad2x2 {
 
 namespace {
-PyObject* method_typeid_CsPad2x2DigitalPotsCfg() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg), 0);
+template <typename T>
+PyObject* method_typeid() {
+  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
   Py_INCREF(ptypeid);
   return ptypeid;
 }
-
-PyObject* method_typeid_CsPad2x2ReadOnlyCfg() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ProtectionSystemThreshold() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ProtectionSystemThreshold), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_CsPad2x2GainMapCfg() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV1QuadReg() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ConfigV1QuadReg), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ConfigV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV2QuadReg() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ConfigV2QuadReg), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ConfigV2() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ConfigV2), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
-PyObject* method_typeid_ElementV1() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(Psana::CsPad2x2::ElementV1), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
-
 } // namespace
+
 void createWrappers(PyObject* module) {
   PyObject* submodule = Py_InitModule3( "psana.CsPad2x2", 0, "The Python wrapper module for CsPad2x2 types");
   Py_INCREF(submodule);
@@ -70,33 +25,33 @@ void createWrappers(PyObject* module) {
   scope mod = object(handle<>(borrowed(submodule)));
   class_<psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper>("CsPad2x2DigitalPotsCfg", no_init)
     .def("pots", &psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper::pots)
-    .def("__typeid__", &method_typeid_CsPad2x2DigitalPotsCfg)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<CsPad2x2DigitalPotsCfg_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg, psddl_python::CsPad2x2::CsPad2x2DigitalPotsCfg_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper>("CsPad2x2ReadOnlyCfg", no_init)
     .def("shiftTest", &psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper::shiftTest)
     .def("version", &psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper::version)
-    .def("__typeid__", &method_typeid_CsPad2x2ReadOnlyCfg)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<CsPad2x2ReadOnlyCfg_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg, psddl_python::CsPad2x2::CsPad2x2ReadOnlyCfg_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper>("ProtectionSystemThreshold", no_init)
     .def("adcThreshold", &psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper::adcThreshold)
     .def("pixelCountThreshold", &psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper::pixelCountThreshold)
-    .def("__typeid__", &method_typeid_ProtectionSystemThreshold)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ProtectionSystemThreshold>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ProtectionSystemThreshold_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ProtectionSystemThreshold, psddl_python::CsPad2x2::ProtectionSystemThreshold_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper>("CsPad2x2GainMapCfg", no_init)
     .def("gainMap", &psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper::gainMap)
-    .def("__typeid__", &method_typeid_CsPad2x2GainMapCfg)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::CsPad2x2GainMapCfg>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<CsPad2x2GainMapCfg_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::CsPad2x2GainMapCfg, psddl_python::CsPad2x2::CsPad2x2GainMapCfg_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper>("ConfigV1QuadReg", no_init)
     .def("shiftSelect", &psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper::shiftSelect)
@@ -123,10 +78,10 @@ void createWrappers(PyObject* module) {
     .def("ro", &psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper::ro, return_value_policy<copy_const_reference>())
     .def("dp", &psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper::dp, return_value_policy<copy_const_reference>())
     .def("gm", &psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper::gm, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_ConfigV1QuadReg)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ConfigV1QuadReg>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1QuadReg_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ConfigV1QuadReg, psddl_python::CsPad2x2::ConfigV1QuadReg_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::ConfigV1_Wrapper>("ConfigV1", no_init)
     .def("concentratorVersion", &psddl_python::CsPad2x2::ConfigV1_Wrapper::concentratorVersion)
@@ -142,10 +97,10 @@ void createWrappers(PyObject* module) {
     .def("quad", &psddl_python::CsPad2x2::ConfigV1_Wrapper::quad, return_value_policy<copy_const_reference>())
     .def("numAsicsRead", &psddl_python::CsPad2x2::ConfigV1_Wrapper::numAsicsRead)
     .def("numAsicsStored", &psddl_python::CsPad2x2::ConfigV1_Wrapper::numAsicsStored)
-    .def("__typeid__", &method_typeid_ConfigV1)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ConfigV1, psddl_python::CsPad2x2::ConfigV1_Wrapper> >(Pds::TypeId::Id_Cspad2x2Config, 1));
 
   class_<psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper>("ConfigV2QuadReg", no_init)
     .def("shiftSelect", &psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper::shiftSelect)
@@ -174,10 +129,10 @@ void createWrappers(PyObject* module) {
     .def("ro", &psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper::ro, return_value_policy<copy_const_reference>())
     .def("dp", &psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper::dp, return_value_policy<copy_const_reference>())
     .def("gm", &psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper::gm, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid_ConfigV2QuadReg)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ConfigV2QuadReg>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2QuadReg_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ConfigV2QuadReg, psddl_python::CsPad2x2::ConfigV2QuadReg_Wrapper> >(-1, -1));
 
   class_<psddl_python::CsPad2x2::ConfigV2_Wrapper>("ConfigV2", no_init)
     .def("concentratorVersion", &psddl_python::CsPad2x2::ConfigV2_Wrapper::concentratorVersion)
@@ -194,10 +149,10 @@ void createWrappers(PyObject* module) {
     .def("quad", &psddl_python::CsPad2x2::ConfigV2_Wrapper::quad, return_value_policy<copy_const_reference>())
     .def("numAsicsRead", &psddl_python::CsPad2x2::ConfigV2_Wrapper::numAsicsRead)
     .def("numAsicsStored", &psddl_python::CsPad2x2::ConfigV2_Wrapper::numAsicsStored)
-    .def("__typeid__", &method_typeid_ConfigV2)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ConfigV2>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ConfigV2_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ConfigV2, psddl_python::CsPad2x2::ConfigV2_Wrapper> >(Pds::TypeId::Id_Cspad2x2Config, 2));
 
   class_<psddl_python::CsPad2x2::ElementV1_Wrapper>("ElementV1", no_init)
     .def("virtual_channel", &psddl_python::CsPad2x2::ElementV1_Wrapper::virtual_channel)
@@ -213,10 +168,10 @@ void createWrappers(PyObject* module) {
     .def("frame_type", &psddl_python::CsPad2x2::ElementV1_Wrapper::frame_type)
     .def("data", &psddl_python::CsPad2x2::ElementV1_Wrapper::data)
     .def("common_mode", &psddl_python::CsPad2x2::ElementV1_Wrapper::common_mode)
-    .def("__typeid__", &method_typeid_ElementV1)
+    .def("__typeid__", &method_typeid<Psana::CsPad2x2::ElementV1>)
     .staticmethod("__typeid__")
   ;
-  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<ElementV1_Converter>());
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefWrap<Psana::CsPad2x2::ElementV1, psddl_python::CsPad2x2::ElementV1_Wrapper> >(Pds::TypeId::Id_Cspad2x2Element, 1));
 
   {
     PyObject* unvlist = PyList_New(2);
