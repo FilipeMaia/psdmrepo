@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_FCCD_DDL_WRAPPER_H
 #define PSDDL_PYTHON_FCCD_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/fccd.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/fccd.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace FCCD {
@@ -20,56 +21,54 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class FccdConfigV1_Wrapper {
-  shared_ptr<Psana::FCCD::FccdConfigV1> _o;
-  Psana::FCCD::FccdConfigV1* o;
+  shared_ptr<const Psana::FCCD::FccdConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_FccdConfig };
   enum { Version = 1 };
-  FccdConfigV1_Wrapper(shared_ptr<Psana::FCCD::FccdConfigV1> obj) : _o(obj), o(_o.get()) {}
-  FccdConfigV1_Wrapper(Psana::FCCD::FccdConfigV1* obj) : o(obj) {}
-  uint16_t outputMode() const { return o->outputMode(); }
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t trimmedWidth() const { return o->trimmedWidth(); }
-  uint32_t trimmedHeight() const { return o->trimmedHeight(); }
+  FccdConfigV1_Wrapper(const shared_ptr<const Psana::FCCD::FccdConfigV1>& obj) : m_obj(obj) {}
+  uint16_t outputMode() const { return m_obj->outputMode(); }
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t trimmedWidth() const { return m_obj->trimmedWidth(); }
+  uint32_t trimmedHeight() const { return m_obj->trimmedHeight(); }
 };
 
 class FccdConfigV2_Wrapper {
-  shared_ptr<Psana::FCCD::FccdConfigV2> _o;
-  Psana::FCCD::FccdConfigV2* o;
+  shared_ptr<const Psana::FCCD::FccdConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_FccdConfig };
   enum { Version = 2 };
-  FccdConfigV2_Wrapper(shared_ptr<Psana::FCCD::FccdConfigV2> obj) : _o(obj), o(_o.get()) {}
-  FccdConfigV2_Wrapper(Psana::FCCD::FccdConfigV2* obj) : o(obj) {}
-  uint16_t outputMode() const { return o->outputMode(); }
-  uint8_t ccdEnable() const { return o->ccdEnable(); }
-  uint8_t focusMode() const { return o->focusMode(); }
-  uint32_t exposureTime() const { return o->exposureTime(); }
-  PyObject* dacVoltages() const { ND_CONVERT(o->dacVoltages(), float, 1); }
-  PyObject* waveforms() const { ND_CONVERT(o->waveforms(), uint16_t, 1); }
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t trimmedWidth() const { return o->trimmedWidth(); }
-  uint32_t trimmedHeight() const { return o->trimmedHeight(); }
+  FccdConfigV2_Wrapper(const shared_ptr<const Psana::FCCD::FccdConfigV2>& obj) : m_obj(obj) {}
+  uint16_t outputMode() const { return m_obj->outputMode(); }
+  uint8_t ccdEnable() const { return m_obj->ccdEnable(); }
+  uint8_t focusMode() const { return m_obj->focusMode(); }
+  uint32_t exposureTime() const { return m_obj->exposureTime(); }
+  PyObject* dacVoltages() const { return detail::ndToNumpy(m_obj->dacVoltages(), m_obj); }
+  PyObject* waveforms() const { return detail::ndToNumpy(m_obj->waveforms(), m_obj); }
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t trimmedWidth() const { return m_obj->trimmedWidth(); }
+  uint32_t trimmedHeight() const { return m_obj->trimmedHeight(); }
 };
 
-  class FccdConfigV1_Getter : public psddl_python::Getter {
+  class FccdConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::FCCD::FccdConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::FCCD::FccdConfigV1);}
     const char* getTypeName() const { return "Psana::FCCD::FccdConfigV1";}
     int getVersion() const { return Psana::FCCD::FccdConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_FccdConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::FCCD::FccdConfigV1> result = boost::static_pointer_cast<Psana::FCCD::FccdConfigV1>(vdata);
       return result.get() ? object(FccdConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FccdConfigV2_Getter : public psddl_python::Getter {
+  class FccdConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::FCCD::FccdConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::FCCD::FccdConfigV2);}
     const char* getTypeName() const { return "Psana::FCCD::FccdConfigV2";}
     int getVersion() const { return Psana::FCCD::FccdConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_FccdConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::FCCD::FccdConfigV2> result = boost::static_pointer_cast<Psana::FCCD::FccdConfigV2>(vdata);
       return result.get() ? object(FccdConfigV2_Wrapper(result)) : object();

@@ -11,6 +11,21 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2013-02-06 Andy Salnikov
+- lots of changes everywhere:
+- Getters renamed to Converters, there are no differences anymore between
+  event and env converters, converters are only converting data between
+  c++ and python, they do not care about event
+- GetterMap renamed to ConverterMap and reimpemented completely based on
+  type_info and Pds::TypeId; no more strings/templates
+- vector stuff disappeared
+- generator does not generate _Wrapper classes for value types, for these 
+  boost already does what we need
+- lifetime management should be done correctly now for all types and 
+  ndarray too
+- something else that I forgot
+
 Tag: V00-03-03
 2013-02-05 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-03

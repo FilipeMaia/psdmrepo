@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_CAMERA_DDL_WRAPPER_H
 #define PSDDL_PYTHON_CAMERA_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/camera.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/camera.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Camera {
@@ -19,126 +20,111 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class FrameCoord_Wrapper {
-  shared_ptr<Psana::Camera::FrameCoord> _o;
-  Psana::Camera::FrameCoord* o;
-public:
-  FrameCoord_Wrapper(shared_ptr<Psana::Camera::FrameCoord> obj) : _o(obj), o(_o.get()) {}
-  FrameCoord_Wrapper(Psana::Camera::FrameCoord* obj) : o(obj) {}
-  uint16_t column() const { return o->column(); }
-  uint16_t row() const { return o->row(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
 class FrameFccdConfigV1_Wrapper {
-  shared_ptr<Psana::Camera::FrameFccdConfigV1> _o;
-  Psana::Camera::FrameFccdConfigV1* o;
+  shared_ptr<const Psana::Camera::FrameFccdConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_FrameFccdConfig };
   enum { Version = 1 };
-  FrameFccdConfigV1_Wrapper(shared_ptr<Psana::Camera::FrameFccdConfigV1> obj) : _o(obj), o(_o.get()) {}
-  FrameFccdConfigV1_Wrapper(Psana::Camera::FrameFccdConfigV1* obj) : o(obj) {}
+  FrameFccdConfigV1_Wrapper(const shared_ptr<const Psana::Camera::FrameFccdConfigV1>& obj) : m_obj(obj) {}
 };
 
 class FrameFexConfigV1_Wrapper {
-  shared_ptr<Psana::Camera::FrameFexConfigV1> _o;
-  Psana::Camera::FrameFexConfigV1* o;
+  shared_ptr<const Psana::Camera::FrameFexConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_FrameFexConfig };
   enum { Version = 1 };
-  FrameFexConfigV1_Wrapper(shared_ptr<Psana::Camera::FrameFexConfigV1> obj) : _o(obj), o(_o.get()) {}
-  FrameFexConfigV1_Wrapper(Psana::Camera::FrameFexConfigV1* obj) : o(obj) {}
-  Psana::Camera::FrameFexConfigV1::Forwarding forwarding() const { return o->forwarding(); }
-  uint32_t forward_prescale() const { return o->forward_prescale(); }
-  Psana::Camera::FrameFexConfigV1::Processing processing() const { return o->processing(); }
-  const FrameCoord_Wrapper roiBegin() const { return FrameCoord_Wrapper(const_cast<Psana::Camera::FrameCoord*>(&o->roiBegin())); }
-  const FrameCoord_Wrapper roiEnd() const { return FrameCoord_Wrapper(const_cast<Psana::Camera::FrameCoord*>(&o->roiEnd())); }
-  uint32_t threshold() const { return o->threshold(); }
-  uint32_t number_of_masked_pixels() const { return o->number_of_masked_pixels(); }
-  vector<Psana::Camera::FrameCoord> masked_pixel_coordinates() const { VEC_CONVERT(o->masked_pixel_coordinates(), Psana::Camera::FrameCoord); }
+  FrameFexConfigV1_Wrapper(const shared_ptr<const Psana::Camera::FrameFexConfigV1>& obj) : m_obj(obj) {}
+  Psana::Camera::FrameFexConfigV1::Forwarding forwarding() const { return m_obj->forwarding(); }
+  uint32_t forward_prescale() const { return m_obj->forward_prescale(); }
+  Psana::Camera::FrameFexConfigV1::Processing processing() const { return m_obj->processing(); }
+  const Psana::Camera::FrameCoord& roiBegin() const { return m_obj->roiBegin(); }
+  const Psana::Camera::FrameCoord& roiEnd() const { return m_obj->roiEnd(); }
+  uint32_t threshold() const { return m_obj->threshold(); }
+  uint32_t number_of_masked_pixels() const { return m_obj->number_of_masked_pixels(); }
+  boost::python::list masked_pixel_coordinates() const { return detail::ndToList(m_obj->masked_pixel_coordinates()); }
 };
 
 class FrameV1_Wrapper {
-  shared_ptr<Psana::Camera::FrameV1> _o;
-  Psana::Camera::FrameV1* o;
+  shared_ptr<const Psana::Camera::FrameV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_Frame };
   enum { Version = 1 };
-  FrameV1_Wrapper(shared_ptr<Psana::Camera::FrameV1> obj) : _o(obj), o(_o.get()) {}
-  FrameV1_Wrapper(Psana::Camera::FrameV1* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t depth() const { return o->depth(); }
-  uint32_t offset() const { return o->offset(); }
-  PyObject* _int_pixel_data() const { ND_CONVERT(o->_int_pixel_data(), uint8_t, 1); }
-  PyObject* data8() const { ND_CONVERT(o->data8(), uint8_t, 2); }
-  PyObject* data16() const { ND_CONVERT(o->data16(), uint16_t, 2); }
+  FrameV1_Wrapper(const shared_ptr<const Psana::Camera::FrameV1>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t depth() const { return m_obj->depth(); }
+  uint32_t offset() const { return m_obj->offset(); }
+  PyObject* _int_pixel_data() const { return detail::ndToNumpy(m_obj->_int_pixel_data(), m_obj); }
+  PyObject* data8() const { return detail::ndToNumpy(m_obj->data8(), m_obj); }
+  PyObject* data16() const { return detail::ndToNumpy(m_obj->data16(), m_obj); }
 };
 
 class TwoDGaussianV1_Wrapper {
-  shared_ptr<Psana::Camera::TwoDGaussianV1> _o;
-  Psana::Camera::TwoDGaussianV1* o;
+  shared_ptr<const Psana::Camera::TwoDGaussianV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_TwoDGaussian };
   enum { Version = 1 };
-  TwoDGaussianV1_Wrapper(shared_ptr<Psana::Camera::TwoDGaussianV1> obj) : _o(obj), o(_o.get()) {}
-  TwoDGaussianV1_Wrapper(Psana::Camera::TwoDGaussianV1* obj) : o(obj) {}
-  uint64_t integral() const { return o->integral(); }
-  double xmean() const { return o->xmean(); }
-  double ymean() const { return o->ymean(); }
-  double major_axis_width() const { return o->major_axis_width(); }
-  double minor_axis_width() const { return o->minor_axis_width(); }
-  double major_axis_tilt() const { return o->major_axis_tilt(); }
+  TwoDGaussianV1_Wrapper(const shared_ptr<const Psana::Camera::TwoDGaussianV1>& obj) : m_obj(obj) {}
+  uint64_t integral() const { return m_obj->integral(); }
+  double xmean() const { return m_obj->xmean(); }
+  double ymean() const { return m_obj->ymean(); }
+  double major_axis_width() const { return m_obj->major_axis_width(); }
+  double minor_axis_width() const { return m_obj->minor_axis_width(); }
+  double major_axis_tilt() const { return m_obj->major_axis_tilt(); }
 };
 
-  class FrameCoord_Getter : public psddl_python::Getter {
+  class FrameCoord_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameCoord);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameCoord);}
     const char* getTypeName() const { return "Psana::Camera::FrameCoord";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Camera::FrameCoord> result = boost::static_pointer_cast<Psana::Camera::FrameCoord>(vdata);
-      return result.get() ? object(FrameCoord_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class FrameFccdConfigV1_Getter : public psddl_python::Getter {
+  class FrameFccdConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameFccdConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameFccdConfigV1);}
     const char* getTypeName() const { return "Psana::Camera::FrameFccdConfigV1";}
     int getVersion() const { return Psana::Camera::FrameFccdConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_FrameFccdConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Camera::FrameFccdConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFccdConfigV1>(vdata);
       return result.get() ? object(FrameFccdConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameFexConfigV1_Getter : public psddl_python::Getter {
+  class FrameFexConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameFexConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameFexConfigV1);}
     const char* getTypeName() const { return "Psana::Camera::FrameFexConfigV1";}
     int getVersion() const { return Psana::Camera::FrameFexConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_FrameFexConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Camera::FrameFexConfigV1> result = boost::static_pointer_cast<Psana::Camera::FrameFexConfigV1>(vdata);
       return result.get() ? object(FrameFexConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::Getter {
+  class FrameV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Camera::FrameV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::FrameV1);}
     const char* getTypeName() const { return "Psana::Camera::FrameV1";}
     int getVersion() const { return Psana::Camera::FrameV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_Frame; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Camera::FrameV1> result = boost::static_pointer_cast<Psana::Camera::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
     }
   };
 
-  class TwoDGaussianV1_Getter : public psddl_python::Getter {
+  class TwoDGaussianV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Camera::TwoDGaussianV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Camera::TwoDGaussianV1);}
     const char* getTypeName() const { return "Psana::Camera::TwoDGaussianV1";}
     int getVersion() const { return Psana::Camera::TwoDGaussianV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_TwoDGaussian; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Camera::TwoDGaussianV1> result = boost::static_pointer_cast<Psana::Camera::TwoDGaussianV1>(vdata);
       return result.get() ? object(TwoDGaussianV1_Wrapper(result)) : object();

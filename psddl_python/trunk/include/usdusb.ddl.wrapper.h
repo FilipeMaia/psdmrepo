@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_USDUSB_DDL_WRAPPER_H
 #define PSDDL_PYTHON_USDUSB_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/usdusb.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/usdusb.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace UsdUsb {
@@ -20,47 +21,45 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::UsdUsb::ConfigV1> _o;
-  Psana::UsdUsb::ConfigV1* o;
+  shared_ptr<const Psana::UsdUsb::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_UsdUsbConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::UsdUsb::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::UsdUsb::ConfigV1* obj) : o(obj) {}
-  PyObject* counting_mode() const { ND_CONVERT(o->counting_mode(), uint32_t, 1); }
-  PyObject* quadrature_mode() const { ND_CONVERT(o->quadrature_mode(), uint32_t, 1); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::UsdUsb::ConfigV1>& obj) : m_obj(obj) {}
+  PyObject* counting_mode() const { return detail::ndToNumpy(m_obj->counting_mode(), m_obj); }
+  PyObject* quadrature_mode() const { return detail::ndToNumpy(m_obj->quadrature_mode(), m_obj); }
 };
 
 class DataV1_Wrapper {
-  shared_ptr<Psana::UsdUsb::DataV1> _o;
-  Psana::UsdUsb::DataV1* o;
+  shared_ptr<const Psana::UsdUsb::DataV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_UsdUsbData };
   enum { Version = 1 };
-  DataV1_Wrapper(shared_ptr<Psana::UsdUsb::DataV1> obj) : _o(obj), o(_o.get()) {}
-  DataV1_Wrapper(Psana::UsdUsb::DataV1* obj) : o(obj) {}
-  uint8_t digital_in() const { return o->digital_in(); }
-  uint32_t timestamp() const { return o->timestamp(); }
-  PyObject* analog_in() const { ND_CONVERT(o->analog_in(), uint16_t, 1); }
-  PyObject* encoder_count() const { ND_CONVERT(o->encoder_count(), int32_t, 1); }
+  DataV1_Wrapper(const shared_ptr<const Psana::UsdUsb::DataV1>& obj) : m_obj(obj) {}
+  uint8_t digital_in() const { return m_obj->digital_in(); }
+  uint32_t timestamp() const { return m_obj->timestamp(); }
+  PyObject* analog_in() const { return detail::ndToNumpy(m_obj->analog_in(), m_obj); }
+  PyObject* encoder_count() const { return detail::ndToNumpy(m_obj->encoder_count(), m_obj); }
 };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::UsdUsb::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::UsdUsb::ConfigV1);}
     const char* getTypeName() const { return "Psana::UsdUsb::ConfigV1";}
     int getVersion() const { return Psana::UsdUsb::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_UsdUsbConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::UsdUsb::ConfigV1> result = boost::static_pointer_cast<Psana::UsdUsb::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::Getter {
+  class DataV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::UsdUsb::DataV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::UsdUsb::DataV1);}
     const char* getTypeName() const { return "Psana::UsdUsb::DataV1";}
     int getVersion() const { return Psana::UsdUsb::DataV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_UsdUsbData; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::UsdUsb::DataV1> result = boost::static_pointer_cast<Psana::UsdUsb::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();

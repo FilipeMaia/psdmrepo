@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_CSPAD2X2_DDL_WRAPPER_H
 #define PSDDL_PYTHON_CSPAD2X2_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/cspad2x2.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/cspad2x2.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace CsPad2x2 {
@@ -20,182 +21,164 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class CsPad2x2DigitalPotsCfg_Wrapper {
-  shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> _o;
-  Psana::CsPad2x2::CsPad2x2DigitalPotsCfg* o;
+  shared_ptr<const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> m_obj;
 public:
-  CsPad2x2DigitalPotsCfg_Wrapper(shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> obj) : _o(obj), o(_o.get()) {}
-  CsPad2x2DigitalPotsCfg_Wrapper(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg* obj) : o(obj) {}
-  PyObject* pots() const { ND_CONVERT(o->pots(), uint8_t, 1); }
+  CsPad2x2DigitalPotsCfg_Wrapper(const shared_ptr<const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>& obj) : m_obj(obj) {}
+  PyObject* pots() const { return detail::ndToNumpy(m_obj->pots(), m_obj); }
 };
 
 class CsPad2x2ReadOnlyCfg_Wrapper {
-  shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> _o;
-  Psana::CsPad2x2::CsPad2x2ReadOnlyCfg* o;
+  shared_ptr<const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> m_obj;
 public:
-  CsPad2x2ReadOnlyCfg_Wrapper(shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> obj) : _o(obj), o(_o.get()) {}
-  CsPad2x2ReadOnlyCfg_Wrapper(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg* obj) : o(obj) {}
-  uint32_t shiftTest() const { return o->shiftTest(); }
-  uint32_t version() const { return o->version(); }
+  CsPad2x2ReadOnlyCfg_Wrapper(const shared_ptr<const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>& obj) : m_obj(obj) {}
+  uint32_t shiftTest() const { return m_obj->shiftTest(); }
+  uint32_t version() const { return m_obj->version(); }
 };
 
 class ProtectionSystemThreshold_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold> _o;
-  Psana::CsPad2x2::ProtectionSystemThreshold* o;
+  shared_ptr<const Psana::CsPad2x2::ProtectionSystemThreshold> m_obj;
 public:
-  ProtectionSystemThreshold_Wrapper(shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold> obj) : _o(obj), o(_o.get()) {}
-  ProtectionSystemThreshold_Wrapper(Psana::CsPad2x2::ProtectionSystemThreshold* obj) : o(obj) {}
-  uint32_t adcThreshold() const { return o->adcThreshold(); }
-  uint32_t pixelCountThreshold() const { return o->pixelCountThreshold(); }
+  ProtectionSystemThreshold_Wrapper(const shared_ptr<const Psana::CsPad2x2::ProtectionSystemThreshold>& obj) : m_obj(obj) {}
+  uint32_t adcThreshold() const { return m_obj->adcThreshold(); }
+  uint32_t pixelCountThreshold() const { return m_obj->pixelCountThreshold(); }
 };
 
 class CsPad2x2GainMapCfg_Wrapper {
-  shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> _o;
-  Psana::CsPad2x2::CsPad2x2GainMapCfg* o;
+  shared_ptr<const Psana::CsPad2x2::CsPad2x2GainMapCfg> m_obj;
 public:
-  CsPad2x2GainMapCfg_Wrapper(shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> obj) : _o(obj), o(_o.get()) {}
-  CsPad2x2GainMapCfg_Wrapper(Psana::CsPad2x2::CsPad2x2GainMapCfg* obj) : o(obj) {}
-  PyObject* gainMap() const { ND_CONVERT(o->gainMap(), uint16_t, 2); }
+  CsPad2x2GainMapCfg_Wrapper(const shared_ptr<const Psana::CsPad2x2::CsPad2x2GainMapCfg>& obj) : m_obj(obj) {}
+  PyObject* gainMap() const { return detail::ndToNumpy(m_obj->gainMap(), m_obj); }
 };
 
 class ConfigV1QuadReg_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> _o;
-  Psana::CsPad2x2::ConfigV1QuadReg* o;
+  shared_ptr<const Psana::CsPad2x2::ConfigV1QuadReg> m_obj;
 public:
-  ConfigV1QuadReg_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1QuadReg_Wrapper(Psana::CsPad2x2::ConfigV1QuadReg* obj) : o(obj) {}
-  uint32_t shiftSelect() const { return o->shiftSelect(); }
-  uint32_t edgeSelect() const { return o->edgeSelect(); }
-  uint32_t readClkSet() const { return o->readClkSet(); }
-  uint32_t readClkHold() const { return o->readClkHold(); }
-  uint32_t dataMode() const { return o->dataMode(); }
-  uint32_t prstSel() const { return o->prstSel(); }
-  uint32_t acqDelay() const { return o->acqDelay(); }
-  uint32_t intTime() const { return o->intTime(); }
-  uint32_t digDelay() const { return o->digDelay(); }
-  uint32_t ampIdle() const { return o->ampIdle(); }
-  uint32_t injTotal() const { return o->injTotal(); }
-  uint32_t rowColShiftPer() const { return o->rowColShiftPer(); }
-  uint32_t ampReset() const { return o->ampReset(); }
-  uint32_t digCount() const { return o->digCount(); }
-  uint32_t digPeriod() const { return o->digPeriod(); }
-  uint32_t PeltierEnable() const { return o->PeltierEnable(); }
-  uint32_t kpConstant() const { return o->kpConstant(); }
-  uint32_t kiConstant() const { return o->kiConstant(); }
-  uint32_t kdConstant() const { return o->kdConstant(); }
-  uint32_t humidThold() const { return o->humidThold(); }
-  uint32_t setPoint() const { return o->setPoint(); }
-  const CsPad2x2ReadOnlyCfg_Wrapper ro() const { return CsPad2x2ReadOnlyCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg*>(&o->ro())); }
-  const CsPad2x2DigitalPotsCfg_Wrapper dp() const { return CsPad2x2DigitalPotsCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg*>(&o->dp())); }
-  const CsPad2x2GainMapCfg_Wrapper gm() const { return CsPad2x2GainMapCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2GainMapCfg*>(&o->gm())); }
+  ConfigV1QuadReg_Wrapper(const shared_ptr<const Psana::CsPad2x2::ConfigV1QuadReg>& obj) : m_obj(obj) {}
+  uint32_t shiftSelect() const { return m_obj->shiftSelect(); }
+  uint32_t edgeSelect() const { return m_obj->edgeSelect(); }
+  uint32_t readClkSet() const { return m_obj->readClkSet(); }
+  uint32_t readClkHold() const { return m_obj->readClkHold(); }
+  uint32_t dataMode() const { return m_obj->dataMode(); }
+  uint32_t prstSel() const { return m_obj->prstSel(); }
+  uint32_t acqDelay() const { return m_obj->acqDelay(); }
+  uint32_t intTime() const { return m_obj->intTime(); }
+  uint32_t digDelay() const { return m_obj->digDelay(); }
+  uint32_t ampIdle() const { return m_obj->ampIdle(); }
+  uint32_t injTotal() const { return m_obj->injTotal(); }
+  uint32_t rowColShiftPer() const { return m_obj->rowColShiftPer(); }
+  uint32_t ampReset() const { return m_obj->ampReset(); }
+  uint32_t digCount() const { return m_obj->digCount(); }
+  uint32_t digPeriod() const { return m_obj->digPeriod(); }
+  uint32_t PeltierEnable() const { return m_obj->PeltierEnable(); }
+  uint32_t kpConstant() const { return m_obj->kpConstant(); }
+  uint32_t kiConstant() const { return m_obj->kiConstant(); }
+  uint32_t kdConstant() const { return m_obj->kdConstant(); }
+  uint32_t humidThold() const { return m_obj->humidThold(); }
+  uint32_t setPoint() const { return m_obj->setPoint(); }
+  const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ro() const { return m_obj->ro(); }
+  const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const { return m_obj->dp(); }
+  const Psana::CsPad2x2::CsPad2x2GainMapCfg& gm() const { return m_obj->gm(); }
 };
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ConfigV1> _o;
-  Psana::CsPad2x2::ConfigV1* o;
+  shared_ptr<const Psana::CsPad2x2::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::CsPad2x2::ConfigV1* obj) : o(obj) {}
-  uint32_t concentratorVersion() const { return o->concentratorVersion(); }
-  const ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper(const_cast<Psana::CsPad2x2::ProtectionSystemThreshold*>(&o->protectionThreshold())); }
-  uint32_t protectionEnable() const { return o->protectionEnable(); }
-  uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
-  uint32_t activeRunMode() const { return o->activeRunMode(); }
-  uint32_t tdi() const { return o->tdi(); }
-  uint32_t payloadSize() const { return o->payloadSize(); }
-  uint32_t badAsicMask() const { return o->badAsicMask(); }
-  uint32_t asicMask() const { return o->asicMask(); }
-  uint32_t roiMask() const { return o->roiMask(); }
-  const ConfigV1QuadReg_Wrapper quad() const { return ConfigV1QuadReg_Wrapper(const_cast<Psana::CsPad2x2::ConfigV1QuadReg*>(&o->quad())); }
-  uint32_t numAsicsRead() const { return o->numAsicsRead(); }
-  uint32_t numAsicsStored() const { return o->numAsicsStored(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::CsPad2x2::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t concentratorVersion() const { return m_obj->concentratorVersion(); }
+  const Psana::CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const { return m_obj->protectionThreshold(); }
+  uint32_t protectionEnable() const { return m_obj->protectionEnable(); }
+  uint32_t inactiveRunMode() const { return m_obj->inactiveRunMode(); }
+  uint32_t activeRunMode() const { return m_obj->activeRunMode(); }
+  uint32_t tdi() const { return m_obj->tdi(); }
+  uint32_t payloadSize() const { return m_obj->payloadSize(); }
+  uint32_t badAsicMask() const { return m_obj->badAsicMask(); }
+  uint32_t asicMask() const { return m_obj->asicMask(); }
+  uint32_t roiMask() const { return m_obj->roiMask(); }
+  const Psana::CsPad2x2::ConfigV1QuadReg& quad() const { return m_obj->quad(); }
+  uint32_t numAsicsRead() const { return m_obj->numAsicsRead(); }
+  uint32_t numAsicsStored() const { return m_obj->numAsicsStored(); }
 };
 
 class ConfigV2QuadReg_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> _o;
-  Psana::CsPad2x2::ConfigV2QuadReg* o;
+  shared_ptr<const Psana::CsPad2x2::ConfigV2QuadReg> m_obj;
 public:
-  ConfigV2QuadReg_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> obj) : _o(obj), o(_o.get()) {}
-  ConfigV2QuadReg_Wrapper(Psana::CsPad2x2::ConfigV2QuadReg* obj) : o(obj) {}
-  uint32_t shiftSelect() const { return o->shiftSelect(); }
-  uint32_t edgeSelect() const { return o->edgeSelect(); }
-  uint32_t readClkSet() const { return o->readClkSet(); }
-  uint32_t readClkHold() const { return o->readClkHold(); }
-  uint32_t dataMode() const { return o->dataMode(); }
-  uint32_t prstSel() const { return o->prstSel(); }
-  uint32_t acqDelay() const { return o->acqDelay(); }
-  uint32_t intTime() const { return o->intTime(); }
-  uint32_t digDelay() const { return o->digDelay(); }
-  uint32_t ampIdle() const { return o->ampIdle(); }
-  uint32_t injTotal() const { return o->injTotal(); }
-  uint32_t rowColShiftPer() const { return o->rowColShiftPer(); }
-  uint32_t ampReset() const { return o->ampReset(); }
-  uint32_t digCount() const { return o->digCount(); }
-  uint32_t digPeriod() const { return o->digPeriod(); }
-  uint32_t PeltierEnable() const { return o->PeltierEnable(); }
-  uint32_t kpConstant() const { return o->kpConstant(); }
-  uint32_t kiConstant() const { return o->kiConstant(); }
-  uint32_t kdConstant() const { return o->kdConstant(); }
-  uint32_t humidThold() const { return o->humidThold(); }
-  uint32_t setPoint() const { return o->setPoint(); }
-  uint32_t biasTuning() const { return o->biasTuning(); }
-  uint32_t pdpmndnmBalance() const { return o->pdpmndnmBalance(); }
-  const CsPad2x2ReadOnlyCfg_Wrapper ro() const { return CsPad2x2ReadOnlyCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg*>(&o->ro())); }
-  const CsPad2x2DigitalPotsCfg_Wrapper dp() const { return CsPad2x2DigitalPotsCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg*>(&o->dp())); }
-  const CsPad2x2GainMapCfg_Wrapper gm() const { return CsPad2x2GainMapCfg_Wrapper(const_cast<Psana::CsPad2x2::CsPad2x2GainMapCfg*>(&o->gm())); }
+  ConfigV2QuadReg_Wrapper(const shared_ptr<const Psana::CsPad2x2::ConfigV2QuadReg>& obj) : m_obj(obj) {}
+  uint32_t shiftSelect() const { return m_obj->shiftSelect(); }
+  uint32_t edgeSelect() const { return m_obj->edgeSelect(); }
+  uint32_t readClkSet() const { return m_obj->readClkSet(); }
+  uint32_t readClkHold() const { return m_obj->readClkHold(); }
+  uint32_t dataMode() const { return m_obj->dataMode(); }
+  uint32_t prstSel() const { return m_obj->prstSel(); }
+  uint32_t acqDelay() const { return m_obj->acqDelay(); }
+  uint32_t intTime() const { return m_obj->intTime(); }
+  uint32_t digDelay() const { return m_obj->digDelay(); }
+  uint32_t ampIdle() const { return m_obj->ampIdle(); }
+  uint32_t injTotal() const { return m_obj->injTotal(); }
+  uint32_t rowColShiftPer() const { return m_obj->rowColShiftPer(); }
+  uint32_t ampReset() const { return m_obj->ampReset(); }
+  uint32_t digCount() const { return m_obj->digCount(); }
+  uint32_t digPeriod() const { return m_obj->digPeriod(); }
+  uint32_t PeltierEnable() const { return m_obj->PeltierEnable(); }
+  uint32_t kpConstant() const { return m_obj->kpConstant(); }
+  uint32_t kiConstant() const { return m_obj->kiConstant(); }
+  uint32_t kdConstant() const { return m_obj->kdConstant(); }
+  uint32_t humidThold() const { return m_obj->humidThold(); }
+  uint32_t setPoint() const { return m_obj->setPoint(); }
+  uint32_t biasTuning() const { return m_obj->biasTuning(); }
+  uint32_t pdpmndnmBalance() const { return m_obj->pdpmndnmBalance(); }
+  const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ro() const { return m_obj->ro(); }
+  const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& dp() const { return m_obj->dp(); }
+  const Psana::CsPad2x2::CsPad2x2GainMapCfg& gm() const { return m_obj->gm(); }
 };
 
 class ConfigV2_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ConfigV2> _o;
-  Psana::CsPad2x2::ConfigV2* o;
+  shared_ptr<const Psana::CsPad2x2::ConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config };
   enum { Version = 2 };
-  ConfigV2_Wrapper(shared_ptr<Psana::CsPad2x2::ConfigV2> obj) : _o(obj), o(_o.get()) {}
-  ConfigV2_Wrapper(Psana::CsPad2x2::ConfigV2* obj) : o(obj) {}
-  uint32_t concentratorVersion() const { return o->concentratorVersion(); }
-  const ProtectionSystemThreshold_Wrapper protectionThreshold() const { return ProtectionSystemThreshold_Wrapper(const_cast<Psana::CsPad2x2::ProtectionSystemThreshold*>(&o->protectionThreshold())); }
-  uint32_t protectionEnable() const { return o->protectionEnable(); }
-  uint32_t inactiveRunMode() const { return o->inactiveRunMode(); }
-  uint32_t activeRunMode() const { return o->activeRunMode(); }
-  uint32_t runTriggerDelay() const { return o->runTriggerDelay(); }
-  uint32_t tdi() const { return o->tdi(); }
-  uint32_t payloadSize() const { return o->payloadSize(); }
-  uint32_t badAsicMask() const { return o->badAsicMask(); }
-  uint32_t asicMask() const { return o->asicMask(); }
-  uint32_t roiMask() const { return o->roiMask(); }
-  const ConfigV2QuadReg_Wrapper quad() const { return ConfigV2QuadReg_Wrapper(const_cast<Psana::CsPad2x2::ConfigV2QuadReg*>(&o->quad())); }
-  uint32_t numAsicsRead() const { return o->numAsicsRead(); }
-  uint32_t numAsicsStored() const { return o->numAsicsStored(); }
+  ConfigV2_Wrapper(const shared_ptr<const Psana::CsPad2x2::ConfigV2>& obj) : m_obj(obj) {}
+  uint32_t concentratorVersion() const { return m_obj->concentratorVersion(); }
+  const Psana::CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const { return m_obj->protectionThreshold(); }
+  uint32_t protectionEnable() const { return m_obj->protectionEnable(); }
+  uint32_t inactiveRunMode() const { return m_obj->inactiveRunMode(); }
+  uint32_t activeRunMode() const { return m_obj->activeRunMode(); }
+  uint32_t runTriggerDelay() const { return m_obj->runTriggerDelay(); }
+  uint32_t tdi() const { return m_obj->tdi(); }
+  uint32_t payloadSize() const { return m_obj->payloadSize(); }
+  uint32_t badAsicMask() const { return m_obj->badAsicMask(); }
+  uint32_t asicMask() const { return m_obj->asicMask(); }
+  uint32_t roiMask() const { return m_obj->roiMask(); }
+  const Psana::CsPad2x2::ConfigV2QuadReg& quad() const { return m_obj->quad(); }
+  uint32_t numAsicsRead() const { return m_obj->numAsicsRead(); }
+  uint32_t numAsicsStored() const { return m_obj->numAsicsStored(); }
 };
 
 class ElementV1_Wrapper {
-  shared_ptr<Psana::CsPad2x2::ElementV1> _o;
-  Psana::CsPad2x2::ElementV1* o;
+  shared_ptr<const Psana::CsPad2x2::ElementV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Element };
   enum { Version = 1 };
-  ElementV1_Wrapper(shared_ptr<Psana::CsPad2x2::ElementV1> obj) : _o(obj), o(_o.get()) {}
-  ElementV1_Wrapper(Psana::CsPad2x2::ElementV1* obj) : o(obj) {}
-  uint32_t virtual_channel() const { return o->virtual_channel(); }
-  uint32_t lane() const { return o->lane(); }
-  uint32_t tid() const { return o->tid(); }
-  uint32_t acq_count() const { return o->acq_count(); }
-  uint32_t op_code() const { return o->op_code(); }
-  uint32_t quad() const { return o->quad(); }
-  uint32_t seq_count() const { return o->seq_count(); }
-  uint32_t ticks() const { return o->ticks(); }
-  uint32_t fiducials() const { return o->fiducials(); }
-  PyObject* sb_temp() const { ND_CONVERT(o->sb_temp(), uint16_t, 1); }
-  uint32_t frame_type() const { return o->frame_type(); }
-  PyObject* data() const { ND_CONVERT(o->data(), int16_t, 3); }
-  float common_mode(uint32_t section) const { return o->common_mode(section); }
+  ElementV1_Wrapper(const shared_ptr<const Psana::CsPad2x2::ElementV1>& obj) : m_obj(obj) {}
+  uint32_t virtual_channel() const { return m_obj->virtual_channel(); }
+  uint32_t lane() const { return m_obj->lane(); }
+  uint32_t tid() const { return m_obj->tid(); }
+  uint32_t acq_count() const { return m_obj->acq_count(); }
+  uint32_t op_code() const { return m_obj->op_code(); }
+  uint32_t quad() const { return m_obj->quad(); }
+  uint32_t seq_count() const { return m_obj->seq_count(); }
+  uint32_t ticks() const { return m_obj->ticks(); }
+  uint32_t fiducials() const { return m_obj->fiducials(); }
+  PyObject* sb_temp() const { return detail::ndToNumpy(m_obj->sb_temp(), m_obj); }
+  uint32_t frame_type() const { return m_obj->frame_type(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  float common_mode(uint32_t section) const { return m_obj->common_mode(section); }
 };
 
-  class CsPad2x2DigitalPotsCfg_Getter : public psddl_python::Getter {
+  class CsPad2x2DigitalPotsCfg_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::CsPad2x2DigitalPotsCfg);}
     const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2DigitalPotsCfg";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>(vdata);
@@ -203,9 +186,9 @@ public:
     }
   };
 
-  class CsPad2x2ReadOnlyCfg_Getter : public psddl_python::Getter {
+  class CsPad2x2ReadOnlyCfg_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::CsPad2x2ReadOnlyCfg);}
     const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2ReadOnlyCfg";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>(vdata);
@@ -213,9 +196,9 @@ public:
     }
   };
 
-  class ProtectionSystemThreshold_Getter : public psddl_python::Getter {
+  class ProtectionSystemThreshold_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ProtectionSystemThreshold);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ProtectionSystemThreshold);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ProtectionSystemThreshold";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold> result = boost::static_pointer_cast<Psana::CsPad2x2::ProtectionSystemThreshold>(vdata);
@@ -223,9 +206,9 @@ public:
     }
   };
 
-  class CsPad2x2GainMapCfg_Getter : public psddl_python::Getter {
+  class CsPad2x2GainMapCfg_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::CsPad2x2GainMapCfg);}
     const char* getTypeName() const { return "Psana::CsPad2x2::CsPad2x2GainMapCfg";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> result = boost::static_pointer_cast<Psana::CsPad2x2::CsPad2x2GainMapCfg>(vdata);
@@ -233,9 +216,9 @@ public:
     }
   };
 
-  class ConfigV1QuadReg_Getter : public psddl_python::Getter {
+  class ConfigV1QuadReg_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV1QuadReg);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ConfigV1QuadReg);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV1QuadReg";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV1QuadReg>(vdata);
@@ -243,20 +226,21 @@ public:
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ConfigV1);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV1";}
     int getVersion() const { return Psana::CsPad2x2::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_Cspad2x2Config; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ConfigV1> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2QuadReg_Getter : public psddl_python::Getter {
+  class ConfigV2QuadReg_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV2QuadReg);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ConfigV2QuadReg);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV2QuadReg";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV2QuadReg>(vdata);
@@ -264,22 +248,24 @@ public:
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::Getter {
+  class ConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ConfigV2);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ConfigV2";}
     int getVersion() const { return Psana::CsPad2x2::ConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_Cspad2x2Config; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ConfigV2> result = boost::static_pointer_cast<Psana::CsPad2x2::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ElementV1_Getter : public psddl_python::Getter {
+  class ElementV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::CsPad2x2::ElementV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::CsPad2x2::ElementV1);}
     const char* getTypeName() const { return "Psana::CsPad2x2::ElementV1";}
     int getVersion() const { return Psana::CsPad2x2::ElementV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_Cspad2x2Element; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::CsPad2x2::ElementV1> result = boost::static_pointer_cast<Psana::CsPad2x2::ElementV1>(vdata);
       return result.get() ? object(ElementV1_Wrapper(result)) : object();

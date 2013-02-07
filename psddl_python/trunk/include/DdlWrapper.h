@@ -1,34 +1,109 @@
-#ifndef PSANA_DDLWRAPPER_H
-#define PSANA_DDLWRAPPER_H 1
+#ifndef PSDDL_PYTHON_DDLWRAPPER_H
+#define PSDDL_PYTHON_DDLWRAPPER_H 1
 
 #include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/make_shared.hpp>
-#include <psddl_python/vector_indexing_suite_nocopy.hpp>
-#include <numpy/arrayobject.h>
 
-#include "psddl_python/GetterMap.h"
+#include <iostream>
+#include <algorithm>
+#include <boost/python/to_python_converter.hpp>
+
+#include "ndarray/ndarray.h"
+#include "psddl_python/psddl_python_numpy.h"
 
 namespace psddl_python {
-  extern PyObject* ndConvert(const unsigned ndim, const unsigned* shape, int ptype, void* data);
+namespace detail {
+
+// convert 1-dimensional ndarray to list
+template <typename CTYPE>
+boost::python::list 
+ndToList(const ndarray<const CTYPE, 1>& a) {
+  boost::python::list res;
+  for (size_t i = 0; i != a.shape()[0]; ++ i) {
+    res.append(boost::python::object(a[i]));
+  }
+  return res;
 }
 
-#define std_vector_class_(T)\
-  boost::python::class_<vector<T> >("std::vector<" #T ">")\
-    .def(vector_indexing_suite_nocopy<std::vector<T> >())
+// Map C++ types to numpy type constants
+template <typename T> struct PyArrayTraits {};
+#define ASSOCIATE_PYARRAYTYPE(CTYPE, PTYPE) template <> struct PyArrayTraits<CTYPE> { enum { type_code = PTYPE }; };
+ASSOCIATE_PYARRAYTYPE(int8_t, PyArray_BYTE);
+ASSOCIATE_PYARRAYTYPE(uint8_t, PyArray_UBYTE);
+ASSOCIATE_PYARRAYTYPE(int16_t, PyArray_SHORT);
+ASSOCIATE_PYARRAYTYPE(uint16_t, PyArray_USHORT);
+ASSOCIATE_PYARRAYTYPE(int32_t, PyArray_INT);
+ASSOCIATE_PYARRAYTYPE(uint32_t, PyArray_UINT);
+ASSOCIATE_PYARRAYTYPE(float, PyArray_FLOAT);
+ASSOCIATE_PYARRAYTYPE(double, PyArray_DOUBLE);
+#undef ASSOCIATE_PYARRAYTYPE
 
-#define associate_PyArrayType(ctype, ptype) const int PyArray_ ## ctype = ptype
-associate_PyArrayType(int8_t, PyArray_BYTE);
-associate_PyArrayType(uint8_t, PyArray_UBYTE);
-associate_PyArrayType(int16_t, PyArray_SHORT);
-associate_PyArrayType(uint16_t, PyArray_USHORT);
-associate_PyArrayType(int32_t, PyArray_INT);
-associate_PyArrayType(uint32_t, PyArray_UINT);
-associate_PyArrayType(float, PyArray_FLOAT);
-associate_PyArrayType(double, PyArray_DOUBLE);
+// helper method for deleting ndarray
+template <typename T, unsigned NDim>
+void _ndarray_dtor(void* ptr)
+{
+  delete static_cast<ndarray<const T, NDim>*>(ptr);
+}
 
-#define ND_CONVERT(value, ctype, ndim) const ndarray<const ctype, ndim>& a(value); return psddl_python::ndConvert(ndim, a.shape(), PyArray_ ## ctype, (void *) a.data())
-#define VEC_CONVERT(value, ctype) const ndarray<const ctype, 1>& a(value); const std::vector<ctype> v(a.data(), a.data() + a.size()); return v
-#define ADD_GETTER(x) psddl_python::GetterMap::instance().addGetter(boost::make_shared<x ## _Getter>())
+// convert ndarray to numpy array
+template <typename T, unsigned NDim, typename U>
+PyObject*
+ndToNumpy(const ndarray<const T, NDim>& array, const boost::shared_ptr<U>& owner)
+{
+  // First we need a Python object which will hold a copy of the ndarray
+  // to control lifetime of the data in it
+  ndarray<const T, NDim>* copy = new ndarray<const T, NDim>(array);
+  if (not owner) {
+    // deep copy array data
+    *copy = copy->copy();
+  }
+  PyObject* ndarr = PyCObject_FromVoidPtr(static_cast<void*>(copy), _ndarray_dtor<T, NDim>);
 
-#endif // PSANA_DDLWRAPPER_H
+  // now make numpy array
+  const unsigned* shape = copy->shape();
+  npy_intp dims[NDim];
+  std::copy(shape, shape+NDim, dims);
+  PyObject* nparr = PyArray_SimpleNewFromData(NDim, dims, PyArrayTraits<T>::type_code, (void*)copy->data());
+
+  // update strides
+  const int* strides = copy->strides();
+  for (unsigned i = 0; i != NDim; ++ i) PyArray_STRIDES(nparr)[i] = strides[i]*sizeof(T);
+
+  // add reference to the owner of the data
+  ((PyArrayObject*)nparr)->base = ndarr;
+
+  return nparr;
+}
+
+// convert ndarray to numpy array
+template <typename T, unsigned NDim>
+PyObject*
+ndToNumpy(const ndarray<const T, NDim>& array)
+{
+  return ndToNumpy(array, boost::shared_ptr<void>());
+}
+
+// need also special boost converter for ndarray
+template <typename T, unsigned NDim>
+struct ndarray_to_numpy_cvt {
+  static PyObject* convert(const ndarray<T, NDim>& x) { return ndToNumpy(x); }
+  static PyTypeObject const* get_pytype() { return &PyArray_Type; }
+};
+
+template <typename T, unsigned NDim>
+void
+register_ndarray_to_numpy_cvt()
+{
+  // register converter but avoid duplicated registration
+  typedef ndarray<T, NDim> ndtype;
+  typedef ndarray_to_numpy_cvt<T, NDim> cvttype;
+  boost::python::type_info tinfo = boost::python::type_id<ndtype>();
+  boost::python::converter::registration const* reg = boost::python::converter::registry::query(tinfo);
+  if (not reg or not reg->m_to_python) {
+    boost::python::to_python_converter<ndtype, cvttype, true>();
+  }
+}
+
+} // namespace detail
+} // namespace psddl_python
+
+#endif // PSDDL_PYTHON_DDLWRAPPER_H

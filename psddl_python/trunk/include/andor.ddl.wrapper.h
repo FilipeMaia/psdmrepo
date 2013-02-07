@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_ANDOR_DDL_WRAPPER_H
 #define PSDDL_PYTHON_ANDOR_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/andor.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/andor.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Andor {
@@ -20,65 +21,63 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::Andor::ConfigV1> _o;
-  Psana::Andor::ConfigV1* o;
+  shared_ptr<const Psana::Andor::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AndorConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::Andor::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::Andor::ConfigV1* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint8_t fanMode() const { return o->fanMode(); }
-  uint8_t baselineClamp() const { return o->baselineClamp(); }
-  uint8_t highCapacity() const { return o->highCapacity(); }
-  uint8_t gainIndex() const { return o->gainIndex(); }
-  uint16_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
-  uint32_t numDelayShots() const { return o->numDelayShots(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::Andor::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint8_t fanMode() const { return m_obj->fanMode(); }
+  uint8_t baselineClamp() const { return m_obj->baselineClamp(); }
+  uint8_t highCapacity() const { return m_obj->highCapacity(); }
+  uint8_t gainIndex() const { return m_obj->gainIndex(); }
+  uint16_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint16_t exposureEventCode() const { return m_obj->exposureEventCode(); }
+  uint32_t numDelayShots() const { return m_obj->numDelayShots(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 class ConfigV1;
 
 class FrameV1_Wrapper {
-  shared_ptr<Psana::Andor::FrameV1> _o;
-  Psana::Andor::FrameV1* o;
+  shared_ptr<const Psana::Andor::FrameV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AndorFrame };
   enum { Version = 1 };
-  FrameV1_Wrapper(shared_ptr<Psana::Andor::FrameV1> obj) : _o(obj), o(_o.get()) {}
-  FrameV1_Wrapper(Psana::Andor::FrameV1* obj) : o(obj) {}
-  uint32_t shotIdStart() const { return o->shotIdStart(); }
-  float readoutTime() const { return o->readoutTime(); }
-  float temperature() const { return o->temperature(); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
+  FrameV1_Wrapper(const shared_ptr<const Psana::Andor::FrameV1>& obj) : m_obj(obj) {}
+  uint32_t shotIdStart() const { return m_obj->shotIdStart(); }
+  float readoutTime() const { return m_obj->readoutTime(); }
+  float temperature() const { return m_obj->temperature(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
 };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Andor::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Andor::ConfigV1);}
     const char* getTypeName() const { return "Psana::Andor::ConfigV1";}
     int getVersion() const { return Psana::Andor::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AndorConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Andor::ConfigV1> result = boost::static_pointer_cast<Psana::Andor::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::Getter {
+  class FrameV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Andor::FrameV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Andor::FrameV1);}
     const char* getTypeName() const { return "Psana::Andor::FrameV1";}
     int getVersion() const { return Psana::Andor::FrameV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AndorFrame; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Andor::FrameV1> result = boost::static_pointer_cast<Psana::Andor::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();

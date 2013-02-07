@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_ORCA_DDL_WRAPPER_H
 #define PSDDL_PYTHON_ORCA_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/orca.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/orca.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Orca {
@@ -20,24 +21,23 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::Orca::ConfigV1> _o;
-  Psana::Orca::ConfigV1* o;
+  shared_ptr<const Psana::Orca::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_OrcaConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::Orca::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::Orca::ConfigV1* obj) : o(obj) {}
-  Psana::Orca::ConfigV1::ReadoutMode mode() const { return o->mode(); }
-  Psana::Orca::ConfigV1::Cooling cooling() const { return o->cooling(); }
-  int8_t defect_pixel_correction_enabled() const { return o->defect_pixel_correction_enabled(); }
-  uint32_t rows() const { return o->rows(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::Orca::ConfigV1>& obj) : m_obj(obj) {}
+  Psana::Orca::ConfigV1::ReadoutMode mode() const { return m_obj->mode(); }
+  Psana::Orca::ConfigV1::Cooling cooling() const { return m_obj->cooling(); }
+  int8_t defect_pixel_correction_enabled() const { return m_obj->defect_pixel_correction_enabled(); }
+  uint32_t rows() const { return m_obj->rows(); }
 };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Orca::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Orca::ConfigV1);}
     const char* getTypeName() const { return "Psana::Orca::ConfigV1";}
     int getVersion() const { return Psana::Orca::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_OrcaConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Orca::ConfigV1> result = boost::static_pointer_cast<Psana::Orca::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();

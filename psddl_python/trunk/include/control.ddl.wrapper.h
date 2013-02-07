@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_CONTROL_DDL_WRAPPER_H
 #define PSDDL_PYTHON_CONTROL_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/control.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/control.ddl.h" // inc_psana
 
 #include <pdsdata/xtc/ClockTime.hh>
 namespace psddl_python {
@@ -20,128 +21,88 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class PVControl_Wrapper {
-  shared_ptr<Psana::ControlData::PVControl> _o;
-  Psana::ControlData::PVControl* o;
-public:
-  PVControl_Wrapper(shared_ptr<Psana::ControlData::PVControl> obj) : _o(obj), o(_o.get()) {}
-  PVControl_Wrapper(Psana::ControlData::PVControl* obj) : o(obj) {}
-  const char* name() const { return o->name(); }
-  uint32_t index() const { return o->index(); }
-  double value() const { return o->value(); }
-  uint8_t array() const { return o->array(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class PVMonitor_Wrapper {
-  shared_ptr<Psana::ControlData::PVMonitor> _o;
-  Psana::ControlData::PVMonitor* o;
-public:
-  PVMonitor_Wrapper(shared_ptr<Psana::ControlData::PVMonitor> obj) : _o(obj), o(_o.get()) {}
-  PVMonitor_Wrapper(Psana::ControlData::PVMonitor* obj) : o(obj) {}
-  const char* name() const { return o->name(); }
-  uint32_t index() const { return o->index(); }
-  double loValue() const { return o->loValue(); }
-  double hiValue() const { return o->hiValue(); }
-  uint8_t array() const { return o->array(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class PVLabel_Wrapper {
-  shared_ptr<Psana::ControlData::PVLabel> _o;
-  Psana::ControlData::PVLabel* o;
-public:
-  PVLabel_Wrapper(shared_ptr<Psana::ControlData::PVLabel> obj) : _o(obj), o(_o.get()) {}
-  PVLabel_Wrapper(Psana::ControlData::PVLabel* obj) : o(obj) {}
-  const char* name() const { return o->name(); }
-  const char* value() const { return o->value(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::ControlData::ConfigV1> _o;
-  Psana::ControlData::ConfigV1* o;
+  shared_ptr<const Psana::ControlData::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_ControlConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::ControlData::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::ControlData::ConfigV1* obj) : o(obj) {}
-  uint32_t events() const { return o->events(); }
-  uint8_t uses_duration() const { return o->uses_duration(); }
-  uint8_t uses_events() const { return o->uses_events(); }
-  const Pds::ClockTime& duration() const { return o->duration(); }
-  uint32_t npvControls() const { return o->npvControls(); }
-  uint32_t npvMonitors() const { return o->npvMonitors(); }
-  vector<Psana::ControlData::PVControl> pvControls() const { VEC_CONVERT(o->pvControls(), Psana::ControlData::PVControl); }
-  vector<Psana::ControlData::PVMonitor> pvMonitors() const { VEC_CONVERT(o->pvMonitors(), Psana::ControlData::PVMonitor); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::ControlData::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t events() const { return m_obj->events(); }
+  uint8_t uses_duration() const { return m_obj->uses_duration(); }
+  uint8_t uses_events() const { return m_obj->uses_events(); }
+  const Pds::ClockTime& duration() const { return m_obj->duration(); }
+  uint32_t npvControls() const { return m_obj->npvControls(); }
+  uint32_t npvMonitors() const { return m_obj->npvMonitors(); }
+  boost::python::list pvControls() const { return detail::ndToList(m_obj->pvControls()); }
+  boost::python::list pvMonitors() const { return detail::ndToList(m_obj->pvMonitors()); }
 };
 
 class ConfigV2_Wrapper {
-  shared_ptr<Psana::ControlData::ConfigV2> _o;
-  Psana::ControlData::ConfigV2* o;
+  shared_ptr<const Psana::ControlData::ConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_ControlConfig };
   enum { Version = 2 };
-  ConfigV2_Wrapper(shared_ptr<Psana::ControlData::ConfigV2> obj) : _o(obj), o(_o.get()) {}
-  ConfigV2_Wrapper(Psana::ControlData::ConfigV2* obj) : o(obj) {}
-  uint32_t events() const { return o->events(); }
-  uint8_t uses_duration() const { return o->uses_duration(); }
-  uint8_t uses_events() const { return o->uses_events(); }
-  const Pds::ClockTime& duration() const { return o->duration(); }
-  uint32_t npvControls() const { return o->npvControls(); }
-  uint32_t npvMonitors() const { return o->npvMonitors(); }
-  uint32_t npvLabels() const { return o->npvLabels(); }
-  vector<Psana::ControlData::PVControl> pvControls() const { VEC_CONVERT(o->pvControls(), Psana::ControlData::PVControl); }
-  vector<Psana::ControlData::PVMonitor> pvMonitors() const { VEC_CONVERT(o->pvMonitors(), Psana::ControlData::PVMonitor); }
-  vector<Psana::ControlData::PVLabel> pvLabels() const { VEC_CONVERT(o->pvLabels(), Psana::ControlData::PVLabel); }
+  ConfigV2_Wrapper(const shared_ptr<const Psana::ControlData::ConfigV2>& obj) : m_obj(obj) {}
+  uint32_t events() const { return m_obj->events(); }
+  uint8_t uses_duration() const { return m_obj->uses_duration(); }
+  uint8_t uses_events() const { return m_obj->uses_events(); }
+  const Pds::ClockTime& duration() const { return m_obj->duration(); }
+  uint32_t npvControls() const { return m_obj->npvControls(); }
+  uint32_t npvMonitors() const { return m_obj->npvMonitors(); }
+  uint32_t npvLabels() const { return m_obj->npvLabels(); }
+  boost::python::list pvControls() const { return detail::ndToList(m_obj->pvControls()); }
+  boost::python::list pvMonitors() const { return detail::ndToList(m_obj->pvMonitors()); }
+  boost::python::list pvLabels() const { return detail::ndToList(m_obj->pvLabels()); }
 };
 
-  class PVControl_Getter : public psddl_python::Getter {
+  class PVControl_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVControl);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVControl);}
     const char* getTypeName() const { return "Psana::ControlData::PVControl";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::ControlData::PVControl> result = boost::static_pointer_cast<Psana::ControlData::PVControl>(vdata);
-      return result.get() ? object(PVControl_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class PVMonitor_Getter : public psddl_python::Getter {
+  class PVMonitor_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVMonitor);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVMonitor);}
     const char* getTypeName() const { return "Psana::ControlData::PVMonitor";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::ControlData::PVMonitor> result = boost::static_pointer_cast<Psana::ControlData::PVMonitor>(vdata);
-      return result.get() ? object(PVMonitor_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class PVLabel_Getter : public psddl_python::Getter {
+  class PVLabel_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::PVLabel);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::PVLabel);}
     const char* getTypeName() const { return "Psana::ControlData::PVLabel";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::ControlData::PVLabel> result = boost::static_pointer_cast<Psana::ControlData::PVLabel>(vdata);
-      return result.get() ? object(PVLabel_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::ConfigV1);}
     const char* getTypeName() const { return "Psana::ControlData::ConfigV1";}
     int getVersion() const { return Psana::ControlData::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_ControlConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::ControlData::ConfigV1> result = boost::static_pointer_cast<Psana::ControlData::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::Getter {
+  class ConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::ControlData::ConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::ControlData::ConfigV2);}
     const char* getTypeName() const { return "Psana::ControlData::ConfigV2";}
     int getVersion() const { return Psana::ControlData::ConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_ControlConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::ControlData::ConfigV2> result = boost::static_pointer_cast<Psana::ControlData::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();

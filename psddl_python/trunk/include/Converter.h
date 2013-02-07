@@ -1,12 +1,12 @@
-#ifndef PSDDL_PYTHON_GETTER_H
-#define PSDDL_PYTHON_GETTER_H
+#ifndef PSDDL_PYTHON_CONVERTER_H
+#define PSDDL_PYTHON_CONVERTER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 //      $Id: PyDataType.h 5266 2013-01-31 20:14:36Z salnikov@SLAC.STANFORD.EDU $
 //
 // Description:
-//      Class Getter.
+//      Class Converter.
 //
 //------------------------------------------------------------------------
 
@@ -41,27 +41,32 @@ namespace psddl_python {
 /**
  *  @ingroup psddl_python
  *
- *  @brief Class defining interface for "getter" object types.
+ *  @brief Class defining interface for "converter" object types.
  *
- *  Instances of getter types know how to extract data from proxy dictionary
- *  and convert it into Python objects. There will be one instance of getter
+ *  Instances of converter types know how to convert data from data from 
+ *  C++ format into Python objects. There will be one instance of getter
  *  for each corresponding C++ type.
  *
- *  @see GetterMap
+ *  @see ConverterMap
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  */
 
-class Getter {
+class Converter {
 public:
 
-  virtual ~Getter() {}
+  virtual ~Converter() {}
 
   /**
    *  @brief Return type_info of the corresponding C++ type.
    */
-  virtual const std::type_info& typeinfo() const = 0;
+  virtual const std::type_info* typeinfo() const = 0;
+
+  /**
+   *  @brief Return value of pdsdata::TypeId::Type enum a type or -1.
+   */
+  virtual int pdsTypeId() const { return -1; }
 
   /**
    *  @brief Return name of the corresponding C++ type.
@@ -91,4 +96,4 @@ public:
 
 }
 
-#endif // PSDDL_PYTHON_GETTER_H
+#endif // PSDDL_PYTHON_CONVERTER_H

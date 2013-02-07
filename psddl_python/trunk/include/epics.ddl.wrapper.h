@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_EPICS_DDL_WRAPPER_H
 #define PSDDL_PYTHON_EPICS_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/epics.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/epics.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Epics {
@@ -19,604 +20,339 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class epicsTimeStamp_Wrapper {
-  shared_ptr<Psana::Epics::epicsTimeStamp> _o;
-  Psana::Epics::epicsTimeStamp* o;
-public:
-  epicsTimeStamp_Wrapper(shared_ptr<Psana::Epics::epicsTimeStamp> obj) : _o(obj), o(_o.get()) {}
-  epicsTimeStamp_Wrapper(Psana::Epics::epicsTimeStamp* obj) : o(obj) {}
-  uint32_t sec() const { return o->sec(); }
-  uint32_t nsec() const { return o->nsec(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_string_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_string> _o;
-  Psana::Epics::dbr_time_string* o;
-public:
-  dbr_time_string_Wrapper(shared_ptr<Psana::Epics::dbr_time_string> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_string_Wrapper(Psana::Epics::dbr_time_string* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_short_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_short> _o;
-  Psana::Epics::dbr_time_short* o;
-public:
-  dbr_time_short_Wrapper(shared_ptr<Psana::Epics::dbr_time_short> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_short_Wrapper(Psana::Epics::dbr_time_short* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_float_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_float> _o;
-  Psana::Epics::dbr_time_float* o;
-public:
-  dbr_time_float_Wrapper(shared_ptr<Psana::Epics::dbr_time_float> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_float_Wrapper(Psana::Epics::dbr_time_float* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_enum_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_enum> _o;
-  Psana::Epics::dbr_time_enum* o;
-public:
-  dbr_time_enum_Wrapper(shared_ptr<Psana::Epics::dbr_time_enum> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_enum_Wrapper(Psana::Epics::dbr_time_enum* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_char_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_char> _o;
-  Psana::Epics::dbr_time_char* o;
-public:
-  dbr_time_char_Wrapper(shared_ptr<Psana::Epics::dbr_time_char> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_char_Wrapper(Psana::Epics::dbr_time_char* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_long_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_long> _o;
-  Psana::Epics::dbr_time_long* o;
-public:
-  dbr_time_long_Wrapper(shared_ptr<Psana::Epics::dbr_time_long> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_long_Wrapper(Psana::Epics::dbr_time_long* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_time_double_Wrapper {
-  shared_ptr<Psana::Epics::dbr_time_double> _o;
-  Psana::Epics::dbr_time_double* o;
-public:
-  dbr_time_double_Wrapper(shared_ptr<Psana::Epics::dbr_time_double> obj) : _o(obj), o(_o.get()) {}
-  dbr_time_double_Wrapper(Psana::Epics::dbr_time_double* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const epicsTimeStamp_Wrapper stamp() const { return epicsTimeStamp_Wrapper(const_cast<Psana::Epics::epicsTimeStamp*>(&o->stamp())); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_sts_string_Wrapper {
-  shared_ptr<Psana::Epics::dbr_sts_string> _o;
-  Psana::Epics::dbr_sts_string* o;
-public:
-  dbr_sts_string_Wrapper(shared_ptr<Psana::Epics::dbr_sts_string> obj) : _o(obj), o(_o.get()) {}
-  dbr_sts_string_Wrapper(Psana::Epics::dbr_sts_string* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class dbr_ctrl_short_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_short> _o;
-  Psana::Epics::dbr_ctrl_short* o;
-public:
-  dbr_ctrl_short_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_short> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_short_Wrapper(Psana::Epics::dbr_ctrl_short* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const char* units() const { return o->units(); }
-  int16_t upper_disp_limit() const { return o->upper_disp_limit(); }
-  int16_t lower_disp_limit() const { return o->lower_disp_limit(); }
-  int16_t upper_alarm_limit() const { return o->upper_alarm_limit(); }
-  int16_t upper_warning_limit() const { return o->upper_warning_limit(); }
-  int16_t lower_warning_limit() const { return o->lower_warning_limit(); }
-  int16_t lower_alarm_limit() const { return o->lower_alarm_limit(); }
-  int16_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
-  int16_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> units_shape() const { return o->units_shape(); }
-};
-
-class dbr_ctrl_float_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_float> _o;
-  Psana::Epics::dbr_ctrl_float* o;
-public:
-  dbr_ctrl_float_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_float> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_float_Wrapper(Psana::Epics::dbr_ctrl_float* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  int16_t precision() const { return o->precision(); }
-  const char* units() const { return o->units(); }
-  float upper_disp_limit() const { return o->upper_disp_limit(); }
-  float lower_disp_limit() const { return o->lower_disp_limit(); }
-  float upper_alarm_limit() const { return o->upper_alarm_limit(); }
-  float upper_warning_limit() const { return o->upper_warning_limit(); }
-  float lower_warning_limit() const { return o->lower_warning_limit(); }
-  float lower_alarm_limit() const { return o->lower_alarm_limit(); }
-  float upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
-  float lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> units_shape() const { return o->units_shape(); }
-};
-
-class dbr_ctrl_enum_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_enum> _o;
-  Psana::Epics::dbr_ctrl_enum* o;
-public:
-  dbr_ctrl_enum_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_enum> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_enum_Wrapper(Psana::Epics::dbr_ctrl_enum* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  int16_t no_str() const { return o->no_str(); }
-  const char* strings(uint32_t i0) const { return o->strings(i0); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> strings_shape() const { return o->strings_shape(); }
-};
-
-class dbr_ctrl_char_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_char> _o;
-  Psana::Epics::dbr_ctrl_char* o;
-public:
-  dbr_ctrl_char_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_char> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_char_Wrapper(Psana::Epics::dbr_ctrl_char* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const char* units() const { return o->units(); }
-  uint8_t upper_disp_limit() const { return o->upper_disp_limit(); }
-  uint8_t lower_disp_limit() const { return o->lower_disp_limit(); }
-  uint8_t upper_alarm_limit() const { return o->upper_alarm_limit(); }
-  uint8_t upper_warning_limit() const { return o->upper_warning_limit(); }
-  uint8_t lower_warning_limit() const { return o->lower_warning_limit(); }
-  uint8_t lower_alarm_limit() const { return o->lower_alarm_limit(); }
-  uint8_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
-  uint8_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> units_shape() const { return o->units_shape(); }
-};
-
-class dbr_ctrl_long_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_long> _o;
-  Psana::Epics::dbr_ctrl_long* o;
-public:
-  dbr_ctrl_long_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_long> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_long_Wrapper(Psana::Epics::dbr_ctrl_long* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  const char* units() const { return o->units(); }
-  int32_t upper_disp_limit() const { return o->upper_disp_limit(); }
-  int32_t lower_disp_limit() const { return o->lower_disp_limit(); }
-  int32_t upper_alarm_limit() const { return o->upper_alarm_limit(); }
-  int32_t upper_warning_limit() const { return o->upper_warning_limit(); }
-  int32_t lower_warning_limit() const { return o->lower_warning_limit(); }
-  int32_t lower_alarm_limit() const { return o->lower_alarm_limit(); }
-  int32_t upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
-  int32_t lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> units_shape() const { return o->units_shape(); }
-};
-
-class dbr_ctrl_double_Wrapper {
-  shared_ptr<Psana::Epics::dbr_ctrl_double> _o;
-  Psana::Epics::dbr_ctrl_double* o;
-public:
-  dbr_ctrl_double_Wrapper(shared_ptr<Psana::Epics::dbr_ctrl_double> obj) : _o(obj), o(_o.get()) {}
-  dbr_ctrl_double_Wrapper(Psana::Epics::dbr_ctrl_double* obj) : o(obj) {}
-  int16_t status() const { return o->status(); }
-  int16_t severity() const { return o->severity(); }
-  int16_t precision() const { return o->precision(); }
-  const char* units() const { return o->units(); }
-  double upper_disp_limit() const { return o->upper_disp_limit(); }
-  double lower_disp_limit() const { return o->lower_disp_limit(); }
-  double upper_alarm_limit() const { return o->upper_alarm_limit(); }
-  double upper_warning_limit() const { return o->upper_warning_limit(); }
-  double lower_warning_limit() const { return o->lower_warning_limit(); }
-  double lower_alarm_limit() const { return o->lower_alarm_limit(); }
-  double upper_ctrl_limit() const { return o->upper_ctrl_limit(); }
-  double lower_ctrl_limit() const { return o->lower_ctrl_limit(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> units_shape() const { return o->units_shape(); }
-};
-
 class EpicsPvHeader_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvHeader> _o;
-  Psana::Epics::EpicsPvHeader* o;
+  shared_ptr<const Psana::Epics::EpicsPvHeader> m_obj;
 public:
-  EpicsPvHeader_Wrapper(shared_ptr<Psana::Epics::EpicsPvHeader> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvHeader_Wrapper(Psana::Epics::EpicsPvHeader* obj) : o(obj) {}
-  int16_t pvId() const { return o->pvId(); }
-  int16_t dbrType() const { return o->dbrType(); }
-  int16_t numElements() const { return o->numElements(); }
-  void print() const { return o->print(); }
-  uint8_t isCtrl() const { return o->isCtrl(); }
-  uint8_t isTime() const { return o->isTime(); }
-  uint16_t status() const { return o->status(); }
-  uint16_t severity() const { return o->severity(); }
+  EpicsPvHeader_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvHeader>& obj) : m_obj(obj) {}
+  int16_t pvId() const { return m_obj->pvId(); }
+  int16_t dbrType() const { return m_obj->dbrType(); }
+  int16_t numElements() const { return m_obj->numElements(); }
+  void print() const { m_obj->print(); }
+  uint8_t isCtrl() const { return m_obj->isCtrl(); }
+  uint8_t isTime() const { return m_obj->isTime(); }
+  uint16_t status() const { return m_obj->status(); }
+  uint16_t severity() const { return m_obj->severity(); }
 };
 
 class EpicsPvCtrlHeader_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlHeader> _o;
-  Psana::Epics::EpicsPvCtrlHeader* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlHeader> m_obj;
 public:
-  EpicsPvCtrlHeader_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlHeader> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlHeader_Wrapper(Psana::Epics::EpicsPvCtrlHeader* obj) : o(obj) {}
-  const char* pvName() const { return o->pvName(); }
-  vector<int> pvName_shape() const { return o->pvName_shape(); }
+  EpicsPvCtrlHeader_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlHeader>& obj) : m_obj(obj) {}
+  const char* pvName() const { return m_obj->pvName(); }
+  boost::python::list pvName_shape() const { boost::python::list res; const vector<int>& sh=m_obj->pvName_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
 };
 
 class EpicsPvTimeHeader_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeHeader> _o;
-  Psana::Epics::EpicsPvTimeHeader* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeHeader> m_obj;
 public:
-  EpicsPvTimeHeader_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeHeader> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeHeader_Wrapper(Psana::Epics::EpicsPvTimeHeader* obj) : o(obj) {}
-  Psana::Epics::epicsTimeStamp stamp() const { return o->stamp(); }
+  EpicsPvTimeHeader_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeHeader>& obj) : m_obj(obj) {}
+  Psana::Epics::epicsTimeStamp stamp() const { return m_obj->stamp(); }
 };
 
 class EpicsPvCtrlString_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlString> _o;
-  Psana::Epics::EpicsPvCtrlString* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlString> m_obj;
 public:
-  EpicsPvCtrlString_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlString> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlString_Wrapper(Psana::Epics::EpicsPvCtrlString* obj) : o(obj) {}
-  const dbr_sts_string_Wrapper dbr() const { return dbr_sts_string_Wrapper(const_cast<Psana::Epics::dbr_sts_string*>(&o->dbr())); }
-  const char* data(uint32_t i0) const { return o->data(i0); }
-  const char* value(uint32_t i) const { return o->value(i); }
-  vector<int> data_shape() const { return o->data_shape(); }
-  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
+  EpicsPvCtrlString_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlString>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_sts_string& dbr() const { return m_obj->dbr(); }
+  const char* data(uint32_t i0) const { return m_obj->data(i0); }
+  const char* value(uint32_t i) const { return m_obj->value(i); }
+  boost::python::list data_shape() const { boost::python::list res; const vector<int>& sh=m_obj->data_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
+  boost::python::list data_list() { boost::python::list l; const int n = m_obj->data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class EpicsPvCtrlShort_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlShort> _o;
-  Psana::Epics::EpicsPvCtrlShort* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlShort> m_obj;
 public:
-  EpicsPvCtrlShort_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlShort> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlShort_Wrapper(Psana::Epics::EpicsPvCtrlShort* obj) : o(obj) {}
-  const dbr_ctrl_short_Wrapper dbr() const { return dbr_ctrl_short_Wrapper(const_cast<Psana::Epics::dbr_ctrl_short*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), int16_t, 1); }
-  int16_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlShort_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlShort>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_short& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  int16_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvCtrlFloat_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlFloat> _o;
-  Psana::Epics::EpicsPvCtrlFloat* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlFloat> m_obj;
 public:
-  EpicsPvCtrlFloat_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlFloat> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlFloat_Wrapper(Psana::Epics::EpicsPvCtrlFloat* obj) : o(obj) {}
-  const dbr_ctrl_float_Wrapper dbr() const { return dbr_ctrl_float_Wrapper(const_cast<Psana::Epics::dbr_ctrl_float*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), float, 1); }
-  float value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlFloat_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlFloat>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_float& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  float value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvCtrlEnum_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlEnum> _o;
-  Psana::Epics::EpicsPvCtrlEnum* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlEnum> m_obj;
 public:
-  EpicsPvCtrlEnum_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlEnum> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlEnum_Wrapper(Psana::Epics::EpicsPvCtrlEnum* obj) : o(obj) {}
-  const dbr_ctrl_enum_Wrapper dbr() const { return dbr_ctrl_enum_Wrapper(const_cast<Psana::Epics::dbr_ctrl_enum*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
-  uint16_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlEnum_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlEnum>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_enum& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  uint16_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvCtrlChar_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlChar> _o;
-  Psana::Epics::EpicsPvCtrlChar* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlChar> m_obj;
 public:
-  EpicsPvCtrlChar_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlChar> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlChar_Wrapper(Psana::Epics::EpicsPvCtrlChar* obj) : o(obj) {}
-  const dbr_ctrl_char_Wrapper dbr() const { return dbr_ctrl_char_Wrapper(const_cast<Psana::Epics::dbr_ctrl_char*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint8_t, 1); }
-  uint8_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlChar_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlChar>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_char& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  uint8_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvCtrlLong_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlLong> _o;
-  Psana::Epics::EpicsPvCtrlLong* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlLong> m_obj;
 public:
-  EpicsPvCtrlLong_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlLong> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlLong_Wrapper(Psana::Epics::EpicsPvCtrlLong* obj) : o(obj) {}
-  const dbr_ctrl_long_Wrapper dbr() const { return dbr_ctrl_long_Wrapper(const_cast<Psana::Epics::dbr_ctrl_long*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), int32_t, 1); }
-  int32_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlLong_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlLong>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_long& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  int32_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvCtrlDouble_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvCtrlDouble> _o;
-  Psana::Epics::EpicsPvCtrlDouble* o;
+  shared_ptr<const Psana::Epics::EpicsPvCtrlDouble> m_obj;
 public:
-  EpicsPvCtrlDouble_Wrapper(shared_ptr<Psana::Epics::EpicsPvCtrlDouble> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvCtrlDouble_Wrapper(Psana::Epics::EpicsPvCtrlDouble* obj) : o(obj) {}
-  const dbr_ctrl_double_Wrapper dbr() const { return dbr_ctrl_double_Wrapper(const_cast<Psana::Epics::dbr_ctrl_double*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), double, 1); }
-  double value(uint32_t i) const { return o->value(i); }
+  EpicsPvCtrlDouble_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvCtrlDouble>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_ctrl_double& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  double value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeString_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeString> _o;
-  Psana::Epics::EpicsPvTimeString* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeString> m_obj;
 public:
-  EpicsPvTimeString_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeString> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeString_Wrapper(Psana::Epics::EpicsPvTimeString* obj) : o(obj) {}
-  const dbr_time_string_Wrapper dbr() const { return dbr_time_string_Wrapper(const_cast<Psana::Epics::dbr_time_string*>(&o->dbr())); }
-  const char* data(uint32_t i0) const { return o->data(i0); }
-  const char* value(uint32_t i) const { return o->value(i); }
-  vector<int> data_shape() const { return o->data_shape(); }
-  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
+  EpicsPvTimeString_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeString>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_string& dbr() const { return m_obj->dbr(); }
+  const char* data(uint32_t i0) const { return m_obj->data(i0); }
+  const char* value(uint32_t i) const { return m_obj->value(i); }
+  boost::python::list data_shape() const { boost::python::list res; const vector<int>& sh=m_obj->data_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
+  boost::python::list data_list() { boost::python::list l; const int n = m_obj->data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class EpicsPvTimeShort_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeShort> _o;
-  Psana::Epics::EpicsPvTimeShort* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeShort> m_obj;
 public:
-  EpicsPvTimeShort_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeShort> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeShort_Wrapper(Psana::Epics::EpicsPvTimeShort* obj) : o(obj) {}
-  const dbr_time_short_Wrapper dbr() const { return dbr_time_short_Wrapper(const_cast<Psana::Epics::dbr_time_short*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), int16_t, 1); }
-  int16_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeShort_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeShort>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_short& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  int16_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeFloat_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeFloat> _o;
-  Psana::Epics::EpicsPvTimeFloat* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeFloat> m_obj;
 public:
-  EpicsPvTimeFloat_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeFloat> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeFloat_Wrapper(Psana::Epics::EpicsPvTimeFloat* obj) : o(obj) {}
-  const dbr_time_float_Wrapper dbr() const { return dbr_time_float_Wrapper(const_cast<Psana::Epics::dbr_time_float*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), float, 1); }
-  float value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeFloat_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeFloat>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_float& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  float value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeEnum_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeEnum> _o;
-  Psana::Epics::EpicsPvTimeEnum* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeEnum> m_obj;
 public:
-  EpicsPvTimeEnum_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeEnum> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeEnum_Wrapper(Psana::Epics::EpicsPvTimeEnum* obj) : o(obj) {}
-  const dbr_time_enum_Wrapper dbr() const { return dbr_time_enum_Wrapper(const_cast<Psana::Epics::dbr_time_enum*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
-  uint16_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeEnum_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeEnum>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_enum& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  uint16_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeChar_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeChar> _o;
-  Psana::Epics::EpicsPvTimeChar* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeChar> m_obj;
 public:
-  EpicsPvTimeChar_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeChar> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeChar_Wrapper(Psana::Epics::EpicsPvTimeChar* obj) : o(obj) {}
-  const dbr_time_char_Wrapper dbr() const { return dbr_time_char_Wrapper(const_cast<Psana::Epics::dbr_time_char*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint8_t, 1); }
-  uint8_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeChar_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeChar>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_char& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  uint8_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeLong_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeLong> _o;
-  Psana::Epics::EpicsPvTimeLong* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeLong> m_obj;
 public:
-  EpicsPvTimeLong_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeLong> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeLong_Wrapper(Psana::Epics::EpicsPvTimeLong* obj) : o(obj) {}
-  const dbr_time_long_Wrapper dbr() const { return dbr_time_long_Wrapper(const_cast<Psana::Epics::dbr_time_long*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), int32_t, 1); }
-  int32_t value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeLong_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeLong>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_long& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  int32_t value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class EpicsPvTimeDouble_Wrapper {
-  shared_ptr<Psana::Epics::EpicsPvTimeDouble> _o;
-  Psana::Epics::EpicsPvTimeDouble* o;
+  shared_ptr<const Psana::Epics::EpicsPvTimeDouble> m_obj;
 public:
-  EpicsPvTimeDouble_Wrapper(shared_ptr<Psana::Epics::EpicsPvTimeDouble> obj) : _o(obj), o(_o.get()) {}
-  EpicsPvTimeDouble_Wrapper(Psana::Epics::EpicsPvTimeDouble* obj) : o(obj) {}
-  const dbr_time_double_Wrapper dbr() const { return dbr_time_double_Wrapper(const_cast<Psana::Epics::dbr_time_double*>(&o->dbr())); }
-  PyObject* data() const { ND_CONVERT(o->data(), double, 1); }
-  double value(uint32_t i) const { return o->value(i); }
+  EpicsPvTimeDouble_Wrapper(const shared_ptr<const Psana::Epics::EpicsPvTimeDouble>& obj) : m_obj(obj) {}
+  const Psana::Epics::dbr_time_double& dbr() const { return m_obj->dbr(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  double value(uint32_t i) const { return m_obj->value(i); }
 };
 
 class PvConfigV1_Wrapper {
-  shared_ptr<Psana::Epics::PvConfigV1> _o;
-  Psana::Epics::PvConfigV1* o;
+  shared_ptr<const Psana::Epics::PvConfigV1> m_obj;
 public:
-  PvConfigV1_Wrapper(shared_ptr<Psana::Epics::PvConfigV1> obj) : _o(obj), o(_o.get()) {}
-  PvConfigV1_Wrapper(Psana::Epics::PvConfigV1* obj) : o(obj) {}
-  int16_t pvId() const { return o->pvId(); }
-  const char* description() const { return o->description(); }
-  float interval() const { return o->interval(); }
+  PvConfigV1_Wrapper(const shared_ptr<const Psana::Epics::PvConfigV1>& obj) : m_obj(obj) {}
+  int16_t pvId() const { return m_obj->pvId(); }
+  const char* description() const { return m_obj->description(); }
+  float interval() const { return m_obj->interval(); }
 };
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::Epics::ConfigV1> _o;
-  Psana::Epics::ConfigV1* o;
+  shared_ptr<const Psana::Epics::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::Epics::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::Epics::ConfigV1* obj) : o(obj) {}
-  int32_t numPv() const { return o->numPv(); }
-  const PvConfigV1_Wrapper pvControls(uint32_t i0) const { return PvConfigV1_Wrapper(const_cast<Psana::Epics::PvConfigV1*>(&o->pvControls(i0))); }
-  vector<int> pvControls_shape() const { return o->pvControls_shape(); }
-  boost::python::list pvControls_list() { boost::python::list l; const int n = pvControls_shape()[0]; for (int i = 0; i < n; i++) l.append(pvControls(i)); return l; }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::Epics::ConfigV1>& obj) : m_obj(obj) {}
+  int32_t numPv() const { return m_obj->numPv(); }
+  Epics::PvConfigV1_Wrapper pvControls(uint32_t i0) const { return Epics::PvConfigV1_Wrapper(boost::shared_ptr<const Psana::Epics::PvConfigV1>(m_obj, &m_obj->pvControls(i0))); }
+  boost::python::list pvControls_shape() const { boost::python::list res; const vector<int>& sh=m_obj->pvControls_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
+  boost::python::list pvControls_list() { boost::python::list l; const int n = m_obj->pvControls_shape()[0]; for (int i = 0; i < n; i++) l.append(pvControls(i)); return l; }
 };
 
-  class epicsTimeStamp_Getter : public psddl_python::Getter {
+  class epicsTimeStamp_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::epicsTimeStamp);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::epicsTimeStamp);}
     const char* getTypeName() const { return "Psana::Epics::epicsTimeStamp";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::epicsTimeStamp> result = boost::static_pointer_cast<Psana::Epics::epicsTimeStamp>(vdata);
-      return result.get() ? object(epicsTimeStamp_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_string_Getter : public psddl_python::Getter {
+  class dbr_time_string_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_string);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_string);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_string";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_string> result = boost::static_pointer_cast<Psana::Epics::dbr_time_string>(vdata);
-      return result.get() ? object(dbr_time_string_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_short_Getter : public psddl_python::Getter {
+  class dbr_time_short_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_short);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_short);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_short";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_short> result = boost::static_pointer_cast<Psana::Epics::dbr_time_short>(vdata);
-      return result.get() ? object(dbr_time_short_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_float_Getter : public psddl_python::Getter {
+  class dbr_time_float_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_float);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_float);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_float";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_float> result = boost::static_pointer_cast<Psana::Epics::dbr_time_float>(vdata);
-      return result.get() ? object(dbr_time_float_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_enum_Getter : public psddl_python::Getter {
+  class dbr_time_enum_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_enum);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_enum);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_enum";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_enum> result = boost::static_pointer_cast<Psana::Epics::dbr_time_enum>(vdata);
-      return result.get() ? object(dbr_time_enum_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_char_Getter : public psddl_python::Getter {
+  class dbr_time_char_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_char);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_char);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_char";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_char> result = boost::static_pointer_cast<Psana::Epics::dbr_time_char>(vdata);
-      return result.get() ? object(dbr_time_char_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_long_Getter : public psddl_python::Getter {
+  class dbr_time_long_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_long);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_long);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_long";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_long> result = boost::static_pointer_cast<Psana::Epics::dbr_time_long>(vdata);
-      return result.get() ? object(dbr_time_long_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_time_double_Getter : public psddl_python::Getter {
+  class dbr_time_double_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_time_double);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_time_double);}
     const char* getTypeName() const { return "Psana::Epics::dbr_time_double";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_time_double> result = boost::static_pointer_cast<Psana::Epics::dbr_time_double>(vdata);
-      return result.get() ? object(dbr_time_double_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_sts_string_Getter : public psddl_python::Getter {
+  class dbr_sts_string_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_sts_string);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_sts_string);}
     const char* getTypeName() const { return "Psana::Epics::dbr_sts_string";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_sts_string> result = boost::static_pointer_cast<Psana::Epics::dbr_sts_string>(vdata);
-      return result.get() ? object(dbr_sts_string_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_short_Getter : public psddl_python::Getter {
+  class dbr_ctrl_short_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_short);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_short);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_short";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_short> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_short>(vdata);
-      return result.get() ? object(dbr_ctrl_short_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_float_Getter : public psddl_python::Getter {
+  class dbr_ctrl_float_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_float);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_float);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_float";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_float> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_float>(vdata);
-      return result.get() ? object(dbr_ctrl_float_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_enum_Getter : public psddl_python::Getter {
+  class dbr_ctrl_enum_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_enum);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_enum);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_enum";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_enum> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_enum>(vdata);
-      return result.get() ? object(dbr_ctrl_enum_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_char_Getter : public psddl_python::Getter {
+  class dbr_ctrl_char_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_char);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_char);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_char";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_char> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_char>(vdata);
-      return result.get() ? object(dbr_ctrl_char_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_long_Getter : public psddl_python::Getter {
+  class dbr_ctrl_long_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_long);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_long);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_long";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_long> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_long>(vdata);
-      return result.get() ? object(dbr_ctrl_long_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class dbr_ctrl_double_Getter : public psddl_python::Getter {
+  class dbr_ctrl_double_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::dbr_ctrl_double);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::dbr_ctrl_double);}
     const char* getTypeName() const { return "Psana::Epics::dbr_ctrl_double";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::dbr_ctrl_double> result = boost::static_pointer_cast<Psana::Epics::dbr_ctrl_double>(vdata);
-      return result.get() ? object(dbr_ctrl_double_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class EpicsPvHeader_Getter : public psddl_python::Getter {
+  class EpicsPvHeader_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvHeader);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvHeader);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvHeader";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvHeader>(vdata);
@@ -624,9 +360,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlHeader_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlHeader_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlHeader);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlHeader);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlHeader";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlHeader>(vdata);
@@ -634,9 +370,9 @@ public:
     }
   };
 
-  class EpicsPvTimeHeader_Getter : public psddl_python::Getter {
+  class EpicsPvTimeHeader_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeHeader);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeHeader);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeHeader";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeHeader> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeHeader>(vdata);
@@ -644,9 +380,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlString_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlString_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlString);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlString);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlString";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlString> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlString>(vdata);
@@ -654,9 +390,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlShort_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlShort_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlShort);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlShort);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlShort";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlShort> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlShort>(vdata);
@@ -664,9 +400,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlFloat_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlFloat_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlFloat);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlFloat);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlFloat";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlFloat> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlFloat>(vdata);
@@ -674,9 +410,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlEnum_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlEnum_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlEnum);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlEnum);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlEnum";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlEnum> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlEnum>(vdata);
@@ -684,9 +420,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlChar_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlChar_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlChar);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlChar);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlChar";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlChar> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlChar>(vdata);
@@ -694,9 +430,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlLong_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlLong_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlLong);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlLong);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlLong";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlLong> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlLong>(vdata);
@@ -704,9 +440,9 @@ public:
     }
   };
 
-  class EpicsPvCtrlDouble_Getter : public psddl_python::Getter {
+  class EpicsPvCtrlDouble_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvCtrlDouble);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvCtrlDouble);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvCtrlDouble";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvCtrlDouble> result = boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlDouble>(vdata);
@@ -714,9 +450,9 @@ public:
     }
   };
 
-  class EpicsPvTimeString_Getter : public psddl_python::Getter {
+  class EpicsPvTimeString_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeString);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeString);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeString";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeString> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeString>(vdata);
@@ -724,9 +460,9 @@ public:
     }
   };
 
-  class EpicsPvTimeShort_Getter : public psddl_python::Getter {
+  class EpicsPvTimeShort_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeShort);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeShort);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeShort";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeShort> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeShort>(vdata);
@@ -734,9 +470,9 @@ public:
     }
   };
 
-  class EpicsPvTimeFloat_Getter : public psddl_python::Getter {
+  class EpicsPvTimeFloat_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeFloat);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeFloat);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeFloat";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeFloat> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeFloat>(vdata);
@@ -744,9 +480,9 @@ public:
     }
   };
 
-  class EpicsPvTimeEnum_Getter : public psddl_python::Getter {
+  class EpicsPvTimeEnum_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeEnum);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeEnum);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeEnum";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeEnum> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeEnum>(vdata);
@@ -754,9 +490,9 @@ public:
     }
   };
 
-  class EpicsPvTimeChar_Getter : public psddl_python::Getter {
+  class EpicsPvTimeChar_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeChar);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeChar);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeChar";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeChar> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeChar>(vdata);
@@ -764,9 +500,9 @@ public:
     }
   };
 
-  class EpicsPvTimeLong_Getter : public psddl_python::Getter {
+  class EpicsPvTimeLong_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeLong);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeLong);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeLong";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeLong> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeLong>(vdata);
@@ -774,9 +510,9 @@ public:
     }
   };
 
-  class EpicsPvTimeDouble_Getter : public psddl_python::Getter {
+  class EpicsPvTimeDouble_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::EpicsPvTimeDouble);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::EpicsPvTimeDouble);}
     const char* getTypeName() const { return "Psana::Epics::EpicsPvTimeDouble";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::EpicsPvTimeDouble> result = boost::static_pointer_cast<Psana::Epics::EpicsPvTimeDouble>(vdata);
@@ -784,9 +520,9 @@ public:
     }
   };
 
-  class PvConfigV1_Getter : public psddl_python::Getter {
+  class PvConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::PvConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::PvConfigV1);}
     const char* getTypeName() const { return "Psana::Epics::PvConfigV1";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::PvConfigV1> result = boost::static_pointer_cast<Psana::Epics::PvConfigV1>(vdata);
@@ -794,11 +530,12 @@ public:
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Epics::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Epics::ConfigV1);}
     const char* getTypeName() const { return "Psana::Epics::ConfigV1";}
     int getVersion() const { return Psana::Epics::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EpicsConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Epics::ConfigV1> result = boost::static_pointer_cast<Psana::Epics::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();

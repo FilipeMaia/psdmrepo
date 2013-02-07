@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_PRINCETON_DDL_WRAPPER_H
 #define PSDDL_PYTHON_PRINCETON_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/princeton.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/princeton.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Princeton {
@@ -20,139 +21,129 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::Princeton::ConfigV1> _o;
-  Psana::Princeton::ConfigV1* o;
+  shared_ptr<const Psana::Princeton::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::Princeton::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::Princeton::ConfigV1* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint32_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint16_t readoutEventCode() const { return o->readoutEventCode(); }
-  uint16_t delayMode() const { return o->delayMode(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::Princeton::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint32_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint16_t readoutEventCode() const { return m_obj->readoutEventCode(); }
+  uint16_t delayMode() const { return m_obj->delayMode(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 
 class ConfigV2_Wrapper {
-  shared_ptr<Psana::Princeton::ConfigV2> _o;
-  Psana::Princeton::ConfigV2* o;
+  shared_ptr<const Psana::Princeton::ConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
   enum { Version = 2 };
-  ConfigV2_Wrapper(shared_ptr<Psana::Princeton::ConfigV2> obj) : _o(obj), o(_o.get()) {}
-  ConfigV2_Wrapper(Psana::Princeton::ConfigV2* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint16_t gainIndex() const { return o->gainIndex(); }
-  uint16_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint16_t readoutEventCode() const { return o->readoutEventCode(); }
-  uint16_t delayMode() const { return o->delayMode(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV2_Wrapper(const shared_ptr<const Psana::Princeton::ConfigV2>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint16_t gainIndex() const { return m_obj->gainIndex(); }
+  uint16_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint16_t readoutEventCode() const { return m_obj->readoutEventCode(); }
+  uint16_t delayMode() const { return m_obj->delayMode(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 
 class ConfigV3_Wrapper {
-  shared_ptr<Psana::Princeton::ConfigV3> _o;
-  Psana::Princeton::ConfigV3* o;
+  shared_ptr<const Psana::Princeton::ConfigV3> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
   enum { Version = 3 };
-  ConfigV3_Wrapper(shared_ptr<Psana::Princeton::ConfigV3> obj) : _o(obj), o(_o.get()) {}
-  ConfigV3_Wrapper(Psana::Princeton::ConfigV3* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint8_t gainIndex() const { return o->gainIndex(); }
-  uint8_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
-  uint32_t numDelayShots() const { return o->numDelayShots(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV3_Wrapper(const shared_ptr<const Psana::Princeton::ConfigV3>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint8_t gainIndex() const { return m_obj->gainIndex(); }
+  uint8_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint16_t exposureEventCode() const { return m_obj->exposureEventCode(); }
+  uint32_t numDelayShots() const { return m_obj->numDelayShots(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 
 class ConfigV4_Wrapper {
-  shared_ptr<Psana::Princeton::ConfigV4> _o;
-  Psana::Princeton::ConfigV4* o;
+  shared_ptr<const Psana::Princeton::ConfigV4> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
   enum { Version = 4 };
-  ConfigV4_Wrapper(shared_ptr<Psana::Princeton::ConfigV4> obj) : _o(obj), o(_o.get()) {}
-  ConfigV4_Wrapper(Psana::Princeton::ConfigV4* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  uint32_t maskedHeight() const { return o->maskedHeight(); }
-  uint32_t kineticHeight() const { return o->kineticHeight(); }
-  float vsSpeed() const { return o->vsSpeed(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint8_t gainIndex() const { return o->gainIndex(); }
-  uint8_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
-  uint32_t numDelayShots() const { return o->numDelayShots(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV4_Wrapper(const shared_ptr<const Psana::Princeton::ConfigV4>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  uint32_t maskedHeight() const { return m_obj->maskedHeight(); }
+  uint32_t kineticHeight() const { return m_obj->kineticHeight(); }
+  float vsSpeed() const { return m_obj->vsSpeed(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint8_t gainIndex() const { return m_obj->gainIndex(); }
+  uint8_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint16_t exposureEventCode() const { return m_obj->exposureEventCode(); }
+  uint32_t numDelayShots() const { return m_obj->numDelayShots(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 
 class ConfigV5_Wrapper {
-  shared_ptr<Psana::Princeton::ConfigV5> _o;
-  Psana::Princeton::ConfigV5* o;
+  shared_ptr<const Psana::Princeton::ConfigV5> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig };
   enum { Version = 5 };
-  ConfigV5_Wrapper(shared_ptr<Psana::Princeton::ConfigV5> obj) : _o(obj), o(_o.get()) {}
-  ConfigV5_Wrapper(Psana::Princeton::ConfigV5* obj) : o(obj) {}
-  uint32_t width() const { return o->width(); }
-  uint32_t height() const { return o->height(); }
-  uint32_t orgX() const { return o->orgX(); }
-  uint32_t orgY() const { return o->orgY(); }
-  uint32_t binX() const { return o->binX(); }
-  uint32_t binY() const { return o->binY(); }
-  float exposureTime() const { return o->exposureTime(); }
-  float coolingTemp() const { return o->coolingTemp(); }
-  uint16_t gainIndex() const { return o->gainIndex(); }
-  uint16_t readoutSpeedIndex() const { return o->readoutSpeedIndex(); }
-  uint32_t maskedHeight() const { return o->maskedHeight(); }
-  uint32_t kineticHeight() const { return o->kineticHeight(); }
-  float vsSpeed() const { return o->vsSpeed(); }
-  int16_t infoReportInterval() const { return o->infoReportInterval(); }
-  uint16_t exposureEventCode() const { return o->exposureEventCode(); }
-  uint32_t numDelayShots() const { return o->numDelayShots(); }
-  uint32_t frameSize() const { return o->frameSize(); }
-  uint32_t numPixelsX() const { return o->numPixelsX(); }
-  uint32_t numPixelsY() const { return o->numPixelsY(); }
-  uint32_t numPixels() const { return o->numPixels(); }
+  ConfigV5_Wrapper(const shared_ptr<const Psana::Princeton::ConfigV5>& obj) : m_obj(obj) {}
+  uint32_t width() const { return m_obj->width(); }
+  uint32_t height() const { return m_obj->height(); }
+  uint32_t orgX() const { return m_obj->orgX(); }
+  uint32_t orgY() const { return m_obj->orgY(); }
+  uint32_t binX() const { return m_obj->binX(); }
+  uint32_t binY() const { return m_obj->binY(); }
+  float exposureTime() const { return m_obj->exposureTime(); }
+  float coolingTemp() const { return m_obj->coolingTemp(); }
+  uint16_t gainIndex() const { return m_obj->gainIndex(); }
+  uint16_t readoutSpeedIndex() const { return m_obj->readoutSpeedIndex(); }
+  uint32_t maskedHeight() const { return m_obj->maskedHeight(); }
+  uint32_t kineticHeight() const { return m_obj->kineticHeight(); }
+  float vsSpeed() const { return m_obj->vsSpeed(); }
+  int16_t infoReportInterval() const { return m_obj->infoReportInterval(); }
+  uint16_t exposureEventCode() const { return m_obj->exposureEventCode(); }
+  uint32_t numDelayShots() const { return m_obj->numDelayShots(); }
+  uint32_t frameSize() const { return m_obj->frameSize(); }
+  uint32_t numPixelsX() const { return m_obj->numPixelsX(); }
+  uint32_t numPixelsY() const { return m_obj->numPixelsY(); }
+  uint32_t numPixels() const { return m_obj->numPixels(); }
 };
 class ConfigV1;
 class ConfigV2;
@@ -161,16 +152,14 @@ class ConfigV4;
 class ConfigV5;
 
 class FrameV1_Wrapper {
-  shared_ptr<Psana::Princeton::FrameV1> _o;
-  Psana::Princeton::FrameV1* o;
+  shared_ptr<const Psana::Princeton::FrameV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame };
   enum { Version = 1 };
-  FrameV1_Wrapper(shared_ptr<Psana::Princeton::FrameV1> obj) : _o(obj), o(_o.get()) {}
-  FrameV1_Wrapper(Psana::Princeton::FrameV1* obj) : o(obj) {}
-  uint32_t shotIdStart() const { return o->shotIdStart(); }
-  float readoutTime() const { return o->readoutTime(); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
+  FrameV1_Wrapper(const shared_ptr<const Psana::Princeton::FrameV1>& obj) : m_obj(obj) {}
+  uint32_t shotIdStart() const { return m_obj->shotIdStart(); }
+  float readoutTime() const { return m_obj->readoutTime(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
 };
 class ConfigV1;
 class ConfigV2;
@@ -179,116 +168,110 @@ class ConfigV4;
 class ConfigV5;
 
 class FrameV2_Wrapper {
-  shared_ptr<Psana::Princeton::FrameV2> _o;
-  Psana::Princeton::FrameV2* o;
+  shared_ptr<const Psana::Princeton::FrameV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame };
   enum { Version = 2 };
-  FrameV2_Wrapper(shared_ptr<Psana::Princeton::FrameV2> obj) : _o(obj), o(_o.get()) {}
-  FrameV2_Wrapper(Psana::Princeton::FrameV2* obj) : o(obj) {}
-  uint32_t shotIdStart() const { return o->shotIdStart(); }
-  float readoutTime() const { return o->readoutTime(); }
-  float temperature() const { return o->temperature(); }
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 2); }
+  FrameV2_Wrapper(const shared_ptr<const Psana::Princeton::FrameV2>& obj) : m_obj(obj) {}
+  uint32_t shotIdStart() const { return m_obj->shotIdStart(); }
+  float readoutTime() const { return m_obj->readoutTime(); }
+  float temperature() const { return m_obj->temperature(); }
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
 };
 
-class InfoV1_Wrapper {
-  shared_ptr<Psana::Princeton::InfoV1> _o;
-  Psana::Princeton::InfoV1* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_PrincetonInfo };
-  enum { Version = 1 };
-  InfoV1_Wrapper(shared_ptr<Psana::Princeton::InfoV1> obj) : _o(obj), o(_o.get()) {}
-  InfoV1_Wrapper(Psana::Princeton::InfoV1* obj) : o(obj) {}
-  float temperature() const { return o->temperature(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::ConfigV1);}
     const char* getTypeName() const { return "Psana::Princeton::ConfigV1";}
     int getVersion() const { return Psana::Princeton::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::ConfigV1> result = boost::static_pointer_cast<Psana::Princeton::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::Getter {
+  class ConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::ConfigV2);}
     const char* getTypeName() const { return "Psana::Princeton::ConfigV2";}
     int getVersion() const { return Psana::Princeton::ConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::ConfigV2> result = boost::static_pointer_cast<Psana::Princeton::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV3_Getter : public psddl_python::Getter {
+  class ConfigV3_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV3);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::ConfigV3);}
     const char* getTypeName() const { return "Psana::Princeton::ConfigV3";}
     int getVersion() const { return Psana::Princeton::ConfigV3::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::ConfigV3> result = boost::static_pointer_cast<Psana::Princeton::ConfigV3>(vdata);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV4_Getter : public psddl_python::Getter {
+  class ConfigV4_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV4);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::ConfigV4);}
     const char* getTypeName() const { return "Psana::Princeton::ConfigV4";}
     int getVersion() const { return Psana::Princeton::ConfigV4::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::ConfigV4> result = boost::static_pointer_cast<Psana::Princeton::ConfigV4>(vdata);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV5_Getter : public psddl_python::Getter {
+  class ConfigV5_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::ConfigV5);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::ConfigV5);}
     const char* getTypeName() const { return "Psana::Princeton::ConfigV5";}
     int getVersion() const { return Psana::Princeton::ConfigV5::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::ConfigV5> result = boost::static_pointer_cast<Psana::Princeton::ConfigV5>(vdata);
       return result.get() ? object(ConfigV5_Wrapper(result)) : object();
     }
   };
 
-  class FrameV1_Getter : public psddl_python::Getter {
+  class FrameV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::FrameV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::FrameV1);}
     const char* getTypeName() const { return "Psana::Princeton::FrameV1";}
     int getVersion() const { return Psana::Princeton::FrameV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonFrame; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::FrameV1> result = boost::static_pointer_cast<Psana::Princeton::FrameV1>(vdata);
       return result.get() ? object(FrameV1_Wrapper(result)) : object();
     }
   };
 
-  class FrameV2_Getter : public psddl_python::Getter {
+  class FrameV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::FrameV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::FrameV2);}
     const char* getTypeName() const { return "Psana::Princeton::FrameV2";}
     int getVersion() const { return Psana::Princeton::FrameV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonFrame; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::FrameV2> result = boost::static_pointer_cast<Psana::Princeton::FrameV2>(vdata);
       return result.get() ? object(FrameV2_Wrapper(result)) : object();
     }
   };
 
-  class InfoV1_Getter : public psddl_python::Getter {
+  class InfoV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Princeton::InfoV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Princeton::InfoV1);}
     const char* getTypeName() const { return "Psana::Princeton::InfoV1";}
     int getVersion() const { return Psana::Princeton::InfoV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PrincetonInfo; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Princeton::InfoV1> result = boost::static_pointer_cast<Psana::Princeton::InfoV1>(vdata);
-      return result.get() ? object(InfoV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 } // namespace Princeton

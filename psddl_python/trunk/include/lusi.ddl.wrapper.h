@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_LUSI_DDL_WRAPPER_H
 #define PSDDL_PYTHON_LUSI_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/lusi.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/lusi.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Lusi {
@@ -19,172 +20,109 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class DiodeFexConfigV1_Wrapper {
-  shared_ptr<Psana::Lusi::DiodeFexConfigV1> _o;
-  Psana::Lusi::DiodeFexConfigV1* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_DiodeFexConfig };
-  enum { Version = 1 };
-  DiodeFexConfigV1_Wrapper(shared_ptr<Psana::Lusi::DiodeFexConfigV1> obj) : _o(obj), o(_o.get()) {}
-  DiodeFexConfigV1_Wrapper(Psana::Lusi::DiodeFexConfigV1* obj) : o(obj) {}
-  PyObject* base() const { ND_CONVERT(o->base(), float, 1); }
-  PyObject* scale() const { ND_CONVERT(o->scale(), float, 1); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class DiodeFexConfigV2_Wrapper {
-  shared_ptr<Psana::Lusi::DiodeFexConfigV2> _o;
-  Psana::Lusi::DiodeFexConfigV2* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_DiodeFexConfig };
-  enum { Version = 2 };
-  DiodeFexConfigV2_Wrapper(shared_ptr<Psana::Lusi::DiodeFexConfigV2> obj) : _o(obj), o(_o.get()) {}
-  DiodeFexConfigV2_Wrapper(Psana::Lusi::DiodeFexConfigV2* obj) : o(obj) {}
-  PyObject* base() const { ND_CONVERT(o->base(), float, 1); }
-  PyObject* scale() const { ND_CONVERT(o->scale(), float, 1); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class DiodeFexV1_Wrapper {
-  shared_ptr<Psana::Lusi::DiodeFexV1> _o;
-  Psana::Lusi::DiodeFexV1* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_DiodeFex };
-  enum { Version = 1 };
-  DiodeFexV1_Wrapper(shared_ptr<Psana::Lusi::DiodeFexV1> obj) : _o(obj), o(_o.get()) {}
-  DiodeFexV1_Wrapper(Psana::Lusi::DiodeFexV1* obj) : o(obj) {}
-  float value() const { return o->value(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
 class IpmFexConfigV1_Wrapper {
-  shared_ptr<Psana::Lusi::IpmFexConfigV1> _o;
-  Psana::Lusi::IpmFexConfigV1* o;
+  shared_ptr<const Psana::Lusi::IpmFexConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig };
   enum { Version = 1 };
-  IpmFexConfigV1_Wrapper(shared_ptr<Psana::Lusi::IpmFexConfigV1> obj) : _o(obj), o(_o.get()) {}
-  IpmFexConfigV1_Wrapper(Psana::Lusi::IpmFexConfigV1* obj) : o(obj) {}
-  vector<Psana::Lusi::DiodeFexConfigV1> diode() const { VEC_CONVERT(o->diode(), Psana::Lusi::DiodeFexConfigV1); }
-  float xscale() const { return o->xscale(); }
-  float yscale() const { return o->yscale(); }
+  IpmFexConfigV1_Wrapper(const shared_ptr<const Psana::Lusi::IpmFexConfigV1>& obj) : m_obj(obj) {}
+  boost::python::list diode() const { return detail::ndToList(m_obj->diode()); }
+  float xscale() const { return m_obj->xscale(); }
+  float yscale() const { return m_obj->yscale(); }
 };
 
 class IpmFexConfigV2_Wrapper {
-  shared_ptr<Psana::Lusi::IpmFexConfigV2> _o;
-  Psana::Lusi::IpmFexConfigV2* o;
+  shared_ptr<const Psana::Lusi::IpmFexConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig };
   enum { Version = 2 };
-  IpmFexConfigV2_Wrapper(shared_ptr<Psana::Lusi::IpmFexConfigV2> obj) : _o(obj), o(_o.get()) {}
-  IpmFexConfigV2_Wrapper(Psana::Lusi::IpmFexConfigV2* obj) : o(obj) {}
-  vector<Psana::Lusi::DiodeFexConfigV2> diode() const { VEC_CONVERT(o->diode(), Psana::Lusi::DiodeFexConfigV2); }
-  float xscale() const { return o->xscale(); }
-  float yscale() const { return o->yscale(); }
+  IpmFexConfigV2_Wrapper(const shared_ptr<const Psana::Lusi::IpmFexConfigV2>& obj) : m_obj(obj) {}
+  boost::python::list diode() const { return detail::ndToList(m_obj->diode()); }
+  float xscale() const { return m_obj->xscale(); }
+  float yscale() const { return m_obj->yscale(); }
 };
 
-class IpmFexV1_Wrapper {
-  shared_ptr<Psana::Lusi::IpmFexV1> _o;
-  Psana::Lusi::IpmFexV1* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_IpmFex };
-  enum { Version = 1 };
-  IpmFexV1_Wrapper(shared_ptr<Psana::Lusi::IpmFexV1> obj) : _o(obj), o(_o.get()) {}
-  IpmFexV1_Wrapper(Psana::Lusi::IpmFexV1* obj) : o(obj) {}
-  PyObject* channel() const { ND_CONVERT(o->channel(), float, 1); }
-  float sum() const { return o->sum(); }
-  float xpos() const { return o->xpos(); }
-  float ypos() const { return o->ypos(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class PimImageConfigV1_Wrapper {
-  shared_ptr<Psana::Lusi::PimImageConfigV1> _o;
-  Psana::Lusi::PimImageConfigV1* o;
-public:
-  enum { TypeId = Pds::TypeId::Id_PimImageConfig };
-  enum { Version = 1 };
-  PimImageConfigV1_Wrapper(shared_ptr<Psana::Lusi::PimImageConfigV1> obj) : _o(obj), o(_o.get()) {}
-  PimImageConfigV1_Wrapper(Psana::Lusi::PimImageConfigV1* obj) : o(obj) {}
-  float xscale() const { return o->xscale(); }
-  float yscale() const { return o->yscale(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-  class DiodeFexConfigV1_Getter : public psddl_python::Getter {
+  class DiodeFexConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::DiodeFexConfigV1);}
     const char* getTypeName() const { return "Psana::Lusi::DiodeFexConfigV1";}
     int getVersion() const { return Psana::Lusi::DiodeFexConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_DiodeFexConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::DiodeFexConfigV1> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexConfigV1>(vdata);
-      return result.get() ? object(DiodeFexConfigV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class DiodeFexConfigV2_Getter : public psddl_python::Getter {
+  class DiodeFexConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::DiodeFexConfigV2);}
     const char* getTypeName() const { return "Psana::Lusi::DiodeFexConfigV2";}
     int getVersion() const { return Psana::Lusi::DiodeFexConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_DiodeFexConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::DiodeFexConfigV2> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexConfigV2>(vdata);
-      return result.get() ? object(DiodeFexConfigV2_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class DiodeFexV1_Getter : public psddl_python::Getter {
+  class DiodeFexV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::DiodeFexV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::DiodeFexV1);}
     const char* getTypeName() const { return "Psana::Lusi::DiodeFexV1";}
     int getVersion() const { return Psana::Lusi::DiodeFexV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_DiodeFex; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::DiodeFexV1> result = boost::static_pointer_cast<Psana::Lusi::DiodeFexV1>(vdata);
-      return result.get() ? object(DiodeFexV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class IpmFexConfigV1_Getter : public psddl_python::Getter {
+  class IpmFexConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::IpmFexConfigV1);}
     const char* getTypeName() const { return "Psana::Lusi::IpmFexConfigV1";}
     int getVersion() const { return Psana::Lusi::IpmFexConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_IpmFexConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::IpmFexConfigV1> result = boost::static_pointer_cast<Psana::Lusi::IpmFexConfigV1>(vdata);
       return result.get() ? object(IpmFexConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class IpmFexConfigV2_Getter : public psddl_python::Getter {
+  class IpmFexConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::IpmFexConfigV2);}
     const char* getTypeName() const { return "Psana::Lusi::IpmFexConfigV2";}
     int getVersion() const { return Psana::Lusi::IpmFexConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_IpmFexConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::IpmFexConfigV2> result = boost::static_pointer_cast<Psana::Lusi::IpmFexConfigV2>(vdata);
       return result.get() ? object(IpmFexConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class IpmFexV1_Getter : public psddl_python::Getter {
+  class IpmFexV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::IpmFexV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::IpmFexV1);}
     const char* getTypeName() const { return "Psana::Lusi::IpmFexV1";}
     int getVersion() const { return Psana::Lusi::IpmFexV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_IpmFex; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::IpmFexV1> result = boost::static_pointer_cast<Psana::Lusi::IpmFexV1>(vdata);
-      return result.get() ? object(IpmFexV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class PimImageConfigV1_Getter : public psddl_python::Getter {
+  class PimImageConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Lusi::PimImageConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Lusi::PimImageConfigV1);}
     const char* getTypeName() const { return "Psana::Lusi::PimImageConfigV1";}
     int getVersion() const { return Psana::Lusi::PimImageConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_PimImageConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Lusi::PimImageConfigV1> result = boost::static_pointer_cast<Psana::Lusi::PimImageConfigV1>(vdata);
-      return result.get() ? object(PimImageConfigV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 } // namespace Lusi

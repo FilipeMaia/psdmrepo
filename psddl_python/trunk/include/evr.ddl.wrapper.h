@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_EVR_DDL_WRAPPER_H
 #define PSDDL_PYTHON_EVR_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/evr.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/evr.ddl.h" // inc_psana
 
 #include <pdsdata/xtc/DetInfo.hh>
 namespace psddl_python {
@@ -20,474 +21,279 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class PulseConfig_Wrapper {
-  shared_ptr<Psana::EvrData::PulseConfig> _o;
-  Psana::EvrData::PulseConfig* o;
-public:
-  PulseConfig_Wrapper(shared_ptr<Psana::EvrData::PulseConfig> obj) : _o(obj), o(_o.get()) {}
-  PulseConfig_Wrapper(Psana::EvrData::PulseConfig* obj) : o(obj) {}
-  uint32_t pulse() const { return o->pulse(); }
-  uint32_t _input_control_value() const { return o->_input_control_value(); }
-  int16_t bf_trigger() const { return o->bf_trigger(); }
-  int16_t bf_set() const { return o->bf_set(); }
-  int16_t bf_clear() const { return o->bf_clear(); }
-  uint32_t _output_control_value() const { return o->_output_control_value(); }
-  uint8_t polarity() const { return o->polarity(); }
-  uint8_t map_set_enable() const { return o->map_set_enable(); }
-  uint8_t map_reset_enable() const { return o->map_reset_enable(); }
-  uint8_t map_trigger_enable() const { return o->map_trigger_enable(); }
-  uint32_t prescale() const { return o->prescale(); }
-  uint32_t delay() const { return o->delay(); }
-  uint32_t width() const { return o->width(); }
-  int16_t trigger() const { return o->trigger(); }
-  int16_t set() const { return o->set(); }
-  int16_t clear() const { return o->clear(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class PulseConfigV3_Wrapper {
-  shared_ptr<Psana::EvrData::PulseConfigV3> _o;
-  Psana::EvrData::PulseConfigV3* o;
-public:
-  PulseConfigV3_Wrapper(shared_ptr<Psana::EvrData::PulseConfigV3> obj) : _o(obj), o(_o.get()) {}
-  PulseConfigV3_Wrapper(Psana::EvrData::PulseConfigV3* obj) : o(obj) {}
-  uint16_t pulseId() const { return o->pulseId(); }
-  uint16_t polarity() const { return o->polarity(); }
-  uint32_t prescale() const { return o->prescale(); }
-  uint32_t delay() const { return o->delay(); }
-  uint32_t width() const { return o->width(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class EventCodeV3_Wrapper {
-  shared_ptr<Psana::EvrData::EventCodeV3> _o;
-  Psana::EvrData::EventCodeV3* o;
-public:
-  EventCodeV3_Wrapper(shared_ptr<Psana::EvrData::EventCodeV3> obj) : _o(obj), o(_o.get()) {}
-  EventCodeV3_Wrapper(Psana::EvrData::EventCodeV3* obj) : o(obj) {}
-  uint16_t code() const { return o->code(); }
-  uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
-  uint8_t isReadout() const { return o->isReadout(); }
-  uint8_t isTerminator() const { return o->isTerminator(); }
-  uint32_t maskTrigger() const { return o->maskTrigger(); }
-  uint32_t maskSet() const { return o->maskSet(); }
-  uint32_t maskClear() const { return o->maskClear(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class EventCodeV4_Wrapper {
-  shared_ptr<Psana::EvrData::EventCodeV4> _o;
-  Psana::EvrData::EventCodeV4* o;
-public:
-  EventCodeV4_Wrapper(shared_ptr<Psana::EvrData::EventCodeV4> obj) : _o(obj), o(_o.get()) {}
-  EventCodeV4_Wrapper(Psana::EvrData::EventCodeV4* obj) : o(obj) {}
-  uint16_t code() const { return o->code(); }
-  uint16_t _u16MaskEventAttr_value() const { return o->_u16MaskEventAttr_value(); }
-  uint8_t isReadout() const { return o->isReadout(); }
-  uint8_t isTerminator() const { return o->isTerminator(); }
-  uint32_t reportDelay() const { return o->reportDelay(); }
-  uint32_t reportWidth() const { return o->reportWidth(); }
-  uint32_t maskTrigger() const { return o->maskTrigger(); }
-  uint32_t maskSet() const { return o->maskSet(); }
-  uint32_t maskClear() const { return o->maskClear(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class EventCodeV5_Wrapper {
-  shared_ptr<Psana::EvrData::EventCodeV5> _o;
-  Psana::EvrData::EventCodeV5* o;
-public:
-  EventCodeV5_Wrapper(shared_ptr<Psana::EvrData::EventCodeV5> obj) : _o(obj), o(_o.get()) {}
-  EventCodeV5_Wrapper(Psana::EvrData::EventCodeV5* obj) : o(obj) {}
-  uint16_t code() const { return o->code(); }
-  uint8_t isReadout() const { return o->isReadout(); }
-  uint8_t isCommand() const { return o->isCommand(); }
-  uint8_t isLatch() const { return o->isLatch(); }
-  uint32_t reportDelay() const { return o->reportDelay(); }
-  uint32_t reportWidth() const { return o->reportWidth(); }
-  uint32_t maskTrigger() const { return o->maskTrigger(); }
-  uint32_t maskSet() const { return o->maskSet(); }
-  uint32_t maskClear() const { return o->maskClear(); }
-  const char* desc() const { return o->desc(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> desc_shape() const { return o->desc_shape(); }
-};
-
-class EventCodeV6_Wrapper {
-  shared_ptr<Psana::EvrData::EventCodeV6> _o;
-  Psana::EvrData::EventCodeV6* o;
-public:
-  EventCodeV6_Wrapper(shared_ptr<Psana::EvrData::EventCodeV6> obj) : _o(obj), o(_o.get()) {}
-  EventCodeV6_Wrapper(Psana::EvrData::EventCodeV6* obj) : o(obj) {}
-  uint16_t code() const { return o->code(); }
-  uint8_t isReadout() const { return o->isReadout(); }
-  uint8_t isCommand() const { return o->isCommand(); }
-  uint8_t isLatch() const { return o->isLatch(); }
-  uint32_t reportDelay() const { return o->reportDelay(); }
-  uint32_t reportWidth() const { return o->reportWidth(); }
-  uint32_t maskTrigger() const { return o->maskTrigger(); }
-  uint32_t maskSet() const { return o->maskSet(); }
-  uint32_t maskClear() const { return o->maskClear(); }
-  const char* desc() const { return o->desc(); }
-  uint16_t readoutGroup() const { return o->readoutGroup(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> desc_shape() const { return o->desc_shape(); }
-};
-
-class OutputMap_Wrapper {
-  shared_ptr<Psana::EvrData::OutputMap> _o;
-  Psana::EvrData::OutputMap* o;
-public:
-  OutputMap_Wrapper(shared_ptr<Psana::EvrData::OutputMap> obj) : _o(obj), o(_o.get()) {}
-  OutputMap_Wrapper(Psana::EvrData::OutputMap* obj) : o(obj) {}
-  uint32_t value() const { return o->value(); }
-  Psana::EvrData::OutputMap::Source source() const { return o->source(); }
-  uint8_t source_id() const { return o->source_id(); }
-  Psana::EvrData::OutputMap::Conn conn() const { return o->conn(); }
-  uint8_t conn_id() const { return o->conn_id(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class OutputMapV2_Wrapper {
-  shared_ptr<Psana::EvrData::OutputMapV2> _o;
-  Psana::EvrData::OutputMapV2* o;
-public:
-  OutputMapV2_Wrapper(shared_ptr<Psana::EvrData::OutputMapV2> obj) : _o(obj), o(_o.get()) {}
-  OutputMapV2_Wrapper(Psana::EvrData::OutputMapV2* obj) : o(obj) {}
-  uint32_t value() const { return o->value(); }
-  Psana::EvrData::OutputMapV2::Source source() const { return o->source(); }
-  uint8_t source_id() const { return o->source_id(); }
-  Psana::EvrData::OutputMapV2::Conn conn() const { return o->conn(); }
-  uint8_t conn_id() const { return o->conn_id(); }
-  uint8_t module() const { return o->module(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV1> _o;
-  Psana::EvrData::ConfigV1* o;
+  shared_ptr<const Psana::EvrData::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::EvrData::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::EvrData::ConfigV1* obj) : o(obj) {}
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfig); }
-  vector<Psana::EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMap); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
 };
 
 class ConfigV2_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV2> _o;
-  Psana::EvrData::ConfigV2* o;
+  shared_ptr<const Psana::EvrData::ConfigV2> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 2 };
-  ConfigV2_Wrapper(shared_ptr<Psana::EvrData::ConfigV2> obj) : _o(obj), o(_o.get()) {}
-  ConfigV2_Wrapper(Psana::EvrData::ConfigV2* obj) : o(obj) {}
-  uint32_t opcode() const { return o->opcode(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::PulseConfig> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfig); }
-  vector<Psana::EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMap); }
-  Psana::EvrData::ConfigV2::BeamCode beam() const { return o->beam(); }
-  Psana::EvrData::ConfigV2::RateCode rate() const { return o->rate(); }
+  ConfigV2_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV2>& obj) : m_obj(obj) {}
+  uint32_t opcode() const { return m_obj->opcode(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
+  Psana::EvrData::ConfigV2::BeamCode beam() const { return m_obj->beam(); }
+  Psana::EvrData::ConfigV2::RateCode rate() const { return m_obj->rate(); }
 };
 
 class ConfigV3_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV3> _o;
-  Psana::EvrData::ConfigV3* o;
+  shared_ptr<const Psana::EvrData::ConfigV3> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 3 };
-  ConfigV3_Wrapper(shared_ptr<Psana::EvrData::ConfigV3> obj) : _o(obj), o(_o.get()) {}
-  ConfigV3_Wrapper(Psana::EvrData::ConfigV3* obj) : o(obj) {}
-  uint32_t neventcodes() const { return o->neventcodes(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::EventCodeV3> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV3); }
-  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
-  vector<Psana::EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMap); }
+  ConfigV3_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV3>& obj) : m_obj(obj) {}
+  uint32_t neventcodes() const { return m_obj->neventcodes(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list eventcodes() const { return detail::ndToList(m_obj->eventcodes()); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
 };
 
 class ConfigV4_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV4> _o;
-  Psana::EvrData::ConfigV4* o;
+  shared_ptr<const Psana::EvrData::ConfigV4> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 4 };
-  ConfigV4_Wrapper(shared_ptr<Psana::EvrData::ConfigV4> obj) : _o(obj), o(_o.get()) {}
-  ConfigV4_Wrapper(Psana::EvrData::ConfigV4* obj) : o(obj) {}
-  uint32_t neventcodes() const { return o->neventcodes(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::EventCodeV4> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV4); }
-  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
-  vector<Psana::EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMap); }
-};
-
-class SequencerEntry_Wrapper {
-  shared_ptr<Psana::EvrData::SequencerEntry> _o;
-  Psana::EvrData::SequencerEntry* o;
-public:
-  SequencerEntry_Wrapper(shared_ptr<Psana::EvrData::SequencerEntry> obj) : _o(obj), o(_o.get()) {}
-  SequencerEntry_Wrapper(Psana::EvrData::SequencerEntry* obj) : o(obj) {}
-  uint32_t delay() const { return o->delay(); }
-  uint32_t eventcode() const { return o->eventcode(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  ConfigV4_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV4>& obj) : m_obj(obj) {}
+  uint32_t neventcodes() const { return m_obj->neventcodes(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list eventcodes() const { return detail::ndToList(m_obj->eventcodes()); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
 };
 
 class SequencerConfigV1_Wrapper {
-  shared_ptr<Psana::EvrData::SequencerConfigV1> _o;
-  Psana::EvrData::SequencerConfigV1* o;
+  shared_ptr<const Psana::EvrData::SequencerConfigV1> m_obj;
 public:
-  SequencerConfigV1_Wrapper(shared_ptr<Psana::EvrData::SequencerConfigV1> obj) : _o(obj), o(_o.get()) {}
-  SequencerConfigV1_Wrapper(Psana::EvrData::SequencerConfigV1* obj) : o(obj) {}
-  Psana::EvrData::SequencerConfigV1::Source sync_source() const { return o->sync_source(); }
-  Psana::EvrData::SequencerConfigV1::Source beam_source() const { return o->beam_source(); }
-  uint32_t length() const { return o->length(); }
-  uint32_t cycles() const { return o->cycles(); }
-  vector<Psana::EvrData::SequencerEntry> entries() const { VEC_CONVERT(o->entries(), Psana::EvrData::SequencerEntry); }
+  SequencerConfigV1_Wrapper(const shared_ptr<const Psana::EvrData::SequencerConfigV1>& obj) : m_obj(obj) {}
+  Psana::EvrData::SequencerConfigV1::Source sync_source() const { return m_obj->sync_source(); }
+  Psana::EvrData::SequencerConfigV1::Source beam_source() const { return m_obj->beam_source(); }
+  uint32_t length() const { return m_obj->length(); }
+  uint32_t cycles() const { return m_obj->cycles(); }
+  boost::python::list entries() const { return detail::ndToList(m_obj->entries()); }
 };
 
 class ConfigV5_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV5> _o;
-  Psana::EvrData::ConfigV5* o;
+  shared_ptr<const Psana::EvrData::ConfigV5> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 5 };
-  ConfigV5_Wrapper(shared_ptr<Psana::EvrData::ConfigV5> obj) : _o(obj), o(_o.get()) {}
-  ConfigV5_Wrapper(Psana::EvrData::ConfigV5* obj) : o(obj) {}
-  uint32_t neventcodes() const { return o->neventcodes(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV5); }
-  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
-  vector<Psana::EvrData::OutputMap> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMap); }
-  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper(const_cast<Psana::EvrData::SequencerConfigV1*>(&o->seq_config())); }
+  ConfigV5_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV5>& obj) : m_obj(obj) {}
+  uint32_t neventcodes() const { return m_obj->neventcodes(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list eventcodes() const { return detail::ndToList(m_obj->eventcodes()); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
+  const Psana::EvrData::SequencerConfigV1& seq_config() const { return m_obj->seq_config(); }
 };
 
 class ConfigV6_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV6> _o;
-  Psana::EvrData::ConfigV6* o;
+  shared_ptr<const Psana::EvrData::ConfigV6> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 6 };
-  ConfigV6_Wrapper(shared_ptr<Psana::EvrData::ConfigV6> obj) : _o(obj), o(_o.get()) {}
-  ConfigV6_Wrapper(Psana::EvrData::ConfigV6* obj) : o(obj) {}
-  uint32_t neventcodes() const { return o->neventcodes(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::EventCodeV5> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV5); }
-  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
-  vector<Psana::EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMapV2); }
-  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper(const_cast<Psana::EvrData::SequencerConfigV1*>(&o->seq_config())); }
+  ConfigV6_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV6>& obj) : m_obj(obj) {}
+  uint32_t neventcodes() const { return m_obj->neventcodes(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list eventcodes() const { return detail::ndToList(m_obj->eventcodes()); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
+  const Psana::EvrData::SequencerConfigV1& seq_config() const { return m_obj->seq_config(); }
 };
 
 class ConfigV7_Wrapper {
-  shared_ptr<Psana::EvrData::ConfigV7> _o;
-  Psana::EvrData::ConfigV7* o;
+  shared_ptr<const Psana::EvrData::ConfigV7> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig };
   enum { Version = 7 };
-  ConfigV7_Wrapper(shared_ptr<Psana::EvrData::ConfigV7> obj) : _o(obj), o(_o.get()) {}
-  ConfigV7_Wrapper(Psana::EvrData::ConfigV7* obj) : o(obj) {}
-  uint32_t neventcodes() const { return o->neventcodes(); }
-  uint32_t npulses() const { return o->npulses(); }
-  uint32_t noutputs() const { return o->noutputs(); }
-  vector<Psana::EvrData::EventCodeV6> eventcodes() const { VEC_CONVERT(o->eventcodes(), Psana::EvrData::EventCodeV6); }
-  vector<Psana::EvrData::PulseConfigV3> pulses() const { VEC_CONVERT(o->pulses(), Psana::EvrData::PulseConfigV3); }
-  vector<Psana::EvrData::OutputMapV2> output_maps() const { VEC_CONVERT(o->output_maps(), Psana::EvrData::OutputMapV2); }
-  const SequencerConfigV1_Wrapper seq_config() const { return SequencerConfigV1_Wrapper(const_cast<Psana::EvrData::SequencerConfigV1*>(&o->seq_config())); }
-};
-
-class FIFOEvent_Wrapper {
-  shared_ptr<Psana::EvrData::FIFOEvent> _o;
-  Psana::EvrData::FIFOEvent* o;
-public:
-  FIFOEvent_Wrapper(shared_ptr<Psana::EvrData::FIFOEvent> obj) : _o(obj), o(_o.get()) {}
-  FIFOEvent_Wrapper(Psana::EvrData::FIFOEvent* obj) : o(obj) {}
-  uint32_t timestampHigh() const { return o->timestampHigh(); }
-  uint32_t timestampLow() const { return o->timestampLow(); }
-  uint32_t eventCode() const { return o->eventCode(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  ConfigV7_Wrapper(const shared_ptr<const Psana::EvrData::ConfigV7>& obj) : m_obj(obj) {}
+  uint32_t neventcodes() const { return m_obj->neventcodes(); }
+  uint32_t npulses() const { return m_obj->npulses(); }
+  uint32_t noutputs() const { return m_obj->noutputs(); }
+  boost::python::list eventcodes() const { return detail::ndToList(m_obj->eventcodes()); }
+  boost::python::list pulses() const { return detail::ndToList(m_obj->pulses()); }
+  boost::python::list output_maps() const { return detail::ndToList(m_obj->output_maps()); }
+  const Psana::EvrData::SequencerConfigV1& seq_config() const { return m_obj->seq_config(); }
 };
 
 class DataV3_Wrapper {
-  shared_ptr<Psana::EvrData::DataV3> _o;
-  Psana::EvrData::DataV3* o;
+  shared_ptr<const Psana::EvrData::DataV3> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrData };
   enum { Version = 3 };
-  DataV3_Wrapper(shared_ptr<Psana::EvrData::DataV3> obj) : _o(obj), o(_o.get()) {}
-  DataV3_Wrapper(Psana::EvrData::DataV3* obj) : o(obj) {}
-  uint32_t numFifoEvents() const { return o->numFifoEvents(); }
-  vector<Psana::EvrData::FIFOEvent> fifoEvents() const { VEC_CONVERT(o->fifoEvents(), Psana::EvrData::FIFOEvent); }
-};
-
-class IOChannel_Wrapper {
-  shared_ptr<Psana::EvrData::IOChannel> _o;
-  Psana::EvrData::IOChannel* o;
-public:
-  IOChannel_Wrapper(shared_ptr<Psana::EvrData::IOChannel> obj) : _o(obj), o(_o.get()) {}
-  IOChannel_Wrapper(Psana::EvrData::IOChannel* obj) : o(obj) {}
-  const char* name() const { return o->name(); }
-  uint32_t ninfo() const { return o->ninfo(); }
-  vector<Pds::DetInfo> infos() const { VEC_CONVERT(o->infos(), Pds::DetInfo); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-  vector<int> name_shape() const { return o->name_shape(); }
+  DataV3_Wrapper(const shared_ptr<const Psana::EvrData::DataV3>& obj) : m_obj(obj) {}
+  uint32_t numFifoEvents() const { return m_obj->numFifoEvents(); }
+  boost::python::list fifoEvents() const { return detail::ndToList(m_obj->fifoEvents()); }
 };
 
 class IOConfigV1_Wrapper {
-  shared_ptr<Psana::EvrData::IOConfigV1> _o;
-  Psana::EvrData::IOConfigV1* o;
+  shared_ptr<const Psana::EvrData::IOConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig };
   enum { Version = 1 };
-  IOConfigV1_Wrapper(shared_ptr<Psana::EvrData::IOConfigV1> obj) : _o(obj), o(_o.get()) {}
-  IOConfigV1_Wrapper(Psana::EvrData::IOConfigV1* obj) : o(obj) {}
-  uint16_t nchannels() const { return o->nchannels(); }
-  vector<Psana::EvrData::IOChannel> channels() const { VEC_CONVERT(o->channels(), Psana::EvrData::IOChannel); }
-  Psana::EvrData::OutputMap::Conn conn() const { return o->conn(); }
+  IOConfigV1_Wrapper(const shared_ptr<const Psana::EvrData::IOConfigV1>& obj) : m_obj(obj) {}
+  uint16_t nchannels() const { return m_obj->nchannels(); }
+  boost::python::list channels() const { return detail::ndToList(m_obj->channels()); }
+  Psana::EvrData::OutputMap::Conn conn() const { return m_obj->conn(); }
 };
 
-  class PulseConfig_Getter : public psddl_python::Getter {
+  class PulseConfig_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::PulseConfig);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::PulseConfig);}
     const char* getTypeName() const { return "Psana::EvrData::PulseConfig";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::PulseConfig> result = boost::static_pointer_cast<Psana::EvrData::PulseConfig>(vdata);
-      return result.get() ? object(PulseConfig_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class PulseConfigV3_Getter : public psddl_python::Getter {
+  class PulseConfigV3_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::PulseConfigV3);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::PulseConfigV3);}
     const char* getTypeName() const { return "Psana::EvrData::PulseConfigV3";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::PulseConfigV3> result = boost::static_pointer_cast<Psana::EvrData::PulseConfigV3>(vdata);
-      return result.get() ? object(PulseConfigV3_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class EventCodeV3_Getter : public psddl_python::Getter {
+  class EventCodeV3_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::EventCodeV3);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::EventCodeV3);}
     const char* getTypeName() const { return "Psana::EvrData::EventCodeV3";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::EventCodeV3> result = boost::static_pointer_cast<Psana::EvrData::EventCodeV3>(vdata);
-      return result.get() ? object(EventCodeV3_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class EventCodeV4_Getter : public psddl_python::Getter {
+  class EventCodeV4_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::EventCodeV4);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::EventCodeV4);}
     const char* getTypeName() const { return "Psana::EvrData::EventCodeV4";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::EventCodeV4> result = boost::static_pointer_cast<Psana::EvrData::EventCodeV4>(vdata);
-      return result.get() ? object(EventCodeV4_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class EventCodeV5_Getter : public psddl_python::Getter {
+  class EventCodeV5_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::EventCodeV5);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::EventCodeV5);}
     const char* getTypeName() const { return "Psana::EvrData::EventCodeV5";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::EventCodeV5> result = boost::static_pointer_cast<Psana::EvrData::EventCodeV5>(vdata);
-      return result.get() ? object(EventCodeV5_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class EventCodeV6_Getter : public psddl_python::Getter {
+  class EventCodeV6_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::EventCodeV6);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::EventCodeV6);}
     const char* getTypeName() const { return "Psana::EvrData::EventCodeV6";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::EventCodeV6> result = boost::static_pointer_cast<Psana::EvrData::EventCodeV6>(vdata);
-      return result.get() ? object(EventCodeV6_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class OutputMap_Getter : public psddl_python::Getter {
+  class OutputMap_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::OutputMap);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::OutputMap);}
     const char* getTypeName() const { return "Psana::EvrData::OutputMap";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::OutputMap> result = boost::static_pointer_cast<Psana::EvrData::OutputMap>(vdata);
-      return result.get() ? object(OutputMap_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class OutputMapV2_Getter : public psddl_python::Getter {
+  class OutputMapV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::OutputMapV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::OutputMapV2);}
     const char* getTypeName() const { return "Psana::EvrData::OutputMapV2";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::OutputMapV2> result = boost::static_pointer_cast<Psana::EvrData::OutputMapV2>(vdata);
-      return result.get() ? object(OutputMapV2_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV1);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV1";}
     int getVersion() const { return Psana::EvrData::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV1> result = boost::static_pointer_cast<Psana::EvrData::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV2_Getter : public psddl_python::Getter {
+  class ConfigV2_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV2);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV2);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV2";}
     int getVersion() const { return Psana::EvrData::ConfigV2::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV2> result = boost::static_pointer_cast<Psana::EvrData::ConfigV2>(vdata);
       return result.get() ? object(ConfigV2_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV3_Getter : public psddl_python::Getter {
+  class ConfigV3_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV3);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV3);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV3";}
     int getVersion() const { return Psana::EvrData::ConfigV3::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV3> result = boost::static_pointer_cast<Psana::EvrData::ConfigV3>(vdata);
       return result.get() ? object(ConfigV3_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV4_Getter : public psddl_python::Getter {
+  class ConfigV4_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV4);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV4);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV4";}
     int getVersion() const { return Psana::EvrData::ConfigV4::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV4> result = boost::static_pointer_cast<Psana::EvrData::ConfigV4>(vdata);
       return result.get() ? object(ConfigV4_Wrapper(result)) : object();
     }
   };
 
-  class SequencerEntry_Getter : public psddl_python::Getter {
+  class SequencerEntry_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::SequencerEntry);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::SequencerEntry);}
     const char* getTypeName() const { return "Psana::EvrData::SequencerEntry";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::SequencerEntry> result = boost::static_pointer_cast<Psana::EvrData::SequencerEntry>(vdata);
-      return result.get() ? object(SequencerEntry_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class SequencerConfigV1_Getter : public psddl_python::Getter {
+  class SequencerConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::SequencerConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::SequencerConfigV1);}
     const char* getTypeName() const { return "Psana::EvrData::SequencerConfigV1";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::SequencerConfigV1> result = boost::static_pointer_cast<Psana::EvrData::SequencerConfigV1>(vdata);
@@ -495,75 +301,80 @@ public:
     }
   };
 
-  class ConfigV5_Getter : public psddl_python::Getter {
+  class ConfigV5_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV5);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV5);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV5";}
     int getVersion() const { return Psana::EvrData::ConfigV5::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV5> result = boost::static_pointer_cast<Psana::EvrData::ConfigV5>(vdata);
       return result.get() ? object(ConfigV5_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV6_Getter : public psddl_python::Getter {
+  class ConfigV6_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV6);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV6);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV6";}
     int getVersion() const { return Psana::EvrData::ConfigV6::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV6> result = boost::static_pointer_cast<Psana::EvrData::ConfigV6>(vdata);
       return result.get() ? object(ConfigV6_Wrapper(result)) : object();
     }
   };
 
-  class ConfigV7_Getter : public psddl_python::Getter {
+  class ConfigV7_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::ConfigV7);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::ConfigV7);}
     const char* getTypeName() const { return "Psana::EvrData::ConfigV7";}
     int getVersion() const { return Psana::EvrData::ConfigV7::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::ConfigV7> result = boost::static_pointer_cast<Psana::EvrData::ConfigV7>(vdata);
       return result.get() ? object(ConfigV7_Wrapper(result)) : object();
     }
   };
 
-  class FIFOEvent_Getter : public psddl_python::Getter {
+  class FIFOEvent_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::FIFOEvent);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::FIFOEvent);}
     const char* getTypeName() const { return "Psana::EvrData::FIFOEvent";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::FIFOEvent> result = boost::static_pointer_cast<Psana::EvrData::FIFOEvent>(vdata);
-      return result.get() ? object(FIFOEvent_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class DataV3_Getter : public psddl_python::Getter {
+  class DataV3_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::DataV3);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::DataV3);}
     const char* getTypeName() const { return "Psana::EvrData::DataV3";}
     int getVersion() const { return Psana::EvrData::DataV3::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrData; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::DataV3> result = boost::static_pointer_cast<Psana::EvrData::DataV3>(vdata);
       return result.get() ? object(DataV3_Wrapper(result)) : object();
     }
   };
 
-  class IOChannel_Getter : public psddl_python::Getter {
+  class IOChannel_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::IOChannel);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::IOChannel);}
     const char* getTypeName() const { return "Psana::EvrData::IOChannel";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::IOChannel> result = boost::static_pointer_cast<Psana::EvrData::IOChannel>(vdata);
-      return result.get() ? object(IOChannel_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class IOConfigV1_Getter : public psddl_python::Getter {
+  class IOConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::EvrData::IOConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::EvrData::IOConfigV1);}
     const char* getTypeName() const { return "Psana::EvrData::IOConfigV1";}
     int getVersion() const { return Psana::EvrData::IOConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_EvrIOConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::EvrData::IOConfigV1> result = boost::static_pointer_cast<Psana::EvrData::IOConfigV1>(vdata);
       return result.get() ? object(IOConfigV1_Wrapper(result)) : object();

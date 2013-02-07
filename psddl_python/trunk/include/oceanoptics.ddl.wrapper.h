@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_OCEANOPTICS_DDL_WRAPPER_H
 #define PSDDL_PYTHON_OCEANOPTICS_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/oceanoptics.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/oceanoptics.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace OceanOptics {
@@ -20,80 +21,67 @@ using std::vector;
 void createWrappers(PyObject* module);
 
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::OceanOptics::ConfigV1> _o;
-  Psana::OceanOptics::ConfigV1* o;
+  shared_ptr<const Psana::OceanOptics::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_OceanOpticsConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::OceanOptics::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::OceanOptics::ConfigV1* obj) : o(obj) {}
-  float exposureTime() const { return o->exposureTime(); }
-  PyObject* waveLenCalib() const { ND_CONVERT(o->waveLenCalib(), double, 1); }
-  PyObject* nonlinCorrect() const { ND_CONVERT(o->nonlinCorrect(), double, 1); }
-  double strayLightConstant() const { return o->strayLightConstant(); }
-};
-
-class timespec64_Wrapper {
-  shared_ptr<Psana::OceanOptics::timespec64> _o;
-  Psana::OceanOptics::timespec64* o;
-public:
-  timespec64_Wrapper(shared_ptr<Psana::OceanOptics::timespec64> obj) : _o(obj), o(_o.get()) {}
-  timespec64_Wrapper(Psana::OceanOptics::timespec64* obj) : o(obj) {}
-  uint64_t tv_sec() const { return o->tv_sec(); }
-  uint64_t tv_nsec() const { return o->tv_nsec(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::OceanOptics::ConfigV1>& obj) : m_obj(obj) {}
+  float exposureTime() const { return m_obj->exposureTime(); }
+  PyObject* waveLenCalib() const { return detail::ndToNumpy(m_obj->waveLenCalib(), m_obj); }
+  PyObject* nonlinCorrect() const { return detail::ndToNumpy(m_obj->nonlinCorrect(), m_obj); }
+  double strayLightConstant() const { return m_obj->strayLightConstant(); }
 };
 class ConfigV1;
 
 class DataV1_Wrapper {
-  shared_ptr<Psana::OceanOptics::DataV1> _o;
-  Psana::OceanOptics::DataV1* o;
+  shared_ptr<const Psana::OceanOptics::DataV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_OceanOpticsData };
   enum { Version = 1 };
-  DataV1_Wrapper(shared_ptr<Psana::OceanOptics::DataV1> obj) : _o(obj), o(_o.get()) {}
-  DataV1_Wrapper(Psana::OceanOptics::DataV1* obj) : o(obj) {}
-  PyObject* data() const { ND_CONVERT(o->data(), uint16_t, 1); }
-  uint64_t frameCounter() const { return o->frameCounter(); }
-  uint64_t numDelayedFrames() const { return o->numDelayedFrames(); }
-  uint64_t numDiscardFrames() const { return o->numDiscardFrames(); }
-  const timespec64_Wrapper timeFrameStart() const { return timespec64_Wrapper(const_cast<Psana::OceanOptics::timespec64*>(&o->timeFrameStart())); }
-  const timespec64_Wrapper timeFrameFirstData() const { return timespec64_Wrapper(const_cast<Psana::OceanOptics::timespec64*>(&o->timeFrameFirstData())); }
-  const timespec64_Wrapper timeFrameEnd() const { return timespec64_Wrapper(const_cast<Psana::OceanOptics::timespec64*>(&o->timeFrameEnd())); }
-  int32_t version() const { return o->version(); }
-  int8_t numSpectraInData() const { return o->numSpectraInData(); }
-  int8_t numSpectraInQueue() const { return o->numSpectraInQueue(); }
-  int8_t numSpectraUnused() const { return o->numSpectraUnused(); }
-  double durationOfFrame() const { return o->durationOfFrame(); }
-  double nonlinerCorrected(uint32_t iPixel) const { return o->nonlinerCorrected(iPixel); }
+  DataV1_Wrapper(const shared_ptr<const Psana::OceanOptics::DataV1>& obj) : m_obj(obj) {}
+  PyObject* data() const { return detail::ndToNumpy(m_obj->data(), m_obj); }
+  uint64_t frameCounter() const { return m_obj->frameCounter(); }
+  uint64_t numDelayedFrames() const { return m_obj->numDelayedFrames(); }
+  uint64_t numDiscardFrames() const { return m_obj->numDiscardFrames(); }
+  const Psana::OceanOptics::timespec64& timeFrameStart() const { return m_obj->timeFrameStart(); }
+  const Psana::OceanOptics::timespec64& timeFrameFirstData() const { return m_obj->timeFrameFirstData(); }
+  const Psana::OceanOptics::timespec64& timeFrameEnd() const { return m_obj->timeFrameEnd(); }
+  int32_t version() const { return m_obj->version(); }
+  int8_t numSpectraInData() const { return m_obj->numSpectraInData(); }
+  int8_t numSpectraInQueue() const { return m_obj->numSpectraInQueue(); }
+  int8_t numSpectraUnused() const { return m_obj->numSpectraUnused(); }
+  double durationOfFrame() const { return m_obj->durationOfFrame(); }
+  double nonlinerCorrected(uint32_t iPixel) const { return m_obj->nonlinerCorrected(iPixel); }
 };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::ConfigV1);}
     const char* getTypeName() const { return "Psana::OceanOptics::ConfigV1";}
     int getVersion() const { return Psana::OceanOptics::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_OceanOpticsConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::OceanOptics::ConfigV1> result = boost::static_pointer_cast<Psana::OceanOptics::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class timespec64_Getter : public psddl_python::Getter {
+  class timespec64_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::timespec64);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::timespec64);}
     const char* getTypeName() const { return "Psana::OceanOptics::timespec64";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::OceanOptics::timespec64> result = boost::static_pointer_cast<Psana::OceanOptics::timespec64>(vdata);
-      return result.get() ? object(timespec64_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class DataV1_Getter : public psddl_python::Getter {
+  class DataV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::OceanOptics::DataV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::OceanOptics::DataV1);}
     const char* getTypeName() const { return "Psana::OceanOptics::DataV1";}
     int getVersion() const { return Psana::OceanOptics::DataV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_OceanOpticsData; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::OceanOptics::DataV1> result = boost::static_pointer_cast<Psana::OceanOptics::DataV1>(vdata);
       return result.get() ? object(DataV1_Wrapper(result)) : object();

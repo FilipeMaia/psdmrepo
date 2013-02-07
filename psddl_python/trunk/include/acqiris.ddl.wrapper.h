@@ -3,11 +3,12 @@
 #ifndef PSDDL_PYTHON_ACQIRIS_DDL_WRAPPER_H
 #define PSDDL_PYTHON_ACQIRIS_DDL_WRAPPER_H 1
 
-#include <psddl_python/DdlWrapper.h>
 #include <vector>
-#include <ndarray/ndarray.h>
-#include <pdsdata/xtc/TypeId.hh>
-#include <psddl_psana/acqiris.ddl.h> // inc_psana
+#include "psddl_python/DdlWrapper.h"
+#include "psddl_python/Converter.h"
+#include "ndarray/ndarray.h"
+#include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/acqiris.ddl.h" // inc_psana
 
 namespace psddl_python {
 namespace Acqiris {
@@ -19,281 +20,125 @@ using std::vector;
 
 void createWrappers(PyObject* module);
 
-class VertV1_Wrapper {
-  shared_ptr<Psana::Acqiris::VertV1> _o;
-  Psana::Acqiris::VertV1* o;
-public:
-  enum { Version = 1 };
-  VertV1_Wrapper(shared_ptr<Psana::Acqiris::VertV1> obj) : _o(obj), o(_o.get()) {}
-  VertV1_Wrapper(Psana::Acqiris::VertV1* obj) : o(obj) {}
-  double fullScale() const { return o->fullScale(); }
-  double offset() const { return o->offset(); }
-  uint32_t coupling() const { return o->coupling(); }
-  uint32_t bandwidth() const { return o->bandwidth(); }
-  double slope() const { return o->slope(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class HorizV1_Wrapper {
-  shared_ptr<Psana::Acqiris::HorizV1> _o;
-  Psana::Acqiris::HorizV1* o;
-public:
-  enum { Version = 1 };
-  HorizV1_Wrapper(shared_ptr<Psana::Acqiris::HorizV1> obj) : _o(obj), o(_o.get()) {}
-  HorizV1_Wrapper(Psana::Acqiris::HorizV1* obj) : o(obj) {}
-  double sampInterval() const { return o->sampInterval(); }
-  double delayTime() const { return o->delayTime(); }
-  uint32_t nbrSamples() const { return o->nbrSamples(); }
-  uint32_t nbrSegments() const { return o->nbrSegments(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TrigV1_Wrapper {
-  shared_ptr<Psana::Acqiris::TrigV1> _o;
-  Psana::Acqiris::TrigV1* o;
-public:
-  enum { Version = 1 };
-  TrigV1_Wrapper(shared_ptr<Psana::Acqiris::TrigV1> obj) : _o(obj), o(_o.get()) {}
-  TrigV1_Wrapper(Psana::Acqiris::TrigV1* obj) : o(obj) {}
-  uint32_t coupling() const { return o->coupling(); }
-  uint32_t input() const { return o->input(); }
-  uint32_t slope() const { return o->slope(); }
-  double level() const { return o->level(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
 class ConfigV1_Wrapper {
-  shared_ptr<Psana::Acqiris::ConfigV1> _o;
-  Psana::Acqiris::ConfigV1* o;
+  shared_ptr<const Psana::Acqiris::ConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqConfig };
   enum { Version = 1 };
-  ConfigV1_Wrapper(shared_ptr<Psana::Acqiris::ConfigV1> obj) : _o(obj), o(_o.get()) {}
-  ConfigV1_Wrapper(Psana::Acqiris::ConfigV1* obj) : o(obj) {}
-  uint32_t nbrConvertersPerChannel() const { return o->nbrConvertersPerChannel(); }
-  uint32_t channelMask() const { return o->channelMask(); }
-  uint32_t nbrBanks() const { return o->nbrBanks(); }
-  const TrigV1_Wrapper trig() const { return TrigV1_Wrapper(const_cast<Psana::Acqiris::TrigV1*>(&o->trig())); }
-  const HorizV1_Wrapper horiz() const { return HorizV1_Wrapper(const_cast<Psana::Acqiris::HorizV1*>(&o->horiz())); }
-  vector<Psana::Acqiris::VertV1> vert() const { VEC_CONVERT(o->vert(), Psana::Acqiris::VertV1); }
-  uint32_t nbrChannels() const { return o->nbrChannels(); }
-};
-
-class TimestampV1_Wrapper {
-  shared_ptr<Psana::Acqiris::TimestampV1> _o;
-  Psana::Acqiris::TimestampV1* o;
-public:
-  enum { Version = 1 };
-  TimestampV1_Wrapper(shared_ptr<Psana::Acqiris::TimestampV1> obj) : _o(obj), o(_o.get()) {}
-  TimestampV1_Wrapper(Psana::Acqiris::TimestampV1* obj) : o(obj) {}
-  double pos() const { return o->pos(); }
-  uint32_t timeStampLo() const { return o->timeStampLo(); }
-  uint32_t timeStampHi() const { return o->timeStampHi(); }
-  uint64_t value() const { return o->value(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  ConfigV1_Wrapper(const shared_ptr<const Psana::Acqiris::ConfigV1>& obj) : m_obj(obj) {}
+  uint32_t nbrConvertersPerChannel() const { return m_obj->nbrConvertersPerChannel(); }
+  uint32_t channelMask() const { return m_obj->channelMask(); }
+  uint32_t nbrBanks() const { return m_obj->nbrBanks(); }
+  const Psana::Acqiris::TrigV1& trig() const { return m_obj->trig(); }
+  const Psana::Acqiris::HorizV1& horiz() const { return m_obj->horiz(); }
+  boost::python::list vert() const { return detail::ndToList(m_obj->vert()); }
+  uint32_t nbrChannels() const { return m_obj->nbrChannels(); }
 };
 class ConfigV1;
 
 class DataDescV1Elem_Wrapper {
-  shared_ptr<Psana::Acqiris::DataDescV1Elem> _o;
-  Psana::Acqiris::DataDescV1Elem* o;
+  shared_ptr<const Psana::Acqiris::DataDescV1Elem> m_obj;
 public:
   enum { Version = 1 };
-  DataDescV1Elem_Wrapper(shared_ptr<Psana::Acqiris::DataDescV1Elem> obj) : _o(obj), o(_o.get()) {}
-  DataDescV1Elem_Wrapper(Psana::Acqiris::DataDescV1Elem* obj) : o(obj) {}
-  uint32_t nbrSamplesInSeg() const { return o->nbrSamplesInSeg(); }
-  uint32_t indexFirstPoint() const { return o->indexFirstPoint(); }
-  uint32_t nbrSegments() const { return o->nbrSegments(); }
-  vector<Psana::Acqiris::TimestampV1> timestamp() const { VEC_CONVERT(o->timestamp(), Psana::Acqiris::TimestampV1); }
-  PyObject* waveforms() const { ND_CONVERT(o->waveforms(), int16_t, 2); }
+  DataDescV1Elem_Wrapper(const shared_ptr<const Psana::Acqiris::DataDescV1Elem>& obj) : m_obj(obj) {}
+  uint32_t nbrSamplesInSeg() const { return m_obj->nbrSamplesInSeg(); }
+  uint32_t indexFirstPoint() const { return m_obj->indexFirstPoint(); }
+  uint32_t nbrSegments() const { return m_obj->nbrSegments(); }
+  boost::python::list timestamp() const { return detail::ndToList(m_obj->timestamp()); }
+  PyObject* waveforms() const { return detail::ndToNumpy(m_obj->waveforms(), m_obj); }
 };
 class ConfigV1;
 
 class DataDescV1_Wrapper {
-  shared_ptr<Psana::Acqiris::DataDescV1> _o;
-  Psana::Acqiris::DataDescV1* o;
+  shared_ptr<const Psana::Acqiris::DataDescV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqWaveform };
   enum { Version = 1 };
-  DataDescV1_Wrapper(shared_ptr<Psana::Acqiris::DataDescV1> obj) : _o(obj), o(_o.get()) {}
-  DataDescV1_Wrapper(Psana::Acqiris::DataDescV1* obj) : o(obj) {}
-  const DataDescV1Elem_Wrapper data(uint32_t i0) const { return DataDescV1Elem_Wrapper(const_cast<Psana::Acqiris::DataDescV1Elem*>(&o->data(i0))); }
-  vector<int> data_shape() const { return o->data_shape(); }
-  boost::python::list data_list() { boost::python::list l; const int n = data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
-};
-
-class TdcChannel_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcChannel> _o;
-  Psana::Acqiris::TdcChannel* o;
-public:
-  TdcChannel_Wrapper(shared_ptr<Psana::Acqiris::TdcChannel> obj) : _o(obj), o(_o.get()) {}
-  TdcChannel_Wrapper(Psana::Acqiris::TdcChannel* obj) : o(obj) {}
-  uint32_t _channel_int() const { return o->_channel_int(); }
-  uint32_t _mode_int() const { return o->_mode_int(); }
-  Psana::Acqiris::TdcChannel::Slope slope() const { return o->slope(); }
-  Psana::Acqiris::TdcChannel::Mode mode() const { return o->mode(); }
-  double level() const { return o->level(); }
-  Psana::Acqiris::TdcChannel::Channel channel() const { return o->channel(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TdcAuxIO_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcAuxIO> _o;
-  Psana::Acqiris::TdcAuxIO* o;
-public:
-  TdcAuxIO_Wrapper(shared_ptr<Psana::Acqiris::TdcAuxIO> obj) : _o(obj), o(_o.get()) {}
-  TdcAuxIO_Wrapper(Psana::Acqiris::TdcAuxIO* obj) : o(obj) {}
-  uint32_t channel_int() const { return o->channel_int(); }
-  uint32_t signal_int() const { return o->signal_int(); }
-  uint32_t qualifier_int() const { return o->qualifier_int(); }
-  Psana::Acqiris::TdcAuxIO::Channel channel() const { return o->channel(); }
-  Psana::Acqiris::TdcAuxIO::Mode mode() const { return o->mode(); }
-  Psana::Acqiris::TdcAuxIO::Termination term() const { return o->term(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TdcVetoIO_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcVetoIO> _o;
-  Psana::Acqiris::TdcVetoIO* o;
-public:
-  TdcVetoIO_Wrapper(shared_ptr<Psana::Acqiris::TdcVetoIO> obj) : _o(obj), o(_o.get()) {}
-  TdcVetoIO_Wrapper(Psana::Acqiris::TdcVetoIO* obj) : o(obj) {}
-  uint32_t signal_int() const { return o->signal_int(); }
-  uint32_t qualifier_int() const { return o->qualifier_int(); }
-  Psana::Acqiris::TdcVetoIO::Channel channel() const { return o->channel(); }
-  Psana::Acqiris::TdcVetoIO::Mode mode() const { return o->mode(); }
-  Psana::Acqiris::TdcVetoIO::Termination term() const { return o->term(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  DataDescV1_Wrapper(const shared_ptr<const Psana::Acqiris::DataDescV1>& obj) : m_obj(obj) {}
+  Acqiris::DataDescV1Elem_Wrapper data(uint32_t i0) const { return Acqiris::DataDescV1Elem_Wrapper(boost::shared_ptr<const Psana::Acqiris::DataDescV1Elem>(m_obj, &m_obj->data(i0))); }
+  boost::python::list data_shape() const { boost::python::list res; const vector<int>& sh=m_obj->data_shape(); for (vector<int>::const_iterator i = sh.begin(); i != sh.end(); ++ i) res.append(*i); return res; }
+  boost::python::list data_list() { boost::python::list l; const int n = m_obj->data_shape()[0]; for (int i = 0; i < n; i++) l.append(data(i)); return l; }
 };
 
 class TdcConfigV1_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcConfigV1> _o;
-  Psana::Acqiris::TdcConfigV1* o;
+  shared_ptr<const Psana::Acqiris::TdcConfigV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcConfig };
   enum { Version = 1 };
-  TdcConfigV1_Wrapper(shared_ptr<Psana::Acqiris::TdcConfigV1> obj) : _o(obj), o(_o.get()) {}
-  TdcConfigV1_Wrapper(Psana::Acqiris::TdcConfigV1* obj) : o(obj) {}
-  vector<Psana::Acqiris::TdcChannel> channels() const { VEC_CONVERT(o->channels(), Psana::Acqiris::TdcChannel); }
-  vector<Psana::Acqiris::TdcAuxIO> auxio() const { VEC_CONVERT(o->auxio(), Psana::Acqiris::TdcAuxIO); }
-  const TdcVetoIO_Wrapper veto() const { return TdcVetoIO_Wrapper(const_cast<Psana::Acqiris::TdcVetoIO*>(&o->veto())); }
-};
-
-class TdcDataV1_Item_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcDataV1_Item> _o;
-  Psana::Acqiris::TdcDataV1_Item* o;
-public:
-  TdcDataV1_Item_Wrapper(shared_ptr<Psana::Acqiris::TdcDataV1_Item> obj) : _o(obj), o(_o.get()) {}
-  TdcDataV1_Item_Wrapper(Psana::Acqiris::TdcDataV1_Item* obj) : o(obj) {}
-  uint32_t value() const { return o->value(); }
-  uint32_t bf_val_() const { return o->bf_val_(); }
-  Psana::Acqiris::TdcDataV1_Item::Source source() const { return o->source(); }
-  uint8_t bf_ofv_() const { return o->bf_ofv_(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TdcDataV1Common_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcDataV1Common> _o;
-  Psana::Acqiris::TdcDataV1Common* o;
-public:
-  TdcDataV1Common_Wrapper(shared_ptr<Psana::Acqiris::TdcDataV1Common> obj) : _o(obj), o(_o.get()) {}
-  TdcDataV1Common_Wrapper(Psana::Acqiris::TdcDataV1Common* obj) : o(obj) {}
-  uint32_t nhits() const { return o->nhits(); }
-  uint8_t overflow() const { return o->overflow(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TdcDataV1Channel_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcDataV1Channel> _o;
-  Psana::Acqiris::TdcDataV1Channel* o;
-public:
-  TdcDataV1Channel_Wrapper(shared_ptr<Psana::Acqiris::TdcDataV1Channel> obj) : _o(obj), o(_o.get()) {}
-  TdcDataV1Channel_Wrapper(Psana::Acqiris::TdcDataV1Channel* obj) : o(obj) {}
-  uint32_t ticks() const { return o->ticks(); }
-  uint8_t overflow() const { return o->overflow(); }
-  double time() const { return o->time(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
-};
-
-class TdcDataV1Marker_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcDataV1Marker> _o;
-  Psana::Acqiris::TdcDataV1Marker* o;
-public:
-  TdcDataV1Marker_Wrapper(shared_ptr<Psana::Acqiris::TdcDataV1Marker> obj) : _o(obj), o(_o.get()) {}
-  TdcDataV1Marker_Wrapper(Psana::Acqiris::TdcDataV1Marker* obj) : o(obj) {}
-  Psana::Acqiris::TdcDataV1Marker::Type type() const { return o->type(); }
-  uint32_t _sizeof() const { return o->_sizeof(); }
+  TdcConfigV1_Wrapper(const shared_ptr<const Psana::Acqiris::TdcConfigV1>& obj) : m_obj(obj) {}
+  boost::python::list channels() const { return detail::ndToList(m_obj->channels()); }
+  boost::python::list auxio() const { return detail::ndToList(m_obj->auxio()); }
+  const Psana::Acqiris::TdcVetoIO& veto() const { return m_obj->veto(); }
 };
 
 class TdcDataV1_Wrapper {
-  shared_ptr<Psana::Acqiris::TdcDataV1> _o;
-  Psana::Acqiris::TdcDataV1* o;
+  shared_ptr<const Psana::Acqiris::TdcDataV1> m_obj;
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData };
   enum { Version = 1 };
-  TdcDataV1_Wrapper(shared_ptr<Psana::Acqiris::TdcDataV1> obj) : _o(obj), o(_o.get()) {}
-  TdcDataV1_Wrapper(Psana::Acqiris::TdcDataV1* obj) : o(obj) {}
-  vector<Psana::Acqiris::TdcDataV1_Item> data() const { VEC_CONVERT(o->data(), Psana::Acqiris::TdcDataV1_Item); }
+  TdcDataV1_Wrapper(const shared_ptr<const Psana::Acqiris::TdcDataV1>& obj) : m_obj(obj) {}
+  boost::python::list data() const { return detail::ndToList(m_obj->data()); }
 };
 
-  class VertV1_Getter : public psddl_python::Getter {
+  class VertV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::VertV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::VertV1);}
     const char* getTypeName() const { return "Psana::Acqiris::VertV1";}
     int getVersion() const { return Psana::Acqiris::VertV1::Version; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::VertV1> result = boost::static_pointer_cast<Psana::Acqiris::VertV1>(vdata);
-      return result.get() ? object(VertV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class HorizV1_Getter : public psddl_python::Getter {
+  class HorizV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::HorizV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::HorizV1);}
     const char* getTypeName() const { return "Psana::Acqiris::HorizV1";}
     int getVersion() const { return Psana::Acqiris::HorizV1::Version; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::HorizV1> result = boost::static_pointer_cast<Psana::Acqiris::HorizV1>(vdata);
-      return result.get() ? object(HorizV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TrigV1_Getter : public psddl_python::Getter {
+  class TrigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TrigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TrigV1);}
     const char* getTypeName() const { return "Psana::Acqiris::TrigV1";}
     int getVersion() const { return Psana::Acqiris::TrigV1::Version; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TrigV1> result = boost::static_pointer_cast<Psana::Acqiris::TrigV1>(vdata);
-      return result.get() ? object(TrigV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class ConfigV1_Getter : public psddl_python::Getter {
+  class ConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::ConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::ConfigV1);}
     const char* getTypeName() const { return "Psana::Acqiris::ConfigV1";}
     int getVersion() const { return Psana::Acqiris::ConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AcqConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::ConfigV1> result = boost::static_pointer_cast<Psana::Acqiris::ConfigV1>(vdata);
       return result.get() ? object(ConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TimestampV1_Getter : public psddl_python::Getter {
+  class TimestampV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TimestampV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TimestampV1);}
     const char* getTypeName() const { return "Psana::Acqiris::TimestampV1";}
     int getVersion() const { return Psana::Acqiris::TimestampV1::Version; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TimestampV1> result = boost::static_pointer_cast<Psana::Acqiris::TimestampV1>(vdata);
-      return result.get() ? object(TimestampV1_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class DataDescV1Elem_Getter : public psddl_python::Getter {
+  class DataDescV1Elem_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::DataDescV1Elem);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::DataDescV1Elem);}
     const char* getTypeName() const { return "Psana::Acqiris::DataDescV1Elem";}
     int getVersion() const { return Psana::Acqiris::DataDescV1Elem::Version; }
     object convert(const boost::shared_ptr<void>& vdata) const {
@@ -302,103 +147,106 @@ public:
     }
   };
 
-  class DataDescV1_Getter : public psddl_python::Getter {
+  class DataDescV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::DataDescV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::DataDescV1);}
     const char* getTypeName() const { return "Psana::Acqiris::DataDescV1";}
     int getVersion() const { return Psana::Acqiris::DataDescV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AcqWaveform; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::DataDescV1> result = boost::static_pointer_cast<Psana::Acqiris::DataDescV1>(vdata);
       return result.get() ? object(DataDescV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcChannel_Getter : public psddl_python::Getter {
+  class TdcChannel_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcChannel);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcChannel);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcChannel";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcChannel> result = boost::static_pointer_cast<Psana::Acqiris::TdcChannel>(vdata);
-      return result.get() ? object(TdcChannel_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcAuxIO_Getter : public psddl_python::Getter {
+  class TdcAuxIO_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcAuxIO);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcAuxIO);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcAuxIO";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcAuxIO> result = boost::static_pointer_cast<Psana::Acqiris::TdcAuxIO>(vdata);
-      return result.get() ? object(TdcAuxIO_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcVetoIO_Getter : public psddl_python::Getter {
+  class TdcVetoIO_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcVetoIO);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcVetoIO);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcVetoIO";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcVetoIO> result = boost::static_pointer_cast<Psana::Acqiris::TdcVetoIO>(vdata);
-      return result.get() ? object(TdcVetoIO_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcConfigV1_Getter : public psddl_python::Getter {
+  class TdcConfigV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcConfigV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcConfigV1);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcConfigV1";}
     int getVersion() const { return Psana::Acqiris::TdcConfigV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AcqTdcConfig; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcConfigV1> result = boost::static_pointer_cast<Psana::Acqiris::TdcConfigV1>(vdata);
       return result.get() ? object(TdcConfigV1_Wrapper(result)) : object();
     }
   };
 
-  class TdcDataV1_Item_Getter : public psddl_python::Getter {
+  class TdcDataV1_Item_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1_Item);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcDataV1_Item);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1_Item";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcDataV1_Item> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1_Item>(vdata);
-      return result.get() ? object(TdcDataV1_Item_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcDataV1Common_Getter : public psddl_python::Getter {
+  class TdcDataV1Common_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Common);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcDataV1Common);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Common";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcDataV1Common> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Common>(vdata);
-      return result.get() ? object(TdcDataV1Common_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcDataV1Channel_Getter : public psddl_python::Getter {
+  class TdcDataV1Channel_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Channel);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcDataV1Channel);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Channel";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcDataV1Channel> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Channel>(vdata);
-      return result.get() ? object(TdcDataV1Channel_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcDataV1Marker_Getter : public psddl_python::Getter {
+  class TdcDataV1Marker_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1Marker);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcDataV1Marker);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1Marker";}
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcDataV1Marker> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1Marker>(vdata);
-      return result.get() ? object(TdcDataV1Marker_Wrapper(result)) : object();
+      return result.get() ? object(*result) : object();
     }
   };
 
-  class TdcDataV1_Getter : public psddl_python::Getter {
+  class TdcDataV1_Converter : public psddl_python::Converter {
   public:
-    const std::type_info& typeinfo() const { return typeid(Psana::Acqiris::TdcDataV1);}
+    const std::type_info* typeinfo() const { return &typeid(Psana::Acqiris::TdcDataV1);}
     const char* getTypeName() const { return "Psana::Acqiris::TdcDataV1";}
     int getVersion() const { return Psana::Acqiris::TdcDataV1::Version; }
+    int pdsTypeId() const { return Pds::TypeId::Id_AcqTdcData; }
     object convert(const boost::shared_ptr<void>& vdata) const {
       shared_ptr<Psana::Acqiris::TdcDataV1> result = boost::static_pointer_cast<Psana::Acqiris::TdcDataV1>(vdata);
       return result.get() ? object(TdcDataV1_Wrapper(result)) : object();
