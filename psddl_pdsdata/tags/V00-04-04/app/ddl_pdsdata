@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for f in  psddldata/data/[a-w]*.ddl.xml ; do 
+    psddlc -b pdsdata -I data -E psddl_pdsdata/include -O psddl_pdsdata/src -i psddl_pdsdata -t PsddlPds $f
+done
