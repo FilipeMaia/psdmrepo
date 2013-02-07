@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 
+2013-02-07 Mikhail S. Dubrovin
+A       src/PlotG2.py
+A       src/PlotG2Widget.py
+A       src/PlotG2Buttons.py
+
 2013-02-05 Mikhail S. Dubrovin
 D       src/GUIBlamish.py -> GUIBlemish, "blam" -> "blem" everywhere
 A  +    src/GUIBlemish.py

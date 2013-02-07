@@ -110,6 +110,7 @@ class ViewResults :
         sp.cor_arr = None
         sp.g2_vs_itau_arr = None
         sp.mask_total = None
+        sp.mask_blemish = None
 
         sp.set_file_name(fname)
         sp.set_parameters()
@@ -514,7 +515,7 @@ class ViewResults :
 
         sp.cor_arr = np.fromfile(sp.fname, dtype=np.float32)
         nptau = sp.cor_arr.shape[0]/cp.bat_img_size.value()/3
-        sp.cor_arr.shape = (nptau, 3, sp.rows, sp.cols)
+        sp.cor_arr.shape = (nptau, 3, sp.rows, sp.cols) # 3 stands for <Ip>, <If>, and <Ip*If>
         logger.info('Set arr.shape = ' + str(sp.cor_arr.shape), __name__)
         return sp.cor_arr
 
@@ -558,10 +559,8 @@ class ViewResults :
         return sp.arr2d
 
 
-    def get_random_binomial_img(sp) :
-        logger.info('get_random_binomial_img()', __name__)
-        ntrials = 1
-        p = 0.99 # probability of success (1)
+    def get_random_binomial_img(sp, ntrials=1, p=0.99) :
+        logger.info('get_random_binomial_img() for n=%d, p=%4.2f'%(ntrials, p), __name__)
         sp.arr2d = np.random.binomial(ntrials, p, sp.size)
         sp.arr2d.shape = (sp.rows,sp.cols)
         return sp.arr2d
@@ -588,16 +587,32 @@ class ViewResults :
 
 
     def get_mask_blemish(sp) :
-        sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
+        if sp.mask_blemish != None : return sp.mask_blemish
+        if cp.ccdcorr_blemish.value() :
+            sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
+            logger.info('Blemish mask is taken from file ' + fnm.path_blem(), __name__)
+        else :
+            logger.info('Blemish mask is turned off', __name__)
+            sp.mask_blemish = np.ones((sp.rows,sp.cols), dtype=np.uint8)
+            #np.savetxt(fnm.path_blem()+'-all-ones', sp.mask_blemish, fmt='%1d', delimiter=' ') 
         return sp.mask_blemish
 
 
     def get_mask_hotpix(sp) :
         #sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix())
         #return sp.mask_hotpix
-        print 'get_mask_hotpix IS NOT IMPLEMENTED YET! get random binomial for now...'
+        msg = 'get_mask_hotpix IS NOT IMPLEMENTED YET! get random binomial for now...'
+        logger.warning(msg, __name__)
+        print 'WOARNING: ' + msg
         #return sp.get_random_img()
-        return sp.get_random_binomial_img()
+        return sp.get_random_binomial_img(p=0.99)
+
+
+    def get_mask_regs(sp) :
+        msg = 'get_mask_regs IS NOT IMPLEMENTED YET! get random binomial for now...'
+        logger.warning(msg, __name__)
+        print 'WOARNING: ' + msg
+        return sp.get_random_binomial_img(p=0.50)
 
 
     def get_mask_total(sp) :

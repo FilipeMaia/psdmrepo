@@ -389,6 +389,9 @@ class GUIMainTB ( QtGui.QWidget ) :
         try    : cp.plotarray.close()
         except : pass
 
+        try    : cp.plot_g2.close()
+        except : pass
+
         #try    : del cp.guimain
         #except : pass
 

@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module PlotImgSpe...
+#  Module PlotG2...
 #
 #------------------------------------------------------------------------
 
-"""Plots image and spectrum for 2d array.
+"""Plot for G2 arrays.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -33,10 +33,13 @@ import os
 import random
 import numpy as np
 
-import matplotlib
-matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-#import matplotlib.pyplot as plt
+# For self-run debugging:
+#try :
+#    import matplotlib
+#    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#except : pass
 
+import matplotlib.pyplot as plt
 
 #from matplotlib.figure import Figure
 from PyQt4 import QtGui, QtCore
@@ -45,9 +48,8 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-#import ImgSpeNavToolBar     as imgtb
-import PlotImgSpeWidget         as imgwidg
-import PlotImgSpeButtons        as imgbuts
+import PlotG2Widget         as imgwidg
+import PlotG2Buttons        as imgbuts
 
 from ConfigParametersCorAna import confpars as cp
 
@@ -55,46 +57,26 @@ from ConfigParametersCorAna import confpars as cp
 #  Class definition --
 #---------------------
 
-#class PlotImgSpe (QtGui.QMainWindow) :
-class PlotImgSpe (QtGui.QWidget) :
-    """Plots image and spectrum for 2d array"""
+class PlotG2 (QtGui.QWidget) :
+    """Plot for G2 arrays"""
 
-
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array'):
-        #QtGui.QMainWindow.__init__(self, parent)
+    def __init__(self, parent=None, arrays=None, ofname='./fig_g2.png', title=''):
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 600, 700)
-        self.setWindowTitle(title)
+        self.setGeometry(20, 40, 800, 600)
+        self.setWindowTitle('Plot for G2 arrays')
         self.setFrame()
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
-        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
-        #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
+        self.widgimage = imgwidg.PlotG2Widget(parent, arrays, title=title)
+        self.widgbuts  = imgbuts.PlotG2Buttons(self, self.widgimage, ofname)
  
         #---------------------
-
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
         #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
         vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas 
-        #vbox.addWidget(self.mpl_toolbar)                # <=== Add toolbar
         vbox.addWidget(self.widgbuts)                   # <=== Add buttons         
         self.setLayout(vbox)
-        #self.show()
         #---------------------
-        #self.main_frame = QtGui.QWidget()
-        #self.main_frame.setLayout(vbox)
-        #self.setCentralWidget(self.main_frame)
-        #---------------------
-
-
-    def set_image_array(self,arr,title='Plot 2d array'):
-        self.widgimage.set_image_array(arr)
-        self.setWindowTitle(title)
-
-
-    def set_image_array_new(self,arr,title='Plot 2d array'):
-        self.widgimage.set_image_array_new(arr)
-        self.setWindowTitle(title)
+        cp.plotg2_is_on = True
 
 
     def setFrame(self):
@@ -120,41 +102,43 @@ class PlotImgSpe (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-        #try    : self.mpl_toolbar.close()
-        #except : pass
+        cp.plotg2_is_on = False
 
-        #try    : del cp.plotimgspe # suicide... of object #1
-        #except : pass
-
-        #try    : del cp.plotimgspe_g # suicide... of object #2
-        #except : pass
+        try    : del cp.plot_g2 # suicide..., but what to do in order to close it properly?
+        except : pass
 
         #print 'Close application'
 
+    def set_array(self, arr, title='') :
+        self.widgimage.set_array(arr, title)
 
 #-----------------------------
 # Test
 #-----------------------------
 
-def get_array2d_for_test() :
-    mu, sigma = 200, 25
-    #arr = mu + sigma*np.random.standard_normal(size=2400)
-    arr = 100*np.random.standard_exponential(size=2400)
-    #arr = np.arange(2400)
-    arr.shape = (40,60)
-    return arr
+def get_arrays_for_test() :
+    rows, cols = 31, 20 # for q and tau
+    mu, sigma = 1., 0.2
+    arr_g2 = mu + sigma*np.random.standard_normal( size = rows*cols )
+    arr_g2.shape = (rows,cols)
+    arr_tau = np.arange(rows)
+    arr_q   = np.arange(cols)
 
+    print_array(arr_g2,  'arr_g2')
+    print_array(arr_q,   'arr_q')
+    print_array(arr_tau, 'arr_tau')
+
+    return arr_g2, arr_tau, arr_q
+
+def print_array(arr, msg='') :
+    print '\n' + msg + ':\n', arr
+    print 'shape:', arr.shape
 
 def main():
-
     app = QtGui.QApplication(sys.argv)
-
-    #w  = PlotImgSpe(None, get_array2d_for_test())
-    w  = PlotImgSpe(None)
-    w.set_image_array( get_array2d_for_test() )
+    w = PlotG2(arrays=get_arrays_for_test(), ofname='./fig_g2.png', title='My title')
     w.move(QtCore.QPoint(50,50))
     w.show()
-
     app.exec_()
         
 #-----------------------------
