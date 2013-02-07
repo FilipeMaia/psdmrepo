@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-04
+2013-02-06 Andy Salnikov
+- in pnccd moved FramesV1 below FulFrameV1. Python bindings use this
+  order to find data in event for given type_id, because those classes
+  have the same type_id FramesV1 was found first. Preferred for Python is 
+  to return FullFrame so it has to come first.
+
 Tag: V00-04-03
 2013-02-05 Andy Salnikov
 - update usdusb.DataV1 definition

@@ -120,30 +120,6 @@
         <!-- ========================================================================= -->
 
 
-        <pstype name="FramesV1" version="1" type_id="Id_pnCCDframe">
-
-            pnCCD class FramesV1 which is a collection of FrameV1 objects, number of 
-            frames in collection is determined by numLinks() method (which should return 4 
-            in most cases). This class does not exist in original pdsdata, has been 
-            introduced to psana to help in organizing 4 small pnCCD frames together.
-
-            <xtc-config name="ConfigV1" />
-            <xtc-config name="ConfigV2" />
-
-            <attribute name="_frames" type="FrameV1" shape="{xtc-config}.numLinks()" accessor="frame" shape_method="frame_shape">
-            Number of frames is determined by numLinks() method.
-            </attribute>
-            
-            <method name="numLinks" type="uint32_t">
-                <tag name="inline"/>
-                <expr lang="C++" value="{xtc-config}.numLinks()"/>
-            </method>
-
-        </pstype>
-
-        <!-- ========================================================================= -->
-
-
         <pstype name="FullFrameV1" version="1" type_id="Id_pnCCDframe">
 
             This is a "synthetic" pnCCD frame which is four original 512x512 frames
@@ -169,6 +145,30 @@
             <attribute name="_data" type="uint16_t" accessor="data" shape="1024,1024">
                 Full frame data, image size is 1024x1024.
             </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+
+        <pstype name="FramesV1" version="1" type_id="Id_pnCCDframe">
+
+            pnCCD class FramesV1 which is a collection of FrameV1 objects, number of 
+            frames in collection is determined by numLinks() method (which should return 4 
+            in most cases). This class does not exist in original pdsdata, has been 
+            introduced to psana to help in organizing 4 small pnCCD frames together.
+
+            <xtc-config name="ConfigV1" />
+            <xtc-config name="ConfigV2" />
+
+            <attribute name="_frames" type="FrameV1" shape="{xtc-config}.numLinks()" accessor="frame" shape_method="frame_shape">
+            Number of frames is determined by numLinks() method.
+            </attribute>
+            
+            <method name="numLinks" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="{xtc-config}.numLinks()"/>
+            </method>
 
         </pstype>
 
