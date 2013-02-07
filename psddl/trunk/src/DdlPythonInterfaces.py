@@ -155,6 +155,8 @@ class DdlPythonInterfaces ( object ) :
         inc_python = "psddl_python/" + inc_base
         print >>self.cpp, '#include "%s" // inc_python' % inc_python
         print >>self.cpp, '#include "psddl_python/ConverterMap.h"'
+        print >>self.cpp, '#include "psddl_python/ConverterBoostDef.h"'
+        print >>self.cpp, '#include "psddl_python/ConverterBoostDefWrap.h"'
         print >>self.cpp, ""
 
         # headers for other included packages
@@ -216,16 +218,10 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, ""
 
         print >>self.cpp, 'namespace {'
-        # loop over types
-        for ns in self.pkg.namespaces() :
-            if isinstance(ns, Type) :
-                type = ns
-                cname = type.name
-                wrapped = type.fullName('C++', self.psana_ns)
-                print >>self.cpp, T('PyObject* method_typeid_$cname() {')(locals())
-                print >>self.cpp, T('  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid($wrapped), 0);')(locals())
-                print >>self.cpp, T('  Py_INCREF(ptypeid);\n  return ptypeid;\n}\n')(locals())
-        print >>self.cpp, '} // namespace'
+        print >>self.cpp, 'template <typename T>\nPyObject* method_typeid() {'
+        print >>self.cpp, '  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);'
+        print >>self.cpp, '  Py_INCREF(ptypeid);\n  return ptypeid;\n}'
+        print >>self.cpp, '} // namespace\n'
 
 
         print >>self.cpp, "void createWrappers(PyObject* module) {"
@@ -267,10 +263,6 @@ class DdlPythonInterfaces ( object ) :
         # end createWrappers()
         print >>self.cpp, ""
         print >>self.cpp, "} // createWrappers()"
-        # now create converter classes
-        for ns in self.pkg.namespaces() :
-            if isinstance(ns, Type) :
-                self._createConverterClass(type = ns)
 
         # close namespaces
         print >>self.inc, T("} // namespace $name")[self.pkg]
@@ -284,29 +276,6 @@ class DdlPythonInterfaces ( object ) :
         if type.included : return
 
         self.codegen(type, ndconverters)
-
-    def _createConverterClass(self, type):
-
-        type_name = type.name
-        psana_type_name = type.fullName('C++', self.psana_ns)
-
-        print >>self.inc, ''
-        print >> self.inc, T('  class ${type_name}_Converter : public psddl_python::Converter {')(locals())
-        print >> self.inc, '  public:'
-        print >> self.inc, T('    const std::type_info* typeinfo() const { return &typeid(${psana_type_name});}')(locals())
-        print >> self.inc, T('    const char* getTypeName() const { return "${psana_type_name}";}')(locals())
-        if type.version is not None:
-            print >> self.inc, T('    int getVersion() const { return ${psana_type_name}::Version; }')(locals())
-        if type.type_id is not None:
-            print >> self.inc, T('    int pdsTypeId() const { return Pds::TypeId::${type_id}; }')(type_id=type.type_id)
-        print >> self.inc, T('    object convert(const boost::shared_ptr<void>& vdata) const {')(locals())
-        print >> self.inc, T('      shared_ptr<${psana_type_name}> result = boost::static_pointer_cast<${psana_type_name}>(vdata);')(locals())
-        if type.value_type:
-            print >> self.inc, T('      return result.get() ? object(*result) : object();')(locals())
-        else:
-            print >> self.inc, T('      return result.get() ? object(${type_name}_Wrapper(result)) : object();')(locals())
-        print >> self.inc, '    }'
-        print >> self.inc, '  };'
 
     def codegen(self, type, ndconverters):
         # type is abstract by default but can be reset with tag "value-type"
@@ -369,12 +338,19 @@ class DdlPythonInterfaces ( object ) :
             self._genAttrShapeAndListDecl(type, attr, bclass)
 
         # close class declaration
-        print >>self.cpp, T('    .def("__typeid__", &method_typeid_$cname)')(locals())
+        print >>self.cpp, T('    .def("__typeid__", &method_typeid<$wrapped>)')(locals())
         print >>self.cpp, T('    .staticmethod("__typeid__")')(locals())
         print >>self.cpp, '  ;'
         if not type.value_type: print >>self.inc, "};"
 
-        print >>self.cpp, T('  psddl_python::ConverterMap::instance().addConverter(boost::make_shared<${type_name}_Converter>());')(type_name=type.name)
+        # generates converter instance
+        type_id = "Pds::TypeId::"+type.type_id if type.type_id is not None else -1
+        version = type.version if type.version is not None else -1
+        if type.value_type:
+            cvt_type = T('ConverterBoostDef<$wrapped> ')(locals()) 
+        else:
+            cvt_type = T('ConverterBoostDefWrap<$wrapped, $bclass> ')(locals()) 
+        print >>self.cpp, T('  ConverterMap::instance().addConverter(boost::make_shared<$cvt_type>($type_id, $version));')(locals())
         print >>self.cpp, ""
 
     def _access(self, newaccess, oldaccess):
