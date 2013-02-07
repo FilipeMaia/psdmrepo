@@ -87,29 +87,6 @@ public:
   virtual ndarray<const uint16_t, 2> data() const = 0;
 };
 
-/** @class FramesV1
-
-  pnCCD class FramesV1 which is a collection of FrameV1 objects, number of 
-            frames in collection is determined by numLinks() method (which should return 4 
-            in most cases). This class does not exist in original pdsdata, has been 
-            introduced to psana to help in organizing 4 small pnCCD frames together.
-*/
-
-class ConfigV1;
-class ConfigV2;
-
-class FramesV1 {
-public:
-  enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
-  enum { Version = 1 /**< XTC type version number */ };
-  virtual ~FramesV1();
-  /** Number of frames is determined by numLinks() method. */
-  virtual const PNCCD::FrameV1& frame(uint32_t i0) const = 0;
-  virtual uint32_t numLinks() const = 0;
-  /** Method which returns the shape (dimensions) of the data returned by frame() method. */
-  virtual std::vector<int> frame_shape() const = 0;
-};
-
 /** @class FullFrameV1
 
   This is a "synthetic" pnCCD frame which is four original 512x512 frames
@@ -133,6 +110,29 @@ public:
   virtual uint32_t timeStampLo() const = 0;
   /** Full frame data, image size is 1024x1024. */
   virtual ndarray<const uint16_t, 2> data() const = 0;
+};
+
+/** @class FramesV1
+
+  pnCCD class FramesV1 which is a collection of FrameV1 objects, number of 
+            frames in collection is determined by numLinks() method (which should return 4 
+            in most cases). This class does not exist in original pdsdata, has been 
+            introduced to psana to help in organizing 4 small pnCCD frames together.
+*/
+
+class ConfigV1;
+class ConfigV2;
+
+class FramesV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~FramesV1();
+  /** Number of frames is determined by numLinks() method. */
+  virtual const PNCCD::FrameV1& frame(uint32_t i0) const = 0;
+  virtual uint32_t numLinks() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by frame() method. */
+  virtual std::vector<int> frame_shape() const = 0;
 };
 } // namespace PNCCD
 } // namespace Psana
