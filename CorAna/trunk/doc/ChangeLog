@@ -13,6 +13,10 @@ reverse time order.
 
 
 2013-02-07 Mikhail S. Dubrovin
+A       src/DragObjectSet.py
+A       src/Drag.py
+A       src/DragLine.py
+
 A       src/PlotG2.py
 A       src/PlotG2Widget.py
 A       src/PlotG2Buttons.py
