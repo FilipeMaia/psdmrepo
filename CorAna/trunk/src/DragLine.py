@@ -7,7 +7,6 @@ import copy
 import matplotlib.pyplot as plt
 import matplotlib.lines  as lines
 import math # cos(x), sin(x), radians(x), degrees()
-#import copy
 from Drag import *
 
 class DragLine( Drag, lines.Line2D ) :
@@ -130,6 +129,7 @@ class DragLine( Drag, lines.Line2D ) :
 from DragObjectSet import *
 
 #-----------------------------
+#-----------------------------
  
 def generate_list_of_objects(img_extent) :
     """Produce the list of initial random objects for test purpose.
@@ -141,12 +141,12 @@ def generate_list_of_objects(img_extent) :
     x = (xmin,xmax)
     y = ymin+(ymax-ymin)*np.random.rand(nobj,2)
 
-    list_of_objs = []
+    obj_list = []
     for ind in range(nobj) :
         obj = DragLine(x, y[ind], linewidth=2, color='g', picker=5, linestyle='-')
-        list_of_objs.append(obj)
+        obj_list.append(obj)
 
-    return list_of_objs
+    return obj_list
 
 #-----------------------------
 
@@ -154,13 +154,13 @@ def main_full_test():
     """Full test of the class DragRectangle, using the class DragObjectSet
        1. make a 2D plot
        2. make a list of random objects and add them to the plot
-       3. use the class DragObjectSet to switch between Add/Move/Remove modes for full test of the object
+       3. use the class DragObjectSet to switch between Add/Move/Remove modes for full test of the DragLine
     """
     fig, axes, imsh = generate_test_image()
     list_of_objs = generate_list_of_objects(imsh.get_extent())
 
     t = DragObjectSet(fig, axes, DragLine, useKeyboard=True)
-    #t.set_list_of_objs(list_of_objs)
+    t.set_list_of_objs(list_of_objs)
 
     plt.get_current_fig_manager().window.geometry('+50+10') # move(50, 10)
     plt.show()

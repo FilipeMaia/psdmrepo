@@ -11,7 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+2013-02-08 Mikhail S. Dubrovin
+A         src/DragRectangle.py
+A         src/DragWedge.py
+A         src/DragCircle.py
+A         src/DragCenter.py
+	
 2013-02-07 Mikhail S. Dubrovin
 A       src/DragObjectSet.py
 A       src/Drag.py
