@@ -12,6 +12,8 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2013-02-08 Mikhail S. Dubrovin
+A         src/MaskEditor.py
+A         src/MaskEditorButtons.py
 A         src/DragRectangle.py
 A         src/DragWedge.py
 A         src/DragCircle.py

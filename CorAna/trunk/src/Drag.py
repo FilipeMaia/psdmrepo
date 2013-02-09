@@ -270,7 +270,7 @@ import numpy as np
 
 def get_array2d_for_test() :
     mu, sigma = 200, 25
-    rows, cols = 90, 150
+    rows, cols = 1300, 1340
     arr = mu + sigma*np.random.standard_normal(size=rows*cols)
     #arr = np.arange(2400)
     arr.shape = (rows,cols)
@@ -283,20 +283,20 @@ def generate_test_image() :
     """Produce the figure with 2-d image for the test purpose.
        returns the necessary for test parameters: 
     """
-    fig = plt.figure()
-    fig.my_mode = None # This is used to transmit signals
-    axes = fig.add_subplot(111)
-
+    fig = plt.figure(figsize=(7,6), dpi=100, facecolor='w', edgecolor='w', frameon=True)
+    fig.my_mode = None # This is used by the Drag* objects
+    #axes = fig.add_subplot(111)
+    axes = fig.add_axes([0.08,  0.05, 0.89, 0.92])
+ 
     imsh = axes.imshow(get_array2d_for_test(), origin='upper', interpolation='nearest', aspect='auto')#, extent=self.range
-    #imsh.set_clim(zmin,zmax)
-    mycolbar = fig.colorbar(imsh, pad=0.1, fraction=0.15, shrink=1.0, aspect=15, orientation=1)#, ticks=coltickslocs) #orientation=1,
+    mycolbar = fig.colorbar(imsh, pad=0.01, fraction=0.08, shrink=1.0, aspect=30, orientation='vertical')#, ticks=coltickslocs)
 
     return fig, axes, imsh
 
 #-----------------------------
 
 def main_test_global():
-    """Test of the global methods only
+    """Test of global methods only
     """
     fig, axes, imsh = generate_test_image()
 

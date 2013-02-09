@@ -74,49 +74,29 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.cbox_log  = QtGui.QCheckBox('&LogX')
         self.tit_nbins = QtGui.QLabel('1-st plot:')
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.widgimage.iq_begin))
-
+        self.but_inc   = QtGui.QPushButton(u'\u25B6') # right-head triangle
+        self.but_dec   = QtGui.QPushButton(u'\u25C0') # left-head triangle
+ 
         self.set_buttons()
         self.setIcons()
-
-        width = 60
-        self.edi_nbins.setFixedWidth(width)
-        #self.but_reset.setFixedWidth(width)
-        #self.but_help .setFixedWidth(width)
-        #self.but_save .setFixedWidth(width)
-        #self.but_elog .setFixedWidth(width)
-        #self.but_quit .setFixedWidth(width)
-        self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
-
-        self.but_help .setStyleSheet (cp.styleButtonGood) 
-        self.but_reset.setStyleSheet (cp.styleButton) 
-        self.but_save .setStyleSheet (cp.styleButton) 
-        self.but_quit .setStyleSheet (cp.styleButtonBad) 
 
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
         self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
         self.connect(self.but_elog,  QtCore.SIGNAL('clicked()'),          self.on_but_elog)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
+        self.connect(self.but_inc,   QtCore.SIGNAL('clicked()'),          self.on_but_inc)
+        self.connect(self.but_dec,   QtCore.SIGNAL('clicked()'),          self.on_but_dec)
+        self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
         self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_grid)
         self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_log)
-        self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
-
-        # Layout with box sizers
-        #self.grid = QtGui.QGridLayout() 
-        #self.grid.addWidget(self.but_help,  0, 0)
-        #self.grid.addWidget(self.tit_nbins, 0, 1)
-        #self.grid.addWidget(self.edi_nbins, 0, 2)
-        #self.grid.addWidget(self.cbox_grid, 0, 3)
-        #self.grid.addWidget(self.cbox_log,  0, 4)
-        #self.grid.addWidget(self.but_reset, 0, 6)
-        #self.grid.addWidget(self.but_save,  0, 7)
-        #self.grid.addWidget(self.but_quit,  0, 8)
-        #self.setLayout(self.grid)
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.but_help)
         self.hbox.addWidget(self.tit_nbins)
+        self.hbox.addWidget(self.but_dec)
         self.hbox.addWidget(self.edi_nbins)
+        self.hbox.addWidget(self.but_inc)
         self.hbox.addWidget(self.cbox_grid)
         self.hbox.addWidget(self.cbox_log)
         self.hbox.addWidget(self.but_reset)
@@ -127,7 +107,8 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.setLayout(self.hbox)
 
         self.showToolTips()
-        self.setFixedHeight(50)
+        self.setStyle()
+
 
 
     def setIcons(self) :
@@ -158,7 +139,26 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(False)
 
+    def setStyle(self):
+        self           .setFixedHeight(50)
+        self.but_inc   .setFixedWidth (30)
+        self.but_dec   .setFixedWidth (30)
+        self.edi_nbins .setFixedWidth (40)
 
+        self           .setStyleSheet (cp.styleBkgd) 
+        self.tit_nbins .setStyleSheet (cp.styleLabel)
+        self.but_help  .setStyleSheet (cp.styleButtonGood) 
+        self.but_reset .setStyleSheet (cp.styleButton) 
+        self.but_save  .setStyleSheet (cp.styleButton) 
+        self.but_quit  .setStyleSheet (cp.styleButtonBad) 
+        self.but_inc   .setStyleSheet (cp.styleButton)
+        self.but_dec   .setStyleSheet (cp.styleButton)
+        self.edi_nbins .setStyleSheet (cp.styleEdit)
+
+        self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
+
+
+ 
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
@@ -198,7 +198,37 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.widgimage.iq_begin = int(self.edi_nbins.displayText())
         logger.info('Set for spectrum the number of bins ='+str(self.widgimage.iq_begin), __name__ )
         self.widgimage.on_draw_in_limits()
+
+
+    def get_iq_begin(self, iq=0) :
+        self.iq_min = 0
+        self.iq_max = self.widgimage.arr_q.shape[0]
+        nwin_max    = self.widgimage.nwin_max
+        if   iq < self.iq_min             : return self.iq_min
+        elif self.iq_max <= nwin_max      : return self.iq_min
+        elif self.iq_max-iq <= nwin_max   : return self.iq_max-nwin_max
+        else                              : return iq
+
+
+    def change_iq_begin(self, diq):
+        logger.debug('change iq by %d'% (diq), __name__ )
+        iq = int(self.edi_nbins.displayText())
+        iq_begin = self.get_iq_begin(iq + diq)
+        if iq_begin == iq :
+            logger.info('1-st plot is on limit of allowed interval [%d, %d] and is not changed.'%(self.iq_min,self.iq_max), __name__ )
+            return
+        self.edi_nbins.setText(str(iq_begin))
+        self.widgimage.iq_begin = iq_begin 
+        self.widgimage.on_draw_in_limits()
+
  
+    def on_but_inc(self):
+        self.change_iq_begin( self.widgimage.nwin_max )
+
+
+    def on_but_dec(self):
+        self.change_iq_begin( -self.widgimage.nwin_max )
+
 
     def on_but_reset(self):
         logger.debug('on_but_reset', __name__ )

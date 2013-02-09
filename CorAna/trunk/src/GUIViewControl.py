@@ -430,6 +430,21 @@ class GUIViewControl ( QtGui.QWidget ) :
         cp.plotimgspe_g.set_image_array(self.arr2d, self.getTitle())
 
 
+    def onButClose(self):
+        logger.info('onButClose', __name__)
+        try    : cp.plotimgspe_g.close()
+        except : pass
+        try    : del cp.plotimgspe_g
+        except : pass
+        cp.plotimgspe_g = None
+
+        try    : cp.plot_g2.close()
+        except : pass
+        try    : del cp.plot_g2
+        except : pass
+
+
+
     def on_but_g2tau_gr(self):  
         #self.arr2d = self.vr.get_random_img()
         #self.list_of_tau
@@ -455,20 +470,6 @@ class GUIViewControl ( QtGui.QWidget ) :
 
             #cp.plotg2_is_on = False
         
-
-    def onButClose(self):
-        logger.info('onButClose', __name__)
-        try    : cp.plotimgspe_g.close()
-        except : pass
-        try    : del cp.plotimgspe_g
-        except : pass
-        cp.plotimgspe_g = None
-
-        try    : cp.plot_g2.close()
-        except : pass
-        try    : del cp.plot_g2
-        except : pass
-
 
     def stringTau(self):
         return 'tau(%d)=%d' % (self.tau_ind, self.tau_val) 

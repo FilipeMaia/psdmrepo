@@ -68,6 +68,7 @@ class PlotG2Widget (QtGui.QWidget) :
         self.title   = title
         self.parent  = parent
         self.figsize = figsize
+        self.nwin_max = 9
 
         self.fig = plt.figure(figsize=figsize, dpi=100, facecolor='w',edgecolor='w',frameon=True)
 
@@ -139,15 +140,13 @@ class PlotG2Widget (QtGui.QWidget) :
 
 
     def get_iq_list(self, iq_begin=0) :
-        iq_min = 0
-        iq_max = self.arr_q.shape[0]
-
-        nwin_max = 9
+        iq_min   = 0
+        iq_max   = self.arr_q.shape[0]
         #return [0,1,2,3,4,5,6,7,8]
 
-        if   iq_max <= nwin_max          : return range(iq_max)
-        elif iq_max-iq_begin <= nwin_max : return range(iq_max-nwin_max, iq_max)
-        else                             : return range(iq_begin, iq_begin+nwin_max)
+        if   iq_max <= self.nwin_max          : return range(iq_max)
+        elif iq_max-iq_begin <= self.nwin_max : return range(iq_max-self.nwin_max, iq_max)
+        else                                  : return range(iq_begin, iq_begin+self.nwin_max)
 
 
 
@@ -176,7 +175,7 @@ class PlotG2Widget (QtGui.QWidget) :
 
         #iq_begin = 5
         iq_list  = self.get_iq_list(iq_begin)
-        #print 'iq_list:', iq_list, ' at iq_max =',self.arr_q.shape[0]
+        #print 'iq_list:', iq_list, ' at self.iq_max =',self.arr_q.shape[0]
 
         for iwin, iq in enumerate(iq_list) :
 
