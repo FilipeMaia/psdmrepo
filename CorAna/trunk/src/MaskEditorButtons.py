@@ -37,6 +37,13 @@ from Logger                 import logger
 #from FileNameManager        import fnm
 from ConfigParametersCorAna import confpars as cp
 
+from DragWedge     import *
+from DragLine      import *
+from DragRectangle import *
+from DragCircle    import *
+from DragCenter    import *
+from DragObjectSet import *
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -57,16 +64,25 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         self.parent    = parent
         self.ofname    = ofname
-
         self.widgimage = widgimage
-        if widgimage != None : self.fig = widgimage.fig
 
-        self.list_of_modes = ['Zoom', 'Move', 'Add', 'Remove', 'Mark']
-        self.list_of_forms = ['Wedge', 'Polygone', 'Line', 'Circle', 'Rectangle']
+        if widgimage != None :
+            self.fig  = self.widgimage.fig
+            self.axes = self.widgimage.axim
+            self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False)
+            self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False)
+            self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False)
+            self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False)
+            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False)
+            self.disconnect_all()
+            
+        self.list_of_modes = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
+        self.list_of_forms = ['Line', 'Rectangle', 'Circle', 'Center', 'Wedge']
         self.list_of_buts  = []
 
         self.current_mode = self.list_of_modes[0]
-        self.current_form = self.list_of_forms[0]
+        #self.current_form = self.list_of_forms[0]
+        self.current_form = None
 
         self.tit_modes = QtGui.QLabel('Modes:')
         self.tit_forms = QtGui.QLabel('Forms:')
@@ -161,6 +177,14 @@ class MaskEditorButtons (QtGui.QWidget) :
             if but.hasFocus() : return but
 
  
+    def disconnect_all(self):
+        self.set_lines     .disconnect_objs()    
+        self.set_rectangles.disconnect_objs()    
+        self.set_circles   .disconnect_objs()    
+        self.set_centers   .disconnect_objs()    
+        self.set_wedges    .disconnect_objs()    
+
+
     def on_but(self):
         but = self.get_pushed_but()
         msg = 'on_but ' + str(but.text())
@@ -168,8 +192,34 @@ class MaskEditorButtons (QtGui.QWidget) :
         print msg
 
         but_text = str(but.text())
-        if but_text in self.list_of_modes : self.current_mode = but_text
-        if but_text in self.list_of_forms : self.current_form = but_text
+        if but_text in self.list_of_modes :
+            self.current_mode = but_text
+            self.fig.my_mode  = but_text
+
+            if self.current_mode == 'Zoom' :
+                self.widgimage.connectZoomMode()
+                self.disconnect_all()
+                self.current_form = None
+            else :
+                self.widgimage.disconnectZoomMode()
+
+        if but_text in self.list_of_forms :
+
+            if   self.current_form == 'Line'      : self.set_lines     .disconnect_objs()    
+            elif self.current_form == 'Rectangle' : self.set_rectangles.disconnect_objs()    
+            elif self.current_form == 'Circle'    : self.set_circles   .disconnect_objs()    
+            elif self.current_form == 'Center'    : self.set_centers   .disconnect_objs()    
+            elif self.current_form == 'Wedge'     : self.set_wedges    .disconnect_objs()    
+            else                                  : pass
+
+            self.current_form = but_text
+
+            if   self.current_form == 'Line'      : self.set_lines     .connect_objs()    
+            elif self.current_form == 'Rectangle' : self.set_rectangles.connect_objs()    
+            elif self.current_form == 'Circle'    : self.set_circles   .connect_objs()    
+            elif self.current_form == 'Center'    : self.set_centers   .connect_objs()    
+            elif self.current_form == 'Wedge'     : self.set_wedges    .connect_objs()    
+            else                                  : pass
 
         self.setButtonStyle()
  

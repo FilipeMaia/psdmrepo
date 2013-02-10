@@ -63,7 +63,7 @@ class PlotImgSpe (QtGui.QWidget) :
     def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 600, 700)
+        self.setGeometry(20, 40, 500, 600)
         self.setWindowTitle(title)
         self.setFrame()
 

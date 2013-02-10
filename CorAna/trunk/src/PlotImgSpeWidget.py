@@ -44,7 +44,7 @@ except :
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from   matplotlib.ticker import MaxNLocator
+from   matplotlib.ticker import MaxNLocator, NullFormatter
 #from   matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt4 import QtGui, QtCore
@@ -63,7 +63,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
         #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
         #print 'fig.number =', self.fig.number
-  
+
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
@@ -72,19 +72,36 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.setLayout(self.vbox)
         #-----------------------------------
 
-        self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
-        self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
         self.canvas.mpl_connect('axes_leave_event',     self.processAxesLeaveEvent)
         self.canvas.mpl_connect('axes_enter_event',     self.processAxesEnterEvent)
         self.canvas.mpl_connect('figure_leave_event',   self.processFigureLeaveEvent)
 
+        self.connectZoomMode()
 
         self.initParameters()
         self.setFrame()
+
+        self.fig.clear()        
+
+        self.axhi = self.fig.add_axes([0.15, 0.06, 0.78, 0.21])
+        self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
+        self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
+  
         if self.arr != None : self.on_draw()
 
 
+    def connectZoomMode(self):
+        self.cid_press   = self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
+        self.cid_release = self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
+        self.cid_motion  = self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+
+
+    def disconnectZoomMode(self):
+        self.canvas.mpl_disconnect(self.cid_press)
+        self.canvas.mpl_disconnect(self.cid_release)
+        self.canvas.mpl_disconnect(self.cid_motion)
+
+        
     def initParameters(self):
         self.fig.myXmin      = None
         self.fig.myXmax      = None
@@ -169,8 +186,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #print 'self.range_his = ', self.range_his
         #print 'self.arrwin = ', self.arrwin
 
-        self.fig.clear()        
+        #self.fig.clear() # <<<<==== ????????
         self.nbins = nbins
+
+        self.axhi.clear()
+        #self.axim.clear()
+        #self.axcb.clear()
 
         #if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_xhist()
         if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_yhist()
@@ -202,11 +223,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
         #print 'vmin, vmax, log_vmin, log_vmax = ', vmin, vmax, log_vmin, log_vmax
                         
-        self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
-        self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
+        #self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
+        #self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
 
         self.axhi.xaxis.set_major_locator(MaxNLocator(5))
         self.axhi.yaxis.set_major_locator(MaxNLocator(4))
+        self.axhi.xaxis.set_major_formatter(NullFormatter())
 
         self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his, log=True)
 
@@ -215,15 +237,28 @@ class PlotImgSpeWidget (QtGui.QWidget) :
                                           extent=self.range, aspect='auto')
         self.imsh.set_clim(log_vmin,log_vmax)
 
+#        self.colb = self.fig.colorbar(self.imsh, orientation='vertical')#, cax=self.axim, \
+#                                      fraction=0.1, pad=0.01, shrink=1.0, aspect=20) #cax=self.axim, 
+
         #self.axcb = self.fig.add_axes([0.15, 0.95, 0.78, 0.05])
         #self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
         #                                orientation='horizontal')#, ticks=xticks)
-        self.colb = self.fig.colorbar(self.imsh, orientation='vertical', \
-                                        fraction=0.1, pad=0.01, shrink=1.0, aspect=20)
+
+        #self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
+        #self.axcb = self.fig.add_axes([0.90, 0.32, 0.10, 0.67])
+        #self.colb = self.fig.colorbar(self.imsh, orientation='horizontal') #, \
+#                                      fraction=0.1, pad=0.01, shrink=1.0, aspect=20)
+
         # fraction - of the 2d plot occupied by the color bar
         # pad      - is a space between 2d image and color bar
         # shrink   - factor for the length of the color bar
         # aspect   - ratio length/width of the color bar
+
+        try    : del self.colb
+        except : pass
+        self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
+        self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
+                                      orientation='horizontal')#, ticks=xticks)
 
 
     def plots_in_log10_scale_for_img_and_xhist(self) :
@@ -254,6 +289,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         logbins=np.logspace(log_vmin, log_vmax, self.nbins)
         #print 'logbins =', logbins        
         #self.axhi.hist(self.arr2d.flatten(), bins=self.nbins, range=self.range_his)
+
         self.axhi.hist(self.arrwin.flatten(), bins=logbins )
         self.set_hist_yticks()
 
@@ -277,17 +313,13 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.arr2d = self.arrwin
         #print 'self.arr2d = ', self.arr2d
 
-        #gs = gridspec.GridSpec(20, 20)
-        #self.axhi = self.fig.add_subplot(gs[15:19,:]) # self.fig.add_subplot(212)
-        #self.axim = self.fig.add_subplot(gs[0:14,:])
-        #self.axcb = self.fig.add_subplot(gs[19,:])
-
-        self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
-        self.axhi = self.fig.add_axes([0.15, 0.06, 0.78, 0.21])
-        self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
+        #self.axhi = self.fig.add_axes([0.15, 0.06, 0.78, 0.21])
+        #self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
+        #self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
 
         self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
         self.set_hist_yticks()
+        self.axhi.xaxis.set_major_formatter(NullFormatter())
 
         xticks = self.axhi.get_xticks()
         #print 'xticks =', xticks 
@@ -300,8 +332,11 @@ class PlotImgSpeWidget (QtGui.QWidget) :
                                           interpolation='nearest', \
                                           extent=self.range, aspect='auto')
         self.imsh.set_clim(cmin,cmax)
+        try    : del self.colb
+        except : pass
+        self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
         self.colb = self.fig.colorbar(self.imsh, cax=self.axcb, \
-                                        orientation=1, ticks=xticks)
+                                      orientation='horizontal', ticks=xticks)
                              #fraction=0.15, pad=0.1, shrink=1.0, aspect=15
         #self.colb.set_clim(zmin,zmax)
 

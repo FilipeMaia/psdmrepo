@@ -63,7 +63,7 @@ class MaskEditor (QtGui.QWidget) :
     def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Mask editor for 2d array'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 600, 700)
+        self.setGeometry(20, 40, 500, 550)
         self.setWindowTitle(title)
         self.setFrame()
 
@@ -122,8 +122,8 @@ class MaskEditor (QtGui.QWidget) :
         try    : self.widgbuts.close()
         except : pass
 
-        #try    : self.mpl_toolbar.close()
-        #except : pass
+        try    : self.widgmebuts.close()
+        except : pass
 
         #try    : del cp.plotimgspe # suicide... of object #1
         #except : pass
@@ -152,10 +152,10 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    #w  = MaskEditor(None, get_array2d_for_test())
-    w  = MaskEditor(None)
-    w.set_image_array( get_array2d_for_test() )
-    w.move(QtCore.QPoint(50,50))
+    w = MaskEditor(None, get_array2d_for_test())
+    #w = MaskEditor(None)
+    #w.set_image_array( get_array2d_for_test() )
+    w.move(QtCore.QPoint(300,10))
     w.show()
 
     app.exec_()

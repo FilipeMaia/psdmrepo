@@ -13,13 +13,28 @@ class DragObjectSet :
         self.fig.my_mode  = None  # Mode for interaction between fig and obj
         self.list_of_objs = []
 
+        self.connect_objs()
 
-        self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)    # for Add mode
-        self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)  # for Remove
-        #self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)   # For Remove (at the end)
         if useKeyboard :
             self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)      # for test only
             self.print_mode_keys()
+
+
+    def connect_objs(self) :
+        self.cid_press  =self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)    # for Add mode
+        self.cid_release=self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)  # for Remove
+        #self.cid_motion =self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)   # For Remove (at the end)
+        for obj in self.list_of_objs :
+            obj.connect()
+
+
+    def disconnect_objs(self):
+        self.fig.canvas.mpl_disconnect(self.cid_press)
+        self.fig.canvas.mpl_disconnect(self.cid_release)
+        #self.fig.canvas.mpl_disconnect(self.cid_motion)
+
+        for obj in self.list_of_objs :
+            obj.disconnect()
 
 
     def set_list_of_objs(self, list) :
@@ -42,7 +57,7 @@ class DragObjectSet :
         elif event.key == 'r': self.fig.my_mode  = 'Remove'
         elif event.key == 'm': self.fig.my_mode  = 'Select'
         elif event.key == 'w': self.print_list_of_objs()
-        elif event.key == 'd': self.test_remove_selected_objs_from_img_by_call()
+        elif event.key == 'd': self.remove_selected_objs_from_img_by_call()
         else                 : self.print_mode_keys()
         print '\nCurrent mode:', self.fig.my_mode
 
@@ -92,10 +107,10 @@ class DragObjectSet :
                 #======================================================================================
 
 
-    def test_remove_selected_objs_from_img_by_call(self) :
+    def remove_selected_objs_from_img_by_call(self) :
         """Loop over list of objects and remove selected from the image USING CALL from code.
         """
-        print 'test_remove_selected_objs_from_img_by_call()'
+        print 'remove_selected_objs_from_img_by_call()'
 
         initial_list_of_objs = list(self.list_of_objs)
         for obj in initial_list_of_objs :
