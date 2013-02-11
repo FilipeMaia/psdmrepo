@@ -91,21 +91,22 @@ class DragLine( Drag, lines.Line2D ) :
 
         #print 'event on_moution', self.get_xydata()
         currentxy = event.xdata, event.ydata
-        #print 'self.onmoutionxy =',currentxy 
 
         xy0, clickxy, vertindex = self.press
         dx = currentxy[0] - clickxy[0]
         dy = currentxy[1] - clickxy[1]
 
-        #xy = xy0.copy() # copy
-        #xy = [xy0[0][0], xy0[0][1]], [xy0[1][0], xy0[1][1]]
         xy = copy.deepcopy(xy0)
 
-        #print 'xy0=', xy0
-        #print 'xy =', xy 
+        if event.button is 3 and self.isInitialized : # for left mouse button
+            xy[0][0] += dx
+            xy[0][1] += dy
+            xy[1][0] += dx
+            xy[1][1] += dy
 
-        xy[vertindex][0] += dx
-        xy[vertindex][1] += dy
+        if event.button is 1 or not self.isInitialized: # for right mouse button
+            xy[vertindex][0] += dx
+            xy[vertindex][1] += dy
 
         self.set_data([[xy[0][0], xy[1][0]],[xy[0][1], xy[1][1]]])
 

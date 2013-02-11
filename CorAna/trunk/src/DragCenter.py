@@ -10,7 +10,7 @@ from Drag import *
 
 class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) : 
 
-    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=2, color='b', picker=5, linestyle='-') :
+    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=2, color='b', picker=10, linestyle='-') :
 
         Drag.__init__(self, linewidth, color, linestyle)
 
@@ -121,10 +121,14 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
             vertindex = 0 # assumes that the click xy is close to center
             ind       = 0
+
+            self.dist_min = 1000
             for vertex in (1,2,4,5) :
                 ind += 1
-                if self.max_deviation(clickxy,(xarr[vertex],yarr[vertex])) < self.myPicker :
+                dist = self.max_deviation(clickxy,(xarr[vertex],yarr[vertex]))
+                if dist < self.dist_min : # self.myPicker
                     vertindex = ind #vertex
+                    self.dist_min = dist
 
             print 'vertindex=', vertindex
 
@@ -156,12 +160,15 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         dx = currentxy[0]-clickxy[0]
         dy = currentxy[1]-clickxy[1] 
 
-        if self.isInitialized : # for left mouse button
 
-            if   vertindex == 0 : # center
-                xcnew, ycnew = xc + dx, yc + dy
+        if event.button is 3 and self.isInitialized : # move
+            xcnew, ycnew = xc + dx, yc + dy
+            self.set_xy_arrays_for_center_sign(xcnew,ycnew,abs(xenew),abs(yenew))
 
-            elif vertindex == 1 :
+
+        elif event.button is 1 and self.isInitialized : # for left mouse button
+
+            if   vertindex == 1 :
                 xenew = xerr + dx
 
             elif vertindex == 2 :
@@ -172,6 +179,8 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
             elif vertindex == 4 :
                 yenew = yerr - dy
+            else : # vertindex == 0 -is center, move 
+                xcnew, ycnew = xc + dx, yc + dy
 
             # protection
             min_err_size = 5
@@ -180,7 +189,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
             self.set_xy_arrays_for_center_sign(xcnew,ycnew,abs(xenew),abs(yenew))
 
-        else :
+        elif event.button is 1 and not self.isInitialized : # Initialization
             self.set_xy_arrays_for_center_sign(clickxy[0],clickxy[1],abs(dx),abs(dy))
 
         self.on_motion_graphic_manipulations()

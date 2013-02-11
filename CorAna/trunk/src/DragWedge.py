@@ -351,11 +351,17 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         current_r = self.distance( current_xy, xy0 )
         current_t = math.degrees( math.atan2(current_y-y0, current_x-x0) ) # Click angle in the range [-180,180]
 
-        #dx = current_x - click_x
-        #dy = current_y - click_y
+
+        if event.button is 3 and self.isInitialized : 
+            dx = current_x - click_x
+            dy = current_y - click_y
+            self.center = x0+dx, y0+dy
+            self.set_xy_arrays_for_wedge()
+            self.on_motion_graphic_manipulations()
+            return
+
         dr = current_r - click_r
         dt = current_t - click_t
-
 
         # Jump ovet the sheet cut
         if dt - self.dt_old >  180 : self.dt_offset -= 360
