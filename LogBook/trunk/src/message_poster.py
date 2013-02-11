@@ -126,7 +126,7 @@ class message_poster(object):
         if self._logbook_child_cmd is not None:
             child_output = os.popen(self._logbook_child_cmd).read()
 
-        if parent_message_id and runnum:
+        if parent_message_id and run_num:
             raise Exception("inconsistent parameters: run number can't be used together with the parent message ID")
 
         params = [ ('author_account' , self._logbook_author),
@@ -175,7 +175,7 @@ class message_poster(object):
         except urllib2.HTTPError, code:
             raise Exception("failed to post the message due to: %s" % str(code))
 
- 
+
     def _ws_configure_auth(self):
         """
         Configure authentication context of the web service
