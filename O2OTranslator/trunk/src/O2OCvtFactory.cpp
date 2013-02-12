@@ -173,12 +173,6 @@ O2OCvtFactory::O2OCvtFactory(ConfigObjectStore& configStore, CalibObjectStore& c
 O2OCvtFactory::DataTypeCvtList
 O2OCvtFactory::getConverters(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src)
 {
-  // for epics only, all sources (which are usually different in PID only) are
-  // processed by a single converter
-  if (typeId.id() == Pds::TypeId::Id_Epics) {
-    src = Pds::DetInfo(0, Pds::DetInfo::EpicsArch, 0, Pds::DetInfo::NoDevice, 0);
-  }
-
   TypeSrcCvtMap& typeSrcCvtMap = m_groupCvtMap[group];
 
   TypeSrcCvtMap::iterator it = typeSrcCvtMap.find(std::make_pair(typeId, src));
@@ -823,10 +817,13 @@ O2OCvtFactory::TypeAndSourceCmp::operator()(const TypeAndSource& lhs, const Type
 {
   if (lhs.first.value() < rhs.first.value()) return true;
   if (lhs.first.value() > rhs.first.value()) return false;
-  if (lhs.second.log() < rhs.second.log()) return true;
-  if (lhs.second.log() > rhs.second.log()) return false;
-  return lhs.second.phy() < rhs.second.phy();
+  if (lhs.second.phy() < rhs.second.phy()) return true;
+  if (lhs.second.phy() > rhs.second.phy()) return false;
+  // for all known Src subtypes log() value is a combination of
+  // level and process ID. We do not want to compare PIDs (we consider
+  // all sources with different PIDs identical, different PIDs probably
+  // only happen in EPICS data).
+  return int(lhs.second.level()) < int(rhs.second.level());
 };
-
 
 } // namespace O2OTranslator
