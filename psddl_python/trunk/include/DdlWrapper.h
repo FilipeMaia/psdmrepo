@@ -15,11 +15,13 @@ namespace detail {
 
 // convert 1-dimensional ndarray to list
 template <typename CTYPE>
-boost::python::list 
+PyObject*
 ndToList(const ndarray<const CTYPE, 1>& a) {
-  boost::python::list res;
+  PyObject* res = PyList_New(a.shape()[0]);
   for (size_t i = 0; i != a.shape()[0]; ++ i) {
-    res.append(boost::python::object(a[i]));
+    boost::python::object elem(a[i]);
+    Py_INCREF(elem.ptr());
+    PyList_SET_ITEM(res, i, elem.ptr());
   }
   return res;
 }
@@ -82,7 +84,7 @@ ndToNumpy(const ndarray<const T, NDim>& array)
   return ndToNumpy(array, boost::shared_ptr<void>());
 }
 
-// need also special boost converter for ndarray
+// special boost converter for ndarray (to numpy array)
 template <typename T, unsigned NDim>
 struct ndarray_to_numpy_cvt {
   static PyObject* convert(const ndarray<T, NDim>& x) { return ndToNumpy(x); }
@@ -96,6 +98,27 @@ register_ndarray_to_numpy_cvt()
   // register converter but avoid duplicated registration
   typedef ndarray<T, NDim> ndtype;
   typedef ndarray_to_numpy_cvt<T, NDim> cvttype;
+  boost::python::type_info tinfo = boost::python::type_id<ndtype>();
+  boost::python::converter::registration const* reg = boost::python::converter::registry::query(tinfo);
+  if (not reg or not reg->m_to_python) {
+    boost::python::to_python_converter<ndtype, cvttype, true>();
+  }
+}
+
+// special boost converter for ndarray (to list)
+template <typename T>
+struct ndarray_to_list_cvt {
+  static PyObject* convert(const ndarray<T, 1>& x) { return ndToList(x); }
+  static PyTypeObject const* get_pytype() { return &PyList_Type; }
+};
+
+template <typename T>
+void
+register_ndarray_to_list_cvt()
+{
+  // register converter but avoid duplicated registration
+  typedef ndarray<T, 1> ndtype;
+  typedef ndarray_to_list_cvt<T> cvttype;
   boost::python::type_info tinfo = boost::python::type_id<ndtype>();
   boost::python::converter::registration const* reg = boost::python::converter::registry::query(tinfo);
   if (not reg or not reg->m_to_python) {

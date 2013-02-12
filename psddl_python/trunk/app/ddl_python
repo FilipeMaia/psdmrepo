@@ -15,7 +15,7 @@ for f in  psddldata/data/*.ddl.xml ; do
   echo "DECL($package)" >> psddl_python/src/WrapperList.txt
   echo "module $module, package $package"
   psddlc -b python -I data -I psddl_psana -t psddl_python -B dev-types=$devtypes \
-    -e psddl_python/include/$module.ddl.wrapper.h \
-  	-o psddl_python/src/$module.ddl.wrapper.cpp \
-  	psddldata/data/$module.ddl.xml
+    -e psddl_python/include/$module.ddl.h \
+    -o psddl_python/src/$module.ddl.cpp \
+    psddldata/data/$module.ddl.xml
 done

@@ -56,11 +56,17 @@ class ConverterFun : public Converter {
 public:
 
   // Default constructor
-  ConverterFun(Functor func, int pdsTypeId = -1, int version = -1)
-  : m_func(func), m_pdsTypeId(pdsTypeId), m_version(version) {}
+  ConverterFun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1, int version = -1)
+    : m_func(func), m_pyTypeObject(pyTypeObject), m_pdsTypeId(pdsTypeId), m_version(version) 
+  {
+    Py_INCREF(m_pyTypeObject);
+  }
 
   // Destructor
-  virtual ~ConverterFun() {}
+  virtual ~ConverterFun() 
+  {
+    Py_CLEAR(m_pyTypeObject);
+  }
 
   /**
    *  @brief Return type_info of the corresponding C++ type.
@@ -84,6 +90,7 @@ public:
    *  @brief Convert C++ object to Python
    *
    *  @param[in] vdata  Void pointer to C++ data.
+   *  @return New reference
    */
   virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const {
     const boost::shared_ptr<T>& result = boost::static_pointer_cast<T>(vdata);
@@ -91,11 +98,24 @@ public:
     Py_RETURN_NONE;
   }
 
+  /**
+   *  @brief Returns Python type of the objects produced by this converter.
+   *
+   *  Some special converters can return PyBaseObject_Type (object).
+   *  
+   *  @return Borrowed reference
+   */
+  virtual PyTypeObject* pyTypeObject() const
+  {
+    return m_pyTypeObject;
+  }
+
 protected:
 
 private:
 
   Functor m_func;
+  PyTypeObject* m_pyTypeObject;
   int m_pdsTypeId;
   int m_version;
 
@@ -106,9 +126,9 @@ private:
  */
 template <typename T, typename Functor>
 boost::shared_ptr<ConverterFun<T, Functor> >
-make_converter_fun(Functor func, int pdsTypeId = -1, int version = -1)
+make_converter_fun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1, int version = -1)
 {
-  return boost::make_shared<ConverterFun<T, Functor> >(func, pdsTypeId, version);
+  return boost::make_shared<ConverterFun<T, Functor> >(func, pyTypeObject, pdsTypeId, version);
 }
 
 } // namespace psddl_python

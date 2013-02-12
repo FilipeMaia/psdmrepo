@@ -80,8 +80,18 @@ public:
    *  @brief Convert C++ object to Python
    *
    *  @param[in] vdata  Void pointer to C++ data.
+   *  @return New reference
    */
   virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const = 0;
+
+  /**
+   *  @brief Returns Python type of the objects produced by this converter.
+   *
+   *  Some special converters can return PyBaseObject_Type (object).
+   *  
+   *  @return Borrowed reference
+   */
+  virtual PyTypeObject* pyTypeObject() const = 0;
 
 };
 

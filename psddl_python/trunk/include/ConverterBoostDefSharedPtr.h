@@ -1,12 +1,12 @@
-#ifndef PSDDL_PYTHON_CONVERTERBOOSTDEF_H
-#define PSDDL_PYTHON_CONVERTERBOOSTDEF_H
+#ifndef PSDDL_PYTHON_CONVERTERBOOSTDEFSHAREDPTR_H
+#define PSDDL_PYTHON_CONVERTERBOOSTDEFSHAREDPTR_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ConverterBoostDef.
+//	Class ConverterBoostDefSharedPtr.
 //
 //------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psddl_python/Converter.h"
+#include "Converter.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -38,11 +38,11 @@ namespace psddl_python {
 /**
  *  @ingroup psddl_python
  *
- *  @brief Default implementation of the converter interface for value-type objects.
+ *  @brief Default implementation of the converter interface for objects in shared pointers.
  *
  *  Conversion is done via Boost.Python object class. Instance of a template type
- *  is passed to obejct constructor directly, so there should be a boost converter
- *  defined for this type.
+ *  is first wrapped into a shared pointer instance and that instance is passed to object
+ *  constructor.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -53,14 +53,14 @@ namespace psddl_python {
  */
 
 template <typename T>
-class ConverterBoostDef : public Converter {
+class ConverterBoostDefSharedPtr : public Converter {
 public:
 
   // Default constructor
-  ConverterBoostDef(int pdsTypeId = -1, int version = -1) : m_pdsTypeId(pdsTypeId), m_version(version) {}
+  ConverterBoostDefSharedPtr(int pdsTypeId = -1, int version = -1) : m_pdsTypeId(pdsTypeId), m_version(version) {}
 
   // Destructor
-  virtual ~ConverterBoostDef() {}
+  virtual ~ConverterBoostDefSharedPtr() {}
 
   /**
    *  @brief Return type_info of the corresponding C++ type.
@@ -89,7 +89,7 @@ public:
   virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const {
     const boost::shared_ptr<T>& result = boost::static_pointer_cast<T>(vdata);
     if (result) {
-      boost::python::object obj(*result);
+      boost::python::object obj(result);
       Py_INCREF(obj.ptr());
       return obj.ptr();
     }
@@ -105,7 +105,7 @@ public:
    */
   virtual PyTypeObject* pyTypeObject() const
   {
-    // find registration info for type T
+    // find registration info for type Wrapper
     boost::python::converter::registration const* reg = boost::python::converter::registry::query(boost::python::type_id<T>());
     if (reg) {
       try {
@@ -129,4 +129,4 @@ private:
 
 } // namespace psddl_python
 
-#endif // PSDDL_PYTHON_CONVERTERBOOSTDEF_H
+#endif // PSDDL_PYTHON_CONVERTERBOOSTDEFSHAREDPTR_H
