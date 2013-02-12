@@ -59,6 +59,7 @@ def standardSConscript( **kw ) :
         PYEXTMOD - name of the Python extension module, package name used by default
         CCFLAGS - additional flags passed to C/C++ compilers
         NEED_QT - set to True to enable Qt support
+        PHPDIR - either string or dictionary, will link directory to arch/../php/ area
     """
 
     pkg = _getpkg ( kw )
@@ -81,6 +82,7 @@ def standardSConscript( **kw ) :
     standardLib( env, **ukw )
     standardPyLib( env, **ukw )
     standardPyExt( env, **ukw )
+    standardPhpLib( env, **ukw )
     standardScripts( env, **ukw )
     standardBins ( env, **ukw )
     standardTests ( env, **ukw )
@@ -201,6 +203,32 @@ def standardPyExt( env, **kw ) :
         
         # get the list of libraries need for this package
         addPkgLib ( pkg, extmod[0] )
+
+#
+# Process content of PHPDIR argument, create directories in $ARCHDIR/php.
+# If PHPDIR is a dictionary then it will create symlinks
+#    $ARCHDIR/php/<key> -> Package/<value> 
+# for each key:value pair in the dictionary. If PHPDIR is a string it will
+# create symlink
+#    $ARCHDIR/php/Package -> Package/PHPDIR
+#
+def standardPhpLib( env, **kw ) :
+
+    phpdir = kw.get('PHPDIR')
+    if not phpdir: return
+    
+    pkg = _getpkg( kw )
+    
+    # if PHPDIR is not a dict then make it a dict with a key equal to package name
+    if not isinstance(phpdir, dict): phpdir = { pkg: phpdir }
+
+    for link, dir in phpdir.items():
+        dstdir = env.subst(pjoin(env['PHPDIR'], link))
+        trace ( "php link = "+dstdir, "SConscript", 2 )
+        src = env.subst(pjoin('#'+pkg, dir))
+        trace ( "php src = "+str(src), "SConscript", 2 )
+        dst = env.SymlinkRel(Dir(dstdir), source=Dir(src))
+        DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend(dst)
 
 #
 # Process app/ directory, install all scripts

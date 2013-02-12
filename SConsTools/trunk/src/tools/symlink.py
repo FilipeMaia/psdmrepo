@@ -32,7 +32,11 @@ class _makeSymlink :
             fail ( "unexpected number of sources for symlink: "+str(source) )
     
         if self._rel:
-            source = target[0].rel_path(source[0])
+            # rel_path behaves differently when target is a directory
+            if target[0].__class__ is SCons.Node.FS.Dir:
+                source = target[0].get_dir().rel_path(source[0])
+            else:
+                source = target[0].rel_path(source[0])
         else:
             source = str(source[0].abspath)
         target = str(target[0])

@@ -90,6 +90,7 @@ def buildEnv () :
     bindir = "${ARCHDIR}/bin"
     libdir = "${ARCHDIR}/lib"
     pydir = "${ARCHDIR}/python"
+    phpdir = "${ARCHDIR}/php"
     cpppath = ['.']   # this translates to package directory, not to top dir
     for r in all_sit_repos :
         cpppath.append(pjoin(r, "arch", sit_arch, "geninc"))
@@ -102,6 +103,7 @@ def buildEnv () :
                 BINDIR=bindir,
                 LIBDIR=libdir,
                 PYDIR=pydir,
+                PHPDIR=phpdir,
                 CPPPATH=cpppath,
                 LIBPATH=libpath,
                 LIB_ABI=lib_abi,

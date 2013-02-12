@@ -11,6 +11,17 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-05
+2013-02-11 Andy Salnikov
+- adding support for collecting links to PHP stuff in ARCHDIR/php directory
+- this is activated by presence (and value) of PHPDIR argument to 
+  standardSConscript():
+  If PHPDIR is a dictionary then it will create symlinks
+     $ARCHDIR/php/<key> -> Package/<value> 
+  for each key:value pair in the dictionary. If PHPDIR is a string it will
+  create symlink
+     $ARCHDIR/php/Package -> Package/PHPDIR
+
 Tag: V00-08-04
 2013-01-28 Andy Salnikov
 - extend "doc" target with docs for psana python modules
