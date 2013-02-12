@@ -130,6 +130,13 @@ class FileNameManager :
     def path_blem_plot(self) :
         return self.path_prefix() + self.str_exp_run_data() + 'blem-plot.png'
 
+#-----------------------------
+
+    def path_roi_mask_plot(self) :
+        return self.path_prefix() + self.str_exp_run_data() + 'roi-mask-plot.png'
+
+    def path_roi_mask_prefix_fname(self) :
+        return self.path_prefix() + self.str_exp_run_data() + 'roi-mask'
 
 #-----------------------------
 

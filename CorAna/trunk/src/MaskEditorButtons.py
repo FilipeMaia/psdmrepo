@@ -56,7 +56,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ofname='./fig.png'):
+    def __init__(self, parent=None, widgimage=None, ofname='./roi-mask.png', mfname='./roi-mask'):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -64,6 +64,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         self.parent    = parent
         self.ofname    = ofname
+        self.mfname    = mfname
         self.widgimage = widgimage
 
         if widgimage != None :
@@ -73,7 +74,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False)
             self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False)
             self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False)
-            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False)
+            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, is_single_obj=True)
             self.disconnect_all()
             
         self.list_of_modes = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
@@ -126,7 +127,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
     def setStyle(self):
         self           .setFixedWidth(90)
-        self           .setStyleSheet (cp.styleBkgd) 
+        #self           .setStyleSheet (cp.styleBkgd) 
         self.tit_modes .setStyleSheet (cp.styleLabel)
         self.tit_forms .setStyleSheet (cp.styleLabel)
         self.tit_modes .setAlignment  (QtCore.Qt.AlignCenter)

@@ -5,13 +5,15 @@ from Drag import * # for access to global methods like add_obj_to_axes(...)
 
 class DragObjectSet : 
 
-    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False) :
+    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False) :
 
-        self.ObjectType   = ObjectType
-        self.axes         = axes
-        self.fig          = fig
-        self.fig.my_mode  = None  # Mode for interaction between fig and obj
-        self.list_of_objs = []
+        self.ObjectType    = ObjectType
+        self.axes          = axes
+        self.fig           = fig
+        self.is_single_obj = is_single_obj
+        self.fig.my_mode   = None  # Mode for interaction between fig and obj
+
+        self.list_of_objs  = []
 
         self.connect_objs()
 
@@ -39,7 +41,10 @@ class DragObjectSet :
 
     def set_list_of_objs(self, list) :
         for obj in list :
-            add_obj_to_axes(obj, self.axes, self.list_of_objs)
+            if self.is_single_obj and len(self.list_of_objs) > 0 :
+                print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
+                return
+                add_obj_to_axes(obj, self.axes, self.list_of_objs)
 
 
     def print_mode_keys(self) :
@@ -79,10 +84,12 @@ class DragObjectSet :
         if self.fig.my_mode  == 'Add' :
             if event.button != 1 : return # if other than Left mouse button
             #print 'mode=', self.fig.my_mode
+            if self.is_single_obj and len(self.list_of_objs) > 0 :
+                print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
+                return
             obj = self.ObjectType() # Creates the draggable object with 1st vertex in xy
-            add_obj_to_axes(obj, self.axes, self.list_of_objs)      # <<<==========================
-            obj.on_press(event)                                     # <<<==========================
-
+            add_obj_to_axes(obj, self.axes, self.list_of_objs)
+            obj.on_press(event)                                                    # <<<==========================
 
 
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
@@ -97,7 +104,7 @@ class DragObjectSet :
 
     
     def update_list_of_objs(self) :
-        print 'update_list_of_objs()'
+        #print 'update_list_of_objs()'
         initial_list_of_objs = list(self.list_of_objs) # the list() is used in order to COPY object in new list
         for obj in initial_list_of_objs :
             if obj.isRemoved :

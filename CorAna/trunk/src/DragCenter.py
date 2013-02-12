@@ -251,7 +251,7 @@ def main_full_test():
     fig, axes, imsh = generate_test_image()
     list_of_objs = generate_list_of_objects(imsh.get_extent())
 
-    t = DragObjectSet(fig, axes, DragCenter, useKeyboard=True)
+    t = DragObjectSet(fig, axes, DragCenter, useKeyboard=True, is_single_obj=True)
     t .set_list_of_objs(list_of_objs)
 
     plt.get_current_fig_manager().window.geometry('+50+10') # move(50, 10)

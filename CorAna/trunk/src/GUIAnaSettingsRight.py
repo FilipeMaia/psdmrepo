@@ -29,6 +29,9 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 from Logger import logger
 from ConfigParametersCorAna import confpars as cp
+from FileNameManager        import fnm
+from MaskEditor             import *
+import GlobalUtils          as     gu
 
 #---------------------
 #  Class definition --
@@ -74,7 +77,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_new .setChecked(True)
         if cp.ana_mask_type.value() == self.list_mask_types[2] : self.rad_mask_file.setChecked(True)
 
-        self.but_mask_poly = QtGui.QPushButton('Mask Polygon')
+        self.but_mask_poly = QtGui.QPushButton('ROI Mask')
         self.but_browser   = QtGui.QPushButton('Browser')
         self.edi_mask_file = QtGui.QLineEdit( cp.ana_mask_file.value() )        
         self.edi_mask_file.setReadOnly( True )  
@@ -239,6 +242,13 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         except AttributeError:
             pass # silently ignore
 
+        try :
+            cp.maskeditor.close()
+            del cp.maskeditor
+        except :
+            pass
+
+
     def onClose(self):
         logger.debug('onClose', __name__)
         self.close()
@@ -316,7 +326,21 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         logger.info('onMaskRadioGrp - set cp.ana_mask_type = ' + cp.ana_mask_type.value(), __name__)
 
     def onMaskPoly(self):
-        logger.info('onMaskPoly - is not implemented yet...', __name__)
+        logger.info('onMaskPoly', __name__)
+        try :
+            cp.maskeditor.close()
+            try    : del cp.maskeditor
+            except : pass
+            self.but_mask_poly.setStyleSheet(cp.styleButtonBad)
+
+        except :
+            arr = gu.get_array_from_file(fnm.path_data_ave())
+            if arr == None : return
+            #print arr.shape,'\n', arr
+            cp.maskeditor = MaskEditor(None, arr, ofname=fnm.path_roi_mask_plot(), mfname=fnm.path_roi_mask_prefix_fname())
+            cp.maskeditor.move(cp.guimain.pos().__add__(QtCore.QPoint(860,20)))
+            cp.maskeditor.show()
+            self.but_mask_poly.setStyleSheet(cp.styleButtonGood)
 
 
     def onButBrowser(self):

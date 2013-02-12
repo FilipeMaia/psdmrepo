@@ -60,16 +60,19 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Mask editor for 2d array'):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(20, 40, 500, 550)
+        #self.setGeometry(20, 40, 500, 550)
+        self.setGeometry(20, 40, 900, 900)
         self.setWindowTitle(title)
         self.setFrame()
 
+        self.title = title
+
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ofname)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ofname, mfname)
  
         #---------------------
 
@@ -89,14 +92,16 @@ class MaskEditor (QtGui.QWidget) :
         #---------------------
 
 
-    def set_image_array(self,arr,title='Mask editor for 2d array'):
+    def set_image_array(self,arr,title=None):
         self.widgimage.set_image_array(arr)
-        self.setWindowTitle(title)
+        if title != None : self.setWindowTitle(title)
+        else             : self.setWindowTitle(self.title)
 
 
-    def set_image_array_new(self,arr,title='Mask editor for 2d array'):
+    def set_image_array_new(self,arr,title=None):
         self.widgimage.set_image_array_new(arr)
-        self.setWindowTitle(title)
+        if title != None : self.setWindowTitle(title)
+        else             : self.setWindowTitle(self.title)
 
 
     def setFrame(self):

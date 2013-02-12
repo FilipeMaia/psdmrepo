@@ -11,18 +11,18 @@ from Drag import *
 
 class DragRectangle( Drag, patches.Rectangle ) : 
 
-    def __init__(self, xy=None, width=1, height=1, linewidth=2, linestyle='solid', color='b', picker=2) :
+    def __init__(self, xy=None, width=1, height=1, linewidth=2, linestyle='solid', color='b', picker=8, fill=False) :
 
         Drag.__init__(self, linewidth, color, linestyle)
 
         if  xy == None : # Default line initialization
             xy0=(0,0)
-            patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
+            patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
             self.isInitialized = False
             print "DragRectangle initialization w/o parameters."
 
         else :
-            patches.Rectangle.__init__(self, xy,  width, height, linewidth=linewidth, color=color, fill=False, picker=picker)
+            patches.Rectangle.__init__(self, xy,  width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
             self.isInitialized = True
 
         self.set_picker(picker)
@@ -107,17 +107,33 @@ class DragRectangle( Drag, patches.Rectangle ) :
             y0  = self.get_y()
             w0  = self.get_width()
             h0  = self.get_height()
+            w2  = w0/2
+            h2  = h0/2
 
-            vertindex = 5 # click xy is already contained around rect area within self.myPicker 
+            self.list_of_verts = [(x0,y0),    (x0+w0,y0),    (x0,y0+h0), (x0+w0,y0+h0), 
+                                  (x0,y0+h2), (x0+w0,y0+h2), (x0+w2,y0), (x0+w2,y0+h0)]
 
-            if  self.max_deviation(clickxy,(x0,y0))        < self.myPicker :
-                vertindex = 0
-            elif self.max_deviation(clickxy,(x0+w0,y0))    < self.myPicker :
-                vertindex = 1
-            elif self.max_deviation(clickxy,(x0+w0,y0+h0)) < self.myPicker :
-                vertindex = 2
-            elif self.max_deviation(clickxy,(x0,y0+h0))    < self.myPicker :
-                vertindex = 3
+# Numeration in vertindex the vertices and sides of the wedge
+#
+#        x0                x0+w0
+#        
+# y0+h0  3--------8--------4
+#        |                 |
+#        |                 |
+#        5                 6
+#        |                 |
+#        |                 |
+# y0     1--------7--------2
+
+
+            vertindex = 10 # click xy is already contained around rect area within self.myPicker 
+
+            self.dist_min = 1000
+            for i, vert in enumerate(self.list_of_verts) :
+                dist = self.max_deviation(clickxy,vert)
+                if dist < self.dist_min :
+                    vertindex = i+1
+                    self.dist_min = dist
 
             #print 'vertindex=',vertindex
 
@@ -152,27 +168,42 @@ class DragRectangle( Drag, patches.Rectangle ) :
         dx = currentxy[0]-clickxy[0]
         dy = currentxy[1]-clickxy[1] 
 
-        if self.isInitialized : # for left mouse button
+        if event.button is 3 and self.isInitialized : # move on right mouse button
 
-            if   vertindex == 5 : #side
-                self.set_xy( (xy0[0] + dx,  xy0[1] + dy) )
-            elif vertindex == 0 :
+            #if   vertindex == 10 : #side
+            self.set_xy( (xy0[0] + dx,  xy0[1] + dy) )
+
+
+        elif event.button is 1 and self.isInitialized : # change size for left mouse button
+
+            if   vertindex == 1 :
                 self.set_xy( (xy0[0] + dx,  xy0[1] + dy) )
                 self.set_width (w0 - dx)
                 self.set_height(h0 - dy)
-            elif vertindex == 1 :
+            elif vertindex == 2 :
                 self.set_y( xy0[1] + dy)
                 self.set_width (w0 + dx)
                 self.set_height(h0 - dy)
-            elif vertindex == 2 :
-                self.set_width (w0 + dx)
-                self.set_height(h0 + dy)
             elif vertindex == 3 :
                 self.set_x( xy0[0] + dx)
                 self.set_width (w0 - dx)
                 self.set_height(h0 + dy)
+            elif vertindex == 4 :
+                self.set_width (w0 + dx)
+                self.set_height(h0 + dy)
+            elif vertindex == 5 :
+                self.set_x( xy0[0] + dx)
+                self.set_width (w0 - dx)
+            elif vertindex == 6 :
+                self.set_width (w0 + dx)
+            elif vertindex == 7 :
+                self.set_y( xy0[1] + dy)
+                self.set_height(h0 - dy)
+            elif vertindex == 8 :
+                self.set_height(h0 + dy)
 
-        else :
+        elif event.button is 1 and not self.isInitialized : # add new rect
+
             self.set_width (dx)
             self.set_height(dy)
             self.set_xy(xy0)
