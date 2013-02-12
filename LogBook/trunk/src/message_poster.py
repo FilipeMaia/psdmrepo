@@ -61,8 +61,8 @@ from poster.streaminghttp import register_openers
 # Local non-exported definitions --
 #----------------------------------
 
-default_ws_base_url       = 'https://pswww/pcdsn/ws-auth'  # this may change, so it's better not to rely on this at all
-default_ws_login_user     = pwd.getpwuid(os.geteuid())[0]  # assume current logged user
+default_ws_base_url       = 'https://pswww.slac.stanford.edu/ws-auth/'  # this may change, so it's better not to rely on this at all
+default_ws_login_user     = pwd.getpwuid(os.geteuid())[0]               # assume current logged user
 default_ws_login_password = ''
 
 #---------------------
@@ -158,7 +158,8 @@ class message_poster(object):
 
         try:
 
-            url = ''.join([self._ws_base_url,'/LogBook/NewFFEntry4grabberJSON.php'])
+            #url = ''.join([self._ws_base_url,'/LogBook/NewFFEntry4grabberJSON.php'])
+            url = ''.join([self._ws_base_url,'/LogBook/NewFFEntry4posterJSON.php'])
 
             datagen,headers = multipart_encode(params)
 
@@ -293,3 +294,16 @@ class message_poster(object):
 
         self._initialized = True
 
+
+class message_poster_self(message_poster):
+
+    """
+    The class to encapsulate user interuction with E-Log via
+    Web services. Unlike its base class message_poster this one
+    would post messages on behalf of the current logged user w/o
+    a need to provide Web server credentials explicitly.
+    """
+
+    def __init__(self, instrument, experiment=None, ws_base_url=None, child_cmd=None):
+
+        super.__init__(instrument, experiment, ws_base_url, ws_login_user='amoopr', ws_login_password='pcds',child_cmd=child_cmd)
