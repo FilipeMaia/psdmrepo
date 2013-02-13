@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ ! -d psddldata/data/ ]; then
+    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
+    exit 1
+fi
+
+echo "" > psddl_python/src/WrapperList.txt
+for f in  psddldata/data/*.ddl.xml ; do
+  module=`basename $f .ddl.xml`
+  if [ "$module" == "xtc" ] ; then
+      continue
+  fi
+  package=`grep "package name" $f | sed -e 's,^.*name=",,' -e 's,".*,,'`
+  echo "DECL($package)" >> psddl_python/src/WrapperList.txt
+  echo "module $module, package $package"
+  psddlc -b python -I data -I psddl_psana -t psddl_python -B dev-types=$devtypes \
+    -e psddl_python/include/$module.ddl.h \
+    -o psddl_python/src/$module.ddl.cpp \
+    psddldata/data/$module.ddl.xml
+done
