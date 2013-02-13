@@ -75,7 +75,6 @@ public:
   virtual uint16_t status() const;
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -121,7 +120,6 @@ public:
   virtual const Psana::Epics::dbr_sts_string& dbr() const;
   virtual const char* data(uint32_t i0) const;
   virtual const char* value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -148,7 +146,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_short& dbr() const;
   virtual ndarray<const int16_t, 1> data() const;
   virtual int16_t value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -174,7 +171,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_float& dbr() const;
   virtual ndarray<const float, 1> data() const;
   virtual float value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -200,7 +196,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_enum& dbr() const;
   virtual ndarray<const uint16_t, 1> data() const;
   virtual uint16_t value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -226,7 +221,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_char& dbr() const;
   virtual ndarray<const uint8_t, 1> data() const;
   virtual uint8_t value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -252,7 +246,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_long& dbr() const;
   virtual ndarray<const int32_t, 1> data() const;
   virtual int32_t value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -278,7 +271,6 @@ public:
   virtual const Psana::Epics::dbr_ctrl_double& dbr() const;
   virtual ndarray<const double, 1> data() const;
   virtual double value(uint32_t i) const;
-  virtual std::vector<int> pvName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
