@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2013-02-12 Andy Salnikov
+- use shared_ptr as a holder instead of generating wrapper classes
+- do not generate headers, they are not needed
+- *_list methods removed
+
 Tag: V00-05-02
 2013-02-07 Andy Salnikov
 - reduce volume of generated code by using template classes/functions
