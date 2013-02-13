@@ -551,7 +551,7 @@
 
             Base class for all CTRL-type PV values.
 
-            <attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName">
+            <attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName" shape_method="None">
             PV name.
             </attribute>
 

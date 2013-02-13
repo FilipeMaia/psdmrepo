@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-05
+2013-02-12 Andy Salnikov
+- removed shape method for pvName
+
 Tag: V00-04-04
 2013-02-06 Andy Salnikov
 - in pnccd moved FramesV1 below FulFrameV1. Python bindings use this
