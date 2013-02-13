@@ -76,6 +76,15 @@ public:
 
 };
 
+/// Error generated when dataset directory is not found
+class DatasetDirError : public Exception {
+public:
+
+  DatasetDirError(const ErrSvc::Context& ctx, const std::string& str)
+    : Exception(ctx, "dataset directory is missing: " + str) {}
+
+};
+
 } // namespace IData
 
 #endif // IDATA_EXCEPTIONS_H

@@ -54,12 +54,12 @@ namespace IData {
  *  Dataset instances can override those global options by providing
  *  their own values in a constructor.
  *
- *  Constructor of Dataset class takes string representation of
- *  the dataset which is a list of options separated by colon (:)
- *  characters:
+ *  Constructor of Dataset class takes either a file name or a string 
+ *  representation of the dataset which is a list of options separated 
+ *  by colon (:) characters:
  *
  *    @code
- *    option:option[:option...]
+ *    option[:option[:option...]]
  *    @endcode
  *
  *  Each @c option can be a key-value pair separated by equal sign
@@ -88,6 +88,13 @@ namespace IData {
  *  If the same key appears multiple times in the input string the latter
  *  values for this key override earlier values.
  *
+ *  If the string passed to a constructor looks like a file name then dataset 
+ *  constructor tries to guess various pieces of information from the file name
+ *  itself. To look like a file name the string should either:
+ *  - do not contain colon character and contain at least on dot
+ *  - if colon character is in the string it follows by slash or digit (for 
+ *    something like root://host:port/path)
+ *
  *  <hr>
  *
  *  This software was developed for the LCLS project.  If you use all or 
@@ -103,6 +110,7 @@ public:
 
   typedef std::pair<unsigned, unsigned> RunRange;
   typedef std::vector<RunRange> Runs;
+  typedef std::vector<std::string> NameList;
 
   /**
    *  @brief Sets application-wide experiment name.
@@ -179,17 +187,36 @@ public:
   /// Returns set of run numbers
   const Runs& runs() const;
 
+  /// Returns true if dataset was specified as a single file name
+  bool isFile() const { return m_isFile; }
+  
+  /// Return the directory name for files, if "dir" option is specified 
+  /// the it is returned, otherwise some default lcoation for experiment 
+  /// files is returned.
+  std::string dirName() const;
+
+  /// Return the list of file names for this dataset
+  const NameList& files() const;
+  
 protected:
 
+  // parse XTC file name
+  void parseXtcFileName(std::string path);
+  
+  // parse HDF file name
+  void parseHdfFileName(std::string path);
+  
 private:
 
   typedef std::map<std::string, std::string> Key2Val;
 
+  bool m_isFile;             ///< True if dataset is a file name 
   Key2Val m_key2val;         ///< Mapping of keys to values
   Runs m_runs;               ///< Set of runs
   unsigned m_expId;          ///< Experiment ID
   std::string m_instrName;   ///< Instrument name
   std::string m_expName;     ///< Experiment name
+  mutable NameList m_files;  ///< List of file names for this dataset
 
   static Key2Val s_key2val;         ///< Application-wide options
   static unsigned s_expId;          ///< Application-wide experiment ID

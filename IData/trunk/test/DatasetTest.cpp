@@ -34,6 +34,7 @@ using namespace IData ;
 BOOST_AUTO_TEST_CASE( test_def_def )
 {
   Dataset ds;
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 0U);
   BOOST_CHECK_EQUAL(ds.instrument(), "");
   BOOST_CHECK_EQUAL(ds.experiment(), "");
@@ -56,6 +57,7 @@ BOOST_AUTO_TEST_CASE( test_def_1 )
   Dataset::setDefOption("live", "");
 
   Dataset ds;
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 0U);
   BOOST_CHECK_EQUAL(ds.instrument(), "");
   BOOST_CHECK_EQUAL(ds.experiment(), "");
@@ -77,6 +79,7 @@ BOOST_AUTO_TEST_CASE( test_def_exp_1 )
   Dataset::setAppExpName("10");
 
   Dataset ds;
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -93,6 +96,7 @@ BOOST_AUTO_TEST_CASE( test_def_exp_2 )
   Dataset::setAppExpName("amo00209");
 
   Dataset ds;
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -109,6 +113,7 @@ BOOST_AUTO_TEST_CASE( test_def_exp_3 )
   Dataset::setAppExpName("AMO/amo00209");
 
   Dataset ds;
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -136,6 +141,7 @@ BOOST_AUTO_TEST_CASE( test_def_exp_fail )
 BOOST_AUTO_TEST_CASE( test_exp_1 )
 {
   Dataset ds("exp=10");
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -150,6 +156,7 @@ BOOST_AUTO_TEST_CASE( test_exp_1 )
 BOOST_AUTO_TEST_CASE( test_exp_2 )
 {
   Dataset ds("exp=amo00209");
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -164,6 +171,7 @@ BOOST_AUTO_TEST_CASE( test_exp_2 )
 BOOST_AUTO_TEST_CASE( test_exp_3 )
 {
   Dataset ds("exp=AMO/amo00209");
+  BOOST_CHECK(not ds.isFile());
   BOOST_CHECK_EQUAL(ds.expID(), 10U);
   BOOST_CHECK_EQUAL(ds.instrument(), "AMO");
   BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
@@ -373,5 +381,104 @@ BOOST_AUTO_TEST_CASE( test_run_combo_3 )
   BOOST_CHECK(ds.exists("live"));
   BOOST_CHECK_EQUAL(ds.value("live"), "");
 
+}
+
+// ==============================================================
+
+// test file name
+
+BOOST_AUTO_TEST_CASE( test_filename_1 )
+{
+  BOOST_REQUIRE_NO_THROW(Dataset("e100-r0200-s00-c00.xtc"));
+  Dataset ds("e100-r0200-s00-c00.xtc");
+
+  BOOST_CHECK(ds.isFile());
+  BOOST_CHECK(ds.exists("xtc"));
+  BOOST_CHECK_EQUAL(ds.expID(), 100U);
+  BOOST_CHECK_EQUAL(ds.experiment(), "sxr27211");
+  BOOST_CHECK_EQUAL(ds.dirName(), "/reg/d/psdm/SXR/sxr27211/xtc");
+
+  const Dataset::Runs& runs = ds.runs();
+  Dataset::Runs::const_iterator it = runs.begin();
+
+  BOOST_REQUIRE(it != runs.end());
+  BOOST_CHECK_EQUAL(it->first, 200U);
+  BOOST_CHECK_EQUAL(it->second, 200U);
+  ++ it;
+  BOOST_CHECK(it == runs.end());
+
+  const Dataset::NameList& files = ds.files();
+  Dataset::NameList::const_iterator nit = files.begin();
+
+  BOOST_REQUIRE(nit != files.end());
+  BOOST_CHECK_EQUAL(*nit, "e100-r0200-s00-c00.xtc");
+  ++ nit;
+  BOOST_CHECK(nit == files.end());
+}
+
+// ==============================================================
+
+// test file name
+
+BOOST_AUTO_TEST_CASE( test_filename_2 )
+{
+  BOOST_REQUIRE_NO_THROW(Dataset("amo00209-r0123.h5"));
+  Dataset ds("amo00209-r0123.h5");
+
+  BOOST_CHECK(ds.isFile());
+  BOOST_CHECK(ds.exists("h5"));
+  BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
+  BOOST_CHECK_EQUAL(ds.expID(), 10U);
+  BOOST_CHECK_EQUAL(ds.dirName(), "/reg/d/psdm/AMO/amo00209/hdf5");
+
+  const Dataset::Runs& runs = ds.runs();
+  Dataset::Runs::const_iterator it = runs.begin();
+
+  BOOST_REQUIRE(it != runs.end());
+  BOOST_CHECK_EQUAL(it->first, 123U);
+  BOOST_CHECK_EQUAL(it->second, 123U);
+  ++ it;
+  BOOST_CHECK(it == runs.end());
+
+  const Dataset::NameList& files = ds.files();
+  Dataset::NameList::const_iterator nit = files.begin();
+
+  BOOST_REQUIRE(nit != files.end());
+  BOOST_CHECK_EQUAL(*nit, "amo00209-r0123.h5");
+  ++ nit;
+  BOOST_CHECK(nit == files.end());
+}
+
+// ==============================================================
+
+// test file name
+
+BOOST_AUTO_TEST_CASE( test_filename_3 )
+{
+  BOOST_REQUIRE_NO_THROW(Dataset("/reg/d/psdm/AMO/amo00209/hdf5/amo00209-r0123.h5"));
+  Dataset ds("/reg/d/psdm/AMO/amo00209/hdf5/amo00209-r0123.h5");
+
+  BOOST_CHECK(ds.isFile());
+  BOOST_CHECK(ds.exists("h5"));
+  BOOST_CHECK_EQUAL(ds.experiment(), "amo00209");
+  BOOST_CHECK_EQUAL(ds.expID(), 10U);
+  BOOST_CHECK_EQUAL(ds.dirName(), "/reg/d/psdm/AMO/amo00209/hdf5");
+
+  const Dataset::Runs& runs = ds.runs();
+  Dataset::Runs::const_iterator it = runs.begin();
+
+  BOOST_REQUIRE(it != runs.end());
+  BOOST_CHECK_EQUAL(it->first, 123U);
+  BOOST_CHECK_EQUAL(it->second, 123U);
+  ++ it;
+  BOOST_CHECK(it == runs.end());
+
+  const Dataset::NameList& files = ds.files();
+  Dataset::NameList::const_iterator nit = files.begin();
+
+  BOOST_REQUIRE(nit != files.end());
+  BOOST_CHECK_EQUAL(*nit, "/reg/d/psdm/AMO/amo00209/hdf5/amo00209-r0123.h5");
+  ++ nit;
+  BOOST_CHECK(nit == files.end());
 }
 

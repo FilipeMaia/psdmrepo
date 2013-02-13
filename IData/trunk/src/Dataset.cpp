@@ -18,8 +18,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <cctype>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
+#include <boost/format.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -32,6 +36,8 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace fs = boost::filesystem;
+
 namespace {
 
   const char* logger = "Dataset";
@@ -41,6 +47,9 @@ namespace {
 
   // parse run list
   void parseRuns(const std::string& str, IData::Dataset::Runs& runs);
+  
+  // checks to see if the string is a file name
+  bool isFileName(const std::string& str);
 
 }
 
@@ -98,49 +107,70 @@ Dataset::setDefOption(const std::string& key, const std::string& value)
 // Constructors --
 //----------------
 Dataset::Dataset()
-  : m_key2val()
+  : m_isFile(false)
+  , m_key2val()
   , m_runs()
   , m_expId(0)
   , m_instrName()
   , m_expName()
+  , m_files()
 {
 }
 
 Dataset::Dataset(const std::string& ds)
-  : m_key2val()
+  : m_isFile(false)
+  , m_key2val()
   , m_runs()
   , m_expId(0)
   , m_instrName()
   , m_expName()
+  , m_files()
 {
-  // split it at colons
-  std::vector<std::string> options;
-  boost::split(options, ds, boost::is_any_of(":"), boost::token_compress_on);
-  for (std::vector<std::string>::const_iterator it = options.begin(); it != options.end(); ++ it) {
-
-    std::string option = *it;
-    boost::trim(option);
-    if (option.empty()) continue;
-
-    std::string key(option);
-    std::string val;
-
-    std::string::size_type p = option.find('=');
-    if (p != std::string::npos) {
-      key.erase(p);
-      boost::trim(key);
-      val = option.substr(p+1);
-      boost::trim(val);
+  if (::isFileName(ds)) {
+ 
+    // parse file names with good extensions
+    if (boost::ends_with(ds, ".xtc")) {
+      parseXtcFileName(ds);
+    } else if (boost::ends_with(ds, ".h5")) {
+      parseHdfFileName(ds);
     }
+    
+    // store the file name
+    m_files.push_back(ds);
+ 
+    m_isFile = true;
+    
+  } else {
 
-    if (key == "exp") {
-      ::parseExpName(val, m_expId, m_instrName, m_expName);
-    } else if (key == "run") {
-      ::parseRuns(val, m_runs);
+    // must be a dataset, split it at colons
+    std::vector<std::string> options;
+    boost::split(options, ds, boost::is_any_of(":"), boost::token_compress_on);
+    for (std::vector<std::string>::const_iterator it = options.begin(); it != options.end(); ++ it) {
+  
+      std::string option = *it;
+      boost::trim(option);
+      if (option.empty()) continue;
+  
+      std::string key(option);
+      std::string val;
+  
+      std::string::size_type p = option.find('=');
+      if (p != std::string::npos) {
+        key.erase(p);
+        boost::trim(key);
+        val = option.substr(p+1);
+        boost::trim(val);
+      }
+  
+      if (key == "exp") {
+        ::parseExpName(val, m_expId, m_instrName, m_expName);
+      } else if (key == "run") {
+        ::parseRuns(val, m_runs);
+      }
+  
+      m_key2val[key] = val;
+
     }
-
-    m_key2val[key] = val;
-
   }
 
 }
@@ -219,9 +249,159 @@ Dataset::runs() const
   return m_runs;
 }
 
+/// Return the directory name for files
+std::string 
+Dataset::dirName() const
+{
+  // get directory name where to look for files
+  std::string dir = this->value("dir");
+  if (dir.empty()) {
+    const char* type = this->exists("h5") ? "hdf5" : "xtc";
+    boost::format fmt("/reg/d/psdm/%1%/%2%/%3%");
+    fmt % instrument() % experiment() % type;
+    dir = fmt.str();
+  }
+  return dir;
+}
+
+/// Return the list of file names for this dataset
+const Dataset::NameList& 
+Dataset::files() const
+{
+  if (not m_files.empty()) return m_files;
+
+  bool hdf5 = this->exists("h5");
+  
+  // get directory name where to look for files
+  std::string dir = this->dirName();
+  if (not fs::is_directory(dir)) {
+    throw DatasetDirError(ERR_LOC, dir);
+  }
+
+  // scan all files in directory, find matching ones
+  std::map<unsigned, unsigned> filesPerRun;
+  for (fs::directory_iterator fiter(dir); fiter != fs::directory_iterator(); ++ fiter) {
+
+    if (fiter->status().type() != fs::regular_file) continue;
+    
+    const fs::path& path = fiter->path();
+    const fs::path& basename = path.filename();
+    
+    for (IData::Dataset::Runs::const_iterator ritr = m_runs.begin(); ritr != m_runs.end(); ++ ritr) {
+      for (unsigned run = ritr->first; run <= ritr->second; ++ run) {
+        
+        // make file name regex 
+        std::string reStr;
+        if (hdf5) {
+          reStr = boost::str(boost::format("%1%-r0*%2%(-.*)?[.]h5") % experiment() % run);
+        } else {
+          reStr = boost::str(boost::format("e%1%-r0*%2%-s[0-9]+-c[0-9]+[.]xtc") % expID() % run);          
+        }
+        boost::regex re(reStr);
+
+        if (boost::regex_match(basename.string(), re)) {
+          MsgLog(logger, debug, "found matching file: " << path);
+          m_files.push_back(path.string());
+          ++ filesPerRun[run];
+        }
+      }
+      
+    }
+  }
+
+  // Check file count per run, issue warning for runs without files
+  for (IData::Dataset::Runs::const_iterator ritr = m_runs.begin(); ritr != m_runs.end(); ++ ritr) {
+    // only check runs specified explicitly, not ranges
+    if (ritr->first == ritr->second) {
+      if (filesPerRun[ritr->first] == 0) {
+        MsgLog(logger, warning, "no input files found for run #" << ritr->first);
+      }
+    }
+  }
+
+  return m_files;
+}
+
+void 
+Dataset::parseXtcFileName(std::string path)
+{
+  m_key2val["xtc"];
+
+  // leave only basename
+  std::string::size_type p = path.rfind('/');
+  if (p != std::string::npos) path.erase(0, p+1);
+  
+  // drop extension
+  p = path.rfind('.');
+  if (p != std::string::npos) path.erase(p);
+
+  // split into parts
+  std::vector<std::string> parts;
+  boost::split(parts, path, boost::is_any_of("-"), boost::token_compress_on);
+  
+  // need at least 2 pieces - experiment and run number
+  if (parts.size() < 2) return;
+    
+  // first part is expected to be experiment id in format eNNNN
+  if (parts[0].empty() or parts[0][0] != 'e') return;
+  std::string expid(parts[0], 1);
+
+  // must be all digits, and at least one digit
+  if (expid.empty() or not boost::all(expid, boost::is_digit())) return;
+
+  // second part is expected to be run number in format rNNNN
+  if (parts[1].empty() or parts[1][0] != 'r') return;
+  std::string run(parts[1], 1);
+
+  // must be all digits, and at least one digit
+  if (run.empty() or not boost::all(run, boost::is_digit())) return;
+
+  // parse ans store these
+  ::parseExpName(expid, m_expId, m_instrName, m_expName);
+  ::parseRuns(run, m_runs);
+}
+
+
+void 
+Dataset::parseHdfFileName(std::string path)
+{
+  m_key2val["h5"];
+
+  // leave only basename
+  std::string::size_type p = path.rfind('/');
+  if (p != std::string::npos) path.erase(0, p+1);
+  
+  // drop extension
+  p = path.rfind('.');
+  if (p != std::string::npos) path.erase(p);
+
+  // split into parts
+  std::vector<std::string> parts;
+  boost::split(parts, path, boost::is_any_of("-"), boost::token_compress_on);
+  
+  // need at least 2 pieces - experiment and run number
+  if (parts.size() < 2) return;
+    
+  // first part is expected to be experiment name
+  if (parts[0].empty()) return;
+  std::string expname(parts[0]);
+
+  // second part is expected to be run number in format rNNNN
+  if (parts[1].empty() or parts[1][0] != 'r') return;
+  std::string run(parts[1], 1);
+
+  // must be all digits, and at least one digit
+  if (run.empty() or not boost::all(run, boost::is_digit())) return;
+
+  // parse ans store these
+  ::parseExpName(expname, m_expId, m_instrName, m_expName);
+  ::parseRuns(run, m_runs);
+}
+
 } // namespace IData
 
 namespace {
+
 
 // parse experiment name
 void parseExpName(const std::string& exp, unsigned& expId, std::string& instrName, std::string& expName)
@@ -321,6 +501,44 @@ void parseRuns(const std::string& str, IData::Dataset::Runs& runs)
 
   }
 
+}
+
+// checks to see if the string is a file name
+bool 
+isFileName(const std::string& str)
+{
+  std::string::size_type col = str.find(':');
+  if (col == std::string::npos) {
+
+    // no columns but an equal sign - should be an option
+    if (str.find('=') != std::string::npos) return false;
+    
+    // no colons and some dots - must be a file,
+    // no colons and no dots - assume it's an option
+    return str.find('.') != std::string::npos;
+  
+  } else {
+  
+    // there are colons, if they are followed by slash or digits still fine for a file name
+    while (col != std::string::npos) {
+      
+      if (col == str.size()-1) {
+        // last character is column, cannot be file name
+        return false;
+      }
+      
+      if (str[col+1] != '/' and not std::isdigit(str[col+1])) {
+        // colon followed by something other than / or digit, not a file
+        return false;
+      }
+      
+      // move to next one
+      col = str.find(':', col+1);
+    }
+  
+    return true;
+  }
+  
 }
 
 }
