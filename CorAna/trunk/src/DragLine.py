@@ -33,7 +33,7 @@ class DragLine( Drag, lines.Line2D ) :
     #    self.set_linewidth(1)
     #    self.set_linestyle('--') #'--', ':'
 
-    def get_list_of_line_pars(self) :
+    def get_list_of_pars(self) :
         x1  = int( self.get_xdata()[0] )
         x2  = int( self.get_xdata()[1] )
         y1  = int( self.get_ydata()[0] )
@@ -47,7 +47,7 @@ class DragLine( Drag, lines.Line2D ) :
 
 
     def print_pars(self) :
-        x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_line_pars()
+        x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_pars()
         print 'x1,x2,y1,y2,lw,col,s,t,r =', x1,x2,y1,y2,lw,col,s,t,r
 
 

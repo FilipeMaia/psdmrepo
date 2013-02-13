@@ -292,7 +292,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def='4',type='str' )
 
         self.ana_mask_type     = self.declareParameter( name='ANA_MASK_TYPE',             val_def='no-mask',type='str' )
-        self.ana_mask_file     = self.declareParameter( name='ANA_MASK_FILE',             val_def='mask.txt',type='str' )
+        self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='./roi-mask.txt',type='str' )
+        self.ana_mask_dname    = self.declareParameter( name='ANA_MASK_DIRECTORY',        val_def='.',type='str' )
 
         # GUIAnaSettingsRight.py
         self.ana_ndelays       = self.declareParameter( name='ANA_NDELAYS_PER_MTAU_LEVEL',       val_def=4,     type='int' )
@@ -436,7 +437,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreenish  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
-        self.styleGreenPure = "background-color: rgb(0,   255, 150); color: rgb(0, 0, 0);" # Green
+        self.styleGreenPure = "background-color: rgb(150, 255, 150); color: rgb(0, 0, 0);" # Green
         self.styleBluish    = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
         self.styleWhite     = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
         self.styleRedBkgd   = "background-color: rgb(255,   0,   0); color: rgb(0, 0, 0);" # Red background

@@ -36,6 +36,7 @@ from Logger                 import logger
 #from GUIELogPostingDialog   import *
 #from FileNameManager        import fnm
 from ConfigParametersCorAna import confpars as cp
+import GlobalUtils          as     gu
 
 from DragWedge     import *
 from DragLine      import *
@@ -56,7 +57,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ofname='./roi-mask.png', mfname='./roi-mask'):
+    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask'):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -65,21 +66,33 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ofname    = ofname
         self.mfname    = mfname
+
+        self.mfname_img  = ifname
+        self.mfname_mask = self.mfname + '.txt'
+        self.mfname_objs = self.mfname + '-shape-objs.txt'
+
         self.widgimage = widgimage
 
         if widgimage != None :
-            self.fig  = self.widgimage.fig
-            self.axes = self.widgimage.axim
+            self.fig        = self.widgimage.fig
+            self.axes       = self.widgimage.get_axim()
+            self.fig.my_xyc = self.widgimage.get_xy_img_center()
+            print 'Image center: ', self.fig.my_xyc
+
             self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False)
-            self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False)
+            self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False, use_xyc=True)
             self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False)
             self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False)
             self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, is_single_obj=True)
             self.disconnect_all()
             
-        self.list_of_modes = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
-        self.list_of_forms = ['Line', 'Rectangle', 'Circle', 'Center', 'Wedge']
-        self.list_of_buts  = []
+        self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
+        self.list_of_forms   = ['Line', 'Rectangle', 'Circle', 'Center', 'Wedge']
+        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask']
+        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask]
+
+        self.list_of_buts    = []
+        self.list_of_io_buts = []
 
         self.current_mode = self.list_of_modes[0]
         #self.current_form = self.list_of_forms[0]
@@ -87,6 +100,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         self.tit_modes = QtGui.QLabel('Modes:')
         self.tit_forms = QtGui.QLabel('Forms:')
+        self.tit_io    = QtGui.QLabel('I/O:')
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_modes)
@@ -106,11 +120,26 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.vbox.addWidget(but)
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
 
+
+        self.vbox.addStretch(1)
+        self.vbox.addWidget(self.tit_io)
+
+        for io_tit in self.list_of_io_tits :
+            but = QtGui.QPushButton(io_tit)
+            self.list_of_io_buts.append(but)
+            self.vbox.addWidget(but)
+            self.connect(but, QtCore.SIGNAL('clicked()'), self.on_io_but)
+
+
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
 
         self.showToolTips()
         self.setStyle()
+
+
+    #def updateCenter(self,x,y):
+    #    print 'updateCenter, x,y=', x, y 
 
 
     def showToolTips(self):
@@ -126,12 +155,14 @@ class MaskEditorButtons (QtGui.QWidget) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self           .setFixedWidth(90)
+        self           .setFixedWidth(100)
         #self           .setStyleSheet (cp.styleBkgd) 
         self.tit_modes .setStyleSheet (cp.styleLabel)
         self.tit_forms .setStyleSheet (cp.styleLabel)
+        self.tit_io    .setStyleSheet (cp.styleLabel)
         self.tit_modes .setAlignment  (QtCore.Qt.AlignCenter)
         self.tit_forms .setAlignment  (QtCore.Qt.AlignCenter)
+        self.tit_io    .setAlignment  (QtCore.Qt.AlignCenter)
 
         self.setButtonStyle()
 
@@ -224,6 +255,69 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         self.setButtonStyle()
  
+
+    def get_pushed_io_but(self):
+        for ind, but in enumerate(self.list_of_io_buts) :
+            if but.hasFocus() : return but, ind, self.list_of_fnames[ind]
+
+
+    def on_io_but(self):
+        but, ind, fname = self.get_pushed_io_but()
+        but_text = str(but.text())
+        msg = but_text + ', default file name: ' + str(fname) 
+        logger.debug(msg, __name__ )
+        print msg
+
+        if fname == None : path0 = '.'
+        else             : path0 = fname
+
+
+        #path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',fname) )
+        #dname, fname = os.path.split(path)
+        #if dname == '' or fname == '' :
+        #    logger.info('Input directiry name or file name is empty... keep file path unchanged...')
+        #    return
+
+ 
+        if but_text == self.list_of_io_tits[0] : # 'Load Img'
+            path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file', path0) )
+            dname, fname = os.path.split(path)
+            if dname == '' or fname == '' :
+                logger.info('Input directiry name or file name is empty... keep file path unchanged...')
+                return
+            arr = gu.get_array_from_file(path)             
+            self.parent.set_image_array_new(arr, title='Image from '+fname )
+
+
+        if but_text == self.list_of_io_tits[2] : # 'Save Forms'
+            path  = str( QtGui.QFileDialog.getSaveFileName(self,
+                                                           caption = but_text + ' in file',
+                                                           directory = path0,
+                                                           filter = '*.txt'
+                                                           ) )
+            if path == '' :
+                logger.debug('Saving is cancelled.', __name__)
+                return
+            logger.info(but_text + ' in file: ' + path, __name__)
+ 
+
+        if but_text == self.list_of_io_tits[3] : # 'Save Mask'
+            self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def on_but_reset(self):
         logger.debug('on_but_reset', __name__ )

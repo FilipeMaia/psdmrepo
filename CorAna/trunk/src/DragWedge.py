@@ -10,7 +10,7 @@ from Drag import *
 
 class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
-    def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=5) :
+    def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=10) :
         """Draw a wedge centered at x, y center with radius r that sweeps theta1 to theta2 (in degrees) in positive angle direction.
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
         Drag.__init__(self, linewidth, color, linestyle)
@@ -167,7 +167,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         return self.n_rings, self.n_sects
 
 
-    def get_list_of_wedge_pars(self) :
+    def get_list_of_pars(self) :
         x,y =      self.center
         r   =      self.radius
         w   =      self.width
@@ -182,12 +182,12 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def print_pars(self) :
-        x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_wedge_pars()
+        x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_pars()
         print 'x,y,r,w,t1,t2,lw,col,s,t,rem =', x,y,r,w,t1,t2,lw,col,s,t,rem
 
 
     def my_contains(self, click_r, click_theta, theta1, theta2, dtpick):
-        x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_wedge_pars()
+        x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_pars()
         drpick = self.myPicker
 
         #dt = math.degrees( drpick / r ) # picker size (degree) in angular direction
@@ -254,7 +254,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
         if self.isInitialized :
 
-            x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_wedge_pars()
+            x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_pars()
             click_r = self.distance( clickxy, (x,y) )
             click_theta = math.degrees( math.atan2(click_y-y, click_x-x) ) # Click angle in the range [-180,180]
             drpick = self.myPicker

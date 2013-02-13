@@ -38,7 +38,7 @@ try :
     import matplotlib
    #matplotlib.use('GTKAgg') # forse Agg rendering to a GTK canvas (backend)
     matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-except :
+except UserWarning :
     pass
 
 #from   matplotlib.figure import Figure
@@ -77,6 +77,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.canvas.mpl_connect('figure_leave_event',   self.processFigureLeaveEvent)
 
         self.connectZoomMode()
+        self.cid_digi_motion  = self.canvas.mpl_connect('motion_notify_event',  self.onMouseMotion)
 
         self.initParameters()
         self.setFrame()
@@ -114,6 +115,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.fig.myLogIsOn   = False
         self.fig.myZoomIsOn  = False
         self.fig.ntbZoomIsOn = False
+        self.fig.my_xyc      = None
 
         self.xpress    = 0
         self.ypress    = 0
@@ -132,6 +134,16 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
     def getCanvas(self):
         return self.canvas
+
+    def get_axim(self):
+        return self.axim
+
+    def get_imsh(self):
+        return self.imsh
+
+    def get_xy_img_center(self):
+        xmin,xmax,ymin,ymax = self.imsh.get_extent()
+        return abs(xmax-xmin)/2, abs(ymin-ymax)/2
 
 
     def resizeEvent(self, e):
@@ -445,9 +457,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
 
 
-    def processMouseMotion(self, event) :
-
-        if self.fig.ntbZoomIsOn : return
+    def onMouseMotion(self, event) :
 
         if event.inaxes == self.axhi :
             self.drawXCoordinateOfCoursor(event)
@@ -456,6 +466,19 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
         if event.inaxes == self.axim :
             self.drawXYCoordinateOfCoursor(event)
+
+
+    def processMouseMotion(self, event) :
+
+        if self.fig.ntbZoomIsOn : return
+
+        #if event.inaxes == self.axhi :
+        #    self.drawXCoordinateOfCoursor(event)
+        #    self.drawVerticalLineThroughCoursor(event)
+        #    #self.drawHorizontalLineThroughCoursor(event)
+
+        #if event.inaxes == self.axim :
+        #    self.drawXYCoordinateOfCoursor(event)
 
         if event.inaxes == self.axim and self.fig.myZoomIsOn :
             #print 'processMouseMotion',

@@ -32,7 +32,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
         self.ny_slices = 1
 
         
-    def get_list_of_rect_pars(self) :
+    def get_list_of_pars(self) :
         x0 = int( self.get_x() )
         y0 = int( self.get_y() )
         w0 = int( self.get_width () )
@@ -54,7 +54,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
 
     def print_pars(self) :
-        x,y,w,h,lw,col,s,t,r = self.get_list_of_rect_pars()
+        x,y,w,h,lw,col,s,t,r = self.get_list_of_pars()
         print 'x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
 
 

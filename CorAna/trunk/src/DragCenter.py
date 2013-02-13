@@ -10,7 +10,7 @@ from Drag import *
 
 class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) : 
 
-    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=2, color='b', picker=10, linestyle='-') :
+    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=1, color='b', picker=10, linestyle='-') :
 
         Drag.__init__(self, linewidth, color, linestyle)
 
@@ -42,7 +42,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
     def reset_center_position(self,x,y) :
         """Reset the center position keeping all other properties"""
-        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_center_pars()
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
         self.set_xy_arrays_for_center_sign(x,y,xerr,yerr)        
 
 
@@ -53,7 +53,11 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         self.set_ydata(yarr)
 
 
-    def get_list_of_center_pars(self) :
+    def get_xy_center(self) :      
+        return int(self.get_xdata()[0]), int(self.get_ydata()[0])
+
+
+    def get_list_of_pars(self) :
         xarr = self.get_xdata()
         yarr = self.get_ydata()
         xc   = int( xarr[0] )
@@ -69,13 +73,13 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
 
     def print_pars(self) :
-        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_center_pars()
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
         print 'xc,yc,xerr,yerr,lw,col,s,t,r =', xc,yc,xerr,yerr,lw,col,s,t,r
 
 
     def my_contains(self, event):
         x,y = event.xdata, event.ydata
-        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_center_pars()
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
         r   = self.myPicker
 
         xmin = xc-xerr
@@ -108,7 +112,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         clickxy = event.xdata, event.ydata
         #print 'clickxy =',clickxy 
 
-        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_center_pars()
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
 
         if self.isInitialized :
             #contains, attrd = self.contains(event)
@@ -197,8 +201,13 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
     def on_release(self, event):
         'on release we reset the press data'
-        self.on_release_graphic_manipulations()
+
+        self.xc, self.yc = self.figure.my_xyc = self.get_xy_center()
+        print 'Set new center coordinates xc, yc=' + str(self.xc) + ', ' +  str(self.yc) 
+        #self.emit( QtCore.SIGNAL('new_xy_center(int,int)'), self.xc, self.yc)
         
+        self.on_release_graphic_manipulations()
+
         self.press = None
 
 #-----------------------------

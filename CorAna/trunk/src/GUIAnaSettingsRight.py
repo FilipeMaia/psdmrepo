@@ -79,7 +79,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         self.but_mask_poly = QtGui.QPushButton('ROI Mask')
         self.but_browser   = QtGui.QPushButton('Browser')
-        self.edi_mask_file = QtGui.QLineEdit( cp.ana_mask_file.value() )        
+        self.edi_mask_file = QtGui.QLineEdit( fnm.path_roi_mask() )       
         self.edi_mask_file.setReadOnly( True )  
 
         self.tit_res_sets        = QtGui.QLabel('Result saving settings:')
@@ -242,11 +242,11 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         except AttributeError:
             pass # silently ignore
 
-        try :
-            cp.maskeditor.close()
-            del cp.maskeditor
-        except :
-            pass
+        #try :
+        #    cp.maskeditor.close()
+        #    del cp.maskeditor
+        #except :
+        #    pass
 
 
     def onClose(self):
@@ -334,10 +334,10 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
             self.but_mask_poly.setStyleSheet(cp.styleButtonBad)
 
         except :
-            arr = gu.get_array_from_file(fnm.path_data_ave())
-            if arr == None : return
-            #print arr.shape,'\n', arr
-            cp.maskeditor = MaskEditor(None, arr, ofname=fnm.path_roi_mask_plot(), mfname=fnm.path_roi_mask_prefix_fname())
+            img_fname = fnm.path_data_ave()
+            logger.info( 'Open Mask Editor for image from file: ' + img_fname, __name__)
+            if img_fname == None : return
+            cp.maskeditor = MaskEditor(None, ifname=img_fname, ofname=fnm.path_roi_mask_plot(), mfname=fnm.path_roi_mask_prefix())
             cp.maskeditor.move(cp.guimain.pos().__add__(QtCore.QPoint(860,20)))
             cp.maskeditor.show()
             self.but_mask_poly.setStyleSheet(cp.styleButtonGood)
@@ -346,11 +346,13 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
     def onButBrowser(self):
         logger.info('onButBrowser', __name__)
 
-        path = cp.ana_mask_file.value()
-        if path == None : dname = './'
+        path = fnm.path_roi_mask()
+        #print 'path_roi_mask()', path
+
+        if path == None : dname, fname = '.', 'roi-mask.txt'
         else            : dname, fname = os.path.split(path)
 
-        path  = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',dname) )
+        path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )
         dname, fname = os.path.split(path)
 
         if dname == '' or fname == '' :
@@ -358,8 +360,9 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
             return
 
         self.edi_mask_file.setText(path)
-        cp.ana_mask_file.setValue(path)
-        logger.info('selected file for mask: ' + str(cp.ana_mask_file.value()), __name__ )
+        cp.ana_mask_fname.setValue(fname)
+        cp.ana_mask_dname.setValue(dname)
+        logger.info('selected file for mask: ' + str(cp.ana_mask_fname.value()), __name__ )
 
 #-----------------------------
 

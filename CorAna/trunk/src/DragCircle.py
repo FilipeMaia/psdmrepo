@@ -42,7 +42,7 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
     #    else :
     #        return False
 
-    def get_list_of_circ_pars(self) :
+    def get_list_of_pars(self) :
         xc,yc = self.center
         x,y = (int(xc), int(yc))
         r0  = int( self.get_radius() )
@@ -55,7 +55,7 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
 
 
     def print_pars(self) :
-        x,y,r0,lw,col,s,t,r = self.get_list_of_circ_pars()
+        x,y,r0,lw,col,s,t,r = self.get_list_of_pars()
         print 'x,y,r0,lw,col,s,t,r =', x,y,r0,lw,col,s,t,r
 
 

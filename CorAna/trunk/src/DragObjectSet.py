@@ -5,13 +5,14 @@ from Drag import * # for access to global methods like add_obj_to_axes(...)
 
 class DragObjectSet : 
 
-    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False) :
+    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False, use_xyc=False) :
 
         self.ObjectType    = ObjectType
         self.axes          = axes
         self.fig           = fig
         self.is_single_obj = is_single_obj
         self.fig.my_mode   = None  # Mode for interaction between fig and obj
+        self.use_xyc       = use_xyc
 
         self.list_of_objs  = []
 
@@ -20,6 +21,10 @@ class DragObjectSet :
         if useKeyboard :
             self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)      # for test only
             self.print_mode_keys()
+
+
+    def set_xy_center(self, xyc) :
+        self.fig.my_xyc = xyc
 
 
     def connect_objs(self) :
@@ -87,7 +92,9 @@ class DragObjectSet :
             if self.is_single_obj and len(self.list_of_objs) > 0 :
                 print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
                 return
-            obj = self.ObjectType() # Creates the draggable object with 1st vertex in xy
+            if self.use_xyc : obj = self.ObjectType(xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
+            else            : obj = self.ObjectType() # Creates the draggable object with 1st vertex in xy
+
             add_obj_to_axes(obj, self.axes, self.list_of_objs)
             obj.on_press(event)                                                    # <<<==========================
 

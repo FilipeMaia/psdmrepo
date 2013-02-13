@@ -33,8 +33,11 @@ import os
 import random
 import numpy as np
 
-import matplotlib
-matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#try :
+#    import matplotlib
+#    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#except UserWarning: pass
+
 #import matplotlib.pyplot as plt
 
 
@@ -49,6 +52,7 @@ import PlotImgSpeWidget         as imgwidg
 import PlotImgSpeButtons        as imgbuts
 import MaskEditorButtons        as mebuts
 
+import GlobalUtils              as gu
 from ConfigParametersCorAna import confpars as cp
 
 #---------------------
@@ -60,7 +64,7 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
+    def __init__(self, parent=None, arr=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         #self.setGeometry(20, 40, 500, 550)
@@ -68,11 +72,16 @@ class MaskEditor (QtGui.QWidget) :
         self.setWindowTitle(title)
         self.setFrame()
 
-        self.title = title
+        if      arr != None : self.arr = arr
+        elif ifname != None : self.arr = gu.get_array_from_file(ifname)
+        else                : self.arr = get_array2d_for_test()
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
+        self.ifname = ifname
+        self.title  = title
+
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ofname, mfname)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname)
  
         #---------------------
 

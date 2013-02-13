@@ -392,8 +392,12 @@ class GUIMainTB ( QtGui.QWidget ) :
         try    : cp.plot_g2.close()
         except : pass
 
+        try    : cp.maskeditor.close()
+        except : pass
+
         #try    : del cp.guimain
         #except : pass
+
 
 
     def onExit(self):

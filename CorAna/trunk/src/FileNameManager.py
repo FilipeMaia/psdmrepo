@@ -132,11 +132,14 @@ class FileNameManager :
 
 #-----------------------------
 
-    def path_roi_mask_plot(self) :
-        return self.path_prefix() + self.str_exp_run_data() + 'roi-mask-plot.png'
+    def path_roi_mask(self) :
+        return  cp.ana_mask_dname.value() + '/' + cp.ana_mask_fname.value() 
 
-    def path_roi_mask_prefix_fname(self) :
-        return self.path_prefix() + self.str_exp_run_data() + 'roi-mask'
+    def path_roi_mask_prefix(self) :
+        return os.path.splitext(self.path_roi_mask())[0]
+
+    def path_roi_mask_plot(self) :
+        return self.path_roi_mask_prefix() + '-plot.png'
 
 #-----------------------------
 

@@ -5,12 +5,16 @@
 import matplotlib.patches as patches
 import math # cos(x), sin(x), radians(x), degrees()
 
-class Drag :
+#from PyQt4 import QtGui, QtCore # need it in order to use QtCore.QObject for signal exchange...
+
+class Drag () : # ( QtCore.QObject )
 
     def __init__(self, linewidth=2, color='k', linestyle='solid') :
         """
         Actual initialization is done by the method add_to_axes(...)
         """        
+        #QtCore.QObject.__init__(self, None) # need it for signal exchange...
+
         self.isInitialized = False
 
         self.myColor       = color
