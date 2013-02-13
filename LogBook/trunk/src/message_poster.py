@@ -306,4 +306,4 @@ class message_poster_self(message_poster):
 
     def __init__(self, instrument, experiment=None, ws_base_url=None, child_cmd=None):
 
-        super.__init__(instrument, experiment, ws_base_url, ws_login_user='amoopr', ws_login_password='pcds',child_cmd=child_cmd)
+        super().__init__(instrument, experiment, ws_base_url, ws_login_user='amoopr', ws_login_password='pcds',child_cmd=child_cmd)
