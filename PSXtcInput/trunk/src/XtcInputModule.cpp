@@ -86,16 +86,22 @@ XtcInputModule::XtcInputModule (const std::string& name)
   , m_cvt()
   , m_skipEvents(0)
   , m_maxEvents(0)
+  , m_skipEpics(false)
+  , m_fileNames()
   , m_l1Count(0)
   , m_simulateEOR(0)
 {
   std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
 
   // get number of events to process/skip from psana configuration
-  ConfigSvc::ConfigSvc cfg;
+  ConfigSvc::ConfigSvc cfg = configSvc();
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
   m_skipEpics = cfg.get("psana", "skip-epics", true);
+  m_fileNames = configList("files");
+  if ( m_fileNames.empty() ) {
+    throw EmptyFileList(ERR_LOC);
+  }
 }
 
 //--------------
@@ -120,14 +126,9 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   MsgLog(name(), debug, name() << ": in beginJob()");
 
   // will throw if no files were defined in config
-  std::list<std::string> fileNames = configList("files");
-  if ( fileNames.empty() ) {
-    throw EmptyFileList(ERR_LOC);
-  }
-  
   WithMsgLog(name(), debug, str) {
     str << "Input files: ";
-    std::copy(fileNames.begin(), fileNames.end(), std::ostream_iterator<std::string>(str, " "));
+    std::copy(m_fileNames.begin(), m_fileNames.end(), std::ostream_iterator<std::string>(str, " "));
   }
   
   // start reader thread
@@ -136,7 +137,7 @@ XtcInputModule::beginJob(Event& evt, Env& env)
   unsigned liveTimeout = config("liveTimeout", 120U);
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
-  m_readerThread.reset( new boost::thread( DgramReader ( fileNames.begin(), fileNames.end(), 
+  m_readerThread.reset( new boost::thread( DgramReader ( m_fileNames.begin(), m_fileNames.end(),
       *m_dgQueue, merge, liveDbConn, liveTable, liveTimeout, l1offset) ) );
   
   // try to read first event and see if it is a Configure transition
@@ -173,7 +174,8 @@ XtcInputModule::beginJob(Event& evt, Env& env)
 InputModule::Status 
 XtcInputModule::event(Event& evt, Env& env)
 {
-  MsgLog(name(), debug, name() << ": in event()");
+  MsgLog(name(), debug, name() << ": in event() - m_l1Count=" << m_l1Count
+      << " m_maxEvents=" << m_maxEvents << " m_skipEvents=" << m_skipEvents);
 
   // are we in the simulated EOR/EOF
   if (m_simulateEOR > 0) {

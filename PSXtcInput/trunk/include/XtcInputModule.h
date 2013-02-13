@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <vector>
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -107,6 +108,7 @@ private:
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
+  std::vector<std::string> m_fileNames;               ///< List of file names/datasets to read data from
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
 };

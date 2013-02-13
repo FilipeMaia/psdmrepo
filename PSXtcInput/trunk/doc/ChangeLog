@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-02-12 Andy Salnikov
+- use correct instance of configuration service to get parameters
+- some parameters have to read in constructor, they may change by the 
+  time of beginJob()
+
 Tag: V00-06-00
 2013-01-16 Andy Salnikov
 - XtcInput interfaces changed, fixing dependencies here
