@@ -563,8 +563,6 @@ public:
   virtual ~EpicsPvCtrlHeader();
   /** PV name. */
   virtual const char* pvName() const = 0;
-  /** Method which returns the shape (dimensions) of the data returned by pvName() method. */
-  virtual std::vector<int> pvName_shape() const = 0;
 };
 
 /** @class EpicsPvTimeHeader
