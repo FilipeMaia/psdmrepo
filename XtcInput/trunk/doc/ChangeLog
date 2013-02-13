@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+2013-02-12 Andy Salnikov
+- use new Dataset functionality to find the list of files instead of 
+  own algorithm
+
 Tag: V00-07-02
 2013-01-21 Andy Salnikov
 - bug fix in implementation of Shared file, assumed live data even 

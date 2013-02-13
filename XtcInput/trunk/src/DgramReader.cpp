@@ -49,12 +49,6 @@ namespace {
 
   const char* logger = "DgramReader";
 
-  // get directory name for the dataset
-  std::string dsDirPath(const IData::Dataset& ds);
-
-  // Find files on dist corresponding to a dataset
-  void findDeadFiles(const IData::Dataset& ds, std::vector<XtcInput::XtcFileName>& files);
-
 }
 
 //		----------------------------------------
@@ -89,7 +83,10 @@ try {
 
   // guess whether we have datasets or pure file names (or mixture)
   for (FileList::const_iterator it = m_files.begin(); it != m_files.end(); ++ it) {
-    if (it->find('=') == std::string::npos) {
+    
+    IData::Dataset ds(*it);
+    
+    if (ds.isFile()) {
 
       // must be file name
       if (liveMode == Live) throw DatasetSpecError(ERR_LOC, "cannot specify file names in live mode");
@@ -98,7 +95,6 @@ try {
 
     } else {
 
-      IData::Dataset ds(*it);
       bool live = liveMode == Live or ds.exists("live");
       if (live) {
 
@@ -112,7 +108,7 @@ try {
 
         // get directory name where to look for files
         if (liveDir.empty()) {
-          liveDir = ::dsDirPath(ds);
+          liveDir = ds.dirName();
         } else {
           std::string dir = ds.value("dir");
           if (not dir.empty() and liveDir != dir) {
@@ -128,7 +124,10 @@ try {
 
         if (liveMode == Unknown) liveMode = Dead;
         // Find files on disk and add to the list
-        ::findDeadFiles(ds, files);
+        const IData::Dataset::NameList& strfiles = ds.files();
+        for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
+          files.push_back(XtcFileName(*it));
+        }
 
       }
 
@@ -204,71 +203,3 @@ try {
 
 } // namespace XtcInput
 
-namespace {
-
-// get directory name for the dataset
-std::string dsDirPath(const IData::Dataset& ds)
-{
-  // get directory name where to look for files
-  std::string dir = ds.value("dir");
-  if (dir.empty()) {
-    boost::format fmt("/reg/d/psdm/%1%/%2%/xtc");
-    fmt % ds.instrument() % ds.experiment();
-    dir = fmt.str();
-  }
-  return dir;
-}
-
-// Find files on dist corresponding to a dataset
-void findDeadFiles(const IData::Dataset& ds, std::vector<XtcInput::XtcFileName>& files)
-{
-  // get directory name where to look for files
-  fs::path dir = ::dsDirPath(ds);
-  if (not fs::is_directory(dir)) {
-    throw XtcInput::DatasetDirError(ERR_LOC, dir.string());
-  }
-
-  // scan all files in directory, find matching ones
-  std::map<unsigned, unsigned> filesPerRun;
-  for (fs::directory_iterator fiter(dir); fiter != fs::directory_iterator(); ++ fiter) {
-
-    if (fiter->status().type() != fs::regular_file) continue;
-    
-    const fs::path& path = fiter->path();
-    const fs::path& basename = path.filename();
-//    MsgLog(logger, debug, "matching file: " << basename);
-    
-    const IData::Dataset::Runs& runs = ds.runs();
-    for (IData::Dataset::Runs::const_iterator ritr = runs.begin(); ritr != runs.end(); ++ ritr) {
-      for (unsigned run = ritr->first; run <= ritr->second; ++ run) {
-        
-        // make file name regex 
-        boost::format pattern("e%1%-r0*%2%-s[0-9]+-c[0-9]+[.]xtc");
-        pattern % ds.expID() % run;
-        boost::regex re(pattern.str());
-//        MsgLog(logger, debug, "pattern: " << pattern.str());
-
-        if (boost::regex_match(basename.string(), re)) {
-          MsgLog(logger, debug, "found matching file: " << path);
-          files.push_back(XtcInput::XtcFileName(path.string()));
-          ++ filesPerRun[run];
-        }
-      }
-      
-    }
-  }
-
-  // Check file count per run
-  const IData::Dataset::Runs& runs = ds.runs();
-  for (IData::Dataset::Runs::const_iterator ritr = runs.begin(); ritr != runs.end(); ++ ritr) {
-    // only check runs specified explicitly, not ranges
-    if (ritr->first == ritr->second) {
-      if (filesPerRun[ritr->first] == 0) {
-        MsgLog(logger, warning, "no input files found for run #" << ritr->first);
-      }
-    }
-  }
-
-}
-
-}
