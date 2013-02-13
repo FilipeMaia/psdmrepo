@@ -36,13 +36,15 @@
 
 namespace ConfigSvc {
 
+/// @addtogroup ConfigSvc
+
 /**
+ *  @ingroup ConfigSvc
+ *
  *  Implementation of the configuration service based on INI file format.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

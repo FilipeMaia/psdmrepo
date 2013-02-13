@@ -36,13 +36,15 @@
 
 namespace ConfigSvc {
 
+/// @addtogroup ConfigSvc
+
 /**
+ *  @ingroup ConfigSvc
+ *
  *  Type traits package for type conversion in ConfigSvc service.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

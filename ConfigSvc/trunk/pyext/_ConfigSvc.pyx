@@ -58,12 +58,12 @@ cdef extern from "<sstream>" namespace "std":
         void str(string)
         string str()
 
-cdef extern from "<memory>" namespace "std":
+cdef extern from "<boost/shared_ptr.hpp>" namespace "boost":
 
-    cdef cppclass auto_ptr[T]:
+    cdef cppclass shared_ptr[T]:
     
-        auto_ptr()
-        auto_ptr(T*)
+        shared_ptr()
+        shared_ptr(T*)
         
         T* get()
         void reset(T*)
@@ -112,7 +112,7 @@ cdef extern from "pyext/ConfigSvcPyHelper.h" namespace "ConfigSvc":
 cdef extern from "ConfigSvc/ConfigSvc.h" namespace "ConfigSvc::ConfigSvc":
 
     # this is actually a static method in ConfigSvc::ConfigSvc class
-    cdef void init(auto_ptr[ConfigSvcImplI]) except +
+    cdef void init(shared_ptr[ConfigSvcImplI]) except +
 
 
 #------------------------
@@ -136,7 +136,7 @@ def initConfigSvc(object file not None):
     In case of any errors ``RuntimeError`` exception is raised.
     """
     
-    cdef auto_ptr[ConfigSvcImplI] ptr
+    cdef shared_ptr[ConfigSvcImplI] ptr
     cdef string strfname
     cdef object sstr
     cdef istringstream istr

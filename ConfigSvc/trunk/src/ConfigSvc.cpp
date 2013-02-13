@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <map>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,8 +30,9 @@
 
 namespace {
   
-  // one global configuration service instance
-  std::auto_ptr<ConfigSvc::ConfigSvcImplI> g_impl;
+  // set of instances
+  typedef std::map<ConfigSvc::ConfigSvc::context_t, boost::shared_ptr<ConfigSvc::ConfigSvcImplI> > ContextMap;
+  ContextMap g_impl;
   
 }
 
@@ -41,18 +43,24 @@ namespace {
 namespace ConfigSvc {
 
 void
-ConfigSvc::init(std::auto_ptr<ConfigSvcImplI> impl)
+ConfigSvc::init(const boost::shared_ptr<ConfigSvcImplI>& impl, context_t context)
 {
-  if (g_impl.get()) throw ExceptionInitialized();
-  g_impl = impl;
+  if (g_impl.find(context) != g_impl.end()) throw ExceptionInitialized();
+  g_impl.insert(std::make_pair(context, impl));
+}
+
+bool
+ConfigSvc::initialized(context_t context)
+{
+  return g_impl.find(context) != g_impl.end();
 }
 
 ConfigSvcImplI&
-ConfigSvc::impl()
+ConfigSvc::impl(context_t context)
 {
-  ConfigSvcImplI* p = g_impl.get();
-  if (not p) throw ExceptionNotInitialized();
-  return *p;
+  ContextMap::const_iterator it = g_impl.find(context);
+  if (it == g_impl.end()) throw ExceptionNotInitialized();
+  return *it->second;
 }
 
 } // namespace ConfigSvc

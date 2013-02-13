@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2013-02-12 Andy Salnikov
+- enable support for multiple instances of the configuration service
+
 Tag: V00-00-12
 2013-01-10 Andy Salnikov
 - in __init__.py fix check for linux platform

@@ -71,7 +71,7 @@ public:
   TestFixture() {
     std::istringstream stream(config);
     // start with reading configuration file
-    std::auto_ptr<ConfigSvc::ConfigSvcImplI> cfgImpl ( new ConfigSvc::ConfigSvcImplFile(stream) );
+    boost::shared_ptr<ConfigSvc::ConfigSvcImplI> cfgImpl ( new ConfigSvc::ConfigSvcImplFile(stream) );
     // initialize config service
     ConfigSvc::ConfigSvc::init(cfgImpl);
   }

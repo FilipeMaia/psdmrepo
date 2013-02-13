@@ -52,16 +52,16 @@ ConfigSvcImplFile::ConfigSvcImplFile (const string& file)
   : ConfigSvcImplI()
   , m_config()
 {
-  // copied from AppUtils/AppCmdLine.cpp
+  if (not file.empty()) {
+    // open the file
+    ifstream istream ( file.c_str() ) ;
+    if ( not istream ) {
+      // failed to open file
+      throw ExceptionFileMissing ( file ) ;
+    }
   
-  // open the file
-  ifstream istream ( file.c_str() ) ;
-  if ( not istream ) {
-    // failed to open file
-    throw ExceptionFileMissing ( file ) ;
+    readStream( istream, file );
   }
-
-  readStream( istream, file );
 }
 
 ConfigSvcImplFile::ConfigSvcImplFile (istream& stream, const string& file)
