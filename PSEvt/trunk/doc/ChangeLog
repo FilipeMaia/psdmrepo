@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-03
+2013-02-12 Andy Salnikov
+- add "TM6740" as recognizable name for Device (regular is "Tm6740"
+  but pyana uses "TM6740")
+
 Tag: V00-06-02
 2013-01-31 Andy Salnikov
 - add method Event::proxyDict() to get access to internal

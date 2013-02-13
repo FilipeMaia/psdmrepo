@@ -473,7 +473,7 @@ initName2Dev()
   }
 
   // add some names which existed in the past
-  // ... nothing ...
+  name2dev["TM6740"] = Pds::DetInfo::TM6740;
 
   return name2dev;
 }
