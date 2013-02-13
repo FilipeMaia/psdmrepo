@@ -233,8 +233,7 @@ class pyana_waveform (object) :
             channel = int(parts[1]) # e.g. 0 or 19
 
             if self.psana:
-                detsrc = source.split('|')[0].split('-')[0]
-                acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, detsrc)
+                acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, source)
             else:
                 acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
 

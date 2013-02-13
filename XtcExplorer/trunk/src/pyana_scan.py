@@ -186,13 +186,14 @@ class pyana_scan (object) :
 
             # store the value
             if self.psana:
-                epv = env.epicsStore().value(epv_name, 0)
+                epv = env.epicsStore().value(epv_name)
             else:
                 epv = env.epicsStore().value(epv_name)
-            if not epv:
+                if epv is not None: epv = epv.value
+            if epv is None:
                 logging.warning('EPICS PV %s does not exist', epv_name)
             else :
-                self.evts_scalars[epv_name].append(epv.value)
+                self.evts_scalars[epv_name].append(epv)
 
         # Other scalars in the event
         for scalar in self.input_scalars :

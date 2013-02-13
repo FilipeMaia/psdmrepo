@@ -120,6 +120,12 @@ class pyana_epics (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_epics.beginjob() called")
 
+        try:
+            env.assert_psana()
+            self.psana = True
+        except:
+            self.psana = False
+
         self.n_shots = 0
         self.accu_start = 0
         
@@ -128,38 +134,62 @@ class pyana_epics (object) :
         self.epics_data = {}
         for pv_name in self.pv_names :
 
-            pv = env.epicsStore().value( pv_name )
+            if self.psana:
+                
+                pv = env.epicsStore().getPV( pv_name )
+                if pv:
+                    # The returned value should be of the type epics.EpicsPvCtrl.
+                    pvId = pv.pvId()
+                    dbrType = pv.dbrType()
+                    status = pv.status()
+                    severity = pv.severity()
+                    dbr = pv.dbr()
+                    precision = dbr.precision()
+                    units = dbr.units()
+                    limits = (dbr.lower_ctrl_limit(), dbr.upper_ctrl_limit(),
+                            dbr.lower_disp_limit(), dbr.upper_disp_limit(), 
+                            dbr.lower_warning_limit(), dbr.upper_warning_limit(), 
+                            dbr.lower_alarm_limit(), dbr.upper_alarm_limit())
+                    
+            else:
+        
+                pv = env.epicsStore().value( pv_name )
+                if pv:
+                    # The returned value should be of the type epics.EpicsPvCtrl.
+                    pvId = pv.iPvId
+                    dbrType = pv.iDbrType
+                    precision = pv.precision
+                    units = pv.units
+                    status = pv.status
+                    severity = pv.severity
+                    limits = (pv.lower_ctrl_limit, pv.upper_ctrl_limit,
+                            pv.lower_disp_limit, pv.upper_disp_limit, 
+                            pv.lower_warning_limit, pv.upper_warning_limit, 
+                            pv.lower_alarm_limit, pv.upper_alarm_limit)
+
             if not pv:
                 logging.warning('EPICS PV %s does not exist', pv_name)
-            else :
+            else:
 
-                # The returned value should be of the type epics.EpicsPvCtrl.
-                #print "PV %s: id=%d type=%d size=%d status=%s severity=%s values=%s" % \
-                #      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
-                #       pv.status, pv.severity, pv.values)
-                
                 message = "%s (Id=%d, Type=%d, Precision=%s, Unit=%s )\n" \
-                          %(pv_name,pv.iPvId, pv.iDbrType, str(pv.precision), pv.units)
-
-                message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
+                          %(pv_name, pvId, dbrType, precision, units)
+    
+                message += "   Status = %d , Severity = %d \n"%(status, severity)
                 try:
                     message += "(%s), (%s)\n" \
-                               %(epics.epicsAlarmConditionStrings[pv.status],
-                                 epics.epicsAlarmSeverityStrings[pv.severity])
+                               %(epics.epicsAlarmConditionStrings[status],
+                                 epics.epicsAlarmSeverityStrings[severity])
                 except:
                     pass
                 
                 message += "   Limits: " 
-                message += "   Ctrl: [%s - %s]" % (pv.lower_ctrl_limit, pv.upper_ctrl_limit)
-                message += "   Display: [%s - %s]" % (pv.lower_disp_limit, pv.upper_disp_limit) 
-                message += "   Warning: [%s - %s]" % (pv.lower_warning_limit, pv.upper_warning_limit) 
-                message += "   Alarm: [%s - %s]" % (pv.lower_alarm_limit, pv.upper_alarm_limit)
-                
-                
+                message += "   Ctrl: [%s - %s]   Display: [%s - %s]   Warning: [%s - %s]   Alarm: [%s - %s]" % limits
+            
                 print message
+                
                 self.epics_data[pv_name] = EpicsData(pv_name)
-
-        
+                
+                    
     def event( self, evt, env ) :
         """
         @param evt    event data object
@@ -180,23 +210,39 @@ class pyana_epics (object) :
         # Use environment object to access EPICS data
         for pv_name in self.pv_names :
 
-            ## The returned value should be of the type epics.EpicsPvTime.
-            pv = env.epicsStore().value( pv_name )
+            if self.psana:
+
+                ## The returned value should be of the type epics.EpicsPvTime.
+                pv = env.epicsStore().getPV( pv_name )
+                if pv:
+                    pv_value = pv.value(0)
+                    status = pv.status()
+                    severity = pv.severity()
+
+            else:
+                
+                ## The returned value should be of the type epics.EpicsPvTime.
+                pv = env.epicsStore().value( pv_name )
+                if pv:
+                    pv_value = pv.value
+                    status = pv.status
+                    severity = pv.severity
+                                    
             if not pv:
                 logging.warning('EPICS PV %s does not exist', pv_name)
             else:
                 # only add to list if it changed since last event
                 try:
-                    pv_value = float(pv.value)
+                    pv_value = float(pv_value)
                 except ValueError:
                     # Try parsing value as a date, e.g. '07/01/2011 05:20:31'
-                    pv_value = time.mktime(time.strptime(pv.value, "%m/%d/%Y %H:%M:%S"))
+                    pv_value = time.mktime(time.strptime(pv_value, "%m/%d/%Y %H:%M:%S"))
                 if pv_value != self.prev_val[pv_name] :
                     self.prev_val[pv_name] = pv_value
                     self.pv_value[pv_name].append( pv_value )
                     self.pv_shots[pv_name].append( self.n_shots )
-                    self.pv_status[pv_name].append( pv.status )
-                    self.pv_severity[pv_name].append( pv.severity )
+                    self.pv_status[pv_name].append( status )
+                    self.pv_severity[pv_name].append( severity )
 
 
         # ----------------- Plotting ---------------------
@@ -292,7 +338,7 @@ class pyana_epics (object) :
                                             bins=shots_array,
                                             histtype='step')
             except Exception, err:
-                if str(err) == "zero-size array to ufunc.reduce without identity":
+                if str(err).startswith("zero-size array"):
                     # For some reason, hist() removes all 0 values,
                     # but if all the values are zero, this results
                     # in an empty array and thus the error above.

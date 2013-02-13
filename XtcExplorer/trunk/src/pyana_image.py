@@ -335,6 +335,8 @@ class  pyana_image ( object ) :
         # this one counts every event
         self.n_shots+=1
 
+        isHit = False
+        
         # -------------------------------------------------
         # get the image(s) from the event datagram
         for addr in self.sources :
@@ -365,7 +367,8 @@ class  pyana_image ( object ) :
                     print "No Cspad entry found for %s" % addr
                     continue
                 if self.psana:
-                    quads = frame.quads_list()
+                    nquads = frame.quads_shape()[0]
+                    quads = [frame.quads(i) for i in range(nquads)]
                 else:
                     quads = evt.getCsPadQuads(addr, env)
                 # then call cspad library to assemble the image
@@ -431,7 +434,6 @@ class  pyana_image ( object ) :
 
 
             # prepare to apply threshold and see if this is a hit or a dark event
-            isHit = False
             isDark = False
             isSaturated = False
             name = addr

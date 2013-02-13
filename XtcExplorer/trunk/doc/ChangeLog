@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-Feb-12 salnikov V00-02-01
+	- still more changes in psana, migrating things which depend on it
+
 2013-Feb-06 salnikov V00-02-00
 	- improved psana compatibility 
 
