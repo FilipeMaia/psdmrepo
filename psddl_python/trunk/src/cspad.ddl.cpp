@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {
@@ -119,11 +123,11 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask1", &Psana::CsPad::ConfigV1::badAsicMask1)
     .def("asicMask", &Psana::CsPad::ConfigV1::asicMask)
     .def("quadMask", &Psana::CsPad::ConfigV1::quadMask)
-    .def("quads", &Psana::CsPad::ConfigV1::quads, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("quads", &Psana::CsPad::ConfigV1::quads, return_internal_reference<>())
     .def("numAsicsRead", &Psana::CsPad::ConfigV1::numAsicsRead)
     .def("numQuads", &Psana::CsPad::ConfigV1::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV1::numSect)
-    .def("quads_shape", &Psana::CsPad::ConfigV1::quads_shape)
+    .def("quads_shape", &method_shape<Psana::CsPad::ConfigV1, &Psana::CsPad::ConfigV1::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV1>)
     .staticmethod("__typeid__")
   ;
@@ -141,13 +145,13 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask1", &Psana::CsPad::ConfigV2::badAsicMask1)
     .def("asicMask", &Psana::CsPad::ConfigV2::asicMask)
     .def("quadMask", &Psana::CsPad::ConfigV2::quadMask)
-    .def("quads", &Psana::CsPad::ConfigV2::quads, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("quads", &Psana::CsPad::ConfigV2::quads, return_internal_reference<>())
     .def("numAsicsRead", &Psana::CsPad::ConfigV2::numAsicsRead)
     .def("roiMask", &Psana::CsPad::ConfigV2::roiMask)
     .def("numAsicsStored", &Psana::CsPad::ConfigV2::numAsicsStored)
     .def("numQuads", &Psana::CsPad::ConfigV2::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV2::numSect)
-    .def("quads_shape", &Psana::CsPad::ConfigV2::quads_shape)
+    .def("quads_shape", &method_shape<Psana::CsPad::ConfigV2, &Psana::CsPad::ConfigV2::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV2>)
     .staticmethod("__typeid__")
   ;
@@ -157,7 +161,7 @@ void createWrappers(PyObject* module) {
     .def("concentratorVersion", &Psana::CsPad::ConfigV3::concentratorVersion)
     .def("runDelay", &Psana::CsPad::ConfigV3::runDelay)
     .def("eventCode", &Psana::CsPad::ConfigV3::eventCode)
-    .def("protectionThresholds", &Psana::CsPad::ConfigV3::protectionThresholds, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("protectionThresholds", &Psana::CsPad::ConfigV3::protectionThresholds, return_internal_reference<>())
     .def("protectionEnable", &Psana::CsPad::ConfigV3::protectionEnable)
     .def("inactiveRunMode", &Psana::CsPad::ConfigV3::inactiveRunMode)
     .def("activeRunMode", &Psana::CsPad::ConfigV3::activeRunMode)
@@ -167,14 +171,14 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask1", &Psana::CsPad::ConfigV3::badAsicMask1)
     .def("asicMask", &Psana::CsPad::ConfigV3::asicMask)
     .def("quadMask", &Psana::CsPad::ConfigV3::quadMask)
-    .def("quads", &Psana::CsPad::ConfigV3::quads, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("quads", &Psana::CsPad::ConfigV3::quads, return_internal_reference<>())
     .def("numAsicsRead", &Psana::CsPad::ConfigV3::numAsicsRead)
     .def("roiMask", &Psana::CsPad::ConfigV3::roiMask)
     .def("numAsicsStored", &Psana::CsPad::ConfigV3::numAsicsStored)
     .def("numQuads", &Psana::CsPad::ConfigV3::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV3::numSect)
-    .def("protectionThresholds_shape", &Psana::CsPad::ConfigV3::protectionThresholds_shape)
-    .def("quads_shape", &Psana::CsPad::ConfigV3::quads_shape)
+    .def("protectionThresholds_shape", &method_shape<Psana::CsPad::ConfigV3, &Psana::CsPad::ConfigV3::protectionThresholds_shape>)
+    .def("quads_shape", &method_shape<Psana::CsPad::ConfigV3, &Psana::CsPad::ConfigV3::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV3>)
     .staticmethod("__typeid__")
   ;
@@ -184,7 +188,7 @@ void createWrappers(PyObject* module) {
     .def("concentratorVersion", &Psana::CsPad::ConfigV4::concentratorVersion)
     .def("runDelay", &Psana::CsPad::ConfigV4::runDelay)
     .def("eventCode", &Psana::CsPad::ConfigV4::eventCode)
-    .def("protectionThresholds", &Psana::CsPad::ConfigV4::protectionThresholds, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("protectionThresholds", &Psana::CsPad::ConfigV4::protectionThresholds, return_internal_reference<>())
     .def("protectionEnable", &Psana::CsPad::ConfigV4::protectionEnable)
     .def("inactiveRunMode", &Psana::CsPad::ConfigV4::inactiveRunMode)
     .def("activeRunMode", &Psana::CsPad::ConfigV4::activeRunMode)
@@ -194,14 +198,14 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask1", &Psana::CsPad::ConfigV4::badAsicMask1)
     .def("asicMask", &Psana::CsPad::ConfigV4::asicMask)
     .def("quadMask", &Psana::CsPad::ConfigV4::quadMask)
-    .def("quads", &Psana::CsPad::ConfigV4::quads, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("quads", &Psana::CsPad::ConfigV4::quads, return_internal_reference<>())
     .def("numAsicsRead", &Psana::CsPad::ConfigV4::numAsicsRead)
     .def("roiMask", &Psana::CsPad::ConfigV4::roiMask)
     .def("numAsicsStored", &Psana::CsPad::ConfigV4::numAsicsStored)
     .def("numQuads", &Psana::CsPad::ConfigV4::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV4::numSect)
-    .def("protectionThresholds_shape", &Psana::CsPad::ConfigV4::protectionThresholds_shape)
-    .def("quads_shape", &Psana::CsPad::ConfigV4::quads_shape)
+    .def("protectionThresholds_shape", &method_shape<Psana::CsPad::ConfigV4, &Psana::CsPad::ConfigV4::protectionThresholds_shape>)
+    .def("quads_shape", &method_shape<Psana::CsPad::ConfigV4, &Psana::CsPad::ConfigV4::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV4>)
     .staticmethod("__typeid__")
   ;
@@ -228,8 +232,8 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ElementV1> >(-1, -1));
 
   class_<Psana::CsPad::DataV1, boost::shared_ptr<Psana::CsPad::DataV1>, boost::noncopyable >("DataV1", no_init)
-    .def("quads", &Psana::CsPad::DataV1::quads, return_value_policy<return_by_value, return_internal_reference<> >())
-    .def("quads_shape", &Psana::CsPad::DataV1::quads_shape)
+    .def("quads", &Psana::CsPad::DataV1::quads, return_internal_reference<>())
+    .def("quads_shape", &method_shape<Psana::CsPad::DataV1, &Psana::CsPad::DataV1::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::DataV1>)
     .staticmethod("__typeid__")
   ;
@@ -256,8 +260,8 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ElementV2> >(-1, -1));
 
   class_<Psana::CsPad::DataV2, boost::shared_ptr<Psana::CsPad::DataV2>, boost::noncopyable >("DataV2", no_init)
-    .def("quads", &Psana::CsPad::DataV2::quads, return_value_policy<return_by_value, return_internal_reference<> >())
-    .def("quads_shape", &Psana::CsPad::DataV2::quads_shape)
+    .def("quads", &Psana::CsPad::DataV2::quads, return_internal_reference<>())
+    .def("quads_shape", &method_shape<Psana::CsPad::DataV2, &Psana::CsPad::DataV2::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::DataV2>)
     .staticmethod("__typeid__")
   ;

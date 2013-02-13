@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {
@@ -123,7 +127,7 @@ void createWrappers(PyObject* module) {
     .def("lower_alarm_limit", &Psana::Epics::dbr_ctrl_short::lower_alarm_limit)
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_short::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_short::lower_ctrl_limit)
-    .def("units_shape", &Psana::Epics::dbr_ctrl_short::units_shape)
+    .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_short, &Psana::Epics::dbr_ctrl_short::units_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_short>)
     .staticmethod("__typeid__")
   ;
@@ -142,7 +146,7 @@ void createWrappers(PyObject* module) {
     .def("lower_alarm_limit", &Psana::Epics::dbr_ctrl_float::lower_alarm_limit)
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_float::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_float::lower_ctrl_limit)
-    .def("units_shape", &Psana::Epics::dbr_ctrl_float::units_shape)
+    .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_float, &Psana::Epics::dbr_ctrl_float::units_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_float>)
     .staticmethod("__typeid__")
   ;
@@ -153,7 +157,7 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_ctrl_enum::severity)
     .def("no_str", &Psana::Epics::dbr_ctrl_enum::no_str)
     .def("strings", &Psana::Epics::dbr_ctrl_enum::strings)
-    .def("strings_shape", &Psana::Epics::dbr_ctrl_enum::strings_shape)
+    .def("strings_shape", &method_shape<Psana::Epics::dbr_ctrl_enum, &Psana::Epics::dbr_ctrl_enum::strings_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_enum>)
     .staticmethod("__typeid__")
   ;
@@ -171,7 +175,7 @@ void createWrappers(PyObject* module) {
     .def("lower_alarm_limit", &Psana::Epics::dbr_ctrl_char::lower_alarm_limit)
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_char::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_char::lower_ctrl_limit)
-    .def("units_shape", &Psana::Epics::dbr_ctrl_char::units_shape)
+    .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_char, &Psana::Epics::dbr_ctrl_char::units_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_char>)
     .staticmethod("__typeid__")
   ;
@@ -189,7 +193,7 @@ void createWrappers(PyObject* module) {
     .def("lower_alarm_limit", &Psana::Epics::dbr_ctrl_long::lower_alarm_limit)
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_long::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_long::lower_ctrl_limit)
-    .def("units_shape", &Psana::Epics::dbr_ctrl_long::units_shape)
+    .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_long, &Psana::Epics::dbr_ctrl_long::units_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_long>)
     .staticmethod("__typeid__")
   ;
@@ -208,7 +212,7 @@ void createWrappers(PyObject* module) {
     .def("lower_alarm_limit", &Psana::Epics::dbr_ctrl_double::lower_alarm_limit)
     .def("upper_ctrl_limit", &Psana::Epics::dbr_ctrl_double::upper_ctrl_limit)
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_double::lower_ctrl_limit)
-    .def("units_shape", &Psana::Epics::dbr_ctrl_double::units_shape)
+    .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_double, &Psana::Epics::dbr_ctrl_double::units_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::dbr_ctrl_double>)
     .staticmethod("__typeid__")
   ;
@@ -246,7 +250,7 @@ void createWrappers(PyObject* module) {
     .def("dbr", &Psana::Epics::EpicsPvCtrlString::dbr, return_value_policy<copy_const_reference>())
     .def("data", &Psana::Epics::EpicsPvCtrlString::data)
     .def("value", &Psana::Epics::EpicsPvCtrlString::value)
-    .def("data_shape", &Psana::Epics::EpicsPvCtrlString::data_shape)
+    .def("data_shape", &method_shape<Psana::Epics::EpicsPvCtrlString, &Psana::Epics::EpicsPvCtrlString::data_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvCtrlString>)
     .staticmethod("__typeid__")
   ;
@@ -310,7 +314,7 @@ void createWrappers(PyObject* module) {
     .def("dbr", &Psana::Epics::EpicsPvTimeString::dbr, return_value_policy<copy_const_reference>())
     .def("data", &Psana::Epics::EpicsPvTimeString::data)
     .def("value", &Psana::Epics::EpicsPvTimeString::value)
-    .def("data_shape", &Psana::Epics::EpicsPvTimeString::data_shape)
+    .def("data_shape", &method_shape<Psana::Epics::EpicsPvTimeString, &Psana::Epics::EpicsPvTimeString::data_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::EpicsPvTimeString>)
     .staticmethod("__typeid__")
   ;
@@ -381,8 +385,8 @@ void createWrappers(PyObject* module) {
 
   class_<Psana::Epics::ConfigV1, boost::shared_ptr<Psana::Epics::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("numPv", &Psana::Epics::ConfigV1::numPv)
-    .def("pvControls", &Psana::Epics::ConfigV1::pvControls, return_value_policy<return_by_value, return_internal_reference<> >())
-    .def("pvControls_shape", &Psana::Epics::ConfigV1::pvControls_shape)
+    .def("pvControls", &Psana::Epics::ConfigV1::pvControls, return_internal_reference<>())
+    .def("pvControls_shape", &method_shape<Psana::Epics::ConfigV1, &Psana::Epics::ConfigV1::pvControls_shape>)
     .def("__typeid__", &method_typeid<Psana::Epics::ConfigV1>)
     .staticmethod("__typeid__")
   ;

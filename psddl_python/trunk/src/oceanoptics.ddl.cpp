@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {

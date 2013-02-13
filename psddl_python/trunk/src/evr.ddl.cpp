@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {
@@ -104,7 +108,7 @@ void createWrappers(PyObject* module) {
     .def("maskSet", &Psana::EvrData::EventCodeV5::maskSet)
     .def("maskClear", &Psana::EvrData::EventCodeV5::maskClear)
     .def("desc", &Psana::EvrData::EventCodeV5::desc)
-    .def("desc_shape", &Psana::EvrData::EventCodeV5::desc_shape)
+    .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV5, &Psana::EvrData::EventCodeV5::desc_shape>)
     .def("__typeid__", &method_typeid<Psana::EvrData::EventCodeV5>)
     .staticmethod("__typeid__")
   ;
@@ -122,7 +126,7 @@ void createWrappers(PyObject* module) {
     .def("maskClear", &Psana::EvrData::EventCodeV6::maskClear)
     .def("desc", &Psana::EvrData::EventCodeV6::desc)
     .def("readoutGroup", &Psana::EvrData::EventCodeV6::readoutGroup)
-    .def("desc_shape", &Psana::EvrData::EventCodeV6::desc_shape)
+    .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV6, &Psana::EvrData::EventCodeV6::desc_shape>)
     .def("__typeid__", &method_typeid<Psana::EvrData::EventCodeV6>)
     .staticmethod("__typeid__")
   ;
@@ -277,7 +281,7 @@ void createWrappers(PyObject* module) {
     .def("name", &Psana::EvrData::IOChannel::name)
     .def("ninfo", &Psana::EvrData::IOChannel::ninfo)
     .def("infos", &Psana::EvrData::IOChannel::infos)
-    .def("name_shape", &Psana::EvrData::IOChannel::name_shape)
+    .def("name_shape", &method_shape<Psana::EvrData::IOChannel, &Psana::EvrData::IOChannel::name_shape>)
     .def("__typeid__", &method_typeid<Psana::EvrData::IOChannel>)
     .staticmethod("__typeid__")
   ;

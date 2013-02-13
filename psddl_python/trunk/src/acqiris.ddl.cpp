@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {
@@ -99,7 +103,7 @@ void createWrappers(PyObject* module) {
 
   class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", no_init)
     .def("data", &Psana::Acqiris::DataDescV1::data, return_internal_reference<>())
-    .def("data_shape", &Psana::Acqiris::DataDescV1::data_shape)
+    .def("data_shape", &method_shape<Psana::Acqiris::DataDescV1, &Psana::Acqiris::DataDescV1::data_shape>)
     .def("__typeid__", &method_typeid<Psana::Acqiris::DataDescV1>)
     .staticmethod("__typeid__")
   ;

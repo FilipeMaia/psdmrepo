@@ -25,6 +25,10 @@ PyObject* method_typeid() {
   Py_INCREF(ptypeid);
   return ptypeid;
 }
+template<typename T, std::vector<int> (T::*MF)() const>
+PyObject* method_shape(const T *x) {
+  return detail::vintToList((x->*MF)());
+}
 } // namespace
 
 void createWrappers(PyObject* module) {
@@ -51,8 +55,8 @@ void createWrappers(PyObject* module) {
     .def("camexMagic", &Psana::PNCCD::ConfigV2::camexMagic)
     .def("info", &Psana::PNCCD::ConfigV2::info)
     .def("timingFName", &Psana::PNCCD::ConfigV2::timingFName)
-    .def("info_shape", &Psana::PNCCD::ConfigV2::info_shape)
-    .def("timingFName_shape", &Psana::PNCCD::ConfigV2::timingFName_shape)
+    .def("info_shape", &method_shape<Psana::PNCCD::ConfigV2, &Psana::PNCCD::ConfigV2::info_shape>)
+    .def("timingFName_shape", &method_shape<Psana::PNCCD::ConfigV2, &Psana::PNCCD::ConfigV2::timingFName_shape>)
     .def("__typeid__", &method_typeid<Psana::PNCCD::ConfigV2>)
     .staticmethod("__typeid__")
   ;
@@ -82,9 +86,9 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FullFrameV1> >(Pds::TypeId::Id_pnCCDframe, 1));
 
   class_<Psana::PNCCD::FramesV1, boost::shared_ptr<Psana::PNCCD::FramesV1>, boost::noncopyable >("FramesV1", no_init)
-    .def("frame", &Psana::PNCCD::FramesV1::frame, return_value_policy<return_by_value, return_internal_reference<> >())
+    .def("frame", &Psana::PNCCD::FramesV1::frame, return_internal_reference<>())
     .def("numLinks", &Psana::PNCCD::FramesV1::numLinks)
-    .def("frame_shape", &Psana::PNCCD::FramesV1::frame_shape)
+    .def("frame_shape", &method_shape<Psana::PNCCD::FramesV1, &Psana::PNCCD::FramesV1::frame_shape>)
     .def("__typeid__", &method_typeid<Psana::PNCCD::FramesV1>)
     .staticmethod("__typeid__")
   ;

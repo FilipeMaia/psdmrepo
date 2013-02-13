@@ -26,6 +26,17 @@ ndToList(const ndarray<const CTYPE, 1>& a) {
   return res;
 }
 
+// convert vector<int> to list
+inline
+PyObject*
+vintToList(const std::vector<int>& v) {
+  PyObject* res = PyList_New(v.size());
+  for (size_t i = 0; i != v.size(); ++ i) {
+    PyList_SET_ITEM(res, i, PyInt_FromLong(v[i]));
+  }
+  return res;
+}
+
 // Map C++ types to numpy type constants
 template <typename T> struct PyArrayTraits {};
 #define ASSOCIATE_PYARRAYTYPE(CTYPE, PTYPE) template <> struct PyArrayTraits<CTYPE> { enum { type_code = PTYPE }; };
