@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-05
+2013-02-12 Igor Gaponenko
+- improved version of the Python module for posting messages to allow this
+operation on behalf of the current user w/o explicit exchance of credentials.
+
 Tag: V00-03-04
 2013-01-28 Igor Gaponenko
 - fixed 2 bugs left after prior migration of Web services location (from html/ to html/ws/)

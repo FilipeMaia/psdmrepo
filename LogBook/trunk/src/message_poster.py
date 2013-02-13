@@ -83,14 +83,9 @@ class message_poster(object):
 
     # Parameters provided/calculated in the constructor
 
-    _logbook_instrument = None       # mandatory (constructor)
-    _logbook_experiment = 'current'  # mandatory (constructor)
-    _logbook_child_cmd  = None       # optional  (constructor)
-
-    # Parameters of the experiment. This data structure will be properly
-    # set (if possible) during 'lazy' initialization of the object's context.
-
-    _logbook_experiment_info = None
+    _logbook_instrument = None  # mandatory (constructor)
+    _logbook_experiment = None  # mandatory (constructor)
+    _logbook_child_cmd  = None  # optional  (constructor)
 
     # Connection parameters for Web services
 
@@ -103,7 +98,7 @@ class message_poster(object):
 
     _initialized = False
 
-    def __init__(self, instrument, experiment=None, ws_base_url=None, ws_login_user=None, ws_login_password=None, child_cmd=None):
+    def __init__(self, instrument, experiment, ws_base_url=None, ws_login_user=None, ws_login_password=None, child_cmd=None):
 
         if instrument:        self._logbook_instrument = instrument
         else:
@@ -117,6 +112,60 @@ class message_poster(object):
 
     def post(self, message_text, tags=None, attachments=None, parent_message_id=None, run_num=None):
 
+        """
+        ____________
+        ATTACHMENTS:
+
+          Attachments are specified as a tuple/list of entries:
+
+            attachments: [entry1, entry2, ...]
+
+          Where each entry can be eather a path to a file to be attached:
+
+            entry: '/u2/tmp/MyFile.jpg'
+
+          or a tuple/list of 1 or 2 elements:
+
+            entry: ('/u2/tmp/MyFile.jpg','Name2displayInELog')
+            entry: ('/u2/tmp/MyFile.jpg','')
+
+          The second optional element represents a name which will be displayed
+          in e-Log for the corresponding attachment. If no name is provided or
+          if it's an empty string then the file name w/o its directory will be
+          assumed.
+
+          When specifying multiple attachments strings and tuples can be freely
+          mixed. For example, consider adding 5 atatchments:
+
+            [ '/u2/tmp/MyFile.jpg',
+              ('/u2/tmp/MyFile.jpg','Name2displayInELog'),
+              ['/u2/tmp/MyFile2.jpg',''],
+              'SomethingElse.pdf',
+              ('./Image.jpg',)
+            ]
+
+        _____
+        TAGS:
+
+          Tags are specified similarly to atatchments:
+
+
+            tags: [entry1, entry2, ...]
+
+          Where each entry can be eather the name of a tag:
+
+            entry: 'MyTag'
+
+          or a tuple/list of 1 or 2 elements:
+
+            entry: ('MyTag_with_value','some_value')
+            entry: ('MyTag_without_value',)
+
+          Note that tags in e-log are allowed to have optional values. Usage of
+          values depends on a specific Web interface to e-log. Most tags in the
+          current e-log don't have values.
+
+        """
         self._init()
 
         if parent_message_id and run_num:
@@ -130,7 +179,8 @@ class message_poster(object):
             raise Exception("inconsistent parameters: run number can't be used together with the parent message ID")
 
         params = [ ('author_account' , self._logbook_author),
-                   ('id'             , self._logbook_experiment_info['id']),
+                   ('instrument'     , self._logbook_instrument),
+                   ('experiment'     , self._logbook_experiment),
                    ('message_text'   , message_text),
                    ('text4child'     , child_output) ]
 
@@ -139,8 +189,18 @@ class message_poster(object):
 
             tag_idx = 0 # must begin with 0
             for tag in tags:
-                params.extend( [ ("tag_name_%d"  % tag_idx, tag[0]),
-                                 ("tag_value_%d" % tag_idx, tag[1]) ] )
+                t_name = None
+                t_value = ''
+                if isinstance(tag,str):
+                    t_name = tag
+                elif isinstance(tag,tuple) or isinstance(tag,list):
+                    t_name = tag[0]
+                    if len(tag) > 1: t_value = tag[1]
+                else:
+                    raise ValueError("illegal type of the tag parameter")
+
+                params.extend( [ ("tag_name_%d"  % tag_idx, t_name),
+                                 ("tag_value_%d" % tag_idx, t_value) ] )
                 tag_idx = tag_idx + 1
         else:
             params.append(('num_tags', '0'))
@@ -148,8 +208,23 @@ class message_poster(object):
         if attachments:
             a_idx = 1 # must begin with 1
             for a in attachments:
-                params.extend( [ MultipartParam.from_file("file%d" % a_idx, a[0]),
-                                 ("file%d" % a_idx,                         a[1]) ] )
+                a_path = None
+                a_name = ''
+                if isinstance(a,str):
+                    a_path = a
+                elif isinstance(a,tuple) or isinstance(a,list):
+                    a_path = a[0]
+                    if len(a) > 1: a_name = a[1]
+                else:
+                    raise ValueError("illegal type of the attachment parameter")
+
+                if a_name == '':
+                    idx = a_path.rfind('/')
+                    if idx == -1: a_name = a_path
+                    else:         a_name = a_path[idx+1:]
+
+                params.extend( [ MultipartParam.from_file("file%d" % a_idx, a_path),
+                                 ("file%d" % a_idx,                         a_name) ] )
                 a_idx = a_idx + 1
 
         if      run_num:        params.extend( [ ('scope','run'),      ('run_num',   run_num)           ] )
@@ -158,7 +233,6 @@ class message_poster(object):
 
         try:
 
-            #url = ''.join([self._ws_base_url,'/LogBook/NewFFEntry4grabberJSON.php'])
             url = ''.join([self._ws_base_url,'/LogBook/NewFFEntry4posterJSON.php'])
 
             datagen,headers = multipart_encode(params)
@@ -169,6 +243,8 @@ class message_poster(object):
             result   = simplejson.loads(the_page)
             if result['status'] != 'success':
                 raise Exception("failed to interpret server response because of: %s" % str(result['message']))
+
+            return int(result['message_id'])
 
         except urllib2.URLError, reason:
             raise Exception("failed to post the message due to: %s" % str(reason))
@@ -200,49 +276,6 @@ class message_poster(object):
 
         except urllib2.HTTPError, code:
             raise Exception("failed to set up Web Service authentication context due to: ", code)
-
-
-    def _ws_get_experiment_info (self):
-        """
-        Contact the Web service an obtain parameters of an experiment specified
-        at object creation. If pseudo-experiment name 'current' was used then
-        translate the name into the name of the corresponding real experiment
-        before proiceedwing with the rest of the operation.
-        The real experiment must be known to the Web service, and the user should
-        have proper privileges to post messages in a context of the experiment.
-        """
-
-        if  self._logbook_experiment == 'current':
-            self._logbook_experiment  = self._ws_get_current_experiment()
-
-        # Try both experiments (at instruments) and facilities (at locations)
-        #
-        urls = [ ''.join([self._ws_base_url,'/LogBook/RequestExperimentsNew.php?instr=',self._logbook_instrument,'&access=post']),
-                 ''.join([self._ws_base_url,'/LogBook/RequestExperimentsNew.php?instr=',self._logbook_instrument,'&access=post&is_location' ]) ]
-
-        try:
-
-            for url in urls:
-
-                req      = urllib2.Request(url)
-                response = urllib2.urlopen(req)
-                the_page = response.read()
-                result   = simplejson.loads(the_page)
-
-                for experiment in result['ResultSet']['Result']:
-                    if  self._logbook_experiment == experiment['name']:
-                        self._logbook_experiment_info = experiment
-                        return
-
-            if not self._logbook_experiment_info:
-                raise Exception("specified experiment '%s' is either unknown or not available for the user" % self._logbook_experiment)
-
-        except urllib2.URLError, reason:
-            raise Exception("failed to get a list of experiment from Web Service due to: ", reason)
-
-        except urllib2.HTTPError, code:
-            raise Exception("failed to get a list of experiment from Web Service due to: ", code)
-
 
 
     def _ws_get_current_experiment (self):
@@ -287,10 +320,12 @@ class message_poster(object):
 
         self._ws_configure_auth()
 
-        # Find the specified experiment and verify caller's privileges to post messages
-        # for the experiment.
+        # Find the actual name of the 'current' experiment in case if that
+        # pseudo-experiment name was passed into the object's constructor.
 
-        self._ws_get_experiment_info()
+        if  self._logbook_experiment == 'current':
+            self._logbook_experiment  = self._ws_get_current_experiment()
+
 
         self._initialized = True
 
@@ -304,6 +339,6 @@ class message_poster_self(message_poster):
     a need to provide Web server credentials explicitly.
     """
 
-    def __init__(self, instrument, experiment=None, ws_base_url=None, child_cmd=None):
+    def __init__(self, instrument, experiment, ws_base_url=None, child_cmd=None):
 
         message_poster.__init__(self, instrument, experiment, ws_base_url, ws_login_user='amoopr', ws_login_password='pcds',child_cmd=child_cmd)
