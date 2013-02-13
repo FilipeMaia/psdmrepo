@@ -131,7 +131,6 @@ CsPad2x2ConfigV2::native_type()
   quadType.insert_native<uint32_t>( "kdConstant", offsetof(CsPad2x2ConfigV2QuadReg_Data, kdConstant) ) ;
   quadType.insert_native<uint32_t>( "humidThold", offsetof(CsPad2x2ConfigV2QuadReg_Data, humidThold) ) ;
   quadType.insert_native<uint32_t>( "setPoint", offsetof(CsPad2x2ConfigV2QuadReg_Data, setPoint) ) ;
-  quadType.insert_native<uint32_t>( "setPoint", offsetof(CsPad2x2ConfigV2QuadReg_Data, setPoint) ) ;
   quadType.insert_native<uint32_t>( "biasTuning", offsetof(CsPad2x2ConfigV2QuadReg_Data, biasTuning) ) ;
   quadType.insert_native<uint32_t>( "pdpmndnmBalance", offsetof(CsPad2x2ConfigV2QuadReg_Data, pdpmndnmBalance) ) ;
   quadType.insert("readOnly", offsetof(CsPad2x2ConfigV2QuadReg_Data, readOnly), readOnlyType) ;
