@@ -56,13 +56,6 @@ uint8_t
 EpicsPvHeader::isTime() const {
   return _iDbrType >= DBR_TIME_STRING and _iDbrType <= DBR_TIME_DOUBLE;
 }
-std::vector<int>
-EpicsPvCtrlHeader::pvName_shape() const {
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(iMaxPvNameLength);
-  return shape;
-}
 const char*
 EpicsPvCtrlString::value(uint32_t i) const {
   return data(i);

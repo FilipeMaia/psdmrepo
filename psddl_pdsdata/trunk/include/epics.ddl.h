@@ -568,8 +568,6 @@ public:
   /** PV name. */
   const char* pvName() const { return _sPvName; }
   static uint32_t _sizeof()  { return (((((Epics::EpicsPvHeader::_sizeof())+(1*(iMaxPvNameLength)))+1)-1)/1)*1; }
-  /** Method which returns the shape (dimensions) of the data returned by pvName() method. */
-  std::vector<int> pvName_shape() const;
 private:
   char	_sPvName[iMaxPvNameLength];	/**< PV name. */
 };
