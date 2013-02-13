@@ -1,0 +1,3 @@
+- aloow multiple instances of framework
+- dataset specs are accepted by psana instead of file names
+- finished EPICS python wrappers
