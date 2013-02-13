@@ -174,7 +174,23 @@ public:
     m_impl->storeAlias(src, pvId, alias);
   }
 
-  /// Get the list of PV names, all known names are returned.
+  /**
+   *  @brief  Get the full list of PV names and aliases.
+   *
+   *  Returned list includes the names of all PVs and aliases.
+   */
+  std::vector<std::string> names() const
+  {
+    std::vector<std::string> names;
+    m_impl->names(names);
+    return names;
+  }
+
+  /**
+   *  @brief  Get the list of PV names.
+   *
+   *  Returned list includes the names of all PVs but no alias names.
+   */
   std::vector<std::string> pvNames() const 
   {
     std::vector<std::string> names;
@@ -183,7 +199,39 @@ public:
   }
 
   /**
-   *   @brief Get the value for a given PV name
+   *  @brief  Get the list of PV aliases.
+   *
+   *  Returned list includes the names of all alias names but no PV names.
+   */
+  std::vector<std::string> aliases() const
+  {
+    std::vector<std::string> names;
+    m_impl->aliases(names);
+    return names;
+  }
+
+  /**
+   *  @brief  Get alias name for specified PV name.
+   *
+   *  If specified PV is not found or does not have an alias an empty string is returned.
+   */
+  std::string alias(const std::string& pv) const
+  {
+    return m_impl->alias(pv);
+  }
+
+  /**
+   *  @brief  Get PV name for specified alias name.
+   *
+   *  If specified alias is not found an empty string is returned.
+   */
+  std::string pvName(const std::string& alias) const
+  {
+    return m_impl->pvName(alias);
+  }
+
+  /**
+   *   @brief Get the value for a given PV or alias name.
    *   
    *   @param[in] name      PV name
    *   @param[in] idx       value index (for array PVs)
@@ -198,7 +246,7 @@ public:
   }
   
   /**
-   *   @brief Get status information for a given PV name.
+   *   @brief Get status information for a given PV or alias name.
    *   
    *   @param[in] name      PV name
    *   @param[out] status   EPICS status value
@@ -212,7 +260,7 @@ public:
   }
   
   /** 
-   *  @brief Find EPICS PV given its name.
+   *  @brief Find EPICS PV given its PV or alias name.
    *  
    *  @param[in] name      PV name
    *  @return  Object convertible to shared_ptr<T> where T is one of the epics PV classes.
@@ -223,6 +271,16 @@ public:
     return pv;
   }
   
+  /**
+   *  @brief Access implementation object.
+   *
+   *  Do not use this method unless you know what you are doing. This is not
+   *  supposed to be used by end clients, but may be useful for other services
+   *  like Python wrappers. The name is intentionally long to make you very
+   *  uncomfortable using it.
+   */
+  const EpicsStoreImpl& internal_implementation() const { return *m_impl; }
+
 protected:
 
 private:

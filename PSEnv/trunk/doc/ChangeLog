@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-00
+2013-02-12 Andy Salnikov
+- EpicsStore class has few more methods to work with aliases 
+
 Tag: V00-10-02
 2013-01-31 Andy Salnikov
 - add method EnvObjectStore::proxyDict() to get access to internal
