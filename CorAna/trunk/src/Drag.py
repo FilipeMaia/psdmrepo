@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 #----------------------------------
-#import numpy as np
+import numpy as np
+#import numpy.ma as ma
 #import copy
 import matplotlib.patches as patches
+from   matplotlib.nxutils import points_inside_poly
 import math # cos(x), sin(x), radians(x), degrees()
+
 
 #from PyQt4 import QtGui, QtCore # need it in order to use QtCore.QObject for signal exchange...
 
@@ -225,6 +228,13 @@ class Drag () : # ( QtCore.QObject )
         self.figure.canvas.draw()               # Draw canvas with all current objects on it
 
 #-----------------------------
+
+    def get_obj_mask(self, shape):
+        self.mask = get_mask(shape, self.get_poly_verts())
+        if self.isSelected : return ~self.mask # inversed mask
+        else               : return  self.mask # mask
+
+#-----------------------------
 #-----------------------------
 # Global methods
 #-----------------------------
@@ -265,6 +275,13 @@ def redraw_objs_from_list(axes, list_of_objs) :
         redraw_obj_update_list(obj, axes, list_of_objs)
         #drag.redraw_obj_update_list(obj, axes, list_of_objs)
 
+
+def get_mask(shape, poly_verts) :
+    x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
+    ij   = zip(x.flatten(), y.flatten()) # or np.vstack((x,y)).T
+    mask = np.array(points_inside_poly(ij, poly_verts))
+    mask.shape = shape
+    return mask
 
 #-----------------------------
 # Global methods for test
@@ -308,11 +325,23 @@ def main_test_global():
     plt.show()
 
 #-----------------------------
+
+def main_test_global_mask():
+    """Test mask
+    """
+    shape = (10,10)
+    poly_verts = [(1,1), (5,1), (5,9), (3,2), (1,1)] 
+    mask = get_mask(shape, poly_verts)
+
+    print 'mask:\n', mask
+
+#-----------------------------
 import sys
 
 if __name__ == "__main__" :
 
-    main_test_global()
+    #main_test_global()
+    main_test_global_mask()
     sys.exit ('End of test')
 
 #-----------------------------

@@ -27,6 +27,10 @@ class DragObjectSet :
         self.fig.my_xyc = xyc
 
 
+    def get_list_of_objs(self) :
+        return self.list_of_objs 
+
+
     def connect_objs(self) :
         self.cid_press  =self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)    # for Add mode
         self.cid_release=self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)  # for Remove

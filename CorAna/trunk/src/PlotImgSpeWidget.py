@@ -143,8 +143,10 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
     def get_xy_img_center(self):
         xmin,xmax,ymin,ymax = self.imsh.get_extent()
-        return abs(xmax-xmin)/2, abs(ymin-ymax)/2
+        return abs(ymin-ymax)/2, abs(xmax-xmin)/2  # return in terms of row, column ????
 
+    def get_img_shape(self):
+        return self.arr.shape
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 

@@ -140,6 +140,10 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         self.set_ydata(yarr)
 
 
+    def get_xy_arrays_for_current_wedge(self) :
+        return self.get_xdata(), self.get_ydata()
+
+
     def get_xy_arrays_for_wedge(self,xc,yc,radius,width,theta1,theta2) :      
         """Return arrays of X and Y polyline coordinates which define the shape of the wedge"""
 
@@ -415,6 +419,12 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
         if self.press != None : self.print_pars()
         self.press = None
+
+
+    def get_poly_verts(self):
+        """Creates a set of (closed) poly vertices for mask"""
+        xarr, yarr = self.get_xy_arrays_for_current_wedge()
+        return zip(xarr, yarr)
 
 
 #-----------------------------

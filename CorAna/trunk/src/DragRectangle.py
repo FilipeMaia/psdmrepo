@@ -217,6 +217,13 @@ class DragRectangle( Drag, patches.Rectangle ) :
         
         self.press = None
 
+
+    def get_poly_verts(self):
+        """Creates a set of (closed) poly vertices for mask"""
+        x,y,w,h,lw,col,s,t,r = self.get_list_of_pars()
+        return [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)] 
+
+
 #-----------------------------
 #-----------------------------
 #-----------------------------

@@ -28,6 +28,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+import numpy as np
 
 from PyQt4 import QtGui, QtCore
 
@@ -289,6 +290,15 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.parent.set_image_array_new(arr, title='Image from '+fname )
 
 
+
+
+        if but_text == self.list_of_io_tits[1] : # 'Load Forms'
+            print 'Load Forms is NOT IMPLEMENTED!' 
+
+
+
+
+
         if but_text == self.list_of_io_tits[2] : # 'Save Forms'
             path  = str( QtGui.QFileDialog.getSaveFileName(self,
                                                            caption = but_text + ' in file',
@@ -301,21 +311,30 @@ class MaskEditorButtons (QtGui.QWidget) :
             logger.info(but_text + ' in file: ' + path, __name__)
  
 
+
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
             self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
 
+            shape = self.widgimage.get_img_shape()
+            print 'get_img_shape():', shape
+
+            self.mask_total = None
+            for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
+            
+                if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
+                else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
+                print 'mask for object %i is ready...' % (i)            
+
+            self.parent.set_image_array_new(self.mask_total, title='Mask for rectangle')
 
 
+    def get_list_of_objs_for_mask(self):       
 
-
-
-
-
-
-
-
-
-
+        return self.set_rectangles.get_list_of_objs() \
+              +self.set_wedges    .get_list_of_objs()
+            #+self.set_lines     .get_list_of_objs()
+            #+self.set_circles   .get_list_of_objs()
+            #self.set_centers
 
 
 
