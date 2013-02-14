@@ -40,6 +40,7 @@ import numpy as np
 import subprocess # for subprocess.Popen
 
 from Logger import logger
+from PyQt4 import QtGui, QtCore
 
 #-----------------------------
 # Imports for other modules --
@@ -432,7 +433,35 @@ def get_text_list_from_file(fname) :
     f.close() 
     return list_recs
 
-#-----------------------------
+#----------------------------------
+
+def get_save_fname_through_dialog_box(parent, path0, dial_title, filter='*.txt'):       
+
+    path = str( QtGui.QFileDialog.getSaveFileName(parent,
+                                                  caption   = dial_title,
+                                                  directory = path0,
+                                                  filter    = filter
+                                                  ) )
+    if path == '' :
+        logger.debug('Saving is cancelled.', __name__)
+        return None
+    logger.info('Output file: ' + path, __name__)
+    return path
+
+#----------------------------------
+
+def get_open_fname_through_dialog_box(parent, path0, dial_title, filter='*.txt'):       
+
+    path = str( QtGui.QFileDialog.getOpenFileName(parent, dial_title, path0, filter=filter) )
+    dname, fname = os.path.split(path)
+    if dname == '' or fname == '' :
+        logger.info('Input directiry name or file name is empty... keep file path unchanged...')
+        return None
+    logger.info('Input file: ' + path, __name__)
+    return path
+
+
+#----------------------------------
 
 #    def get_pedestals_from_file(self) :
 #        fname = fnm.path_pedestals_ave()

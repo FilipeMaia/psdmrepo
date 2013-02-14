@@ -13,7 +13,7 @@ class DragLine( Drag, lines.Line2D ) :
 
     def __init__(self, x=None, y=None, linewidth=2, color='b', picker=5, linestyle='-') :
 
-        Drag.__init__(self, linewidth, color, linestyle)
+        Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
 
         if x == None or y == None : # Default line initialization
             x0=y0=(0,0)
@@ -39,16 +39,21 @@ class DragLine( Drag, lines.Line2D ) :
         y1  = int( self.get_ydata()[0] )
         y2  = int( self.get_ydata()[1] )
         lw  = int( self.get_linewidth() ) 
-        col =      self.get_color() 
+        #col =      self.get_color() 
+        col = self.myColor
         s   = self.isSelected
         t   = self.myType
         r   = self.isRemoved
         return (x1,x2,y1,y2,lw,col,s,t,r)
 
 
-    def print_pars(self) :
+    def get_str_of_pars(self) :
         x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_pars()
-        print 'x1,x2,y1,y2,lw,col,s,t,r =', x1,x2,y1,y2,lw,col,s,t,r
+        return '%s %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,x1,x2,y1,y2,lw,col,s,r)
+
+
+    def print_pars(self) :
+        print 't,x1,x2,y1,y2,lw,col,s,r =', self.get_str_of_pars()
 
 
     def on_press(self, event):
@@ -116,8 +121,38 @@ class DragLine( Drag, lines.Line2D ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
+        #if self.press != None : self.print_pars()
+        if self.press != None : self.maskIsAvailable = False        
         self.press = None
 
+    #def get_poly_verts(self):
+    #    """Creates a set of (closed) poly vertices for mask"""
+    #    print 'Is not implemented for DragLine - does not make sense...'
+    #    return None
+
+#-----------------------------
+
+    def get_obj_mask(self, shape):
+        """Re-implementation of this method from Drag: standard method for points in polygon has no sence for line"""
+        if not self.maskIsAvailable :
+            self.mask = self.get_mask_for_line(shape)
+            self.maskIsAvailable = True
+        if self.isSelected : return ~self.mask # inversed mask
+        else               : return  self.mask # mask
+
+
+    def get_mask_for_line(self, shape):
+        x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_pars()
+
+        if abs(x1-x2) > abs(y1-y2) : npix = int(abs(x1-x2)+1)
+        else                       : npix = int(abs(y1-y2)+1)
+
+        xarr = np.array( np.linspace(x1, x2, npix, endpoint=True), dtype=np.int32() )
+        yarr = np.array( np.linspace(y1, y2, npix, endpoint=True), dtype=np.int32() )
+
+        mask = np.zeros(shape, dtype=np.bool_())
+        for c,r in zip(xarr,yarr) : mask[r,c]=True 
+        return mask
 
 #-----------------------------
 #-----------------------------

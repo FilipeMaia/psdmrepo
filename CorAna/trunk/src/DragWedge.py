@@ -13,7 +13,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
     def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=10) :
         """Draw a wedge centered at x, y center with radius r that sweeps theta1 to theta2 (in degrees) in positive angle direction.
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
-        Drag.__init__(self, linewidth, color, linestyle)
+        Drag.__init__(self, linewidth, color, linestyle, my_type='Wedge')
 
         if  xy == None :      # Default initialization
             self.center = (xc,yc) = (10,10)
@@ -185,9 +185,13 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         return (x,y,r,w,t1,t2,lw,col,s,t,rem)
 
 
-    def print_pars(self) :
+    def get_str_of_pars(self) :
         x,y,r,w,t1,t2,lw,col,s,t,rem = self.get_list_of_pars()
-        print 'x,y,r,w,t1,t2,lw,col,s,t,rem =', x,y,r,w,t1,t2,lw,col,s,t,rem
+        return '%s %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,x,y,r,w,t1,t2,lw,col,s,rem)
+
+
+    def print_pars(self) :
+        print 't,x,y,r,w,t1,t2,lw,col,s,rem =', self.get_str_of_pars()
 
 
     def my_contains(self, click_r, click_theta, theta1, theta2, dtpick):
@@ -416,8 +420,8 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
     #    'on release we reset the press data'
         self.set_standard_wedge_parameters()
         self.on_release_graphic_manipulations()
-
-        if self.press != None : self.print_pars()
+        #if self.press != None : self.print_pars()
+        if self.press != None : self.maskIsAvailable = False        
         self.press = None
 
 

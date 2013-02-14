@@ -12,7 +12,7 @@ import math # cos(x), sin(x), radians(x), degrees()
 
 class Drag () : # ( QtCore.QObject )
 
-    def __init__(self, linewidth=2, color='k', linestyle='solid') :
+    def __init__(self, linewidth=2, color='k', linestyle='solid', my_type=None) :
         """
         Actual initialization is done by the method add_to_axes(...)
         """        
@@ -20,17 +20,17 @@ class Drag () : # ( QtCore.QObject )
 
         self.isInitialized = False
 
-        self.myColor       = color
-        self.myWidth       = linewidth
-        self.myStyle       = linestyle
-        self.isSelected    = False
-        self.isRemoved     = False
-        self.fig_outside   = None
-        self.isChanged     = False
-        self.modeRemove    = 'Remove'  # Should be the same as icp.modeRemove
-        self.modeSelect    = 'Select'
-
-        self.myType        = None #?????????????
+        self.myType          = str(my_type) # to print/save/read the string of parameters
+        self.myColor         = color
+        self.myWidth         = linewidth
+        self.myStyle         = linestyle
+        self.isSelected      = False
+        self.isRemoved       = False
+        self.fig_outside     = None
+        self.isChanged       = False
+        self.modeRemove      = 'Remove'  # Should be the same as icp.modeRemove
+        self.modeSelect      = 'Select'
+        self.maskIsAvailable = False
 
 
     def add_to_axes(self, axes) :
@@ -230,7 +230,9 @@ class Drag () : # ( QtCore.QObject )
 #-----------------------------
 
     def get_obj_mask(self, shape):
-        self.mask = get_mask(shape, self.get_poly_verts())
+        if not self.maskIsAvailable :
+            self.mask = get_mask(shape, self.get_poly_verts())
+            self.maskIsAvailable = True
         if self.isSelected : return ~self.mask # inversed mask
         else               : return  self.mask # mask
 
@@ -239,6 +241,14 @@ class Drag () : # ( QtCore.QObject )
 # Global methods
 #-----------------------------
 #-----------------------------
+
+def get_mask(shape, poly_verts) :
+    x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
+    ij   = zip(x.flatten(), y.flatten()) # or np.vstack((x,y)).T
+    mask = np.array(points_inside_poly(ij, poly_verts))
+    mask.shape = shape
+    return mask
+
 
 def add_obj_to_axes(obj, axes, list_of_objs) :
     """Add object to axes and append the list of objects
@@ -275,13 +285,6 @@ def redraw_objs_from_list(axes, list_of_objs) :
         redraw_obj_update_list(obj, axes, list_of_objs)
         #drag.redraw_obj_update_list(obj, axes, list_of_objs)
 
-
-def get_mask(shape, poly_verts) :
-    x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
-    ij   = zip(x.flatten(), y.flatten()) # or np.vstack((x,y)).T
-    mask = np.array(points_inside_poly(ij, poly_verts))
-    mask.shape = shape
-    return mask
 
 #-----------------------------
 # Global methods for test

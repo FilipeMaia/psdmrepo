@@ -13,13 +13,13 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
     def __init__(self, xy=None, width=1, height=1, linewidth=2, linestyle='solid', color='b', picker=8, fill=False) :
 
-        Drag.__init__(self, linewidth, color, linestyle)
+        Drag.__init__(self, linewidth, color, linestyle, my_type='Rectangle')
 
         if  xy == None : # Default line initialization
             xy0=(0,0)
             patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
             self.isInitialized = False
-            print "DragRectangle initialization w/o parameters."
+            #print "DragRectangle initialization w/o parameters."
 
         else :
             patches.Rectangle.__init__(self, xy,  width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
@@ -28,8 +28,6 @@ class DragRectangle( Drag, patches.Rectangle ) :
         self.set_picker(picker)
         self.myPicker  = picker
         self.press     = None # Is used to transmit local information between press and release button
-        self.nx_slices = 1
-        self.ny_slices = 1
 
         
     def get_list_of_pars(self) :
@@ -38,7 +36,8 @@ class DragRectangle( Drag, patches.Rectangle ) :
         w0 = int( self.get_width () )
         h0 = int( self.get_height() )
         lw = int( self.get_linewidth() ) 
-        col=      self.get_edgecolor() 
+        #col=      self.get_edgecolor() 
+        col=      self.myColor
         x  = min(x0,x0+w0)
         y  = min(y0,y0+h0)
         h  = abs(h0)
@@ -49,13 +48,13 @@ class DragRectangle( Drag, patches.Rectangle ) :
         return (x,y,w,h,lw,col,s,t,r)
 
 
-    def get_number_of_slices_for_rect(self) :
-        return self.nx_slices, self.ny_slices
+    def get_str_of_pars(self) :
+        x,y,w,h,lw,col,s,t,r = self.get_list_of_pars()
+        return '%s %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,x,y,w,h,lw,col,s,r)
 
 
     def print_pars(self) :
-        x,y,w,h,lw,col,s,t,r = self.get_list_of_pars()
-        print 'x,y,w,h,lw,col,s,t,r =', x,y,w,h,lw,col,s,t,r
+        print 't,x,y,w,h,lw,col,s,r =', self.get_str_of_pars()
 
 
     def my_contains(self, event):
@@ -214,7 +213,8 @@ class DragRectangle( Drag, patches.Rectangle ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-        
+        #if self.press != None : self.print_pars()
+        if self.press != None : self.maskIsAvailable = False        
         self.press = None
 
 
@@ -223,6 +223,21 @@ class DragRectangle( Drag, patches.Rectangle ) :
         x,y,w,h,lw,col,s,t,r = self.get_list_of_pars()
         return [(x,y), (x+w,y), (x+w,y+h), (x,y+h), (x,y)] 
 
+#-----------------------------
+
+    def get_obj_mask(self, shape):
+        """Re-implementation of this method from Drag: standard method for points in polygon is very slow"""
+        if not self.maskIsAvailable :
+            self.mask = self.get_mask_for_rectangle(shape)
+            self.maskIsAvailable = True
+        if self.isSelected : return ~self.mask # inversed mask
+        else               : return  self.mask # mask
+
+
+    def get_mask_for_rectangle(self, shape):
+        x0,y0,w,h,lw,col,s,t,r = self.get_list_of_pars()
+        x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
+        return np.select([x<x0, x>x0+w, y<y0, y>y0+h], [False, False, False, False], default=True)
 
 #-----------------------------
 #-----------------------------

@@ -88,9 +88,9 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.disconnect_all()
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
-        self.list_of_forms   = ['Line', 'Rectangle', 'Circle', 'Center', 'Wedge']
-        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask']
-        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask]
+        self.list_of_forms   = ['Line', 'Rectangle', 'Circle', 'Wedge'] #, 'Center'] 
+        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M']
+        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask]
 
         self.list_of_buts    = []
         self.list_of_io_buts = []
@@ -104,8 +104,15 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.tit_io    = QtGui.QLabel('I/O:')
 
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addWidget(self.tit_modes)
+        self.vbox.addWidget(self.tit_forms)
+        for form in self.list_of_forms :
+            but = QtGui.QPushButton(form)
+            self.list_of_buts.append(but)
+            self.vbox.addWidget(but)
+            self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
 
+        self.vbox.addStretch(1)
+        self.vbox.addWidget(self.tit_modes)
         for mode in self.list_of_modes :
             but = QtGui.QPushButton(mode)
             self.list_of_buts.append(but)
@@ -113,24 +120,12 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
 
         self.vbox.addStretch(1)
-        self.vbox.addWidget(self.tit_forms)
-
-        for form in self.list_of_forms :
-            but = QtGui.QPushButton(form)
-            self.list_of_buts.append(but)
-            self.vbox.addWidget(but)
-            self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
-
-
-        self.vbox.addStretch(1)
         self.vbox.addWidget(self.tit_io)
-
         for io_tit in self.list_of_io_tits :
             but = QtGui.QPushButton(io_tit)
             self.list_of_io_buts.append(but)
             self.vbox.addWidget(but)
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_io_but)
-
 
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)
@@ -281,60 +276,83 @@ class MaskEditorButtons (QtGui.QWidget) :
 
  
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
-            path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file', path0) )
-            dname, fname = os.path.split(path)
-            if dname == '' or fname == '' :
-                logger.info('Input directiry name or file name is empty... keep file path unchanged...')
-                return
+            path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+
             arr = gu.get_array_from_file(path)             
-            self.parent.set_image_array_new(arr, title='Image from '+fname )
-
-
+            self.parent.set_image_array_new(arr, title='Image from '+path )
 
 
         if but_text == self.list_of_io_tits[1] : # 'Load Forms'
             print 'Load Forms is NOT IMPLEMENTED!' 
-
-
-
+            path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            if path == None : return
+            msg='Load shaping-objects for mask from file: ' + path 
+            logger.debug(msg, __name__ )
+            print msg
+            #text = gu.get_text_file_content(path)
+            f=open(path,'r')
+            for line in f :
+                print line
+            f.close() 
 
 
         if but_text == self.list_of_io_tits[2] : # 'Save Forms'
-            path  = str( QtGui.QFileDialog.getSaveFileName(self,
-                                                           caption = but_text + ' in file',
-                                                           directory = path0,
-                                                           filter = '*.txt'
-                                                           ) )
-            if path == '' :
-                logger.debug('Saving is cancelled.', __name__)
-                return
-            logger.info(but_text + ' in file: ' + path, __name__)
+            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            if path == None : return
+            msg='Save shaping-objects for mask in file: ' + path 
+            logger.debug(msg, __name__ )
+            f=open(path,'w')
+            for obj in self.get_list_of_objs_for_mask() :
+                str_of_pars = obj.get_str_of_pars()
+                print str_of_pars
+                f.write(str_of_pars + '\n')
+            f.close() 
+
  
-
-
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
-            self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            mask_total = self.get_mask_total()
+            self.parent.set_image_array_new(mask_total, title='Mask')
+            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            if path == None : return
+            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
 
-            shape = self.widgimage.get_img_shape()
-            print 'get_img_shape():', shape
 
-            self.mask_total = None
-            for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
+        if but_text == self.list_of_io_tits[4] : # 'Save Inv-Mask'
+            mask_total = ~self.get_mask_total()
+            self.parent.set_image_array_new(mask_total, title='Inverse Mask')
+            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            if path == None : return
+            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+
+
+    def get_mask_total(self):       
+        shape = self.widgimage.get_img_shape()
+        print 'get_img_shape():', shape
+
+        self.mask_total = None
+        for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
+            if obj.isSelected : continue # Loop over ROI-type objects
+            if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
+            else                       : self.mask_total = np.logical_or(self.mask_total, obj.get_obj_mask(shape))
+            print 'mask for ROI-type object %i is ready...' % (i)
             
-                if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
-                else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
-                print 'mask for object %i is ready...' % (i)            
+        for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
+            if not obj.isSelected : continue # Loop over inversed objects
+            if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
+            else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
+            print 'mask for inversed object %i is ready...' % (i)            
 
-            self.parent.set_image_array_new(self.mask_total, title='Mask for rectangle')
+        return self.mask_total
 
 
     def get_list_of_objs_for_mask(self):       
-
         return self.set_rectangles.get_list_of_objs() \
-              +self.set_wedges    .get_list_of_objs()
-            #+self.set_lines     .get_list_of_objs()
-            #+self.set_circles   .get_list_of_objs()
-            #self.set_centers
+              +self.set_wedges    .get_list_of_objs() \
+              +self.set_circles   .get_list_of_objs() \
+              +self.set_lines     .get_list_of_objs()
+            #+self.set_centers
 
 
 
@@ -349,16 +367,20 @@ class MaskEditorButtons (QtGui.QWidget) :
         logger.debug('on_but_save', __name__ )
         path = self.ofname
         #dir, fname = os.path.split(path)
-        path  = str( QtGui.QFileDialog.getSaveFileName(self,
-                                                       caption='Select file to save the plot',
-                                                       directory = path,
-                                                       filter = '*.png, *.eps, *pdf, *.ps'
-                                                       ) )
-        if path == '' :
-            logger.debug('Saving is cancelled.', __name__ )
-            return
-        logger.info('Save plot in file: ' + path, __name__ )
-        self.widgimage.saveFigure(path)
+        path = gu.get_save_fname_through_dialog_box(self, path, \
+                                                    'Select file to save the plot', \
+                                                    filter='*.png, *.eps, *pdf, *.ps')
+        #path  = str( QtGui.QFileDialog.getSaveFileName(self,
+        #                                               caption='Select file to save the plot',
+        #                                               directory = path,
+        #                                               filter = '*.png, *.eps, *pdf, *.ps'
+        #                                               ) )
+        #if path == '' :
+        #    logger.debug('Saving is cancelled.', __name__ )
+        #    return 
+        #logger.info('Save file: ' + path, __name__ )
+
+        if path != None : self.widgimage.saveFigure(path)
 
 
     def on_but_elog(self):

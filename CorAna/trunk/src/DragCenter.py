@@ -12,7 +12,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
     def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=1, color='b', picker=10, linestyle='-') :
 
-        Drag.__init__(self, linewidth, color, linestyle)
+        Drag.__init__(self, linewidth, color, linestyle, my_type='Center')
 
         if  x == None or y == None : # Default line initialization
             xc,yc=(10,10)
@@ -65,16 +65,22 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         xerr = int( xarr[1] - xarr[0] )
         yerr = int( yarr[0] - yarr[5] )
         lw   = int( self.get_linewidth() ) 
-        col  =      self.get_color() 
+        #col  =      self.get_color() 
+        col  = self.myColor
         s    = self.isSelected
         t    = self.myType
         r    = self.isRemoved
         return (xc,yc,xerr,yerr,lw,col,s,t,r)
 
 
+    def get_str_of_pars(self) :
+        xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
+        return '%s %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,xc,yc,xerr,yerr,lw,col,s,r)
+
+
     def print_pars(self) :
         xc,yc,xerr,yerr,lw,col,s,t,r = self.get_list_of_pars()
-        print 'xc,yc,xerr,yerr,lw,col,s,t,r =', xc,yc,xerr,yerr,lw,col,s,t,r
+        print 't,xc,yc,xerr,yerr,lw,col,s,t,r =', self.get_str_of_pars()
 
 
     def my_contains(self, event):
@@ -201,13 +207,11 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
     def on_release(self, event):
         'on release we reset the press data'
-
         self.xc, self.yc = self.figure.my_xyc = self.get_xy_center()
-        print 'Set new center coordinates xc, yc=' + str(self.xc) + ', ' +  str(self.yc) 
-        #self.emit( QtCore.SIGNAL('new_xy_center(int,int)'), self.xc, self.yc)
-        
+        #print 'Set new center coordinates xc, yc=' + str(self.xc) + ', ' +  str(self.yc) 
+        #self.emit( QtCore.SIGNAL('new_xy_center(int,int)'), self.xc, self.yc)        
         self.on_release_graphic_manipulations()
-
+        #if self.press != None : self.print_pars()
         self.press = None
 
 #-----------------------------
