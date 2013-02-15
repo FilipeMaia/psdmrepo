@@ -11,11 +11,19 @@ from Drag import *
 
 class DragLine( Drag, lines.Line2D ) :
 
-    def __init__(self, x=None, y=None, linewidth=2, color='b', picker=5, linestyle='-') :
+    def __init__(self, x=None, y=None, linewidth=2, color='b', picker=5, linestyle='-', str_of_pars=None) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
 
-        if x == None or y == None : # Default line initialization
+        if str_of_pars != None :
+            x1,x2,y1,y2,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
+            self.isSelected    = s
+            self.myType        = t
+            self.isRemoved     = r
+            self.isInitialized = True
+            lines.Line2D.__init__(self, (x1,x2), (y1,y2), linewidth=lw, color=col, picker=picker)
+
+        elif x == None or y == None : # Default line initialization
             x0=y0=(0,0)
             lines.Line2D.__init__(self, x0, y0, linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
@@ -40,10 +48,24 @@ class DragLine( Drag, lines.Line2D ) :
         y2  = int( self.get_ydata()[1] )
         lw  = int( self.get_linewidth() ) 
         #col =      self.get_color() 
-        col = self.myColor
+        col = self.myCurrentColor
         s   = self.isSelected
         t   = self.myType
         r   = self.isRemoved
+        return (x1,x2,y1,y2,lw,col,s,t,r)
+
+    def parse_str_of_pars(self, str_of_pars) :
+        pars = str_of_pars.split()
+        #print 'pars:', pars
+        t   = pars[0]
+        x1  = float(pars[1])
+        x2  = float(pars[2])
+        y1  = float(pars[3])
+        y2  = float(pars[4])
+        lw  = int(pars[5])
+        col = str(pars[6])
+        s   = self.dicBool[pars[7].lower()]
+        r   = self.dicBool[pars[8].lower()]
         return (x1,x2,y1,y2,lw,col,s,t,r)
 
 

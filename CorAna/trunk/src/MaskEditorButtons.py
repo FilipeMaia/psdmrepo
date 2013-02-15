@@ -58,7 +58,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask'):
+    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -77,7 +77,10 @@ class MaskEditorButtons (QtGui.QWidget) :
         if widgimage != None :
             self.fig        = self.widgimage.fig
             self.axes       = self.widgimage.get_axim()
-            self.fig.my_xyc = self.widgimage.get_xy_img_center()
+
+            if xyc != None : self.fig.my_xyc = xyc
+            else           : self.fig.my_xyc = self.widgimage.get_xy_img_center()
+
             print 'Image center: ', self.fig.my_xyc
 
             self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False)
@@ -250,7 +253,18 @@ class MaskEditorButtons (QtGui.QWidget) :
             else                                  : pass
 
         self.setButtonStyle()
- 
+
+
+    def add_obj(self, str_of_pars) :
+        """Add object when load the forms from file"""
+        obj_type = str_of_pars.split(' ',1)[0]
+        if   obj_type == 'Line'      : self.set_lines     .add_obj_for_str_of_pars(str_of_pars)    
+        elif obj_type == 'Rectangle' : self.set_rectangles.add_obj_for_str_of_pars(str_of_pars)    
+        elif obj_type == 'Circle'    : self.set_circles   .add_obj_for_str_of_pars(str_of_pars)    
+        elif obj_type == 'Center'    : self.set_centers   .add_obj_for_str_of_pars(str_of_pars)    
+        elif obj_type == 'Wedge'     : self.set_wedges    .add_obj_for_str_of_pars(str_of_pars)    
+        else                         : pass
+
 
     def get_pushed_io_but(self):
         for ind, but in enumerate(self.list_of_io_buts) :
@@ -283,7 +297,6 @@ class MaskEditorButtons (QtGui.QWidget) :
 
 
         if but_text == self.list_of_io_tits[1] : # 'Load Forms'
-            print 'Load Forms is NOT IMPLEMENTED!' 
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None : return
             msg='Load shaping-objects for mask from file: ' + path 
@@ -291,13 +304,14 @@ class MaskEditorButtons (QtGui.QWidget) :
             print msg
             #text = gu.get_text_file_content(path)
             f=open(path,'r')
-            for line in f :
-                print line
+            for str_of_pars in f :
+                self.add_obj(str_of_pars.rstrip('\n'))
             f.close() 
 
 
         if but_text == self.list_of_io_tits[2] : # 'Save Forms'
             #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            if self.list_of_objs_for_mask_is_empty() : return
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None : return
             msg='Save shaping-objects for mask in file: ' + path 
@@ -311,6 +325,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
  
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
+            if self.list_of_objs_for_mask_is_empty() : return
             mask_total = self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Mask')
             #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
@@ -320,6 +335,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
 
         if but_text == self.list_of_io_tits[4] : # 'Save Inv-Mask'
+            if self.list_of_objs_for_mask_is_empty() : return
             mask_total = ~self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Inverse Mask')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
@@ -345,6 +361,14 @@ class MaskEditorButtons (QtGui.QWidget) :
             print 'mask for inversed object %i is ready...' % (i)            
 
         return self.mask_total
+
+
+    def list_of_objs_for_mask_is_empty(self):       
+        if len(self.get_list_of_objs_for_mask()) == 0 :
+            logger.warning('List of objects for mask IS EMPTY!', __name__ )            
+            return True
+        else :
+            return False
 
 
     def get_list_of_objs_for_mask(self):       

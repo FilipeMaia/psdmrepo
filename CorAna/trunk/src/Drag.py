@@ -12,6 +12,8 @@ import math # cos(x), sin(x), radians(x), degrees()
 
 class Drag () : # ( QtCore.QObject )
 
+    dicBool = {'false':False, 'true':True}
+
     def __init__(self, linewidth=2, color='k', linestyle='solid', my_type=None) :
         """
         Actual initialization is done by the method add_to_axes(...)
@@ -21,7 +23,6 @@ class Drag () : # ( QtCore.QObject )
         self.isInitialized = False
 
         self.myType          = str(my_type) # to print/save/read the string of parameters
-        self.myColor         = color
         self.myWidth         = linewidth
         self.myStyle         = linestyle
         self.isSelected      = False
@@ -31,7 +32,8 @@ class Drag () : # ( QtCore.QObject )
         self.modeRemove      = 'Remove'  # Should be the same as icp.modeRemove
         self.modeSelect      = 'Select'
         self.maskIsAvailable = False
-
+        self.myColor         = color
+        self.myCurrentColor  = color
 
     def add_to_axes(self, axes) :
         axes.add_artist(self)
@@ -152,8 +154,10 @@ class Drag () : # ( QtCore.QObject )
 
     def set_select_deselect_color(self, color='w') :
 
-        if self.isSelected : self.set_color(color)
-        else               : self.set_color(self.myColor)
+        if self.isSelected : self.myCurrentColor = color
+        else               : self.myCurrentColor = self.myColor
+
+        self.set_color(self.myCurrentColor)
 
 
     def on_press_graphic_manipulations(self) :

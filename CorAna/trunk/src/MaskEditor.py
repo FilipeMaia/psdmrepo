@@ -64,7 +64,17 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
+        """List of input parameters:
+        @param parent  parent window is used to open other window moved w.r.t. parent.
+        @param arr     2D array for image. If None then image will be taken from file or generated as random.
+        @param xyc     (x,y) coordinate of the (beam) center which is used to create Wedges. If None, then center of image will be used.
+        @param ifname  path to the text file with 2D array for image.
+        @param ofname  default path to save plot of the graphical window.
+        @param mfname  default path-prefix for newly created files with mask and shaping objects.
+        @param title   Initial title of the window.
+        """
+ 
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         #self.setGeometry(20, 40, 500, 550)
@@ -81,7 +91,7 @@ class MaskEditor (QtGui.QWidget) :
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc)
  
         #---------------------
 
@@ -166,7 +176,7 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    w = MaskEditor(None, get_array2d_for_test())
+    w = MaskEditor(None, get_array2d_for_test(), xyc=(600,700))
     #w = MaskEditor(None)
     #w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(300,10))

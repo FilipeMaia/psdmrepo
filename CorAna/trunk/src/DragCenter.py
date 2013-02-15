@@ -10,11 +10,20 @@ from Drag import *
 
 class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) : 
 
-    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=1, color='b', picker=10, linestyle='-') :
+    def __init__(self, x=None, y=None, xerr=5, yerr=5, linewidth=1, color='b', picker=10, linestyle='-', str_of_pars=None) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Center')
 
-        if  x == None or y == None : # Default line initialization
+        if str_of_pars != None : 
+            xc,yc,xe,ye,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
+            self.isSelected    = s
+            self.myType        = t
+            self.isRemoved     = r
+            self.isInitialized = True
+            xarr, yarr = self.get_xy_arrays_for_center_sign(xc,yx,xe,ye)
+            lines.Line2D.__init__(self,  xarr,  yarr, linewidth=lw, color=col, picker=picker)
+
+        elif x == None or y == None : # Default line initialization
             xc,yc=(10,10)
             xarr, yarr = self.get_xy_arrays_for_center_sign(xc,yc,xerr,yerr)
             lines.Line2D.__init__(self, xarr, yarr, linewidth=linewidth, color=color, picker=picker)
@@ -22,7 +31,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
             print "DragCenter initialization w/o parameters."
 
         else :
-            xc, yc = x, y
+            #xc, yc = x, y
             xarr, yarr = self.get_xy_arrays_for_center_sign(x,y,xerr,yerr)
             lines.Line2D.__init__(self,  xarr,  yarr, linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = True
@@ -66,11 +75,26 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         yerr = int( yarr[0] - yarr[5] )
         lw   = int( self.get_linewidth() ) 
         #col  =      self.get_color() 
-        col  = self.myColor
+        col  = self.myCurrentColor
         s    = self.isSelected
         t    = self.myType
         r    = self.isRemoved
         return (xc,yc,xerr,yerr,lw,col,s,t,r)
+
+
+    def parse_str_of_pars(self, str_of_pars) :
+        pars = str_of_pars.split()
+        #print 'pars:', pars
+        t   = pars[0]
+        xc  = float(pars[1])
+        yc  = float(pars[2])
+        xe  = float(pars[3])
+        ye  = float(pars[4])
+        lw  = int(pars[5])
+        col = str(pars[6])
+        s   = self.dicBool[pars[7].lower()]
+        r   = self.dicBool[pars[8].lower()]
+        return (xc,yc,xe,ye,lw,col,s,t,r)
 
 
     def get_str_of_pars(self) :

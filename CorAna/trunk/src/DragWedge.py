@@ -10,29 +10,37 @@ from Drag import *
 
 class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
-    def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=10) :
+    def __init__(self, xy=None, radius=None, theta1=0, theta2=10, width=15, linewidth=2, linestyle='solid', color='b', picker=10, str_of_pars=None) :
         """Draw a wedge centered at x, y center with radius r that sweeps theta1 to theta2 (in degrees) in positive angle direction.
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
         Drag.__init__(self, linewidth, color, linestyle, my_type='Wedge')
 
-        if  xy == None :      # Default initialization
+        if str_of_pars != None : 
+            x,y,r0,w,t1,t2,lw,col,s,t,rem = self.parse_str_of_pars(str_of_pars)
+            self.center = (xc,yc) = (x,y)
+            self.isSelected    = s
+            self.myType        = t
+            self.isRemoved     = rem
+            self.isInitialized = True
+
+        elif xy == None :      # Default initialization
             self.center = (xc,yc) = (10,10)
-            r0=10
+            r0, w, t1, t2, col = 10, width, theta1, theta2, color 
             self.isInitialized = False
 
         elif radius == None : # Semi-default initialization
             self.center = (xc,yc) = xy
-            r0=10
+            r0, w, t1, t2, col = 10, width, theta1, theta2, color 
             self.isInitialized = False
 
         else :
             self.center = (xc,yc) = xy
-            r0=radius
+            r0, w, t1, t2, col = radius, width, theta1, theta2, color 
             self.isInitialized = True
 
-        self.set_wedge_pars(self.center, r0, width, theta1, theta2)
-        xarr, yarr = self.get_xy_arrays_for_wedge(xc,yc,r0,width,theta1,theta2)
-        lines.Line2D.__init__(self, xarr, yarr, linewidth=linewidth, color=color, picker=picker)
+        self.set_wedge_pars(self.center, r0, w, t1, t2)
+        xarr, yarr = self.get_xy_arrays_for_wedge(xc, yc, r0, w, t1, t2)
+        lines.Line2D.__init__(self, xarr, yarr, linewidth=linewidth, color=col, picker=picker)
 
         self.set_picker(picker)
         self.myPicker = picker
@@ -178,10 +186,28 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         t1  =      self.theta1
         t2  =      self.theta2
         lw  =      self.get_linewidth()
-        col =      self.get_color() 
+        #col =      self.get_color() 
+        col =      self.myCurrentColor
         s   =      self.isSelected
         t   =      self.myType
         rem =      self.isRemoved
+        return (x,y,r,w,t1,t2,lw,col,s,t,rem)
+
+
+    def parse_str_of_pars(self, str_of_pars) :
+        pars = str_of_pars.split()
+        #print 'pars:', pars
+        t   = pars[0]
+        x   = float(pars[1])
+        y   = float(pars[2])
+        r   = float(pars[3])
+        w   = float(pars[4])
+        t1  = float(pars[5])
+        t2  = float(pars[6])
+        lw  = int(pars[7])
+        col = str(pars[8])
+        s   = self.dicBool[pars[9].lower()]
+        rem = self.dicBool[pars[10].lower()]
         return (x,y,r,w,t1,t2,lw,col,s,t,rem)
 
 

@@ -48,12 +48,27 @@ class DragObjectSet :
             obj.disconnect()
 
 
+
+    def add_obj_for_str_of_pars(self, str_of_pars) :
+        """Add object when load the forms from file"""
+        obj_type = str_of_pars.split(' ',1)[0]
+        #print 'Add object with pars:', str_of_pars
+        if self.is_single_obj and len(self.list_of_objs) > 0 :
+            print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
+            return
+        if self.use_xyc : obj = self.ObjectType(str_of_pars=str_of_pars, xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
+        else            : obj = self.ObjectType(str_of_pars=str_of_pars) # Creates the draggable object with 1st vertex in xy
+        add_obj_to_axes(obj, self.axes, self.list_of_objs)        
+
+
+
     def set_list_of_objs(self, list) :
         for obj in list :
             if self.is_single_obj and len(self.list_of_objs) > 0 :
                 print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
                 return
                 add_obj_to_axes(obj, self.axes, self.list_of_objs)
+
 
 
     def print_mode_keys(self) :

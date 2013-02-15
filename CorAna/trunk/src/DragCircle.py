@@ -12,21 +12,29 @@ from Drag import *
 
 class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
 
-    def __init__(self, xy=None, radius=1, linewidth=2, linestyle='solid', color='b', picker=5) :
+    def __init__(self, xy=None, radius=1, linewidth=2, linestyle='solid', color='b', picker=5, str_of_pars=None) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Circle')
 
-        if  xy == None : # Default line initialization
+        if str_of_pars != None :
+            x,y,r0,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
+            self.isSelected    = s
+            self.myType        = t
+            self.isRemoved     = r
+            self.isInitialized = True
+            patches.Circle.__init__(self, (x,y), radius=r0, linewidth=lw, color=col, fill=False, picker=picker)
+
+        elif xy == None : # Default line initialization
             xy0=(0,0)
             r0=1
             #patches.CirclePolygon.__init__(self, xy0, linewidth=linewidth, color=color, fill=False, picker=picker)
             patches.Circle.__init__(self, xy0, radius=r0, linewidth=linewidth, color=color, fill=False, picker=picker)
-            #self.isInitialized = False
-            self.set_isInitialized(False)
+            self.isInitialized = False
+            #self.set_isInitialized(False)
         else :
             patches.Circle.__init__(self, xy, radius=radius, linewidth=linewidth, color=color, fill=False, picker=picker)
-            #self.isInitialized = True
-            self.set_isInitialized(True)
+            self.isInitialized = True
+            #self.set_isInitialized(True)
 
         self.set_picker(picker)
         self.myPicker = picker
@@ -48,10 +56,24 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
         r0  = int( self.get_radius() )
         lw  = int( self.get_linewidth() ) 
         #col =      self.get_edgecolor() 
-        col =      self.myColor
+        col =      self.myCurrentColor
         s   =      self.isSelected
         t   =      self.myType
         r   =      self.isRemoved
+        return (x,y,r0,lw,col,s,t,r)
+
+
+    def parse_str_of_pars(self, str_of_pars) :
+        pars = str_of_pars.split()
+        #print 'pars:', pars
+        t   = pars[0]
+        x   = float(pars[1])
+        y   = float(pars[2])
+        r0  = float(pars[3])
+        lw  = int(pars[4])
+        col = str(pars[5])
+        s   = self.dicBool[pars[6].lower()]
+        r   = self.dicBool[pars[7].lower()]
         return (x,y,r0,lw,col,s,t,r)
 
 

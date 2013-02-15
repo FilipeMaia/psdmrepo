@@ -11,11 +11,19 @@ from Drag import *
 
 class DragRectangle( Drag, patches.Rectangle ) : 
 
-    def __init__(self, xy=None, width=1, height=1, linewidth=2, linestyle='solid', color='b', picker=8, fill=False) :
+    def __init__(self, xy=None, width=1, height=1, linewidth=2, linestyle='solid', color='b', picker=8, fill=False, str_of_pars=None) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Rectangle')
 
-        if  xy == None : # Default line initialization
+        if str_of_pars != None :
+            x,y,w,h,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
+            patches.Rectangle.__init__(self, (x,y), w, h, linewidth=lw, color=col, fill=fill, picker=picker)
+            self.isSelected    = s
+            self.myType        = t
+            self.isRemoved     = r
+            self.isInitialized = True
+
+        elif xy == None : # Default line initialization
             xy0=(0,0)
             patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
             self.isInitialized = False
@@ -36,8 +44,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
         w0 = int( self.get_width () )
         h0 = int( self.get_height() )
         lw = int( self.get_linewidth() ) 
-        #col=      self.get_edgecolor() 
-        col=      self.myColor
+        col= self.myCurrentColor
         x  = min(x0,x0+w0)
         y  = min(y0,y0+h0)
         h  = abs(h0)
@@ -45,6 +52,22 @@ class DragRectangle( Drag, patches.Rectangle ) :
         s  = self.isSelected
         t  = self.myType
         r  = self.isRemoved
+        return (x,y,w,h,lw,col,s,t,r)
+
+
+    def parse_str_of_pars(self, str_of_pars) :
+        pars = str_of_pars.split()
+        #print 'pars:', pars
+        t   = pars[0]
+        x   = float(pars[1])
+        y   = float(pars[2])
+        w   = float(pars[3])
+        h   = float(pars[4])
+        lw  = int(pars[5])
+        col = str(pars[6])
+        s   = self.dicBool[pars[7].lower()]
+        r   = self.dicBool[pars[8].lower()]
+        #print 'Parsed pars: %s %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,x,y,w,h,lw,col,s,r)
         return (x,y,w,h,lw,col,s,t,r)
 
 
@@ -213,7 +236,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-        #if self.press != None : self.print_pars()
+        if self.press != None : self.print_pars()
         if self.press != None : self.maskIsAvailable = False        
         self.press = None
 
