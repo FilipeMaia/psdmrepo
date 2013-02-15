@@ -104,7 +104,7 @@ class Drag () : # ( QtCore.QObject )
         #print 'Save Color, Width, Style =', self.myColor, self.myWidth, self.myStyle 
         self.set_color    (self.myColor)
         self.set_linewidth(self.myWidth)
-        self.set_linestyle(self.myStyle)
+        self.set_linestyle('solid') #self.myStyle)
 
 
     def set_dragged_obj_properties(self) :

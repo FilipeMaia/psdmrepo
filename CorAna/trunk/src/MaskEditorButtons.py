@@ -44,6 +44,7 @@ from DragLine      import *
 from DragRectangle import *
 from DragCircle    import *
 from DragCenter    import *
+from DragPolygon   import *
 from DragObjectSet import *
 
 #---------------------
@@ -88,17 +89,18 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False)
             self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False)
             self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, is_single_obj=True)
+            self.set_polygons   = DragObjectSet(self.fig, self.axes, DragPolygon,   useKeyboard=False)
             self.disconnect_all()
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
-        self.list_of_forms   = ['Line', 'Rectangle', 'Circle', 'Wedge'] #, 'Center'] 
+        self.list_of_forms   = ['Rectangle', 'Wedge', 'Circle', 'Line', 'Polygon'] #, 'Center'] 
         self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M']
         self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask]
 
         self.list_of_buts    = []
         self.list_of_io_buts = []
 
-        self.current_mode = self.list_of_modes[0]
+        self.fig.my_mode = self.list_of_modes[0]
         #self.current_form = self.list_of_forms[0]
         self.current_form = None
 
@@ -169,7 +171,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     def setButtonStyle(self):
         for but in self.list_of_buts :
             but_text = str(but.text()) 
-            if   but_text == self.current_mode : but.setStyleSheet (cp.styleButtonGood)
+            if   but_text == self.fig.my_mode : but.setStyleSheet (cp.styleButtonGood)
             elif but_text == self.current_form : but.setStyleSheet (cp.styleButtonGood)
             else                               : but.setStyleSheet (cp.styleButton)
  
@@ -214,45 +216,36 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.set_circles   .disconnect_objs()    
         self.set_centers   .disconnect_objs()    
         self.set_wedges    .disconnect_objs()    
+        self.set_polygons  .disconnect_objs()    
 
 
-    def on_but(self):
-        but = self.get_pushed_but()
-        msg = 'on_but ' + str(but.text())
-        logger.debug(msg, __name__ )
-        print msg
+    def connect_all(self):
+        self.set_lines     .connect_objs()    
+        self.set_rectangles.connect_objs()    
+        self.set_circles   .connect_objs()    
+        self.set_centers   .connect_objs()    
+        self.set_wedges    .connect_objs()    
+        self.set_polygons  .connect_objs()    
 
-        but_text = str(but.text())
-        if but_text in self.list_of_modes :
-            self.current_mode = but_text
-            self.fig.my_mode  = but_text
 
-            if self.current_mode == 'Zoom' :
-                self.widgimage.connectZoomMode()
-                self.disconnect_all()
-                self.current_form = None
-            else :
-                self.widgimage.disconnectZoomMode()
+    def disconnect_form(self, form='Line'):
+        if   form == 'Line'      : self.set_lines     .disconnect_objs()    
+        elif form == 'Rectangle' : self.set_rectangles.disconnect_objs()    
+        elif form == 'Circle'    : self.set_circles   .disconnect_objs()    
+        elif form == 'Center'    : self.set_centers   .disconnect_objs()    
+        elif form == 'Wedge'     : self.set_wedges    .disconnect_objs()    
+        elif form == 'Polygon'   : self.set_polygons  .disconnect_objs()    
+        else                     : pass
 
-        if but_text in self.list_of_forms :
 
-            if   self.current_form == 'Line'      : self.set_lines     .disconnect_objs()    
-            elif self.current_form == 'Rectangle' : self.set_rectangles.disconnect_objs()    
-            elif self.current_form == 'Circle'    : self.set_circles   .disconnect_objs()    
-            elif self.current_form == 'Center'    : self.set_centers   .disconnect_objs()    
-            elif self.current_form == 'Wedge'     : self.set_wedges    .disconnect_objs()    
-            else                                  : pass
-
-            self.current_form = but_text
-
-            if   self.current_form == 'Line'      : self.set_lines     .connect_objs()    
-            elif self.current_form == 'Rectangle' : self.set_rectangles.connect_objs()    
-            elif self.current_form == 'Circle'    : self.set_circles   .connect_objs()    
-            elif self.current_form == 'Center'    : self.set_centers   .connect_objs()    
-            elif self.current_form == 'Wedge'     : self.set_wedges    .connect_objs()    
-            else                                  : pass
-
-        self.setButtonStyle()
+    def connect_form(self, form='Line'):
+        if   form == 'Line'      : self.set_lines     .connect_objs()    
+        elif form == 'Rectangle' : self.set_rectangles.connect_objs()    
+        elif form == 'Circle'    : self.set_circles   .connect_objs()    
+        elif form == 'Center'    : self.set_centers   .connect_objs()    
+        elif form == 'Wedge'     : self.set_wedges    .connect_objs()    
+        elif form == 'Polygon'   : self.set_polygons  .connect_objs()    
+        else                     : pass
 
 
     def add_obj(self, str_of_pars) :
@@ -263,7 +256,40 @@ class MaskEditorButtons (QtGui.QWidget) :
         elif obj_type == 'Circle'    : self.set_circles   .add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Center'    : self.set_centers   .add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Wedge'     : self.set_wedges    .add_obj_for_str_of_pars(str_of_pars)    
+        elif obj_type == 'Polygon'   : self.set_polygons  .add_obj_for_str_of_pars(str_of_pars)
         else                         : pass
+
+
+    def on_but(self):
+        but = self.get_pushed_but()
+        msg = 'on_but ' + str(but.text())
+        logger.debug(msg, __name__ )
+        #print msg
+
+        but_text = str(but.text())
+        if but_text in self.list_of_modes :
+            self.fig.my_mode  = but_text # Sets mode for Drag objects
+
+            if self.fig.my_mode == 'Zoom' :
+                self.widgimage.connectZoomMode()
+                self.disconnect_all()
+                self.current_form = None
+            else :
+                self.widgimage.disconnectZoomMode()
+                #self.connect_all()
+                #self.current_form = None
+
+            #if self.fig.my_mode == 'Add' :
+            #    self.disconnect_all()
+
+
+        if but_text in self.list_of_forms :
+            self.disconnect_all()
+            #self.disconnect_form(self.current_form) # Disconnect objects for OLD form
+            self.current_form = but_text
+            self.connect_form(self.current_form)    # Connect objects for NEW form
+
+        self.setButtonStyle()
 
 
     def get_pushed_io_but(self):
@@ -352,13 +378,15 @@ class MaskEditorButtons (QtGui.QWidget) :
             if obj.isSelected : continue # Loop over ROI-type objects
             if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
             else                       : self.mask_total = np.logical_or(self.mask_total, obj.get_obj_mask(shape))
-            print 'mask for ROI-type object %i is ready...' % (i)
+            msg = 'mask for ROI-type object %i is ready...' % (i)
+            logger.info(msg, __name__ )
             
         for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
             if not obj.isSelected : continue # Loop over inversed objects
             if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
             else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
-            print 'mask for inversed object %i is ready...' % (i)            
+            msg = 'mask for inversed object %i is ready...' % (i)            
+            logger.info(msg, __name__ )
 
         return self.mask_total
 
@@ -375,7 +403,8 @@ class MaskEditorButtons (QtGui.QWidget) :
         return self.set_rectangles.get_list_of_objs() \
               +self.set_wedges    .get_list_of_objs() \
               +self.set_circles   .get_list_of_objs() \
-              +self.set_lines     .get_list_of_objs()
+              +self.set_lines     .get_list_of_objs() \
+              +self.set_polygons  .get_list_of_objs()
             #+self.set_centers
 
 

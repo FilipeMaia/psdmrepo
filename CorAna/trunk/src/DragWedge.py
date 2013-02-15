@@ -148,8 +148,8 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         self.set_ydata(yarr)
 
 
-    def get_xy_arrays_for_current_wedge(self) :
-        return self.get_xdata(), self.get_ydata()
+    #def get_xy_arrays_for_current_wedge(self) :
+    #    return self.get_xdata(), self.get_ydata()
 
 
     def get_xy_arrays_for_wedge(self,xc,yc,radius,width,theta1,theta2) :      
@@ -453,7 +453,8 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
     def get_poly_verts(self):
         """Creates a set of (closed) poly vertices for mask"""
-        xarr, yarr = self.get_xy_arrays_for_current_wedge()
+        #xarr, yarr = self.get_xy_arrays_for_current_wedge()
+        xarr, yarr = self.get_data()
         return zip(xarr, yarr)
 
 

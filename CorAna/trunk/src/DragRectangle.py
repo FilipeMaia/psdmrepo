@@ -236,7 +236,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-        if self.press != None : self.print_pars()
+        #if self.press != None : self.print_pars()
         if self.press != None : self.maskIsAvailable = False        
         self.press = None
 

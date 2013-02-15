@@ -14,6 +14,8 @@ class DragObjectSet :
         self.fig.my_mode   = None  # Mode for interaction between fig and obj
         self.use_xyc       = use_xyc
 
+        self.new_obj       = None
+
         self.list_of_objs  = []
 
         self.connect_objs()
@@ -102,25 +104,30 @@ class DragObjectSet :
     def on_mouse_press(self, event) :
         """Responds on mouse signals and do the object initialization for the mode Add
         """
-        #x = (event.xdata, event.xdata+1)
-        #y = (event.ydata, event.ydata+1)
-        #print 'TestDragRectangle : on_mouse_press(...), xy =', xy        
-        if self.fig.my_mode  == 'Add' :
+        #x,y = (event.xdata, event.xdata+1)
+
+        if self.fig.my_mode == 'Add' :
+
+            # This check is required for multi-click objects like polygon
+            # It should not create new object until previous is completely initializad
+            if self.new_obj != None : 
+                if not self.new_obj.isInitialized : return
+
             if event.button != 1 : return # if other than Left mouse button
             #print 'mode=', self.fig.my_mode
             if self.is_single_obj and len(self.list_of_objs) > 0 :
                 print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
                 return
-            if self.use_xyc : obj = self.ObjectType(xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
-            else            : obj = self.ObjectType() # Creates the draggable object with 1st vertex in xy
+            if self.use_xyc : self.new_obj = self.ObjectType(xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
+            else            : self.new_obj = self.ObjectType() # Creates the draggable object with default pars, which will be set dynamically
 
-            add_obj_to_axes(obj, self.axes, self.list_of_objs)
-            obj.on_press(event)                                                    # <<<==========================
+            add_obj_to_axes(self.new_obj, self.axes, self.list_of_objs)
+            self.new_obj.on_press(event)                        # <<<==========================
 
 
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
         print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
-        obj.print_pars()
+        #obj.print_pars()
         #====================== REMOVE OBJECT =================================================
         # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK OR PROGRAM CALL
         # SIGNAL ABOUT REMOVAL SHOULD BE SENT FROM HERE
@@ -161,7 +168,6 @@ class DragObjectSet :
         for obj in self.list_of_objs :
             print 'ind=', self.list_of_objs.index(obj),':',
             obj.print_pars()
-
 
 #-----------------------------
 #-----------------------------
