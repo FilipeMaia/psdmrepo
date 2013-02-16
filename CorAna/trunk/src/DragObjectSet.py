@@ -2,6 +2,7 @@
 #-----------------------------
 from Drag import * # for access to global methods like add_obj_to_axes(...)
 
+from PyQt4 import QtGui, QtCore # For ability to override cursor...
 
 class DragObjectSet : 
 
@@ -36,7 +37,7 @@ class DragObjectSet :
     def connect_objs(self) :
         self.cid_press  =self.fig.canvas.mpl_connect('button_press_event',   self.on_mouse_press)    # for Add mode
         self.cid_release=self.fig.canvas.mpl_connect('button_release_event', self.on_mouse_release)  # for Remove
-        #self.cid_motion =self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)   # For Remove (at the end)
+        self.cid_motion =self.fig.canvas.mpl_connect('motion_notify_event',  self.on_mouse_motion)   # For Remove (at the end)
         for obj in self.list_of_objs :
             obj.connect()
 
@@ -44,7 +45,7 @@ class DragObjectSet :
     def disconnect_objs(self):
         self.fig.canvas.mpl_disconnect(self.cid_press)
         self.fig.canvas.mpl_disconnect(self.cid_release)
-        #self.fig.canvas.mpl_disconnect(self.cid_motion)
+        self.fig.canvas.mpl_disconnect(self.cid_motion)
 
         for obj in self.list_of_objs :
             obj.disconnect()
@@ -79,6 +80,17 @@ class DragObjectSet :
         print '\n\nUse keyboard to select the mode: \nA=ADD, \nM=MARK, \nD=REMOVE SELECTED, \nR=REMOVE, \nN=NONE, \nW=PRINT list'
 
 
+
+    def override_cursor(self, contains):
+        if contains :
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        else :
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+        #QtCore.Qt.PointingHandCursor,    
+        #QtCore.Qt.SizeAllCursor
+
+
+
     def on_key_press(self, event) :
         """Responds on keyboard signals and switch the fig.my_mode
            It also prints the list of objects for key W.
@@ -91,6 +103,15 @@ class DragObjectSet :
         elif event.key == 'd': self.remove_selected_objs_from_img_by_call()
         else                 : self.print_mode_keys()
         print '\nCurrent mode:', self.fig.my_mode
+
+
+    def on_mouse_motion(self, event) :
+        # Change cursor for fun...
+        for obj in self.list_of_objs :
+            if obj.obj_contains_cursor(event) :
+                self.override_cursor(True)
+                return
+        self.override_cursor(False)
 
 
     def on_mouse_release(self, event) :
@@ -126,7 +147,7 @@ class DragObjectSet :
 
 
     def send_signal_and_remove_object_from_list(self, obj, list_of_objs, remove_type) :
-        print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
+        #print 'Object is removing from the list. ACT HERE !!!, remove_type=', remove_type
         #obj.print_pars()
         #====================== REMOVE OBJECT =================================================
         # THIS IS A PLACE TO REMOVE EVERYTHING ASSOCIATED WITH OBJECT AFTER CLICK OR PROGRAM CALL
@@ -150,7 +171,7 @@ class DragObjectSet :
     def remove_selected_objs_from_img_by_call(self) :
         """Loop over list of objects and remove selected from the image USING CALL from code.
         """
-        print 'remove_selected_objs_from_img_by_call()'
+        #print 'remove_selected_objs_from_img_by_call()'
 
         initial_list_of_objs = list(self.list_of_objs)
         for obj in initial_list_of_objs :

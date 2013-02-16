@@ -281,7 +281,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
 
 
     def on_press(self, event):
-        'on button press we will see if the mouse is over us and store some data'
+        """on button press we will see if the mouse is over us and store some data"""
         if event.inaxes != self.axes: return
 
         clickxy = click_x, click_y = event.xdata, event.ydata
@@ -300,7 +300,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
             #if not self.contains(event) : return
             if not self.my_contains(click_r, click_theta, theta1, theta2, dtpick) : return
 
-            self.print_pars()
+            #self.print_pars()
             #print 'x,y,r,w,t1,t2,dtpick,click_theta,_r = ', x,y,r,w,t1,t2,dtpick, click_theta, click_r
             #self.set_center(clickxy) 
 

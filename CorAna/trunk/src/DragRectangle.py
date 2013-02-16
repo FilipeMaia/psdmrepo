@@ -80,6 +80,10 @@ class DragRectangle( Drag, patches.Rectangle ) :
         print 't,x,y,w,h,lw,col,s,r =', self.get_str_of_pars()
 
 
+    def obj_contains_cursor(self, event): # Overrides method in Drag
+        return self.my_contains(event)
+
+
     def my_contains(self, event):
         x,y = event.xdata, event.ydata
         x0  = self.get_x()

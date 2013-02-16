@@ -86,6 +86,10 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
         print 't,x,y,r0,lw,col,s,r =', self.get_str_of_pars()
 
 
+    def obj_contains_cursor(self, event): # Overrides method in Drag
+        return False
+
+
     def on_press(self, event):
         'on button press we will see if the mouse is over us and store some data'
         if event.inaxes != self.axes: return

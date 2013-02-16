@@ -11,17 +11,18 @@ from Drag import *
 
 class DragPolygon( Drag, lines.Line2D ) :
 
-    def __init__(self, x=None, y=None, linewidth=2, color='b', picker=10, linestyle='-', str_of_pars=None) :
+    def __init__(self, x=None, y=None, linewidth=2, color='b', picker=5, linestyle='-', str_of_pars=None) :
 
-        Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
+        Drag.__init__(self, linewidth, color, linestyle, my_type='Polygon')
 
         if str_of_pars != None : # Initialization for input from file
-            x1,x2,y1,y2,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
+            t,lw,col,s,r,nvtx,self.xarr,self.yarr = self.parse_str_of_pars(str_of_pars)
             self.isSelected    = s
             self.myType        = t
             self.isRemoved     = r
             self.isInitialized = True
-            lines.Line2D.__init__(self, (x1,x2), (y1,y2), linewidth=lw, color=col, picker=picker)
+            lines.Line2D.__init__(self, self.xarr, self.yarr, linewidth=lw, color=col, picker=picker)
+            #self.print_pars()
 
         elif x == None or y == None : # Default line initialization
             x0=y0=(0,0)
@@ -43,40 +44,42 @@ class DragPolygon( Drag, lines.Line2D ) :
     #    self.set_linestyle('--') #'--', ':'
 
     def get_list_of_pars(self) :
-        x1  = int( self.get_xdata()[0] )
-        x2  = int( self.get_xdata()[1] )
-        y1  = int( self.get_ydata()[0] )
-        y2  = int( self.get_ydata()[1] )
+        xarr, yarr = self.get_data()
+        nvtx1      = len(xarr)
         lw  = int( self.get_linewidth() ) 
-        #col =      self.get_color() 
         col = self.myCurrentColor
         s   = self.isSelected
         t   = self.myType
         r   = self.isRemoved
-        return (x1,x2,y1,y2,lw,col,s,t,r)
+        return (t,lw,col,s,r,nvtx1,xarr,yarr)
+
 
     def parse_str_of_pars(self, str_of_pars) :
         pars = str_of_pars.split()
-        #print 'pars:', pars
-        t   = pars[0]
-        x1  = float(pars[1])
-        x2  = float(pars[2])
-        y1  = float(pars[3])
-        y2  = float(pars[4])
-        lw  = int(pars[5])
-        col = str(pars[6])
-        s   = self.dicBool[pars[7].lower()]
-        r   = self.dicBool[pars[8].lower()]
-        return (x1,x2,y1,y2,lw,col,s,t,r)
+        #print 'parse_str_of_pars:', pars
+        t    = pars[0]
+        lw   = int(pars[1])
+        col  = str(pars[2])
+        s    = self.dicBool[pars[3].lower()]
+        r    = self.dicBool[pars[4].lower()]
+        nvtx1= int(pars[5])
+        xarr = [float(pars[i+6])       for i in range(nvtx1)]
+        yarr = [float(pars[i+6+nvtx1]) for i in range(nvtx1)]
+        return (t,lw,col,s,r,nvtx1,xarr,yarr)
 
 
     def get_str_of_pars(self) :
-        x1,x2,y1,y2,lw,col,s,t,r = self.get_list_of_pars()
-        return '%s %7.2f %7.2f %7.2f %7.2f %d %s %s %s' % (t,x1,x2,y1,y2,lw,col,s,r)
+        t,lw,col,s,r,nvtx1,xarr,yarr = self.get_list_of_pars()
+        str_of_pars = '%s %d %s %s %s %d ' % (t,lw,col,s,r,nvtx1)
+        str_of_xarr = ''
+        str_of_yarr = ''
+        for x in xarr : str_of_xarr+='%7.2d ' % (x)
+        for y in yarr : str_of_yarr+='%7.2d ' % (y)
+        return str_of_pars + str_of_xarr + str_of_yarr
 
 
     def print_pars(self) :
-        print 't,x1,x2,y1,y2,lw,col,s,r =', self.get_str_of_pars()
+        print 't,lw,col,s,r,nvtx1,xarr,yarr =', self.get_str_of_pars()
 
 
     def on_press(self, event):
@@ -118,11 +121,11 @@ class DragPolygon( Drag, lines.Line2D ) :
 
             
             # Try to prevent double-clicks
-            if self.vtx>1 and clickxy == (self.xarr[self.vtx-1], self.yarr[self.vtx-1]) : return
+            #if self.vtx>1 and clickxy == (self.xarr[self.vtx-1], self.yarr[self.vtx-1]) : return
 
             self.vtx += 1
-            self.xarr.append(clickxy[0]) # take it twise, will be changed...
-            self.yarr.append(clickxy[1])
+            self.xarr.append(clickxy[0]+1) # take it twise, will be changed...
+            self.yarr.append(clickxy[1]+1)
 
             self.press = clickxy, clickxy
 
@@ -131,8 +134,9 @@ class DragPolygon( Drag, lines.Line2D ) :
 
     def on_motion(self, event):
         """on motion we will move the rect if the mouse is over us"""
-        if self.press is None: return
         if event.inaxes != self.axes: return
+
+        if self.press is None: return
 
         #print 'event on_moution', self.get_xydata()
         currentxy = event.xdata, event.ydata

@@ -90,6 +90,15 @@ class Drag () : # ( QtCore.QObject )
         return max(dx,dy)
 
 
+    def obj_contains_cursor(self, event):
+        if event.inaxes != self.axes: return False
+
+        if self.isInitialized : 
+            contains, attrd = self.contains(event)
+            if contains : return True
+        return False
+
+
     def save_obj_properties(self) :
         #print 'save_line_properties',
         #self.myColor = self.get_color()
@@ -146,10 +155,10 @@ class Drag () : # ( QtCore.QObject )
 
         if  self.isSelected == False :
             self.isSelected =  True
-            print 'object IS SELECTED'
+            #print 'object IS SELECTED'
         else:
             self.isSelected =  False
-            print 'object IS DESELECTED'
+            #print 'object IS DESELECTED'
 
 
     def set_select_deselect_color(self, color='w') :

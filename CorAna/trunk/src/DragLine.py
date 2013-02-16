@@ -24,8 +24,7 @@ class DragLine( Drag, lines.Line2D ) :
             lines.Line2D.__init__(self, (x1,x2), (y1,y2), linewidth=lw, color=col, picker=picker)
 
         elif x == None or y == None : # Default line initialization
-            x0=y0=(0,0)
-            lines.Line2D.__init__(self, x0, y0, linewidth=linewidth, color=color, picker=picker)
+            lines.Line2D.__init__(self, (0,1), (0,1), linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
         else :
             lines.Line2D.__init__(self,  x,  y, linewidth=linewidth, color=color, picker=picker)
@@ -78,6 +77,10 @@ class DragLine( Drag, lines.Line2D ) :
         print 't,x1,x2,y1,y2,lw,col,s,r =', self.get_str_of_pars()
 
 
+    #def obj_contains_cursor(self, event):
+    #    return False
+
+
     def on_press(self, event):
         'on button press we will see if the mouse is over us and store some data'
         if event.inaxes != self.axes: return
@@ -124,6 +127,7 @@ class DragLine( Drag, lines.Line2D ) :
         dy = currentxy[1] - clickxy[1]
 
         xy = copy.deepcopy(xy0)
+        #(x1,y1),(x2,y2) = xy0
 
         if event.button is 3 and self.isInitialized : # for left mouse button
             xy[0][0] += dx
@@ -131,10 +135,24 @@ class DragLine( Drag, lines.Line2D ) :
             xy[1][0] += dx
             xy[1][1] += dy
 
+            #x1 += dx
+            #y1 += dy
+            #x2 += dx
+            #y2 += dy
+
         if event.button is 1 or not self.isInitialized: # for right mouse button
             xy[vertindex][0] += dx
             xy[vertindex][1] += dy
 
+            #if vertindex == 0 :
+            #    x1 += dx
+            #    y1 += dy
+            #if vertindex == 1 :
+            #    x2 += dx
+            #    y2 += dy
+            #if x1==x2 : x2+=1 # protection against double-click
+
+        #self.set_data((x1,x2),(y1,y2))
         self.set_data([[xy[0][0], xy[1][0]],[xy[0][1], xy[1][1]]])
 
         self.on_motion_graphic_manipulations()
