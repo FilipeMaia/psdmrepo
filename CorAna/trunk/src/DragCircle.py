@@ -41,15 +41,6 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
         self.press    = None
 
 
-    #def contains(self, event):
-    #    clickxy  = event.xdata, event.ydata
-    #    xy0 = self.center
-    #    r0  = self.get_radius()
-    #    if abs(self.distance(clickxy,xy0) - r0) < self.myPicker :
-    #        return True
-    #    else :
-    #        return False
-
     def get_list_of_pars(self) :
         xc,yc = self.center
         x,y = (int(xc), int(yc))
@@ -87,7 +78,21 @@ class DragCircle( Drag, patches.Circle ) :  #patches.CirclePolygon
 
 
     def obj_contains_cursor(self, event): # Overrides method in Drag
-        return False
+        if not self.isInitialized   : return False
+        if event.inaxes != self.axes: return False
+        return self.my_contains(event)
+        #return False
+
+
+    def my_contains(self, event):
+        clickxy  = event.xdata, event.ydata
+        xy0 = self.center
+        r0  = self.get_radius()
+        if abs(self.distance(clickxy,xy0) - r0) < self.myPicker :
+            return True
+        else :
+            return False
+
 
 
     def on_press(self, event):

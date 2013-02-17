@@ -108,6 +108,8 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
 
     def obj_contains_cursor(self, event): # Overrides method in Drag
+        if not self.isInitialized   : return False
+        if event.inaxes != self.axes: return False
         return self.my_contains(event)
 
 
