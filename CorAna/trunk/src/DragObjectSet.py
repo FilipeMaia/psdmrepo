@@ -6,7 +6,7 @@ from PyQt4 import QtGui, QtCore # For ability to override cursor...
 
 class DragObjectSet : 
 
-    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False, use_xyc=False) :
+    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False, use_xyc=False, lw=2, col='b', picker=8) :
 
         self.ObjectType    = ObjectType
         self.axes          = axes
@@ -14,15 +14,19 @@ class DragObjectSet :
         self.is_single_obj = is_single_obj
         self.fig.my_mode   = None  # Mode for interaction between fig and obj
         self.use_xyc       = use_xyc
-
+        self.lw            = lw
+        self.col           = col
+        self.picker        = picker
         self.new_obj       = None
+
+        #print 'lw,col,picker=', lw, col, picker
 
         self.list_of_objs  = []
 
         self.connect_objs()
 
         if useKeyboard :
-            self.fig.canvas.mpl_connect('key_press_event',      self.on_key_press)      # for test only
+            self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)      # for test only
             self.print_mode_keys()
 
 
@@ -59,8 +63,10 @@ class DragObjectSet :
         if self.is_single_obj and len(self.list_of_objs) > 0 :
             print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
             return
-        if self.use_xyc : obj = self.ObjectType(str_of_pars=str_of_pars, xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
-        else            : obj = self.ObjectType(str_of_pars=str_of_pars) # Creates the draggable object with 1st vertex in xy
+        # Creates the draggable object with 1st vertex in xy
+        # else Creates the draggable object with 1st vertex in xy
+        if self.use_xyc : obj = self.ObjectType(str_of_pars=str_of_pars, linewidth=self.lw, color=self.col, picker=self.picker, xy=self.fig.my_xyc)
+        else            : obj = self.ObjectType(str_of_pars=str_of_pars, linewidth=self.lw, color=self.col, picker=self.picker)
         add_obj_to_axes(obj, self.axes, self.list_of_objs)        
 
 
@@ -139,8 +145,8 @@ class DragObjectSet :
             if self.is_single_obj and len(self.list_of_objs) > 0 :
                 print 'WARNING ! This is a singleton. One object is already in the list. Request to add more object(s) is ignored.'
                 return
-            if self.use_xyc : self.new_obj = self.ObjectType(xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
-            else            : self.new_obj = self.ObjectType() # Creates the draggable object with default pars, which will be set dynamically
+            if self.use_xyc : self.new_obj = self.ObjectType(linewidth=self.lw, color=self.col, picker=self.picker, xy=self.fig.my_xyc) # Creates the draggable object with 1st vertex in xy
+            else            : self.new_obj = self.ObjectType(linewidth=self.lw, color=self.col, picker=self.picker) # Creates the draggable object with default pars, which will be set dynamically
 
             add_obj_to_axes(self.new_obj, self.axes, self.list_of_objs)
             self.new_obj.on_press(event)                        # <<<==========================

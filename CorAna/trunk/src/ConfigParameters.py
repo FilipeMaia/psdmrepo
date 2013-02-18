@@ -315,6 +315,13 @@ def usage() :
 #---------------------------------------
 
 def getConfigFileFromInput() :
+    """DO NOT PARSE INPUT PARAMETERS IN THIS APPLICATION
+    This is interfere with other applications which really need to use input pars,
+    for example maskeditor...
+    """
+
+    return None
+
 
     msg = 'Input pars sys.argv: '
     for par in sys.argv :  msg += par

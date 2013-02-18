@@ -11,9 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2013-02-15 Mikhail S. Dubrovin
+2013-02-18 Mikhail S. Dubrovin
+A         app/med                  2013-02-18
 A         src/DragPolygon.py       2013-02-15
-
 A         src/MaskEditor.py        2013-02-08
 A         src/MaskEditorButtons.py
 A         src/DragRectangle.py

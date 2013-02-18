@@ -59,7 +59,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None):
+    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None, lw=2, col='b', picker=5):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -75,6 +75,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         self.widgimage = widgimage
 
+
         if widgimage != None :
             self.fig        = self.widgimage.fig
             self.axes       = self.widgimage.get_axim()
@@ -84,18 +85,29 @@ class MaskEditorButtons (QtGui.QWidget) :
 
             print 'Image center: ', self.fig.my_xyc
 
-            self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False)
-            self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False, use_xyc=True)
-            self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False)
-            self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False)
-            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, is_single_obj=True)
-            self.set_polygons   = DragObjectSet(self.fig, self.axes, DragPolygon,   useKeyboard=False)
+            self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False, lw=lw, col=col, picker=picker)
+            self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False, lw=lw, col=col, picker=picker, use_xyc=True)
+            self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False, lw=lw, col=col, picker=picker)
+            self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False, lw=lw, col=col, picker=picker)
+            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, lw=lw, col=col, picker=picker, is_single_obj=True)
+            self.set_polygons   = DragObjectSet(self.fig, self.axes, DragPolygon,   useKeyboard=False, lw=lw, col=col, picker=picker)
             self.disconnect_all()
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
         self.list_of_forms   = ['Rectangle', 'Wedge', 'Circle', 'Line', 'Polygon'] #, 'Center'] 
         self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M']
+        self.list_of_io_tips = ['Load image for \ndisplay from file',
+                                'Load forms of masked \nregions from file',
+                                'Save forms of masked \nregions in text file',
+                                'Save mask as a 2D array \nof ones and zeros in text file',
+                                'Save inversed-mask as a 2D array\n of ones and zeros in text file']
+
         self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask]
+
+        zoom_tip_msg = 'Zoom mode for image and spactrom.' + \
+                       '\nZoom-in image: left mouse button click-drug-release.' + \
+                       '\nZoom-in spectrum: left/right mouse button click for min/max limit.' + \
+                       '\nReset to full size: middle mouse button click.'
 
         self.list_of_buts    = []
         self.list_of_io_buts = []
@@ -115,6 +127,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.list_of_buts.append(but)
             self.vbox.addWidget(but)
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
+            but.setToolTip('Select form to draw on image \nas ROI or masked region')
 
         self.vbox.addStretch(1)
         self.vbox.addWidget(self.tit_modes)
@@ -123,14 +136,18 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.list_of_buts.append(but)
             self.vbox.addWidget(but)
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_but)
+            if   mode == 'Zoom'   : but.setToolTip(zoom_tip_msg)
+            elif mode == 'Select' : but.setToolTip('Select forms for inversed masking. \nSelected forms are marked by different color')
+            else                  : but.setToolTip('Select mode of manipulation with form')
 
         self.vbox.addStretch(1)
         self.vbox.addWidget(self.tit_io)
-        for io_tit in self.list_of_io_tits :
+        for io_tit, io_tip in zip(self.list_of_io_tits, self.list_of_io_tips) :
             but = QtGui.QPushButton(io_tit)
             self.list_of_io_buts.append(but)
             self.vbox.addWidget(but)
             self.connect(but, QtCore.SIGNAL('clicked()'), self.on_io_but)
+            but.setToolTip(io_tip)
 
         self.vbox.addStretch(1)
         self.setLayout(self.vbox)

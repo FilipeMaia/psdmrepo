@@ -44,7 +44,8 @@ class GUIHelp ( QtGui.QWidget ) :
 
         self.setGeometry(100, 100, 730, 200)
         self.setWindowTitle('GUI Help')
-        self.setWindowIcon(cp.icon_help)
+        try : self.setWindowIcon(cp.icon_help)
+        except : pass
         self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()
@@ -66,7 +67,7 @@ class GUIHelp ( QtGui.QWidget ) :
         
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
  
-        self.startFileBrowser(msg)
+        self.setHelpMessage(msg)
 
         self.showToolTips()
         self.setStyle()
@@ -130,8 +131,8 @@ class GUIHelp ( QtGui.QWidget ) :
         self.close()
 
 
-    def startFileBrowser(self, msg) :
-        logger.debug('Start the GUIHelp.',__name__)
+    def setHelpMessage(self, msg) :
+        logger.debug('Set help message',__name__)
         self.box_txt.setText(msg)
         self.setStatus(0, 'Status: show help info...')
 
@@ -150,8 +151,9 @@ class GUIHelp ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIHelp ()
-    widget.show()
+    w = GUIHelp()
+    w.setHelpMessage('This is a test message to test methods of GUIHelp...')
+    w.show()
     app.exec_()
 
 #-----------------------------

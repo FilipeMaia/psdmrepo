@@ -64,7 +64,7 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor'):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=2, col='b', picker=8):
         """List of input parameters:
         @param parent  parent window is used to open other window moved w.r.t. parent.
         @param arr     2D array for image. If None then image will be taken from file or generated as random.
@@ -91,7 +91,7 @@ class MaskEditor (QtGui.QWidget) :
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker)
  
         #---------------------
 
