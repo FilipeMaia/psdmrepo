@@ -112,6 +112,10 @@ class DragObjectSet :
 
 
     def on_mouse_motion(self, event) :
+        #===========================
+        #return # In order to get rid of dependence on PyQt for self test
+        #===========================
+
         # Change cursor for fun...
         for obj in self.list_of_objs :
             if obj.obj_contains_cursor(event) :

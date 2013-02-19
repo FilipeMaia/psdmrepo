@@ -149,7 +149,7 @@ class DragPolygon( Drag, lines.Line2D ) :
             dy = currentxy[1] - y0
 
             # Move a single vertex
-            if event.button is 1 and self.isInitialized: # for left mouse button
+            if event.button is 1 : # for left mouse button
                 self.xarr[self.vtx] = xv + dx
                 self.yarr[self.vtx] = yv + dy
 

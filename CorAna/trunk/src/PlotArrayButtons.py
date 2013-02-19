@@ -48,7 +48,7 @@ class PlotArrayButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ofname='./fig.png'):
+    def __init__(self, parent=None, widgimage=None, ofname='./fig.png', help_msg=None):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -64,6 +64,9 @@ class PlotArrayButtons (QtGui.QWidget) :
             self.widgimage.logIsOn  = False
         else :
             self.widgimage = widgimage
+
+        if help_msg==None : self.help_msg = self.help_message()
+        else              : self.help_msg = help_msg
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -251,7 +254,7 @@ class PlotArrayButtons (QtGui.QWidget) :
             self.guihelp.close()
             del self.guihelp
         except :
-            self.guihelp = GUIHelp(None,self.help_message())
+            self.guihelp = GUIHelp(None, self.help_msg)
             #self.guihelp.setMinimumSize(600,150) 
             self.guihelp.setFixedSize(610,130) 
             try   : self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 

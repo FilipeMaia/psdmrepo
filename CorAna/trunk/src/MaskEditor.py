@@ -90,7 +90,7 @@ class MaskEditor (QtGui.QWidget) :
         self.title  = title
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
-        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
+        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname, help_msg=self.help_message())
         self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker)
  
         #---------------------
@@ -157,6 +157,31 @@ class MaskEditor (QtGui.QWidget) :
 
         #print 'Close application'
 
+    def help_message(self):
+        msg  = 'Mouse control buttons for Mask Editor:' + \
+               '\n' + '='*38 +\
+               '\n' + \
+               '\n"Zoom" mode - serves to zoom-in image and to set limits for spectrum.' + \
+               '\nZoom-in image: left mouse button click-drug-release for desired region of image.' + \
+               '\nSet limits for spectrum: left/right mouse button click on desired min/max limit.' + \
+               '\nReset to full size: middle mouse button click or "Reset" button' + \
+               '\n' + \
+               '\n"Add" mode - adds new form to shape mask on image: ' + \
+               '\nIn the "Add" mode for Rectangle, Wedge, Circle and Line use left mouse button click-drug-release,' + \
+               '\nfor Polygon use left mouse button click to add each next vertex and right mouse button click for last vertex' + \
+               '\n' + \
+               '\n"Select" mode - select forms are for inverse regions in mask.' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n' + \
+               '\n'
+
+        return msg
 
 #-----------------------------
 # Test

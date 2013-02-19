@@ -11,7 +11,7 @@ from Drag import *
 
 class DragLine( Drag, lines.Line2D ) :
 
-    def __init__(self, x=None, y=None, linewidth=2, color='b', picker=5, linestyle='-', str_of_pars=None) :
+    def __init__(self, x=None, y=None, linewidth=1, color='b', picker=8, linestyle='-', str_of_pars=None) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
 
@@ -33,6 +33,8 @@ class DragLine( Drag, lines.Line2D ) :
         self.set_pickradius(picker)
         self.press    = None
         self.myPicker = picker
+        self.vtx      = 0
+
 
 
     #def set_dragged_obj_properties(self):
@@ -41,17 +43,14 @@ class DragLine( Drag, lines.Line2D ) :
     #    self.set_linestyle('--') #'--', ':'
 
     def get_list_of_pars(self) :
-        x1  = int( self.get_xdata()[0] )
-        x2  = int( self.get_xdata()[1] )
-        y1  = int( self.get_ydata()[0] )
-        y2  = int( self.get_ydata()[1] )
+        xarr, yarr = self.get_data()
         lw  = int( self.get_linewidth() ) 
         #col =      self.get_color() 
         col = self.myCurrentColor
         s   = self.isSelected
         t   = self.myType
         r   = self.isRemoved
-        return (x1,x2,y1,y2,lw,col,s,t,r)
+        return (xarr[0],xarr[1],yarr[0],yarr[1],lw,col,s,t,r)
 
     def parse_str_of_pars(self, str_of_pars) :
         pars = str_of_pars.split()
@@ -86,20 +85,23 @@ class DragLine( Drag, lines.Line2D ) :
         if event.inaxes != self.axes: return
 
         clickxy = event.xdata, event.ydata
-        #print 'clickxy =',clickxy
 
         if self.isInitialized :
             contains, attrd = self.contains(event)
-            #contains = self.contains(event)
             if not contains: return
 
-            xy0 = self.get_xydata()
-            #print 'event contains: xy0[0], xy0[1]', xy0[0], xy0[1]
-            if self.distance(clickxy,xy0[0]) < self.distance(clickxy,xy0[1]) :
-                vertindex = 0
-            else :
-                vertindex = 1
-            self.press = xy0, clickxy, vertindex
+            xarr, yarr = self.get_data()
+            self.dx_prev, self.dy_prev = 0, 0
+
+            # find vertex closest to the click
+            self.dist_min=10000
+            for ind, xy in enumerate(zip(xarr,yarr)) :
+                dist = self.max_deviation(clickxy, xy)
+                if dist < self.dist_min :
+                    self.dist_min = dist
+                    self.vtx = ind
+
+            self.press = clickxy, (xarr[self.vtx], yarr[self.vtx])
 
             #----Remove object at click on middle mouse botton
             if event.button is 2 : # for middle mouse button
@@ -107,54 +109,59 @@ class DragLine( Drag, lines.Line2D ) :
                 return
 
         else : # if the line position is not defined yet:
-            vertindex = 1
-            xy0 = [event.xdata, event.ydata], [event.xdata, event.ydata]
-            self.press = xy0, clickxy, vertindex
+
+            if self.vtx == 0 :
+                self.xarr = [clickxy[0]]
+                self.yarr = [clickxy[1]]
+            
+            # Try to prevent double-clicks
+            #if self.vtx>1 and clickxy == (self.xarr[self.vtx-1], self.yarr[self.vtx-1]) : return
+
+            self.vtx += 1
+            self.xarr.append(clickxy[0]+1) # take it twise, will be changed...
+            self.yarr.append(clickxy[1]+1)
+
+            self.press = clickxy, clickxy
 
         self.on_press_graphic_manipulations()
 
 
     def on_motion(self, event):
         'on motion we will move the rect if the mouse is over us'
-        if self.press is None: return
         if event.inaxes != self.axes: return
+        if self.press is None: return
 
         #print 'event on_moution', self.get_xydata()
         currentxy = event.xdata, event.ydata
 
-        xy0, clickxy, vertindex = self.press
-        dx = currentxy[0] - clickxy[0]
-        dy = currentxy[1] - clickxy[1]
+        (x0, y0), (xv, yv) = self.press
 
-        xy = copy.deepcopy(xy0)
-        #(x1,y1),(x2,y2) = xy0
+        dx = currentxy[0] - x0
+        dy = currentxy[1] - y0
 
-        if event.button is 3 and self.isInitialized : # for left mouse button
-            xy[0][0] += dx
-            xy[0][1] += dy
-            xy[1][0] += dx
-            xy[1][1] += dy
+        # Move/edit line
+        if self.isInitialized : 
+            # Move a single vertex
+            if event.button is 1 : # for left mouse button
+                self.xarr[self.vtx] = xv + dx
+                self.yarr[self.vtx] = yv + dy
 
-            #x1 += dx
-            #y1 += dy
-            #x2 += dx
-            #y2 += dy
+            # Move entire lane
+            if event.button is 3 : # for right mouse button
+                for vi in range(len(self.xarr)) :
+                    self.xarr[vi] += dx - self.dx_prev
+                    self.yarr[vi] += dy - self.dy_prev
 
-        if event.button is 1 or not self.isInitialized: # for right mouse button
-            xy[vertindex][0] += dx
-            xy[vertindex][1] += dy
+                self.dx_prev, self.dy_prev = dx, dy
+            
+ 
+        # Draw continuation of the line to the next (moving) point
+        else : # not initialized 
+            self.xarr[self.vtx] = currentxy[0]
+            self.yarr[self.vtx] = currentxy[1]
+            #print 'self.xarr:',self.xarr
 
-            #if vertindex == 0 :
-            #    x1 += dx
-            #    y1 += dy
-            #if vertindex == 1 :
-            #    x2 += dx
-            #    y2 += dy
-            #if x1==x2 : x2+=1 # protection against double-click
-
-        #self.set_data((x1,x2),(y1,y2))
-        self.set_data([[xy[0][0], xy[1][0]],[xy[0][1], xy[1][1]]])
-
+        self.set_data(self.xarr, self.yarr)
         self.on_motion_graphic_manipulations()
 
 

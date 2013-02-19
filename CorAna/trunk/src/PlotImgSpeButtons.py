@@ -50,7 +50,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ofname='./fig.png'):
+    def __init__(self, parent=None, widgimage=None, ofname='./fig.png', help_msg=None):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -61,6 +61,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
         self.widgimage = widgimage
         self.fig       = widgimage.fig
+
+        if help_msg==None : self.help_msg = self.help_message()
+        else              : self.help_msg = help_msg
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -254,8 +257,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
             self.guihelp.close()
             del self.guihelp
         except :
-            self.guihelp = GUIHelp(None,self.help_message())
-            self.guihelp.setFixedSize(620,160) 
+            self.guihelp = GUIHelp(None, self.help_msg)
+            self.guihelp.setFixedSize(620, 160) 
             self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
             self.guihelp.show()
 

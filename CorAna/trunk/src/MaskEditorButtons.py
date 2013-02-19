@@ -89,7 +89,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False, lw=lw, col=col, picker=picker, use_xyc=True)
             self.set_rectangles = DragObjectSet(self.fig, self.axes, DragRectangle, useKeyboard=False, lw=lw, col=col, picker=picker)
             self.set_circles    = DragObjectSet(self.fig, self.axes, DragCircle,    useKeyboard=False, lw=lw, col=col, picker=picker)
-            self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, lw=lw, col=col, picker=picker, is_single_obj=True)
+            #self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, lw=lw, col=col, picker=picker, is_single_obj=True)
             self.set_polygons   = DragObjectSet(self.fig, self.axes, DragPolygon,   useKeyboard=False, lw=lw, col=col, picker=picker)
             self.disconnect_all()
             
@@ -231,27 +231,27 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.set_lines     .disconnect_objs()    
         self.set_rectangles.disconnect_objs()    
         self.set_circles   .disconnect_objs()    
-        self.set_centers   .disconnect_objs()    
         self.set_wedges    .disconnect_objs()    
         self.set_polygons  .disconnect_objs()    
+        #self.set_centers   .disconnect_objs()    
 
 
     def connect_all(self):
         self.set_lines     .connect_objs()    
         self.set_rectangles.connect_objs()    
         self.set_circles   .connect_objs()    
-        self.set_centers   .connect_objs()    
         self.set_wedges    .connect_objs()    
         self.set_polygons  .connect_objs()    
+        #self.set_centers   .connect_objs()    
 
 
     def disconnect_form(self, form='Line'):
         if   form == 'Line'      : self.set_lines     .disconnect_objs()    
         elif form == 'Rectangle' : self.set_rectangles.disconnect_objs()    
         elif form == 'Circle'    : self.set_circles   .disconnect_objs()    
-        elif form == 'Center'    : self.set_centers   .disconnect_objs()    
         elif form == 'Wedge'     : self.set_wedges    .disconnect_objs()    
         elif form == 'Polygon'   : self.set_polygons  .disconnect_objs()    
+        #elif form == 'Center'    : self.set_centers   .disconnect_objs()    
         else                     : pass
 
 
@@ -259,9 +259,9 @@ class MaskEditorButtons (QtGui.QWidget) :
         if   form == 'Line'      : self.set_lines     .connect_objs()    
         elif form == 'Rectangle' : self.set_rectangles.connect_objs()    
         elif form == 'Circle'    : self.set_circles   .connect_objs()    
-        elif form == 'Center'    : self.set_centers   .connect_objs()    
         elif form == 'Wedge'     : self.set_wedges    .connect_objs()    
         elif form == 'Polygon'   : self.set_polygons  .connect_objs()    
+        #elif form == 'Center'    : self.set_centers   .connect_objs()    
         else                     : pass
 
 
@@ -271,9 +271,9 @@ class MaskEditorButtons (QtGui.QWidget) :
         if   obj_type == 'Line'      : self.set_lines     .add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Rectangle' : self.set_rectangles.add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Circle'    : self.set_circles   .add_obj_for_str_of_pars(str_of_pars)    
-        elif obj_type == 'Center'    : self.set_centers   .add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Wedge'     : self.set_wedges    .add_obj_for_str_of_pars(str_of_pars)    
         elif obj_type == 'Polygon'   : self.set_polygons  .add_obj_for_str_of_pars(str_of_pars)
+        #elif obj_type == 'Center'    : self.set_centers   .add_obj_for_str_of_pars(str_of_pars)    
         else                         : pass
 
 
@@ -291,13 +291,16 @@ class MaskEditorButtons (QtGui.QWidget) :
                 self.widgimage.connectZoomMode()
                 self.disconnect_all()
                 self.current_form = None
+
+            #elif self.fig.my_mode == 'Add' :
+            #    self.widgimage.disconnectZoomMode()
+            #    self.disconnect_all()
+                #self.current_form = None
+
             else :
                 self.widgimage.disconnectZoomMode()
                 #self.connect_all()
                 #self.current_form = None
-
-            #if self.fig.my_mode == 'Add' :
-            #    self.disconnect_all()
 
 
         if but_text in self.list_of_forms :
@@ -334,7 +337,7 @@ class MaskEditorButtons (QtGui.QWidget) :
  
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-
+            if path == None : return
             arr = gu.get_array_from_file(path)             
             self.parent.set_image_array_new(arr, title='Image from '+path )
 

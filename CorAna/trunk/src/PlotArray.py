@@ -58,14 +58,14 @@ from ConfigParametersCorAna import confpars as cp
 class PlotArray (QtGui.QWidget) :
     """Plot for array"""
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', title=''):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='', help_msg=None):
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 800, 600)
         self.setWindowTitle('Plot for array')
         self.setFrame()
 
         self.widgimage = imgwidg.PlotArrayWidget(parent, arr, title=title)
-        self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)
+        self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname, help_msg)
  
         #---------------------
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
